@@ -26,7 +26,9 @@ The operator's instruction to execute the numbered plan authorizes in-scope R0 a
 
 Do not request approval for a new commit SHA, tree, parent, content hash, branch name, or routine command when the work remains in scope. Record exact identities as execution checks and results, not as permission receipts.
 
-An R3 action must be expressly named by the current numbered task. Ask the operator only when an R3 action is not named, expands scope, or requires a human decision. Never infer permission for a force push, deletion, settings change, credential or permission change, protection change, or gate bypass.
+The instruction to execute the numbered plan is also standing authority for an on-plan merge. A merge is on-plan only when the current numbered task expressly names it; the repository, PR, target branch, head commit, tree, and scope match that task; required review and checks pass for the same immutable head; no material change or unresolved feedback remains; the PR is mergeable; and the selected repository-permitted method does not bypass a control. Do not request separate operator approval for that merge.
+
+Ask the operator when a merge is not on-plan, the task assigns a material decision to a human, or the work expands scope. Never infer permission for a force push, deletion, settings change, credential or permission change, protection change, administrator override, or gate bypass. These exceptional R3 actions require separate explicit authority even when a task names them.
 
 ## Risk tiers
 
@@ -37,7 +39,7 @@ Use the highest tier that applies to any action in the task.
 | R0 | Read-only inspection, planning, or local analysis | Targeted reads and a truthful result |
 | R1 | Reversible routine work, commits, non-force topic pushes, PR or issue updates, comments, and review requests | Relevant validation, exact precondition, native result, and targeted readback |
 | R2 | Trust roots, workflows, security policy, required checks, default-branch non-force bootstrap updates, or sensitive cross-repository convergence | Full applicable validation, exact identities, clean state, independent review when reviewable bytes change, and targeted readback |
-| R3 | Merge, force, deletion, settings, credentials, permissions, branch protection, or gate changes | Express task authority, all R2 controls, current green gates, required review, and an explicit final readiness check |
+| R3 | Merge, force, deletion, settings, credentials, permissions, branch protection, or gate changes | Standing plan authority for an on-plan merge; separate explicit authority for other R3 actions; all R2 controls, current green gates, required review, and an explicit final readiness check |
 
 Risk controls are cumulative. Churn and implementation effort do not justify a weaker tier. A task can move to a higher tier if its action changes. It cannot move to a lower tier only to avoid a failed gate.
 
@@ -155,6 +157,8 @@ Paginate only the connection whose completeness is required for the current deci
 Check CI before merge. Do not merge when any required check is red, skipped, canceled, missing, pending, stale, timed out, or expired.
 
 Use repository-required review for R1. Use an independent review for R2 when reviewable bytes change. R3 merge requires the exact reviewed head and tree, resolved material findings, a truthful PR body, current green required checks, and a mergeable state. A code or material risk-description change invalidates review of the old bytes. A status record or comment does not.
+
+Immediately before an on-plan merge, repeat the final readiness check against the live PR and target ref. Use head-commit matching when the merge tool supports it. Stop for drift, new material feedback, an incomplete or failed required gate, an off-plan target or scope, a required human decision, or any need for an administrator override or bypass. Do not stop only to obtain another approval for a merge that still satisfies the on-plan definition.
 
 Do not request duplicate AI reviews on an unchanged head without a material reason. Do not require two named AI reviewers and a separate fresh-agent pass for routine low-risk work unless repository policy or the task names that gate.
 

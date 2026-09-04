@@ -28,9 +28,11 @@ Classify each task at the highest applicable risk tier:
 | R0 | Read-only inspection, planning, and local analysis | Targeted reads and a truthful result |
 | R1 | Reversible routine work, append-only commits, non-force topic pushes, issue or PR updates, comments, and review requests | Relevant validation, exact precondition, native result, and targeted readback |
 | R2 | Trust roots, workflows, security policy, required checks, default-branch non-force bootstrap updates, and sensitive convergence | Full applicable validation, exact identities, clean state, required independent review, and targeted readback |
-| R3 | Merge, force, deletion, settings, credentials, permissions, protections, and gate changes | Express task scope, all R2 controls, current green gates, required review, and final readiness check |
+| R3 | Merge, force, deletion, settings, credentials, permissions, protections, and gate changes | Standing plan authority for an on-plan merge; separate explicit authority for other R3 actions; all R2 controls, current green gates, required review, and final readiness check |
 
-The instruction to execute this plan authorizes in-scope R0 and R1 work. It also authorizes an R2 action when the current task expressly requires that action and all R2 controls pass. An R3 action must be expressly named by the task. Request an operator decision only when an R3 action is not named, the work expands scope, or the task assigns the decision to a human.
+The instruction to execute this plan authorizes in-scope R0 and R1 work. It also authorizes an R2 action when the current task expressly requires that action and all R2 controls pass. It is standing authority for an on-plan merge. A merge is on-plan only when the current task expressly names it; the repository, PR, target branch, head commit, tree, and scope match the task; required review and checks pass for the same immutable head; no material change or unresolved feedback remains; the PR is mergeable; and the repository-permitted merge method does not bypass a control. Do not request separate operator approval for an on-plan merge.
+
+Request an operator decision when a merge is off-plan, work expands scope, or the task assigns a material decision to a human. Never infer permission for a force push, deletion, settings change, credential or permission change, protection change, administrator override, or gate bypass. These exceptional R3 actions require separate explicit authority even when a task names them.
 
 Use `pending`, `active`, `validating`, `ready`, `waiting_external`, `waiting_human`, `complete`, and `blocked`. A failed validation or new finding returns the task to `active`. Use `waiting_human` only for a real human decision. Use `blocked` only when the same real blocker persists and no safe work remains.
 
@@ -693,7 +695,6 @@ Only values enclosed in double braces are variables. Resolve each variable from 
 | --- | --- | --- |
 | Candidate PR | `{{PS_METADATA_POLICY_PR_URL}}` | Tasks 6 and 7 |
 | Gated head/tree | `{{PS_METADATA_REVIEWED_HEAD_SHA}}` / `{{PS_METADATA_REVIEWED_TREE_SHA}}` | Must equal Tasks 6 and 7 |
-| Explicit merge authority | `{{PS_METADATA_POLICY_MERGE_AUTHORIZATION}}` | Obtain from the execution context immediately before merge; task existence is not authority |
 | Landed commit/tree | `{{PS_METADATA_POLICY_LANDED_COMMIT_SHA}}` / `{{PS_METADATA_POLICY_LANDED_TREE_SHA}}` | Resolve after merge |
 
 ### Record inputs
@@ -706,11 +707,10 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 | --- | --- | --- |
 | Task 6 | `FS` | One reviewer pair is terminally clean on the gated head/tree and frozen semantic input. |
 | Task 7 | `FS` | Independent quality passes on the same gated head/tree and input. |
-| Explicit merge authority | `FS` | The current execution context explicitly authorizes this exact PR and merge action. |
 
 ### Objective
 
-Merge only the exact head/tree that passed Tasks 6 and 7 after explicit authority is present. Do not repair, update the body, request review, publish the handoff, perform cross-repository comparison, or change settings.
+Merge only the exact head/tree that passed Tasks 6 and 7 while the merge remains on-plan. Do not repair, update the body, request review, publish the handoff, perform cross-repository comparison, or change settings.
 
 ### Execution controls
 
@@ -721,31 +721,31 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 1. Re-query the complete PR and issue state. Require current head/tree and frozen semantic input to equal both gates.
 2. Classify every post-gate mutation. Comment-only results and compact-state updates do not invalidate review. Any code/diff or material scope/behavior/risk change blocks merge and returns through Tasks 4–7.
 3. Require all applicable checks terminal and truthful, zero unresolved threads/findings, accurate closing reference, mergeability, allowed merge method, and no competing slot owner.
-4. Do not treat this task or a prior plan statement as merge authority. Record exact current authority without secrets.
+4. Treat this task and the instruction to execute the plan as standing merge authority only while every on-plan condition in the shared policy remains true. Do not request or record separate per-merge approval.
 
 ### Procedure
 
-1. Validate both results and explicit authority. Re-query PR base/head/tree/body semantics, issues, dependencies, comments, reviews, threads, checks, statuses, merge state, and current `main`.
+1. Validate both results and confirm that the merge remains on-plan. Re-query PR base/head/tree/body semantics, issues, dependencies, comments, reviews, threads, checks, statuses, merge state, and current `main`.
 2. Prove no material change occurred after either gate and no same-head request was needed for record-only publication.
-3. Use one permitted non-bypassing merge method. Do not enable auto-merge unless the explicit authority names it.
+3. Use one permitted non-bypassing merge method. Do not enable auto-merge unless this task expressly requires it.
 4. Read back PR merge state, merge commit/tree/parents, `main`, issue state/reason, umbrella state, checks, and changed-path blobs.
 5. Confirm the old run remains failed and no five-document metadata-only edit was introduced. Release the slot and stop before handoff.
 
 ### Validation and evidence
 
-Require exact gate equality, explicit authority, truthful terminal checks, zero unresolved work, semantic mutation audit, allowed merge method, landed object readback, focused issue terminal state, unchanged failure truth, and no successor publication.
+Require exact gate equality, an on-plan merge classification, truthful terminal checks, zero unresolved work, semantic mutation audit, allowed merge method, landed object readback, focused issue terminal state, unchanged failure truth, and no successor publication.
 
 ### Stop and escalation conditions
 
-Stop if authority is absent, head/tree/body semantics drift, a material mutation occurred, a required check is not success, mergeability is false/unknown, an issue relationship is wrong, or the merge method would bypass protection.
+Stop if the merge is off-plan, head/tree/body semantics drift, a material mutation occurred, a required check is not success, mergeability is false/unknown, an issue relationship is wrong, or the merge method would bypass protection. Do not stop only to obtain separate operator approval.
 
 ### Exact output
 
-One authenticated `PS_METADATA_POLICY_MERGED` record contains authority identity, PR/method/time/actor, gated head/tree/body, landed commit/tree/parents, final issue/main/check state, mutation audit, and failed-run preservation.
+One authenticated `PS_METADATA_POLICY_MERGED` record contains the on-plan classification, PR/method/time/actor, gated head/tree/body, landed commit/tree/parents, final issue/main/check state, mutation audit, and failed-run preservation.
 
 ### Complete when
 
-The exact reviewed and independently quality-checked head lands on PS `main` under explicit authority, readback is complete, the focused issue reaches its correct terminal state, and no handoff or comparison occurred.
+The exact reviewed and independently quality-checked head lands on PS `main` under standing plan authority, readback is complete, the focused issue reaches its correct terminal state, and no handoff or comparison occurred.
 
 ## Task 9 — publish the PS metadata-policy landed handoff
 
@@ -1323,7 +1323,6 @@ Only values enclosed in double braces are variables. Resolve each variable from 
 | --- | --- | --- |
 | Candidate PR | `{{REVIEW_LOOP_CORRECTIVE_PR_URL}}` | Tasks 15 and 16 |
 | Gated head/tree | `{{REVIEW_LOOP_REVIEWED_HEAD_SHA}}` / `{{REVIEW_LOOP_REVIEWED_TREE_SHA}}` | Must equal Tasks 15 and 16 |
-| Explicit merge authority | `{{REVIEW_LOOP_MERGE_AUTHORIZATION}}` | Obtain immediately before merge; task existence is not authority |
 | Landed commit/tree | `{{REVIEW_LOOP_LANDED_COMMIT_SHA}}` / `{{REVIEW_LOOP_LANDED_TREE_SHA}}` | Resolve after merge into `planning-CRT-PR-852` |
 
 ### Record inputs
@@ -1336,11 +1335,10 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 | --- | --- | --- |
 | Task 15 | `FS` | One reviewer pair is terminally clean on the gated head/tree and frozen input. |
 | Task 16 | `FS` | Independent quality passes on the same gated head/tree/input. |
-| Explicit merge authority | `FS` | Current context explicitly authorizes this exact PR and target branch. |
 
 ### Objective
 
-Merge only the exact gated head into `planning-CRT-PR-852` after explicit authority. Do not merge to `main`, repair, update reviewer input, request review for results, publish handoff, or change settings.
+Merge only the exact gated head into `planning-CRT-PR-852` while the merge remains on-plan. Do not merge to `main`, repair, update reviewer input, request review for results, publish handoff, or change settings.
 
 ### Execution controls
 
@@ -1350,11 +1348,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 
 1. Require exact equality with both gates and verify every post-gate mutation semantically. Separate comment/record results do not invalidate review; code/diff or material scope/risk change does.
 2. Require the PR base to be `planning-CRT-PR-852`, all applicable checks truthful, no unresolved findings, one-pair policy satisfied, and a permitted merge method.
-3. Record explicit authority. Do not infer it from the plan. Do not copy the resulting planning files into `main`.
+3. Treat this task and the instruction to execute the plan as standing merge authority only while every on-plan condition in the shared policy remains true. Do not request or record separate per-merge approval. Do not copy the resulting planning files into `main`.
 
 ### Procedure
 
-1. Validate both results and authority. Re-query complete PR/issue/review/check/relationship state and current planning target.
+1. Validate both results and confirm that the merge remains on-plan. Re-query complete PR/issue/review/check/relationship state and current planning target.
 2. Prove unchanged gated head/tree/frozen semantics and no unreviewed material mutation.
 3. Merge once using a permitted non-bypassing method into `planning-CRT-PR-852`.
 4. Read back merge commit/tree/parents, target ref, PR and issue states, checks, paths/blobs, request/body-edit metrics, and slot release.
@@ -1362,19 +1360,19 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 
 ### Validation and evidence
 
-Require explicit authority, exact gate equality, correct target base, semantic mutation audit, truthful checks, zero unresolved work, one-pair metrics, allowed merge, landed readback, issue terminal state, and no `main` planning-file change.
+Require an on-plan merge classification, exact gate equality, correct target base, semantic mutation audit, truthful checks, zero unresolved work, one-pair metrics, allowed merge, landed readback, issue terminal state, and no `main` planning-file change.
 
 ### Stop and escalation conditions
 
-Stop if authority is absent, target is not the planning branch, head/tree/body semantics drift, a material mutation lacks review, checks fail, merge would bypass protection, or `main` would be modified.
+Stop if the merge is off-plan, target is not the planning branch, head/tree/body semantics drift, a material mutation lacks review, checks fail, merge would bypass protection, or `main` would be modified. Do not stop only to obtain separate operator approval.
 
 ### Exact output
 
-One authenticated `REVIEW_LOOP_MERGED` record contains authority, PR/method/time/actor, gated and landed identities, target ref, final issue/check state, mutation/request metrics, and proof no planning-only file landed on `main`.
+One authenticated `REVIEW_LOOP_MERGED` record contains the on-plan classification, PR/method/time/actor, gated and landed identities, target ref, final issue/check state, mutation/request metrics, and proof no planning-only file landed on `main`.
 
 ### Complete when
 
-The exact reviewed and quality-checked head lands on `planning-CRT-PR-852` under explicit authority, readback is complete, and no handoff or `main` mutation occurred.
+The exact reviewed and quality-checked head lands on `planning-CRT-PR-852` under standing plan authority, readback is complete, and no handoff or `main` mutation occurred.
 
 ## Task 18 — publish the review-loop landed handoff
 
@@ -1658,7 +1656,7 @@ Require exact immutable inputs, all 28 rows exactly once, raw-byte and behavior 
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -1785,7 +1783,7 @@ Require the current disposition, complete GitHub pagination, exact body coverage
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -1909,7 +1907,7 @@ Require an exact conditional branch, free slot, current issue/body and source ob
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -2038,7 +2036,7 @@ Require all applicable 28 rows, exact immutable inputs/candidate outputs, proved
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -2167,7 +2165,7 @@ Require exact remote head/tree, one accurate PR, correct issue/umbrella referenc
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -2323,7 +2321,7 @@ Require correct conditional handling. On repair, require a native subagent or co
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -2473,7 +2471,7 @@ Require correct conditional handling; on repair, fresh-session identity, complet
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -2602,7 +2600,7 @@ Require correct conditional branch, same-head/tree gates and current reviews/che
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -2729,7 +2727,7 @@ Require exact immutable target objects, all 28 identities, complete repair lifec
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -2856,7 +2854,7 @@ Require current exact commits/trees, all 84 cells and 13 path rows exactly once,
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -2983,7 +2981,7 @@ Require the latest comparison, exact conditional branch, one selected target on 
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -3107,7 +3105,7 @@ Require correct conditional handling, free cycle slot, exact issue/base/source o
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -3233,7 +3231,7 @@ Require exact selected blocker reproduction and closure, no unselected or unrela
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -3360,7 +3358,7 @@ Require correct conditional handling; on repair, exact non-force head/tree, one 
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -3513,7 +3511,7 @@ Require correct conditional handling. On repair, require the required model and 
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -3660,7 +3658,7 @@ Require correct conditional handling; on repair, fresh session, complete indepen
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -3787,7 +3785,7 @@ Require correct conditional branch; on repair, exact same-head gates, current ch
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -3911,7 +3909,7 @@ Require correct conditional handling; on repair, immutable landed objects, compl
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -4037,7 +4035,7 @@ Require current exact refs, all 84 cells and 28 rows once, complete byte/behavio
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -4161,7 +4159,7 @@ Require current final refs, zero blockers, complete catalog/exception/lifecycle/
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -4285,7 +4283,7 @@ Require current fixed-point evidence, zero blockers, all focused work terminal, 
 
 ### Stop and escalation conditions
 
-Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, required authority is absent, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
+Stop without starting a successor if an input object is unavailable, a ref or body changed unexpectedly, complete pagination is impossible, an applicable placeholder cannot be resolved, the one-at-a-time slot is occupied, the requested action is outside the plan's standing authority, a native dependency is false, a proposed exception is not proved, a review or check is stale, validation fails, an unresolved finding or illegitimate deferral remains, or the requested state would weaken security, failure truth, review coverage, repository self-containment, or fixed-point integrity. Record the exact blocker and the next required decision.
 
 ### Exact output
 
@@ -4770,14 +4768,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -5496,15 +5494,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 55 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -6220,15 +6218,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 64 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -7161,15 +7159,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 75 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -7857,15 +7855,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 84 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -8553,15 +8551,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 93 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -9419,14 +9417,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -10143,15 +10141,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 111 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -10865,15 +10863,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 120 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -11694,14 +11692,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -12418,15 +12416,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 140 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -13140,15 +13138,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 149 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -13936,14 +13934,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -14660,15 +14658,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 168 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -15382,15 +15380,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 177 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -16110,14 +16108,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -16845,15 +16843,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 196 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -17564,15 +17562,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 205 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -18586,15 +18584,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 217 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -19504,14 +19502,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -20201,14 +20199,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -20923,15 +20921,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 247 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -21636,15 +21634,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 256 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -22260,14 +22258,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -22988,15 +22986,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 274 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -23715,15 +23713,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 283 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -24347,14 +24345,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -25090,15 +25088,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 301 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -26251,15 +26249,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If the approved fallback path was not selected and the predecessor review/quality tasks were skipped, record `SKIPPED — EXISTING MERGE PATH` and stop.
 2. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+3. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 4. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 5. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -26452,14 +26450,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -27149,14 +27147,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -27871,15 +27869,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 338 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -28584,15 +28582,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 347 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -29208,14 +29206,14 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every authorization gate is satisfied.
+2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
 3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
 4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
 
@@ -29936,15 +29934,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 365 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -30663,15 +30661,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 374 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -31637,15 +31635,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 386 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
@@ -32597,15 +32595,15 @@ Immediately before the merge:
 
 1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
 2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, a new comment or review arrived, a check is incomplete or failed, the PR is not mergeable, an approval is missing, or a dependency or authorization condition is unmet.
-4. Use the approved merge method. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
+3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
+4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
 5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
 
 ### Procedure
 
 1. If Task 397 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
 2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and authorized.
+3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
 4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
 
 ### Review-evidence materiality gate
