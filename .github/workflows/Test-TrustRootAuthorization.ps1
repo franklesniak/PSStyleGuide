@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260903.1
+# Version: 1.2.20260904.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -2878,7 +2878,24 @@ if ($SelfTest) {
                     --cacheinfo "100644,$($objSchemaPath.blob),$($objSchemaPath.path)"
             }
             $strInactiveManifestSource =
-                Join-Path $RepositoryRootPath $strAuthorizationPath
+                Join-Path $strSchemaFixtureRoot 'inactive-manifest.json'
+            $objInactiveManifest = [ordered]@{
+                schema_version = 2
+                authorization_id = 'no-active-trust-root-maintenance'
+                limits = [ordered]@{
+                    maximum_paths = 16
+                    maximum_blob_bytes = 573440
+                    maximum_manifest_bytes = 65536
+                    maximum_commits = 64
+                }
+                allowed_paths = @()
+            }
+            [IO.File]::WriteAllText(
+                $strInactiveManifestSource,
+                ((ConvertTo-Json -InputObject $objInactiveManifest -Depth 4) `
+                    -replace "`r`n", "`n") + "`n",
+                [Text.UTF8Encoding]::new($false)
+            )
             $arrInactiveManifestBytes =
                 [IO.File]::ReadAllBytes($strInactiveManifestSource)
             $strInactiveManifestBlob = ([string] (
