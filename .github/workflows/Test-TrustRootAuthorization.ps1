@@ -3,9 +3,11 @@
 # .DESCRIPTION
 # Reads the authorization manifest only from the authenticated trusted revision.
 # Schema 2 authorizes exact content on a descendant of that revision without an
-# unborn commit identity. Schema 1 is retained only for the detached-base
-# transition that lands the inactive schema 2 manifest. Candidate blobs are
-# decoded and parsed, but never sourced, imported, invoked, built, or executed.
+# unborn commit identity. It can authorize one exact change from an active
+# manifest to the canonical inactive schema 2 manifest. Schema 1 is retained
+# only to bootstrap schema 2. Candidate blobs are decoded and parsed, but never
+# sourced, imported, invoked, built, or executed.
+# The inactive candidate revision records completion of that one-way authority.
 # .PARAMETER RepositoryRootPath
 # The trusted repository worktree.
 # .PARAMETER TrustedRevision
@@ -2667,6 +2669,7 @@ if ($SelfTest) {
 
         $scriptblockExpectSchemaRejection = {
             param(
+                [Parameter()][string] $Trusted = $strSchemaTrusted,
                 [Parameter(Mandatory)][string] $Base,
                 [Parameter(Mandatory)][string] $Head,
                 [Parameter(Mandatory)][string] $ExpectedMessage
@@ -2674,7 +2677,7 @@ if ($SelfTest) {
             try {
                 [void] @(& $PSCommandPath `
                         -RepositoryRootPath $strSchemaFixtureRoot `
-                        -TrustedRevision $strSchemaTrusted `
+                        -TrustedRevision $Trusted `
                         -BaseRevision $Base -HeadRevision $Head)
                 throw "Schema 2 mutation passed: $ExpectedMessage"
             }
@@ -2760,7 +2763,7 @@ if ($SelfTest) {
         & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
         & $scriptblockExpectSchemaRejection -Base $strSchemaTrusted `
             -Head $strChangedManifestHead `
-            -ExpectedMessage 'changed the trusted authorization manifest'
+            -ExpectedMessage 'changed-path count does not match'
 
         & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaCandidate
         $strUnexpectedPath = Join-Path $strSchemaFixtureRoot 'unexpected.txt'
@@ -3004,6 +3007,229 @@ if ($SelfTest) {
                 throw
             }
         }
+
+        $objSameBaseTransitionManifest = [ordered]@{
+            schema_version = 2
+            authorization_id = 'self-test-same-base-deactivation'
+            limits = [ordered]@{
+                maximum_paths = 16
+                maximum_blob_bytes = 573440
+                maximum_manifest_bytes = 65536
+                maximum_commits = 64
+            }
+            allowed_paths = $arrTransitionAllowedPath
+        }
+        $strSameBaseTransitionManifestFile = Join-Path `
+            $strSchemaFixtureRoot 'same-base-transition-manifest.json'
+        [IO.File]::WriteAllText(
+            $strSameBaseTransitionManifestFile,
+            ((ConvertTo-Json `
+                    -InputObject $objSameBaseTransitionManifest -Depth 8) `
+                -replace "`r`n", "`n") + "`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        $strSameBaseTransitionManifestBlob = ([string] (
+                & git -C $strSchemaFixtureRoot hash-object -w -- `
+                    $strSameBaseTransitionManifestFile
+            )).Trim()
+        $strSameBaseIndex = Join-Path `
+            $strSchemaFixtureRoot 'same-base-transition.index'
+        $strOriginalIndexFile = [Environment]::GetEnvironmentVariable(
+            'GIT_INDEX_FILE'
+        )
+        try {
+            [Environment]::SetEnvironmentVariable(
+                'GIT_INDEX_FILE',
+                $strSameBaseIndex
+            )
+            & git -C $strSchemaFixtureRoot read-tree $strTransitionBaseTree
+            & git -C $strSchemaFixtureRoot update-index --add `
+                --cacheinfo `
+                "100644,$strSameBaseTransitionManifestBlob,$strAuthorizationPath"
+            $strSameBaseTrustedTree = ([string] (
+                    & git -C $strSchemaFixtureRoot write-tree
+                )).Trim()
+            $strSameBaseTrusted = ([string] (
+                    "same-base schema 2 trusted root`n" | `
+                        git -C $strSchemaFixtureRoot `
+                            -c 'user.name=Trust root schema self-test' `
+                            -c 'user.email=trust-root-schema@example.invalid' `
+                            commit-tree $strSameBaseTrustedTree
+                )).Trim()
+            $strSameBaseCandidate = ([string] (
+                    "same-base schema 2 candidate`n" | `
+                        git -C $strSchemaFixtureRoot `
+                            -c 'user.name=Trust root schema self-test' `
+                            -c 'user.email=trust-root-schema@example.invalid' `
+                            commit-tree $strTransitionCandidateTree `
+                            -p $strSameBaseTrusted
+                )).Trim()
+            $strBadInactiveManifestFile = Join-Path `
+                $strSchemaFixtureRoot 'bad-inactive-manifest.json'
+            [IO.File]::WriteAllText(
+                $strBadInactiveManifestFile,
+                '{"schema_version":2,"authorization_id":' +
+                    '"not-the-canonical-inactive-manifest","limits":{' +
+                    '"maximum_paths":16,"maximum_blob_bytes":573440,' +
+                    '"maximum_manifest_bytes":65536,"maximum_commits":64},' +
+                    '"allowed_paths":[]}' + "`n",
+                [Text.UTF8Encoding]::new($false)
+            )
+            $strBadInactiveManifestBlob = ([string] (
+                    & git -C $strSchemaFixtureRoot hash-object -w -- `
+                        $strBadInactiveManifestFile
+                )).Trim()
+            & git -C $strSchemaFixtureRoot read-tree $strTransitionCandidateTree
+            & git -C $strSchemaFixtureRoot update-index --add `
+                --cacheinfo `
+                "100644,$strBadInactiveManifestBlob,$strAuthorizationPath"
+            $strBadInactiveCandidateTree = ([string] (
+                    & git -C $strSchemaFixtureRoot write-tree
+                )).Trim()
+            $strBadInactiveCandidate = ([string] (
+                    "wrong same-base inactive manifest`n" | `
+                        git -C $strSchemaFixtureRoot `
+                            -c 'user.name=Trust root schema self-test' `
+                            -c 'user.email=trust-root-schema@example.invalid' `
+                            commit-tree $strBadInactiveCandidateTree `
+                            -p $strSameBaseTrusted
+                )).Trim()
+        }
+        finally {
+            if ([string]::IsNullOrEmpty($strOriginalIndexFile)) {
+                Remove-Item -LiteralPath 'Env:GIT_INDEX_FILE' `
+                    -ErrorAction SilentlyContinue
+            }
+            else {
+                [Environment]::SetEnvironmentVariable(
+                    'GIT_INDEX_FILE',
+                    $strOriginalIndexFile
+                )
+            }
+        }
+        & git -C $strSchemaFixtureRoot update-ref --no-deref HEAD `
+            $strSameBaseTrusted
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not select the same-base schema 2 trust root.'
+        }
+        $arrSameBaseTransitionResult = @(& $PSCommandPath `
+                -RepositoryRootPath $strSchemaFixtureRoot `
+                -TrustedRevision $strSameBaseTrusted `
+                -BaseRevision $strSameBaseTrusted `
+                -HeadRevision $strSameBaseCandidate)
+        if ($arrSameBaseTransitionResult.Count -ne 1 -or
+            $arrSameBaseTransitionResult[0] -isnot [bool] -or
+            -not $arrSameBaseTransitionResult[0]) {
+            throw 'The content-exact same-base schema 2 deactivation was rejected.'
+        }
+        & $scriptblockExpectSchemaRejection -Trusted $strSameBaseTrusted `
+            -Base $strSameBaseTrusted `
+            -Head $strBadInactiveCandidate `
+            -ExpectedMessage 'mismatched Git identity'
+
+        $arrNoncanonicalTransitionAllowedPath = @($listSchemaAllowedPath) + @(
+            [ordered]@{
+                path = $strAuthorizationPath
+                mode = '100644'
+                blob = $strBadInactiveManifestBlob
+                bytes = ([IO.File]::ReadAllBytes(
+                        $strBadInactiveManifestFile
+                    )).Length
+                sha256 = [Convert]::ToHexString(
+                    [Security.Cryptography.SHA256]::HashData(
+                        [IO.File]::ReadAllBytes($strBadInactiveManifestFile)
+                    )
+                ).ToLowerInvariant()
+                encoding = 'utf-8-no-bom-lf'
+                syntax = 'json'
+                semantic_invariants = @()
+            }
+        )
+        $objNoncanonicalTransitionManifest = [ordered]@{
+            schema_version = 2
+            authorization_id = 'self-test-noncanonical-deactivation-target'
+            limits = [ordered]@{
+                maximum_paths = 16
+                maximum_blob_bytes = 573440
+                maximum_manifest_bytes = 65536
+                maximum_commits = 64
+            }
+            allowed_paths = $arrNoncanonicalTransitionAllowedPath
+        }
+        $strNoncanonicalTransitionManifestFile = Join-Path `
+            $strSchemaFixtureRoot 'noncanonical-transition-manifest.json'
+        [IO.File]::WriteAllText(
+            $strNoncanonicalTransitionManifestFile,
+            ((ConvertTo-Json `
+                    -InputObject $objNoncanonicalTransitionManifest -Depth 8) `
+                -replace "`r`n", "`n") + "`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        $strNoncanonicalTransitionManifestBlob = ([string] (
+                & git -C $strSchemaFixtureRoot hash-object -w -- `
+                    $strNoncanonicalTransitionManifestFile
+            )).Trim()
+        $strNoncanonicalIndex = Join-Path `
+            $strSchemaFixtureRoot 'noncanonical-transition.index'
+        $strOriginalIndexFile = [Environment]::GetEnvironmentVariable(
+            'GIT_INDEX_FILE'
+        )
+        try {
+            [Environment]::SetEnvironmentVariable(
+                'GIT_INDEX_FILE',
+                $strNoncanonicalIndex
+            )
+            & git -C $strSchemaFixtureRoot read-tree $strTransitionBaseTree
+            & git -C $strSchemaFixtureRoot update-index --add `
+                --cacheinfo `
+                "100644,$strNoncanonicalTransitionManifestBlob,$strAuthorizationPath"
+            $strNoncanonicalTrustedTree = ([string] (
+                    & git -C $strSchemaFixtureRoot write-tree
+                )).Trim()
+            $strNoncanonicalTrusted = ([string] (
+                    "noncanonical schema 2 trusted root`n" | `
+                        git -C $strSchemaFixtureRoot `
+                            -c 'user.name=Trust root schema self-test' `
+                            -c 'user.email=trust-root-schema@example.invalid' `
+                            commit-tree $strNoncanonicalTrustedTree
+                )).Trim()
+            & git -C $strSchemaFixtureRoot read-tree $strTransitionCandidateTree
+            & git -C $strSchemaFixtureRoot update-index --add `
+                --cacheinfo `
+                "100644,$strBadInactiveManifestBlob,$strAuthorizationPath"
+            $strNoncanonicalCandidateTree = ([string] (
+                    & git -C $strSchemaFixtureRoot write-tree
+                )).Trim()
+            $strNoncanonicalCandidate = ([string] (
+                    "noncanonical schema 2 candidate`n" | `
+                        git -C $strSchemaFixtureRoot `
+                            -c 'user.name=Trust root schema self-test' `
+                            -c 'user.email=trust-root-schema@example.invalid' `
+                            commit-tree $strNoncanonicalCandidateTree `
+                            -p $strNoncanonicalTrusted
+                )).Trim()
+        }
+        finally {
+            if ([string]::IsNullOrEmpty($strOriginalIndexFile)) {
+                Remove-Item -LiteralPath 'Env:GIT_INDEX_FILE' `
+                    -ErrorAction SilentlyContinue
+            }
+            else {
+                [Environment]::SetEnvironmentVariable(
+                    'GIT_INDEX_FILE',
+                    $strOriginalIndexFile
+                )
+            }
+        }
+        & git -C $strSchemaFixtureRoot update-ref --no-deref HEAD `
+            $strNoncanonicalTrusted
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not select the noncanonical schema 2 trust root.'
+        }
+        & $scriptblockExpectSchemaRejection -Trusted $strNoncanonicalTrusted `
+            -Base $strNoncanonicalTrusted `
+            -Head $strNoncanonicalCandidate `
+            -ExpectedMessage 'does not land the exact inactive schema 2 manifest'
     }
     finally {
         if ([IO.Directory]::Exists($strSchemaFixtureRoot) -and
@@ -3086,6 +3312,7 @@ if ($objManifest.schema_version -notin @(1, 2) -or
     throw 'The authorization manifest identity is invalid.'
 }
 $boolTransitionAuthorization = $objManifest.schema_version -eq 1
+$boolContentExactManifestDeactivation = $false
 $strHistoryBaseRevision = $BaseRevision
 $intEffectiveCommitLimit = $intCandidateMaximumCommits
 if ($boolTransitionAuthorization) {
@@ -3163,9 +3390,11 @@ else {
     $strCandidateManifestEntry = [string] (& git -C $RepositoryRootPath `
             ls-tree $HeadRevision -- $AuthorizationManifestPath)
     if ($LASTEXITCODE -ne 0 -or
-        $strCandidateManifestEntry -cne $strManifestEntry) {
-        throw 'The candidate changed the trusted authorization manifest.'
+        $strCandidateManifestEntry -cnotmatch '^100644 blob ([0-9a-f]{40})\t') {
+        throw 'The candidate authorization manifest is missing or invalid.'
     }
+    $boolContentExactManifestDeactivation =
+        $strCandidateManifestEntry -cne $strManifestEntry
     if ($objManifest.limits.maximum_commits -gt
         $intCandidateMaximumCommits -or
         $objManifest.limits.maximum_commits -lt 1) {
@@ -3205,7 +3434,8 @@ foreach ($objPath in $arrAllowedPaths) {
         $strPath.IndexOfAny([char[]] @("`0", "`r", "`n", "`t")) -ge 0 -or
         -not $setAllowedPaths.Add($strPath) -or
         ($strPath -ceq $AuthorizationManifestPath -and
-            -not $boolTransitionAuthorization)) {
+            -not $boolTransitionAuthorization -and
+            -not $boolContentExactManifestDeactivation)) {
         throw 'The authorization contains an unsafe, duplicate, or self-authorizing path.'
     }
     if ($objPath.mode -cne '100644' -or
@@ -3241,7 +3471,8 @@ foreach ($objPath in $arrAllowedPaths) {
     Assert-CandidateSyntax -Syntax $objPath.syntax -Text $strText -Path $strPath
     $arrInvariants = @($objPath.semantic_invariants)
     $boolTransitionManifestPath =
-        $boolTransitionAuthorization -and
+        ($boolTransitionAuthorization -or
+            $boolContentExactManifestDeactivation) -and
         $strPath -ceq $AuthorizationManifestPath
     if (($arrInvariants.Count -lt 1 -and -not $boolTransitionManifestPath) -or
         ($arrInvariants.Count -ne 0 -and $boolTransitionManifestPath) -or
