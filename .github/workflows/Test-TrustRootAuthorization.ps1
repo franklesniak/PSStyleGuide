@@ -1017,7 +1017,7 @@ function Assert-SemanticInvariant {
             "import { fileURLToPath } from 'node:url';",
             "} = await import('yaml'));",
             "const VALIDATOR_VERSION = '1.2.2';",
-            "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '3b1b0eb57730601de0f2a2673db8bd21230fde25a5f21d78d73c12fda7360679';",
+            "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';",
             "const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';",
             'function readContractWithoutDependencies() {',
             "path.join(SCRIPT_DIRECTORY, 'workflow-policy-contract.json'),",
@@ -1147,7 +1147,7 @@ function Assert-SemanticInvariant {
             if ($objContract.validatorIdentity.path -cne
                     'Validate-WorkflowPolicy.mjs' -or
                 $objContract.validatorIdentity.sha256 -cne
-                    '948d54724d9c0374fb2d643d3626be8e23a37b59c7108fe113b3756d953ebcd7') {
+                    '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9') {
                 throw 'The workflow validator identity is invalid.'
             }
             & $script:scriptblockAssertExactDictionaryKeySet `

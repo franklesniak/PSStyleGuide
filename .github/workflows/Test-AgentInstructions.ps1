@@ -10462,6 +10462,7 @@ if ($SelfTest) {
                 'seenCommitIds.has(entry.id)',
                 'if (ids.length > 0 &&',
                 'ids[ids.length - 1] !== process.env.PUSH_AFTER_SHA',
+                'String(ids.length) + "\n", "utf8");',
                 '(ids.length > 0 ? "\n" : ""), "utf8");',
                 'mapfile -t push_commit_ids <"${push_commit_ids_file}"',
                 "destination_local_ref='refs/remotes/event/created-destination'",
@@ -11677,6 +11678,14 @@ if ($SelfTest) {
                 'if (ids.length === 0 ||'
             )
             Expected = 'Workflow contract literal is missing: if (ids.length > 0 &&'
+        },
+        [pscustomobject]@{
+            Name = 'shell-expansive push count template reintroduced'
+            Content = $strAgentWorkflowContent.Replace(
+                'String(ids.length) + "\n", "utf8");',
+                '`${ids.length}\n`, "utf8");'
+            )
+            Expected = 'Workflow contract literal is missing: String(ids.length)'
         },
         [pscustomobject]@{
             Name = 'empty push commit array serialized as one blank record'

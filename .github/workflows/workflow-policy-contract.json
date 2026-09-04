@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "948d54724d9c0374fb2d643d3626be8e23a37b59c7108fe113b3756d953ebcd7"
+    "sha256": "33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9"
   },
   "actions": {
     "checkout": {
@@ -335,8 +335,8 @@
       },
       "preCommit": {
         "path": "../../.pre-commit-config.yaml",
-        "length": 3034,
-        "sha256": "55d1d264e59708b0ef5ca83437dbfa6246462337c34202a8750a8ee0b2581905",
+        "length": 3261,
+        "sha256": "a4a7e28184356c8d6e337533aadfcec88d17debd78bf5d74dcf09a2bb3f7c8da",
         "extensions": ["md", "mdc"],
         "linebreakArgument": "--markdown-linebreak-ext=md,mdc"
       }

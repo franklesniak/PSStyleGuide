@@ -259,7 +259,7 @@ jobs:
             }
             fs.writeFileSync(process.argv[1], ids.join("\n") +
               (ids.length > 0 ? "\n" : ""), "utf8");
-            fs.writeFileSync(process.argv[2], `${ids.length}\n`, "utf8");
+            fs.writeFileSync(process.argv[2], String(ids.length) + "\n", "utf8");
           ' "${push_commit_ids_file}" "${push_commit_count_file}"; then
             echo 'Push commit evidence parsing failed.' >&2
             exit 1
