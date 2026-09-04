@@ -1463,6 +1463,9 @@ async function runSelfTest() {
     guard = successfulGuard,
     pullRun = successfulPullRun,
     guardRun = currentBaseRun,
+    currentBaseWorkflow = null,
+    defaultBranch = 'main',
+    expectedReservation = 10,
     liveRace = false,
     baseRace = false,
     statusRace = false,
@@ -1472,12 +1475,12 @@ async function runSelfTest() {
     return {
       repository: 'owner/repository',
       serverOrigin: 'https://example.invalid',
-      assertCanRequest: (count) => assert(count === 10,
+      assertCanRequest: (count) => assert(count === expectedReservation,
         'Merge verification must reserve its exact read-only request bound.'),
       request: async (method, path) => {
         assert(method === 'GET', 'Merge verification must use only GET.');
         if (path === 'repos/owner/repository') {
-          return { full_name: 'owner/repository', default_branch: 'main' };
+          return { full_name: 'owner/repository', default_branch: defaultBranch };
         }
         if (path.endsWith('/pulls/101')) {
           pullReadCount += 1;
@@ -1492,6 +1495,10 @@ async function runSelfTest() {
         if (path.includes('/git/ref/heads/main')) {
           return { object: { type: 'commit', sha:
             baseRace && pullReadCount > 1 ? baselineSha : advancedSha } };
+        }
+        if (path.includes(
+          `/contents/${encodeRef(currentBaseWorkflowPath)}?ref=`)) {
+          return currentBaseWorkflow;
         }
         if (path.endsWith('/actions/runs/601')) return pullRun;
         if (path.endsWith('/actions/runs/700')) return guardRun;
@@ -1628,6 +1635,100 @@ async function runSelfTest() {
     await expectRejected(async () => verifyMergeEvidence(failure.client, 101),
       failure.message,
       `Merge verification must reject ${failure.name}.`);
+  }
+
+  const initialMergeExpected = {
+    pullNumber: 101,
+    baseRef: 'main',
+    baseSha: advancedSha,
+    headSha: sameBaselinePulls[0].head.sha,
+  };
+  const createInitialMergeClient = (options = {}) => createMergeClient({
+    pullStatus: null,
+    guard: null,
+    expectedReservation: 11,
+    ...options,
+  });
+  await verifyInitialMergeEvidence(createInitialMergeClient(),
+    initialMergeExpected, '601');
+  const initialMergeFailures = [{
+    name: 'an existing PR status',
+    client: createInitialMergeClient({ pullStatus: currentStatus }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'an existing sweep guard',
+    client: createInitialMergeClient({ guard: successfulGuard }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'an installed current-base workflow',
+    client: createInitialMergeClient({ currentBaseWorkflow: {
+      type: 'file',
+      path: currentBaseWorkflowPath,
+      sha: '5'.repeat(40),
+    } }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'a non-default PR base',
+    client: createInitialMergeClient({ defaultBranch: 'release' }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'a substituted expected base ref',
+    client: createInitialMergeClient(),
+    expected: { ...initialMergeExpected, baseRef: 'release' },
+  }, {
+    name: 'a substituted expected base SHA',
+    client: createInitialMergeClient(),
+    expected: { ...initialMergeExpected, baseSha: baselineSha },
+  }, {
+    name: 'a substituted expected head SHA',
+    client: createInitialMergeClient(),
+    expected: { ...initialMergeExpected, headSha: '9'.repeat(40) },
+  }, {
+    name: 'a substituted validation run ID',
+    client: createInitialMergeClient({ pullRun: {
+      ...successfulPullRun,
+      id: 602,
+    } }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'a failed validation run',
+    client: createInitialMergeClient({ pullRun: {
+      ...successfulPullRun,
+      conclusion: 'failure',
+    } }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'a different validation workflow',
+    client: createInitialMergeClient({ pullRun: {
+      ...successfulPullRun,
+      path: '.github/workflows/other.yml',
+    } }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'a different validation event',
+    client: createInitialMergeClient({ pullRun: {
+      ...successfulPullRun,
+      event: 'pull_request',
+    } }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'a cross-repository validation run',
+    client: createInitialMergeClient({ pullRun: {
+      ...successfulPullRun,
+      repository: { full_name: 'other/repository' },
+    } }),
+    expected: initialMergeExpected,
+  }, {
+    name: 'live-state drift',
+    client: createInitialMergeClient({ liveRace: true }),
+    expected: initialMergeExpected,
+    message: 'Live initial-install merge evidence changed during verification.',
+  }];
+  for (const failure of initialMergeFailures) {
+    await expectRejected(async () => verifyInitialMergeEvidence(
+      failure.client, failure.expected, '601'),
+    failure.message ?? 'Initial-install merge evidence is unavailable.',
+    `Initial-install merge verification must reject ${failure.name}.`);
   }
 
   const sweepPulls = Array.from({ length: 21 }, (_, index) => ({
@@ -2655,6 +2756,51 @@ async function verifyMerge() {
   await verifyMergeEvidence(createClient(), Number(pullNumberText));
 }
 
+async function readInitialMergeSnapshot(client, pullNumber) {
+  const snapshot = await readMergeSnapshot(client, pullNumber);
+  const currentBaseWorkflow = await client.request('GET',
+    `repos/${client.repository}/contents/${encodeRef(currentBaseWorkflowPath)}` +
+      `?ref=${snapshot.live.baseSha}`, undefined, true);
+  return { ...snapshot, currentBaseWorkflow };
+}
+
+function initialMergeSnapshotMatchesExpected(snapshot, expected) {
+  const { defaultBranch, live, pullStatus, guard, currentBaseWorkflow } =
+    snapshot;
+  return defaultBranch === expected.baseRef &&
+    live.pullNumber === expected.pullNumber &&
+    live.baseRef === expected.baseRef && live.baseSha === expected.baseSha &&
+    live.headSha === expected.headSha && pullStatus === null && guard === null &&
+    currentBaseWorkflow === null;
+}
+
+async function verifyInitialMergeEvidence(client, expected, runId) {
+  assert(Number.isInteger(expected.pullNumber) && expected.pullNumber >= 1 &&
+    validRef(expected.baseRef) && shaPattern.test(expected.baseSha) &&
+    shaPattern.test(expected.headSha) && /^[1-9][0-9]{0,19}$/.test(runId),
+  'Initial-install merge verification input is invalid.');
+  assertCanRequest(client, 11);
+  const first = await readInitialMergeSnapshot(client, expected.pullNumber);
+  assert(initialMergeSnapshotMatchesExpected(first, expected),
+    'Initial-install merge evidence is unavailable.');
+  const run = await client.request('GET',
+    `repos/${client.repository}/actions/runs/${runId}`);
+  assert(isSuccessfulPullRequestWorkflowRun(run, {
+    ...first.live,
+    repository: client.repository,
+  }, runId), 'Initial-install merge evidence is unavailable.');
+  const second = await readInitialMergeSnapshot(client, expected.pullNumber);
+  assert(mergeSnapshotsMatch(first, second),
+    'Live initial-install merge evidence changed during verification.');
+}
+
+async function verifyInitialMerge() {
+  assert(getEnvironment('ALLOW_INITIAL_INSTALL') === 'true',
+    'Initial-install merge verification is not explicitly enabled.');
+  await verifyInitialMergeEvidence(createClient(), getExpectedPullRequest(),
+    getEnvironment('EXPECTED_PULL_RUN_ID'));
+}
+
 function expectedRunUrl(client, runId) {
   assert(/^[1-9][0-9]{0,19}$/.test(runId),
     'Actions run identity is invalid.');
@@ -2936,10 +3082,11 @@ async function main() {
   await runSelfTest();
   const mode = process.argv[2];
   if (mode === 'self-test') return;
-  const operation = mode === 'start' ? start :
-    mode === 'finalize' ? finalize :
-      mode === 'invalidate' ? invalidate :
-        mode === 'verify-merge' ? verifyMerge : null;
+  const operation = mode === 'verify-initial-merge' ? verifyInitialMerge :
+    mode === 'start' ? start :
+      mode === 'finalize' ? finalize :
+        mode === 'invalidate' ? invalidate :
+          mode === 'verify-merge' ? verifyMerge : null;
   assert(operation !== null,
     'Expected start, finalize, invalidate, or verify-merge mode.');
   await operation();
