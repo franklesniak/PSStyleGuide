@@ -69,12 +69,14 @@ $arrTrustRootPaths = @(
     '.github/workflows/agent-instructions.yml'
 )
 $script:arrSpecialSemanticInvariant = @(
+    'actionlint-queue-schema-exceptions-are-exact',
     'agent-instruction-heading-status-and-bootstrap-order-is-exact',
     'exact-maintenance-production-call-is-gated',
     'legacy-transition-marker-is-inert-data',
     'package-lock-parser-closure-is-exact',
     'package-parser-roots-are-exact',
     'parser-manifest-direct-roots-and-closure-is-exact',
+    'pre-commit-actionlint-gate-is-exact',
     'published-path-array-binding-is-explicit',
     'workflow-policy-contract-identities-and-structure-are-exact',
     'workflow-policy-preflight-authenticates-deferred-yaml-import',
@@ -82,12 +84,15 @@ $script:arrSpecialSemanticInvariant = @(
     'current-base-status-helper-is-fail-closed'
 )
 $script:hashtableSemanticInvariantPath = @{
+    'actionlint-queue-schema-exceptions-are-exact' =
+        '.github/actionlint.yaml'
     'agent-instruction-heading-status-and-bootstrap-order-is-exact' =
         '.github/workflows/Test-AgentInstructions.ps1'
     'package-lock-parser-closure-is-exact' = 'package-lock.json'
     'package-parser-roots-are-exact' = 'package.json'
     'parser-manifest-direct-roots-and-closure-is-exact' =
         '.github/workflows/Test-AgentInstructionParserManifest.mjs'
+    'pre-commit-actionlint-gate-is-exact' = '.pre-commit-config.yaml'
     'workflow-policy-contract-identities-and-structure-are-exact' =
         '.github/workflows/workflow-policy-contract.json'
     'workflow-policy-preflight-authenticates-deferred-yaml-import' =
@@ -1017,7 +1022,7 @@ function Assert-SemanticInvariant {
             "import { fileURLToPath } from 'node:url';",
             "} = await import('yaml'));",
             "const VALIDATOR_VERSION = '1.2.2';",
-            "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '3b1b0eb57730601de0f2a2673db8bd21230fde25a5f21d78d73c12fda7360679';",
+            "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';",
             "const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';",
             'function readContractWithoutDependencies() {',
             "path.join(SCRIPT_DIRECTORY, 'workflow-policy-contract.json'),",
@@ -1101,6 +1106,62 @@ function Assert-SemanticInvariant {
         return
     }
 
+    if ($Invariant -ceq 'actionlint-queue-schema-exceptions-are-exact') {
+        $strExpectedText = [string]::Join("`n", @(
+                '# GitHub supports concurrency.queue, but actionlint does not yet model that key.',
+                '# These path-scoped exceptions are also covered by schema and mutation checks.',
+                'paths:',
+                '  .github/workflows/agent-instruction-current-base.yml:',
+                '    ignore:',
+                '      - ''^unexpected key "queue" for "concurrency" section\. expected one of "cancel-in-progress", "group"$''',
+                '  .github/workflows/agent-instructions.yml:',
+                '    ignore:',
+                '      - ''^unexpected key "queue" for "concurrency" section\. expected one of "cancel-in-progress", "group"$''',
+                ''
+            ))
+        if ($Text -cne $strExpectedText) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
+    if ($Invariant -ceq 'pre-commit-actionlint-gate-is-exact') {
+        $arrRequiredLiteral = @(
+            '\.github/(actionlint\.yaml|dependabot\.yml)|',
+            '\.github/actionlint\.yaml|',
+            'https://github.com/rhysd/actionlint',
+            'rev: "011a6d15e749bb3f2d771eed9c7aa0e7e3e10ee7"',
+            '- id: actionlint',
+            'files: ^\.github/workflows/.*\.ya?ml$'
+        )
+        foreach ($strRequiredLiteral in $arrRequiredLiteral) {
+            if (-not $Text.Contains(
+                    $strRequiredLiteral,
+                    [StringComparison]::Ordinal
+                )) {
+                throw "$Path does not satisfy semantic invariant $Invariant."
+            }
+        }
+        if ([regex]::Matches(
+                $Text,
+                [regex]::Escape('\.github/actionlint\.yaml')
+            ).Count -ne 2 -or
+            [regex]::Matches(
+                $Text,
+                [regex]::Escape(
+                    '\.github/(actionlint\.yaml|dependabot\.yml)'
+                )
+            ).Count -ne 2 -or
+            [regex]::Matches(
+                $Text,
+                [regex]::Escape('https://github.com/rhysd/actionlint')
+            ).Count -ne 1 -or
+            $Text.Contains('-shellcheck=', [StringComparison]::Ordinal)) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
     if ($Invariant -ceq
         'workflow-policy-contract-identities-and-structure-are-exact') {
         try {
@@ -1147,7 +1208,7 @@ function Assert-SemanticInvariant {
             if ($objContract.validatorIdentity.path -cne
                     'Validate-WorkflowPolicy.mjs' -or
                 $objContract.validatorIdentity.sha256 -cne
-                    '948d54724d9c0374fb2d643d3626be8e23a37b59c7108fe113b3756d953ebcd7') {
+                    '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9') {
                 throw 'The workflow validator identity is invalid.'
             }
             & $script:scriptblockAssertExactDictionaryKeySet `
@@ -2269,6 +2330,14 @@ if ($SelfTest) {
     }
     $arrNewInvariantSpec = @(
         [pscustomobject]@{
+            Path = '.github/actionlint.yaml'
+            Syntax = 'yaml'
+            Invariant = 'actionlint-queue-schema-exceptions-are-exact'
+            MutationFrom =
+                '.github/workflows/agent-instruction-current-base.yml:'
+            MutationTo = '.github/workflows/build.yml:'
+        },
+        [pscustomobject]@{
             Path = '.github/workflows/Test-AgentInstructionParserManifest.mjs'
             Syntax = 'javascript'
             Invariant =
@@ -2287,6 +2356,14 @@ if ($SelfTest) {
                 'if (token.type !== "heading_open" || token.level !== 0) return [];'
             MutationTo =
                 'if (token.type !== "heading_open") return [];'
+        },
+        [pscustomobject]@{
+            Path = '.pre-commit-config.yaml'
+            Syntax = 'yaml'
+            Invariant = 'pre-commit-actionlint-gate-is-exact'
+            MutationFrom =
+                'rev: "011a6d15e749bb3f2d771eed9c7aa0e7e3e10ee7"'
+            MutationTo = 'rev: "v1.7.12"'
         },
         [pscustomobject]@{
             Path = '.github/workflows/Validate-WorkflowPolicy.mjs'
@@ -2382,6 +2459,11 @@ if ($SelfTest) {
         }
         $arrSchemaPathSpec = @(
             [pscustomobject]@{
+                Path = '.github/actionlint.yaml'
+                Syntax = 'yaml'
+                Invariants = @('actionlint-queue-schema-exceptions-are-exact')
+            },
+            [pscustomobject]@{
                 Path = '.github/instructions/docs.instructions.md'
                 Syntax = 'markdown'
                 Invariants = @(
@@ -2432,6 +2514,11 @@ if ($SelfTest) {
                     'verifier-audits-authorized-history',
                     'verifier-reads-trusted-revision-manifest'
                 )
+            },
+            [pscustomobject]@{
+                Path = '.pre-commit-config.yaml'
+                Syntax = 'yaml'
+                Invariants = @('pre-commit-actionlint-gate-is-exact')
             },
             [pscustomobject]@{
                 Path = '.github/workflows/Validate-WorkflowPolicy.mjs'
@@ -2784,7 +2871,7 @@ if ($SelfTest) {
                     parent_commits = @($strTransitionBase)
                 }
                 limits = [ordered]@{
-                    maximum_paths = 13
+                    maximum_paths = 16
                     maximum_blob_bytes = 573440
                     maximum_manifest_bytes = 65536
                 }
