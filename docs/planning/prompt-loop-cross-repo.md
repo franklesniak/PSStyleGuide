@@ -1,4 +1,4 @@
-<!-- markdownlint-disable MD041 -->
+<!-- markdownlint-disable MD013 MD041 -->
 
 We are working on:
 
@@ -7,7 +7,9 @@ We are working on:
 
 I need to conduct the following loop:
 
-Use Codex as the orchestration and execution agent for this loop. Treat each `/goal` as a Codex persistent goal, wait for its terminal result, and verify the resulting repository state before the next step. Do not invoke Claude Code for any step in this loop. When a generated prompt later requires a formal pull-request review loop, dispatch that review loop to a fresh Codex subagent under the target repository's applicable `AGENTS.md`. If the target repository has no `AGENTS.md`, explicitly tell Codex to read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Keep the local Codex executor distinct from the remote Codex reviewer triggered by an exact `@codex review` PR comment.
+Use Codex as the orchestration and execution agent for this loop. Treat each `/goal` as a Codex persistent goal, wait for its terminal result, and verify the resulting repository state before the next step. Do not invoke Claude Code for any step in this loop. Use one compact state record and risk-proportionate validation. Do not create per-command receipts, routing proofs, or paperwork-only lifecycle steps.
+
+When a generated prompt later requires a formal pull-request review loop, use one local Codex executor under the target repository's applicable instructions. Keep it distinct from GitHub Copilot and the remote Codex reviewer triggered by an exact `@codex review` PR comment. Freeze the semantically verified reviewer-facing body before review and keep mutable state and results outside it. Default to one reviewer pair for each final reviewed input. Require a new pair after a code/diff change or a recorded material scope, behavior, or risk change. Do not request review again for a factual identity correction, result, task-state update, audit record, or comment-only publication on an unchanged reviewed input. Preserve both submitted-review objects and attributable Codex PR-conversation comments.
 
 - Against the `PSStyleGuide` repo, run a `/goal` pointed at the prompt in `docs\planning\PSStyleGuide\prompt-01b-in-repo-with-criticism.md`. Wait for the goal to finish.
 - Against the `PSStyleGuide` repo, run a `/goal` pointed at the prompt in `docs\planning\PSStyleGuide\prompt-02-in-repo.md`. Wait for the goal to finish.

@@ -48,6 +48,18 @@ The compact policy controls orchestration mechanics. A task-specific objective, 
 
 For PR work, generate and read back an accurate reviewer-facing body before review. Keep live task and review state out of that body. Request one required review set for the final reviewed head. A code, reviewed-diff, or material scope, behavior, or risk change invalidates that review. A verified factual correction in compact state or a comment-only publication does not. After a confirmed remote write, use targeted readback; do not repeat the write because local result recording failed.
 
+The machine-readable review-input and mutation contract is `docs/planning/review-loop-policy.json`. Its deterministic implementation and scenarios are `docs/planning/review-loop-policy.mjs` and `docs/planning/review-loop-policy.test.mjs`. These files validate decisions; they do not perform GitHub writes. Task-local PR publication, review, and quality prompts remain complete without requiring an executor to read the shared files.
+
+Use exactly these semantic mutation classes:
+
+- `CODE_OR_DIFF`: The commit, tree, code, or reviewed diff changed. Require one new review pair.
+- `MATERIAL_SCOPE_BEHAVIOR_RISK`: The same head now represents a materially different scope, behavior, or risk. Record the reason and require one new review pair.
+- `NON_MATERIAL_FACT`: A factual identity or bounded evidence field changed without changing reviewed meaning. Do not request review again.
+- `RESULT_OR_STATE`: Task state, polling state, reviewer IDs, results, quality results, metrics, or audit records changed. Keep the change outside reviewer input and do not request review again.
+- `COMMENT_ONLY`: A separate comment or landed handoff changed. Do not request review again.
+
+The reviewed input is the final head, tree, complete diff identity, and frozen reviewer-facing scope, behavior, and risk semantics. Raw PR-body byte inequality is not a review invalidation rule. A public mutation becomes confirmed only after a successful native response and matching authenticated readback. After confirmation, a local serialization failure can change only compact state; it cannot authorize a retry.
+
 ## Execution-order map
 
 | Task range | Ordered result |
@@ -495,6 +507,14 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 5. Read back PR base/head/tree, body, edit history, relationships, draft state, merge state, checks, byte count, and hash. Freeze the body and update compact state.
 6. Confirm no reviewer request, `@codex review` comment, review result, merge, issue closure, or settings change occurred. Stop.
 
+### Reviewer-facing body freeze gate
+
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Require exact non-force push reconciliation, current base/head/tree, accurate issue closure, complete body coverage, semantic identity verification, backtick/Unicode/control-character transport tests, empty/singleton/multiple collection tests, body readback/hash, compact-state readback, and no review request or merge.
@@ -552,6 +572,16 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 3. Request at most one pair per final code head by default. Reject a same-head request without a recorded material reason. A result, task-state, record, or comment-only mutation never justifies another pair.
 4. A code/diff change requires a fresh pair. A material scope/behavior/risk-description change normally requires one and records why. A same-head factual identity correction receives deterministic verification without a new code review.
 5. Store review IDs, polling state, findings, and terminal results in compact state and the final task result, not in the frozen body. Publish an append-only comment only when this task requires a public final result.
+
+### Reviewer-input and mutation-materiality controls
+
+1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Corrected Copilot-and-Codex review-loop prompt
 
@@ -638,6 +668,15 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 2. Verify the reviewed head, tree, diff, body semantics, represented scope/risk, issue requirements, review surfaces, checks, and deterministic evidence before adjudication.
 3. A non-material evidence correction is read back and reruns Task 7 only on the unchanged head. A material code/diff/scope/behavior/risk correction returns to Task 4 or 5 and requires new Tasks 6 and 7.
 4. Do not append terminal review IDs or results to the body. Preserve the failed landed run as immutable failure evidence.
+
+### Post-review materiality controls
+
+1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -1126,6 +1165,14 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 4. Generate, validate, publish, and read back the complete reviewer body. Run the transport, collection, and control-character fixtures.
 5. Record exact PR/head/base/tree/body/edit/relationship/check identities in the final task result. Confirm no reviewer request, trigger comment, review result, merge, issue closure, or setting change. Stop.
 
+### Reviewer-facing body freeze gate
+
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Require non-force push reconciliation, exact planning base/head/tree, path closure, accurate PR relationships, semantic body verification, all transport/cardinality fixtures, frozen body hash, compact-state readback, and no review request or merge.
@@ -1181,6 +1228,16 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 2. Exercise same-head rejection, compact-state updates, semantic materiality, dual-channel Codex ingestion, transport, collection normalization, result-recording failure/readback reconciliation, retry suppression, and the task-required performance measurements during the real lifecycle.
 3. Request at most one pair for the final code head unless a code/diff change or recorded material scope/behavior/risk change requires another. Do not request again for a result, task state, record, or comment.
 4. Publish terminal review evidence outside the frozen body. Prove that recording it creates no request.
+
+### Reviewer-input and mutation-materiality controls
+
+1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Corrected Copilot-and-Codex review-loop prompt
 
@@ -1266,6 +1323,15 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 1. Verify unchanged reviewed head/diff/body semantics, inventory closure, all nine scenarios, dual-channel monitor, publication idempotency, and performance controls.
 2. Independently prove that an append-only result or local serialization failure cannot request reviewers again on the same head.
 3. Non-material evidence correction reruns Task 16 only. A material code/diff/scope/behavior/risk correction returns through Tasks 13/14 and requires new Tasks 15/16.
+
+### Post-review materiality controls
+
+1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -1775,8 +1841,6 @@ The focused issue authorizes only the Terraform changes required by the Task 20 
 6. Read back all issue state and prove no commencement marker, branch, commit, or closing PR exists.
 7. Return the issue or skip result and stop.
 
-### Reviewer-facing body freeze gate
-
 ### Validation and evidence
 
 Require the current disposition, complete GitHub pagination, exact body coverage/readback on the repair branch, correct cross-reference without false native relationship, no already-knowable placeholder, no implementation marker, unchanged refs/bytes, and an exact conformant skip when applicable.
@@ -2159,6 +2223,12 @@ Git blob equality across repositories is byte equality. Also compute SHA-256 ove
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Require exact remote head/tree, one accurate PR, correct issue/umbrella references, complete diff, truthful checks, no stale placeholder, no review/merge/closure, or an exact conformant skip.
@@ -2280,8 +2350,12 @@ Git blob equality across repositories is byte equality. Also compute SHA-256 ove
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -2436,8 +2510,11 @@ Git blob equality across repositories is byte equality. Also compute SHA-256 ove
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -2973,8 +3050,6 @@ Use the latest `REPAIR_REQUIRED` comparison: Task 29 for the first instance or t
 5. Create/update only that issue. Add the permitted tracker relationship or cross-reference. Do not add a native dependency only for chronology.
 6. Read back the issue, relationships, body identity, and absence of commencement/branch/PR state. Return the issue or skip result.
 
-### Reviewer-facing body freeze gate
-
 ### Validation and evidence
 
 Require the latest comparison, exact conditional branch, one selected target on repair, complete issue-body/readback/relationship evidence, no duplicate or false dependency, no commencement/repository mutation, or an exact current fixed-point skip.
@@ -3352,6 +3427,12 @@ Change only the exact blocker path set selected by the latest comparison. Use th
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Require correct conditional handling; on repair, exact non-force head/tree, one accurate PR to exact base, complete authorized diff, issue links, truthful checks, no review/merge; on skip, exact current evidence.
@@ -3470,8 +3551,12 @@ Change only the exact blocker path set selected by the latest comparison. Use th
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -3623,8 +3708,11 @@ Change only the exact blocker path set selected by the latest comparison. Use th
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -4550,6 +4638,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -4607,8 +4701,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below against the PS #16
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -4688,8 +4786,11 @@ Run the task-local independent final PR quality-check prompt below against the P
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -5026,8 +5127,6 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 3. State the problem, decision basis, trigger/reopen condition, exact scope, source commits and blobs, intended paths, validation, originating comparison, real native dependencies, security and failure requirements, and terminal outcome.
 4. Read the issue and all native dependencies back. Correct false, missing, reversed, or tracker-only dependency edges. Do not create a branch, edit bytes, or occupy the implementation slot.
 
-### Reviewer-facing body freeze gate
-
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -5269,6 +5368,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -5328,8 +5433,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -5413,8 +5522,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -5749,8 +5861,6 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 3. State the problem, decision basis, trigger/reopen condition, exact scope, source commits and blobs, intended paths, validation, originating comparison, real native dependencies, security and failure requirements, and terminal outcome.
 4. Read the issue and all native dependencies back. Correct false, missing, reversed, or tracker-only dependency edges. Do not create a branch, edit bytes, or occupy the implementation slot.
 
-### Reviewer-facing body freeze gate
-
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -5993,6 +6103,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -6052,8 +6168,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -6137,8 +6257,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -6934,6 +7057,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -6993,8 +7122,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -7078,8 +7211,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -7630,6 +7766,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -7689,8 +7831,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -7774,8 +7920,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -8326,6 +8475,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -8385,8 +8540,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -8470,8 +8629,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -9199,6 +9361,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -9256,8 +9424,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below against the PS #16
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -9337,8 +9509,11 @@ Run the task-local independent final PR quality-check prompt below against the P
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -9916,6 +10091,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -9975,8 +10156,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -10060,8 +10245,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -10638,6 +10826,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -10697,8 +10891,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -10782,8 +10980,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -11474,6 +11675,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -11531,8 +11738,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below against the PS #15
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -11612,8 +11823,11 @@ Run the task-local independent final PR quality-check prompt below. Require PS #
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -12191,6 +12405,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -12250,8 +12470,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -12335,8 +12559,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -12913,6 +13140,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -12972,8 +13205,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -13057,8 +13294,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -13716,6 +13956,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -13773,8 +14019,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below against the PS #16
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -13854,8 +14104,11 @@ Run the task-local independent final PR quality-check prompt below. Require PS #
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -14433,6 +14686,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -14492,8 +14751,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -14577,8 +14840,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -15155,6 +15421,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -15214,8 +15486,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -15299,8 +15575,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -15890,6 +16169,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -15947,8 +16232,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below in TerraformStyleG
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -16028,8 +16317,11 @@ Run the task-local independent final PR quality-check prompt below. Require all 
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -16615,6 +16907,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -16675,8 +16973,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -16761,8 +17063,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -17337,6 +17642,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -17396,8 +17707,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -17481,8 +17796,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -18359,6 +18677,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -18418,8 +18742,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -18503,8 +18831,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -19103,6 +19434,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -19215,8 +19552,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below against the PS #14
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -19297,8 +19638,11 @@ Run the task-local independent final PR quality-check prompt below. Require full
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -19936,6 +20280,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -20038,8 +20388,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below in TerraformStyleG
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -20119,8 +20473,11 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -20696,6 +21053,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -20755,8 +21118,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -20840,8 +21207,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -21409,6 +21779,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -21468,8 +21844,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -21553,8 +21933,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -22040,6 +22423,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -22097,8 +22486,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below against the PS #14
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -22178,8 +22571,11 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -22758,6 +23154,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -22818,8 +23220,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -22904,8 +23310,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -23485,6 +23894,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -23545,8 +23960,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -23631,8 +24050,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -24127,6 +24549,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -24184,8 +24612,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below in TerraformStyleG
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -24265,8 +24697,11 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -24860,6 +25295,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -24920,8 +25361,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -25006,8 +25451,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -25528,6 +25976,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -25585,8 +26039,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below against the PS #14
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -25666,8 +26124,11 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -26031,6 +26492,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -26088,8 +26555,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below against the fallba
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -26169,8 +26640,11 @@ Run the task-local independent final PR quality-check prompt below. Require exac
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -26884,6 +27358,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -26986,8 +27466,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below in TerraformStyleG
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -27067,8 +27551,11 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -27644,6 +28131,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -27703,8 +28196,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -27788,8 +28285,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -28357,6 +28857,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -28416,8 +28922,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -28501,8 +29011,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -28988,6 +29501,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -29045,8 +29564,12 @@ Run the task-local Copilot-and-Codex review-loop prompt below against the PS #15
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -29126,8 +29649,11 @@ Run the task-local independent final PR quality-check prompt below. Require comp
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final PR quality-check prompt
 
@@ -29706,6 +30232,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -29766,8 +30298,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -29852,8 +30388,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -30433,6 +30972,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -30493,8 +31038,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -30579,8 +31128,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -31410,6 +31962,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -31469,8 +32027,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -31554,8 +32116,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 
@@ -32370,6 +32935,12 @@ Before this task is complete:
 
 ### Reviewer-facing body freeze gate
 
+1. Build the reviewer-facing title and body from typed or deterministically recomputed data before review. Bind the reviewed input to the candidate head, tree, complete diff, represented scope, behavior, risk, and rollback statement. Verify the rendered meaning and freeze it after authenticated readback.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw body-byte inequality is not the classifier.
+4. Treat a successful API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile from the readback and do not repeat the public mutation.
+5. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode during construction and readback. Reject disallowed control characters.
+
 ### Validation and evidence
 
 Apply the shared validation policy and the task-specific validation requirements.
@@ -32429,8 +33000,12 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Reviewer-input and mutation-materiality controls
 
 1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Request at most one Codex and one GitHub Copilot review for the final code head by default. A code-head or reviewed-diff change requires a fresh pair. A material scope, behavior, or risk-description change normally requires a fresh pair and must record the material reason.
-3. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
+2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
+3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
+4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
+5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
+6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
+7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
 
 ### Copilot-and-Codex review-loop prompt
 
@@ -32514,8 +33089,11 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Post-review materiality controls
 
 1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Route material code, diff, scope, behavior, or risk defects back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair. Reject a same-head review request without a recorded material reason.
-3. Preserve both review-object and attributable conversation-comment ingestion for Codex and preserve public-mutation response/readback idempotency.
+2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
+3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
+4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
+5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
 
 ### Independent final quality-check prompt
 

@@ -72,28 +72,24 @@ Do not put the preservation ledger or other analysis artifacts in the output pla
 
 ## Task construction requirements
 
-Every numbered item in the output plan must be an atomic leaf task. An atomic task has one executor, one primary action or lifecycle gate, and one objectively testable completion result. Do not use numbered parent tasks that contain independently executable child tasks.
+Every numbered item in the output plan must be an atomic leaf task. An atomic task has one executor, one primary outcome, one risk tier, and one objectively testable completion result. It can combine routine preparation, commit, non-force push, PR publication, targeted readback, handoff, or closure steps when they use the same executor, authority, risk tier, and validation boundary. Do not create a leaf only to record commencement, a new identity, or an intermediate receipt.
 
-Separate the following into discrete tasks whenever they apply:
+Separate the following only when a different executor, risk tier, external wait, independent gate, or human decision makes the boundary necessary:
 
-- creating or updating an issue;
-- explicitly commencing implementation of that issue;
-- implementing the change;
-- creating or updating the PR;
+- creating or updating an issue when it is a required durable product or coordination object;
+- implementing, validating, and publishing the candidate;
 - running the Codex review loop in a fresh subagent;
 - running an independent final quality check in a fresh coding-agent session;
 - making a human or administrator decision;
 - changing repository settings after exact authorization;
 - merging the PR;
-- publishing the landed handoff;
-- performing the cross-repository comparison;
+- publishing the landed handoff and performing the next comparison when one executor and validation boundary can do both;
 - implementing any required reciprocal sync-back;
 - repeating review and quality gates after reviewable bytes change;
-- performing the final reciprocal comparison;
-- closing a fixed point; and
-- closing a tracker or umbrella issue.
+- performing the final reciprocal comparison and closing the fixed point when the comparison proves closure; and
+- closing a tracker or umbrella issue when closure is not already part of the same proved final state.
 
-Do not combine issue creation with implementation commencement. Do not combine implementation, review, final quality checking, and merge. Do not treat a tracker, comparison, evidence-publication action, or closure action as implementation merely because it is part of the same issue cycle.
+Do not combine implementation with an independent review, an independent final quality check, a human or administrator decision, or merge. Do not split routine work into issue, commencement, branch, commit, push, PR, handoff, and closure leaves only to create a paper trail.
 
 For each task or independently executable conditional task, include:
 
@@ -109,51 +105,51 @@ For each task or independently executable conditional task, include:
 - the exact output or state transition; and
 - an objective `Complete when` condition.
 
-A task must be fully self-contained and copy-paste-ready for its designated executor. A person or coding agent coming in cold must not need instructions from another task, a shared execution contract, an earlier template, or an implied convention to execute it correctly. A dependency may identify a predecessor’s required output, but it must not outsource the current task’s procedure to that predecessor.
+A task must be copy-paste-ready for its designated executor. Include its objective, risk tier, task-specific scope, variables, dependencies, procedure, validation, stop conditions, output, and completion test. A compact shared state, risk, remote-write, and review-input policy can define common mechanics once. Do not duplicate that policy in every task. Include the complete task-local review or quality prompt where an independent executor needs it.
 
 Replace all values that are already knowable. Use placeholders only for values that genuinely cannot be known until a predecessor completes. Name each placeholder precisely and state where the operator obtains its value.
 
 Apply ASD-STE100 principles to all human-executed and non-executable tracking or control tasks. Improve clarity without reducing necessary detail.
 
-## Prohibition on shared operative sections
+## Compact shared policy and task-local boundaries
 
-Do not create or retain shared or generalized operative sections that apply instructions to multiple tasks. This prohibition includes sections equivalent to:
+Create one compact shared section for state transitions, risk tiers, standing authority, remote-write preconditions, result separation, review-input classification, validation reuse, failure handling, and on-plan merge readiness. Do not create shared sections that hide task-specific product scope, security conditions, decision inputs, or completion predicates.
 
-- a global execution contract;
-- general execution rules;
-- a mandatory PR lifecycle;
-- a reciprocal fixed-point contract;
-- a target common foundation;
-- a shared quality-check procedure;
-- a shared review-loop procedure; or
-- a common task template that individual tasks merely reference.
+Keep these items task-local:
 
-Fold every applicable requirement from such source sections into every task that needs it. Include complete task-local review-loop and quality-check prompts at each applicable point. Do not replace them with “follow the process above,” “repeat Task N,” “use the standard process,” or similar references.
+- issue or product requirements;
+- repository and path scope;
+- predecessor outputs and live identities;
+- security and failure conditions;
+- material intentional differences;
+- independent review and quality prompts; and
+- objective completion predicates.
 
-After folding the requirements into the relevant tasks, remove the shared operative sections from the output plan. Non-operative title, purpose, verified-state, phase-heading, and reference material may remain only when no task depends on those sections for execution instructions.
+Include complete task-local review-loop and quality-check prompts at each applicable point. Do not replace those independent-executor prompts with “follow the process above,” “repeat Task N,” or “use the standard process.” Common compact mechanics can remain in the shared section and do not need verbatim duplication.
 
-Do not shorten, summarize, or generalize existing task content merely to control the document’s length. Preserve the semantic detail of the source task slate.
+Remove receipt catalogs, per-command approval records, prompt hashes, routing activation records, repeated completion records, and shared text copied into every leaf. Preserve product requirements, security behavior, failure truth, necessary independent gates, and all completion conditions.
 
 ## PR lifecycle and reciprocal-cycle safeguards
 
-For every existing or future implementation PR covered by the plan, preserve the discrete lifecycle:
+For every existing or future implementation PR covered by the plan, preserve these gates. Routine candidate preparation and publication can be one task. A landed handoff and immediately dependent comparison can be one task when no external wait or risk-tier change intervenes.
 
-1. candidate implementation;
-2. Codex review loop in a fresh `gpt-5.6-sol` subagent with `xhigh` reasoning;
-3. independent final quality check by a fresh coding agent;
-4. rerun of the review loop and quality check if reviewable repository bytes change;
-5. merge only after both gates apply to the same final head and tree;
-6. landed-commit handoff;
-7. cross-repository comparison or proved non-applicability;
-8. any required reciprocal implementation, review, quality check, and merge;
-9. reverse comparison and sync-back when required; and
-10. fixed-point closure.
+1. candidate implementation, applicable validation, non-force publication, accurate reviewer-facing body, and targeted readback;
+2. one Codex and one Copilot review for the frozen reviewed input;
+3. an independent final quality check on that same input;
+4. a new review and quality pair only after code/diff change or a recorded material scope, behavior, or risk change;
+5. merge only after both gates apply to the same final head, tree, and frozen semantics;
+6. landed-commit handoff and cross-repository comparison or proved non-applicability; and
+7. any required reciprocal implementation and the final fixed-point closure.
 
-Each applicable review-loop and quality-check task must retain all existing safeguards concerning current-head reviewer evidence, review-thread and comment pagination, unfinished-work and deferral audits, issue-requirement verification, PR-description verification, dependency verification, validation, and prohibition on merge.
+Each applicable review-loop and quality task must retain current-head reviewer evidence, complete relevant pagination, unfinished-work and deferral audits, issue-requirement verification, PR-description verification, dependency verification, validation, and prohibition on premature merge.
 
-Each review-loop task must identify the local Codex subagent as the executor and `chatgpt-codex-connector` as a separate remote reviewer. It must instruct the subagent to use the repository's applicable `AGENTS.md`. If the target repository has no `AGENTS.md`, it must explicitly tell Codex to read the root `CLAUDE.md` as compatibility workflow instructions and state that the filename does not change the executor. It must request the remote reviewer with an exact `@codex review` PR comment and treat that trigger comment as neither a finding nor an instruction to the local executor. Use the native Codex subagent interface. Permit headless `codex exec --json` only as an explicit fallback when native subagents are unavailable and the task defines equivalent monitoring and safety controls.
+Each review-loop task must identify the local Codex executor, GitHub Copilot, and `chatgpt-codex-connector` as distinct actors. It must apply the repository's applicable instructions, request remote Codex with an exact `@codex review` PR comment, and treat that trigger as neither a finding nor a local instruction. Preserve both submitted-review objects and attributable Codex PR-conversation comments. Use the native Codex interface. Permit headless `codex exec --json` only as an explicit fallback with equivalent scope, monitoring, mutation, timeout, and result controls.
 
-Do not allow an unreviewed repair, metadata correction that invalidates evidence, stale review, or head change to bypass a required gate.
+Before review, generate and semantically verify the reviewer-facing body, then freeze its scope, behavior, and risk meaning. Keep task state, polling state, reviewer requests, review IDs, review results, quality results, metrics, audit records, and terminal results outside it. Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Only the first two classes invalidate review. Raw PR-body byte inequality is not the classifier.
+
+Default to one reviewer pair for each reviewed input. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes that input. Normalize empty, singleton, and multiple review API collections. Preserve Markdown backticks and Unicode and reject disallowed control characters. Treat a successful API response plus matching authenticated readback as the public-mutation boundary. A later local serialization failure cannot repeat the request.
+
+Do not allow an unreviewed material repair, stale review, or head change to bypass a required gate. A verified non-material factual correction, result, task-state update, audit record, or comment-only publication on the unchanged reviewed input does not require another code review.
 
 ## Renumbering and cross-reference requirements
 
@@ -217,7 +213,7 @@ Place a Markdown comment or frontmatter in the output plan that disables MD013. 
 
 Write the document to disk incrementally. You may create temporary analysis files prefixed with `TEMP`, but do not mix analysis artifacts into the output plan.
 
-Run as many review passes as necessary, up to 10. Include dedicated passes for:
+Run one focused structural pass and one final semantic pass. Repeat only a failed or invalidated check. Across those passes, cover:
 
 1. live-state and factual correctness;
 2. preservation-ledger coverage;

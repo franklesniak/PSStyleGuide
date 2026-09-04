@@ -158,6 +158,14 @@ Check CI before merge. Do not merge when any required check is red, skipped, can
 
 Use repository-required review for R1. Use an independent review for R2 when reviewable bytes change. R3 merge requires the exact reviewed head and tree, resolved material findings, a truthful PR body, current green required checks, and a mergeable state. A code or material risk-description change invalidates review of the old bytes. A status record or comment does not.
 
+For a planned dual-review task, generate and semantically verify the reviewer-facing body before the first request. Freeze its scope, behavior, and risk meaning. Keep task state, polling state, reviewer requests, review IDs, review results, quality results, metrics, audit records, and terminal results in compact state or separate comments. Never append them to the frozen reviewer-facing body.
+
+Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. The first two classes invalidate review. The other classes do not. Raw PR-body byte inequality is not the classifier. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input.
+
+Preserve both Codex result channels: submitted-review objects and attributable `chatgpt-codex-connector` PR-conversation comments. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode and reject disallowed control characters. A successful public API response plus matching authenticated readback confirms the mutation; later local serialization failure cannot repeat it.
+
+The deterministic planning-only policy and scenarios are in `docs/planning/review-loop-policy.json`, `docs/planning/review-loop-policy.mjs`, and `docs/planning/review-loop-policy.test.mjs`. They validate decisions and transport. They do not perform GitHub writes.
+
 Immediately before an on-plan merge, repeat the final readiness check against the live PR and target ref. Use head-commit matching when the merge tool supports it. Stop for drift, new material feedback, an incomplete or failed required gate, an off-plan target or scope, a required human decision, or any need for an administrator override or bypass. Do not stop only to obtain another approval for a merge that still satisfies the on-plan definition.
 
 Do not request duplicate AI reviews on an unchanged head without a material reason. Do not require two named AI reviewers and a separate fresh-agent pass for routine low-risk work unless repository policy or the task names that gate.

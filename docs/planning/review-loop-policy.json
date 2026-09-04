@@ -1,0 +1,258 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/franklesniak/PSStyleGuide/docs/planning/review-loop-policy.json",
+  "title": "Compact review-loop state",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "reviewInput",
+    "mutationClass",
+    "reviewRequests",
+    "codexResults",
+    "publicMutation",
+    "metrics"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": 1
+    },
+    "reviewInput": {
+      "$ref": "#/$defs/reviewInput"
+    },
+    "mutationClass": {
+      "$ref": "#/$defs/mutationClass"
+    },
+    "materialReason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "reviewRequests": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/reviewRequest"
+      }
+    },
+    "codexResults": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "submittedReviews",
+        "conversationComments"
+      ],
+      "properties": {
+        "submittedReviews": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        },
+        "conversationComments": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          }
+        }
+      }
+    },
+    "publicMutation": {
+      "$ref": "#/$defs/publicMutation"
+    },
+    "metrics": {
+      "$ref": "#/$defs/metrics"
+    }
+  },
+  "$defs": {
+    "sha1": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "reviewInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "head",
+        "tree",
+        "diffSha256",
+        "bodySha256",
+        "scope",
+        "behavior",
+        "risk"
+      ],
+      "properties": {
+        "head": {
+          "$ref": "#/$defs/sha1"
+        },
+        "tree": {
+          "$ref": "#/$defs/sha1"
+        },
+        "diffSha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "bodySha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1
+        },
+        "behavior": {
+          "type": "string",
+          "minLength": 1
+        },
+        "risk": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "mutationClass": {
+      "enum": [
+        "CODE_OR_DIFF",
+        "MATERIAL_SCOPE_BEHAVIOR_RISK",
+        "NON_MATERIAL_FACT",
+        "RESULT_OR_STATE",
+        "COMMENT_ONLY"
+      ]
+    },
+    "reviewRequest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "channel",
+        "reviewInputKey",
+        "requestedAt"
+      ],
+      "properties": {
+        "channel": {
+          "enum": [
+            "copilot",
+            "codex"
+          ]
+        },
+        "reviewInputKey": {
+          "$ref": "#/$defs/sha256"
+        },
+        "requestedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "publicMutation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "nativeResponseAccepted",
+        "readbackMatched",
+        "retryAllowed"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "NOT_ATTEMPTED",
+            "NOT_EXECUTED",
+            "AMBIGUOUS",
+            "CONFIRMED"
+          ]
+        },
+        "nativeResponseAccepted": {
+          "type": "boolean"
+        },
+        "readbackMatched": {
+          "type": "boolean"
+        },
+        "retryAllowed": {
+          "type": "boolean"
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewerRequestsPerHead",
+        "bodyEditsAfterReviewBegan",
+        "sameHeadRerequestReasons",
+        "cleanReviewRecognitionMilliseconds",
+        "cleanPairToMergeMilliseconds"
+      ],
+      "properties": {
+        "reviewerRequestsPerHead": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "bodyEditsAfterReviewBegan": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sameHeadRerequestReasons": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "reason",
+              "material"
+            ],
+            "properties": {
+              "reason": {
+                "type": "string",
+                "minLength": 1
+              },
+              "material": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "cleanReviewRecognitionMilliseconds": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "cleanPairToMergeMilliseconds": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "mutationClass": {
+            "const": "MATERIAL_SCOPE_BEHAVIOR_RISK"
+          }
+        }
+      },
+      "then": {
+        "required": [
+          "materialReason"
+        ],
+        "properties": {
+          "materialReason": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  ]
+}
