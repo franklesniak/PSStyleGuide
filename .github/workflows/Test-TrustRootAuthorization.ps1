@@ -58,6 +58,7 @@ $strVerifierPath = '.github/workflows/Test-TrustRootAuthorization.ps1'
 $arrTrustRootPaths = @(
     '.gitattributes',
     '.github/.gitattributes',
+    '.github/actionlint.yaml',
     '.github/workflows/.gitattributes',
     '.github/workflows/Test-TrustRootAuthorization.ps1',
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
@@ -66,7 +67,8 @@ $arrTrustRootPaths = @(
     '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
     '.github/workflows/trust-root-authorization.json',
     '.github/workflows/agent-instruction-current-base.yml',
-    '.github/workflows/agent-instructions.yml'
+    '.github/workflows/agent-instructions.yml',
+    '.pre-commit-config.yaml'
 )
 $script:arrSpecialSemanticInvariant = @(
     'actionlint-queue-schema-exceptions-are-exact',
@@ -2690,6 +2692,55 @@ if ($SelfTest) {
         & $scriptblockExpectSchemaRejection -Base $strSchemaCandidate `
             -Head $strSchemaCandidate `
             -ExpectedMessage 'base must equal the trusted revision'
+
+        foreach ($strStandaloneProtectedPath in @(
+                '.github/actionlint.yaml',
+                '.pre-commit-config.yaml'
+            )) {
+            & git -C $strSchemaFixtureRoot switch --quiet --detach `
+                $strSchemaTrusted
+            [IO.File]::Copy(
+                (Join-Path $RepositoryRootPath $strStandaloneProtectedPath),
+                (Join-Path $strSchemaFixtureRoot $strStandaloneProtectedPath),
+                $true
+            )
+            & git -C $strSchemaFixtureRoot add -- $strStandaloneProtectedPath
+            & git -C $strSchemaFixtureRoot `
+                -c 'user.name=Trust root schema self-test' `
+                -c 'user.email=trust-root-schema@example.invalid' `
+                -c 'commit.gpgSign=false' `
+                -c 'core.hooksPath=NUL' `
+                commit --quiet --no-gpg-sign `
+                -m "standalone protected path $strStandaloneProtectedPath"
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Could not commit a standalone protected-path fixture.'
+            }
+            $strStandaloneProtectedHead = ([string] (
+                    & git -C $strSchemaFixtureRoot rev-parse --verify `
+                        'HEAD^{commit}'
+                )).Trim()
+            & git -C $strSchemaFixtureRoot switch --quiet --detach `
+                $strSchemaTrusted
+            $arrStandaloneApplicability = @(& $PSCommandPath `
+                    -RepositoryRootPath $strSchemaFixtureRoot `
+                    -TrustedRevision $strSchemaTrusted `
+                    -BaseRevision $strSchemaTrusted `
+                    -HeadRevision $strStandaloneProtectedHead `
+                    -AuthorizationApplicabilityOnly)
+            if ($arrStandaloneApplicability.Count -ne 1 -or
+                $arrStandaloneApplicability[0] -isnot [bool] -or
+                -not $arrStandaloneApplicability[0]) {
+                throw (
+                    'A standalone protected-path change bypassed ' +
+                    "authorization applicability: $strStandaloneProtectedPath"
+                )
+            }
+            & $scriptblockExpectSchemaRejection -Base $strSchemaTrusted `
+                -Head $strStandaloneProtectedHead `
+                -ExpectedMessage (
+                    'missing, linked, deleted, or has a mismatched Git identity'
+                )
+        }
 
         & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaCandidate
         [IO.File]::AppendAllText(

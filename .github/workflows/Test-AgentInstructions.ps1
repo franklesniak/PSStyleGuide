@@ -82,6 +82,7 @@ $script:arrOperationalLintGuidePaths = @(
 )
 $script:arrTrustRootPaths = @(
     $script:arrCheckoutAttributePaths
+    '.github/actionlint.yaml',
     '.github/workflows/Test-TrustRootAuthorization.ps1',
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
@@ -89,7 +90,8 @@ $script:arrTrustRootPaths = @(
     '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
     '.github/workflows/trust-root-authorization.json',
     '.github/workflows/agent-instruction-current-base.yml',
-    '.github/workflows/agent-instructions.yml'
+    '.github/workflows/agent-instructions.yml',
+    '.pre-commit-config.yaml'
 )
 $script:arrGovernedInstructionRootPaths = @(
     '.hermes.md',
@@ -8637,6 +8639,16 @@ if ($SelfTest) {
         -BaseRevision $strCheckedOutRevision `
         -HeadRevision $strCheckedOutRevision `
         -SelfTest
+    foreach ($strProtectedValidationPath in @(
+            '.github/actionlint.yaml',
+            '.pre-commit-config.yaml'
+        )) {
+        if (@($script:arrTrustRootPaths | Where-Object {
+                    $_ -ceq $strProtectedValidationPath
+                }).Count -ne 1) {
+            throw "$strProtectedValidationPath is outside trust-root governance."
+        }
+    }
     if (@($script:arrTrustRootPaths | Where-Object {
                 $_ -ceq $strExtractedSelfTestPath
             }).Count -ne 1 -or

@@ -92,6 +92,37 @@ function hasExactProperties(value, properties) {
     [...properties].sort().join('\n');
 }
 
+function isRepositoryIdentity(value) {
+  if (!(isRecord(value) && Number.isSafeInteger(value.id) && value.id >= 1 &&
+    typeof value.name === 'string' &&
+    /^[A-Za-z0-9_.-]+$/.test(value.name) &&
+    typeof value.url === 'string' && value.url.length <= 4096)) return false;
+  let url;
+  try {
+    url = new URL(value.url);
+  } catch {
+    return false;
+  }
+  return url.protocol === 'https:' && url.username === '' &&
+    url.password === '' && url.search === '' && url.hash === '';
+}
+
+function repositoryIdentity(value, expectedFullName) {
+  assert(isRepositoryIdentity(value) &&
+    typeof value.full_name === 'string' &&
+    repositoryPattern.test(value.full_name) &&
+    (expectedFullName === undefined || value.full_name === expectedFullName) &&
+    value.name === value.full_name.slice(value.full_name.indexOf('/') + 1),
+  'Live pull request repository response is invalid.');
+  return { id: value.id, name: value.name, url: value.url };
+}
+
+function repositoryIdentitiesMatch(actual, expected) {
+  return isRepositoryIdentity(actual) && isRepositoryIdentity(expected) &&
+    actual.id === expected.id && actual.name === expected.name &&
+    actual.url === expected.url;
+}
+
 function statusContext(pullNumber) {
   return `Agent instruction current base/PR-${pullNumber}`;
 }
@@ -708,17 +739,36 @@ async function runSelfTest() {
   assert(statusContext(101) !== statusContext(102) &&
     statusContext(101) === 'Agent instruction current base/PR-101',
   'Status contexts must be stable and pull-request-specific.');
+  const baseRepository = {
+    id: 1001,
+    name: 'repository',
+    url: 'https://api.example.invalid/repos/owner/repository',
+  };
+  const headRepository = {
+    id: 1002,
+    name: 'repository-fork',
+    url: 'https://api.example.invalid/repos/contributor/repository-fork',
+  };
   const expected = {
     pullNumber: 101,
     baseRef: 'main',
     baseSha: advancedSha,
     headSha: sameBaselinePulls[0].head.sha,
+    baseRepository,
+    headRepository,
   };
   const pull = {
     number: 101,
     state: 'open',
-    base: { ref: 'main', sha: advancedSha },
-    head: { sha: sameBaselinePulls[0].head.sha },
+    base: {
+      ref: 'main',
+      sha: advancedSha,
+      repo: { ...baseRepository, full_name: 'owner/repository' },
+    },
+    head: {
+      sha: sameBaselinePulls[0].head.sha,
+      repo: { ...headRepository, full_name: 'contributor/repository-fork' },
+    },
   };
   assert(isCurrentPull(pull,
     { object: { type: 'commit', sha: advancedSha } }, expected),
@@ -1149,17 +1199,20 @@ async function runSelfTest() {
     path: '.github/workflows/agent-instructions.yml',
     status,
     head_sha: endpoints.headSha,
-    repository: { full_name: 'owner/repository' },
+    repository: {
+      ...endpoints.baseRepository,
+      full_name: 'owner/repository',
+    },
     pull_requests: [{
       number: endpoints.pullNumber,
       base: {
         ref: endpoints.baseRef,
         sha: endpoints.baseSha,
-        repo: { full_name: 'owner/repository' },
+        repo: { ...endpoints.baseRepository },
       },
       head: {
         sha: endpoints.headSha,
-        repo: { full_name: 'owner/repository' },
+        repo: { ...endpoints.headRepository },
       },
     }],
   });
@@ -1204,11 +1257,74 @@ async function runSelfTest() {
     'A strictly newer authenticated same-endpoint success must be preserved.');
 
   const newerSuccessClient = createFreshnessClient();
+  const oldRunExpected = {
+    ...oldExpected,
+    repository: 'owner/repository',
+  };
   assert(parseActionsRunTarget(sourceRunUrl, 'owner/repository').runId ===
-    '600' && isAuthenticPullRequestWorkflowRun(sourceOldRun,
-    { ...oldExpected, repository: 'owner/repository' }, '600') &&
+    '600' &&
+    !Object.hasOwn(sourceOldRun.pull_requests[0].base.repo, 'full_name') &&
+    !Object.hasOwn(sourceOldRun.pull_requests[0].head.repo, 'full_name') &&
+    isAuthenticPullRequestWorkflowRun(sourceOldRun, oldRunExpected, '600') &&
     isStrictlyLaterWorkflowRun(newerCurrentRun, sourceOldRun),
-  'Actions-run provenance must authenticate before freshness comparison.');
+  'The live minimal Actions repository shape must authenticate before ' +
+    'freshness comparison.');
+  const changedTopRepositoryId = {
+    ...sourceOldRun,
+    repository: { ...sourceOldRun.repository, id: 9999 },
+  };
+  const changedBaseRepositoryName = {
+    ...sourceOldRun,
+    pull_requests: [{
+      ...sourceOldRun.pull_requests[0],
+      base: {
+        ...sourceOldRun.pull_requests[0].base,
+        repo: {
+          ...sourceOldRun.pull_requests[0].base.repo,
+          name: 'other-repository',
+        },
+      },
+    }],
+  };
+  const changedHeadRepositoryUrl = {
+    ...sourceOldRun,
+    pull_requests: [{
+      ...sourceOldRun.pull_requests[0],
+      head: {
+        ...sourceOldRun.pull_requests[0].head,
+        repo: {
+          ...sourceOldRun.pull_requests[0].head.repo,
+          url: 'https://api.example.invalid/repos/other/repository-fork',
+        },
+      },
+    }],
+  };
+  const missingHeadRepositoryId = {
+    ...sourceOldRun,
+    pull_requests: [{
+      ...sourceOldRun.pull_requests[0],
+      head: {
+        ...sourceOldRun.pull_requests[0].head,
+        repo: {
+          name: sourceOldRun.pull_requests[0].head.repo.name,
+          url: sourceOldRun.pull_requests[0].head.repo.url,
+        },
+      },
+    }],
+  };
+  assert(!isAuthenticPullRequestWorkflowRun({
+    ...sourceOldRun,
+    head_sha: oldExpected.baseSha,
+  }, oldRunExpected, '600') &&
+    !isAuthenticPullRequestWorkflowRun(changedTopRepositoryId,
+      oldRunExpected, '600') &&
+    !isAuthenticPullRequestWorkflowRun(changedBaseRepositoryName,
+      oldRunExpected, '600') &&
+    !isAuthenticPullRequestWorkflowRun(changedHeadRepositoryUrl,
+      oldRunExpected, '600') &&
+    !isAuthenticPullRequestWorkflowRun(missingHeadRepositoryId,
+      oldRunExpected, '600'),
+  'Pull-request run provenance mutations must fail closed.');
   await expectRejected(async () => parseActionsRunTarget(
     'https://evil.invalid/owner/repository/actions/runs/601',
     'owner/repository', 'https://example.invalid'),
@@ -1366,10 +1482,10 @@ async function runSelfTest() {
         if (path.endsWith('/pulls/101')) {
           pullReadCount += 1;
           if (liveRace && pullReadCount > 1) {
-            return { ...pull, head: { sha: '9'.repeat(40) } };
+            return { ...pull, head: { ...pull.head, sha: '9'.repeat(40) } };
           }
           if (baseRace && pullReadCount > 1) {
-            return { ...pull, base: { ref: 'main', sha: baselineSha } };
+            return { ...pull, base: { ...pull.base, sha: baselineSha } };
           }
           return pull;
         }
@@ -2207,9 +2323,13 @@ async function readLivePullState(client, pullNumber) {
     `repos/${client.repository}/pulls/${pullNumber}`);
   assert(isRecord(pull) && pull.number === pullNumber && pull.state === 'open' &&
     isRecord(pull.base) && validRef(pull.base.ref) &&
-    shaPattern.test(pull.base.sha) && isRecord(pull.head) &&
-    shaPattern.test(pull.head.sha),
+    shaPattern.test(pull.base.sha) && isRecord(pull.base.repo) &&
+    isRecord(pull.head) && shaPattern.test(pull.head.sha) &&
+    isRecord(pull.head.repo),
   'Live pull request response is invalid.');
+  const baseRepository = repositoryIdentity(pull.base.repo,
+    client.repository);
+  const headRepository = repositoryIdentity(pull.head.repo);
   const ref = await client.request('GET',
     `repos/${client.repository}/git/ref/heads/${encodeRef(pull.base.ref)}`);
   assert(isRecord(ref) && isRecord(ref.object) &&
@@ -2220,6 +2340,8 @@ async function readLivePullState(client, pullNumber) {
     baseRef: pull.base.ref,
     baseSha: pull.base.sha,
     headSha: pull.head.sha,
+    baseRepository,
+    headRepository,
   };
 }
 
@@ -2343,6 +2465,7 @@ function isAuthenticPullRequestWorkflowRun(run, expected, runId) {
     workflowRunStatuses.has(run.status) &&
     isRecord(run.repository) &&
     run.repository.full_name === expected.repository &&
+    repositoryIdentitiesMatch(run.repository, expected.baseRepository) &&
     run.head_sha === expected.headSha &&
     Array.isArray(run.pull_requests) && run.pull_requests.length === 1)) {
     return false;
@@ -2351,10 +2474,10 @@ function isAuthenticPullRequestWorkflowRun(run, expected, runId) {
   return isRecord(pull) && pull.number === expected.pullNumber &&
     isRecord(pull.base) && pull.base.ref === expected.baseRef &&
     pull.base.sha === expected.baseSha && isRecord(pull.base.repo) &&
-    pull.base.repo.full_name === expected.repository &&
+    repositoryIdentitiesMatch(pull.base.repo, expected.baseRepository) &&
     isRecord(pull.head) && pull.head.sha === expected.headSha &&
     isRecord(pull.head.repo) &&
-    repositoryPattern.test(pull.head.repo.full_name);
+    repositoryIdentitiesMatch(pull.head.repo, expected.headRepository);
 }
 
 function isSuccessfulPullRequestWorkflowRun(run, expected, runId) {
@@ -2388,7 +2511,12 @@ async function hasAuthenticatedNewerSuccess(client, expected, live, latest,
     `repos/${client.repository}/actions/runs/${sourceTarget.runId}`);
   const candidateRun = await client.request('GET',
     `repos/${client.repository}/actions/runs/${candidateTarget.runId}`);
-  const sourceExpected = { ...expected, repository: client.repository };
+  const sourceExpected = {
+    ...expected,
+    repository: client.repository,
+    baseRepository: live.baseRepository,
+    headRepository: live.headRepository,
+  };
   const candidateExpected = { ...live, repository: client.repository };
   return isAuthenticPullRequestWorkflowRun(sourceRun, sourceExpected,
     sourceTarget.runId) &&
