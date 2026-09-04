@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "authorization_id": "issue176-actionlint-gate-d02a7669",
+  "authorization_id": "issue176-review-gaps-cbd1200d",
   "candidate": {
     "base_commit": "70bf7522233a6c8558809a2c2fc22be83a23a7b9",
-    "head_commit": "d02a766957fd5932c7c0a6a3c44a051118b3a70c",
-    "head_tree": "e0912645055013d43faab14bb1cbddfc275bf8a6",
+    "head_commit": "cbd1200d5a2529165bdcd5c10d9aa4aa4b12f73e",
+    "head_tree": "142c5d2f6a1f30b46ac7cdd581856b3908b20295",
     "parent_commits": [
-      "51b91edc0c9f2e0a88218b9cf37a06ea60eb255d"
+      "d02a766957fd5932c7c0a6a3c44a051118b3a70c"
     ]
   },
   "limits": {
@@ -43,9 +43,9 @@
     {
       "path": ".github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs",
       "mode": "100644",
-      "blob": "6364127a5f7e8b556fb7b7bd60c597074319a5a0",
-      "bytes": 112384,
-      "sha256": "6ad64e4d40a89d103ffebfcb016ec68e923bcbc878198e4a31a39b64d009b66f",
+      "blob": "ed662c5eee32cab86d6b6de0ad058f3ac7e3d3a0",
+      "bytes": 116524,
+      "sha256": "4140db75ea2d71ae6b19a62a708c6e959d26f2f448efdcf7de0482734c253421",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "javascript",
       "semantic_invariants": [
@@ -79,9 +79,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "6071e079a603bca03537e2bc309c82e995e104e9",
-      "bytes": 552834,
-      "sha256": "44d12b6ef0bd26b4e898b083597795a9a41374f3076d22402aaf997b4cb858f4",
+      "blob": "1d4fd03cde481304ce26895283991adcc0b40b81",
+      "bytes": 553278,
+      "sha256": "54809cab1465761227711db7be43aea4d8f81e9bb9eb2440b72c7a69540db0ee",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -103,9 +103,9 @@
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "96a86831309b2223e443b260188fad7269fa0013",
-      "bytes": 154655,
-      "sha256": "4eb0b19dcda00f52fb9eca259c6bb57f67e8b39964fa5a5df8ca8a96adb36416",
+      "blob": "67302242541f25f672d2c433bfc41bf539250541",
+      "bytes": 157090,
+      "sha256": "a7f815124c92d8a204bc4f564c9a59bac6771f23ca6dbe8404dc500947ee881b",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
