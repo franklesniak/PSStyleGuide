@@ -148,6 +148,7 @@ export function classifyMutation(previousState, currentState) {
     'mutationClass',
     'materialReason',
     'reviewRequests',
+    'copilotResults',
     'codexResults',
     'publicMutation',
     'metrics',
@@ -217,6 +218,9 @@ export function decideReviewRequest({
 
   const currentKey = getReviewInputKey(currentReviewInput);
   const requests = normalizeCollection(existingRequests);
+  if (requests.some((request) => !isReviewRequestRecord(request))) {
+    throw new TypeError('A review request is malformed or mismatched.');
+  }
   const requestsForCurrentInput = requests.filter(
     (request) => request.reviewInputKey === currentKey,
   );
@@ -247,6 +251,40 @@ export function decideReviewRequest({
       channels: [],
       reason: 'The required pair already exists for this reviewed input.',
     });
+  }
+
+  if (requestsForCurrentInput.length > 0) {
+    return Object.freeze({
+      status: 'REQUEST_REQUIRED',
+      reviewInputKey: currentKey,
+      channels: missingChannels,
+      reason: 'Complete the review pair that already started for this reviewed input.',
+    });
+  }
+
+  if (
+    previousReviewInput !== null &&
+    mutationClass === 'MATERIAL_SCOPE_BEHAVIOR_RISK' &&
+    previousReviewInput.head === currentReviewInput.head
+  ) {
+    const priorSameHeadRequests = requests.filter(
+      (request) => request.head === currentReviewInput.head && request.reviewInputKey !== currentKey,
+    );
+    const priorKeys = new Set(priorSameHeadRequests.map((request) => request.reviewInputKey));
+    const hasPendingPriorPair = [...priorKeys].some((key) => {
+      const pair = priorSameHeadRequests.filter((request) => request.reviewInputKey === key);
+      const channels = new Set(pair.map((request) => request.channel));
+      return channels.size !== 2 || pair.some((request) => request.terminal !== true);
+    });
+
+    if (hasPendingPriorPair) {
+      return Object.freeze({
+        status: 'WAIT_FOR_PRIOR_PAIR',
+        reviewInputKey: currentKey,
+        channels: [],
+        reason: 'A prior review pair on this head must become terminal before another pair starts.',
+      });
+    }
   }
 
   if (previousReviewInput === null || mutationClass === 'CODE_OR_DIFF') {
@@ -310,7 +348,7 @@ function getItemTime(item, fields) {
   return null;
 }
 
-function isReviewRequestForInput(request, reviewInput, requiredChannel = null) {
+function isReviewRequestRecord(request) {
   const reviewBaselinesAreValid = Array.isArray(request?.baselineReviewNodeIds) &&
     request.baselineReviewNodeIds.every((id) => typeof id === 'string' && id.length > 0) &&
     new Set(request.baselineReviewNodeIds).size === request.baselineReviewNodeIds.length;
@@ -325,12 +363,21 @@ function isReviewRequestForInput(request, reviewInput, requiredChannel = null) {
   const channelIsValid = request?.channel === 'copilot' || request?.channel === 'codex';
 
   return channelIsValid &&
-    (requiredChannel === null || request.channel === requiredChannel) &&
-    request.head === reviewInput?.head &&
-    request.reviewInputKey === getReviewInputKey(reviewInput) &&
+    typeof request.terminal === 'boolean' &&
+    typeof request.head === 'string' &&
+    SHA1_PATTERN.test(request.head) &&
+    typeof request.reviewInputKey === 'string' &&
+    SHA256_PATTERN.test(request.reviewInputKey) &&
     getItemTime(request, ['requestedAt']) !== null &&
     reviewBaselinesAreValid &&
     commentBaselinesAreValid;
+}
+
+function isReviewRequestForInput(request, reviewInput, requiredChannel = null) {
+  return isReviewRequestRecord(request) &&
+    (requiredChannel === null || request.channel === requiredChannel) &&
+    request.head === reviewInput?.head &&
+    request.reviewInputKey === getReviewInputKey(reviewInput);
 }
 
 export function collectCodexResults({
@@ -354,7 +401,6 @@ export function collectCodexResults({
     return Object.freeze({
       submittedReviews: [],
       conversationComments: [],
-      total: 0,
     });
   }
 
@@ -407,7 +453,6 @@ export function collectCodexResults({
   return Object.freeze({
     submittedReviews: reviews,
     conversationComments: comments,
-    total: reviews.length + comments.length,
   });
 }
 
@@ -423,22 +468,22 @@ export function reconcilePublicMutation({
     canonicalJson(readback) === canonicalJson(expected);
   const recordSucceeded = Boolean(localRecordSucceeded);
 
-  if (readbackMatched) {
-    return Object.freeze({
-      state: 'CONFIRMED',
-      nativeResponseAccepted,
-      readbackMatched,
-      retryAllowed: false,
-      localRecordSucceeded: recordSucceeded,
-    });
-  }
-
   if (response?.executed === false) {
     return Object.freeze({
       state: 'NOT_EXECUTED',
       nativeResponseAccepted,
       readbackMatched,
       retryAllowed: true,
+      localRecordSucceeded: recordSucceeded,
+    });
+  }
+
+  if (nativeResponseAccepted && readbackMatched) {
+    return Object.freeze({
+      state: 'CONFIRMED',
+      nativeResponseAccepted,
+      readbackMatched,
+      retryAllowed: false,
       localRecordSucceeded: recordSucceeded,
     });
   }
@@ -473,29 +518,59 @@ export function createMetrics({
   cleanPairAt,
   mergedAt,
 }) {
+  const parseTimestamp = (value, label) => {
+    if (typeof value !== 'string' || value.length === 0) {
+      throw new TypeError(`${label} must be a valid timestamp.`);
+    }
+
+    const timestamp = Date.parse(value);
+    if (!Number.isFinite(timestamp)) {
+      throw new TypeError(`${label} must be a valid timestamp.`);
+    }
+
+    return timestamp;
+  };
+
   const requestsPerHead = {};
   for (const request of normalizeCollection(reviewRequests)) {
     requestsPerHead[request.head] = (requestsPerHead[request.head] ?? 0) + 1;
   }
 
-  const reviewStart = Date.parse(reviewBeganAt);
-  const bodyEditsAfterReviewBegan = normalizeCollection(bodyEditTimes).filter(
-    (time) => Date.parse(time) > reviewStart,
+  const reviewStart = parseTimestamp(reviewBeganAt, 'reviewBeganAt');
+  const parsedBodyEditTimes = normalizeCollection(bodyEditTimes).map(
+    (time, index) => parseTimestamp(time, `bodyEditTimes[${index}]`),
+  );
+  const bodyEditsAfterReviewBegan = parsedBodyEditTimes.filter(
+    (time) => time > reviewStart,
   ).length;
 
-  const elapsed = (start, end) => {
-    if (start === null || end === null) {
+  const elapsed = (start, end, startLabel, endLabel) => {
+    if (start === null && end === null) {
       return null;
     }
 
-    return Date.parse(end) - Date.parse(start);
+    if (start === null || end === null) {
+      throw new TypeError(`${startLabel} and ${endLabel} must both be null or valid timestamps.`);
+    }
+
+    const milliseconds = parseTimestamp(end, endLabel) - parseTimestamp(start, startLabel);
+    if (milliseconds < 0) {
+      throw new TypeError(`${endLabel} must not be earlier than ${startLabel}.`);
+    }
+
+    return milliseconds;
   };
 
   return Object.freeze({
     reviewerRequestsPerHead: requestsPerHead,
     bodyEditsAfterReviewBegan,
     sameHeadRerequestReasons: normalizeCollection(sameHeadRerequestReasons),
-    cleanReviewRecognitionMilliseconds: elapsed(cleanReviewAt, recognizedAt),
-    cleanPairToMergeMilliseconds: elapsed(cleanPairAt, mergedAt),
+    cleanReviewRecognitionMilliseconds: elapsed(
+      cleanReviewAt,
+      recognizedAt,
+      'cleanReviewAt',
+      'recognizedAt',
+    ),
+    cleanPairToMergeMilliseconds: elapsed(cleanPairAt, mergedAt, 'cleanPairAt', 'mergedAt'),
   });
 }

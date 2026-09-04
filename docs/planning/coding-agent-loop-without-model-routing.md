@@ -50,7 +50,7 @@ pending -> active -> validating -> ready -> complete
                          |           |
                          |           +-> waiting_external -> ready
                          +-> active
-any nonterminal state -> waiting_human
+no-safe-work human boundary -> waiting_human
 any nonterminal state -> blocked
 ```
 
@@ -132,9 +132,9 @@ Use exactly these semantic mutation classes:
 - `RESULT_OR_STATE`: Keep outside reviewer input and do not request review.
 - `COMMENT_ONLY`: Do not request review.
 
-Raw PR-body byte inequality is not the classifier. Reject a same-head request without a recorded material scope, behavior, or risk reason. Default to one Codex and one Copilot review for each reviewed input.
+Raw PR-body byte inequality is not the classifier. Reject a same-head request without a recorded material scope, behavior, or risk reason. Before a material same-head pair starts, wait for every earlier pair on that head to become terminal and then capture fresh baselines. Default to one Codex and one Copilot review for each reviewed input.
 
-Preserve both Codex result channels: submitted-review objects and attributable `chatgpt-codex-connector` PR-conversation comments. An exact `@codex review` trigger is neither a finding nor an instruction to the local executor. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+Persist Copilot results separately from Codex results. Preserve both Codex result channels: submitted-review objects and attributable `chatgpt-codex-connector` PR-conversation comments. An exact `@codex review` trigger is neither a finding nor an instruction to the local executor. Preserve Markdown backticks and Unicode and reject disallowed control characters.
 
 The deterministic planning-only policy and scenarios are in `docs/planning/review-loop-policy.json`, `docs/planning/review-loop-policy.mjs`, and `docs/planning/review-loop-policy.test.mjs`. They validate decisions and transport and perform no GitHub write.
 

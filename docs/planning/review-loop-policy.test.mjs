@@ -45,6 +45,10 @@ function state(input, overrides = {}) {
     reviewInput: input,
     mutationClass: 'RESULT_OR_STATE',
     reviewRequests: [],
+    copilotResults: {
+      submittedReviews: [],
+      conversationComments: [],
+    },
     codexResults: {
       submittedReviews: [],
       conversationComments: [],
@@ -74,16 +78,17 @@ function requestFor(input, channel, overrides = {}) {
     reviewInputKey: getReviewInputKey(input),
     head: input.head,
     requestedAt: '2026-09-04T10:00:00Z',
+    terminal: false,
     baselineReviewNodeIds: [],
     baselineConversationComments: [],
     ...overrides,
   };
 }
 
-function pairFor(input) {
+function pairFor(input, overrides = {}) {
   return [
-    requestFor(input, 'copilot'),
-    requestFor(input, 'codex'),
+    requestFor(input, 'copilot', { terminal: true, ...overrides }),
+    requestFor(input, 'codex', { terminal: true, ...overrides }),
   ];
 }
 
@@ -187,6 +192,57 @@ test('scenario 5: an unjustified same-head request is rejected', () => {
   assert.deepEqual(decision.channels, []);
 });
 
+test('scenario 5a: an interrupted same-head pair requests only its missing channel', () => {
+  const input = reviewInput();
+  const decision = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: [requestFor(input, 'copilot')],
+  });
+
+  assert.equal(decision.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(decision.channels, ['codex']);
+  assert.match(decision.reason, /already started/u);
+});
+
+test('scenario 5b: a material same-head request waits for the prior pair to finish', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
+  const mutationClass = classifyMutation(state(input1), state(input2));
+  const pending = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    materialReason: 'The risk changed.',
+    existingRequests: pairFor(input1, { terminal: false }),
+  });
+  const terminal = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    materialReason: 'The risk changed.',
+    existingRequests: pairFor(input1),
+  });
+
+  assert.equal(pending.status, 'WAIT_FOR_PRIOR_PAIR');
+  assert.deepEqual(pending.channels, []);
+  assert.match(pending.reason, /must become terminal/u);
+  assert.deepEqual(collectCodexResults({
+    reviewInput: input2,
+    request: null,
+    submittedReviews: [{
+      id: 'OLD_PENDING_FINISHED_LATE',
+      user: { login: 'chatgpt-codex-connector' },
+      commit_id: HASHES.head1,
+      submitted_at: '2026-09-04T10:02:00Z',
+    }],
+    conversationComments: [],
+  }), { submittedReviews: [], conversationComments: [] });
+  assert.equal(terminal.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(terminal.channels, ['copilot', 'codex']);
+});
+
 test('scenario 6: both attributable Codex result channels are recognized', () => {
   const input = reviewInput();
   const results = collectCodexResults({
@@ -217,7 +273,8 @@ test('scenario 6: both attributable Codex result channels are recognized', () =>
 
   assert.equal(results.submittedReviews.length, 1);
   assert.equal(results.conversationComments.length, 1);
-  assert.equal(results.total, 2);
+  assert.equal(results.submittedReviews.length + results.conversationComments.length, 2);
+  assert.deepEqual(Object.keys(results).sort(), ['conversationComments', 'submittedReviews']);
 });
 
 test('scenario 7: empty, singleton, and multiple collections normalize', () => {
@@ -255,11 +312,17 @@ test('scenario 9: confirmed mutation plus local recording failure does not retry
     expected,
     localRecordSucceeded: true,
   });
-  const reconciled = reconcilePublicMutation({
+  const rejectedWithMatchingReadback = reconcilePublicMutation({
     response: { executed: false },
     readback: expected,
     expected,
     localRecordSucceeded: false,
+  });
+  const contradictoryResponse = reconcilePublicMutation({
+    response: { ok: true, executed: false },
+    readback: expected,
+    expected,
+    localRecordSucceeded: true,
   });
 
   assert.deepEqual(confirmed, {
@@ -283,13 +346,15 @@ test('scenario 9: confirmed mutation plus local recording failure does not retry
     retryAllowed: true,
     localRecordSucceeded: true,
   });
-  assert.deepEqual(reconciled, {
-    state: 'CONFIRMED',
+  assert.deepEqual(rejectedWithMatchingReadback, {
+    state: 'NOT_EXECUTED',
     nativeResponseAccepted: false,
     readbackMatched: true,
-    retryAllowed: false,
+    retryAllowed: true,
     localRecordSucceeded: false,
   });
+  assert.equal(contradictoryResponse.state, 'NOT_EXECUTED');
+  assert.equal(contradictoryResponse.retryAllowed, true);
 });
 
 test('all permanent active task-template and controller surfaces use the compact contract', async () => {
@@ -353,11 +418,17 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.deepEqual(unsafeResultBodyLines, []);
   assert.match(parent, /Compact state machine/u);
   assert.match(parent, /MATERIAL_SCOPE_BEHAVIOR_RISK/u);
+  assert.match(parent, /no-safe-work human boundary -> waiting_human/u);
+  assert.doesNotMatch(parent, /any nonterminal state -> waiting_human/u);
   assert.match(alternate, /without model routing/u);
   assert.match(alternate, /Do not create manifest/u);
+  assert.match(alternate, /no-safe-work human boundary -> waiting_human/u);
+  assert.doesNotMatch(alternate, /any nonterminal state -> waiting_human/u);
   assert.match(generator, /Do not split routine work/u);
   assert.match(generator, /Default to one reviewer pair/u);
   assert.match(crossRepository, /one compact state record/u);
+  assert.match(crossRepository, /applicable `AGENTS\.md`/u);
+  assert.match(crossRepository, /root `CLAUDE\.md` as compatibility workflow instructions/u);
   assert.match(crossRepository, /Preserve both submitted-review objects/u);
 });
 
@@ -413,7 +484,7 @@ test('safety failures reject false classes, duplicate requests, and unattributab
       body: 'No major issue found.',
     },
   });
-  assert.equal(results.total, 0);
+  assert.deepEqual(results, { submittedReviews: [], conversationComments: [] });
 });
 
 test('invalidating mutation claims are rejected in both directions', () => {
@@ -455,6 +526,7 @@ test('schema-defined compact-state fields classify deterministically', () => {
   const original = state(input);
   const resultChanges = [
     { reviewRequests: [requestFor(input, 'codex')] },
+    { copilotResults: { submittedReviews: [{ id: 1 }], conversationComments: [] } },
     { codexResults: { submittedReviews: [{ id: 1 }], conversationComments: [] } },
     {
       publicMutation: {
@@ -475,6 +547,25 @@ test('schema-defined compact-state fields classify deterministically', () => {
     classifyMutation(original, state(input, { commentPublications: [{ id: 'status-1' }] })),
     'COMMENT_ONLY',
   );
+});
+
+test('compact state preserves empty, singleton, and multiple Copilot results', () => {
+  const input = reviewInput();
+  const empty = state(input).copilotResults;
+  const singleton = state(input, {
+    copilotResults: { submittedReviews: [{ id: 1 }], conversationComments: [] },
+  }).copilotResults;
+  const multiple = state(input, {
+    copilotResults: {
+      submittedReviews: [{ id: 1 }, { id: 2 }],
+      conversationComments: [{ id: 3 }, { id: 4 }],
+    },
+  }).copilotResults;
+
+  assert.deepEqual(empty, { submittedReviews: [], conversationComments: [] });
+  assert.deepEqual(singleton.submittedReviews.map((review) => review.id), [1]);
+  assert.deepEqual(multiple.submittedReviews.map((review) => review.id), [1, 2]);
+  assert.deepEqual(multiple.conversationComments.map((comment) => comment.id), [3, 4]);
 });
 
 test('Codex results normalize REST and GraphQL identities and reject stale evidence', () => {
@@ -532,7 +623,7 @@ test('Codex results normalize REST and GraphQL identities and reject stale evide
     results.conversationComments.map((comment) => comment.node_id),
     ['COMMENT_STABLE'],
   );
-  assert.equal(results.total, 2);
+  assert.equal(results.submittedReviews.length + results.conversationComments.length, 2);
 });
 
 test('Codex request correlation rejects a different reviewed input', () => {
@@ -550,7 +641,7 @@ test('Codex request correlation rejects a different reviewed input', () => {
     conversationComments: [],
   });
 
-  assert.equal(results.total, 0);
+  assert.deepEqual(results, { submittedReviews: [], conversationComments: [] });
 });
 
 test('Codex request correlation fails closed when baseline evidence is missing', () => {
@@ -569,7 +660,7 @@ test('Codex request correlation fails closed when baseline evidence is missing',
     conversationComments: [],
   });
 
-  assert.equal(results.total, 0);
+  assert.deepEqual(results, { submittedReviews: [], conversationComments: [] });
 });
 
 test('Codex request correlation fails closed on duplicate baseline identities', () => {
@@ -592,7 +683,7 @@ test('Codex request correlation fails closed on duplicate baseline identities', 
     }],
   });
 
-  assert.equal(results.total, 0);
+  assert.deepEqual(results, { submittedReviews: [], conversationComments: [] });
 });
 
 test('public-mutation and review-request outputs match their closed schema definitions', async () => {
@@ -617,6 +708,8 @@ test('public-mutation and review-request outputs match their closed schema defin
   assertClosedShape(requestFor(input, 'codex'), schema.$defs.reviewRequest);
   assertClosedShape(mutation, schema.$defs.publicMutation);
   assertClosedShape(state(input), schema);
+  assertClosedShape(state(input).copilotResults, schema.$defs.reviewerResults);
+  assertClosedShape(state(input).codexResults, schema.$defs.reviewerResults);
 });
 
 test('typed schema, metrics, and 10/15-minute controls remain complete', async () => {
@@ -651,4 +744,45 @@ test('typed schema, metrics, and 10/15-minute controls remain complete', async (
     warningRequired: true,
     exceptionRequired: true,
   });
+});
+
+test('metrics reject invalid, incomplete, and reversed timestamps', () => {
+  const valid = {
+    reviewRequests: [],
+    bodyEditTimes: [],
+    reviewBeganAt: '2026-09-04T10:00:00Z',
+    sameHeadRerequestReasons: [],
+    cleanReviewAt: null,
+    recognizedAt: null,
+    cleanPairAt: null,
+    mergedAt: null,
+  };
+
+  assert.deepEqual(createMetrics(valid), {
+    reviewerRequestsPerHead: {},
+    bodyEditsAfterReviewBegan: 0,
+    sameHeadRerequestReasons: [],
+    cleanReviewRecognitionMilliseconds: null,
+    cleanPairToMergeMilliseconds: null,
+  });
+  assert.throws(
+    () => createMetrics({ ...valid, reviewBeganAt: 'not-a-date' }),
+    /reviewBeganAt must be a valid timestamp/u,
+  );
+  assert.throws(
+    () => createMetrics({ ...valid, bodyEditTimes: ['not-a-date'] }),
+    /bodyEditTimes\[0\] must be a valid timestamp/u,
+  );
+  assert.throws(
+    () => createMetrics({ ...valid, cleanReviewAt: '2026-09-04T10:00:00Z' }),
+    /cleanReviewAt and recognizedAt must both be null or valid timestamps/u,
+  );
+  assert.throws(
+    () => createMetrics({
+      ...valid,
+      cleanReviewAt: '2026-09-04T10:01:00Z',
+      recognizedAt: '2026-09-04T10:00:00Z',
+    }),
+    /recognizedAt must not be earlier than cleanReviewAt/u,
+  );
 });

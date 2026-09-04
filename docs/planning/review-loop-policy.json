@@ -9,6 +9,7 @@
     "reviewInput",
     "mutationClass",
     "reviewRequests",
+    "copilotResults",
     "codexResults",
     "publicMutation",
     "metrics",
@@ -36,7 +37,27 @@
         "$ref": "#/$defs/reviewRequest"
       }
     },
+    "copilotResults": {
+      "$ref": "#/$defs/reviewerResults"
+    },
     "codexResults": {
+      "$ref": "#/$defs/reviewerResults"
+    },
+    "publicMutation": {
+      "$ref": "#/$defs/publicMutation"
+    },
+    "metrics": {
+      "$ref": "#/$defs/metrics"
+    },
+    "commentPublications": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "$defs": {
+    "reviewerResults": {
       "type": "object",
       "additionalProperties": false,
       "required": [
@@ -58,20 +79,6 @@
         }
       }
     },
-    "publicMutation": {
-      "$ref": "#/$defs/publicMutation"
-    },
-    "metrics": {
-      "$ref": "#/$defs/metrics"
-    },
-    "commentPublications": {
-      "type": "array",
-      "items": {
-        "type": "object"
-      }
-    }
-  },
-  "$defs": {
     "sha1": {
       "type": "string",
       "pattern": "^[0-9a-f]{40}$"
@@ -136,6 +143,7 @@
         "reviewInputKey",
         "head",
         "requestedAt",
+        "terminal",
         "baselineReviewNodeIds",
         "baselineConversationComments"
       ],
@@ -155,6 +163,9 @@
         "requestedAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "terminal": {
+          "type": "boolean"
         },
         "baselineReviewNodeIds": {
           "type": "array",
