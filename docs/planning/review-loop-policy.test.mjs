@@ -82,7 +82,8 @@ function state(input, overrides = {}) {
   if (!Object.hasOwn(overrides, 'metrics')) {
     const requestsPerHead = { [input.head]: 0 };
     for (const request of value.reviewRequests) {
-      requestsPerHead[request.head] = (requestsPerHead[request.head] ?? 0) + 1;
+      requestsPerHead[request.head] =
+        (requestsPerHead[request.head] ?? 0) + (request.attemptCount ?? 1);
     }
     value.metrics = {
       ...value.metrics,
@@ -891,6 +892,58 @@ test('Codex requests require durable Copilot readiness ordering', async () => {
   );
 });
 
+test('a Copilot request without readyAt cannot release Codex', () => {
+  const input = reviewInput();
+  const copilotRequest = requestFor(input, 'copilot', {
+    confirmed: true,
+    terminal: false,
+  });
+  delete copilotRequest.readyAt;
+  const waiting = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: [copilotRequest],
+  });
+
+  assert.equal(waiting.status, 'WAIT_FOR_CURRENT_CHANNEL');
+  assert.deepEqual(waiting.channels, []);
+
+  copilotRequest.readyAt = copilotRequest.requestedAt;
+  const released = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: [copilotRequest],
+  });
+  assert.equal(released.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(released.channels, ['codex']);
+
+  const terminalRequest = requestFor(input, 'copilot', {
+    terminal: true,
+    terminalDisposition: nonfunctionalDisposition(),
+  });
+  delete terminalRequest.readyAt;
+  const terminalWaiting = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: [terminalRequest],
+  });
+  assert.equal(terminalWaiting.status, 'WAIT_FOR_CURRENT_CHANNEL');
+  assert.deepEqual(terminalWaiting.channels, []);
+
+  terminalRequest.readyAt = terminalRequest.terminalDisposition.recordedAt;
+  const terminalReleased = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: [terminalRequest],
+  });
+  assert.equal(terminalReleased.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(terminalReleased.channels, ['codex']);
+});
+
 test('persisted and collection request histories enforce global pair serialization', () => {
   const input1 = reviewInput();
   const input2 = reviewInput({
@@ -1147,13 +1200,20 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
         total_count: 1,
         check_runs: [{
           id: 'new-check-run',
-          app: { slug: 'copilot-pull-request-reviewer' },
+          name: 'copilot-pull-request-reviewer',
+          app: {
+            id: 15368,
+            node_id: 'MDM6QXBwMTUzNjg=',
+            slug: 'github-actions',
+            name: 'GitHub Actions',
+            owner: { login: 'github' },
+          },
           head_sha: HASHES.head1,
           created_at: '2026-09-04T10:01:00Z',
         }],
       },
     }).reviewRunMatched,
-    true,
+    false,
   );
   assert.equal(
     collectCopilotRequestEvidence({
@@ -1867,6 +1927,12 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.equal(plan.split(baselineOverlapRule).length - 1, 82);
   for (const surface of [parent, alternate, generator, crossRepository]) {
     assert.match(surface, new RegExp(baselineOverlapRule, 'u'));
+  }
+  const checkRunAuthenticationRule =
+    'do not authenticate Copilot from a mutable check-run name plus the generic ' +
+    'GitHub Actions App identity';
+  for (const surface of [plan, parent, alternate, generator, crossRepository]) {
+    assert.match(surface, new RegExp(checkRunAuthenticationRule, 'u'));
   }
 });
 
@@ -2705,6 +2771,52 @@ test('confirmed terminal requests require one attributable persisted result', as
     /assigned to multiple requests/u,
   );
 
+  const sameHeadInput = reviewInput({ risk: 'R2 sensitive planning change.' });
+  const sharedResult = {
+    id: 71,
+    nodeId: 'SHARED_RESULT_NODE',
+    actor: 'copilot-pull-request-reviewer[bot]',
+    commit: input.head,
+    submittedAt: '2026-09-04T10:01:00Z',
+  };
+  const alternateIdentityReuse = compactState(sameHeadInput, {
+    mutationClass: 'MATERIAL_SCOPE_BEHAVIOR_RISK',
+    materialReason: 'The reviewed risk changed.',
+    reviewRequests: [
+      requestFor(input, 'copilot', {
+        confirmed: true,
+        terminal: true,
+        terminalResultRef: {
+          kind: 'submitted-review',
+          id: '71',
+          observedAt: '2026-09-04T10:01:00Z',
+        },
+      }),
+      requestFor(sameHeadInput, 'copilot', {
+        confirmed: true,
+        terminal: true,
+        requestedAt: '2026-09-04T10:01:00Z',
+        terminalResultRef: {
+          kind: 'submitted-review',
+          id: 'SHARED_RESULT_NODE',
+          observedAt: '2026-09-04T10:01:00Z',
+        },
+      }),
+    ],
+    supersededReviewInputs: supersessionFor(input, sameHeadInput, {
+      supersededAt: '2026-09-04T10:01:00Z',
+    }),
+    copilotResults: {
+      submittedReviews: [sharedResult],
+      conversationComments: [],
+    },
+  });
+  assertSchemaValid(alternateIdentityReuse, schema, schema);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(alternateIdentityReuse)),
+    /terminal result is assigned to multiple requests/u,
+  );
+
   const copilotConversation = structuredClone(validCopilot);
   copilotConversation.current_task.review.reviewRequests[0].terminalResultRef.kind =
     'conversation-comment';
@@ -3418,7 +3530,9 @@ test('compact-state ingestion requires state-dependent reconciliation timestamps
     delete missingAttempt.attemptedAt;
     assert.throws(
       () => parseCompactStateJson(JSON.stringify(compactState(input, {
-        reviewRequests: [reviewRequest],
+        reviewRequests: [requestFor(input, 'copilot', {
+          attemptCount: mutation.attemptCount,
+        })],
         publicMutation: missingAttempt,
       }))),
       /must contain attemptedAt/u,
@@ -3429,7 +3543,9 @@ test('compact-state ingestion requires state-dependent reconciliation timestamps
     delete missingReconciliation.reconciledAt;
     assert.throws(
       () => parseCompactStateJson(JSON.stringify(compactState(input, {
-        reviewRequests: [reviewRequest],
+        reviewRequests: [requestFor(input, 'copilot', {
+          attemptCount: mutation.attemptCount,
+        })],
         publicMutation: missingReconciliation,
       }))),
       /must contain (?:a null )?reconciledAt/u,
@@ -3731,6 +3847,29 @@ test('public-mutation schema rejects every contradictory persisted state', async
       JSON.stringify(mutation),
     );
   }
+
+  const input = reviewInput();
+  const request = requestFor(input, 'copilot');
+  for (const mutation of reviewMutations.slice(0, 3)) {
+    const triggerMatched = {
+      ...mutation,
+      evidence: { ...mutation.evidence, triggerCommentMatched: true },
+    };
+    const persisted = compactState(input, {
+      reviewRequests: [request],
+      publicMutation: triggerMatched,
+    });
+    assert.throws(
+      () => assertSchemaValid(persisted, schema, schema),
+      undefined,
+      triggerMatched.state,
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(persisted)),
+      /mutation evidence is malformed/u,
+      triggerMatched.state,
+    );
+  }
 });
 
 test('a confirmed request survives local state-write failure without a duplicate', () => {
@@ -3762,7 +3901,7 @@ test('typed schema, metrics, and 10/15-minute controls remain complete', async (
   const metrics = createMetrics({
     reviewedHeads: [HASHES.head1, HASHES.head2, '3'.repeat(40)],
     reviewRequests: [
-      { head: HASHES.head1 },
+      { head: HASHES.head1, attemptCount: 2 },
       { head: HASHES.head1 },
       { head: HASHES.head2 },
     ],
@@ -3776,7 +3915,8 @@ test('typed schema, metrics, and 10/15-minute controls remain complete', async (
   });
 
   assert.deepEqual(mutationClasses, MUTATION_CLASSES);
-  assert.equal(metrics.reviewerRequestsPerHead[HASHES.head1], 2);
+  assert.equal(metrics.reviewerRequestsPerHead[HASHES.head1], 3);
+  assert.equal(metrics.reviewerRequestsPerHead[HASHES.head2], 1);
   assert.equal(metrics.reviewerRequestsPerHead['3'.repeat(40)], 0);
   assert.equal(metrics.bodyEditsAfterReviewBegan, 1);
   assert.equal(metrics.cleanReviewRecognitionMilliseconds, 5_000);
@@ -3808,6 +3948,71 @@ test('typed schema, metrics, and 10/15-minute controls remain complete', async (
     warningRequired: true,
     exceptionRequired: true,
   });
+  assert.deepEqual(evaluateFindingBudget({ elapsedMinutes: 15, hasOutcome: true }), {
+    warningRequired: false,
+    exceptionRequired: false,
+  });
+  for (const hasOutcome of ['false', 0, null, undefined]) {
+    assert.throws(
+      () => evaluateFindingBudget({ elapsedMinutes: 15, hasOutcome }),
+      /hasOutcome must be a Boolean/u,
+    );
+  }
+});
+
+test('physical request attempts drive persisted per-head metrics consistently', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const request = requestFor(input, 'copilot', { attemptCount: 2 });
+  const evidence = {
+    responseReviewerMatched: false,
+    requestEventMatched: true,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    triggerCommentMatched: false,
+    readbackComplete: true,
+  };
+  const publicMutation = reconcileReviewRequestMutation({
+    response: { ok: true },
+    evidence,
+    reviewInputKey: getReviewInputKey(input),
+    channel: 'copilot',
+    attemptedAt: request.requestedAt,
+    observedAt: '2026-09-04T10:02:00Z',
+    attemptCount: 2,
+    localRecordSucceeded: true,
+  });
+  const valid = compactState(input, {
+    reviewRequests: [request],
+    publicMutation,
+  });
+
+  assert.equal(valid.current_task.review.metrics.reviewerRequestsPerHead[input.head], 2);
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  const contradictory = structuredClone(valid);
+  delete contradictory.current_task.review.reviewRequests[0].attemptCount;
+  contradictory.current_task.review.metrics.reviewerRequestsPerHead[input.head] = 1;
+  assertSchemaValid(contradictory, schema, schema);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(contradictory)),
+    /attempt count must match its persisted request/u,
+  );
+
+  for (const attemptCount of [0, 3, 1.5, '2']) {
+    const invalid = compactState(input, {
+      reviewRequests: [requestFor(input, 'copilot', { attemptCount })],
+    });
+    assert.throws(() => assertSchemaValid(invalid, schema, schema));
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /persisted review request is malformed/u,
+    );
+  }
 });
 
 test('metrics reject invalid, incomplete, and reversed timestamps', () => {

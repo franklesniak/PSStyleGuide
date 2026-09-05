@@ -398,6 +398,11 @@
         "requestedAt": {
           "$ref": "#/$defs/rfc3339"
         },
+        "attemptCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
         "readyAt": {
           "$ref": "#/$defs/rfc3339"
         },
@@ -840,6 +845,9 @@
                       },
                       "reviewRunMatched": {
                         "const": false
+                      },
+                      "triggerCommentMatched": {
+                        "const": false
                       }
                     }
                   }
@@ -899,6 +907,9 @@
                         "const": false
                       },
                       "reviewRunMatched": {
+                        "const": false
+                      },
+                      "triggerCommentMatched": {
                         "const": false
                       },
                       "readbackComplete": {
@@ -962,6 +973,9 @@
                         "const": false
                       },
                       "reviewRunMatched": {
+                        "const": false
+                      },
+                      "triggerCommentMatched": {
                         "const": false
                       },
                       "readbackComplete": {

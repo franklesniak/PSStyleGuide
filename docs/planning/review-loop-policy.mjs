@@ -73,6 +73,22 @@ const PUBLIC_MUTATION_BOOLEAN_FIELDS = Object.freeze([
   'retryAllowed',
   'localRecordSucceeded',
 ]);
+const REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
+  'responseReviewerMatched',
+  'requestEventMatched',
+  'requestedReviewerMatched',
+  'submittedReviewMatched',
+  'reviewRunMatched',
+  'triggerCommentMatched',
+  'readbackComplete',
+]);
+const DURABLE_REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
+  'requestEventMatched',
+  'requestedReviewerMatched',
+  'submittedReviewMatched',
+  'reviewRunMatched',
+  'triggerCommentMatched',
+]);
 
 function canonicalize(value) {
   if (Array.isArray(value)) {
@@ -464,7 +480,10 @@ function validatePersistedRequestMetrics(metrics, requests, currentHead) {
 
   const actualCounts = new Map();
   for (const request of requests) {
-    actualCounts.set(request.head, (actualCounts.get(request.head) ?? 0) + 1);
+    actualCounts.set(
+      request.head,
+      (actualCounts.get(request.head) ?? 0) + getReviewRequestAttemptCount(request),
+    );
   }
   const entries = Object.entries(requestsPerHead);
   if (entries.some(
@@ -559,6 +578,23 @@ function validatePersistedPublicMutation(publicMutation, requests) {
   let matchingRequest = null;
   if (hasEvidence) {
     if (
+      publicMutation.evidence === null ||
+      typeof publicMutation.evidence !== 'object' ||
+      Array.isArray(publicMutation.evidence) ||
+      Object.keys(publicMutation.evidence).length !== REVIEW_REQUEST_EVIDENCE_FIELDS.length ||
+      REVIEW_REQUEST_EVIDENCE_FIELDS.some(
+        (field) => typeof publicMutation.evidence[field] !== 'boolean',
+      ) ||
+      (
+        ['RECONCILING', 'NO_EFFECT', 'EXHAUSTED'].includes(publicMutation.state) &&
+        DURABLE_REVIEW_REQUEST_EVIDENCE_FIELDS.some(
+          (field) => publicMutation.evidence[field] !== false,
+        )
+      )
+    ) {
+      throw new TypeError('Persisted review-request mutation evidence is malformed.');
+    }
+    if (
       typeof publicMutation.reviewInputKey !== 'string' ||
       !SHA256_PATTERN.test(publicMutation.reviewInputKey) ||
       !['copilot', 'codex'].includes(publicMutation.channel)
@@ -575,6 +611,16 @@ function validatePersistedPublicMutation(publicMutation, requests) {
       );
     }
     [matchingRequest] = matches;
+    if (
+      !Number.isInteger(publicMutation.attemptCount) ||
+      publicMutation.attemptCount < 1 ||
+      publicMutation.attemptCount > 2 ||
+      publicMutation.attemptCount !== getReviewRequestAttemptCount(matchingRequest)
+    ) {
+      throw new TypeError(
+        'A review-request mutation attempt count must match its persisted request.',
+      );
+    }
     if (
       publicMutation.state === 'NO_EFFECT' &&
       (matchingRequest.confirmed === true || matchingRequest.terminal === true)
@@ -1352,6 +1398,12 @@ function isReviewRequestRecord(request) {
   const hasReadyAt = Object.hasOwn(request ?? {}, 'readyAt');
   const hasTerminalDisposition = Object.hasOwn(request ?? {}, 'terminalDisposition');
   const hasTerminalResultRef = Object.hasOwn(request ?? {}, 'terminalResultRef');
+  const attemptCountIsValid = !Object.hasOwn(request ?? {}, 'attemptCount') ||
+    (
+      Number.isInteger(request.attemptCount) &&
+      request.attemptCount >= 1 &&
+      request.attemptCount <= 2
+    );
   const terminalDispositionIsValid = hasTerminalDisposition
     ? request.terminal === true &&
       request.confirmed === false &&
@@ -1387,9 +1439,20 @@ function isReviewRequestRecord(request) {
     requestedTime !== null &&
     identityBaselinesAreValid &&
     commentBaselinesAreValid &&
+    attemptCountIsValid &&
     terminalDispositionIsValid &&
     terminalResultRefIsValid &&
     readyAtIsValid;
+}
+
+function getReviewRequestAttemptCount(request) {
+  const attemptCount = Object.hasOwn(request ?? {}, 'attemptCount')
+    ? request.attemptCount
+    : 1;
+  if (!Number.isInteger(attemptCount) || attemptCount < 1 || attemptCount > 2) {
+    throw new TypeError('A review-request attempt count must be one or two.');
+  }
+  return attemptCount;
 }
 
 function isTerminalResultRef(reference) {
@@ -1538,20 +1601,11 @@ function validateTerminalResultReferences(requests, reviewState) {
     }
   }
 
-  const seenReferences = new Set();
+  const seenResultIdentities = new Set();
   for (const request of requests.filter(
     (candidate) => candidate.confirmed === true && candidate.terminal === true,
   )) {
     const reference = request.terminalResultRef;
-    const referenceIdentity = canonicalJson({
-      channel: request.channel,
-      ...reference,
-    });
-    if (seenReferences.has(referenceIdentity)) {
-      throw new TypeError('A terminal result reference is assigned to multiple requests.');
-    }
-    seenReferences.add(referenceIdentity);
-
     const collection = reference.kind === 'submitted-review'
       ? resultCollections[request.channel].submittedReviews
       : resultCollections[request.channel].conversationComments;
@@ -1563,15 +1617,35 @@ function validateTerminalResultReferences(requests, reviewState) {
         'A confirmed terminal request must reference one attributable terminal result.',
       );
     }
+    const identityNamespace = `${request.channel}:${reference.kind}`;
+    const resultIdentities = getItemIdentities(matches[0])
+      .map((identity) => `${identityNamespace}:${identity}`);
+    if (resultIdentities.some((identity) => seenResultIdentities.has(identity))) {
+      throw new TypeError('A terminal result is assigned to multiple requests.');
+    }
+    resultIdentities.forEach((identity) => seenResultIdentities.add(identity));
   }
 }
 
 function isCopilotReadyForCodex(request) {
-  return request?.confirmed === true ||
+  const requestedTime = getItemTime(request, ['requestedAt']);
+  const readyTime = getItemTime(request, ['readyAt']);
+  return (
+    request?.confirmed === true &&
+    Object.hasOwn(request, 'readyAt') &&
+    requestedTime !== null &&
+    readyTime !== null &&
+    readyTime >= requestedTime
+  ) ||
     (
       request?.terminal === true &&
       request?.confirmed === false &&
-      isRepositoryAuthorizedNonfunctionalDisposition(request.terminalDisposition, request)
+      Object.hasOwn(request, 'readyAt') &&
+      requestedTime !== null &&
+      readyTime !== null &&
+      readyTime >= requestedTime &&
+      isRepositoryAuthorizedNonfunctionalDisposition(request.terminalDisposition, request) &&
+      readyTime === getItemTime(request.terminalDisposition, ['recordedAt'])
     );
 }
 
@@ -1596,6 +1670,14 @@ function validateReviewRequestOrdering(
         request.reviewInputKey === codexRequest.reviewInputKey,
     );
     const copilotRequest = copilotRequests[0];
+    if (
+      copilotRequests.length === 1 &&
+      copilotRequest.head === codexRequest.head &&
+      copilotRequest.confirmed === true &&
+      !Object.hasOwn(copilotRequest, 'readyAt')
+    ) {
+      throw new TypeError('A Codex request requires its Copilot predecessor readiness time.');
+    }
     const copilotReady = copilotRequests.length === 1 &&
       copilotRequest.head === codexRequest.head &&
       isCopilotReadyForCodex(copilotRequest);
@@ -1605,9 +1687,6 @@ function validateReviewRequestOrdering(
       );
     }
 
-    if (!Object.hasOwn(copilotRequest, 'readyAt')) {
-      throw new TypeError('A Codex request requires its Copilot predecessor readiness time.');
-    }
     const copilotTime = parseRfc3339Timestamp(copilotRequest.readyAt, 'Copilot readyAt');
     const codexTime = parseRfc3339Timestamp(codexRequest.requestedAt, 'Codex requestedAt');
     if (copilotTime > codexTime) {
@@ -2009,6 +2088,9 @@ export function evaluateFindingBudget({ elapsedMinutes, hasOutcome }) {
   if (!Number.isFinite(elapsedMinutes) || elapsedMinutes < 0) {
     throw new TypeError('elapsedMinutes must be a non-negative finite number.');
   }
+  if (typeof hasOutcome !== 'boolean') {
+    throw new TypeError('hasOutcome must be a Boolean.');
+  }
 
   return Object.freeze({
     warningRequired: !hasOutcome && elapsedMinutes >= 10,
@@ -2034,7 +2116,8 @@ export function createMetrics({
   }
   for (const [index, request] of normalizeCollection(reviewRequests).entries()) {
     assertHash(request?.head, SHA1_PATTERN, `reviewRequests[${index}].head`);
-    requestsPerHead[request.head] = (requestsPerHead[request.head] ?? 0) + 1;
+    const attemptCount = getReviewRequestAttemptCount(request);
+    requestsPerHead[request.head] = (requestsPerHead[request.head] ?? 0) + attemptCount;
   }
 
   const reviewStart = parseRfc3339Timestamp(reviewBeganAt, 'reviewBeganAt');
