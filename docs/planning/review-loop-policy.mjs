@@ -438,6 +438,23 @@ function validatePersistedPublicMutation(publicMutation) {
 
   const attemptedAt = publicMutation.attemptedAt;
   const reconciledAt = publicMutation.reconciledAt;
+  const requiresAttemptedAt = [
+    'RECONCILING',
+    'NO_EFFECT',
+    'EXHAUSTED',
+  ].includes(publicMutation.state);
+  if (requiresAttemptedAt && (attemptedAt === undefined || attemptedAt === null)) {
+    throw new TypeError(`A persisted ${publicMutation.state} mutation must contain attemptedAt.`);
+  }
+  if (publicMutation.state === 'RECONCILING' && reconciledAt !== null) {
+    throw new TypeError('A persisted RECONCILING mutation must contain a null reconciledAt.');
+  }
+  if (
+    (publicMutation.state === 'NO_EFFECT' || publicMutation.state === 'EXHAUSTED') &&
+    (reconciledAt === undefined || reconciledAt === null)
+  ) {
+    throw new TypeError(`A persisted ${publicMutation.state} mutation must contain reconciledAt.`);
+  }
   if (attemptedAt === undefined || attemptedAt === null) {
     return;
   }
@@ -1536,6 +1553,11 @@ export function createMetrics({
         throw new TypeError(`sameHeadRerequestReasons[${index}] is malformed.`);
       }
       assertNonemptyText(record.reason, `sameHeadRerequestReasons[${index}].reason`);
+      if (record.reason.trim().length === 0) {
+        throw new TypeError(
+          `sameHeadRerequestReasons[${index}].reason must contain non-whitespace text.`,
+        );
+      }
       return Object.freeze({
         reason: record.reason,
         material: record.material,

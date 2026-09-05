@@ -2428,6 +2428,76 @@ test('compact-state ingestion rejects invalid predecessor and reconciliation ord
   );
 });
 
+test('compact-state ingestion requires state-dependent reconciliation timestamps', () => {
+  const input = reviewInput();
+  const evidence = {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    readbackComplete: true,
+  };
+  const attemptedAt = '2026-09-04T10:00:00Z';
+  const mutations = [
+    reconcileReviewRequestMutation({
+      response: { ok: true },
+      evidence,
+      attemptedAt,
+      observedAt: '2026-09-04T10:01:59Z',
+      attemptCount: 1,
+      localRecordSucceeded: true,
+    }),
+    reconcileReviewRequestMutation({
+      response: { ok: true },
+      evidence,
+      attemptedAt,
+      observedAt: '2026-09-04T10:02:00Z',
+      attemptCount: 1,
+      localRecordSucceeded: true,
+    }),
+    reconcileReviewRequestMutation({
+      response: { ok: true },
+      evidence,
+      attemptedAt,
+      observedAt: '2026-09-04T10:02:00Z',
+      attemptCount: 2,
+      localRecordSucceeded: true,
+    }),
+  ];
+
+  for (const mutation of mutations) {
+    const missingAttempt = structuredClone(mutation);
+    delete missingAttempt.attemptedAt;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(compactState(input, {
+        publicMutation: missingAttempt,
+      }))),
+      /must contain attemptedAt/u,
+      mutation.state,
+    );
+
+    const missingReconciliation = structuredClone(mutation);
+    delete missingReconciliation.reconciledAt;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(compactState(input, {
+        publicMutation: missingReconciliation,
+      }))),
+      /must contain (?:a null )?reconciledAt/u,
+      mutation.state,
+    );
+  }
+
+  const completedReconciliation = structuredClone(mutations[0]);
+  completedReconciliation.reconciledAt = '2026-09-04T10:01:59Z';
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(compactState(input, {
+      publicMutation: completedReconciliation,
+    }))),
+    /must contain a null reconciledAt/u,
+  );
+});
+
 test('a no-attempt mutation rejects every attempt-only property', async () => {
   const input = reviewInput();
   const schema = JSON.parse(
@@ -2643,6 +2713,17 @@ test('typed schema, metrics, and 10/15-minute controls remain complete', async (
     () => assertSchemaValid(invalidPersistedMetric, schema, schema),
     /does not match/u,
   );
+  for (const reason of [' ', '\t\r\n']) {
+    const invalidReason = compactState(reviewInput());
+    invalidReason.current_task.review.metrics.sameHeadRerequestReasons = [{
+      reason,
+      material: true,
+    }];
+    assert.throws(
+      () => assertSchemaValid(invalidReason, schema, schema),
+      /does not match pattern/u,
+    );
+  }
   assert.deepEqual(evaluateFindingBudget({ elapsedMinutes: 10, hasOutcome: false }), {
     warningRequired: true,
     exceptionRequired: false,
@@ -2694,6 +2775,8 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
     'unexpected',
     {},
     { reason: '', material: true },
+    { reason: ' ', material: true },
+    { reason: '\t\r\n', material: true },
     { reason: 'Material risk changed.', material: 'true' },
     { reason: 'Material risk changed.', material: true, extra: true },
   ]) {
