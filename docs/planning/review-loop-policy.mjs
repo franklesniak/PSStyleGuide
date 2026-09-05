@@ -519,10 +519,12 @@ function validatePredecessorOutputs(predecessorOutputs, completedTaskNumber = nu
 export function prunePredecessorOutputs(predecessorOutputs, completedTaskNumber) {
   if (
     !Number.isInteger(completedTaskNumber) ||
-    completedTaskNumber < 1 ||
+    completedTaskNumber < 0 ||
     completedTaskNumber > PLAN_TASK_COUNT
   ) {
-    throw new TypeError('completedTaskNumber must identify a task in the fixed plan.');
+    throw new TypeError(
+      'completedTaskNumber must be a completed plan prefix within the fixed plan.',
+    );
   }
   validatePredecessorOutputs(predecessorOutputs);
 

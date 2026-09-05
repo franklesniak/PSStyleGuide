@@ -2250,6 +2250,15 @@ test('pruning rejects future producers and out-of-plan progress after valid expi
     },
   };
 
+  assert.deepEqual(prunePredecessorOutputs({}, 0), {});
+  assert.throws(
+    () => prunePredecessorOutputs({
+      1: {
+        FUTURE_DATA: { value: 'invalid', last_consumer_task: 2 },
+      },
+    }, 0),
+    /predecessor task must contain a bounded output map/u,
+  );
   assert.deepEqual(prunePredecessorOutputs(expiring, 3), {});
   assert.deepEqual(prunePredecessorOutputs(retained, 3), retained);
   assert.throws(
@@ -2262,8 +2271,14 @@ test('pruning rejects future producers and out-of-plan progress after valid expi
   );
   assert.throws(
     () => prunePredecessorOutputs({}, PLAN_TASK_COUNT + 1),
-    /fixed plan/u,
+    /completed plan prefix/u,
   );
+  for (const invalidProgress of [-1, 0.5]) {
+    assert.throws(
+      () => prunePredecessorOutputs({}, invalidProgress),
+      /completed plan prefix/u,
+    );
+  }
 });
 
 test('predecessor outputs stay within the fixed plan in both ingestion layers', async () => {
