@@ -70,8 +70,8 @@ Use one untracked `TEMP-coding-agent-loop-state.json` resume aid with this shape
     "risk": "R2",
     "repository": "franklesniak/PSStyleGuide",
     "branch": "agent/example",
-    "base": "<commit-or-null>",
-    "head": "<commit-or-null>",
+    "base": null,
+    "head": null,
     "last_gate": "<short-result-or-null>",
     "next_action": "<one-action>",
     "blocker": null

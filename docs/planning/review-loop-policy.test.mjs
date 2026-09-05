@@ -1637,6 +1637,36 @@ test('the actual compact resume record and review state match their closed schem
   assertSchemaValid(readControllerExample(alternate), schema, schema);
 });
 
+test('compact task commit identities are SHA-1 values or null', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const persisted = compactState(reviewInput());
+  const withoutCommitIdentities = structuredClone(persisted);
+  withoutCommitIdentities.current_task.base = null;
+  withoutCommitIdentities.current_task.head = null;
+
+  assertSchemaValid(persisted, schema, schema);
+  assertSchemaValid(withoutCommitIdentities, schema, schema);
+
+  for (const field of ['base', 'head']) {
+    for (const malformed of [
+      'refs/heads/not-a-commit',
+      'deadbeef',
+      'A'.repeat(40),
+      'a'.repeat(39),
+      'a'.repeat(41),
+    ]) {
+      const candidate = structuredClone(persisted);
+      candidate.current_task[field] = malformed;
+      assert.throws(
+        () => assertSchemaValid(candidate, schema, schema),
+        /does not match any allowed schema/u,
+      );
+    }
+  }
+});
+
 test('predecessor outputs survive required restart boundaries and prune after final use', async () => {
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
