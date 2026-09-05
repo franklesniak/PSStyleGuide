@@ -157,6 +157,8 @@ Do not allow an unreviewed material repair, stale review, or head change to bypa
 
 For each confirmed terminal request, persist one closed `terminalResultRef` with the result kind, immutable identity, and observed time while the complete result stays in its separate channel result collection. During compact-state ingestion, cross-validate the reference against the correct channel, actor, request baseline, request time, reviewed head when available, safe headless-comment evidence, and the next different-input request boundary. Reject a missing, duplicate, stale, baseline, wrong-actor, wrong-head, wrong-channel, or wrong-time reference. Do not add this reference to an unconfirmed or nonterminal request.
 
+Keep every frozen reviewed head in `reviewerRequestsPerHead`, including a head that received zero requests. During ingestion, require the current head and every request head to occur in that map, and require each count to equal the persisted request history. Use only those validated keys, the current head, and request heads as known successor identities for retained supersessions.
+
 ## Renumbering and cross-reference requirements
 
 After inserting the tasks for the new GitHub work items, renumber the entire remaining executable slate consecutively, beginning with `Task 1`.

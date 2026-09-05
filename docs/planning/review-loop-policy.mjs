@@ -338,12 +338,18 @@ export function parseCompactStateJson(text) {
       const supersessions = validatePersistedSupersededReviewInputs(
         reviewState.supersededReviewInputs,
       );
+      const reviewedHeads = validatePersistedRequestMetrics(
+        reviewState.metrics,
+        requests,
+        reviewState.reviewInput.head,
+      );
       validateSupersessionsAgainstRequests({
         requests,
         supersessions,
         knownHeads: new Set([
           reviewState.reviewInput.head,
           ...requests.map((request) => request.head),
+          ...reviewedHeads,
         ]),
         currentKey: getReviewInputKey(reviewState.reviewInput),
       });
@@ -397,6 +403,43 @@ function validatePersistedReviewRequests(reviewRequests, reviewState) {
   validateReviewRequestOrdering(reviewRequests);
   validateTerminalResultReferences(reviewRequests, reviewState);
   return reviewRequests;
+}
+
+function validatePersistedRequestMetrics(metrics, requests, currentHead) {
+  const requestsPerHead = metrics?.reviewerRequestsPerHead;
+  if (
+    requestsPerHead === null ||
+    typeof requestsPerHead !== 'object' ||
+    Array.isArray(requestsPerHead)
+  ) {
+    throw new TypeError('The persisted request-per-head metric is malformed.');
+  }
+
+  const actualCounts = new Map();
+  for (const request of requests) {
+    actualCounts.set(request.head, (actualCounts.get(request.head) ?? 0) + 1);
+  }
+  const entries = Object.entries(requestsPerHead);
+  if (entries.some(
+    ([head, count]) => !SHA1_PATTERN.test(head) || !Number.isInteger(count) || count < 0,
+  )) {
+    throw new TypeError('The persisted request-per-head metric is malformed.');
+  }
+  if (!Object.hasOwn(requestsPerHead, currentHead)) {
+    throw new TypeError('The current reviewed head is missing from the request metric.');
+  }
+  for (const [head, count] of entries) {
+    if (count !== (actualCounts.get(head) ?? 0)) {
+      throw new TypeError('A persisted request count does not match the request history.');
+    }
+  }
+  for (const head of actualCounts.keys()) {
+    if (!Object.hasOwn(requestsPerHead, head)) {
+      throw new TypeError('A request head is missing from the request metric.');
+    }
+  }
+
+  return entries.map(([head]) => head);
 }
 
 function validatePersistedSupersededReviewInputs(supersededReviewInputs) {
@@ -1678,6 +1721,7 @@ export function evaluateFindingBudget({ elapsedMinutes, hasOutcome }) {
 
 export function createMetrics({
   reviewRequests,
+  reviewedHeads = [],
   bodyEditTimes,
   reviewBeganAt,
   sameHeadRerequestReasons,
@@ -1687,6 +1731,10 @@ export function createMetrics({
   mergedAt,
 }) {
   const requestsPerHead = {};
+  for (const [index, head] of normalizeCollection(reviewedHeads).entries()) {
+    assertHash(head, SHA1_PATTERN, `reviewedHeads[${index}]`);
+    requestsPerHead[head] = 0;
+  }
   for (const [index, request] of normalizeCollection(reviewRequests).entries()) {
     assertHash(request?.head, SHA1_PATTERN, `reviewRequests[${index}].head`);
     requestsPerHead[request.head] = (requestsPerHead[request.head] ?? 0) + 1;

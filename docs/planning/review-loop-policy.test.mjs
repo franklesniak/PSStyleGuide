@@ -77,6 +77,16 @@ function state(input, overrides = {}) {
     commentPublications: [],
     ...overrides,
   };
+  if (!Object.hasOwn(overrides, 'metrics')) {
+    const requestsPerHead = { [input.head]: 0 };
+    for (const request of value.reviewRequests) {
+      requestsPerHead[request.head] = (requestsPerHead[request.head] ?? 0) + 1;
+    }
+    value.metrics = {
+      ...value.metrics,
+      reviewerRequestsPerHead: requestsPerHead,
+    };
+  }
   for (const channel of ['copilot', 'codex']) {
     const field = `${channel}Results`;
     if (!Object.hasOwn(overrides, field)) {
@@ -1341,6 +1351,7 @@ test('all permanent active task-template and controller surfaces use the compact
   );
   assert.match(plan, /closed `terminalResultRef`/u);
   assert.match(plan, /next different-input request boundary/u);
+  assert.match(plan, /including a head that received zero requests/u);
 
   for (const task of qualityTasks) {
     assert.match(task.body, /### Post-review materiality controls/u);
@@ -1372,6 +1383,7 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(parent, /persist its head, reviewed-input key, request time, `confirmed: true`, and nonterminal state/u);
   assert.match(parent, /closed `terminalResultRef`/u);
   assert.match(parent, /wrong-channel, or wrong-time reference/u);
+  assert.match(parent, /each count to equal the persisted request history/u);
   assert.match(parent, /Locate and obey the applicable `AGENTS\.md`/u);
   assert.match(
     parent,
@@ -1400,6 +1412,7 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(alternate, /persist its head, reviewed-input key, request time, `confirmed: true`, and nonterminal state/u);
   assert.match(alternate, /closed `terminalResultRef`/u);
   assert.match(alternate, /next different-input request boundary/u);
+  assert.match(alternate, /known successor identities for retained supersessions/u);
   assert.match(alternate, /Locate and obey the applicable `AGENTS\.md`/u);
   assert.match(
     alternate,
@@ -1414,11 +1427,13 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(generator, /only after every recorded request for the old input is terminal/u);
   assert.match(generator, /headless Codex PR-conversation result/u);
   assert.match(generator, /closed `terminalResultRef`/u);
+  assert.match(generator, /including a head that received zero requests/u);
   assert.match(generator, /copilot-pull-request-reviewer\[bot\]/u);
   assert.match(generator, /a second proved no-effect attempt is `EXHAUSTED`/iu);
   assert.match(crossRepository, /Reject non-finite or out-of-portable-range JSON numbers/u);
   assert.match(crossRepository, /task head and review-input head differ/u);
   assert.match(crossRepository, /closed `terminalResultRef`/u);
+  assert.match(crossRepository, /each count to equal the persisted request history/u);
   const task15 = tasks.find((task) => task.number === 15);
   assert.notEqual(task15, undefined);
   assert.match(task15.body, /Continue implementation, CI repair, review, and readiness work/u);
@@ -2186,12 +2201,101 @@ test('compact-state ingestion cross-validates supersessions and causal ordering'
   ].supersededAt = '2026-09-04T09:59:59Z';
 
   assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
-  for (const candidate of [noRequest, completePair, wrongHead, predatesRequest]) {
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(noRequest)),
+    /request count does not match/u,
+  );
+  for (const candidate of [completePair, wrongHead, predatesRequest]) {
     assert.throws(
       () => parseCompactStateJson(JSON.stringify(candidate)),
       /terminal incomplete prior-input pair/u,
     );
   }
+});
+
+test('request metrics retain an unrequested successor across a second head drift', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const input3 = reviewInput({
+    head: '3'.repeat(40),
+    tree: '4'.repeat(40),
+    diffSha256: '3'.repeat(64),
+    bodySha256: '4'.repeat(64),
+  });
+  const oldRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const firstDrift = compactState(input2, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [oldRequest],
+    supersededReviewInputs: supersessionFor(input1, input2),
+  });
+  const secondDrift = compactState(input3, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [oldRequest],
+    supersededReviewInputs: supersessionFor(input1, input2),
+    metrics: {
+      ...firstDrift.current_task.review.metrics,
+      reviewerRequestsPerHead: {
+        ...firstDrift.current_task.review.metrics.reviewerRequestsPerHead,
+        [input3.head]: 0,
+      },
+    },
+  });
+
+  assertSchemaValid(secondDrift, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(secondDrift)), secondDrift);
+
+  const missingIntermediate = structuredClone(secondDrift);
+  delete missingIntermediate.current_task.review.metrics
+    .reviewerRequestsPerHead[input2.head];
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missingIntermediate)),
+    /terminal incomplete prior-input pair/u,
+  );
+
+  const missingCurrent = structuredClone(secondDrift);
+  delete missingCurrent.current_task.review.metrics
+    .reviewerRequestsPerHead[input3.head];
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missingCurrent)),
+    /current reviewed head is missing/u,
+  );
+
+  const missingRequestHead = structuredClone(secondDrift);
+  delete missingRequestHead.current_task.review.metrics
+    .reviewerRequestsPerHead[input1.head];
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missingRequestHead)),
+    /request head is missing/u,
+  );
+
+  const wrongCount = structuredClone(secondDrift);
+  wrongCount.current_task.review.metrics.reviewerRequestsPerHead[input1.head] = 2;
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(wrongCount)),
+    /request count does not match/u,
+  );
+
+  const malformedHead = structuredClone(secondDrift);
+  malformedHead.current_task.review.metrics.reviewerRequestsPerHead.invalid = 0;
+  assert.throws(
+    () => assertSchemaValid(malformedHead, schema, schema),
+    /property name does not match pattern/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(malformedHead)),
+    /request-per-head metric is malformed/u,
+  );
 });
 
 test('compact-state ingestion binds the review input to the current task head', () => {
@@ -2916,6 +3020,7 @@ test('typed schema, metrics, and 10/15-minute controls remain complete', async (
   const schema = JSON.parse(await readFile(schemaUrl, 'utf8'));
   const mutationClasses = schema.$defs.mutationClass.enum;
   const metrics = createMetrics({
+    reviewedHeads: [HASHES.head1, HASHES.head2, '3'.repeat(40)],
     reviewRequests: [
       { head: HASHES.head1 },
       { head: HASHES.head1 },
@@ -2932,6 +3037,7 @@ test('typed schema, metrics, and 10/15-minute controls remain complete', async (
 
   assert.deepEqual(mutationClasses, MUTATION_CLASSES);
   assert.equal(metrics.reviewerRequestsPerHead[HASHES.head1], 2);
+  assert.equal(metrics.reviewerRequestsPerHead['3'.repeat(40)], 0);
   assert.equal(metrics.bodyEditsAfterReviewBegan, 1);
   assert.equal(metrics.cleanReviewRecognitionMilliseconds, 5_000);
   assert.equal(metrics.cleanPairToMergeMilliseconds, 120_000);

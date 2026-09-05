@@ -52,6 +52,8 @@ For PR work, generate and read back an accurate reviewer-facing body before revi
 
 For each confirmed terminal request, persist one closed `terminalResultRef` that identifies the result kind, immutable result, and observed time while the complete result stays in its separate channel result collection. During compact-state ingestion, cross-validate the reference against the correct channel, actor, request baseline, request time, reviewed head when available, safe headless-comment evidence, and the next different-input request boundary. Reject a missing, duplicate, stale, baseline, wrong-actor, wrong-head, wrong-channel, or wrong-time reference. Do not add this reference to an unconfirmed or nonterminal request.
 
+Keep every frozen reviewed head in `reviewerRequestsPerHead`, including a head that received zero requests. During ingestion, require the current head and every request head to occur in that map, and require each count to equal the persisted request history. Use only those validated keys, the current head, and request heads as known successor identities for retained supersessions.
+
 The machine-readable review-input and mutation contract is `docs/planning/review-loop-policy.json`. Its deterministic implementation and scenarios are `docs/planning/review-loop-policy.mjs` and `docs/planning/review-loop-policy.test.mjs`. These files validate decisions; they do not perform GitHub writes. Task-local PR publication, review, and quality prompts remain complete without requiring an executor to read the shared files.
 
 Use exactly these semantic mutation classes:
