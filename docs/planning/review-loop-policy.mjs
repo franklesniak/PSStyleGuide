@@ -42,6 +42,37 @@ const PREDECESSOR_OUTPUT_PATTERN = /^[A-Z][A-Z0-9_]{0,127}$/u;
 const DISALLOWED_CONTROL_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/u;
 const RFC3339_PATTERN = /^(?<year>\d{4})-(?<month>0[1-9]|1[0-2])-(?<day>0[1-9]|[12]\d|3[01])[Tt](?<hour>[01]\d|2[0-3]):(?<minute>[0-5]\d):(?<second>[0-5]\d)(?:\.\d+)?(?<zone>[Zz]|(?<offsetSign>[+-])(?<offsetHour>0\d|1[0-4]):(?<offsetMinute>[0-5]\d))$/u;
 const REVIEW_LOOP_TASK_NUMBER_SET = new Set(REVIEW_LOOP_TASK_NUMBERS);
+const PUBLIC_MUTATION_STATES = new Set([
+  'NOT_ATTEMPTED',
+  'NOT_EXECUTED',
+  'RECONCILING',
+  'NO_EFFECT',
+  'EXHAUSTED',
+  'AMBIGUOUS',
+  'CONFIRMED',
+]);
+const PUBLIC_MUTATION_REQUIRED_FIELDS = new Set([
+  'state',
+  'nativeResponseAccepted',
+  'readbackMatched',
+  'retryAllowed',
+  'localRecordSucceeded',
+]);
+const PUBLIC_MUTATION_ALLOWED_FIELDS = new Set([
+  ...PUBLIC_MUTATION_REQUIRED_FIELDS,
+  'reviewInputKey',
+  'channel',
+  'attemptCount',
+  'attemptedAt',
+  'reconciledAt',
+  'evidence',
+]);
+const PUBLIC_MUTATION_BOOLEAN_FIELDS = Object.freeze([
+  'nativeResponseAccepted',
+  'readbackMatched',
+  'retryAllowed',
+  'localRecordSucceeded',
+]);
 
 function canonicalize(value) {
   if (Array.isArray(value)) {
@@ -484,6 +515,18 @@ function validatePersistedPublicMutation(publicMutation, requests) {
     Array.isArray(publicMutation)
   ) {
     throw new TypeError('The persisted public mutation is malformed.');
+  }
+
+  const publicMutationFields = Object.keys(publicMutation);
+  if (
+    [...PUBLIC_MUTATION_REQUIRED_FIELDS]
+      .some((field) => !Object.hasOwn(publicMutation, field)) ||
+    publicMutationFields.some((field) => !PUBLIC_MUTATION_ALLOWED_FIELDS.has(field)) ||
+    !PUBLIC_MUTATION_STATES.has(publicMutation.state) ||
+    PUBLIC_MUTATION_BOOLEAN_FIELDS
+      .some((field) => typeof publicMutation[field] !== 'boolean')
+  ) {
+    throw new TypeError('The persisted public mutation base record is malformed.');
   }
 
   const attemptMetadataFields = [

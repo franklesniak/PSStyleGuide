@@ -3080,6 +3080,59 @@ test('compact-state ingestion requires state-dependent reconciliation timestamps
   );
 });
 
+test('compact-state ingestion enforces the public mutation base schema contract', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const valid = compactState(input);
+
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  const unknownStateOnly = structuredClone(valid);
+  unknownStateOnly.current_task.review.publicMutation = { state: 'ALIEN' };
+
+  const missingBooleans = structuredClone(valid);
+  for (const field of [
+    'nativeResponseAccepted',
+    'readbackMatched',
+    'retryAllowed',
+    'localRecordSucceeded',
+  ]) {
+    delete missingBooleans.current_task.review.publicMutation[field];
+  }
+
+  const wrongBooleanTypes = structuredClone(valid);
+  Object.assign(wrongBooleanTypes.current_task.review.publicMutation, {
+    nativeResponseAccepted: 'false',
+    readbackMatched: 0,
+    retryAllowed: null,
+    localRecordSucceeded: {},
+  });
+
+  const undeclaredMember = structuredClone(valid);
+  undeclaredMember.current_task.review.publicMutation.unexpected = true;
+
+  for (const [label, malformed] of [
+    ['unknown state without required members', unknownStateOnly],
+    ['missing required Boolean members', missingBooleans],
+    ['wrong Boolean member types', wrongBooleanTypes],
+    ['undeclared member', undeclaredMember],
+  ]) {
+    assert.throws(
+      () => assertSchemaValid(malformed, schema, schema),
+      undefined,
+      label,
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(malformed)),
+      /public mutation base record is malformed/u,
+      label,
+    );
+  }
+});
+
 test('review-request mutation state is bound to one persisted request identity', async () => {
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
