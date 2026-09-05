@@ -559,24 +559,6 @@ export function decideReviewRequest({
     supersessionByKey.set(disposition.reviewInputKey, disposition);
   }
 
-  if (missingChannels.length === 0) {
-    return Object.freeze({
-      status: 'NO_REQUEST',
-      reviewInputKey: currentKey,
-      channels: [],
-      reason: 'The required pair already exists for this reviewed input.',
-    });
-  }
-
-  if (requestsForCurrentInput.length > 0) {
-    return Object.freeze({
-      status: 'REQUEST_REQUIRED',
-      reviewInputKey: currentKey,
-      channels: missingChannels,
-      reason: 'Complete the review pair that already started for this reviewed input.',
-    });
-  }
-
   const priorRequests = requests.filter(
     (request) => request.reviewInputKey !== currentKey,
   );
@@ -619,6 +601,24 @@ export function decideReviewRequest({
       reviewInputKey: currentKey,
       channels: [],
       reason: 'Every prior review pair for a different input must become terminal before another pair starts.',
+    });
+  }
+
+  if (missingChannels.length === 0) {
+    return Object.freeze({
+      status: 'NO_REQUEST',
+      reviewInputKey: currentKey,
+      channels: [],
+      reason: 'The required pair already exists for this reviewed input.',
+    });
+  }
+
+  if (requestsForCurrentInput.length > 0) {
+    return Object.freeze({
+      status: 'REQUEST_REQUIRED',
+      reviewInputKey: currentKey,
+      channels: missingChannels,
+      reason: 'Complete the review pair that already started for this reviewed input.',
     });
   }
 

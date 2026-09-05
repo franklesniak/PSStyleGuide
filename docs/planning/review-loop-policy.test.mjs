@@ -390,6 +390,54 @@ test('scenario 5a: an interrupted same-head pair requests only its missing chann
   assert.match(decision.reason, /already started/u);
 });
 
+test('current-input records cannot bypass different-input pair serialization', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const mutationClass = classifyMutation(state(input1), state(input2));
+  const pendingOldPair = pairFor(input1, { terminal: false });
+  const partialCurrentPair = [requestFor(input2, 'codex')];
+  const completeCurrentPair = pairFor(input2, { terminal: false });
+  const pendingPartial = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    existingRequests: [...pendingOldPair, ...partialCurrentPair],
+  });
+  const pendingComplete = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    existingRequests: [...pendingOldPair, ...completeCurrentPair],
+  });
+  const terminalOld = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    existingRequests: [...pairFor(input1), ...partialCurrentPair],
+  });
+  const supersededOld = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    existingRequests: [requestFor(input1, 'codex'), ...partialCurrentPair],
+    supersededInputs: supersessionFor(input1, input2),
+  });
+
+  assert.equal(pendingPartial.status, 'WAIT_FOR_PRIOR_PAIR');
+  assert.deepEqual(pendingPartial.channels, []);
+  assert.equal(pendingComplete.status, 'WAIT_FOR_PRIOR_PAIR');
+  assert.deepEqual(pendingComplete.channels, []);
+  assert.equal(terminalOld.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(terminalOld.channels, ['copilot']);
+  assert.equal(supersededOld.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(supersededOld.channels, ['copilot']);
+});
+
 test('scenario 5b: a material same-head request waits for the prior pair to finish', () => {
   const input1 = reviewInput();
   const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
