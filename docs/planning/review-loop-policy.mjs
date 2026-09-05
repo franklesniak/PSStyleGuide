@@ -132,6 +132,10 @@ export function normalizeCollection(value) {
     return normalizeCollection(value.check_runs);
   }
 
+  if (typeof value === 'object' && Object.hasOwn(value, 'workflow_runs')) {
+    return normalizeCollection(value.workflow_runs);
+  }
+
   return [value];
 }
 
@@ -183,7 +187,9 @@ function scanJsonWithoutDuplicateMembers(text) {
       const character = text[cursor];
       if (character === '"') {
         cursor += 1;
-        return JSON.parse(text.slice(start, cursor));
+        const decoded = JSON.parse(text.slice(start, cursor));
+        validateTransport(decoded);
+        return decoded;
       }
       if (character === '\\') {
         cursor += 1;
@@ -301,7 +307,9 @@ export function parseCompactStateJson(text) {
     Object.hasOwn(parsed, 'current_task')
   ) {
     validatePredecessorOutputs(parsed.predecessor_outputs);
-    validatePersistedPublicMutation(parsed.current_task?.review?.publicMutation);
+    if (parsed.current_task?.review !== undefined) {
+      validatePersistedPublicMutation(parsed.current_task.review.publicMutation);
+    }
   }
 
   return parsed;
@@ -660,10 +668,29 @@ export function decideReviewRequest({
   }
 
   if (requestsForCurrentInput.length > 0) {
+    const copilotRequest = requestsForCurrentInput.find(
+      (request) => request.channel === 'copilot',
+    );
+    const codexRequest = requestsForCurrentInput.find(
+      (request) => request.channel === 'codex',
+    );
+    if (
+      copilotRequest !== undefined &&
+      copilotRequest.terminal !== true &&
+      codexRequest === undefined
+    ) {
+      return Object.freeze({
+        status: 'WAIT_FOR_CURRENT_CHANNEL',
+        reviewInputKey: currentKey,
+        channels: [],
+        reason: 'Copilot must be confirmed or terminally proved non-functional before Codex starts.',
+      });
+    }
+
     return Object.freeze({
       status: 'REQUEST_REQUIRED',
       reviewInputKey: currentKey,
-      channels: missingChannels,
+      channels: missingChannels.slice(0, 1),
       reason: 'Complete the review pair that already started for this reviewed input.',
     });
   }
@@ -672,7 +699,7 @@ export function decideReviewRequest({
     return Object.freeze({
       status: 'REQUEST_REQUIRED',
       reviewInputKey: currentKey,
-      channels: missingChannels,
+      channels: ['copilot'],
       reason: previousReviewInput === null ? 'First review for this input.' : 'Code or diff changed.',
     });
   }
@@ -681,7 +708,7 @@ export function decideReviewRequest({
     return Object.freeze({
       status: 'REQUEST_REQUIRED',
       reviewInputKey: currentKey,
-      channels: missingChannels,
+      channels: ['copilot'],
       reason: materialReason.trim(),
     });
   }
@@ -1233,10 +1260,15 @@ export function createMetrics({
 
   const reviewStart = parseRfc3339Timestamp(reviewBeganAt, 'reviewBeganAt');
   const parsedBodyEditTimes = normalizeCollection(bodyEditTimes).map(
-    (time, index) => parseRfc3339Timestamp(time, `bodyEditTimes[${index}]`),
+    (value, index) => ({
+      value,
+      timestamp: parseRfc3339Timestamp(value, `bodyEditTimes[${index}]`),
+    }),
   );
   const bodyEditsAfterReviewBegan = parsedBodyEditTimes.filter(
-    (time) => time > reviewStart,
+    ({ value, timestamp }) => /:\d{2}\.\d+/u.test(value)
+      ? timestamp > reviewStart
+      : timestamp >= Math.floor(reviewStart / 1_000) * 1_000,
   ).length;
 
   const elapsed = (start, end, startLabel, endLabel) => {

@@ -196,7 +196,7 @@ test('scenario 3: H1 to H2 requires one new pair for H2', () => {
 
   assert.equal(mutationClass, 'CODE_OR_DIFF');
   assert.equal(decision.status, 'REQUEST_REQUIRED');
-  assert.deepEqual(decision.channels, ['copilot', 'codex']);
+  assert.deepEqual(decision.channels, ['copilot']);
 });
 
 test('scenario 3a: H2 waits for a pending H1 pair before accepting a headless result', () => {
@@ -285,7 +285,7 @@ test('scenario 3b: authenticated head drift supersedes an impossible missing H1 
     [getReviewInputKey(input1)],
   );
   assert.equal(recovered.status, 'REQUEST_REQUIRED');
-  assert.deepEqual(recovered.channels, ['copilot', 'codex']);
+  assert.deepEqual(recovered.channels, ['copilot']);
   assert.deepEqual(
     lateOldResult.conversationComments.map((comment) => comment.id),
     ['LATE_H1_RESULT'],
@@ -332,7 +332,7 @@ test('scenario 3c: authenticated same-head input drift supersedes an impossible 
     [getReviewInputKey(input1)],
   );
   assert.equal(recovered.status, 'REQUEST_REQUIRED');
-  assert.deepEqual(recovered.channels, ['copilot', 'codex']);
+  assert.deepEqual(recovered.channels, ['copilot']);
 });
 
 test('old-head supersession rejects forged, current-input, and complete-pair records', () => {
@@ -385,6 +385,7 @@ test('scenario 4: a material same-head change records a reason and requires revi
 
   assert.equal(mutationClass, 'MATERIAL_SCOPE_BEHAVIOR_RISK');
   assert.equal(decision.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(decision.channels, ['copilot']);
   assert.match(decision.reason, /security-sensitive/u);
   assert.throws(
     () => decideReviewRequest({
@@ -410,18 +411,27 @@ test('scenario 5: an unjustified same-head request is rejected', () => {
   assert.deepEqual(decision.channels, []);
 });
 
-test('scenario 5a: an interrupted same-head pair requests only its missing channel', () => {
+test('scenario 5a: an interrupted same-head pair waits for Copilot before Codex', () => {
   const input = reviewInput();
-  const decision = decideReviewRequest({
+  const pending = decideReviewRequest({
     previousReviewInput: input,
     currentReviewInput: input,
     mutationClass: 'RESULT_OR_STATE',
     existingRequests: [requestFor(input, 'copilot')],
   });
+  const terminal = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: [requestFor(input, 'copilot', { terminal: true })],
+  });
 
-  assert.equal(decision.status, 'REQUEST_REQUIRED');
-  assert.deepEqual(decision.channels, ['codex']);
-  assert.match(decision.reason, /already started/u);
+  assert.equal(pending.status, 'WAIT_FOR_CURRENT_CHANNEL');
+  assert.deepEqual(pending.channels, []);
+  assert.match(pending.reason, /confirmed or terminally proved non-functional/u);
+  assert.equal(terminal.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(terminal.channels, ['codex']);
+  assert.match(terminal.reason, /already started/u);
 });
 
 test('current-input records cannot bypass different-input pair serialization', () => {
@@ -506,7 +516,7 @@ test('scenario 5b: a material same-head request waits for the prior pair to fini
     conversationComments: [],
   }), { submittedReviews: [], conversationComments: [] });
   assert.equal(terminal.status, 'REQUEST_REQUIRED');
-  assert.deepEqual(terminal.channels, ['copilot', 'codex']);
+  assert.deepEqual(terminal.channels, ['copilot']);
 });
 
 test('scenario 5c: a same-head diff change waits for the prior pair to finish', () => {
@@ -619,6 +629,12 @@ test('scenario 7: empty, singleton, and multiple collections normalize', () => {
     normalizeCollection({ total_count: 2, check_runs: [{ id: 1 }, { id: 2 }] }),
     [{ id: 1 }, { id: 2 }],
   );
+  assert.deepEqual(normalizeCollection({ total_count: 0, workflow_runs: [] }), []);
+  assert.deepEqual(normalizeCollection({ total_count: 1, workflow_runs: [{ id: 1 }] }), [{ id: 1 }]);
+  assert.deepEqual(
+    normalizeCollection({ total_count: 2, workflow_runs: [{ id: 1 }, { id: 2 }] }),
+    [{ id: 1 }, { id: 2 }],
+  );
 });
 
 test('Copilot REST requests use the exact documented reviewer identity', () => {
@@ -705,9 +721,14 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
     },
     reviewRuns: {
       total_count: 1,
-      check_runs: [{
+      workflow_runs: [{
         id: 'new-run',
-        app: { slug: 'copilot-pull-request-reviewer' },
+        actor: {
+          login: 'Copilot',
+          type: 'Bot',
+          id: 175728472,
+          node_id: 'BOT_kgDOCnlnWA',
+        },
         head_sha: HASHES.head1,
         created_at: '2026-09-04T10:01:00Z',
       }],
@@ -721,6 +742,25 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
     reviewRunMatched: true,
     readbackComplete: true,
   });
+  assert.equal(
+    collectCopilotRequestEvidence({
+      ...common,
+      responseReviewers: [],
+      requestEvents: [],
+      requestedReviewers: [],
+      submittedReviews: [],
+      reviewRuns: {
+        total_count: 1,
+        check_runs: [{
+          id: 'new-check-run',
+          app: { slug: 'copilot-pull-request-reviewer' },
+          head_sha: HASHES.head1,
+          created_at: '2026-09-04T10:01:00Z',
+        }],
+      },
+    }).reviewRunMatched,
+    true,
+  );
   assert.equal(
     collectCopilotRequestEvidence({
       ...common,
@@ -871,6 +911,14 @@ test('scenario 8: Markdown backticks and Unicode survive and controls fail', () 
   const payload = 'Use `git diff --check` for café and 雪.';
   assert.equal(validateTransport(payload), payload);
   assert.throws(() => validateTransport(`bad${String.fromCharCode(1)}value`), /control character/u);
+  assert.throws(
+    () => parseCompactStateJson('{"value":"bad\\u0007payload"}'),
+    /control character/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson('{"bad\\u007fkey":true}'),
+    /control character/u,
+  );
 });
 
 test('scenario 9: confirmed mutation plus local recording failure does not retry', () => {
@@ -1115,6 +1163,15 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(parent, /no-safe-work human boundary -> waiting_human/u);
   assert.match(parent, /copilot-pull-request-reviewer\[bot\]/u);
   assert.match(parent, /A second proved no-effect attempt is `EXHAUSTED`/u);
+  assert.match(parent, /including drift on an unchanged head/u);
+  assert.match(
+    parent,
+    /unique request-event, review-run, submitted-review, and node-ID-to-timestamp conversation-comment baselines/u,
+  );
+  assert.match(
+    parent,
+    /confirmed or is terminally proved non-functional under the repository's reviewer-unavailability instructions/u,
+  );
   assert.doesNotMatch(parent, /any nonterminal state -> waiting_human/u);
   assert.match(alternate, /without model routing/u);
   assert.match(alternate, /Do not create manifest/u);
@@ -1126,6 +1183,15 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.doesNotMatch(alternate, /any nonterminal state -> waiting_human/u);
   assert.match(alternate, /copilot-pull-request-reviewer\[bot\]/u);
   assert.match(alternate, /A second proved no-effect attempt is `EXHAUSTED`/u);
+  assert.match(alternate, /including drift on an unchanged head/u);
+  assert.match(
+    alternate,
+    /unique request-event, review-run, submitted-review, and node-ID-to-timestamp conversation-comment baselines/u,
+  );
+  assert.match(
+    alternate,
+    /confirmed or is terminally proved non-functional under the repository's reviewer-unavailability instructions/u,
+  );
   assert.match(generator, /Do not split routine work/u);
   assert.match(generator, /Default to one reviewer pair/u);
   assert.match(generator, /immutable predecessor outputs/u);
@@ -1541,6 +1607,8 @@ test('the actual compact resume record and review state match their closed schem
     localRecordSucceeded: false,
   });
   const persisted = compactState(input);
+  const persistedWithoutReview = structuredClone(persisted);
+  delete persistedWithoutReview.current_task.review;
   const parent = await readFile(new URL('./coding-agent-loop.md', import.meta.url), 'utf8');
   const alternate = await readFile(
     new URL('./coding-agent-loop-without-model-routing.md', import.meta.url),
@@ -1560,6 +1628,11 @@ test('the actual compact resume record and review state match their closed schem
   assertClosedShape(state(input).copilotResults, schema.$defs.reviewerResults);
   assertClosedShape(state(input).codexResults, schema.$defs.reviewerResults);
   assertSchemaValid(persisted, schema, schema);
+  assertSchemaValid(persistedWithoutReview, schema, schema);
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(persistedWithoutReview)),
+    persistedWithoutReview,
+  );
   assertSchemaValid(readControllerExample(parent), schema, schema);
   assertSchemaValid(readControllerExample(alternate), schema, schema);
 });
@@ -1900,6 +1973,26 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
     }),
     /recognizedAt must not be earlier than cleanReviewAt/u,
   );
+});
+
+test('metrics correlate whole-second body edits at their available precision', () => {
+  const metrics = createMetrics({
+    reviewRequests: [],
+    bodyEditTimes: [
+      '2026-09-04T09:59:59Z',
+      '2026-09-04T10:00:00Z',
+      '2026-09-04T10:00:00.093Z',
+      '2026-09-04T10:00:00.095Z',
+    ],
+    reviewBeganAt: '2026-09-04T10:00:00.094Z',
+    sameHeadRerequestReasons: [],
+    cleanReviewAt: null,
+    recognizedAt: null,
+    cleanPairAt: null,
+    mergedAt: null,
+  });
+
+  assert.equal(metrics.bodyEditsAfterReviewBegan, 2);
 });
 
 test('review requests and schema use the same RFC 3339 grammar', async () => {
