@@ -1268,6 +1268,70 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
   );
 });
 
+test('Copilot request evidence excludes a baseline match through any supplied identity', () => {
+  const expectedHead = HASHES.head1;
+  const copilot = {
+    login: 'Copilot',
+    type: 'Bot',
+    id: 175728472,
+    node_id: 'BOT_kgDOCnlnWA',
+  };
+  const common = {
+    responseReviewers: [],
+    requestedReviewers: [],
+    expectedHead,
+    requestedAt: '2026-09-04T10:00:00Z',
+    readbackCompleteness: {
+      requestEvents: true,
+      requestedReviewers: true,
+      submittedReviews: true,
+      reviewRuns: true,
+    },
+  };
+  const evidence = collectCopilotRequestEvidence({
+    ...common,
+    baselineRequestEventIds: ['101'],
+    baselineReviewNodeIds: ['202'],
+    baselineReviewRunIds: ['303'],
+    requestEvents: [{
+      id: 101,
+      node_id: 'RRE_preferred',
+      event: 'review_requested',
+      created_at: '2026-09-04T10:01:00Z',
+      requested_reviewer: copilot,
+    }],
+    submittedReviews: [{
+      id: 202,
+      node_id: 'PRR_preferred',
+      submitted_at: '2026-09-04T10:01:00Z',
+      commit_id: expectedHead,
+      user: {
+        login: 'copilot-pull-request-reviewer[bot]',
+        type: 'Bot',
+        id: 175728472,
+        node_id: 'BOT_kgDOCnlnWA',
+      },
+    }],
+    reviewRuns: [{
+      id: 303,
+      node_id: 'WFR_preferred',
+      created_at: '2026-09-04T10:01:00Z',
+      head_sha: expectedHead,
+      actor: copilot,
+    }],
+  });
+
+  assert.deepEqual(evidence, {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    triggerCommentMatched: false,
+    readbackComplete: true,
+  });
+});
+
 test('Codex request evidence requires exact authenticated trigger-comment readback', () => {
   const common = {
     baselineConversationComments: {
@@ -1797,6 +1861,13 @@ test('all permanent active task-template and controller surfaces use the compact
     [...plan.matchAll(/Persist Copilot `readyAt` as the authenticated release boundary before a Codex request\./gu)].length,
     82,
   );
+  const baselineOverlapRule =
+    'Treat a request event, submitted review, or review run as baseline evidence when any ' +
+    'supplied node, numeric, or database identity overlaps its persisted baseline';
+  assert.equal(plan.split(baselineOverlapRule).length - 1, 82);
+  for (const surface of [parent, alternate, generator, crossRepository]) {
+    assert.match(surface, new RegExp(baselineOverlapRule, 'u'));
+  }
 });
 
 test('active fixed-plan review-loop tasks require persisted review state', async () => {

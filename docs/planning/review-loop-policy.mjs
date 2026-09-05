@@ -1231,11 +1231,11 @@ export function collectCopilotRequestEvidence({
     (reviewer) => isCopilotIdentity(reviewer),
   );
   const requestEventMatched = normalizeCollection(requestEvents).some((event) => {
-    const id = getItemId(event);
+    const identities = getItemIdentities(event);
     const reviewer = event?.requested_reviewer ?? event?.requestedReviewer;
     return event?.event === 'review_requested' &&
-      id !== null &&
-      !eventBaselines.has(id) &&
+      identities.length > 0 &&
+      identities.every((identity) => !eventBaselines.has(identity)) &&
       isItemAtOrAfterRequest(event, ['created_at', 'createdAt'], requestTime) &&
       isCopilotIdentity(reviewer);
   });
@@ -1243,18 +1243,18 @@ export function collectCopilotRequestEvidence({
     (reviewer) => isCopilotIdentity(reviewer),
   );
   const submittedReviewMatched = normalizeCollection(submittedReviews).some((review) => {
-    const id = getItemId(review);
-    return id !== null &&
-      !reviewBaselines.has(id) &&
+    const identities = getItemIdentities(review);
+    return identities.length > 0 &&
+      identities.every((identity) => !reviewBaselines.has(identity)) &&
       isItemAtOrAfterRequest(review, ['submitted_at', 'submittedAt'], requestTime) &&
       getCommitOid(review) === expectedHead &&
       isCopilotIdentity(review);
   });
   const reviewRunMatched = normalizeCollection(reviewRuns).some((run) => {
-    const id = getItemId(run);
+    const identities = getItemIdentities(run);
     const head = run?.head_sha ?? run?.headSha ?? run?.headCommit?.oid;
-    return id !== null &&
-      !runBaselines.has(id) &&
+    return identities.length > 0 &&
+      identities.every((identity) => !runBaselines.has(identity)) &&
       isItemAtOrAfterRequest(
         run,
         ['created_at', 'createdAt', 'run_started_at', 'runStartedAt'],
