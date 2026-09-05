@@ -28,6 +28,12 @@ export const REVIEW_REQUEST_SPECS = Object.freeze({
 
 export const REVIEW_REQUEST_RECONCILIATION_MILLISECONDS = 120_000;
 export const PLAN_TASK_COUNT = 402;
+export const REVIEW_LOOP_TASK_NUMBERS = Object.freeze([
+  6, 15, 25, 34, 45, 54, 63, 74, 83, 92, 101, 110, 119, 130,
+  139, 148, 158, 167, 176, 186, 195, 204, 216, 227, 237, 246,
+  255, 264, 273, 282, 291, 300, 309, 317, 328, 337, 346, 355,
+  364, 373, 385, 396,
+]);
 
 const SHA1_PATTERN = /^[0-9a-f]{40}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
@@ -35,6 +41,7 @@ const PREDECESSOR_TASK_PATTERN = /^[1-9]\d{0,2}$/u;
 const PREDECESSOR_OUTPUT_PATTERN = /^[A-Z][A-Z0-9_]{0,127}$/u;
 const DISALLOWED_CONTROL_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/u;
 const RFC3339_PATTERN = /^(?<year>\d{4})-(?<month>0[1-9]|1[0-2])-(?<day>0[1-9]|[12]\d|3[01])[Tt](?<hour>[01]\d|2[0-3]):(?<minute>[0-5]\d):(?<second>[0-5]\d)(?:\.\d+)?(?<zone>[Zz]|(?<offsetSign>[+-])(?<offsetHour>0\d|1[0-4]):(?<offsetMinute>[0-5]\d))$/u;
+const REVIEW_LOOP_TASK_NUMBER_SET = new Set(REVIEW_LOOP_TASK_NUMBERS);
 
 function canonicalize(value) {
   if (Array.isArray(value)) {
@@ -322,6 +329,15 @@ export function parseCompactStateJson(text) {
       parsed.completed,
     );
     validatePredecessorOutputs(parsed.predecessor_outputs, completedTaskNumber);
+    if (
+      REVIEW_LOOP_TASK_NUMBER_SET.has(parsed.current_task?.number) &&
+      parsed.current_task?.state !== 'pending' &&
+      parsed.current_task?.review === undefined
+    ) {
+      throw new TypeError(
+        'An active fixed-plan review-loop task must contain persisted review state.',
+      );
+    }
     if (parsed.current_task?.review !== undefined) {
       const reviewState = parsed.current_task.review;
       if (
@@ -330,11 +346,11 @@ export function parseCompactStateJson(text) {
       ) {
         throw new TypeError('The persisted review input must match the current task head.');
       }
-      validatePersistedPublicMutation(reviewState.publicMutation);
       const requests = validatePersistedReviewRequests(
         reviewState.reviewRequests,
         reviewState,
       );
+      validatePersistedPublicMutation(reviewState.publicMutation, requests);
       const supersessions = validatePersistedSupersededReviewInputs(
         reviewState.supersededReviewInputs,
       );
@@ -400,7 +416,7 @@ function validatePersistedReviewRequests(reviewRequests, reviewState) {
     seenRequests.add(requestIdentity);
   }
 
-  validateReviewRequestOrdering(reviewRequests);
+  validateReviewRequestOrdering(reviewRequests, { enforceGlobalSerialization: true });
   validateTerminalResultReferences(reviewRequests, reviewState);
   return reviewRequests;
 }
@@ -461,7 +477,7 @@ function validatePersistedSupersededReviewInputs(supersededReviewInputs) {
   return dispositions;
 }
 
-function validatePersistedPublicMutation(publicMutation) {
+function validatePersistedPublicMutation(publicMutation, requests) {
   if (
     publicMutation === null ||
     typeof publicMutation !== 'object' ||
@@ -475,12 +491,55 @@ function validatePersistedPublicMutation(publicMutation) {
     'attemptedAt',
     'reconciledAt',
     'evidence',
+    'reviewInputKey',
+    'channel',
   ];
   if (
     publicMutation.state === 'NOT_ATTEMPTED' &&
     attemptMetadataFields.some((field) => Object.hasOwn(publicMutation, field))
   ) {
     throw new TypeError('A NOT_ATTEMPTED mutation must not contain attempt metadata.');
+  }
+
+  const hasEvidence = Object.hasOwn(publicMutation, 'evidence');
+  const hasReviewInputKey = Object.hasOwn(publicMutation, 'reviewInputKey');
+  const hasChannel = Object.hasOwn(publicMutation, 'channel');
+  if (
+    hasEvidence !== (hasReviewInputKey && hasChannel) ||
+    (!hasEvidence && (hasReviewInputKey || hasChannel))
+  ) {
+    throw new TypeError(
+      'A review-request mutation must contain its reviewed-input key and channel.',
+    );
+  }
+
+  let matchingRequest = null;
+  if (hasEvidence) {
+    if (
+      typeof publicMutation.reviewInputKey !== 'string' ||
+      !SHA256_PATTERN.test(publicMutation.reviewInputKey) ||
+      !['copilot', 'codex'].includes(publicMutation.channel)
+    ) {
+      throw new TypeError('A review-request mutation identity is malformed.');
+    }
+    const matches = requests.filter(
+      (request) => request.reviewInputKey === publicMutation.reviewInputKey &&
+        request.channel === publicMutation.channel,
+    );
+    if (matches.length !== 1) {
+      throw new TypeError(
+        'A review-request mutation must identify exactly one persisted request.',
+      );
+    }
+    [matchingRequest] = matches;
+    if (
+      publicMutation.state === 'NO_EFFECT' &&
+      (matchingRequest.confirmed === true || matchingRequest.terminal === true)
+    ) {
+      throw new TypeError(
+        'A retry-eligible no-effect mutation must identify one unconfirmed nonterminal request.',
+      );
+    }
   }
 
   const attemptedAt = publicMutation.attemptedAt;
@@ -507,6 +566,12 @@ function validatePersistedPublicMutation(publicMutation) {
   }
 
   const attemptedTime = parseRfc3339Timestamp(attemptedAt, 'attemptedAt');
+  if (
+    matchingRequest !== null &&
+    attemptedTime < parseRfc3339Timestamp(matchingRequest.requestedAt, 'requestedAt')
+  ) {
+    throw new TypeError('A review-request mutation attempt precedes its request record.');
+  }
   if (reconciledAt === undefined || reconciledAt === null) {
     return;
   }
@@ -1236,12 +1301,17 @@ function isResultActorForChannel(result, channel) {
 }
 
 function getNextDifferentInputRequestTime(request, requests) {
-  const requestTime = getItemTime(request, ['requestedAt']);
-  const laterTimes = requests
-    .filter((candidate) => candidate.reviewInputKey !== request.reviewInputKey)
-    .map((candidate) => getItemTime(candidate, ['requestedAt']))
-    .filter((candidateTime) => candidateTime !== null && candidateTime > requestTime);
-  return laterTimes.length === 0 ? null : Math.min(...laterTimes);
+  const requestIndex = requests.indexOf(request);
+  const resolvedIndex = requestIndex >= 0
+    ? requestIndex
+    : requests.findIndex((candidate) => canonicalJson(candidate) === canonicalJson(request));
+  if (resolvedIndex < 0) {
+    return null;
+  }
+  const successor = requests.slice(resolvedIndex + 1).find(
+    (candidate) => candidate.reviewInputKey !== request.reviewInputKey,
+  );
+  return successor === undefined ? null : getItemTime(successor, ['requestedAt']);
 }
 
 function isReferencedTerminalResult(result, request, reference, requests) {
@@ -1260,7 +1330,7 @@ function isReferencedTerminalResult(result, request, reference, requests) {
     resultTime !== referenceTime ||
     !identities.includes(reference.id) ||
     !isItemAtOrAfterRequest(result, timeFields, requestTime) ||
-    (nextDifferentInputTime !== null && resultTime >= nextDifferentInputTime) ||
+    (nextDifferentInputTime !== null && resultTime > nextDifferentInputTime) ||
     !isResultActorForChannel(result, request.channel)
   ) {
     return false;
@@ -1361,7 +1431,19 @@ function isCopilotReadyForCodex(request) {
     );
 }
 
-function validateReviewRequestOrdering(reviewRequests) {
+function getRequestTerminalTime(request) {
+  if (request?.terminal !== true) {
+    return null;
+  }
+  return request.confirmed === true
+    ? getItemTime(request.terminalResultRef, ['observedAt'])
+    : getItemTime(request.terminalDisposition, ['recordedAt']);
+}
+
+function validateReviewRequestOrdering(
+  reviewRequests,
+  { enforceGlobalSerialization = false } = {},
+) {
   for (const codexRequest of reviewRequests.filter(
     (request) => request.channel === 'codex',
   )) {
@@ -1386,6 +1468,33 @@ function validateReviewRequestOrdering(reviewRequests) {
     const codexTime = parseRfc3339Timestamp(codexRequest.requestedAt, 'Codex requestedAt');
     if (copilotTime > codexTime) {
       throw new TypeError('A Codex request must not precede its Copilot request.');
+    }
+  }
+
+  if (!enforceGlobalSerialization) {
+    return;
+  }
+  const requestTimes = reviewRequests.map(
+    (request) => getItemTime(request, ['requestedAt']),
+  );
+  for (let index = 1; index < reviewRequests.length; index += 1) {
+    if (requestTimes[index] < requestTimes[index - 1]) {
+      throw new TypeError('The persisted review-request history is not time ordered.');
+    }
+  }
+  for (let index = 0; index < reviewRequests.length; index += 1) {
+    const request = reviewRequests[index];
+    for (let priorIndex = 0; priorIndex < index; priorIndex += 1) {
+      const prior = reviewRequests[priorIndex];
+      if (prior.reviewInputKey === request.reviewInputKey) {
+        continue;
+      }
+      const terminalTime = getRequestTerminalTime(prior);
+      if (terminalTime === null || terminalTime > requestTimes[index]) {
+        throw new TypeError(
+          'A different-input request requires every earlier-input request to be terminal first.',
+        );
+      }
     }
   }
 }
@@ -1480,7 +1589,7 @@ export function collectCodexResults({
       }
       seenRequests.add(identity);
     }
-    validateReviewRequestOrdering(requests);
+    validateReviewRequestOrdering(requests, { enforceGlobalSerialization: true });
     requestHistoryIsValid = requests.some(
       (candidate) => canonicalJson(candidate) === canonicalJson(request),
     );
@@ -1515,7 +1624,9 @@ export function collectCodexResults({
         isItemAtOrAfterRequest(review, ['submitted_at', 'submittedAt'], requestTime);
     },
   );
-  const comments = normalizeCollection(conversationComments).filter(
+  const comments = normalizeCollection(conversationComments)
+    .map((comment) => normalizeCodexConversationResult(comment, head))
+    .filter(
     (comment) => {
       if (
         normalizeActorLogin(getActorLogin(comment)) !== expectedActor ||
@@ -1548,8 +1659,8 @@ export function collectCodexResults({
 
       const baselineTime = baselineComments.get(id);
       return baselineTime === undefined || updatedAt > baselineTime;
-    },
-  );
+      },
+    );
 
   return Object.freeze({
     submittedReviews: reviews,
@@ -1557,15 +1668,43 @@ export function collectCodexResults({
   });
 }
 
+function normalizeCodexConversationResult(comment, head) {
+  if (
+    typeof comment?.status === 'string' &&
+    comment.status.startsWith('completed')
+  ) {
+    return comment;
+  }
+  const body = typeof comment?.body === 'string' ? comment.body : '';
+  const completedRow = /\|\s*[^|\r\n]*\*\*Code Review\*\*\s*\|\s*[^|\r\n]*\*\*Completed\*\*[^|\r\n]*\|\s*`(?<commitPrefix>[0-9a-f]{7,40})`\s*\|/iu.exec(body);
+  if (completedRow === null || !head.startsWith(completedRow.groups.commitPrefix)) {
+    return comment;
+  }
+  return {
+    ...comment,
+    status: 'completed',
+    commitPrefix: completedRow.groups.commitPrefix,
+  };
+}
+
 export function reconcileReviewRequestMutation({
   response,
   evidence,
+  reviewInputKey,
+  channel,
   attemptedAt,
   observedAt,
   attemptCount,
   localRecordSucceeded,
   minimumWaitMilliseconds = REVIEW_REQUEST_RECONCILIATION_MILLISECONDS,
 }) {
+  if (
+    typeof reviewInputKey !== 'string' ||
+    !SHA256_PATTERN.test(reviewInputKey) ||
+    !['copilot', 'codex'].includes(channel)
+  ) {
+    throw new TypeError('Review-request mutation identity is malformed.');
+  }
   const evidenceKeys = [
     'responseReviewerMatched',
     'requestEventMatched',
@@ -1611,6 +1750,8 @@ export function reconcileReviewRequestMutation({
     attemptedAt,
     reconciledAt: null,
     evidence: Object.freeze({ ...evidence }),
+    reviewInputKey,
+    channel,
   };
 
   if (response?.executed === false && nativeResponseAccepted) {

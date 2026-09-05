@@ -128,7 +128,75 @@
         "review": {
           "$ref": "#/$defs/reviewState"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "number": {
+                "enum": [
+                  6,
+                  15,
+                  25,
+                  34,
+                  45,
+                  54,
+                  63,
+                  74,
+                  83,
+                  92,
+                  101,
+                  110,
+                  119,
+                  130,
+                  139,
+                  148,
+                  158,
+                  167,
+                  176,
+                  186,
+                  195,
+                  204,
+                  216,
+                  227,
+                  237,
+                  246,
+                  255,
+                  264,
+                  273,
+                  282,
+                  291,
+                  300,
+                  309,
+                  317,
+                  328,
+                  337,
+                  346,
+                  355,
+                  364,
+                  373,
+                  385,
+                  396
+                ]
+              },
+              "state": {
+                "not": {
+                  "const": "pending"
+                }
+              }
+            },
+            "required": [
+              "number",
+              "state"
+            ]
+          },
+          "then": {
+            "required": [
+              "review"
+            ]
+          }
+        }
+      ]
     },
     "reviewState": {
       "type": "object",
@@ -631,6 +699,15 @@
         "localRecordSucceeded": {
           "type": "boolean"
         },
+        "reviewInputKey": {
+          "$ref": "#/$defs/sha256"
+        },
+        "channel": {
+          "enum": [
+            "copilot",
+            "codex"
+          ]
+        },
         "attemptCount": {
           "type": "integer",
           "minimum": 1,
@@ -661,6 +738,35 @@
         }
       },
       "allOf": [
+        {
+          "if": {
+            "required": [
+              "evidence"
+            ]
+          },
+          "then": {
+            "required": [
+              "reviewInputKey",
+              "channel"
+            ]
+          },
+          "else": {
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "reviewInputKey"
+                  ]
+                },
+                {
+                  "required": [
+                    "channel"
+                  ]
+                }
+              ]
+            }
+          }
+        },
         {
           "if": {
             "properties": {

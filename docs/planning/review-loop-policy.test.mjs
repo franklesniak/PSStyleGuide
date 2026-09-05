@@ -4,6 +4,7 @@ import test from 'node:test';
 import {
   MUTATION_CLASSES,
   PLAN_TASK_COUNT,
+  REVIEW_LOOP_TASK_NUMBERS,
   classifyMutation,
   collectCopilotRequestEvidence,
   collectCodexResults,
@@ -763,6 +764,120 @@ test('scenario 6: both attributable Codex result channels are recognized', () =>
   assert.deepEqual(Object.keys(results).sort(), ['conversationComments', 'submittedReviews']);
 });
 
+test('native completed Codex summaries become typed terminal conversation results', () => {
+  const input = reviewInput();
+  const copilotRequest = requestFor(input, 'copilot', { confirmed: true });
+  const codexRequest = requestFor(input, 'codex', {
+    confirmed: true,
+    terminal: true,
+    requestedAt: '2026-09-04T10:01:00Z',
+    terminalResultRef: {
+      kind: 'conversation-comment',
+      id: 'COMMENT_NATIVE',
+      observedAt: '2026-09-04T10:02:00Z',
+    },
+  });
+  const requestHistory = [copilotRequest, codexRequest];
+  const nativeSummary = {
+    node_id: 'COMMENT_NATIVE',
+    user: { login: 'chatgpt-codex-connector[bot]' },
+    created_at: '2026-09-04T09:00:00Z',
+    updated_at: '2026-09-04T10:02:00Z',
+    body: '| 📝 **Code Review** | ✅ **Completed** <relative-time>now</relative-time> | `aaaaaaa` | Manual request |',
+  };
+  const collected = collectCodexResults({
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: requestHistory,
+    submittedReviews: [],
+    conversationComments: nativeSummary,
+  });
+  assert.equal(collected.conversationComments[0].status, 'completed');
+  assert.equal(collected.conversationComments[0].commitPrefix, 'aaaaaaa');
+
+  const persisted = compactState(input, {
+    reviewRequests: requestHistory,
+    codexResults: collected,
+  });
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(persisted)), persisted);
+
+  for (const body of [
+    '| 📝 **Code Review** | 🔄 **Running** | `aaaaaaa` | Manual request |',
+    '| 📝 **Code Review** | ✅ **Completed** | `bbbbbbb` | Manual request |',
+  ]) {
+    const nonterminal = collectCodexResults({
+      reviewInput: input,
+      request: codexRequest,
+      reviewRequests: requestHistory,
+      submittedReviews: [],
+      conversationComments: { ...nativeSummary, body },
+    });
+    assert.equal(nonterminal.conversationComments[0].status, undefined);
+  }
+});
+
+test('persisted and collection request histories enforce global pair serialization', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const oldCopilot = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const oldCodex = requestFor(input1, 'codex', {
+    confirmed: true,
+    terminal: false,
+    requestedAt: '2026-09-04T10:01:00Z',
+  });
+  const newCopilot = requestFor(input2, 'copilot', {
+    confirmed: true,
+    requestedAt: '2026-09-04T10:02:00Z',
+  });
+  const newCodex = requestFor(input2, 'codex', {
+    requestedAt: '2026-09-04T10:03:00Z',
+  });
+  const bypass = compactState(input2, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [oldCopilot, oldCodex, newCopilot, newCodex],
+  });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(bypass)),
+    /earlier-input request to be terminal first/u,
+  );
+  assert.deepEqual(collectCodexResults({
+    reviewInput: input2,
+    request: newCodex,
+    reviewRequests: bypass.current_task.review.reviewRequests,
+    submittedReviews: [],
+    conversationComments: [{
+      id: 'MISATTRIBUTED',
+      user: { login: 'chatgpt-codex-connector[bot]' },
+      updated_at: '2026-09-04T10:04:00Z',
+      body: '| **Code Review** | **Completed** | `bbbbbbb` | Manual request |',
+    }],
+  }), { submittedReviews: [], conversationComments: [] });
+
+  const reversed = compactState(input2, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [
+      requestFor(input1, 'copilot', {
+        confirmed: true,
+        terminal: true,
+        requestedAt: '2026-09-04T10:02:00Z',
+      }),
+      requestFor(input2, 'copilot', { requestedAt: '2026-09-04T10:01:00Z' }),
+    ],
+  });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(reversed)),
+    /not time ordered/u,
+  );
+});
+
 test('whole-second Codex evidence matches a fractional request boundary', () => {
   const input = reviewInput();
   const request = requestFor(input, 'codex', {
@@ -1194,6 +1309,11 @@ test('scenario 9: confirmed mutation plus local recording failure does not retry
 });
 
 test('accepted review requests reconcile, prove no effect, retry once, and exhaust', () => {
+  const input = reviewInput();
+  const mutationIdentity = {
+    reviewInputKey: getReviewInputKey(input),
+    channel: 'copilot',
+  };
   const emptyEvidence = {
     responseReviewerMatched: false,
     requestEventMatched: false,
@@ -1204,6 +1324,7 @@ test('accepted review requests reconcile, prove no effect, retry once, and exhau
   };
   const attemptedAt = '2026-09-04T10:00:00Z';
   const reconciling = reconcileReviewRequestMutation({
+    ...mutationIdentity,
     response: { ok: true },
     evidence: emptyEvidence,
     attemptedAt,
@@ -1212,6 +1333,7 @@ test('accepted review requests reconcile, prove no effect, retry once, and exhau
     localRecordSucceeded: true,
   });
   const noEffect = reconcileReviewRequestMutation({
+    ...mutationIdentity,
     response: { ok: true },
     evidence: emptyEvidence,
     attemptedAt,
@@ -1220,6 +1342,7 @@ test('accepted review requests reconcile, prove no effect, retry once, and exhau
     localRecordSucceeded: true,
   });
   const exhausted = reconcileReviewRequestMutation({
+    ...mutationIdentity,
     response: { ok: true },
     evidence: emptyEvidence,
     attemptedAt,
@@ -1228,6 +1351,7 @@ test('accepted review requests reconcile, prove no effect, retry once, and exhau
     localRecordSucceeded: true,
   });
   const confirmed = reconcileReviewRequestMutation({
+    ...mutationIdentity,
     response: { ok: true },
     evidence: { ...emptyEvidence, requestEventMatched: true },
     attemptedAt,
@@ -1236,6 +1360,7 @@ test('accepted review requests reconcile, prove no effect, retry once, and exhau
     localRecordSucceeded: false,
   });
   const contradictory = reconcileReviewRequestMutation({
+    ...mutationIdentity,
     response: { ok: true, executed: false },
     evidence: { ...emptyEvidence, requestEventMatched: true },
     attemptedAt,
@@ -1261,6 +1386,7 @@ test('accepted review requests reconcile, prove no effect, retry once, and exhau
   assert.equal(contradictory.retryAllowed, false);
   assert.throws(
     () => reconcileReviewRequestMutation({
+      ...mutationIdentity,
       response: { ok: true },
       evidence: emptyEvidence,
       attemptedAt,
@@ -1279,6 +1405,9 @@ test('all permanent active task-template and controller surfaces use the compact
   const alternate = await readFile(new URL('coding-agent-loop-without-model-routing.md', planningRoot), 'utf8');
   const generator = await readFile(new URL('prompt-action-items-update.md', planningRoot), 'utf8');
   const crossRepository = await readFile(new URL('prompt-loop-cross-repo.md', planningRoot), 'utf8');
+  const schema = JSON.parse(
+    await readFile(new URL('review-loop-policy.json', planningRoot), 'utf8'),
+  );
   const headingPattern = /^## Task (\d+) — (.+)$/gmu;
   const headings = [...plan.matchAll(headingPattern)];
   const tasks = headings.map((match, index) => ({
@@ -1300,6 +1429,11 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.equal(qualityTasks.length, 42);
   assert.equal(mergeTasks.length, 42);
   assert.equal(handoffTasks.length, 46);
+  const plannedReviewTaskNumbers = reviewTasks.map((task) => task.number);
+  const schemaReviewTaskNumbers =
+    schema.$defs.taskState.allOf[0].if.properties.number.enum;
+  assert.deepEqual(REVIEW_LOOP_TASK_NUMBERS, plannedReviewTaskNumbers);
+  assert.deepEqual(schemaReviewTaskNumbers, plannedReviewTaskNumbers);
 
   for (const task of publicationTasks) {
     assert.match(task.body, /### Reviewer-facing body freeze gate/u);
@@ -1443,6 +1577,45 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(crossRepository, /Preserve both submitted-review objects/u);
   assert.match(crossRepository, /copilot-pull-request-reviewer\[bot\]/u);
   assert.match(crossRepository, /`RECONCILING` → `NO_EFFECT` → one-retry → `EXHAUSTED`/u);
+});
+
+test('active fixed-plan review-loop tasks require persisted review state', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const completedThrough = (taskNumber) => Array.from(
+    { length: taskNumber - 1 },
+    (_, index) => index + 1,
+  );
+  const activeReviewTask = compactState(
+    reviewInput(),
+    {},
+    { number: 15, state: 'active' },
+    { completed: completedThrough(15) },
+  );
+  delete activeReviewTask.current_task.review;
+  assert.throws(
+    () => assertSchemaValid(activeReviewTask, schema, schema),
+    /review is required/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(activeReviewTask)),
+    /must contain persisted review state/u,
+  );
+
+  const pendingReviewTask = structuredClone(activeReviewTask);
+  pendingReviewTask.current_task.state = 'pending';
+  assertSchemaValid(pendingReviewTask, schema, schema);
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(pendingReviewTask)),
+    pendingReviewTask,
+  );
+
+  const nonReviewTask = structuredClone(activeReviewTask);
+  nonReviewTask.current_task.number = 16;
+  nonReviewTask.completed = completedThrough(16);
+  assertSchemaValid(nonReviewTask, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(nonReviewTask)), nonReviewTask);
 });
 
 test('safety failures reject false classes, duplicate requests, and unattributable comments', () => {
@@ -1840,6 +2013,9 @@ function assertSchemaValid(value, definition, root, location = '$') {
     if (conditionMatches && condition.then !== undefined) {
       assertSchemaValid(value, condition.then, root, location);
     }
+    if (!conditionMatches && condition.else !== undefined) {
+      assertSchemaValid(value, condition.else, root, location);
+    }
   }
 }
 
@@ -2134,9 +2310,16 @@ test('confirmed terminal requests require one attributable persisted result', as
       }),
     ],
   });
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(afterDifferentInputBoundary)),
+    afterDifferentInputBoundary,
+  );
+  const successorBeforeTerminalEvidence = structuredClone(afterDifferentInputBoundary);
+  successorBeforeTerminalEvidence.current_task.review.reviewRequests[2].requestedAt =
+    '2026-09-04T10:01:59Z';
   assert.throws(
-    () => parseCompactStateJson(JSON.stringify(afterDifferentInputBoundary)),
-    /one attributable terminal result/u,
+    () => parseCompactStateJson(JSON.stringify(successorBeforeTerminalEvidence)),
+    /earlier-input request to be terminal first/u,
   );
 
   const duplicatedReference = compactState(input2, {
@@ -2146,6 +2329,7 @@ test('confirmed terminal requests require one attributable persisted result', as
       requestFor(input2, 'copilot', {
         confirmed: true,
         terminal: true,
+        requestedAt: '2026-09-04T10:01:00Z',
         terminalResultRef: structuredClone(copilotRequest.terminalResultRef),
       }),
     ],
@@ -2517,7 +2701,20 @@ test('compact-state ingestion rejects duplicate reviewed-input channel requests'
   const distinctInputs = compactState(input1, {
     reviewRequests: [first, requestFor(input2, 'copilot')],
   });
-  assert.deepEqual(parseCompactStateJson(JSON.stringify(distinctInputs)), distinctInputs);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(distinctInputs)),
+    /earlier-input request to be terminal first/u,
+  );
+  const serializedDistinctInputs = compactState(input1, {
+    reviewRequests: [
+      requestFor(input1, 'copilot', { confirmed: true, terminal: true }),
+      requestFor(input2, 'copilot', { requestedAt: '2026-09-04T10:01:00Z' }),
+    ],
+  });
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(serializedDistinctInputs)),
+    serializedDistinctInputs,
+  );
 });
 
 test('compact task commit identities are SHA-1 values or null', async () => {
@@ -2751,6 +2948,7 @@ test('compact-state ingestion rejects future and expired predecessor outputs', a
 
 test('compact-state ingestion rejects invalid predecessor and reconciliation ordering', () => {
   const input = reviewInput();
+  const reviewRequest = requestFor(input, 'copilot');
   const negativeEvidence = {
     responseReviewerMatched: false,
     requestEventMatched: false,
@@ -2766,12 +2964,16 @@ test('compact-state ingestion rejects invalid predecessor and reconciliation ord
       readbackMatched: false,
       retryAllowed: true,
       localRecordSucceeded: true,
+      reviewInputKey: getReviewInputKey(input),
+      channel: 'copilot',
       attemptCount: 1,
       attemptedAt: '2026-09-04T10:02:00Z',
       reconciledAt: '2026-09-04T10:02:00Z',
       evidence: negativeEvidence,
     },
   });
+  invalidInterval.current_task.review.reviewRequests = [reviewRequest];
+  invalidInterval.current_task.review.metrics.reviewerRequestsPerHead[input.head] = 1;
   const reversedInterval = structuredClone(invalidInterval);
   reversedInterval.current_task.review.publicMutation.reconciledAt =
     '2026-09-04T10:01:59Z';
@@ -2799,6 +3001,11 @@ test('compact-state ingestion rejects invalid predecessor and reconciliation ord
 
 test('compact-state ingestion requires state-dependent reconciliation timestamps', () => {
   const input = reviewInput();
+  const reviewRequest = requestFor(input, 'copilot');
+  const mutationIdentity = {
+    reviewInputKey: getReviewInputKey(input),
+    channel: 'copilot',
+  };
   const evidence = {
     responseReviewerMatched: false,
     requestEventMatched: false,
@@ -2810,6 +3017,7 @@ test('compact-state ingestion requires state-dependent reconciliation timestamps
   const attemptedAt = '2026-09-04T10:00:00Z';
   const mutations = [
     reconcileReviewRequestMutation({
+      ...mutationIdentity,
       response: { ok: true },
       evidence,
       attemptedAt,
@@ -2818,6 +3026,7 @@ test('compact-state ingestion requires state-dependent reconciliation timestamps
       localRecordSucceeded: true,
     }),
     reconcileReviewRequestMutation({
+      ...mutationIdentity,
       response: { ok: true },
       evidence,
       attemptedAt,
@@ -2826,6 +3035,7 @@ test('compact-state ingestion requires state-dependent reconciliation timestamps
       localRecordSucceeded: true,
     }),
     reconcileReviewRequestMutation({
+      ...mutationIdentity,
       response: { ok: true },
       evidence,
       attemptedAt,
@@ -2840,6 +3050,7 @@ test('compact-state ingestion requires state-dependent reconciliation timestamps
     delete missingAttempt.attemptedAt;
     assert.throws(
       () => parseCompactStateJson(JSON.stringify(compactState(input, {
+        reviewRequests: [reviewRequest],
         publicMutation: missingAttempt,
       }))),
       /must contain attemptedAt/u,
@@ -2850,6 +3061,7 @@ test('compact-state ingestion requires state-dependent reconciliation timestamps
     delete missingReconciliation.reconciledAt;
     assert.throws(
       () => parseCompactStateJson(JSON.stringify(compactState(input, {
+        reviewRequests: [reviewRequest],
         publicMutation: missingReconciliation,
       }))),
       /must contain (?:a null )?reconciledAt/u,
@@ -2861,9 +3073,74 @@ test('compact-state ingestion requires state-dependent reconciliation timestamps
   completedReconciliation.reconciledAt = '2026-09-04T10:01:59Z';
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(compactState(input, {
+      reviewRequests: [reviewRequest],
       publicMutation: completedReconciliation,
     }))),
     /must contain a null reconciledAt/u,
+  );
+});
+
+test('review-request mutation state is bound to one persisted request identity', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const request = requestFor(input, 'copilot');
+  const noEffect = reconcileReviewRequestMutation({
+    reviewInputKey: getReviewInputKey(input),
+    channel: 'copilot',
+    response: { ok: true },
+    evidence: {
+      responseReviewerMatched: false,
+      requestEventMatched: false,
+      requestedReviewerMatched: false,
+      submittedReviewMatched: false,
+      reviewRunMatched: false,
+      readbackComplete: true,
+    },
+    attemptedAt: request.requestedAt,
+    observedAt: '2026-09-04T10:02:00Z',
+    attemptCount: 1,
+    localRecordSucceeded: true,
+  });
+  const valid = compactState(input, {
+    reviewRequests: [request],
+    publicMutation: noEffect,
+  });
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  const missingIdentity = structuredClone(valid);
+  delete missingIdentity.current_task.review.publicMutation.reviewInputKey;
+  assert.throws(
+    () => assertSchemaValid(missingIdentity, schema, schema),
+    /reviewInputKey is required/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missingIdentity)),
+    /must contain its reviewed-input key and channel/u,
+  );
+
+  const noRequest = structuredClone(valid);
+  noRequest.current_task.review.reviewRequests = [];
+  noRequest.current_task.review.metrics.reviewerRequestsPerHead[input.head] = 0;
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(noRequest)),
+    /identify exactly one persisted request/u,
+  );
+
+  const wrongChannel = structuredClone(valid);
+  wrongChannel.current_task.review.publicMutation.channel = 'codex';
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(wrongChannel)),
+    /identify exactly one persisted request/u,
+  );
+
+  const confirmedRequest = structuredClone(valid);
+  confirmedRequest.current_task.review.reviewRequests[0].confirmed = true;
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(confirmedRequest)),
+    /unconfirmed nonterminal request/u,
   );
 });
 
@@ -2885,6 +3162,8 @@ test('a no-attempt mutation rejects every attempt-only property', async () => {
       reviewRunMatched: false,
       readbackComplete: true,
     },
+    reviewInputKey: getReviewInputKey(input),
+    channel: 'copilot',
   };
 
   assertSchemaValid(valid, schema.$defs.publicMutation, schema);
@@ -2937,6 +3216,8 @@ test('public-mutation schema rejects every contradictory persisted state', async
     evidence: negativeEvidence,
     attemptedAt: '2026-09-04T10:00:00Z',
     localRecordSucceeded: true,
+    reviewInputKey: getReviewInputKey(reviewInput()),
+    channel: 'copilot',
   };
   const reviewMutations = [
     reconcileReviewRequestMutation({
