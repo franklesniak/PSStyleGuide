@@ -88,21 +88,32 @@ jobs:
             fi
           done
 
-          root_manifest_present=false
-          root_lock_present=false
-          [[ -f package.json && ! -L package.json ]] && \
-            root_manifest_present=true
-          [[ -f package-lock.json && ! -L package-lock.json ]] && \
-            root_lock_present=true
+          classify_npm_input() {
+            if [[ -L "$1" ]]; then
+              printf 'symlink'
+            elif [[ -f "$1" ]]; then
+              printf 'regular-file'
+            elif [[ -e "$1" ]]; then
+              printf 'non-regular'
+            else
+              printf 'absent'
+            fi
+          }
 
-          if [[ "${root_manifest_present}" == true && \
-            "${root_lock_present}" == true ]]; then
+          root_manifest_state="$(classify_npm_input package.json)"
+          root_lock_state="$(classify_npm_input package-lock.json)"
+
+          if [[ "${root_manifest_state}" == regular-file && \
+            "${root_lock_state}" == regular-file ]]; then
             echo 'layout=modern' >> "${GITHUB_OUTPUT}"
-          elif [[ ! -e package.json && ! -L package.json && \
-            ! -e package-lock.json && ! -L package-lock.json ]]; then
+          elif [[ "${root_manifest_state}" == absent && \
+            "${root_lock_state}" == absent ]]; then
             echo 'layout=legacy' >> "${GITHUB_OUTPUT}"
           else
-            echo '::error::The root npm validation tuple is incomplete or unsafe.'
+            echo '::error::The root npm validation tuple requires both inputs as' \
+              'regular files or both inputs absent;' \
+              "package.json=${root_manifest_state};" \
+              "package-lock.json=${root_lock_state}."
             exit 1
           fi
 
