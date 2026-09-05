@@ -282,6 +282,16 @@ function scanJsonWithoutDuplicateMembers(text) {
     numberPattern.lastIndex = cursor;
     const number = numberPattern.exec(text);
     if (number !== null) {
+      const numericValue = Number(number[0]);
+      if (
+        !Number.isFinite(numericValue) ||
+        Math.abs(numericValue) > Number.MAX_SAFE_INTEGER
+      ) {
+        throw new TypeError(
+          'JSON numbers must be finite and within the portable safe-integer magnitude; ' +
+          'encode larger exact values as strings.',
+        );
+      }
       cursor = numberPattern.lastIndex;
       return;
     }
@@ -313,11 +323,27 @@ export function parseCompactStateJson(text) {
     );
     validatePredecessorOutputs(parsed.predecessor_outputs, completedTaskNumber);
     if (parsed.current_task?.review !== undefined) {
-      validatePersistedPublicMutation(parsed.current_task.review.publicMutation);
-      validatePersistedSupersededReviewInputs(
-        parsed.current_task.review.supersededReviewInputs,
+      const reviewState = parsed.current_task.review;
+      if (
+        typeof parsed.current_task.head !== 'string' ||
+        parsed.current_task.head !== reviewState.reviewInput?.head
+      ) {
+        throw new TypeError('The persisted review input must match the current task head.');
+      }
+      validatePersistedPublicMutation(reviewState.publicMutation);
+      const requests = validatePersistedReviewRequests(reviewState.reviewRequests);
+      const supersessions = validatePersistedSupersededReviewInputs(
+        reviewState.supersededReviewInputs,
       );
-      validatePersistedReviewRequests(parsed.current_task.review.reviewRequests);
+      validateSupersessionsAgainstRequests({
+        requests,
+        supersessions,
+        knownHeads: new Set([
+          reviewState.reviewInput.head,
+          ...requests.map((request) => request.head),
+        ]),
+        currentKey: getReviewInputKey(reviewState.reviewInput),
+      });
     }
   }
 
@@ -366,6 +392,7 @@ function validatePersistedReviewRequests(reviewRequests) {
   }
 
   validateReviewRequestOrdering(reviewRequests);
+  return reviewRequests;
 }
 
 function validatePersistedSupersededReviewInputs(supersededReviewInputs) {
@@ -384,6 +411,7 @@ function validatePersistedSupersededReviewInputs(supersededReviewInputs) {
   if (dispositions.some((disposition) => !isSupersededReviewInputRecord(disposition))) {
     throw new TypeError('A persisted superseded review-input disposition is malformed.');
   }
+  return dispositions;
 }
 
 function validatePersistedPublicMutation(publicMutation) {
@@ -696,30 +724,16 @@ export function decideReviewRequest({
     }
   }
   validateReviewRequestOrdering(requests);
-  const supersessionByKey = new Map();
   const knownHeads = new Set([
     currentReviewInput.head,
     ...requests.map((request) => request.head),
   ]);
-  for (const disposition of supersessions) {
-    const pair = requests.filter(
-      (request) => request.reviewInputKey === disposition.reviewInputKey,
-    );
-    const channels = new Set(pair.map((request) => request.channel));
-    const heads = new Set(pair.map((request) => request.head));
-    if (
-      pair.length === 0 ||
-      channels.size === 2 ||
-      heads.size !== 1 ||
-      !heads.has(disposition.head) ||
-      !knownHeads.has(disposition.successorHead)
-    ) {
-      throw new TypeError('A superseded disposition does not describe an incomplete prior-input pair.');
-    }
-    if (disposition.reviewInputKey !== currentKey) {
-      supersessionByKey.set(disposition.reviewInputKey, disposition);
-    }
-  }
+  const supersessionByKey = validateSupersessionsAgainstRequests({
+    requests,
+    supersessions,
+    knownHeads,
+    currentKey,
+  });
 
   const priorRequests = requests.filter(
     (request) => request.reviewInputKey !== currentKey,
@@ -731,7 +745,9 @@ export function decideReviewRequest({
     const heads = new Set(pair.map((request) => request.head));
     const supersession = supersessionByKey.get(key);
     const missingChannel = channels.size !== 2;
-    const canSupersede = missingChannel && heads.size === 1;
+    const canSupersede = missingChannel &&
+      heads.size === 1 &&
+      pair.every((request) => request.terminal === true);
     return {
       key,
       needsSupersession: canSupersede && supersession === undefined,
@@ -782,8 +798,7 @@ export function decideReviewRequest({
     );
     if (
       copilotRequest !== undefined &&
-      copilotRequest.confirmed !== true &&
-      copilotRequest.terminal !== true &&
+      !isCopilotReadyForCodex(copilotRequest) &&
       codexRequest === undefined
     ) {
       return Object.freeze({
@@ -1061,6 +1076,12 @@ function isReviewRequestRecord(request) {
         getItemTime({ updatedAt }, ['updatedAt']) !== null,
     );
   const channelIsValid = request?.channel === 'copilot' || request?.channel === 'codex';
+  const hasTerminalDisposition = Object.hasOwn(request ?? {}, 'terminalDisposition');
+  const terminalDispositionIsValid = hasTerminalDisposition
+    ? request.terminal === true &&
+      request.confirmed === false &&
+      isRepositoryAuthorizedNonfunctionalDisposition(request.terminalDisposition, request)
+    : !(request?.terminal === true && request?.confirmed === false);
 
   return channelIsValid &&
     typeof request.confirmed === 'boolean' &&
@@ -1071,7 +1092,37 @@ function isReviewRequestRecord(request) {
     SHA256_PATTERN.test(request.reviewInputKey) &&
     getItemTime(request, ['requestedAt']) !== null &&
     identityBaselinesAreValid &&
-    commentBaselinesAreValid;
+    commentBaselinesAreValid &&
+    terminalDispositionIsValid;
+}
+
+function isRepositoryAuthorizedNonfunctionalDisposition(disposition, request) {
+  if (
+    disposition === null ||
+    typeof disposition !== 'object' ||
+    Array.isArray(disposition) ||
+    Object.keys(disposition).length !== 4 ||
+    disposition.state !== 'REPOSITORY_AUTHORIZED_NON_FUNCTIONAL' ||
+    typeof disposition.authority !== 'string' ||
+    disposition.authority.trim().length === 0 ||
+    typeof disposition.reason !== 'string' ||
+    disposition.reason.trim().length === 0
+  ) {
+    return false;
+  }
+
+  const recordedTime = getItemTime(disposition, ['recordedAt']);
+  const requestTime = getItemTime(request, ['requestedAt']);
+  return recordedTime !== null && requestTime !== null && recordedTime >= requestTime;
+}
+
+function isCopilotReadyForCodex(request) {
+  return request?.confirmed === true ||
+    (
+      request?.terminal === true &&
+      request?.confirmed === false &&
+      isRepositoryAuthorizedNonfunctionalDisposition(request.terminalDisposition, request)
+    );
 }
 
 function validateReviewRequestOrdering(reviewRequests) {
@@ -1085,7 +1136,7 @@ function validateReviewRequestOrdering(reviewRequests) {
     const copilotRequest = copilotRequests[0];
     const copilotReady = copilotRequests.length === 1 &&
       copilotRequest.head === codexRequest.head &&
-      (copilotRequest.confirmed === true || copilotRequest.terminal === true);
+      isCopilotReadyForCodex(copilotRequest);
     if (!copilotReady) {
       throw new TypeError(
         'A Codex request requires one eligible Copilot predecessor for the same reviewed input.',
@@ -1118,6 +1169,44 @@ function isSupersededReviewInputRecord(disposition) {
     getItemTime(disposition, ['supersededAt']) !== null &&
     typeof disposition.reason === 'string' &&
     disposition.reason.trim().length > 0;
+}
+
+function validateSupersessionsAgainstRequests({
+  requests,
+  supersessions,
+  knownHeads,
+  currentKey = null,
+}) {
+  const supersessionByKey = new Map();
+  for (const disposition of supersessions) {
+    const pair = requests.filter(
+      (request) => request.reviewInputKey === disposition.reviewInputKey,
+    );
+    const channels = new Set(pair.map((request) => request.channel));
+    const heads = new Set(pair.map((request) => request.head));
+    const supersededTime = getItemTime(disposition, ['supersededAt']);
+    const requestTimes = pair.map(
+      (request) => getItemTime(request, ['requestedAt']),
+    );
+    if (
+      pair.length === 0 ||
+      channels.size === 2 ||
+      heads.size !== 1 ||
+      !heads.has(disposition.head) ||
+      !knownHeads.has(disposition.successorHead) ||
+      pair.some((request) => request.terminal !== true) ||
+      supersededTime === null ||
+      requestTimes.some((requestTime) => requestTime === null || supersededTime < requestTime)
+    ) {
+      throw new TypeError(
+        'A superseded disposition does not describe a terminal incomplete prior-input pair.',
+      );
+    }
+    if (disposition.reviewInputKey !== currentKey) {
+      supersessionByKey.set(disposition.reviewInputKey, disposition);
+    }
+  }
+  return supersessionByKey;
 }
 
 function isReviewRequestForInput(request, reviewInput, requiredChannel = null) {

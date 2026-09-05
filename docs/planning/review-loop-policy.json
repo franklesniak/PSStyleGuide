@@ -359,6 +359,73 @@
         },
         "baselineConversationComments": {
           "$ref": "#/$defs/commentBaselines"
+        },
+        "terminalDisposition": {
+          "$ref": "#/$defs/terminalDisposition"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "confirmed": {
+                "const": false
+              },
+              "terminal": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "terminalDisposition"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "terminalDisposition"
+            ]
+          },
+          "then": {
+            "properties": {
+              "confirmed": {
+                "const": false
+              },
+              "terminal": {
+                "const": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "terminalDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "recordedAt",
+        "authority",
+        "reason"
+      ],
+      "properties": {
+        "state": {
+          "const": "REPOSITORY_AUTHORIZED_NON_FUNCTIONAL"
+        },
+        "recordedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
         }
       }
     },
@@ -828,6 +895,36 @@
         }
       ]
     },
+    "portableJsonValue": {
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "string"
+        },
+        {
+          "type": "number",
+          "minimum": -9007199254740991,
+          "maximum": 9007199254740991
+        },
+        {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/portableJsonValue"
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/portableJsonValue"
+          }
+        }
+      ]
+    },
     "predecessorOutputs": {
       "type": "object",
       "maxProperties": 64,
@@ -856,7 +953,9 @@
         "last_consumer_task"
       ],
       "properties": {
-        "value": {},
+        "value": {
+          "$ref": "#/$defs/portableJsonValue"
+        },
         "last_consumer_task": {
           "type": "integer",
           "minimum": 2,

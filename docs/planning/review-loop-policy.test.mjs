@@ -120,6 +120,16 @@ function requestFor(input, channel, overrides = {}) {
   };
 }
 
+function nonfunctionalDisposition(overrides = {}) {
+  return {
+    state: 'REPOSITORY_AUTHORIZED_NON_FUNCTIONAL',
+    recordedAt: '2026-09-04T10:01:00Z',
+    authority: 'Repository reviewer-unavailability instructions.',
+    reason: 'Two accepted requests produced complete negative evidence.',
+    ...overrides,
+  };
+}
+
 function supersessionFor(input, successorInput, overrides = {}) {
   return {
     [getReviewInputKey(input)]: {
@@ -136,7 +146,7 @@ function supersessionFor(input, successorInput, overrides = {}) {
 function pairFor(input, overrides = {}) {
   return [
     requestFor(input, 'copilot', { confirmed: true, terminal: true, ...overrides }),
-    requestFor(input, 'codex', { terminal: true, ...overrides }),
+    requestFor(input, 'codex', { confirmed: true, terminal: true, ...overrides }),
   ];
 }
 
@@ -255,7 +265,10 @@ test('scenario 3b: authenticated head drift supersedes an impossible missing H1 
     bodySha256: HASHES.body2,
   });
   const mutationClass = classifyMutation(state(input1), state(input2));
-  const oldRequest = requestFor(input1, 'copilot');
+  const oldRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
   const requiresDisposition = decideReviewRequest({
     previousReviewInput: input1,
     currentReviewInput: input2,
@@ -295,7 +308,10 @@ test('scenario 3c: authenticated same-head input drift supersedes an impossible 
   const input1 = reviewInput();
   const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
   const mutationClass = classifyMutation(state(input1), state(input2));
-  const oldRequest = requestFor(input1, 'copilot');
+  const oldRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
   const requiresDisposition = decideReviewRequest({
     previousReviewInput: input1,
     currentReviewInput: input2,
@@ -332,7 +348,10 @@ test('old-head supersession rejects forged, current-input, and complete-pair rec
     bodySha256: HASHES.body2,
   });
   const mutationClass = classifyMutation(state(input1), state(input2));
-  const oldRequest = requestFor(input1, 'copilot');
+  const oldRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
   const decide = (supersededInputs, existingRequests = [oldRequest]) => decideReviewRequest({
     previousReviewInput: input1,
     currentReviewInput: input2,
@@ -438,7 +457,10 @@ test('scenario 5a: a same-head pair releases Codex after Copilot confirmation or
     previousReviewInput: input,
     currentReviewInput: input,
     mutationClass: 'RESULT_OR_STATE',
-    existingRequests: [requestFor(input, 'copilot', { terminal: true })],
+    existingRequests: [requestFor(input, 'copilot', {
+      terminal: true,
+      terminalDisposition: nonfunctionalDisposition(),
+    })],
   });
 
   assert.equal(pending.status, 'WAIT_FOR_CURRENT_CHANNEL');
@@ -479,6 +501,7 @@ test('Codex requests require an eligible earlier Copilot predecessor', () => {
     requestFor(input, 'copilot', {
       terminal: true,
       requestedAt: '2026-09-04T10:00:00Z',
+      terminalDisposition: nonfunctionalDisposition(),
     }),
     codexRequest,
   ];
@@ -565,7 +588,10 @@ test('current-input records cannot bypass different-input pair serialization', (
     previousReviewInput: input1,
     currentReviewInput: input2,
     mutationClass,
-    existingRequests: [requestFor(input1, 'copilot'), ...partialCurrentPair],
+    existingRequests: [requestFor(input1, 'copilot', {
+      confirmed: true,
+      terminal: true,
+    }), ...partialCurrentPair],
     supersededInputs: supersessionFor(input1, input2),
   });
 
@@ -1236,7 +1262,10 @@ test('all permanent active task-template and controller surfaces use the compact
     assert.match(task.body, /`EXHAUSTED`/u);
     assert.match(task.body, /at least 120 seconds/u);
     assert.match(task.body, /Do not (?:send|post)[^\n]*(?:Codex trigger|@codex review)/u);
-    assert.match(task.body, /terminally proved non-functional under the repository's reviewer-unavailability instructions/u);
+    assert.match(
+      task.body,
+      /terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`/u,
+    );
     assert.doesNotMatch(
       task.body,
       /result for the round only when it is newer than the applicable baseline and is explicitly anchored to the recorded PR head SHA/u,
@@ -1281,7 +1310,7 @@ test('all permanent active task-template and controller surfaces use the compact
   );
   assert.match(
     parent,
-    /confirmed or is terminally proved non-functional under the repository's reviewer-unavailability instructions/u,
+    /confirmed or is terminally proved non-functional through a persisted `terminalDisposition`/u,
   );
   assert.match(parent, /persist its head, reviewed-input key, request time, `confirmed: true`, and nonterminal state/u);
   assert.match(parent, /Locate and obey the applicable `AGENTS\.md`/u);
@@ -1307,7 +1336,7 @@ test('all permanent active task-template and controller surfaces use the compact
   );
   assert.match(
     alternate,
-    /confirmed or is terminally proved non-functional under the repository's reviewer-unavailability instructions/u,
+    /confirmed or is terminally proved non-functional through a persisted `terminalDisposition`/u,
   );
   assert.match(alternate, /persist its head, reviewed-input key, request time, `confirmed: true`, and nonterminal state/u);
   assert.match(alternate, /Locate and obey the applicable `AGENTS\.md`/u);
@@ -1319,9 +1348,14 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(generator, /Default to one reviewer pair/u);
   assert.match(generator, /immutable predecessor outputs/u);
   assert.match(generator, /typed `SUPERSEDED` disposition/u);
+  assert.match(generator, /absolute value exceeds 9007199254740991/u);
+  assert.match(generator, /current task head to equal the review-input head/u);
+  assert.match(generator, /only after every recorded request for the old input is terminal/u);
   assert.match(generator, /headless Codex PR-conversation result/u);
   assert.match(generator, /copilot-pull-request-reviewer\[bot\]/u);
   assert.match(generator, /a second proved no-effect attempt is `EXHAUSTED`/iu);
+  assert.match(crossRepository, /Reject non-finite or out-of-portable-range JSON numbers/u);
+  assert.match(crossRepository, /task head and review-input head differ/u);
   const task15 = tasks.find((task) => task.number === 15);
   assert.notEqual(task15, undefined);
   assert.match(task15.body, /Continue implementation, CI repair, review, and readiness work/u);
@@ -1826,7 +1860,10 @@ test('supersession reasons require non-whitespace text in schema and ingestion',
   });
   const valid = compactState(input2, {
     mutationClass: 'CODE_OR_DIFF',
-    reviewRequests: [requestFor(input1, 'copilot')],
+    reviewRequests: [requestFor(input1, 'copilot', {
+      confirmed: true,
+      terminal: true,
+    })],
     supersededReviewInputs: supersessionFor(input1, input2),
   });
 
@@ -1844,6 +1881,176 @@ test('supersession reasons require non-whitespace text in schema and ingestion',
       /persisted superseded review-input disposition is malformed/u,
     );
   }
+});
+
+test('terminal request state requires typed repository-authorized evidence', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const unsupported = compactState(input, {
+    reviewRequests: [requestFor(input, 'copilot', { terminal: true })],
+  });
+  const supportedRequest = requestFor(input, 'copilot', {
+    terminal: true,
+    terminalDisposition: nonfunctionalDisposition(),
+  });
+  const supported = compactState(input, { reviewRequests: [supportedRequest] });
+  const mistimed = structuredClone(supported);
+  mistimed.current_task.review.reviewRequests[0].terminalDisposition.recordedAt =
+    '2026-09-04T09:59:59Z';
+  const premature = compactState(input, {
+    reviewRequests: [requestFor(input, 'copilot', {
+      terminalDisposition: nonfunctionalDisposition(),
+    })],
+  });
+
+  assert.throws(
+    () => assertSchemaValid(unsupported, schema, schema),
+    /terminalDisposition is required/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(unsupported)),
+    /persisted review request is malformed/u,
+  );
+  assertSchemaValid(supported, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(supported)), supported);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(mistimed)),
+    /persisted review request is malformed/u,
+  );
+  assert.throws(
+    () => assertSchemaValid(premature, schema, schema),
+    /does not match const/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(premature)),
+    /persisted review request is malformed/u,
+  );
+});
+
+test('compact-state ingestion cross-validates supersessions and causal ordering', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const oldRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const valid = compactState(input2, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [oldRequest],
+    supersededReviewInputs: supersessionFor(input1, input2),
+  });
+  const noRequest = structuredClone(valid);
+  noRequest.current_task.review.reviewRequests = [];
+  const completePair = structuredClone(valid);
+  completePair.current_task.review.reviewRequests = pairFor(input1);
+  const wrongHead = structuredClone(valid);
+  wrongHead.current_task.review.supersededReviewInputs[getReviewInputKey(input1)].head =
+    HASHES.tree1;
+  const predatesRequest = structuredClone(valid);
+  predatesRequest.current_task.review.supersededReviewInputs[
+    getReviewInputKey(input1)
+  ].supersededAt = '2026-09-04T09:59:59Z';
+
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+  for (const candidate of [noRequest, completePair, wrongHead, predatesRequest]) {
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(candidate)),
+      /terminal incomplete prior-input pair/u,
+    );
+  }
+});
+
+test('compact-state ingestion binds the review input to the current task head', () => {
+  const input = reviewInput();
+  const mismatched = compactState(input, {}, { head: HASHES.head2 });
+
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(mismatched)),
+    /review input must match the current task head/u,
+  );
+});
+
+test('compact-state ingestion rejects nonportable JSON numbers without rounding', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const portable = compactState(input, {}, {}, {
+    predecessor_outputs: {
+      3: {
+        PORTABLE_VALUES: {
+          value: {
+            maximum: Number.MAX_SAFE_INTEGER,
+            fraction: 0.125,
+            nested: [null, true, 'exact'],
+          },
+          last_consumer_task: 4,
+        },
+      },
+    },
+  });
+  const unsafeSchemaValue = structuredClone(portable);
+  unsafeSchemaValue.predecessor_outputs[3].PORTABLE_VALUES.value =
+    Number.MAX_SAFE_INTEGER + 1;
+  const nonfiniteSchemaValue = structuredClone(portable);
+  nonfiniteSchemaValue.predecessor_outputs[3].PORTABLE_VALUES.value = Infinity;
+  const progress = Array.from({ length: 14 }, (_, index) => index + 1).join(',');
+  const rawState = (numericToken) =>
+    `{"current_task":{"number":15,"state":"active"},` +
+    `"completed":[${progress}],"predecessor_outputs":{"14":{"REMOTE_ID":{` +
+    `"value":${numericToken},"last_consumer_task":15}}}}`;
+
+  assertSchemaValid(portable, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(portable)), portable);
+  for (const candidate of [unsafeSchemaValue, nonfiniteSchemaValue]) {
+    assert.throws(
+      () => assertSchemaValid(candidate, schema, schema),
+      /does not match any allowed schema/u,
+    );
+  }
+  for (const numericToken of ['9007199254740993', '1e400', '-1e400']) {
+    assert.throws(
+      () => parseCompactStateJson(rawState(numericToken)),
+      /portable safe-integer magnitude/u,
+    );
+  }
+});
+
+test('a live prior channel cannot be closed by same-head supersession', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
+  const liveRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: false,
+  });
+  const decision = (request, supersededInputs = {}) => decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass: 'MATERIAL_SCOPE_BEHAVIOR_RISK',
+    materialReason: 'The risk changed.',
+    existingRequests: [request],
+    supersededInputs,
+  });
+
+  assert.equal(decision(liveRequest).status, 'WAIT_FOR_PRIOR_PAIR');
+  assert.throws(
+    () => decision(liveRequest, supersessionFor(input1, input2)),
+    /terminal incomplete prior-input pair/u,
+  );
+
+  const terminalRequest = { ...liveRequest, terminal: true };
+  assert.equal(decision(terminalRequest).status, 'SUPERSESSION_REQUIRED');
+  assert.equal(
+    decision(terminalRequest, supersessionFor(input1, input2)).status,
+    'REQUEST_REQUIRED',
+  );
 });
 
 test('compact progress stays within the fixed plan and names contiguous predecessors', async () => {
