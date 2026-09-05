@@ -707,6 +707,7 @@ export function decideReviewRequest({
   materialReason = null,
   existingRequests = [],
   supersededInputs = {},
+  reviewMetrics = null,
 }) {
   if (mutationClass !== null && !MUTATION_CLASSES.includes(mutationClass)) {
     throw new TypeError('Unknown mutation class.');
@@ -790,9 +791,17 @@ export function decideReviewRequest({
     }
   }
   validateReviewRequestOrdering(requests);
+  const reviewedHeads = reviewMetrics === null
+    ? []
+    : validatePersistedRequestMetrics(
+      reviewMetrics,
+      requests,
+      currentReviewInput.head,
+    );
   const knownHeads = new Set([
     currentReviewInput.head,
     ...requests.map((request) => request.head),
+    ...reviewedHeads,
   ]);
   const supersessionByKey = validateSupersessionsAgainstRequests({
     requests,

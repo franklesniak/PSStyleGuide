@@ -2255,6 +2255,41 @@ test('request metrics retain an unrequested successor across a second head drift
   assertSchemaValid(secondDrift, schema, schema);
   assert.deepEqual(parseCompactStateJson(JSON.stringify(secondDrift)), secondDrift);
 
+  const resumedDecision = decideReviewRequest({
+    previousReviewInput: input2,
+    currentReviewInput: input3,
+    mutationClass: 'CODE_OR_DIFF',
+    existingRequests: secondDrift.current_task.review.reviewRequests,
+    supersededInputs: secondDrift.current_task.review.supersededReviewInputs,
+    reviewMetrics: secondDrift.current_task.review.metrics,
+  });
+  assert.equal(resumedDecision.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(resumedDecision.channels, ['copilot']);
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input2,
+      currentReviewInput: input3,
+      mutationClass: 'CODE_OR_DIFF',
+      existingRequests: secondDrift.current_task.review.reviewRequests,
+      supersededInputs: secondDrift.current_task.review.supersededReviewInputs,
+    }),
+    /terminal incomplete prior-input pair/u,
+  );
+
+  const wrongDecisionMetrics = structuredClone(secondDrift.current_task.review.metrics);
+  wrongDecisionMetrics.reviewerRequestsPerHead[input1.head] = 2;
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input2,
+      currentReviewInput: input3,
+      mutationClass: 'CODE_OR_DIFF',
+      existingRequests: secondDrift.current_task.review.reviewRequests,
+      supersededInputs: secondDrift.current_task.review.supersededReviewInputs,
+      reviewMetrics: wrongDecisionMetrics,
+    }),
+    /request count does not match/u,
+  );
+
   const missingIntermediate = structuredClone(secondDrift);
   delete missingIntermediate.current_task.review.metrics
     .reviewerRequestsPerHead[input2.head];
