@@ -359,6 +359,27 @@ test('old-head supersession rejects forged, current-input, and complete-pair rec
   );
 });
 
+test('a reactivated superseded input resumes its original incomplete pair', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
+  const oldRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const decision = decideReviewRequest({
+    previousReviewInput: input2,
+    currentReviewInput: input1,
+    mutationClass: classifyMutation(state(input2), state(input1)),
+    materialReason: 'The prior risk change was reverted.',
+    existingRequests: [oldRequest, ...pairFor(input2)],
+    supersededInputs: supersessionFor(input1, input2),
+  });
+
+  assert.equal(decision.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(decision.channels, ['codex']);
+  assert.match(decision.reason, /already started/u);
+});
+
 test('scenario 4: a material same-head change records a reason and requires review', () => {
   const input1 = reviewInput();
   const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
@@ -2034,7 +2055,7 @@ test('predecessor outputs stay within the fixed plan in both ingestion layers', 
   });
   const outsideConsumerBoundary = compactState(input, {}, {}, {
     predecessor_outputs: {
-      12: {
+      2: {
         OUTSIDE_CONSUMER: {
           value: 'invalid',
           last_consumer_task: PLAN_TASK_COUNT + 1,
@@ -2066,6 +2087,49 @@ test('predecessor outputs stay within the fixed plan in both ingestion layers', 
   );
 });
 
+test('compact-state ingestion rejects future and expired predecessor outputs', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const futureProducer = compactState(input, {}, {}, {
+    predecessor_outputs: {
+      10: {
+        FUTURE_DATA: { value: 'fabricated', last_consumer_task: 11 },
+      },
+    },
+  });
+  const expiredOutput = compactState(input, {}, {}, {
+    predecessor_outputs: {
+      2: {
+        EXPIRED_DATA: { value: 'stale', last_consumer_task: 3 },
+      },
+    },
+  });
+  const validBoundary = compactState(input, {}, {}, {
+    predecessor_outputs: {
+      3: {
+        CURRENT_DATA: { value: 'valid', last_consumer_task: 4 },
+      },
+    },
+  });
+
+  assertSchemaValid(futureProducer, schema, schema);
+  assertSchemaValid(expiredOutput, schema, schema);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(futureProducer)),
+    /predecessor task must contain a bounded output map/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(expiredOutput)),
+    /predecessor output record is malformed/u,
+  );
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(validBoundary)),
+    validBoundary,
+  );
+});
+
 test('compact-state ingestion rejects invalid predecessor and reconciliation ordering', () => {
   const input = reviewInput();
   const negativeEvidence = {
@@ -2094,8 +2158,8 @@ test('compact-state ingestion rejects invalid predecessor and reconciliation ord
     '2026-09-04T10:01:59Z';
   const invalidPredecessor = compactState(input, {}, {}, {
     predecessor_outputs: {
-      12: {
-        INVALID_ORDER: { value: 'bad', last_consumer_task: 12 },
+      2: {
+        INVALID_ORDER: { value: 'bad', last_consumer_task: 2 },
       },
     },
   });
@@ -2376,6 +2440,31 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
       /reviewRequests\[0\]\.head has an invalid hash/u,
     );
   }
+  for (const malformedReason of [
+    'unexpected',
+    {},
+    { reason: '', material: true },
+    { reason: 'Material risk changed.', material: 'true' },
+    { reason: 'Material risk changed.', material: true, extra: true },
+  ]) {
+    assert.throws(
+      () => createMetrics({
+        ...valid,
+        sameHeadRerequestReasons: [malformedReason],
+      }),
+      /sameHeadRerequestReasons\[0\]/u,
+    );
+  }
+  assert.deepEqual(
+    createMetrics({
+      ...valid,
+      sameHeadRerequestReasons: {
+        reason: 'Material risk changed.',
+        material: true,
+      },
+    }).sameHeadRerequestReasons,
+    [{ reason: 'Material risk changed.', material: true }],
+  );
   assert.throws(
     () => createMetrics({ ...valid, reviewBeganAt: 'not-a-date' }),
     /reviewBeganAt must be a valid timestamp/u,

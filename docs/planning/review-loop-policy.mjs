@@ -307,8 +307,11 @@ export function parseCompactStateJson(text) {
     Object.hasOwn(parsed, 'predecessor_outputs') &&
     Object.hasOwn(parsed, 'current_task')
   ) {
-    validatePredecessorOutputs(parsed.predecessor_outputs);
-    validatePersistedProgress(parsed.current_task, parsed.completed);
+    const completedTaskNumber = validatePersistedProgress(
+      parsed.current_task,
+      parsed.completed,
+    );
+    validatePredecessorOutputs(parsed.predecessor_outputs, completedTaskNumber);
     if (parsed.current_task?.review !== undefined) {
       validatePersistedPublicMutation(parsed.current_task.review.publicMutation);
       validatePersistedSupersededReviewInputs(
@@ -341,6 +344,8 @@ function validatePersistedProgress(currentTask, completed) {
   ) {
     throw new TypeError('Completed tasks must be the contiguous predecessors of the current task.');
   }
+
+  return lastCompletedTask;
 }
 
 function validatePersistedReviewRequests(reviewRequests) {
@@ -426,12 +431,20 @@ function validatePersistedPublicMutation(publicMutation) {
   }
 }
 
-function validatePredecessorOutputs(predecessorOutputs) {
+function validatePredecessorOutputs(predecessorOutputs, completedTaskNumber = null) {
   if (
     predecessorOutputs === null ||
     typeof predecessorOutputs !== 'object' ||
     Array.isArray(predecessorOutputs) ||
-    Object.keys(predecessorOutputs).length > 64
+    Object.keys(predecessorOutputs).length > 64 ||
+    (
+      completedTaskNumber !== null &&
+      (
+        !Number.isInteger(completedTaskNumber) ||
+        completedTaskNumber < 0 ||
+        completedTaskNumber > PLAN_TASK_COUNT
+      )
+    )
   ) {
     throw new TypeError('predecessorOutputs must be a bounded task-output map.');
   }
@@ -444,7 +457,8 @@ function validatePredecessorOutputs(predecessorOutputs) {
       outputs === null ||
       typeof outputs !== 'object' ||
       Array.isArray(outputs) ||
-      Object.keys(outputs).length > 64
+      Object.keys(outputs).length > 64 ||
+      (completedTaskNumber !== null && taskNumber > completedTaskNumber)
     ) {
       throw new TypeError('Each predecessor task must contain a bounded output map.');
     }
@@ -458,7 +472,11 @@ function validatePredecessorOutputs(predecessorOutputs) {
         !Object.hasOwn(record, 'value') ||
         !Number.isInteger(record.last_consumer_task) ||
         record.last_consumer_task <= taskNumber ||
-        record.last_consumer_task > PLAN_TASK_COUNT
+        record.last_consumer_task > PLAN_TASK_COUNT ||
+        (
+          completedTaskNumber !== null &&
+          record.last_consumer_task <= completedTaskNumber
+        )
       ) {
         throw new TypeError('A predecessor output record is malformed.');
       }
@@ -688,12 +706,13 @@ export function decideReviewRequest({
       channels.size === 2 ||
       heads.size !== 1 ||
       !heads.has(disposition.head) ||
-      !knownHeads.has(disposition.successorHead) ||
-      disposition.reviewInputKey === currentKey
+      !knownHeads.has(disposition.successorHead)
     ) {
       throw new TypeError('A superseded disposition does not describe an incomplete prior-input pair.');
     }
-    supersessionByKey.set(disposition.reviewInputKey, disposition);
+    if (disposition.reviewInputKey !== currentKey) {
+      supersessionByKey.set(disposition.reviewInputKey, disposition);
+    }
   }
 
   const priorRequests = requests.filter(
@@ -1406,6 +1425,26 @@ export function createMetrics({
       ? timestamp > reviewStart
       : timestamp >= Math.floor(reviewStart / 1_000) * 1_000,
   ).length;
+  const rerequestReasons = normalizeCollection(sameHeadRerequestReasons).map(
+    (record, index) => {
+      if (
+        record === null ||
+        typeof record !== 'object' ||
+        Array.isArray(record) ||
+        Object.keys(record).length !== 2 ||
+        !Object.hasOwn(record, 'reason') ||
+        !Object.hasOwn(record, 'material') ||
+        typeof record.material !== 'boolean'
+      ) {
+        throw new TypeError(`sameHeadRerequestReasons[${index}] is malformed.`);
+      }
+      assertNonemptyText(record.reason, `sameHeadRerequestReasons[${index}].reason`);
+      return Object.freeze({
+        reason: record.reason,
+        material: record.material,
+      });
+    },
+  );
 
   const elapsed = (start, end, startLabel, endLabel) => {
     if (start === null && end === null) {
@@ -1428,7 +1467,7 @@ export function createMetrics({
   return Object.freeze({
     reviewerRequestsPerHead: requestsPerHead,
     bodyEditsAfterReviewBegan,
-    sameHeadRerequestReasons: normalizeCollection(sameHeadRerequestReasons),
+    sameHeadRerequestReasons: rerequestReasons,
     cleanReviewRecognitionMilliseconds: elapsed(
       cleanReviewAt,
       recognizedAt,
