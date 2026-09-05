@@ -6,6 +6,7 @@ import {
   PLAN_TASK_COUNT,
   REVIEW_LOOP_TASK_NUMBERS,
   classifyMutation,
+  collectCodexRequestEvidence,
   collectCopilotRequestEvidence,
   collectCodexResults,
   createReviewRequestSpec,
@@ -145,6 +146,16 @@ function requestFor(input, channel, overrides = {}) {
     baselineConversationComments: {},
     ...overrides,
   };
+  if (request.channel === 'copilot' && !Object.hasOwn(request, 'readyAt')) {
+    if (request.confirmed === true) {
+      request.readyAt = request.requestedAt;
+    } else if (
+      request.terminal === true &&
+      Object.hasOwn(request, 'terminalDisposition')
+    ) {
+      request.readyAt = request.terminalDisposition.recordedAt;
+    }
+  }
   if (
     request.confirmed === true &&
     request.terminal === true &&
@@ -816,6 +827,56 @@ test('native completed Codex summaries become typed terminal conversation result
   }
 });
 
+test('Codex requests require durable Copilot readiness ordering', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const codexRequest = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+  });
+  const confirmed = requestFor(input, 'copilot', {
+    confirmed: true,
+    readyAt: '2026-09-04T10:00:30Z',
+  });
+  const decide = (copilotRequest) => decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: [copilotRequest, codexRequest],
+  });
+
+  assert.equal(decide(confirmed).status, 'NO_REQUEST');
+  const missing = structuredClone(confirmed);
+  delete missing.readyAt;
+  assert.throws(() => decide(missing), /readiness time/u);
+  assert.throws(
+    () => decide({ ...confirmed, readyAt: '2026-09-04T10:01:01Z' }),
+    /must not precede Copilot readiness/u,
+  );
+  assert.throws(
+    () => decide({ ...confirmed, readyAt: '2026-09-04T09:59:59Z' }),
+    /review request is malformed/u,
+  );
+  const terminal = requestFor(input, 'copilot', {
+    terminal: true,
+    terminalDisposition: nonfunctionalDisposition(),
+  });
+  assert.equal(decide(terminal).status, 'NO_REQUEST');
+  assert.throws(
+    () => decide({ ...terminal, readyAt: '2026-09-04T10:00:30Z' }),
+    /review request is malformed/u,
+  );
+  assert.throws(
+    () => assertSchemaValid(
+      { ...codexRequest, readyAt: '2026-09-04T10:00:30Z' },
+      schema.$defs.reviewRequest,
+      schema,
+    ),
+    /does not match const/u,
+  );
+});
+
 test('persisted and collection request histories enforce global pair serialization', () => {
   const input1 = reviewInput();
   const input2 = reviewInput({
@@ -1000,6 +1061,7 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
     requestedReviewerMatched: false,
     submittedReviewMatched: false,
     reviewRunMatched: false,
+    triggerCommentMatched: false,
     readbackComplete: true,
   });
 
@@ -1057,6 +1119,7 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
     requestedReviewerMatched: true,
     submittedReviewMatched: true,
     reviewRunMatched: true,
+    triggerCommentMatched: false,
     readbackComplete: true,
   });
   assert.equal(
@@ -1133,6 +1196,7 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
     requestedReviewerMatched: false,
     submittedReviewMatched: false,
     reviewRunMatched: false,
+    triggerCommentMatched: false,
     readbackComplete: true,
   });
   assert.equal(
@@ -1146,6 +1210,64 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
     }).readbackComplete,
     false,
   );
+});
+
+test('Codex request evidence requires exact authenticated trigger-comment readback', () => {
+  const common = {
+    baselineConversationComments: {
+      BASELINE: '2026-09-04T09:59:00Z',
+    },
+    expectedActorLogin: 'franklesniak',
+    requestedAt: '2026-09-04T10:00:00.500Z',
+    readbackComplete: true,
+  };
+  const positive = collectCodexRequestEvidence({
+    ...common,
+    triggerComments: [{
+      id: 'NEW_TRIGGER',
+      user: { login: 'franklesniak' },
+      created_at: '2026-09-04T10:00:00Z',
+      body: '@codex review',
+    }],
+  });
+  assert.equal(positive.triggerCommentMatched, true);
+  assert.equal(positive.readbackComplete, true);
+
+  for (const triggerComments of [
+    [{
+      id: 'BASELINE',
+      user: { login: 'franklesniak' },
+      created_at: '2026-09-04T10:00:01Z',
+      body: '@codex review',
+    }],
+    [{
+      id: 'WRONG_ACTOR',
+      user: { login: 'another-user' },
+      created_at: '2026-09-04T10:00:01Z',
+      body: '@codex review',
+    }],
+    [{
+      id: 'WRONG_BODY',
+      user: { login: 'franklesniak' },
+      created_at: '2026-09-04T10:00:01Z',
+      body: '@codex review ',
+    }],
+    [{
+      id: 'EARLY',
+      user: { login: 'franklesniak' },
+      created_at: '2026-09-04T09:59:59Z',
+      body: '@codex review',
+    }],
+  ]) {
+    assert.equal(collectCodexRequestEvidence({
+      ...common,
+      triggerComments,
+    }).triggerCommentMatched, false);
+  }
+  assert.equal(collectCodexRequestEvidence({
+    ...common,
+    triggerComments: null,
+  }).readbackComplete, false);
 });
 
 test('whole-second Copilot evidence matches a fractional request boundary', () => {
@@ -1219,6 +1341,7 @@ test('whole-second Copilot evidence matches a fractional request boundary', () =
     requestedReviewerMatched: false,
     submittedReviewMatched: true,
     reviewRunMatched: true,
+    triggerCommentMatched: false,
     readbackComplete: true,
   });
   assert.equal(early.requestEventMatched, false);
@@ -1320,6 +1443,7 @@ test('accepted review requests reconcile, prove no effect, retry once, and exhau
     requestedReviewerMatched: false,
     submittedReviewMatched: false,
     reviewRunMatched: false,
+    triggerCommentMatched: false,
     readbackComplete: true,
   };
   const attemptedAt = '2026-09-04T10:00:00Z';
@@ -1368,6 +1492,16 @@ test('accepted review requests reconcile, prove no effect, retry once, and exhau
     attemptCount: 1,
     localRecordSucceeded: true,
   });
+  const codexConfirmed = reconcileReviewRequestMutation({
+    ...mutationIdentity,
+    channel: 'codex',
+    response: { ok: true },
+    evidence: { ...emptyEvidence, triggerCommentMatched: true },
+    attemptedAt,
+    observedAt: '2026-09-04T10:00:01Z',
+    attemptCount: 1,
+    localRecordSucceeded: true,
+  });
 
   assert.equal(reconciling.state, 'RECONCILING');
   assert.equal(reconciling.retryAllowed, false);
@@ -1384,6 +1518,22 @@ test('accepted review requests reconcile, prove no effect, retry once, and exhau
   assert.equal(confirmed.localRecordSucceeded, false);
   assert.equal(contradictory.state, 'AMBIGUOUS');
   assert.equal(contradictory.retryAllowed, false);
+  assert.equal(codexConfirmed.state, 'CONFIRMED');
+  assert.equal(codexConfirmed.readbackMatched, true);
+  const missingTriggerField = { ...emptyEvidence };
+  delete missingTriggerField.triggerCommentMatched;
+  assert.throws(
+    () => reconcileReviewRequestMutation({
+      ...mutationIdentity,
+      response: { ok: true },
+      evidence: missingTriggerField,
+      attemptedAt,
+      observedAt: '2026-09-04T10:00:01Z',
+      attemptCount: 1,
+      localRecordSucceeded: true,
+    }),
+    /evidence is malformed/u,
+  );
   assert.throws(
     () => reconcileReviewRequestMutation({
       ...mutationIdentity,
@@ -1704,6 +1854,21 @@ test('invalidating mutation claims are rejected in both directions', () => {
       existingRequests: [],
     }),
     /derived transition MATERIAL_SCOPE_BEHAVIOR_RISK/u,
+  );
+});
+
+test('copied review prompts preserve both Copilot release paths', async () => {
+  const plan = await readFile(
+    new URL('./action-items-2026-08-30.md', import.meta.url),
+    'utf8',
+  );
+  assert.equal(
+    [...plan.matchAll(/Only after the Copilot request is confirmed,/gu)].length,
+    0,
+  );
+  assert.equal(
+    [...plan.matchAll(/Only after the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request,/gu)].length,
+    2,
   );
 });
 
@@ -2098,6 +2263,29 @@ test('material reasons require non-whitespace text in both schema and runtime', 
       }),
       /requires a reason/u,
     );
+  }
+});
+
+test('review-input meaning fields require non-whitespace text in schema and runtime', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const valid = reviewInput();
+  for (const field of ['scope', 'behavior', 'risk']) {
+    for (const whitespace of [' ', '\t\r\n']) {
+      assert.throws(
+        () => reviewInput({ [field]: whitespace }),
+        new RegExp(`${field} must be non-empty text`, 'u'),
+      );
+      assert.throws(
+        () => assertSchemaValid(
+          { ...valid, [field]: whitespace },
+          schema.$defs.reviewInput,
+          schema,
+        ),
+        /does not match pattern/u,
+      );
+    }
   }
 });
 
@@ -2955,6 +3143,7 @@ test('compact-state ingestion rejects invalid predecessor and reconciliation ord
     requestedReviewerMatched: false,
     submittedReviewMatched: false,
     reviewRunMatched: false,
+    triggerCommentMatched: false,
     readbackComplete: true,
   };
   const invalidInterval = compactState(input, {
@@ -3012,6 +3201,7 @@ test('compact-state ingestion requires state-dependent reconciliation timestamps
     requestedReviewerMatched: false,
     submittedReviewMatched: false,
     reviewRunMatched: false,
+    triggerCommentMatched: false,
     readbackComplete: true,
   };
   const attemptedAt = '2026-09-04T10:00:00Z';
@@ -3149,6 +3339,7 @@ test('review-request mutation state is bound to one persisted request identity',
       requestedReviewerMatched: false,
       submittedReviewMatched: false,
       reviewRunMatched: false,
+      triggerCommentMatched: false,
       readbackComplete: true,
     },
     attemptedAt: request.requestedAt,
@@ -3213,6 +3404,7 @@ test('a no-attempt mutation rejects every attempt-only property', async () => {
       requestedReviewerMatched: false,
       submittedReviewMatched: false,
       reviewRunMatched: false,
+      triggerCommentMatched: false,
       readbackComplete: true,
     },
     reviewInputKey: getReviewInputKey(input),
@@ -3262,6 +3454,7 @@ test('public-mutation schema rejects every contradictory persisted state', async
     requestedReviewerMatched: false,
     submittedReviewMatched: false,
     reviewRunMatched: false,
+    triggerCommentMatched: false,
     readbackComplete: true,
   };
   const reviewMutationBase = {

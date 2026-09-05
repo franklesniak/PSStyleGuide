@@ -343,15 +343,18 @@
         },
         "scope": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "\\S"
         },
         "behavior": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "\\S"
         },
         "risk": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "\\S"
         }
       }
     },
@@ -395,6 +398,9 @@
         "requestedAt": {
           "$ref": "#/$defs/rfc3339"
         },
+        "readyAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
         "confirmed": {
           "type": "boolean"
         },
@@ -436,6 +442,20 @@
         }
       },
       "allOf": [
+        {
+          "if": {
+            "required": [
+              "readyAt"
+            ]
+          },
+          "then": {
+            "properties": {
+              "channel": {
+                "const": "copilot"
+              }
+            }
+          }
+        },
         {
           "if": {
             "properties": {
@@ -642,6 +662,7 @@
         "requestedReviewerMatched",
         "submittedReviewMatched",
         "reviewRunMatched",
+        "triggerCommentMatched",
         "readbackComplete"
       ],
       "properties": {
@@ -658,6 +679,9 @@
           "type": "boolean"
         },
         "reviewRunMatched": {
+          "type": "boolean"
+        },
+        "triggerCommentMatched": {
           "type": "boolean"
         },
         "readbackComplete": {

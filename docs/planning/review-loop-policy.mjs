@@ -101,7 +101,7 @@ function assertHash(value, pattern, label) {
 }
 
 function assertNonemptyText(value, label) {
-  if (typeof value !== 'string' || value.length === 0) {
+  if (typeof value !== 'string' || value.trim().length === 0) {
     throw new TypeError(`${label} must be non-empty text.`);
   }
 
@@ -1235,7 +1235,58 @@ export function collectCopilotRequestEvidence({
     requestedReviewerMatched,
     submittedReviewMatched,
     reviewRunMatched,
+    triggerCommentMatched: false,
     readbackComplete,
+  });
+}
+
+export function collectCodexRequestEvidence({
+  triggerComments,
+  baselineConversationComments,
+  expectedActorLogin,
+  requestedAt,
+  readbackComplete,
+}) {
+  const requestTime = parseRfc3339Timestamp(requestedAt, 'requestedAt');
+  if (
+    baselineConversationComments === null ||
+    typeof baselineConversationComments !== 'object' ||
+    Array.isArray(baselineConversationComments) ||
+    Object.entries(baselineConversationComments).some(
+      ([id, updatedAt]) => id.length === 0 ||
+        getItemTime({ updatedAt }, ['updatedAt']) === null,
+    )
+  ) {
+    throw new TypeError('The conversation-comment baseline is malformed.');
+  }
+  if (
+    typeof expectedActorLogin !== 'string' ||
+    expectedActorLogin.trim().length === 0 ||
+    typeof readbackComplete !== 'boolean'
+  ) {
+    throw new TypeError('Codex trigger-comment evidence identity is malformed.');
+  }
+  const commentsAvailable = triggerComments !== undefined && triggerComments !== null;
+  const expectedActor = normalizeActorLogin(expectedActorLogin);
+  const triggerCommentMatched = commentsAvailable && normalizeCollection(triggerComments).some(
+    (comment) => {
+      const id = getItemId(comment);
+      return id !== null &&
+        !Object.hasOwn(baselineConversationComments, id) &&
+        normalizeActorLogin(getActorLogin(comment)) === expectedActor &&
+        comment?.body === REVIEW_REQUEST_SPECS.codex.body &&
+        isItemAtOrAfterRequest(comment, ['created_at', 'createdAt'], requestTime);
+    },
+  );
+
+  return Object.freeze({
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    triggerCommentMatched,
+    readbackComplete: readbackComplete && commentsAvailable,
   });
 }
 
@@ -1262,6 +1313,8 @@ function isReviewRequestRecord(request) {
         getItemTime({ updatedAt }, ['updatedAt']) !== null,
     );
   const channelIsValid = request?.channel === 'copilot' || request?.channel === 'codex';
+  const requestedTime = getItemTime(request, ['requestedAt']);
+  const hasReadyAt = Object.hasOwn(request ?? {}, 'readyAt');
   const hasTerminalDisposition = Object.hasOwn(request ?? {}, 'terminalDisposition');
   const hasTerminalResultRef = Object.hasOwn(request ?? {}, 'terminalResultRef');
   const terminalDispositionIsValid = hasTerminalDisposition
@@ -1276,6 +1329,18 @@ function isReviewRequestRecord(request) {
       !(request.channel === 'copilot' &&
         request.terminalResultRef.kind !== 'submitted-review')
     : !(request?.terminal === true && request?.confirmed === true);
+  const readyAtIsValid = !hasReadyAt ||
+    (
+      request.channel === 'copilot' &&
+      isCopilotReadyForCodex(request) &&
+      getItemTime(request, ['readyAt']) !== null &&
+      requestedTime !== null &&
+      getItemTime(request, ['readyAt']) >= requestedTime &&
+      (
+        request.confirmed === true ||
+        request.readyAt === request.terminalDisposition.recordedAt
+      )
+    );
 
   return channelIsValid &&
     typeof request.confirmed === 'boolean' &&
@@ -1284,11 +1349,12 @@ function isReviewRequestRecord(request) {
     SHA1_PATTERN.test(request.head) &&
     typeof request.reviewInputKey === 'string' &&
     SHA256_PATTERN.test(request.reviewInputKey) &&
-    getItemTime(request, ['requestedAt']) !== null &&
+    requestedTime !== null &&
     identityBaselinesAreValid &&
     commentBaselinesAreValid &&
     terminalDispositionIsValid &&
-    terminalResultRefIsValid;
+    terminalResultRefIsValid &&
+    readyAtIsValid;
 }
 
 function isTerminalResultRef(reference) {
@@ -1504,13 +1570,13 @@ function validateReviewRequestOrdering(
       );
     }
 
-    const copilotTime = parseRfc3339Timestamp(
-      copilotRequest.requestedAt,
-      'Copilot requestedAt',
-    );
+    if (!Object.hasOwn(copilotRequest, 'readyAt')) {
+      throw new TypeError('A Codex request requires its Copilot predecessor readiness time.');
+    }
+    const copilotTime = parseRfc3339Timestamp(copilotRequest.readyAt, 'Copilot readyAt');
     const codexTime = parseRfc3339Timestamp(codexRequest.requestedAt, 'Codex requestedAt');
     if (copilotTime > codexTime) {
-      throw new TypeError('A Codex request must not precede its Copilot request.');
+      throw new TypeError('A Codex request must not precede Copilot readiness.');
     }
   }
 
@@ -1754,6 +1820,7 @@ export function reconcileReviewRequestMutation({
     'requestedReviewerMatched',
     'submittedReviewMatched',
     'reviewRunMatched',
+    'triggerCommentMatched',
     'readbackComplete',
   ];
   if (
@@ -1784,7 +1851,8 @@ export function reconcileReviewRequestMutation({
   const durableMatch = evidence.requestEventMatched ||
     evidence.requestedReviewerMatched ||
     evidence.submittedReviewMatched ||
-    evidence.reviewRunMatched;
+    evidence.reviewRunMatched ||
+    evidence.triggerCommentMatched;
   const baseRecord = {
     nativeResponseAccepted,
     readbackMatched: durableMatch,
