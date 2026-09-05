@@ -1606,6 +1606,15 @@ function assertSchemaValid(value, definition, root, location = '$') {
     });
     assert.ok(matches, `${location} does not match any allowed schema.`);
   }
+  if (resolved.not !== undefined) {
+    let excludedSchemaMatches = true;
+    try {
+      assertSchemaValid(value, resolved.not, root, location);
+    } catch {
+      excludedSchemaMatches = false;
+    }
+    assert.equal(excludedSchemaMatches, false, `${location} matches an excluded schema.`);
+  }
   const allowedTypes = Array.isArray(resolved.type) ? resolved.type : [resolved.type];
   const matchesType = (type) => {
     if (type === undefined) return true;
@@ -2013,6 +2022,59 @@ test('compact-state ingestion rejects invalid predecessor and reconciliation ord
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(invalidPredecessor)),
     /predecessor output record is malformed/u,
+  );
+});
+
+test('a no-attempt mutation rejects every attempt-only property', async () => {
+  const input = reviewInput();
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const valid = state(input).publicMutation;
+  const attemptMetadata = {
+    attemptCount: 1,
+    attemptedAt: '2026-09-04T10:00:00Z',
+    reconciledAt: '2026-09-04T10:00:01Z',
+    evidence: {
+      responseReviewerMatched: false,
+      requestEventMatched: false,
+      requestedReviewerMatched: false,
+      submittedReviewMatched: false,
+      reviewRunMatched: false,
+      readbackComplete: true,
+    },
+  };
+
+  assertSchemaValid(valid, schema.$defs.publicMutation, schema);
+  assert.doesNotThrow(
+    () => parseCompactStateJson(JSON.stringify(compactState(input))),
+  );
+
+  for (const [field, value] of Object.entries(attemptMetadata)) {
+    const invalid = { ...valid, [field]: value };
+    assert.throws(
+      () => assertSchemaValid(invalid, schema.$defs.publicMutation, schema),
+      undefined,
+      field,
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(compactState(input, {
+        publicMutation: invalid,
+      }))),
+      /must not contain attempt metadata/u,
+      field,
+    );
+  }
+
+  const combined = { ...valid, ...attemptMetadata };
+  assert.throws(
+    () => assertSchemaValid(combined, schema.$defs.publicMutation, schema),
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(compactState(input, {
+      publicMutation: combined,
+    }))),
+    /must not contain attempt metadata/u,
   );
 });
 

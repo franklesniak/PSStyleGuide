@@ -369,6 +369,19 @@ function validatePersistedPublicMutation(publicMutation) {
     throw new TypeError('The persisted public mutation is malformed.');
   }
 
+  const attemptMetadataFields = [
+    'attemptCount',
+    'attemptedAt',
+    'reconciledAt',
+    'evidence',
+  ];
+  if (
+    publicMutation.state === 'NOT_ATTEMPTED' &&
+    attemptMetadataFields.some((field) => Object.hasOwn(publicMutation, field))
+  ) {
+    throw new TypeError('A NOT_ATTEMPTED mutation must not contain attempt metadata.');
+  }
+
   const attemptedAt = publicMutation.attemptedAt;
   const reconciledAt = publicMutation.reconciledAt;
   if (attemptedAt === undefined || attemptedAt === null) {

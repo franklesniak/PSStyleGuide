@@ -710,6 +710,30 @@
               "retryAllowed": {
                 "const": true
               }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "attemptCount"
+                  ]
+                },
+                {
+                  "required": [
+                    "attemptedAt"
+                  ]
+                },
+                {
+                  "required": [
+                    "reconciledAt"
+                  ]
+                },
+                {
+                  "required": [
+                    "evidence"
+                  ]
+                }
+              ]
             }
           }
         },
