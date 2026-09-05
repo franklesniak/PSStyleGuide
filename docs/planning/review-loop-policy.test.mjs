@@ -72,6 +72,29 @@ function state(input, overrides = {}) {
   };
 }
 
+function compactState(input, reviewOverrides = {}, taskOverrides = {}) {
+  return {
+    schema: 1,
+    plan: 'docs/planning/action-items-2026-08-30.md',
+    current_task: {
+      number: 4,
+      state: 'active',
+      risk: 'R2',
+      repository: 'franklesniak/PSStyleGuide',
+      branch: 'agent/example',
+      base: HASHES.head1,
+      head: input.head,
+      last_gate: null,
+      next_action: 'Continue the review loop.',
+      blocker: null,
+      review: state(input, reviewOverrides),
+      ...taskOverrides,
+    },
+    completed: [1, 2, 3],
+    updated_utc: '2026-09-04T10:00:00Z',
+  };
+}
+
 function requestFor(input, channel, overrides = {}) {
   return {
     channel,
@@ -151,6 +174,50 @@ test('scenario 3: H1 to H2 requires one new pair for H2', () => {
   assert.equal(mutationClass, 'CODE_OR_DIFF');
   assert.equal(decision.status, 'REQUEST_REQUIRED');
   assert.deepEqual(decision.channels, ['copilot', 'codex']);
+});
+
+test('scenario 3a: H2 waits for a pending H1 pair before accepting a headless result', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const mutationClass = classifyMutation(state(input1), state(input2));
+  const pendingRequests = pairFor(input1, { terminal: false });
+  const decision = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    existingRequests: pendingRequests,
+  });
+  const recoveredWithoutPreviousInput = decideReviewRequest({
+    previousReviewInput: null,
+    currentReviewInput: input2,
+    mutationClass: 'CODE_OR_DIFF',
+    existingRequests: pendingRequests,
+  });
+  const lateH1Result = collectCodexResults({
+    reviewInput: input1,
+    request: pendingRequests.find((request) => request.channel === 'codex'),
+    submittedReviews: [],
+    conversationComments: [{
+      id: 'H1_HEADLESS_RESULT',
+      user: { login: 'chatgpt-codex-connector[bot]' },
+      created_at: '2026-09-04T10:01:00Z',
+      body: 'Review complete for the earlier request.',
+    }],
+  });
+
+  assert.equal(decision.status, 'WAIT_FOR_PRIOR_PAIR');
+  assert.equal(recoveredWithoutPreviousInput.status, 'WAIT_FOR_PRIOR_PAIR');
+  assert.deepEqual(decision.channels, []);
+  assert.match(decision.reason, /every prior review pair/iu);
+  assert.deepEqual(
+    lateH1Result.conversationComments.map((comment) => comment.id),
+    ['H1_HEADLESS_RESULT'],
+  );
 });
 
 test('scenario 4: a material same-head change records a reason and requires review', () => {
@@ -241,6 +308,22 @@ test('scenario 5b: a material same-head request waits for the prior pair to fini
   }), { submittedReviews: [], conversationComments: [] });
   assert.equal(terminal.status, 'REQUEST_REQUIRED');
   assert.deepEqual(terminal.channels, ['copilot', 'codex']);
+});
+
+test('scenario 5c: a same-head diff change waits for the prior pair to finish', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({ diffSha256: HASHES.diff2 });
+  const mutationClass = classifyMutation(state(input1), state(input2));
+  const decision = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    existingRequests: pairFor(input1, { terminal: false }),
+  });
+
+  assert.equal(mutationClass, 'CODE_OR_DIFF');
+  assert.equal(decision.status, 'WAIT_FOR_PRIOR_PAIR');
+  assert.deepEqual(decision.channels, []);
 });
 
 test('scenario 6: both attributable Codex result channels are recognized', () => {
@@ -350,11 +433,16 @@ test('scenario 9: confirmed mutation plus local recording failure does not retry
     state: 'NOT_EXECUTED',
     nativeResponseAccepted: false,
     readbackMatched: true,
-    retryAllowed: true,
+    retryAllowed: false,
     localRecordSucceeded: false,
   });
-  assert.equal(contradictoryResponse.state, 'NOT_EXECUTED');
-  assert.equal(contradictoryResponse.retryAllowed, true);
+  assert.deepEqual(contradictoryResponse, {
+    state: 'AMBIGUOUS',
+    nativeResponseAccepted: true,
+    readbackMatched: true,
+    retryAllowed: false,
+    localRecordSucceeded: true,
+  });
 });
 
 test('all permanent active task-template and controller surfaces use the compact contract', async () => {
@@ -423,6 +511,10 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(alternate, /without model routing/u);
   assert.match(alternate, /Do not create manifest/u);
   assert.match(alternate, /no-safe-work human boundary -> waiting_human/u);
+  assert.match(
+    alternate,
+    /Use `waiting_human` only when the next concrete action needs one exact human decision or exceptional action and no independent safe in-scope work remains\./u,
+  );
   assert.doesNotMatch(alternate, /any nonterminal state -> waiting_human/u);
   assert.match(generator, /Do not split routine work/u);
   assert.match(generator, /Default to one reviewer pair/u);
@@ -521,7 +613,7 @@ test('invalidating mutation claims are rejected in both directions', () => {
   );
 });
 
-test('schema-defined compact-state fields classify deterministically', () => {
+test('schema-defined nested review-state fields classify deterministically', () => {
   const input = reviewInput();
   const original = state(input);
   const resultChanges = [
@@ -686,12 +778,93 @@ test('Codex request correlation fails closed on duplicate baseline identities', 
   assert.deepEqual(results, { submittedReviews: [], conversationComments: [] });
 });
 
-test('public-mutation and review-request outputs match their closed schema definitions', async () => {
+function resolveSchemaReference(definition, root) {
+  if (typeof definition?.$ref !== 'string') {
+    return definition;
+  }
+
+  return definition.$ref
+    .slice(2)
+    .split('/')
+    .map((part) => part.replaceAll('~1', '/').replaceAll('~0', '~'))
+    .reduce((value, part) => value[part], root);
+}
+
+function assertSchemaValid(value, definition, root, location = '$') {
+  const resolved = resolveSchemaReference(definition, root);
+  const allowedTypes = Array.isArray(resolved.type) ? resolved.type : [resolved.type];
+  const matchesType = (type) => {
+    if (type === undefined) return true;
+    if (type === 'null') return value === null;
+    if (type === 'array') return Array.isArray(value);
+    if (type === 'object') return value !== null && typeof value === 'object' && !Array.isArray(value);
+    if (type === 'integer') return Number.isInteger(value);
+    return typeof value === type;
+  };
+
+  if (!allowedTypes.some(matchesType)) {
+    assert.fail(`${location} has the wrong type.`);
+  }
+  if (Object.hasOwn(resolved, 'const')) {
+    assert.deepEqual(value, resolved.const, `${location} does not match const.`);
+  }
+  if (resolved.enum !== undefined) {
+    assert.ok(resolved.enum.includes(value), `${location} is not in the enum.`);
+  }
+  if (typeof value === 'string') {
+    if (resolved.minLength !== undefined) {
+      assert.ok(value.length >= resolved.minLength, `${location} is too short.`);
+    }
+    if (resolved.pattern !== undefined) {
+      assert.match(value, new RegExp(resolved.pattern, 'u'), `${location} does not match pattern.`);
+    }
+  }
+  if (typeof value === 'number' && resolved.minimum !== undefined) {
+    assert.ok(value >= resolved.minimum, `${location} is below minimum.`);
+  }
+  if (Array.isArray(value)) {
+    if (resolved.uniqueItems === true) {
+      assert.equal(new Set(value.map((item) => JSON.stringify(item))).size, value.length);
+    }
+    if (resolved.items !== undefined) {
+      value.forEach((item, index) => assertSchemaValid(item, resolved.items, root, `${location}[${index}]`));
+    }
+  }
+  if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+    for (const required of resolved.required ?? []) {
+      assert.ok(Object.hasOwn(value, required), `${location}.${required} is required.`);
+    }
+    for (const [key, item] of Object.entries(value)) {
+      if (Object.hasOwn(resolved.properties ?? {}, key)) {
+        assertSchemaValid(item, resolved.properties[key], root, `${location}.${key}`);
+      } else if (resolved.additionalProperties === false) {
+        assert.fail(`${location}.${key} is not allowed.`);
+      } else if (typeof resolved.additionalProperties === 'object') {
+        assertSchemaValid(item, resolved.additionalProperties, root, `${location}.${key}`);
+      }
+    }
+  }
+  for (const condition of resolved.allOf ?? []) {
+    let conditionMatches = true;
+    try {
+      assertSchemaValid(value, condition.if, root, location);
+    } catch {
+      conditionMatches = false;
+    }
+    if (conditionMatches && condition.then !== undefined) {
+      assertSchemaValid(value, condition.then, root, location);
+    }
+  }
+}
+
+test('the actual compact resume record and review state match their closed schema', async () => {
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
   );
   const assertClosedShape = (value, definition) => {
-    assert.deepEqual(Object.keys(value).sort(), [...definition.required].sort());
+    for (const required of definition.required) {
+      assert.ok(Object.hasOwn(value, required), `${required} is required.`);
+    }
     assert.deepEqual(
       Object.keys(value).filter((key) => !Object.hasOwn(definition.properties, key)),
       [],
@@ -704,12 +877,50 @@ test('public-mutation and review-request outputs match their closed schema defin
     expected: { id: 42 },
     localRecordSucceeded: false,
   });
+  const persisted = compactState(input);
+  const parent = await readFile(new URL('./coding-agent-loop.md', import.meta.url), 'utf8');
+  const alternate = await readFile(
+    new URL('./coding-agent-loop-without-model-routing.md', import.meta.url),
+    'utf8',
+  );
+  const readControllerExample = (controller) => {
+    const match = /## Compact state record[\s\S]*?```json\r?\n(?<json>[\s\S]*?)\r?\n```/u.exec(controller);
+    assert.notEqual(match, null);
+    return JSON.parse(match.groups.json);
+  };
 
   assertClosedShape(requestFor(input, 'codex'), schema.$defs.reviewRequest);
   assertClosedShape(mutation, schema.$defs.publicMutation);
-  assertClosedShape(state(input), schema);
+  assertClosedShape(persisted, schema);
+  assertClosedShape(persisted.current_task, schema.$defs.taskState);
+  assertClosedShape(persisted.current_task.review, schema.$defs.reviewState);
   assertClosedShape(state(input).copilotResults, schema.$defs.reviewerResults);
   assertClosedShape(state(input).codexResults, schema.$defs.reviewerResults);
+  assertSchemaValid(persisted, schema, schema);
+  assertSchemaValid(readControllerExample(parent), schema, schema);
+  assertSchemaValid(readControllerExample(alternate), schema, schema);
+});
+
+test('a confirmed request survives local state-write failure without a duplicate', () => {
+  const input = reviewInput();
+  const requests = pairFor(input, { terminal: false });
+  const mutation = reconcilePublicMutation({
+    response: { ok: true, status: 201 },
+    readback: requests[1],
+    expected: requests[1],
+    localRecordSucceeded: false,
+  });
+  const decision = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: requests,
+  });
+
+  assert.equal(mutation.state, 'CONFIRMED');
+  assert.equal(mutation.retryAllowed, false);
+  assert.equal(decision.status, 'NO_REQUEST');
+  assert.deepEqual(decision.channels, []);
 });
 
 test('typed schema, metrics, and 10/15-minute controls remain complete', async () => {
@@ -769,6 +980,34 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
     () => createMetrics({ ...valid, reviewBeganAt: 'not-a-date' }),
     /reviewBeganAt must be a valid timestamp/u,
   );
+  for (const timestamp of [
+    '2026-09-04',
+    '2026-09-04T10:00:00',
+    'September 4, 2026 10:00:00 UTC',
+    '2026-02-30T10:00:00Z',
+    '2025-02-29T10:00:00Z',
+    '2026-04-31T10:00:00Z',
+    '2026-09-04T24:00:00Z',
+    '2026-09-04T10:00:00+14:01',
+    '2026-09-04T10:00:00+15:00',
+  ]) {
+    assert.throws(
+      () => createMetrics({ ...valid, reviewBeganAt: timestamp }),
+      /reviewBeganAt must be a valid timestamp/u,
+      timestamp,
+    );
+  }
+  for (const timestamp of [
+    '2024-02-29T23:59:59Z',
+    '2026-09-04t10:00:00.123456z',
+    '2026-09-04T10:00:00+05:30',
+    '2026-09-04T10:00:00-14:00',
+  ]) {
+    assert.doesNotThrow(
+      () => createMetrics({ ...valid, reviewBeganAt: timestamp }),
+      timestamp,
+    );
+  }
   assert.throws(
     () => createMetrics({ ...valid, bodyEditTimes: ['not-a-date'] }),
     /bodyEditTimes\[0\] must be a valid timestamp/u,
@@ -785,4 +1024,44 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
     }),
     /recognizedAt must not be earlier than cleanReviewAt/u,
   );
+});
+
+test('review requests and schema use the same RFC 3339 grammar', async () => {
+  const input = reviewInput();
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const grammar = new RegExp(schema.$defs.rfc3339.pattern, 'u');
+
+  for (const timestamp of [
+    '2026-09-04T10:00:00Z',
+    '2026-09-04t10:00:00.123z',
+    '2026-09-04T10:00:00+05:30',
+  ]) {
+    assert.match(timestamp, grammar);
+    assert.doesNotThrow(() => decideReviewRequest({
+      previousReviewInput: input,
+      currentReviewInput: input,
+      mutationClass: 'RESULT_OR_STATE',
+      existingRequests: [requestFor(input, 'copilot', { requestedAt: timestamp })],
+    }));
+  }
+
+  for (const timestamp of [
+    '2026-09-04',
+    '2026-09-04T10:00:00',
+    '09/04/2026 10:00:00',
+    '2026-09-04T10:00:00+14:01',
+  ]) {
+    assert.doesNotMatch(timestamp, grammar);
+    assert.throws(
+      () => decideReviewRequest({
+        previousReviewInput: input,
+        currentReviewInput: input,
+        mutationClass: 'RESULT_OR_STATE',
+        existingRequests: [requestFor(input, 'copilot', { requestedAt: timestamp })],
+      }),
+      /malformed or mismatched/u,
+    );
+  }
 });

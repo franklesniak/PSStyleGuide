@@ -90,9 +90,11 @@ Use one untracked `TEMP-coding-agent-loop-state.json` file. It is a resume aid, 
     "blocker": null
   },
   "completed": [1, 2, 3],
-  "updated_utc": "<timestamp>"
+  "updated_utc": "2026-09-04T10:00:00Z"
 }
 ```
+
+The root file and `current_task` object are closed records. When the current task uses the review loop, add only one `review` member under `current_task`; its closed shape contains the reviewed input, mutation class, request records, separate reviewer results, public-mutation reconciliation, metrics, and comment publications. The actual resume file must validate against `docs/planning/review-loop-policy.json`. Do not place review-loop fields beside the five root fields.
 
 Write the state at task start, after a meaningful implementation or validation boundary, after a remote mutation readback, before a real wait, and at task completion. Do not write it for unchanged status probes.
 
@@ -162,11 +164,13 @@ Use repository-required review for R1. Use an independent review for R2 when rev
 
 For a planned dual-review task, generate and semantically verify the reviewer-facing body before the first request. Freeze its scope, behavior, and risk meaning. Keep task state, polling state, reviewer requests, review IDs, review results, quality results, metrics, audit records, and terminal results in compact state or separate comments. Never append them to the frozen reviewer-facing body.
 
-Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. The first two classes invalidate review. The other classes do not. Raw PR-body byte inequality is not the classifier. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. Before a material same-head pair starts, wait for every earlier pair on that head to become terminal and then capture fresh baselines.
+Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. The first two classes invalidate review. The other classes do not. Raw PR-body byte inequality is not the classifier. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. Before a pair starts for a new reviewed-input key, require every earlier pair for every different key to contain both channels and be terminal. Then capture fresh baselines.
 
 Persist Copilot results separately from Codex results. Preserve both Codex result channels: submitted-review objects and attributable `chatgpt-codex-connector` PR-conversation comments. Normalize empty, singleton, and multiple API collections. Preserve Markdown backticks and Unicode and reject disallowed control characters. A successful public API response plus matching authenticated readback confirms the mutation; later local serialization failure cannot repeat it.
 
-The deterministic planning-only policy and scenarios are in `docs/planning/review-loop-policy.json`, `docs/planning/review-loop-policy.mjs`, and `docs/planning/review-loop-policy.test.mjs`. They validate decisions and transport. They do not perform GitHub writes.
+After each confirmed reviewer request and its targeted readback, persist its head, reviewed-input key, request time, nonterminal state, submitted-review baseline, and conversation-comment baseline in `current_task.review` before another public mutation. Mark the request terminal only after an attributable terminal result. If the local state write fails, reconstruct the request from targeted remote readback and do not repeat a confirmed request.
+
+The deterministic planning-only policy and scenarios are in `docs/planning/review-loop-policy.json`, `docs/planning/review-loop-policy.mjs`, and `docs/planning/review-loop-policy.test.mjs`. The module operates on the nested `current_task.review` value, and the schema validates the enclosing resume file. They validate decisions and transport. They do not perform GitHub writes.
 
 An anticipated approval boundary does not defer CI or review work that can run safely before that boundary. Request the approval early, continue toward a clean reviewed head, and stop only at the exact action that needs the approval. When that action is required before one final check can become green, finish all other checks and reviews and report that single dependency precisely.
 

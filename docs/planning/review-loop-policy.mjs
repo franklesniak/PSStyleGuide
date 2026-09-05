@@ -11,6 +11,7 @@ export const MUTATION_CLASSES = Object.freeze([
 const SHA1_PATTERN = /^[0-9a-f]{40}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 const DISALLOWED_CONTROL_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/u;
+const RFC3339_PATTERN = /^(?<year>\d{4})-(?<month>0[1-9]|1[0-2])-(?<day>0[1-9]|[12]\d|3[01])[Tt](?<hour>[01]\d|2[0-3]):(?<minute>[0-5]\d):(?<second>[0-5]\d)(?:\.\d+)?(?<zone>[Zz]|(?<offsetSign>[+-])(?<offsetHour>0\d|1[0-4]):(?<offsetMinute>[0-5]\d))$/u;
 
 function canonicalize(value) {
   if (Array.isArray(value)) {
@@ -44,6 +45,48 @@ function assertNonemptyText(value, label) {
   }
 
   validateTransport(value);
+}
+
+function parseRfc3339Timestamp(value, label) {
+  const match = typeof value === 'string' ? RFC3339_PATTERN.exec(value) : null;
+  if (match === null) {
+    throw new TypeError(`${label} must be a valid timestamp in RFC 3339 format.`);
+  }
+
+  const year = Number.parseInt(match.groups.year, 10);
+  const month = Number.parseInt(match.groups.month, 10);
+  const day = Number.parseInt(match.groups.day, 10);
+  const daysInMonth = [
+    31,
+    year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0) ? 29 : 28,
+    31,
+    30,
+    31,
+    30,
+    31,
+    31,
+    30,
+    31,
+    30,
+    31,
+  ];
+  const offsetHour = match.groups.offsetHour === undefined
+    ? 0
+    : Number.parseInt(match.groups.offsetHour, 10);
+  const offsetMinute = match.groups.offsetMinute === undefined
+    ? 0
+    : Number.parseInt(match.groups.offsetMinute, 10);
+  const timestamp = Date.parse(value);
+
+  if (
+    day > daysInMonth[month - 1] ||
+    (offsetHour === 14 && offsetMinute !== 0) ||
+    !Number.isFinite(timestamp)
+  ) {
+    throw new TypeError(`${label} must be a valid timestamp in RFC 3339 format.`);
+  }
+
+  return timestamp;
 }
 
 export function normalizeCollection(value) {
@@ -235,12 +278,13 @@ export function decideReviewRequest({
   const missingChannels = ['copilot', 'codex'].filter(
     (channel) => !requestedChannels.has(channel),
   );
-  for (const channel of ['copilot', 'codex']) {
-    const count = requestsForCurrentInput.filter(
-      (request) => request.channel === channel,
-    ).length;
-    if (count > 1) {
-      throw new TypeError(`Duplicate ${channel} requests exist for the reviewed input.`);
+  for (const key of new Set(requests.map((request) => request.reviewInputKey))) {
+    const pair = requests.filter((request) => request.reviewInputKey === key);
+    for (const channel of ['copilot', 'codex']) {
+      const count = pair.filter((request) => request.channel === channel).length;
+      if (count > 1) {
+        throw new TypeError(`Duplicate ${channel} requests exist for the reviewed input.`);
+      }
     }
   }
 
@@ -262,29 +306,23 @@ export function decideReviewRequest({
     });
   }
 
-  if (
-    previousReviewInput !== null &&
-    mutationClass === 'MATERIAL_SCOPE_BEHAVIOR_RISK' &&
-    previousReviewInput.head === currentReviewInput.head
-  ) {
-    const priorSameHeadRequests = requests.filter(
-      (request) => request.head === currentReviewInput.head && request.reviewInputKey !== currentKey,
-    );
-    const priorKeys = new Set(priorSameHeadRequests.map((request) => request.reviewInputKey));
-    const hasPendingPriorPair = [...priorKeys].some((key) => {
-      const pair = priorSameHeadRequests.filter((request) => request.reviewInputKey === key);
-      const channels = new Set(pair.map((request) => request.channel));
-      return channels.size !== 2 || pair.some((request) => request.terminal !== true);
-    });
+  const priorRequests = requests.filter(
+    (request) => request.reviewInputKey !== currentKey,
+  );
+  const priorKeys = new Set(priorRequests.map((request) => request.reviewInputKey));
+  const hasPendingPriorPair = [...priorKeys].some((key) => {
+    const pair = priorRequests.filter((request) => request.reviewInputKey === key);
+    const channels = new Set(pair.map((request) => request.channel));
+    return channels.size !== 2 || pair.some((request) => request.terminal !== true);
+  });
 
-    if (hasPendingPriorPair) {
-      return Object.freeze({
-        status: 'WAIT_FOR_PRIOR_PAIR',
-        reviewInputKey: currentKey,
-        channels: [],
-        reason: 'A prior review pair on this head must become terminal before another pair starts.',
-      });
-    }
+  if (hasPendingPriorPair) {
+    return Object.freeze({
+      status: 'WAIT_FOR_PRIOR_PAIR',
+      reviewInputKey: currentKey,
+      channels: [],
+      reason: 'Every prior review pair for a different input must become terminal before another pair starts.',
+    });
   }
 
   if (previousReviewInput === null || mutationClass === 'CODE_OR_DIFF') {
@@ -340,8 +378,14 @@ function getItemId(item) {
 function getItemTime(item, fields) {
   for (const field of fields) {
     const value = item?.[field];
-    if (typeof value === 'string' && Number.isFinite(Date.parse(value))) {
-      return Date.parse(value);
+    if (value === undefined || value === null) {
+      continue;
+    }
+
+    try {
+      return parseRfc3339Timestamp(value, field);
+    } catch {
+      return null;
     }
   }
 
@@ -407,7 +451,7 @@ export function collectCodexResults({
   const baselineReviewIds = new Set(request.baselineReviewNodeIds);
   const baselineComments = new Map(
     normalizeCollection(request.baselineConversationComments).map(
-      (comment) => [comment.nodeId, Date.parse(comment.updatedAt)],
+      (comment) => [comment.nodeId, getItemTime(comment, ['updatedAt'])],
     ),
   );
   const reviews = normalizeCollection(submittedReviews).filter(
@@ -468,12 +512,22 @@ export function reconcilePublicMutation({
     canonicalJson(readback) === canonicalJson(expected);
   const recordSucceeded = Boolean(localRecordSucceeded);
 
+  if (response?.executed === false && nativeResponseAccepted) {
+    return Object.freeze({
+      state: 'AMBIGUOUS',
+      nativeResponseAccepted,
+      readbackMatched,
+      retryAllowed: false,
+      localRecordSucceeded: recordSucceeded,
+    });
+  }
+
   if (response?.executed === false) {
     return Object.freeze({
       state: 'NOT_EXECUTED',
       nativeResponseAccepted,
       readbackMatched,
-      retryAllowed: true,
+      retryAllowed: !readbackMatched,
       localRecordSucceeded: recordSucceeded,
     });
   }
@@ -518,27 +572,14 @@ export function createMetrics({
   cleanPairAt,
   mergedAt,
 }) {
-  const parseTimestamp = (value, label) => {
-    if (typeof value !== 'string' || value.length === 0) {
-      throw new TypeError(`${label} must be a valid timestamp.`);
-    }
-
-    const timestamp = Date.parse(value);
-    if (!Number.isFinite(timestamp)) {
-      throw new TypeError(`${label} must be a valid timestamp.`);
-    }
-
-    return timestamp;
-  };
-
   const requestsPerHead = {};
   for (const request of normalizeCollection(reviewRequests)) {
     requestsPerHead[request.head] = (requestsPerHead[request.head] ?? 0) + 1;
   }
 
-  const reviewStart = parseTimestamp(reviewBeganAt, 'reviewBeganAt');
+  const reviewStart = parseRfc3339Timestamp(reviewBeganAt, 'reviewBeganAt');
   const parsedBodyEditTimes = normalizeCollection(bodyEditTimes).map(
-    (time, index) => parseTimestamp(time, `bodyEditTimes[${index}]`),
+    (time, index) => parseRfc3339Timestamp(time, `bodyEditTimes[${index}]`),
   );
   const bodyEditsAfterReviewBegan = parsedBodyEditTimes.filter(
     (time) => time > reviewStart,
@@ -553,7 +594,8 @@ export function createMetrics({
       throw new TypeError(`${startLabel} and ${endLabel} must both be null or valid timestamps.`);
     }
 
-    const milliseconds = parseTimestamp(end, endLabel) - parseTimestamp(start, startLabel);
+    const milliseconds = parseRfc3339Timestamp(end, endLabel) -
+      parseRfc3339Timestamp(start, startLabel);
     if (milliseconds < 0) {
       throw new TypeError(`${endLabel} must not be earlier than ${startLabel}.`);
     }
