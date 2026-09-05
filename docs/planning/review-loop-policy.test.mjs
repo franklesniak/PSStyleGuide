@@ -1977,6 +1977,62 @@ test('predecessor outputs survive required restart boundaries and prune after fi
   );
 });
 
+test('predecessor outputs stay within the fixed plan in both ingestion layers', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const atPlanBoundary = compactState(input, {}, {
+    number: PLAN_TASK_COUNT,
+  }, {
+    predecessor_outputs: {
+      [PLAN_TASK_COUNT - 1]: {
+        FINAL_HANDOFF: { value: 'valid', last_consumer_task: PLAN_TASK_COUNT },
+      },
+    },
+    completed: Array.from({ length: PLAN_TASK_COUNT - 1 }, (_, index) => index + 1),
+  });
+  const outsideProducerBoundary = compactState(input, {}, {}, {
+    predecessor_outputs: {
+      [PLAN_TASK_COUNT + 1]: {
+        OUTSIDE_PRODUCER: { value: 'invalid', last_consumer_task: 999 },
+      },
+    },
+  });
+  const outsideConsumerBoundary = compactState(input, {}, {}, {
+    predecessor_outputs: {
+      12: {
+        OUTSIDE_CONSUMER: {
+          value: 'invalid',
+          last_consumer_task: PLAN_TASK_COUNT + 1,
+        },
+      },
+    },
+  });
+
+  assertSchemaValid(atPlanBoundary, schema, schema);
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(atPlanBoundary)),
+    atPlanBoundary,
+  );
+  assert.throws(
+    () => assertSchemaValid(outsideProducerBoundary, schema, schema),
+    /property name does not match pattern/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(outsideProducerBoundary)),
+    /bounded output map/u,
+  );
+  assert.throws(
+    () => assertSchemaValid(outsideConsumerBoundary, schema, schema),
+    /above maximum/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(outsideConsumerBoundary)),
+    /predecessor output record is malformed/u,
+  );
+});
+
 test('compact-state ingestion rejects invalid predecessor and reconciliation ordering', () => {
   const input = reviewInput();
   const negativeEvidence = {

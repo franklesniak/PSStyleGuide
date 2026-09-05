@@ -419,6 +419,7 @@ function validatePredecessorOutputs(predecessorOutputs) {
     const taskNumber = Number.parseInt(task, 10);
     if (
       !PREDECESSOR_TASK_PATTERN.test(task) ||
+      taskNumber > PLAN_TASK_COUNT ||
       outputs === null ||
       typeof outputs !== 'object' ||
       Array.isArray(outputs) ||
@@ -436,7 +437,7 @@ function validatePredecessorOutputs(predecessorOutputs) {
         !Object.hasOwn(record, 'value') ||
         !Number.isInteger(record.last_consumer_task) ||
         record.last_consumer_task <= taskNumber ||
-        record.last_consumer_task > 999
+        record.last_consumer_task > PLAN_TASK_COUNT
       ) {
         throw new TypeError('A predecessor output record is malformed.');
       }
