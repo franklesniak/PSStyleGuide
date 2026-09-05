@@ -293,7 +293,9 @@
         "head",
         "requestedAt",
         "terminal",
+        "baselineRequestEventIds",
         "baselineReviewNodeIds",
+        "baselineReviewRunIds",
         "baselineConversationComments"
       ],
       "properties": {
@@ -315,7 +317,23 @@
         "terminal": {
           "type": "boolean"
         },
+        "baselineRequestEventIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
         "baselineReviewNodeIds": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "baselineReviewRunIds": {
           "type": "array",
           "items": {
             "type": "string",

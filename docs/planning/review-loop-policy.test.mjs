@@ -110,7 +110,9 @@ function requestFor(input, channel, overrides = {}) {
     head: input.head,
     requestedAt: '2026-09-04T10:00:00Z',
     terminal: false,
+    baselineRequestEventIds: [],
     baselineReviewNodeIds: [],
+    baselineReviewRunIds: [],
     baselineConversationComments: {},
     ...overrides,
   };
@@ -299,6 +301,38 @@ test('scenario 3b: authenticated head drift supersedes an impossible missing H1 
       body: 'Late result for H1.',
     }],
   }), { submittedReviews: [], conversationComments: [] });
+});
+
+test('scenario 3c: authenticated same-head input drift supersedes an impossible missing request', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
+  const mutationClass = classifyMutation(state(input1), state(input2));
+  const oldRequest = requestFor(input1, 'copilot');
+  const requiresDisposition = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    materialReason: 'The risk changed.',
+    existingRequests: [oldRequest],
+  });
+  const recovered = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    materialReason: 'The risk changed.',
+    existingRequests: [oldRequest],
+    supersededInputs: supersessionFor(input1, input2, {
+      reason: 'Authenticated reviewed-input drift made the missing old request impossible.',
+    }),
+  });
+
+  assert.equal(requiresDisposition.status, 'SUPERSESSION_REQUIRED');
+  assert.deepEqual(
+    requiresDisposition.supersedeReviewInputKeys,
+    [getReviewInputKey(input1)],
+  );
+  assert.equal(recovered.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(recovered.channels, ['copilot', 'codex']);
 });
 
 test('old-head supersession rejects forged, current-input, and complete-pair records', () => {
@@ -579,6 +613,12 @@ test('scenario 7: empty, singleton, and multiple collections normalize', () => {
   assert.deepEqual(normalizeCollection({ nodes: [] }), []);
   assert.deepEqual(normalizeCollection({ nodes: [{ id: 1 }] }), [{ id: 1 }]);
   assert.deepEqual(normalizeCollection({ edges: [{ node: { id: 1 } }, { node: { id: 2 } }] }), [{ id: 1 }, { id: 2 }]);
+  assert.deepEqual(normalizeCollection({ total_count: 0, check_runs: [] }), []);
+  assert.deepEqual(normalizeCollection({ total_count: 1, check_runs: [{ id: 1 }] }), [{ id: 1 }]);
+  assert.deepEqual(
+    normalizeCollection({ total_count: 2, check_runs: [{ id: 1 }, { id: 2 }] }),
+    [{ id: 1 }, { id: 2 }],
+  );
 });
 
 test('Copilot REST requests use the exact documented reviewer identity', () => {
@@ -663,14 +703,15 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
         },
       ],
     },
-    reviewRuns: [
-      {
+    reviewRuns: {
+      total_count: 1,
+      check_runs: [{
         id: 'new-run',
         app: { slug: 'copilot-pull-request-reviewer' },
         head_sha: HASHES.head1,
         created_at: '2026-09-04T10:01:00Z',
-      },
-    ],
+      }],
+    },
   });
   assert.deepEqual(populated, {
     responseReviewerMatched: false,
@@ -692,6 +733,18 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
       reviewRuns: [],
     }).responseReviewerMatched,
     true,
+  );
+  assert.throws(
+    () => collectCopilotRequestEvidence({
+      ...common,
+      baselineReviewRunIds: undefined,
+      responseReviewers: [],
+      requestEvents: [],
+      requestedReviewers: [],
+      submittedReviews: [],
+      reviewRuns: [],
+    }),
+    /review run baseline/u,
   );
   const unverifiedAliases = collectCopilotRequestEvidence({
     ...common,
@@ -1024,6 +1077,7 @@ test('all permanent active task-template and controller surfaces use the compact
     assert.match(task.body, /`EXHAUSTED`/u);
     assert.match(task.body, /at least 120 seconds/u);
     assert.match(task.body, /Do not (?:send|post)[^\n]*(?:Codex trigger|@codex review)/u);
+    assert.match(task.body, /terminally proved non-functional under the repository's reviewer-unavailability instructions/u);
     assert.doesNotMatch(
       task.body,
       /result for the round only when it is newer than the applicable baseline and is explicitly anchored to the recorded PR head SHA/u,
@@ -1033,6 +1087,10 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.equal(
     [...plan.matchAll(/Count a submitted-review result for the round only when its commit matches the recorded PR head SHA and it is newer than the applicable baseline\./gu)].length,
     38,
+  );
+  assert.match(
+    plan,
+    /Persist the unique request-event, review-run, submitted-review, and conversation-comment baselines with the in-flight attempt\./u,
   );
   assert.equal(
     [...plan.matchAll(/Count a headless Codex PR-conversation result only when the authenticated author, request time, baseline exclusion, reviewed-input key, and serialized predecessor-pair order attribute it to this round\./gu)].length,
@@ -1560,6 +1618,54 @@ test('predecessor outputs survive required restart boundaries and prune after fi
       },
     }, 12),
     /malformed/u,
+  );
+});
+
+test('compact-state ingestion rejects invalid predecessor and reconciliation ordering', () => {
+  const input = reviewInput();
+  const negativeEvidence = {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    readbackComplete: true,
+  };
+  const invalidInterval = compactState(input, {
+    publicMutation: {
+      state: 'NO_EFFECT',
+      nativeResponseAccepted: true,
+      readbackMatched: false,
+      retryAllowed: true,
+      localRecordSucceeded: true,
+      attemptCount: 1,
+      attemptedAt: '2026-09-04T10:02:00Z',
+      reconciledAt: '2026-09-04T10:02:00Z',
+      evidence: negativeEvidence,
+    },
+  });
+  const reversedInterval = structuredClone(invalidInterval);
+  reversedInterval.current_task.review.publicMutation.reconciledAt =
+    '2026-09-04T10:01:59Z';
+  const invalidPredecessor = compactState(input, {}, {}, {
+    predecessor_outputs: {
+      12: {
+        INVALID_ORDER: { value: 'bad', last_consumer_task: 12 },
+      },
+    },
+  });
+
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(invalidInterval)),
+    /interval is too short/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(reversedInterval)),
+    /precedes its attempt/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(invalidPredecessor)),
+    /predecessor output record is malformed/u,
   );
 });
 

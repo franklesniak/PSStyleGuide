@@ -82,7 +82,7 @@ Use one untracked `TEMP-coding-agent-loop-state.json` resume aid with this shape
 }
 ```
 
-The root file and `current_task` object are closed records. Keep immutable predecessor values that a later task still needs in `predecessor_outputs`. Key each value first by its producing task number and then by its exact output name. Store the value and `last_consumer_task`. Delete the value when that consumer completes. Do not retain full task results. Reject duplicate JSON member names before parsing the state file.
+The root file and `current_task` object are closed records. Keep immutable predecessor values that a later task still needs in `predecessor_outputs`. Key each value first by its producing task number and then by its exact output name. Store the value and `last_consumer_task`. Delete the value when that consumer completes. Do not retain full task results. Reject duplicate JSON member names before parsing the state file. During ingestion, reject a predecessor output whose final consumer is not later than its producing task. Also reject a reversed reconciliation interval or a terminal no-effect interval shorter than 120 seconds.
 
 When the current task uses the review loop, add only one `review` member under `current_task`; its closed shape contains the reviewed input, mutation class, request records, typed superseded-input dispositions, separate reviewer results, public-mutation reconciliation attempts, metrics, and comment publications. The actual resume file must validate against `docs/planning/review-loop-policy.json`. Do not place review-loop fields beside the six root fields.
 

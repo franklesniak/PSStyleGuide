@@ -128,6 +128,10 @@ export function normalizeCollection(value) {
     return normalizeCollection(value.edges).map((edge) => edge?.node ?? edge);
   }
 
+  if (typeof value === 'object' && Object.hasOwn(value, 'check_runs')) {
+    return normalizeCollection(value.check_runs);
+  }
+
   return [value];
 }
 
@@ -287,7 +291,52 @@ function scanJsonWithoutDuplicateMembers(text) {
 export function parseCompactStateJson(text) {
   validateTransport(text);
   scanJsonWithoutDuplicateMembers(text);
-  return JSON.parse(text);
+  const parsed = JSON.parse(text);
+
+  if (
+    parsed !== null &&
+    typeof parsed === 'object' &&
+    !Array.isArray(parsed) &&
+    Object.hasOwn(parsed, 'predecessor_outputs') &&
+    Object.hasOwn(parsed, 'current_task')
+  ) {
+    validatePredecessorOutputs(parsed.predecessor_outputs);
+    validatePersistedPublicMutation(parsed.current_task?.review?.publicMutation);
+  }
+
+  return parsed;
+}
+
+function validatePersistedPublicMutation(publicMutation) {
+  if (
+    publicMutation === null ||
+    typeof publicMutation !== 'object' ||
+    Array.isArray(publicMutation)
+  ) {
+    throw new TypeError('The persisted public mutation is malformed.');
+  }
+
+  const attemptedAt = publicMutation.attemptedAt;
+  const reconciledAt = publicMutation.reconciledAt;
+  if (attemptedAt === undefined || attemptedAt === null) {
+    return;
+  }
+
+  const attemptedTime = parseRfc3339Timestamp(attemptedAt, 'attemptedAt');
+  if (reconciledAt === undefined || reconciledAt === null) {
+    return;
+  }
+
+  const reconciledTime = parseRfc3339Timestamp(reconciledAt, 'reconciledAt');
+  if (reconciledTime < attemptedTime) {
+    throw new TypeError('The persisted reconciliation precedes its attempt.');
+  }
+  if (
+    (publicMutation.state === 'NO_EFFECT' || publicMutation.state === 'EXHAUSTED') &&
+    reconciledTime - attemptedTime < REVIEW_REQUEST_RECONCILIATION_MILLISECONDS
+  ) {
+    throw new TypeError('The persisted no-effect reconciliation interval is too short.');
+  }
 }
 
 function validatePredecessorOutputs(predecessorOutputs) {
@@ -550,11 +599,10 @@ export function decideReviewRequest({
       channels.size === 2 ||
       heads.size !== 1 ||
       !heads.has(disposition.head) ||
-      disposition.successorHead === disposition.head ||
       !knownHeads.has(disposition.successorHead) ||
       disposition.reviewInputKey === currentKey
     ) {
-      throw new TypeError('A superseded disposition does not describe an incomplete old-head pair.');
+      throw new TypeError('A superseded disposition does not describe an incomplete prior-input pair.');
     }
     supersessionByKey.set(disposition.reviewInputKey, disposition);
   }
@@ -569,9 +617,7 @@ export function decideReviewRequest({
     const heads = new Set(pair.map((request) => request.head));
     const supersession = supersessionByKey.get(key);
     const missingChannel = channels.size !== 2;
-    const canSupersede = missingChannel &&
-      heads.size === 1 &&
-      !heads.has(currentReviewInput.head);
+    const canSupersede = missingChannel && heads.size === 1;
     return {
       key,
       needsSupersession: canSupersede && supersession === undefined,
@@ -589,7 +635,7 @@ export function decideReviewRequest({
       reviewInputKey: currentKey,
       channels: [],
       supersedeReviewInputKeys: Object.freeze(supersessionRequired),
-      reason: 'After authenticated head-drift readback, mark each incomplete old-head pair SUPERSEDED before requesting the new pair.',
+      reason: 'After authenticated reviewed-input drift, mark each incomplete prior-input pair SUPERSEDED before requesting the new pair.',
     });
   }
 
@@ -756,9 +802,9 @@ export function collectCopilotRequestEvidence({
   requestedReviewers,
   submittedReviews,
   reviewRuns,
-  baselineRequestEventIds = [],
-  baselineReviewNodeIds = [],
-  baselineReviewRunIds = [],
+  baselineRequestEventIds,
+  baselineReviewNodeIds,
+  baselineReviewRunIds,
   expectedHead,
   requestedAt,
   readbackCompleteness,
@@ -859,9 +905,17 @@ export function collectCopilotRequestEvidence({
 }
 
 function isReviewRequestRecord(request) {
-  const reviewBaselinesAreValid = Array.isArray(request?.baselineReviewNodeIds) &&
-    request.baselineReviewNodeIds.every((id) => typeof id === 'string' && id.length > 0) &&
-    new Set(request.baselineReviewNodeIds).size === request.baselineReviewNodeIds.length;
+  const identityBaselineFields = [
+    'baselineRequestEventIds',
+    'baselineReviewNodeIds',
+    'baselineReviewRunIds',
+  ];
+  const identityBaselinesAreValid = identityBaselineFields.every((field) => {
+    const values = request?.[field];
+    return Array.isArray(values) &&
+      values.every((id) => typeof id === 'string' && id.length > 0) &&
+      new Set(values).size === values.length;
+  });
   const commentBaselines = request?.baselineConversationComments;
   const commentBaselinesAreValid = commentBaselines !== null &&
     typeof commentBaselines === 'object' &&
@@ -881,7 +935,7 @@ function isReviewRequestRecord(request) {
     typeof request.reviewInputKey === 'string' &&
     SHA256_PATTERN.test(request.reviewInputKey) &&
     getItemTime(request, ['requestedAt']) !== null &&
-    reviewBaselinesAreValid &&
+    identityBaselinesAreValid &&
     commentBaselinesAreValid;
 }
 
