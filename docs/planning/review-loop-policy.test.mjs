@@ -525,6 +525,53 @@ test('scenario 6: both attributable Codex result channels are recognized', () =>
   assert.deepEqual(Object.keys(results).sort(), ['conversationComments', 'submittedReviews']);
 });
 
+test('whole-second Codex evidence matches a fractional request boundary', () => {
+  const input = reviewInput();
+  const results = collectCodexResults({
+    reviewInput: input,
+    request: requestFor(input, 'codex', {
+      requestedAt: '2026-09-04T10:00:00.094Z',
+    }),
+    submittedReviews: [
+      {
+        id: 'REVIEW_SAME_SECOND',
+        user: { login: 'chatgpt-codex-connector[bot]' },
+        commit_id: HASHES.head1,
+        submitted_at: '2026-09-04T10:00:00Z',
+      },
+      {
+        id: 'REVIEW_EARLY',
+        user: { login: 'chatgpt-codex-connector[bot]' },
+        commit_id: HASHES.head1,
+        submitted_at: '2026-09-04T09:59:59.999Z',
+      },
+    ],
+    conversationComments: [
+      {
+        id: 'COMMENT_SAME_SECOND',
+        user: { login: 'chatgpt-codex-connector[bot]' },
+        created_at: '2026-09-04T10:00:00Z',
+        body: 'Review complete with no findings.',
+      },
+      {
+        id: 'COMMENT_EARLY',
+        user: { login: 'chatgpt-codex-connector[bot]' },
+        created_at: '2026-09-04T09:59:59.999Z',
+        body: 'Earlier result.',
+      },
+    ],
+  });
+
+  assert.deepEqual(
+    results.submittedReviews.map((review) => review.id),
+    ['REVIEW_SAME_SECOND'],
+  );
+  assert.deepEqual(
+    results.conversationComments.map((comment) => comment.id),
+    ['COMMENT_SAME_SECOND'],
+  );
+});
+
 test('scenario 7: empty, singleton, and multiple collections normalize', () => {
   assert.deepEqual(normalizeCollection(null), []);
   assert.deepEqual(normalizeCollection({ id: 1 }), [{ id: 1 }]);
@@ -652,6 +699,67 @@ test('Copilot request evidence normalizes cardinality and rejects the display na
     }).readbackComplete,
     false,
   );
+});
+
+test('whole-second Copilot evidence matches a fractional request boundary', () => {
+  const common = {
+    responseReviewers: { requested_reviewers: [] },
+    requestedReviewers: { users: [] },
+    baselineRequestEventIds: [],
+    baselineReviewNodeIds: [],
+    baselineReviewRunIds: [],
+    expectedHead: HASHES.head1,
+    requestedAt: '2026-09-04T10:00:00.094Z',
+    readbackCompleteness: {
+      requestEvents: true,
+      requestedReviewers: true,
+      submittedReviews: true,
+      reviewRuns: true,
+    },
+  };
+  const evidence = collectCopilotRequestEvidence({
+    ...common,
+    requestEvents: [{
+      id: 'EVENT_SAME_SECOND',
+      event: 'review_requested',
+      created_at: '2026-09-04T10:00:00Z',
+      requested_reviewer: { login: 'Copilot' },
+    }],
+    submittedReviews: [{
+      id: 'REVIEW_SAME_SECOND',
+      user: { login: 'copilot-pull-request-reviewer[bot]' },
+      commit_id: HASHES.head1,
+      submitted_at: '2026-09-04T10:00:00Z',
+    }],
+    reviewRuns: [{
+      id: 'RUN_SAME_SECOND',
+      name: 'Running Copilot Code Review',
+      head_sha: HASHES.head1,
+      created_at: '2026-09-04T10:00:00Z',
+      actor: { login: 'Copilot' },
+    }],
+  });
+  const early = collectCopilotRequestEvidence({
+    ...common,
+    requestEvents: [{
+      id: 'EVENT_EARLY',
+      event: 'review_requested',
+      created_at: '2026-09-04T09:59:59.999Z',
+      requested_reviewer: { login: 'Copilot' },
+    }],
+    submittedReviews: [],
+    reviewRuns: [],
+  });
+
+  assert.deepEqual(evidence, {
+    responseReviewerMatched: false,
+    requestEventMatched: true,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: true,
+    reviewRunMatched: true,
+    readbackComplete: true,
+  });
+  assert.equal(early.requestEventMatched, false);
 });
 
 test('scenario 8: Markdown backticks and Unicode survive and controls fail', () => {

@@ -689,6 +689,27 @@ function getItemTime(item, fields) {
   return null;
 }
 
+function isItemAtOrAfterRequest(item, fields, requestTime) {
+  for (const field of fields) {
+    const value = item?.[field];
+    if (value === undefined || value === null) {
+      continue;
+    }
+
+    try {
+      const itemTime = parseRfc3339Timestamp(value, field);
+      const requestBoundary = /:\d{2}\.\d+/u.test(value)
+        ? requestTime
+        : Math.floor(requestTime / 1_000) * 1_000;
+      return itemTime >= requestBoundary;
+    } catch {
+      continue;
+    }
+  }
+
+  return false;
+}
+
 function isCopilotIdentity(login, { allowDisplayName = true } = {}) {
   const normalized = normalizeActorLogin(login);
   return normalized === 'copilot-pull-request-reviewer' ||
@@ -776,14 +797,12 @@ export function collectCopilotRequestEvidence({
   );
   const requestEventMatched = normalizeCollection(requestEvents).some((event) => {
     const id = getItemId(event);
-    const createdAt = getItemTime(event, ['created_at', 'createdAt']);
     const reviewerLogin = event?.requested_reviewer?.login ??
       event?.requestedReviewer?.login;
     return event?.event === 'review_requested' &&
       id !== null &&
       !eventBaselines.has(id) &&
-      createdAt !== null &&
-      createdAt >= requestTime &&
+      isItemAtOrAfterRequest(event, ['created_at', 'createdAt'], requestTime) &&
       isCopilotIdentity(reviewerLogin);
   });
   const requestedReviewerMatched = getReviewerCollection(requestedReviewers).some(
@@ -791,24 +810,24 @@ export function collectCopilotRequestEvidence({
   );
   const submittedReviewMatched = normalizeCollection(submittedReviews).some((review) => {
     const id = getItemId(review);
-    const submittedAt = getItemTime(review, ['submitted_at', 'submittedAt']);
     return id !== null &&
       !reviewBaselines.has(id) &&
-      submittedAt !== null &&
-      submittedAt >= requestTime &&
+      isItemAtOrAfterRequest(review, ['submitted_at', 'submittedAt'], requestTime) &&
       getCommitOid(review) === expectedHead &&
       isCopilotIdentity(getActorLogin(review));
   });
   const reviewRunMatched = normalizeCollection(reviewRuns).some((run) => {
     const id = getItemId(run);
-    const createdAt = getItemTime(run, ['created_at', 'createdAt', 'run_started_at', 'runStartedAt']);
     const head = run?.head_sha ?? run?.headSha ?? run?.headCommit?.oid;
     const actor = run?.app?.slug ?? run?.app?.name ?? run?.actor?.login;
     const name = run?.name ?? run?.display_title ?? run?.displayTitle ?? '';
     return id !== null &&
       !runBaselines.has(id) &&
-      createdAt !== null &&
-      createdAt >= requestTime &&
+      isItemAtOrAfterRequest(
+        run,
+        ['created_at', 'createdAt', 'run_started_at', 'runStartedAt'],
+        requestTime,
+      ) &&
       head === expectedHead &&
       (isCopilotIdentity(actor) || /copilot.*code review/iu.test(name));
   });
@@ -907,13 +926,11 @@ export function collectCodexResults({
   const reviews = normalizeCollection(submittedReviews).filter(
     (review) => {
       const id = getItemId(review);
-      const submittedAt = getItemTime(review, ['submitted_at', 'submittedAt']);
       return normalizeActorLogin(getActorLogin(review)) === expectedActor &&
         getCommitOid(review) === head &&
         id !== null &&
         !baselineReviewIds.has(id) &&
-        submittedAt !== null &&
-        submittedAt >= requestTime;
+        isItemAtOrAfterRequest(review, ['submitted_at', 'submittedAt'], requestTime);
     },
   );
   const comments = normalizeCollection(conversationComments).filter(
@@ -935,7 +952,15 @@ export function collectCodexResults({
         comment,
         ['updated_at', 'updatedAt', 'created_at', 'createdAt'],
       );
-      if (id === null || updatedAt === null || updatedAt < requestTime) {
+      if (
+        id === null ||
+        updatedAt === null ||
+        !isItemAtOrAfterRequest(
+          comment,
+          ['updated_at', 'updatedAt', 'created_at', 'createdAt'],
+          requestTime,
+        )
+      ) {
         return false;
       }
 
