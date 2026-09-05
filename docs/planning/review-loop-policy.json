@@ -378,6 +378,38 @@
         }
       }
     },
+    "reviewRequestEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "responseReviewerMatched",
+        "requestEventMatched",
+        "requestedReviewerMatched",
+        "submittedReviewMatched",
+        "reviewRunMatched",
+        "readbackComplete"
+      ],
+      "properties": {
+        "responseReviewerMatched": {
+          "type": "boolean"
+        },
+        "requestEventMatched": {
+          "type": "boolean"
+        },
+        "requestedReviewerMatched": {
+          "type": "boolean"
+        },
+        "submittedReviewMatched": {
+          "type": "boolean"
+        },
+        "reviewRunMatched": {
+          "type": "boolean"
+        },
+        "readbackComplete": {
+          "type": "boolean"
+        }
+      }
+    },
     "publicMutation": {
       "type": "object",
       "additionalProperties": false,
@@ -393,6 +425,9 @@
           "enum": [
             "NOT_ATTEMPTED",
             "NOT_EXECUTED",
+            "RECONCILING",
+            "NO_EFFECT",
+            "EXHAUSTED",
             "AMBIGUOUS",
             "CONFIRMED"
           ]
@@ -408,9 +443,220 @@
         },
         "localRecordSucceeded": {
           "type": "boolean"
+        },
+        "attemptCount": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2
+        },
+        "attemptedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/rfc3339"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "reconciledAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/rfc3339"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "evidence": {
+          "$ref": "#/$defs/reviewRequestEvidence"
         }
       },
       "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "RECONCILING"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "attemptCount",
+              "attemptedAt",
+              "reconciledAt",
+              "evidence"
+            ],
+            "properties": {
+              "nativeResponseAccepted": {
+                "const": true
+              },
+              "readbackMatched": {
+                "const": false
+              },
+              "retryAllowed": {
+                "const": false
+              },
+              "attemptedAt": {
+                "$ref": "#/$defs/rfc3339"
+              },
+              "reconciledAt": {
+                "type": "null"
+              },
+              "evidence": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/reviewRequestEvidence"
+                  },
+                  {
+                    "properties": {
+                      "requestEventMatched": {
+                        "const": false
+                      },
+                      "requestedReviewerMatched": {
+                        "const": false
+                      },
+                      "submittedReviewMatched": {
+                        "const": false
+                      },
+                      "reviewRunMatched": {
+                        "const": false
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "NO_EFFECT"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "attemptCount",
+              "attemptedAt",
+              "reconciledAt",
+              "evidence"
+            ],
+            "properties": {
+              "nativeResponseAccepted": {
+                "const": true
+              },
+              "readbackMatched": {
+                "const": false
+              },
+              "retryAllowed": {
+                "const": true
+              },
+              "attemptCount": {
+                "const": 1
+              },
+              "attemptedAt": {
+                "$ref": "#/$defs/rfc3339"
+              },
+              "reconciledAt": {
+                "$ref": "#/$defs/rfc3339"
+              },
+              "evidence": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/reviewRequestEvidence"
+                  },
+                  {
+                    "properties": {
+                      "requestEventMatched": {
+                        "const": false
+                      },
+                      "requestedReviewerMatched": {
+                        "const": false
+                      },
+                      "submittedReviewMatched": {
+                        "const": false
+                      },
+                      "reviewRunMatched": {
+                        "const": false
+                      },
+                      "readbackComplete": {
+                        "const": true
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "EXHAUSTED"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "attemptCount",
+              "attemptedAt",
+              "reconciledAt",
+              "evidence"
+            ],
+            "properties": {
+              "nativeResponseAccepted": {
+                "const": true
+              },
+              "readbackMatched": {
+                "const": false
+              },
+              "retryAllowed": {
+                "const": false
+              },
+              "attemptCount": {
+                "const": 2
+              },
+              "attemptedAt": {
+                "$ref": "#/$defs/rfc3339"
+              },
+              "reconciledAt": {
+                "$ref": "#/$defs/rfc3339"
+              },
+              "evidence": {
+                "allOf": [
+                  {
+                    "$ref": "#/$defs/reviewRequestEvidence"
+                  },
+                  {
+                    "properties": {
+                      "requestEventMatched": {
+                        "const": false
+                      },
+                      "requestedReviewerMatched": {
+                        "const": false
+                      },
+                      "submittedReviewMatched": {
+                        "const": false
+                      },
+                      "reviewRunMatched": {
+                        "const": false
+                      },
+                      "readbackComplete": {
+                        "const": true
+                      }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
         {
           "if": {
             "properties": {

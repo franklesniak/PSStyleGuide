@@ -4,7 +4,9 @@ import test from 'node:test';
 import {
   MUTATION_CLASSES,
   classifyMutation,
+  collectCopilotRequestEvidence,
   collectCodexResults,
+  createReviewRequestSpec,
   createMetrics,
   createReviewInput,
   decideReviewRequest,
@@ -14,6 +16,7 @@ import {
   parseCompactStateJson,
   prunePredecessorOutputs,
   reconcilePublicMutation,
+  reconcileReviewRequestMutation,
   validateTransport,
 } from './review-loop-policy.mjs';
 
@@ -483,6 +486,126 @@ test('scenario 7: empty, singleton, and multiple collections normalize', () => {
   assert.deepEqual(normalizeCollection({ edges: [{ node: { id: 1 } }, { node: { id: 2 } }] }), [{ id: 1 }, { id: 2 }]);
 });
 
+test('Copilot REST requests use the exact documented reviewer identity', () => {
+  const spec = createReviewRequestSpec('copilot');
+  assert.deepEqual(spec, {
+    channel: 'copilot',
+    method: 'POST',
+    transport: 'rest-review-request',
+    reviewerLogin: 'copilot-pull-request-reviewer[bot]',
+    payload: {
+      reviewers: ['copilot-pull-request-reviewer[bot]'],
+    },
+  });
+  assert.ok(Object.isFrozen(spec));
+  assert.ok(Object.isFrozen(spec.payload));
+  assert.ok(Object.isFrozen(spec.payload.reviewers));
+  assert.throws(() => createReviewRequestSpec('Copilot'), /copilot or codex/u);
+  assert.throws(() => createReviewRequestSpec('copilot-pull-request-reviewer[bot]'), /copilot or codex/u);
+});
+
+test('Copilot request evidence normalizes cardinality and rejects the display name in a REST response', () => {
+  const common = {
+    baselineRequestEventIds: ['old-event'],
+    baselineReviewNodeIds: ['old-review'],
+    baselineReviewRunIds: ['old-run'],
+    expectedHead: HASHES.head1,
+    requestedAt: '2026-09-04T10:00:00Z',
+    readbackCompleteness: {
+      requestEvents: true,
+      requestedReviewers: true,
+      submittedReviews: true,
+      reviewRuns: true,
+    },
+  };
+  const empty = collectCopilotRequestEvidence({
+    ...common,
+    responseReviewers: { requested_reviewers: [] },
+    requestEvents: [],
+    requestedReviewers: { users: [] },
+    submittedReviews: { nodes: [] },
+    reviewRuns: [],
+  });
+  assert.deepEqual(empty, {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    readbackComplete: true,
+  });
+
+  const populated = collectCopilotRequestEvidence({
+    ...common,
+    responseReviewers: { requested_reviewers: [{ login: 'Copilot' }] },
+    requestEvents: [
+      {
+        id: 'old-event',
+        event: 'review_requested',
+        created_at: '2026-09-04T10:01:00Z',
+        requested_reviewer: { login: 'Copilot' },
+      },
+      {
+        id: 'new-event',
+        event: 'review_requested',
+        created_at: '2026-09-04T10:01:00Z',
+        requested_reviewer: { login: 'Copilot' },
+      },
+    ],
+    requestedReviewers: { users: [{ login: 'copilot-pull-request-reviewer[bot]' }] },
+    submittedReviews: {
+      nodes: [
+        {
+          nodeId: 'new-review',
+          author: { login: 'copilot-pull-request-reviewer' },
+          commitOid: HASHES.head1,
+          submittedAt: '2026-09-04T10:01:00Z',
+        },
+      ],
+    },
+    reviewRuns: [
+      {
+        id: 'new-run',
+        app: { slug: 'copilot-pull-request-reviewer' },
+        head_sha: HASHES.head1,
+        created_at: '2026-09-04T10:01:00Z',
+      },
+    ],
+  });
+  assert.deepEqual(populated, {
+    responseReviewerMatched: false,
+    requestEventMatched: true,
+    requestedReviewerMatched: true,
+    submittedReviewMatched: true,
+    reviewRunMatched: true,
+    readbackComplete: true,
+  });
+  assert.equal(
+    collectCopilotRequestEvidence({
+      ...common,
+      responseReviewers: {
+        requested_reviewers: [{ login: 'copilot-pull-request-reviewer[bot]' }],
+      },
+      requestEvents: [],
+      requestedReviewers: [],
+      submittedReviews: [],
+      reviewRuns: [],
+    }).responseReviewerMatched,
+    true,
+  );
+  assert.equal(
+    collectCopilotRequestEvidence({
+      ...common,
+      responseReviewers: [],
+      requestEvents: null,
+      requestedReviewers: [],
+      submittedReviews: [],
+      reviewRuns: [],
+    }).readbackComplete,
+    false,
+  );
+});
+
 test('scenario 8: Markdown backticks and Unicode survive and controls fail', () => {
   const payload = 'Use `git diff --check` for café and 雪.';
   assert.equal(validateTransport(payload), payload);
@@ -559,6 +682,85 @@ test('scenario 9: confirmed mutation plus local recording failure does not retry
   });
 });
 
+test('accepted review requests reconcile, prove no effect, retry once, and exhaust', () => {
+  const emptyEvidence = {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    readbackComplete: true,
+  };
+  const attemptedAt = '2026-09-04T10:00:00Z';
+  const reconciling = reconcileReviewRequestMutation({
+    response: { ok: true },
+    evidence: emptyEvidence,
+    attemptedAt,
+    observedAt: '2026-09-04T10:01:59Z',
+    attemptCount: 1,
+    localRecordSucceeded: true,
+  });
+  const noEffect = reconcileReviewRequestMutation({
+    response: { ok: true },
+    evidence: emptyEvidence,
+    attemptedAt,
+    observedAt: '2026-09-04T10:02:00Z',
+    attemptCount: 1,
+    localRecordSucceeded: true,
+  });
+  const exhausted = reconcileReviewRequestMutation({
+    response: { ok: true },
+    evidence: emptyEvidence,
+    attemptedAt,
+    observedAt: '2026-09-04T10:02:00Z',
+    attemptCount: 2,
+    localRecordSucceeded: true,
+  });
+  const confirmed = reconcileReviewRequestMutation({
+    response: { ok: true },
+    evidence: { ...emptyEvidence, requestEventMatched: true },
+    attemptedAt,
+    observedAt: '2026-09-04T10:00:01Z',
+    attemptCount: 1,
+    localRecordSucceeded: false,
+  });
+  const contradictory = reconcileReviewRequestMutation({
+    response: { ok: true, executed: false },
+    evidence: { ...emptyEvidence, requestEventMatched: true },
+    attemptedAt,
+    observedAt: '2026-09-04T10:00:01Z',
+    attemptCount: 1,
+    localRecordSucceeded: true,
+  });
+
+  assert.equal(reconciling.state, 'RECONCILING');
+  assert.equal(reconciling.retryAllowed, false);
+  assert.equal(reconciling.reconciledAt, null);
+  assert.equal(noEffect.state, 'NO_EFFECT');
+  assert.equal(noEffect.retryAllowed, true);
+  assert.equal(noEffect.attemptCount, 1);
+  assert.equal(exhausted.state, 'EXHAUSTED');
+  assert.equal(exhausted.retryAllowed, false);
+  assert.equal(exhausted.attemptCount, 2);
+  assert.equal(confirmed.state, 'CONFIRMED');
+  assert.equal(confirmed.readbackMatched, true);
+  assert.equal(confirmed.retryAllowed, false);
+  assert.equal(confirmed.localRecordSucceeded, false);
+  assert.equal(contradictory.state, 'AMBIGUOUS');
+  assert.equal(contradictory.retryAllowed, false);
+  assert.throws(
+    () => reconcileReviewRequestMutation({
+      response: { ok: true },
+      evidence: emptyEvidence,
+      attemptedAt,
+      observedAt: '2026-09-04T10:02:00Z',
+      attemptCount: 3,
+      localRecordSucceeded: true,
+    }),
+    /one or two/u,
+  );
+});
+
 test('all permanent active task-template and controller surfaces use the compact contract', async () => {
   const planningRoot = new URL('./', import.meta.url);
   const plan = await readFile(new URL('action-items-2026-08-30.md', planningRoot), 'utf8');
@@ -599,10 +801,21 @@ test('all permanent active task-template and controller surfaces use the compact
   for (const task of reviewTasks) {
     assert.match(task.body, /### Reviewer-input and mutation-materiality controls/u);
     assert.match(task.body, /MATERIAL_SCOPE_BEHAVIOR_RISK/u);
-    assert.match(task.body, /Reject a same-head request/u);
+    assert.match(task.body, /Reject (?:a |any other )?same-head request/u);
     assert.match(task.body, /submitted-review/u);
     assert.match(task.body, /PR-conversation-comment/u);
     assert.match(task.body, /local serialization fails/u);
+    assert.match(task.body, /copilot-pull-request-reviewer\[bot\]/u);
+    assert.match(task.body, /display name `Copilot`/u);
+    assert.match(
+      task.body,
+      /(?:Generate the Copilot REST request|Generate the GitHub Copilot(?: review)? request) from the typed policy specification/u,
+    );
+    assert.match(task.body, /`RECONCILING`/u);
+    assert.match(task.body, /`NO_EFFECT`/u);
+    assert.match(task.body, /`EXHAUSTED`/u);
+    assert.match(task.body, /at least 120 seconds/u);
+    assert.match(task.body, /Do not (?:send|post)[^\n]*(?:Codex trigger|@codex review)/u);
     assert.doesNotMatch(
       task.body,
       /result for the round only when it is newer than the applicable baseline and is explicitly anchored to the recorded PR head SHA/u,
@@ -634,6 +847,8 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(parent, /Compact state machine/u);
   assert.match(parent, /MATERIAL_SCOPE_BEHAVIOR_RISK/u);
   assert.match(parent, /no-safe-work human boundary -> waiting_human/u);
+  assert.match(parent, /copilot-pull-request-reviewer\[bot\]/u);
+  assert.match(parent, /A second proved no-effect attempt is `EXHAUSTED`/u);
   assert.doesNotMatch(parent, /any nonterminal state -> waiting_human/u);
   assert.match(alternate, /without model routing/u);
   assert.match(alternate, /Do not create manifest/u);
@@ -643,11 +858,15 @@ test('all permanent active task-template and controller surfaces use the compact
     /Use `waiting_human` only when the next concrete action needs one exact human decision or exceptional action and no independent safe in-scope work remains\./u,
   );
   assert.doesNotMatch(alternate, /any nonterminal state -> waiting_human/u);
+  assert.match(alternate, /copilot-pull-request-reviewer\[bot\]/u);
+  assert.match(alternate, /A second proved no-effect attempt is `EXHAUSTED`/u);
   assert.match(generator, /Do not split routine work/u);
   assert.match(generator, /Default to one reviewer pair/u);
   assert.match(generator, /immutable predecessor outputs/u);
   assert.match(generator, /typed `SUPERSEDED` disposition/u);
   assert.match(generator, /headless Codex PR-conversation result/u);
+  assert.match(generator, /copilot-pull-request-reviewer\[bot\]/u);
+  assert.match(generator, /a second proved no-effect attempt is `EXHAUSTED`/iu);
   const task15 = tasks.find((task) => task.number === 15);
   assert.notEqual(task15, undefined);
   assert.match(task15.body, /Continue implementation, CI repair, review, and readiness work/u);
@@ -655,6 +874,8 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(crossRepository, /applicable `AGENTS\.md`/u);
   assert.match(crossRepository, /root `CLAUDE\.md` as compatibility workflow instructions/u);
   assert.match(crossRepository, /Preserve both submitted-review objects/u);
+  assert.match(crossRepository, /copilot-pull-request-reviewer\[bot\]/u);
+  assert.match(crossRepository, /`RECONCILING` → `NO_EFFECT` → one-retry → `EXHAUSTED`/u);
 });
 
 test('safety failures reject false classes, duplicate requests, and unattributable comments', () => {
@@ -927,6 +1148,17 @@ function resolveSchemaReference(definition, root) {
 
 function assertSchemaValid(value, definition, root, location = '$') {
   const resolved = resolveSchemaReference(definition, root);
+  if (resolved.anyOf !== undefined) {
+    const matches = resolved.anyOf.some((candidate) => {
+      try {
+        assertSchemaValid(value, candidate, root, location);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+    assert.ok(matches, `${location} does not match any allowed schema.`);
+  }
   const allowedTypes = Array.isArray(resolved.type) ? resolved.type : [resolved.type];
   const matchesType = (type) => {
     if (type === undefined) return true;
@@ -1006,6 +1238,10 @@ function assertSchemaValid(value, definition, root, location = '$') {
     }
   }
   for (const condition of resolved.allOf ?? []) {
+    if (condition.if === undefined) {
+      assertSchemaValid(value, condition, root, location);
+      continue;
+    }
     let conditionMatches = true;
     try {
       assertSchemaValid(value, condition.if, root, location);
@@ -1123,6 +1359,43 @@ test('public-mutation schema rejects every contradictory persisted state', async
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
   );
+  const negativeEvidence = {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    readbackComplete: true,
+  };
+  const reviewMutationBase = {
+    response: { ok: true },
+    evidence: negativeEvidence,
+    attemptedAt: '2026-09-04T10:00:00Z',
+    localRecordSucceeded: true,
+  };
+  const reviewMutations = [
+    reconcileReviewRequestMutation({
+      ...reviewMutationBase,
+      observedAt: '2026-09-04T10:01:00Z',
+      attemptCount: 1,
+    }),
+    reconcileReviewRequestMutation({
+      ...reviewMutationBase,
+      observedAt: '2026-09-04T10:02:00Z',
+      attemptCount: 1,
+    }),
+    reconcileReviewRequestMutation({
+      ...reviewMutationBase,
+      observedAt: '2026-09-04T10:02:00Z',
+      attemptCount: 2,
+    }),
+    reconcileReviewRequestMutation({
+      ...reviewMutationBase,
+      evidence: { ...negativeEvidence, submittedReviewMatched: true },
+      observedAt: '2026-09-04T10:00:01Z',
+      attemptCount: 1,
+    }),
+  ];
   const valid = [
     state(reviewInput()).publicMutation,
     reconcilePublicMutation({
@@ -1137,6 +1410,7 @@ test('public-mutation schema rejects every contradictory persisted state', async
       expected: { id: 1 },
       localRecordSucceeded: true,
     }),
+    ...reviewMutations,
     reconcilePublicMutation({
       response: { executed: false },
       readback: { id: 1 },
@@ -1163,8 +1437,22 @@ test('public-mutation schema rejects every contradictory persisted state', async
     { ...valid[1], retryAllowed: true },
     { ...valid[2], nativeResponseAccepted: true },
     { ...valid[2], retryAllowed: false },
-    { ...valid[3], retryAllowed: true },
-    { ...valid[4], retryAllowed: true },
+    { ...valid[7], retryAllowed: true },
+    { ...valid[8], retryAllowed: true },
+    { ...reviewMutations[0], reconciledAt: '2026-09-04T10:01:00Z' },
+    {
+      ...reviewMutations[0],
+      evidence: { ...reviewMutations[0].evidence, requestEventMatched: true },
+    },
+    { ...reviewMutations[1], attemptCount: 2 },
+    { ...reviewMutations[1], readbackMatched: true },
+    {
+      ...reviewMutations[1],
+      evidence: { ...reviewMutations[1].evidence, requestEventMatched: true },
+    },
+    { ...reviewMutations[2], attemptCount: 1 },
+    { ...reviewMutations[2], retryAllowed: true },
+    { ...reviewMutations[2], evidence: undefined },
   ];
   for (const mutation of contradictory) {
     assert.throws(

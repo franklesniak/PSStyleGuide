@@ -8,6 +8,26 @@ export const MUTATION_CLASSES = Object.freeze([
   'COMMENT_ONLY',
 ]);
 
+export const REVIEW_REQUEST_SPECS = Object.freeze({
+  copilot: Object.freeze({
+    channel: 'copilot',
+    method: 'POST',
+    transport: 'rest-review-request',
+    reviewerLogin: 'copilot-pull-request-reviewer[bot]',
+    payload: Object.freeze({
+      reviewers: Object.freeze(['copilot-pull-request-reviewer[bot]']),
+    }),
+  }),
+  codex: Object.freeze({
+    body: '@codex review',
+    channel: 'codex',
+    method: 'POST',
+    transport: 'rest-issue-comment',
+  }),
+});
+
+export const REVIEW_REQUEST_RECONCILIATION_MILLISECONDS = 120_000;
+
 const SHA1_PATTERN = /^[0-9a-f]{40}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 const PREDECESSOR_TASK_PATTERN = /^[1-9]\d{0,2}$/u;
@@ -109,6 +129,24 @@ export function normalizeCollection(value) {
   }
 
   return [value];
+}
+
+export function createReviewRequestSpec(channel) {
+  const spec = REVIEW_REQUEST_SPECS[channel];
+  if (spec === undefined) {
+    throw new TypeError('Review channel must be copilot or codex.');
+  }
+
+  if (channel === 'copilot') {
+    return Object.freeze({
+      ...spec,
+      payload: Object.freeze({
+        reviewers: Object.freeze([...spec.payload.reviewers]),
+      }),
+    });
+  }
+
+  return Object.freeze({ ...spec });
 }
 
 export function validateTransport(value) {
@@ -651,6 +689,140 @@ function getItemTime(item, fields) {
   return null;
 }
 
+function isCopilotIdentity(login, { allowDisplayName = true } = {}) {
+  const normalized = normalizeActorLogin(login);
+  return normalized === 'copilot-pull-request-reviewer' ||
+    (allowDisplayName && normalized === 'copilot');
+}
+
+function getReviewerCollection(value) {
+  if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+    if (Object.hasOwn(value, 'requested_reviewers')) {
+      return normalizeCollection(value.requested_reviewers);
+    }
+    if (Object.hasOwn(value, 'users')) {
+      return normalizeCollection(value.users);
+    }
+  }
+
+  return normalizeCollection(value);
+}
+
+export function collectCopilotRequestEvidence({
+  responseReviewers,
+  requestEvents,
+  requestedReviewers,
+  submittedReviews,
+  reviewRuns,
+  baselineRequestEventIds = [],
+  baselineReviewNodeIds = [],
+  baselineReviewRunIds = [],
+  expectedHead,
+  requestedAt,
+  readbackCompleteness,
+}) {
+  if (typeof expectedHead !== 'string' || !SHA1_PATTERN.test(expectedHead)) {
+    throw new TypeError('The expected review-request head is invalid.');
+  }
+  const requestTime = parseRfc3339Timestamp(requestedAt, 'requestedAt');
+  const baselineSets = [
+    ['request event', baselineRequestEventIds],
+    ['review', baselineReviewNodeIds],
+    ['review run', baselineReviewRunIds],
+  ];
+  for (const [label, values] of baselineSets) {
+    if (
+      !Array.isArray(values) ||
+      values.some((value) => typeof value !== 'string' || value.length === 0) ||
+      new Set(values).size !== values.length
+    ) {
+      throw new TypeError(`The ${label} baseline must contain unique identities.`);
+    }
+  }
+  const completenessKeys = [
+    'requestEvents',
+    'requestedReviewers',
+    'submittedReviews',
+    'reviewRuns',
+  ];
+  if (
+    readbackCompleteness === null ||
+    typeof readbackCompleteness !== 'object' ||
+    Array.isArray(readbackCompleteness) ||
+    Object.keys(readbackCompleteness).length !== completenessKeys.length ||
+    completenessKeys.some((key) => typeof readbackCompleteness[key] !== 'boolean')
+  ) {
+    throw new TypeError('Review-request readback completeness is malformed.');
+  }
+  const readbackCollections = {
+    requestEvents,
+    requestedReviewers,
+    submittedReviews,
+    reviewRuns,
+  };
+  const readbackComplete = completenessKeys.every(
+    (key) => readbackCompleteness[key] &&
+      readbackCollections[key] !== undefined &&
+      readbackCollections[key] !== null,
+  );
+  const eventBaselines = new Set(baselineRequestEventIds);
+  const reviewBaselines = new Set(baselineReviewNodeIds);
+  const runBaselines = new Set(baselineReviewRunIds);
+
+  const responseReviewerMatched = getReviewerCollection(responseReviewers).some(
+    (reviewer) => isCopilotIdentity(getActorLogin(reviewer) ?? reviewer?.login, {
+      allowDisplayName: false,
+    }),
+  );
+  const requestEventMatched = normalizeCollection(requestEvents).some((event) => {
+    const id = getItemId(event);
+    const createdAt = getItemTime(event, ['created_at', 'createdAt']);
+    const reviewerLogin = event?.requested_reviewer?.login ??
+      event?.requestedReviewer?.login;
+    return event?.event === 'review_requested' &&
+      id !== null &&
+      !eventBaselines.has(id) &&
+      createdAt !== null &&
+      createdAt >= requestTime &&
+      isCopilotIdentity(reviewerLogin);
+  });
+  const requestedReviewerMatched = getReviewerCollection(requestedReviewers).some(
+    (reviewer) => isCopilotIdentity(getActorLogin(reviewer) ?? reviewer?.login),
+  );
+  const submittedReviewMatched = normalizeCollection(submittedReviews).some((review) => {
+    const id = getItemId(review);
+    const submittedAt = getItemTime(review, ['submitted_at', 'submittedAt']);
+    return id !== null &&
+      !reviewBaselines.has(id) &&
+      submittedAt !== null &&
+      submittedAt >= requestTime &&
+      getCommitOid(review) === expectedHead &&
+      isCopilotIdentity(getActorLogin(review));
+  });
+  const reviewRunMatched = normalizeCollection(reviewRuns).some((run) => {
+    const id = getItemId(run);
+    const createdAt = getItemTime(run, ['created_at', 'createdAt', 'run_started_at', 'runStartedAt']);
+    const head = run?.head_sha ?? run?.headSha ?? run?.headCommit?.oid;
+    const actor = run?.app?.slug ?? run?.app?.name ?? run?.actor?.login;
+    const name = run?.name ?? run?.display_title ?? run?.displayTitle ?? '';
+    return id !== null &&
+      !runBaselines.has(id) &&
+      createdAt !== null &&
+      createdAt >= requestTime &&
+      head === expectedHead &&
+      (isCopilotIdentity(actor) || /copilot.*code review/iu.test(name));
+  });
+
+  return Object.freeze({
+    responseReviewerMatched,
+    requestEventMatched,
+    requestedReviewerMatched,
+    submittedReviewMatched,
+    reviewRunMatched,
+    readbackComplete,
+  });
+}
+
 function isReviewRequestRecord(request) {
   const reviewBaselinesAreValid = Array.isArray(request?.baselineReviewNodeIds) &&
     request.baselineReviewNodeIds.every((id) => typeof id === 'string' && id.length > 0) &&
@@ -775,6 +947,115 @@ export function collectCodexResults({
   return Object.freeze({
     submittedReviews: reviews,
     conversationComments: comments,
+  });
+}
+
+export function reconcileReviewRequestMutation({
+  response,
+  evidence,
+  attemptedAt,
+  observedAt,
+  attemptCount,
+  localRecordSucceeded,
+  minimumWaitMilliseconds = REVIEW_REQUEST_RECONCILIATION_MILLISECONDS,
+}) {
+  const evidenceKeys = [
+    'responseReviewerMatched',
+    'requestEventMatched',
+    'requestedReviewerMatched',
+    'submittedReviewMatched',
+    'reviewRunMatched',
+    'readbackComplete',
+  ];
+  if (
+    evidence === null ||
+    typeof evidence !== 'object' ||
+    Array.isArray(evidence) ||
+    Object.keys(evidence).length !== evidenceKeys.length ||
+    evidenceKeys.some((key) => typeof evidence[key] !== 'boolean')
+  ) {
+    throw new TypeError('Review-request evidence is malformed.');
+  }
+  if (!Number.isInteger(attemptCount) || attemptCount < 1 || attemptCount > 2) {
+    throw new TypeError('Review-request attempt count must be one or two.');
+  }
+  if (
+    !Number.isInteger(minimumWaitMilliseconds) ||
+    minimumWaitMilliseconds < REVIEW_REQUEST_RECONCILIATION_MILLISECONDS
+  ) {
+    throw new TypeError('The review-request reconciliation wait is too short.');
+  }
+  const attemptedTime = parseRfc3339Timestamp(attemptedAt, 'attemptedAt');
+  const observedTime = parseRfc3339Timestamp(observedAt, 'observedAt');
+  if (observedTime < attemptedTime) {
+    throw new TypeError('Review-request observation precedes the attempt.');
+  }
+
+  const nativeResponseAccepted = response?.ok === true;
+  const durableMatch = evidence.requestEventMatched ||
+    evidence.requestedReviewerMatched ||
+    evidence.submittedReviewMatched ||
+    evidence.reviewRunMatched;
+  const baseRecord = {
+    nativeResponseAccepted,
+    readbackMatched: durableMatch,
+    localRecordSucceeded: Boolean(localRecordSucceeded),
+    attemptCount,
+    attemptedAt,
+    reconciledAt: null,
+    evidence: Object.freeze({ ...evidence }),
+  };
+
+  if (response?.executed === false && nativeResponseAccepted) {
+    return Object.freeze({
+      ...baseRecord,
+      state: 'AMBIGUOUS',
+      retryAllowed: false,
+      reconciledAt: observedAt,
+    });
+  }
+
+  if (durableMatch) {
+    return Object.freeze({
+      ...baseRecord,
+      state: nativeResponseAccepted ? 'CONFIRMED' : 'AMBIGUOUS',
+      retryAllowed: false,
+      reconciledAt: observedAt,
+    });
+  }
+
+  if (response?.executed === false && !nativeResponseAccepted) {
+    return Object.freeze({
+      ...baseRecord,
+      state: 'NOT_EXECUTED',
+      retryAllowed: true,
+      reconciledAt: observedAt,
+    });
+  }
+
+  if (!nativeResponseAccepted) {
+    return Object.freeze({
+      ...baseRecord,
+      state: 'AMBIGUOUS',
+      retryAllowed: false,
+      reconciledAt: observedAt,
+    });
+  }
+
+  const waitSatisfied = observedTime - attemptedTime >= minimumWaitMilliseconds;
+  if (!evidence.readbackComplete || !waitSatisfied) {
+    return Object.freeze({
+      ...baseRecord,
+      state: 'RECONCILING',
+      retryAllowed: false,
+    });
+  }
+
+  return Object.freeze({
+    ...baseRecord,
+    state: attemptCount === 1 ? 'NO_EFFECT' : 'EXHAUSTED',
+    retryAllowed: attemptCount === 1,
+    reconciledAt: observedAt,
   });
 }
 
