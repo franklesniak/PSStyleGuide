@@ -844,6 +844,9 @@
       "properties": {
         "reviewerRequestsPerHead": {
           "type": "object",
+          "propertyNames": {
+            "$ref": "#/$defs/sha1"
+          },
           "additionalProperties": {
             "type": "integer",
             "minimum": 0

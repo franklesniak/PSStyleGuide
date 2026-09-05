@@ -1254,7 +1254,8 @@ export function createMetrics({
   mergedAt,
 }) {
   const requestsPerHead = {};
-  for (const request of normalizeCollection(reviewRequests)) {
+  for (const [index, request] of normalizeCollection(reviewRequests).entries()) {
+    assertHash(request?.head, SHA1_PATTERN, `reviewRequests[${index}].head`);
     requestsPerHead[request.head] = (requestsPerHead[request.head] ?? 0) + 1;
   }
 

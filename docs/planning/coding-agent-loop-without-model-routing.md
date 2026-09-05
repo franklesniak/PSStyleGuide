@@ -96,7 +96,7 @@ For each numbered task:
 
 1. Read the exact task and active dependencies. Do not load all completed task bodies.
 2. Confirm the actual completion condition for each predecessor. Query live state only when it is mutable.
-3. Read applicable repository instructions.
+3. Locate and obey the applicable `AGENTS.md`. If no `AGENTS.md` applies, read the repository root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor.
 4. Classify the task at R0, R1, R2, or R3 and update compact state.
 5. Inspect only repositories, refs, issues, PRs, checks, reviews, settings, and paths that can affect the task.
 6. Give one executor the objective, repository, branch, base, allowed scope, risk tier, known findings, validation, and completion test.

@@ -111,7 +111,7 @@ For each numbered task:
 
 1. Read the exact task and its active dependencies. Do not load all completed task bodies.
 2. Confirm each predecessor's actual completion condition. Use live state only when the condition is mutable.
-3. Read the applicable repository instructions.
+3. Locate and obey the applicable `AGENTS.md`. If no `AGENTS.md` applies, read the repository root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor.
 4. Classify the task as R0, R1, R2, or R3. Record the tier in compact state.
 5. Inspect only the repositories, refs, issues, PRs, checks, reviews, settings, and paths that can affect this task.
 6. Select the executor. Use `model-routing-advisor` once for a new coding task or a genuine capability-driven reroute. Do not create an activation receipt.

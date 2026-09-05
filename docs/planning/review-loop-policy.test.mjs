@@ -1172,6 +1172,11 @@ test('all permanent active task-template and controller surfaces use the compact
     parent,
     /confirmed or is terminally proved non-functional under the repository's reviewer-unavailability instructions/u,
   );
+  assert.match(parent, /Locate and obey the applicable `AGENTS\.md`/u);
+  assert.match(
+    parent,
+    /If no `AGENTS\.md` applies, read the repository root `CLAUDE\.md` as compatibility workflow instructions; the filename does not change the executor/u,
+  );
   assert.doesNotMatch(parent, /any nonterminal state -> waiting_human/u);
   assert.match(alternate, /without model routing/u);
   assert.match(alternate, /Do not create manifest/u);
@@ -1191,6 +1196,11 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(
     alternate,
     /confirmed or is terminally proved non-functional under the repository's reviewer-unavailability instructions/u,
+  );
+  assert.match(alternate, /Locate and obey the applicable `AGENTS\.md`/u);
+  assert.match(
+    alternate,
+    /If no `AGENTS\.md` applies, read the repository root `CLAUDE\.md` as compatibility workflow instructions; the filename does not change the executor/u,
   );
   assert.match(generator, /Do not split routine work/u);
   assert.match(generator, /Default to one reviewer pair/u);
@@ -1926,6 +1936,14 @@ test('typed schema, metrics, and 10/15-minute controls remain complete', async (
   assert.equal(metrics.bodyEditsAfterReviewBegan, 1);
   assert.equal(metrics.cleanReviewRecognitionMilliseconds, 5_000);
   assert.equal(metrics.cleanPairToMergeMilliseconds, 120_000);
+  const invalidPersistedMetric = compactState(reviewInput());
+  invalidPersistedMetric.current_task.review.metrics.reviewerRequestsPerHead = {
+    undefined: 1,
+  };
+  assert.throws(
+    () => assertSchemaValid(invalidPersistedMetric, schema, schema),
+    /does not match/u,
+  );
   assert.deepEqual(evaluateFindingBudget({ elapsedMinutes: 10, hasOutcome: false }), {
     warningRequired: true,
     exceptionRequired: false,
@@ -1955,6 +1973,24 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
     cleanReviewRecognitionMilliseconds: null,
     cleanPairToMergeMilliseconds: null,
   });
+  for (const malformedRequest of [
+    null,
+    {},
+    'unexpected',
+    { head: null },
+    { head: 'deadbeef' },
+    { head: 'A'.repeat(40) },
+    { head: 'a'.repeat(39) },
+    { head: 'a'.repeat(41) },
+  ]) {
+    assert.throws(
+      () => createMetrics({
+        ...valid,
+        reviewRequests: [malformedRequest],
+      }),
+      /reviewRequests\[0\]\.head has an invalid hash/u,
+    );
+  }
   assert.throws(
     () => createMetrics({ ...valid, reviewBeganAt: 'not-a-date' }),
     /reviewBeganAt must be a valid timestamp/u,
