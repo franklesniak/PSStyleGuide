@@ -8,6 +8,7 @@
     "schema",
     "plan",
     "current_task",
+    "predecessor_outputs",
     "completed",
     "updated_utc"
   ],
@@ -20,6 +21,9 @@
     },
     "current_task": {
       "$ref": "#/$defs/taskState"
+    },
+    "predecessor_outputs": {
+      "$ref": "#/$defs/predecessorOutputs"
     },
     "completed": {
       "type": "array",
@@ -123,6 +127,7 @@
         "reviewInput",
         "mutationClass",
         "reviewRequests",
+        "supersededReviewInputs",
         "copilotResults",
         "codexResults",
         "publicMutation",
@@ -150,6 +155,9 @@
           "items": {
             "$ref": "#/$defs/reviewRequest"
           }
+        },
+        "supersededReviewInputs": {
+          "$ref": "#/$defs/supersededReviewInputs"
         },
         "copilotResults": {
           "$ref": "#/$defs/reviewerResults"
@@ -316,27 +324,57 @@
           "uniqueItems": true
         },
         "baselineConversationComments": {
-          "type": "array",
-          "items": {
-            "$ref": "#/$defs/commentBaseline"
-          }
+          "$ref": "#/$defs/commentBaselines"
         }
       }
     },
-    "commentBaseline": {
+    "commentBaselines": {
+      "type": "object",
+      "maxProperties": 10000,
+      "propertyNames": {
+        "minLength": 1,
+        "maxLength": 256
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/rfc3339"
+      }
+    },
+    "supersededReviewInputs": {
+      "type": "object",
+      "maxProperties": 64,
+      "propertyNames": {
+        "$ref": "#/$defs/sha256"
+      },
+      "additionalProperties": {
+        "$ref": "#/$defs/supersededReviewInput"
+      }
+    },
+    "supersededReviewInput": {
       "type": "object",
       "additionalProperties": false,
       "required": [
-        "nodeId",
-        "updatedAt"
+        "state",
+        "head",
+        "successorHead",
+        "supersededAt",
+        "reason"
       ],
       "properties": {
-        "nodeId": {
+        "state": {
+          "const": "SUPERSEDED"
+        },
+        "head": {
+          "$ref": "#/$defs/sha1"
+        },
+        "successorHead": {
+          "$ref": "#/$defs/sha1"
+        },
+        "supersededAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "reason": {
           "type": "string",
           "minLength": 1
-        },
-        "updatedAt": {
-          "$ref": "#/$defs/rfc3339"
         }
       }
     },
@@ -370,6 +408,154 @@
         },
         "localRecordSucceeded": {
           "type": "boolean"
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "NOT_ATTEMPTED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "nativeResponseAccepted": {
+                "const": false
+              },
+              "readbackMatched": {
+                "const": false
+              },
+              "retryAllowed": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "CONFIRMED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "nativeResponseAccepted": {
+                "const": true
+              },
+              "readbackMatched": {
+                "const": true
+              },
+              "retryAllowed": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "AMBIGUOUS"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "retryAllowed": {
+                "const": false
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "state": {
+                "const": "NOT_EXECUTED"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "nativeResponseAccepted": {
+                "const": false
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "properties": {
+                    "readbackMatched": {
+                      "const": true
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "retryAllowed": {
+                      "const": false
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "properties": {
+                    "readbackMatched": {
+                      "const": false
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "retryAllowed": {
+                      "const": true
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "predecessorOutputs": {
+      "type": "object",
+      "maxProperties": 64,
+      "propertyNames": {
+        "pattern": "^[1-9][0-9]{0,2}$"
+      },
+      "patternProperties": {
+        "^[1-9][0-9]{0,2}$": {
+          "type": "object",
+          "maxProperties": 64,
+          "propertyNames": {
+            "pattern": "^[A-Z][A-Z0-9_]{0,127}$"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/predecessorOutput"
+          }
+        }
+      },
+      "additionalProperties": false
+    },
+    "predecessorOutput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "value",
+        "last_consumer_task"
+      ],
+      "properties": {
+        "value": {},
+        "last_consumer_task": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 999
         }
       }
     },

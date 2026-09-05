@@ -115,6 +115,8 @@ Apply ASD-STE100 principles to all human-executed and non-executable tracking or
 
 Create one compact shared section for state transitions, risk tiers, standing authority, remote-write preconditions, result separation, review-input classification, validation reuse, failure handling, and on-plan merge readiness. Do not create shared sections that hide task-specific product scope, security conditions, decision inputs, or completion predicates.
 
+The compact resume state must retain only immutable predecessor outputs that a later task still needs. Key each value by producing task and exact output name, record its final consumer, and prune it after that consumer completes. Use closed bounded maps and reject duplicate JSON members during ingestion.
+
 Keep these items task-local:
 
 - issue or product requirements;
@@ -140,6 +142,8 @@ For every existing or future implementation PR covered by the plan, preserve the
 5. merge only after both gates apply to the same final head, tree, and frozen semantics;
 6. landed-commit handoff and cross-repository comparison or proved non-applicability; and
 7. any required reciprocal implementation and the final fixed-point closure.
+
+Serialize pairs for different reviewed inputs. If authenticated head drift makes an unrequested old-head channel impossible, store one typed `SUPERSEDED` disposition; do not create synthetic evidence. Require a submitted review's commit to match the reviewed head. Attribute a headless Codex PR-conversation result only through authenticated author, request time, baseline exclusion, reviewed-input key, and serialized predecessor-pair order. Store conversation baselines as a node-ID-to-timestamp map.
 
 Each applicable review-loop and quality task must retain current-head reviewer evidence, complete relevant pagination, unfinished-work and deferral audits, issue-requirement verification, PR-description verification, dependency verification, validation, and prohibition on premature merge.
 

@@ -10,6 +10,8 @@ export const MUTATION_CLASSES = Object.freeze([
 
 const SHA1_PATTERN = /^[0-9a-f]{40}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
+const PREDECESSOR_TASK_PATTERN = /^[1-9]\d{0,2}$/u;
+const PREDECESSOR_OUTPUT_PATTERN = /^[A-Z][A-Z0-9_]{0,127}$/u;
 const DISALLOWED_CONTROL_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/u;
 const RFC3339_PATTERN = /^(?<year>\d{4})-(?<month>0[1-9]|1[0-2])-(?<day>0[1-9]|[12]\d|3[01])[Tt](?<hour>[01]\d|2[0-3]):(?<minute>[0-5]\d):(?<second>[0-5]\d)(?:\.\d+)?(?<zone>[Zz]|(?<offsetSign>[+-])(?<offsetHour>0\d|1[0-4]):(?<offsetMinute>[0-5]\d))$/u;
 
@@ -121,6 +123,198 @@ export function validateTransport(value) {
   return value;
 }
 
+function scanJsonWithoutDuplicateMembers(text) {
+  let cursor = 0;
+  const whitespace = /\s/u;
+  const numberPattern = /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/uy;
+
+  const skipWhitespace = () => {
+    while (cursor < text.length && whitespace.test(text[cursor])) {
+      cursor += 1;
+    }
+  };
+
+  const readString = () => {
+    const start = cursor;
+    cursor += 1;
+    while (cursor < text.length) {
+      const character = text[cursor];
+      if (character === '"') {
+        cursor += 1;
+        return JSON.parse(text.slice(start, cursor));
+      }
+      if (character === '\\') {
+        cursor += 1;
+        if (text[cursor] === 'u') {
+          cursor += 5;
+        } else {
+          cursor += 1;
+        }
+        continue;
+      }
+      if (character.charCodeAt(0) < 0x20) {
+        throw new SyntaxError('JSON string contains an unescaped control character.');
+      }
+      cursor += 1;
+    }
+    throw new SyntaxError('JSON string is not terminated.');
+  };
+
+  const readValue = () => {
+    skipWhitespace();
+    const character = text[cursor];
+    if (character === '{') {
+      cursor += 1;
+      skipWhitespace();
+      const keys = new Set();
+      if (text[cursor] === '}') {
+        cursor += 1;
+        return;
+      }
+      while (cursor < text.length) {
+        if (text[cursor] !== '"') {
+          throw new SyntaxError('JSON object member name must be a string.');
+        }
+        const key = readString();
+        if (keys.has(key)) {
+          throw new SyntaxError(`JSON object contains duplicate member ${JSON.stringify(key)}.`);
+        }
+        keys.add(key);
+        skipWhitespace();
+        if (text[cursor] !== ':') {
+          throw new SyntaxError('JSON object member is missing a colon.');
+        }
+        cursor += 1;
+        readValue();
+        skipWhitespace();
+        if (text[cursor] === '}') {
+          cursor += 1;
+          return;
+        }
+        if (text[cursor] !== ',') {
+          throw new SyntaxError('JSON object members must be comma separated.');
+        }
+        cursor += 1;
+        skipWhitespace();
+      }
+      throw new SyntaxError('JSON object is not terminated.');
+    }
+    if (character === '[') {
+      cursor += 1;
+      skipWhitespace();
+      if (text[cursor] === ']') {
+        cursor += 1;
+        return;
+      }
+      while (cursor < text.length) {
+        readValue();
+        skipWhitespace();
+        if (text[cursor] === ']') {
+          cursor += 1;
+          return;
+        }
+        if (text[cursor] !== ',') {
+          throw new SyntaxError('JSON array items must be comma separated.');
+        }
+        cursor += 1;
+      }
+      throw new SyntaxError('JSON array is not terminated.');
+    }
+    if (character === '"') {
+      readString();
+      return;
+    }
+    for (const literal of ['true', 'false', 'null']) {
+      if (text.startsWith(literal, cursor)) {
+        cursor += literal.length;
+        return;
+      }
+    }
+    numberPattern.lastIndex = cursor;
+    const number = numberPattern.exec(text);
+    if (number !== null) {
+      cursor = numberPattern.lastIndex;
+      return;
+    }
+    throw new SyntaxError('JSON contains an invalid value.');
+  };
+
+  readValue();
+  skipWhitespace();
+  if (cursor !== text.length) {
+    throw new SyntaxError('JSON contains trailing content.');
+  }
+}
+
+export function parseCompactStateJson(text) {
+  validateTransport(text);
+  scanJsonWithoutDuplicateMembers(text);
+  return JSON.parse(text);
+}
+
+function validatePredecessorOutputs(predecessorOutputs) {
+  if (
+    predecessorOutputs === null ||
+    typeof predecessorOutputs !== 'object' ||
+    Array.isArray(predecessorOutputs) ||
+    Object.keys(predecessorOutputs).length > 64
+  ) {
+    throw new TypeError('predecessorOutputs must be a bounded task-output map.');
+  }
+
+  for (const [task, outputs] of Object.entries(predecessorOutputs)) {
+    const taskNumber = Number.parseInt(task, 10);
+    if (
+      !PREDECESSOR_TASK_PATTERN.test(task) ||
+      outputs === null ||
+      typeof outputs !== 'object' ||
+      Array.isArray(outputs) ||
+      Object.keys(outputs).length > 64
+    ) {
+      throw new TypeError('Each predecessor task must contain a bounded output map.');
+    }
+    for (const [name, record] of Object.entries(outputs)) {
+      if (
+        !PREDECESSOR_OUTPUT_PATTERN.test(name) ||
+        record === null ||
+        typeof record !== 'object' ||
+        Array.isArray(record) ||
+        Object.keys(record).length !== 2 ||
+        !Object.hasOwn(record, 'value') ||
+        !Number.isInteger(record.last_consumer_task) ||
+        record.last_consumer_task <= taskNumber ||
+        record.last_consumer_task > 999
+      ) {
+        throw new TypeError('A predecessor output record is malformed.');
+      }
+      const serialized = JSON.stringify(record.value);
+      if (serialized === undefined || serialized.length > 65_536) {
+        throw new TypeError('A predecessor output value is not bounded JSON.');
+      }
+    }
+  }
+}
+
+export function prunePredecessorOutputs(predecessorOutputs, completedTaskNumber) {
+  if (!Number.isInteger(completedTaskNumber) || completedTaskNumber < 1) {
+    throw new TypeError('completedTaskNumber must be a positive integer.');
+  }
+  validatePredecessorOutputs(predecessorOutputs);
+
+  const retained = {};
+  for (const [task, outputs] of Object.entries(predecessorOutputs)) {
+    const retainedOutputs = Object.fromEntries(
+      Object.entries(outputs).filter(
+        ([, record]) => record.last_consumer_task > completedTaskNumber,
+      ),
+    );
+    if (Object.keys(retainedOutputs).length > 0) {
+      retained[task] = retainedOutputs;
+    }
+  }
+  return canonicalize(retained);
+}
+
 export function createReviewInput({
   head,
   tree,
@@ -191,6 +385,7 @@ export function classifyMutation(previousState, currentState) {
     'mutationClass',
     'materialReason',
     'reviewRequests',
+    'supersededReviewInputs',
     'copilotResults',
     'codexResults',
     'publicMutation',
@@ -218,6 +413,7 @@ export function decideReviewRequest({
   mutationClass,
   materialReason = null,
   existingRequests = [],
+  supersededInputs = {},
 }) {
   if (mutationClass !== null && !MUTATION_CLASSES.includes(mutationClass)) {
     throw new TypeError('Unknown mutation class.');
@@ -261,8 +457,21 @@ export function decideReviewRequest({
 
   const currentKey = getReviewInputKey(currentReviewInput);
   const requests = normalizeCollection(existingRequests);
+  if (
+    supersededInputs === null ||
+    typeof supersededInputs !== 'object' ||
+    Array.isArray(supersededInputs)
+  ) {
+    throw new TypeError('Superseded review-input dispositions must be a keyed map.');
+  }
+  const supersessions = Object.entries(supersededInputs).map(
+    ([reviewInputKey, disposition]) => ({ ...disposition, reviewInputKey }),
+  );
   if (requests.some((request) => !isReviewRequestRecord(request))) {
     throw new TypeError('A review request is malformed or mismatched.');
+  }
+  if (supersessions.some((disposition) => !isSupersededReviewInputRecord(disposition))) {
+    throw new TypeError('A superseded review-input disposition is malformed.');
   }
   const requestsForCurrentInput = requests.filter(
     (request) => request.reviewInputKey === currentKey,
@@ -287,6 +496,30 @@ export function decideReviewRequest({
       }
     }
   }
+  const supersessionByKey = new Map();
+  const knownHeads = new Set([
+    currentReviewInput.head,
+    ...requests.map((request) => request.head),
+  ]);
+  for (const disposition of supersessions) {
+    const pair = requests.filter(
+      (request) => request.reviewInputKey === disposition.reviewInputKey,
+    );
+    const channels = new Set(pair.map((request) => request.channel));
+    const heads = new Set(pair.map((request) => request.head));
+    if (
+      pair.length === 0 ||
+      channels.size === 2 ||
+      heads.size !== 1 ||
+      !heads.has(disposition.head) ||
+      disposition.successorHead === disposition.head ||
+      !knownHeads.has(disposition.successorHead) ||
+      disposition.reviewInputKey === currentKey
+    ) {
+      throw new TypeError('A superseded disposition does not describe an incomplete old-head pair.');
+    }
+    supersessionByKey.set(disposition.reviewInputKey, disposition);
+  }
 
   if (missingChannels.length === 0) {
     return Object.freeze({
@@ -310,11 +543,37 @@ export function decideReviewRequest({
     (request) => request.reviewInputKey !== currentKey,
   );
   const priorKeys = new Set(priorRequests.map((request) => request.reviewInputKey));
-  const hasPendingPriorPair = [...priorKeys].some((key) => {
+  const priorPairStates = [...priorKeys].map((key) => {
     const pair = priorRequests.filter((request) => request.reviewInputKey === key);
     const channels = new Set(pair.map((request) => request.channel));
-    return channels.size !== 2 || pair.some((request) => request.terminal !== true);
+    const heads = new Set(pair.map((request) => request.head));
+    const supersession = supersessionByKey.get(key);
+    const missingChannel = channels.size !== 2;
+    const canSupersede = missingChannel &&
+      heads.size === 1 &&
+      !heads.has(currentReviewInput.head);
+    return {
+      key,
+      needsSupersession: canSupersede && supersession === undefined,
+      pending: supersession === undefined &&
+        (missingChannel || pair.some((request) => request.terminal !== true)),
+    };
   });
+
+  const supersessionRequired = priorPairStates
+    .filter((state) => state.needsSupersession)
+    .map((state) => state.key);
+  if (supersessionRequired.length > 0) {
+    return Object.freeze({
+      status: 'SUPERSESSION_REQUIRED',
+      reviewInputKey: currentKey,
+      channels: [],
+      supersedeReviewInputKeys: Object.freeze(supersessionRequired),
+      reason: 'After authenticated head-drift readback, mark each incomplete old-head pair SUPERSEDED before requesting the new pair.',
+    });
+  }
+
+  const hasPendingPriorPair = priorPairStates.some((state) => state.pending);
 
   if (hasPendingPriorPair) {
     return Object.freeze({
@@ -396,14 +655,16 @@ function isReviewRequestRecord(request) {
   const reviewBaselinesAreValid = Array.isArray(request?.baselineReviewNodeIds) &&
     request.baselineReviewNodeIds.every((id) => typeof id === 'string' && id.length > 0) &&
     new Set(request.baselineReviewNodeIds).size === request.baselineReviewNodeIds.length;
-  const commentBaselinesAreValid = Array.isArray(request?.baselineConversationComments) &&
-    request.baselineConversationComments.every(
-      (comment) => typeof comment?.nodeId === 'string' &&
-        comment.nodeId.length > 0 &&
-        getItemTime(comment, ['updatedAt']) !== null,
-    ) &&
-    new Set(request.baselineConversationComments.map((comment) => comment.nodeId)).size ===
-      request.baselineConversationComments.length;
+  const commentBaselines = request?.baselineConversationComments;
+  const commentBaselinesAreValid = commentBaselines !== null &&
+    typeof commentBaselines === 'object' &&
+    !Array.isArray(commentBaselines) &&
+    Object.keys(commentBaselines).length <= 10_000 &&
+    Object.entries(commentBaselines).every(
+      ([nodeId, updatedAt]) => nodeId.length > 0 &&
+        nodeId.length <= 256 &&
+        getItemTime({ updatedAt }, ['updatedAt']) !== null,
+    );
   const channelIsValid = request?.channel === 'copilot' || request?.channel === 'codex';
 
   return channelIsValid &&
@@ -415,6 +676,23 @@ function isReviewRequestRecord(request) {
     getItemTime(request, ['requestedAt']) !== null &&
     reviewBaselinesAreValid &&
     commentBaselinesAreValid;
+}
+
+function isSupersededReviewInputRecord(disposition) {
+  return disposition !== null &&
+    typeof disposition === 'object' &&
+    !Array.isArray(disposition) &&
+    Object.keys(disposition).length === 6 &&
+    disposition.state === 'SUPERSEDED' &&
+    typeof disposition.reviewInputKey === 'string' &&
+    SHA256_PATTERN.test(disposition.reviewInputKey) &&
+    typeof disposition.head === 'string' &&
+    SHA1_PATTERN.test(disposition.head) &&
+    typeof disposition.successorHead === 'string' &&
+    SHA1_PATTERN.test(disposition.successorHead) &&
+    getItemTime(disposition, ['supersededAt']) !== null &&
+    typeof disposition.reason === 'string' &&
+    disposition.reason.trim().length > 0;
 }
 
 function isReviewRequestForInput(request, reviewInput, requiredChannel = null) {
@@ -450,8 +728,8 @@ export function collectCodexResults({
 
   const baselineReviewIds = new Set(request.baselineReviewNodeIds);
   const baselineComments = new Map(
-    normalizeCollection(request.baselineConversationComments).map(
-      (comment) => [comment.nodeId, getItemTime(comment, ['updatedAt'])],
+    Object.entries(request.baselineConversationComments).map(
+      ([nodeId, updatedAt]) => [nodeId, getItemTime({ updatedAt }, ['updatedAt'])],
     ),
   );
   const reviews = normalizeCollection(submittedReviews).filter(

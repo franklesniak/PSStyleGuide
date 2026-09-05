@@ -11,6 +11,8 @@ import {
   evaluateFindingBudget,
   getReviewInputKey,
   normalizeCollection,
+  parseCompactStateJson,
+  prunePredecessorOutputs,
   reconcilePublicMutation,
   validateTransport,
 } from './review-loop-policy.mjs';
@@ -45,6 +47,7 @@ function state(input, overrides = {}) {
     reviewInput: input,
     mutationClass: 'RESULT_OR_STATE',
     reviewRequests: [],
+    supersededReviewInputs: {},
     copilotResults: {
       submittedReviews: [],
       conversationComments: [],
@@ -72,7 +75,7 @@ function state(input, overrides = {}) {
   };
 }
 
-function compactState(input, reviewOverrides = {}, taskOverrides = {}) {
+function compactState(input, reviewOverrides = {}, taskOverrides = {}, rootOverrides = {}) {
   return {
     schema: 1,
     plan: 'docs/planning/action-items-2026-08-30.md',
@@ -90,8 +93,10 @@ function compactState(input, reviewOverrides = {}, taskOverrides = {}) {
       review: state(input, reviewOverrides),
       ...taskOverrides,
     },
+    predecessor_outputs: {},
     completed: [1, 2, 3],
     updated_utc: '2026-09-04T10:00:00Z',
+    ...rootOverrides,
   };
 }
 
@@ -103,8 +108,21 @@ function requestFor(input, channel, overrides = {}) {
     requestedAt: '2026-09-04T10:00:00Z',
     terminal: false,
     baselineReviewNodeIds: [],
-    baselineConversationComments: [],
+    baselineConversationComments: {},
     ...overrides,
+  };
+}
+
+function supersessionFor(input, successorInput, overrides = {}) {
+  return {
+    [getReviewInputKey(input)]: {
+      state: 'SUPERSEDED',
+      head: input.head,
+      successorHead: successorInput.head,
+      supersededAt: '2026-09-04T10:02:00Z',
+      reason: 'Authenticated PR readback shows that the old head is no longer current.',
+      ...overrides,
+    },
   };
 }
 
@@ -217,6 +235,102 @@ test('scenario 3a: H2 waits for a pending H1 pair before accepting a headless re
   assert.deepEqual(
     lateH1Result.conversationComments.map((comment) => comment.id),
     ['H1_HEADLESS_RESULT'],
+  );
+});
+
+test('scenario 3b: authenticated head drift supersedes an impossible missing H1 request', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const mutationClass = classifyMutation(state(input1), state(input2));
+  const oldRequest = requestFor(input1, 'codex');
+  const requiresDisposition = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    existingRequests: [oldRequest],
+  });
+  const supersession = supersessionFor(input1, input2);
+  const recovered = decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    existingRequests: [oldRequest],
+    supersededInputs: supersession,
+  });
+  const lateOldResult = collectCodexResults({
+    reviewInput: input1,
+    request: oldRequest,
+    submittedReviews: [],
+    conversationComments: [{
+      id: 'LATE_H1_RESULT',
+      user: { login: 'chatgpt-codex-connector[bot]' },
+      created_at: '2026-09-04T10:03:00Z',
+      body: 'Late result for H1.',
+    }],
+  });
+
+  assert.equal(requiresDisposition.status, 'SUPERSESSION_REQUIRED');
+  assert.deepEqual(
+    requiresDisposition.supersedeReviewInputKeys,
+    [getReviewInputKey(input1)],
+  );
+  assert.equal(recovered.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(recovered.channels, ['copilot', 'codex']);
+  assert.deepEqual(
+    lateOldResult.conversationComments.map((comment) => comment.id),
+    ['LATE_H1_RESULT'],
+  );
+  assert.deepEqual(collectCodexResults({
+    reviewInput: input2,
+    request: oldRequest,
+    submittedReviews: [],
+    conversationComments: [{
+      id: 'LATE_H1_RESULT',
+      user: { login: 'chatgpt-codex-connector[bot]' },
+      created_at: '2026-09-04T10:03:00Z',
+      body: 'Late result for H1.',
+    }],
+  }), { submittedReviews: [], conversationComments: [] });
+});
+
+test('old-head supersession rejects forged, current-input, and complete-pair records', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const mutationClass = classifyMutation(state(input1), state(input2));
+  const oldRequest = requestFor(input1, 'codex');
+  const decide = (supersededInputs, existingRequests = [oldRequest]) => decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass,
+    existingRequests,
+    supersededInputs,
+  });
+
+  assert.throws(
+    () => decide(supersessionFor(input1, input2, { successorHead: HASHES.tree1 })),
+    /does not describe/u,
+  );
+  assert.throws(
+    () => decide(supersessionFor(input2, input1)),
+    /malformed|does not describe/u,
+  );
+  assert.throws(
+    () => decide(supersessionFor(input1, input2), pairFor(input1, { terminal: false })),
+    /does not describe/u,
+  );
+  assert.throws(
+    () => decide([supersessionFor(input1, input2)]),
+    /keyed map/u,
   );
 });
 
@@ -489,7 +603,20 @@ test('all permanent active task-template and controller surfaces use the compact
     assert.match(task.body, /submitted-review/u);
     assert.match(task.body, /PR-conversation-comment/u);
     assert.match(task.body, /local serialization fails/u);
+    assert.doesNotMatch(
+      task.body,
+      /result for the round only when it is newer than the applicable baseline and is explicitly anchored to the recorded PR head SHA/u,
+    );
   }
+
+  assert.equal(
+    [...plan.matchAll(/Count a submitted-review result for the round only when its commit matches the recorded PR head SHA and it is newer than the applicable baseline\./gu)].length,
+    38,
+  );
+  assert.equal(
+    [...plan.matchAll(/Count a headless Codex PR-conversation result only when the authenticated author, request time, baseline exclusion, reviewed-input key, and serialized predecessor-pair order attribute it to this round\./gu)].length,
+    38,
+  );
 
   for (const task of qualityTasks) {
     assert.match(task.body, /### Post-review materiality controls/u);
@@ -518,6 +645,12 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.doesNotMatch(alternate, /any nonterminal state -> waiting_human/u);
   assert.match(generator, /Do not split routine work/u);
   assert.match(generator, /Default to one reviewer pair/u);
+  assert.match(generator, /immutable predecessor outputs/u);
+  assert.match(generator, /typed `SUPERSEDED` disposition/u);
+  assert.match(generator, /headless Codex PR-conversation result/u);
+  const task15 = tasks.find((task) => task.number === 15);
+  assert.notEqual(task15, undefined);
+  assert.match(task15.body, /Continue implementation, CI repair, review, and readiness work/u);
   assert.match(crossRepository, /one compact state record/u);
   assert.match(crossRepository, /applicable `AGENTS\.md`/u);
   assert.match(crossRepository, /root `CLAUDE\.md` as compatibility workflow instructions/u);
@@ -618,6 +751,17 @@ test('schema-defined nested review-state fields classify deterministically', () 
   const original = state(input);
   const resultChanges = [
     { reviewRequests: [requestFor(input, 'codex')] },
+    {
+      supersededReviewInputs: {
+        [HASHES.diff2]: {
+          state: 'SUPERSEDED',
+          head: HASHES.head1,
+          successorHead: HASHES.head2,
+          supersededAt: '2026-09-04T10:02:00Z',
+          reason: 'Authenticated head drift.',
+        },
+      },
+    },
     { copilotResults: { submittedReviews: [{ id: 1 }], conversationComments: [] } },
     { codexResults: { submittedReviews: [{ id: 1 }], conversationComments: [] } },
     {
@@ -664,10 +808,10 @@ test('Codex results normalize REST and GraphQL identities and reject stale evide
   const input = reviewInput();
   const request = requestFor(input, 'codex', {
     baselineReviewNodeIds: ['REVIEW_OLD'],
-    baselineConversationComments: [
-      { nodeId: 'COMMENT_STABLE', updatedAt: '2026-09-04T09:59:00Z' },
-      { nodeId: 'COMMENT_OLD', updatedAt: '2026-09-04T09:59:00Z' },
-    ],
+    baselineConversationComments: {
+      COMMENT_STABLE: '2026-09-04T09:59:00Z',
+      COMMENT_OLD: '2026-09-04T09:59:00Z',
+    },
   });
   const results = collectCodexResults({
     reviewInput: input,
@@ -755,27 +899,18 @@ test('Codex request correlation fails closed when baseline evidence is missing',
   assert.deepEqual(results, { submittedReviews: [], conversationComments: [] });
 });
 
-test('Codex request correlation fails closed on duplicate baseline identities', () => {
-  const input = reviewInput();
-  const request = requestFor(input, 'codex', {
-    baselineConversationComments: [
-      { nodeId: 'COMMENT_OLD', updatedAt: '2026-09-04T09:58:00Z' },
-      { nodeId: 'COMMENT_OLD', updatedAt: '2026-09-04T09:59:00Z' },
-    ],
-  });
-  const results = collectCodexResults({
-    reviewInput: input,
-    request,
-    submittedReviews: [],
-    conversationComments: [{
-      node_id: 'COMMENT_NEW',
-      user: { login: 'chatgpt-codex-connector[bot]' },
-      updated_at: '2026-09-04T10:02:00Z',
-      body: 'New review result.',
-    }],
-  });
+test('compact-state JSON ingestion rejects duplicate baseline member identities', () => {
+  const duplicateLiteral = '{"baselineConversationComments":{"COMMENT_OLD":"2026-09-04T09:58:00Z","COMMENT_OLD":"2026-09-04T09:59:00Z"}}';
+  const duplicateEscaped = '{"baselineConversationComments":{"COMMENT_OLD":"2026-09-04T09:58:00Z","\\u0043OMMENT_OLD":"2026-09-04T09:59:00Z"}}';
+  const unique = '{"baselineConversationComments":{"COMMENT_OLD":"2026-09-04T09:59:00Z"}}';
 
-  assert.deepEqual(results, { submittedReviews: [], conversationComments: [] });
+  assert.throws(() => parseCompactStateJson(duplicateLiteral), /duplicate member "COMMENT_OLD"/u);
+  assert.throws(() => parseCompactStateJson(duplicateEscaped), /duplicate member "COMMENT_OLD"/u);
+  assert.deepEqual(parseCompactStateJson(unique), {
+    baselineConversationComments: {
+      COMMENT_OLD: '2026-09-04T09:59:00Z',
+    },
+  });
 });
 
 function resolveSchemaReference(definition, root) {
@@ -815,6 +950,9 @@ function assertSchemaValid(value, definition, root, location = '$') {
     if (resolved.minLength !== undefined) {
       assert.ok(value.length >= resolved.minLength, `${location} is too short.`);
     }
+    if (resolved.maxLength !== undefined) {
+      assert.ok(value.length <= resolved.maxLength, `${location} is too long.`);
+    }
     if (resolved.pattern !== undefined) {
       assert.match(value, new RegExp(resolved.pattern, 'u'), `${location} does not match pattern.`);
     }
@@ -822,7 +960,13 @@ function assertSchemaValid(value, definition, root, location = '$') {
   if (typeof value === 'number' && resolved.minimum !== undefined) {
     assert.ok(value >= resolved.minimum, `${location} is below minimum.`);
   }
+  if (typeof value === 'number' && resolved.maximum !== undefined) {
+    assert.ok(value <= resolved.maximum, `${location} is above maximum.`);
+  }
   if (Array.isArray(value)) {
+    if (resolved.maxItems !== undefined) {
+      assert.ok(value.length <= resolved.maxItems, `${location} has too many items.`);
+    }
     if (resolved.uniqueItems === true) {
       assert.equal(new Set(value.map((item) => JSON.stringify(item))).size, value.length);
     }
@@ -831,16 +975,33 @@ function assertSchemaValid(value, definition, root, location = '$') {
     }
   }
   if (value !== null && typeof value === 'object' && !Array.isArray(value)) {
+    if (resolved.maxProperties !== undefined) {
+      assert.ok(
+        Object.keys(value).length <= resolved.maxProperties,
+        `${location} has too many properties.`,
+      );
+    }
     for (const required of resolved.required ?? []) {
       assert.ok(Object.hasOwn(value, required), `${location}.${required} is required.`);
     }
     for (const [key, item] of Object.entries(value)) {
+      if (resolved.propertyNames !== undefined) {
+        assertSchemaValid(key, resolved.propertyNames, root, `${location} property name`);
+      }
       if (Object.hasOwn(resolved.properties ?? {}, key)) {
         assertSchemaValid(item, resolved.properties[key], root, `${location}.${key}`);
-      } else if (resolved.additionalProperties === false) {
-        assert.fail(`${location}.${key} is not allowed.`);
-      } else if (typeof resolved.additionalProperties === 'object') {
-        assertSchemaValid(item, resolved.additionalProperties, root, `${location}.${key}`);
+      } else {
+        const matchingPatterns = Object.entries(resolved.patternProperties ?? {})
+          .filter(([pattern]) => new RegExp(pattern, 'u').test(key));
+        if (matchingPatterns.length > 0) {
+          for (const [, patternDefinition] of matchingPatterns) {
+            assertSchemaValid(item, patternDefinition, root, `${location}.${key}`);
+          }
+        } else if (resolved.additionalProperties === false) {
+          assert.fail(`${location}.${key} is not allowed.`);
+        } else if (typeof resolved.additionalProperties === 'object') {
+          assertSchemaValid(item, resolved.additionalProperties, root, `${location}.${key}`);
+        }
       }
     }
   }
@@ -899,6 +1060,119 @@ test('the actual compact resume record and review state match their closed schem
   assertSchemaValid(persisted, schema, schema);
   assertSchemaValid(readControllerExample(parent), schema, schema);
   assertSchemaValid(readControllerExample(alternate), schema, schema);
+});
+
+test('predecessor outputs survive required restart boundaries and prune after final use', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const outputs = {
+    12: {
+      TASK_012_REVIEWED_HEAD: {
+        value: HASHES.head1,
+        last_consumer_task: 15,
+      },
+      TASK_012_TASK_13_ONLY: {
+        value: 'repair input',
+        last_consumer_task: 13,
+      },
+    },
+  };
+  const after12 = prunePredecessorOutputs(outputs, 12);
+  const after13 = prunePredecessorOutputs(outputs, 13);
+  const after14 = prunePredecessorOutputs(outputs, 14);
+  const after15 = prunePredecessorOutputs(outputs, 15);
+
+  assert.deepEqual(Object.keys(after12[12]).sort(), [
+    'TASK_012_REVIEWED_HEAD',
+    'TASK_012_TASK_13_ONLY',
+  ]);
+  assert.deepEqual(Object.keys(after13[12]), ['TASK_012_REVIEWED_HEAD']);
+  assert.deepEqual(after14, after13);
+  assert.deepEqual(after15, {});
+
+  for (const [taskNumber, predecessorOutputs] of [
+    [13, after12],
+    [14, after13],
+    [15, after14],
+  ]) {
+    const resumed = compactState(
+      input,
+      {},
+      { number: taskNumber },
+      {
+        predecessor_outputs: predecessorOutputs,
+        completed: Array.from({ length: taskNumber - 1 }, (_, index) => index + 1),
+      },
+    );
+    assertSchemaValid(resumed, schema, schema);
+  }
+
+  assert.throws(
+    () => prunePredecessorOutputs({
+      12: {
+        TASK_012_BAD: { value: 'bad', last_consumer_task: 12 },
+      },
+    }, 12),
+    /malformed/u,
+  );
+});
+
+test('public-mutation schema rejects every contradictory persisted state', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const valid = [
+    state(reviewInput()).publicMutation,
+    reconcilePublicMutation({
+      response: { ok: true },
+      readback: { id: 1 },
+      expected: { id: 1 },
+      localRecordSucceeded: false,
+    }),
+    reconcilePublicMutation({
+      response: { executed: false },
+      readback: { id: 2 },
+      expected: { id: 1 },
+      localRecordSucceeded: true,
+    }),
+    reconcilePublicMutation({
+      response: { executed: false },
+      readback: { id: 1 },
+      expected: { id: 1 },
+      localRecordSucceeded: false,
+    }),
+    reconcilePublicMutation({
+      response: { ok: true },
+      readback: { id: 2 },
+      expected: { id: 1 },
+      localRecordSucceeded: true,
+    }),
+  ];
+  for (const mutation of valid) {
+    assertSchemaValid(mutation, schema.$defs.publicMutation, schema);
+  }
+
+  const contradictory = [
+    { ...valid[0], nativeResponseAccepted: true },
+    { ...valid[0], readbackMatched: true },
+    { ...valid[0], retryAllowed: false },
+    { ...valid[1], nativeResponseAccepted: false },
+    { ...valid[1], readbackMatched: false },
+    { ...valid[1], retryAllowed: true },
+    { ...valid[2], nativeResponseAccepted: true },
+    { ...valid[2], retryAllowed: false },
+    { ...valid[3], retryAllowed: true },
+    { ...valid[4], retryAllowed: true },
+  ];
+  for (const mutation of contradictory) {
+    assert.throws(
+      () => assertSchemaValid(mutation, schema.$defs.publicMutation, schema),
+      undefined,
+      JSON.stringify(mutation),
+    );
+  }
 });
 
 test('a confirmed request survives local state-write failure without a duplicate', () => {
