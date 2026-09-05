@@ -331,7 +331,10 @@ export function parseCompactStateJson(text) {
         throw new TypeError('The persisted review input must match the current task head.');
       }
       validatePersistedPublicMutation(reviewState.publicMutation);
-      const requests = validatePersistedReviewRequests(reviewState.reviewRequests);
+      const requests = validatePersistedReviewRequests(
+        reviewState.reviewRequests,
+        reviewState,
+      );
       const supersessions = validatePersistedSupersededReviewInputs(
         reviewState.supersededReviewInputs,
       );
@@ -374,7 +377,7 @@ function validatePersistedProgress(currentTask, completed) {
   return lastCompletedTask;
 }
 
-function validatePersistedReviewRequests(reviewRequests) {
+function validatePersistedReviewRequests(reviewRequests, reviewState) {
   if (!Array.isArray(reviewRequests)) {
     throw new TypeError('The persisted review-request collection is malformed.');
   }
@@ -392,6 +395,7 @@ function validatePersistedReviewRequests(reviewRequests) {
   }
 
   validateReviewRequestOrdering(reviewRequests);
+  validateTerminalResultReferences(reviewRequests, reviewState);
   return reviewRequests;
 }
 
@@ -868,7 +872,8 @@ export function decideReviewRequest({
 }
 
 function getActorLogin(item) {
-  return item?.user?.login ?? item?.author?.login ?? item?.actor?.login ?? null;
+  return item?.user?.login ?? item?.author?.login ?? item?.actor?.login ??
+    (typeof item?.actor === 'string' ? item.actor : null);
 }
 
 function normalizeActorLogin(login) {
@@ -878,7 +883,9 @@ function normalizeActorLogin(login) {
 }
 
 function getCommitOid(item) {
-  return item?.commit_id ?? item?.commit?.oid ?? item?.commitOid ?? null;
+  return item?.commit_id ?? item?.commit?.oid ??
+    (typeof item?.commit === 'string' ? item.commit : null) ??
+    item?.commitOid ?? null;
 }
 
 function getItemId(item) {
@@ -1096,11 +1103,19 @@ function isReviewRequestRecord(request) {
     );
   const channelIsValid = request?.channel === 'copilot' || request?.channel === 'codex';
   const hasTerminalDisposition = Object.hasOwn(request ?? {}, 'terminalDisposition');
+  const hasTerminalResultRef = Object.hasOwn(request ?? {}, 'terminalResultRef');
   const terminalDispositionIsValid = hasTerminalDisposition
     ? request.terminal === true &&
       request.confirmed === false &&
       isRepositoryAuthorizedNonfunctionalDisposition(request.terminalDisposition, request)
     : !(request?.terminal === true && request?.confirmed === false);
+  const terminalResultRefIsValid = hasTerminalResultRef
+    ? request.terminal === true &&
+      request.confirmed === true &&
+      isTerminalResultRef(request.terminalResultRef) &&
+      !(request.channel === 'copilot' &&
+        request.terminalResultRef.kind !== 'submitted-review')
+    : !(request?.terminal === true && request?.confirmed === true);
 
   return channelIsValid &&
     typeof request.confirmed === 'boolean' &&
@@ -1112,7 +1127,25 @@ function isReviewRequestRecord(request) {
     getItemTime(request, ['requestedAt']) !== null &&
     identityBaselinesAreValid &&
     commentBaselinesAreValid &&
-    terminalDispositionIsValid;
+    terminalDispositionIsValid &&
+    terminalResultRefIsValid;
+}
+
+function isTerminalResultRef(reference) {
+  if (
+    reference === null ||
+    typeof reference !== 'object' ||
+    Array.isArray(reference) ||
+    Object.keys(reference).length !== 3 ||
+    !['submitted-review', 'conversation-comment'].includes(reference.kind) ||
+    typeof reference.id !== 'string' ||
+    reference.id.length === 0 ||
+    reference.id.length > 256
+  ) {
+    return false;
+  }
+
+  return getItemTime(reference, ['observedAt']) !== null;
 }
 
 function isRepositoryAuthorizedNonfunctionalDisposition(disposition, request) {
@@ -1133,6 +1166,138 @@ function isRepositoryAuthorizedNonfunctionalDisposition(disposition, request) {
   const recordedTime = getItemTime(disposition, ['recordedAt']);
   const requestTime = getItemTime(request, ['requestedAt']);
   return recordedTime !== null && requestTime !== null && recordedTime >= requestTime;
+}
+
+function getItemIdentities(item) {
+  return [...new Set([
+    item?.node_id,
+    item?.nodeId,
+    item?.id,
+    item?.databaseId,
+  ].filter((value) => value !== null && value !== undefined).map(String))];
+}
+
+function isResultActorForChannel(result, channel) {
+  return channel === 'copilot'
+    ? isCopilotIdentity(result)
+    : normalizeActorLogin(getActorLogin(result)) === 'chatgpt-codex-connector';
+}
+
+function getNextDifferentInputRequestTime(request, requests) {
+  const requestTime = getItemTime(request, ['requestedAt']);
+  const laterTimes = requests
+    .filter((candidate) => candidate.reviewInputKey !== request.reviewInputKey)
+    .map((candidate) => getItemTime(candidate, ['requestedAt']))
+    .filter((candidateTime) => candidateTime !== null && candidateTime > requestTime);
+  return laterTimes.length === 0 ? null : Math.min(...laterTimes);
+}
+
+function isReferencedTerminalResult(result, request, reference, requests) {
+  const timeFields = reference.kind === 'submitted-review'
+    ? ['submitted_at', 'submittedAt']
+    : ['updated_at', 'updatedAt', 'created_at', 'createdAt'];
+  const requestTime = getItemTime(request, ['requestedAt']);
+  const resultTime = getItemTime(result, timeFields);
+  const referenceTime = getItemTime(reference, ['observedAt']);
+  const identities = getItemIdentities(result);
+  const nextDifferentInputTime = getNextDifferentInputRequestTime(request, requests);
+
+  if (
+    requestTime === null ||
+    resultTime === null ||
+    resultTime !== referenceTime ||
+    !identities.includes(reference.id) ||
+    !isItemAtOrAfterRequest(result, timeFields, requestTime) ||
+    (nextDifferentInputTime !== null && resultTime >= nextDifferentInputTime) ||
+    !isResultActorForChannel(result, request.channel)
+  ) {
+    return false;
+  }
+
+  if (reference.kind === 'submitted-review') {
+    const baselines = new Set(request.baselineReviewNodeIds);
+    return getCommitOid(result) === request.head &&
+      identities.every((identity) => !baselines.has(identity));
+  }
+
+  if (
+    request.channel !== 'codex' ||
+    result.body?.trim() === '@codex review' ||
+    typeof result.status !== 'string' ||
+    !result.status.startsWith('completed')
+  ) {
+    return false;
+  }
+
+  const explicitHead = result.head ?? result.headRefOid;
+  if (explicitHead !== undefined && explicitHead !== request.head) {
+    return false;
+  }
+  if (
+    result.commitPrefix !== undefined &&
+    (
+      typeof result.commitPrefix !== 'string' ||
+      !/^[0-9a-f]{7,40}$/u.test(result.commitPrefix) ||
+      !request.head.startsWith(result.commitPrefix)
+    )
+  ) {
+    return false;
+  }
+
+  const baselineTimes = identities
+    .filter((identity) => Object.hasOwn(request.baselineConversationComments, identity))
+    .map((identity) => getItemTime(
+      { updatedAt: request.baselineConversationComments[identity] },
+      ['updatedAt'],
+    ));
+  return baselineTimes.every(
+    (baselineTime) => baselineTime !== null && resultTime > baselineTime,
+  );
+}
+
+function validateTerminalResultReferences(requests, reviewState) {
+  const resultCollections = {
+    copilot: reviewState?.copilotResults,
+    codex: reviewState?.codexResults,
+  };
+  for (const [channel, results] of Object.entries(resultCollections)) {
+    if (
+      results === null ||
+      typeof results !== 'object' ||
+      Array.isArray(results) ||
+      !Array.isArray(results.submittedReviews) ||
+      !Array.isArray(results.conversationComments)
+    ) {
+      throw new TypeError(`The persisted ${channel} result collection is malformed.`);
+    }
+  }
+
+  const seenReferences = new Set();
+  for (const request of requests.filter(
+    (candidate) => candidate.confirmed === true && candidate.terminal === true,
+  )) {
+    const reference = request.terminalResultRef;
+    const referenceIdentity = canonicalJson({
+      channel: request.channel,
+      ...reference,
+    });
+    if (seenReferences.has(referenceIdentity)) {
+      throw new TypeError('A terminal result reference is assigned to multiple requests.');
+    }
+    seenReferences.add(referenceIdentity);
+
+    const collection = reference.kind === 'submitted-review'
+      ? resultCollections[request.channel].submittedReviews
+      : resultCollections[request.channel].conversationComments;
+    const matches = collection.filter(
+      (result) => isReferencedTerminalResult(result, request, reference, requests),
+    );
+    if (matches.length !== 1) {
+      throw new TypeError(
+        'A confirmed terminal request must reference one attributable terminal result.',
+      );
+    }
+  }
 }
 
 function isCopilotReadyForCodex(request) {

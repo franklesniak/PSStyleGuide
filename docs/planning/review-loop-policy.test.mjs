@@ -46,7 +46,7 @@ function reviewInput(overrides = {}) {
 }
 
 function state(input, overrides = {}) {
-  return {
+  const value = {
     schemaVersion: 1,
     reviewInput: input,
     mutationClass: 'RESULT_OR_STATE',
@@ -77,6 +77,22 @@ function state(input, overrides = {}) {
     commentPublications: [],
     ...overrides,
   };
+  for (const channel of ['copilot', 'codex']) {
+    const field = `${channel}Results`;
+    if (!Object.hasOwn(overrides, field)) {
+      const results = value.reviewRequests
+        .filter((request) => request.channel === channel && request.terminalResultRef)
+        .map((request) => resultForRequest(request));
+      value[field] = {
+        submittedReviews: results.filter((result) => result.kind === 'submitted-review')
+          .map((result) => result.value),
+        conversationComments: results
+          .filter((result) => result.kind === 'conversation-comment')
+          .map((result) => result.value),
+      };
+    }
+  }
+  return value;
 }
 
 function compactState(input, reviewOverrides = {}, taskOverrides = {}, rootOverrides = {}) {
@@ -105,7 +121,7 @@ function compactState(input, reviewOverrides = {}, taskOverrides = {}, rootOverr
 }
 
 function requestFor(input, channel, overrides = {}) {
-  return {
+  const request = {
     channel,
     reviewInputKey: getReviewInputKey(input),
     head: input.head,
@@ -117,6 +133,45 @@ function requestFor(input, channel, overrides = {}) {
     baselineReviewRunIds: [],
     baselineConversationComments: {},
     ...overrides,
+  };
+  if (
+    request.confirmed === true &&
+    request.terminal === true &&
+    !Object.hasOwn(request, 'terminalResultRef')
+  ) {
+    request.terminalResultRef = {
+      kind: 'submitted-review',
+      id: `RESULT_${channel}_${input.head}`,
+      observedAt: '2026-09-04T10:01:00Z',
+    };
+  }
+  return request;
+}
+
+function resultForRequest(request) {
+  const actor = request.channel === 'copilot'
+    ? 'copilot-pull-request-reviewer[bot]'
+    : 'chatgpt-codex-connector[bot]';
+  if (request.terminalResultRef.kind === 'submitted-review') {
+    return {
+      kind: 'submitted-review',
+      value: {
+        nodeId: request.terminalResultRef.id,
+        actor,
+        commit: request.head,
+        submittedAt: request.terminalResultRef.observedAt,
+      },
+    };
+  }
+  return {
+    kind: 'conversation-comment',
+    value: {
+      nodeId: request.terminalResultRef.id,
+      actor,
+      updatedAt: request.terminalResultRef.observedAt,
+      status: 'completed',
+      commitPrefix: request.head.slice(0, 7),
+    },
   };
 }
 
@@ -1284,6 +1339,8 @@ test('all permanent active task-template and controller surfaces use the compact
     [...plan.matchAll(/Count a headless Codex PR-conversation result only when the authenticated author, request time, baseline exclusion, reviewed-input key, and serialized predecessor-pair order attribute it to this round\./gu)].length,
     38,
   );
+  assert.match(plan, /closed `terminalResultRef`/u);
+  assert.match(plan, /next different-input request boundary/u);
 
   for (const task of qualityTasks) {
     assert.match(task.body, /### Post-review materiality controls/u);
@@ -1313,6 +1370,8 @@ test('all permanent active task-template and controller surfaces use the compact
     /confirmed or is terminally proved non-functional through a persisted `terminalDisposition`/u,
   );
   assert.match(parent, /persist its head, reviewed-input key, request time, `confirmed: true`, and nonterminal state/u);
+  assert.match(parent, /closed `terminalResultRef`/u);
+  assert.match(parent, /wrong-channel, or wrong-time reference/u);
   assert.match(parent, /Locate and obey the applicable `AGENTS\.md`/u);
   assert.match(
     parent,
@@ -1339,6 +1398,8 @@ test('all permanent active task-template and controller surfaces use the compact
     /confirmed or is terminally proved non-functional through a persisted `terminalDisposition`/u,
   );
   assert.match(alternate, /persist its head, reviewed-input key, request time, `confirmed: true`, and nonterminal state/u);
+  assert.match(alternate, /closed `terminalResultRef`/u);
+  assert.match(alternate, /next different-input request boundary/u);
   assert.match(alternate, /Locate and obey the applicable `AGENTS\.md`/u);
   assert.match(
     alternate,
@@ -1352,10 +1413,12 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(generator, /current task head to equal the review-input head/u);
   assert.match(generator, /only after every recorded request for the old input is terminal/u);
   assert.match(generator, /headless Codex PR-conversation result/u);
+  assert.match(generator, /closed `terminalResultRef`/u);
   assert.match(generator, /copilot-pull-request-reviewer\[bot\]/u);
   assert.match(generator, /a second proved no-effect attempt is `EXHAUSTED`/iu);
   assert.match(crossRepository, /Reject non-finite or out-of-portable-range JSON numbers/u);
   assert.match(crossRepository, /task head and review-input head differ/u);
+  assert.match(crossRepository, /closed `terminalResultRef`/u);
   const task15 = tasks.find((task) => task.number === 15);
   assert.notEqual(task15, undefined);
   assert.match(task15.body, /Continue implementation, CI repair, review, and readiness work/u);
@@ -1929,6 +1992,167 @@ test('terminal request state requires typed repository-authorized evidence', asy
   );
 });
 
+test('confirmed terminal requests require one attributable persisted result', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const copilotRequest = requestFor(input, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const validCopilot = compactState(input, {
+    reviewRequests: [copilotRequest],
+  });
+
+  assertSchemaValid(validCopilot, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(validCopilot)), validCopilot);
+
+  const missingReference = structuredClone(validCopilot);
+  delete missingReference.current_task.review.reviewRequests[0].terminalResultRef;
+  assert.throws(
+    () => assertSchemaValid(missingReference, schema, schema),
+    /terminalResultRef is required/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missingReference)),
+    /persisted review request is malformed/u,
+  );
+
+  const missingResult = structuredClone(validCopilot);
+  missingResult.current_task.review.copilotResults.submittedReviews = [];
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missingResult)),
+    /one attributable terminal result/u,
+  );
+
+  for (const mutate of [
+    (candidate) => {
+      candidate.current_task.review.copilotResults.submittedReviews[0].actor =
+        'untrusted-reviewer[bot]';
+    },
+    (candidate) => {
+      candidate.current_task.review.copilotResults.submittedReviews[0].commit = HASHES.head2;
+    },
+    (candidate) => {
+      candidate.current_task.review.copilotResults.submittedReviews[0].submittedAt =
+        '2026-09-04T09:59:59Z';
+    },
+    (candidate) => {
+      candidate.current_task.review.reviewRequests[0].baselineReviewNodeIds = [
+        copilotRequest.terminalResultRef.id,
+      ];
+    },
+    (candidate) => {
+      candidate.current_task.review.copilotResults.submittedReviews.push(
+        structuredClone(candidate.current_task.review.copilotResults.submittedReviews[0]),
+      );
+    },
+  ]) {
+    const invalid = structuredClone(validCopilot);
+    mutate(invalid);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /one attributable terminal result/u,
+    );
+  }
+
+  const codexRequest = requestFor(input, 'codex', {
+    confirmed: true,
+    terminal: true,
+    requestedAt: '2026-09-04T10:01:00Z',
+    baselineConversationComments: {
+      COMMENT_CODEX: '2026-09-04T10:00:30Z',
+    },
+    terminalResultRef: {
+      kind: 'conversation-comment',
+      id: 'COMMENT_CODEX',
+      observedAt: '2026-09-04T10:02:00Z',
+    },
+  });
+  const validHeadlessCodex = compactState(input, {
+    reviewRequests: [copilotRequest, codexRequest],
+  });
+  assertSchemaValid(validHeadlessCodex, schema, schema);
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(validHeadlessCodex)),
+    validHeadlessCodex,
+  );
+
+  for (const mutate of [
+    (candidate) => {
+      delete candidate.current_task.review.codexResults.conversationComments[0].status;
+    },
+    (candidate) => {
+      candidate.current_task.review.codexResults.conversationComments[0].status = 'in-progress';
+    },
+    (candidate) => {
+      candidate.current_task.review.codexResults.conversationComments[0].commitPrefix =
+        HASHES.head2.slice(0, 7);
+    },
+    (candidate) => {
+      candidate.current_task.review.reviewRequests[1]
+        .baselineConversationComments.COMMENT_CODEX = '2026-09-04T10:02:00Z';
+    },
+  ]) {
+    const invalid = structuredClone(validHeadlessCodex);
+    mutate(invalid);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /one attributable terminal result/u,
+    );
+  }
+
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const afterDifferentInputBoundary = compactState(input2, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [
+      copilotRequest,
+      codexRequest,
+      requestFor(input2, 'copilot', {
+        requestedAt: '2026-09-04T10:02:00Z',
+      }),
+    ],
+  });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(afterDifferentInputBoundary)),
+    /one attributable terminal result/u,
+  );
+
+  const duplicatedReference = compactState(input2, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [
+      copilotRequest,
+      requestFor(input2, 'copilot', {
+        confirmed: true,
+        terminal: true,
+        terminalResultRef: structuredClone(copilotRequest.terminalResultRef),
+      }),
+    ],
+  });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(duplicatedReference)),
+    /assigned to multiple requests/u,
+  );
+
+  const copilotConversation = structuredClone(validCopilot);
+  copilotConversation.current_task.review.reviewRequests[0].terminalResultRef.kind =
+    'conversation-comment';
+  assert.throws(
+    () => assertSchemaValid(copilotConversation, schema, schema),
+    /does not match const/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(copilotConversation)),
+    /persisted review request is malformed/u,
+  );
+});
+
 test('compact-state ingestion cross-validates supersessions and causal ordering', () => {
   const input1 = reviewInput();
   const input2 = reviewInput({
@@ -1948,8 +2172,11 @@ test('compact-state ingestion cross-validates supersessions and causal ordering'
   });
   const noRequest = structuredClone(valid);
   noRequest.current_task.review.reviewRequests = [];
-  const completePair = structuredClone(valid);
-  completePair.current_task.review.reviewRequests = pairFor(input1);
+  const completePair = compactState(input2, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: pairFor(input1),
+    supersededReviewInputs: supersessionFor(input1, input2),
+  });
   const wrongHead = structuredClone(valid);
   wrongHead.current_task.review.supersededReviewInputs[getReviewInputKey(input1)].head =
     HASHES.tree1;
@@ -2045,7 +2272,10 @@ test('a live prior channel cannot be closed by same-head supersession', () => {
     /terminal incomplete prior-input pair/u,
   );
 
-  const terminalRequest = { ...liveRequest, terminal: true };
+  const terminalRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
   assert.equal(decision(terminalRequest).status, 'SUPERSESSION_REQUIRED');
   assert.equal(
     decision(terminalRequest, supersessionFor(input1, input2)).status,

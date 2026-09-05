@@ -333,6 +333,9 @@
         "terminal": {
           "type": "boolean"
         },
+        "terminalResultRef": {
+          "$ref": "#/$defs/terminalResultRef"
+        },
         "baselineRequestEventIds": {
           "type": "array",
           "items": {
@@ -398,8 +401,90 @@
               }
             }
           }
+        },
+        {
+          "if": {
+            "properties": {
+              "confirmed": {
+                "const": true
+              },
+              "terminal": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "terminalResultRef"
+            ]
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "terminalResultRef"
+            ]
+          },
+          "then": {
+            "properties": {
+              "confirmed": {
+                "const": true
+              },
+              "terminal": {
+                "const": true
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "terminalResultRef"
+            ],
+            "properties": {
+              "channel": {
+                "const": "copilot"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "terminalResultRef": {
+                "properties": {
+                  "kind": {
+                    "const": "submitted-review"
+                  }
+                }
+              }
+            }
+          }
         }
       ]
+    },
+    "terminalResultRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "observedAt"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "submitted-review",
+            "conversation-comment"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "observedAt": {
+          "$ref": "#/$defs/rfc3339"
+        }
+      }
     },
     "terminalDisposition": {
       "type": "object",
