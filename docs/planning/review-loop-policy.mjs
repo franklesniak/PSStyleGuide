@@ -356,6 +356,8 @@ function validatePersistedReviewRequests(reviewRequests) {
     }
     seenRequests.add(requestIdentity);
   }
+
+  validateReviewRequestOrdering(reviewRequests);
 }
 
 function validatePersistedPublicMutation(publicMutation) {
@@ -634,6 +636,7 @@ export function decideReviewRequest({
       }
     }
   }
+  validateReviewRequestOrdering(requests);
   const supersessionByKey = new Map();
   const knownHeads = new Set([
     currentReviewInput.head,
@@ -1011,6 +1014,35 @@ function isReviewRequestRecord(request) {
     commentBaselinesAreValid;
 }
 
+function validateReviewRequestOrdering(reviewRequests) {
+  for (const codexRequest of reviewRequests.filter(
+    (request) => request.channel === 'codex',
+  )) {
+    const copilotRequests = reviewRequests.filter(
+      (request) => request.channel === 'copilot' &&
+        request.reviewInputKey === codexRequest.reviewInputKey,
+    );
+    const copilotRequest = copilotRequests[0];
+    const copilotReady = copilotRequests.length === 1 &&
+      copilotRequest.head === codexRequest.head &&
+      (copilotRequest.confirmed === true || copilotRequest.terminal === true);
+    if (!copilotReady) {
+      throw new TypeError(
+        'A Codex request requires one eligible Copilot predecessor for the same reviewed input.',
+      );
+    }
+
+    const copilotTime = parseRfc3339Timestamp(
+      copilotRequest.requestedAt,
+      'Copilot requestedAt',
+    );
+    const codexTime = parseRfc3339Timestamp(codexRequest.requestedAt, 'Codex requestedAt');
+    if (copilotTime > codexTime) {
+      throw new TypeError('A Codex request must not precede its Copilot request.');
+    }
+  }
+}
+
 function isSupersededReviewInputRecord(disposition) {
   return disposition !== null &&
     typeof disposition === 'object' &&
@@ -1041,6 +1073,7 @@ export function collectCodexResults({
   reviewInput,
   actor = 'chatgpt-codex-connector',
   request = null,
+  reviewRequests = [],
 }) {
   const head = reviewInput?.head;
   const reviewInputKey = reviewInput === null || reviewInput === undefined
@@ -1048,8 +1081,30 @@ export function collectCodexResults({
     : getReviewInputKey(reviewInput);
   const requestTime = getItemTime(request, ['requestedAt']);
   const expectedActor = normalizeActorLogin(actor);
+  const requests = normalizeCollection(reviewRequests);
+  let requestHistoryIsValid = false;
+  try {
+    const seenRequests = new Set();
+    if (requests.some((candidate) => !isReviewRequestRecord(candidate))) {
+      throw new TypeError('A Codex result request history is malformed.');
+    }
+    for (const candidate of requests) {
+      const identity = `${candidate.reviewInputKey}:${candidate.channel}`;
+      if (seenRequests.has(identity)) {
+        throw new TypeError('A Codex result request history contains a duplicate channel.');
+      }
+      seenRequests.add(identity);
+    }
+    validateReviewRequestOrdering(requests);
+    requestHistoryIsValid = requests.some(
+      (candidate) => canonicalJson(candidate) === canonicalJson(request),
+    );
+  } catch {
+    requestHistoryIsValid = false;
+  }
   const requestMatches = reviewInputKey !== null &&
     isReviewRequestForInput(request, reviewInput, 'codex') &&
+    requestHistoryIsValid &&
     expectedActor !== null &&
     requestTime !== null;
   if (!requestMatches) {

@@ -135,7 +135,7 @@ function supersessionFor(input, successorInput, overrides = {}) {
 
 function pairFor(input, overrides = {}) {
   return [
-    requestFor(input, 'copilot', { terminal: true, ...overrides }),
+    requestFor(input, 'copilot', { confirmed: true, terminal: true, ...overrides }),
     requestFor(input, 'codex', { terminal: true, ...overrides }),
   ];
 }
@@ -226,6 +226,7 @@ test('scenario 3a: H2 waits for a pending H1 pair before accepting a headless re
   const lateH1Result = collectCodexResults({
     reviewInput: input1,
     request: pendingRequests.find((request) => request.channel === 'codex'),
+    reviewRequests: pendingRequests,
     submittedReviews: [],
     conversationComments: [{
       id: 'H1_HEADLESS_RESULT',
@@ -254,7 +255,7 @@ test('scenario 3b: authenticated head drift supersedes an impossible missing H1 
     bodySha256: HASHES.body2,
   });
   const mutationClass = classifyMutation(state(input1), state(input2));
-  const oldRequest = requestFor(input1, 'codex');
+  const oldRequest = requestFor(input1, 'copilot');
   const requiresDisposition = decideReviewRequest({
     previousReviewInput: input1,
     currentReviewInput: input2,
@@ -269,18 +270,6 @@ test('scenario 3b: authenticated head drift supersedes an impossible missing H1 
     existingRequests: [oldRequest],
     supersededInputs: supersession,
   });
-  const lateOldResult = collectCodexResults({
-    reviewInput: input1,
-    request: oldRequest,
-    submittedReviews: [],
-    conversationComments: [{
-      id: 'LATE_H1_RESULT',
-      user: { login: 'chatgpt-codex-connector[bot]' },
-      created_at: '2026-09-04T10:03:00Z',
-      body: 'Late result for H1.',
-    }],
-  });
-
   assert.equal(requiresDisposition.status, 'SUPERSESSION_REQUIRED');
   assert.deepEqual(
     requiresDisposition.supersedeReviewInputKeys,
@@ -288,13 +277,10 @@ test('scenario 3b: authenticated head drift supersedes an impossible missing H1 
   );
   assert.equal(recovered.status, 'REQUEST_REQUIRED');
   assert.deepEqual(recovered.channels, ['copilot']);
-  assert.deepEqual(
-    lateOldResult.conversationComments.map((comment) => comment.id),
-    ['LATE_H1_RESULT'],
-  );
   assert.deepEqual(collectCodexResults({
     reviewInput: input2,
     request: oldRequest,
+    reviewRequests: [oldRequest],
     submittedReviews: [],
     conversationComments: [{
       id: 'LATE_H1_RESULT',
@@ -346,7 +332,7 @@ test('old-head supersession rejects forged, current-input, and complete-pair rec
     bodySha256: HASHES.body2,
   });
   const mutationClass = classifyMutation(state(input1), state(input2));
-  const oldRequest = requestFor(input1, 'codex');
+  const oldRequest = requestFor(input1, 'copilot');
   const decide = (supersededInputs, existingRequests = [oldRequest]) => decideReviewRequest({
     previousReviewInput: input1,
     currentReviewInput: input2,
@@ -444,6 +430,86 @@ test('scenario 5a: a same-head pair releases Codex after Copilot confirmation or
   assert.match(terminal.reason, /already started/u);
 });
 
+test('Codex requests require an eligible earlier Copilot predecessor', () => {
+  const input = reviewInput();
+  const codexRequest = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+  });
+  const orphan = [codexRequest];
+  const premature = [
+    requestFor(input, 'copilot'),
+    codexRequest,
+  ];
+  const reversed = [
+    requestFor(input, 'copilot', {
+      confirmed: true,
+      requestedAt: '2026-09-04T10:02:00Z',
+    }),
+    codexRequest,
+  ];
+  const validConfirmed = [
+    requestFor(input, 'copilot', {
+      confirmed: true,
+      requestedAt: '2026-09-04T10:00:00Z',
+    }),
+    codexRequest,
+  ];
+  const validTerminal = [
+    requestFor(input, 'copilot', {
+      terminal: true,
+      requestedAt: '2026-09-04T10:00:00Z',
+    }),
+    codexRequest,
+  ];
+  const decide = (reviewRequests) => decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: reviewRequests,
+  });
+
+  assert.throws(() => decide(orphan), /eligible Copilot predecessor/u);
+  assert.throws(() => decide(premature), /eligible Copilot predecessor/u);
+  assert.throws(() => decide(reversed), /must not precede/u);
+  for (const [reviewRequests, expectedError] of [
+    [orphan, /eligible Copilot predecessor/u],
+    [premature, /eligible Copilot predecessor/u],
+    [reversed, /must not precede/u],
+  ]) {
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(compactState(input, {
+        reviewRequests,
+      }))),
+      expectedError,
+    );
+  }
+  assert.equal(decide(validConfirmed).status, 'NO_REQUEST');
+  assert.equal(decide(validTerminal).status, 'NO_REQUEST');
+
+  const conversationComments = [{
+    id: 'HEADLESS',
+    user: { login: 'chatgpt-codex-connector[bot]' },
+    created_at: '2026-09-04T10:02:00Z',
+    body: 'Review complete with no findings.',
+  }];
+  for (const reviewRequests of [orphan, premature, reversed]) {
+    assert.deepEqual(collectCodexResults({
+      reviewInput: input,
+      request: codexRequest,
+      reviewRequests,
+      submittedReviews: [],
+      conversationComments,
+    }), { submittedReviews: [], conversationComments: [] });
+  }
+  assert.deepEqual(collectCodexResults({
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: validConfirmed,
+    submittedReviews: [],
+    conversationComments,
+  }).conversationComments.map((comment) => comment.id), ['HEADLESS']);
+});
+
 test('current-input records cannot bypass different-input pair serialization', () => {
   const input1 = reviewInput();
   const input2 = reviewInput({
@@ -454,7 +520,7 @@ test('current-input records cannot bypass different-input pair serialization', (
   });
   const mutationClass = classifyMutation(state(input1), state(input2));
   const pendingOldPair = pairFor(input1, { terminal: false });
-  const partialCurrentPair = [requestFor(input2, 'codex')];
+  const partialCurrentPair = [requestFor(input2, 'copilot')];
   const completeCurrentPair = pairFor(input2, { terminal: false });
   const pendingPartial = decideReviewRequest({
     previousReviewInput: input1,
@@ -478,7 +544,7 @@ test('current-input records cannot bypass different-input pair serialization', (
     previousReviewInput: input1,
     currentReviewInput: input2,
     mutationClass,
-    existingRequests: [requestFor(input1, 'codex'), ...partialCurrentPair],
+    existingRequests: [requestFor(input1, 'copilot'), ...partialCurrentPair],
     supersededInputs: supersessionFor(input1, input2),
   });
 
@@ -486,10 +552,10 @@ test('current-input records cannot bypass different-input pair serialization', (
   assert.deepEqual(pendingPartial.channels, []);
   assert.equal(pendingComplete.status, 'WAIT_FOR_PRIOR_PAIR');
   assert.deepEqual(pendingComplete.channels, []);
-  assert.equal(terminalOld.status, 'REQUEST_REQUIRED');
-  assert.deepEqual(terminalOld.channels, ['copilot']);
-  assert.equal(supersededOld.status, 'REQUEST_REQUIRED');
-  assert.deepEqual(supersededOld.channels, ['copilot']);
+  assert.equal(terminalOld.status, 'WAIT_FOR_CURRENT_CHANNEL');
+  assert.deepEqual(terminalOld.channels, []);
+  assert.equal(supersededOld.status, 'WAIT_FOR_CURRENT_CHANNEL');
+  assert.deepEqual(supersededOld.channels, []);
 });
 
 test('scenario 5b: a material same-head request waits for the prior pair to finish', () => {
@@ -547,9 +613,15 @@ test('scenario 5c: a same-head diff change waits for the prior pair to finish', 
 
 test('scenario 6: both attributable Codex result channels are recognized', () => {
   const input = reviewInput();
+  const request = requestFor(input, 'codex');
+  const reviewRequests = [
+    requestFor(input, 'copilot', { confirmed: true }),
+    request,
+  ];
   const results = collectCodexResults({
     reviewInput: input,
-    request: requestFor(input, 'codex'),
+    request,
+    reviewRequests,
     submittedReviews: {
       id: 1,
       user: { login: 'chatgpt-codex-connector' },
@@ -581,11 +653,19 @@ test('scenario 6: both attributable Codex result channels are recognized', () =>
 
 test('whole-second Codex evidence matches a fractional request boundary', () => {
   const input = reviewInput();
+  const request = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:00:00.094Z',
+  });
   const results = collectCodexResults({
     reviewInput: input,
-    request: requestFor(input, 'codex', {
-      requestedAt: '2026-09-04T10:00:00.094Z',
-    }),
+    request,
+    reviewRequests: [
+      requestFor(input, 'copilot', {
+        confirmed: true,
+        requestedAt: '2026-09-04T10:00:00Z',
+      }),
+      request,
+    ],
     submittedReviews: [
       {
         id: 'REVIEW_SAME_SECOND',
@@ -1391,6 +1471,10 @@ test('Codex results normalize REST and GraphQL identities and reject stale evide
   const results = collectCodexResults({
     reviewInput: input,
     request,
+    reviewRequests: [
+      requestFor(input, 'copilot', { confirmed: true }),
+      request,
+    ],
     submittedReviews: {
       nodes: [
         {
@@ -1440,9 +1524,14 @@ test('Codex results normalize REST and GraphQL identities and reject stale evide
 test('Codex request correlation rejects a different reviewed input', () => {
   const input = reviewInput();
   const changedInput = reviewInput({ risk: 'R2 sensitive planning change.' });
+  const request = requestFor(input, 'codex');
   const results = collectCodexResults({
     reviewInput: changedInput,
-    request: requestFor(input, 'codex'),
+    request,
+    reviewRequests: [
+      requestFor(input, 'copilot', { confirmed: true }),
+      request,
+    ],
     submittedReviews: [{
       id: 'REVIEW_NEW',
       user: { login: 'chatgpt-codex-connector[bot]' },
@@ -1462,6 +1551,10 @@ test('Codex request correlation fails closed when baseline evidence is missing',
   const results = collectCodexResults({
     reviewInput: input,
     request,
+    reviewRequests: [
+      requestFor(input, 'copilot', { confirmed: true }),
+      request,
+    ],
     submittedReviews: [{
       id: 'REVIEW_NEW',
       user: { login: 'chatgpt-codex-connector[bot]' },
@@ -1775,7 +1868,10 @@ test('compact-state ingestion rejects duplicate reviewed-input channel requests'
   );
 
   const distinctChannels = compactState(input1, {
-    reviewRequests: [first, requestFor(input1, 'codex')],
+    reviewRequests: [
+      requestFor(input1, 'copilot', { confirmed: true }),
+      requestFor(input1, 'codex'),
+    ],
   });
   assert.deepEqual(parseCompactStateJson(JSON.stringify(distinctChannels)), distinctChannels);
 
