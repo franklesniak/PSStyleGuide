@@ -2063,11 +2063,6 @@ export function createMetrics({
         throw new TypeError(`sameHeadRerequestReasons[${index}] is malformed.`);
       }
       assertNonemptyText(record.reason, `sameHeadRerequestReasons[${index}].reason`);
-      if (record.reason.trim().length === 0) {
-        throw new TypeError(
-          `sameHeadRerequestReasons[${index}].reason must contain non-whitespace text.`,
-        );
-      }
       return Object.freeze({
         reason: record.reason,
         material: record.material,
