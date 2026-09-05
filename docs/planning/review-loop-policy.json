@@ -29,8 +29,10 @@
       "type": "array",
       "items": {
         "type": "integer",
-        "minimum": 1
+        "minimum": 1,
+        "maximum": 402
       },
+      "maxItems": 402,
       "uniqueItems": true
     },
     "updated_utc": {
@@ -56,7 +58,8 @@
       "properties": {
         "number": {
           "type": "integer",
-          "minimum": 1
+          "minimum": 1,
+          "maximum": 402
         },
         "state": {
           "enum": [
@@ -202,7 +205,8 @@
             "properties": {
               "materialReason": {
                 "type": "string",
-                "minLength": 1
+                "minLength": 1,
+                "pattern": "\\S"
               }
             }
           }
@@ -300,6 +304,7 @@
         "reviewInputKey",
         "head",
         "requestedAt",
+        "confirmed",
         "terminal",
         "baselineRequestEventIds",
         "baselineReviewNodeIds",
@@ -321,6 +326,9 @@
         },
         "requestedAt": {
           "$ref": "#/$defs/rfc3339"
+        },
+        "confirmed": {
+          "type": "boolean"
         },
         "terminal": {
           "type": "boolean"

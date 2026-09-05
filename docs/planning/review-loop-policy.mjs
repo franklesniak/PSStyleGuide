@@ -27,6 +27,7 @@ export const REVIEW_REQUEST_SPECS = Object.freeze({
 });
 
 export const REVIEW_REQUEST_RECONCILIATION_MILLISECONDS = 120_000;
+export const PLAN_TASK_COUNT = 402;
 
 const SHA1_PATTERN = /^[0-9a-f]{40}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
@@ -307,12 +308,54 @@ export function parseCompactStateJson(text) {
     Object.hasOwn(parsed, 'current_task')
   ) {
     validatePredecessorOutputs(parsed.predecessor_outputs);
+    validatePersistedProgress(parsed.current_task, parsed.completed);
     if (parsed.current_task?.review !== undefined) {
       validatePersistedPublicMutation(parsed.current_task.review.publicMutation);
+      validatePersistedReviewRequests(parsed.current_task.review.reviewRequests);
     }
   }
 
   return parsed;
+}
+
+function validatePersistedProgress(currentTask, completed) {
+  const currentTaskNumber = currentTask?.number;
+  if (
+    !Number.isInteger(currentTaskNumber) ||
+    currentTaskNumber < 1 ||
+    currentTaskNumber > PLAN_TASK_COUNT ||
+    !Array.isArray(completed)
+  ) {
+    throw new TypeError('The persisted task progress is malformed or outside the plan.');
+  }
+
+  const lastCompletedTask = currentTask?.state === 'complete'
+    ? currentTaskNumber
+    : currentTaskNumber - 1;
+  if (
+    completed.length !== lastCompletedTask ||
+    completed.some((taskNumber, index) => taskNumber !== index + 1)
+  ) {
+    throw new TypeError('Completed tasks must be the contiguous predecessors of the current task.');
+  }
+}
+
+function validatePersistedReviewRequests(reviewRequests) {
+  if (!Array.isArray(reviewRequests)) {
+    throw new TypeError('The persisted review-request collection is malformed.');
+  }
+
+  const seenRequests = new Set();
+  for (const request of reviewRequests) {
+    if (!isReviewRequestRecord(request)) {
+      throw new TypeError('A persisted review request is malformed.');
+    }
+    const requestIdentity = `${request.reviewInputKey}:${request.channel}`;
+    if (seenRequests.has(requestIdentity)) {
+      throw new TypeError('A duplicate reviewed-input and channel request is persisted.');
+    }
+    seenRequests.add(requestIdentity);
+  }
 }
 
 function validatePersistedPublicMutation(publicMutation) {
@@ -676,6 +719,7 @@ export function decideReviewRequest({
     );
     if (
       copilotRequest !== undefined &&
+      copilotRequest.confirmed !== true &&
       copilotRequest.terminal !== true &&
       codexRequest === undefined
     ) {
@@ -956,6 +1000,7 @@ function isReviewRequestRecord(request) {
   const channelIsValid = request?.channel === 'copilot' || request?.channel === 'codex';
 
   return channelIsValid &&
+    typeof request.confirmed === 'boolean' &&
     typeof request.terminal === 'boolean' &&
     typeof request.head === 'string' &&
     SHA1_PATTERN.test(request.head) &&

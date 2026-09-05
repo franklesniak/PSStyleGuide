@@ -3,6 +3,7 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
   MUTATION_CLASSES,
+  PLAN_TASK_COUNT,
   classifyMutation,
   collectCopilotRequestEvidence,
   collectCodexResults,
@@ -109,6 +110,7 @@ function requestFor(input, channel, overrides = {}) {
     reviewInputKey: getReviewInputKey(input),
     head: input.head,
     requestedAt: '2026-09-04T10:00:00Z',
+    confirmed: false,
     terminal: false,
     baselineRequestEventIds: [],
     baselineReviewNodeIds: [],
@@ -411,13 +413,19 @@ test('scenario 5: an unjustified same-head request is rejected', () => {
   assert.deepEqual(decision.channels, []);
 });
 
-test('scenario 5a: an interrupted same-head pair waits for Copilot before Codex', () => {
+test('scenario 5a: a same-head pair releases Codex after Copilot confirmation or terminal disposition', () => {
   const input = reviewInput();
   const pending = decideReviewRequest({
     previousReviewInput: input,
     currentReviewInput: input,
     mutationClass: 'RESULT_OR_STATE',
     existingRequests: [requestFor(input, 'copilot')],
+  });
+  const confirmed = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: [requestFor(input, 'copilot', { confirmed: true })],
   });
   const terminal = decideReviewRequest({
     previousReviewInput: input,
@@ -429,6 +437,8 @@ test('scenario 5a: an interrupted same-head pair waits for Copilot before Codex'
   assert.equal(pending.status, 'WAIT_FOR_CURRENT_CHANNEL');
   assert.deepEqual(pending.channels, []);
   assert.match(pending.reason, /confirmed or terminally proved non-functional/u);
+  assert.equal(confirmed.status, 'REQUEST_REQUIRED');
+  assert.deepEqual(confirmed.channels, ['codex']);
   assert.equal(terminal.status, 'REQUEST_REQUIRED');
   assert.deepEqual(terminal.channels, ['codex']);
   assert.match(terminal.reason, /already started/u);
@@ -1172,6 +1182,7 @@ test('all permanent active task-template and controller surfaces use the compact
     parent,
     /confirmed or is terminally proved non-functional under the repository's reviewer-unavailability instructions/u,
   );
+  assert.match(parent, /persist its head, reviewed-input key, request time, `confirmed: true`, and nonterminal state/u);
   assert.match(parent, /Locate and obey the applicable `AGENTS\.md`/u);
   assert.match(
     parent,
@@ -1197,6 +1208,7 @@ test('all permanent active task-template and controller surfaces use the compact
     alternate,
     /confirmed or is terminally proved non-functional under the repository's reviewer-unavailability instructions/u,
   );
+  assert.match(alternate, /persist its head, reviewed-input key, request time, `confirmed: true`, and nonterminal state/u);
   assert.match(alternate, /Locate and obey the applicable `AGENTS\.md`/u);
   assert.match(
     alternate,
@@ -1645,6 +1657,132 @@ test('the actual compact resume record and review state match their closed schem
   );
   assertSchemaValid(readControllerExample(parent), schema, schema);
   assertSchemaValid(readControllerExample(alternate), schema, schema);
+});
+
+test('material reasons require non-whitespace text in both schema and runtime', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const previousInput = reviewInput({ risk: 'R1 reversible planning change.' });
+  const currentInput = reviewInput({ risk: 'R2 sensitive planning change.' });
+  const valid = compactState(currentInput, {
+    mutationClass: 'MATERIAL_SCOPE_BEHAVIOR_RISK',
+    materialReason: 'The risk changed.',
+  });
+
+  assertSchemaValid(valid, schema, schema);
+  for (const materialReason of ['', ' ', '\t\r\n']) {
+    const invalid = structuredClone(valid);
+    invalid.current_task.review.materialReason = materialReason;
+    assert.throws(
+      () => assertSchemaValid(invalid, schema, schema),
+      /too short|does not match pattern/u,
+    );
+    assert.throws(
+      () => decideReviewRequest({
+        previousReviewInput: previousInput,
+        currentReviewInput: currentInput,
+        mutationClass: 'MATERIAL_SCOPE_BEHAVIOR_RISK',
+        materialReason,
+      }),
+      /requires a reason/u,
+    );
+  }
+});
+
+test('compact progress stays within the fixed plan and names contiguous predecessors', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  assert.equal(PLAN_TASK_COUNT, 402);
+  const activeFinalTask = compactState(reviewInput(), {}, {
+    number: PLAN_TASK_COUNT,
+  }, {
+    completed: Array.from({ length: PLAN_TASK_COUNT - 1 }, (_, index) => index + 1),
+  });
+  const completeFinalTask = structuredClone(activeFinalTask);
+  completeFinalTask.current_task.state = 'complete';
+  completeFinalTask.completed.push(PLAN_TASK_COUNT);
+
+  assertSchemaValid(activeFinalTask, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(activeFinalTask)), activeFinalTask);
+  assertSchemaValid(completeFinalTask, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(completeFinalTask)), completeFinalTask);
+
+  const outsidePlan = compactState(reviewInput(), {}, { number: PLAN_TASK_COUNT + 1 }, {
+    completed: [1, 2, 3],
+  });
+  const nonexistentCompletedTask = compactState(reviewInput(), {}, {}, {
+    completed: [1, 2, PLAN_TASK_COUNT + 1],
+  });
+  assert.throws(() => assertSchemaValid(outsidePlan, schema, schema), /above maximum/u);
+  assert.throws(
+    () => assertSchemaValid(nonexistentCompletedTask, schema, schema),
+    /above maximum/u,
+  );
+
+  for (const completed of [
+    [1, 3],
+    [2, 1, 3],
+    [1, 2, 3, 4],
+    [1, 2],
+  ]) {
+    const invalid = compactState(reviewInput(), {}, {}, { completed });
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /contiguous predecessors/u,
+    );
+  }
+
+  const incompleteCompleteTask = compactState(reviewInput(), {}, { state: 'complete' });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(incompleteCompleteTask)),
+    /contiguous predecessors/u,
+  );
+});
+
+test('compact-state ingestion rejects duplicate reviewed-input channel requests', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const first = requestFor(input1, 'copilot');
+  const differentTimestamp = requestFor(input1, 'copilot', {
+    requestedAt: '2026-09-04T10:01:00Z',
+  });
+  const duplicate = compactState(input1, {
+    reviewRequests: [first, differentTimestamp],
+  });
+
+  assertSchemaValid(duplicate, schema, schema);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(duplicate)),
+    /duplicate reviewed-input and channel/u,
+  );
+
+  const identical = compactState(input1, {
+    reviewRequests: [first, structuredClone(first)],
+  });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(identical)),
+    /duplicate reviewed-input and channel/u,
+  );
+
+  const distinctChannels = compactState(input1, {
+    reviewRequests: [first, requestFor(input1, 'codex')],
+  });
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(distinctChannels)), distinctChannels);
+
+  const distinctInputs = compactState(input1, {
+    reviewRequests: [first, requestFor(input2, 'copilot')],
+  });
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(distinctInputs)), distinctInputs);
 });
 
 test('compact task commit identities are SHA-1 values or null', async () => {
