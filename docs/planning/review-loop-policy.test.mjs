@@ -1792,6 +1792,39 @@ test('material reasons require non-whitespace text in both schema and runtime', 
   }
 });
 
+test('supersession reasons require non-whitespace text in schema and ingestion', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const valid = compactState(input2, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [requestFor(input1, 'copilot')],
+    supersededReviewInputs: supersessionFor(input1, input2),
+  });
+
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+  for (const reason of ['', ' ', '\t\r\n']) {
+    const invalid = structuredClone(valid);
+    invalid.current_task.review.supersededReviewInputs[getReviewInputKey(input1)].reason = reason;
+    assert.throws(
+      () => assertSchemaValid(invalid, schema, schema),
+      /too short|does not match pattern/u,
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /persisted superseded review-input disposition is malformed/u,
+    );
+  }
+});
+
 test('compact progress stays within the fixed plan and names contiguous predecessors', async () => {
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),

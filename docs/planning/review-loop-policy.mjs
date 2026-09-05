@@ -311,6 +311,9 @@ export function parseCompactStateJson(text) {
     validatePersistedProgress(parsed.current_task, parsed.completed);
     if (parsed.current_task?.review !== undefined) {
       validatePersistedPublicMutation(parsed.current_task.review.publicMutation);
+      validatePersistedSupersededReviewInputs(
+        parsed.current_task.review.supersededReviewInputs,
+      );
       validatePersistedReviewRequests(parsed.current_task.review.reviewRequests);
     }
   }
@@ -358,6 +361,24 @@ function validatePersistedReviewRequests(reviewRequests) {
   }
 
   validateReviewRequestOrdering(reviewRequests);
+}
+
+function validatePersistedSupersededReviewInputs(supersededReviewInputs) {
+  if (
+    supersededReviewInputs === null ||
+    typeof supersededReviewInputs !== 'object' ||
+    Array.isArray(supersededReviewInputs) ||
+    Object.keys(supersededReviewInputs).length > 64
+  ) {
+    throw new TypeError('The persisted superseded review-input collection is malformed.');
+  }
+
+  const dispositions = Object.entries(supersededReviewInputs).map(
+    ([reviewInputKey, disposition]) => ({ ...disposition, reviewInputKey }),
+  );
+  if (dispositions.some((disposition) => !isSupersededReviewInputRecord(disposition))) {
+    throw new TypeError('A persisted superseded review-input disposition is malformed.');
+  }
 }
 
 function validatePersistedPublicMutation(publicMutation) {
