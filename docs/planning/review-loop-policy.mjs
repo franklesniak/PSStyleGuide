@@ -1095,27 +1095,62 @@ const COPILOT_REVIEWER_DATABASE_ID = 175728472;
 const COPILOT_REVIEWER_NODE_ID = 'BOT_kgDOCnlnWA';
 
 function isCopilotIdentity(item) {
+  const itemObject = item !== null && typeof item === 'object' ? item : null;
   const actor = item?.user ?? item?.author ?? item?.actor ?? item;
   const login = actor?.login ?? actor?.slug ??
     (typeof actor === 'string' ? actor : null);
   const normalized = normalizeActorLogin(login);
-  if (normalized === 'copilot-pull-request-reviewer') {
-    return true;
-  }
-  if (normalized !== 'copilot' || actor === null || typeof actor !== 'object') {
+  if (
+    normalized !== 'copilot-pull-request-reviewer' &&
+    normalized !== 'copilot'
+  ) {
     return false;
   }
 
-  const actorType = actor.type ?? actor.__typename;
-  const hasDatabaseId = [actor.id, actor.databaseId, actor.database_id].some(
+  const actorObject = actor !== null && typeof actor === 'object' ? actor : null;
+  const actorType = actorObject?.type ?? actorObject?.__typename ??
+    itemObject?.actorType ?? itemObject?.actor_type;
+  const databaseIds = [
+    actorObject?.databaseId,
+    actorObject?.database_id,
+    itemObject?.actorDatabaseId,
+    itemObject?.actor_database_id,
+  ].filter((value) => value !== undefined && value !== null);
+  const nodeIds = [
+    actorObject?.nodeId,
+    actorObject?.node_id,
+    itemObject?.actorNodeId,
+    itemObject?.actor_node_id,
+  ].filter((value) => value !== undefined && value !== null);
+  if (actorObject?.id !== undefined && actorObject.id !== null) {
+    if (
+      typeof actorObject.id === 'number' ||
+      (typeof actorObject.id === 'string' && /^\d+$/u.test(actorObject.id))
+    ) {
+      databaseIds.push(actorObject.id);
+    } else {
+      nodeIds.push(actorObject.id);
+    }
+  }
+
+  const hasIdentityMetadata = actorType !== undefined ||
+    databaseIds.length > 0 || nodeIds.length > 0;
+  if (!hasIdentityMetadata) {
+    return normalized === 'copilot-pull-request-reviewer';
+  }
+
+  const databaseIdsMatch = databaseIds.every(
     (value) => Number(value) === COPILOT_REVIEWER_DATABASE_ID,
   );
-  const hasNodeId = [actor.id, actor.nodeId, actor.node_id].some(
+  const nodeIdsMatch = nodeIds.every(
     (value) => value === COPILOT_REVIEWER_NODE_ID,
   );
+  const hasImmutableMatch = databaseIds.length > 0 || nodeIds.length > 0;
   return typeof actorType === 'string' &&
     actorType.toLowerCase() === 'bot' &&
-    (hasDatabaseId || hasNodeId);
+    hasImmutableMatch &&
+    databaseIdsMatch &&
+    nodeIdsMatch;
 }
 
 function getReviewerCollection(value) {
@@ -1786,13 +1821,14 @@ function normalizeCodexConversationResult(comment, head) {
   }
   const body = typeof comment?.body === 'string' ? comment.body : '';
   const completedRow = /\|\s*[^|\r\n]*\*\*Code Review\*\*\s*\|\s*[^|\r\n]*\*\*Completed\*\*[^|\r\n]*\|\s*`(?<commitPrefix>[0-9a-f]{7,40})`\s*\|/iu.exec(body);
-  if (completedRow === null || !head.startsWith(completedRow.groups.commitPrefix)) {
+  const commitPrefix = completedRow?.groups.commitPrefix.toLowerCase();
+  if (commitPrefix === undefined || !head.startsWith(commitPrefix)) {
     return comment;
   }
   return {
     ...comment,
     status: 'completed',
-    commitPrefix: completedRow.groups.commitPrefix,
+    commitPrefix,
   };
 }
 

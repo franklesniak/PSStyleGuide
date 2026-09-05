@@ -806,6 +806,20 @@ test('native completed Codex summaries become typed terminal conversation result
   assert.equal(collected.conversationComments[0].status, 'completed');
   assert.equal(collected.conversationComments[0].commitPrefix, 'aaaaaaa');
 
+  const uppercase = collectCodexResults({
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: requestHistory,
+    submittedReviews: [],
+    conversationComments: {
+      ...nativeSummary,
+      node_id: 'COMMENT_UPPERCASE',
+      body: '| 📝 **Code Review** | ✅ **Completed** <relative-time>now</relative-time> | `AAAAAAA` | Manual request |',
+    },
+  });
+  assert.equal(uppercase.conversationComments[0].status, 'completed');
+  assert.equal(uppercase.conversationComments[0].commitPrefix, 'aaaaaaa');
+
   const persisted = compactState(input, {
     reviewRequests: requestHistory,
     codexResults: collected,
@@ -1154,6 +1168,48 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
     }).responseReviewerMatched,
     true,
   );
+  assert.equal(
+    collectCopilotRequestEvidence({
+      ...common,
+      responseReviewers: [],
+      requestEvents: [],
+      requestedReviewers: [{
+        login: 'copilot-pull-request-reviewer[bot]',
+        type: 'Bot',
+        id: 175728472,
+        node_id: 'BOT_kgDOCnlnWA',
+      }],
+      submittedReviews: [],
+      reviewRuns: [],
+    }).requestedReviewerMatched,
+    true,
+  );
+  for (const requestedReviewer of [
+    {
+      login: 'copilot-pull-request-reviewer[bot]',
+      type: 'Bot',
+      id: 199175422,
+      node_id: 'BOT_kgDOC98s_g',
+    },
+    {
+      login: 'copilot-pull-request-reviewer[bot]',
+      type: 'Bot',
+      id: 175728472,
+      node_id: 'BOT_kgDOC98s_g',
+    },
+  ]) {
+    assert.equal(
+      collectCopilotRequestEvidence({
+        ...common,
+        responseReviewers: [],
+        requestEvents: [],
+        requestedReviewers: [requestedReviewer],
+        submittedReviews: [],
+        reviewRuns: [],
+      }).requestedReviewerMatched,
+      false,
+    );
+  }
   assert.throws(
     () => collectCopilotRequestEvidence({
       ...common,
@@ -1615,6 +1671,10 @@ test('all permanent active task-template and controller surfaces use the compact
       task.body,
       /terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`/u,
     );
+    assert.match(
+      task.body,
+      /Persist Copilot `readyAt` as the authenticated release boundary before a Codex request/u,
+    );
     assert.doesNotMatch(
       task.body,
       /result for the round only when it is newer than the applicable baseline and is explicitly anchored to the recorded PR head SHA/u,
@@ -1664,7 +1724,9 @@ test('all permanent active task-template and controller surfaces use the compact
     parent,
     /confirmed or is terminally proved non-functional through a persisted `terminalDisposition`/u,
   );
-  assert.match(parent, /persist its head, reviewed-input key, request time, `confirmed: true`, and nonterminal state/u);
+  assert.match(parent, /persist its head, reviewed-input key, request time, `confirmed: true`, nonterminal state, and Copilot `readyAt` time/u);
+  assert.match(parent, /whose `readyAt` time is not later than the Codex request time/u);
+  assert.doesNotMatch(parent, /whose request time is not later than the Codex request time/u);
   assert.match(parent, /closed `terminalResultRef`/u);
   assert.match(parent, /wrong-channel, or wrong-time reference/u);
   assert.match(parent, /each count to equal the persisted request history/u);
@@ -1693,7 +1755,9 @@ test('all permanent active task-template and controller surfaces use the compact
     alternate,
     /confirmed or is terminally proved non-functional through a persisted `terminalDisposition`/u,
   );
-  assert.match(alternate, /persist its head, reviewed-input key, request time, `confirmed: true`, and nonterminal state/u);
+  assert.match(alternate, /persist its head, reviewed-input key, request time, `confirmed: true`, nonterminal state, and Copilot `readyAt` time/u);
+  assert.match(alternate, /whose `readyAt` time is not later than the Codex request time/u);
+  assert.doesNotMatch(alternate, /whose request time is not later than the Codex request time/u);
   assert.match(alternate, /closed `terminalResultRef`/u);
   assert.match(alternate, /next different-input request boundary/u);
   assert.match(alternate, /known successor identities for retained supersessions/u);
@@ -1714,6 +1778,7 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(generator, /including a head that received zero requests/u);
   assert.match(generator, /copilot-pull-request-reviewer\[bot\]/u);
   assert.match(generator, /a second proved no-effect attempt is `EXHAUSTED`/iu);
+  assert.match(generator, /Persist Copilot `readyAt` as the authenticated release boundary/u);
   assert.match(crossRepository, /Reject non-finite or out-of-portable-range JSON numbers/u);
   assert.match(crossRepository, /task head and review-input head differ/u);
   assert.match(crossRepository, /closed `terminalResultRef`/u);
@@ -1727,6 +1792,11 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(crossRepository, /Preserve both submitted-review objects/u);
   assert.match(crossRepository, /copilot-pull-request-reviewer\[bot\]/u);
   assert.match(crossRepository, /`RECONCILING` → `NO_EFFECT` → one-retry → `EXHAUSTED`/u);
+  assert.match(crossRepository, /Persist Copilot `readyAt` as the authenticated release boundary/u);
+  assert.equal(
+    [...plan.matchAll(/Persist Copilot `readyAt` as the authenticated release boundary before a Codex request\./gu)].length,
+    82,
+  );
 });
 
 test('active fixed-plan review-loop tasks require persisted review state', async () => {
@@ -2404,6 +2474,43 @@ test('confirmed terminal requests require one attributable persisted result', as
     () => parseCompactStateJson(JSON.stringify(missingResult)),
     /one attributable terminal result/u,
   );
+
+  const authenticatedCopilot = structuredClone(validCopilot);
+  Object.assign(
+    authenticatedCopilot.current_task.review.copilotResults.submittedReviews[0],
+    {
+      actorDatabaseId: 175728472,
+      actorNodeId: 'BOT_kgDOCnlnWA',
+      actorType: 'Bot',
+    },
+  );
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(authenticatedCopilot)),
+    authenticatedCopilot,
+  );
+
+  for (const conflictingIdentity of [
+    {
+      actorDatabaseId: 199175422,
+      actorNodeId: 'BOT_kgDOC98s_g',
+      actorType: 'Bot',
+    },
+    {
+      actorDatabaseId: 175728472,
+      actorNodeId: 'BOT_kgDOC98s_g',
+      actorType: 'Bot',
+    },
+  ]) {
+    const invalid = structuredClone(validCopilot);
+    Object.assign(
+      invalid.current_task.review.copilotResults.submittedReviews[0],
+      conflictingIdentity,
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /one attributable terminal result/u,
+    );
+  }
 
   for (const mutate of [
     (candidate) => {
