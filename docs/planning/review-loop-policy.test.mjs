@@ -599,7 +599,7 @@ test('Copilot REST requests use the exact documented reviewer identity', () => {
   assert.throws(() => createReviewRequestSpec('copilot-pull-request-reviewer[bot]'), /copilot or codex/u);
 });
 
-test('Copilot request evidence normalizes cardinality and rejects the display name in a REST response', () => {
+test('Copilot request evidence normalizes cardinality and verifies GitHub bot aliases', () => {
   const common = {
     baselineRequestEventIds: ['old-event'],
     baselineReviewNodeIds: ['old-review'],
@@ -644,7 +644,12 @@ test('Copilot request evidence normalizes cardinality and rejects the display na
         id: 'new-event',
         event: 'review_requested',
         created_at: '2026-09-04T10:01:00Z',
-        requested_reviewer: { login: 'Copilot' },
+        requested_reviewer: {
+          login: 'Copilot',
+          type: 'Bot',
+          id: 175728472,
+          node_id: 'BOT_kgDOCnlnWA',
+        },
       },
     ],
     requestedReviewers: { users: [{ login: 'copilot-pull-request-reviewer[bot]' }] },
@@ -688,6 +693,38 @@ test('Copilot request evidence normalizes cardinality and rejects the display na
     }).responseReviewerMatched,
     true,
   );
+  const unverifiedAliases = collectCopilotRequestEvidence({
+    ...common,
+    responseReviewers: [{ login: 'Copilot' }],
+    requestEvents: [{
+      id: 'unverified-event',
+      event: 'review_requested',
+      created_at: '2026-09-04T10:01:00Z',
+      requested_reviewer: { login: 'Copilot', type: 'User', id: 12 },
+    }],
+    requestedReviewers: [{ login: 'Copilot' }],
+    submittedReviews: [{
+      id: 'unverified-review',
+      user: { login: 'Copilot', type: 'Bot', id: 12 },
+      commit_id: HASHES.head1,
+      submitted_at: '2026-09-04T10:01:00Z',
+    }],
+    reviewRuns: [{
+      id: 'unverified-run',
+      name: 'Running Copilot Code Review',
+      head_sha: HASHES.head1,
+      created_at: '2026-09-04T10:01:00Z',
+      actor: { login: 'Copilot', type: 'Bot', id: 12 },
+    }],
+  });
+  assert.deepEqual(unverifiedAliases, {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    readbackComplete: true,
+  });
   assert.equal(
     collectCopilotRequestEvidence({
       ...common,
@@ -723,7 +760,12 @@ test('whole-second Copilot evidence matches a fractional request boundary', () =
       id: 'EVENT_SAME_SECOND',
       event: 'review_requested',
       created_at: '2026-09-04T10:00:00Z',
-      requested_reviewer: { login: 'Copilot' },
+      requested_reviewer: {
+        login: 'Copilot',
+        type: 'Bot',
+        id: 175728472,
+        node_id: 'BOT_kgDOCnlnWA',
+      },
     }],
     submittedReviews: [{
       id: 'REVIEW_SAME_SECOND',
@@ -736,7 +778,12 @@ test('whole-second Copilot evidence matches a fractional request boundary', () =
       name: 'Running Copilot Code Review',
       head_sha: HASHES.head1,
       created_at: '2026-09-04T10:00:00Z',
-      actor: { login: 'Copilot' },
+      actor: {
+        login: 'Copilot',
+        type: 'Bot',
+        id: 175728472,
+        node_id: 'BOT_kgDOCnlnWA',
+      },
     }],
   });
   const early = collectCopilotRequestEvidence({
@@ -745,7 +792,12 @@ test('whole-second Copilot evidence matches a fractional request boundary', () =
       id: 'EVENT_EARLY',
       event: 'review_requested',
       created_at: '2026-09-04T09:59:59.999Z',
-      requested_reviewer: { login: 'Copilot' },
+      requested_reviewer: {
+        login: 'Copilot',
+        type: 'Bot',
+        id: 175728472,
+        node_id: 'BOT_kgDOCnlnWA',
+      },
     }],
     submittedReviews: [],
     reviewRuns: [],

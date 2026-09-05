@@ -710,10 +710,31 @@ function isItemAtOrAfterRequest(item, fields, requestTime) {
   return false;
 }
 
-function isCopilotIdentity(login, { allowDisplayName = true } = {}) {
+const COPILOT_REVIEWER_DATABASE_ID = 175728472;
+const COPILOT_REVIEWER_NODE_ID = 'BOT_kgDOCnlnWA';
+
+function isCopilotIdentity(item) {
+  const actor = item?.user ?? item?.author ?? item?.actor ?? item;
+  const login = actor?.login ?? actor?.slug ??
+    (typeof actor === 'string' ? actor : null);
   const normalized = normalizeActorLogin(login);
-  return normalized === 'copilot-pull-request-reviewer' ||
-    (allowDisplayName && normalized === 'copilot');
+  if (normalized === 'copilot-pull-request-reviewer') {
+    return true;
+  }
+  if (normalized !== 'copilot' || actor === null || typeof actor !== 'object') {
+    return false;
+  }
+
+  const actorType = actor.type ?? actor.__typename;
+  const hasDatabaseId = [actor.id, actor.databaseId, actor.database_id].some(
+    (value) => Number(value) === COPILOT_REVIEWER_DATABASE_ID,
+  );
+  const hasNodeId = [actor.id, actor.nodeId, actor.node_id].some(
+    (value) => value === COPILOT_REVIEWER_NODE_ID,
+  );
+  return typeof actorType === 'string' &&
+    actorType.toLowerCase() === 'bot' &&
+    (hasDatabaseId || hasNodeId);
 }
 
 function getReviewerCollection(value) {
@@ -791,22 +812,19 @@ export function collectCopilotRequestEvidence({
   const runBaselines = new Set(baselineReviewRunIds);
 
   const responseReviewerMatched = getReviewerCollection(responseReviewers).some(
-    (reviewer) => isCopilotIdentity(getActorLogin(reviewer) ?? reviewer?.login, {
-      allowDisplayName: false,
-    }),
+    (reviewer) => isCopilotIdentity(reviewer),
   );
   const requestEventMatched = normalizeCollection(requestEvents).some((event) => {
     const id = getItemId(event);
-    const reviewerLogin = event?.requested_reviewer?.login ??
-      event?.requestedReviewer?.login;
+    const reviewer = event?.requested_reviewer ?? event?.requestedReviewer;
     return event?.event === 'review_requested' &&
       id !== null &&
       !eventBaselines.has(id) &&
       isItemAtOrAfterRequest(event, ['created_at', 'createdAt'], requestTime) &&
-      isCopilotIdentity(reviewerLogin);
+      isCopilotIdentity(reviewer);
   });
   const requestedReviewerMatched = getReviewerCollection(requestedReviewers).some(
-    (reviewer) => isCopilotIdentity(getActorLogin(reviewer) ?? reviewer?.login),
+    (reviewer) => isCopilotIdentity(reviewer),
   );
   const submittedReviewMatched = normalizeCollection(submittedReviews).some((review) => {
     const id = getItemId(review);
@@ -814,13 +832,11 @@ export function collectCopilotRequestEvidence({
       !reviewBaselines.has(id) &&
       isItemAtOrAfterRequest(review, ['submitted_at', 'submittedAt'], requestTime) &&
       getCommitOid(review) === expectedHead &&
-      isCopilotIdentity(getActorLogin(review));
+      isCopilotIdentity(review);
   });
   const reviewRunMatched = normalizeCollection(reviewRuns).some((run) => {
     const id = getItemId(run);
     const head = run?.head_sha ?? run?.headSha ?? run?.headCommit?.oid;
-    const actor = run?.app?.slug ?? run?.app?.name ?? run?.actor?.login;
-    const name = run?.name ?? run?.display_title ?? run?.displayTitle ?? '';
     return id !== null &&
       !runBaselines.has(id) &&
       isItemAtOrAfterRequest(
@@ -829,7 +845,7 @@ export function collectCopilotRequestEvidence({
         requestTime,
       ) &&
       head === expectedHead &&
-      (isCopilotIdentity(actor) || /copilot.*code review/iu.test(name));
+      (isCopilotIdentity(run?.app) || isCopilotIdentity(run?.actor));
   });
 
   return Object.freeze({
