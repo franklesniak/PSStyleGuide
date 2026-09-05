@@ -489,8 +489,12 @@ function validatePredecessorOutputs(predecessorOutputs, completedTaskNumber = nu
 }
 
 export function prunePredecessorOutputs(predecessorOutputs, completedTaskNumber) {
-  if (!Number.isInteger(completedTaskNumber) || completedTaskNumber < 1) {
-    throw new TypeError('completedTaskNumber must be a positive integer.');
+  if (
+    !Number.isInteger(completedTaskNumber) ||
+    completedTaskNumber < 1 ||
+    completedTaskNumber > PLAN_TASK_COUNT
+  ) {
+    throw new TypeError('completedTaskNumber must identify a task in the fixed plan.');
   }
   validatePredecessorOutputs(predecessorOutputs);
 
@@ -505,7 +509,9 @@ export function prunePredecessorOutputs(predecessorOutputs, completedTaskNumber)
       retained[task] = retainedOutputs;
     }
   }
-  return canonicalize(retained);
+  const canonicalRetained = canonicalize(retained);
+  validatePredecessorOutputs(canonicalRetained, completedTaskNumber);
+  return canonicalRetained;
 }
 
 export function createReviewInput({

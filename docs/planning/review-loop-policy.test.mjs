@@ -2031,6 +2031,34 @@ test('predecessor outputs survive required restart boundaries and prune after fi
   );
 });
 
+test('pruning rejects future producers and out-of-plan progress after valid expiry', () => {
+  const expiring = {
+    2: {
+      CURRENT_DATA: { value: 'valid', last_consumer_task: 3 },
+    },
+  };
+  const retained = {
+    2: {
+      FUTURE_DATA: { value: 'needed', last_consumer_task: 4 },
+    },
+  };
+
+  assert.deepEqual(prunePredecessorOutputs(expiring, 3), {});
+  assert.deepEqual(prunePredecessorOutputs(retained, 3), retained);
+  assert.throws(
+    () => prunePredecessorOutputs({
+      10: {
+        FABRICATED_DATA: { value: 'invalid', last_consumer_task: 11 },
+      },
+    }, 3),
+    /predecessor task must contain a bounded output map/u,
+  );
+  assert.throws(
+    () => prunePredecessorOutputs({}, PLAN_TASK_COUNT + 1),
+    /fixed plan/u,
+  );
+});
+
 test('predecessor outputs stay within the fixed plan in both ingestion layers', async () => {
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
