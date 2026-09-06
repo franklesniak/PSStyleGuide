@@ -900,9 +900,6 @@
                       "requestEventMatched": {
                         "const": false
                       },
-                      "requestedReviewerMatched": {
-                        "const": false
-                      },
                       "submittedReviewMatched": {
                         "const": false
                       },

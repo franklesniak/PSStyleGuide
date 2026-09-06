@@ -2522,6 +2522,19 @@ test('all permanent active task-template and controller surfaces use the compact
     assert.match(task.body, /`NO_EFFECT`/u);
     assert.match(task.body, /`EXHAUSTED`/u);
     assert.match(task.body, /at least 120 seconds/u);
+    assert.match(
+      task.body,
+      /Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt\./u,
+    );
+    assert.doesNotMatch(
+      task.body,
+      /Confirm the request through matching authenticated request-event, current-requested-reviewer/u,
+    );
+    assert.doesNotMatch(
+      task.body,
+      /no matching request event, current requested reviewer, submitted review/u,
+    );
+    assert.doesNotMatch(task.body, /require matching authenticated readback/u);
     assert.match(task.body, /Do not (?:send|post)[^\n]*(?:Codex trigger|@codex review)/u);
     assert.match(
       task.body,
@@ -2706,6 +2719,14 @@ test('all permanent active task-template and controller surfaces use the compact
     'GitHub Actions App identity';
   for (const surface of [plan, parent, alternate, generator, crossRepository]) {
     assert.match(surface, new RegExp(checkRunAuthenticationRule, 'u'));
+    assert.match(
+      surface,
+      /Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt\./u,
+    );
+    assert.doesNotMatch(
+      surface,
+      /Require a matching authenticated request event, requested-reviewer record, submitted review, or workflow-run bot actor\./u,
+    );
   }
 });
 
@@ -6414,8 +6435,11 @@ test('metrics correlate whole-second body edits at their available precision', (
   assert.equal(metrics.bodyEditsAfterReviewBegan, 2);
 });
 
-test('requested-reviewer membership is diagnostic and cannot confirm a request', () => {
+test('requested-reviewer membership is diagnostic and blocks terminal negative reconciliation', async () => {
   const input = reviewInput();
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
   const evidence = {
     responseReviewerMatched: false,
     requestEventMatched: false,
@@ -6425,7 +6449,7 @@ test('requested-reviewer membership is diagnostic and cannot confirm a request',
     triggerCommentMatched: false,
     readbackComplete: true,
   };
-  const mutation = reconcileReviewRequestMutation({
+  const mutationArguments = {
     response: { ok: true },
     evidence,
     reviewInputKey: getReviewInputKey(input),
@@ -6434,17 +6458,79 @@ test('requested-reviewer membership is diagnostic and cannot confirm a request',
     observedAt: '2026-09-04T10:00:01Z',
     attemptCount: 1,
     localRecordSucceeded: true,
-  });
+  };
+  const mutation = reconcileReviewRequestMutation(mutationArguments);
 
   assert.equal(mutation.state, 'RECONCILING');
   assert.equal(mutation.readbackMatched, false);
   assert.equal(mutation.retryAllowed, false);
 
-  const state = compactState(input, {
+  const earlyState = compactState(input, {
     reviewRequests: [requestFor(input, 'copilot')],
     publicMutation: mutation,
   });
-  assert.deepEqual(parseCompactStateJson(JSON.stringify(state)), state);
+  assertSchemaValid(earlyState, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(earlyState)), earlyState);
+
+  const lateMutation = reconcileReviewRequestMutation({
+    ...mutationArguments,
+    observedAt: '2026-09-04T10:02:01Z',
+  });
+  assert.equal(lateMutation.state, 'RECONCILING');
+  assert.equal(lateMutation.reconciledAt, null);
+  assert.equal(lateMutation.retryAllowed, false);
+
+  const lateState = compactState(input, {
+    reviewRequests: [requestFor(input, 'copilot')],
+    publicMutation: lateMutation,
+  });
+  assertSchemaValid(lateState, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(lateState)), lateState);
+
+  const completeNegativeMutation = reconcileReviewRequestMutation({
+    ...mutationArguments,
+    evidence: { ...evidence, requestedReviewerMatched: false },
+    observedAt: '2026-09-04T10:02:01Z',
+  });
+  assert.equal(completeNegativeMutation.state, 'NO_EFFECT');
+  const completeNegativeState = compactState(input, {
+    reviewRequests: [requestFor(input, 'copilot')],
+    publicMutation: completeNegativeMutation,
+  });
+  assertSchemaValid(completeNegativeState, schema, schema);
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(completeNegativeState)),
+    completeNegativeState,
+  );
+
+  const exhaustedMutation = reconcileReviewRequestMutation({
+    ...mutationArguments,
+    evidence: { ...evidence, requestedReviewerMatched: false },
+    observedAt: '2026-09-04T10:02:01Z',
+    attemptCount: 2,
+  });
+  assert.equal(exhaustedMutation.state, 'EXHAUSTED');
+
+  for (const [terminalMutation, request] of [
+    [completeNegativeMutation, requestFor(input, 'copilot')],
+    [exhaustedMutation, requestFor(input, 'copilot', { attemptCount: 2 })],
+  ]) {
+    const forgedTerminalMutation = { ...terminalMutation, evidence };
+    assert.throws(
+      () => assertSchemaValid(
+        forgedTerminalMutation,
+        schema.$defs.publicMutation,
+        schema,
+      ),
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(compactState(input, {
+        reviewRequests: [request],
+        publicMutation: forgedTerminalMutation,
+      }))),
+      /complete negative readback/u,
+    );
+  }
 });
 
 test('compact-state ingestion validates the complete closed metrics record', () => {

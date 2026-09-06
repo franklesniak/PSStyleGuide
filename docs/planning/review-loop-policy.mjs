@@ -221,6 +221,12 @@ const COPILOT_DURABLE_REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
   'submittedReviewMatched',
   'reviewRunMatched',
 ]);
+const COPILOT_COMPLETE_NEGATIVE_EVIDENCE_FIELDS = Object.freeze([
+  'requestEventMatched',
+  'requestedReviewerMatched',
+  'submittedReviewMatched',
+  'reviewRunMatched',
+]);
 
 const METRICS_FIELDS = Object.freeze([
   'reviewerRequestsPerHead',
@@ -241,6 +247,13 @@ function getChannelDurableEvidenceMatch(evidence, channel) {
     ? COPILOT_DURABLE_REVIEW_REQUEST_EVIDENCE_FIELDS
     : ['triggerCommentMatched'];
   return permittedFields.some((field) => evidence[field]);
+}
+
+function hasChannelCompleteNegativeEvidence(evidence, channel) {
+  const requiredNegativeFields = channel === 'copilot'
+    ? COPILOT_COMPLETE_NEGATIVE_EVIDENCE_FIELDS
+    : ['triggerCommentMatched'];
+  return requiredNegativeFields.every((field) => evidence[field] === false);
 }
 
 function canonicalize(value) {
@@ -1197,6 +1210,17 @@ function validatePersistedPublicMutation(publicMutation, requests) {
     );
     if (publicMutation.readbackMatched !== durableMatch) {
       throw new TypeError('Persisted review-request mutation evidence is malformed.');
+    }
+    if (
+      ['NO_EFFECT', 'EXHAUSTED'].includes(publicMutation.state) &&
+      !hasChannelCompleteNegativeEvidence(
+        publicMutation.evidence,
+        publicMutation.channel,
+      )
+    ) {
+      throw new TypeError(
+        'A terminal no-effect mutation requires complete negative readback.',
+      );
     }
     const matches = requests.filter(
       (request) => request.reviewInputKey === publicMutation.reviewInputKey &&
@@ -3018,7 +3042,11 @@ export function reconcileReviewRequestMutation({
     'attemptedAt',
     'observedAt',
   );
-  if (!evidence.readbackComplete || !waitSatisfied) {
+  if (
+    !evidence.readbackComplete ||
+    !waitSatisfied ||
+    !hasChannelCompleteNegativeEvidence(evidence, channel)
+  ) {
     return Object.freeze({
       ...baseRecord,
       state: 'RECONCILING',
