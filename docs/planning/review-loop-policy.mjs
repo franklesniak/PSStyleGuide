@@ -129,9 +129,12 @@ function assertPortableJsonValue(value, seen = new WeakSet()) {
 
   if (
     value === null ||
-    valueType === 'boolean' ||
-    valueType === 'string'
+    valueType === 'boolean'
   ) {
+    return;
+  }
+  if (valueType === 'string') {
+    validateTransport(value);
     return;
   }
   if (valueType === 'number') {
@@ -188,6 +191,7 @@ function assertPortableJsonValue(value, seen = new WeakSet()) {
     ) {
       fail();
     }
+    validateTransport(key);
     assertPortableJsonValue(descriptor.value, seen);
   }
 }
@@ -319,6 +323,23 @@ function scanJsonWithoutDuplicateMembers(text) {
   let cursor = 0;
   const whitespace = /\s/u;
   const numberPattern = /-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/uy;
+  const normalizeDecimalLexeme = (lexeme) => {
+    const match = /^(?<sign>-?)(?<integer>0|[1-9]\d*)(?:\.(?<fraction>\d+))?(?:[eE](?<exponent>[+-]?\d+))?$/u.exec(lexeme);
+    if (match === null) {
+      throw new SyntaxError('JSON contains an invalid numeric value.');
+    }
+    const fraction = match.groups.fraction ?? '';
+    let digits = `${match.groups.integer}${fraction}`.replace(/^0+/u, '');
+    if (digits.length === 0) {
+      return match.groups.sign === '-' ? '-0' : '0';
+    }
+    let exponent = BigInt(match.groups.exponent ?? '0') - BigInt(fraction.length);
+    while (digits.endsWith('0')) {
+      digits = digits.slice(0, -1);
+      exponent += 1n;
+    }
+    return `${match.groups.sign}${digits}e${exponent}`;
+  };
 
   const skipWhitespace = () => {
     while (cursor < text.length && whitespace.test(text[cursor])) {
@@ -430,11 +451,12 @@ function scanJsonWithoutDuplicateMembers(text) {
       const numericValue = Number(number[0]);
       if (
         !Number.isFinite(numericValue) ||
-        Math.abs(numericValue) > Number.MAX_SAFE_INTEGER
+        Math.abs(numericValue) > Number.MAX_SAFE_INTEGER ||
+        normalizeDecimalLexeme(number[0]) !== normalizeDecimalLexeme(String(numericValue))
       ) {
         throw new TypeError(
-          'JSON numbers must be finite and within the portable safe-integer magnitude; ' +
-          'encode larger exact values as strings.',
+          'JSON numbers must be finite, lossless, and within the portable safe-integer ' +
+          'magnitude; encode larger or changed exact values as strings.',
         );
       }
       cursor = numberPattern.lastIndex;
@@ -498,6 +520,13 @@ export function parseCompactStateJson(text) {
       reviewState.reviewRequests,
       reviewState,
     );
+    const currentReviewInputKey = getReviewInputKey(reviewState.reviewInput);
+    if (requests.some(
+      (request) => request.reviewInputKey === currentReviewInputKey &&
+        request.head !== reviewState.reviewInput.head,
+    )) {
+      throw new TypeError('A persisted current-input request must match the reviewed head.');
+    }
     validatePersistedPublicMutation(reviewState.publicMutation, requests);
     const supersessions = validatePersistedSupersededReviewInputs(
       reviewState.supersededReviewInputs,
@@ -1853,6 +1882,12 @@ function validateSupersessionsAgainstRequests({
     const requestTimes = pair.map(
       (request) => getItemTime(request, ['requestedAt']),
     );
+    const successorRequestTimes = requests
+      .filter(
+        (request) => request.reviewInputKey !== disposition.reviewInputKey &&
+          request.head === disposition.successorHead,
+      )
+      .map((request) => getItemTime(request, ['requestedAt']));
     if (
       pair.length === 0 ||
       channels.size === 2 ||
@@ -1861,7 +1896,13 @@ function validateSupersessionsAgainstRequests({
       !knownHeads.has(disposition.successorHead) ||
       pair.some((request) => request.terminal !== true) ||
       supersededTime === null ||
-      requestTimes.some((requestTime) => requestTime === null || supersededTime < requestTime)
+      requestTimes.some((requestTime) => requestTime === null || supersededTime < requestTime) ||
+      (
+        disposition.reviewInputKey !== currentKey &&
+        successorRequestTimes.some(
+          (requestTime) => requestTime === null || supersededTime > requestTime,
+        )
+      )
     ) {
       throw new TypeError(
         'A superseded disposition does not describe a terminal incomplete prior-input pair.',

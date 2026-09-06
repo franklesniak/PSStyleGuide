@@ -720,7 +720,9 @@ test('current-input records cannot bypass different-input pair serialization', (
   });
   const mutationClass = classifyMutation(state(input1), state(input2));
   const pendingOldPair = pairFor(input1, { terminal: false });
-  const partialCurrentPair = [requestFor(input2, 'copilot')];
+  const partialCurrentPair = [requestFor(input2, 'copilot', {
+    requestedAt: '2026-09-04T10:03:00Z',
+  })];
   const completeCurrentPair = pairFor(input2, { terminal: false });
   const pendingPartial = decideReviewRequest({
     previousReviewInput: input1,
@@ -3103,8 +3105,24 @@ test('compact-state ingestion cross-validates supersessions and causal ordering'
   predatesRequest.current_task.review.supersededReviewInputs[
     getReviewInputKey(input1)
   ].supersededAt = '2026-09-04T09:59:59Z';
+  const successorStartedBeforeSupersession = compactState(input2, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [
+      oldRequest,
+      requestFor(input2, 'copilot', { requestedAt: '2026-09-04T10:01:30Z' }),
+    ],
+    supersededReviewInputs: supersessionFor(input1, input2),
+  });
+  const supersededBeforeSuccessor = structuredClone(successorStartedBeforeSupersession);
+  supersededBeforeSuccessor.current_task.review.supersededReviewInputs[
+    getReviewInputKey(input1)
+  ].supersededAt = '2026-09-04T10:01:15Z';
 
   assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(supersededBeforeSuccessor)),
+    supersededBeforeSuccessor,
+  );
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(noRequest)),
     /request count does not match/u,
@@ -3115,6 +3133,10 @@ test('compact-state ingestion cross-validates supersessions and causal ordering'
       /terminal incomplete prior-input pair/u,
     );
   }
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(successorStartedBeforeSupersession)),
+    /terminal incomplete prior-input pair/u,
+  );
 });
 
 test('request metrics retain an unrequested successor across a second head drift', async () => {
@@ -3245,6 +3267,14 @@ test('compact-state ingestion binds the review input to the current task head', 
     () => parseCompactStateJson(JSON.stringify(mismatched)),
     /review input must match the current task head/u,
   );
+
+  const mismatchedRequest = compactState(input, {
+    reviewRequests: [requestFor(input, 'copilot', { head: HASHES.head2 })],
+  });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(mismatchedRequest)),
+    /current-input request must match the reviewed head/u,
+  );
 });
 
 test('compact-state ingestion rejects nonportable JSON numbers without rounding', async () => {
@@ -3285,10 +3315,29 @@ test('compact-state ingestion rejects nonportable JSON numbers without rounding'
       /does not match any allowed schema/u,
     );
   }
-  for (const numericToken of ['9007199254740993', '1e400', '-1e400']) {
+  for (const numericToken of [
+    '9007199254740993',
+    '9007199254740991.1',
+    '-9007199254740991.1',
+    '1e400',
+    '-1e400',
+    '-0',
+  ]) {
     assert.throws(
       () => parseCompactStateJson(rawState(numericToken)),
-      /portable safe-integer magnitude/u,
+      /finite, lossless, and within the portable safe-integer magnitude/u,
+    );
+  }
+  for (const [numericToken, expected] of [
+    ['1.0', 1],
+    ['1e0', 1],
+    ['0.1250', 0.125],
+  ]) {
+    const exactText = JSON.stringify(portable).replace('0.125', numericToken);
+    assert.equal(
+      parseCompactStateJson(exactText).predecessor_outputs[3]
+        .PORTABLE_VALUES.value.fraction,
+      expected,
     );
   }
 });
@@ -3652,6 +3701,16 @@ test('predecessor output values must be lossless portable JSON trees', () => {
     /not portable JSON/u,
     'Shared non-cyclic references are graphs, not portable JSON trees.',
   );
+  for (const value of [
+    'bad\u0007value',
+    { safe: 'bad\u0007value' },
+    { 'bad\u0007key': 'safe' },
+  ]) {
+    assert.throws(
+      () => prunePredecessorOutputs(outputsFor(value), 1),
+      /disallowed control character/u,
+    );
+  }
 
   const nullPrototype = Object.create(null);
   nullPrototype.safe = '✓';
