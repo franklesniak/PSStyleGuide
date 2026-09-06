@@ -343,11 +343,18 @@ function isRfc3339ElapsedAtLeastMilliseconds(
 function getRfc3339ElapsedMilliseconds(start, end, startLabel, endLabel) {
   const startInstant = parseRfc3339Instant(start, startLabel);
   const endInstant = parseRfc3339Instant(end, endLabel);
-  const fractionalSeconds = (fraction) =>
-    fraction.length === 0 ? 0 : Number(`0.${fraction}`);
-  return Number(endInstant.epochSecond - startInstant.epochSecond) * 1_000 +
-    (fractionalSeconds(endInstant.fraction) -
-      fractionalSeconds(startInstant.fraction)) * 1_000;
+  const width = Math.max(
+    startInstant.fraction.length,
+    endInstant.fraction.length,
+    3,
+  );
+  const scale = 10n ** BigInt(width);
+  const millisecondsScale = 10n ** BigInt(width - 3);
+  const toUnits = (instant) =>
+    instant.epochSecond * scale +
+    BigInt(instant.fraction.padEnd(width, '0') || '0');
+  const elapsedUnits = toUnits(endInstant) - toUnits(startInstant);
+  return Number(elapsedUnits / millisecondsScale);
 }
 
 export function normalizeCollection(value) {

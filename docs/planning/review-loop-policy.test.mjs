@@ -5342,6 +5342,24 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
   );
 });
 
+test('elapsed metrics preserve exact fractions and return complete integer milliseconds', () => {
+  const metrics = createMetrics({
+    reviewRequests: [],
+    bodyEditTimes: [],
+    reviewBeganAt: '2026-09-04T04:30:00Z',
+    sameHeadRerequestReasons: [],
+    cleanReviewAt: '2026-09-04T10:00:00.0000000000000001+05:30',
+    recognizedAt: '2026-09-04T04:30:00.0010000000000002Z',
+    cleanPairAt: '2026-09-04T10:00:00.9999Z',
+    mergedAt: '2026-09-04T10:00:01.0001Z',
+  });
+
+  assert.equal(metrics.cleanReviewRecognitionMilliseconds, 1);
+  assert.equal(metrics.cleanPairToMergeMilliseconds, 0);
+  assert.equal(Number.isInteger(metrics.cleanReviewRecognitionMilliseconds), true);
+  assert.equal(Number.isInteger(metrics.cleanPairToMergeMilliseconds), true);
+});
+
 test('metrics correlate whole-second body edits at their available precision', () => {
   const metrics = createMetrics({
     reviewRequests: [],
