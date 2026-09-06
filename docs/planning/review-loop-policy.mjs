@@ -119,6 +119,26 @@ const PUBLIC_MUTATION_STATE_CONSTANTS = Object.freeze({
     retryAllowed: false,
   }),
 });
+const PUBLIC_MUTATION_STATE_REQUIRED_METADATA = Object.freeze({
+  RECONCILING: Object.freeze([
+    'attemptCount',
+    'attemptedAt',
+    'reconciledAt',
+    'evidence',
+  ]),
+  NO_EFFECT: Object.freeze([
+    'attemptCount',
+    'attemptedAt',
+    'reconciledAt',
+    'evidence',
+  ]),
+  EXHAUSTED: Object.freeze([
+    'attemptCount',
+    'attemptedAt',
+    'reconciledAt',
+    'evidence',
+  ]),
+});
 const REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
   'responseReviewerMatched',
   'requestEventMatched',
@@ -830,6 +850,8 @@ function validatePersistedPublicMutation(publicMutation, requests) {
   }
 
   const stateConstants = PUBLIC_MUTATION_STATE_CONSTANTS[publicMutation.state];
+  const requiredMetadata =
+    PUBLIC_MUTATION_STATE_REQUIRED_METADATA[publicMutation.state] ?? [];
   if (
     Object.entries(stateConstants).some(
       ([field, expected]) => publicMutation[field] !== expected,
@@ -954,6 +976,11 @@ function validatePersistedPublicMutation(publicMutation, requests) {
     (reconciledAt === undefined || reconciledAt === null)
   ) {
     throw new TypeError(`A persisted ${publicMutation.state} mutation must contain reconciledAt.`);
+  }
+  if (requiredMetadata.some((field) => !Object.hasOwn(publicMutation, field))) {
+    throw new TypeError(
+      `A persisted ${publicMutation.state} mutation must contain its required attempt metadata.`,
+    );
   }
   if (attemptedAt === undefined || attemptedAt === null) {
     return;
@@ -1397,8 +1424,21 @@ export function decideReviewRequest({
 }
 
 function getActorLogin(item) {
-  return item?.user?.login ?? item?.author?.login ?? item?.actor?.login ??
-    (typeof item?.actor === 'string' ? item.actor : null);
+  const logins = [
+    item?.user?.login,
+    item?.author?.login,
+    item?.actor?.login,
+    typeof item?.actor === 'string' ? item.actor : null,
+    item?.login,
+  ].filter((login) => login !== undefined && login !== null);
+  if (logins.length === 0 || logins.some((login) => typeof login !== 'string')) {
+    return null;
+  }
+
+  const normalized = logins.map(normalizeActorLogin);
+  return normalized[0] !== null && normalized.every((login) => login === normalized[0])
+    ? logins[0]
+    : null;
 }
 
 function normalizeActorLogin(login) {
@@ -1542,8 +1582,14 @@ const COPILOT_REVIEWER_NODE_ID = 'BOT_kgDOCnlnWA';
 function isCopilotIdentity(item) {
   const itemObject = item !== null && typeof item === 'object' ? item : null;
   const actor = item?.user ?? item?.author ?? item?.actor ?? item;
-  const login = actor?.login ?? actor?.slug ??
-    (typeof actor === 'string' ? actor : null);
+  const hasLoginAlias = [
+    item?.user?.login,
+    item?.author?.login,
+    item?.actor?.login,
+    typeof item?.actor === 'string' ? item.actor : null,
+    item?.login,
+  ].some((login) => login !== undefined && login !== null);
+  const login = hasLoginAlias ? getActorLogin(item) : actor?.slug;
   const normalized = normalizeActorLogin(login);
   if (
     normalized !== 'copilot-pull-request-reviewer' &&
@@ -2145,6 +2191,12 @@ function validateReviewRequestOrdering(
     const copilotRequest = copilotRequests[0];
     if (
       copilotRequests.length === 1 &&
+      reviewRequests.indexOf(copilotRequest) >= reviewRequests.indexOf(codexRequest)
+    ) {
+      throw new TypeError('A Codex request must follow its Copilot predecessor in request history.');
+    }
+    if (
+      copilotRequests.length === 1 &&
       copilotRequest.head === codexRequest.head &&
       copilotRequest.confirmed === true &&
       !Object.hasOwn(copilotRequest, 'readyAt')
@@ -2228,6 +2280,7 @@ function validateSupersessionsAgainstRequests({
   requests,
   supersessions,
   reviewedHeads,
+  currentHead = null,
   currentKey = null,
 }) {
   const knownHeads = new Set(reviewedHeads);
@@ -2279,9 +2332,11 @@ function validateSupersessionsAgainstRequests({
       ? firstSuccessorRequest.head
       : null;
     const allowedSuccessorHeads = requestedImmediateHead === null
-      ? new Set([disposition.head, nextDistinctHead].filter(
-        (head) => head !== undefined,
-      ))
+      ? new Set([
+        disposition.head,
+        nextDistinctHead,
+        firstSuccessorRequest === null ? currentHead : null,
+      ].filter((head) => head !== undefined && head !== null))
       : new Set([requestedImmediateHead]);
     if (
       pair.length === 0 ||

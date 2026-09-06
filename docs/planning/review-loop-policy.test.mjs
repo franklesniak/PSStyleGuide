@@ -5603,6 +5603,166 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
   );
 });
 
+test('an incomplete successor can be superseded by a reactivated current head', () => {
+  const inputA = reviewInput();
+  const inputB = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const requestA = requestFor(inputA, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const requestB = requestFor(inputB, 'copilot', {
+    requestedAt: '2026-09-04T10:02:00Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: 'REACTIVATED_INCOMPLETE_SUCCESSOR',
+      observedAt: '2026-09-04T10:03:00Z',
+    },
+  });
+  const reactivated = compactState(inputA, {
+    reviewRequests: [requestA, requestB],
+    supersededReviewInputs: {
+      ...supersessionFor(inputA, inputB),
+      ...supersessionFor(inputB, inputA, {
+        supersededAt: '2026-09-04T10:03:00Z',
+      }),
+    },
+  });
+
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(reactivated)), reactivated);
+
+  const unrelated = structuredClone(reactivated);
+  unrelated.current_task.review.supersededReviewInputs[
+    getReviewInputKey(inputB)
+  ].successorHead = '3'.repeat(40);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(unrelated)),
+    /terminal incomplete prior-input pair/u,
+  );
+});
+
+test('RECONCILING ingestion requires its complete request and attempt identity', () => {
+  const input = reviewInput();
+  const request = requestFor(input, 'copilot');
+  const evidence = {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    triggerCommentMatched: false,
+    readbackComplete: true,
+  };
+  const validMutation = reconcileReviewRequestMutation({
+    response: { ok: true },
+    evidence,
+    reviewInputKey: getReviewInputKey(input),
+    channel: 'copilot',
+    attemptedAt: '2026-09-04T10:00:00Z',
+    observedAt: '2026-09-04T10:00:01Z',
+    attemptCount: 1,
+    localRecordSucceeded: true,
+  });
+  const valid = compactState(input, {
+    reviewRequests: [request],
+    publicMutation: validMutation,
+  });
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  const missingIdentity = structuredClone(valid);
+  for (const field of ['evidence', 'reviewInputKey', 'channel', 'attemptCount']) {
+    delete missingIdentity.current_task.review.publicMutation[field];
+  }
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missingIdentity)),
+    /required attempt metadata/u,
+  );
+});
+
+test('review attribution rejects conflicting actor aliases', () => {
+  const input = reviewInput();
+  const copilotRequest = requestFor(input, 'copilot', { confirmed: true });
+  const codexRequest = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+  });
+  const conflictingCodex = {
+    node_id: 'CONFLICTING_CODEX_ACTORS',
+    user: { login: 'chatgpt-codex-connector[bot]' },
+    author: { login: 'attacker' },
+    commit_id: input.head,
+    submitted_at: '2026-09-04T10:02:00Z',
+  };
+  assert.deepEqual(collectCodexResults({
+    submittedReviews: [conflictingCodex],
+    conversationComments: [],
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: [copilotRequest, codexRequest],
+  }), { submittedReviews: [], conversationComments: [] });
+
+  const copilotEvidence = collectCopilotRequestEvidence({
+    responseReviewers: [],
+    requestEvents: [],
+    requestedReviewers: [],
+    submittedReviews: [{
+      node_id: 'CONFLICTING_COPILOT_ACTORS',
+      user: {
+        login: 'copilot-pull-request-reviewer[bot]',
+        slug: 'copilot-pull-request-reviewer',
+      },
+      author: { login: 'attacker' },
+      commit_id: input.head,
+      submitted_at: '2026-09-04T10:01:00Z',
+    }],
+    reviewRuns: [],
+    baselineRequestEventIds: [],
+    baselineReviewNodeIds: [],
+    baselineReviewRunIds: [],
+    expectedHead: input.head,
+    requestedAt: '2026-09-04T10:00:00Z',
+    readbackCompleteness: {
+      requestEvents: true,
+      requestedReviewers: true,
+      submittedReviews: true,
+      reviewRuns: true,
+    },
+  });
+  assert.equal(copilotEvidence.submittedReviewMatched, false);
+});
+
+test('equal-time reviewer requests preserve Copilot-before-Codex array order', () => {
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', {
+    confirmed: true,
+    requestedAt: '2026-09-04T10:00:00Z',
+    readyAt: '2026-09-04T10:00:00Z',
+  });
+  const codex = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:00:00Z',
+  });
+  const ordered = compactState(input, { reviewRequests: [copilot, codex] });
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(ordered)), ordered);
+
+  const reversed = compactState(input, { reviewRequests: [codex, copilot] });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(reversed)),
+    /must follow its Copilot predecessor/u,
+  );
+  assert.deepEqual(collectCodexResults({
+    submittedReviews: [],
+    conversationComments: [],
+    reviewInput: input,
+    request: codex,
+    reviewRequests: reversed.current_task.review.reviewRequests,
+  }), { submittedReviews: [], conversationComments: [] });
+});
+
 test('elapsed metrics preserve exact fractions and return complete integer milliseconds', () => {
   const metrics = createMetrics({
     reviewRequests: [],
