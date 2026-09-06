@@ -2252,11 +2252,38 @@ test('compact-state JSON ingestion rejects duplicate baseline member identities'
 
   assert.throws(() => parseCompactStateJson(duplicateLiteral), /duplicate member "COMMENT_OLD"/u);
   assert.throws(() => parseCompactStateJson(duplicateEscaped), /duplicate member "COMMENT_OLD"/u);
-  assert.deepEqual(parseCompactStateJson(unique), {
-    baselineConversationComments: {
-      COMMENT_OLD: '2026-09-04T09:59:00Z',
-    },
-  });
+  assert.throws(
+    () => parseCompactStateJson(unique),
+    /must contain every required root field/u,
+  );
+});
+
+test('compact-state JSON ingestion rejects unrelated or incomplete root values', () => {
+  const valid = compactState(reviewInput());
+  const requiredRootFields = [
+    'schema',
+    'plan',
+    'current_task',
+    'predecessor_outputs',
+    'completed',
+    'updated_utc',
+  ];
+
+  for (const unrelated of [null, [], {}, { safe: 1 }]) {
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(unrelated)),
+      /must contain every required root field/u,
+    );
+  }
+  for (const field of requiredRootFields) {
+    const incomplete = structuredClone(valid);
+    delete incomplete[field];
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(incomplete)),
+      /must contain every required root field/u,
+    );
+  }
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
 });
 
 function resolveSchemaReference(definition, root) {

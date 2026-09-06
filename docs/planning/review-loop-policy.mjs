@@ -35,6 +35,15 @@ export const REVIEW_LOOP_TASK_NUMBERS = Object.freeze([
   364, 373, 385, 396,
 ]);
 
+const COMPACT_STATE_REQUIRED_ROOT_FIELDS = Object.freeze([
+  'schema',
+  'plan',
+  'current_task',
+  'predecessor_outputs',
+  'completed',
+  'updated_utc',
+]);
+
 const SHA1_PATTERN = /^[0-9a-f]{40}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 const PREDECESSOR_TASK_PATTERN = /^[1-9]\d{0,2}$/u;
@@ -365,58 +374,59 @@ export function parseCompactStateJson(text) {
   const parsed = JSON.parse(text);
 
   if (
-    parsed !== null &&
-    typeof parsed === 'object' &&
-    !Array.isArray(parsed) &&
-    Object.hasOwn(parsed, 'predecessor_outputs') &&
-    Object.hasOwn(parsed, 'current_task')
+    parsed === null ||
+    typeof parsed !== 'object' ||
+    Array.isArray(parsed) ||
+    COMPACT_STATE_REQUIRED_ROOT_FIELDS.some((field) => !Object.hasOwn(parsed, field))
   ) {
-    const completedTaskNumber = validatePersistedProgress(
-      parsed.current_task,
-      parsed.completed,
+    throw new TypeError('Compact-state JSON must contain every required root field.');
+  }
+
+  const completedTaskNumber = validatePersistedProgress(
+    parsed.current_task,
+    parsed.completed,
+  );
+  validatePredecessorOutputs(parsed.predecessor_outputs, completedTaskNumber);
+  if (
+    REVIEW_LOOP_TASK_NUMBER_SET.has(parsed.current_task?.number) &&
+    parsed.current_task?.state !== 'pending' &&
+    parsed.current_task?.review === undefined
+  ) {
+    throw new TypeError(
+      'An active fixed-plan review-loop task must contain persisted review state.',
     );
-    validatePredecessorOutputs(parsed.predecessor_outputs, completedTaskNumber);
+  }
+  if (parsed.current_task?.review !== undefined) {
+    const reviewState = parsed.current_task.review;
     if (
-      REVIEW_LOOP_TASK_NUMBER_SET.has(parsed.current_task?.number) &&
-      parsed.current_task?.state !== 'pending' &&
-      parsed.current_task?.review === undefined
+      typeof parsed.current_task.head !== 'string' ||
+      parsed.current_task.head !== reviewState.reviewInput?.head
     ) {
-      throw new TypeError(
-        'An active fixed-plan review-loop task must contain persisted review state.',
-      );
+      throw new TypeError('The persisted review input must match the current task head.');
     }
-    if (parsed.current_task?.review !== undefined) {
-      const reviewState = parsed.current_task.review;
-      if (
-        typeof parsed.current_task.head !== 'string' ||
-        parsed.current_task.head !== reviewState.reviewInput?.head
-      ) {
-        throw new TypeError('The persisted review input must match the current task head.');
-      }
-      const requests = validatePersistedReviewRequests(
-        reviewState.reviewRequests,
-        reviewState,
-      );
-      validatePersistedPublicMutation(reviewState.publicMutation, requests);
-      const supersessions = validatePersistedSupersededReviewInputs(
-        reviewState.supersededReviewInputs,
-      );
-      const reviewedHeads = validatePersistedRequestMetrics(
-        reviewState.metrics,
-        requests,
+    const requests = validatePersistedReviewRequests(
+      reviewState.reviewRequests,
+      reviewState,
+    );
+    validatePersistedPublicMutation(reviewState.publicMutation, requests);
+    const supersessions = validatePersistedSupersededReviewInputs(
+      reviewState.supersededReviewInputs,
+    );
+    const reviewedHeads = validatePersistedRequestMetrics(
+      reviewState.metrics,
+      requests,
+      reviewState.reviewInput.head,
+    );
+    validateSupersessionsAgainstRequests({
+      requests,
+      supersessions,
+      knownHeads: new Set([
         reviewState.reviewInput.head,
-      );
-      validateSupersessionsAgainstRequests({
-        requests,
-        supersessions,
-        knownHeads: new Set([
-          reviewState.reviewInput.head,
-          ...requests.map((request) => request.head),
-          ...reviewedHeads,
-        ]),
-        currentKey: getReviewInputKey(reviewState.reviewInput),
-      });
-    }
+        ...requests.map((request) => request.head),
+        ...reviewedHeads,
+      ]),
+      currentKey: getReviewInputKey(reviewState.reviewInput),
+    });
   }
 
   return parsed;
