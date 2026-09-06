@@ -1954,6 +1954,14 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(alternate, /including drift on an unchanged head/u);
   assert.match(
     alternate,
+    /reject a numeric token if it is non-finite, its absolute value exceeds 9007199254740991, it is negative zero, or conversion to an ECMAScript `Number` changes its exact decimal value/u,
+  );
+  assert.match(
+    alternate,
+    /Store an exact value as a string if its numeric token fails any condition/u,
+  );
+  assert.match(
+    alternate,
     /unique request-event, review-run, submitted-review, and node-ID-to-timestamp conversation-comment baselines/u,
   );
   assert.match(
@@ -2321,6 +2329,47 @@ test('Codex results normalize REST and GraphQL identities and reject stale evide
     ['COMMENT_STABLE'],
   );
   assert.equal(results.submittedReviews.length + results.conversationComments.length, 2);
+});
+
+test('Codex result timestamp aliases continue after an invalid candidate', () => {
+  const input = reviewInput();
+  const copilotRequest = requestFor(input, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const codexRequest = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:02:00Z',
+    confirmed: true,
+  });
+  const result = collectCodexResults({
+    submittedReviews: [],
+    conversationComments: [
+      {
+        node_id: 'COMMENT_VALID_FALLBACK',
+        user: { login: 'chatgpt-codex-connector[bot]' },
+        updated_at: 'not-a-timestamp',
+        createdAt: '2026-09-04T10:03:00Z',
+        status: 'completed',
+        body: 'Completed review result.',
+      },
+      {
+        node_id: 'COMMENT_ALL_INVALID',
+        user: { login: 'chatgpt-codex-connector[bot]' },
+        updated_at: 'still-not-a-timestamp',
+        createdAt: 42,
+        status: 'completed',
+        body: 'Invalid timestamp evidence.',
+      },
+    ],
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: [copilotRequest, codexRequest],
+  });
+
+  assert.deepEqual(
+    result.conversationComments.map((comment) => comment.node_id),
+    ['COMMENT_VALID_FALLBACK'],
+  );
 });
 
 test('Codex results exclude a baseline match through any supplied review identity', () => {

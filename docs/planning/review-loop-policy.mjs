@@ -1237,7 +1237,7 @@ function getItemTime(item, fields) {
     try {
       return parseRfc3339Timestamp(value, field);
     } catch {
-      return null;
+      continue;
     }
   }
 
