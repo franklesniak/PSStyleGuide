@@ -46,6 +46,16 @@ const COMPACT_STATE_REQUIRED_ROOT_FIELDS = Object.freeze([
   'updated_utc',
 ]);
 
+const REVIEW_INPUT_FIELDS = Object.freeze([
+  'head',
+  'tree',
+  'diffSha256',
+  'bodySha256',
+  'scope',
+  'behavior',
+  'risk',
+]);
+
 const SHA1_PATTERN = /^[0-9a-f]{40}$/u;
 const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 const PREDECESSOR_TASK_PATTERN = /^[1-9]\d{0,2}$/u;
@@ -693,6 +703,7 @@ export function parseCompactStateJson(text) {
   }
   if (parsed.current_task?.review !== undefined) {
     const reviewState = parsed.current_task.review;
+    assertReviewInput(reviewState.reviewInput);
     if (
       typeof parsed.current_task.head !== 'string' ||
       parsed.current_task.head !== reviewState.reviewInput?.head
@@ -1142,24 +1153,18 @@ export function prunePredecessorOutputs(predecessorOutputs, completedTaskNumber)
   return canonicalRetained;
 }
 
-export function createReviewInput({
-  head,
-  tree,
-  diffSha256,
-  bodySha256,
-  scope,
-  behavior,
-  risk,
-}) {
-  assertHash(head, SHA1_PATTERN, 'head');
-  assertHash(tree, SHA1_PATTERN, 'tree');
-  assertHash(diffSha256, SHA256_PATTERN, 'diffSha256');
-  assertHash(bodySha256, SHA256_PATTERN, 'bodySha256');
-  assertNonemptyText(scope, 'scope');
-  assertNonemptyText(behavior, 'behavior');
-  assertNonemptyText(risk, 'risk');
+function assertReviewInput(reviewInput) {
+  if (
+    reviewInput === null ||
+    typeof reviewInput !== 'object' ||
+    Array.isArray(reviewInput) ||
+    Object.keys(reviewInput).length !== REVIEW_INPUT_FIELDS.length ||
+    REVIEW_INPUT_FIELDS.some((field) => !Object.hasOwn(reviewInput, field))
+  ) {
+    throw new TypeError('A review input must contain exactly the required fields.');
+  }
 
-  return Object.freeze({
+  const {
     head,
     tree,
     diffSha256,
@@ -1167,10 +1172,32 @@ export function createReviewInput({
     scope,
     behavior,
     risk,
+  } = reviewInput;
+  assertHash(head, SHA1_PATTERN, 'head');
+  assertHash(tree, SHA1_PATTERN, 'tree');
+  assertHash(diffSha256, SHA256_PATTERN, 'diffSha256');
+  assertHash(bodySha256, SHA256_PATTERN, 'bodySha256');
+  assertNonemptyText(scope, 'scope');
+  assertNonemptyText(behavior, 'behavior');
+  assertNonemptyText(risk, 'risk');
+}
+
+export function createReviewInput(reviewInput) {
+  assertReviewInput(reviewInput);
+
+  return Object.freeze({
+    head: reviewInput.head,
+    tree: reviewInput.tree,
+    diffSha256: reviewInput.diffSha256,
+    bodySha256: reviewInput.bodySha256,
+    scope: reviewInput.scope,
+    behavior: reviewInput.behavior,
+    risk: reviewInput.risk,
   });
 }
 
 export function getReviewInputKey(reviewInput) {
+  assertReviewInput(reviewInput);
   const semanticInput = {
     head: reviewInput.head,
     tree: reviewInput.tree,
@@ -1517,10 +1544,13 @@ function hasMatchingConversationHeadIdentities(item, expectedHead) {
 function hasRequiredTerminalConversationHeadEvidence(item, expectedHead) {
   const suppliedEvidence = [item?.head, item?.headRefOid, item?.commitPrefix]
     .some((value) => value !== undefined);
-  const terminal = typeof item?.status === 'string' &&
-    item.status.startsWith('completed');
+  const terminal = isCompletedCodexStatus(item?.status);
   return (!terminal || suppliedEvidence) &&
     hasMatchingConversationHeadIdentities(item, expectedHead);
+}
+
+function isCompletedCodexStatus(status) {
+  return status === 'completed';
 }
 
 function getItemTime(item, fields) {
@@ -1812,7 +1842,14 @@ export function collectCopilotRequestEvidence({
       getCommitOid(review) === expectedHead &&
       isCopilotIdentity(review);
   });
-  const reviewRunMatched = normalizeCollection(reviewRuns).some((run) => {
+  const reviewRunsCanAuthenticate = !(
+    reviewRuns !== null &&
+    typeof reviewRuns === 'object' &&
+    !Array.isArray(reviewRuns) &&
+    Object.hasOwn(reviewRuns, 'check_runs')
+  );
+  const reviewRunMatched = reviewRunsCanAuthenticate &&
+    normalizeCollection(reviewRuns).some((run) => {
     const identities = getItemIdentities(run);
     const heads = [run?.head_sha, run?.headSha, run?.headCommit?.oid].filter(
       (value) => value !== undefined && value !== null,
@@ -1829,8 +1866,8 @@ export function collectCopilotRequestEvidence({
       ) &&
       heads.length > 0 &&
       heads.every((head) => typeof head === 'string' && head === expectedHead) &&
-      (isCopilotIdentity(run?.app) || isCopilotIdentity(run?.actor));
-  });
+      isCopilotIdentity(run?.actor);
+    });
 
   return Object.freeze({
     responseReviewerMatched,
@@ -2097,7 +2134,7 @@ function isReferencedTerminalResult(result, request, reference, requests) {
       referenceTime,
       'result timestamp',
       'terminal result observedAt',
-    ) !== 0 ||
+    ) > 0 ||
     !identities.includes(reference.id) ||
     !isItemAtOrAfterRequestWithAliases(result, timeGroups, requestTime) ||
     (nextDifferentInputTime !== null && compareRfc3339Instants(
@@ -2120,8 +2157,7 @@ function isReferencedTerminalResult(result, request, reference, requests) {
   if (
     request.channel !== 'codex' ||
     result.body?.trim() === '@codex review' ||
-    typeof result.status !== 'string' ||
-    !result.status.startsWith('completed')
+    !isCompletedCodexStatus(result.status)
   ) {
     return false;
   }
@@ -2593,8 +2629,7 @@ export function collectCodexResults({
 
 function normalizeCodexConversationResult(comment, head) {
   if (
-    typeof comment?.status === 'string' &&
-    comment.status.startsWith('completed')
+    isCompletedCodexStatus(comment?.status)
   ) {
     if (comment.commitPrefix === undefined) {
       return comment;

@@ -269,6 +269,47 @@ test('scenario 2: a non-material same-head correction creates no request', () =>
   assert.equal(decision.status, 'NO_REQUEST');
 });
 
+test('review-input construction and key derivation require the exact closed contract', () => {
+  const input = structuredClone(reviewInput());
+  assert.deepEqual(createReviewInput(input), input);
+  assert.match(getReviewInputKey(input), /^[0-9a-f]{64}$/u);
+
+  const invalidInputs = [null, undefined, true, []];
+  for (const field of [
+    'head',
+    'tree',
+    'diffSha256',
+    'bodySha256',
+    'scope',
+    'behavior',
+    'risk',
+  ]) {
+    const missing = structuredClone(input);
+    delete missing[field];
+    invalidInputs.push(missing);
+  }
+  invalidInputs.push({ ...input, unexpected: true });
+  invalidInputs.push({ ...input, tree: null });
+
+  for (const invalidInput of invalidInputs) {
+    assert.throws(
+      () => createReviewInput(invalidInput),
+      /required fields|must be|invalid hash/u,
+    );
+    assert.throws(
+      () => getReviewInputKey(invalidInput),
+      /required fields|must be|invalid hash/u,
+    );
+
+    const persisted = compactState(input);
+    persisted.current_task.review.reviewInput = invalidInput;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(persisted)),
+      /required fields|must be|invalid hash/u,
+    );
+  }
+});
+
 test('scenario 3: H1 to H2 requires one new pair for H2', () => {
   const input1 = reviewInput();
   const input2 = reviewInput({
@@ -1570,12 +1611,18 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
         check_runs: [{
           id: 'new-check-run',
           name: 'copilot-pull-request-reviewer',
+          actor: {
+            login: 'Copilot',
+            type: 'Bot',
+            id: 175728472,
+            node_id: 'BOT_kgDOCnlnWA',
+          },
           app: {
-            id: 15368,
-            node_id: 'MDM6QXBwMTUzNjg=',
-            slug: 'github-actions',
-            name: 'GitHub Actions',
-            owner: { login: 'github' },
+            id: 175728472,
+            node_id: 'BOT_kgDOCnlnWA',
+            slug: 'copilot-pull-request-reviewer',
+            name: 'Copilot',
+            owner: { login: 'github-copilot' },
           },
           head_sha: HASHES.head1,
           created_at: '2026-09-04T10:01:00Z',
@@ -3903,6 +3950,22 @@ test('confirmed terminal requests require one attributable persisted result', as
     validHeadlessCodex,
   );
 
+  const observedAfterPublication = structuredClone(validHeadlessCodex);
+  observedAfterPublication.current_task.review.reviewRequests[1]
+    .terminalResultRef.observedAt = '2026-09-04T10:02:01Z';
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(observedAfterPublication)),
+    observedAfterPublication,
+  );
+
+  const observedBeforePublication = structuredClone(validHeadlessCodex);
+  observedBeforePublication.current_task.review.reviewRequests[1]
+    .terminalResultRef.observedAt = '2026-09-04T10:01:59Z';
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(observedBeforePublication)),
+    /one attributable terminal result/u,
+  );
+
   const agreeingHeadIdentities = structuredClone(validHeadlessCodex);
   const agreeingComment = agreeingHeadIdentities.current_task.review
     .codexResults.conversationComments[0];
@@ -3927,6 +3990,10 @@ test('confirmed terminal requests require one attributable persisted result', as
     },
     (candidate) => {
       candidate.current_task.review.codexResults.conversationComments[0].status = 'in-progress';
+    },
+    (candidate) => {
+      candidate.current_task.review.codexResults.conversationComments[0].status =
+        'completed-pending';
     },
     (candidate) => {
       candidate.current_task.review.codexResults.conversationComments[0].commitPrefix =
