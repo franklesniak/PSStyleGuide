@@ -420,6 +420,30 @@ export function normalizeCollection(value) {
   return [value];
 }
 
+function hasCompleteCollectionReadback(value, wrapperKeys) {
+  if (value === null || value === undefined) {
+    return false;
+  }
+
+  if (Array.isArray(value)) {
+    return true;
+  }
+
+  if (typeof value !== 'object') {
+    return false;
+  }
+
+  for (const key of wrapperKeys) {
+    if (Object.hasOwn(value, key)) {
+      return hasCompleteCollectionReadback(value[key], wrapperKeys);
+    }
+  }
+
+  return !['total_count', 'totalCount', 'pageInfo'].some(
+    (key) => Object.hasOwn(value, key),
+  );
+}
+
 export function createReviewRequestSpec(channel) {
   const spec = REVIEW_REQUEST_SPECS[channel];
   if (spec === undefined) {
@@ -1640,10 +1664,18 @@ export function collectCopilotRequestEvidence({
     submittedReviews,
     reviewRuns,
   };
+  const readbackWrapperKeys = {
+    requestEvents: ['nodes', 'edges'],
+    requestedReviewers: ['requested_reviewers', 'users'],
+    submittedReviews: ['nodes', 'edges'],
+    reviewRuns: ['nodes', 'edges', 'check_runs', 'workflow_runs'],
+  };
   const readbackComplete = completenessKeys.every(
     (key) => readbackCompleteness[key] &&
-      readbackCollections[key] !== undefined &&
-      readbackCollections[key] !== null,
+      hasCompleteCollectionReadback(
+        readbackCollections[key],
+        readbackWrapperKeys[key],
+      ),
   );
   const eventBaselines = new Set(baselineRequestEventIds);
   const reviewBaselines = new Set(baselineReviewNodeIds);
@@ -1904,13 +1936,20 @@ function isRepositoryAuthorizedNonfunctionalDisposition(disposition, request) {
 }
 
 function getItemIdentities(item) {
-  return [...new Set([
+  const suppliedIdentities = [
     item?.node_id,
     item?.nodeId,
     item?.id,
     item?.database_id,
     item?.databaseId,
-  ].filter((value) => value !== null && value !== undefined).map(String))];
+  ].filter((value) => value !== null && value !== undefined);
+  if (suppliedIdentities.some((value) => !(
+    (typeof value === 'string' && value.length > 0) ||
+    (typeof value === 'number' && Number.isSafeInteger(value) && value > 0)
+  ))) {
+    return [];
+  }
+  return [...new Set(suppliedIdentities.map(String))];
 }
 
 function isResultActorForChannel(result, channel) {
@@ -2189,7 +2228,6 @@ function validateSupersessionsAgainstRequests({
   requests,
   supersessions,
   reviewedHeads,
-  currentHead,
   currentKey = null,
 }) {
   const knownHeads = new Set(reviewedHeads);
@@ -2197,9 +2235,31 @@ function validateSupersessionsAgainstRequests({
   const describedKeys = new Set(supersessions.map(
     (disposition) => disposition.reviewInputKey,
   ));
+  const getOriginalPairAndSuccessor = (key) => {
+    const firstPairRequestIndex = requests.findIndex(
+      (request) => request.reviewInputKey === key,
+    );
+    if (firstPairRequestIndex < 0) {
+      return { pair: [], firstSuccessorRequest: null };
+    }
+    const relativeSuccessorIndex = requests
+      .slice(firstPairRequestIndex + 1)
+      .findIndex((request) => request.reviewInputKey !== key);
+    const firstSuccessorRequestIndex = relativeSuccessorIndex < 0
+      ? requests.length
+      : firstPairRequestIndex + relativeSuccessorIndex + 1;
+    return {
+      pair: requests
+        .slice(firstPairRequestIndex, firstSuccessorRequestIndex)
+        .filter((request) => request.reviewInputKey === key),
+      firstSuccessorRequest: firstSuccessorRequestIndex < requests.length
+        ? requests[firstSuccessorRequestIndex]
+        : null,
+    };
+  };
   for (const disposition of supersessions) {
-    const pair = requests.filter(
-      (request) => request.reviewInputKey === disposition.reviewInputKey,
+    const { pair, firstSuccessorRequest } = getOriginalPairAndSuccessor(
+      disposition.reviewInputKey,
     );
     const channels = new Set(pair.map((request) => request.channel));
     const heads = new Set(pair.map((request) => request.head));
@@ -2208,41 +2268,28 @@ function validateSupersessionsAgainstRequests({
       (request) => getItemTimestamp(request, ['requestedAt']),
     );
     const terminalTimes = pair.map(getRequestTerminalTimestamp);
-    const finalPairRequestIndex = requests.reduce(
-      (latest, request, index) => request.reviewInputKey === disposition.reviewInputKey
-        ? index
-        : latest,
-      -1,
-    );
-    const laterDifferentInputRequests = requests
-      .slice(finalPairRequestIndex + 1)
-      .filter((request) => request.reviewInputKey !== disposition.reviewInputKey);
-    const firstSuccessorRequest = laterDifferentInputRequests[0] ?? null;
     const firstSuccessorRequestTime = firstSuccessorRequest === null
       ? null
       : getItemTimestamp(firstSuccessorRequest, ['requestedAt']);
     const predecessorHeadIndex = reviewedHeads.indexOf(disposition.head);
-    const expectedSuccessorHead = firstSuccessorRequest?.head === disposition.head
-      ? disposition.head
-      : reviewedHeads[predecessorHeadIndex + 1];
+    const nextDistinctHead = reviewedHeads[predecessorHeadIndex + 1];
+    const requestedImmediateHead = [disposition.head, nextDistinctHead]
+      .filter((head) => head !== undefined)
+      .includes(firstSuccessorRequest?.head)
+      ? firstSuccessorRequest.head
+      : null;
+    const allowedSuccessorHeads = requestedImmediateHead === null
+      ? new Set([disposition.head, nextDistinctHead].filter(
+        (head) => head !== undefined,
+      ))
+      : new Set([requestedImmediateHead]);
     if (
       pair.length === 0 ||
       channels.size === 2 ||
       heads.size !== 1 ||
       !heads.has(disposition.head) ||
       !knownHeads.has(disposition.successorHead) ||
-      (
-        expectedSuccessorHead === undefined &&
-        !(
-          firstSuccessorRequest === null &&
-          disposition.successorHead === disposition.head &&
-          currentHead === disposition.head
-        )
-      ) ||
-      (
-        expectedSuccessorHead !== undefined &&
-        disposition.successorHead !== expectedSuccessorHead
-      ) ||
+      !allowedSuccessorHeads.has(disposition.successorHead) ||
       pair.some((request) => request.terminal !== true) ||
       supersededTime === null ||
       requestTimes.some((requestTime) => requestTime === null || compareRfc3339Instants(
@@ -2278,19 +2325,12 @@ function validateSupersessionsAgainstRequests({
     }
   }
   for (const key of new Set(requests.map((request) => request.reviewInputKey))) {
-    const pair = requests.filter((request) => request.reviewInputKey === key);
+    const { pair, firstSuccessorRequest } = getOriginalPairAndSuccessor(key);
     const channels = new Set(pair.map((request) => request.channel));
-    const finalPairRequestIndex = requests.reduce(
-      (latest, request, index) => request.reviewInputKey === key ? index : latest,
-      -1,
-    );
-    const hasSuccessorRequest = requests
-      .slice(finalPairRequestIndex + 1)
-      .some((request) => request.reviewInputKey !== key);
     if (
       channels.size !== 2 &&
       pair.every((request) => request.terminal === true) &&
-      hasSuccessorRequest &&
+      firstSuccessorRequest !== null &&
       !describedKeys.has(key)
     ) {
       throw new TypeError(

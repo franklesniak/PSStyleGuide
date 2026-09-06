@@ -527,6 +527,48 @@ test('a reactivated superseded input resumes its original incomplete pair', () =
   assert.match(decision.reason, /already started/u);
 });
 
+test('a reactivated request retains the completed successor boundary', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
+  const oldRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const successorPair = [
+    requestFor(input2, 'copilot', {
+      confirmed: true,
+      terminal: true,
+      requestedAt: '2026-09-04T10:03:00Z',
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id: 'REACTIVATION_BOUNDARY_COPILOT',
+        observedAt: '2026-09-04T10:04:00Z',
+      },
+    }),
+    requestFor(input2, 'codex', {
+      confirmed: true,
+      terminal: true,
+      requestedAt: '2026-09-04T10:04:00Z',
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id: 'REACTIVATION_BOUNDARY_CODEX',
+        observedAt: '2026-09-04T10:05:00Z',
+      },
+    }),
+  ];
+  const reactivatedRequest = requestFor(input1, 'codex', {
+    requestedAt: '2026-09-04T10:06:00Z',
+  });
+  const persisted = compactState(input1, {
+    mutationClass: 'MATERIAL_SCOPE_BEHAVIOR_RISK',
+    materialReason: 'The prior risk change was reverted.',
+    reviewRequests: [oldRequest, ...successorPair, reactivatedRequest],
+    supersededReviewInputs: supersessionFor(input1, input2),
+  });
+
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(persisted)), persisted);
+});
+
 test('a reactivated input still validates its retained supersession boundary', () => {
   const input1 = reviewInput();
   const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
@@ -1653,6 +1695,32 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
     }).readbackComplete,
     false,
   );
+  for (const [field, collection] of [
+    ['requestEvents', { nodes: null }],
+    ['requestEvents', { pageInfo: { hasNextPage: false } }],
+    ['requestedReviewers', { requested_reviewers: undefined }],
+    ['requestedReviewers', { users: null }],
+    ['submittedReviews', { nodes: null }],
+    ['submittedReviews', { edges: null }],
+    ['reviewRuns', { workflow_runs: null }],
+    ['reviewRuns', { check_runs: null }],
+    ['reviewRuns', { total_count: 0 }],
+    ['reviewRuns', 'not-a-collection'],
+  ]) {
+    assert.equal(
+      collectCopilotRequestEvidence({
+        ...common,
+        responseReviewers: [],
+        requestEvents: [],
+        requestedReviewers: [],
+        submittedReviews: [],
+        reviewRuns: [],
+        [field]: collection,
+      }).readbackComplete,
+      false,
+      `${field} rejects an unavailable nested collection`,
+    );
+  }
 });
 
 test('Copilot request evidence excludes a baseline match through any supplied identity', () => {
@@ -2372,6 +2440,25 @@ test('all permanent active task-template and controller surfaces use the compact
     assert.match(surface, /chronological discovery order/u);
     assert.match(surface, /immediate successor/u);
   }
+  const nestedReadbackRule =
+    'a present outer wrapper with a null or missing selected `nodes`, `edges`, ' +
+    '`requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete';
+  const primitiveIdentityRule =
+    'Accept each supplied native evidence identity only as a nonempty string or positive safe integer';
+  const originalPairRule =
+    'Validate a retained disposition against the original request segment ending at the first later different-input request';
+  const successorFallbackRule =
+    'When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head';
+  assert.equal(plan.split(nestedReadbackRule).length - 1, 82);
+  assert.equal(plan.split(primitiveIdentityRule).length - 1, 82);
+  assert.equal(plan.split(originalPairRule).length - 1, 82);
+  assert.equal(plan.split(successorFallbackRule).length - 1, 82);
+  for (const surface of [parent, alternate, generator, crossRepository]) {
+    assert.match(surface, new RegExp(nestedReadbackRule, 'u'));
+    assert.match(surface, new RegExp(primitiveIdentityRule, 'u'));
+    assert.match(surface, new RegExp(originalPairRule, 'u'));
+    assert.match(surface, new RegExp(successorFallbackRule, 'u'));
+  }
   assert.match(alternate, /Locate and obey the applicable `AGENTS\.md`/u);
   assert.match(
     alternate,
@@ -3041,6 +3128,46 @@ test('Codex results exclude a baseline match through any supplied review identit
   assert.deepEqual(results, { submittedReviews: [], conversationComments: [] });
 });
 
+test('result identities must be nonempty strings or positive safe integers', () => {
+  const input = reviewInput();
+  const request = requestFor(input, 'codex');
+  const reviewRequests = [
+    requestFor(input, 'copilot', { confirmed: true }),
+    request,
+  ];
+  const result = (identities) => collectCodexResults({
+    reviewInput: input,
+    request,
+    reviewRequests,
+    submittedReviews: [{
+      ...identities,
+      user: { login: 'chatgpt-codex-connector[bot]' },
+      commit_id: HASHES.head1,
+      submitted_at: '2026-09-04T10:02:00Z',
+    }],
+    conversationComments: [],
+  });
+
+  for (const identities of [
+    { id: {} },
+    { id: true },
+    { id: Number.MAX_SAFE_INTEGER + 1 },
+    { id: 0 },
+    { id: '' },
+    { node_id: 'VALID_NODE', id: {} },
+  ]) {
+    assert.deepEqual(
+      result(identities),
+      { submittedReviews: [], conversationComments: [] },
+      JSON.stringify(identities),
+    );
+  }
+  assert.deepEqual(
+    result({ id: 202 }).submittedReviews.map((review) => review.id),
+    [202],
+  );
+});
+
 test('Codex request correlation rejects a different reviewed input', () => {
   const input = reviewInput();
   const changedInput = reviewInput({ risk: 'R2 sensitive planning change.' });
@@ -3570,6 +3697,24 @@ test('confirmed terminal requests require one attributable persisted result', as
     /one attributable terminal result/u,
   );
 
+  for (const invalidIdentities of [
+    { id: {} },
+    { id: true },
+    { id: Number.MAX_SAFE_INTEGER + 1 },
+    { nodeId: copilotRequest.terminalResultRef.id, id: {} },
+  ]) {
+    const invalid = structuredClone(validCopilot);
+    Object.assign(
+      invalid.current_task.review.copilotResults.submittedReviews[0],
+      invalidIdentities,
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /one attributable terminal result|portable safe-integer/u,
+      JSON.stringify(invalidIdentities),
+    );
+  }
+
   const authenticatedCopilot = structuredClone(validCopilot);
   Object.assign(
     authenticatedCopilot.current_task.review.copilotResults.submittedReviews[0],
@@ -4060,6 +4205,52 @@ test('request metrics retain an unrequested successor across a second head drift
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(malformedHead)),
     /request-per-head metric is malformed/u,
+  );
+});
+
+test('same-head unrequested successors survive a later distinct-head drift', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({ risk: 'R2 same-head successor.' });
+  const input3 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const oldRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const retained = compactState(input3, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [oldRequest],
+    supersededReviewInputs: supersessionFor(input1, input2),
+    metrics: {
+      ...state(input2, { reviewRequests: [oldRequest] }).metrics,
+      reviewerRequestsPerHead: {
+        [input1.head]: 1,
+        [input3.head]: 0,
+      },
+    },
+  });
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(retained)), retained);
+
+  const requestedSuccessor = structuredClone(retained);
+  requestedSuccessor.current_task.review.reviewRequests.push(
+    requestFor(input3, 'copilot', { requestedAt: '2026-09-04T10:03:00Z' }),
+  );
+  requestedSuccessor.current_task.review.metrics
+    .reviewerRequestsPerHead[input3.head] = 1;
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(requestedSuccessor)),
+    /terminal incomplete prior-input pair/u,
+  );
+  requestedSuccessor.current_task.review.supersededReviewInputs[
+    getReviewInputKey(input1)
+  ].successorHead = input3.head;
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(requestedSuccessor)),
+    requestedSuccessor,
   );
 });
 
