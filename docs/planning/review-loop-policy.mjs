@@ -1104,7 +1104,7 @@ export function decideReviewRequest({
       }
     }
   }
-  validateReviewRequestOrdering(requests);
+  validateReviewRequestOrdering(requests, { enforceGlobalSerialization: true });
   const reviewedHeads = reviewMetrics === null
     ? []
     : validatePersistedRequestMetrics(
@@ -1244,9 +1244,21 @@ function normalizeActorLogin(login) {
 }
 
 function getCommitOid(item) {
-  return item?.commit_id ?? item?.commit?.oid ??
-    (typeof item?.commit === 'string' ? item.commit : null) ??
-    item?.commitOid ?? null;
+  const commitOids = [
+    item?.commit_id,
+    item?.commit?.oid,
+    typeof item?.commit === 'string' ? item.commit : null,
+    item?.commitOid,
+  ].filter((value) => value !== null && value !== undefined);
+  if (
+    commitOids.length === 0 ||
+    commitOids.some((value) => typeof value !== 'string')
+  ) {
+    return null;
+  }
+
+  const [commitOid] = commitOids;
+  return commitOids.every((value) => value === commitOid) ? commitOid : null;
 }
 
 function getItemId(item) {
@@ -1924,11 +1936,8 @@ function validateSupersessionsAgainstRequests({
       pair.some((request) => request.terminal !== true) ||
       supersededTime === null ||
       requestTimes.some((requestTime) => requestTime === null || supersededTime < requestTime) ||
-      (
-        disposition.reviewInputKey !== currentKey &&
-        successorRequestTimes.some(
-          (requestTime) => requestTime === null || supersededTime > requestTime,
-        )
+      successorRequestTimes.some(
+        (requestTime) => requestTime === null || supersededTime > requestTime,
       )
     ) {
       throw new TypeError(

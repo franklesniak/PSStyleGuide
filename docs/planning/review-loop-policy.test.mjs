@@ -490,18 +490,89 @@ test('a reactivated superseded input resumes its original incomplete pair', () =
     confirmed: true,
     terminal: true,
   });
+  const successorPair = [
+    requestFor(input2, 'copilot', {
+      confirmed: true,
+      terminal: true,
+      requestedAt: '2026-09-04T10:02:00Z',
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id: 'REACTIVATION_SUCCESSOR_COPILOT',
+        observedAt: '2026-09-04T10:03:00Z',
+      },
+    }),
+    requestFor(input2, 'codex', {
+      confirmed: true,
+      terminal: true,
+      requestedAt: '2026-09-04T10:03:00Z',
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id: 'REACTIVATION_SUCCESSOR_CODEX',
+        observedAt: '2026-09-04T10:04:00Z',
+      },
+    }),
+  ];
   const decision = decideReviewRequest({
     previousReviewInput: input2,
     currentReviewInput: input1,
     mutationClass: classifyMutation(state(input2), state(input1)),
     materialReason: 'The prior risk change was reverted.',
-    existingRequests: [oldRequest, ...pairFor(input2)],
+    existingRequests: [oldRequest, ...successorPair],
     supersededInputs: supersessionFor(input1, input2),
   });
 
   assert.equal(decision.status, 'REQUEST_REQUIRED');
   assert.deepEqual(decision.channels, ['codex']);
   assert.match(decision.reason, /already started/u);
+});
+
+test('a reactivated input still validates its retained supersession boundary', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
+  const oldRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: 'REACTIVATED_OLD_COPILOT',
+      observedAt: '2026-09-04T10:00:30Z',
+    },
+  });
+  const successorPair = [
+    requestFor(input2, 'copilot', {
+      confirmed: true,
+      terminal: true,
+      requestedAt: '2026-09-04T10:01:00Z',
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id: 'RETROACTIVE_SUCCESSOR_COPILOT',
+        observedAt: '2026-09-04T10:01:15Z',
+      },
+    }),
+    requestFor(input2, 'codex', {
+      confirmed: true,
+      terminal: true,
+      requestedAt: '2026-09-04T10:01:30Z',
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id: 'RETROACTIVE_SUCCESSOR_CODEX',
+        observedAt: '2026-09-04T10:01:45Z',
+      },
+    }),
+  ];
+  const reactivated = compactState(input1, {
+    mutationClass: 'MATERIAL_SCOPE_BEHAVIOR_RISK',
+    materialReason: 'The prior risk change was reverted.',
+    reviewRequests: [oldRequest, ...successorPair],
+    supersededReviewInputs: supersessionFor(input1, input2, {
+      supersededAt: '2026-09-04T10:02:00Z',
+    }),
+  });
+
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(reactivated)),
+    /terminal incomplete prior-input pair/u,
+  );
 });
 
 test('scenario 4: a material same-head change records a reason and requires review', () => {
@@ -724,13 +795,13 @@ test('current-input records cannot bypass different-input pair serialization', (
     requestedAt: '2026-09-04T10:03:00Z',
   })];
   const completeCurrentPair = pairFor(input2, { terminal: false });
-  const pendingPartial = decideReviewRequest({
+  const pendingPartial = () => decideReviewRequest({
     previousReviewInput: input1,
     currentReviewInput: input2,
     mutationClass,
     existingRequests: [...pendingOldPair, ...partialCurrentPair],
   });
-  const pendingComplete = decideReviewRequest({
+  const pendingComplete = () => decideReviewRequest({
     previousReviewInput: input1,
     currentReviewInput: input2,
     mutationClass,
@@ -753,14 +824,50 @@ test('current-input records cannot bypass different-input pair serialization', (
     supersededInputs: supersessionFor(input1, input2),
   });
 
-  assert.equal(pendingPartial.status, 'WAIT_FOR_PRIOR_PAIR');
-  assert.deepEqual(pendingPartial.channels, []);
-  assert.equal(pendingComplete.status, 'WAIT_FOR_PRIOR_PAIR');
-  assert.deepEqual(pendingComplete.channels, []);
+  assert.throws(pendingPartial, /earlier-input request to be terminal first/u);
+  assert.throws(pendingComplete, /earlier-input request to be terminal first/u);
   assert.equal(terminalOld.status, 'WAIT_FOR_CURRENT_CHANNEL');
   assert.deepEqual(terminalOld.channels, []);
   assert.equal(supersededOld.status, 'WAIT_FOR_CURRENT_CHANNEL');
   assert.deepEqual(supersededOld.channels, []);
+});
+
+test('request decisions reject a current-input start before prior-input terminal evidence', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const oldCopilot = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const oldCodex = requestFor(input1, 'codex', {
+    confirmed: true,
+    terminal: true,
+    requestedAt: '2026-09-04T10:01:00Z',
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: 'LATE_OLD_CODEX',
+      observedAt: '2026-09-04T10:04:00Z',
+    },
+  });
+  const newCopilot = requestFor(input2, 'copilot', {
+    confirmed: true,
+    requestedAt: '2026-09-04T10:03:00Z',
+  });
+
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input1,
+      currentReviewInput: input2,
+      mutationClass: 'CODE_OR_DIFF',
+      existingRequests: [oldCopilot, oldCodex, newCopilot],
+    }),
+    /earlier-input request to be terminal first/u,
+  );
 });
 
 test('scenario 5b: a material same-head request waits for the prior pair to finish', () => {
@@ -854,6 +961,73 @@ test('scenario 6: both attributable Codex result channels are recognized', () =>
   assert.equal(results.conversationComments.length, 1);
   assert.equal(results.submittedReviews.length + results.conversationComments.length, 2);
   assert.deepEqual(Object.keys(results).sort(), ['conversationComments', 'submittedReviews']);
+});
+
+test('submitted reviews require all supplied commit identities to agree', () => {
+  const input = reviewInput();
+  const copilotRequest = requestFor(input, 'copilot', { confirmed: true });
+  const codexRequest = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+  });
+  const commonReview = {
+    user: { login: 'chatgpt-codex-connector[bot]' },
+    commit_id: HASHES.head1,
+    submitted_at: '2026-09-04T10:02:00Z',
+  };
+  const codexResults = collectCodexResults({
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: [copilotRequest, codexRequest],
+    submittedReviews: [
+      {
+        ...commonReview,
+        id: 'CONFLICTING_CODEX_COMMIT',
+        commit: { oid: HASHES.head2 },
+      },
+      {
+        ...commonReview,
+        id: 'AGREEING_CODEX_COMMIT',
+        commit: { oid: HASHES.head1 },
+        commitOid: HASHES.head1,
+      },
+    ],
+    conversationComments: [],
+  });
+  assert.deepEqual(
+    codexResults.submittedReviews.map((review) => review.id),
+    ['AGREEING_CODEX_COMMIT'],
+  );
+
+  const copilotEvidence = collectCopilotRequestEvidence({
+    baselineRequestEventIds: [],
+    baselineReviewNodeIds: [],
+    baselineReviewRunIds: [],
+    responseReviewers: [],
+    requestEvents: [],
+    requestedReviewers: [],
+    submittedReviews: [{
+      id: 'CONFLICTING_COPILOT_COMMIT',
+      user: {
+        login: 'copilot-pull-request-reviewer[bot]',
+        type: 'Bot',
+        id: 175728472,
+        node_id: 'BOT_kgDOCnlnWA',
+      },
+      commit_id: HASHES.head1,
+      commit: { oid: HASHES.head2 },
+      submitted_at: '2026-09-04T10:02:00Z',
+    }],
+    reviewRuns: [],
+    expectedHead: HASHES.head1,
+    requestedAt: '2026-09-04T10:00:00Z',
+    readbackCompleteness: {
+      requestEvents: true,
+      requestedReviewers: true,
+      submittedReviews: true,
+      reviewRuns: true,
+    },
+  });
+  assert.equal(copilotEvidence.submittedReviewMatched, false);
 });
 
 test('native completed Codex summaries become typed terminal conversation results', () => {
@@ -3059,6 +3233,14 @@ test('confirmed terminal requests require one attributable persisted result', as
     authenticatedCopilot,
   );
 
+  const agreeingCommitIdentities = structuredClone(validCopilot);
+  agreeingCommitIdentities.current_task.review.copilotResults
+    .submittedReviews[0].commitOid = HASHES.head1;
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(agreeingCommitIdentities)),
+    agreeingCommitIdentities,
+  );
+
   for (const conflictingIdentity of [
     {
       actorDatabaseId: 199175422,
@@ -3089,6 +3271,9 @@ test('confirmed terminal requests require one attributable persisted result', as
     },
     (candidate) => {
       candidate.current_task.review.copilotResults.submittedReviews[0].commit = HASHES.head2;
+    },
+    (candidate) => {
+      candidate.current_task.review.copilotResults.submittedReviews[0].commitOid = HASHES.head2;
     },
     (candidate) => {
       candidate.current_task.review.copilotResults.submittedReviews[0].submittedAt =
