@@ -1844,6 +1844,37 @@ test('Codex request evidence requires exact authenticated trigger-comment readba
     ...common,
     triggerComments: null,
   }).readbackComplete, false);
+  for (const triggerComments of [
+    { nodes: null },
+    { edges: null },
+    { total_count: 0 },
+    { pageInfo: { hasNextPage: false } },
+    'not-a-collection',
+  ]) {
+    const evidence = collectCodexRequestEvidence({
+      ...common,
+      triggerComments,
+    });
+    assert.equal(
+      evidence.readbackComplete,
+      false,
+      'Codex rejects an unavailable nested comment collection',
+    );
+    assert.equal(
+      reconcileReviewRequestMutation({
+        response: { ok: true, executed: true },
+        evidence,
+        reviewInputKey: HASHES.diff1,
+        channel: 'codex',
+        attemptedAt: common.requestedAt,
+        observedAt: '2026-09-04T10:02:01Z',
+        attemptCount: 1,
+        localRecordSucceeded: true,
+      }).state,
+      'RECONCILING',
+      'incomplete negative Codex readback cannot authorize a retry',
+    );
+  }
 });
 
 test('whole-second Copilot evidence matches a fractional request boundary', () => {
@@ -2664,7 +2695,7 @@ test('copied review prompts preserve both Copilot release paths', async () => {
   );
 });
 
-test('Task 6 terminal gates and later quality loops preserve their exact release paths', async () => {
+test('review-task terminal gates and later quality loops preserve their exact release paths', async () => {
   const plan = await readFile(
     new URL('./action-items-2026-08-30.md', import.meta.url),
     'utf8',
@@ -2676,20 +2707,40 @@ test('Task 6 terminal gates and later quality loops preserve their exact release
     return plan.slice(start, end === -1 ? plan.length : end);
   };
   const task6 = taskBody(6);
+  const task15 = taskBody(15);
+  const task25 = taskBody(25);
   const task8 = taskBody(8);
   const task26 = taskBody(26);
   const task27 = taskBody(27);
+  const task34 = taskBody(34);
   const task35 = taskBody(35);
   const task36 = taskBody(36);
 
-  assert.match(
-    task6,
-    /GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/u,
-  );
-  assert.equal(
-    [...task6.matchAll(/one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/gu)].length,
-    1,
-  );
+  for (const task of [task6, task15, task25, task34]) {
+    assert.match(
+      task,
+      /GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/u,
+    );
+    assert.match(
+      task,
+      /either one clean Copilot review or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/u,
+    );
+    assert.equal(
+      [...task.matchAll(/one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/gu)].length,
+      1,
+    );
+    assert.match(
+      task,
+      /Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/u,
+    );
+  }
+  for (const task of [task25, task34]) {
+    assert.match(
+      task,
+      /Wait for a new Codex review that explicitly applies to the current head\. If Copilot is confirmed, also wait for its new current-head review; otherwise verify the exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/u,
+    );
+    assert.doesNotMatch(task, /Wait for a new review from each reviewer/u);
+  }
   assert.match(
     task8,
     /Copilot has either a clean result or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/u,

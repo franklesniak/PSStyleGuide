@@ -1271,7 +1271,7 @@ If a review finding requires repository-byte change, route to Task 13, then upda
 
 Publish a status warning when a simple finding has not produced commit-ready bytes or a concrete exception by 10 minutes. Produce one of those outcomes by 15 minutes. Track reviewer requests per head, body edits after review begins, same-head re-request reasons, time from clean review to recognition, and time from first clean pair to merge. Do not rerun reviewers as a substitute for deterministic validation.
 
-Return `TERMINALLY_CLEAN` only when the local audit, one GitHub Copilot review, and one attributable Codex review are clean on the same final code head and reviewed input; all findings and threads are terminal; checks and validations are truthful; the frozen body is accurate; mutable results are separate; and no merge occurred. Otherwise return `REVIEW_BLOCKED` with the exact defect, materiality class, and route through Task 13 or Task 14, followed by new Task 15 and Task 16 instances only when the classifier requires them. Do not merge, enable auto-merge, close an issue, or publish the landed handoff.
+Return `TERMINALLY_CLEAN` only when the local audit and one attributable Codex review are clean on the same final code head and reviewed input; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; all findings and threads are terminal; checks and validations are truthful; the frozen body is accurate; mutable results are separate; and no merge occurred. Otherwise return `REVIEW_BLOCKED` with the exact defect, materiality class, and route through Task 13 or Task 14, followed by new Task 15 and Task 16 instances only when the classifier requires them. Do not merge, enable auto-merge, close an issue, or publish the landed handoff.
 ~~~
 
 ### Procedure
@@ -1284,7 +1284,7 @@ Return `TERMINALLY_CLEAN` only when the local audit, one GitHub Copilot review, 
 
 ### Validation and evidence
 
-Require fresh local executor identity/model/reasoning, complete pagination, inventory closure, all deterministic scenarios, frozen input, one clean Copilot and one clean attributable Codex result for the final reviewed input, same-head suppression, dual-channel ingestion, truthful checks, metrics, and no merge.
+Require fresh local executor identity/model/reasoning, complete pagination, inventory closure, all deterministic scenarios, frozen input, one clean attributable Codex result, either one clean Copilot review or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition for the final reviewed input, same-head suppression, dual-channel ingestion, truthful checks, metrics, and no merge.
 
 ### Stop and escalation conditions
 
@@ -1292,11 +1292,11 @@ Stop on unjustified same-head request, record/body coupling, monitor regression,
 
 ### Exact output
 
-One authenticated `REVIEW_LOOP_TERMINALLY_CLEAN` final result contains final head/tree/body, local and reviewer results, trigger, complete inventories, materiality and retry evidence, nine scenarios, task-required measurements, and proof no merge occurred.
+One authenticated `REVIEW_LOOP_TERMINALLY_CLEAN` final result contains final head/tree/body, local results, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, one attributable Codex result and trigger, complete inventories, materiality and retry evidence, nine scenarios, task-required measurements, and proof no merge occurred.
 
 ### Complete when
 
-The local audit and one clean reviewer pair are terminal on the same final code head and frozen semantics, recording results caused no rerequest, and the PR remains unmerged.
+The local audit and one clean attributable Codex review are terminal on the same final code head and frozen semantics; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; recording results caused no rerequest; and the PR remains unmerged.
 
 ## Task 16 — run the independent final quality check on the review-loop PR
 
@@ -2285,7 +2285,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 ### Objective
 
-On the repair-required branch, run a complete local Codex audit and the GitHub Copilot and remote Codex code reviews. Repeat all three review actions on every changed head. On the conformant branch, propagate the skip. Do not quality-check, merge, close, hand off, or change settings.
+On the repair-required branch, run a complete local Codex audit and, by default, one GitHub Copilot and one remote Codex code review. Repeat the local audit and required reviewer actions on every changed head. On the conformant branch, propagate the skip. Do not quality-check, merge, close, hand off, or change settings.
 
 ### Execution controls
 
@@ -2387,11 +2387,11 @@ Run the repository's complete applicable validation from a clean state. Include 
 
 For each finding, reproduce or refute it with repository evidence. If valid, list reasonable options, create a finding-specific weighted rubric, score all options, implement only the selected in-scope repair, and validate it. Keep decision analysis in `TEMP-*` files. Before any push, fetch the exact current PR head without force, inspect the complete outgoing range, verify allowed paths, ancestry, tree, and a clean worktree, then use an explicit non-force update. Read back the exact head and tree.
 
-After the local audit is clean on the current head, record separate GitHub Copilot and remote Codex baselines. Generate the GitHub Copilot request from the typed policy specification and send the authenticated REST review-request payload with exact reviewer login `copilot-pull-request-reviewer[bot]`. Do not use the display name `Copilot`. Capture the native status and response body. Normalize every returned collection with the tested helper; an empty collection is not success. Confirm the request through matching authenticated request-event, current-requested-reviewer, submitted-review, or Copilot-review-run readback. If an accepted request has no match, record `RECONCILING`, continue other safe work, wait at least 120 seconds, and require complete negative evidence from all four surfaces before recording `NO_EFFECT`. Retry at most once for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Only after the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request, post one PR conversation comment whose entire body is exactly `@codex review` to request the separate `chatgpt-codex-connector` review. The trigger is not a finding. Wait for a new review from each reviewer that explicitly applies to the current head. Re-query all review surfaces with complete pagination. Reconcile each review body, finding, inline thread, synthetic key, declared count, and deferral from both reviewers.
+After the local audit is clean on the current head, record separate GitHub Copilot and remote Codex baselines. Generate the GitHub Copilot request from the typed policy specification and send the authenticated REST review-request payload with exact reviewer login `copilot-pull-request-reviewer[bot]`. Do not use the display name `Copilot`. Capture the native status and response body. Normalize every returned collection with the tested helper; an empty collection is not success. Confirm the request through matching authenticated request-event, current-requested-reviewer, submitted-review, or Copilot-review-run readback. If an accepted request has no match, record `RECONCILING`, continue other safe work, wait at least 120 seconds, and require complete negative evidence from all four surfaces before recording `NO_EFFECT`. Retry at most once for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Only after the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request, post one PR conversation comment whose entire body is exactly `@codex review` to request the separate `chatgpt-codex-connector` review. The trigger is not a finding. Wait for a new Codex review that explicitly applies to the current head. If Copilot is confirmed, also wait for its new current-head review; otherwise verify the exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Re-query all review surfaces with complete pagination. Reconcile each review body, finding, inline thread, synthetic key, declared count, and deferral from both reviewers.
 
 If the code head or reviewed diff changes, discard the prior terminal claim, update and refreeze the body, repeat the local audit, and request one fresh pair on the new head. If scope, behavior, or risk description changes materially without a code change, record the material reason and request a fresh pair. For a deterministically verified non-material factual identity correction, result, task-state update, audit-record change, or comment-only publication on the same head, preserve and reuse the valid review. Reject a same-head re-request without a recorded material reason. Do not merge, enable auto-merge, close the issue, publish a landed handoff, or start a cross-repository comparison.
 
-Return `TERMINALLY_CLEAN` only when the local audit, GitHub Copilot review, and `chatgpt-codex-connector` review are clean on the same current head SHA and tree. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review results must be public and readable. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 23 for bytes or Task 24 for PR-only metadata, followed by a new Task 25 instance.
+Return `TERMINALLY_CLEAN` only when the local audit and one attributable `chatgpt-codex-connector` review are clean on the same current head SHA and tree; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review results must be public and readable. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 23 for bytes or Task 24 for PR-only metadata, followed by a new Task 25 instance.
 ~~~
 
 ### Procedure
@@ -2404,7 +2404,7 @@ Return `TERMINALLY_CLEAN` only when the local audit, GitHub Copilot review, and 
 
 ### Validation and evidence
 
-Require correct conditional handling. On repair, require a native subagent or controlled fallback, the required model and effort, applicable instructions, complete pagination, a clean local audit, clean GitHub Copilot and remote Codex reviews on one head/tree, complete issue/parity/deferral/check validation, and no merge. On skip, require exact current evidence.
+Require correct conditional handling. On repair, require a native subagent or controlled fallback, the required model and effort, applicable instructions, complete pagination, a clean local audit, one clean attributable remote Codex review, either one clean Copilot review or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition on one head/tree, complete issue/parity/deferral/check validation, and no merge. On skip, require exact current evidence.
 
 ### Stop and escalation conditions
 
@@ -2412,11 +2412,11 @@ Stop without starting a successor if an input object is unavailable, a ref or bo
 
 ### Exact output
 
-One `TF_PR78_TERMINALLY_CLEAN` record contains the final head/tree, the local audit evidence, the GitHub Copilot review ID and commit, and the remote Codex review result, or one exact conformant skip. No quality or merge action occurred.
+One `TF_PR78_TERMINALLY_CLEAN` record contains the final head/tree, the local audit evidence, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, and the remote Codex review result, or one exact conformant skip. No quality or merge action occurred.
 
 ### Complete when
 
-The local audit, GitHub Copilot review, and remote Codex review are terminally clean on the same Terraform head/tree, or the conformant branch is skipped. No unresolved work or successor action remains in this leaf.
+The local audit and one clean attributable remote Codex review are terminally clean on the same Terraform head/tree; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Otherwise, the conformant branch is skipped. No unresolved work or successor action remains in this leaf.
 
 ## Task 26 — run the independent final quality check on the Terraform PR #78 port PR
 
@@ -3489,7 +3489,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 ### Objective
 
-On the repair branch, run a complete local Codex audit and the GitHub Copilot and remote Codex code reviews. Repeat all three review actions after every evidence change. On the fixed-point branch, propagate the skip. Do not quality-check, merge, hand off, close, or change settings.
+On the repair branch, run a complete local Codex audit and, by default, one GitHub Copilot and one remote Codex code review. Repeat the local audit and required reviewer actions after every material evidence change. On the fixed-point branch, propagate the skip. Do not quality-check, merge, hand off, close, or change settings.
 
 ### Execution controls
 
@@ -3588,11 +3588,11 @@ Run the repository's complete applicable validation from a clean state. Include 
 
 For each finding, reproduce or refute it with repository evidence. If valid, list reasonable options, create a finding-specific weighted rubric, score all options, implement only the selected in-scope repair, and validate it. Keep decision analysis in `TEMP-*` files. Before any push, fetch the exact current PR head without force, inspect the complete outgoing range, verify allowed paths, ancestry, tree, and a clean worktree, then use an explicit non-force update. Read back the exact head and tree.
 
-After the local audit is clean on the current head, record separate GitHub Copilot and remote Codex baselines. Generate the GitHub Copilot request from the typed policy specification and send the authenticated REST review-request payload with exact reviewer login `copilot-pull-request-reviewer[bot]`. Do not use the display name `Copilot`. Capture the native status and response body. Normalize every returned collection with the tested helper; an empty collection is not success. Confirm the request through matching authenticated request-event, current-requested-reviewer, submitted-review, or Copilot-review-run readback. If an accepted request has no match, record `RECONCILING`, continue other safe work, wait at least 120 seconds, and require complete negative evidence from all four surfaces before recording `NO_EFFECT`. Retry at most once for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Only after the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request, post one PR conversation comment whose entire body is exactly `@codex review` to request the separate `chatgpt-codex-connector` review. The trigger is not a finding. Wait for a new review from each reviewer that explicitly applies to the current head. Re-query all review surfaces with complete pagination. Reconcile each review body, finding, inline thread, synthetic key, declared count, and deferral from both reviewers.
+After the local audit is clean on the current head, record separate GitHub Copilot and remote Codex baselines. Generate the GitHub Copilot request from the typed policy specification and send the authenticated REST review-request payload with exact reviewer login `copilot-pull-request-reviewer[bot]`. Do not use the display name `Copilot`. Capture the native status and response body. Normalize every returned collection with the tested helper; an empty collection is not success. Confirm the request through matching authenticated request-event, current-requested-reviewer, submitted-review, or Copilot-review-run readback. If an accepted request has no match, record `RECONCILING`, continue other safe work, wait at least 120 seconds, and require complete negative evidence from all four surfaces before recording `NO_EFFECT`. Retry at most once for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Only after the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request, post one PR conversation comment whose entire body is exactly `@codex review` to request the separate `chatgpt-codex-connector` review. The trigger is not a finding. Wait for a new Codex review that explicitly applies to the current head. If Copilot is confirmed, also wait for its new current-head review; otherwise verify the exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Re-query all review surfaces with complete pagination. Reconcile each review body, finding, inline thread, synthetic key, declared count, and deferral from both reviewers.
 
 If the code head or reviewed diff changes, discard the prior terminal claim, update and refreeze the body, repeat the local audit, and request one fresh pair on the new head. If scope, behavior, or risk description changes materially without a code change, record the material reason and request a fresh pair. For a deterministically verified non-material factual identity correction, result, task-state update, audit-record change, or comment-only publication on the same head, preserve and reuse the valid review. Reject a same-head re-request without a recorded material reason. Do not merge, enable auto-merge, close the issue, publish a landed handoff, or start a cross-repository comparison.
 
-Return `TERMINALLY_CLEAN` only when the local audit, GitHub Copilot review, and `chatgpt-codex-connector` review are clean on the same current head SHA and tree. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review results must be public and readable. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 32 for bytes or Task 33 for PR-only metadata, followed by a new Task 34 instance in the same loop.
+Return `TERMINALLY_CLEAN` only when the local audit and one attributable `chatgpt-codex-connector` review are clean on the same current head SHA and tree; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review results must be public and readable. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 32 for bytes or Task 33 for PR-only metadata, followed by a new Task 34 instance in the same loop.
 ~~~
 
 ### Procedure
@@ -3605,7 +3605,7 @@ Return `TERMINALLY_CLEAN` only when the local audit, GitHub Copilot review, and 
 
 ### Validation and evidence
 
-Require correct conditional handling. On repair, require the required model and effort, a native executor or controlled fallback, applicable instructions, complete pagination, a clean local audit, clean GitHub Copilot and remote Codex reviews on one head/tree, all blocker/issue/parity/check/deferral evidence, and no merge. On skip, require exact state.
+Require correct conditional handling. On repair, require the required model and effort, a native executor or controlled fallback, applicable instructions, complete pagination, a clean local audit, one clean attributable remote Codex review, either one clean Copilot review or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition on one head/tree, all blocker/issue/parity/check/deferral evidence, and no merge. On skip, require exact state.
 
 ### Stop and escalation conditions
 
@@ -3613,11 +3613,11 @@ Stop without starting a successor if an input object is unavailable, a ref or bo
 
 ### Exact output
 
-One `PR78_SELECTED_REPAIR_TERMINALLY_CLEAN` record contains exact-head local audit evidence, the GitHub Copilot review ID and commit, the remote Codex review result, and the loop identity, or one exact skip.
+One `PR78_SELECTED_REPAIR_TERMINALLY_CLEAN` record contains exact-head local audit evidence, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, the remote Codex review result, and the loop identity, or one exact skip.
 
 ### Complete when
 
-The local audit, GitHub Copilot review, and remote Codex review are clean on the same selected-target head/tree, or the fixed-point branch is skipped. No unresolved work or successor action occurred.
+The local audit and one clean attributable remote Codex review are clean on the same selected-target head/tree; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Otherwise, the fixed-point branch is skipped. No unresolved work or successor action occurred.
 
 ## Task 35 — run the independent final quality check on one selected-target PR #78 repair PR
 

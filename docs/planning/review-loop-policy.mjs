@@ -1839,7 +1839,10 @@ export function collectCodexRequestEvidence({
   ) {
     throw new TypeError('Codex trigger-comment evidence identity is malformed.');
   }
-  const commentsAvailable = triggerComments !== undefined && triggerComments !== null;
+  const commentsAvailable = hasCompleteCollectionReadback(
+    triggerComments,
+    ['nodes', 'edges'],
+  );
   const expectedActor = normalizeActorLogin(expectedActorLogin);
   const triggerCommentMatched = commentsAvailable && normalizeCollection(triggerComments).some(
     (comment) => {
