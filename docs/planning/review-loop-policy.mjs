@@ -119,6 +119,77 @@ function canonicalJson(value) {
   return JSON.stringify(canonicalize(value));
 }
 
+function assertPortableJsonValue(value, seen = new WeakSet()) {
+  const fail = () => {
+    throw new TypeError('A predecessor output value is not portable JSON.');
+  };
+  const valueType = typeof value;
+
+  if (
+    value === null ||
+    valueType === 'boolean' ||
+    valueType === 'string'
+  ) {
+    return;
+  }
+  if (valueType === 'number') {
+    if (
+      !Number.isFinite(value) ||
+      Math.abs(value) > Number.MAX_SAFE_INTEGER ||
+      Object.is(value, -0)
+    ) {
+      fail();
+    }
+    return;
+  }
+  if (valueType !== 'object' || seen.has(value)) {
+    fail();
+  }
+  // JSON trees cannot preserve cycles or shared object identity.
+  seen.add(value);
+
+  const descriptors = Object.getOwnPropertyDescriptors(value);
+  const keys = Reflect.ownKeys(descriptors);
+  if (Array.isArray(value)) {
+    if (
+      Object.getPrototypeOf(value) !== Array.prototype ||
+      keys.some((key) => typeof key !== 'string') ||
+      keys.some((key) => key !== 'length' && !/^(?:0|[1-9]\d*)$/u.test(key)) ||
+      keys.length !== value.length + 1
+    ) {
+      fail();
+    }
+    for (let index = 0; index < value.length; index += 1) {
+      const descriptor = descriptors[String(index)];
+      if (
+        descriptor === undefined ||
+        descriptor.enumerable !== true ||
+        !Object.hasOwn(descriptor, 'value')
+      ) {
+        fail();
+      }
+      assertPortableJsonValue(descriptor.value, seen);
+    }
+    return;
+  }
+
+  const prototype = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype && prototype !== null) {
+    fail();
+  }
+  for (const key of keys) {
+    const descriptor = descriptors[key];
+    if (
+      typeof key !== 'string' ||
+      descriptor.enumerable !== true ||
+      !Object.hasOwn(descriptor, 'value')
+    ) {
+      fail();
+    }
+    assertPortableJsonValue(descriptor.value, seen);
+  }
+}
+
 function assertHash(value, pattern, label) {
   if (typeof value !== 'string' || !pattern.test(value)) {
     throw new TypeError(`${label} has an invalid hash.`);
@@ -736,6 +807,7 @@ function validatePredecessorOutputs(predecessorOutputs, completedTaskNumber = nu
       ) {
         throw new TypeError('A predecessor output record is malformed.');
       }
+      assertPortableJsonValue(record.value);
       const serialized = JSON.stringify(record.value);
       if (serialized === undefined || serialized.length > 65_536) {
         throw new TypeError('A predecessor output value is not bounded JSON.');
@@ -911,6 +983,9 @@ export function decideReviewRequest({
     (typeof materialReason !== 'string' || materialReason.trim().length === 0)
   ) {
     throw new TypeError('A material scope, behavior, or risk change requires a reason.');
+  }
+  if (mutationClass === 'MATERIAL_SCOPE_BEHAVIOR_RISK') {
+    validateTransport(materialReason);
   }
 
   const currentKey = getReviewInputKey(currentReviewInput);

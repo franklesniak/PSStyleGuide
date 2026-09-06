@@ -2500,6 +2500,28 @@ test('material reasons require non-whitespace text in both schema and runtime', 
   }
 });
 
+test('material review reasons reject control characters without changing valid text', () => {
+  const previousInput = reviewInput({ risk: 'R1 reversible planning change.' });
+  const currentInput = reviewInput({ risk: 'R2 sensitive planning change.' });
+  const common = {
+    previousReviewInput: previousInput,
+    currentReviewInput: currentInput,
+    mutationClass: 'MATERIAL_SCOPE_BEHAVIOR_RISK',
+  };
+
+  for (const materialReason of ['unsafe\u0001reason', ' \u0001 ']) {
+    assert.throws(
+      () => decideReviewRequest({ ...common, materialReason }),
+      /control character/u,
+    );
+  }
+  const safeReason = '  Preserve `backticks` and Unicode ✓.  ';
+  assert.equal(
+    decideReviewRequest({ ...common, materialReason: safeReason }).reason,
+    safeReason.trim(),
+  );
+});
+
 test('review-input meaning fields require non-whitespace text in schema and runtime', async () => {
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
@@ -3306,6 +3328,162 @@ test('predecessor outputs survive required restart boundaries and prune after fi
       },
     }, 12),
     /malformed/u,
+  );
+});
+
+test('predecessor output values must be lossless portable JSON trees', () => {
+  const outputsFor = (value) => ({
+    1: {
+      VALUE: {
+        value,
+        last_consumer_task: 2,
+      },
+    },
+  });
+  const invalidPrimitiveValues = [
+    undefined,
+    NaN,
+    Infinity,
+    -Infinity,
+    -0,
+    Number.MAX_SAFE_INTEGER + 1,
+    () => true,
+    Symbol('value'),
+    1n,
+  ];
+  for (const value of invalidPrimitiveValues) {
+    assert.throws(
+      () => prunePredecessorOutputs(outputsFor(value), 1),
+      /not portable JSON/u,
+    );
+  }
+
+  for (const value of [
+    { kept: true, lost: undefined },
+    { kept: true, lost: () => true },
+    { kept: true, lost: Symbol('value') },
+    [true, undefined],
+    [true, () => true],
+    [true, Symbol('value')],
+  ]) {
+    assert.throws(
+      () => prunePredecessorOutputs(outputsFor(value), 1),
+      /not portable JSON/u,
+    );
+  }
+
+  const cycle = {};
+  cycle.self = cycle;
+  const sparse = [];
+  sparse.length = 1;
+  const shared = { safe: true };
+  const symbolObject = { safe: true };
+  symbolObject[Symbol('hidden')] = false;
+  const symbolArray = [true];
+  symbolArray[Symbol('hidden')] = false;
+  const hiddenObject = { safe: true };
+  Object.defineProperty(hiddenObject, 'hidden', { value: false });
+  const hiddenArray = [true];
+  Object.defineProperty(hiddenArray, 'hidden', { value: false });
+  const customArray = [true];
+  customArray.extra = false;
+  let getterCalls = 0;
+  const accessorObject = {};
+  Object.defineProperty(accessorObject, 'unsafe', {
+    enumerable: true,
+    get() {
+      getterCalls += 1;
+      return true;
+    },
+  });
+  const accessorArray = [true];
+  Object.defineProperty(accessorArray, '0', {
+    enumerable: true,
+    get() {
+      getterCalls += 1;
+      return true;
+    },
+  });
+  class CustomArray extends Array {}
+  const inheritedToJsonArray = [true];
+  Object.setPrototypeOf(
+    inheritedToJsonArray,
+    Object.create(Array.prototype, {
+      toJSON: {
+        get() {
+          getterCalls += 1;
+          return () => null;
+        },
+      },
+    }),
+  );
+  const ownToJson = {
+    safe: true,
+    toJSON() {
+      return { changed: true };
+    },
+  };
+  class CustomValue {
+    constructor() {
+      this.safe = true;
+    }
+  }
+
+  for (const value of [
+    cycle,
+    sparse,
+    symbolObject,
+    symbolArray,
+    hiddenObject,
+    hiddenArray,
+    customArray,
+    accessorObject,
+    accessorArray,
+    new CustomArray(true),
+    inheritedToJsonArray,
+    ownToJson,
+    new Date('2026-09-06T00:00:00Z'),
+    new Map([['safe', true]]),
+    new Set([true]),
+    new Uint8Array([1]),
+    new CustomValue(),
+  ]) {
+    assert.throws(
+      () => prunePredecessorOutputs(outputsFor(value), 1),
+      /not portable JSON/u,
+    );
+  }
+  assert.equal(getterCalls, 0);
+  assert.throws(
+    () => prunePredecessorOutputs(outputsFor([shared, shared]), 1),
+    /not portable JSON/u,
+    'Shared non-cyclic references are graphs, not portable JSON trees.',
+  );
+
+  const nullPrototype = Object.create(null);
+  nullPrototype.safe = '✓';
+  const valid = {
+    nil: null,
+    yes: true,
+    no: false,
+    text: '`Markdown` and Unicode ✓',
+    integer: Number.MAX_SAFE_INTEGER,
+    decimal: 0.125,
+    array: [null, false, { nested: 'value' }],
+    nullPrototype,
+  };
+  assert.deepEqual(
+    prunePredecessorOutputs(outputsFor(valid), 1),
+    outputsFor({
+      array: [null, false, { nested: 'value' }],
+      decimal: 0.125,
+      integer: Number.MAX_SAFE_INTEGER,
+      nil: null,
+      no: false,
+      nullPrototype: { safe: '✓' },
+      text: '`Markdown` and Unicode ✓',
+      yes: true,
+    }),
   );
 });
 
