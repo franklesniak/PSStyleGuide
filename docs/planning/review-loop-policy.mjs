@@ -204,6 +204,15 @@ function assertNonemptyText(value, label) {
   validateTransport(value);
 }
 
+function isNonemptyTransportText(value) {
+  try {
+    assertNonemptyText(value, 'value');
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function parseRfc3339Timestamp(value, label) {
   const match = typeof value === 'string' ? RFC3339_PATTERN.exec(value) : null;
   if (match === null) {
@@ -1564,10 +1573,8 @@ function isRepositoryAuthorizedNonfunctionalDisposition(disposition, request) {
     Array.isArray(disposition) ||
     Object.keys(disposition).length !== 4 ||
     disposition.state !== 'REPOSITORY_AUTHORIZED_NON_FUNCTIONAL' ||
-    typeof disposition.authority !== 'string' ||
-    disposition.authority.trim().length === 0 ||
-    typeof disposition.reason !== 'string' ||
-    disposition.reason.trim().length === 0
+    !isNonemptyTransportText(disposition.authority) ||
+    !isNonemptyTransportText(disposition.reason)
   ) {
     return false;
   }
@@ -1582,6 +1589,7 @@ function getItemIdentities(item) {
     item?.node_id,
     item?.nodeId,
     item?.id,
+    item?.database_id,
     item?.databaseId,
   ].filter((value) => value !== null && value !== undefined).map(String))];
 }
@@ -1820,8 +1828,7 @@ function isSupersededReviewInputRecord(disposition) {
     typeof disposition.successorHead === 'string' &&
     SHA1_PATTERN.test(disposition.successorHead) &&
     getItemTime(disposition, ['supersededAt']) !== null &&
-    typeof disposition.reason === 'string' &&
-    disposition.reason.trim().length > 0;
+    isNonemptyTransportText(disposition.reason);
 }
 
 function validateSupersessionsAgainstRequests({
@@ -1924,11 +1931,11 @@ export function collectCodexResults({
   );
   const reviews = normalizeCollection(submittedReviews).filter(
     (review) => {
-      const id = getItemId(review);
+      const identities = getItemIdentities(review);
       return normalizeActorLogin(getActorLogin(review)) === expectedActor &&
         getCommitOid(review) === head &&
-        id !== null &&
-        !baselineReviewIds.has(id) &&
+        identities.length > 0 &&
+        identities.every((identity) => !baselineReviewIds.has(identity)) &&
         isItemAtOrAfterRequest(review, ['submitted_at', 'submittedAt'], requestTime);
     },
   );

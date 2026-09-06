@@ -456,6 +456,33 @@ test('old-head supersession rejects forged, current-input, and complete-pair rec
   );
 });
 
+test('decision gating rejects transport-invalid supersession reasons', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const oldRequest = requestFor(input1, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input1,
+      currentReviewInput: input2,
+      mutationClass: 'CODE_OR_DIFF',
+      existingRequests: [oldRequest],
+      supersededInputs: supersessionFor(input1, input2, {
+        reason: 'Authenticated drift\u0001hidden',
+      }),
+    }),
+    /malformed/u,
+  );
+});
+
 test('a reactivated superseded input resumes its original incomplete pair', () => {
   const input1 = reviewInput();
   const input2 = reviewInput({ risk: 'R2 sensitive planning change.' });
@@ -549,6 +576,27 @@ test('scenario 5a: a same-head pair releases Codex after Copilot confirmation or
   assert.equal(terminal.status, 'REQUEST_REQUIRED');
   assert.deepEqual(terminal.channels, ['codex']);
   assert.match(terminal.reason, /already started/u);
+});
+
+test('decision gating rejects transport-invalid terminal disposition text', () => {
+  const input = reviewInput();
+  const decide = (terminalDisposition) => decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: [requestFor(input, 'copilot', {
+      terminal: true,
+      terminalDisposition,
+    })],
+  });
+
+  for (const terminalDisposition of [
+    nonfunctionalDisposition({ authority: 'Repository policy\u0001hidden' }),
+    nonfunctionalDisposition({ reason: 'Reviewer unavailable\u0001hidden' }),
+  ]) {
+    assert.throws(() => decide(terminalDisposition), /malformed/u);
+  }
+  assert.equal(decide(nonfunctionalDisposition()).status, 'REQUEST_REQUIRED');
 });
 
 test('Codex requests require an eligible earlier Copilot predecessor', () => {
@@ -1351,7 +1399,7 @@ test('Copilot request evidence excludes a baseline match through any supplied id
   const evidence = collectCopilotRequestEvidence({
     ...common,
     baselineRequestEventIds: ['101'],
-    baselineReviewNodeIds: ['202'],
+    baselineReviewNodeIds: ['404'],
     baselineReviewRunIds: ['303'],
     requestEvents: [{
       id: 101,
@@ -1362,6 +1410,7 @@ test('Copilot request evidence excludes a baseline match through any supplied id
     }],
     submittedReviews: [{
       id: 202,
+      database_id: 404,
       node_id: 'PRR_preferred',
       submitted_at: '2026-09-04T10:01:00Z',
       commit_id: expectedHead,
@@ -2197,6 +2246,31 @@ test('Codex results normalize REST and GraphQL identities and reject stale evide
     ['COMMENT_STABLE'],
   );
   assert.equal(results.submittedReviews.length + results.conversationComments.length, 2);
+});
+
+test('Codex results exclude a baseline match through any supplied review identity', () => {
+  const input = reviewInput();
+  const request = requestFor(input, 'codex', {
+    baselineReviewNodeIds: ['202'],
+  });
+  const results = collectCodexResults({
+    reviewInput: input,
+    request,
+    reviewRequests: [
+      requestFor(input, 'copilot', { confirmed: true }),
+      request,
+    ],
+    submittedReviews: [{
+      database_id: 202,
+      node_id: 'PRR_preferred',
+      user: { login: 'chatgpt-codex-connector[bot]' },
+      commit_id: HASHES.head1,
+      submitted_at: '2026-09-04T10:02:00Z',
+    }],
+    conversationComments: [],
+  });
+
+  assert.deepEqual(results, { submittedReviews: [], conversationComments: [] });
 });
 
 test('Codex request correlation rejects a different reviewed input', () => {
