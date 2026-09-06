@@ -51,7 +51,7 @@ const SHA256_PATTERN = /^[0-9a-f]{64}$/u;
 const PREDECESSOR_TASK_PATTERN = /^[1-9]\d{0,2}$/u;
 const PREDECESSOR_OUTPUT_PATTERN = /^[A-Z][A-Z0-9_]{0,127}$/u;
 const DISALLOWED_CONTROL_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/u;
-const RFC3339_PATTERN = /^(?<year>\d{4})-(?<month>0[1-9]|1[0-2])-(?<day>0[1-9]|[12]\d|3[01])[Tt](?<hour>[01]\d|2[0-3]):(?<minute>[0-5]\d):(?<second>[0-5]\d)(?:\.\d+)?(?<zone>[Zz]|(?<offsetSign>[+-])(?<offsetHour>0\d|1[0-4]):(?<offsetMinute>[0-5]\d))$/u;
+const RFC3339_PATTERN = /^(?<year>\d{4})-(?<month>0[1-9]|1[0-2])-(?<day>0[1-9]|[12]\d|3[01])[Tt](?<hour>[01]\d|2[0-3]):(?<minute>[0-5]\d):(?<second>[0-5]\d)(?:\.(?<fraction>\d+))?(?<zone>[Zz]|(?<offsetSign>[+-])(?<offsetHour>0\d|1[0-4]):(?<offsetMinute>[0-5]\d))$/u;
 const REVIEW_LOOP_TASK_NUMBER_SET = new Set(REVIEW_LOOP_TASK_NUMBERS);
 const PUBLIC_MUTATION_STATES = new Set([
   'NOT_ATTEMPTED',
@@ -285,6 +285,69 @@ function parseRfc3339Timestamp(value, label) {
   }
 
   return timestamp;
+}
+
+function parseRfc3339Instant(value, label) {
+  const timestamp = parseRfc3339Timestamp(value, label);
+  const match = RFC3339_PATTERN.exec(value);
+  const wholeSecondText = value.replace(
+    /\.\d+(?=[Zz]$|[+-]\d{2}:\d{2}$)/u,
+    '',
+  );
+  const wholeSecondMilliseconds = Date.parse(wholeSecondText);
+  if (match === null || !Number.isFinite(wholeSecondMilliseconds)) {
+    throw new TypeError(`${label} must be a valid timestamp in RFC 3339 format.`);
+  }
+  return {
+    milliseconds: timestamp,
+    epochSecond: BigInt(Math.trunc(wholeSecondMilliseconds / 1_000)),
+    fraction: match.groups.fraction ?? '',
+  };
+}
+
+function compareRfc3339Instants(left, right, leftLabel, rightLabel) {
+  const leftInstant = parseRfc3339Instant(left, leftLabel);
+  const rightInstant = parseRfc3339Instant(right, rightLabel);
+  if (leftInstant.epochSecond !== rightInstant.epochSecond) {
+    return leftInstant.epochSecond < rightInstant.epochSecond ? -1 : 1;
+  }
+  const width = Math.max(leftInstant.fraction.length, rightInstant.fraction.length);
+  const leftFraction = leftInstant.fraction.padEnd(width, '0');
+  const rightFraction = rightInstant.fraction.padEnd(width, '0');
+  return leftFraction === rightFraction ? 0 : leftFraction < rightFraction ? -1 : 1;
+}
+
+function isRfc3339ElapsedAtLeastMilliseconds(
+  start,
+  end,
+  minimumMilliseconds,
+  startLabel,
+  endLabel,
+) {
+  const startInstant = parseRfc3339Instant(start, startLabel);
+  const endInstant = parseRfc3339Instant(end, endLabel);
+  const width = Math.max(
+    startInstant.fraction.length,
+    endInstant.fraction.length,
+    3,
+  );
+  const scale = 10n ** BigInt(width);
+  const millisecondsScale = 10n ** BigInt(width - 3);
+  const toUnits = (instant) =>
+    instant.epochSecond * scale +
+    BigInt(instant.fraction.padEnd(width, '0') || '0');
+  return toUnits(endInstant) - toUnits(startInstant) >=
+    BigInt(minimumMilliseconds) * millisecondsScale;
+}
+
+function getRfc3339ElapsedMilliseconds(start, end, startLabel, endLabel) {
+  const startInstant = parseRfc3339Instant(start, startLabel);
+  const endInstant = parseRfc3339Instant(end, endLabel);
+  const fractionalSeconds = (fraction) =>
+    fraction.length === 0 ? 0 : Number(`0.${fraction}`);
+  return Number(endInstant.epochSecond - startInstant.epochSecond) * 1_000 +
+    (fractionalSeconds(endInstant.fraction) -
+      fractionalSeconds(startInstant.fraction)) * 1_000;
 }
 
 export function normalizeCollection(value) {
@@ -816,10 +879,15 @@ function validatePersistedPublicMutation(publicMutation, requests) {
     return;
   }
 
-  const attemptedTime = parseRfc3339Timestamp(attemptedAt, 'attemptedAt');
+  parseRfc3339Instant(attemptedAt, 'attemptedAt');
   if (
     matchingRequest !== null &&
-    attemptedTime < parseRfc3339Timestamp(matchingRequest.requestedAt, 'requestedAt')
+    compareRfc3339Instants(
+      attemptedAt,
+      matchingRequest.requestedAt,
+      'attemptedAt',
+      'requestedAt',
+    ) < 0
   ) {
     throw new TypeError('A review-request mutation attempt precedes its request record.');
   }
@@ -827,13 +895,24 @@ function validatePersistedPublicMutation(publicMutation, requests) {
     return;
   }
 
-  const reconciledTime = parseRfc3339Timestamp(reconciledAt, 'reconciledAt');
-  if (reconciledTime < attemptedTime) {
+  parseRfc3339Instant(reconciledAt, 'reconciledAt');
+  if (compareRfc3339Instants(
+    reconciledAt,
+    attemptedAt,
+    'reconciledAt',
+    'attemptedAt',
+  ) < 0) {
     throw new TypeError('The persisted reconciliation precedes its attempt.');
   }
   if (
     (publicMutation.state === 'NO_EFFECT' || publicMutation.state === 'EXHAUSTED') &&
-    reconciledTime - attemptedTime < REVIEW_REQUEST_RECONCILIATION_MILLISECONDS
+    !isRfc3339ElapsedAtLeastMilliseconds(
+      attemptedAt,
+      reconciledAt,
+      REVIEW_REQUEST_RECONCILIATION_MILLISECONDS,
+      'attemptedAt',
+      'reconciledAt',
+    )
   ) {
     throw new TypeError('The persisted no-effect reconciliation interval is too short.');
   }
@@ -1271,16 +1350,27 @@ function hasMatchingConversationHeadIdentities(item, expectedHead) {
   const headOids = [item?.head, item?.headRefOid].filter(
     (value) => value !== undefined,
   );
+  const commitPrefixes = [item?.commitPrefix].filter(
+    (value) => value !== undefined,
+  );
   return headOids.every(
     (value) => typeof value === 'string' &&
       SHA1_PATTERN.test(value) &&
       value === expectedHead,
+  ) && commitPrefixes.every(
+    (value) => typeof value === 'string' &&
+      /^[0-9a-f]{7,40}$/u.test(value) &&
+      expectedHead.startsWith(value),
   );
 }
 
-function getItemId(item) {
-  const id = item?.node_id ?? item?.nodeId ?? item?.id ?? item?.databaseId;
-  return id === null || id === undefined ? null : String(id);
+function hasRequiredTerminalConversationHeadEvidence(item, expectedHead) {
+  const suppliedEvidence = [item?.head, item?.headRefOid, item?.commitPrefix]
+    .some((value) => value !== undefined);
+  const terminal = typeof item?.status === 'string' &&
+    item.status.startsWith('completed');
+  return (!terminal || suppliedEvidence) &&
+    hasMatchingConversationHeadIdentities(item, expectedHead);
 }
 
 function getItemTime(item, fields) {
@@ -1300,25 +1390,71 @@ function getItemTime(item, fields) {
   return null;
 }
 
-function isItemAtOrAfterRequest(item, fields, requestTime) {
+function getItemTimestamp(item, fields) {
   for (const field of fields) {
     const value = item?.[field];
     if (value === undefined || value === null) {
       continue;
     }
-
     try {
-      const itemTime = parseRfc3339Timestamp(value, field);
-      const requestBoundary = /:\d{2}\.\d+/u.test(value)
-        ? requestTime
-        : Math.floor(requestTime / 1_000) * 1_000;
-      return itemTime >= requestBoundary;
+      parseRfc3339Instant(value, field);
+      return value;
     } catch {
       continue;
     }
   }
+  return null;
+}
 
-  return false;
+function getConsistentItemTimestamp(item, fieldGroups) {
+  for (const fields of fieldGroups) {
+    const validTimestamps = [];
+    for (const field of fields) {
+      const value = item?.[field];
+      if (value === undefined || value === null) {
+        continue;
+      }
+      try {
+        validTimestamps.push({
+          value,
+          instant: parseRfc3339Instant(value, field),
+          hasFraction: /:\d{2}\.\d+/u.test(value),
+        });
+      } catch {
+        continue;
+      }
+    }
+    const [first] = validTimestamps;
+    if (first === undefined) {
+      continue;
+    }
+    return validTimestamps.every(({ value }) =>
+      compareRfc3339Instants(value, first.value, 'timestamp alias', 'timestamp alias') === 0)
+      ? {
+        value: first.value,
+        instant: first.instant,
+        hasFraction: validTimestamps.some((value) => value.hasFraction),
+      }
+      : null;
+  }
+  return null;
+}
+
+function isItemAtOrAfterRequestWithAliases(item, fieldGroups, requestTime) {
+  const itemTime = getConsistentItemTimestamp(item, fieldGroups);
+  if (itemTime === null) {
+    return false;
+  }
+  if (!itemTime.hasFraction) {
+    return itemTime.instant.epochSecond >=
+      parseRfc3339Instant(requestTime, 'requestedAt').epochSecond;
+  }
+  return compareRfc3339Instants(
+    itemTime.value,
+    requestTime,
+    'evidence timestamp',
+    'requestedAt',
+  ) >= 0;
 }
 
 const COPILOT_REVIEWER_DATABASE_ID = 175728472;
@@ -1412,7 +1548,8 @@ export function collectCopilotRequestEvidence({
   if (typeof expectedHead !== 'string' || !SHA1_PATTERN.test(expectedHead)) {
     throw new TypeError('The expected review-request head is invalid.');
   }
-  const requestTime = parseRfc3339Timestamp(requestedAt, 'requestedAt');
+  parseRfc3339Instant(requestedAt, 'requestedAt');
+  const requestTime = requestedAt;
   const baselineSets = [
     ['request event', baselineRequestEventIds],
     ['review', baselineReviewNodeIds],
@@ -1466,7 +1603,11 @@ export function collectCopilotRequestEvidence({
     return event?.event === 'review_requested' &&
       identities.length > 0 &&
       identities.every((identity) => !eventBaselines.has(identity)) &&
-      isItemAtOrAfterRequest(event, ['created_at', 'createdAt'], requestTime) &&
+      isItemAtOrAfterRequestWithAliases(
+        event,
+        [['created_at', 'createdAt']],
+        requestTime,
+      ) &&
       isCopilotIdentity(reviewer);
   });
   const requestedReviewerMatched = getReviewerCollection(requestedReviewers).some(
@@ -1476,21 +1617,31 @@ export function collectCopilotRequestEvidence({
     const identities = getItemIdentities(review);
     return identities.length > 0 &&
       identities.every((identity) => !reviewBaselines.has(identity)) &&
-      isItemAtOrAfterRequest(review, ['submitted_at', 'submittedAt'], requestTime) &&
+      isItemAtOrAfterRequestWithAliases(
+        review,
+        [['submitted_at', 'submittedAt']],
+        requestTime,
+      ) &&
       getCommitOid(review) === expectedHead &&
       isCopilotIdentity(review);
   });
   const reviewRunMatched = normalizeCollection(reviewRuns).some((run) => {
     const identities = getItemIdentities(run);
-    const head = run?.head_sha ?? run?.headSha ?? run?.headCommit?.oid;
+    const heads = [run?.head_sha, run?.headSha, run?.headCommit?.oid].filter(
+      (value) => value !== undefined && value !== null,
+    );
     return identities.length > 0 &&
       identities.every((identity) => !runBaselines.has(identity)) &&
-      isItemAtOrAfterRequest(
+      isItemAtOrAfterRequestWithAliases(
         run,
-        ['created_at', 'createdAt', 'run_started_at', 'runStartedAt'],
+        [
+          ['created_at', 'createdAt'],
+          ['run_started_at', 'runStartedAt'],
+        ],
         requestTime,
       ) &&
-      head === expectedHead &&
+      heads.length > 0 &&
+      heads.every((head) => typeof head === 'string' && head === expectedHead) &&
       (isCopilotIdentity(run?.app) || isCopilotIdentity(run?.actor));
   });
 
@@ -1512,7 +1663,8 @@ export function collectCodexRequestEvidence({
   requestedAt,
   readbackComplete,
 }) {
-  const requestTime = parseRfc3339Timestamp(requestedAt, 'requestedAt');
+  parseRfc3339Instant(requestedAt, 'requestedAt');
+  const requestTime = requestedAt;
   if (
     baselineConversationComments === null ||
     typeof baselineConversationComments !== 'object' ||
@@ -1535,12 +1687,18 @@ export function collectCodexRequestEvidence({
   const expectedActor = normalizeActorLogin(expectedActorLogin);
   const triggerCommentMatched = commentsAvailable && normalizeCollection(triggerComments).some(
     (comment) => {
-      const id = getItemId(comment);
-      return id !== null &&
-        !Object.hasOwn(baselineConversationComments, id) &&
+      const identities = getItemIdentities(comment);
+      return identities.length > 0 &&
+        identities.every(
+          (identity) => !Object.hasOwn(baselineConversationComments, identity),
+        ) &&
         normalizeActorLogin(getActorLogin(comment)) === expectedActor &&
         comment?.body === REVIEW_REQUEST_SPECS.codex.body &&
-        isItemAtOrAfterRequest(comment, ['created_at', 'createdAt'], requestTime);
+        isItemAtOrAfterRequestWithAliases(
+          comment,
+          [['created_at', 'createdAt']],
+          requestTime,
+        );
     },
   );
 
@@ -1578,7 +1736,7 @@ function isReviewRequestRecord(request) {
         getItemTime({ updatedAt }, ['updatedAt']) !== null,
     );
   const channelIsValid = request?.channel === 'copilot' || request?.channel === 'codex';
-  const requestedTime = getItemTime(request, ['requestedAt']);
+  const requestedTime = getItemTimestamp(request, ['requestedAt']);
   const hasReadyAt = Object.hasOwn(request ?? {}, 'readyAt');
   const hasTerminalDisposition = Object.hasOwn(request ?? {}, 'terminalDisposition');
   const hasTerminalResultRef = Object.hasOwn(request ?? {}, 'terminalResultRef');
@@ -1605,12 +1763,22 @@ function isReviewRequestRecord(request) {
     (
       request.channel === 'copilot' &&
       isCopilotReadyForCodex(request) &&
-      getItemTime(request, ['readyAt']) !== null &&
+      getItemTimestamp(request, ['readyAt']) !== null &&
       requestedTime !== null &&
-      getItemTime(request, ['readyAt']) >= requestedTime &&
+      compareRfc3339Instants(
+        request.readyAt,
+        requestedTime,
+        'readyAt',
+        'requestedAt',
+      ) >= 0 &&
       (
         request.confirmed === true ||
-        request.readyAt === request.terminalDisposition.recordedAt
+        compareRfc3339Instants(
+          request.readyAt,
+          request.terminalDisposition.recordedAt,
+          'readyAt',
+          'terminal disposition recordedAt',
+        ) === 0
       )
     );
 
@@ -1670,9 +1838,14 @@ function isRepositoryAuthorizedNonfunctionalDisposition(disposition, request) {
     return false;
   }
 
-  const recordedTime = getItemTime(disposition, ['recordedAt']);
-  const requestTime = getItemTime(request, ['requestedAt']);
-  return recordedTime !== null && requestTime !== null && recordedTime >= requestTime;
+  const recordedTime = getItemTimestamp(disposition, ['recordedAt']);
+  const requestTime = getItemTimestamp(request, ['requestedAt']);
+  return recordedTime !== null && requestTime !== null && compareRfc3339Instants(
+    recordedTime,
+    requestTime,
+    'terminal disposition recordedAt',
+    'requestedAt',
+  ) >= 0;
 }
 
 function getItemIdentities(item) {
@@ -1702,26 +1875,40 @@ function getNextDifferentInputRequestTime(request, requests) {
   const successor = requests.slice(resolvedIndex + 1).find(
     (candidate) => candidate.reviewInputKey !== request.reviewInputKey,
   );
-  return successor === undefined ? null : getItemTime(successor, ['requestedAt']);
+  return successor === undefined ? null : getItemTimestamp(successor, ['requestedAt']);
 }
 
 function isReferencedTerminalResult(result, request, reference, requests) {
-  const timeFields = reference.kind === 'submitted-review'
-    ? ['submitted_at', 'submittedAt']
-    : ['updated_at', 'updatedAt', 'created_at', 'createdAt'];
-  const requestTime = getItemTime(request, ['requestedAt']);
-  const resultTime = getItemTime(result, timeFields);
-  const referenceTime = getItemTime(reference, ['observedAt']);
+  const timeGroups = reference.kind === 'submitted-review'
+    ? [['submitted_at', 'submittedAt']]
+    : [
+      ['updated_at', 'updatedAt'],
+      ['created_at', 'createdAt'],
+    ];
+  const requestTime = getItemTimestamp(request, ['requestedAt']);
+  const resultTime = getConsistentItemTimestamp(result, timeGroups)?.value ?? null;
+  const referenceTime = getItemTimestamp(reference, ['observedAt']);
   const identities = getItemIdentities(result);
   const nextDifferentInputTime = getNextDifferentInputRequestTime(request, requests);
 
   if (
     requestTime === null ||
     resultTime === null ||
-    resultTime !== referenceTime ||
+    referenceTime === null ||
+    compareRfc3339Instants(
+      resultTime,
+      referenceTime,
+      'result timestamp',
+      'terminal result observedAt',
+    ) !== 0 ||
     !identities.includes(reference.id) ||
-    !isItemAtOrAfterRequest(result, timeFields, requestTime) ||
-    (nextDifferentInputTime !== null && resultTime > nextDifferentInputTime) ||
+    !isItemAtOrAfterRequestWithAliases(result, timeGroups, requestTime) ||
+    (nextDifferentInputTime !== null && compareRfc3339Instants(
+      resultTime,
+      nextDifferentInputTime,
+      'result timestamp',
+      'successor requestedAt',
+    ) > 0) ||
     !isResultActorForChannel(result, request.channel)
   ) {
     return false;
@@ -1742,7 +1929,7 @@ function isReferencedTerminalResult(result, request, reference, requests) {
     return false;
   }
 
-  if (!hasMatchingConversationHeadIdentities(result, request.head)) {
+  if (!hasRequiredTerminalConversationHeadEvidence(result, request.head)) {
     return false;
   }
   if (
@@ -1758,12 +1945,17 @@ function isReferencedTerminalResult(result, request, reference, requests) {
 
   const baselineTimes = identities
     .filter((identity) => Object.hasOwn(request.baselineConversationComments, identity))
-    .map((identity) => getItemTime(
+    .map((identity) => getItemTimestamp(
       { updatedAt: request.baselineConversationComments[identity] },
       ['updatedAt'],
     ));
   return baselineTimes.every(
-    (baselineTime) => baselineTime !== null && resultTime > baselineTime,
+    (baselineTime) => baselineTime !== null && compareRfc3339Instants(
+      resultTime,
+      baselineTime,
+      'conversation result time',
+      'conversation baseline time',
+    ) > 0,
   );
 }
 
@@ -1811,34 +2003,38 @@ function validateTerminalResultReferences(requests, reviewState) {
 }
 
 function isCopilotReadyForCodex(request) {
-  const requestedTime = getItemTime(request, ['requestedAt']);
-  const readyTime = getItemTime(request, ['readyAt']);
+  const requestedTime = getItemTimestamp(request, ['requestedAt']);
+  const readyTime = getItemTimestamp(request, ['readyAt']);
+  const readyFollowsRequest = requestedTime !== null &&
+    readyTime !== null &&
+    compareRfc3339Instants(readyTime, requestedTime, 'readyAt', 'requestedAt') >= 0;
   return (
     request?.confirmed === true &&
     Object.hasOwn(request, 'readyAt') &&
-    requestedTime !== null &&
-    readyTime !== null &&
-    readyTime >= requestedTime
+    readyFollowsRequest
   ) ||
     (
       request?.terminal === true &&
       request?.confirmed === false &&
       Object.hasOwn(request, 'readyAt') &&
-      requestedTime !== null &&
-      readyTime !== null &&
-      readyTime >= requestedTime &&
+      readyFollowsRequest &&
       isRepositoryAuthorizedNonfunctionalDisposition(request.terminalDisposition, request) &&
-      readyTime === getItemTime(request.terminalDisposition, ['recordedAt'])
+      compareRfc3339Instants(
+        readyTime,
+        request.terminalDisposition.recordedAt,
+        'readyAt',
+        'terminal disposition recordedAt',
+      ) === 0
     );
 }
 
-function getRequestTerminalTime(request) {
+function getRequestTerminalTimestamp(request) {
   if (request?.terminal !== true) {
     return null;
   }
   return request.confirmed === true
-    ? getItemTime(request.terminalResultRef, ['observedAt'])
-    : getItemTime(request.terminalDisposition, ['recordedAt']);
+    ? getItemTimestamp(request.terminalResultRef, ['observedAt'])
+    : getItemTimestamp(request.terminalDisposition, ['recordedAt']);
 }
 
 function validateReviewRequestOrdering(
@@ -1870,9 +2066,12 @@ function validateReviewRequestOrdering(
       );
     }
 
-    const copilotTime = parseRfc3339Timestamp(copilotRequest.readyAt, 'Copilot readyAt');
-    const codexTime = parseRfc3339Timestamp(codexRequest.requestedAt, 'Codex requestedAt');
-    if (copilotTime > codexTime) {
+    if (compareRfc3339Instants(
+      copilotRequest.readyAt,
+      codexRequest.requestedAt,
+      'Copilot readyAt',
+      'Codex requestedAt',
+    ) > 0) {
       throw new TypeError('A Codex request must not precede Copilot readiness.');
     }
   }
@@ -1881,10 +2080,15 @@ function validateReviewRequestOrdering(
     return;
   }
   const requestTimes = reviewRequests.map(
-    (request) => getItemTime(request, ['requestedAt']),
+    (request) => getItemTimestamp(request, ['requestedAt']),
   );
   for (let index = 1; index < reviewRequests.length; index += 1) {
-    if (requestTimes[index] < requestTimes[index - 1]) {
+    if (compareRfc3339Instants(
+      requestTimes[index],
+      requestTimes[index - 1],
+      'requestedAt',
+      'prior requestedAt',
+    ) < 0) {
       throw new TypeError('The persisted review-request history is not time ordered.');
     }
   }
@@ -1895,8 +2099,13 @@ function validateReviewRequestOrdering(
       if (prior.reviewInputKey === request.reviewInputKey) {
         continue;
       }
-      const terminalTime = getRequestTerminalTime(prior);
-      if (terminalTime === null || terminalTime > requestTimes[index]) {
+      const terminalTime = getRequestTerminalTimestamp(prior);
+      if (terminalTime === null || compareRfc3339Instants(
+        terminalTime,
+        requestTimes[index],
+        'terminal time',
+        'successor requestedAt',
+      ) > 0) {
         throw new TypeError(
           'A different-input request requires every earlier-input request to be terminal first.',
         );
@@ -1928,16 +2137,20 @@ function validateSupersessionsAgainstRequests({
   currentKey = null,
 }) {
   const supersessionByKey = new Map();
+  const describedKeys = new Set(supersessions.map(
+    (disposition) => disposition.reviewInputKey,
+  ));
   for (const disposition of supersessions) {
     const pair = requests.filter(
       (request) => request.reviewInputKey === disposition.reviewInputKey,
     );
     const channels = new Set(pair.map((request) => request.channel));
     const heads = new Set(pair.map((request) => request.head));
-    const supersededTime = getItemTime(disposition, ['supersededAt']);
+    const supersededTime = getItemTimestamp(disposition, ['supersededAt']);
     const requestTimes = pair.map(
-      (request) => getItemTime(request, ['requestedAt']),
+      (request) => getItemTimestamp(request, ['requestedAt']),
     );
+    const terminalTimes = pair.map(getRequestTerminalTimestamp);
     const finalPairRequestIndex = requests.reduce(
       (latest, request, index) => request.reviewInputKey === disposition.reviewInputKey
         ? index
@@ -1950,7 +2163,7 @@ function validateSupersessionsAgainstRequests({
         (request) => request.reviewInputKey !== disposition.reviewInputKey &&
           request.head === disposition.successorHead,
       )
-      .map((request) => getItemTime(request, ['requestedAt']));
+      .map((request) => getItemTimestamp(request, ['requestedAt']));
     if (
       pair.length === 0 ||
       channels.size === 2 ||
@@ -1959,9 +2172,25 @@ function validateSupersessionsAgainstRequests({
       !knownHeads.has(disposition.successorHead) ||
       pair.some((request) => request.terminal !== true) ||
       supersededTime === null ||
-      requestTimes.some((requestTime) => requestTime === null || supersededTime < requestTime) ||
+      requestTimes.some((requestTime) => requestTime === null || compareRfc3339Instants(
+        supersededTime,
+        requestTime,
+        'supersededAt',
+        'requestedAt',
+      ) < 0) ||
+      terminalTimes.some((terminalTime) => terminalTime === null || compareRfc3339Instants(
+        supersededTime,
+        terminalTime,
+        'supersededAt',
+        'terminal time',
+      ) < 0) ||
       successorRequestTimes.some(
-        (requestTime) => requestTime === null || supersededTime > requestTime,
+        (requestTime) => requestTime === null || compareRfc3339Instants(
+          supersededTime,
+          requestTime,
+          'supersededAt',
+          'successor requestedAt',
+        ) > 0,
       )
     ) {
       throw new TypeError(
@@ -1970,6 +2199,27 @@ function validateSupersessionsAgainstRequests({
     }
     if (disposition.reviewInputKey !== currentKey) {
       supersessionByKey.set(disposition.reviewInputKey, disposition);
+    }
+  }
+  for (const key of new Set(requests.map((request) => request.reviewInputKey))) {
+    const pair = requests.filter((request) => request.reviewInputKey === key);
+    const channels = new Set(pair.map((request) => request.channel));
+    const finalPairRequestIndex = requests.reduce(
+      (latest, request, index) => request.reviewInputKey === key ? index : latest,
+      -1,
+    );
+    const hasSuccessorRequest = requests
+      .slice(finalPairRequestIndex + 1)
+      .some((request) => request.reviewInputKey !== key);
+    if (
+      channels.size !== 2 &&
+      pair.every((request) => request.terminal === true) &&
+      hasSuccessorRequest &&
+      !describedKeys.has(key)
+    ) {
+      throw new TypeError(
+        'A successor request requires a superseded disposition for each terminal incomplete prior-input pair.',
+      );
     }
   }
   return supersessionByKey;
@@ -1994,7 +2244,7 @@ export function collectCodexResults({
   const reviewInputKey = reviewInput === null || reviewInput === undefined
     ? null
     : getReviewInputKey(reviewInput);
-  const requestTime = getItemTime(request, ['requestedAt']);
+  const requestTime = getItemTimestamp(request, ['requestedAt']);
   const expectedActor = normalizeActorLogin(actor);
   const requests = normalizeCollection(reviewRequests);
   let requestHistoryIsValid = false;
@@ -2032,7 +2282,7 @@ export function collectCodexResults({
   const baselineReviewIds = new Set(request.baselineReviewNodeIds);
   const baselineComments = new Map(
     Object.entries(request.baselineConversationComments).map(
-      ([nodeId, updatedAt]) => [nodeId, getItemTime({ updatedAt }, ['updatedAt'])],
+      ([nodeId, updatedAt]) => [nodeId, getItemTimestamp({ updatedAt }, ['updatedAt'])],
     ),
   );
   const reviews = normalizeCollection(submittedReviews).filter(
@@ -2042,7 +2292,11 @@ export function collectCodexResults({
         getCommitOid(review) === head &&
         identities.length > 0 &&
         identities.every((identity) => !baselineReviewIds.has(identity)) &&
-        isItemAtOrAfterRequest(review, ['submitted_at', 'submittedAt'], requestTime);
+        isItemAtOrAfterRequestWithAliases(
+          review,
+          [['submitted_at', 'submittedAt']],
+          requestTime,
+        );
     },
   );
   const comments = normalizeCollection(conversationComments)
@@ -2056,29 +2310,42 @@ export function collectCodexResults({
         return false;
       }
 
-      if (!hasMatchingConversationHeadIdentities(comment, head)) {
+      if (!hasRequiredTerminalConversationHeadEvidence(comment, head)) {
         return false;
       }
 
-      const id = getItemId(comment);
-      const updatedAt = getItemTime(
+      const identities = getItemIdentities(comment);
+      const timeGroups = [
+        ['updated_at', 'updatedAt'],
+        ['created_at', 'createdAt'],
+      ];
+      const updatedAt = getConsistentItemTimestamp(
         comment,
-        ['updated_at', 'updatedAt', 'created_at', 'createdAt'],
-      );
+        timeGroups,
+      )?.value ?? null;
       if (
-        id === null ||
+        identities.length === 0 ||
         updatedAt === null ||
-        !isItemAtOrAfterRequest(
+        !isItemAtOrAfterRequestWithAliases(
           comment,
-          ['updated_at', 'updatedAt', 'created_at', 'createdAt'],
+          timeGroups,
           requestTime,
         )
       ) {
         return false;
       }
 
-      const baselineTime = baselineComments.get(id);
-      return baselineTime === undefined || updatedAt > baselineTime;
+      const baselineTimes = identities
+        .filter((identity) => baselineComments.has(identity))
+        .map((identity) => baselineComments.get(identity));
+      return baselineTimes.every(
+        (baselineTime) => baselineTime !== null && compareRfc3339Instants(
+          updatedAt,
+          baselineTime,
+          'conversation updatedAt',
+          'conversation baseline updatedAt',
+        ) > 0,
+      );
       },
     );
 
@@ -2156,9 +2423,14 @@ export function reconcileReviewRequestMutation({
   ) {
     throw new TypeError('The review-request reconciliation wait is too short.');
   }
-  const attemptedTime = parseRfc3339Timestamp(attemptedAt, 'attemptedAt');
-  const observedTime = parseRfc3339Timestamp(observedAt, 'observedAt');
-  if (observedTime < attemptedTime) {
+  parseRfc3339Instant(attemptedAt, 'attemptedAt');
+  parseRfc3339Instant(observedAt, 'observedAt');
+  if (compareRfc3339Instants(
+    observedAt,
+    attemptedAt,
+    'observedAt',
+    'attemptedAt',
+  ) < 0) {
     throw new TypeError('Review-request observation precedes the attempt.');
   }
 
@@ -2212,7 +2484,13 @@ export function reconcileReviewRequestMutation({
     });
   }
 
-  const waitSatisfied = observedTime - attemptedTime >= minimumWaitMilliseconds;
+  const waitSatisfied = isRfc3339ElapsedAtLeastMilliseconds(
+    attemptedAt,
+    observedAt,
+    minimumWaitMilliseconds,
+    'attemptedAt',
+    'observedAt',
+  );
   if (!evidence.readbackComplete || !waitSatisfied) {
     return Object.freeze({
       ...baseRecord,
@@ -2319,17 +2597,22 @@ export function createMetrics({
     requestsPerHead[request.head] = (requestsPerHead[request.head] ?? 0) + attemptCount;
   }
 
-  const reviewStart = parseRfc3339Timestamp(reviewBeganAt, 'reviewBeganAt');
+  const reviewStart = parseRfc3339Instant(reviewBeganAt, 'reviewBeganAt');
   const parsedBodyEditTimes = normalizeCollection(bodyEditTimes).map(
     (value, index) => ({
       value,
-      timestamp: parseRfc3339Timestamp(value, `bodyEditTimes[${index}]`),
+      instant: parseRfc3339Instant(value, `bodyEditTimes[${index}]`),
     }),
   );
   const bodyEditsAfterReviewBegan = parsedBodyEditTimes.filter(
-    ({ value, timestamp }) => /:\d{2}\.\d+/u.test(value)
-      ? timestamp > reviewStart
-      : timestamp >= Math.floor(reviewStart / 1_000) * 1_000,
+    ({ value, instant }) => /:\d{2}\.\d+/u.test(value)
+      ? compareRfc3339Instants(
+        value,
+        reviewBeganAt,
+        'body edit time',
+        'reviewBeganAt',
+      ) > 0
+      : instant.epochSecond >= reviewStart.epochSecond,
   ).length;
   const rerequestReasons = normalizeCollection(sameHeadRerequestReasons).map(
     (record, index) => {
@@ -2361,13 +2644,11 @@ export function createMetrics({
       throw new TypeError(`${startLabel} and ${endLabel} must both be null or valid timestamps.`);
     }
 
-    const milliseconds = parseRfc3339Timestamp(end, endLabel) -
-      parseRfc3339Timestamp(start, startLabel);
-    if (milliseconds < 0) {
+    if (compareRfc3339Instants(end, start, endLabel, startLabel) < 0) {
       throw new TypeError(`${endLabel} must not be earlier than ${startLabel}.`);
     }
 
-    return milliseconds;
+    return getRfc3339ElapsedMilliseconds(start, end, startLabel, endLabel);
   };
 
   return Object.freeze({

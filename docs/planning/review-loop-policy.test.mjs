@@ -2252,7 +2252,7 @@ test('all permanent active task-template and controller surfaces use the compact
   }
 
   assert.equal(
-    [...plan.matchAll(/Count a submitted-review result for the round only when its commit matches the recorded PR head SHA and it is newer than the applicable baseline\./gu)].length,
+    [...plan.matchAll(/Count a submitted-review result for the round only when every supplied commit identity matches the recorded PR head SHA, every valid timestamp alias agrees, and it is newer than every applicable supplied-identity baseline\./gu)].length,
     38,
   );
   assert.match(
@@ -2260,7 +2260,7 @@ test('all permanent active task-template and controller surfaces use the compact
     /Persist the unique request-event, review-run, submitted-review, and conversation-comment baselines with the in-flight attempt\./u,
   );
   assert.equal(
-    [...plan.matchAll(/Count a headless Codex PR-conversation result only when the authenticated author, request time, baseline exclusion, reviewed-input key, and serialized predecessor-pair order attribute it to this round\./gu)].length,
+    [...plan.matchAll(/Count a headless Codex PR-conversation result only when the authenticated author, request time, exclusion of every supplied identity from the baseline, agreement of every valid timestamp alias, explicit matching normalized head evidence for a terminal result, reviewed-input key, and serialized predecessor-pair order attribute it to this round\./gu)].length,
     38,
   );
   assert.match(plan, /closed `terminalResultRef`/u);
@@ -2376,11 +2376,22 @@ test('all permanent active task-template and controller surfaces use the compact
     82,
   );
   const baselineOverlapRule =
-    'Treat a request event, submitted review, or review run as baseline evidence when any ' +
+    'Treat a request event, submitted review, review run, or conversation comment as baseline evidence when any ' +
     'supplied node, numeric, or database identity overlaps its persisted baseline';
   assert.equal(plan.split(baselineOverlapRule).length - 1, 82);
   for (const surface of [parent, alternate, generator, crossRepository]) {
     assert.match(surface, new RegExp(baselineOverlapRule, 'u'));
+    assert.match(surface, /every supplied review-run head identity must match the reviewed head/u);
+    assert.match(surface, /all valid timestamp aliases for one event time must agree/u);
+    assert.match(surface, /Causal RFC 3339 ordering must preserve every supplied fractional digit/u);
+    assert.match(surface, /required matching normalized head evidence for a terminal conversation result/u);
+  }
+  for (const surface of [plan, parent, alternate, generator, crossRepository]) {
+    assert.match(
+      surface,
+      /not earlier than every (?:described )?request terminal-result or terminal-disposition boundary/u,
+    );
+    assert.match(surface, /before (?:a|the) different-input successor request/u);
   }
   const checkRunAuthenticationRule =
     'do not authenticate Copilot from a mutable check-run name plus the generic ' +
@@ -2715,6 +2726,7 @@ test('Codex result timestamp aliases continue after an invalid candidate', () =>
         updated_at: 'not-a-timestamp',
         createdAt: '2026-09-04T10:03:00Z',
         status: 'completed',
+        head: HASHES.head1,
         body: 'Completed review result.',
       },
       {
@@ -2735,6 +2747,240 @@ test('Codex result timestamp aliases continue after an invalid candidate', () =>
     result.conversationComments.map((comment) => comment.node_id),
     ['COMMENT_VALID_FALLBACK'],
   );
+});
+
+test('terminal Codex conversations require matching head evidence', () => {
+  const input = reviewInput();
+  const copilotRequest = requestFor(input, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const codexRequest = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:02:00Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'conversation-comment',
+      id: 'COMMENT_MISSING_HEAD',
+      observedAt: '2026-09-04T10:03:00Z',
+    },
+  });
+  const persisted = compactState(input, {
+    reviewRequests: [copilotRequest, codexRequest],
+    codexResults: {
+      submittedReviews: [],
+      conversationComments: [{
+        nodeId: 'COMMENT_MISSING_HEAD',
+        actor: 'chatgpt-codex-connector[bot]',
+        updatedAt: '2026-09-04T10:03:00Z',
+        status: 'completed',
+      }],
+    },
+  });
+
+  assert.deepEqual(collectCodexResults({
+    submittedReviews: [],
+    conversationComments: persisted.current_task.review.codexResults.conversationComments,
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: [copilotRequest, codexRequest],
+  }), { submittedReviews: [], conversationComments: [] });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(persisted)),
+    /one attributable terminal result/u,
+  );
+});
+
+test('successor histories require an earlier incomplete-pair supersession', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const prior = requestFor(input1, 'copilot', { confirmed: true, terminal: true });
+  const successor = requestFor(input2, 'copilot', {
+    requestedAt: '2026-09-04T10:02:00Z',
+  });
+  const missing = compactState(input2, { reviewRequests: [prior, successor] }, {
+    head: input2.head,
+  });
+
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missing)),
+    /requires a superseded disposition/u,
+  );
+  missing.current_task.review.supersededReviewInputs = supersessionFor(input1, input2, {
+    supersededAt: '2026-09-04T10:01:00Z',
+  });
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(missing)), missing);
+});
+
+test('conversation baselines compare every supplied native identity', () => {
+  const input = reviewInput();
+  const request = requestFor(input, 'codex', {
+    confirmed: true,
+    requestedAt: '2026-09-04T09:59:00Z',
+    baselineConversationComments: {
+      '12345': '2026-09-04T10:00:00Z',
+    },
+  });
+  const aliasObject = {
+    id: 12345,
+    node_id: 'COMMENT_NODE_ALIAS',
+    user: { login: 'chatgpt-codex-connector[bot]' },
+    head: HASHES.head1,
+    status: 'completed',
+    updated_at: '2026-09-04T10:00:00Z',
+    body: 'Completed result.',
+  };
+  const trigger = collectCodexRequestEvidence({
+    triggerComments: [{
+      ...aliasObject,
+      user: { login: 'franklesniak' },
+      body: '@codex review',
+      created_at: '2026-09-04T10:02:00Z',
+    }],
+    baselineConversationComments: request.baselineConversationComments,
+    expectedActorLogin: 'franklesniak',
+    requestedAt: request.requestedAt,
+    readbackComplete: true,
+  });
+  const results = collectCodexResults({
+    submittedReviews: [],
+    conversationComments: [aliasObject],
+    reviewInput: input,
+    request,
+    reviewRequests: [
+      requestFor(input, 'copilot', { confirmed: true }),
+      request,
+    ],
+  });
+
+  assert.equal(trigger.triggerCommentMatched, false);
+  assert.deepEqual(results, { submittedReviews: [], conversationComments: [] });
+});
+
+test('Copilot run evidence rejects conflicting head aliases', () => {
+  const evidence = collectCopilotRequestEvidence({
+    responseReviewers: [],
+    requestEvents: [],
+    requestedReviewers: [],
+    submittedReviews: [],
+    reviewRuns: [{
+      node_id: 'RUN_CONFLICTING_HEADS',
+      created_at: '2026-09-04T10:01:00Z',
+      head_sha: HASHES.head1,
+      headSha: HASHES.head2,
+      headCommit: { oid: HASHES.head2 },
+      app: {
+        login: 'copilot-pull-request-reviewer[bot]',
+        type: 'Bot',
+        id: 175728472,
+        node_id: 'BOT_kgDOCnlnWA',
+      },
+    }],
+    baselineRequestEventIds: [],
+    baselineReviewNodeIds: [],
+    baselineReviewRunIds: [],
+    expectedHead: HASHES.head1,
+    requestedAt: '2026-09-04T10:00:00Z',
+    readbackCompleteness: {
+      requestEvents: true,
+      requestedReviewers: true,
+      submittedReviews: true,
+      reviewRuns: true,
+    },
+  });
+
+  assert.equal(evidence.reviewRunMatched, false);
+});
+
+test('review decisions preserve sub-millisecond timestamp ordering', () => {
+  const input = reviewInput();
+  const copilotRequest = requestFor(input, 'copilot', {
+    requestedAt: '2026-09-04T10:00:00.0009Z',
+    readyAt: '2026-09-04T10:00:00.0001Z',
+    confirmed: true,
+    terminal: true,
+  });
+
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: null,
+      currentReviewInput: input,
+      mutationClass: null,
+      existingRequests: [copilotRequest],
+    }),
+    /review request is malformed/u,
+  );
+
+  const orderedCopilotRequest = requestFor(input, 'copilot', {
+    requestedAt: '2026-09-04T10:00:00.0001Z',
+    readyAt: '2026-09-04T10:00:00.0009Z',
+    confirmed: true,
+    terminal: true,
+  });
+  assert.doesNotThrow(() => decideReviewRequest({
+    previousReviewInput: null,
+    currentReviewInput: input,
+    mutationClass: null,
+    existingRequests: [orderedCopilotRequest],
+  }));
+});
+
+test('review evidence rejects conflicting valid timestamp aliases', () => {
+  const input = reviewInput();
+  const copilotRequest = requestFor(input, 'copilot', { confirmed: true });
+  const codexRequest = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+    confirmed: true,
+  });
+  const conflicting = {
+    node_id: 'REVIEW_CONFLICTING_TIMES',
+    user: { login: 'chatgpt-codex-connector[bot]' },
+    commit_id: HASHES.head1,
+    submitted_at: '2026-09-04T10:02:00Z',
+    submittedAt: '2026-09-04T09:59:00Z',
+  };
+
+  assert.deepEqual(collectCodexResults({
+    submittedReviews: [conflicting],
+    conversationComments: [],
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: [copilotRequest, codexRequest],
+  }), { submittedReviews: [], conversationComments: [] });
+});
+
+test('supersession time follows every old request terminal boundary', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const prior = requestFor(input1, 'copilot', { confirmed: true, terminal: true });
+  const successor = requestFor(input2, 'copilot', {
+    requestedAt: '2026-09-04T10:02:00Z',
+  });
+  const persisted = compactState(input2, {
+    reviewRequests: [prior, successor],
+    supersededReviewInputs: supersessionFor(input1, input2, {
+      supersededAt: '2026-09-04T10:00:30Z',
+    }),
+  }, { head: input2.head });
+
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(persisted)),
+    /terminal incomplete prior-input pair/u,
+  );
+  persisted.current_task.review.supersededReviewInputs[
+    getReviewInputKey(input1)
+  ].supersededAt = prior.terminalResultRef.observedAt;
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(persisted)), persisted);
 });
 
 test('Codex results exclude a baseline match through any supplied review identity', () => {
@@ -3983,6 +4229,12 @@ test('compact-state ingestion rejects duplicate reviewed-input channel requests'
       requestFor(input2, 'copilot', { requestedAt: '2026-09-04T10:01:00Z' }),
     ],
   });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(serializedDistinctInputs)),
+    /requires a superseded disposition/u,
+  );
+  serializedDistinctInputs.current_task.review.supersededReviewInputs =
+    supersessionFor(input1, input2, { supersededAt: '2026-09-04T10:01:00Z' });
   assert.deepEqual(
     parseCompactStateJson(JSON.stringify(serializedDistinctInputs)),
     serializedDistinctInputs,
@@ -5062,7 +5314,8 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
   }
   for (const timestamp of [
     '2024-02-29T23:59:59Z',
-    '2026-09-04t10:00:00.123456z',
+    '2026-09-04t10:00:00.123z',
+    '2026-09-04T10:00:00.123456789Z',
     '2026-09-04T10:00:00+05:30',
     '2026-09-04T10:00:00-14:00',
   ]) {
