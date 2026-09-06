@@ -84,6 +84,41 @@ const PUBLIC_MUTATION_BOOLEAN_FIELDS = Object.freeze([
   'retryAllowed',
   'localRecordSucceeded',
 ]);
+const PUBLIC_MUTATION_STATE_CONSTANTS = Object.freeze({
+  NOT_ATTEMPTED: Object.freeze({
+    nativeResponseAccepted: false,
+    readbackMatched: false,
+    retryAllowed: true,
+  }),
+  NOT_EXECUTED: Object.freeze({
+    nativeResponseAccepted: false,
+  }),
+  RECONCILING: Object.freeze({
+    nativeResponseAccepted: true,
+    readbackMatched: false,
+    retryAllowed: false,
+  }),
+  NO_EFFECT: Object.freeze({
+    nativeResponseAccepted: true,
+    readbackMatched: false,
+    retryAllowed: true,
+    attemptCount: 1,
+  }),
+  EXHAUSTED: Object.freeze({
+    nativeResponseAccepted: true,
+    readbackMatched: false,
+    retryAllowed: false,
+    attemptCount: 2,
+  }),
+  AMBIGUOUS: Object.freeze({
+    retryAllowed: false,
+  }),
+  CONFIRMED: Object.freeze({
+    nativeResponseAccepted: true,
+    readbackMatched: true,
+    retryAllowed: false,
+  }),
+});
 const REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
   'responseReviewerMatched',
   'requestEventMatched',
@@ -635,11 +670,8 @@ export function parseCompactStateJson(text) {
     validateSupersessionsAgainstRequests({
       requests,
       supersessions,
-      knownHeads: new Set([
-        reviewState.reviewInput.head,
-        ...requests.map((request) => request.head),
-        ...reviewedHeads,
-      ]),
+      reviewedHeads,
+      currentHead: reviewState.reviewInput.head,
       currentKey: getReviewInputKey(reviewState.reviewInput),
     });
   }
@@ -771,6 +803,23 @@ function validatePersistedPublicMutation(publicMutation, requests) {
       .some((field) => typeof publicMutation[field] !== 'boolean')
   ) {
     throw new TypeError('The persisted public mutation base record is malformed.');
+  }
+
+  const stateConstants = PUBLIC_MUTATION_STATE_CONSTANTS[publicMutation.state];
+  if (
+    Object.entries(stateConstants).some(
+      ([field, expected]) => publicMutation[field] !== expected,
+    ) ||
+    (
+      publicMutation.state === 'NOT_EXECUTED' &&
+      publicMutation.retryAllowed !== !publicMutation.readbackMatched
+    ) ||
+    (
+      ['NO_EFFECT', 'EXHAUSTED'].includes(publicMutation.state) &&
+      publicMutation.evidence?.readbackComplete !== true
+    )
+  ) {
+    throw new TypeError('The persisted public mutation does not match its state.');
   }
 
   const attemptMetadataFields = [
@@ -1198,21 +1247,20 @@ export function decideReviewRequest({
   }
   validateReviewRequestOrdering(requests, { enforceGlobalSerialization: true });
   const reviewedHeads = reviewMetrics === null
-    ? []
+    ? [...new Set([
+      ...requests.map((request) => request.head),
+      currentReviewInput.head,
+    ])]
     : validatePersistedRequestMetrics(
       reviewMetrics,
       requests,
       currentReviewInput.head,
     );
-  const knownHeads = new Set([
-    currentReviewInput.head,
-    ...requests.map((request) => request.head),
-    ...reviewedHeads,
-  ]);
   const supersessionByKey = validateSupersessionsAgainstRequests({
     requests,
     supersessions,
-    knownHeads,
+    reviewedHeads,
+    currentHead: currentReviewInput.head,
     currentKey,
   });
 
@@ -2140,9 +2188,11 @@ function isSupersededReviewInputRecord(disposition) {
 function validateSupersessionsAgainstRequests({
   requests,
   supersessions,
-  knownHeads,
+  reviewedHeads,
+  currentHead,
   currentKey = null,
 }) {
+  const knownHeads = new Set(reviewedHeads);
   const supersessionByKey = new Map();
   const describedKeys = new Set(supersessions.map(
     (disposition) => disposition.reviewInputKey,
@@ -2164,19 +2214,35 @@ function validateSupersessionsAgainstRequests({
         : latest,
       -1,
     );
-    const successorRequestTimes = requests
+    const laterDifferentInputRequests = requests
       .slice(finalPairRequestIndex + 1)
-      .filter(
-        (request) => request.reviewInputKey !== disposition.reviewInputKey &&
-          request.head === disposition.successorHead,
-      )
-      .map((request) => getItemTimestamp(request, ['requestedAt']));
+      .filter((request) => request.reviewInputKey !== disposition.reviewInputKey);
+    const firstSuccessorRequest = laterDifferentInputRequests[0] ?? null;
+    const firstSuccessorRequestTime = firstSuccessorRequest === null
+      ? null
+      : getItemTimestamp(firstSuccessorRequest, ['requestedAt']);
+    const predecessorHeadIndex = reviewedHeads.indexOf(disposition.head);
+    const expectedSuccessorHead = firstSuccessorRequest?.head === disposition.head
+      ? disposition.head
+      : reviewedHeads[predecessorHeadIndex + 1];
     if (
       pair.length === 0 ||
       channels.size === 2 ||
       heads.size !== 1 ||
       !heads.has(disposition.head) ||
       !knownHeads.has(disposition.successorHead) ||
+      (
+        expectedSuccessorHead === undefined &&
+        !(
+          firstSuccessorRequest === null &&
+          disposition.successorHead === disposition.head &&
+          currentHead === disposition.head
+        )
+      ) ||
+      (
+        expectedSuccessorHead !== undefined &&
+        disposition.successorHead !== expectedSuccessorHead
+      ) ||
       pair.some((request) => request.terminal !== true) ||
       supersededTime === null ||
       requestTimes.some((requestTime) => requestTime === null || compareRfc3339Instants(
@@ -2191,13 +2257,16 @@ function validateSupersessionsAgainstRequests({
         'supersededAt',
         'terminal time',
       ) < 0) ||
-      successorRequestTimes.some(
-        (requestTime) => requestTime === null || compareRfc3339Instants(
-          supersededTime,
-          requestTime,
-          'supersededAt',
-          'successor requestedAt',
-        ) > 0,
+      (
+        firstSuccessorRequest !== null &&
+        (
+          firstSuccessorRequestTime === null || compareRfc3339Instants(
+            supersededTime,
+            firstSuccessorRequestTime,
+            'supersededAt',
+            'successor requestedAt',
+          ) > 0
+        )
       )
     ) {
       throw new TypeError(

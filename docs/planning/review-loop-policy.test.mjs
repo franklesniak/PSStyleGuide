@@ -80,11 +80,12 @@ function state(input, overrides = {}) {
     ...overrides,
   };
   if (!Object.hasOwn(overrides, 'metrics')) {
-    const requestsPerHead = { [input.head]: 0 };
+    const requestsPerHead = {};
     for (const request of value.reviewRequests) {
       requestsPerHead[request.head] =
         (requestsPerHead[request.head] ?? 0) + (request.attemptCount ?? 1);
     }
+    requestsPerHead[input.head] ??= 0;
     value.metrics = {
       ...value.metrics,
       reviewerRequestsPerHead: requestsPerHead,
@@ -2338,7 +2339,10 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.doesNotMatch(alternate, /whose request time is not later than the Codex request time/u);
   assert.match(alternate, /closed `terminalResultRef`/u);
   assert.match(alternate, /next different-input request boundary/u);
-  assert.match(alternate, /known successor identities for retained supersessions/u);
+  for (const surface of [plan, parent, alternate, generator, crossRepository]) {
+    assert.match(surface, /chronological discovery order/u);
+    assert.match(surface, /immediate successor/u);
+  }
   assert.match(alternate, /Locate and obey the applicable `AGENTS\.md`/u);
   assert.match(
     alternate,
@@ -3827,6 +3831,13 @@ test('compact-state ingestion cross-validates supersessions and causal ordering'
   supersededBeforeSuccessor.current_task.review.supersededReviewInputs[
     getReviewInputKey(input1)
   ].supersededAt = '2026-09-04T10:01:15Z';
+  const retroactiveWrongSuccessor = structuredClone(successorStartedBeforeSupersession);
+  retroactiveWrongSuccessor.current_task.review.supersededReviewInputs[
+    getReviewInputKey(input1)
+  ].successorHead = input1.head;
+  retroactiveWrongSuccessor.current_task.review.supersededReviewInputs[
+    getReviewInputKey(input1)
+  ].supersededAt = '2026-09-04T10:01:45Z';
 
   assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
   assert.deepEqual(
@@ -3845,6 +3856,10 @@ test('compact-state ingestion cross-validates supersessions and causal ordering'
   }
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(successorStartedBeforeSupersession)),
+    /terminal incomplete prior-input pair/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(retroactiveWrongSuccessor)),
     /terminal incomplete prior-input pair/u,
   );
 });
@@ -3970,6 +3985,17 @@ test('request metrics retain an unrequested successor across a second head drift
     .reviewerRequestsPerHead[input2.head];
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(missingIntermediate)),
+    /terminal incomplete prior-input pair/u,
+  );
+
+  const reorderedHistory = structuredClone(secondDrift);
+  reorderedHistory.current_task.review.metrics.reviewerRequestsPerHead = {
+    [input2.head]: 0,
+    [input1.head]: 1,
+    [input3.head]: 0,
+  };
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(reorderedHistory)),
     /terminal incomplete prior-input pair/u,
   );
 
@@ -5055,6 +5081,21 @@ test('public-mutation schema rejects every contradictory persisted state', async
   for (const mutation of contradictory) {
     assert.throws(
       () => assertSchemaValid(mutation, schema.$defs.publicMutation, schema),
+      undefined,
+      JSON.stringify(mutation),
+    );
+
+    const input = reviewInput();
+    const reviewRequests = mutation.evidence === undefined
+      ? []
+      : [requestFor(input, mutation.channel, {
+        attemptCount: mutation.attemptCount,
+      })];
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(compactState(input, {
+        reviewRequests,
+        publicMutation: mutation,
+      }))),
       undefined,
       JSON.stringify(mutation),
     );

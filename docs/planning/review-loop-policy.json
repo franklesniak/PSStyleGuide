@@ -1268,6 +1268,7 @@
       "properties": {
         "reviewerRequestsPerHead": {
           "type": "object",
+          "description": "Properties preserve chronological reviewed-head discovery order, including zero-request heads, for immediate-successor validation.",
           "propertyNames": {
             "$ref": "#/$defs/sha1"
           },
