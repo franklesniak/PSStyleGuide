@@ -205,7 +205,6 @@ const REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
 ]);
 const DURABLE_REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
   'requestEventMatched',
-  'requestedReviewerMatched',
   'submittedReviewMatched',
   'reviewRunMatched',
   'triggerCommentMatched',
@@ -219,9 +218,16 @@ const COPILOT_REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
 ]);
 const COPILOT_DURABLE_REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
   'requestEventMatched',
-  'requestedReviewerMatched',
   'submittedReviewMatched',
   'reviewRunMatched',
+]);
+
+const METRICS_FIELDS = Object.freeze([
+  'reviewerRequestsPerHead',
+  'bodyEditsAfterReviewBegan',
+  'sameHeadRerequestReasons',
+  'cleanReviewRecognitionMilliseconds',
+  'cleanPairToMergeMilliseconds',
 ]);
 
 function getChannelDurableEvidenceMatch(evidence, channel) {
@@ -967,6 +973,51 @@ function validatePersistedReviewRequests(reviewRequests, reviewState) {
 }
 
 function validatePersistedRequestMetrics(metrics, requests, currentHead) {
+  if (
+    metrics === null ||
+    typeof metrics !== 'object' ||
+    Array.isArray(metrics) ||
+    Object.keys(metrics).length !== METRICS_FIELDS.length ||
+    METRICS_FIELDS.some((field) => !Object.hasOwn(metrics, field))
+  ) {
+    throw new TypeError('The persisted metrics record is malformed.');
+  }
+  if (
+    !Number.isInteger(metrics.bodyEditsAfterReviewBegan) ||
+    metrics.bodyEditsAfterReviewBegan < 0
+  ) {
+    throw new TypeError('The persisted body-edit metric is malformed.');
+  }
+  if (!Array.isArray(metrics.sameHeadRerequestReasons)) {
+    throw new TypeError('The persisted same-head re-request reasons are malformed.');
+  }
+  for (const [index, record] of metrics.sameHeadRerequestReasons.entries()) {
+    if (
+      record === null ||
+      typeof record !== 'object' ||
+      Array.isArray(record) ||
+      Object.keys(record).length !== 2 ||
+      !Object.hasOwn(record, 'reason') ||
+      !Object.hasOwn(record, 'material') ||
+      typeof record.reason !== 'string' ||
+      !/\S/u.test(record.reason) ||
+      typeof record.material !== 'boolean'
+    ) {
+      throw new TypeError(
+        `The persisted same-head re-request reason at index ${index} is malformed.`,
+      );
+    }
+  }
+  for (const field of [
+    'cleanReviewRecognitionMilliseconds',
+    'cleanPairToMergeMilliseconds',
+  ]) {
+    const value = metrics[field];
+    if (value !== null && (!Number.isInteger(value) || value < 0)) {
+      throw new TypeError(`The persisted ${field} metric is malformed.`);
+    }
+  }
+
   const requestsPerHead = metrics?.reviewerRequestsPerHead;
   if (
     requestsPerHead === null ||

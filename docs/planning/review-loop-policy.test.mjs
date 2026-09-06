@@ -2346,7 +2346,7 @@ test('review-request reconciliation binds durable evidence to its channel', asyn
       channel: 'copilot',
       evidence: { ...emptyEvidence, [field]: true },
     });
-    if (field === 'responseReviewerMatched') {
+    if (['responseReviewerMatched', 'requestedReviewerMatched'].includes(field)) {
       assert.equal(mutation.state, 'RECONCILING', field);
       assert.equal(mutation.readbackMatched, false, field);
       assert.equal(mutation.retryAllowed, false, field);
@@ -6412,6 +6412,87 @@ test('metrics correlate whole-second body edits at their available precision', (
   });
 
   assert.equal(metrics.bodyEditsAfterReviewBegan, 2);
+});
+
+test('requested-reviewer membership is diagnostic and cannot confirm a request', () => {
+  const input = reviewInput();
+  const evidence = {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: true,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    triggerCommentMatched: false,
+    readbackComplete: true,
+  };
+  const mutation = reconcileReviewRequestMutation({
+    response: { ok: true },
+    evidence,
+    reviewInputKey: getReviewInputKey(input),
+    channel: 'copilot',
+    attemptedAt: '2026-09-04T10:00:00Z',
+    observedAt: '2026-09-04T10:00:01Z',
+    attemptCount: 1,
+    localRecordSucceeded: true,
+  });
+
+  assert.equal(mutation.state, 'RECONCILING');
+  assert.equal(mutation.readbackMatched, false);
+  assert.equal(mutation.retryAllowed, false);
+
+  const state = compactState(input, {
+    reviewRequests: [requestFor(input, 'copilot')],
+    publicMutation: mutation,
+  });
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(state)), state);
+});
+
+test('compact-state ingestion validates the complete closed metrics record', () => {
+  const input = reviewInput();
+  const valid = compactState(input);
+  const invalidCases = [
+    (metrics) => { delete metrics.bodyEditsAfterReviewBegan; },
+    (metrics) => { metrics.extra = true; },
+    (metrics) => { metrics.bodyEditsAfterReviewBegan = -1; },
+    (metrics) => { metrics.bodyEditsAfterReviewBegan = 0.5; },
+    (metrics) => { metrics.sameHeadRerequestReasons = {}; },
+    (metrics) => { metrics.sameHeadRerequestReasons = [null]; },
+    (metrics) => {
+      metrics.sameHeadRerequestReasons = [{ reason: ' ', material: true }];
+    },
+    (metrics) => {
+      metrics.sameHeadRerequestReasons = [{ reason: 'Material change.', material: 1 }];
+    },
+    (metrics) => {
+      metrics.sameHeadRerequestReasons = [{
+        reason: 'Material change.',
+        material: true,
+        extra: true,
+      }];
+    },
+    (metrics) => { metrics.cleanReviewRecognitionMilliseconds = -1; },
+    (metrics) => { metrics.cleanReviewRecognitionMilliseconds = 0.5; },
+    (metrics) => { metrics.cleanPairToMergeMilliseconds = '0'; },
+  ];
+
+  for (const mutate of invalidCases) {
+    const invalid = structuredClone(valid);
+    mutate(invalid.current_task.review.metrics);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /persisted .*metric|persisted same-head/u,
+    );
+  }
+
+  const boundary = structuredClone(valid);
+  boundary.current_task.review.metrics = {
+    reviewerRequestsPerHead: { [input.head]: 0 },
+    bodyEditsAfterReviewBegan: 0,
+    sameHeadRerequestReasons: [{ reason: 'Material change.', material: false }],
+    cleanReviewRecognitionMilliseconds: 0,
+    cleanPairToMergeMilliseconds: 0,
+  };
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(boundary)), boundary);
 });
 
 test('review requests and schema use the same RFC 3339 grammar', async () => {
