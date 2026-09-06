@@ -1581,7 +1581,16 @@ const COPILOT_REVIEWER_NODE_ID = 'BOT_kgDOCnlnWA';
 
 function isCopilotIdentity(item) {
   const itemObject = item !== null && typeof item === 'object' ? item : null;
-  const actor = item?.user ?? item?.author ?? item?.actor ?? item;
+  const nestedActorObjects = [item?.user, item?.author, item?.actor].filter(
+    (value) => value !== null && typeof value === 'object',
+  );
+  const hasNestedActorAlias = [item?.user, item?.author, item?.actor].some(
+    (value) => value !== undefined && value !== null,
+  );
+  const actorObjects = [...new Set([
+    ...nestedActorObjects,
+    !hasNestedActorAlias ? itemObject : null,
+  ].filter((value) => value !== null))];
   const hasLoginAlias = [
     item?.user?.login,
     item?.author?.login,
@@ -1589,7 +1598,17 @@ function isCopilotIdentity(item) {
     typeof item?.actor === 'string' ? item.actor : null,
     item?.login,
   ].some((login) => login !== undefined && login !== null);
-  const login = hasLoginAlias ? getActorLogin(item) : actor?.slug;
+  const slugs = actorObjects
+    .map((actor) => actor.slug)
+    .filter((slug) => slug !== undefined && slug !== null);
+  const normalizedSlugs = slugs.map(normalizeActorLogin);
+  const login = hasLoginAlias
+    ? getActorLogin(item)
+    : normalizedSlugs.length > 0 &&
+        normalizedSlugs[0] !== null &&
+        normalizedSlugs.every((slug) => slug === normalizedSlugs[0])
+      ? slugs[0]
+      : null;
   const normalized = normalizeActorLogin(login);
   if (
     normalized !== 'copilot-pull-request-reviewer' &&
@@ -1598,22 +1617,25 @@ function isCopilotIdentity(item) {
     return false;
   }
 
-  const actorObject = actor !== null && typeof actor === 'object' ? actor : null;
-  const actorType = actorObject?.type ?? actorObject?.__typename ??
-    itemObject?.actorType ?? itemObject?.actor_type;
+  const actorTypes = [
+    ...actorObjects.flatMap((actor) => [actor.type, actor.__typename]),
+    itemObject?.actorType,
+    itemObject?.actor_type,
+  ].filter((value) => value !== undefined && value !== null);
   const databaseIds = [
-    actorObject?.databaseId,
-    actorObject?.database_id,
+    ...actorObjects.flatMap((actor) => [actor.databaseId, actor.database_id]),
     itemObject?.actorDatabaseId,
     itemObject?.actor_database_id,
   ].filter((value) => value !== undefined && value !== null);
   const nodeIds = [
-    actorObject?.nodeId,
-    actorObject?.node_id,
+    ...actorObjects.flatMap((actor) => [actor.nodeId, actor.node_id]),
     itemObject?.actorNodeId,
     itemObject?.actor_node_id,
   ].filter((value) => value !== undefined && value !== null);
-  if (actorObject?.id !== undefined && actorObject.id !== null) {
+  for (const actorObject of actorObjects) {
+    if (actorObject.id === undefined || actorObject.id === null) {
+      continue;
+    }
     if (
       typeof actorObject.id === 'number' ||
       (typeof actorObject.id === 'string' && /^\d+$/u.test(actorObject.id))
@@ -1624,7 +1646,7 @@ function isCopilotIdentity(item) {
     }
   }
 
-  const hasIdentityMetadata = actorType !== undefined ||
+  const hasIdentityMetadata = actorTypes.length > 0 ||
     databaseIds.length > 0 || nodeIds.length > 0;
   if (!hasIdentityMetadata) {
     return normalized === 'copilot-pull-request-reviewer';
@@ -1637,8 +1659,9 @@ function isCopilotIdentity(item) {
     (value) => value === COPILOT_REVIEWER_NODE_ID,
   );
   const hasImmutableMatch = databaseIds.length > 0 || nodeIds.length > 0;
-  return typeof actorType === 'string' &&
-    actorType.toLowerCase() === 'bot' &&
+  return actorTypes.length > 0 && actorTypes.every(
+    (value) => typeof value === 'string' && value.toLowerCase() === 'bot',
+  ) &&
     hasImmutableMatch &&
     databaseIdsMatch &&
     nodeIdsMatch;
@@ -2331,11 +2354,19 @@ function validateSupersessionsAgainstRequests({
       .includes(firstSuccessorRequest?.head)
       ? firstSuccessorRequest.head
       : null;
+    const retainedReactivationHead = firstSuccessorRequest === null && supersessions.some(
+      (candidate) => candidate.reviewInputKey !== disposition.reviewInputKey &&
+        candidate.head === disposition.successorHead &&
+        candidate.successorHead === disposition.head,
+    )
+      ? disposition.successorHead
+      : null;
     const allowedSuccessorHeads = requestedImmediateHead === null
       ? new Set([
         disposition.head,
         nextDistinctHead,
         firstSuccessorRequest === null ? currentHead : null,
+        retainedReactivationHead,
       ].filter((head) => head !== undefined && head !== null))
       : new Set([requestedImmediateHead]);
     if (

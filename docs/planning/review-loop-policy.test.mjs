@@ -5645,6 +5645,46 @@ test('an incomplete successor can be superseded by a reactivated current head', 
     () => parseCompactStateJson(JSON.stringify(unrelated)),
     /terminal incomplete prior-input pair/u,
   );
+
+  const inputC = reviewInput({
+    head: '3'.repeat(40),
+    tree: '4'.repeat(40),
+    diffSha256: '5'.repeat(64),
+    bodySha256: '6'.repeat(64),
+  });
+  const driftedAfterReactivation = compactState(inputC, {
+    reviewRequests: [requestA, requestB],
+    supersededReviewInputs: reactivated.current_task.review.supersededReviewInputs,
+  });
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(driftedAfterReactivation)),
+    driftedAfterReactivation,
+  );
+
+  const unrelatedKnownHead = structuredClone(driftedAfterReactivation);
+  unrelatedKnownHead.current_task.review.metrics.reviewerRequestsPerHead[
+    '7'.repeat(40)
+  ] = 0;
+  unrelatedKnownHead.current_task.review.supersededReviewInputs[
+    getReviewInputKey(inputB)
+  ].successorHead = '7'.repeat(40);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(unrelatedKnownHead)),
+    /terminal incomplete prior-input pair/u,
+  );
+
+  const requestedAfterReactivation = compactState(inputC, {
+    reviewRequests: [
+      requestA,
+      requestB,
+      requestFor(inputC, 'copilot', { requestedAt: '2026-09-04T10:04:00Z' }),
+    ],
+    supersededReviewInputs: reactivated.current_task.review.supersededReviewInputs,
+  });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(requestedAfterReactivation)),
+    /terminal incomplete prior-input pair/u,
+  );
 });
 
 test('RECONCILING ingestion requires its complete request and attempt identity', () => {
@@ -5734,6 +5774,81 @@ test('review attribution rejects conflicting actor aliases', () => {
     },
   });
   assert.equal(copilotEvidence.submittedReviewMatched, false);
+
+  const copilotMatchFor = (actorAliases) => collectCopilotRequestEvidence({
+    responseReviewers: [],
+    requestEvents: [],
+    requestedReviewers: [],
+    submittedReviews: [{
+      node_id: 'AUTHENTICATED_COPILOT_ACTORS',
+      user: {
+        login: 'copilot-pull-request-reviewer[bot]',
+        type: 'Bot',
+        id: 175728472,
+        node_id: 'BOT_kgDOCnlnWA',
+      },
+      commit_id: input.head,
+      submitted_at: '2026-09-04T10:01:00Z',
+      ...actorAliases,
+    }],
+    reviewRuns: [],
+    baselineRequestEventIds: [],
+    baselineReviewNodeIds: [],
+    baselineReviewRunIds: [],
+    expectedHead: input.head,
+    requestedAt: '2026-09-04T10:00:00Z',
+    readbackCompleteness: {
+      requestEvents: true,
+      requestedReviewers: true,
+      submittedReviews: true,
+      reviewRuns: true,
+    },
+  }).submittedReviewMatched;
+  assert.equal(copilotMatchFor({
+    author: {
+      login: 'copilot-pull-request-reviewer',
+      __typename: 'Bot',
+      databaseId: 175728472,
+      id: 'BOT_kgDOCnlnWA',
+    },
+  }), true);
+  for (const actorAliases of [
+    {
+      author: {
+        login: 'copilot-pull-request-reviewer',
+        __typename: 'User',
+        databaseId: 175728472,
+        id: 'BOT_kgDOCnlnWA',
+      },
+    },
+    {
+      author: {
+        login: 'copilot-pull-request-reviewer',
+        type: 'Bot',
+        __typename: 'User',
+        databaseId: 175728472,
+        id: 'BOT_kgDOCnlnWA',
+      },
+    },
+    {
+      actor: {
+        login: 'copilot-pull-request-reviewer[bot]',
+        type: 'Bot',
+        database_id: 1,
+        node_id: 'BOT_kgDOCnlnWA',
+      },
+    },
+    {
+      author: {
+        login: 'copilot-pull-request-reviewer',
+        __typename: 'Bot',
+        databaseId: 175728472,
+        id: 'BOT_conflicting',
+      },
+    },
+  ]) {
+    assert.equal(copilotMatchFor(actorAliases), false, JSON.stringify(actorAliases));
+  }
 });
 
 test('equal-time reviewer requests preserve Copilot-before-Codex array order', () => {
