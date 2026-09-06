@@ -46,6 +46,40 @@ const COMPACT_STATE_REQUIRED_ROOT_FIELDS = Object.freeze([
   'updated_utc',
 ]);
 
+const TASK_STATE_REQUIRED_FIELDS = Object.freeze([
+  'number',
+  'state',
+  'risk',
+  'repository',
+  'branch',
+  'base',
+  'head',
+  'last_gate',
+  'next_action',
+  'blocker',
+]);
+const TASK_STATE_ALLOWED_FIELDS = new Set([
+  ...TASK_STATE_REQUIRED_FIELDS,
+  'review',
+]);
+
+const REVIEW_STATE_REQUIRED_FIELDS = Object.freeze([
+  'schemaVersion',
+  'reviewInput',
+  'mutationClass',
+  'reviewRequests',
+  'supersededReviewInputs',
+  'copilotResults',
+  'codexResults',
+  'publicMutation',
+  'metrics',
+  'commentPublications',
+]);
+const REVIEW_STATE_ALLOWED_FIELDS = new Set([
+  ...REVIEW_STATE_REQUIRED_FIELDS,
+  'materialReason',
+]);
+
 const REVIEW_INPUT_FIELDS = Object.freeze([
   'head',
   'tree',
@@ -72,6 +106,7 @@ const TASK_STATES = new Set([
   'complete',
   'blocked',
 ]);
+const TASK_RISKS = new Set(['R0', 'R1', 'R2', 'R3']);
 const REVIEW_LOOP_TASK_NUMBER_SET = new Set(REVIEW_LOOP_TASK_NUMBERS);
 const PUBLIC_MUTATION_STATES = new Set([
   'NOT_ATTEMPTED',
@@ -460,6 +495,37 @@ export function normalizeCollection(value) {
   return [value];
 }
 
+function normalizeCollectionWithSource(value, source = 'direct') {
+  if (value === null || value === undefined) {
+    return [];
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => ({ item, source }));
+  }
+
+  if (typeof value === 'object' && Object.hasOwn(value, 'nodes')) {
+    return normalizeCollectionWithSource(value.nodes, source);
+  }
+
+  if (typeof value === 'object' && Object.hasOwn(value, 'edges')) {
+    return normalizeCollectionWithSource(value.edges, source).map((entry) => ({
+      item: entry.item?.node ?? entry.item,
+      source: entry.source,
+    }));
+  }
+
+  if (typeof value === 'object' && Object.hasOwn(value, 'check_runs')) {
+    return normalizeCollectionWithSource(value.check_runs, 'check_runs');
+  }
+
+  if (typeof value === 'object' && Object.hasOwn(value, 'workflow_runs')) {
+    return normalizeCollectionWithSource(value.workflow_runs, 'workflow_runs');
+  }
+
+  return [{ item: value, source }];
+}
+
 function hasCompleteCollectionReadback(value, wrapperKeys) {
   if (value === null || value === undefined) {
     return false;
@@ -686,6 +752,7 @@ export function parseCompactStateJson(text) {
     throw new TypeError('The compact-state plan is unsupported.');
   }
   parseRfc3339Timestamp(parsed.updated_utc, 'Compact-state updated_utc');
+  validatePersistedTaskState(parsed.current_task);
 
   const completedTaskNumber = validatePersistedProgress(
     parsed.current_task,
@@ -703,6 +770,7 @@ export function parseCompactStateJson(text) {
   }
   if (parsed.current_task?.review !== undefined) {
     const reviewState = parsed.current_task.review;
+    validatePersistedReviewState(reviewState);
     assertReviewInput(reviewState.reviewInput);
     if (
       typeof parsed.current_task.head !== 'string' ||
@@ -740,6 +808,115 @@ export function parseCompactStateJson(text) {
   }
 
   return parsed;
+}
+
+function validatePersistedTaskState(currentTask) {
+  if (
+    currentTask === null ||
+    typeof currentTask !== 'object' ||
+    Array.isArray(currentTask) ||
+    TASK_STATE_REQUIRED_FIELDS.some((field) => !Object.hasOwn(currentTask, field)) ||
+    Object.keys(currentTask).some((field) => !TASK_STATE_ALLOWED_FIELDS.has(field))
+  ) {
+    throw new TypeError(
+      'The persisted task progress is malformed or violates the closed current-task contract.',
+    );
+  }
+
+  if (
+    !Number.isInteger(currentTask.number) ||
+    currentTask.number < 1 ||
+    currentTask.number > PLAN_TASK_COUNT ||
+    !TASK_STATES.has(currentTask.state) ||
+    !TASK_RISKS.has(currentTask.risk) ||
+    typeof currentTask.repository !== 'string' ||
+    currentTask.repository.length === 0 ||
+    typeof currentTask.branch !== 'string' ||
+    currentTask.branch.length === 0 ||
+    (
+      currentTask.base !== null &&
+      (typeof currentTask.base !== 'string' || !SHA1_PATTERN.test(currentTask.base))
+    ) ||
+    (
+      currentTask.head !== null &&
+      (typeof currentTask.head !== 'string' || !SHA1_PATTERN.test(currentTask.head))
+    ) ||
+    (currentTask.last_gate !== null && typeof currentTask.last_gate !== 'string') ||
+    typeof currentTask.next_action !== 'string' ||
+    currentTask.next_action.length === 0 ||
+    (currentTask.blocker !== null && typeof currentTask.blocker !== 'string')
+  ) {
+    throw new TypeError('The persisted task progress is malformed or outside the plan.');
+  }
+
+  for (const text of [
+    currentTask.repository,
+    currentTask.branch,
+    currentTask.last_gate,
+    currentTask.next_action,
+    currentTask.blocker,
+  ]) {
+    if (text !== null) {
+      validateTransport(text);
+    }
+  }
+}
+
+function validatePersistedReviewState(reviewState) {
+  if (
+    reviewState === null ||
+    typeof reviewState !== 'object' ||
+    Array.isArray(reviewState) ||
+    REVIEW_STATE_REQUIRED_FIELDS.some((field) => !Object.hasOwn(reviewState, field)) ||
+    Object.keys(reviewState).some((field) => !REVIEW_STATE_ALLOWED_FIELDS.has(field))
+  ) {
+    throw new TypeError(
+      'The persisted review state must be valid under the closed review-state contract.',
+    );
+  }
+
+  const objectFields = [
+    'reviewInput',
+    'supersededReviewInputs',
+    'copilotResults',
+    'codexResults',
+    'publicMutation',
+    'metrics',
+  ];
+  if (
+    reviewState.schemaVersion !== COMPACT_STATE_SCHEMA_VERSION ||
+    !MUTATION_CLASSES.includes(reviewState.mutationClass) ||
+    !Array.isArray(reviewState.reviewRequests) ||
+    !Array.isArray(reviewState.commentPublications) ||
+    reviewState.commentPublications.some((publication) =>
+      publication === null ||
+      typeof publication !== 'object' ||
+      Array.isArray(publication)) ||
+    objectFields.some((field) =>
+      reviewState[field] === null ||
+      typeof reviewState[field] !== 'object' ||
+      Array.isArray(reviewState[field])) ||
+    (
+      Object.hasOwn(reviewState, 'materialReason') &&
+      reviewState.materialReason !== null &&
+      typeof reviewState.materialReason !== 'string'
+    ) ||
+    (
+      reviewState.mutationClass === 'MATERIAL_SCOPE_BEHAVIOR_RISK' &&
+      (
+        typeof reviewState.materialReason !== 'string' ||
+        reviewState.materialReason.trim().length === 0
+      )
+    )
+  ) {
+    throw new TypeError(
+      'The persisted review state is malformed or unsupported and must be schema-valid.',
+    );
+  }
+
+  if (typeof reviewState.materialReason === 'string') {
+    validateTransport(reviewState.materialReason);
+  }
 }
 
 function validatePersistedProgress(currentTask, completed) {
@@ -1741,6 +1918,20 @@ function getReviewerCollection(value) {
   return normalizeCollection(value);
 }
 
+function getConsistentCopilotReviewerAlias(item, fields) {
+  const suppliedAliases = fields
+    .filter((field) => item?.[field] !== undefined && item?.[field] !== null)
+    .map((field) => item[field]);
+  if (
+    suppliedAliases.length === 0 ||
+    suppliedAliases.some((alias) => !isCopilotIdentity(alias))
+  ) {
+    return null;
+  }
+
+  return suppliedAliases[0];
+}
+
 export function collectCopilotRequestEvidence({
   responseReviewers,
   requestEvents,
@@ -1816,7 +2007,10 @@ export function collectCopilotRequestEvidence({
   );
   const requestEventMatched = normalizeCollection(requestEvents).some((event) => {
     const identities = getItemIdentities(event);
-    const reviewer = event?.requested_reviewer ?? event?.requestedReviewer;
+    const reviewer = getConsistentCopilotReviewerAlias(
+      event,
+      ['requested_reviewer', 'requestedReviewer'],
+    );
     return event?.event === 'review_requested' &&
       identities.length > 0 &&
       identities.every((identity) => !eventBaselines.has(identity)) &&
@@ -1825,7 +2019,7 @@ export function collectCopilotRequestEvidence({
         [['created_at', 'createdAt']],
         requestTime,
       ) &&
-      isCopilotIdentity(reviewer);
+      reviewer !== null;
   });
   const requestedReviewerMatched = getReviewerCollection(requestedReviewers).some(
     (reviewer) => isCopilotIdentity(reviewer),
@@ -1842,19 +2036,14 @@ export function collectCopilotRequestEvidence({
       getCommitOid(review) === expectedHead &&
       isCopilotIdentity(review);
   });
-  const reviewRunsCanAuthenticate = !(
-    reviewRuns !== null &&
-    typeof reviewRuns === 'object' &&
-    !Array.isArray(reviewRuns) &&
-    Object.hasOwn(reviewRuns, 'check_runs')
-  );
-  const reviewRunMatched = reviewRunsCanAuthenticate &&
-    normalizeCollection(reviewRuns).some((run) => {
+  const reviewRunMatched = normalizeCollectionWithSource(reviewRuns).some((entry) => {
+    const run = entry.item;
     const identities = getItemIdentities(run);
     const heads = [run?.head_sha, run?.headSha, run?.headCommit?.oid].filter(
       (value) => value !== undefined && value !== null,
     );
-    return identities.length > 0 &&
+    return entry.source !== 'check_runs' &&
+      identities.length > 0 &&
       identities.every((identity) => !runBaselines.has(identity)) &&
       isItemAtOrAfterRequestWithAliases(
         run,
@@ -1867,7 +2056,7 @@ export function collectCopilotRequestEvidence({
       heads.length > 0 &&
       heads.every((head) => typeof head === 'string' && head === expectedHead) &&
       isCopilotIdentity(run?.actor);
-    });
+  });
 
   return Object.freeze({
     responseReviewerMatched,

@@ -1773,6 +1773,110 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
   }
 });
 
+test('Copilot request events require all supplied reviewer aliases to agree', () => {
+  const copilotRest = {
+    login: 'copilot-pull-request-reviewer[bot]',
+    type: 'Bot',
+    id: 175728472,
+    node_id: 'BOT_kgDOCnlnWA',
+  };
+  const copilotGraphql = {
+    login: 'copilot-pull-request-reviewer',
+    __typename: 'Bot',
+    databaseId: 175728472,
+    id: 'BOT_kgDOCnlnWA',
+  };
+  const common = {
+    responseReviewers: [],
+    requestedReviewers: [],
+    submittedReviews: [],
+    reviewRuns: [],
+    baselineRequestEventIds: [],
+    baselineReviewNodeIds: [],
+    baselineReviewRunIds: [],
+    expectedHead: HASHES.head1,
+    requestedAt: '2026-09-04T10:00:00Z',
+    readbackCompleteness: {
+      requestEvents: true,
+      requestedReviewers: true,
+      submittedReviews: true,
+      reviewRuns: true,
+    },
+  };
+  const event = (aliases) => ({
+    id: 'EVENT_NEW',
+    event: 'review_requested',
+    created_at: '2026-09-04T10:01:00Z',
+    ...aliases,
+  });
+  const matches = (aliases) => collectCopilotRequestEvidence({
+    ...common,
+    requestEvents: [event(aliases)],
+  }).requestEventMatched;
+
+  assert.equal(matches({ requested_reviewer: copilotRest }), true);
+  assert.equal(matches({ requestedReviewer: copilotGraphql }), true);
+  assert.equal(matches({
+    requested_reviewer: copilotRest,
+    requestedReviewer: copilotGraphql,
+  }), true);
+  assert.equal(matches({
+    requested_reviewer: copilotRest,
+    requestedReviewer: {
+      login: 'dependabot[bot]',
+      type: 'Bot',
+      id: 49699333,
+      node_id: 'MDM6Qm90NDk2OTkzMzM=',
+    },
+  }), false);
+  assert.equal(matches({
+    requested_reviewer: { ...copilotRest, id: 49699333 },
+    requestedReviewer: copilotGraphql,
+  }), false);
+});
+
+test('Copilot workflow-run authentication preserves recursive collection provenance', () => {
+  const run = {
+    id: 'RUN_NEW',
+    actor: {
+      login: 'copilot-pull-request-reviewer[bot]',
+      type: 'Bot',
+      id: 175728472,
+      node_id: 'BOT_kgDOCnlnWA',
+    },
+    head_sha: HASHES.head1,
+    created_at: '2026-09-04T10:01:00Z',
+  };
+  const common = {
+    responseReviewers: [],
+    requestEvents: [],
+    requestedReviewers: [],
+    submittedReviews: [],
+    baselineRequestEventIds: [],
+    baselineReviewNodeIds: [],
+    baselineReviewRunIds: [],
+    expectedHead: HASHES.head1,
+    requestedAt: '2026-09-04T10:00:00Z',
+    readbackCompleteness: {
+      requestEvents: true,
+      requestedReviewers: true,
+      submittedReviews: true,
+      reviewRuns: true,
+    },
+  };
+  const matchFor = (reviewRuns) => collectCopilotRequestEvidence({
+    ...common,
+    reviewRuns,
+  }).reviewRunMatched;
+
+  assert.equal(matchFor([run]), true);
+  assert.equal(matchFor({ workflow_runs: [run] }), true);
+  assert.equal(matchFor({ nodes: { workflow_runs: [run] } }), true);
+  assert.equal(matchFor({ check_runs: [run] }), false);
+  assert.equal(matchFor({ nodes: { check_runs: [run] } }), false);
+  assert.equal(matchFor({ edges: { check_runs: [run] } }), false);
+});
+
 test('Copilot request evidence excludes a baseline match through any supplied identity', () => {
   const expectedHead = HASHES.head1;
   const copilot = {
@@ -3403,6 +3507,167 @@ test('compact-state JSON ingestion validates semantic root metadata', () => {
   const fractional = structuredClone(valid);
   fractional.updated_utc = '2026-09-04T10:00:00.123Z';
   assert.deepEqual(parseCompactStateJson(JSON.stringify(fractional)), fractional);
+});
+
+test('compact-state JSON ingestion enforces the closed current-task contract', () => {
+  const valid = compactState(reviewInput());
+  const requiredFields = [
+    'number',
+    'state',
+    'risk',
+    'repository',
+    'branch',
+    'base',
+    'head',
+    'last_gate',
+    'next_action',
+    'blocker',
+  ];
+
+  for (const field of requiredFields) {
+    const candidate = structuredClone(valid);
+    delete candidate.current_task[field];
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(candidate)),
+      /persisted task progress is malformed/u,
+      `${field} is required`,
+    );
+  }
+
+  const undeclared = structuredClone(valid);
+  undeclared.current_task.unexpected = true;
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(undeclared)),
+    /closed current-task contract/u,
+  );
+
+  const invalidValues = [
+    ['number', 0],
+    ['number', 403],
+    ['state', 'unknown'],
+    ['risk', 'R4'],
+    ['repository', ''],
+    ['repository', null],
+    ['branch', ''],
+    ['branch', null],
+    ['base', 'not-a-sha'],
+    ['base', ['a'.repeat(40)]],
+    ['head', 'not-a-sha'],
+    ['head', ['a'.repeat(40)]],
+    ['last_gate', []],
+    ['next_action', ''],
+    ['next_action', null],
+    ['blocker', {}],
+  ];
+  for (const [field, value] of invalidValues) {
+    const candidate = structuredClone(valid);
+    candidate.current_task[field] = value;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(candidate)),
+      /persisted task progress is malformed/u,
+      `${field} rejects ${JSON.stringify(value)}`,
+    );
+  }
+
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+});
+
+test('compact-state JSON ingestion enforces the closed review-state contract', () => {
+  const valid = compactState(reviewInput());
+  const requiredFields = [
+    'schemaVersion',
+    'reviewInput',
+    'mutationClass',
+    'reviewRequests',
+    'supersededReviewInputs',
+    'copilotResults',
+    'codexResults',
+    'publicMutation',
+    'metrics',
+    'commentPublications',
+  ];
+
+  for (const field of requiredFields) {
+    const candidate = structuredClone(valid);
+    delete candidate.current_task.review[field];
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(candidate)),
+      /closed review-state contract/u,
+      `${field} is required`,
+    );
+  }
+
+  const undeclared = structuredClone(valid);
+  undeclared.current_task.review.unexpected = true;
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(undeclared)),
+    /closed review-state contract/u,
+  );
+
+  for (const schemaVersion of [0, 2, '1', null]) {
+    const candidate = structuredClone(valid);
+    candidate.current_task.review.schemaVersion = schemaVersion;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(candidate)),
+      /review state is malformed or unsupported/u,
+    );
+  }
+  for (const mutationClass of [null, '', 'UNKNOWN']) {
+    const candidate = structuredClone(valid);
+    candidate.current_task.review.mutationClass = mutationClass;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(candidate)),
+      /review state is malformed or unsupported/u,
+    );
+  }
+
+  const invalidContainers = [
+    ['reviewInput', []],
+    ['reviewRequests', {}],
+    ['supersededReviewInputs', []],
+    ['copilotResults', []],
+    ['codexResults', null],
+    ['publicMutation', []],
+    ['metrics', null],
+    ['commentPublications', {}],
+    ['commentPublications', [null]],
+    ['commentPublications', [[]]],
+  ];
+  for (const [field, value] of invalidContainers) {
+    const candidate = structuredClone(valid);
+    candidate.current_task.review[field] = value;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(candidate)),
+      /review state is malformed or unsupported/u,
+      `${field} rejects ${JSON.stringify(value)}`,
+    );
+  }
+
+  for (const materialReason of [undefined, null, '', ' ', '\t\r\n']) {
+    const candidate = compactState(reviewInput(), {
+      mutationClass: 'MATERIAL_SCOPE_BEHAVIOR_RISK',
+      materialReason,
+    });
+    if (materialReason === undefined) {
+      delete candidate.current_task.review.materialReason;
+    }
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(candidate)),
+      /review state is malformed or unsupported/u,
+    );
+  }
+
+  const nonmaterialNullReason = structuredClone(valid);
+  nonmaterialNullReason.current_task.review.materialReason = null;
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(nonmaterialNullReason)),
+    nonmaterialNullReason,
+  );
+  const material = compactState(reviewInput(), {
+    mutationClass: 'MATERIAL_SCOPE_BEHAVIOR_RISK',
+    materialReason: 'The reviewed risk changed.',
+  });
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(material)), material);
 });
 
 test('compact-state JSON ingestion validates the task-state schema enum', async () => {
