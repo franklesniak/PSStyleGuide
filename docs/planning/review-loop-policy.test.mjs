@@ -2358,7 +2358,7 @@ test('compact-state JSON ingestion rejects duplicate baseline member identities'
   assert.throws(() => parseCompactStateJson(duplicateEscaped), /duplicate member "COMMENT_OLD"/u);
   assert.throws(
     () => parseCompactStateJson(unique),
-    /must contain every required root field/u,
+    /must contain exactly the required root fields/u,
   );
 });
 
@@ -2376,7 +2376,7 @@ test('compact-state JSON ingestion rejects unrelated or incomplete root values',
   for (const unrelated of [null, [], {}, { safe: 1 }]) {
     assert.throws(
       () => parseCompactStateJson(JSON.stringify(unrelated)),
-      /must contain every required root field/u,
+      /must contain exactly the required root fields/u,
     );
   }
   for (const field of requiredRootFields) {
@@ -2384,9 +2384,15 @@ test('compact-state JSON ingestion rejects unrelated or incomplete root values',
     delete incomplete[field];
     assert.throws(
       () => parseCompactStateJson(JSON.stringify(incomplete)),
-      /must contain every required root field/u,
+      /must contain exactly the required root fields/u,
     );
   }
+  const undeclared = structuredClone(valid);
+  undeclared.unexpected_root = 'must be rejected';
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(undeclared)),
+    /must contain exactly the required root fields/u,
+  );
   assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
 });
 

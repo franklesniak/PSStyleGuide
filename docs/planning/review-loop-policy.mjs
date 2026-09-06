@@ -459,9 +459,10 @@ export function parseCompactStateJson(text) {
     parsed === null ||
     typeof parsed !== 'object' ||
     Array.isArray(parsed) ||
+    Object.keys(parsed).length !== COMPACT_STATE_REQUIRED_ROOT_FIELDS.length ||
     COMPACT_STATE_REQUIRED_ROOT_FIELDS.some((field) => !Object.hasOwn(parsed, field))
   ) {
-    throw new TypeError('Compact-state JSON must contain every required root field.');
+    throw new TypeError('Compact-state JSON must contain exactly the required root fields.');
   }
   if (parsed.schema !== COMPACT_STATE_SCHEMA_VERSION) {
     throw new TypeError('The compact-state schema version is unsupported.');
