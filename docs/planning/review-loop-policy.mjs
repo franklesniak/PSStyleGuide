@@ -107,6 +107,12 @@ const COPILOT_REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
   'submittedReviewMatched',
   'reviewRunMatched',
 ]);
+const COPILOT_DURABLE_REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
+  'requestEventMatched',
+  'requestedReviewerMatched',
+  'submittedReviewMatched',
+  'reviewRunMatched',
+]);
 
 function getChannelDurableEvidenceMatch(evidence, channel) {
   const foreignFields = channel === 'copilot'
@@ -116,7 +122,7 @@ function getChannelDurableEvidenceMatch(evidence, channel) {
     throw new TypeError('Review-request evidence does not match its channel.');
   }
   const permittedFields = channel === 'copilot'
-    ? COPILOT_REVIEW_REQUEST_EVIDENCE_FIELDS
+    ? COPILOT_DURABLE_REVIEW_REQUEST_EVIDENCE_FIELDS
     : ['triggerCommentMatched'];
   return permittedFields.some((field) => evidence[field]);
 }
@@ -1261,6 +1267,17 @@ function getCommitOid(item) {
   return commitOids.every((value) => value === commitOid) ? commitOid : null;
 }
 
+function hasMatchingConversationHeadIdentities(item, expectedHead) {
+  const headOids = [item?.head, item?.headRefOid].filter(
+    (value) => value !== undefined,
+  );
+  return headOids.every(
+    (value) => typeof value === 'string' &&
+      SHA1_PATTERN.test(value) &&
+      value === expectedHead,
+  );
+}
+
 function getItemId(item) {
   const id = item?.node_id ?? item?.nodeId ?? item?.id ?? item?.databaseId;
   return id === null || id === undefined ? null : String(id);
@@ -1724,8 +1741,7 @@ function isReferencedTerminalResult(result, request, reference, requests) {
     return false;
   }
 
-  const explicitHead = result.head ?? result.headRefOid;
-  if (explicitHead !== undefined && explicitHead !== request.head) {
+  if (!hasMatchingConversationHeadIdentities(result, request.head)) {
     return false;
   }
   if (
@@ -1921,7 +1937,14 @@ function validateSupersessionsAgainstRequests({
     const requestTimes = pair.map(
       (request) => getItemTime(request, ['requestedAt']),
     );
+    const finalPairRequestIndex = requests.reduce(
+      (latest, request, index) => request.reviewInputKey === disposition.reviewInputKey
+        ? index
+        : latest,
+      -1,
+    );
     const successorRequestTimes = requests
+      .slice(finalPairRequestIndex + 1)
       .filter(
         (request) => request.reviewInputKey !== disposition.reviewInputKey &&
           request.head === disposition.successorHead,
@@ -2032,8 +2055,7 @@ export function collectCodexResults({
         return false;
       }
 
-      const explicitHead = comment.head ?? comment.headRefOid;
-      if (explicitHead !== undefined && explicitHead !== head) {
+      if (!hasMatchingConversationHeadIdentities(comment, head)) {
         return false;
       }
 

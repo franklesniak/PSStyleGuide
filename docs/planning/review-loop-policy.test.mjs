@@ -1030,6 +1030,49 @@ test('submitted reviews require all supplied commit identities to agree', () => 
   assert.equal(copilotEvidence.submittedReviewMatched, false);
 });
 
+test('conversation results require all supplied head identities to agree', () => {
+  const input = reviewInput();
+  const copilotRequest = requestFor(input, 'copilot', { confirmed: true });
+  const codexRequest = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+  });
+  const commonComment = {
+    user: { login: 'chatgpt-codex-connector[bot]' },
+    created_at: '2026-09-04T10:02:00Z',
+    body: 'Review completed.',
+  };
+  const results = collectCodexResults({
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: [copilotRequest, codexRequest],
+    submittedReviews: [],
+    conversationComments: [
+      {
+        ...commonComment,
+        id: 'CONFLICTING_CODEX_HEAD',
+        head: HASHES.head1,
+        headRefOid: HASHES.head2,
+      },
+      {
+        ...commonComment,
+        id: 'AGREEING_CODEX_HEAD',
+        head: HASHES.head1,
+        headRefOid: HASHES.head1,
+      },
+      {
+        ...commonComment,
+        id: 'SINGLE_CODEX_HEAD',
+        headRefOid: HASHES.head1,
+      },
+    ],
+  });
+
+  assert.deepEqual(
+    results.conversationComments.map((comment) => comment.id),
+    ['AGREEING_CODEX_HEAD', 'SINGLE_CODEX_HEAD'],
+  );
+});
+
 test('native completed Codex summaries become typed terminal conversation results', () => {
   const input = reviewInput();
   const copilotRequest = requestFor(input, 'copilot', { confirmed: true });
@@ -2012,11 +2055,19 @@ test('review-request reconciliation binds durable evidence to its channel', asyn
   ];
 
   for (const field of copilotFields) {
-    assert.equal(reconcileReviewRequestMutation({
+    const mutation = reconcileReviewRequestMutation({
       ...common,
       channel: 'copilot',
       evidence: { ...emptyEvidence, [field]: true },
-    }).state, 'CONFIRMED', field);
+    });
+    if (field === 'responseReviewerMatched') {
+      assert.equal(mutation.state, 'RECONCILING', field);
+      assert.equal(mutation.readbackMatched, false, field);
+      assert.equal(mutation.retryAllowed, false, field);
+    } else {
+      assert.equal(mutation.state, 'CONFIRMED', field);
+      assert.equal(mutation.readbackMatched, true, field);
+    }
     assert.throws(
       () => reconcileReviewRequestMutation({
         ...common,
@@ -3320,6 +3371,24 @@ test('confirmed terminal requests require one attributable persisted result', as
     validHeadlessCodex,
   );
 
+  const agreeingHeadIdentities = structuredClone(validHeadlessCodex);
+  const agreeingComment = agreeingHeadIdentities.current_task.review
+    .codexResults.conversationComments[0];
+  agreeingComment.head = HASHES.head1;
+  agreeingComment.headRefOid = HASHES.head1;
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(agreeingHeadIdentities)),
+    agreeingHeadIdentities,
+  );
+
+  const conflictingHeadIdentities = structuredClone(agreeingHeadIdentities);
+  conflictingHeadIdentities.current_task.review.codexResults
+    .conversationComments[0].headRefOid = HASHES.head2;
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(conflictingHeadIdentities)),
+    /one attributable terminal result/u,
+  );
+
   for (const mutate of [
     (candidate) => {
       delete candidate.current_task.review.codexResults.conversationComments[0].status;
@@ -3509,6 +3578,45 @@ test('compact-state ingestion cross-validates supersessions and causal ordering'
   }
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(successorStartedBeforeSupersession)),
+    /terminal incomplete prior-input pair/u,
+  );
+});
+
+test('supersession timing ignores earlier reviewed inputs on the same successor head', () => {
+  const inputX = reviewInput();
+  const inputY = reviewInput({ risk: 'R2 material risk Y.' });
+  const inputZ = reviewInput({ risk: 'R3 material risk Z.' });
+  const xPair = pairFor(inputX);
+  const yRequest = requestFor(inputY, 'copilot', {
+    requestedAt: '2026-09-04T10:02:00Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: 'RESULT_Y_COPILOT',
+      observedAt: '2026-09-04T10:03:00Z',
+    },
+  });
+  const zRequest = requestFor(inputZ, 'copilot', {
+    requestedAt: '2026-09-04T10:04:00Z',
+  });
+  const valid = compactState(inputZ, {
+    mutationClass: 'MATERIAL_SCOPE_BEHAVIOR_RISK',
+    materialReason: 'Input Z materially changes the reviewed risk.',
+    reviewRequests: [...xPair, yRequest, zRequest],
+    supersededReviewInputs: supersessionFor(inputY, inputZ, {
+      supersededAt: '2026-09-04T10:03:30Z',
+    }),
+  });
+
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  const late = structuredClone(valid);
+  late.current_task.review.supersededReviewInputs[
+    getReviewInputKey(inputY)
+  ].supersededAt = '2026-09-04T10:04:01Z';
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(late)),
     /terminal incomplete prior-input pair/u,
   );
 });
