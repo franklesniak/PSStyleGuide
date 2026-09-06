@@ -28,6 +28,8 @@ export const REVIEW_REQUEST_SPECS = Object.freeze({
 
 export const REVIEW_REQUEST_RECONCILIATION_MILLISECONDS = 120_000;
 export const PLAN_TASK_COUNT = 402;
+const COMPACT_STATE_SCHEMA_VERSION = 1;
+const COMPACT_STATE_PLAN_PATH = 'docs/planning/action-items-2026-08-30.md';
 export const REVIEW_LOOP_TASK_NUMBERS = Object.freeze([
   6, 15, 25, 34, 45, 54, 63, 74, 83, 92, 101, 110, 119, 130,
   139, 148, 158, 167, 176, 186, 195, 204, 216, 227, 237, 246,
@@ -461,6 +463,13 @@ export function parseCompactStateJson(text) {
   ) {
     throw new TypeError('Compact-state JSON must contain every required root field.');
   }
+  if (parsed.schema !== COMPACT_STATE_SCHEMA_VERSION) {
+    throw new TypeError('The compact-state schema version is unsupported.');
+  }
+  if (parsed.plan !== COMPACT_STATE_PLAN_PATH) {
+    throw new TypeError('The compact-state plan is unsupported.');
+  }
+  parseRfc3339Timestamp(parsed.updated_utc, 'Compact-state updated_utc');
 
   const completedTaskNumber = validatePersistedProgress(
     parsed.current_task,

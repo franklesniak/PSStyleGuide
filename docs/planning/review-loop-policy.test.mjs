@@ -2360,6 +2360,46 @@ test('compact-state JSON ingestion rejects unrelated or incomplete root values',
   assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
 });
 
+test('compact-state JSON ingestion validates semantic root metadata', () => {
+  const valid = compactState(reviewInput());
+
+  for (const schema of [0, 2, '1', null]) {
+    const unsupported = structuredClone(valid);
+    unsupported.schema = schema;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(unsupported)),
+      /schema version is unsupported/u,
+    );
+  }
+
+  for (const plan of ['', 'docs/planning/other.md', null]) {
+    const unsupported = structuredClone(valid);
+    unsupported.plan = plan;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(unsupported)),
+      /compact-state plan is unsupported/u,
+    );
+  }
+
+  for (const updatedUtc of [
+    null,
+    'not-a-timestamp',
+    '2026-02-31T00:00:00Z',
+    '2026-09-04T10:00:00+14:01',
+  ]) {
+    const malformed = structuredClone(valid);
+    malformed.updated_utc = updatedUtc;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(malformed)),
+      /Compact-state updated_utc must be a valid timestamp in RFC 3339 format/u,
+    );
+  }
+
+  const fractional = structuredClone(valid);
+  fractional.updated_utc = '2026-09-04T10:00:00.123Z';
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(fractional)), fractional);
+});
+
 function resolveSchemaReference(definition, root) {
   if (typeof definition?.$ref !== 'string') {
     return definition;
