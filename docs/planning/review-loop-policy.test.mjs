@@ -3211,6 +3211,19 @@ test('terminal request state requires typed repository-authorized evidence', asy
       terminalDisposition: nonfunctionalDisposition(),
     })],
   });
+  const codexTerminalRequest = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:02:00Z',
+    terminal: true,
+    terminalDisposition: nonfunctionalDisposition({
+      recordedAt: '2026-09-04T10:03:00Z',
+    }),
+  });
+  const codexTerminal = compactState(input, {
+    reviewRequests: [
+      requestFor(input, 'copilot', { confirmed: true, terminal: true }),
+      codexTerminalRequest,
+    ],
+  });
 
   assert.throws(
     () => assertSchemaValid(unsupported, schema, schema),
@@ -3232,6 +3245,14 @@ test('terminal request state requires typed repository-authorized evidence', asy
   );
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(premature)),
+    /persisted review request is malformed/u,
+  );
+  assert.throws(
+    () => assertSchemaValid(codexTerminalRequest, schema.$defs.reviewRequest, schema),
+    /does not match const/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(codexTerminal)),
     /persisted review request is malformed/u,
   );
 });

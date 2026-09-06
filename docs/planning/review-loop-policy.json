@@ -486,6 +486,9 @@
           },
           "then": {
             "properties": {
+              "channel": {
+                "const": "copilot"
+              },
               "confirmed": {
                 "const": false
               },

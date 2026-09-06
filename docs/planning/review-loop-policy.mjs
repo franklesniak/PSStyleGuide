@@ -1589,7 +1589,8 @@ function isReviewRequestRecord(request) {
       request.attemptCount <= 2
     );
   const terminalDispositionIsValid = hasTerminalDisposition
-    ? request.terminal === true &&
+    ? request.channel === 'copilot' &&
+      request.terminal === true &&
       request.confirmed === false &&
       isRepositoryAuthorizedNonfunctionalDisposition(request.terminalDisposition, request)
     : !(request?.terminal === true && request?.confirmed === false);
