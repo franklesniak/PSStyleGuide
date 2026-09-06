@@ -1809,6 +1809,146 @@ test('accepted review requests reconcile, prove no effect, retry once, and exhau
   );
 });
 
+test('review-request reconciliation binds durable evidence to its channel', async () => {
+  const input = reviewInput();
+  const reviewInputKey = getReviewInputKey(input);
+  const emptyEvidence = {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    triggerCommentMatched: false,
+    readbackComplete: true,
+  };
+  const common = {
+    response: { ok: true },
+    reviewInputKey,
+    attemptedAt: '2026-09-04T10:00:00Z',
+    observedAt: '2026-09-04T10:00:01Z',
+    attemptCount: 1,
+    localRecordSucceeded: true,
+  };
+  const copilotFields = [
+    'responseReviewerMatched',
+    'requestEventMatched',
+    'requestedReviewerMatched',
+    'submittedReviewMatched',
+    'reviewRunMatched',
+  ];
+
+  for (const field of copilotFields) {
+    assert.equal(reconcileReviewRequestMutation({
+      ...common,
+      channel: 'copilot',
+      evidence: { ...emptyEvidence, [field]: true },
+    }).state, 'CONFIRMED', field);
+    assert.throws(
+      () => reconcileReviewRequestMutation({
+        ...common,
+        channel: 'codex',
+        evidence: { ...emptyEvidence, [field]: true },
+      }),
+      /does not match its channel/u,
+      field,
+    );
+  }
+  assert.equal(reconcileReviewRequestMutation({
+    ...common,
+    channel: 'codex',
+    evidence: { ...emptyEvidence, triggerCommentMatched: true },
+  }).state, 'CONFIRMED');
+  assert.throws(
+    () => reconcileReviewRequestMutation({
+      ...common,
+      channel: 'copilot',
+      evidence: { ...emptyEvidence, triggerCommentMatched: true },
+    }),
+    /does not match its channel/u,
+  );
+
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const copilotRequest = requestFor(input, 'copilot', { confirmed: true });
+  const crossChannelMutation = {
+    state: 'CONFIRMED',
+    nativeResponseAccepted: true,
+    readbackMatched: true,
+    retryAllowed: false,
+    localRecordSucceeded: true,
+    reviewInputKey,
+    channel: 'copilot',
+    attemptCount: 1,
+    attemptedAt: '2026-09-04T10:00:00Z',
+    reconciledAt: '2026-09-04T10:00:01Z',
+    evidence: { ...emptyEvidence, triggerCommentMatched: true },
+  };
+  assert.throws(
+    () => assertSchemaValid(crossChannelMutation, schema.$defs.publicMutation, schema),
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(compactState(input, {
+      reviewRequests: [copilotRequest],
+      publicMutation: crossChannelMutation,
+    }))),
+    /does not match its channel/u,
+  );
+});
+
+test('mutation reconciliation rejects non-Boolean local record results', () => {
+  const emptyEvidence = {
+    responseReviewerMatched: false,
+    requestEventMatched: false,
+    requestedReviewerMatched: false,
+    submittedReviewMatched: false,
+    reviewRunMatched: false,
+    triggerCommentMatched: true,
+    readbackComplete: true,
+  };
+  const reviewArguments = {
+    response: { ok: true },
+    evidence: emptyEvidence,
+    reviewInputKey: 'a'.repeat(64),
+    channel: 'codex',
+    attemptedAt: '2026-09-04T10:00:00Z',
+    observedAt: '2026-09-04T10:00:01Z',
+    attemptCount: 1,
+  };
+  const publicArguments = {
+    response: { ok: true },
+    readback: { id: 1 },
+    expected: { id: 1 },
+  };
+
+  assert.equal(reconcileReviewRequestMutation({
+    ...reviewArguments,
+    localRecordSucceeded: false,
+  }).localRecordSucceeded, false);
+  assert.equal(reconcilePublicMutation({
+    ...publicArguments,
+    localRecordSucceeded: true,
+  }).localRecordSucceeded, true);
+  for (const value of ['false', 0, null, {}, []]) {
+    assert.throws(
+      () => reconcileReviewRequestMutation({
+        ...reviewArguments,
+        localRecordSucceeded: value,
+      }),
+      /must be a Boolean/u,
+      JSON.stringify(value),
+    );
+    assert.throws(
+      () => reconcilePublicMutation({
+        ...publicArguments,
+        localRecordSucceeded: value,
+      }),
+      /must be a Boolean/u,
+      JSON.stringify(value),
+    );
+  }
+});
+
 test('all permanent active task-template and controller surfaces use the compact contract', async () => {
   const planningRoot = new URL('./', import.meta.url);
   const plan = await readFile(new URL('action-items-2026-08-30.md', planningRoot), 'utf8');

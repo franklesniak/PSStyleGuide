@@ -770,6 +770,66 @@
         {
           "if": {
             "required": [
+              "channel",
+              "evidence"
+            ],
+            "properties": {
+              "channel": {
+                "const": "copilot"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "evidence": {
+                "properties": {
+                  "triggerCommentMatched": {
+                    "const": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "channel",
+              "evidence"
+            ],
+            "properties": {
+              "channel": {
+                "const": "codex"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "evidence": {
+                "properties": {
+                  "responseReviewerMatched": {
+                    "const": false
+                  },
+                  "requestEventMatched": {
+                    "const": false
+                  },
+                  "requestedReviewerMatched": {
+                    "const": false
+                  },
+                  "submittedReviewMatched": {
+                    "const": false
+                  },
+                  "reviewRunMatched": {
+                    "const": false
+                  }
+                }
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
               "evidence"
             ]
           },

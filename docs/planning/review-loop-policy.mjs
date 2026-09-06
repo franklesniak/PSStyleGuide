@@ -100,6 +100,26 @@ const DURABLE_REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
   'reviewRunMatched',
   'triggerCommentMatched',
 ]);
+const COPILOT_REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
+  'responseReviewerMatched',
+  'requestEventMatched',
+  'requestedReviewerMatched',
+  'submittedReviewMatched',
+  'reviewRunMatched',
+]);
+
+function getChannelDurableEvidenceMatch(evidence, channel) {
+  const foreignFields = channel === 'copilot'
+    ? ['triggerCommentMatched']
+    : COPILOT_REVIEW_REQUEST_EVIDENCE_FIELDS;
+  if (foreignFields.some((field) => evidence[field] !== false)) {
+    throw new TypeError('Review-request evidence does not match its channel.');
+  }
+  const permittedFields = channel === 'copilot'
+    ? COPILOT_REVIEW_REQUEST_EVIDENCE_FIELDS
+    : ['triggerCommentMatched'];
+  return permittedFields.some((field) => evidence[field]);
+}
 
 function canonicalize(value) {
   if (Array.isArray(value)) {
@@ -729,6 +749,13 @@ function validatePersistedPublicMutation(publicMutation, requests) {
       !['copilot', 'codex'].includes(publicMutation.channel)
     ) {
       throw new TypeError('A review-request mutation identity is malformed.');
+    }
+    const durableMatch = getChannelDurableEvidenceMatch(
+      publicMutation.evidence,
+      publicMutation.channel,
+    );
+    if (publicMutation.readbackMatched !== durableMatch) {
+      throw new TypeError('Persisted review-request mutation evidence is malformed.');
     }
     const matches = requests.filter(
       (request) => request.reviewInputKey === publicMutation.reviewInputKey &&
@@ -2088,6 +2115,9 @@ export function reconcileReviewRequestMutation({
   if (!Number.isInteger(attemptCount) || attemptCount < 1 || attemptCount > 2) {
     throw new TypeError('Review-request attempt count must be one or two.');
   }
+  if (typeof localRecordSucceeded !== 'boolean') {
+    throw new TypeError('The local record result must be a Boolean.');
+  }
   if (
     !Number.isInteger(minimumWaitMilliseconds) ||
     minimumWaitMilliseconds < REVIEW_REQUEST_RECONCILIATION_MILLISECONDS
@@ -2101,15 +2131,11 @@ export function reconcileReviewRequestMutation({
   }
 
   const nativeResponseAccepted = response?.ok === true;
-  const durableMatch = evidence.requestEventMatched ||
-    evidence.requestedReviewerMatched ||
-    evidence.submittedReviewMatched ||
-    evidence.reviewRunMatched ||
-    evidence.triggerCommentMatched;
+  const durableMatch = getChannelDurableEvidenceMatch(evidence, channel);
   const baseRecord = {
     nativeResponseAccepted,
     readbackMatched: durableMatch,
-    localRecordSucceeded: Boolean(localRecordSucceeded),
+    localRecordSucceeded,
     attemptCount,
     attemptedAt,
     reconciledAt: null,
@@ -2177,11 +2203,14 @@ export function reconcilePublicMutation({
   expected,
   localRecordSucceeded,
 }) {
+  if (typeof localRecordSucceeded !== 'boolean') {
+    throw new TypeError('The local record result must be a Boolean.');
+  }
   const nativeResponseAccepted = response?.ok === true;
   const readbackMatched = expected !== undefined &&
     readback !== undefined &&
     canonicalJson(readback) === canonicalJson(expected);
-  const recordSucceeded = Boolean(localRecordSucceeded);
+  const recordSucceeded = localRecordSucceeded;
 
   if (response?.executed === false && nativeResponseAccepted) {
     return Object.freeze({
