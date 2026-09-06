@@ -2158,6 +2158,49 @@ test('copied review prompts preserve both Copilot release paths', async () => {
   );
 });
 
+test('Task 6 terminal gates and later quality loops preserve their exact release paths', async () => {
+  const plan = await readFile(
+    new URL('./action-items-2026-08-30.md', import.meta.url),
+    'utf8',
+  );
+  const taskBody = (number) => {
+    const start = plan.indexOf(`## Task ${number} —`);
+    const end = plan.indexOf(`## Task ${number + 1} —`, start);
+    assert.notEqual(start, -1);
+    return plan.slice(start, end === -1 ? plan.length : end);
+  };
+  const task6 = taskBody(6);
+  const task8 = taskBody(8);
+  const task26 = taskBody(26);
+  const task27 = taskBody(27);
+  const task35 = taskBody(35);
+  const task36 = taskBody(36);
+
+  assert.match(
+    task6,
+    /GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/u,
+  );
+  assert.equal(
+    [...task6.matchAll(/one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/gu)].length,
+    1,
+  );
+  assert.match(
+    task8,
+    /Copilot has either a clean result or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition/u,
+  );
+
+  assert.match(task26, /new Tasks 25 and 26 instances/u);
+  assert.doesNotMatch(task26, /new Tasks 25 and 16 instances/u);
+  assert.match(task27, /Tasks 25 and 26/u);
+  assert.doesNotMatch(task27, /Tasks 25 and 16/u);
+
+  assert.match(task35, /new Tasks 34 and 35 instances/u);
+  assert.match(task35, /returns to Task 32 or Task 33 and then new Tasks 34 and 35 instances/u);
+  assert.doesNotMatch(task35, /Tasks 34 and 25|Task 32 or 23/u);
+  assert.match(task36, /Tasks 34 and 35/u);
+  assert.doesNotMatch(task36, /Tasks 34 and 25/u);
+});
+
 test('schema-defined nested review-state fields classify deterministically', () => {
   const input = reviewInput();
   const original = state(input);

@@ -612,7 +612,7 @@ If a review finding requires repository-byte change, route to Task 4, then updat
 
 Publish a status warning when a simple finding has not produced commit-ready bytes or a concrete exception by 10 minutes. Produce one of those outcomes by 15 minutes. Track reviewer requests per head, body edits after review begins, same-head re-request reasons, time from clean review to recognition, and time from first clean pair to merge. Do not rerun reviewers as a substitute for deterministic validation.
 
-Return `TERMINALLY_CLEAN` only when the local audit, one GitHub Copilot review, and one attributable Codex review are clean on the same final code head and reviewed input; all findings and threads are terminal; checks and validations are truthful; the frozen body is accurate; mutable results are separate; and no merge occurred. Otherwise return `REVIEW_BLOCKED` with the exact defect, materiality class, and route through Task 4 or Task 5, followed by new Task 6 and Task 7 instances only when the classifier requires them. Do not merge, enable auto-merge, close an issue, or publish the landed handoff.
+Return `TERMINALLY_CLEAN` only when the local audit and one attributable Codex review are clean on the same final code head and reviewed input; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; all findings and threads are terminal; checks and validations are truthful; the frozen body is accurate; mutable results are separate; and no merge occurred. Otherwise return `REVIEW_BLOCKED` with the exact defect, materiality class, and route through Task 4 or Task 5, followed by new Task 6 and Task 7 instances only when the classifier requires them. Do not merge, enable auto-merge, close an issue, or publish the landed handoff.
 ~~~
 
 ### Procedure
@@ -625,7 +625,7 @@ Return `TERMINALLY_CLEAN` only when the local audit, one GitHub Copilot review, 
 
 ### Validation and evidence
 
-Require fresh native-subagent identity and requested model/reasoning, exact current head/tree, frozen semantic input, full provenance and issue coverage, focused and full validation, one clean Copilot review, one clean attributable Codex result, zero unresolved findings/threads/deferrals, truthful checks, materiality records for any mutation, and no merge.
+Require fresh native-subagent identity and requested model/reasoning, exact current head/tree, frozen semantic input, full provenance and issue coverage, focused and full validation, one clean attributable Codex result, either one clean Copilot review or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, zero unresolved findings/threads/deferrals, truthful checks, materiality records for any mutation, and no merge.
 
 ### Stop and escalation conditions
 
@@ -633,11 +633,11 @@ Stop on stale head, body semantic drift, incomplete monitor surfaces, an unprove
 
 ### Exact output
 
-One authenticated `PS_METADATA_POLICY_TERMINALLY_CLEAN` record contains final head/tree, frozen body identity, local subagent identity, one Copilot result, one attributable Codex result and trigger, complete inventories, decisions, validation, mutation classes, request metrics, and proof no merge occurred.
+One authenticated `PS_METADATA_POLICY_TERMINALLY_CLEAN` record contains final head/tree, frozen body identity, local subagent identity, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, one attributable Codex result and trigger, complete inventories, decisions, validation, mutation classes, request metrics, and proof no merge occurred.
 
 ### Complete when
 
-The local audit and one clean reviewer pair are terminal on the same final code head and frozen semantic input; every finding is closed; no same-head request lacks a material reason; and the PR remains unmerged.
+The local audit and one clean attributable Codex review are terminal on the same final code head and frozen semantic input; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; every finding is closed; no same-head request lacks a material reason; and the PR remains unmerged.
 
 ## Task 7 — run the independent final quality check on the PS metadata-policy PR
 
@@ -754,7 +754,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 6 | `FS` | One reviewer pair is terminally clean on the gated head/tree and frozen semantic input. |
+| Task 6 | `FS` | Codex is terminally clean and Copilot has either a clean result or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition on the gated head/tree and frozen semantic input. |
 | Task 7 | `FS` | Independent quality passes on the same gated head/tree and input. |
 
 ### Objective
@@ -2544,7 +2544,7 @@ Independently audit the entire diff and all governing-issue requirements. Verify
 
 Run the full applicable repository validation from a clean state. Include the complete agent-instruction and mutation suite, manifest validator, workflow/YAML validation, Markdown lint, repository hooks or pre-commit, package and lock consistency, trust-root/security tests, `git diff --check`, and raw-byte Git-blob/SHA-256 comparisons. Record commands, runtimes, native exit codes, and exact outputs. Do not repair, push, comment, change PR metadata, merge, enable auto-merge, close an issue, or publish a handoff in this task.
 
-Return `PASS` only when all evidence applies to the exact same final head and tree as the review result. If any repository byte, head, issue requirement, PR description, evidence-bearing metadata, review state, or required check changes, return `FAIL — EVIDENCE_INVALIDATED`; require the operator to use Task 23 or Task 24 as applicable, then new Tasks 25 and 16 instances, rerun the full local audit and Copilot-and-Codex review loop, and then run a new independent quality check. If a defect exists without a byte change, return `FAIL` with exact evidence and the same return path. Do not merge.
+Return `PASS` only when all evidence applies to the exact same final head and tree as the review result. If any repository byte, head, issue requirement, PR description, evidence-bearing metadata, review state, or required check changes, return `FAIL — EVIDENCE_INVALIDATED`; require the operator to use Task 23 or Task 24 as applicable, then new Tasks 25 and 26 instances, rerun the full local audit and Copilot-and-Codex review loop, and then run a new independent quality check. If a defect exists without a byte change, return `FAIL` with exact evidence and the same return path. Do not merge.
 ~~~
 
 ### Procedure
@@ -2582,7 +2582,7 @@ Only values enclosed in double braces are variables. Replace each variable with 
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
 | Target repository | `franklesniak/TerraformStyleGuide` | Fixed on the repair-required branch |
-| Candidate PR | `{{TF_PR78_PORT_PR_URL}}` | Tasks 25 and 16 |
+| Candidate PR | `{{TF_PR78_PORT_PR_URL}}` | Tasks 25 and 26 |
 | Gated head/tree | `{{TF_PR78_REVIEWED_HEAD_SHA}}` / `{{TF_PR78_REVIEWED_TREE_SHA}}` | Must equal both gate results |
 | Landed commit/tree | `{{TF_PR78_LANDED_COMMIT_SHA}}` / `{{TF_PR78_LANDED_TREE_SHA}}` | Resolve after merge; on skip, use the Task 20 conformant commit/tree |
 
@@ -3742,7 +3742,7 @@ Independently audit the entire diff and all governing-issue requirements. Verify
 
 Run the full applicable repository validation from a clean state. Include the complete agent-instruction and mutation suite, manifest validator, workflow/YAML validation, Markdown lint, repository hooks or pre-commit, package and lock consistency, trust-root/security tests, `git diff --check`, and raw-byte Git-blob/SHA-256 comparisons. Record commands, runtimes, native exit codes, and exact outputs. Do not repair, push, comment, change PR metadata, merge, enable auto-merge, close an issue, or publish a handoff in this task.
 
-Return `PASS` only when all evidence applies to the exact same final head and tree as the review result. If any repository byte, head, issue requirement, PR description, evidence-bearing metadata, review state, or required check changes, return `FAIL — EVIDENCE_INVALIDATED`; require the operator to use Task 32 or Task 33 as applicable, then new Tasks 34 and 25 instances in the same loop, rerun the full local audit and Copilot-and-Codex review loop, and then run a new independent quality check. If a defect exists without a byte change, return `FAIL` with exact evidence and the same return path. Do not merge.
+Return `PASS` only when all evidence applies to the exact same final head and tree as the review result. If any repository byte, head, issue requirement, PR description, evidence-bearing metadata, review state, or required check changes, return `FAIL — EVIDENCE_INVALIDATED`; require the operator to use Task 32 or Task 33 as applicable, then new Tasks 34 and 35 instances in the same loop, rerun the full local audit and Copilot-and-Codex review loop, and then run a new independent quality check. If a defect exists without a byte change, return `FAIL` with exact evidence and the same return path. Do not merge.
 ~~~
 
 ### Procedure
@@ -3750,7 +3750,7 @@ Return `PASS` only when all evidence applies to the exact same final head and tr
 1. Propagate an exact current skip when Task 34 skipped.
 2. Otherwise start a fresh coding-agent session with the full prompt and monitor it.
 3. Independently verify its complete audit, validation, matrix, issue/PR state, and exact Task 34 head/tree.
-4. Any byte/head/evidence change returns to Task 32 or 23 and then new Tasks 34 and 25 instances.
+4. Any byte/head/evidence change returns to Task 32 or Task 33 and then new Tasks 34 and 35 instances.
 5. Return the PASS or skip result.
 
 ### Validation and evidence
@@ -3779,8 +3779,8 @@ Only values enclosed in double braces are variables. Replace each variable with 
 
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
-| Selected repository/base | `{{PR78_SELECTED_REPAIR_REPOSITORY}}` / `{{PR78_SELECTED_REPAIR_BASE_REF}}` | Tasks 34 and 25 |
-| Repair PR | `{{PR78_SELECTED_REPAIR_PR_URL}}` | Tasks 34 and 25 |
+| Selected repository/base | `{{PR78_SELECTED_REPAIR_REPOSITORY}}` / `{{PR78_SELECTED_REPAIR_BASE_REF}}` | Tasks 34 and 35 |
+| Repair PR | `{{PR78_SELECTED_REPAIR_PR_URL}}` | Tasks 34 and 35 |
 | Gated head/tree | `{{PR78_SELECTED_REPAIR_REVIEWED_HEAD_SHA}}` / `{{PR78_SELECTED_REPAIR_REVIEWED_TREE_SHA}}` | Must equal both gates |
 | Landed commit/tree | `{{PR78_SELECTED_REPAIR_LANDED_COMMIT_SHA}}` / `{{PR78_SELECTED_REPAIR_LANDED_TREE_SHA}}` | Resolve after merge |
 | Loop instance | `{{PR78_REPAIR_LOOP_INSTANCE}}` | Same loop instance |
