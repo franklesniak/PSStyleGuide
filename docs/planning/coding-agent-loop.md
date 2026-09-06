@@ -30,6 +30,8 @@ The instruction to execute the numbered plan is also standing authority for an o
 
 Ask the operator when a merge is not on-plan, the task assigns a material decision to a human, or the work expands scope. Never infer permission for a force push, deletion, settings change, credential or permission change, protection change, administrator override, or gate bypass. These exceptional R3 actions require separate explicit authority even when a task names them.
 
+Notify the operator as soon as a future exceptional action and its readiness conditions are known. The notification is not a stop condition. While authority is pending, continue every safe in-scope action that does not cross that boundary, including implementation, local validation, non-force topic publication, PR correction, CI diagnosis, review requests, finding repair, and final readiness work. Enter `waiting_human` only when the next concrete action requires the operator and no independent safe in-scope work remains. If the exceptional action is itself necessary to clear one final gate, complete every independent gate, identify the exact residual gate and cause, and do not weaken or bypass it.
+
 ## Risk tiers
 
 Use the highest tier that applies to any action in the task.
@@ -52,7 +54,7 @@ pending -> active -> validating -> ready -> complete
                          |           |
                          |           +-> waiting_external -> ready
                          +-> active
-any nonterminal state -> waiting_human
+no-safe-work human boundary -> waiting_human
 any nonterminal state -> blocked
 ```
 
@@ -61,7 +63,7 @@ any nonterminal state -> blocked
 - `validating`: The final applicable gate set is running.
 - `ready`: Validation passed and the next planned mutation can run.
 - `waiting_external`: A CI, review, or other external result is pending.
-- `waiting_human`: One exact decision or exceptional action requires a human.
+- `waiting_human`: The next concrete action needs one exact human decision or exceptional authority, and no independent safe in-scope work remains.
 - `complete`: The task's `Complete when` condition is true.
 - `blocked`: The same genuine blocker has persisted after the required retry or decision process, and no safe work remains.
 
@@ -81,16 +83,21 @@ Use one untracked `TEMP-coding-agent-loop-state.json` file. It is a resume aid, 
     "risk": "R2",
     "repository": "franklesniak/PSStyleGuide",
     "branch": "agent/example",
-    "base": "<commit-or-null>",
-    "head": "<commit-or-null>",
+    "base": null,
+    "head": null,
     "last_gate": "<short-result-or-null>",
     "next_action": "<one-action>",
     "blocker": null
   },
+  "predecessor_outputs": {},
   "completed": [1, 2, 3],
-  "updated_utc": "<timestamp>"
+  "updated_utc": "2026-09-04T10:00:00Z"
 }
 ```
+
+The root file and `current_task` object are closed records. Keep immutable predecessor values that a later task still needs in `predecessor_outputs`. Key each value first by its producing task number and then by its exact output name. Store the value and `last_consumer_task`. Delete the value when that consumer completes. Do not retain full task results. Reject duplicate JSON member names before parsing the state file. Before JSON parsing can change a number, reject a non-finite token, a token whose exact decimal value differs after Number conversion, negative zero, or a token whose absolute value exceeds 9007199254740991; store a larger exact identifier as a string. Require every in-memory predecessor string value and object key to pass the same decoded transport rule before pruning returns it. During ingestion, require every output producer to be a completed task, reject an output whose final consumer is not later than its producing task, and reject an output whose final consumer has already completed. When review state exists, require `current_task.head` to equal the review-input head and require every request for the current reviewed-input key to name that reviewed head. Also reject a reversed reconciliation interval, a terminal no-effect interval shorter than 120 seconds, a supersession that names a non-immediate retained successor or is recorded after the first later different-input request, and a Codex request without one eligible same-input Copilot predecessor whose `readyAt` time is not later than the Codex request time.
+
+When the current task uses the review loop, add only one `review` member under `current_task`; its closed shape contains the reviewed input, mutation class, request records, typed superseded-input dispositions, separate reviewer results, public-mutation reconciliation attempts, metrics, and comment publications. The actual resume file must validate against `docs/planning/review-loop-policy.json`. Do not place review-loop fields beside the six root fields.
 
 Write the state at task start, after a meaningful implementation or validation boundary, after a remote mutation readback, before a real wait, and at task completion. Do not write it for unchanged status probes.
 
@@ -104,7 +111,7 @@ For each numbered task:
 
 1. Read the exact task and its active dependencies. Do not load all completed task bodies.
 2. Confirm each predecessor's actual completion condition. Use live state only when the condition is mutable.
-3. Read the applicable repository instructions.
+3. Locate and obey the applicable `AGENTS.md`. If no `AGENTS.md` applies, read the repository root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor.
 4. Classify the task as R0, R1, R2, or R3. Record the tier in compact state.
 5. Inspect only the repositories, refs, issues, PRs, checks, reviews, settings, and paths that can affect this task.
 6. Select the executor. Use `model-routing-advisor` once for a new coding task or a genuine capability-driven reroute. Do not create an activation receipt.
@@ -158,6 +165,26 @@ Check CI before merge. Do not merge when any required check is red, skipped, can
 
 Use repository-required review for R1. Use an independent review for R2 when reviewable bytes change. R3 merge requires the exact reviewed head and tree, resolved material findings, a truthful PR body, current green required checks, and a mergeable state. A code or material risk-description change invalidates review of the old bytes. A status record or comment does not.
 
+For a planned dual-review task, generate and semantically verify the reviewer-facing body before the first request. Freeze its scope, behavior, and risk meaning. Keep task state, polling state, reviewer requests, review IDs, review results, quality results, metrics, audit records, and terminal results in compact state or separate comments. Never append them to the frozen reviewer-facing body.
+
+Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. The first two classes invalidate review. The other classes do not. Raw PR-body byte inequality is not the classifier. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. Before a pair starts for a new reviewed-input key, require every earlier pair for every different key to contain both channels and be terminal. If authenticated readback proves reviewed-input drift that makes an unrequested old-input channel impossible, including drift on an unchanged head, record one typed `SUPERSEDED` disposition with the old input, successor head, time, and reason only after every recorded old-input request is terminal. Cross-validate the disposition against request existence, an incomplete channel set, one matching head, the immediate successor head in retained chronological head order, and a time that is not earlier than every described request terminal-result or terminal-disposition boundary and is not later than the first later different-input request. Preserve a zero-request intermediate head and permit a same-head successor only when the successor input retains that head. Require that disposition before a different-input successor request. If that superseded key later becomes current again, validate and retain its disposition as history, ignore it only for current-input gating, and resume the original incomplete pair without creating a duplicate request identity. Do not synthesize the missing request or attribute successor-input evidence to the old input. Then capture fresh baselines. Before persisting metrics, require each same-head re-request reason record to contain only a nonempty `reason` string and Boolean `material` value.
+
+Persist Copilot results separately from Codex results. Preserve both Codex result channels. Require a submitted review's commit to match the reviewed head. Pass the complete persisted request collection to Codex result collection. Accept a headless `chatgpt-codex-connector` PR-conversation result only when the authenticated author, request time, exclusion of every supplied identity from the baseline, mutually consistent valid timestamp aliases, required matching normalized head evidence when terminal, reviewed-input key, and one eligible same-input Copilot predecessor whose `readyAt` time is not later than the Codex request time attribute it to the request. Reject an orphan, premature, or reverse-ordered Codex request during compact-state ingestion and every request decision. Normalize empty, singleton, and multiple API collections with the tested policy helper; an empty collection is not a match. Preserve Markdown backticks and Unicode and reject disallowed control characters.
+
+Generate a GitHub Copilot REST request only from the typed policy specification. The exact reviewer login is `copilot-pull-request-reviewer[bot]`; do not send the display name `Copilot`. Capture the native status and response body. A successful public API response plus matching authenticated readback confirms the mutation; later local serialization failure cannot repeat it. If an accepted request has no matching readback, record `RECONCILING` and continue other safe work. Wait at least 120 seconds, then require complete negative readback from new request events, current requested reviewers, matching submitted reviews, and matching Copilot review runs before recording `NO_EFFECT`. Permit only one retry for the same reviewed input and channel. A second proved no-effect attempt is `EXHAUSTED`. Do not send the serialized Codex trigger until the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Treat a request event, submitted review, review run, or conversation comment as baseline evidence when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity must be absent from the matching baseline, every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head.
+
+Normalize native check-run records for complete readback, but do not authenticate Copilot from a mutable check-run name plus the generic GitHub Actions App identity. Require a matching authenticated request event, requested-reviewer record, submitted review, or workflow-run bot actor.
+
+Persist the unique request-event, review-run, submitted-review, and node-ID-to-timestamp conversation-comment baselines with the in-flight attempt before or at the confirmed mutation. After each confirmed reviewer request and its targeted readback, persist its head, reviewed-input key, request time, `confirmed: true`, nonterminal state, and Copilot `readyAt` time in `current_task.review` before another public mutation. Use `confirmed` only for authenticated request readback. Mark the request terminal only after an attributable terminal result or an exact repository-authorized non-functional disposition. If the local state write fails, reconstruct the request from targeted remote readback and do not repeat a confirmed request.
+
+For each confirmed terminal request, persist one closed `terminalResultRef` with the result kind, immutable identity, and observed time. Keep the complete result in its separate channel result collection. During compact-state ingestion, cross-validate the reference against the correct channel, actor, every supplied request-baseline identity, losslessly ordered mutually consistent timestamp aliases, required matching normalized head evidence for a terminal conversation result, the reviewed head, and the next different-input request boundary. Reject a missing, duplicate, stale, baseline, wrong-actor, wrong-head, wrong-channel, or wrong-time reference. Do not add this reference to an unconfirmed or nonterminal request.
+
+Keep every frozen reviewed head in chronological discovery order in `reviewerRequestsPerHead`, including a head that received zero requests. Persist each logical request's bounded physical `attemptCount` as one or two, default an absent legacy value to one, and sum those attempt counts in `reviewerRequestsPerHead`. During ingestion, require the current head and every request head to occur in that map, and require each count to equal the persisted request history. Pass that map into request-decision calls that evaluate retained supersessions. Revalidate its current head, request heads, exact counts, key syntax, and chronological property order there before using those ordered keys to bind each retained supersession to its immediate successor, including a zero-request head.
+
+The deterministic planning-only policy and scenarios are in `docs/planning/review-loop-policy.json`, `docs/planning/review-loop-policy.mjs`, and `docs/planning/review-loop-policy.test.mjs`. The module operates on the nested `current_task.review` value, and the schema validates the enclosing resume file. They validate decisions and transport. They do not perform GitHub writes.
+
+An anticipated approval boundary does not defer CI or review work that can run safely before that boundary. Request the approval early, continue toward a clean reviewed head, and stop only at the exact action that needs the approval. When that action is required before one final check can become green, finish all other checks and reviews and report that single dependency precisely.
+
 Immediately before an on-plan merge, repeat the final readiness check against the live PR and target ref. Use head-commit matching when the merge tool supports it. Stop for drift, new material feedback, an incomplete or failed required gate, an off-plan target or scope, a required human decision, or any need for an administrator override or bypass. Do not stop only to obtain another approval for a merge that still satisfies the on-plan definition.
 
 Do not request duplicate AI reviews on an unchanged head without a material reason. Do not require two named AI reviewers and a separate fresh-agent pass for routine low-risk work unless repository policy or the task names that gate.
@@ -168,7 +195,7 @@ Diagnose every failed gate. Apply the finding decision process before a non-mech
 
 Continue after ordinary code, test, tool, or infrastructure failures while a safe repair or alternative exists. A new commit identity is progress, not a human blocker.
 
-Use `waiting_external` only when an external result is genuinely pending and no independent work remains. Use `waiting_human` only for one exact human decision or exceptional action. State the minimum requested decision in plain English. Use `blocked` only after the same blocker has persisted through the applicable retry or decision process and no safe progress remains.
+Use `waiting_external` only when an external result is genuinely pending and no independent work remains. Use `waiting_human` only when the next concrete action needs one exact human decision or exceptional authority and no independent safe in-scope work remains. Notify the operator early, state the minimum requested decision in plain English, and continue safe preparation until that exact boundary. Use `blocked` only after the same blocker has persisted through the applicable retry or decision process and no safe progress remains.
 
 Provide short user updates at meaningful boundaries. Do not create persistent 15-second or 60-second monitoring records. A quiet, live test is not stalled.
 
