@@ -1696,6 +1696,9 @@ test('Copilot request evidence normalizes cardinality and verifies GitHub bot al
     false,
   );
   for (const [field, collection] of [
+    ['requestEvents', {}],
+    ['requestEvents', { message: 'rate limited' }],
+    ['requestEvents', { data: null, errors: [{ message: 'partial response' }] }],
     ['requestEvents', { nodes: null }],
     ['requestEvents', { pageInfo: { hasNextPage: false } }],
     ['requestedReviewers', { requested_reviewers: undefined }],
@@ -1845,6 +1848,9 @@ test('Codex request evidence requires exact authenticated trigger-comment readba
     triggerComments: null,
   }).readbackComplete, false);
   for (const triggerComments of [
+    {},
+    { message: 'rate limited' },
+    { data: null, errors: [{ message: 'partial response' }] },
     { nodes: null },
     { edges: null },
     { total_count: 0 },
@@ -3352,6 +3358,36 @@ test('compact-state JSON ingestion validates semantic root metadata', () => {
   assert.deepEqual(parseCompactStateJson(JSON.stringify(fractional)), fractional);
 });
 
+test('compact-state JSON ingestion validates the task-state schema enum', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const allowedStates = schema.$defs.taskState.properties.state.enum;
+
+  for (const taskState of allowedStates) {
+    const candidate = compactState(
+      reviewInput(),
+      {},
+      { state: taskState },
+      taskState === 'complete' ? { completed: [1, 2, 3, 4] } : {},
+    );
+    assert.deepEqual(parseCompactStateJson(JSON.stringify(candidate)), candidate);
+  }
+
+  for (const taskState of [undefined, null, '', 'bogus']) {
+    const candidate = compactState(reviewInput());
+    if (taskState === undefined) {
+      delete candidate.current_task.state;
+    } else {
+      candidate.current_task.state = taskState;
+    }
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(candidate)),
+      /persisted task progress is malformed/u,
+    );
+  }
+});
+
 function resolveSchemaReference(definition, root) {
   if (typeof definition?.$ref !== 'string') {
     return definition;
@@ -4256,6 +4292,85 @@ test('request metrics retain an unrequested successor across a second head drift
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(malformedHead)),
     /request-per-head metric is malformed/u,
+  );
+});
+
+test('request metrics reject forged reviewed-head chronology', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const input3 = reviewInput({
+    head: '3'.repeat(40),
+    tree: '4'.repeat(40),
+    diffSha256: '3'.repeat(64),
+    bodySha256: '4'.repeat(64),
+  });
+  const input1Request = requestFor(input1, 'copilot', {
+    requestedAt: '2026-09-04T10:00:00Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: 'RESULT_INPUT_1',
+      observedAt: '2026-09-04T10:01:00Z',
+    },
+  });
+  const input2Requests = [
+    requestFor(input2, 'copilot', {
+      requestedAt: '2026-09-04T10:03:00Z',
+      confirmed: true,
+      terminal: true,
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id: 'RESULT_INPUT_2_COPILOT',
+        observedAt: '2026-09-04T10:04:00Z',
+      },
+    }),
+    requestFor(input2, 'codex', {
+      requestedAt: '2026-09-04T10:05:00Z',
+      confirmed: true,
+      terminal: true,
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id: 'RESULT_INPUT_2_CODEX',
+        observedAt: '2026-09-04T10:06:00Z',
+      },
+    }),
+  ];
+  const forged = compactState(input3, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [input1Request, ...input2Requests],
+    supersededReviewInputs: supersessionFor(input1, input3, {
+      supersededAt: '2026-09-04T10:02:00Z',
+    }),
+    metrics: {
+      ...state(input3).metrics,
+      reviewerRequestsPerHead: {
+        [input1.head]: 1,
+        [input3.head]: 0,
+        [input2.head]: 2,
+      },
+    },
+  });
+
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(forged)),
+    /does not preserve reviewed-head chronology/u,
+  );
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input2,
+      currentReviewInput: input3,
+      mutationClass: 'CODE_OR_DIFF',
+      existingRequests: forged.current_task.review.reviewRequests,
+      supersededInputs: forged.current_task.review.supersededReviewInputs,
+      reviewMetrics: forged.current_task.review.metrics,
+    }),
+    /does not preserve reviewed-head chronology/u,
   );
 });
 

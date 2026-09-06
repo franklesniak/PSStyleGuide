@@ -52,6 +52,16 @@ const PREDECESSOR_TASK_PATTERN = /^[1-9]\d{0,2}$/u;
 const PREDECESSOR_OUTPUT_PATTERN = /^[A-Z][A-Z0-9_]{0,127}$/u;
 const DISALLOWED_CONTROL_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/u;
 const RFC3339_PATTERN = /^(?<year>\d{4})-(?<month>0[1-9]|1[0-2])-(?<day>0[1-9]|[12]\d|3[01])[Tt](?<hour>[01]\d|2[0-3]):(?<minute>[0-5]\d):(?<second>[0-5]\d)(?:\.(?<fraction>\d+))?(?<zone>[Zz]|(?<offsetSign>[+-])(?<offsetHour>0\d|1[0-4]):(?<offsetMinute>[0-5]\d))$/u;
+const TASK_STATES = new Set([
+  'pending',
+  'active',
+  'validating',
+  'ready',
+  'waiting_external',
+  'waiting_human',
+  'complete',
+  'blocked',
+]);
 const REVIEW_LOOP_TASK_NUMBER_SET = new Set(REVIEW_LOOP_TASK_NUMBERS);
 const PUBLIC_MUTATION_STATES = new Set([
   'NOT_ATTEMPTED',
@@ -459,9 +469,7 @@ function hasCompleteCollectionReadback(value, wrapperKeys) {
     }
   }
 
-  return !['total_count', 'totalCount', 'pageInfo'].some(
-    (key) => Object.hasOwn(value, key),
-  );
+  return false;
 }
 
 export function createReviewRequestSpec(channel) {
@@ -729,6 +737,7 @@ function validatePersistedProgress(currentTask, completed) {
     !Number.isInteger(currentTaskNumber) ||
     currentTaskNumber < 1 ||
     currentTaskNumber > PLAN_TASK_COUNT ||
+    !TASK_STATES.has(currentTask?.state) ||
     !Array.isArray(completed)
   ) {
     throw new TypeError('The persisted task progress is malformed or outside the plan.');
@@ -804,6 +813,28 @@ function validatePersistedRequestMetrics(metrics, requests, currentHead) {
     if (!Object.hasOwn(requestsPerHead, head)) {
       throw new TypeError('A request head is missing from the request metric.');
     }
+  }
+
+  const headPositions = new Map(
+    entries.map(([head], index) => [head, index]),
+  );
+  let lastRequestedHeadPosition = -1;
+  for (const head of actualCounts.keys()) {
+    const position = headPositions.get(head);
+    if (position <= lastRequestedHeadPosition) {
+      throw new TypeError(
+        'The persisted request-per-head metric does not preserve reviewed-head chronology.',
+      );
+    }
+    lastRequestedHeadPosition = position;
+  }
+  if (
+    !actualCounts.has(currentHead) &&
+    headPositions.get(currentHead) < lastRequestedHeadPosition
+  ) {
+    throw new TypeError(
+      'The persisted request-per-head metric does not preserve reviewed-head chronology.',
+    );
   }
 
   return entries.map(([head]) => head);
