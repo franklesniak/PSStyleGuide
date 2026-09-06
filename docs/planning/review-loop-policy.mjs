@@ -1167,16 +1167,11 @@ export function decideReviewRequest({
     });
   }
 
-  const previousKey = getReviewInputKey(previousReviewInput);
   return Object.freeze({
-    status: previousReviewInput.head === currentReviewInput.head
-      ? 'REJECTED_SAME_HEAD'
-      : 'NO_REQUEST',
+    status: 'REJECTED_SAME_HEAD',
     reviewInputKey: currentKey,
     channels: [],
-    reason: previousKey === currentKey
-      ? 'The reviewed input is unchanged.'
-      : 'The change class does not invalidate code review.',
+    reason: 'The reviewed input is unchanged.',
   });
 }
 

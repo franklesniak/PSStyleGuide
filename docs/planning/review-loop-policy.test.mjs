@@ -544,6 +544,36 @@ test('scenario 5: an unjustified same-head request is rejected', () => {
   assert.deepEqual(decision.channels, []);
 });
 
+test('the non-invalidating final decision path has one exact result', () => {
+  const previousInput = reviewInput();
+  const currentInput = reviewInput({ bodySha256: HASHES.body2 });
+  const expected = {
+    status: 'REJECTED_SAME_HEAD',
+    reviewInputKey: getReviewInputKey(currentInput),
+    channels: [],
+    reason: 'The reviewed input is unchanged.',
+  };
+
+  assert.equal(getReviewInputKey(previousInput), getReviewInputKey(currentInput));
+  for (const mutationClass of [
+    null,
+    'NON_MATERIAL_FACT',
+    'RESULT_OR_STATE',
+    'COMMENT_ONLY',
+  ]) {
+    const decision = decideReviewRequest({
+      previousReviewInput: previousInput,
+      currentReviewInput: currentInput,
+      mutationClass,
+      existingRequests: [],
+    });
+
+    assert.deepEqual(decision, expected);
+    assert.notEqual(decision.status, 'NO_REQUEST');
+    assert.notEqual(decision.reason, 'The change class does not invalidate code review.');
+  }
+});
+
 test('scenario 5a: a same-head pair releases Codex after Copilot confirmation or terminal disposition', () => {
   const input = reviewInput();
   const pending = decideReviewRequest({
