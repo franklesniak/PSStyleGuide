@@ -1119,6 +1119,35 @@ test('native completed Codex summaries become typed terminal conversation result
   assert.equal(uppercase.conversationComments[0].status, 'completed');
   assert.equal(uppercase.conversationComments[0].commitPrefix, 'aaaaaaa');
 
+  const preclassifiedUppercase = collectCodexResults({
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: requestHistory,
+    submittedReviews: [],
+    conversationComments: {
+      ...nativeSummary,
+      node_id: 'COMMENT_PRECLASSIFIED_UPPERCASE',
+      status: 'completed',
+      commitPrefix: 'AAAAAAA',
+    },
+  });
+  assert.equal(preclassifiedUppercase.conversationComments[0].status, 'completed');
+  assert.equal(preclassifiedUppercase.conversationComments[0].commitPrefix, 'aaaaaaa');
+
+  const preclassifiedWrongHead = collectCodexResults({
+    reviewInput: input,
+    request: codexRequest,
+    reviewRequests: requestHistory,
+    submittedReviews: [],
+    conversationComments: {
+      ...nativeSummary,
+      node_id: 'COMMENT_PRECLASSIFIED_WRONG_HEAD',
+      status: 'completed',
+      commitPrefix: 'BBBBBBB',
+    },
+  });
+  assert.equal(preclassifiedWrongHead.conversationComments.length, 0);
+
   const persisted = compactState(input, {
     reviewRequests: requestHistory,
     codexResults: collected,

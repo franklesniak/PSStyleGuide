@@ -2436,7 +2436,23 @@ function normalizeCodexConversationResult(comment, head) {
     typeof comment?.status === 'string' &&
     comment.status.startsWith('completed')
   ) {
-    return comment;
+    if (comment.commitPrefix === undefined) {
+      return comment;
+    }
+    if (
+      typeof comment.commitPrefix !== 'string' ||
+      !/^[0-9a-f]{7,40}$/iu.test(comment.commitPrefix)
+    ) {
+      return comment;
+    }
+    const commitPrefix = comment.commitPrefix.toLowerCase();
+    if (!head.startsWith(commitPrefix)) {
+      return comment;
+    }
+    return {
+      ...comment,
+      commitPrefix,
+    };
   }
   const body = typeof comment?.body === 'string' ? comment.body : '';
   const completedRow = /\|\s*[^|\r\n]*\*\*Code Review\*\*\s*\|\s*[^|\r\n]*\*\*Completed\*\*[^|\r\n]*\|\s*`(?<commitPrefix>[0-9a-f]{7,40})`\s*\|/iu.exec(body);
