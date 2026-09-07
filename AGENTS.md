@@ -1,13 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # Agent Instructions for OpenAI Codex CLI
 
-**Version:** 1.5.20260830.0
+**Version:** 1.6.20260907.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-08-30
+- **Last Updated:** 2026-09-07
 - **Scope:** Agent-specific entry point for OpenAI Codex CLI and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
 <!-- template-sync: begin markdown-reference-only -->
 - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
@@ -193,6 +193,23 @@ Only genuine deferred work requires a GitHub Issue.
 6. **Protect scope.** Deferring a governing requirement or PR commitment needs owner authorization.
 7. **Sweep the whole PR.** Before clean or merge, inspect every review-submission body, every resolved or unresolved thread, every PR-level comment, and the PR body. Complete convenience deferrals, Issue-track genuine ones, and relabel residuals or deviations. No deferred work may live only in PR text.
 
+## GitHub Copilot pull-request reviews
+
+Use `Balanced` as the preferred effort for each GitHub Copilot pull-request review.
+
+This preference controls the transport choice even when a task or controller describes the REST reviewer request. Keep that REST request as the fallback.
+
+1. Capture the request-event, requested-reviewer, submitted-review, and Copilot workflow-run baselines required by the active review-loop policy.
+2. Open the pull request on GitHub. In the `Reviewers` section, use the control next to Copilot. Select `Balanced`, then submit one request.
+3. Confirm one new authenticated request event or exact-head Copilot workflow run. Do not repeat an accepted request while its result is pending.
+4. When the review finishes, read the effort from the pull-request timeline or Copilot overview. Record the observed value. Do not infer `Balanced` from an HTTP `201` response or from reviewer identity alone.
+5. If the supported interface cannot select `Balanced`, record the reason and use the GitHub CLI special value `@copilot`: `gh pr edit PR-NUMBER --add-reviewer '@copilot'`. The quotes are required in PowerShell. If that command is unavailable, use `gh api --method POST "repos/OWNER/REPOSITORY/pulls/PR-NUMBER/requested_reviewers" -f "reviewers[]=copilot-pull-request-reviewer[bot]"`. A resulting `Lite` review is an acceptable fallback. It does not fail or stall the review loop.
+6. Do not send a second request only because GitHub used `Lite`. Continue the review loop with that result unless another active rule independently requires a new review.
+
+The GitHub CLI and public REST review-request API select a reviewer but do not expose a per-request effort option as of 2026-09-07. For the CLI, `@copilot` is a documented special value, not a reviewer login. For a direct REST request, send reviewer login `copilot-pull-request-reviewer[bot]`; do not send display name `Copilot`. Captured browser cookies, CSRF tokens, nonces, multipart boundaries, and internal form fields are transient secrets or implementation details. Do not store, publish, replay, or document them.
+
+References: [GitHub Copilot code-review effort levels](https://docs.github.com/en/copilot/concepts/agents/code-review#review-effort-level) and [GitHub review-request REST parameters](https://docs.github.com/en/rest/pulls/review-requests?apiVersion=2022-11-28#request-reviewers-for-a-pull-request).
+
 ## Automated Review Loop (User-Initiated)
 
 When the owner asks for multiple rounds, use Copilot and remote Codex as co-equal reviewers while the local session stays active; never present the loop as autonomous.
@@ -219,7 +236,7 @@ When a workflow step depends on a capability the GitHub plugin does not currentl
 
 | Capability | Primary | Fallback |
 | --- | --- | --- |
-| Request a Copilot code review | GitHub plugin | `gh pr edit --add-reviewer github-copilot[bot]`, `gh api`, or ask the owner to request the review manually |
+| Request a Copilot code review | GitHub plugin | `gh pr edit --add-reviewer '@copilot'`, `gh api`, or ask the owner to request the review manually |
 | Request a remote Codex review | GitHub PR comment with body `@codex review` | `gh api` to create the comment, or ask the owner to post the exact trigger |
 | Resolve a review thread | GitHub plugin | `gh api graphql` against the `resolveReviewThread` mutation, or ask the owner to resolve the thread manually |
 | Add a reaction on a review comment | GitHub plugin | `gh api -X POST /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions -f content=eyes`, or skip silently if neither path is available |
