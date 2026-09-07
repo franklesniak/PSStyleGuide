@@ -1257,6 +1257,7 @@
       "additionalProperties": false,
       "required": [
         "reviewerRequestsPerHead",
+        "reviewedHeadEvidence",
         "bodyEditsAfterReviewBegan",
         "sameHeadRerequestReasons",
         "cleanReviewRecognitionMilliseconds",
@@ -1272,6 +1273,33 @@
           "additionalProperties": {
             "type": "integer",
             "minimum": 0
+          }
+        },
+        "reviewedHeadEvidence": {
+          "type": "object",
+          "description": "Properties follow zero-request reviewed-head chronology and retain the authenticated PR readback that admitted each head.",
+          "propertyNames": {
+            "$ref": "#/$defs/sha1"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source",
+              "tree",
+              "observedAt"
+            ],
+            "properties": {
+              "source": {
+                "const": "authenticated-pr-readback"
+              },
+              "tree": {
+                "$ref": "#/$defs/sha1"
+              },
+              "observedAt": {
+                "$ref": "#/$defs/rfc3339"
+              }
+            }
           }
         },
         "bodyEditsAfterReviewBegan": {

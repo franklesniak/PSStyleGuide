@@ -80,6 +80,26 @@ const REVIEW_STATE_ALLOWED_FIELDS = new Set([
   'materialReason',
 ]);
 
+const REVIEW_REQUEST_REQUIRED_FIELDS = Object.freeze([
+  'channel',
+  'reviewInputKey',
+  'head',
+  'requestedAt',
+  'confirmed',
+  'terminal',
+  'baselineRequestEventIds',
+  'baselineReviewNodeIds',
+  'baselineReviewRunIds',
+  'baselineConversationComments',
+]);
+const REVIEW_REQUEST_ALLOWED_FIELDS = new Set([
+  ...REVIEW_REQUEST_REQUIRED_FIELDS,
+  'attemptCount',
+  'readyAt',
+  'terminalResultRef',
+  'terminalDisposition',
+]);
+
 const REVIEW_INPUT_FIELDS = Object.freeze([
   'head',
   'tree',
@@ -230,6 +250,7 @@ const COPILOT_COMPLETE_NEGATIVE_EVIDENCE_FIELDS = Object.freeze([
 
 const METRICS_FIELDS = Object.freeze([
   'reviewerRequestsPerHead',
+  'reviewedHeadEvidence',
   'bodyEditsAfterReviewBegan',
   'sameHeadRerequestReasons',
   'cleanReviewRecognitionMilliseconds',
@@ -815,7 +836,7 @@ export function parseCompactStateJson(text) {
     const reviewedHeads = validatePersistedRequestMetrics(
       reviewState.metrics,
       requests,
-      reviewState.reviewInput.head,
+      reviewState.reviewInput,
     );
     validateSupersessionsAgainstRequests({
       requests,
@@ -985,7 +1006,8 @@ function validatePersistedReviewRequests(reviewRequests, reviewState) {
   return reviewRequests;
 }
 
-function validatePersistedRequestMetrics(metrics, requests, currentHead) {
+function validatePersistedRequestMetrics(metrics, requests, currentReviewInput) {
+  const currentHead = currentReviewInput?.head;
   if (
     metrics === null ||
     typeof metrics !== 'object' ||
@@ -1065,6 +1087,38 @@ function validatePersistedRequestMetrics(metrics, requests, currentHead) {
     if (!Object.hasOwn(requestsPerHead, head)) {
       throw new TypeError('A request head is missing from the request metric.');
     }
+  }
+
+  const reviewedHeadEvidence = metrics.reviewedHeadEvidence;
+  if (
+    reviewedHeadEvidence === null ||
+    typeof reviewedHeadEvidence !== 'object' ||
+    Array.isArray(reviewedHeadEvidence)
+  ) {
+    throw new TypeError('The persisted reviewed-head evidence is malformed.');
+  }
+  const zeroRequestHeads = entries
+    .filter(([, count]) => count === 0)
+    .map(([head]) => head);
+  const evidenceEntries = Object.entries(reviewedHeadEvidence);
+  if (
+    evidenceEntries.length !== zeroRequestHeads.length ||
+    evidenceEntries.some(([head], index) => head !== zeroRequestHeads[index]) ||
+    evidenceEntries.some(([head, evidence]) =>
+      !SHA1_PATTERN.test(head) ||
+      evidence === null ||
+      typeof evidence !== 'object' ||
+      Array.isArray(evidence) ||
+      Object.keys(evidence).length !== 3 ||
+      evidence.source !== 'authenticated-pr-readback' ||
+      typeof evidence.tree !== 'string' ||
+      !SHA1_PATTERN.test(evidence.tree) ||
+      (head === currentHead && evidence.tree !== currentReviewInput.tree) ||
+      getItemTimestamp(evidence, ['observedAt']) === null)
+  ) {
+    throw new TypeError(
+      'Every zero-request reviewed head requires exact authenticated retained evidence.',
+    );
   }
 
   const headPositions = new Map(
@@ -1304,6 +1358,22 @@ function validatePersistedPublicMutation(publicMutation, requests) {
     'attemptedAt',
   ) < 0) {
     throw new TypeError('The persisted reconciliation precedes its attempt.');
+  }
+  if (
+    publicMutation.state === 'CONFIRMED' &&
+    matchingRequest?.channel === 'copilot' &&
+    matchingRequest.confirmed === true &&
+    Object.hasOwn(matchingRequest, 'readyAt') &&
+    compareRfc3339Instants(
+      matchingRequest.readyAt,
+      reconciledAt,
+      'readyAt',
+      'reconciledAt',
+    ) !== 0
+  ) {
+    throw new TypeError(
+      'A confirmed Copilot readyAt must equal its authenticated reconciliation time.',
+    );
   }
   if (
     (publicMutation.state === 'NO_EFFECT' || publicMutation.state === 'EXHAUSTED') &&
@@ -1615,7 +1685,7 @@ export function decideReviewRequest({
     : validatePersistedRequestMetrics(
       reviewMetrics,
       requests,
-      currentReviewInput.head,
+      currentReviewInput,
     );
   const supersessionByKey = validateSupersessionsAgainstRequests({
     requests,
@@ -2205,6 +2275,11 @@ export function collectCodexRequestEvidence({
 }
 
 function isReviewRequestRecord(request) {
+  const requestHasExactFields = request !== null &&
+    typeof request === 'object' &&
+    !Array.isArray(request) &&
+    REVIEW_REQUEST_REQUIRED_FIELDS.every((field) => Object.hasOwn(request, field)) &&
+    Object.keys(request).every((field) => REVIEW_REQUEST_ALLOWED_FIELDS.has(field));
   const identityBaselineFields = [
     'baselineRequestEventIds',
     'baselineReviewNodeIds',
@@ -2273,7 +2348,8 @@ function isReviewRequestRecord(request) {
       )
     );
 
-  return channelIsValid &&
+  return requestHasExactFields &&
+    channelIsValid &&
     typeof request.confirmed === 'boolean' &&
     typeof request.terminal === 'boolean' &&
     typeof request.head === 'string' &&
@@ -2489,7 +2565,7 @@ function validateTerminalResultReferences(requests, reviewState) {
         'A confirmed terminal request must reference one attributable terminal result.',
       );
     }
-    const identityNamespace = `${request.channel}:${reference.kind}`;
+    const identityNamespace = reference.kind;
     const resultIdentities = getItemIdentities(matches[0])
       .map((identity) => `${identityNamespace}:${identity}`);
     if (resultIdentities.some((identity) => seenResultIdentities.has(identity))) {
@@ -2688,12 +2764,19 @@ function validateSupersessionsAgainstRequests({
       .includes(firstSuccessorRequest?.head)
       ? firstSuccessorRequest.head
       : null;
-    const retainedReactivationHead = firstSuccessorRequest === null && supersessions.some(
+    const reciprocalReactivationHead = supersessions.some(
       (candidate) => candidate.reviewInputKey !== disposition.reviewInputKey &&
         candidate.head === disposition.successorHead &&
         candidate.successorHead === disposition.head,
     )
       ? disposition.successorHead
+      : null;
+    const retainedReactivationHead = reciprocalReactivationHead !== null &&
+      (
+        firstSuccessorRequest === null ||
+        firstSuccessorRequest.head === reciprocalReactivationHead
+      )
+      ? reciprocalReactivationHead
       : null;
     const allowedSuccessorHeads = requestedImmediateHead === null
       ? new Set([
@@ -3132,7 +3215,7 @@ export function evaluateFindingBudget({ elapsedMinutes, hasOutcome }) {
 
 export function createMetrics({
   reviewRequests,
-  reviewedHeads = [],
+  reviewedHeadObservations = [],
   bodyEditTimes,
   reviewBeganAt,
   sameHeadRerequestReasons,
@@ -3142,8 +3225,43 @@ export function createMetrics({
   mergedAt,
 }) {
   const requestsPerHead = {};
-  for (const [index, head] of normalizeCollection(reviewedHeads).entries()) {
-    assertHash(head, SHA1_PATTERN, `reviewedHeads[${index}]`);
+  const observations = normalizeCollection(reviewedHeadObservations).map(
+    (observation, index) => {
+      if (
+        observation === null ||
+        typeof observation !== 'object' ||
+        Array.isArray(observation) ||
+        Object.keys(observation).length !== 4 ||
+        !Object.hasOwn(observation, 'head') ||
+        !Object.hasOwn(observation, 'tree') ||
+        !Object.hasOwn(observation, 'observedAt') ||
+        observation.source !== 'authenticated-pr-readback'
+      ) {
+        throw new TypeError(
+          `reviewedHeadObservations[${index}] must be authenticated retained evidence.`,
+        );
+      }
+      assertHash(
+        observation.head,
+        SHA1_PATTERN,
+        `reviewedHeadObservations[${index}].head`,
+      );
+      assertHash(
+        observation.tree,
+        SHA1_PATTERN,
+        `reviewedHeadObservations[${index}].tree`,
+      );
+      parseRfc3339Instant(
+        observation.observedAt,
+        `reviewedHeadObservations[${index}].observedAt`,
+      );
+      return observation;
+    },
+  );
+  if (new Set(observations.map(({ head }) => head)).size !== observations.length) {
+    throw new TypeError('reviewedHeadObservations contains a duplicate head.');
+  }
+  for (const { head } of observations) {
     requestsPerHead[head] = 0;
   }
   for (const [index, request] of normalizeCollection(reviewRequests).entries()) {
@@ -3189,6 +3307,12 @@ export function createMetrics({
       });
     },
   );
+  const reviewedHeadEvidence = {};
+  for (const { head, tree, observedAt, source } of observations) {
+    if (requestsPerHead[head] === 0) {
+      reviewedHeadEvidence[head] = { source, tree, observedAt };
+    }
+  }
 
   const elapsed = (start, end, startLabel, endLabel) => {
     if (start === null && end === null) {
@@ -3208,6 +3332,7 @@ export function createMetrics({
 
   return Object.freeze({
     reviewerRequestsPerHead: requestsPerHead,
+    reviewedHeadEvidence,
     bodyEditsAfterReviewBegan,
     sameHeadRerequestReasons: rerequestReasons,
     cleanReviewRecognitionMilliseconds: elapsed(

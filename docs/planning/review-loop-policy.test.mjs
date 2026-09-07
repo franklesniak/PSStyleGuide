@@ -71,6 +71,7 @@ function state(input, overrides = {}) {
     },
     metrics: {
       reviewerRequestsPerHead: {},
+      reviewedHeadEvidence: {},
       bodyEditsAfterReviewBegan: 0,
       sameHeadRerequestReasons: [],
       cleanReviewRecognitionMilliseconds: null,
@@ -89,6 +90,18 @@ function state(input, overrides = {}) {
     value.metrics = {
       ...value.metrics,
       reviewerRequestsPerHead: requestsPerHead,
+      reviewedHeadEvidence: Object.fromEntries(
+        Object.entries(requestsPerHead)
+          .filter(([, count]) => count === 0)
+          .map(([head]) => [
+            head,
+            {
+              source: 'authenticated-pr-readback',
+              tree: head === input.head ? input.tree : HASHES.tree1,
+              observedAt: '2026-09-04T09:00:00Z',
+            },
+          ]),
+      ),
     };
   }
   for (const channel of ['copilot', 'codex']) {
@@ -4553,6 +4566,14 @@ test('request metrics retain an unrequested successor across a second head drift
         ...firstDrift.current_task.review.metrics.reviewerRequestsPerHead,
         [input3.head]: 0,
       },
+      reviewedHeadEvidence: {
+        ...firstDrift.current_task.review.metrics.reviewedHeadEvidence,
+        [input3.head]: {
+          source: 'authenticated-pr-readback',
+          tree: input3.tree,
+          observedAt: '2026-09-04T10:02:30Z',
+        },
+      },
     },
   });
 
@@ -4597,6 +4618,8 @@ test('request metrics retain an unrequested successor across a second head drift
   const missingIntermediate = structuredClone(secondDrift);
   delete missingIntermediate.current_task.review.metrics
     .reviewerRequestsPerHead[input2.head];
+  delete missingIntermediate.current_task.review.metrics
+    .reviewedHeadEvidence[input2.head];
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(missingIntermediate)),
     /terminal incomplete prior-input pair/u,
@@ -4750,6 +4773,13 @@ test('same-head unrequested successors survive a later distinct-head drift', () 
         [input1.head]: 1,
         [input3.head]: 0,
       },
+      reviewedHeadEvidence: {
+        [input3.head]: {
+          source: 'authenticated-pr-readback',
+          tree: input3.tree,
+          observedAt: '2026-09-04T10:02:30Z',
+        },
+      },
     },
   });
   assert.deepEqual(parseCompactStateJson(JSON.stringify(retained)), retained);
@@ -4760,6 +4790,8 @@ test('same-head unrequested successors survive a later distinct-head drift', () 
   );
   requestedSuccessor.current_task.review.metrics
     .reviewerRequestsPerHead[input3.head] = 1;
+  delete requestedSuccessor.current_task.review.metrics
+    .reviewedHeadEvidence[input3.head];
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(requestedSuccessor)),
     /terminal incomplete prior-input pair/u,
@@ -5891,7 +5923,26 @@ test('typed schema, metrics, and 10/15-minute controls remain complete', async (
   const schema = JSON.parse(await readFile(schemaUrl, 'utf8'));
   const mutationClasses = schema.$defs.mutationClass.enum;
   const metrics = createMetrics({
-    reviewedHeads: [HASHES.head1, HASHES.head2, '3'.repeat(40)],
+    reviewedHeadObservations: [
+      {
+        head: HASHES.head1,
+        tree: HASHES.tree1,
+        observedAt: '2026-09-04T09:00:00Z',
+        source: 'authenticated-pr-readback',
+      },
+      {
+        head: HASHES.head2,
+        tree: HASHES.tree2,
+        observedAt: '2026-09-04T09:01:00Z',
+        source: 'authenticated-pr-readback',
+      },
+      {
+        head: '3'.repeat(40),
+        tree: '4'.repeat(40),
+        observedAt: '2026-09-04T09:02:00Z',
+        source: 'authenticated-pr-readback',
+      },
+    ],
     reviewRequests: [
       { head: HASHES.head1, attemptCount: 2 },
       { head: HASHES.head1 },
@@ -5910,6 +5961,13 @@ test('typed schema, metrics, and 10/15-minute controls remain complete', async (
   assert.equal(metrics.reviewerRequestsPerHead[HASHES.head1], 3);
   assert.equal(metrics.reviewerRequestsPerHead[HASHES.head2], 1);
   assert.equal(metrics.reviewerRequestsPerHead['3'.repeat(40)], 0);
+  assert.deepEqual(metrics.reviewedHeadEvidence, {
+    ['3'.repeat(40)]: {
+      source: 'authenticated-pr-readback',
+      tree: '4'.repeat(40),
+      observedAt: '2026-09-04T09:02:00Z',
+    },
+  });
   assert.equal(metrics.bodyEditsAfterReviewBegan, 1);
   assert.equal(metrics.cleanReviewRecognitionMilliseconds, 5_000);
   assert.equal(metrics.cleanPairToMergeMilliseconds, 120_000);
@@ -6021,6 +6079,7 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
 
   assert.deepEqual(createMetrics(valid), {
     reviewerRequestsPerHead: {},
+    reviewedHeadEvidence: {},
     bodyEditsAfterReviewBegan: 0,
     sameHeadRerequestReasons: [],
     cleanReviewRecognitionMilliseconds: null,
@@ -6070,6 +6129,45 @@ test('metrics reject invalid, incomplete, and reversed timestamps', () => {
       },
     }).sameHeadRerequestReasons,
     [{ reason: 'Material risk changed.', material: true }],
+  );
+  for (const reviewedHeadObservations of [
+    [null],
+    [{
+      head: HASHES.head1,
+      tree: HASHES.tree1,
+      observedAt: '2026-09-04T09:00:00Z',
+      source: 'operator-assertion',
+    }],
+    [{
+      head: HASHES.head1,
+      tree: 'invalid',
+      observedAt: '2026-09-04T09:00:00Z',
+      source: 'authenticated-pr-readback',
+    }],
+    [{
+      head: HASHES.head1,
+      tree: HASHES.tree1,
+      observedAt: 'not-a-date',
+      source: 'authenticated-pr-readback',
+    }],
+  ]) {
+    assert.throws(
+      () => createMetrics({ ...valid, reviewedHeadObservations }),
+      /reviewedHeadObservations\[0\]/u,
+    );
+  }
+  const duplicateObservation = {
+    head: HASHES.head1,
+    tree: HASHES.tree1,
+    observedAt: '2026-09-04T09:00:00Z',
+    source: 'authenticated-pr-readback',
+  };
+  assert.throws(
+    () => createMetrics({
+      ...valid,
+      reviewedHeadObservations: [duplicateObservation, duplicateObservation],
+    }),
+    /contains a duplicate head/u,
   );
   assert.throws(
     () => createMetrics({ ...valid, reviewBeganAt: 'not-a-date' }),
@@ -6184,6 +6282,13 @@ test('an incomplete successor can be superseded by a reactivated current head', 
   unrelatedKnownHead.current_task.review.metrics.reviewerRequestsPerHead[
     '7'.repeat(40)
   ] = 0;
+  unrelatedKnownHead.current_task.review.metrics.reviewedHeadEvidence[
+    '7'.repeat(40)
+  ] = {
+    source: 'authenticated-pr-readback',
+    tree: '8'.repeat(40),
+    observedAt: '2026-09-04T10:03:30Z',
+  };
   unrelatedKnownHead.current_task.review.supersededReviewInputs[
     getReviewInputKey(inputB)
   ].successorHead = '7'.repeat(40);
@@ -6435,6 +6540,254 @@ test('metrics correlate whole-second body edits at their available precision', (
   assert.equal(metrics.bodyEditsAfterReviewBegan, 2);
 });
 
+test('reciprocal reactivation remains valid after the resumed request is appended', () => {
+  const inputA = reviewInput();
+  const inputB = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const requestA = requestFor(inputA, 'copilot', {
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: 'RECIPROCAL_A_COPILOT',
+      observedAt: '2026-09-04T10:01:00Z',
+    },
+  });
+  const requestB = requestFor(inputB, 'copilot', {
+    requestedAt: '2026-09-04T10:02:00Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: 'RECIPROCAL_B_COPILOT',
+      observedAt: '2026-09-04T10:03:00Z',
+    },
+  });
+  const resumedA = requestFor(inputA, 'codex', {
+    requestedAt: '2026-09-04T10:04:00Z',
+  });
+  const persisted = compactState(inputA, {
+    reviewRequests: [requestA, requestB, resumedA],
+    supersededReviewInputs: {
+      ...supersessionFor(inputA, inputB, {
+        supersededAt: '2026-09-04T10:01:30Z',
+      }),
+      ...supersessionFor(inputB, inputA, {
+        supersededAt: '2026-09-04T10:03:30Z',
+      }),
+    },
+  });
+
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(persisted)), persisted);
+});
+
+test('zero-request reviewed heads require authenticated retained evidence', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const inputA = reviewInput();
+  const inputC = reviewInput({
+    head: '3'.repeat(40),
+    tree: '4'.repeat(40),
+    diffSha256: '5'.repeat(64),
+    bodySha256: '6'.repeat(64),
+  });
+  const forgedHead = 'f'.repeat(40);
+  const requestA = requestFor(inputA, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const requestC = requestFor(inputC, 'copilot', {
+    requestedAt: '2026-09-04T10:02:00Z',
+  });
+  const forged = compactState(inputC, {
+    reviewRequests: [requestA, requestC],
+    supersededReviewInputs: supersessionFor(inputA, inputC, {
+      successorHead: forgedHead,
+      supersededAt: '2026-09-04T10:01:30Z',
+    }),
+    metrics: {
+      ...state(inputC, { reviewRequests: [requestA, requestC] }).metrics,
+      reviewerRequestsPerHead: {
+        [inputA.head]: 1,
+        [forgedHead]: 0,
+        [inputC.head]: 1,
+      },
+      reviewedHeadEvidence: {},
+    },
+  });
+
+  assertSchemaValid(forged, schema, schema);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(forged)),
+    /requires exact authenticated retained evidence/u,
+  );
+
+  const authenticated = structuredClone(forged);
+  authenticated.current_task.review.metrics.reviewedHeadEvidence[forgedHead] = {
+    source: 'authenticated-pr-readback',
+    tree: '7'.repeat(40),
+    observedAt: '2026-09-04T10:01:15Z',
+  };
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(authenticated)),
+    authenticated,
+  );
+
+  const wrongSource = structuredClone(authenticated);
+  wrongSource.current_task.review.metrics.reviewedHeadEvidence[forgedHead].source =
+    'operator-assertion';
+  assert.throws(() => assertSchemaValid(wrongSource, schema, schema));
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(wrongSource)),
+    /requires exact authenticated retained evidence/u,
+  );
+
+  const wrongCurrentTree = compactState(inputC);
+  wrongCurrentTree.current_task.review.metrics
+    .reviewedHeadEvidence[inputC.head].tree = '8'.repeat(40);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(wrongCurrentTree)),
+    /requires exact authenticated retained evidence/u,
+  );
+});
+
+test('confirmed Copilot readiness equals its authenticated reconciliation time', () => {
+  const input = reviewInput();
+  const request = requestFor(input, 'copilot', {
+    requestedAt: '2026-09-04T10:00:00.0001Z',
+    readyAt: '2026-09-04T10:00:00.0009Z',
+    confirmed: true,
+  });
+  const publicMutation = {
+    state: 'CONFIRMED',
+    nativeResponseAccepted: true,
+    readbackMatched: true,
+    retryAllowed: false,
+    localRecordSucceeded: true,
+    reviewInputKey: getReviewInputKey(input),
+    channel: 'copilot',
+    attemptCount: 1,
+    attemptedAt: '2026-09-04T10:00:00.0001Z',
+    reconciledAt: '2026-09-04T10:00:00.0009Z',
+    evidence: {
+      responseReviewerMatched: false,
+      requestEventMatched: true,
+      requestedReviewerMatched: false,
+      submittedReviewMatched: false,
+      reviewRunMatched: false,
+      triggerCommentMatched: false,
+      readbackComplete: true,
+    },
+  };
+  const valid = compactState(input, {
+    reviewRequests: [request],
+    publicMutation,
+  });
+
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  const mismatched = structuredClone(valid);
+  mismatched.current_task.review.reviewRequests[0].readyAt =
+    '2026-09-04T10:00:00.0008Z';
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(mismatched)),
+    /readyAt must equal its authenticated reconciliation time/u,
+  );
+});
+
+test('terminal result identities cannot be reused across reviewer channels', () => {
+  const input = reviewInput();
+  for (const identity of [
+    { field: 'nodeId', value: 'SHARED_CROSS_CHANNEL_RESULT' },
+    { field: 'id', value: 71 },
+    { field: 'databaseId', value: 72 },
+  ]) {
+    const referenceId = String(identity.value);
+    const copilot = requestFor(input, 'copilot', {
+      confirmed: true,
+      terminal: true,
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id: referenceId,
+        observedAt: '2026-09-04T10:01:00Z',
+      },
+    });
+    const codex = requestFor(input, 'codex', {
+      requestedAt: '2026-09-04T10:02:00Z',
+      confirmed: true,
+      terminal: true,
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id: referenceId,
+        observedAt: '2026-09-04T10:03:00Z',
+      },
+    });
+    const result = (actor, submittedAt) => ({
+      [identity.field]: identity.value,
+      actor,
+      commit: input.head,
+      submittedAt,
+    });
+    const reused = compactState(input, {
+      reviewRequests: [copilot, codex],
+      copilotResults: {
+        submittedReviews: [result(
+          'copilot-pull-request-reviewer[bot]',
+          '2026-09-04T10:01:00Z',
+        )],
+        conversationComments: [],
+      },
+      codexResults: {
+        submittedReviews: [result(
+          'chatgpt-codex-connector[bot]',
+          '2026-09-04T10:03:00Z',
+        )],
+        conversationComments: [],
+      },
+    });
+
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(reused)),
+      /terminal result is assigned to multiple requests/u,
+      identity.field,
+    );
+  }
+});
+
+test('semantic ingestion enforces the closed review-request field set', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const valid = compactState(input, {
+    reviewRequests: [requestFor(input, 'copilot')],
+  });
+
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  const extra = structuredClone(valid);
+  extra.current_task.review.reviewRequests[0].retryAllowed = true;
+  assert.throws(() => assertSchemaValid(extra, schema, schema));
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(extra)),
+    /persisted review request is malformed/u,
+  );
+
+  const missing = structuredClone(valid);
+  delete missing.current_task.review.reviewRequests[0].baselineReviewRunIds;
+  assert.throws(() => assertSchemaValid(missing, schema, schema));
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missing)),
+    /persisted review request is malformed/u,
+  );
+});
+
 test('requested-reviewer membership is diagnostic and blocks terminal negative reconciliation', async () => {
   const input = reviewInput();
   const schema = JSON.parse(
@@ -6538,6 +6891,7 @@ test('compact-state ingestion validates the complete closed metrics record', () 
   const valid = compactState(input);
   const invalidCases = [
     (metrics) => { delete metrics.bodyEditsAfterReviewBegan; },
+    (metrics) => { delete metrics.reviewedHeadEvidence; },
     (metrics) => { metrics.extra = true; },
     (metrics) => { metrics.bodyEditsAfterReviewBegan = -1; },
     (metrics) => { metrics.bodyEditsAfterReviewBegan = 0.5; },
@@ -6566,13 +6920,20 @@ test('compact-state ingestion validates the complete closed metrics record', () 
     mutate(invalid.current_task.review.metrics);
     assert.throws(
       () => parseCompactStateJson(JSON.stringify(invalid)),
-      /persisted .*metric|persisted same-head/u,
+      /persisted .*metric|persisted same-head|reviewed-head evidence/u,
     );
   }
 
   const boundary = structuredClone(valid);
   boundary.current_task.review.metrics = {
     reviewerRequestsPerHead: { [input.head]: 0 },
+    reviewedHeadEvidence: {
+      [input.head]: {
+        source: 'authenticated-pr-readback',
+        tree: input.tree,
+        observedAt: '2026-09-04T09:00:00Z',
+      },
+    },
     bodyEditsAfterReviewBegan: 0,
     sameHeadRerequestReasons: [{ reason: 'Material change.', material: false }],
     cleanReviewRecognitionMilliseconds: 0,
