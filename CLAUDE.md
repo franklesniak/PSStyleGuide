@@ -1,13 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # Agent Instructions for Claude Code
 
-**Version:** 1.8.20260830.0
+**Version:** 1.9.20260907.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-08-30
+- **Last Updated:** 2026-09-07
 - **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
 <!-- template-sync: begin markdown-reference-only -->
 - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
@@ -296,6 +296,23 @@ Only genuine deferred work requires a GitHub Issue.
 5. **Close after tracking.** After a genuine deferral has a cited Issue, resolve the native thread or close the synthetic key. Leave a finding open only when the protocol requires a maintainer decision before disposition.
 6. **Protect required scope.** A deferral that omits a governing requirement or explicit PR commitment is a scope reduction and needs owner authorization.
 7. **Sweep the whole PR.** Before clean or merge, inspect every review-submission body, every resolved or unresolved thread, every PR-level comment, and the PR body for deferred-work language. Complete convenience deferrals, Issue-track genuine ones, and relabel residuals or deviations. No deferred work may remain only in PR text.
+
+## GitHub Copilot pull-request reviews
+
+Use `Balanced` as the preferred effort for each GitHub Copilot pull-request review.
+
+This preference controls the transport choice even when a task or controller describes the REST reviewer request. Keep that REST request as the fallback.
+
+1. Capture the request-event, requested-reviewer, submitted-review, and Copilot workflow-run baselines required by the active review-loop policy.
+2. Open the pull request on GitHub. In the `Reviewers` section, use the control next to Copilot. Select `Balanced`, then submit one request.
+3. Confirm one new authenticated request event or exact-head Copilot workflow run. Do not repeat an accepted request while its result is pending.
+4. When the review finishes, read the effort from the pull-request timeline or Copilot overview. Record the observed value. Do not infer `Balanced` from an HTTP `201` response or from reviewer identity alone.
+5. If the supported interface cannot select `Balanced`, record the reason and use `gh pr edit PR-NUMBER --add-reviewer '@copilot'`. The quotes are required in PowerShell. If that command is unavailable, use `gh api --method POST "repos/OWNER/REPOSITORY/pulls/PR-NUMBER/requested_reviewers" -f "reviewers[]=copilot-pull-request-reviewer[bot]"`. A resulting `Lite` review is an acceptable fallback. It does not fail or stall the review loop.
+6. Do not send a second request only because GitHub used `Lite`. Continue the review loop with that result unless another active rule independently requires a new review.
+
+The GitHub CLI and public REST review-request API select a reviewer but do not expose a per-request effort option as of 2026-09-07. When the REST fallback is used, send reviewer login `copilot-pull-request-reviewer[bot]`; do not send display name `Copilot`. Captured browser cookies, CSRF tokens, nonces, multipart boundaries, and internal form fields are transient secrets or implementation details. Do not store, publish, replay, or document them.
+
+References: [GitHub Copilot code-review effort levels](https://docs.github.com/en/copilot/concepts/agents/code-review#review-effort-level) and [GitHub review-request REST parameters](https://docs.github.com/en/rest/pulls/review-requests?apiVersion=2022-11-28#request-reviewers-for-a-pull-request).
 
 ## Automated Review Loop
 
