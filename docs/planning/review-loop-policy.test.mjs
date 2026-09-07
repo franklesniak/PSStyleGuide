@@ -2825,13 +2825,24 @@ test('all permanent active task-template and controller surfaces use the compact
   for (const surface of [parent, alternate, generator, crossRepository]) {
     assert.match(surface, new RegExp(confirmedMutationMetadataRule, 'u'));
   }
-  const baselineOverlapRule =
-    'Treat a request event, submitted review, review run, or conversation comment as baseline evidence when any ' +
-    'supplied node, numeric, or database identity overlaps its persisted baseline';
-  assert.equal(plan.split(baselineOverlapRule).length - 1, 82);
+  const immutableBaselineOverlapRule =
+    'Reject a request event, submitted review, review run, or Codex trigger comment when any ' +
+    'supplied node, numeric, or database identity overlaps its persisted baseline; every supplied ' +
+    'identity for those immutable items must be absent from the matching baseline';
+  const mutableConversationObservationRule =
+    'For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline ' +
+    'only when its authenticated `updatedAt` is strictly later than every matching baseline observation';
+  const contradictoryBaselineRule =
+    'conversation comment as baseline evidence when any supplied node, numeric, or database identity ' +
+    'overlaps its persisted baseline; every supplied identity must be absent from the matching baseline';
+  assert.equal(plan.split(immutableBaselineOverlapRule).length - 1, 82);
+  assert.equal(plan.split(mutableConversationObservationRule).length - 1, 82);
+  assert.equal(plan.split(contradictoryBaselineRule).length - 1, 0);
   for (const surface of [parent, alternate, generator, crossRepository]) {
-    assert.match(surface, new RegExp(baselineOverlapRule, 'u'));
-    assert.match(surface, /every supplied review-run head identity must match the reviewed head/u);
+    assert.match(surface, new RegExp(immutableBaselineOverlapRule, 'u'));
+    assert.match(surface, new RegExp(mutableConversationObservationRule, 'u'));
+    assert.doesNotMatch(surface, new RegExp(contradictoryBaselineRule, 'u'));
+    assert.match(surface, /[Ee]very supplied review-run head identity must match the reviewed head/u);
     assert.match(surface, /all valid timestamp aliases for one event time must agree/u);
     assert.match(surface, /Causal RFC 3339 ordering must preserve every supplied fractional digit/u);
     assert.match(surface, /matching normalized head evidence/u);
