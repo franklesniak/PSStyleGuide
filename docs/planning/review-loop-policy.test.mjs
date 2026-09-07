@@ -276,7 +276,7 @@ function reviewerExhaustionAuthority(input, overrides = {}) {
     channel: 'codex',
     maximumChannelAttempts: 3,
     completedReviewRounds: 21,
-    authorizedAt: '2026-09-04T10:00:00Z',
+    authorizedAt: '2026-09-04T10:06:01Z',
     authority: 'Explicit operator direction in the durable F152 addendum.',
     reason: 'PR 182 completed more than 20 review rounds.',
     ...overrides,
@@ -7744,6 +7744,136 @@ test('only the exact typed PR 182 authority makes exhausted-not-clean review mer
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(untyped)),
     /closed review-state contract|exact, typed/u,
+  );
+});
+
+test('exhaustion authority follows the exact attempt-three failure boundary', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', { confirmed: true, terminal: true });
+  const first = failedCodexRequest(input);
+  const second = failedCodexRequest(input, {
+    channelAttempt: 2,
+    requestedAt: '2026-09-04T10:03:01Z',
+    baselineCapturedAt: '2026-09-04T10:02:30Z',
+    baselineConversationComments: {
+      CODEX_FAILURE_ONE: '2026-09-04T10:02:00Z',
+      CODEX_SUMMARY: '2026-09-04T10:02:01Z',
+    },
+    terminalFailureRef: terminalFailureRef({
+      id: 'CODEX_FAILURE_TWO',
+      observedAt: '2026-09-04T10:04:00Z',
+      summaryObservedAt: '2026-09-04T10:04:01Z',
+    }),
+  });
+  const thirdBoundary = '2026-09-04T10:06:01.123456789Z';
+  const third = failedCodexRequest(input, {
+    channelAttempt: 3,
+    requestedAt: '2026-09-04T10:05:01Z',
+    baselineCapturedAt: '2026-09-04T10:04:30Z',
+    baselineConversationComments: {
+      CODEX_FAILURE_ONE: '2026-09-04T10:02:00Z',
+      CODEX_FAILURE_TWO: '2026-09-04T10:04:00Z',
+      CODEX_SUMMARY: '2026-09-04T10:04:01Z',
+    },
+    terminalFailureRef: terminalFailureRef({
+      id: 'CODEX_FAILURE_THREE',
+      observedAt: '2026-09-04T10:06:01.123456788Z',
+      summaryObservedAt: thirdBoundary,
+    }),
+  });
+  const requests = [copilot, first, second, third];
+  const allGates = Object.fromEntries(
+    [
+      'exactHeadCiClean',
+      'copilotOutcomeCleanOrAuthorized',
+      'noUnresolvedActionableFindings',
+      'independentQualityAuditPassed',
+      'exactHeadFinalValidationPassed',
+      'frozenInputAccurate',
+      'mergeable',
+      'otherRequiredGatesPassed',
+    ].map((field) => [field, true]),
+  );
+  const evaluate = (reviewState) => evaluateReviewMergeReadiness({
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 182,
+    currentHead: input.head,
+    currentTree: input.tree,
+    reviewState,
+    gates: allGates,
+  });
+  const decide = (authority, requestHistory = requests) => {
+    const reviewState = state(input, { reviewRequests: requestHistory });
+    return decideReviewRequest({
+      previousReviewInput: input,
+      currentReviewInput: input,
+      mutationClass: 'RESULT_OR_STATE',
+      existingRequests: requestHistory,
+      codexResults: reviewState.codexResults,
+      decisionAt: '2026-09-04T10:07:01Z',
+      repository: 'franklesniak/PSStyleGuide',
+      pullRequest: 182,
+      reviewerExhaustionAuthority: authority,
+    });
+  };
+
+  for (const authorizedAt of [thirdBoundary, '2026-09-04T10:06:01.123456790Z']) {
+    const authority = reviewerExhaustionAuthority(input, { authorizedAt });
+    const persisted = compactState(input, {
+      reviewRequests: requests,
+      reviewerExhaustionAuthority: authority,
+    });
+    assertSchemaValid(persisted, schema, schema);
+    assert.deepEqual(parseCompactStateJson(JSON.stringify(persisted)), persisted);
+    assert.equal(decide(authority).status, 'EXHAUSTED_NOT_CLEAN');
+    assert.equal(evaluate(persisted.current_task.review).authorizedExhaustion, true);
+  }
+
+  for (const authorizedAt of [
+    '2026-09-04T10:00:00Z',
+    '2026-09-04T10:06:01.123456788Z',
+  ]) {
+    const authority = reviewerExhaustionAuthority(input, { authorizedAt });
+    const persisted = compactState(input, {
+      reviewRequests: requests,
+      reviewerExhaustionAuthority: authority,
+    });
+    assertSchemaValid(persisted, schema, schema);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(persisted)),
+      /must follow the exact attempt-3 terminal failure/u,
+    );
+    assert.throws(
+      () => decide(authority),
+      /must follow the exact attempt-3 terminal failure/u,
+    );
+    assert.throws(
+      () => evaluate(persisted.current_task.review),
+      /must follow the exact attempt-3 terminal failure/u,
+    );
+  }
+
+  const incompleteRequests = requests.slice(0, -1);
+  const authority = reviewerExhaustionAuthority(input, { authorizedAt: thirdBoundary });
+  const incomplete = compactState(input, {
+    reviewRequests: incompleteRequests,
+    reviewerExhaustionAuthority: authority,
+  });
+  assertSchemaValid(incomplete, schema, schema);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(incomplete)),
+    /must follow the exact attempt-3 terminal failure/u,
+  );
+  assert.throws(
+    () => decide(authority, incompleteRequests),
+    /must follow the exact attempt-3 terminal failure/u,
+  );
+  assert.throws(
+    () => evaluate(incomplete.current_task.review),
+    /must follow the exact attempt-3 terminal failure/u,
   );
 });
 

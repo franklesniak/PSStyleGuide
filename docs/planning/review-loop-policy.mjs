@@ -873,6 +873,7 @@ export function parseCompactStateJson(text) {
           repository: parsed.current_task.repository,
           pullRequest: reviewState.reviewerExhaustionAuthority.pullRequest,
           reviewInput: reviewState.reviewInput,
+          requests,
         },
       );
     }
@@ -1773,6 +1774,7 @@ export function decideReviewRequest({
       repository,
       pullRequest,
       reviewInput: currentReviewInput,
+      requests,
     });
   }
   const requestedChannels = new Set(
@@ -2818,7 +2820,9 @@ function validateReviewerExhaustionAuthority(authority, {
   repository,
   pullRequest,
   reviewInput,
+  requests,
 }) {
+  const authorizedAt = getItemTimestamp(authority, ['authorizedAt']);
   if (
     authority === null ||
     typeof authority !== 'object' ||
@@ -2840,12 +2844,36 @@ function validateReviewerExhaustionAuthority(authority, {
     authority.maximumChannelAttempts !== REVIEW_MAX_CHANNEL_ATTEMPTS ||
     !Number.isSafeInteger(authority.completedReviewRounds) ||
     authority.completedReviewRounds <= 20 ||
-    getItemTimestamp(authority, ['authorizedAt']) === null ||
+    authorizedAt === null ||
     !isNonemptyTransportText(authority.authority) ||
     !isNonemptyTransportText(authority.reason)
   ) {
     throw new TypeError(
       'A reviewer exhaustion authority must be exact, typed, input-bound, and operator-authenticated.',
+    );
+  }
+
+  const reviewInputKey = getReviewInputKey(reviewInput);
+  const finalFailureRequest = Array.isArray(requests)
+    ? requests.find(
+      (request) => request.reviewInputKey === reviewInputKey &&
+        request.channel === 'codex' &&
+        getReviewChannelAttempt(request) === REVIEW_MAX_CHANNEL_ATTEMPTS,
+    )
+    : undefined;
+  if (
+    finalFailureRequest === undefined ||
+    finalFailureRequest.terminal !== true ||
+    !Object.hasOwn(finalFailureRequest, 'terminalFailureRef') ||
+    compareRfc3339Instants(
+      authorizedAt,
+      getTerminalFailureBoundary(finalFailureRequest.terminalFailureRef),
+      'reviewer exhaustion authority authorizedAt',
+      'attempt-3 terminal failure boundary',
+    ) < 0
+  ) {
+    throw new TypeError(
+      'A reviewer exhaustion authority must follow the exact attempt-3 terminal failure.',
     );
   }
 
@@ -3440,6 +3468,7 @@ export function evaluateReviewMergeReadiness({
         repository,
         pullRequest,
         reviewInput: reviewState.reviewInput,
+        requests,
       },
     );
     authorizedExhaustion = codexExhausted;
