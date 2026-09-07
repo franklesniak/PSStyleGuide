@@ -437,7 +437,8 @@
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "\\S"
           },
           "uniqueItems": true
         },
@@ -445,7 +446,8 @@
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "\\S"
           },
           "uniqueItems": true
         },
@@ -453,7 +455,8 @@
           "type": "array",
           "items": {
             "type": "string",
-            "minLength": 1
+            "minLength": 1,
+            "pattern": "\\S"
           },
           "uniqueItems": true
         },
@@ -827,7 +830,8 @@
       "maxProperties": 10000,
       "propertyNames": {
         "minLength": 1,
-        "maxLength": 256
+        "maxLength": 256,
+        "pattern": "\\S"
       },
       "additionalProperties": {
         "$ref": "#/$defs/rfc3339"

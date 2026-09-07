@@ -2290,7 +2290,7 @@ export function collectCopilotRequestEvidence({
   for (const [label, values] of baselineSets) {
     if (
       !Array.isArray(values) ||
-      values.some((value) => typeof value !== 'string' || value.length === 0) ||
+      values.some((value) => !isNonemptyTransportText(value)) ||
       new Set(values).size !== values.length
     ) {
       throw new TypeError(`The ${label} baseline must contain unique identities.`);
@@ -2415,7 +2415,7 @@ export function collectCodexRequestEvidence({
     typeof baselineConversationComments !== 'object' ||
     Array.isArray(baselineConversationComments) ||
     Object.entries(baselineConversationComments).some(
-      ([id, updatedAt]) => id.length === 0 ||
+      ([id, updatedAt]) => !isNonemptyTransportText(id) ||
         getItemTime({ updatedAt }, ['updatedAt']) === null,
     )
   ) {
@@ -2475,7 +2475,7 @@ function isReviewRequestRecord(request) {
   const identityBaselinesAreValid = identityBaselineFields.every((field) => {
     const values = request?.[field];
     return Array.isArray(values) &&
-      values.every((id) => typeof id === 'string' && id.length > 0) &&
+      values.every((id) => isNonemptyTransportText(id)) &&
       new Set(values).size === values.length;
   });
   const commentBaselines = request?.baselineConversationComments;
@@ -2484,7 +2484,7 @@ function isReviewRequestRecord(request) {
     !Array.isArray(commentBaselines) &&
     Object.keys(commentBaselines).length <= 10_000 &&
     Object.entries(commentBaselines).every(
-      ([nodeId, updatedAt]) => nodeId.length > 0 &&
+      ([nodeId, updatedAt]) => isNonemptyTransportText(nodeId) &&
         nodeId.length <= 256 &&
         getItemTime({ updatedAt }, ['updatedAt']) !== null,
     );

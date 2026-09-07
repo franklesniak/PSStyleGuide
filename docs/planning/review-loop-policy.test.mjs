@@ -7245,6 +7245,92 @@ test('review requests and schema use the same RFC 3339 grammar', async () => {
   }
 });
 
+test('baseline identities require non-whitespace text in schema and runtime', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const request = requestFor(input, 'copilot');
+  const valid = compactState(input, { reviewRequests: [request] });
+
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  for (const field of [
+    'baselineRequestEventIds',
+    'baselineReviewNodeIds',
+    'baselineReviewRunIds',
+  ]) {
+    const invalid = structuredClone(valid);
+    invalid.current_task.review.reviewRequests[0][field] = ['   '];
+    assert.throws(
+      () => assertSchemaValid(invalid, schema, schema),
+      /does not match pattern/u,
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /persisted review request is malformed/u,
+    );
+  }
+
+  const invalidMap = structuredClone(valid);
+  invalidMap.current_task.review.reviewRequests[0].baselineConversationComments = {
+    '   ': '2026-09-04T09:59:00Z',
+  };
+  assert.throws(
+    () => assertSchemaValid(invalidMap, schema, schema),
+    /does not match pattern/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(invalidMap)),
+    /persisted review request is malformed/u,
+  );
+
+  const copilotArguments = {
+    responseReviewers: [],
+    requestEvents: [],
+    requestedReviewers: [],
+    submittedReviews: [],
+    reviewRuns: [],
+    baselineRequestEventIds: [],
+    baselineReviewNodeIds: [],
+    baselineReviewRunIds: [],
+    expectedHead: input.head,
+    requestedAt: '2026-09-04T10:00:00Z',
+    readbackCompleteness: {
+      requestEvents: true,
+      requestedReviewers: true,
+      submittedReviews: true,
+      reviewRuns: true,
+    },
+  };
+  for (const field of [
+    'baselineRequestEventIds',
+    'baselineReviewNodeIds',
+    'baselineReviewRunIds',
+  ]) {
+    assert.throws(
+      () => collectCopilotRequestEvidence({
+        ...copilotArguments,
+        [field]: ['   '],
+      }),
+      /baseline must contain unique identities/u,
+    );
+  }
+  assert.throws(
+    () => collectCodexRequestEvidence({
+      triggerComments: [],
+      baselineConversationComments: {
+        '   ': '2026-09-04T09:59:00Z',
+      },
+      expectedActorLogin: 'franklesniak',
+      requestedAt: '2026-09-04T10:00:00Z',
+      readbackComplete: true,
+    }),
+    /conversation-comment baseline is malformed/u,
+  );
+});
+
 test('an exact first terminal failure authorizes only channel attempt two after backoff', () => {
   const input = reviewInput();
   const copilot = requestFor(input, 'copilot', {
