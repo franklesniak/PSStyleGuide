@@ -83,11 +83,13 @@
         },
         "repository": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "\\S"
         },
         "branch": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "\\S"
         },
         "base": {
           "anyOf": [
@@ -117,7 +119,8 @@
         },
         "next_action": {
           "type": "string",
-          "minLength": 1
+          "minLength": 1,
+          "pattern": "\\S"
         },
         "blocker": {
           "type": [

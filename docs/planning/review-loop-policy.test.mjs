@@ -4012,6 +4012,33 @@ test('materialReason rejects whitespace whenever a string is present', async () 
   }
 });
 
+test('task identity and action text reject whitespace in schema and runtime', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const valid = compactState(reviewInput());
+
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  for (const field of ['repository', 'branch', 'next_action']) {
+    for (const value of [' ', '\t\r\n']) {
+      const invalid = structuredClone(valid);
+      invalid.current_task[field] = value;
+      assert.throws(
+        () => assertSchemaValid(invalid, schema, schema),
+        /does not match pattern/u,
+        `${field} rejects whitespace in the schema`,
+      );
+      assert.throws(
+        () => parseCompactStateJson(JSON.stringify(invalid)),
+        /persisted task progress is malformed/u,
+        `${field} rejects whitespace during semantic ingestion`,
+      );
+    }
+  }
+});
+
 test('the actual compact resume record and review state match their closed schema', async () => {
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),

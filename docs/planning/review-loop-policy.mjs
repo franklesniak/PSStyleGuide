@@ -924,9 +924,9 @@ function validatePersistedTaskState(currentTask) {
     !TASK_STATES.has(currentTask.state) ||
     !TASK_RISKS.has(currentTask.risk) ||
     typeof currentTask.repository !== 'string' ||
-    currentTask.repository.length === 0 ||
+    currentTask.repository.trim().length === 0 ||
     typeof currentTask.branch !== 'string' ||
-    currentTask.branch.length === 0 ||
+    currentTask.branch.trim().length === 0 ||
     (
       currentTask.base !== null &&
       (typeof currentTask.base !== 'string' || !SHA1_PATTERN.test(currentTask.base))
@@ -937,7 +937,7 @@ function validatePersistedTaskState(currentTask) {
     ) ||
     (currentTask.last_gate !== null && typeof currentTask.last_gate !== 'string') ||
     typeof currentTask.next_action !== 'string' ||
-    currentTask.next_action.length === 0 ||
+    currentTask.next_action.trim().length === 0 ||
     (currentTask.blocker !== null && typeof currentTask.blocker !== 'string')
   ) {
     throw new TypeError('The persisted task progress is malformed or outside the plan.');
