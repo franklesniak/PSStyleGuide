@@ -327,6 +327,12 @@ The schema-2 controller is 42,568 bytes and 771 physical lines with SHA-256 `09b
 
 The validation used PowerShell in `C:\Users\flesniak\GitHub\PSStyleGuide`. The checks used `markdownlint-cli2`, `git diff --check`, PowerShell parsing and PSScriptAnalyzer, deterministic text assertions, current-plan task-heading parsing, a richer 392-task compact fixture, three isolated schema-2 lifecycle samples, index cache reuse and rebuild, deep receipt-tamper propagation, strict patch rejection, and schema-1/schema-2 preservation tests. No GitHub mutation, workflow run, Claude run, PR-body update, or Task 5 sequence 3 action occurred. The 6.50-through-6.85-second measurement covers the deterministic local controller lifecycle only; it does not measure or prove a full model, GitHub, review, or external-wait orchestration cycle within either active-work budget.
 
+## Current bounded reviewer-failure liveness control
+
+The later compact controller keeps public-delivery no-effect reconciliation separate from downstream reviewer execution. The downstream Codex budget is at most three channel attempts: attempts 1 through 3. Attempt 2 or 3 requires one exact attributable terminal non-success from the immediately preceding attempt, a repository-defined 60-second delay, and a fresh cumulative baseline. Missing, ambiguous, pending, stale, and unattributed evidence does not authorize another request. Only `completed` is clean. Failed, canceled, skipped, timed-out, and expired results remain failed. Attempt 3 failure exhausts the channel, and attempt 4 is invalid.
+
+This control removes a transient external-failure deadlock without creating unlimited retry amplification. Global exhaustion remains blocked. A narrow exact typed operator authority whose state is `OPERATOR_AUTHORIZED_EXHAUSTED_NOT_CLEAN` can represent one exact `EXHAUSTED_NOT_CLEAN` PR lifecycle, but it cannot relabel the reviewer result or weaken CI, Copilot, actionable-finding, independent-quality, exact-head validation, frozen-input, mergeability, or other R3 gates. This dated performance report remains nonoperative; the executable schema, semantic module, controllers, and copied task prompts define the active behavior.
+
 ## References
 
 - [OpenAI model guidance](https://developers.openai.com/api/docs/guides/latest-model): use lower reasoning for latency-sensitive work; use high or extra-high when measurement shows a quality gain; use programmatic tool calling for bounded tool-heavy work; compare quality, tokens, latency, and cost.
