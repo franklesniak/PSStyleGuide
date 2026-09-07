@@ -861,6 +861,34 @@
         },
         {
           "if": {
+            "required": [
+              "state",
+              "evidence"
+            ],
+            "properties": {
+              "state": {
+                "const": "CONFIRMED"
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "attemptCount",
+              "attemptedAt",
+              "reconciledAt"
+            ],
+            "properties": {
+              "attemptedAt": {
+                "$ref": "#/$defs/rfc3339"
+              },
+              "reconciledAt": {
+                "$ref": "#/$defs/rfc3339"
+              }
+            }
+          }
+        },
+        {
+          "if": {
             "properties": {
               "state": {
                 "const": "RECONCILING"

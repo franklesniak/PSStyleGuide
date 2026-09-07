@@ -1308,11 +1308,13 @@ function validatePersistedPublicMutation(publicMutation, requests) {
 
   const attemptedAt = publicMutation.attemptedAt;
   const reconciledAt = publicMutation.reconciledAt;
+  const isConfirmedReviewRequestMutation =
+    publicMutation.state === 'CONFIRMED' && hasEvidence;
   const requiresAttemptedAt = [
     'RECONCILING',
     'NO_EFFECT',
     'EXHAUSTED',
-  ].includes(publicMutation.state);
+  ].includes(publicMutation.state) || isConfirmedReviewRequestMutation;
   if (requiresAttemptedAt && (attemptedAt === undefined || attemptedAt === null)) {
     throw new TypeError(`A persisted ${publicMutation.state} mutation must contain attemptedAt.`);
   }
@@ -1320,7 +1322,11 @@ function validatePersistedPublicMutation(publicMutation, requests) {
     throw new TypeError('A persisted RECONCILING mutation must contain a null reconciledAt.');
   }
   if (
-    (publicMutation.state === 'NO_EFFECT' || publicMutation.state === 'EXHAUSTED') &&
+    (
+      publicMutation.state === 'NO_EFFECT' ||
+      publicMutation.state === 'EXHAUSTED' ||
+      isConfirmedReviewRequestMutation
+    ) &&
     (reconciledAt === undefined || reconciledAt === null)
   ) {
     throw new TypeError(`A persisted ${publicMutation.state} mutation must contain reconciledAt.`);

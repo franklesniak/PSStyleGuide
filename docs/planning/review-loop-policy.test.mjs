@@ -2709,6 +2709,14 @@ test('all permanent active task-template and controller surfaces use the compact
     [...plan.matchAll(/Persist Copilot `readyAt` as the authenticated release boundary before a Codex request\./gu)].length,
     82,
   );
+  const confirmedMutationMetadataRule =
+    'At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt ' +
+    'count and both attempt and reconciliation timestamps, then require `readyAt` to equal ' +
+    'that reconciliation time with lossless RFC 3339 comparison.';
+  assert.equal(plan.split(confirmedMutationMetadataRule).length - 1, 82);
+  for (const surface of [parent, alternate, generator, crossRepository]) {
+    assert.match(surface, new RegExp(confirmedMutationMetadataRule, 'u'));
+  }
   const baselineOverlapRule =
     'Treat a request event, submitted review, review run, or conversation comment as baseline evidence when any ' +
     'supplied node, numeric, or database identity overlaps its persisted baseline';
@@ -6656,7 +6664,10 @@ test('zero-request reviewed heads require authenticated retained evidence', asyn
   );
 });
 
-test('confirmed Copilot readiness equals its authenticated reconciliation time', () => {
+test('confirmed Copilot readiness equals its authenticated reconciliation time', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
   const input = reviewInput();
   const request = requestFor(input, 'copilot', {
     requestedAt: '2026-09-04T10:00:00.0001Z',
@@ -6689,7 +6700,32 @@ test('confirmed Copilot readiness equals its authenticated reconciliation time',
     publicMutation,
   });
 
+  assertSchemaValid(valid, schema, schema);
   assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  const missingAttemptCount = structuredClone(valid);
+  delete missingAttemptCount.current_task.review.publicMutation.attemptCount;
+  assert.throws(
+    () => assertSchemaValid(missingAttemptCount, schema, schema),
+    /is required/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missingAttemptCount)),
+    /attempt count must match its persisted request/u,
+  );
+
+  for (const field of ['attemptedAt', 'reconciledAt']) {
+    const missingTimestamp = structuredClone(valid);
+    delete missingTimestamp.current_task.review.publicMutation[field];
+    assert.throws(
+      () => assertSchemaValid(missingTimestamp, schema, schema),
+      /is required/u,
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(missingTimestamp)),
+      /must contain (?:attemptedAt|reconciledAt)/u,
+    );
+  }
 
   const mismatched = structuredClone(valid);
   mismatched.current_task.review.reviewRequests[0].readyAt =
@@ -6697,6 +6733,21 @@ test('confirmed Copilot readiness equals its authenticated reconciliation time',
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(mismatched)),
     /readyAt must equal its authenticated reconciliation time/u,
+  );
+
+  const genericConfirmedMutation = compactState(input, {
+    publicMutation: {
+      state: 'CONFIRMED',
+      nativeResponseAccepted: true,
+      readbackMatched: true,
+      retryAllowed: false,
+      localRecordSucceeded: true,
+    },
+  });
+  assertSchemaValid(genericConfirmedMutation, schema, schema);
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(genericConfirmedMutation)),
+    genericConfirmedMutation,
   );
 });
 
