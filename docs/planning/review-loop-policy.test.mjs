@@ -7684,6 +7684,11 @@ test('only the exact typed PR 182 authority makes exhausted-not-clean review mer
     });
     assert.equal(result.reviewerState, 'exhausted-not-clean');
     assert.equal(result.clean, false);
+    assert.equal(
+      result.mayProceedToIndependentQuality,
+      gate === 'independentQualityAuditPassed',
+      `${gate} must have the correct independent-quality phase behavior`,
+    );
     assert.equal(result.mergeReady, false, `${gate} must remain a merge gate`);
   }
 
@@ -7713,6 +7718,58 @@ test('only the exact typed PR 182 authority makes exhausted-not-clean review mer
     () => parseCompactStateJson(JSON.stringify(untyped)),
     /closed review-state contract|exact, typed/u,
   );
+});
+
+test('non-Codex gates control independent-quality progression after a clean reviewer pair', () => {
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', {
+    confirmed: true,
+    terminal: true,
+  });
+  const codex = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+    confirmed: true,
+    terminal: true,
+  });
+  const reviewState = state(input, { reviewRequests: [copilot, codex] });
+  const allGates = {
+    exactHeadCiClean: true,
+    copilotOutcomeCleanOrAuthorized: true,
+    noUnresolvedActionableFindings: true,
+    independentQualityAuditPassed: true,
+    exactHeadFinalValidationPassed: true,
+    frozenInputAccurate: true,
+    mergeable: true,
+    otherRequiredGatesPassed: true,
+  };
+  const evaluate = (gates) => evaluateReviewMergeReadiness({
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 182,
+    currentHead: input.head,
+    currentTree: input.tree,
+    reviewState,
+    gates,
+  });
+
+  assert.deepEqual(evaluate(allGates), {
+    reviewerState: 'clean',
+    clean: true,
+    authorizedExhaustion: false,
+    mayProceedToIndependentQuality: true,
+    mergeReady: true,
+  });
+  for (const gate of Object.keys(allGates)) {
+    const result = evaluate({
+      ...allGates,
+      [gate]: false,
+    });
+    assert.equal(
+      result.mayProceedToIndependentQuality,
+      gate === 'independentQualityAuditPassed',
+      `${gate} must have the correct independent-quality phase behavior`,
+    );
+    assert.equal(result.mergeReady, false, `${gate} must remain a merge gate`);
+  }
 });
 
 test('Codex failure ingestion requires one summary and one unique attributable detail', () => {

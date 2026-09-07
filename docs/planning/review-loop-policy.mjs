@@ -253,6 +253,11 @@ const MERGE_READINESS_GATE_FIELDS = Object.freeze([
   'mergeable',
   'otherRequiredGatesPassed',
 ]);
+const INDEPENDENT_QUALITY_READINESS_GATE_FIELDS = Object.freeze(
+  MERGE_READINESS_GATE_FIELDS.filter(
+    (field) => field !== 'independentQualityAuditPassed',
+  ),
+);
 const REVIEW_REQUEST_EVIDENCE_FIELDS = Object.freeze([
   'responseReviewerMatched',
   'requestEventMatched',
@@ -3442,6 +3447,9 @@ export function evaluateReviewMergeReadiness({
 
   const reviewerClean = copilotSatisfied && codexClean;
   const reviewerSatisfied = reviewerClean || (copilotSatisfied && authorizedExhaustion);
+  const independentQualityGatesPass = INDEPENDENT_QUALITY_READINESS_GATE_FIELDS.every(
+    (field) => gates[field],
+  );
   const otherGatesPass = MERGE_READINESS_GATE_FIELDS.every((field) => gates[field]);
   const reviewerState = reviewerClean
     ? 'clean'
@@ -3454,7 +3462,7 @@ export function evaluateReviewMergeReadiness({
     reviewerState,
     clean: reviewerClean,
     authorizedExhaustion,
-    mayProceedToIndependentQuality: reviewerSatisfied,
+    mayProceedToIndependentQuality: reviewerSatisfied && independentQualityGatesPass,
     mergeReady: reviewerSatisfied && otherGatesPass,
   });
 }
