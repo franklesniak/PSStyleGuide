@@ -4282,6 +4282,84 @@ test('terminal request state requires typed repository-authorized evidence', asy
   );
 });
 
+test('terminal evidence identities require non-whitespace text with schema-runtime parity', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', {
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: '  REVIEW_node:123  ',
+      observedAt: '2026-09-04T10:01:00Z',
+    },
+  });
+  const codex = failedCodexRequest(input, {
+    requestedAt: '2026-09-04T10:02:00Z',
+    terminalFailureRef: terminalFailureRef({
+      id: '  FAILURE_node:456  ',
+      observedAt: '2026-09-04T10:03:00Z',
+      summaryId: '  SUMMARY_node:789  ',
+      summaryObservedAt: '2026-09-04T10:03:01Z',
+    }),
+  });
+  const valid = compactState(input, { reviewRequests: [copilot, codex] });
+
+  assertSchemaValid(valid, schema, schema);
+  const parsed = parseCompactStateJson(JSON.stringify(valid));
+  assert.equal(
+    parsed.current_task.review.reviewRequests[0].terminalResultRef.id,
+    '  REVIEW_node:123  ',
+  );
+  assert.equal(
+    parsed.current_task.review.reviewRequests[1].terminalFailureRef.id,
+    '  FAILURE_node:456  ',
+  );
+  assert.equal(
+    parsed.current_task.review.reviewRequests[1].terminalFailureRef.summaryId,
+    '  SUMMARY_node:789  ',
+  );
+
+  const cases = [
+    {
+      label: 'terminalResultRef.id',
+      set(candidate, value) {
+        candidate.current_task.review.reviewRequests[0].terminalResultRef.id = value;
+      },
+    },
+    {
+      label: 'terminalFailureRef.id',
+      set(candidate, value) {
+        candidate.current_task.review.reviewRequests[1].terminalFailureRef.id = value;
+      },
+    },
+    {
+      label: 'terminalFailureRef.summaryId',
+      set(candidate, value) {
+        candidate.current_task.review.reviewRequests[1].terminalFailureRef.summaryId = value;
+      },
+    },
+  ];
+  for (const { label, set } of cases) {
+    for (const whitespace of [' ', '\t\r\n']) {
+      const invalid = structuredClone(valid);
+      set(invalid, whitespace);
+      assert.throws(
+        () => assertSchemaValid(invalid, schema, schema),
+        /does not match pattern/u,
+        `${label} rejects whitespace-only text in the schema`,
+      );
+      assert.throws(
+        () => parseCompactStateJson(JSON.stringify(invalid)),
+        /persisted review request is malformed/u,
+        `${label} rejects whitespace-only text during semantic ingestion`,
+      );
+    }
+  }
+});
+
 test('confirmed terminal requests require one attributable persisted result', async () => {
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),

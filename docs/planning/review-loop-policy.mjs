@@ -2638,8 +2638,7 @@ function isTerminalResultRef(reference) {
     Array.isArray(reference) ||
     Object.keys(reference).length !== 3 ||
     !['submitted-review', 'conversation-comment'].includes(reference.kind) ||
-    typeof reference.id !== 'string' ||
-    reference.id.length === 0 ||
+    !isNonemptyTransportText(reference.id) ||
     reference.id.length > 256
   ) {
     return false;
@@ -2655,11 +2654,9 @@ function isTerminalFailureRef(reference) {
     Array.isArray(reference) ||
     Object.keys(reference).length !== 6 ||
     reference.kind !== 'conversation-comment' ||
-    typeof reference.id !== 'string' ||
-    reference.id.length === 0 ||
+    !isNonemptyTransportText(reference.id) ||
     reference.id.length > 256 ||
-    typeof reference.summaryId !== 'string' ||
-    reference.summaryId.length === 0 ||
+    !isNonemptyTransportText(reference.summaryId) ||
     reference.summaryId.length > 256 ||
     reference.summaryId === reference.id ||
     !REVIEW_TERMINAL_FAILURE_STATUSES.includes(reference.status)

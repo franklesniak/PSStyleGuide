@@ -671,6 +671,12 @@
         }
       ]
     },
+    "terminalEvidenceIdentity": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "pattern": "\\S"
+    },
     "terminalResultRef": {
       "type": "object",
       "additionalProperties": false,
@@ -687,9 +693,7 @@
           ]
         },
         "id": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256
+          "$ref": "#/$defs/terminalEvidenceIdentity"
         },
         "observedAt": {
           "$ref": "#/$defs/rfc3339"
@@ -712,17 +716,13 @@
           "const": "conversation-comment"
         },
         "id": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256
+          "$ref": "#/$defs/terminalEvidenceIdentity"
         },
         "observedAt": {
           "$ref": "#/$defs/rfc3339"
         },
         "summaryId": {
-          "type": "string",
-          "minLength": 1,
-          "maxLength": 256
+          "$ref": "#/$defs/terminalEvidenceIdentity"
         },
         "summaryObservedAt": {
           "$ref": "#/$defs/rfc3339"
