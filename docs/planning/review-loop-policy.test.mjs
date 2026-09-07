@@ -4,7 +4,10 @@ import test from 'node:test';
 import {
   MUTATION_CLASSES,
   PLAN_TASK_COUNT,
+  REVIEW_MAX_CHANNEL_ATTEMPTS,
   REVIEW_LOOP_TASK_NUMBERS,
+  REVIEW_TERMINAL_FAILURE_RETRY_MILLISECONDS,
+  REVIEW_TERMINAL_FAILURE_STATUSES,
   classifyMutation,
   collectCodexRequestEvidence,
   collectCopilotRequestEvidence,
@@ -13,6 +16,7 @@ import {
   createMetrics,
   createReviewInput,
   decideReviewRequest,
+  evaluateReviewMergeReadiness,
   evaluateFindingBudget,
   getReviewInputKey,
   normalizeCollection,
@@ -108,7 +112,9 @@ function state(input, overrides = {}) {
     const field = `${channel}Results`;
     if (!Object.hasOwn(overrides, field)) {
       const results = value.reviewRequests
-        .filter((request) => request.channel === channel && request.terminalResultRef)
+        .filter((request) => request.channel === channel && (
+          request.terminalResultRef || request.terminalFailureRef
+        ))
         .map((request) => resultForRequest(request));
       value[field] = {
         submittedReviews: results.filter((result) => result.kind === 'submitted-review')
@@ -150,6 +156,7 @@ function compactState(input, reviewOverrides = {}, taskOverrides = {}, rootOverr
 function requestFor(input, channel, overrides = {}) {
   const request = {
     channel,
+    channelAttempt: 1,
     reviewInputKey: getReviewInputKey(input),
     head: input.head,
     requestedAt: '2026-09-04T10:00:00Z',
@@ -174,7 +181,8 @@ function requestFor(input, channel, overrides = {}) {
   if (
     request.confirmed === true &&
     request.terminal === true &&
-    !Object.hasOwn(request, 'terminalResultRef')
+    !Object.hasOwn(request, 'terminalResultRef') &&
+    !Object.hasOwn(request, 'terminalFailureRef')
   ) {
     request.terminalResultRef = {
       kind: 'submitted-review',
@@ -189,6 +197,20 @@ function resultForRequest(request) {
   const actor = request.channel === 'copilot'
     ? 'copilot-pull-request-reviewer[bot]'
     : 'chatgpt-codex-connector[bot]';
+  if (Object.hasOwn(request, 'terminalFailureRef')) {
+    return {
+      kind: 'conversation-comment',
+      value: {
+        nodeId: request.terminalFailureRef.id,
+        actor,
+        updatedAt: request.terminalFailureRef.observedAt,
+        status: request.terminalFailureRef.status,
+        commitPrefix: request.head.slice(0, 7),
+        terminalSummaryId: request.terminalFailureRef.summaryId,
+        terminalSummaryUpdatedAt: request.terminalFailureRef.summaryObservedAt,
+      },
+    };
+  }
   if (request.terminalResultRef.kind === 'submitted-review') {
     return {
       kind: 'submitted-review',
@@ -218,6 +240,45 @@ function nonfunctionalDisposition(overrides = {}) {
     recordedAt: '2026-09-04T10:01:00Z',
     authority: 'Repository reviewer-unavailability instructions.',
     reason: 'Two accepted requests produced complete negative evidence.',
+    ...overrides,
+  };
+}
+
+function terminalFailureRef(overrides = {}) {
+  return {
+    kind: 'conversation-comment',
+    id: 'CODEX_FAILURE_ONE',
+    observedAt: '2026-09-04T10:02:00Z',
+    summaryId: 'CODEX_SUMMARY',
+    summaryObservedAt: '2026-09-04T10:02:01Z',
+    status: 'failed',
+    ...overrides,
+  };
+}
+
+function failedCodexRequest(input, overrides = {}) {
+  return requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+    confirmed: true,
+    terminal: true,
+    terminalFailureRef: terminalFailureRef(),
+    ...overrides,
+  });
+}
+
+function reviewerExhaustionAuthority(input, overrides = {}) {
+  return {
+    state: 'OPERATOR_AUTHORIZED_EXHAUSTED_NOT_CLEAN',
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 182,
+    reviewInputKey: getReviewInputKey(input),
+    head: input.head,
+    channel: 'codex',
+    maximumChannelAttempts: 3,
+    completedReviewRounds: 21,
+    authorizedAt: '2026-09-04T10:00:00Z',
+    authority: 'Explicit operator direction in the durable F152 addendum.',
+    reason: 'PR 182 completed more than 20 review rounds.',
     ...overrides,
   };
 }
@@ -2481,6 +2542,10 @@ test('all permanent active task-template and controller surfaces use the compact
   const alternate = await readFile(new URL('coding-agent-loop-without-model-routing.md', planningRoot), 'utf8');
   const generator = await readFile(new URL('prompt-action-items-update.md', planningRoot), 'utf8');
   const crossRepository = await readFile(new URL('prompt-loop-cross-repo.md', planningRoot), 'utf8');
+  const performance = await readFile(
+    new URL('coding-agent-loop-performance-plan-2026-08-25.md', planningRoot),
+    'utf8',
+  );
   const schema = JSON.parse(
     await readFile(new URL('review-loop-policy.json', planningRoot), 'utf8'),
   );
@@ -2536,6 +2601,13 @@ test('all permanent active task-template and controller surfaces use the compact
     assert.match(task.body, /`NO_EFFECT`/u);
     assert.match(task.body, /`EXHAUSTED`/u);
     assert.match(task.body, /at least 120 seconds/u);
+    assert.match(task.body, /permit at most three (?:remote )?Codex channel attempts/iu);
+    assert.match(task.body, /fresh cumulative baseline/u);
+    assert.match(task.body, /at least 60 seconds/u);
+    assert.match(task.body, /Never permit attempt 4/u);
+    assert.match(task.body, /`EXHAUSTED_NOT_CLEAN`/u);
+    assert.match(task.body, /closed (?:exact typed operator|F152) authority/u);
+    assert.match(task.body, /only `completed` as clean/u);
     assert.match(
       task.body,
       /Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt\./u,
@@ -2577,7 +2649,8 @@ test('all permanent active task-template and controller surfaces use the compact
     38,
   );
   assert.match(plan, /closed `terminalResultRef`/u);
-  assert.match(plan, /next different-input request boundary/u);
+  assert.match(plan, /closed `terminalFailureRef`/u);
+  assert.match(plan, /next same-channel and different-input request boundaries/u);
   assert.match(plan, /including a head that received zero requests/u);
 
   for (const task of qualityTasks) {
@@ -2586,6 +2659,13 @@ test('all permanent active task-template and controller surfaces use the compact
     assert.match(task.body, /Raw body-byte inequality is not the classifier/u);
     assert.match(task.body, /submitted-review objects/u);
     assert.match(task.body, /Codex PR-conversation comments/u);
+    assert.match(task.body, /`EXHAUSTED_NOT_CLEAN`/u);
+    assert.match(task.body, /every other gate remains mandatory/iu);
+  }
+
+  for (const task of mergeTasks) {
+    assert.match(task.body, /`EXHAUSTED_NOT_CLEAN`/u);
+    assert.match(task.body, /every other gate remains mandatory/iu);
   }
 
   const unsafeResultBodyLines = plan
@@ -2597,7 +2677,7 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(parent, /MATERIAL_SCOPE_BEHAVIOR_RISK/u);
   assert.match(parent, /no-safe-work human boundary -> waiting_human/u);
   assert.match(parent, /copilot-pull-request-reviewer\[bot\]/u);
-  assert.match(parent, /A second proved no-effect attempt is `EXHAUSTED`/u);
+  assert.match(parent, /A second proved no-effect (?:delivery )?attempt is `EXHAUSTED`/u);
   assert.match(parent, /including drift on an unchanged head/u);
   assert.match(
     parent,
@@ -2611,7 +2691,10 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(parent, /whose `readyAt` time is not later than the Codex request time/u);
   assert.doesNotMatch(parent, /whose request time is not later than the Codex request time/u);
   assert.match(parent, /closed `terminalResultRef`/u);
-  assert.match(parent, /wrong-channel, or wrong-time reference/u);
+  assert.match(parent, /closed `terminalFailureRef`/u);
+  assert.match(parent, /at most three channel attempts/u);
+  assert.match(parent, /Never permit channel attempt 4/u);
+  assert.match(parent, /`OPERATOR_AUTHORIZED_EXHAUSTED_NOT_CLEAN`/u);
   assert.match(parent, /each count to equal the persisted request history/u);
   assert.match(parent, /Locate and obey the applicable `AGENTS\.md`/u);
   assert.match(
@@ -2628,7 +2711,7 @@ test('all permanent active task-template and controller surfaces use the compact
   );
   assert.doesNotMatch(alternate, /any nonterminal state -> waiting_human/u);
   assert.match(alternate, /copilot-pull-request-reviewer\[bot\]/u);
-  assert.match(alternate, /A second proved no-effect attempt is `EXHAUSTED`/u);
+  assert.match(alternate, /A second proved no-effect (?:delivery )?attempt is `EXHAUSTED`/u);
   assert.match(alternate, /including drift on an unchanged head/u);
   assert.match(
     alternate,
@@ -2650,7 +2733,10 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(alternate, /whose `readyAt` time is not later than the Codex request time/u);
   assert.doesNotMatch(alternate, /whose request time is not later than the Codex request time/u);
   assert.match(alternate, /closed `terminalResultRef`/u);
-  assert.match(alternate, /next different-input request boundary/u);
+  assert.match(alternate, /closed `terminalFailureRef`/u);
+  assert.match(alternate, /at most three channel attempts/u);
+  assert.match(alternate, /Never permit channel attempt 4/u);
+  assert.match(alternate, /`OPERATOR_AUTHORIZED_EXHAUSTED_NOT_CLEAN`/u);
   for (const surface of [plan, parent, alternate, generator, crossRepository]) {
     assert.match(surface, /chronological discovery order/u);
     assert.match(surface, /immediate successor/u);
@@ -2695,13 +2781,19 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(generator, /only after every recorded request for the old input is terminal/u);
   assert.match(generator, /headless Codex PR-conversation result/u);
   assert.match(generator, /closed `terminalResultRef`/u);
+  assert.match(generator, /closed `terminalFailureRef`/u);
+  assert.match(generator, /at most three Codex channel attempts/u);
+  assert.match(generator, /`OPERATOR_AUTHORIZED_EXHAUSTED_NOT_CLEAN`/u);
   assert.match(generator, /including a head that received zero requests/u);
   assert.match(generator, /copilot-pull-request-reviewer\[bot\]/u);
-  assert.match(generator, /a second proved no-effect attempt is `EXHAUSTED`/iu);
+  assert.match(generator, /a second proved no-effect (?:delivery )?attempt is `EXHAUSTED`|a second proved no-effect delivery attempt is `EXHAUSTED`/iu);
   assert.match(generator, /Persist Copilot `readyAt` as the authenticated release boundary/u);
   assert.match(crossRepository, /Reject non-finite or out-of-portable-range JSON numbers/u);
   assert.match(crossRepository, /task head and review-input head differ/u);
   assert.match(crossRepository, /closed `terminalResultRef`/u);
+  assert.match(crossRepository, /closed `terminalFailureRef`/u);
+  assert.match(crossRepository, /at most three Codex channel attempts/u);
+  assert.match(crossRepository, /`OPERATOR_AUTHORIZED_EXHAUSTED_NOT_CLEAN`/u);
   assert.match(crossRepository, /each count to equal the persisted request history/u);
   const task15 = tasks.find((task) => task.number === 15);
   assert.notEqual(task15, undefined);
@@ -2717,6 +2809,14 @@ test('all permanent active task-template and controller surfaces use the compact
     [...plan.matchAll(/Persist Copilot `readyAt` as the authenticated release boundary before a Codex request\./gu)].length,
     82,
   );
+  for (const surface of [plan, parent, alternate, generator, crossRepository, performance]) {
+    assert.match(surface, /three (?:downstream )?(?:Codex )?channel attempts/iu);
+    assert.match(surface, /`EXHAUSTED_NOT_CLEAN`/u);
+  }
+  assert.match(performance, /60(?:-second| seconds)/u);
+  assert.match(performance, /attempt 4/u);
+  assert.match(performance, /exact typed operator authority/u);
+  assert.doesNotMatch(plan, /except a reviewer proved non-functional under `AGENTS\.md`/u);
   const confirmedMutationMetadataRule =
     'At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt ' +
     'count and both attempt and reconciliation timestamps, then require `readyAt` to equal ' +
@@ -2734,7 +2834,7 @@ test('all permanent active task-template and controller surfaces use the compact
     assert.match(surface, /every supplied review-run head identity must match the reviewed head/u);
     assert.match(surface, /all valid timestamp aliases for one event time must agree/u);
     assert.match(surface, /Causal RFC 3339 ordering must preserve every supplied fractional digit/u);
-    assert.match(surface, /required matching normalized head evidence for a terminal conversation result/u);
+    assert.match(surface, /matching normalized head evidence/u);
   }
   for (const surface of [plan, parent, alternate, generator, crossRepository]) {
     assert.match(
@@ -4164,7 +4264,7 @@ test('confirmed terminal requests require one attributable persisted result', as
   delete missingReference.current_task.review.reviewRequests[0].terminalResultRef;
   assert.throws(
     () => assertSchemaValid(missingReference, schema, schema),
-    /terminalResultRef is required/u,
+    /does not match any allowed schema/u,
   );
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(missingReference)),
@@ -7143,4 +7243,529 @@ test('review requests and schema use the same RFC 3339 grammar', async () => {
       /malformed or mismatched/u,
     );
   }
+});
+
+test('an exact first terminal failure authorizes only channel attempt two after backoff', () => {
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', {
+    confirmed: true,
+    terminal: true,
+    requestedAt: '2026-09-04T10:00:00Z',
+  });
+  const failedCodex = failedCodexRequest(input);
+  const persisted = state(input, {
+    reviewRequests: [copilot, failedCodex],
+  });
+  const decide = (decisionAt, codexResults = persisted.codexResults) =>
+    decideReviewRequest({
+      previousReviewInput: input,
+      currentReviewInput: input,
+      mutationClass: 'RESULT_OR_STATE',
+      existingRequests: persisted.reviewRequests,
+      codexResults,
+      decisionAt,
+    });
+
+  assert.equal(REVIEW_TERMINAL_FAILURE_RETRY_MILLISECONDS, 60_000);
+  assert.deepEqual(REVIEW_TERMINAL_FAILURE_STATUSES, [
+    'failed',
+    'canceled',
+    'skipped',
+    'timed_out',
+    'expired',
+  ]);
+  assert.equal(REVIEW_MAX_CHANNEL_ATTEMPTS, 3);
+  assert.equal(decide('2026-09-04T10:03:00.999Z').status, 'WAIT_FOR_RETRY_BACKOFF');
+  assert.deepEqual(decide('2026-09-04T10:03:01Z'), {
+    status: 'REQUEST_REQUIRED',
+    reviewInputKey: getReviewInputKey(input),
+    channels: ['codex'],
+    channelAttempt: 2,
+    reason: 'Retry only the channel whose attempt 1 has one exact attributable terminal failure.',
+  });
+  assert.throws(
+    () => decide('2026-09-04T10:03:01Z', null),
+    /complete Codex result collection/u,
+  );
+});
+
+test('missing, ambiguous, nonterminal, and completed evidence never authorizes a failure retry', () => {
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', { confirmed: true, terminal: true });
+  const pendingCodex = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+    confirmed: true,
+  });
+  const pendingDecision = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: [copilot, pendingCodex],
+    decisionAt: '2026-09-04T10:10:00Z',
+  });
+  const completedDecision = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: pairFor(input),
+    decisionAt: '2026-09-04T10:10:00Z',
+  });
+  const malformedFailure = failedCodexRequest(input, {
+    terminalFailureRef: terminalFailureRef({ status: 'pending' }),
+  });
+
+  assert.equal(pendingDecision.status, 'NO_REQUEST');
+  assert.equal(completedDecision.status, 'NO_REQUEST');
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input,
+      currentReviewInput: input,
+      mutationClass: 'RESULT_OR_STATE',
+      existingRequests: [copilot, malformedFailure],
+      codexResults: { submittedReviews: [], conversationComments: [] },
+      decisionAt: '2026-09-04T10:10:00Z',
+    }),
+    /malformed or mismatched/u,
+  );
+});
+
+test('attempt two preserves attempt one and requires exact fresh post-failure baselines', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', { confirmed: true, terminal: true });
+  const first = failedCodexRequest(input, {
+    baselineRequestEventIds: ['REQUEST_BASELINE_ONE'],
+    baselineReviewNodeIds: ['REVIEW_BASELINE_ONE'],
+    baselineReviewRunIds: ['RUN_BASELINE_ONE'],
+    baselineConversationComments: {
+      OLD_COMMENT: '2026-09-04T09:59:00Z',
+    },
+  });
+  const second = requestFor(input, 'codex', {
+    channelAttempt: 2,
+    requestedAt: '2026-09-04T10:03:01Z',
+    baselineCapturedAt: '2026-09-04T10:02:30Z',
+    baselineRequestEventIds: ['REQUEST_BASELINE_ONE'],
+    baselineReviewNodeIds: ['REVIEW_BASELINE_ONE'],
+    baselineReviewRunIds: ['RUN_BASELINE_ONE'],
+    baselineConversationComments: {
+      OLD_COMMENT: '2026-09-04T09:59:00Z',
+      CODEX_FAILURE_ONE: '2026-09-04T10:02:00Z',
+      CODEX_SUMMARY: '2026-09-04T10:02:01Z',
+    },
+  });
+  const valid = compactState(input, {
+    reviewRequests: [copilot, first, second],
+  });
+
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+  assert.equal(valid.current_task.review.reviewRequests[1].terminalFailureRef.status, 'failed');
+  assert.equal(valid.current_task.review.reviewRequests[2].channelAttempt, 2);
+
+  for (const mutate of [
+    (candidate) => {
+      delete candidate.current_task.review.reviewRequests[2]
+        .baselineConversationComments.CODEX_FAILURE_ONE;
+    },
+    (candidate) => {
+      delete candidate.current_task.review.reviewRequests[2]
+        .baselineConversationComments.CODEX_SUMMARY;
+    },
+    (candidate) => {
+      candidate.current_task.review.reviewRequests[2].baselineCapturedAt =
+        '2026-09-04T10:01:59Z';
+    },
+    (candidate) => {
+      candidate.current_task.review.reviewRequests[2].requestedAt =
+        '2026-09-04T10:03:00.999Z';
+    },
+    (candidate) => {
+      candidate.current_task.review.reviewRequests[2].baselineRequestEventIds = [];
+    },
+  ]) {
+    const invalid = structuredClone(valid);
+    mutate(invalid);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /attempt 2|preserve every prior identity baseline/u,
+    );
+  }
+});
+
+test('duplicate failure evidence cannot authorize more than one retry', () => {
+  const input = reviewInput();
+  const requests = [
+    requestFor(input, 'copilot', { confirmed: true, terminal: true }),
+    failedCodexRequest(input),
+  ];
+  const persisted = state(input, { reviewRequests: requests });
+  persisted.codexResults.conversationComments.push(
+    structuredClone(persisted.codexResults.conversationComments[0]),
+  );
+
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input,
+      currentReviewInput: input,
+      mutationClass: 'RESULT_OR_STATE',
+      existingRequests: requests,
+      codexResults: persisted.codexResults,
+      decisionAt: '2026-09-04T10:03:00Z',
+    }),
+    /one unique attributable terminal failure/u,
+  );
+});
+
+test('a second exact terminal failure authorizes attempt three and attempt four fails closed', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', { confirmed: true, terminal: true });
+  const first = failedCodexRequest(input);
+  const second = failedCodexRequest(input, {
+    channelAttempt: 2,
+    requestedAt: '2026-09-04T10:03:01Z',
+    baselineCapturedAt: '2026-09-04T10:02:30Z',
+    baselineConversationComments: {
+      CODEX_FAILURE_ONE: '2026-09-04T10:02:00Z',
+      CODEX_SUMMARY: '2026-09-04T10:02:01Z',
+    },
+    terminalFailureRef: terminalFailureRef({
+      id: 'CODEX_FAILURE_TWO',
+      observedAt: '2026-09-04T10:04:00Z',
+      summaryObservedAt: '2026-09-04T10:04:01Z',
+    }),
+  });
+  const persisted = state(input, {
+    reviewRequests: [copilot, first, second],
+  });
+  const decision = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: persisted.reviewRequests,
+    codexResults: persisted.codexResults,
+    decisionAt: '2026-09-04T10:05:01Z',
+  });
+
+  assert.deepEqual(decision, {
+    status: 'REQUEST_REQUIRED',
+    reviewInputKey: getReviewInputKey(input),
+    channels: ['codex'],
+    channelAttempt: 3,
+    reason: 'Retry only the channel whose attempt 2 has one exact attributable terminal failure.',
+  });
+
+  const third = failedCodexRequest(input, {
+    channelAttempt: 3,
+    requestedAt: '2026-09-04T10:05:01Z',
+    baselineCapturedAt: '2026-09-04T10:04:30Z',
+    baselineConversationComments: {
+      CODEX_FAILURE_ONE: '2026-09-04T10:02:00Z',
+      CODEX_FAILURE_TWO: '2026-09-04T10:04:00Z',
+      CODEX_SUMMARY: '2026-09-04T10:04:01Z',
+    },
+    terminalFailureRef: terminalFailureRef({
+      id: 'CODEX_FAILURE_THREE',
+      observedAt: '2026-09-04T10:06:00Z',
+      summaryObservedAt: '2026-09-04T10:06:01Z',
+    }),
+  });
+  const exhausted = state(input, {
+    reviewRequests: [...persisted.reviewRequests, third],
+  });
+  assert.equal(decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: exhausted.reviewRequests,
+    codexResults: exhausted.codexResults,
+    decisionAt: '2026-09-04T10:07:01Z',
+  }).status, 'REVIEW_BLOCKED');
+
+  const authorized = decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: exhausted.reviewRequests,
+    codexResults: exhausted.codexResults,
+    decisionAt: '2026-09-04T10:07:01Z',
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 182,
+    reviewerExhaustionAuthority: reviewerExhaustionAuthority(input),
+  });
+  assert.equal(authorized.status, 'EXHAUSTED_NOT_CLEAN');
+  assert.equal(authorized.clean, false);
+  assert.equal(authorized.mayProceedToIndependentQuality, true);
+
+  const fourth = requestFor(input, 'codex', {
+    channelAttempt: 4,
+    requestedAt: '2026-09-04T10:07:01Z',
+  });
+  const invalid = compactState(input, {
+    reviewRequests: [...exhausted.reviewRequests, fourth],
+    codexResults: exhausted.codexResults,
+  });
+  assert.throws(() => assertSchemaValid(invalid, schema, schema));
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(invalid)),
+    /persisted review request is malformed/u,
+  );
+});
+
+test('only the exact typed PR 182 authority makes exhausted-not-clean review merge-ready', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', { confirmed: true, terminal: true });
+  const first = failedCodexRequest(input);
+  const second = failedCodexRequest(input, {
+    channelAttempt: 2,
+    requestedAt: '2026-09-04T10:03:01Z',
+    baselineCapturedAt: '2026-09-04T10:02:30Z',
+    baselineConversationComments: {
+      CODEX_FAILURE_ONE: '2026-09-04T10:02:00Z',
+      CODEX_SUMMARY: '2026-09-04T10:02:01Z',
+    },
+    terminalFailureRef: terminalFailureRef({
+      id: 'CODEX_FAILURE_TWO',
+      observedAt: '2026-09-04T10:04:00Z',
+      summaryObservedAt: '2026-09-04T10:04:01Z',
+    }),
+  });
+  const third = failedCodexRequest(input, {
+    channelAttempt: 3,
+    requestedAt: '2026-09-04T10:05:01Z',
+    baselineCapturedAt: '2026-09-04T10:04:30Z',
+    baselineConversationComments: {
+      CODEX_FAILURE_ONE: '2026-09-04T10:02:00Z',
+      CODEX_FAILURE_TWO: '2026-09-04T10:04:00Z',
+      CODEX_SUMMARY: '2026-09-04T10:04:01Z',
+    },
+    terminalFailureRef: terminalFailureRef({
+      id: 'CODEX_FAILURE_THREE',
+      observedAt: '2026-09-04T10:06:00Z',
+      summaryObservedAt: '2026-09-04T10:06:01Z',
+    }),
+  });
+  const authority = reviewerExhaustionAuthority(input);
+  const requests = [copilot, first, second, third];
+  const persisted = compactState(input, {
+    reviewRequests: requests,
+    reviewerExhaustionAuthority: authority,
+  });
+  assertSchemaValid(persisted, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(persisted)), persisted);
+
+  const allGates = {
+    exactHeadCiClean: true,
+    copilotOutcomeCleanOrAuthorized: true,
+    noUnresolvedActionableFindings: true,
+    independentQualityAuditPassed: true,
+    exactHeadFinalValidationPassed: true,
+    frozenInputAccurate: true,
+    mergeable: true,
+    otherRequiredGatesPassed: true,
+  };
+  const evaluate = (reviewState, gates = allGates, pullRequest = 182) =>
+    evaluateReviewMergeReadiness({
+      repository: 'franklesniak/PSStyleGuide',
+      pullRequest,
+      currentHead: input.head,
+      currentTree: input.tree,
+      reviewState,
+      gates,
+    });
+
+  const ready = evaluate(persisted.current_task.review);
+  assert.deepEqual(ready, {
+    reviewerState: 'exhausted-not-clean',
+    clean: false,
+    authorizedExhaustion: true,
+    mayProceedToIndependentQuality: true,
+    mergeReady: true,
+  });
+
+  for (const gate of Object.keys(allGates)) {
+    const result = evaluate(persisted.current_task.review, {
+      ...allGates,
+      [gate]: false,
+    });
+    assert.equal(result.reviewerState, 'exhausted-not-clean');
+    assert.equal(result.clean, false);
+    assert.equal(result.mergeReady, false, `${gate} must remain a merge gate`);
+  }
+
+  const unapproved = state(input, { reviewRequests: requests });
+  assert.deepEqual(evaluate(unapproved), {
+    reviewerState: 'exhausted-blocked',
+    clean: false,
+    authorizedExhaustion: false,
+    mayProceedToIndependentQuality: false,
+    mergeReady: false,
+  });
+  assert.throws(
+    () => evaluate(persisted.current_task.review, allGates, 183),
+    /exact, typed, input-bound, and operator-authenticated/u,
+  );
+
+  const forged = structuredClone(persisted);
+  forged.current_task.review.reviewerExhaustionAuthority.reviewInputKey = 'f'.repeat(64);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(forged)),
+    /exact, typed, input-bound, and operator-authenticated/u,
+  );
+  const untyped = structuredClone(persisted);
+  untyped.current_task.review.reviewerExhaustionAuthority.bypass = true;
+  assert.throws(() => assertSchemaValid(untyped, schema, schema));
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(untyped)),
+    /closed review-state contract|exact, typed/u,
+  );
+});
+
+test('Codex failure ingestion requires one summary and one unique attributable detail', () => {
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', { confirmed: true, terminal: true });
+  const codex = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+    confirmed: true,
+    baselineConversationComments: {
+      SUMMARY: '2026-09-04T10:00:00Z',
+    },
+  });
+  const summary = {
+    nodeId: 'SUMMARY',
+    actor: 'chatgpt-codex-connector[bot]',
+    updatedAt: '2026-09-04T10:02:01Z',
+    body: '| Review | Status | Commit | Review trigger |\n' +
+      '| --- | --- | --- | --- |\n' +
+      `| **Code Review** | **Failed** | \`${input.head.slice(0, 7)}\` | Manual request |`,
+  };
+  const detail = {
+    nodeId: 'CODEX_FAILURE_ONE',
+    actor: 'chatgpt-codex-connector[bot]',
+    createdAt: '2026-09-04T10:02:00Z',
+    body: 'Codex Review: Something went wrong. Try again later.\n\nAn unknown error occurred',
+  };
+  const collected = collectCodexResults({
+    submittedReviews: [],
+    conversationComments: [summary, detail],
+    reviewInput: input,
+    request: codex,
+    reviewRequests: [copilot, codex],
+  });
+
+  assert.deepEqual(collected.conversationComments, [{
+    nodeId: 'CODEX_FAILURE_ONE',
+    actor: 'chatgpt-codex-connector[bot]',
+    updatedAt: '2026-09-04T10:02:00Z',
+    status: 'failed',
+    commitPrefix: input.head.slice(0, 7),
+    terminalSummaryId: 'SUMMARY',
+    terminalSummaryUpdatedAt: '2026-09-04T10:02:01Z',
+  }]);
+  const ambiguous = collectCodexResults({
+    submittedReviews: [],
+    conversationComments: [summary, detail, { ...detail, nodeId: 'SECOND_DETAIL' }],
+    reviewInput: input,
+    request: codex,
+    reviewRequests: [copilot, codex],
+  });
+  assert.deepEqual(ambiguous.conversationComments, []);
+});
+
+test('terminal-failure detail and summary identities are distinct and bound before input drift', () => {
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', { confirmed: true, terminal: true });
+  const sameIdentity = compactState(input, {
+    reviewRequests: [
+      copilot,
+      failedCodexRequest(input, {
+        terminalFailureRef: terminalFailureRef({ summaryId: 'CODEX_FAILURE_ONE' }),
+      }),
+    ],
+  });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(sameIdentity)),
+    /persisted review request is malformed/u,
+  );
+
+  const successor = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const lateSummaryFailure = failedCodexRequest(input, {
+    terminalFailureRef: terminalFailureRef({
+      summaryObservedAt: '2026-09-04T10:03:01Z',
+    }),
+  });
+  const persisted = state(input, {
+    reviewRequests: [
+      copilot,
+      lateSummaryFailure,
+      requestFor(successor, 'copilot', {
+        requestedAt: '2026-09-04T10:03:00Z',
+      }),
+    ],
+  });
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input,
+      currentReviewInput: input,
+      mutationClass: 'RESULT_OR_STATE',
+      existingRequests: persisted.reviewRequests,
+      codexResults: persisted.codexResults,
+      decisionAt: '2026-09-04T10:04:30Z',
+    }),
+    /different-input request requires every earlier-input request to be terminal first|one unique attributable terminal failure/u,
+  );
+});
+
+test('a clean Codex result cannot make an incomplete Copilot pair clean', () => {
+  const input = reviewInput();
+  const copilotPending = requestFor(input, 'copilot', {
+    confirmed: true,
+    terminal: false,
+  });
+  const codexClean = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+    confirmed: true,
+    terminal: true,
+  });
+  const reviewState = state(input, {
+    reviewRequests: [copilotPending, codexClean],
+  });
+  const result = evaluateReviewMergeReadiness({
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 182,
+    currentHead: input.head,
+    currentTree: input.tree,
+    reviewState,
+    gates: {
+      exactHeadCiClean: true,
+      copilotOutcomeCleanOrAuthorized: true,
+      noUnresolvedActionableFindings: true,
+      independentQualityAuditPassed: true,
+      exactHeadFinalValidationPassed: true,
+      frozenInputAccurate: true,
+      mergeable: true,
+      otherRequiredGatesPassed: true,
+    },
+  });
+
+  assert.deepEqual(result, {
+    reviewerState: 'incomplete',
+    clean: false,
+    authorizedExhaustion: false,
+    mayProceedToIndependentQuality: false,
+    mergeReady: false,
+  });
 });

@@ -257,6 +257,9 @@
           "items": {
             "type": "object"
           }
+        },
+        "reviewerExhaustionAuthority": {
+          "$ref": "#/$defs/reviewerExhaustionAuthority"
         }
       },
       "allOf": [
@@ -401,9 +404,19 @@
           "$ref": "#/$defs/rfc3339"
         },
         "attemptCount": {
+          "description": "Number of public-mutation delivery attempts for this channel attempt. This is separate from channelAttempt.",
           "type": "integer",
           "minimum": 1,
           "maximum": 2
+        },
+        "channelAttempt": {
+          "description": "Downstream reviewer attempt ordinal. Omission is the legacy representation of attempt one.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "baselineCapturedAt": {
+          "$ref": "#/$defs/rfc3339"
         },
         "readyAt": {
           "$ref": "#/$defs/rfc3339"
@@ -416,6 +429,9 @@
         },
         "terminalResultRef": {
           "$ref": "#/$defs/terminalResultRef"
+        },
+        "terminalFailureRef": {
+          "$ref": "#/$defs/terminalFailureRef"
         },
         "baselineRequestEventIds": {
           "type": "array",
@@ -546,8 +562,17 @@
             }
           },
           "then": {
-            "required": [
-              "terminalResultRef"
+            "anyOf": [
+              {
+                "required": [
+                  "terminalResultRef"
+                ]
+              },
+              {
+                "required": [
+                  "terminalFailureRef"
+                ]
+              }
             ]
           }
         },
@@ -565,7 +590,54 @@
               "terminal": {
                 "const": true
               }
+            },
+            "not": {
+              "required": [
+                "terminalFailureRef"
+              ]
             }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "terminalFailureRef"
+            ]
+          },
+          "then": {
+            "properties": {
+              "channel": {
+                "const": "codex"
+              },
+              "confirmed": {
+                "const": true
+              },
+              "terminal": {
+                "const": true
+              }
+            },
+            "not": {
+              "required": [
+                "terminalResultRef"
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "channelAttempt": {
+                "minimum": 2
+              }
+            },
+            "required": [
+              "channelAttempt"
+            ]
+          },
+          "then": {
+            "required": [
+              "baselineCapturedAt"
+            ]
           }
         },
         {
@@ -615,6 +687,110 @@
         },
         "observedAt": {
           "$ref": "#/$defs/rfc3339"
+        }
+      }
+    },
+    "terminalFailureRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "observedAt",
+        "summaryId",
+        "summaryObservedAt",
+        "status"
+      ],
+      "properties": {
+        "kind": {
+          "const": "conversation-comment"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "observedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "summaryId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "summaryObservedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "status": {
+          "enum": [
+            "failed",
+            "canceled",
+            "skipped",
+            "timed_out",
+            "expired"
+          ]
+        }
+      }
+    },
+    "reviewerExhaustionAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "repository",
+        "pullRequest",
+        "reviewInputKey",
+        "head",
+        "channel",
+        "maximumChannelAttempts",
+        "completedReviewRounds",
+        "authorizedAt",
+        "authority",
+        "reason"
+      ],
+      "properties": {
+        "state": {
+          "const": "OPERATOR_AUTHORIZED_EXHAUSTED_NOT_CLEAN"
+        },
+        "repository": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "pullRequest": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "reviewInputKey": {
+          "$ref": "#/$defs/sha256"
+        },
+        "head": {
+          "$ref": "#/$defs/sha1"
+        },
+        "channel": {
+          "const": "codex"
+        },
+        "maximumChannelAttempts": {
+          "const": 3
+        },
+        "completedReviewRounds": {
+          "type": "integer",
+          "minimum": 21,
+          "maximum": 9007199254740991
+        },
+        "authorizedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
         }
       }
     },
@@ -776,6 +952,12 @@
             "codex"
           ]
         },
+        "channelAttempt": {
+          "description": "Downstream reviewer attempt ordinal. This is separate from attemptCount, which tracks public-mutation delivery attempts.",
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
         "attemptCount": {
           "type": "integer",
           "minimum": 1,
@@ -889,6 +1071,11 @@
                 {
                   "required": [
                     "channel"
+                  ]
+                },
+                {
+                  "required": [
+                    "channelAttempt"
                   ]
                 }
               ]

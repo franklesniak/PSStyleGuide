@@ -50,11 +50,15 @@ The compact policy controls orchestration mechanics. A task-specific objective, 
 
 For PR work, generate and read back an accurate reviewer-facing body before review. Keep live task and review state out of that body. Request one required review set for the final reviewed input. Generate a Copilot REST request from the typed reviewer specification with exact login `copilot-pull-request-reviewer[bot]`; reject the display name `Copilot`. Normalize every API collection through the tested helper; an empty collection is not a match. Persist the unique request-event, review-run, submitted-review, and conversation-comment baselines with the in-flight attempt. A code, reviewed-diff, or material scope, behavior, or risk change invalidates that review. A verified factual correction in compact state or a comment-only publication does not. Serialize review pairs across different inputs. If authenticated reviewed-input drift makes an unrequested old-input channel impossible, record a typed `SUPERSEDED` disposition only after every recorded request for that input is terminal. Validate the disposition against request existence, an incomplete channel set, one matching head, the immediate successor head in retained chronological head order, and a time that is not earlier than every described request terminal-result or terminal-disposition boundary and is not later than the first later different-input request. Preserve a zero-request intermediate head and permit a same-head successor only when the successor input retains that head. Require that disposition before a different-input successor request. If that key becomes current again, retain the disposition and resume its original incomplete pair without a duplicate request. Require submitted-review commits to match the reviewed head. Require every metric reason record to contain only a nonempty reason string and Boolean material value. Attribute a headless Codex conversation result through its authenticated author, request time, baseline exclusion, reviewed-input key, and predecessor-pair order. After a confirmed remote write, use targeted readback; do not repeat the write because local result recording failed. If an accepted Copilot request has no matching readback, record `RECONCILING` and continue other safe work. After at least 120 seconds, require complete negative readback from request events, requested reviewers, submitted reviews, and Copilot review runs before `NO_EFFECT`. Permit one retry for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger until the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Treat a request event, submitted review, review run, or conversation comment as baseline evidence when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity must be absent from the matching baseline, every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal result to only one request across both reviewer channels; deduplicate its result kind and every native identity globally. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology.
 
+Keep public-mutation `NO_EFFECT` recovery separate from downstream reviewer-terminal recovery. For one confirmed Codex request on an unchanged reviewed-input key, `completed` is the only clean result. An exact attributable `failed`, `canceled`, `skipped`, `timed_out`, or `expired` result is non-clean and permits only the next channel attempt after a repository-defined delay of at least 60 seconds. Permit at most three channel attempts in total. Capture a fresh cumulative baseline for attempts 2 and 3 after the immediately preceding failure boundary. Preserve each earlier request and failure. Require strict actor, head or normalized-head, reviewed-input, request-time, immutable-detail, mutable-summary, uniqueness, fresh-baseline, and next-request-boundary attribution. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4.
+
+After attempt 3 ends in an exact attributable terminal failure, record `EXHAUSTED_NOT_CLEAN` and block by default. Do not call exhaustion clean. A narrow closed `reviewerExhaustionAuthority` may allow independent quality and merge-readiness evaluation only when it exactly binds the repository, pull request, reviewed-input key, head, Codex channel, maximum of three attempts, more than 20 completed review rounds, authorization time, authority, and reason. All CI, exact-head, clean-or-independently-authorized Copilot, unresolved-actionable-finding, independent-quality, frozen-input, mergeability, and other required gates remain mandatory.
+
 Normalize native check-run records for complete readback, but do not authenticate Copilot from a mutable check-run name plus the generic GitHub Actions App identity. Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt. Require a matching fresh authenticated request event, exact-head submitted review, or exact-head workflow-run bot actor.
 
-For each confirmed terminal request, persist one closed `terminalResultRef` that identifies the result kind, immutable result, and observed time while the complete result stays in its separate channel result collection. During compact-state ingestion, cross-validate the reference against the correct channel, actor, request baseline, request time, reviewed head when available, safe headless-comment evidence, and the next different-input request boundary. Reject a missing, duplicate, stale, baseline, wrong-actor, wrong-head, wrong-channel, or wrong-time reference. Do not add this reference to an unconfirmed or nonterminal request.
+For each confirmed terminal request, persist one closed `terminalResultRef` for a clean completed result or one closed `terminalFailureRef` for an exact attributable terminal non-success. Keep the complete immutable result in its separate channel collection. A failure reference also identifies its immutable detail and the exact mutable summary observation used for terminal-state attribution. During compact-state ingestion, cross-validate the reference against the correct channel, actor, request baseline, request time, reviewed head when available, safe headless-comment evidence, and the next same-channel and different-input request boundaries. Reject a missing, duplicate, stale, baseline, wrong-actor, wrong-head, wrong-channel, wrong-time, reused-summary, or later-attempt reference. Do not add either reference to an unconfirmed or nonterminal request.
 
-Keep every frozen reviewed head in chronological discovery order in `reviewerRequestsPerHead`, including a head that received zero requests. Persist each logical request's bounded physical `attemptCount` as one or two, default an absent legacy value to one, and sum those attempt counts in `reviewerRequestsPerHead`. During ingestion, require the current head and every request head to occur in that map, and require each count to equal the persisted request history. Pass that map into request-decision calls that evaluate retained supersessions. Revalidate its current head, request heads, exact counts, key syntax, and chronological property order there before using those ordered keys to bind each retained supersession to its immediate successor, including a zero-request head.
+Keep every frozen reviewed head in chronological discovery order in `reviewerRequestsPerHead`, including a head that received zero requests. Persist each logical public-mutation `attemptCount` as one or two. Persist each downstream reviewer `channelAttempt` as one, two, or three. Default an absent legacy value to one, and sum physical public mutations in `reviewerRequestsPerHead`. During ingestion, require the current head and every request head to occur in that map, and require each count to equal the persisted request history. Pass that map into request-decision calls that evaluate retained supersessions. Revalidate its current head, request heads, exact counts, key syntax, and chronological property order there before using those ordered keys to bind each retained supersession to its immediate successor, including a zero-request head.
 
 The machine-readable review-input and mutation contract is `docs/planning/review-loop-policy.json`. Its deterministic implementation and scenarios are `docs/planning/review-loop-policy.mjs` and `docs/planning/review-loop-policy.test.mjs`. These files validate decisions; they do not perform GitHub writes. Task-local PR publication, review, and quality prompts remain complete without requiring an executor to read the shared files.
 
@@ -612,7 +616,9 @@ If a review finding requires repository-byte change, route to Task 4, then updat
 
 Publish a status warning when a simple finding has not produced commit-ready bytes or a concrete exception by 10 minutes. Produce one of those outcomes by 15 minutes. Track reviewer requests per head, body edits after review begins, same-head re-request reasons, time from clean review to recognition, and time from first clean pair to merge. Do not rerun reviewers as a substitute for deterministic validation.
 
-Return `TERMINALLY_CLEAN` only when the local audit and one attributable Codex review are clean on the same final code head and reviewed input; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; all findings and threads are terminal; checks and validations are truthful; the frozen body is accurate; mutable results are separate; and no merge occurred. Otherwise return `REVIEW_BLOCKED` with the exact defect, materiality class, and route through Task 4 or Task 5, followed by new Task 6 and Task 7 instances only when the classifier requires them. Do not merge, enable auto-merge, close an issue, or publish the landed handoff.
+Keep public-mutation `NO_EFFECT` recovery separate from confirmed Codex downstream-result recovery. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempts 2 and 3 each require the immediately preceding exact attributable terminal non-success, a fresh cumulative baseline after that failure boundary, and at least 60 seconds. Preserve every request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit retry. Never permit attempt 4. After attempt 3 fails exactly, return `EXHAUSTED_NOT_CLEAN` and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; the authority never makes failure clean or waives another gate.
+
+Return `TERMINALLY_CLEAN` only when the local audit and one attributable Codex review are clean on the same final code head and reviewed input; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; all findings and threads are terminal; checks and validations are truthful; the frozen body is accurate; mutable results are separate; and no merge occurred. Return `EXHAUSTED_NOT_CLEAN` only for three preserved exact Codex failures under a closed exact typed operator authority while every other gate passes. Otherwise return `REVIEW_BLOCKED` with the exact defect, materiality class, and route through Task 4 or Task 5, followed by new Task 6 and Task 7 instances only when the classifier requires them. Do not merge, enable auto-merge, close an issue, or publish the landed handoff.
 ~~~
 
 ### Procedure
@@ -633,11 +639,11 @@ Stop on stale head, body semantic drift, incomplete monitor surfaces, an unprove
 
 ### Exact output
 
-One authenticated `PS_METADATA_POLICY_TERMINALLY_CLEAN` record contains final head/tree, frozen body identity, local subagent identity, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, one attributable Codex result and trigger, complete inventories, decisions, validation, mutation classes, request metrics, and proof no merge occurred.
+One authenticated `PS_METADATA_POLICY_TERMINALLY_CLEAN` record contains final head/tree, frozen body identity, local subagent identity, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, one attributable Codex result and trigger, complete inventories, decisions, validation, mutation classes, request metrics, and proof no merge occurred. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The local audit and one clean attributable Codex review are terminal on the same final code head and frozen semantic input; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; every finding is closed; no same-head request lacks a material reason; and the PR remains unmerged.
+The local audit and one clean attributable Codex review are terminal on the same final code head and frozen semantic input; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; every finding is closed; no same-head request lacks a material reason; and the PR remains unmerged. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 7 — run the independent final quality check on the PS metadata-policy PR
 
@@ -662,7 +668,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 6 | `FS` | One local audit and one reviewer pair are terminally clean on the exact required head/tree and frozen semantic input. |
+| Task 6 | `FS` | One local audit and one reviewer pair are terminally clean on the exact required head/tree and frozen semantic input. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -754,7 +760,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 6 | `FS` | Codex is terminally clean and Copilot has either a clean result or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition on the gated head/tree and frozen semantic input. |
+| Task 6 | `FS` | Codex is terminally clean and Copilot has either a clean result or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition on the gated head/tree and frozen semantic input. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 | Task 7 | `FS` | Independent quality passes on the same gated head/tree and input. |
 
 ### Objective
@@ -1098,6 +1104,7 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 8. Generate exact typed reviewer requests, including the documented Copilot REST login. Treat a successful public API response and authenticated readback as the idempotency boundary. A later local serialization failure cannot repeat the public mutation. Add bounded no-effect reconciliation and a one-retry maximum without weakening confirmed-request suppression.
 9. Publish a 10-minute warning for a simple finding and produce commit-ready bytes or a concrete exception by 15 minutes. Track reviewer requests/head, body edits after review, same-head reasons, clean-review recognition time, and clean-pair-to-merge time.
 10. Required deterministic scenarios: clean pair plus compact-state update creates no request; non-material same-head correction creates no request; H1→H2 requires a pair; authenticated H1→H2 drift can supersede an impossible missing old-head channel without synthetic evidence only after every recorded old-input request is terminal; a live requested channel remains pending across same-head drift; a superseded input can become current again and resume its original incomplete pair; malformed, complete-pair, head-mismatched, pre-request, or requestless supersessions fail during ingestion; a terminal unconfirmed Copilot request requires a typed repository-authorized non-functional disposition; `current_task.head` must match the review-input head; non-finite or out-of-portable-range JSON numbers fail before parsing can change them; material same-head scope/risk change records reason and requires review; malformed same-head metric reasons fail during construction; unjustified same-head request is rejected; submitted-review and headless conversation-comment Codex results are attributed safely; the Copilot REST request uses only `copilot-pull-request-reviewer[bot]`; empty/singleton/multiple reviewer collections work and an empty response is not success; conversation baselines use unique node identities and duplicate JSON members fail ingestion; PowerShell-significant Markdown backticks and Unicode transport safely; confirmed public mutation plus result-recording failure reconciles without retry; an accepted no-effect request stays `RECONCILING` for at least 120 seconds, then permits one retry and exhausts after a second proved no-effect attempt; contradictory persisted mutation states fail schema validation; predecessor outputs survive restart until their final consumer and are then pruned; and semantic ingestion rejects future producers and expired retained outputs.
+11. Add deterministic downstream terminal-failure scenarios that are independent of public-mutation `NO_EFFECT`: exact failure of channel attempt 1 permits only attempt 2 after 60 seconds and a fresh cumulative baseline; exact failure of attempt 2 permits only attempt 3 under the same controls; missing, ambiguous, pending, completed, stale, forged, cross-head, cross-input, wrong-actor, duplicate, misordered, summary-reused, or baseline-reused evidence does not permit a retry; attempt 3 failure exhausts the channel; attempt 4 is rejected; exhaustion remains non-clean and blocked without a valid closed authority; and an exact typed authority can permit exhausted-not-clean merge readiness only while every independent non-reviewer gate is true.
 
 ### Procedure
 
@@ -1250,6 +1257,8 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 6. Normalize empty, singleton, and multiple reviewer, review, comment, thread, and review-run collections through the tested helper. An empty collection is not a match. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
 7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. Require an explicit commit match for a submitted review. Attribute a headless conversation result only through its authenticated author, request time, baseline exclusion, reviewed-input key, and serialized predecessor-pair order. An exact `@codex review` trigger is neither a finding nor a local instruction.
 8. If authenticated reviewed-input drift makes an unrequested old-input channel impossible, persist one typed `SUPERSEDED` disposition with the old input, successor head, time, and reason only after every recorded request for the old input is terminal. Cross-validate it against request existence, the incomplete channel set, one matching head, a known successor head, and a disposition time that is not earlier than every described request terminal-result or terminal-disposition boundary and is not later than the successor request. Require the disposition before the different-input successor request. If that key later becomes current again, retain its disposition as history and resume the original incomplete pair without creating a duplicate request identity. Do not invent the missing request or reuse new-head evidence for the old input.
+9. Keep a confirmed Codex downstream terminal failure distinct from a public-mutation `NO_EFFECT`. Preserve attempts 1 through 3 and every exact failure. Permit attempts 2 and 3 only after the immediately preceding attempt has strict attributable terminal non-success evidence, at least 60 seconds have elapsed, and a fresh cumulative baseline has been captured. Completed is the only clean Codex result. Missing, pending, ambiguous, stale, skipped without exact attribution, or otherwise ineligible evidence does not authorize retry. Never permit attempt 4.
+10. For PR #182 only, after attempt 3 also has exact attributable terminal failure evidence, persist the closed `reviewerExhaustionAuthority` authorized by the operator in finding F152. Return `EXHAUSTED_NOT_CLEAN`, not clean. Permit Task 16 to start only when exact-head CI is clean, Copilot is clean or independently authorized as nonfunctional, no actionable finding remains, the frozen input is accurate, and every other non-conflicting gate passes.
 
 ### Corrected Copilot-and-Codex review-loop prompt
 
@@ -1266,12 +1275,14 @@ Audit the complete diff and every issue requirement. Run focused validation firs
 
 Generate the GitHub Copilot review request from the typed policy specification. For the REST review-request API, use exactly `{"reviewers":["copilot-pull-request-reviewer[bot]"]}`. Do not use the display name `Copilot`. Capture the HTTP status and response body. Normalize all collections with the tested helper; an empty collection is not success. Confirm the request only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt. If an accepted request has no matching request event, submitted review, or Copilot review run, record `RECONCILING` and continue other safe work. Wait at least 120 seconds and require complete negative readback from all four surfaces before `NO_EFFECT`. Retry at most once for this reviewed input and channel. Record a second proved no-effect attempt as `EXHAUSTED`. Do not post the exact @codex review trigger until the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Treat a request event, submitted review, review run, or conversation comment as baseline evidence when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity must be absent from the matching baseline, every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal result to only one request across both reviewer channels; deduplicate its result kind and every native identity globally. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology.
 
+Keep that public-mutation retry budget separate from the confirmed Codex downstream-result budget. On one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after the failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve both earlier requests and failures. Count only `completed` as clean. Do not retry missing, pending, ambiguous, stale, or unattributable evidence, and never permit attempt 4. After a third exact terminal failure, record exhausted-not-clean. For this PR only, validate the exact closed F152 operator authority and continue to Task 16 without calling the Codex channel clean; all other gates remain mandatory.
+
 
 If a review finding requires repository-byte change, route to Task 13, then update and refreeze the body in Task 14 before a new Task 15 instance. If authenticated reviewed-input drift makes an unrequested old-input channel impossible, persist a typed `SUPERSEDED` disposition before the new pair only after all recorded requests for the old input are terminal; require request existence, an incomplete channel set, one matching head, a known successor head, and a disposition time not earlier than every old request terminal-result or terminal-disposition boundary and not later than the successor request. Do not invent a request or misattribute a result. If a superseded key becomes current again, retain and validate the disposition, ignore it only for current-input gating, and resume the original incomplete pair without a duplicate request. Require `current_task.head` to equal the review-input head. Reject a predecessor output from an incomplete producer or with a completed final consumer. Reject non-finite or out-of-portable-range JSON numbers before parsing and encode larger exact identifiers as strings. Reject a same-head metric reason that is not an exact nonempty-string and Boolean record. If a material scope or risk statement changes without a code change, record the reason and run a new pair. If a non-material evidence error is found, correct and deterministically verify compact state without restarting code review. A confirmed public mutation followed by local result-recording failure must be reconciled by readback and must not be retried.
 
 Publish a status warning when a simple finding has not produced commit-ready bytes or a concrete exception by 10 minutes. Produce one of those outcomes by 15 minutes. Track reviewer requests per head, body edits after review begins, same-head re-request reasons, time from clean review to recognition, and time from first clean pair to merge. Do not rerun reviewers as a substitute for deterministic validation.
 
-Return `TERMINALLY_CLEAN` only when the local audit and one attributable Codex review are clean on the same final code head and reviewed input; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; all findings and threads are terminal; checks and validations are truthful; the frozen body is accurate; mutable results are separate; and no merge occurred. Otherwise return `REVIEW_BLOCKED` with the exact defect, materiality class, and route through Task 13 or Task 14, followed by new Task 15 and Task 16 instances only when the classifier requires them. Do not merge, enable auto-merge, close an issue, or publish the landed handoff.
+Return `TERMINALLY_CLEAN` only when the local audit and one attributable Codex review are clean on the same final code head and reviewed input; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; all findings and threads are terminal; checks and validations are truthful; the frozen body is accurate; mutable results are separate; and no merge occurred. If all three exact Codex attempts fail and the closed F152 authority validates for PR #182, return `EXHAUSTED_NOT_CLEAN` with every failure attribution and the remaining-gate evaluation; do not relabel it clean. Otherwise return `REVIEW_BLOCKED` with the exact defect, materiality class, and route through Task 13 or Task 14, followed by new Task 15 and Task 16 instances only when the classifier requires them. Do not merge, enable auto-merge, close an issue, or publish the landed handoff.
 ~~~
 
 ### Procedure
@@ -1284,7 +1295,7 @@ Return `TERMINALLY_CLEAN` only when the local audit and one attributable Codex r
 
 ### Validation and evidence
 
-Require fresh local executor identity/model/reasoning, complete pagination, inventory closure, all deterministic scenarios, frozen input, one clean attributable Codex result, either one clean Copilot review or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition for the final reviewed input, same-head suppression, dual-channel ingestion, truthful checks, metrics, and no merge.
+Require fresh local executor identity/model/reasoning, complete pagination, inventory closure, all deterministic scenarios, frozen input, either one clean attributable Codex result or three preserved exact attributable Codex terminal failures plus the exact F152 authority for PR #182, either one clean Copilot review or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition for the final reviewed input, same-head suppression, dual-channel ingestion, truthful checks, zero unresolved actionable findings, metrics, and no merge.
 
 ### Stop and escalation conditions
 
@@ -1292,11 +1303,11 @@ Stop on unjustified same-head request, record/body coupling, monitor regression,
 
 ### Exact output
 
-One authenticated `REVIEW_LOOP_TERMINALLY_CLEAN` final result contains final head/tree/body, local results, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, one attributable Codex result and trigger, complete inventories, materiality and retry evidence, nine scenarios, task-required measurements, and proof no merge occurred.
+One authenticated `REVIEW_LOOP_REVIEW_RESULT` contains final head/tree/body, local results, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, either one attributable clean Codex result or three preserved exact attributable terminal failures plus the exact F152 authority, complete inventories, materiality and retry evidence, deterministic scenarios, task-required measurements, the exact `TERMINALLY_CLEAN`, `EXHAUSTED_NOT_CLEAN`, or `REVIEW_BLOCKED` state, and proof no merge occurred.
 
 ### Complete when
 
-The local audit and one clean attributable Codex review are terminal on the same final code head and frozen semantics; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; recording results caused no rerequest; and the PR remains unmerged.
+The local audit is terminal on the same final code head and frozen semantics; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition; Codex is either clean or is exactly `EXHAUSTED_NOT_CLEAN` after three preserved exact failures under the closed F152 authority for PR #182; recording results caused no rerequest; every other review-readiness gate passes; and the PR remains unmerged.
 
 ## Task 16 — run the independent final quality check on the review-loop PR
 
@@ -1321,7 +1332,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 15 | `FS` | The local audit and one reviewer pair are terminally clean on the exact required head/tree and frozen semantics. |
+| Task 15 | `FS` | The exact Task 15 result is `TERMINALLY_CLEAN`, or it is `EXHAUSTED_NOT_CLEAN` after three exact Codex failures under the closed F152 authority for PR #182; in either case, all non-Codex review-readiness gates pass on the exact required head/tree and frozen semantics. |
 
 ### Objective
 
@@ -1334,8 +1345,9 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Task-specific controls
 
 1. Verify unchanged reviewed head/diff/body semantics, inventory closure, all deterministic scenarios, dual-channel monitor, publication idempotency, and performance controls.
-2. Independently prove that an append-only result or local serialization failure cannot request reviewers again on the same head.
-3. Non-material evidence correction reruns Task 16 only. A material code/diff/scope/behavior/risk correction returns through Tasks 13/14 and requires new Tasks 15/16.
+2. If Task 15 is `EXHAUSTED_NOT_CLEAN`, independently validate all three exact Codex request/failure attributions and the closed PR #182 F152 authority. Preserve that non-clean state. Fail if any failure, retry baseline, delay, attempt boundary, authority field, or other review-readiness gate is missing, stale, ambiguous, or forged. Every other gate remains mandatory.
+3. Independently prove that an append-only result or local serialization failure cannot request reviewers again on the same head.
+4. Non-material evidence correction reruns Task 16 only. A material code/diff/scope/behavior/risk correction returns through Tasks 13/14 and requires new Tasks 15/16.
 
 ### Post-review materiality controls
 
@@ -1371,7 +1383,7 @@ Return `PASS` only when the independent audit and all required validation pass o
 1. Start a fresh independent session with the complete prompt and record its identity.
 2. Paginate and audit the issue, PR, inventory, diff, permanent surfaces, reviews/comments/threads, checks, frozen body, and exact head/tree.
 3. Run focused classifier/serializer/monitor/publication tests, then all full affected controller, manager, template, Markdown, PowerShell, and pre-commit validation.
-4. Reconcile metrics and actual Task 15 behavior with the required one-pair policy. Classify any discrepancy and route it correctly.
+4. Reconcile metrics and actual Task 15 behavior with the default pair, bounded three-attempt Codex failure recovery, and exact typed-exhaustion policy. Classify any discrepancy and route it correctly.
 5. Return the exact quality result and stop before merge.
 
 ### Validation and evidence
@@ -1412,7 +1424,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 15 | `FS` | One reviewer pair is terminally clean on the gated head/tree and frozen input. |
+| Task 15 | `FS` | Review is `TERMINALLY_CLEAN`, or PR #182 is exactly `EXHAUSTED_NOT_CLEAN` after three exact Codex failures under the closed F152 authority; all non-Codex gates pass on the gated head/tree and frozen input. |
 | Task 16 | `FS` | Independent quality passes on the same gated head/tree/input. |
 
 ### Objective
@@ -1426,7 +1438,7 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Task-specific controls
 
 1. Require exact equality with both gates and verify every post-gate mutation semantically. Separate comment/record results do not invalidate review; code/diff or material scope/risk change does.
-2. Require the PR base to be `planning-CRT-PR-852`, all applicable checks truthful, no unresolved findings, one-pair policy satisfied, and a permitted merge method.
+2. Require the PR base to be `planning-CRT-PR-852`, all applicable exact-head checks successful, no unresolved actionable findings, the independent Task 16 audit passed, the default pair or exact typed PR #182 exhausted-not-clean policy satisfied, exact-head final validation passed, frozen input accurate, mergeability clean, every other required gate passed, and a permitted merge method. Every other gate remains mandatory.
 3. Treat this task and the instruction to execute the plan as standing merge authority only while every on-plan condition in the shared policy remains true. Do not request or record separate per-merge approval. Do not copy the resulting planning files into `main`.
 
 ### Procedure
@@ -2391,7 +2403,9 @@ After the local audit is clean on the current head, record separate GitHub Copil
 
 If the code head or reviewed diff changes, discard the prior terminal claim, update and refreeze the body, repeat the local audit, and request one fresh pair on the new head. If scope, behavior, or risk description changes materially without a code change, record the material reason and request a fresh pair. For a deterministically verified non-material factual identity correction, result, task-state update, audit-record change, or comment-only publication on the same head, preserve and reuse the valid review. Reject a same-head re-request without a recorded material reason. Do not merge, enable auto-merge, close the issue, publish a landed handoff, or start a cross-repository comparison.
 
-Return `TERMINALLY_CLEAN` only when the local audit and one attributable `chatgpt-codex-connector` review are clean on the same current head SHA and tree; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review results must be public and readable. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 23 for bytes or Task 24 for PR-only metadata, followed by a new Task 25 instance.
+Keep public-mutation `NO_EFFECT` recovery separate from confirmed downstream-result recovery. For one unchanged reviewed-input key, permit at most three remote Codex channel attempts. Attempts 2 and 3 each require the immediately preceding exact attributable terminal non-success, a fresh cumulative baseline after that failure boundary, and at least 60 seconds. Preserve every request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit retry. Never permit attempt 4. After attempt 3 fails exactly, return `EXHAUSTED_NOT_CLEAN` and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; the authority never makes failure clean or waives another gate.
+
+Return `TERMINALLY_CLEAN` only when the local audit and one attributable `chatgpt-codex-connector` review are clean on the same current head SHA and tree; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review results must be public and readable. Return `EXHAUSTED_NOT_CLEAN` only for three preserved exact Codex failures under a closed exact typed operator authority while every other gate passes. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 23 for bytes or Task 24 for PR-only metadata, followed by a new Task 25 instance.
 ~~~
 
 ### Procedure
@@ -2412,11 +2426,11 @@ Stop without starting a successor if an input object is unavailable, a ref or bo
 
 ### Exact output
 
-One `TF_PR78_TERMINALLY_CLEAN` record contains the final head/tree, the local audit evidence, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, and the remote Codex review result, or one exact conformant skip. No quality or merge action occurred.
+One `TF_PR78_TERMINALLY_CLEAN` record contains the final head/tree, the local audit evidence, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, and the remote Codex review result, or one exact conformant skip. No quality or merge action occurred. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The local audit and one clean attributable remote Codex review are terminally clean on the same Terraform head/tree; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Otherwise, the conformant branch is skipped. No unresolved work or successor action remains in this leaf.
+The local audit and one clean attributable remote Codex review are terminally clean on the same Terraform head/tree; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Otherwise, the conformant branch is skipped. No unresolved work or successor action remains in this leaf. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 26 — run the independent final quality check on the Terraform PR #78 port PR
 
@@ -2441,7 +2455,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 25 | `FS` | The review loop is terminally clean on one head/tree, or the conformant skip is exact. |
+| Task 25 | `FS` | The review loop is terminally clean on one head/tree, or the conformant skip is exact. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -2594,7 +2608,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 25 | `FS` | Review is terminally clean or skipped as already conformant. |
+| Task 25 | `FS` | Review is terminally clean or skipped as already conformant. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 | Task 26 | `FS` | Independent quality passes on the same head/tree or propagates that skip. |
 
 ### Objective
@@ -3592,7 +3606,9 @@ After the local audit is clean on the current head, record separate GitHub Copil
 
 If the code head or reviewed diff changes, discard the prior terminal claim, update and refreeze the body, repeat the local audit, and request one fresh pair on the new head. If scope, behavior, or risk description changes materially without a code change, record the material reason and request a fresh pair. For a deterministically verified non-material factual identity correction, result, task-state update, audit-record change, or comment-only publication on the same head, preserve and reuse the valid review. Reject a same-head re-request without a recorded material reason. Do not merge, enable auto-merge, close the issue, publish a landed handoff, or start a cross-repository comparison.
 
-Return `TERMINALLY_CLEAN` only when the local audit and one attributable `chatgpt-codex-connector` review are clean on the same current head SHA and tree; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review results must be public and readable. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 32 for bytes or Task 33 for PR-only metadata, followed by a new Task 34 instance in the same loop.
+Keep public-mutation `NO_EFFECT` recovery separate from confirmed downstream-result recovery. For one unchanged reviewed-input key, permit at most three remote Codex channel attempts. Attempts 2 and 3 each require the immediately preceding exact attributable terminal non-success, a fresh cumulative baseline after that failure boundary, and at least 60 seconds. Preserve every request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit retry. Never permit attempt 4. After attempt 3 fails exactly, return `EXHAUSTED_NOT_CLEAN` and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; the authority never makes failure clean or waives another gate.
+
+Return `TERMINALLY_CLEAN` only when the local audit and one attributable `chatgpt-codex-connector` review are clean on the same current head SHA and tree; GitHub Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Every thread and synthetic finding must be closed. All required checks and validations must have truthful terminal results. The issue and PR descriptions must be accurate. No unfinished work or illegitimate deferral can remain. The exact review results must be public and readable. Return `EXHAUSTED_NOT_CLEAN` only for three preserved exact Codex failures under a closed exact typed operator authority while every other gate passes. Otherwise, return `REVIEW_BLOCKED` with the exact blocker and the required return path: Task 32 for bytes or Task 33 for PR-only metadata, followed by a new Task 34 instance in the same loop.
 ~~~
 
 ### Procedure
@@ -3613,11 +3629,11 @@ Stop without starting a successor if an input object is unavailable, a ref or bo
 
 ### Exact output
 
-One `PR78_SELECTED_REPAIR_TERMINALLY_CLEAN` record contains exact-head local audit evidence, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, the remote Codex review result, and the loop identity, or one exact skip.
+One `PR78_SELECTED_REPAIR_TERMINALLY_CLEAN` record contains exact-head local audit evidence, one Copilot result or exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition, the remote Codex review result, and the loop identity, or one exact skip. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The local audit and one clean attributable remote Codex review are clean on the same selected-target head/tree; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Otherwise, the fixed-point branch is skipped. No unresolved work or successor action occurred.
+The local audit and one clean attributable remote Codex review are clean on the same selected-target head/tree; Copilot has either one clean review on that input or an exact persisted `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL` terminal disposition. Otherwise, the fixed-point branch is skipped. No unresolved work or successor action occurred. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 35 — run the independent final quality check on one selected-target PR #78 repair PR
 
@@ -3642,7 +3658,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 34 in the same loop instance | `FS` | Review is terminally clean on one head/tree, or the skip is exact. |
+| Task 34 in the same loop instance | `FS` | Review is terminally clean on one head/tree, or the skip is exact. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -3793,7 +3809,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 34 in the same loop instance | `FS` | Review is terminally clean or skipped. |
+| Task 34 in the same loop instance | `FS` | Review is terminally clean or skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 | Task 35 in the same loop instance | `FS` | Independent quality passes on the same head/tree or skips. |
 
 ### Objective
@@ -4740,9 +4756,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -4754,11 +4770,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 46 — run the independent final quality check on the PS #168 PR
 
@@ -4782,7 +4798,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 45 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 45 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -4866,7 +4882,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 46 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 46 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -5470,9 +5486,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -5488,11 +5504,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 55 — run the independent final quality check on the focused repair PR for the PR-body identity synchronization cycle in Terraform
 
@@ -5515,7 +5531,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 54 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 54 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -5603,7 +5619,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 55 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 55 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -6205,9 +6221,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -6223,11 +6239,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 64 — run the independent final quality check on the focused repair PR for the PR-body identity synchronization cycle in PS
 
@@ -6250,7 +6266,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 63 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 63 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -6338,7 +6354,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 64 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 64 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -7159,9 +7175,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -7177,11 +7193,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 75 — run the independent final quality check on the PS #169 PR
 
@@ -7204,7 +7220,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 74 | `FS` | A terminal-clean record applies to the current repair head/tree, and the current issue-ready branch is active. |
+| Task 74 | `FS` | A terminal-clean record applies to the current repair head/tree, and the current issue-ready branch is active. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -7292,7 +7308,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 75 | `FS` | Both review gates apply to the same current head/tree, and the current issue-ready branch is active. |
+| Task 75 | `FS` | Both review gates apply to the same current head/tree, and the current issue-ready branch is active. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -7868,9 +7884,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -7886,11 +7902,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 84 — run the independent final quality check on the PS #170 PR
 
@@ -7913,7 +7929,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 83 | `FS` | A terminal-clean record applies to the current repair head/tree, and the current issue-ready branch is active. |
+| Task 83 | `FS` | A terminal-clean record applies to the current repair head/tree, and the current issue-ready branch is active. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -8001,7 +8017,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 84 | `FS` | Both review gates apply to the same current head/tree, and the current issue-ready branch is active. |
+| Task 84 | `FS` | Both review gates apply to the same current head/tree, and the current issue-ready branch is active. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -8577,9 +8593,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -8595,11 +8611,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 93 — run the independent final quality check on the PS #171 PR
 
@@ -8622,7 +8638,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 92 | `FS` | A terminal-clean record applies to the current repair head/tree, and the current issue-ready branch is active. |
+| Task 92 | `FS` | A terminal-clean record applies to the current repair head/tree, and the current issue-ready branch is active. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -8710,7 +8726,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 93 | `FS` | Both review gates apply to the same current head/tree, and the current issue-ready branch is active. |
+| Task 93 | `FS` | Both review gates apply to the same current head/tree, and the current issue-ready branch is active. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -9463,9 +9479,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -9477,11 +9493,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 102 — run the independent final quality check on the PS #162 PR
 
@@ -9505,7 +9521,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 101 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 101 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -9589,7 +9605,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 102 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 102 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -10193,9 +10209,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -10211,11 +10227,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 111 — run the independent final quality check on the focused repair PR for cycle 3 in Terraform
 
@@ -10238,7 +10254,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 110 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 110 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -10326,7 +10342,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 111 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 111 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -10928,9 +10944,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -10946,11 +10962,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 120 — run the independent final quality check on the focused repair PR for cycle 3 in PS
 
@@ -10973,7 +10989,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 119 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 119 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -11061,7 +11077,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 120 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 120 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -11777,9 +11793,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -11791,11 +11807,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 131 — run the independent final quality check on the PS #158 PR
 
@@ -11819,7 +11835,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 130 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 130 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -11903,7 +11919,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 131 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 131 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -12507,9 +12523,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -12525,11 +12541,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 140 — run the independent final quality check on the focused repair PR for cycle 4 in Terraform
 
@@ -12552,7 +12568,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 139 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 139 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -12640,7 +12656,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 140 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 140 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -13242,9 +13258,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -13260,11 +13276,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 149 — run the independent final quality check on the focused repair PR for cycle 4 in PS
 
@@ -13287,7 +13303,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 148 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 148 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -13375,7 +13391,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 149 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 149 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -14058,9 +14074,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -14072,11 +14088,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 159 — run the independent final quality check on the PS #163 PR
 
@@ -14100,7 +14116,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 158 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 158 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -14184,7 +14200,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 159 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 159 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -14788,9 +14804,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -14806,11 +14822,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 168 — run the independent final quality check on the focused repair PR for cycle 5 in Terraform
 
@@ -14833,7 +14849,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 167 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 167 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -14921,7 +14937,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 168 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 168 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -15523,9 +15539,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -15541,11 +15557,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 177 — run the independent final quality check on the focused repair PR for cycle 5 in PS
 
@@ -15568,7 +15584,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 176 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 176 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -15656,7 +15672,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 177 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 177 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -16271,9 +16287,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -16285,11 +16301,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 187 — run the independent final quality check on the Terraform #21 PR
 
@@ -16313,7 +16329,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 186 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 186 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -16397,7 +16413,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 187 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 187 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -17010,9 +17026,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -17028,11 +17044,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 196 — run the independent final quality check on the focused repair PR for Terraform #21 in PS
 
@@ -17056,7 +17072,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 195 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 195 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -17145,7 +17161,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 196 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 196 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -17744,9 +17760,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -17762,11 +17778,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 205 — run the independent final quality check on the focused repair PR for the final Terraform recheck
 
@@ -17789,7 +17805,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 204 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 204 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -17877,7 +17893,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 205 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 205 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -18779,9 +18795,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -18797,11 +18813,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 217 — run the independent final quality check on the focused repair PR for one untracked-blocker reciprocal cycle
 
@@ -18824,7 +18840,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 216 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 216 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -18912,7 +18928,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 217 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 217 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -19591,9 +19607,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -19605,11 +19621,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree, and the PS #152 evidence still maps to that exact candidate.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree, and the PS #152 evidence still maps to that exact candidate. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree, and the PS #152 evidence still maps to that exact candidate.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree, and the PS #152 evidence still maps to that exact candidate. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 228 — run the independent final quality check on the PS #147 PR
 
@@ -19634,7 +19650,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 227 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 227 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -19836,7 +19852,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 230 | `FS` | PS #152 is closed and the approved persistent rule is active. |
+| Task 230 | `FS` | PS #152 is closed and the approved persistent rule is active. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -20427,9 +20443,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -20441,11 +20457,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 238 — run the independent final quality check on the Terraform #22 PR
 
@@ -20469,7 +20485,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 237 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 237 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -20553,7 +20569,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 238 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 238 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -21155,9 +21171,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -21173,11 +21189,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 247 — run the independent final quality check on the focused repair PR for T1B in PS
 
@@ -21200,7 +21216,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 246 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 246 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -21288,7 +21304,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 247 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 247 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -21881,9 +21897,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -21899,11 +21915,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 256 — run the independent final quality check on the focused repair PR for the final Terraform T1B recheck
 
@@ -21926,7 +21942,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 255 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 255 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -22014,7 +22030,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 256 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 256 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -22525,9 +22541,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -22539,11 +22555,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 265 — run the independent final quality check on the PS #148 PR
 
@@ -22567,7 +22583,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 264 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 264 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -22651,7 +22667,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 265 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 265 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -23257,9 +23273,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -23275,11 +23291,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 274 — run the independent final quality check on the focused repair PR for PS #148 in Terraform
 
@@ -23303,7 +23319,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 273 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 273 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -23392,7 +23408,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 274 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 274 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -23997,9 +24013,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -24015,11 +24031,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 283 — run the independent final quality check on the focused repair PR for the PS #148 cycle
 
@@ -24043,7 +24059,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 282 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 282 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -24132,7 +24148,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 283 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 283 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -24651,9 +24667,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -24665,11 +24681,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 292 — run the independent final quality check on the Terraform #23 PR
 
@@ -24693,7 +24709,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 291 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 291 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -24777,7 +24793,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 292 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 292 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -25398,9 +25414,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -25416,11 +25432,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 301 — run the independent final quality check on the focused repair PR for Terraform #23 applicability in PS
 
@@ -25444,7 +25460,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 300 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 300 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -25533,7 +25549,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 301 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 301 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -26078,9 +26094,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -26092,11 +26108,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 310 — run the independent final quality check on the PS #149 PR
 
@@ -26120,7 +26136,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 309 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 309 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -26594,9 +26610,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -26608,11 +26624,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 318 — run the independent final quality check on the fallback PR
 
@@ -26636,7 +26652,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 317 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 317 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -26720,7 +26736,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 318 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 318 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -26914,7 +26930,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 321 | `FS` | Require `MERGE_READY` for the exact current PS #149 head/tree. |
+| Task 321 | `FS` | Require `MERGE_READY` for the exact current PS #149 head/tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -27505,9 +27521,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -27519,11 +27535,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 329 — run the independent final quality check on the Terraform #24 PR
 
@@ -27547,7 +27563,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 328 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 328 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -27631,7 +27647,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 329 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 329 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -28233,9 +28249,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -28251,11 +28267,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 338 — run the independent final quality check on the focused repair PR for T3 in PS
 
@@ -28278,7 +28294,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 337 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 337 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -28366,7 +28382,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 338 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 338 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -28959,9 +28975,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -28977,11 +28993,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 347 — run the independent final quality check on the focused repair PR for the final Terraform T3 recheck
 
@@ -29004,7 +29020,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 346 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 346 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -29092,7 +29108,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 347 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 347 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -29603,9 +29619,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -29617,11 +29633,11 @@ If you reach a blocker, the 80-round cap, or a maintainer decision, stop without
 
 ### Exact output
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree.
+The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 356 — run the independent final quality check on the PS #151 PR
 
@@ -29645,7 +29661,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 355 | `FS` | The Copilot-and-Codex review loop is terminally clean. |
+| Task 355 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -29729,7 +29745,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 356 | `FS` | The independent quality check passed for the current head and tree. |
+| Task 356 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -30335,9 +30351,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -30353,11 +30369,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 365 — run the independent final quality check on the focused repair PR for PS #151 in Terraform
 
@@ -30381,7 +30397,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 364 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 364 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -30470,7 +30486,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 365 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 365 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -31075,9 +31091,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -31093,11 +31109,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 374 — run the independent final quality check on the focused repair PR for the PS #151 cycle
 
@@ -31121,7 +31137,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 373 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 373 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -31210,7 +31226,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 374 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 374 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -32064,9 +32080,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -32082,11 +32098,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 386 — run the independent final quality check on the focused repair PR for one triggered residual cycle
 
@@ -32109,7 +32125,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 385 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 385 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -32197,7 +32213,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 386 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 386 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
@@ -33037,9 +33053,9 @@ Do not merge the pull request.
 7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
 8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
 9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. If one reviewer cannot review the diff, document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
+11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
 12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except a reviewer proved non-functional under `AGENTS.md`; every declared review-body count is reconciled; every native thread and synthetic key is closed with evidence; and no untracked or illegitimate deferral remains. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
+13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
 14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
 
 If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
@@ -33055,11 +33071,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ### Complete when
 
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`.
+The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
 ## Task 397 — run the independent final quality check on the focused repair PR for one future PS-first paired capability cycle
 
@@ -33082,7 +33098,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 396 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. |
+| Task 396 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
 
 ### Objective
 
@@ -33170,7 +33186,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 397 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. |
+| Task 397 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
 
 ### Objective
 
