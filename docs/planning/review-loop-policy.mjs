@@ -939,7 +939,10 @@ function validatePersistedReviewState(reviewState) {
     (
       Object.hasOwn(reviewState, 'materialReason') &&
       reviewState.materialReason !== null &&
-      typeof reviewState.materialReason !== 'string'
+      (
+        typeof reviewState.materialReason !== 'string' ||
+        reviewState.materialReason.trim().length === 0
+      )
     ) ||
     (
       reviewState.mutationClass === 'MATERIAL_SCOPE_BEHAVIOR_RISK' &&

@@ -227,7 +227,9 @@
           "type": [
             "string",
             "null"
-          ]
+          ],
+          "minLength": 1,
+          "pattern": "\\S"
         },
         "reviewRequests": {
           "type": "array",

@@ -3882,6 +3882,36 @@ function assertSchemaValid(value, definition, root, location = '$') {
   }
 }
 
+test('materialReason rejects whitespace whenever a string is present', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const valid = compactState(reviewInput());
+
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  for (const materialReason of ['', ' ', '\t\r\n']) {
+    const invalid = structuredClone(valid);
+    invalid.current_task.review.materialReason = materialReason;
+    assert.throws(
+      () => assertSchemaValid(invalid, schema, schema),
+      /too short|does not match pattern/u,
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /review state is malformed or unsupported/u,
+    );
+  }
+
+  for (const materialReason of [null, 'Nonmaterial audit context.']) {
+    const allowed = structuredClone(valid);
+    allowed.current_task.review.materialReason = materialReason;
+    assertSchemaValid(allowed, schema, schema);
+    assert.deepEqual(parseCompactStateJson(JSON.stringify(allowed)), allowed);
+  }
+});
+
 test('the actual compact resume record and review state match their closed schema', async () => {
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
