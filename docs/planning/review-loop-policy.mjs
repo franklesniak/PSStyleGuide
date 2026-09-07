@@ -1252,6 +1252,14 @@ function validatePersistedPublicMutation(publicMutation, requests) {
       throw new TypeError('Persisted review-request mutation evidence is malformed.');
     }
     if (
+      publicMutation.state === 'CONFIRMED' &&
+      publicMutation.evidence.readbackComplete !== true
+    ) {
+      throw new TypeError(
+        'A confirmed review-request mutation requires complete readback.',
+      );
+    }
+    if (
       typeof publicMutation.reviewInputKey !== 'string' ||
       !SHA256_PATTERN.test(publicMutation.reviewInputKey) ||
       !['copilot', 'codex'].includes(publicMutation.channel)

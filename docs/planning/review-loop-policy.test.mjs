@@ -2682,7 +2682,14 @@ test('all permanent active task-template and controller surfaces use the compact
   assert.match(generator, /Default to one reviewer pair/u);
   assert.match(generator, /immutable predecessor outputs/u);
   assert.match(generator, /typed `SUPERSEDED` disposition/u);
-  assert.match(generator, /absolute value exceeds 9007199254740991/u);
+  assert.match(
+    generator,
+    /reject a numeric token if it is non-finite, its absolute value exceeds 9007199254740991, it is negative zero, or conversion to an ECMAScript `Number` changes its exact decimal value/u,
+  );
+  assert.match(
+    generator,
+    /Store an exact value as a string if its numeric token fails any condition/u,
+  );
   assert.match(generator, /current task head to equal the review-input head/u);
   assert.match(generator, /only after every recorded request for the old input is terminal/u);
   assert.match(generator, /headless Codex PR-conversation result/u);
@@ -6733,6 +6740,18 @@ test('confirmed Copilot readiness equals its authenticated reconciliation time',
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(mismatched)),
     /readyAt must equal its authenticated reconciliation time/u,
+  );
+
+  const incompleteReadback = structuredClone(valid);
+  incompleteReadback.current_task.review.publicMutation.evidence
+    .readbackComplete = false;
+  assert.throws(
+    () => assertSchemaValid(incompleteReadback, schema, schema),
+    /does not match const/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(incompleteReadback)),
+    /confirmed review-request mutation requires complete readback/u,
   );
 
   const genericConfirmedMutation = compactState(input, {
