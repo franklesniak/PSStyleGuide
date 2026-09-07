@@ -2326,6 +2326,8 @@ function isReviewRequestRecord(request) {
       request.attemptCount >= 1 &&
       request.attemptCount <= 2
     );
+  const readyAtIsRequired = request?.channel === 'copilot' &&
+    (request?.confirmed === true || hasTerminalDisposition);
   const terminalDispositionIsValid = hasTerminalDisposition
     ? request.channel === 'copilot' &&
       request.terminal === true &&
@@ -2339,8 +2341,8 @@ function isReviewRequestRecord(request) {
       !(request.channel === 'copilot' &&
         request.terminalResultRef.kind !== 'submitted-review')
     : !(request?.terminal === true && request?.confirmed === true);
-  const readyAtIsValid = !hasReadyAt ||
-    (
+  const readyAtIsValid = readyAtIsRequired === hasReadyAt &&
+    (!hasReadyAt || (
       request.channel === 'copilot' &&
       isCopilotReadyForCodex(request) &&
       getItemTimestamp(request, ['readyAt']) !== null &&
@@ -2360,7 +2362,7 @@ function isReviewRequestRecord(request) {
           'terminal disposition recordedAt',
         ) === 0
       )
-    );
+    ));
 
   return requestHasExactFields &&
     channelIsValid &&

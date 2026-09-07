@@ -1287,7 +1287,7 @@ test('Codex requests require durable Copilot readiness ordering', async () => {
   assert.equal(decide(confirmed).status, 'NO_REQUEST');
   const missing = structuredClone(confirmed);
   delete missing.readyAt;
-  assert.throws(() => decide(missing), /readiness time/u);
+  assert.throws(() => decide(missing), /review request is malformed/u);
   assert.throws(
     () => decide({ ...confirmed, readyAt: '2026-09-04T10:01:01Z' }),
     /must not precede Copilot readiness/u,
@@ -1315,22 +1315,22 @@ test('Codex requests require durable Copilot readiness ordering', async () => {
   );
 });
 
-test('a Copilot request without readyAt cannot release Codex', () => {
+test('a Copilot request without readyAt is malformed and cannot release Codex', () => {
   const input = reviewInput();
   const copilotRequest = requestFor(input, 'copilot', {
     confirmed: true,
     terminal: false,
   });
   delete copilotRequest.readyAt;
-  const waiting = decideReviewRequest({
-    previousReviewInput: input,
-    currentReviewInput: input,
-    mutationClass: 'RESULT_OR_STATE',
-    existingRequests: [copilotRequest],
-  });
-
-  assert.equal(waiting.status, 'WAIT_FOR_CURRENT_CHANNEL');
-  assert.deepEqual(waiting.channels, []);
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input,
+      currentReviewInput: input,
+      mutationClass: 'RESULT_OR_STATE',
+      existingRequests: [copilotRequest],
+    }),
+    /review request is malformed/u,
+  );
 
   copilotRequest.readyAt = copilotRequest.requestedAt;
   const released = decideReviewRequest({
@@ -1347,14 +1347,15 @@ test('a Copilot request without readyAt cannot release Codex', () => {
     terminalDisposition: nonfunctionalDisposition(),
   });
   delete terminalRequest.readyAt;
-  const terminalWaiting = decideReviewRequest({
-    previousReviewInput: input,
-    currentReviewInput: input,
-    mutationClass: 'RESULT_OR_STATE',
-    existingRequests: [terminalRequest],
-  });
-  assert.equal(terminalWaiting.status, 'WAIT_FOR_CURRENT_CHANNEL');
-  assert.deepEqual(terminalWaiting.channels, []);
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input,
+      currentReviewInput: input,
+      mutationClass: 'RESULT_OR_STATE',
+      existingRequests: [terminalRequest],
+    }),
+    /review request is malformed/u,
+  );
 
   terminalRequest.readyAt = terminalRequest.terminalDisposition.recordedAt;
   const terminalReleased = decideReviewRequest({
@@ -4062,12 +4063,14 @@ test('terminal request state requires typed repository-authorized evidence', asy
     '2026-09-04T09:59:59Z';
   const premature = compactState(input, {
     reviewRequests: [requestFor(input, 'copilot', {
+      readyAt: '2026-09-04T10:01:00Z',
       terminalDisposition: nonfunctionalDisposition(),
     })],
   });
   const codexTerminalRequest = requestFor(input, 'codex', {
     requestedAt: '2026-09-04T10:02:00Z',
     terminal: true,
+    readyAt: '2026-09-04T10:03:00Z',
     terminalDisposition: nonfunctionalDisposition({
       recordedAt: '2026-09-04T10:03:00Z',
     }),
@@ -5700,6 +5703,8 @@ test('review-request mutation state is bound to one persisted request identity',
 
   const confirmedRequest = structuredClone(valid);
   confirmedRequest.current_task.review.reviewRequests[0].confirmed = true;
+  confirmedRequest.current_task.review.reviewRequests[0].readyAt =
+    confirmedRequest.current_task.review.reviewRequests[0].requestedAt;
   assert.throws(
     () => parseCompactStateJson(JSON.stringify(confirmedRequest)),
     /unconfirmed nonterminal request/u,
@@ -6768,6 +6773,50 @@ test('confirmed Copilot readiness equals its authenticated reconciliation time',
     parseCompactStateJson(JSON.stringify(genericConfirmedMutation)),
     genericConfirmedMutation,
   );
+});
+
+test('confirmed Copilot and terminal dispositions require a readiness boundary', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const confirmed = compactState(input, {
+    reviewRequests: [requestFor(input, 'copilot', { confirmed: true })],
+  });
+  const nonfunctional = compactState(input, {
+    reviewRequests: [requestFor(input, 'copilot', {
+      terminal: true,
+      terminalDisposition: nonfunctionalDisposition(),
+    })],
+  });
+  const codex = compactState(input, {
+    reviewRequests: [
+      requestFor(input, 'copilot', { confirmed: true }),
+      requestFor(input, 'codex', { requestedAt: '2026-09-04T10:01:00Z' }),
+    ],
+  });
+
+  for (const valid of [confirmed, nonfunctional, codex]) {
+    assertSchemaValid(valid, schema, schema);
+    assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+  }
+  assert.equal(
+    Object.hasOwn(codex.current_task.review.reviewRequests[1], 'readyAt'),
+    false,
+  );
+
+  for (const valid of [confirmed, nonfunctional]) {
+    const missingReadyAt = structuredClone(valid);
+    delete missingReadyAt.current_task.review.reviewRequests[0].readyAt;
+    assert.throws(
+      () => assertSchemaValid(missingReadyAt, schema, schema),
+      /readyAt is required/u,
+    );
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(missingReadyAt)),
+      /persisted review request is malformed/u,
+    );
+  }
 });
 
 test('terminal result identities cannot be reused across reviewer channels', () => {

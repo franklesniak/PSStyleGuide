@@ -449,6 +449,23 @@
       "allOf": [
         {
           "if": {
+            "properties": {
+              "channel": {
+                "const": "copilot"
+              },
+              "confirmed": {
+                "const": true
+              }
+            }
+          },
+          "then": {
+            "required": [
+              "readyAt"
+            ]
+          }
+        },
+        {
+          "if": {
             "required": [
               "readyAt"
             ]
@@ -485,6 +502,9 @@
             ]
           },
           "then": {
+            "required": [
+              "readyAt"
+            ],
             "properties": {
               "channel": {
                 "const": "copilot"
