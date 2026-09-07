@@ -1311,7 +1311,7 @@ test('Codex requests require durable Copilot readiness ordering', async () => {
       schema.$defs.reviewRequest,
       schema,
     ),
-    /does not match const/u,
+    /does not match any allowed schema/u,
   );
 });
 
@@ -6817,6 +6817,20 @@ test('confirmed Copilot and terminal dispositions require a readiness boundary',
       /persisted review request is malformed/u,
     );
   }
+
+  const prematureReadyAt = compactState(input, {
+    reviewRequests: [requestFor(input, 'copilot', {
+      readyAt: '2026-09-04T10:00:00Z',
+    })],
+  });
+  assert.throws(
+    () => assertSchemaValid(prematureReadyAt, schema, schema),
+    /does not match any allowed schema/u,
+  );
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(prematureReadyAt)),
+    /persisted review request is malformed/u,
+  );
 });
 
 test('terminal result identities cannot be reused across reviewer channels', () => {

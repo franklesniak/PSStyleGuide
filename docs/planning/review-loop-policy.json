@@ -475,7 +475,21 @@
               "channel": {
                 "const": "copilot"
               }
-            }
+            },
+            "anyOf": [
+              {
+                "properties": {
+                  "confirmed": {
+                    "const": true
+                  }
+                }
+              },
+              {
+                "required": [
+                  "terminalDisposition"
+                ]
+              }
+            ]
           }
         },
         {
