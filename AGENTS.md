@@ -236,7 +236,7 @@ When a workflow step depends on a capability the GitHub plugin does not currentl
 
 | Capability | Primary | Fallback |
 | --- | --- | --- |
-| Request a Copilot code review | GitHub plugin | `gh pr edit --add-reviewer github-copilot[bot]`, `gh api`, or ask the owner to request the review manually |
+| Request a Copilot code review | GitHub plugin | `gh pr edit --add-reviewer '@copilot'`, `gh api`, or ask the owner to request the review manually |
 | Request a remote Codex review | GitHub PR comment with body `@codex review` | `gh api` to create the comment, or ask the owner to post the exact trigger |
 | Resolve a review thread | GitHub plugin | `gh api graphql` against the `resolveReviewThread` mutation, or ask the owner to resolve the thread manually |
 | Add a reaction on a review comment | GitHub plugin | `gh api -X POST /repos/{owner}/{repo}/pulls/comments/{comment_id}/reactions -f content=eyes`, or skip silently if neither path is available |
