@@ -1,0 +1,64 @@
+name: Pull Request Body Identity
+
+on:
+  pull_request:
+    branches:
+      - main
+    types:
+      - edited
+      - opened
+      - reopened
+      - synchronize
+
+permissions: {}
+
+jobs:
+  verify_identity:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout pull request head
+        id: checkout_pull_request_head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          token: ${{ github.token }}
+          persist-credentials: false
+          clean: true
+          fetch-depth: 1
+          fetch-tags: false
+          show-progress: true
+          lfs: false
+          submodules: false
+          set-safe-directory: true
+          allow-unsafe-pr-checkout: false
+
+      - name: Set up Node.js
+        id: setup_node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24.18.1'
+
+      - name: Verify Node.js runtime
+        id: verify_node_runtime
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(node --version)" = "v24.18.1"
+
+      - name: Test pull request body identity command
+        id: test_pull_request_body_identity
+        shell: bash
+        run: >-
+          node .github/workflows/Sync-PullRequestBodyIdentity.mjs
+          --self-test
+
+      - name: Verify pull request body identity
+        id: verify_pull_request_body_identity
+        shell: bash
+        run: >-
+          node .github/workflows/Sync-PullRequestBodyIdentity.mjs
+          --check-event "$GITHUB_EVENT_PATH"

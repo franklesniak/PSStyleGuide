@@ -1,0 +1,281 @@
+{
+  "schema": "PSStyleGuide.PullRequestBodyIdentityCases.v1",
+  "sourceCases": [
+    {
+      "id": "source-current",
+      "mutation": "none",
+      "expected": "current"
+    },
+    {
+      "id": "source-contract-malformed-json",
+      "mutation": "contract-malformed-json",
+      "expected": "contract-json"
+    },
+    {
+      "id": "source-contract-forbidden-key",
+      "mutation": "contract-forbidden-key",
+      "expected": "contract-json"
+    },
+    {
+      "id": "source-generator-version-malformed",
+      "mutation": "generator-policy-version-malformed",
+      "expected": "generator-policy"
+    },
+    {
+      "id": "source-generator-digest-malformed",
+      "mutation": "generator-policy-digest-malformed",
+      "expected": "generator-policy"
+    },
+    {
+      "id": "source-generator-version-drift",
+      "mutation": "generator-version-drift",
+      "expected": "generator-identity"
+    },
+    {
+      "id": "source-generator-duplicate-version",
+      "mutation": "generator-duplicate-version",
+      "expected": "generator-version"
+    },
+    {
+      "id": "source-generator-bom",
+      "mutation": "generator-bom",
+      "expected": "generator-encoding"
+    },
+    {
+      "id": "source-path-verifier-crlf",
+      "mutation": "path-verifier-crlf",
+      "expected": "path-verifier-encoding"
+    },
+    {
+      "id": "source-build-generator-drift",
+      "mutation": "build-generator-drift",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-build-path-verifier-drift",
+      "mutation": "build-path-verifier-drift",
+      "expected": "build-path-verifier-version"
+    },
+    {
+      "id": "source-validator-identity-drift",
+      "mutation": "validator-identity-drift",
+      "expected": "validator-identity"
+    },
+    {
+      "id": "source-validator-contract-digest-drift",
+      "mutation": "validator-contract-digest-drift",
+      "expected": "contract-canonical-identity"
+    },
+    {
+      "id": "source-contract-canonical-drift",
+      "mutation": "contract-canonical-drift",
+      "expected": "contract-canonical-identity"
+    },
+    {
+      "id": "source-wrong-mode",
+      "mutation": "source-wrong-mode",
+      "expected": "source-identity"
+    },
+    {
+      "id": "source-wrong-blob",
+      "mutation": "source-wrong-blob",
+      "expected": "source-identity"
+    }
+  ],
+  "bodyCases": [
+    {
+      "id": "check-current",
+      "operation": "check",
+      "fixture": "current",
+      "expected": "current"
+    },
+    {
+      "id": "check-absent",
+      "operation": "check",
+      "fixture": "absent",
+      "expected": "identity-block-absent"
+    },
+    {
+      "id": "check-stale-head",
+      "operation": "check",
+      "fixture": "stale-head",
+      "expected": "identity-block-stale"
+    },
+    {
+      "id": "check-stale-tree",
+      "operation": "check",
+      "fixture": "stale-tree",
+      "expected": "identity-block-stale"
+    },
+    {
+      "id": "check-stale-one-digest",
+      "operation": "check",
+      "fixture": "stale-digest",
+      "expected": "identity-block-stale"
+    },
+    {
+      "id": "check-partial-start",
+      "operation": "check",
+      "fixture": "partial-start",
+      "expected": "identity-block-malformed"
+    },
+    {
+      "id": "check-partial-end",
+      "operation": "check",
+      "fixture": "partial-end",
+      "expected": "identity-block-malformed"
+    },
+    {
+      "id": "check-duplicate",
+      "operation": "check",
+      "fixture": "duplicate",
+      "expected": "identity-block-malformed"
+    },
+    {
+      "id": "check-reversed",
+      "operation": "check",
+      "fixture": "reversed",
+      "expected": "identity-block-malformed"
+    },
+    {
+      "id": "check-inline-marker",
+      "operation": "check",
+      "fixture": "inline-marker",
+      "expected": "identity-block-malformed"
+    },
+    {
+      "id": "check-null-character",
+      "operation": "check",
+      "fixture": "null-character",
+      "expected": "body-invalid"
+    },
+    {
+      "id": "update-current-no-change",
+      "operation": "update",
+      "fixture": "current",
+      "expected": "no-change"
+    },
+    {
+      "id": "update-absent-appends",
+      "operation": "update",
+      "fixture": "absent",
+      "expected": "changed"
+    },
+    {
+      "id": "update-stale-replaces",
+      "operation": "update",
+      "fixture": "stale-head",
+      "expected": "changed"
+    },
+    {
+      "id": "update-partial-refused",
+      "operation": "update",
+      "fixture": "partial-start",
+      "expected": "identity-block-malformed"
+    },
+    {
+      "id": "update-preserves-unrelated-text",
+      "operation": "update",
+      "fixture": "surrounded-stale",
+      "expected": "changed-preserved"
+    }
+  ],
+  "remoteCases": [
+    {
+      "id": "remote-current-no-write",
+      "scenario": "current",
+      "expected": "success-no-change",
+      "expectedPatchCount": 0
+    },
+    {
+      "id": "remote-update-readback",
+      "scenario": "update-success",
+      "expected": "success-changed",
+      "expectedPatchCount": 1
+    },
+    {
+      "id": "remote-head-changes-before-write",
+      "scenario": "head-before-write",
+      "expected": "remote-changed-before-write",
+      "expectedPatchCount": 0
+    },
+    {
+      "id": "remote-body-changes-before-write",
+      "scenario": "body-before-write",
+      "expected": "remote-changed-before-write",
+      "expectedPatchCount": 0
+    },
+    {
+      "id": "remote-initial-read-fails",
+      "scenario": "initial-read-failure",
+      "expected": "api-read",
+      "expectedPatchCount": 0
+    },
+    {
+      "id": "remote-authentication-fails-before-write",
+      "scenario": "authentication-failure",
+      "expected": "api-read",
+      "expectedPatchCount": 0
+    },
+    {
+      "id": "remote-rate-limit-fails-before-write",
+      "scenario": "rate-limit-failure",
+      "expected": "api-read",
+      "expectedPatchCount": 0
+    },
+    {
+      "id": "remote-transport-fails-before-write",
+      "scenario": "transport-read-failure",
+      "expected": "api-read",
+      "expectedPatchCount": 0
+    },
+    {
+      "id": "remote-write-rejected",
+      "scenario": "write-rejected",
+      "expected": "api-write-rejected",
+      "expectedPatchCount": 1
+    },
+    {
+      "id": "remote-authorization-rejects-write",
+      "scenario": "authorization-failure",
+      "expected": "api-write-rejected",
+      "expectedPatchCount": 1
+    },
+    {
+      "id": "remote-write-ambiguous",
+      "scenario": "write-indeterminate",
+      "expected": "indeterminate",
+      "expectedPatchCount": 1
+    },
+    {
+      "id": "remote-patch-response-invalid",
+      "scenario": "patch-response-invalid",
+      "expected": "indeterminate",
+      "expectedPatchCount": 1
+    },
+    {
+      "id": "remote-readback-unavailable",
+      "scenario": "readback-failure",
+      "expected": "indeterminate",
+      "expectedPatchCount": 1
+    },
+    {
+      "id": "remote-readback-head-changed",
+      "scenario": "readback-head-changed",
+      "expected": "indeterminate",
+      "expectedPatchCount": 1
+    },
+    {
+      "id": "remote-readback-body-mismatch",
+      "scenario": "readback-body-mismatch",
+      "expected": "indeterminate",
+      "expectedPatchCount": 1
+    },
+    {
+      "id": "remote-unrelated-text-preserved",
+      "scenario": "update-preserves-text",
+      "expected": "success-changed-preserved",
+      "expectedPatchCount": 1
+    }
+  ]
+}
