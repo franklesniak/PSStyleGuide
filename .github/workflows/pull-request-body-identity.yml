@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: read
+    env:
+      NODE_VERSION: '24.18.1'
 
     steps:
       - name: Checkout pull request head
@@ -40,14 +42,14 @@ jobs:
         id: setup_node
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
-          node-version: '24.18.1'
+          node-version: ${{ env.NODE_VERSION }}
 
       - name: Verify Node.js runtime
         id: verify_node_runtime
         shell: bash
         run: |
           set -euo pipefail
-          test "$(node --version)" = "v24.18.1"
+          test "$(node --version)" = "v${NODE_VERSION}"
 
       - name: Test pull request body identity command
         id: test_pull_request_body_identity

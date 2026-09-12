@@ -9,7 +9,7 @@ import path from 'node:path';
 import { TextDecoder } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
-const TOOL_VERSION = '1.0.20260912.0';
+const TOOL_VERSION = '1.0.20260912.1';
 const RESULT_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityResult.v1';
 const CASE_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityCases.v1';
 const START_MARKER = '<!-- psstyleguide-pr-body-identity:start -->';
@@ -164,14 +164,29 @@ function parseJsonBytes(bytes, maximumBytes, category, requireLfFile = true) {
   return value;
 }
 
+function withoutGitEnvironment(environment) {
+  return Object.fromEntries(
+    Object.entries(environment)
+      .filter(([name]) => !name.toUpperCase().startsWith('GIT_')),
+  );
+}
+
+function trustedGitEnvironment() {
+  return {
+    ...withoutGitEnvironment(process.env),
+    GIT_NO_REPLACE_OBJECTS: '1',
+    GIT_OPTIONAL_LOCKS: '0',
+  };
+}
+
 function runGit(repositoryRoot, args, maximumBytes = MAXIMUM_GIT_OUTPUT_BYTES) {
   const result = childProcess.spawnSync(
     'git',
-    ['-c', 'core.fsmonitor=false', ...args],
+    ['--no-replace-objects', '-c', 'core.fsmonitor=false', ...args],
     {
       cwd: repositoryRoot,
       encoding: null,
-      env: { ...process.env, GIT_OPTIONAL_LOCKS: '0' },
+      env: trustedGitEnvironment(),
       maxBuffer: maximumBytes + 65536,
       shell: false,
       windowsHide: true,
@@ -632,17 +647,54 @@ function normalizeApiRoot(value) {
   return url;
 }
 
-function verifyOriginRepository(repositoryRoot, expectedRepository) {
+function parseOriginRepository(remote, apiRootValue) {
+  assert(typeof remote === 'string' && remote.length >= 1 &&
+    remote.length <= 4096 && !remote.includes('\0'), 'origin-remote');
+  const apiRoot = normalizeApiRoot(apiRootValue);
+  const expectedHostname = apiRoot.hostname.toLowerCase() ===
+    'api.github.com' ? 'github.com' : apiRoot.hostname;
+  const scpMatch = /^git@([^/:?#\s]+):([^?#\s]+)$/u.exec(remote);
+  let hostname;
+  let repositoryPath;
+  if (scpMatch !== null) {
+    [, hostname, repositoryPath] = scpMatch;
+  } else {
+    let url;
+    try {
+      url = new URL(remote);
+    } catch {
+      fail('origin-remote');
+    }
+    assert(url.search === '' && url.hash === '', 'origin-remote');
+    if (url.protocol === 'https:') {
+      assert(url.username === '' && url.password === '', 'origin-remote');
+    } else {
+      assert(url.protocol === 'ssh:' && url.username === 'git' &&
+        url.password === '', 'origin-remote');
+    }
+    hostname = url.hostname;
+    repositoryPath = url.pathname.replace(/^\//u, '');
+  }
+  const repository = repositoryPath.endsWith('.git') ?
+    repositoryPath.slice(0, -4) : repositoryPath;
+  assert(hostname.toLowerCase() === expectedHostname.toLowerCase() &&
+    REPOSITORY_PATTERN.test(repository), 'origin-remote');
+  return repository;
+}
+
+function verifyOriginRepository(
+  repositoryRoot,
+  expectedRepository,
+  apiRootValue,
+) {
   const remote = runGitText(
     normalizeRepositoryRoot(repositoryRoot),
     ['remote', 'get-url', 'origin'],
     'origin-remote',
   );
-  const match = /^(?:https:\/\/github\.com\/|git@github\.com:)([A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+?)(?:\.git)?$/u
-    .exec(remote);
-  assert(match !== null && REPOSITORY_PATTERN.test(match[1]) &&
-    match[1].toLowerCase() === expectedRepository.toLowerCase(),
-  'origin-remote');
+  const repository = parseOriginRepository(remote, apiRootValue);
+  assert(repository.toLowerCase() === expectedRepository.toLowerCase(),
+    'origin-remote');
 }
 
 function validateApiToken(token) {
@@ -761,7 +813,8 @@ function validatePull(pull, expected) {
   assert(isRecord(pull) && pull.number === expected.pullNumber &&
     pull.state === 'open' && (pull.body === null || typeof pull.body === 'string') &&
     isRecord(pull.base) && isRecord(pull.base.repo) &&
-    pull.base.repo.full_name === expected.repository &&
+    REPOSITORY_PATTERN.test(pull.base.repo.full_name) &&
+    pull.base.repo.full_name.toLowerCase() === expected.repository.toLowerCase() &&
     isRecord(pull.head) && pull.head.sha === expected.commit &&
     isRecord(pull.head.repo) &&
     REPOSITORY_PATTERN.test(pull.head.repo.full_name), 'remote-identity');
@@ -1062,6 +1115,13 @@ function createMockApi(scenario, identity) {
   const initialBody = scenario === 'current' ? block :
     scenario === 'update-preserves-text' ? preserved : absent;
   const state = { getCount: 0, patchCount: 0, patchedBody: null };
+  const baseRepositoryName = scenario === 'repository-name-case' ?
+    'Example/Repository' : 'example/repository';
+  const makeScenarioPull = (body, overrides = {}) => makePull(
+    identity,
+    body,
+    { base: { repo: { full_name: baseRepositoryName } }, ...overrides },
+  );
   return {
     state,
     async getPull() {
@@ -1072,28 +1132,28 @@ function createMockApi(scenario, identity) {
         throw new IdentityError('api-read');
       }
       if (scenario === 'head-before-write' && state.getCount === 2) {
-        return makePull(identity, initialBody, {
+        return makeScenarioPull(initialBody, {
           head: { sha: '9'.repeat(40), repo: { full_name: 'example/repository' } },
         });
       }
       if (scenario === 'body-before-write' && state.getCount === 2) {
-        return makePull(identity, `${initialBody}\nconcurrent edit`);
+        return makeScenarioPull(`${initialBody}\nconcurrent edit`);
       }
       if (scenario === 'readback-failure' && state.getCount === 3) {
         throw new Error('simulated transport failure');
       }
       if (state.getCount === 1 || state.getCount === 2) {
-        return makePull(identity, initialBody);
+        return makeScenarioPull(initialBody);
       }
       if (scenario === 'readback-head-changed') {
-        return makePull(identity, state.patchedBody, {
+        return makeScenarioPull(state.patchedBody, {
           head: { sha: '9'.repeat(40), repo: { full_name: 'example/repository' } },
         });
       }
       if (scenario === 'readback-body-mismatch') {
-        return makePull(identity, `${state.patchedBody}\nconcurrent edit`);
+        return makeScenarioPull(`${state.patchedBody}\nconcurrent edit`);
       }
-      return makePull(identity, state.patchedBody);
+      return makeScenarioPull(state.patchedBody);
     },
     async patchPull(_repository, _pullNumber, body) {
       state.patchCount += 1;
@@ -1105,7 +1165,7 @@ function createMockApi(scenario, identity) {
         throw new IdentityError('api-write-indeterminate', 'indeterminate');
       }
       if (scenario === 'patch-response-invalid') return {};
-      return makePull(identity, body);
+      return makeScenarioPull(body);
     },
   };
 }
@@ -1128,6 +1188,141 @@ async function runCaseCatalog(catalog, repositoryRoot) {
     passed += 1;
   }
   const baselineSnapshot = collectSnapshot(repositoryRoot);
+  const originalGitDirectory = process.env.GIT_DIR;
+  try {
+    process.env.GIT_DIR = path.join(repositoryRoot, 'invalid-git-directory');
+    const protectedSnapshot = collectSnapshot(repositoryRoot);
+    assert(protectedSnapshot.commit === baselineSnapshot.commit &&
+      protectedSnapshot.tree === baselineSnapshot.tree, 'git-environment-self-test');
+    passed += 1;
+  } finally {
+    if (originalGitDirectory === undefined) {
+      delete process.env.GIT_DIR;
+    } else {
+      process.env.GIT_DIR = originalGitDirectory;
+    }
+  }
+
+  const temporaryRoot = fs.realpathSync.native(os.tmpdir());
+  const replacementDirectory = fs.mkdtempSync(path.join(
+    temporaryRoot,
+    'psstyleguide-pr-body-git-',
+  ));
+  assert(path.dirname(replacementDirectory).toLowerCase() ===
+    temporaryRoot.toLowerCase(), 'git-replace-self-test');
+  const testGit = (args) => {
+    const result = childProcess.spawnSync('git', args, {
+      encoding: 'utf8',
+      env: withoutGitEnvironment(process.env),
+      maxBuffer: 1048576,
+      shell: false,
+      windowsHide: true,
+    });
+    assert(result.error === undefined && result.status === 0 &&
+      typeof result.stdout === 'string', 'git-replace-self-test');
+    return result.stdout.trim();
+  };
+  try {
+    testGit([
+      'clone', '--quiet', '--no-checkout', repositoryRoot, replacementDirectory,
+    ]);
+    const replacementCommit = testGit([
+      '-C', replacementDirectory, 'rev-parse', '--verify', 'HEAD^{commit}',
+    ]);
+    const replacementParent = testGit([
+      '-C', replacementDirectory, 'rev-parse', '--verify', `${replacementCommit}^`,
+    ]);
+    testGit([
+      '-C', replacementDirectory, 'replace', replacementCommit, replacementParent,
+    ]);
+    const replacedTree = testGit([
+      '-C', replacementDirectory, 'rev-parse', '--verify',
+      `${replacementCommit}^{tree}`,
+    ]);
+    assert(replacedTree !== baselineSnapshot.tree, 'git-replace-self-test');
+    const protectedSnapshot = collectSnapshot(replacementDirectory);
+    assert(protectedSnapshot.commit === baselineSnapshot.commit &&
+      protectedSnapshot.tree === baselineSnapshot.tree, 'git-replace-self-test');
+    passed += 1;
+
+    const originCases = [
+      {
+        remote: 'https://github.com/Example/Repository.git',
+        apiRoot: 'https://api.github.com/',
+        expected: 'current',
+      },
+      {
+        remote: 'git@github.com:Example/Repository.git',
+        apiRoot: 'https://api.github.com/',
+        expected: 'current',
+      },
+      {
+        remote: 'https://github.company.test/Example/Repository.git',
+        apiRoot: 'https://github.company.test/api/v3',
+        expected: 'current',
+      },
+      {
+        remote: 'git@github.company.test:Example/Repository.git',
+        apiRoot: 'https://github.company.test/api/v3',
+        expected: 'current',
+      },
+      {
+        remote: 'ssh://git@github.company.test/Example/Repository.git',
+        apiRoot: 'https://github.company.test/api/v3',
+        expected: 'current',
+      },
+      {
+        remote: 'https://unrelated.test/example/repository.git',
+        apiRoot: 'https://github.company.test/api/v3',
+        expected: 'origin-remote',
+      },
+      {
+        remote: 'https://user@github.company.test/example/repository.git',
+        apiRoot: 'https://github.company.test/api/v3',
+        expected: 'origin-remote',
+      },
+      {
+        remote: 'ssh://owner@github.company.test/example/repository.git',
+        apiRoot: 'https://github.company.test/api/v3',
+        expected: 'origin-remote',
+      },
+      {
+        remote: 'https://github.company.test/example/repository/extra.git',
+        apiRoot: 'https://github.company.test/api/v3',
+        expected: 'origin-remote',
+      },
+      {
+        remote: 'https://github.company.test/example/repository.git?ref=main',
+        apiRoot: 'https://github.company.test/api/v3',
+        expected: 'origin-remote',
+      },
+    ];
+    for (const originCase of originCases) {
+      testGit([
+        '-C', replacementDirectory, 'remote', 'set-url', 'origin',
+        originCase.remote,
+      ]);
+      let observed = 'current';
+      try {
+        verifyOriginRepository(
+          replacementDirectory,
+          'example/repository',
+          originCase.apiRoot,
+        );
+      } catch (error) {
+        if (!(error instanceof IdentityError)) throw error;
+        observed = error.category;
+      }
+      assert(observed === originCase.expected, 'origin-self-test');
+      passed += 1;
+    }
+  } finally {
+    const resolved = path.resolve(replacementDirectory);
+    assert(path.dirname(resolved).toLowerCase() === temporaryRoot.toLowerCase(),
+      'git-replace-self-test');
+    fs.rmSync(resolved, { recursive: true, force: false });
+  }
+
   for (const testCase of catalog.sourceCases) {
     let observed;
     try {
@@ -1192,7 +1387,6 @@ async function runCaseCatalog(catalog, repositoryRoot) {
     passed += 1;
   }
 
-  const temporaryRoot = fs.realpathSync.native(os.tmpdir());
   const temporaryDirectory = fs.mkdtempSync(path.join(
     temporaryRoot,
     'psstyleguide-pr-body-identity-',
@@ -1373,9 +1567,10 @@ async function main() {
   const token = process.env.GITHUB_TOKEN;
   validateApiToken(token);
   const pullNumber = Number(options.pullRequest);
-  verifyOriginRepository(repositoryRoot, options.repository);
-  const apiRoot = options.apiRoot ?? process.env.GITHUB_API_URL ??
-    'https://api.github.com/';
+  const apiRoot = normalizeApiRoot(
+    options.apiRoot ?? process.env.GITHUB_API_URL ?? 'https://api.github.com/',
+  );
+  verifyOriginRepository(repositoryRoot, options.repository, apiRoot);
   const update = await synchronizePullRequest(
     identity,
     options.repository,

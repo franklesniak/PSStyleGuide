@@ -194,6 +194,12 @@
       "expectedPatchCount": 1
     },
     {
+      "id": "remote-repository-name-case-insensitive",
+      "scenario": "repository-name-case",
+      "expected": "success-changed",
+      "expectedPatchCount": 1
+    },
+    {
       "id": "remote-head-changes-before-write",
       "scenario": "head-before-write",
       "expected": "remote-changed-before-write",
