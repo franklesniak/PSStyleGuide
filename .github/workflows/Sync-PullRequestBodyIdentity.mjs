@@ -9,7 +9,7 @@ import path from 'node:path';
 import { TextDecoder } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
-const TOOL_VERSION = '1.0.20260912.1';
+const TOOL_VERSION = '1.0.20260912.2';
 const RESULT_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityResult.v1';
 const CASE_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityCases.v1';
 const START_MARKER = '<!-- psstyleguide-pr-body-identity:start -->';
@@ -1223,14 +1223,34 @@ async function runCaseCatalog(catalog, repositoryRoot) {
     return result.stdout.trim();
   };
   try {
-    testGit([
-      'clone', '--quiet', '--no-checkout', repositoryRoot, replacementDirectory,
+    testGit(['init', '--quiet', replacementDirectory]);
+    const replacementFixture = path.join(replacementDirectory, 'fixture.txt');
+    fs.writeFileSync(replacementFixture, 'parent\n', {
+      encoding: 'utf8', flag: 'wx', mode: 0o600,
+    });
+    testGit(['-C', replacementDirectory, 'add', '--', 'fixture.txt']);
+    const commitFixture = (message) => testGit([
+      '-C', replacementDirectory,
+      '-c', 'user.name=PSStyleGuide self-test',
+      '-c', 'user.email=psstyleguide-self-test@example.invalid',
+      '-c', 'commit.gpgSign=false',
+      '-c', 'core.hooksPath=.git/no-hooks',
+      'commit', '--quiet', '-m', message,
     ]);
+    commitFixture('parent');
+    const replacementParent = testGit([
+      '-C', replacementDirectory, 'rev-parse', '--verify', 'HEAD^{commit}',
+    ]);
+    fs.writeFileSync(replacementFixture, 'child\n', {
+      encoding: 'utf8', flag: 'w', mode: 0o600,
+    });
+    testGit(['-C', replacementDirectory, 'add', '--', 'fixture.txt']);
+    commitFixture('child');
     const replacementCommit = testGit([
       '-C', replacementDirectory, 'rev-parse', '--verify', 'HEAD^{commit}',
     ]);
-    const replacementParent = testGit([
-      '-C', replacementDirectory, 'rev-parse', '--verify', `${replacementCommit}^`,
+    const originalTree = testGit([
+      '-C', replacementDirectory, 'rev-parse', '--verify', 'HEAD^{tree}',
     ]);
     testGit([
       '-C', replacementDirectory, 'replace', replacementCommit, replacementParent,
@@ -1239,11 +1259,24 @@ async function runCaseCatalog(catalog, repositoryRoot) {
       '-C', replacementDirectory, 'rev-parse', '--verify',
       `${replacementCommit}^{tree}`,
     ]);
-    assert(replacedTree !== baselineSnapshot.tree, 'git-replace-self-test');
-    const protectedSnapshot = collectSnapshot(replacementDirectory);
-    assert(protectedSnapshot.commit === baselineSnapshot.commit &&
-      protectedSnapshot.tree === baselineSnapshot.tree, 'git-replace-self-test');
+    assert(replacedTree !== originalTree, 'git-replace-self-test');
+    const protectedCommit = runGitText(
+      replacementDirectory,
+      ['rev-parse', '--verify', 'HEAD^{commit}'],
+      'git-replace-self-test',
+    );
+    const protectedTree = runGitText(
+      replacementDirectory,
+      ['rev-parse', '--verify', 'HEAD^{tree}'],
+      'git-replace-self-test',
+    );
+    assert(protectedCommit === replacementCommit && protectedTree === originalTree,
+      'git-replace-self-test');
     passed += 1;
+    testGit([
+      '-C', replacementDirectory, 'remote', 'add', 'origin',
+      'https://github.com/example/repository.git',
+    ]);
 
     const originCases = [
       {
