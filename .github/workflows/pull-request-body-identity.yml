@@ -130,7 +130,7 @@ jobs:
           }
           & $strGitPath --no-replace-objects -c core.fsmonitor=false remote add proposed "$strServerUrl/$strHeadRepository"
           if ($LASTEXITCODE -ne 0) { throw "acquire: proposed remote add exited $LASTEXITCODE" }
-          & $strGitPath --no-replace-objects -c core.fsmonitor=false fetch --depth 1 --no-tags --no-recurse-submodules proposed $strHeadSha
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false fetch --depth 65 --no-tags --no-recurse-submodules proposed $strHeadSha
           if ($LASTEXITCODE -ne 0) { throw "acquire: proposed fetch exited $LASTEXITCODE" }
           $strFetchedHead = (& $strGitPath --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'FETCH_HEAD^{commit}').Trim()
           if ($LASTEXITCODE -ne 0 -or $strFetchedHead -cne $strHeadSha) {
