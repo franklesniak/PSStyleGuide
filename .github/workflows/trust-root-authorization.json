@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "authorization_id": "pr189-review-corrections-bootstrap-v1",
+  "authorization_id": "pr189-review-corrections-bootstrap-v2",
   "limits": {
     "maximum_paths": 15,
     "maximum_blob_bytes": 573440,
@@ -61,9 +61,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "f67635d446834387c18c78e5a272463e5bf90ea4",
+      "blob": "703597effe62af5f90e047a999ca1b93fe3b65f9",
       "bytes": 563652,
-      "sha256": "95949a87142e24ad17b934190dd75a5c613ba2cce10f4f3c2799f9087d70c71c",
+      "sha256": "a9be17b59b98acd02473d68c813e46ce4128e05d2424b45deddfef0dbc56633a",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -85,9 +85,9 @@
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "7be89b1bb7d61297290d65c13653007d4c1be88a",
-      "bytes": 211643,
-      "sha256": "b551b1d47513f15e3fb197ad797b627f8cd8f76811cf6fe8958d1c3e4c776d1a",
+      "blob": "dc16cd60a4dc481773a2ea5f3e2af4c4b9518511",
+      "bytes": 200623,
+      "sha256": "c2045e259d3128538f1df6991b31b0ac3352d723d258634b901f0994f5234f40",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": ["verifier-audits-authorized-history", "verifier-reads-trusted-revision-manifest"]
