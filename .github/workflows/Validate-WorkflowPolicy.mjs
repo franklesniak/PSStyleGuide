@@ -25,13 +25,13 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.2.7';
+const VALIDATOR_VERSION = '1.2.8';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '0490a0fafe4e58a57990c8286771cec8d6605891d884ff30dc6a1c5193aeff2c';
-const MINIMUM_CASE_COUNT = 96;
-const REQUIRED_IDENTITY_CASE_COUNT = 39;
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd6b5ad4774bbd4fed0608eec3e885d63f9c1b30951aa363a9a3e947a94cd0573';
+const MINIMUM_CASE_COUNT = 99;
+const REQUIRED_IDENTITY_CASE_COUNT = 42;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
 const IDENTITY_WORKFLOW_FILE_NAME = 'pull-request-body-identity.yml';
@@ -622,6 +622,11 @@ function validatePullRequestBodyIdentityPolicy(workflow, rawText) {
     '$longObservedProposedBytes -gt $longMaximumProposedBytes',
     '$strObservedBlob.Trim() -cne $strTreeBlob',
     '$strWrittenBlob.Trim() -cne $strTreeBlob',
+    'remote remove trusted',
+    'remote remove proposed',
+    "'^(remote\\..*|extensions\\.partialclone)$'",
+    '$intOfflineSelectorExit -ne 1',
+    '$arrOfflineSelector.Count -ne 0',
   ];
   if (
     transferLiterals.some((literal) => !runs.includes(literal))

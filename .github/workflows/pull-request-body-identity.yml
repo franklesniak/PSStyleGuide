@@ -264,6 +264,24 @@ jobs:
               $arrProposedWorktreeEntries.Count -ne 0) {
               throw 'acquire: the proposed repository state is invalid'
           }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false remote remove trusted
+          if ($LASTEXITCODE -ne 0) {
+              throw "acquire: trusted remote removal exited $LASTEXITCODE"
+          }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false remote remove proposed
+          if ($LASTEXITCODE -ne 0) {
+              throw "acquire: proposed remote removal exited $LASTEXITCODE"
+          }
+          $arrOfflineSelector = @(
+              & $strGitPath --no-replace-objects -c core.fsmonitor=false `
+                  config --name-only --get-regexp `
+                  '^(remote\..*|extensions\.partialclone)$'
+          )
+          $intOfflineSelectorExit = $LASTEXITCODE
+          if ($intOfflineSelectorExit -ne 1 -or
+              $arrOfflineSelector.Count -ne 0) {
+              throw 'acquire: the disposable repository retains a network selector'
+          }
           $arrProposedEntries = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false ls-tree $strObservedHead -- .github/workflows/Sync-PullRequestBodyIdentity.mjs .github/workflows/pull-request-body-identity-cases.json .github/workflows/pull-request-body-identity.yml)
           if ($LASTEXITCODE -ne 0 -or $arrProposedEntries.Count -ne 3) {
               throw 'acquire: the proposed verifier inputs are invalid'
