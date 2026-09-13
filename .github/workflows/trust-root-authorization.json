@@ -108,9 +108,9 @@
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "3a908907ae46135abd6e46d073c7357a10071107",
-      "bytes": 207134,
-      "sha256": "446d0a9c2f10c464213c108a2c2a85f610da108373e71d71a31bab7d27176dc0",
+      "blob": "363d09be7a78054123761e7b655bb1ae7bbf04a8",
+      "bytes": 207135,
+      "sha256": "ed741444deba11abc2f32f86b4fa4fe2cffcf124d4b6632708e73595ca7dbe8e",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
