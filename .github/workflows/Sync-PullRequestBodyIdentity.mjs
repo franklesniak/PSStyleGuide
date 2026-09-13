@@ -2,6 +2,7 @@
 
 import childProcess from 'node:child_process';
 import crypto from 'node:crypto';
+import { EventEmitter } from 'node:events';
 import fs from 'node:fs';
 import https from 'node:https';
 import os from 'node:os';
@@ -9,7 +10,7 @@ import path from 'node:path';
 import { TextDecoder } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
-const TOOL_VERSION = '1.0.20260912.2';
+const TOOL_VERSION = '1.0.20260912.3';
 const RESULT_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityResult.v1';
 const CASE_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityCases.v1';
 const START_MARKER = '<!-- psstyleguide-pr-body-identity:start -->';
@@ -703,6 +704,42 @@ function validateApiToken(token) {
     !/[\u0000-\u001f\u007f]/u.test(token), 'api-token');
 }
 
+function consumeApiResponse(response, request) {
+  return new Promise((resolve, reject) => {
+    const chunks = [];
+    let length = 0;
+    response.on('data', (chunk) => {
+      length += chunk.length;
+      if (length > MAXIMUM_RESPONSE_BYTES) {
+        const error = new Error('api-response-oversized');
+        request.destroy(error);
+        reject(error);
+        return;
+      }
+      chunks.push(chunk);
+    });
+    response.once('aborted', () => reject(new Error('api-response-aborted')));
+    response.once('error', reject);
+    response.once('end', () => resolve({
+      statusCode: response.statusCode,
+      bytes: Buffer.concat(chunks),
+    }));
+  });
+}
+
+function createApiDeadline(milliseconds) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => {
+    controller.abort(new Error('api-deadline'));
+  }, milliseconds);
+  return {
+    signal: controller.signal,
+    clear() {
+      clearTimeout(timer);
+    },
+  };
+}
+
 function apiRequest(apiRoot, token, method, relativePath, requestBody) {
   validateApiToken(token);
   assert(['GET', 'PATCH'].includes(method) &&
@@ -716,37 +753,43 @@ function apiRequest(apiRoot, token, method, relativePath, requestBody) {
     Buffer.from(JSON.stringify(requestBody), 'utf8');
   assert(bodyBytes.length <= MAXIMUM_BODY_BYTES + 4096, 'api-request');
   return new Promise((resolve, reject) => {
-    const request = https.request(url, {
-      method,
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${token}`,
-        'Content-Length': String(bodyBytes.length),
-        'Content-Type': 'application/json',
-        'User-Agent': `PSStyleGuide-PR-Body-Identity/${TOOL_VERSION}`,
-        'X-GitHub-Api-Version': API_VERSION,
-      },
-      timeout: REQUEST_TIMEOUT_MILLISECONDS,
-    }, (response) => {
-      const chunks = [];
-      let length = 0;
-      response.on('data', (chunk) => {
-        length += chunk.length;
-        if (length > MAXIMUM_RESPONSE_BYTES) {
-          request.destroy(new Error('api-response-oversized'));
-          return;
-        }
-        chunks.push(chunk);
+    const deadline = createApiDeadline(REQUEST_TIMEOUT_MILLISECONDS);
+    let settled = false;
+    const settle = (callback, value) => {
+      if (settled) return;
+      settled = true;
+      deadline.clear();
+      callback(value);
+    };
+    let request;
+    try {
+      request = https.request(url, {
+        method,
+        headers: {
+          Accept: 'application/vnd.github+json',
+          Authorization: `Bearer ${token}`,
+          'Content-Length': String(bodyBytes.length),
+          'Content-Type': 'application/json',
+          'User-Agent': `PSStyleGuide-PR-Body-Identity/${TOOL_VERSION}`,
+          'X-GitHub-Api-Version': API_VERSION,
+        },
+        signal: deadline.signal,
+        timeout: REQUEST_TIMEOUT_MILLISECONDS,
+      }, (response) => consumeApiResponse(response, request)
+        .then(
+          (value) => settle(resolve, value),
+          (error) => settle(reject, error),
+        ));
+      request.once('timeout', () => {
+        request.destroy(new Error('api-timeout'));
       });
-      response.on('end', () => resolve({
-        statusCode: response.statusCode,
-        bytes: Buffer.concat(chunks),
-      }));
-    });
-    request.on('timeout', () => request.destroy(new Error('api-timeout')));
-    request.on('error', reject);
-    if (bodyBytes.length !== 0) request.write(bodyBytes);
-    request.end();
+      request.once('error', (error) => settle(reject, error));
+      if (bodyBytes.length !== 0) request.write(bodyBytes);
+      request.end();
+    } catch (error) {
+      if (request !== undefined) request.destroy();
+      settle(reject, error);
+    }
   });
 }
 
@@ -1170,6 +1213,54 @@ function createMockApi(scenario, identity) {
   };
 }
 
+async function runApiResponseEventSelfTests() {
+  const createResponse = () => {
+    const response = new EventEmitter();
+    response.statusCode = 200;
+    return response;
+  };
+  const request = { destroy() {} };
+  const abortResponse = createResponse();
+  const abortPromise = consumeApiResponse(abortResponse, request);
+  abortResponse.emit('data', Buffer.from('{"partial":', 'utf8'));
+  abortResponse.emit('aborted');
+  abortResponse.emit('error', new Error('simulated response error after abort'));
+  let abortRejected = false;
+  try {
+    await abortPromise;
+  } catch (error) {
+    abortRejected = error instanceof Error &&
+      error.message === 'api-response-aborted';
+  }
+  assert(abortRejected, 'api-response-abort-self-test');
+
+  const errorResponse = createResponse();
+  const errorPromise = consumeApiResponse(errorResponse, request);
+  const simulatedError = new Error('simulated response stream error');
+  errorResponse.emit('error', simulatedError);
+  let errorRejected = false;
+  try {
+    await errorPromise;
+  } catch (error) {
+    errorRejected = error === simulatedError;
+  }
+  assert(errorRejected, 'api-response-error-self-test');
+  return 2;
+}
+
+async function runApiDeadlineSelfTests() {
+  const expired = createApiDeadline(1);
+  const cleared = createApiDeadline(1);
+  cleared.clear();
+  await new Promise((resolve) => setTimeout(resolve, 10));
+  assert(expired.signal.aborted && expired.signal.reason instanceof Error &&
+    expired.signal.reason.message === 'api-deadline',
+  'api-deadline-expiry-self-test');
+  expired.clear();
+  assert(!cleared.signal.aborted, 'api-deadline-clear-self-test');
+  return 2;
+}
+
 async function runCaseCatalog(catalog, repositoryRoot) {
   const identity = fixtureIdentity();
   validateIdentity(identity);
@@ -1187,6 +1278,8 @@ async function runCaseCatalog(catalog, repositoryRoot) {
     assert(rejected, 'token-self-test');
     passed += 1;
   }
+  passed += await runApiResponseEventSelfTests();
+  passed += await runApiDeadlineSelfTests();
   const baselineSnapshot = collectSnapshot(repositoryRoot);
   const originalGitDirectory = process.env.GIT_DIR;
   try {

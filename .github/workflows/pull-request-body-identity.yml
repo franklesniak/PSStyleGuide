@@ -1,7 +1,7 @@
 name: Pull Request Body Identity
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - main
     types:
@@ -15,52 +15,488 @@ permissions: {}
 jobs:
   verify_identity:
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    env:
-      NODE_VERSION: '24.18.1'
+    permissions: {}
 
     steps:
-      - name: Checkout pull request head
-        id: checkout_pull_request_head
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.sha }}
-          token: ${{ github.token }}
-          persist-credentials: false
-          clean: true
-          fetch-depth: 1
-          fetch-tags: false
-          show-progress: true
-          lfs: false
-          submodules: false
-          set-safe-directory: true
-          allow-unsafe-pr-checkout: false
-
-      - name: Set up Node.js
-        id: setup_node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Verify Node.js runtime
-        id: verify_node_runtime
-        shell: bash
+      - name: Acquire exact pull request head and verified Node.js
+        id: acquire
+        shell: pwsh
         run: |
-          set -euo pipefail
-          test "$(node --version)" = "v${NODE_VERSION}"
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
+          }
+
+          $strServerUrl = $env:GITHUB_SERVER_URL
+          $strRepository = $env:GITHUB_REPOSITORY
+          $strEventPath = $env:GITHUB_EVENT_PATH
+          $strWorkflowSha = $env:GITHUB_SHA
+          if ($strServerUrl -cne 'https://github.com') {
+              throw 'acquire: the runner named an unexpected server'
+          }
+          if ($strRepository -cnotmatch '^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$') {
+              throw 'acquire: the triggering repository is not a plain owner/name pair'
+          }
+          if ([string]::IsNullOrEmpty($strEventPath) -or
+              -not [System.IO.File]::Exists($strEventPath)) {
+              throw 'acquire: the pull request event is unavailable'
+          }
+          $objEvent = Get-Content -LiteralPath $strEventPath -Raw |
+              ConvertFrom-Json -Depth 32
+          if ($objEvent.repository.full_name -cne $strRepository -or
+              $objEvent.pull_request.base.repo.full_name -cne $strRepository) {
+              throw 'acquire: the event repository identity is inconsistent'
+          }
+          $strBaseSha = [string]$objEvent.pull_request.base.sha
+          $strHeadRepository = [string]$objEvent.pull_request.head.repo.full_name
+          $strHeadSha = [string]$objEvent.pull_request.head.sha
+          if ($strBaseSha -cnotmatch '^[0-9a-f]{40}$' -or
+              $strWorkflowSha -cne $strBaseSha) {
+              throw 'acquire: the trusted workflow revision is inconsistent'
+          }
+          if ($strHeadRepository -cnotmatch '^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$') {
+              throw 'acquire: the pull request head repository is invalid'
+          }
+          if ($strHeadSha -cnotmatch '^[0-9a-f]{40}$') {
+              throw 'acquire: the pull request head is not a full commit hash'
+          }
+          if (@([System.IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
+              throw 'acquire: the workspace is not empty'
+          }
+
+          $strResolvedGit = @('/usr/bin/git', '/bin/git') |
+              Where-Object { [System.IO.File]::Exists($_) } |
+              Select-Object -First 1
+          $strResolvedCurl = @('/usr/bin/curl', '/bin/curl') |
+              Where-Object { [System.IO.File]::Exists($_) } |
+              Select-Object -First 1
+          $strResolvedTar = @('/usr/bin/tar', '/bin/tar') |
+              Where-Object { [System.IO.File]::Exists($_) } |
+              Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strResolvedGit) -or
+              [string]::IsNullOrEmpty($strResolvedCurl) -or
+              [string]::IsNullOrEmpty($strResolvedTar)) {
+              throw 'acquire: a required native tool was not resolved'
+          }
+          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant
+          New-Variable -Name strCurlPath -Value $strResolvedCurl -Option Constant
+          New-Variable -Name strTarPath -Value $strResolvedTar -Option Constant
+
+          Get-ChildItem Env: |
+              Where-Object { $_.Name -clike 'GIT_*' } |
+              ForEach-Object { Remove-Item -LiteralPath "Env:$($_.Name)" }
+          $env:GIT_NO_REPLACE_OBJECTS = '1'
+          $env:GIT_OPTIONAL_LOCKS = '0'
+
+          function Add-ProposedBlob {
+              [CmdletBinding(PositionalBinding = $false)]
+              [OutputType([long])]
+              param(
+                  [Parameter(Mandatory)][string] $RepositoryPath,
+                  [Parameter(Mandatory)][long] $MaximumBytes,
+                  [Parameter(Mandatory)][int] $Sequence,
+                  [Parameter()][AllowNull()][string] $ExpectedBlob,
+                  [Parameter()][AllowNull()][Nullable[long]] $ExpectedBytes
+              )
+
+              if ([string]::IsNullOrEmpty($RepositoryPath) -or
+                  [System.IO.Path]::IsPathRooted($RepositoryPath) -or
+                  $RepositoryPath.Contains('\', [StringComparison]::Ordinal) -or
+                  $RepositoryPath -match '(^|/)\.\.?(/|$)' -or
+                  $RepositoryPath.IndexOfAny([char[]]@("`0", "`r", "`n", "`t")) -ge 0 -or
+                  $MaximumBytes -lt 0 -or $MaximumBytes -gt 573440 -or
+                  $Sequence -lt 1 -or $Sequence -gt 24 -or
+                  (-not [string]::IsNullOrEmpty($ExpectedBlob) -and
+                      $ExpectedBlob -cnotmatch '^[0-9a-f]{40}$') -or
+                  ($null -ne $ExpectedBytes -and
+                      ($ExpectedBytes -lt 0 -or
+                          $ExpectedBytes -gt $MaximumBytes))) {
+                  throw 'acquire: a proposed blob request is invalid'
+              }
+              $strTreeEntry = [string](& $strGitPath -C $PWD.Path `
+                      --no-replace-objects -c core.fsmonitor=false ls-tree `
+                      $strHeadSha -- $RepositoryPath)
+              if ($LASTEXITCODE -ne 0 -or
+                  $strTreeEntry -cnotmatch '^100644 blob ([0-9a-f]{40})\t(.+)$' -or
+                  $Matches[2] -cne $RepositoryPath -or
+                  (-not [string]::IsNullOrEmpty($ExpectedBlob) -and
+                      $Matches[1] -cne $ExpectedBlob)) {
+                  throw "acquire: $RepositoryPath is not the expected regular blob"
+              }
+              $strTreeBlob = $Matches[1]
+              & $strGitPath -C $PWD.Path --no-replace-objects `
+                  -c core.fsmonitor=false cat-file -e "$strTreeBlob`^{blob}" 2>$null
+              if ($LASTEXITCODE -eq 0) {
+                  return 0
+              }
+              if ($LASTEXITCODE -ne 1 -and $LASTEXITCODE -ne 128) {
+                  throw "acquire: $RepositoryPath blob availability is indeterminate"
+              }
+
+              $strEscapedPath = [string]::Join(
+                  '/',
+                  @($RepositoryPath.Split('/') | ForEach-Object {
+                          [System.Uri]::EscapeDataString($_)
+                      })
+              )
+              $strBlobUrl =
+                  "https://raw.githubusercontent.com/$strHeadRepository/$strHeadSha/$strEscapedPath"
+              $strBlobRoot = [System.IO.Path]::Combine(
+                  $env:RUNNER_TEMP,
+                  'pr-body-identity-proposed-blobs'
+              )
+              [void][System.IO.Directory]::CreateDirectory($strBlobRoot)
+              $strDownloadPath = [System.IO.Path]::Combine(
+                  $strBlobRoot,
+                  "blob-$Sequence.bin"
+              )
+              if ([System.IO.File]::Exists($strDownloadPath) -or
+                  [System.IO.Directory]::Exists($strDownloadPath)) {
+                  throw 'acquire: a proposed blob download path already exists'
+              }
+              $longTransferLimit = $MaximumBytes + 1
+              try {
+                  & $strCurlPath --silent --show-error --fail `
+                      --proto '=https' --tlsv1.2 `
+                      --connect-timeout 15 --max-time 60 `
+                      --speed-limit 1024 --speed-time 15 `
+                      --max-filesize $longTransferLimit `
+                      --range "0-$MaximumBytes" `
+                      --output $strDownloadPath $strBlobUrl
+                  if ($LASTEXITCODE -ne 0 -or
+                      -not [System.IO.File]::Exists($strDownloadPath)) {
+                      throw "acquire: $RepositoryPath bounded download failed"
+                  }
+                  $longObservedBytes =
+                      [System.IO.FileInfo]::new($strDownloadPath).Length
+                  if ($longObservedBytes -gt $MaximumBytes -or
+                      ($null -ne $ExpectedBytes -and
+                          $longObservedBytes -ne $ExpectedBytes)) {
+                      throw "acquire: $RepositoryPath exceeds its byte contract"
+                  }
+                  $strObservedBlob = [string](& $strGitPath -C $PWD.Path `
+                          --no-replace-objects -c core.fsmonitor=false `
+                          hash-object --no-filters $strDownloadPath)
+                  if ($LASTEXITCODE -ne 0 -or
+                      $strObservedBlob.Trim() -cne $strTreeBlob) {
+                      throw "acquire: $RepositoryPath has a mismatched Git blob"
+                  }
+                  $strWrittenBlob = [string](& $strGitPath -C $PWD.Path `
+                          --no-replace-objects -c core.fsmonitor=false `
+                          hash-object --no-filters -w $strDownloadPath)
+                  if ($LASTEXITCODE -ne 0 -or
+                      $strWrittenBlob.Trim() -cne $strTreeBlob) {
+                      throw "acquire: $RepositoryPath could not be stored exactly"
+                  }
+                  return $longObservedBytes
+              }
+              finally {
+                  if ([System.IO.File]::Exists($strDownloadPath)) {
+                      Remove-Item -LiteralPath $strDownloadPath -Force
+                  }
+              }
+          }
+
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false init --quiet .
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git init exited $LASTEXITCODE" }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false remote add trusted "$strServerUrl/$strRepository"
+          if ($LASTEXITCODE -ne 0) { throw "acquire: trusted remote add exited $LASTEXITCODE" }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false fetch --depth 1 --no-tags --no-recurse-submodules trusted $strBaseSha
+          if ($LASTEXITCODE -ne 0) { throw "acquire: trusted fetch exited $LASTEXITCODE" }
+          $strTrustedRoot = [System.IO.Path]::Combine(
+              $env:RUNNER_TEMP,
+              'pr-body-identity-trusted'
+          )
+          if ([System.IO.Directory]::Exists($strTrustedRoot) -or
+              [System.IO.File]::Exists($strTrustedRoot)) {
+              throw 'acquire: the trusted worktree path is not empty'
+          }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false worktree add --quiet --detach $strTrustedRoot $strBaseSha
+          if ($LASTEXITCODE -ne 0) { throw "acquire: trusted worktree exited $LASTEXITCODE" }
+          $strObservedBase = (& $strGitPath -C $strTrustedRoot --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'HEAD^{commit}').Trim()
+          $arrTrustedEntries = @(& $strGitPath -C $strTrustedRoot --no-replace-objects -c core.fsmonitor=false ls-tree $strObservedBase -- .github/workflows/Sync-PullRequestBodyIdentity.mjs .github/workflows/pull-request-body-identity-cases.json .github/workflows/pull-request-body-identity.yml)
+          if ($LASTEXITCODE -ne 0 -or $strObservedBase -cne $strBaseSha -or
+              $arrTrustedEntries.Count -ne 3 -or
+              @($arrTrustedEntries | Where-Object {
+                  $_ -cnotmatch '^100644 blob [0-9a-f]{40}\t\.github/workflows/(Sync-PullRequestBodyIdentity\.mjs|pull-request-body-identity-cases\.json|pull-request-body-identity\.yml)$'
+              }).Count -ne 0) {
+              throw 'acquire: the trusted verifier inputs are invalid'
+          }
+          $strTrustedCommandPath = [System.IO.Path]::Combine(
+              $strTrustedRoot,
+              '.github',
+              'workflows',
+              'Sync-PullRequestBodyIdentity.mjs'
+          )
+          $strTrustedCasesPath = [System.IO.Path]::Combine(
+              $strTrustedRoot,
+              '.github',
+              'workflows',
+              'pull-request-body-identity-cases.json'
+          )
+          if (-not [System.IO.File]::Exists($strTrustedCommandPath) -or
+              -not [System.IO.File]::Exists($strTrustedCasesPath)) {
+              throw 'acquire: a trusted verifier input is absent'
+          }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false remote add proposed "$strServerUrl/$strHeadRepository"
+          if ($LASTEXITCODE -ne 0) { throw "acquire: proposed remote add exited $LASTEXITCODE" }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false fetch --filter=blob:none --depth 65 --no-tags --no-recurse-submodules proposed $strHeadSha
+          if ($LASTEXITCODE -ne 0) { throw "acquire: proposed fetch exited $LASTEXITCODE" }
+          $env:GIT_NO_LAZY_FETCH = '1'
+          $strFetchedHead = (& $strGitPath --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'FETCH_HEAD^{commit}').Trim()
+          if ($LASTEXITCODE -ne 0 -or $strFetchedHead -cne $strHeadSha) {
+              throw 'acquire: the fetched revision is not the exact pull request head'
+          }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false update-ref --no-deref HEAD $strFetchedHead
+          if ($LASTEXITCODE -ne 0) { throw "acquire: detached HEAD update exited $LASTEXITCODE" }
+          $strObservedHead = (& $strGitPath --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'HEAD^{commit}').Trim()
+          $strObservedTree = (& $strGitPath --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'HEAD^{tree}').Trim()
+          $arrReplacementRefs = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false for-each-ref --format='%(refname)' refs/replace/)
+          $arrProposedWorktreeEntries = @(
+              [System.IO.Directory]::EnumerateFileSystemEntries($PWD.Path) |
+                  Where-Object {
+                      [System.IO.Path]::GetFileName($_) -cne '.git'
+                  }
+          )
+          if ($LASTEXITCODE -ne 0 -or $strObservedHead -cne $strHeadSha -or
+              $strObservedTree -cnotmatch '^[0-9a-f]{40}$' -or
+              $arrReplacementRefs.Count -ne 0 -or
+              $arrProposedWorktreeEntries.Count -ne 0) {
+              throw 'acquire: the proposed repository state is invalid'
+          }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false remote remove trusted
+          if ($LASTEXITCODE -ne 0) {
+              throw "acquire: trusted remote removal exited $LASTEXITCODE"
+          }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false remote remove proposed
+          if ($LASTEXITCODE -ne 0) {
+              throw "acquire: proposed remote removal exited $LASTEXITCODE"
+          }
+          $arrOfflineSelector = @(
+              & $strGitPath --no-replace-objects -c core.fsmonitor=false `
+                  config --name-only --get-regexp `
+                  '^(remote\..*|extensions\.partialclone)$'
+          )
+          $intOfflineSelectorExit = $LASTEXITCODE
+          if ($intOfflineSelectorExit -ne 1 -or
+              $arrOfflineSelector.Count -ne 0) {
+              throw 'acquire: the disposable repository retains a network selector'
+          }
+          $arrProposedEntries = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false ls-tree $strObservedHead -- .github/workflows/Sync-PullRequestBodyIdentity.mjs .github/workflows/pull-request-body-identity-cases.json .github/workflows/pull-request-body-identity.yml)
+          if ($LASTEXITCODE -ne 0 -or $arrProposedEntries.Count -ne 3) {
+              throw 'acquire: the proposed verifier inputs are invalid'
+          }
+          $boolVerifierInputsChanged =
+              [string]::Join("`n", $arrProposedEntries) -cne
+              [string]::Join("`n", $arrTrustedEntries)
+
+          $dictionaryProposedBlob =
+              [Collections.Generic.Dictionary[string, object]]::new(
+                  [StringComparer]::Ordinal
+              )
+          $hashtableIdentitySourceLimit = [ordered]@{
+              '.github/workflows/Generate-StyleGuideArtifacts.ps1' = 262144
+              '.github/workflows/Test-ExactGitPathSet.ps1' = 524288
+              '.github/workflows/build.yml' = 131072
+              '.github/workflows/workflow-policy-contract.json' = 524288
+              '.github/workflows/Validate-WorkflowPolicy.mjs' = 262144
+          }
+          foreach ($objSourceLimit in $hashtableIdentitySourceLimit.GetEnumerator()) {
+              $dictionaryProposedBlob.Add(
+                  [string]$objSourceLimit.Key,
+                  [pscustomobject]@{
+                      MaximumBytes = [long]$objSourceLimit.Value
+                      ExpectedBlob = $null
+                      ExpectedBytes = $null
+                  }
+              )
+          }
+          if ($boolVerifierInputsChanged) {
+              $strTrustedAuthorizationPath = [System.IO.Path]::Combine(
+                  $strTrustedRoot,
+                  '.github',
+                  'workflows',
+                  'Test-TrustRootAuthorization.ps1'
+              )
+              if (-not [System.IO.File]::Exists(
+                      $strTrustedAuthorizationPath
+                  )) {
+                  throw 'acquire: the trusted trust-root verifier is absent'
+              }
+              $strTrustedManifestPath = [System.IO.Path]::Combine(
+                  $strTrustedRoot,
+                  '.github',
+                  'workflows',
+                  ('trust-root-' + 'author' + 'ization.json')
+              )
+              if (-not [System.IO.File]::Exists($strTrustedManifestPath) -or
+                  [System.IO.FileInfo]::new($strTrustedManifestPath).Length -gt 65536) {
+                  throw 'acquire: the trusted authorizer manifest is unavailable'
+              }
+              try {
+                  $objTrustedManifest = Get-Content -LiteralPath `
+                      $strTrustedManifestPath -Raw |
+                      ConvertFrom-Json -Depth 32
+              }
+              catch {
+                  throw 'acquire: the trusted authorizer manifest is malformed'
+              }
+              $arrAuthorizedPath = @($objTrustedManifest.allowed_paths)
+              if ($objTrustedManifest.schema_version -notin @(1, 2) -or
+                  $objTrustedManifest.limits.maximum_paths -lt 1 -or
+                  $objTrustedManifest.limits.maximum_paths -gt 19 -or
+                  $objTrustedManifest.limits.maximum_blob_bytes -lt 1 -or
+                  $objTrustedManifest.limits.maximum_blob_bytes -gt 573440 -or
+                  $objTrustedManifest.limits.maximum_manifest_bytes -ne 65536 -or
+                  $arrAuthorizedPath.Count -lt 1 -or
+                  $arrAuthorizedPath.Count -gt
+                      $objTrustedManifest.limits.maximum_paths) {
+                  throw 'acquire: the trusted authorizer transfer plan is invalid'
+              }
+              $setAuthorizedPath =
+                  [Collections.Generic.HashSet[string]]::new(
+                      [StringComparer]::Ordinal
+                  )
+              foreach ($objAuthorizedPath in $arrAuthorizedPath) {
+                  $strAuthorizedPath = [string]$objAuthorizedPath.path
+                  $longAuthorizedBytes = 0
+                  if ([string]::IsNullOrEmpty($strAuthorizedPath) -or
+                      [System.IO.Path]::IsPathRooted($strAuthorizedPath) -or
+                      $strAuthorizedPath.Contains(
+                          '\',
+                          [StringComparison]::Ordinal
+                      ) -or
+                      $strAuthorizedPath -match '(^|/)\.\.?(/|$)' -or
+                      $strAuthorizedPath.IndexOfAny(
+                          [char[]]@("`0", "`r", "`n", "`t")
+                      ) -ge 0 -or
+                      -not $setAuthorizedPath.Add($strAuthorizedPath) -or
+                      $objAuthorizedPath.mode -cne '100644' -or
+                      [string]$objAuthorizedPath.blob -cnotmatch
+                          '^[0-9a-f]{40}$' -or
+                      -not [long]::TryParse(
+                          [string]$objAuthorizedPath.bytes,
+                          [ref]$longAuthorizedBytes
+                      ) -or
+                      $longAuthorizedBytes -lt 0 -or
+                      $longAuthorizedBytes -gt
+                          $objTrustedManifest.limits.maximum_blob_bytes) {
+                      throw 'acquire: an authorized blob transfer is invalid'
+                  }
+                  $dictionaryProposedBlob[$strAuthorizedPath] =
+                      [pscustomobject]@{
+                          MaximumBytes = $longAuthorizedBytes
+                          ExpectedBlob = [string]$objAuthorizedPath.blob
+                          ExpectedBytes = [Nullable[long]]$longAuthorizedBytes
+                      }
+              }
+          }
+
+          $longMaximumProposedBytes = 12599320
+          $longPlannedProposedBytes = 0
+          foreach ($objBlobSpec in $dictionaryProposedBlob.Values) {
+              $longPlannedProposedBytes += $objBlobSpec.MaximumBytes + 1
+          }
+          if ($dictionaryProposedBlob.Count -lt 5 -or
+              $dictionaryProposedBlob.Count -gt 24 -or
+              $longPlannedProposedBytes -gt $longMaximumProposedBytes) {
+              throw 'acquire: the proposed blob transfer plan exceeds its bounds'
+          }
+          $longObservedProposedBytes = 0
+          $intProposedBlobSequence = 0
+          foreach ($objBlobPlan in $dictionaryProposedBlob.GetEnumerator()) {
+              $intProposedBlobSequence++
+              $longObservedProposedBytes += Add-ProposedBlob `
+                  -RepositoryPath $objBlobPlan.Key `
+                  -MaximumBytes $objBlobPlan.Value.MaximumBytes `
+                  -Sequence $intProposedBlobSequence `
+                  -ExpectedBlob $objBlobPlan.Value.ExpectedBlob `
+                  -ExpectedBytes $objBlobPlan.Value.ExpectedBytes
+              if ($longObservedProposedBytes -gt $longMaximumProposedBytes) {
+                  throw 'acquire: proposed blob transfer bytes exceed the total limit'
+              }
+          }
+
+          if ($boolVerifierInputsChanged) {
+              $arrAuthorization = @(
+                  & $strTrustedAuthorizationPath `
+                      -RepositoryRootPath $strTrustedRoot `
+                      -TrustedRevision $strBaseSha `
+                      -BaseRevision $strBaseSha `
+                      -HeadRevision $strHeadSha
+              )
+              if ($arrAuthorization.Count -ne 1 -or
+                  $arrAuthorization[0] -isnot [bool] -or
+                  -not $arrAuthorization[0]) {
+                  throw 'acquire: the verifier change is not exactly authorized'
+              }
+          }
+
+          $strNodeUrl = 'https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz'
+          $strReviewedNodeSha256 = 'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0'
+          $strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'pr-body-identity-node24')
+          $strArchivePath = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'pr-body-identity-node24.tar.xz')
+          & $strCurlPath --silent --show-error --fail --location --proto '=https' --tlsv1.2 --output $strArchivePath $strNodeUrl
+          if ($LASTEXITCODE -ne 0) { throw "acquire: Node download exited $LASTEXITCODE" }
+          $strObservedNodeSha256 = (Get-FileHash -LiteralPath $strArchivePath -Algorithm SHA256).Hash
+          if ($strObservedNodeSha256 -cne $strReviewedNodeSha256) {
+              throw 'acquire: the Node archive does not match the reviewed digest'
+          }
+          [void][System.IO.Directory]::CreateDirectory($strNodeRoot)
+          & $strTarPath -xJf $strArchivePath -C $strNodeRoot --strip-components=1
+          if ($LASTEXITCODE -ne 0) { throw "acquire: Node extraction exited $LASTEXITCODE" }
+          $strNodePath = [System.IO.Path]::Combine($strNodeRoot, 'bin', 'node')
+          if (-not [System.IO.File]::Exists($strNodePath)) {
+              throw 'acquire: the reviewed Node executable is absent'
+          }
+          $strNodeVersion = (& $strNodePath --version).Trim()
+          if ($LASTEXITCODE -ne 0 -or $strNodeVersion -cne 'v24.18.1') {
+              throw 'acquire: the reviewed Node executable has an unexpected version'
+          }
+          Write-Information "acquire: trusted base $strObservedBase, pull request head $strObservedHead tree $strObservedTree, and reviewed Node $strNodeVersion" -InformationAction Continue
 
       - name: Test pull request body identity command
         id: test_pull_request_body_identity
-        shell: bash
-        run: >-
-          node .github/workflows/Sync-PullRequestBodyIdentity.mjs
-          --self-test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $strNodePath = [System.IO.Path]::Combine(
+              $env:RUNNER_TEMP,
+              'pr-body-identity-node24',
+              'bin',
+              'node'
+          )
+          $strTrustedCommandPath = [System.IO.Path]::Combine(
+              $env:RUNNER_TEMP,
+              'pr-body-identity-trusted',
+              '.github',
+              'workflows',
+              'Sync-PullRequestBodyIdentity.mjs'
+          )
+          & $strNodePath $strTrustedCommandPath --self-test --repository-root $PWD.Path
+          if ($LASTEXITCODE -ne 0) {
+              throw "identity-self-test: command exited $LASTEXITCODE"
+          }
 
       - name: Verify pull request body identity
         id: verify_pull_request_body_identity
-        shell: bash
-        run: >-
-          node .github/workflows/Sync-PullRequestBodyIdentity.mjs
-          --check-event "$GITHUB_EVENT_PATH"
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $strNodePath = [System.IO.Path]::Combine(
+              $env:RUNNER_TEMP,
+              'pr-body-identity-node24',
+              'bin',
+              'node'
+          )
+          $strTrustedCommandPath = [System.IO.Path]::Combine(
+              $env:RUNNER_TEMP,
+              'pr-body-identity-trusted',
+              '.github',
+              'workflows',
+              'Sync-PullRequestBodyIdentity.mjs'
+          )
+          & $strNodePath $strTrustedCommandPath --check-event $env:GITHUB_EVENT_PATH --repository-root $PWD.Path
+          if ($LASTEXITCODE -ne 0) {
+              throw "identity-check: command exited $LASTEXITCODE"
+          }
