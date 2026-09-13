@@ -5758,9 +5758,10 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 | Task 60 | Start a source sync-back only after issue setup and a free implementation slot. Adapt the common behavior; do not redesign it independently. |
 | Task 62 | Prepare the source sync-back candidate and complete the task-local conditional repair PR lifecycle. |
 | Task 67 | If the source changes, compare the new landed source result in the destination again. Use the same issue, slot, lifecycle, and evidence controls for each required destination repair. |
+| Task 67 | Close the trust-root transition debt gate. An ordinary on-plan R2 trust-root content update must use one normal PR and must not require a preliminary direct-to-`main` authorization activation. |
 | Task 61 | Stop if the same matrix row changes direction twice. Run a new decision process that evaluates both implementations. |
 | Task 68 | Close the cycle only when every common row is `same`, every intentional difference has complete evidence, and no blocker remains. |
-| Task 68 | Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task. |
+| Task 68 | Post one permanent closure record with both repositories' final identities, the matrix digest, validation, review outcomes, trust-root transition debt disposition, and no-change or non-applicability results. If a dependent final-recheck task owns closure, post the current reciprocal record and leave final closure to that task. |
 
 ### Task-local comparison and fixed-point controls
 
@@ -6478,7 +6479,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 ### Objective
 
-Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `REPAIR_REQUIRED` result. Do not execute a repair or publish closure in this task.
+Perform one reciprocal recheck, close the trust-root transition debt gate, and emit `FIXED_POINT_READY` or the exact next `REPAIR_REQUIRED` result. Do not execute a repair or publish closure in this task.
 
 ### Execution controls
 
@@ -6503,6 +6504,17 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 Require byte identity for role-equivalent CI workflows and common materials after substituting only proved repository-specific values. Limit intentional differences to repository identity and canonical URLs; PowerShell or Terraform source, generated, and artifact filenames or payloads; domain examples and documentation; artifact IDs; schema, type, and diagnostic prefixes; stable check and ruleset names; local evidence identifiers; proved platform conditions; and repository-specific live settings or decisions that cannot be represented by the common bytes.
 
 For each proposed intentional difference, name both literals or behaviors and the exact non-common bytes. Explain why the repository requires the difference. Prove equal security and failure strength. Name the owner. State the review or expiry condition. Do not accept convenience, implementation history, separate authorship, or lower effort as a repository-specific reason. If the evidence does not make the exception certain, stop and escalate it to the human operator.
+
+#### Trust-root transition debt gate
+
+Apply this gate because the current repair required a temporary trusted authorization on `main` to make the trust-root verifier understand the candidate. The temporary bridge can complete as already tested, but that exceptional transition must not become the routine update process.
+
+1. Verify that the final landed authorization manifest is inactive and that no temporary authorization ref, active grant, bypass, weakened check, or transition-only credential remains.
+2. Exercise positive and hostile disposable cases for a future ordinary on-plan R2 trust-root content update. An ordinary update changes protected content but does not change the trust model, verifier rules, repository settings, credentials, permissions, protections, or gate semantics.
+3. Require an ordinary update to use one normal PR. The trusted-base verifier must execute only trusted-base bytes, bind validation and independent review to the exact candidate head, tree, paths, and relevant content, validate closed structural and semantic invariants, fail closed on drift or stale evidence, and keep proposed executable bytes inert until merge.
+4. Do not require a preliminary direct-to-`main` authorization activation, a temporary active-manifest commit, a second cleanup PR, or an exact-command prose authorization for an ordinary update.
+5. Keep stronger controls for a real trust-model or verifier-rule change and for settings, credentials, permissions, protections, administrator overrides, and gate bypasses. This gate does not convert an exceptional R3 action into routine R2 work.
+6. If the landed design cannot satisfy these conditions, emit `REPAIR_REQUIRED` and use the existing focused issue-through-handoff lifecycle represented by Tasks 59–66 as a new range instance. Implement and land the repair before this task can return `FIXED_POINT_READY`. Do not defer the debt to Task 98 and do not create a tracking-only task.
 
 ### Task-local common-foundation contract
 
@@ -6552,10 +6564,10 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 ### Procedure
 
 1. Re-query both repository main refs, relevant issues/PRs, and the Task-range handoff or no-repair record. Pin final commits, trees, and blobs.
-2. Repeat the applicable full or reduced matrix in the required direction. Apply every intentional-difference and row-direction control.
-3. If a blocker remains and no row-direction stop applies, output `REPAIR_REQUIRED` with the next target and repeat Tasks 52–66 as a new numbered-range instance. After its new handoff, repeat Task 67.
+2. Repeat the applicable full or reduced matrix in the required direction. Apply every intentional-difference, row-direction, and trust-root transition debt control.
+3. If a blocker or unresolved trust-root transition debt remains and no row-direction stop applies, output `REPAIR_REQUIRED` with the next target and repeat the applicable existing issue-through-handoff lifecycle as a new numbered-range instance. For trust-root transition debt, use the lifecycle represented by Tasks 59–66. After its new handoff, repeat Task 67.
 4. If the same row changed direction twice, stop for a new finding-specific decision.
-5. When every common row is `same`, every intentional difference is proved, and no blocker remains, output `FIXED_POINT_READY` with both repositories' final pinned identities, matrix digest, validation, reviews, and no-change or non-applicability evidence. Do not publish or close the tracker in this task.
+5. When every common row is `same`, every intentional difference is proved, no blocker remains, and the trust-root transition debt gate passes, output `FIXED_POINT_READY` with both repositories' final pinned identities, matrix digest, validation, reviews, trust-root debt disposition, and no-change or non-applicability evidence. Do not publish or close the tracker in this task.
 
 ### Validation and evidence
 
@@ -6567,11 +6579,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED` or `FIXED_POINT_READY`.
+This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED` or `FIXED_POINT_READY`. `FIXED_POINT_READY` requires the trust-root transition debt gate to pass.
 
 ### Complete when
 
-This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED` or `FIXED_POINT_READY`.
+This recheck instance emits exactly one complete branch record: `REPAIR_REQUIRED` or `FIXED_POINT_READY`. `FIXED_POINT_READY` requires the trust-root transition debt gate to pass.
 
 ## Task 68 — publish the fixed-point closure for the PR-body identity synchronization cycle in PS
 
@@ -6593,7 +6605,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 67 | `FS` | Require an exact `FIXED_POINT_READY` result for the current final identities. |
+| Task 67 | `FS` | Require an exact `FIXED_POINT_READY` result for the current final identities with a passing trust-root transition debt gate. |
 
 ### Objective
 
@@ -6606,8 +6618,8 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 ### Procedure
 
 1. Re-query the final identities and the Task 67 result. Stop if the result is not `FIXED_POINT_READY` or if any relevant state changed.
-2. Verify that every common row is `same`, every intentional difference has complete owner and review/expiry evidence with equal security and failure strength, and no blocker, open repair, false dependency, or unfinished deferral remains.
-3. Publish one permanent closure record with both repositories' final commits, trees and blobs; matrix digest; issues and PRs; validation and runtimes; review and quality results; merge methods; no-change/non-applicability evidence; intentional differences; rollback; and closure state.
+2. Verify that every common row is `same`, every intentional difference has complete owner and review/expiry evidence with equal security and failure strength, the authorization manifest is inactive, the ordinary one-PR R2 trust-root update cases pass, and no blocker, open repair, false dependency, unfinished deferral, or transition-only trust-root mechanism remains.
+3. Publish one permanent closure record with both repositories' final commits, trees and blobs; matrix digest; issues and PRs; validation and runtimes; review and quality results; merge methods; trust-root transition debt disposition; no-change/non-applicability evidence; intentional differences; rollback; and closure state.
 4. Close the task-local tracker or implementation issue only when its exact closure condition is satisfied. Read the record and issue state back and verify them.
 
 ### Validation and evidence
@@ -6620,11 +6632,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-The permanent fixed-point or issue-closure record exists and every task-local tracker state is correct for the final pinned identities.
+The permanent fixed-point or issue-closure record exists, the trust-root transition debt gate passed, and every task-local tracker state is correct for the final pinned identities.
 
 ### Complete when
 
-The permanent fixed-point or issue-closure record exists and every task-local tracker state is correct for the final pinned identities.
+The permanent fixed-point or issue-closure record exists, the trust-root transition debt gate passed, and every task-local tracker state is correct for the final pinned identities.
 
 ## Task 69 — reverse-compare cycle 2 in PS — determine the next disposition
 
