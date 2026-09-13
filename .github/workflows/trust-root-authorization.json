@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "authorization_id": "pr188-authorized-verifier-maintenance-f63-v2",
+  "authorization_id": "pr188-consumer-v126-bridge-f63-v1",
   "limits": {
     "maximum_paths": 19,
     "maximum_blob_bytes": 573440,
@@ -48,9 +48,9 @@
     {
       "path": ".github/workflows/Sync-PullRequestBodyIdentity.mjs",
       "mode": "100644",
-      "blob": "d18302e0c4a4f52d6ecdfa4e8611437055cdc580",
-      "bytes": 59280,
-      "sha256": "03b0aa378cbf8b70d7b292ee2d904a03e808d52dae067af2af5f766f46cabecf",
+      "blob": "47d5c9603b0ec82ae54d9e82a48b6fca39ff0c23",
+      "bytes": 56340,
+      "sha256": "7b61ea2116386f75726af33dccf3e18fc90b509c206d44e900be405388556766",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "javascript",
       "semantic_invariants": [
@@ -84,9 +84,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "0736496446ad95f7fe1d2b1c983f86e0cb298a8f",
+      "blob": "2271ea5697b7b5df0168209ef30154effde1ee82",
       "bytes": 566800,
-      "sha256": "8198944c200b886d2d683db351c483ff96789c0c70ff5972b01b71fd2f3aa8ae",
+      "sha256": "5b196ea824a9cd07429050ef8dc855d1b54ef016a7293f4d31c9cb22f679d926",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -108,9 +108,9 @@
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "b13989584f9ecfb4b6bd8357031c039735e954b3",
-      "bytes": 203771,
-      "sha256": "9e58bed7be016d0ef2c50d3ab41f5bf2a924739a2286c67479454fe55476fca7",
+      "blob": "a510ccb21b7ab9d599c08fcb54add25ceb89548e",
+      "bytes": 205453,
+      "sha256": "dbc3fefbfac61180890c91aa2e740bf5e3dcf9caaf325580db7a17e0b5ae54a6",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -121,9 +121,9 @@
     {
       "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
       "mode": "100644",
-      "blob": "d84f8d2045f8ac428875356585602eb4b9a38588",
-      "bytes": 40920,
-      "sha256": "386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb",
+      "blob": "596b98654871fd72181223cb242de78964ef8a5d",
+      "bytes": 38901,
+      "sha256": "33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "javascript",
       "semantic_invariants": [
@@ -174,9 +174,9 @@
     {
       "path": ".github/workflows/pull-request-body-identity.yml",
       "mode": "100644",
-      "blob": "42f4aa9a64ab785b8754b696f429286d2ceea8cb",
-      "bytes": 12922,
-      "sha256": "80be5df430e409ec51e5dac9cd8f10b88f3c49bf5afb35cfdcd7d2a782ce5100",
+      "blob": "93b77f1a1a59cc28be6ac1cf2c4312eb6014b517",
+      "bytes": 1781,
+      "sha256": "b006c0ed4cc0dc2391199fe1a49431c06f9a45910db34fe143c2e6df3ada2dd0",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "yaml",
       "semantic_invariants": [
@@ -196,9 +196,9 @@
     {
       "path": ".github/workflows/workflow-policy-cases.json",
       "mode": "100644",
-      "blob": "b85705775692cd46bab25bd33d56fc86c8ce4f75",
-      "bytes": 24045,
-      "sha256": "1b56b84abf049a1c1195cb7f8b2dc88a72e413ebd7c081f7032849290d9f030e",
+      "blob": "d5e6ea8835e459c559af6ba3c018bfea1719aa7c",
+      "bytes": 13777,
+      "sha256": "c0221ac73687b9eb0cbe83fb21bbef6419f4359420fbdcafff73e36464bbe09e",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "json",
       "semantic_invariants": [
@@ -208,9 +208,9 @@
     {
       "path": ".github/workflows/workflow-policy-contract.json",
       "mode": "100644",
-      "blob": "ca9bb28c07c7000dc990c22a135ce8bacd589793",
-      "bytes": 23312,
-      "sha256": "d4d6d1319cd25e3c007cf4687ffbaff4c0917450cb2037aa08ac5df6938a0bce",
+      "blob": "5dd83485710899bd831a6a748a352a99c713e3d8",
+      "bytes": 21933,
+      "sha256": "a8215320d50792997ea4a5e779a1339ceadb5f2eadf4b8ad21b52fd6387fdaf0",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "json",
       "semantic_invariants": [
