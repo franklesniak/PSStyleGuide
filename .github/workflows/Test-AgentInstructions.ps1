@@ -3862,10 +3862,12 @@ function Test-GitIgnorePathEffective {
         throw 'Git could not evaluate the proposed ignore rules.'
     }
     finally {
-        if ([IO.Directory]::Exists($strFixtureRoot)) {
-            Invoke-SafeTemporaryDirectoryRemoval `
-                -LiteralPath $strFixtureRoot `
-                -SystemTemporaryRootPath $strSystemTempRoot
+        if ([IO.Directory]::Exists($strFixtureRoot) -and
+            $strFixtureRoot.StartsWith(
+                $strSystemTempRoot,
+                [StringComparison]::OrdinalIgnoreCase
+            )) {
+            Remove-Item -LiteralPath $strFixtureRoot -Recurse -Force
         }
     }
 }
@@ -7413,10 +7415,12 @@ if ($SelfTest) {
     finally {
         $script:boolTrustedMaintenanceAuthorizationValidated =
             $boolOriginalExactAuthorization
-        if ([IO.Directory]::Exists($strAuthorizationFixtureRoot)) {
-            Invoke-SafeTemporaryDirectoryRemoval `
-                -LiteralPath $strAuthorizationFixtureRoot `
-                -SystemTemporaryRootPath $strAuthorizationFixtureSystemTempRoot
+        if ([IO.Directory]::Exists($strAuthorizationFixtureRoot) -and
+            $strAuthorizationFixtureRoot.StartsWith(
+                $strAuthorizationFixtureSystemTempRoot,
+                [StringComparison]::OrdinalIgnoreCase
+            )) {
+            Remove-Item -LiteralPath $strAuthorizationFixtureRoot -Recurse -Force
         }
     }
 }
@@ -8925,9 +8929,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.2\.20260913\.2$'
+            '(?m)^# Version: 1\.2\.20260913\.1$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.2.20260913.2.'
+        throw 'The trust-root authorization script lacks version 1.2.20260913.1.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
