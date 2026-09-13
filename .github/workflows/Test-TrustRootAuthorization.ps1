@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260913.1
+# Version: 1.2.20260913.4
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -128,11 +128,13 @@ $script:hashtableExactTransitionTextIdentity = @{
     )
     'pull-request-body-identity-workflow-topology-is-exact' = @(
         'b006c0ed4cc0dc2391199fe1a49431c06f9a45910db34fe143c2e6df3ada2dd0',
-        'ab795c9bbcadecacb4f6f16dbf3d983b492f7069ff11937f6c94c4266abada51'
+        'ab795c9bbcadecacb4f6f16dbf3d983b492f7069ff11937f6c94c4266abada51',
+        '80be5df430e409ec51e5dac9cd8f10b88f3c49bf5afb35cfdcd7d2a782ce5100'
     )
     'workflow-policy-identity-cases-are-exact' = @(
         'c0221ac73687b9eb0cbe83fb21bbef6419f4359420fbdcafff73e36464bbe09e',
-        '5a79ee8fcacd64a4a502203957e7f3ca7ad3da34666aa047ad26905ad8ec0d3f'
+        '5a79ee8fcacd64a4a502203957e7f3ca7ad3da34666aa047ad26905ad8ec0d3f',
+        '1b56b84abf049a1c1195cb7f8b2dc88a72e413ebd7c081f7032849290d9f030e'
     )
 }
 $script:objCanonicalJsonOptions =
@@ -996,6 +998,15 @@ function Assert-WorkflowPolicyTransitionTuple {
                 'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
             ContractCanonicalSha256 =
                 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb'
+        },
+        [pscustomobject]@{
+            VersionLiteral = "const VALIDATOR_VERSION = '1.2.4';"
+            DigestLiteral =
+                "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824';"
+            ValidatorSha256 =
+                '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
+            ContractCanonicalSha256 =
+                'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824'
         }
     )
     $intVersionLiteralCount = 0
@@ -1457,6 +1468,11 @@ function Assert-SemanticInvariant {
                 Version = "const VALIDATOR_VERSION = '1.2.3';"
                 Digest =
                     "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';"
+            },
+            [pscustomobject]@{
+                Version = "const VALIDATOR_VERSION = '1.2.4';"
+                Digest =
+                    "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824';"
             }
         )
         $intVersionLiteralCount = 0
@@ -1633,7 +1649,8 @@ function Assert-SemanticInvariant {
                     'Validate-WorkflowPolicy.mjs' -or
                 ([string] $objContract.validatorIdentity.sha256) -cnotin @(
                     '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9',
-                    'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+                    'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202',
+                    '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
                 )) {
                 throw 'The workflow validator identity is invalid.'
             }
@@ -2796,8 +2813,8 @@ if ($SelfTest) {
             Syntax = 'javascript'
             Invariant =
                 'workflow-policy-preflight-authenticates-deferred-yaml-import'
-            MutationFrom = "const VALIDATOR_VERSION = '1.2.2';"
-            MutationTo = "const VALIDATOR_VERSION = '1.2.3';"
+            MutationFrom = 'verifyPackageDigests(bootstrapContract);'
+            MutationTo = 'void bootstrapContract;'
         },
         [pscustomobject]@{
             Path = '.github/workflows/workflow-policy-contract.json'
@@ -2901,52 +2918,97 @@ if ($SelfTest) {
             -Depth 8) `
         -Path $strIdentityCaseCatalogPath `
         -Name 'pull request body identity required case removal'
-    $strOldPolicyValidator = $hashtableNewInvariantText[
+    $strCurrentPolicyValidator = $hashtableNewInvariantText[
         '.github/workflows/Validate-WorkflowPolicy.mjs'
     ]
-    $strOldPolicyContract = $hashtableNewInvariantText[
+    $strCurrentPolicyContract = $hashtableNewInvariantText[
         '.github/workflows/workflow-policy-contract.json'
     ]
-    $strNewPolicyValidator = $strOldPolicyValidator.Replace(
-        "const VALIDATOR_VERSION = '1.2.2';",
-        "const VALIDATOR_VERSION = '1.2.3';",
+    if ($strCurrentPolicyValidator.Contains(
+            "const VALIDATOR_VERSION = '1.2.2';",
+            [StringComparison]::Ordinal
+        )) {
+        $strCurrentVersion = '1.2.2'
+        $strCurrentDigest =
+            '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6'
+        $strCurrentValidatorSha256 =
+            '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9'
+        $strAlternateVersion = '1.2.3'
+        $strAlternateDigest =
+            'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb'
+        $strAlternateValidatorSha256 =
+            'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+    } elseif ($strCurrentPolicyValidator.Contains(
+            "const VALIDATOR_VERSION = '1.2.3';",
+            [StringComparison]::Ordinal
+        )) {
+        $strCurrentVersion = '1.2.3'
+        $strCurrentDigest =
+            'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb'
+        $strCurrentValidatorSha256 =
+            'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+        $strAlternateVersion = '1.2.4'
+        $strAlternateDigest =
+            'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824'
+        $strAlternateValidatorSha256 =
+            '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
+    } elseif ($strCurrentPolicyValidator.Contains(
+            "const VALIDATOR_VERSION = '1.2.4';",
+            [StringComparison]::Ordinal
+        )) {
+        $strCurrentVersion = '1.2.4'
+        $strCurrentDigest =
+            'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824'
+        $strCurrentValidatorSha256 =
+            '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
+        $strAlternateVersion = '1.2.3'
+        $strAlternateDigest =
+            'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb'
+        $strAlternateValidatorSha256 =
+            'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+    } else {
+        throw 'The workflow policy validator does not contain an accepted version.'
+    }
+    $strAlternatePolicyValidator = $strCurrentPolicyValidator.Replace(
+        "const VALIDATOR_VERSION = '$strCurrentVersion';",
+        "const VALIDATOR_VERSION = '$strAlternateVersion';",
         [StringComparison]::Ordinal
     ).Replace(
-        "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';",
-        "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';",
+        "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '$strCurrentDigest';",
+        "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '$strAlternateDigest';",
         [StringComparison]::Ordinal
     )
-    $strNewPolicyContract = $strOldPolicyContract.Replace(
-        '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9',
-        'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202',
+    $strAlternatePolicyContract = $strCurrentPolicyContract.Replace(
+        $strCurrentValidatorSha256,
+        $strAlternateValidatorSha256,
         [StringComparison]::Ordinal
     )
     Assert-SemanticInvariant `
         -Invariant 'workflow-policy-preflight-authenticates-deferred-yaml-import' `
-        -Text $strNewPolicyValidator `
+        -Text $strAlternatePolicyValidator `
         -Path '.github/workflows/Validate-WorkflowPolicy.mjs'
     Assert-SemanticInvariant `
         -Invariant 'workflow-policy-contract-identities-and-structure-are-exact' `
-        -Text $strNewPolicyContract `
+        -Text $strAlternatePolicyContract `
         -Path '.github/workflows/workflow-policy-contract.json'
     Assert-WorkflowPolicyTransitionTuple `
-        -ValidatorText $strOldPolicyValidator `
-        -ContractText $strOldPolicyContract
+        -ValidatorText $strCurrentPolicyValidator `
+        -ContractText $strCurrentPolicyContract
     $arrPolicyTupleMutation = @(
         [pscustomobject]@{
             Name = 'synthetic next tuple with wrong validator bytes'
-            Validator = $strNewPolicyValidator
-            Contract = $strNewPolicyContract
+            Validator = $strAlternatePolicyValidator
+            Contract = $strAlternatePolicyContract
         },
         [pscustomobject]@{
             Name = 'changed validator bytes with accepted literals'
-            Validator = $strOldPolicyValidator + "`n// unauthorized bytes"
-            Contract = $strOldPolicyContract
+            Validator = $strCurrentPolicyValidator + "`n// unauthorized bytes"
+            Contract = $strCurrentPolicyContract
         },
         [pscustomobject]@{
             Name = 'changed contract identity content'
-            Validator = $strOldPolicyValidator
-            Contract = $strOldPolicyContract.Replace(
+            Validator = $strCurrentPolicyValidator
+            Contract = $strCurrentPolicyContract.Replace(
                 '"contractVersion": 1',
                 '"contractVersion": 2',
                 [StringComparison]::Ordinal
@@ -2954,22 +3016,23 @@ if ($SelfTest) {
         },
         [pscustomobject]@{
             Name = 'mixed validator version and digest'
-            Validator = $strOldPolicyValidator.Replace(
-                "const VALIDATOR_VERSION = '1.2.2';",
-                "const VALIDATOR_VERSION = '1.2.3';",
+            Validator = $strCurrentPolicyValidator.Replace(
+                "const VALIDATOR_VERSION = '$strCurrentVersion';",
+                "const VALIDATOR_VERSION = '$strAlternateVersion';",
                 [StringComparison]::Ordinal
             )
-            Contract = $strNewPolicyContract
+            Contract = $strAlternatePolicyContract
         },
         [pscustomobject]@{
             Name = 'mismatched validator and contract'
-            Validator = $strOldPolicyValidator
-            Contract = $strNewPolicyContract
+            Validator = $strCurrentPolicyValidator
+            Contract = $strAlternatePolicyContract
         },
         [pscustomobject]@{
             Name = 'duplicate accepted validator tuples'
-            Validator = $strOldPolicyValidator + "`n" + $strNewPolicyValidator
-            Contract = $strNewPolicyContract
+            Validator = $strCurrentPolicyValidator + "`n" +
+                $strAlternatePolicyValidator
+            Contract = $strAlternatePolicyContract
         }
     )
     foreach ($objPolicyTupleMutation in $arrPolicyTupleMutation) {
