@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260912.2
+# Version: 1.2.20260913.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -51,7 +51,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $intManifestMaximumBytes = 65536
-$intCandidateMaximumPaths = 18
+$intCandidateMaximumPaths = 19
 $intInactiveManifestMaximumPaths = 16
 $intCandidateMaximumBlobBytes = 573440
 $intCandidateMaximumCommits = 64
@@ -72,6 +72,7 @@ $arrTrustRootPaths = @(
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
     '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+    '.github/workflows/pull-request-body-identity-cases.json',
     '.github/workflows/pull-request-body-identity.yml',
     '.github/workflows/workflow-policy-cases.json',
     '.pre-commit-config.yaml'
@@ -87,6 +88,7 @@ $script:arrSpecialSemanticInvariant = @(
     'pre-commit-actionlint-gate-is-exact',
     'published-path-array-binding-is-explicit',
     'pull-request-body-identity-api-termination-is-bounded',
+    'pull-request-body-identity-cases-preserve-required-coverage',
     'pull-request-body-identity-workflow-topology-is-exact',
     'workflow-policy-contract-identities-and-structure-are-exact',
     'workflow-policy-identity-cases-are-exact',
@@ -106,6 +108,8 @@ $script:hashtableSemanticInvariantPath = @{
     'pre-commit-actionlint-gate-is-exact' = '.pre-commit-config.yaml'
     'pull-request-body-identity-api-termination-is-bounded' =
         '.github/workflows/Sync-PullRequestBodyIdentity.mjs'
+    'pull-request-body-identity-cases-preserve-required-coverage' =
+        '.github/workflows/pull-request-body-identity-cases.json'
     'pull-request-body-identity-workflow-topology-is-exact' =
         '.github/workflows/pull-request-body-identity.yml'
     'workflow-policy-contract-identities-and-structure-are-exact' =
@@ -628,13 +632,73 @@ $script:scriptblockConvertToCanonicalJsonText = {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260903.0.
+    # Version: 1.0.20260913.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter()][AllowNull()][object] $Value)
 
     if ($null -eq $Value) {
         return 'null'
+    }
+    if ($Value -is [System.Text.Json.JsonElement]) {
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::Object) {
+            [System.Text.Json.JsonProperty[]] $arrProperties =
+                @($Value.EnumerateObject())
+            [Array]::Sort(
+                $arrProperties,
+                [Comparison[System.Text.Json.JsonProperty]] {
+                    param($objLeft, $objRight)
+                    [StringComparer]::Ordinal.Compare(
+                        $objLeft.Name,
+                        $objRight.Name
+                    )
+                }
+            )
+            [string[]] $arrMembers = @(
+                foreach ($objProperty in $arrProperties) {
+                    $strEncodedKey =
+                        [System.Text.Json.JsonSerializer]::Serialize(
+                            [object] $objProperty.Name,
+                            [string],
+                            $script:objCanonicalJsonOptions
+                        )
+                    $strEncodedValue =
+                        & $script:scriptblockConvertToCanonicalJsonText `
+                        -Value $objProperty.Value
+                    $strEncodedKey + ':' + $strEncodedValue
+                }
+            )
+            return '{' + [string]::Join(',', [string[]] $arrMembers) + '}'
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::Array) {
+            [string[]] $arrItems = @(
+                foreach ($objItem in $Value.EnumerateArray()) {
+                    & $script:scriptblockConvertToCanonicalJsonText `
+                        -Value $objItem
+                }
+            )
+            return '[' + [string]::Join(',', [string[]] $arrItems) + ']'
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::String) {
+            return [System.Text.Json.JsonSerializer]::Serialize(
+                [object] $Value.GetString(),
+                [string],
+                $script:objCanonicalJsonOptions
+            )
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::Number) {
+            return $Value.GetRawText()
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::True) {
+            return 'true'
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::False) {
+            return 'false'
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::Null) {
+            return 'null'
+        }
+        throw 'Canonical JSON received an unsupported JSON value kind.'
     }
     if ($Value -is [Collections.IDictionary]) {
         $arrKeys = [string[]] @($Value.Keys)
@@ -851,7 +915,7 @@ function Assert-WorkflowPolicyTransitionTuple {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260912.0.
+    # Version: 1.0.20260913.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -863,6 +927,41 @@ function Assert-WorkflowPolicyTransitionTuple {
         -Text $ContractText -Name 'The workflow-policy transition contract'
     $strContractValidatorSha256 =
         [string] $objContract.validatorIdentity.sha256
+    $strValidatorSha256 = [Convert]::ToHexString(
+        [Security.Cryptography.SHA256]::HashData(
+            [Text.UTF8Encoding]::new($false).GetBytes($ValidatorText)
+        )
+    ).ToLowerInvariant()
+    $objContractDocument = $null
+    try {
+        $objContractDocument =
+            [System.Text.Json.JsonDocument]::Parse($ContractText)
+        Assert-NoDuplicateJsonProperty `
+            -Element $objContractDocument.RootElement
+        $objContractIdentityView = [ordered]@{}
+        foreach ($objContractProperty in
+            $objContractDocument.RootElement.EnumerateObject()) {
+            if ($objContractProperty.Name -cne 'validatorIdentity') {
+                $objContractIdentityView[$objContractProperty.Name] =
+                    $objContractProperty.Value
+            }
+        }
+        $strContractCanonicalText =
+            & $script:scriptblockConvertToCanonicalJsonText `
+            -Value $objContractIdentityView
+    }
+    finally {
+        if ($null -ne $objContractDocument) {
+            $objContractDocument.Dispose()
+        }
+    }
+    $strContractCanonicalSha256 = [Convert]::ToHexString(
+        [Security.Cryptography.SHA256]::HashData(
+            [Text.UTF8Encoding]::new($false).GetBytes(
+                $strContractCanonicalText
+            )
+        )
+    ).ToLowerInvariant()
     $arrTuple = @(
         [pscustomobject]@{
             VersionLiteral = "const VALIDATOR_VERSION = '1.2.2';"
@@ -870,6 +969,8 @@ function Assert-WorkflowPolicyTransitionTuple {
                 "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';"
             ValidatorSha256 =
                 '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9'
+            ContractCanonicalSha256 =
+                '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6'
         },
         [pscustomobject]@{
             VersionLiteral = "const VALIDATOR_VERSION = '1.2.3';"
@@ -877,6 +978,8 @@ function Assert-WorkflowPolicyTransitionTuple {
                 "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';"
             ValidatorSha256 =
                 'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+            ContractCanonicalSha256 =
+                'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb'
         }
     )
     $intVersionLiteralCount = 0
@@ -894,7 +997,10 @@ function Assert-WorkflowPolicyTransitionTuple {
         $intVersionLiteralCount += $intVersionCount
         $intDigestLiteralCount += $intDigestCount
         if ($intVersionCount -eq 1 -and $intDigestCount -eq 1 -and
-            $strContractValidatorSha256 -ceq $objTuple.ValidatorSha256) {
+            $strValidatorSha256 -ceq $objTuple.ValidatorSha256 -and
+            $strContractValidatorSha256 -ceq $objTuple.ValidatorSha256 -and
+            $strContractCanonicalSha256 -ceq
+                $objTuple.ContractCanonicalSha256) {
             $intMatchingTupleCount++
         }
     }
@@ -930,7 +1036,7 @@ function Assert-SemanticInvariant {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20260913.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -1097,6 +1203,169 @@ function Assert-SemanticInvariant {
                 )
             ).Count -ne 2) {
             throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
+    if ($Invariant -ceq
+        'pull-request-body-identity-cases-preserve-required-coverage') {
+        $objCatalogDocument = $null
+        try {
+            $objCatalogDocument = [System.Text.Json.JsonDocument]::Parse($Text)
+            Assert-NoDuplicateJsonProperty `
+                -Element $objCatalogDocument.RootElement
+        }
+        catch {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        finally {
+            if ($null -ne $objCatalogDocument) {
+                $objCatalogDocument.Dispose()
+            }
+        }
+        $objCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
+            -Text $Text -Name $Path
+        & $script:scriptblockAssertExactDictionaryKeySet `
+            -Dictionary $objCatalog -Name $Path -Key @(
+                'schema', 'sourceCases', 'bodyCases', 'remoteCases'
+            )
+        if ($objCatalog.schema -cne
+            'PSStyleGuide.PullRequestBodyIdentityCases.v1') {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+
+        $hashtableExpectedField = @{
+            sourceCases = @('id', 'mutation', 'expected')
+            bodyCases = @('id', 'operation', 'fixture', 'expected')
+            remoteCases = @(
+                'id', 'scenario', 'expected', 'expectedPatchCount'
+            )
+        }
+        $hashtableRequiredCase = @{
+            sourceCases = @(
+                'source-current|none|current',
+                'source-contract-malformed-json|contract-malformed-json|contract-json',
+                'source-contract-forbidden-key|contract-forbidden-key|contract-json',
+                'source-generator-version-malformed|generator-policy-version-malformed|generator-policy',
+                'source-generator-digest-malformed|generator-policy-digest-malformed|generator-policy',
+                'source-generator-version-drift|generator-version-drift|generator-identity',
+                'source-generator-duplicate-version|generator-duplicate-version|generator-version',
+                'source-generator-bom|generator-bom|generator-encoding',
+                'source-path-verifier-crlf|path-verifier-crlf|path-verifier-encoding',
+                'source-build-generator-drift|build-generator-drift|build-generator-version',
+                'source-build-path-verifier-drift|build-path-verifier-drift|build-path-verifier-version',
+                'source-validator-identity-drift|validator-identity-drift|validator-identity',
+                'source-validator-contract-digest-drift|validator-contract-digest-drift|contract-canonical-identity',
+                'source-contract-canonical-drift|contract-canonical-drift|contract-canonical-identity',
+                'source-wrong-mode|source-wrong-mode|source-identity',
+                'source-wrong-blob|source-wrong-blob|source-identity'
+            )
+            bodyCases = @(
+                'check-current|check|current|current',
+                'check-absent|check|absent|identity-block-absent',
+                'check-stale-head|check|stale-head|identity-block-stale',
+                'check-stale-tree|check|stale-tree|identity-block-stale',
+                'check-stale-one-digest|check|stale-digest|identity-block-stale',
+                'check-partial-start|check|partial-start|identity-block-malformed',
+                'check-partial-end|check|partial-end|identity-block-malformed',
+                'check-duplicate|check|duplicate|identity-block-malformed',
+                'check-reversed|check|reversed|identity-block-malformed',
+                'check-inline-marker|check|inline-marker|identity-block-malformed',
+                'check-null-character|check|null-character|body-invalid',
+                'update-current-no-change|update|current|no-change',
+                'update-absent-appends|update|absent|changed',
+                'update-stale-replaces|update|stale-head|changed',
+                'update-partial-refused|update|partial-start|identity-block-malformed',
+                'update-preserves-unrelated-text|update|surrounded-stale|changed-preserved'
+            )
+            remoteCases = @(
+                'remote-current-no-write|current|success-no-change|0',
+                'remote-update-readback|update-success|success-changed|1',
+                'remote-repository-name-case-insensitive|repository-name-case|success-changed|1',
+                'remote-head-changes-before-write|head-before-write|remote-changed-before-write|0',
+                'remote-body-changes-before-write|body-before-write|remote-changed-before-write|0',
+                'remote-initial-read-fails|initial-read-failure|api-read|0',
+                'remote-authentication-fails-before-write|authentication-failure|api-read|0',
+                'remote-rate-limit-fails-before-write|rate-limit-failure|api-read|0',
+                'remote-transport-fails-before-write|transport-read-failure|api-read|0',
+                'remote-write-rejected|write-rejected|api-write-rejected|1',
+                'remote-authorization-rejects-write|authorization-failure|api-write-rejected|1',
+                'remote-write-ambiguous|write-indeterminate|indeterminate|1',
+                'remote-patch-response-invalid|patch-response-invalid|indeterminate|1',
+                'remote-readback-unavailable|readback-failure|indeterminate|1',
+                'remote-readback-head-changed|readback-head-changed|indeterminate|1',
+                'remote-readback-body-mismatch|readback-body-mismatch|indeterminate|1',
+                'remote-unrelated-text-preserved|update-preserves-text|success-changed-preserved|1'
+            )
+        }
+        $setCaseId = [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::Ordinal
+        )
+        foreach ($strCollectionName in @(
+                'sourceCases', 'bodyCases', 'remoteCases'
+            )) {
+            $objCases = $objCatalog[$strCollectionName]
+            if ($objCases -isnot [Collections.IEnumerable] -or
+                $objCases -is [string] -or
+                $objCases -is [Collections.IDictionary]) {
+                throw "$Path does not satisfy semantic invariant $Invariant."
+            }
+            $hashtableActualCase = @{}
+            foreach ($objCase in @($objCases)) {
+                & $script:scriptblockAssertExactDictionaryKeySet `
+                    -Dictionary $objCase `
+                    -Name "$Path $strCollectionName case" `
+                    -Key $hashtableExpectedField[$strCollectionName]
+                $strCaseId = [string] $objCase.id
+                if ($strCaseId -cnotmatch '^[a-z0-9][a-z0-9-]{0,127}$' -or
+                    -not $setCaseId.Add($strCaseId) -or
+                    $objCase.expected -isnot [string]) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+                if ($strCollectionName -ceq 'sourceCases' -and
+                    $objCase.mutation -isnot [string]) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+                if ($strCollectionName -ceq 'bodyCases' -and
+                    ($objCase.operation -cnotin @('check', 'update') -or
+                        $objCase.fixture -isnot [string])) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+                if ($strCollectionName -ceq 'remoteCases' -and
+                    ($objCase.scenario -isnot [string] -or
+                        $objCase.expectedPatchCount -isnot [long] -or
+                        $objCase.expectedPatchCount -notin @(0, 1))) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+                $hashtableActualCase[$strCaseId] = $objCase
+            }
+            foreach ($strRequiredCase in
+                $hashtableRequiredCase[$strCollectionName]) {
+                $arrRequiredField = $strRequiredCase.Split('|')
+                $strRequiredId = $arrRequiredField[0]
+                if (-not $hashtableActualCase.ContainsKey($strRequiredId)) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+                $objActualCase = $hashtableActualCase[$strRequiredId]
+                $boolMatches = if ($strCollectionName -ceq 'sourceCases') {
+                    $objActualCase.mutation -ceq $arrRequiredField[1] -and
+                    $objActualCase.expected -ceq $arrRequiredField[2]
+                }
+                elseif ($strCollectionName -ceq 'bodyCases') {
+                    $objActualCase.operation -ceq $arrRequiredField[1] -and
+                    $objActualCase.fixture -ceq $arrRequiredField[2] -and
+                    $objActualCase.expected -ceq $arrRequiredField[3]
+                }
+                else {
+                    $objActualCase.scenario -ceq $arrRequiredField[1] -and
+                    $objActualCase.expected -ceq $arrRequiredField[2] -and
+                    $objActualCase.expectedPatchCount -eq
+                        [int] $arrRequiredField[3]
+                }
+                if (-not $boolMatches) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+            }
         }
         return
     }
@@ -2733,6 +3002,14 @@ if ($SelfTest) {
                 'response.on(''aborted'', () => reject(new Error(''api-response-aborted'')));'
         },
         [pscustomobject]@{
+            Path = '.github/workflows/pull-request-body-identity-cases.json'
+            Syntax = 'json'
+            Invariant =
+                'pull-request-body-identity-cases-preserve-required-coverage'
+            MutationFrom = '"expected": "identity-block-absent"'
+            MutationTo = '"expected": "current"'
+        },
+        [pscustomobject]@{
             Path = '.github/workflows/pull-request-body-identity.yml'
             Syntax = 'yaml'
             Invariant =
@@ -2801,6 +3078,24 @@ if ($SelfTest) {
             -Path $objInvariantSpec.Path `
             -Name "$($objInvariantSpec.Invariant) targeted corruption"
     }
+    $strIdentityCaseCatalogPath =
+        '.github/workflows/pull-request-body-identity-cases.json'
+    $objMissingIdentityCaseCatalog =
+        & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $hashtableNewInvariantText[$strIdentityCaseCatalogPath] `
+        -Name 'pull request body identity missing-case mutation'
+    $objMissingIdentityCaseCatalog.bodyCases = @(
+        $objMissingIdentityCaseCatalog.bodyCases | Where-Object {
+            $_.id -cne 'check-absent'
+        }
+    )
+    & $scriptblockExpectInvariantRejection `
+        -Invariant `
+            'pull-request-body-identity-cases-preserve-required-coverage' `
+        -Text (ConvertTo-Json -InputObject $objMissingIdentityCaseCatalog `
+            -Depth 8) `
+        -Path $strIdentityCaseCatalogPath `
+        -Name 'pull request body identity required case removal'
     $strOldPolicyValidator = $hashtableNewInvariantText[
         '.github/workflows/Validate-WorkflowPolicy.mjs'
     ]
@@ -2832,10 +3127,26 @@ if ($SelfTest) {
     Assert-WorkflowPolicyTransitionTuple `
         -ValidatorText $strOldPolicyValidator `
         -ContractText $strOldPolicyContract
-    Assert-WorkflowPolicyTransitionTuple `
-        -ValidatorText $strNewPolicyValidator `
-        -ContractText $strNewPolicyContract
     $arrPolicyTupleMutation = @(
+        [pscustomobject]@{
+            Name = 'synthetic next tuple with wrong validator bytes'
+            Validator = $strNewPolicyValidator
+            Contract = $strNewPolicyContract
+        },
+        [pscustomobject]@{
+            Name = 'changed validator bytes with accepted literals'
+            Validator = $strOldPolicyValidator + "`n// unauthorized bytes"
+            Contract = $strOldPolicyContract
+        },
+        [pscustomobject]@{
+            Name = 'changed contract identity content'
+            Validator = $strOldPolicyValidator
+            Contract = $strOldPolicyContract.Replace(
+                '"contractVersion": 1',
+                '"contractVersion": 2',
+                [StringComparison]::Ordinal
+            )
+        },
         [pscustomobject]@{
             Name = 'mixed validator version and digest'
             Validator = $strOldPolicyValidator.Replace(
@@ -2972,6 +3283,13 @@ if ($SelfTest) {
                 SourceText = $strIdentityCommandInvariantFixture
             },
             [pscustomobject]@{
+                Path = '.github/workflows/pull-request-body-identity-cases.json'
+                Syntax = 'json'
+                Invariants = @(
+                    'pull-request-body-identity-cases-preserve-required-coverage'
+                )
+            },
+            [pscustomobject]@{
                 Path = '.github/workflows/pull-request-body-identity.yml'
                 Syntax = 'yaml'
                 Invariants = @(
@@ -3084,7 +3402,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-content-exact'
             limits = [ordered]@{
-                maximum_paths = 18
+                maximum_paths = 19
                 maximum_blob_bytes = 573440
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
@@ -3189,7 +3507,7 @@ if ($SelfTest) {
             ConvertTo-Json -InputObject $objSchemaManifest -Depth 8
         )
         $objOverLimitManifest.authorization_id = 'self-test-path-limit-overflow'
-        $objOverLimitManifest.limits.maximum_paths = 19
+        $objOverLimitManifest.limits.maximum_paths = 20
         [IO.File]::WriteAllText(
             $strSchemaManifestPath,
             ((ConvertTo-Json -InputObject $objOverLimitManifest -Depth 8) `
@@ -3508,7 +3826,7 @@ if ($SelfTest) {
                     parent_commits = @($strTransitionBase)
                 }
                 limits = [ordered]@{
-                    maximum_paths = 18
+                    maximum_paths = 19
                     maximum_blob_bytes = 573440
                     maximum_manifest_bytes = 65536
                 }
@@ -3595,7 +3913,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-same-base-deactivation'
             limits = [ordered]@{
-                maximum_paths = 18
+                maximum_paths = 19
                 maximum_blob_bytes = 573440
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
@@ -3739,7 +4057,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-noncanonical-deactivation-target'
             limits = [ordered]@{
-                maximum_paths = 18
+                maximum_paths = 19
                 maximum_blob_bytes = 573440
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
