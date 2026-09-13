@@ -25,13 +25,13 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.2.4';
+const VALIDATOR_VERSION = '1.2.5';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824';
-const MINIMUM_CASE_COUNT = 85;
-const REQUIRED_IDENTITY_CASE_COUNT = 28;
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '3cdebdc2d7788673cbb98d8451b792b0fd975f97e42c3e753a63e3595ae0d7bf';
+const MINIMUM_CASE_COUNT = 86;
+const REQUIRED_IDENTITY_CASE_COUNT = 29;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
 const IDENTITY_WORKFLOW_FILE_NAME = 'pull-request-body-identity.yml';

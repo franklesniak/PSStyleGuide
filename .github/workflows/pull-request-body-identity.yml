@@ -132,15 +132,26 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "acquire: proposed remote add exited $LASTEXITCODE" }
           & $strGitPath --no-replace-objects -c core.fsmonitor=false fetch --depth 1 --no-tags --no-recurse-submodules proposed $strHeadSha
           if ($LASTEXITCODE -ne 0) { throw "acquire: proposed fetch exited $LASTEXITCODE" }
-          & $strGitPath --no-replace-objects -c core.fsmonitor=false checkout --quiet --detach FETCH_HEAD
-          if ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }
+          $strFetchedHead = (& $strGitPath --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'FETCH_HEAD^{commit}').Trim()
+          if ($LASTEXITCODE -ne 0 -or $strFetchedHead -cne $strHeadSha) {
+              throw 'acquire: the fetched revision is not the exact pull request head'
+          }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false update-ref --no-deref HEAD $strFetchedHead
+          if ($LASTEXITCODE -ne 0) { throw "acquire: detached HEAD update exited $LASTEXITCODE" }
           $strObservedHead = (& $strGitPath --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'HEAD^{commit}').Trim()
           $strObservedTree = (& $strGitPath --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'HEAD^{tree}').Trim()
           $arrReplacementRefs = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false for-each-ref --format='%(refname)' refs/replace/)
+          $arrProposedWorktreeEntries = @(
+              [System.IO.Directory]::EnumerateFileSystemEntries($PWD.Path) |
+                  Where-Object {
+                      [System.IO.Path]::GetFileName($_) -cne '.git'
+                  }
+          )
           if ($LASTEXITCODE -ne 0 -or $strObservedHead -cne $strHeadSha -or
               $strObservedTree -cnotmatch '^[0-9a-f]{40}$' -or
-              $arrReplacementRefs.Count -ne 0) {
-              throw 'acquire: the checked out revision is not the exact pull request head'
+              $arrReplacementRefs.Count -ne 0 -or
+              $arrProposedWorktreeEntries.Count -ne 0) {
+              throw 'acquire: the proposed repository state is invalid'
           }
           $arrProposedEntries = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false ls-tree $strObservedHead -- .github/workflows/Sync-PullRequestBodyIdentity.mjs .github/workflows/pull-request-body-identity-cases.json .github/workflows/pull-request-body-identity.yml)
           if ($LASTEXITCODE -ne 0 -or $arrProposedEntries.Count -ne 3) {
