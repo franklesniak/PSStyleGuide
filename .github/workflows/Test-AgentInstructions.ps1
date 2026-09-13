@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.9.20260913.1
+# Version: 1.9.20260913.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -3685,6 +3685,104 @@ function Get-MarkdownParserBootstrapFailure {
     }
 }
 
+function Invoke-SafeTemporaryDirectoryRemoval {
+    # .SYNOPSIS
+    # Removes one validated temporary directory with bounded retries.
+    #
+    # .DESCRIPTION
+    # Confirms that the directory is a child of the supplied system temporary root,
+    # retries transient recursive-delete failures, and fails after the exact bound.
+    #
+    # .PARAMETER LiteralPath
+    # The exact temporary directory to remove.
+    #
+    # .PARAMETER SystemTemporaryRootPath
+    # The normalized system temporary root that must contain LiteralPath.
+    #
+    # .PARAMETER MaximumAttempts
+    # The maximum number of recursive-delete attempts.
+    #
+    # .PARAMETER InitialDelayMilliseconds
+    # The delay before the second attempt. Each later delay doubles.
+    #
+    # .EXAMPLE
+    # Invoke-SafeTemporaryDirectoryRemoval @hashtableArguments
+    #
+    # # Removes one validated fixture directory.
+    #
+    # .INPUTS
+    # None. Pipeline input is not accepted.
+    #
+    # .OUTPUTS
+    # None.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260913.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string] $LiteralPath,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string] $SystemTemporaryRootPath,
+
+        [Parameter()]
+        [ValidateRange(1, 10)]
+        [int] $MaximumAttempts = 5,
+
+        [Parameter()]
+        [ValidateRange(1, 1000)]
+        [int] $InitialDelayMilliseconds = 50
+    )
+
+    $strValidatedTemporaryRoot = [IO.Path]::GetFullPath(
+        $SystemTemporaryRootPath
+    ).TrimEnd(
+        [IO.Path]::DirectorySeparatorChar,
+        [IO.Path]::AltDirectorySeparatorChar
+    )
+    $strValidatedDirectoryPath = [IO.Path]::GetFullPath($LiteralPath)
+    $strRequiredPrefix = $strValidatedTemporaryRoot +
+        [IO.Path]::DirectorySeparatorChar
+    if (-not $strValidatedDirectoryPath.StartsWith(
+            $strRequiredPrefix,
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        throw 'Refusing to remove a directory outside the system temporary root.'
+    }
+
+    for ($intAttempt = 1; $intAttempt -le $MaximumAttempts; $intAttempt++) {
+        if (-not [IO.Directory]::Exists($strValidatedDirectoryPath)) {
+            return
+        }
+        try {
+            Remove-Item -LiteralPath $strValidatedDirectoryPath -Recurse -Force `
+                -ErrorAction Stop
+        }
+        catch {
+            if ($intAttempt -eq $MaximumAttempts) {
+                throw
+            }
+        }
+        if (-not [IO.Directory]::Exists($strValidatedDirectoryPath)) {
+            return
+        }
+        if ($intAttempt -eq $MaximumAttempts) {
+            throw 'The temporary fixture directory still exists after cleanup.'
+        }
+        $intDelayMilliseconds = [int] (
+            $InitialDelayMilliseconds * [Math]::Pow(2, $intAttempt - 1)
+        )
+        Start-Sleep -Milliseconds $intDelayMilliseconds
+    }
+}
+
 function Test-GitIgnorePathEffective {
     # .SYNOPSIS
     # Tests whether a Git ignore rule excludes one exact path.
@@ -3764,12 +3862,10 @@ function Test-GitIgnorePathEffective {
         throw 'Git could not evaluate the proposed ignore rules.'
     }
     finally {
-        if ([IO.Directory]::Exists($strFixtureRoot) -and
-            $strFixtureRoot.StartsWith(
-                $strSystemTempRoot,
-                [StringComparison]::OrdinalIgnoreCase
-            )) {
-            Remove-Item -LiteralPath $strFixtureRoot -Recurse -Force
+        if ([IO.Directory]::Exists($strFixtureRoot)) {
+            Invoke-SafeTemporaryDirectoryRemoval `
+                -LiteralPath $strFixtureRoot `
+                -SystemTemporaryRootPath $strSystemTempRoot
         }
     }
 }
@@ -7317,12 +7413,10 @@ if ($SelfTest) {
     finally {
         $script:boolTrustedMaintenanceAuthorizationValidated =
             $boolOriginalExactAuthorization
-        if ([IO.Directory]::Exists($strAuthorizationFixtureRoot) -and
-            $strAuthorizationFixtureRoot.StartsWith(
-                $strAuthorizationFixtureSystemTempRoot,
-                [StringComparison]::OrdinalIgnoreCase
-            )) {
-            Remove-Item -LiteralPath $strAuthorizationFixtureRoot -Recurse -Force
+        if ([IO.Directory]::Exists($strAuthorizationFixtureRoot)) {
+            Invoke-SafeTemporaryDirectoryRemoval `
+                -LiteralPath $strAuthorizationFixtureRoot `
+                -SystemTemporaryRootPath $strAuthorizationFixtureSystemTempRoot
         }
     }
 }
@@ -7891,7 +7985,7 @@ if ($SelfTest) {
             [pscustomobject]@{
                 Source = $strValidatorSource
                 Path = '.github/workflows/Test-AgentInstructions.ps1'
-                ExpectedFunctionCount = 59
+                ExpectedFunctionCount = 60
             },
             [pscustomobject]@{
                 Source = $strTrustRootAuthorizationSource
@@ -7967,9 +8061,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.9\.20260913\.1$'
+            '(?m)^# Version: 1\.9\.20260913\.2$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.9.20260913.1.'
+        throw 'The validator script version is not 1.9.20260913.2.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8831,9 +8925,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.2\.20260913\.1$'
+            '(?m)^# Version: 1\.2\.20260913\.2$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.2.20260913.1.'
+        throw 'The trust-root authorization script lacks version 1.2.20260913.2.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -12233,12 +12327,10 @@ if ($SelfTest) {
     finally {
         $script:boolTrustedMaintenanceAuthorizationValidated =
             $boolArrayFixtureOriginalAuthorization
-        if ([IO.Directory]::Exists($strArrayFixtureRoot) -and
-            $strArrayFixtureRoot.StartsWith(
-                $strArrayFixtureSystemTempRoot,
-                [StringComparison]::OrdinalIgnoreCase
-            )) {
-            Remove-Item -LiteralPath $strArrayFixtureRoot -Recurse -Force
+        if ([IO.Directory]::Exists($strArrayFixtureRoot)) {
+            Invoke-SafeTemporaryDirectoryRemoval `
+                -LiteralPath $strArrayFixtureRoot `
+                -SystemTemporaryRootPath $strArrayFixtureSystemTempRoot
         }
     }
 

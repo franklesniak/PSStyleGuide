@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260913.1
+# Version: 1.2.20260913.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -2160,8 +2160,10 @@ function Assert-SemanticInvariant {
         $strFixtureCleanupPattern =
             '(?s)finally \{\s+' +
             '\$script:boolTrustedMaintenanceAuthorizationValidated =.*?' +
-            'Remove-Item -LiteralPath \$strAuthorizationFixtureRoot ' +
-            '-Recurse -Force\s+\}\s+\}'
+            'Invoke-SafeTemporaryDirectoryRemoval.*?' +
+            '-LiteralPath \$strAuthorizationFixtureRoot.*?' +
+            '-SystemTemporaryRootPath ' +
+            '\$strAuthorizationFixtureSystemTempRoot\s+\}\s+\}'
         if ($arrParseErrors.Count -ne 0 -or
             $Text -cnotmatch
                 '(?s)if \(\$ExactAuthorizedMaintenanceProductionCall -and\s+' +
