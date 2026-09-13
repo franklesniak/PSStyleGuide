@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260904.2
+# Version: 1.2.20260912.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -51,7 +51,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $intManifestMaximumBytes = 65536
-$intCandidateMaximumPaths = 16
+$intCandidateMaximumPaths = 18
+$intInactiveManifestMaximumPaths = 16
 $intCandidateMaximumBlobBytes = 573440
 $intCandidateMaximumCommits = 64
 $strObjectIdPattern = '^[0-9a-f]{40}$'
@@ -70,6 +71,9 @@ $arrTrustRootPaths = @(
     '.github/workflows/trust-root-authorization.json',
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
+    '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+    '.github/workflows/pull-request-body-identity.yml',
+    '.github/workflows/workflow-policy-cases.json',
     '.pre-commit-config.yaml'
 )
 $script:arrSpecialSemanticInvariant = @(
@@ -82,7 +86,10 @@ $script:arrSpecialSemanticInvariant = @(
     'parser-manifest-direct-roots-and-closure-is-exact',
     'pre-commit-actionlint-gate-is-exact',
     'published-path-array-binding-is-explicit',
+    'pull-request-body-identity-api-termination-is-bounded',
+    'pull-request-body-identity-workflow-topology-is-exact',
     'workflow-policy-contract-identities-and-structure-are-exact',
+    'workflow-policy-identity-cases-are-exact',
     'workflow-policy-preflight-authenticates-deferred-yaml-import',
     'workflow-created-push-history-fetch-is-bounded',
     'current-base-status-helper-is-fail-closed'
@@ -97,8 +104,14 @@ $script:hashtableSemanticInvariantPath = @{
     'parser-manifest-direct-roots-and-closure-is-exact' =
         '.github/workflows/Test-AgentInstructionParserManifest.mjs'
     'pre-commit-actionlint-gate-is-exact' = '.pre-commit-config.yaml'
+    'pull-request-body-identity-api-termination-is-bounded' =
+        '.github/workflows/Sync-PullRequestBodyIdentity.mjs'
+    'pull-request-body-identity-workflow-topology-is-exact' =
+        '.github/workflows/pull-request-body-identity.yml'
     'workflow-policy-contract-identities-and-structure-are-exact' =
         '.github/workflows/workflow-policy-contract.json'
+    'workflow-policy-identity-cases-are-exact' =
+        '.github/workflows/workflow-policy-cases.json'
     'workflow-policy-preflight-authenticates-deferred-yaml-import' =
         '.github/workflows/Validate-WorkflowPolicy.mjs'
 }
@@ -1007,6 +1020,128 @@ function Assert-SemanticInvariant {
                     'if (token.type !== "heading_open" || token.level !== 0) return [];'
                 )
             ).Count -ne 2) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
+    if ($Invariant -ceq
+        'pull-request-body-identity-api-termination-is-bounded') {
+        $arrRequiredLiteral = @(
+            'function consumeApiResponse(response, request) {',
+            'response.once(''aborted'', () => reject(new Error(''api-response-aborted'')));',
+            'response.once(''error'', reject);',
+            'function createApiDeadline(milliseconds) {',
+            'const controller = new AbortController();',
+            'controller.abort(new Error(''api-deadline''));',
+            'clearTimeout(timer);',
+            'const deadline = createApiDeadline(REQUEST_TIMEOUT_MILLISECONDS);',
+            'signal: deadline.signal,',
+            '(value) => settle(resolve, value),',
+            '(error) => settle(reject, error),',
+            'request.once(''timeout'', () => {',
+            'passed += await runApiResponseEventSelfTests();',
+            'passed += await runApiDeadlineSelfTests();'
+        )
+        foreach ($strRequiredLiteral in $arrRequiredLiteral) {
+            if (-not $Text.Contains(
+                    $strRequiredLiteral,
+                    [StringComparison]::Ordinal
+                )) {
+                throw "$Path does not satisfy semantic invariant $Invariant."
+            }
+        }
+        if ([regex]::Matches(
+                $Text,
+                'function consumeApiResponse\(response, request\) \{'
+            ).Count -ne 1 -or
+            [regex]::Matches(
+                $Text,
+                'function createApiDeadline\(milliseconds\) \{'
+            ).Count -ne 1 -or
+            [regex]::Matches(
+                $Text,
+                'let settled = false;'
+            ).Count -ne 1) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
+    if ($Invariant -ceq
+        'pull-request-body-identity-workflow-topology-is-exact') {
+        $arrRequiredLiteral = @(
+            '  pull_request_target:',
+            '    runs-on: ubuntu-24.04',
+            '    permissions: {}',
+            'Get-ChildItem Env:',
+            "Where-Object { `$_.Name -clike 'GIT_*' }",
+            "`$env:GIT_NO_REPLACE_OBJECTS = '1'",
+            'remote add trusted "$strServerUrl/$strRepository"',
+            'fetch --depth 1 --no-tags --no-recurse-submodules trusted $strBaseSha',
+            'worktree add --quiet --detach $strTrustedRoot $strBaseSha',
+            'remote add proposed "$strServerUrl/$strHeadRepository"',
+            'fetch --depth 1 --no-tags --no-recurse-submodules proposed $strHeadSha',
+            '[string]::Join("`n", $arrProposedEntries) -cne',
+            '[string]::Join("`n", $arrTrustedEntries)',
+            'https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz',
+            'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0',
+            '& $strNodePath $strTrustedCommandPath --self-test --repository-root $PWD.Path',
+            '& $strNodePath $strTrustedCommandPath --check-event $env:GITHUB_EVENT_PATH --repository-root $PWD.Path'
+        )
+        foreach ($strRequiredLiteral in $arrRequiredLiteral) {
+            if (-not $Text.Contains(
+                    $strRequiredLiteral,
+                    [StringComparison]::Ordinal
+                )) {
+                throw "$Path does not satisfy semantic invariant $Invariant."
+            }
+        }
+        if ([regex]::Matches($Text, '(?m)^permissions: \{\}$').Count -ne 1 -or
+            [regex]::Matches($Text, '(?m)^    permissions: \{\}$').Count -ne 1 -or
+            [regex]::Matches(
+                $Text,
+                '& \$strNodePath \$strTrustedCommandPath'
+            ).Count -ne 2 -or
+            $Text -match '(?m)^\s+uses:' -or
+            $Text.Contains('${{', [StringComparison]::Ordinal) -or
+            $Text -match '(?i)GITHUB_TOKEN|github\.token|Authorization|Bearer' -or
+            $Text -match '--(?:update|generate)\b') {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
+    }
+
+    if ($Invariant -ceq 'workflow-policy-identity-cases-are-exact') {
+        try {
+            $objCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
+                -Text $Text -Name $Path
+            $arrCases = @($objCatalog.cases)
+            $arrIds = @($arrCases | ForEach-Object { [string] $_.id })
+            $arrIdentityCases = @($arrCases | Where-Object {
+                    [string] $_.id -cmatch '^PS-P1-IDPOL-[0-9]{3}$'
+                })
+            $arrExpectedIdentityIds = @(1..26 | ForEach-Object {
+                    'PS-P1-IDPOL-{0:D3}' -f $_
+                })
+            if ($objCatalog.schema -cne
+                    'PSStyleGuide.WorkflowPolicyCases.v1' -or
+                $arrCases.Count -ne 83 -or
+                @($arrIds | Sort-Object -Unique).Count -ne 83 -or
+                $arrIdentityCases.Count -ne 26 -or
+                [string]::Join(
+                    "`n",
+                    @($arrIdentityCases | ForEach-Object { [string] $_.id })
+                ) -cne [string]::Join("`n", $arrExpectedIdentityIds) -or
+                @($arrIdentityCases | Where-Object {
+                        $_.domain -cne 'workflow' -or
+                        $_.workflow -cne 'pull-request-body-identity.yml' -or
+                        $_.expected -ne $false
+                    }).Count -ne 0) {
+                throw 'The identity policy case catalog is incomplete.'
+            }
+        }
+        catch {
             throw "$Path does not satisfy semantic invariant $Invariant."
         }
         return
@@ -2332,6 +2467,96 @@ if ($SelfTest) {
             }
         }
     }
+    $strIdentityCommandInvariantFixture = [string]::Join("`n", @(
+            "import { EventEmitter } from 'node:events';",
+            'function consumeApiResponse(response, request) {',
+            '  return new Promise((resolve, reject) => {',
+            '    response.once(''aborted'', () => reject(new Error(''api-response-aborted'')));',
+            '    response.once(''error'', reject);',
+            '    response.once(''end'', () => resolve({ statusCode: 200, bytes: Buffer.alloc(0) }));',
+            '    void request;',
+            '  });',
+            '}',
+            'function createApiDeadline(milliseconds) {',
+            '  const controller = new AbortController();',
+            '  const timer = setTimeout(() => {',
+            '    controller.abort(new Error(''api-deadline''));',
+            '  }, milliseconds);',
+            '  return { signal: controller.signal, clear() { clearTimeout(timer); } };',
+            '}',
+            'function apiRequest() {',
+            '  const deadline = createApiDeadline(REQUEST_TIMEOUT_MILLISECONDS);',
+            '  let settled = false;',
+            '  const settle = (callback, value) => { settled = true; deadline.clear(); callback(value); };',
+            '  const request = new EventEmitter();',
+            '  const options = { signal: deadline.signal, };',
+            '  Promise.resolve().then(',
+            '    (value) => settle(resolve, value),',
+            '    (error) => settle(reject, error),',
+            '  );',
+            '  request.once(''timeout'', () => { request.destroy(); });',
+            '  void settled; void options;',
+            '}',
+            'async function runApiResponseEventSelfTests() {}',
+            'async function runApiDeadlineSelfTests() {}',
+            'async function runCaseCatalog() {',
+            '  let passed = 0;',
+            '  passed += await runApiResponseEventSelfTests();',
+            '  passed += await runApiDeadlineSelfTests();',
+            '  return passed;',
+            '}',
+            'void consumeApiResponse; void apiRequest; void runCaseCatalog;'
+        )) + "`n"
+    $strIdentityWorkflowInvariantFixture = [string]::Join("`n", @(
+            'name: Pull Request Body Identity',
+            'on:',
+            '  pull_request_target:',
+            'permissions: {}',
+            'jobs:',
+            '  verify_identity:',
+            '    runs-on: ubuntu-24.04',
+            '    permissions: {}',
+            '    steps:',
+            '      - shell: pwsh',
+            '        run: |',
+            '          Get-ChildItem Env:',
+            '          Where-Object { $_.Name -clike ''GIT_*'' }',
+            '          $env:GIT_NO_REPLACE_OBJECTS = ''1''',
+            '          git remote add trusted "$strServerUrl/$strRepository"',
+            '          git fetch --depth 1 --no-tags --no-recurse-submodules trusted $strBaseSha',
+            '          git worktree add --quiet --detach $strTrustedRoot $strBaseSha',
+            '          git remote add proposed "$strServerUrl/$strHeadRepository"',
+            '          git fetch --depth 1 --no-tags --no-recurse-submodules proposed $strHeadSha',
+            '          [string]::Join("`n", $arrProposedEntries) -cne',
+            '          [string]::Join("`n", $arrTrustedEntries)',
+            '          https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz',
+            '          D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0',
+            '      - shell: pwsh',
+            '        run: |',
+            '          & $strNodePath $strTrustedCommandPath --self-test --repository-root $PWD.Path',
+            '      - shell: pwsh',
+            '        run: |',
+            '          & $strNodePath $strTrustedCommandPath --check-event $env:GITHUB_EVENT_PATH --repository-root $PWD.Path'
+        )) + "`n"
+    $listIdentityCaseInvariantFixture = [Collections.Generic.List[object]]::new()
+    foreach ($intCase in 1..57) {
+        $listIdentityCaseInvariantFixture.Add([ordered]@{
+                id = 'PS-P1-WFPOL-{0:D3}' -f $intCase
+                expected = $false
+            })
+    }
+    foreach ($intCase in 1..26) {
+        $listIdentityCaseInvariantFixture.Add([ordered]@{
+                id = 'PS-P1-IDPOL-{0:D3}' -f $intCase
+                domain = 'workflow'
+                workflow = 'pull-request-body-identity.yml'
+                expected = $false
+            })
+    }
+    $strIdentityCaseInvariantFixture = (ConvertTo-Json -InputObject ([ordered]@{
+                schema = 'PSStyleGuide.WorkflowPolicyCases.v1'
+                cases = @($listIdentityCaseInvariantFixture)
+            }) -Depth 6) -replace "`r`n", "`n"
     $arrNewInvariantSpec = @(
         [pscustomobject]@{
             Path = '.github/actionlint.yaml'
@@ -2386,6 +2611,34 @@ if ($SelfTest) {
             MutationTo = '"path": "Other-Validator.mjs"'
         },
         [pscustomobject]@{
+            Path = '.github/workflows/Sync-PullRequestBodyIdentity.mjs'
+            Syntax = 'javascript'
+            Invariant =
+                'pull-request-body-identity-api-termination-is-bounded'
+            SourceText = $strIdentityCommandInvariantFixture
+            MutationFrom =
+                'response.once(''aborted'', () => reject(new Error(''api-response-aborted'')));'
+            MutationTo =
+                'response.on(''aborted'', () => reject(new Error(''api-response-aborted'')));'
+        },
+        [pscustomobject]@{
+            Path = '.github/workflows/pull-request-body-identity.yml'
+            Syntax = 'yaml'
+            Invariant =
+                'pull-request-body-identity-workflow-topology-is-exact'
+            SourceText = $strIdentityWorkflowInvariantFixture
+            MutationFrom = '  pull_request_target:'
+            MutationTo = '  pull_request:'
+        },
+        [pscustomobject]@{
+            Path = '.github/workflows/workflow-policy-cases.json'
+            Syntax = 'json'
+            Invariant = 'workflow-policy-identity-cases-are-exact'
+            SourceText = $strIdentityCaseInvariantFixture
+            MutationFrom = '"PS-P1-IDPOL-026"'
+            MutationTo = '"PS-P1-IDPOL-025"'
+        },
+        [pscustomobject]@{
             Path = 'package.json'
             Syntax = 'json'
             Invariant = 'package-parser-roots-are-exact'
@@ -2403,11 +2656,18 @@ if ($SelfTest) {
     )
     $hashtableNewInvariantText = @{}
     foreach ($objInvariantSpec in $arrNewInvariantSpec) {
-        $strInvariantSourcePath =
-            Join-Path $RepositoryRootPath $objInvariantSpec.Path
-        $arrInvariantBytes = [IO.File]::ReadAllBytes($strInvariantSourcePath)
-        $strInvariantText = ConvertFrom-StrictUtf8Text `
-            -Bytes $arrInvariantBytes -Name $objInvariantSpec.Path
+        $strInvariantText = if (
+            $objInvariantSpec.PSObject.Properties.Name -ccontains 'SourceText'
+        ) {
+            [string] $objInvariantSpec.SourceText
+        }
+        else {
+            $strInvariantSourcePath =
+                Join-Path $RepositoryRootPath $objInvariantSpec.Path
+            $arrInvariantBytes = [IO.File]::ReadAllBytes($strInvariantSourcePath)
+            ConvertFrom-StrictUtf8Text -Bytes $arrInvariantBytes `
+                -Name $objInvariantSpec.Path
+        }
         $hashtableNewInvariantText[$objInvariantSpec.Path] = $strInvariantText
         Assert-CandidateSyntax -Syntax $objInvariantSpec.Syntax `
             -Text $strInvariantText -Path $objInvariantSpec.Path
@@ -2520,6 +2780,28 @@ if ($SelfTest) {
                 )
             },
             [pscustomobject]@{
+                Path = '.github/workflows/Sync-PullRequestBodyIdentity.mjs'
+                Syntax = 'javascript'
+                Invariants = @(
+                    'pull-request-body-identity-api-termination-is-bounded'
+                )
+                SourceText = $strIdentityCommandInvariantFixture
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/pull-request-body-identity.yml'
+                Syntax = 'yaml'
+                Invariants = @(
+                    'pull-request-body-identity-workflow-topology-is-exact'
+                )
+                SourceText = $strIdentityWorkflowInvariantFixture
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/workflow-policy-cases.json'
+                Syntax = 'json'
+                Invariants = @('workflow-policy-identity-cases-are-exact')
+                SourceText = $strIdentityCaseInvariantFixture
+            },
+            [pscustomobject]@{
                 Path = '.pre-commit-config.yaml'
                 Syntax = 'yaml'
                 Invariants = @('pre-commit-actionlint-gate-is-exact')
@@ -2570,7 +2852,24 @@ if ($SelfTest) {
         )
         $listSchemaAllowedPath = [Collections.Generic.List[object]]::new()
         foreach ($objSchemaPath in $arrSchemaPathSpec) {
-            $strSchemaSourcePath = Join-Path $RepositoryRootPath $objSchemaPath.Path
+            $strSchemaBaselinePath =
+                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
+            [void] [IO.Directory]::CreateDirectory(
+                [IO.Path]::GetDirectoryName($strSchemaBaselinePath)
+            )
+            $strSchemaSourcePath = if (
+                $objSchemaPath.PSObject.Properties.Name -ccontains 'SourceText'
+            ) {
+                [IO.File]::WriteAllText(
+                    $strSchemaBaselinePath,
+                    [string] $objSchemaPath.SourceText,
+                    [Text.UTF8Encoding]::new($false)
+                )
+                $strSchemaBaselinePath
+            }
+            else {
+                Join-Path $RepositoryRootPath $objSchemaPath.Path
+            }
             $arrSchemaBytes = [IO.File]::ReadAllBytes($strSchemaSourcePath)
             $strSchemaBlob = ([string] (& git -C $strSchemaFixtureRoot `
                         hash-object -w -- $strSchemaSourcePath)).Trim()
@@ -2591,11 +2890,6 @@ if ($SelfTest) {
                     syntax = $objSchemaPath.Syntax
                     semantic_invariants = @($objSchemaPath.Invariants)
                 })
-            $strSchemaBaselinePath =
-                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
-            [void] [IO.Directory]::CreateDirectory(
-                [IO.Path]::GetDirectoryName($strSchemaBaselinePath)
-            )
             [IO.File]::WriteAllText(
                 $strSchemaBaselinePath,
                 "baseline placeholder for $($objSchemaPath.Path)`n",
@@ -2606,7 +2900,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-content-exact'
             limits = [ordered]@{
-                maximum_paths = 16
+                maximum_paths = 18
                 maximum_blob_bytes = 573440
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
@@ -2634,11 +2928,22 @@ if ($SelfTest) {
         $strSchemaTrusted = ([string] (& git -C $strSchemaFixtureRoot `
                     rev-parse --verify 'HEAD^{commit}')).Trim()
         foreach ($objSchemaPath in $arrSchemaPathSpec) {
-            [IO.File]::Copy(
-                (Join-Path $RepositoryRootPath $objSchemaPath.Path),
-                (Join-Path $strSchemaFixtureRoot $objSchemaPath.Path),
-                $true
-            )
+            $strSchemaCandidatePath =
+                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
+            if ($objSchemaPath.PSObject.Properties.Name -ccontains 'SourceText') {
+                [IO.File]::WriteAllText(
+                    $strSchemaCandidatePath,
+                    [string] $objSchemaPath.SourceText,
+                    [Text.UTF8Encoding]::new($false)
+                )
+            }
+            else {
+                [IO.File]::Copy(
+                    (Join-Path $RepositoryRootPath $objSchemaPath.Path),
+                    $strSchemaCandidatePath,
+                    $true
+                )
+            }
         }
         & git -C $strSchemaFixtureRoot add -- .
         & git -C $strSchemaFixtureRoot `
@@ -2695,6 +3000,70 @@ if ($SelfTest) {
         & $scriptblockExpectSchemaRejection -Base $strSchemaCandidate `
             -Head $strSchemaCandidate `
             -ExpectedMessage 'base must equal the trusted revision'
+
+        $objOverLimitManifest = ConvertFrom-Json -InputObject (
+            ConvertTo-Json -InputObject $objSchemaManifest -Depth 8
+        )
+        $objOverLimitManifest.authorization_id = 'self-test-path-limit-overflow'
+        $objOverLimitManifest.limits.maximum_paths = 19
+        [IO.File]::WriteAllText(
+            $strSchemaManifestPath,
+            ((ConvertTo-Json -InputObject $objOverLimitManifest -Depth 8) `
+                -replace "`r`n", "`n") + "`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strSchemaFixtureRoot add -- $strAuthorizationPath
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'path limit overflow trusted base'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the path-limit overflow trusted base.'
+        }
+        $strOverLimitTrusted = ([string] (
+                & git -C $strSchemaFixtureRoot rev-parse --verify 'HEAD^{commit}'
+            )).Trim()
+        foreach ($objSchemaPath in $arrSchemaPathSpec) {
+            $strSchemaCandidatePath =
+                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
+            if ($objSchemaPath.PSObject.Properties.Name -ccontains 'SourceText') {
+                [IO.File]::WriteAllText(
+                    $strSchemaCandidatePath,
+                    [string] $objSchemaPath.SourceText,
+                    [Text.UTF8Encoding]::new($false)
+                )
+            }
+            else {
+                [IO.File]::Copy(
+                    (Join-Path $RepositoryRootPath $objSchemaPath.Path),
+                    $strSchemaCandidatePath,
+                    $true
+                )
+            }
+        }
+        & git -C $strSchemaFixtureRoot add -- .
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'path limit overflow candidate'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the path-limit overflow candidate.'
+        }
+        $strOverLimitHead = ([string] (
+                & git -C $strSchemaFixtureRoot rev-parse --verify 'HEAD^{commit}'
+            )).Trim()
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strOverLimitTrusted
+        & $scriptblockExpectSchemaRejection -Trusted $strOverLimitTrusted `
+            -Base $strOverLimitTrusted -Head $strOverLimitHead `
+            -ExpectedMessage 'authorization limits exceed the trusted verifier limits'
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not restore the trusted schema fixture after path-limit testing.'
+        }
 
         foreach ($strStandaloneProtectedPath in @(
                 '.github/actionlint.yaml',
@@ -2823,11 +3192,22 @@ if ($SelfTest) {
             -c 'core.hooksPath=NUL' `
             commit --quiet --no-gpg-sign -m 'unexpected intermediate path'
         foreach ($objSchemaPath in $arrSchemaPathSpec) {
-            [IO.File]::Copy(
-                (Join-Path $RepositoryRootPath $objSchemaPath.Path),
-                (Join-Path $strSchemaFixtureRoot $objSchemaPath.Path),
-                $true
-            )
+            $strSchemaCandidatePath =
+                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
+            if ($objSchemaPath.PSObject.Properties.Name -ccontains 'SourceText') {
+                [IO.File]::WriteAllText(
+                    $strSchemaCandidatePath,
+                    [string] $objSchemaPath.SourceText,
+                    [Text.UTF8Encoding]::new($false)
+                )
+            }
+            else {
+                [IO.File]::Copy(
+                    (Join-Path $RepositoryRootPath $objSchemaPath.Path),
+                    $strSchemaCandidatePath,
+                    $true
+                )
+            }
         }
         Remove-Item -LiteralPath $strUnexpectedPath -Force
         & git -C $strSchemaFixtureRoot add -- .
@@ -2944,7 +3324,7 @@ if ($SelfTest) {
                     parent_commits = @($strTransitionBase)
                 }
                 limits = [ordered]@{
-                    maximum_paths = 16
+                    maximum_paths = 18
                     maximum_blob_bytes = 573440
                     maximum_manifest_bytes = 65536
                 }
@@ -3031,7 +3411,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-same-base-deactivation'
             limits = [ordered]@{
-                maximum_paths = 16
+                maximum_paths = 18
                 maximum_blob_bytes = 573440
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
@@ -3175,7 +3555,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-noncanonical-deactivation-target'
             limits = [ordered]@{
-                maximum_paths = 16
+                maximum_paths = 18
                 maximum_blob_bytes = 573440
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
@@ -3538,7 +3918,7 @@ foreach ($objPath in $arrAllowedPaths) {
                 $objCandidateManifest.authorization_id -cne
                     'no-active-trust-root-maintenance' -or
                 $objCandidateManifest.limits.maximum_paths -ne
-                    $intCandidateMaximumPaths -or
+                    $intInactiveManifestMaximumPaths -or
                 $objCandidateManifest.limits.maximum_blob_bytes -ne
                     $intCandidateMaximumBlobBytes -or
                 $objCandidateManifest.limits.maximum_manifest_bytes -ne

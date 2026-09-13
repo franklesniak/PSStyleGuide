@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.9.20260903.1
+# Version: 1.9.20260912.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -91,6 +91,9 @@ $script:arrTrustRootPaths = @(
     '.github/workflows/trust-root-authorization.json',
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
+    '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+    '.github/workflows/pull-request-body-identity.yml',
+    '.github/workflows/workflow-policy-cases.json',
     '.pre-commit-config.yaml'
 )
 $script:arrGovernedInstructionRootPaths = @(
@@ -109,7 +112,10 @@ $script:arrPushGovernedExactPaths = @(
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
+    '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+    '.github/workflows/pull-request-body-identity.yml',
     '.github/workflows/trust-root-authorization.json',
+    '.github/workflows/workflow-policy-cases.json',
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
     '.gitignore',
@@ -7959,9 +7965,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.9\.20260903\.1$'
+            '(?m)^# Version: 1\.9\.20260912\.1$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.9.20260903.1.'
+        throw 'The validator script version is not 1.9.20260912.1.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8823,9 +8829,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.2\.20260904\.2$'
+            '(?m)^# Version: 1\.2\.20260912\.1$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.2.20260904.2.'
+        throw 'The trust-root authorization script lacks version 1.2.20260912.1.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -8835,12 +8841,26 @@ if ($SelfTest) {
         -SelfTest
     foreach ($strProtectedValidationPath in @(
             '.github/actionlint.yaml',
+            '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+            '.github/workflows/pull-request-body-identity.yml',
+            '.github/workflows/workflow-policy-cases.json',
             '.pre-commit-config.yaml'
         )) {
         if (@($script:arrTrustRootPaths | Where-Object {
                     $_ -ceq $strProtectedValidationPath
                 }).Count -ne 1) {
             throw "$strProtectedValidationPath is outside trust-root governance."
+        }
+    }
+    foreach ($strIdentityTrustRootPath in @(
+            '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+            '.github/workflows/pull-request-body-identity.yml',
+            '.github/workflows/workflow-policy-cases.json'
+        )) {
+        if (@($script:arrPushGovernedExactPaths | Where-Object {
+                    $_ -ceq $strIdentityTrustRootPath
+                }).Count -ne 1) {
+            throw "$strIdentityTrustRootPath is outside exact push governance."
         }
     }
     if (@($script:arrTrustRootPaths | Where-Object {
