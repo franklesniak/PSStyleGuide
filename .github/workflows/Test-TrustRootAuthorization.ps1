@@ -2985,7 +2985,7 @@ if ($SelfTest) {
         $strAlternateDigest =
             'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824'
         $strAlternateValidatorSha256 =
-            '386ed401ec8a348e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
+            '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
     } elseif ($strCurrentPolicyValidator.Contains(
             "const VALIDATOR_VERSION = '1.2.4';",
             [StringComparison]::Ordinal
