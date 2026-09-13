@@ -25,13 +25,13 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.2.3';
+const VALIDATOR_VERSION = '1.2.4';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';
-const MINIMUM_CASE_COUNT = 83;
-const REQUIRED_IDENTITY_CASE_COUNT = 26;
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824';
+const MINIMUM_CASE_COUNT = 85;
+const REQUIRED_IDENTITY_CASE_COUNT = 28;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
 const IDENTITY_WORKFLOW_FILE_NAME = 'pull-request-body-identity.yml';
@@ -585,7 +585,7 @@ function validateWorkflowObject(fileName, workflow, rawText, contract) {
 function validatePullRequestBodyIdentityPolicy(workflow, rawText) {
   const job = workflow.jobs.verify_identity;
   const source = rawText ?? job.steps.map((step) => step.run ?? '').join('\n');
-  if (/\bGITHUB_TOKEN\b|\bACTIONS_RUNTIME_TOKEN\b|github\s*(?:\.|\[)\s*['"]?token|credential\.helper|extraheader|GIT_ASKPASS|\bAuthorization\b|\bBearer\b/iu.test(source)) {
+  if (/\bGITHUB_TOKEN\b|\bACTIONS_RUNTIME_TOKEN\b|github\s*(?:\.|\[)\s*['"]?token|credential\.helper|extraheader|GIT_ASKPASS|\bAuthorization\b(?!\.ps1)|\bBearer\b/iu.test(source)) {
     fail('identity-credential-policy');
   }
   if (source.includes('${{')) {

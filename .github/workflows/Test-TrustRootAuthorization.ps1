@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260913.2
+# Version: 1.2.20260913.3
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -127,12 +127,12 @@ $script:hashtableExactTransitionTextIdentity = @{
         '03b0aa378cbf8b70d7b292ee2d904a03e808d52dae067af2af5f766f46cabecf'
     )
     'pull-request-body-identity-workflow-topology-is-exact' = @(
-        'b006c0ed4cc0dc2391199fe1a49431c06f9a45910db34fe143c2e6df3ada2dd0',
-        'ab795c9bbcadecacb4f6f16dbf3d983b492f7069ff11937f6c94c4266abada51'
+        'ab795c9bbcadecacb4f6f16dbf3d983b492f7069ff11937f6c94c4266abada51',
+        '80be5df430e409ec51e5dac9cd8f10b88f3c49bf5afb35cfdcd7d2a782ce5100'
     )
     'workflow-policy-identity-cases-are-exact' = @(
-        'c0221ac73687b9eb0cbe83fb21bbef6419f4359420fbdcafff73e36464bbe09e',
-        '5a79ee8fcacd64a4a502203957e7f3ca7ad3da34666aa047ad26905ad8ec0d3f'
+        '5a79ee8fcacd64a4a502203957e7f3ca7ad3da34666aa047ad26905ad8ec0d3f',
+        '1b56b84abf049a1c1195cb7f8b2dc88a72e413ebd7c081f7032849290d9f030e'
     )
 }
 $script:objCanonicalJsonOptions =
@@ -980,15 +980,6 @@ function Assert-WorkflowPolicyTransitionTuple {
     ).ToLowerInvariant()
     $arrTuple = @(
         [pscustomobject]@{
-            VersionLiteral = "const VALIDATOR_VERSION = '1.2.2';"
-            DigestLiteral =
-                "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';"
-            ValidatorSha256 =
-                '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9'
-            ContractCanonicalSha256 =
-                '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6'
-        },
-        [pscustomobject]@{
             VersionLiteral = "const VALIDATOR_VERSION = '1.2.3';"
             DigestLiteral =
                 "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';"
@@ -996,6 +987,15 @@ function Assert-WorkflowPolicyTransitionTuple {
                 'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
             ContractCanonicalSha256 =
                 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb'
+        },
+        [pscustomobject]@{
+            VersionLiteral = "const VALIDATOR_VERSION = '1.2.4';"
+            DigestLiteral =
+                "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824';"
+            ValidatorSha256 =
+                '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
+            ContractCanonicalSha256 =
+                'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824'
         }
     )
     $intVersionLiteralCount = 0
@@ -1449,14 +1449,14 @@ function Assert-SemanticInvariant {
         }
         $arrValidatorTuple = @(
             [pscustomobject]@{
-                Version = "const VALIDATOR_VERSION = '1.2.2';"
-                Digest =
-                    "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';"
-            },
-            [pscustomobject]@{
                 Version = "const VALIDATOR_VERSION = '1.2.3';"
                 Digest =
                     "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';"
+            },
+            [pscustomobject]@{
+                Version = "const VALIDATOR_VERSION = '1.2.4';"
+                Digest =
+                    "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824';"
             }
         )
         $intVersionLiteralCount = 0
@@ -1632,8 +1632,8 @@ function Assert-SemanticInvariant {
             if ($objContract.validatorIdentity.path -cne
                     'Validate-WorkflowPolicy.mjs' -or
                 ([string] $objContract.validatorIdentity.sha256) -cnotin @(
-                    '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9',
-                    'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+                    'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202',
+                    '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
                 )) {
                 throw 'The workflow validator identity is invalid.'
             }
@@ -2907,16 +2907,16 @@ if ($SelfTest) {
     $strCurrentPolicyContract = $hashtableNewInvariantText[
         '.github/workflows/workflow-policy-contract.json'
     ]
-    $strOldVersionLiteral = "const VALIDATOR_VERSION = '1.2.2';"
-    $strNewVersionLiteral = "const VALIDATOR_VERSION = '1.2.3';"
+    $strOldVersionLiteral = "const VALIDATOR_VERSION = '1.2.3';"
+    $strNewVersionLiteral = "const VALIDATOR_VERSION = '1.2.4';"
     $strOldDigestLiteral =
-        "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';"
-    $strNewDigestLiteral =
         "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';"
+    $strNewDigestLiteral =
+        "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824';"
     $strOldValidatorSha256 =
-        '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9'
-    $strNewValidatorSha256 =
         'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+    $strNewValidatorSha256 =
+        '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
     if ($strCurrentPolicyValidator.Contains(
             $strOldVersionLiteral,
             [StringComparison]::Ordinal

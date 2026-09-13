@@ -143,10 +143,36 @@ jobs:
               throw 'acquire: the checked out revision is not the exact pull request head'
           }
           $arrProposedEntries = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false ls-tree $strObservedHead -- .github/workflows/Sync-PullRequestBodyIdentity.mjs .github/workflows/pull-request-body-identity-cases.json .github/workflows/pull-request-body-identity.yml)
-          if ($LASTEXITCODE -ne 0 -or $arrProposedEntries.Count -ne 3 -or
+          if ($LASTEXITCODE -ne 0 -or $arrProposedEntries.Count -ne 3) {
+              throw 'acquire: the proposed verifier inputs are invalid'
+          }
+          $boolVerifierInputsChanged =
               [string]::Join("`n", $arrProposedEntries) -cne
-              [string]::Join("`n", $arrTrustedEntries)) {
-              throw 'acquire: a trusted verifier input changed in the proposed head'
+              [string]::Join("`n", $arrTrustedEntries)
+          if ($boolVerifierInputsChanged) {
+              $strTrustedAuthorizationPath = [System.IO.Path]::Combine(
+                  $strTrustedRoot,
+                  '.github',
+                  'workflows',
+                  'Test-TrustRootAuthorization.ps1'
+              )
+              if (-not [System.IO.File]::Exists(
+                      $strTrustedAuthorizationPath
+                  )) {
+                  throw 'acquire: the trusted trust-root verifier is absent'
+              }
+              $arrAuthorization = @(
+                  & $strTrustedAuthorizationPath `
+                      -RepositoryRootPath $strTrustedRoot `
+                      -TrustedRevision $strBaseSha `
+                      -BaseRevision $strBaseSha `
+                      -HeadRevision $strHeadSha
+              )
+              if ($arrAuthorization.Count -ne 1 -or
+                  $arrAuthorization[0] -isnot [bool] -or
+                  -not $arrAuthorization[0]) {
+                  throw 'acquire: the verifier change is not exactly authorized'
+              }
           }
 
           $strNodeUrl = 'https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz'
