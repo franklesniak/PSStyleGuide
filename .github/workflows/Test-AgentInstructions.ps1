@@ -2,7 +2,7 @@
 # Validates governed agent instructions and optional authenticated Git ranges.
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.9.20260912.0
+# Version: 1.9.20260913.3
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -91,6 +91,10 @@ $script:arrTrustRootPaths = @(
     '.github/workflows/trust-root-authorization.json',
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
+    '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+    '.github/workflows/pull-request-body-identity-cases.json',
+    '.github/workflows/pull-request-body-identity.yml',
+    '.github/workflows/workflow-policy-cases.json',
     '.pre-commit-config.yaml'
 )
 $script:arrGovernedInstructionRootPaths = @(
@@ -109,7 +113,11 @@ $script:arrPushGovernedExactPaths = @(
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs',
+    '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+    '.github/workflows/pull-request-body-identity-cases.json',
+    '.github/workflows/pull-request-body-identity.yml',
     '.github/workflows/trust-root-authorization.json',
+    '.github/workflows/workflow-policy-cases.json',
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
     '.gitignore',
@@ -3674,6 +3682,104 @@ function Get-MarkdownParserBootstrapFailure {
             'Locked Node.js dependencies are missing. Run ' +
             '`npm run bootstrap:agent-instructions` before pre-commit validation.'
         )
+    }
+}
+
+function Invoke-SafeTemporaryDirectoryRemoval {
+    # .SYNOPSIS
+    # Removes one validated temporary directory with bounded retries.
+    #
+    # .DESCRIPTION
+    # Confirms that the directory is a child of the supplied system temporary root,
+    # retries transient recursive-delete failures, and fails after the exact bound.
+    #
+    # .PARAMETER LiteralPath
+    # The exact temporary directory to remove.
+    #
+    # .PARAMETER SystemTemporaryRootPath
+    # The normalized system temporary root that must contain LiteralPath.
+    #
+    # .PARAMETER MaximumAttempts
+    # The maximum number of recursive-delete attempts.
+    #
+    # .PARAMETER InitialDelayMilliseconds
+    # The delay before the second attempt. Each later delay doubles.
+    #
+    # .EXAMPLE
+    # Invoke-SafeTemporaryDirectoryRemoval @hashtableArguments
+    #
+    # # Removes one validated fixture directory.
+    #
+    # .INPUTS
+    # None. Pipeline input is not accepted.
+    #
+    # .OUTPUTS
+    # None.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260913.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string] $LiteralPath,
+
+        [Parameter(Mandatory)]
+        [ValidateNotNullOrEmpty()]
+        [string] $SystemTemporaryRootPath,
+
+        [Parameter()]
+        [ValidateRange(1, 10)]
+        [int] $MaximumAttempts = 5,
+
+        [Parameter()]
+        [ValidateRange(1, 1000)]
+        [int] $InitialDelayMilliseconds = 50
+    )
+
+    $strValidatedTemporaryRoot = [IO.Path]::GetFullPath(
+        $SystemTemporaryRootPath
+    ).TrimEnd(
+        [IO.Path]::DirectorySeparatorChar,
+        [IO.Path]::AltDirectorySeparatorChar
+    )
+    $strValidatedDirectoryPath = [IO.Path]::GetFullPath($LiteralPath)
+    $strRequiredPrefix = $strValidatedTemporaryRoot +
+        [IO.Path]::DirectorySeparatorChar
+    if (-not $strValidatedDirectoryPath.StartsWith(
+            $strRequiredPrefix,
+            [StringComparison]::OrdinalIgnoreCase
+        )) {
+        throw 'Refusing to remove a directory outside the system temporary root.'
+    }
+
+    for ($intAttempt = 1; $intAttempt -le $MaximumAttempts; $intAttempt++) {
+        if (-not [IO.Directory]::Exists($strValidatedDirectoryPath)) {
+            return
+        }
+        try {
+            Remove-Item -LiteralPath $strValidatedDirectoryPath -Recurse -Force `
+                -ErrorAction Stop
+        }
+        catch {
+            if ($intAttempt -eq $MaximumAttempts) {
+                throw
+            }
+        }
+        if (-not [IO.Directory]::Exists($strValidatedDirectoryPath)) {
+            return
+        }
+        if ($intAttempt -eq $MaximumAttempts) {
+            throw 'The temporary fixture directory still exists after cleanup.'
+        }
+        $intDelayMilliseconds = [int] (
+            $InitialDelayMilliseconds * [Math]::Pow(2, $intAttempt - 1)
+        )
+        Start-Sleep -Milliseconds $intDelayMilliseconds
     }
 }
 
@@ -7848,7 +7954,7 @@ if ($SelfTest) {
                 }
                 if ([regex]::Matches(
                         $strFunctionNotes,
-                        '(?m)^Version: 1\.0\.(?:202608(?:30|31)|2026090(?:2|3))\.0\.$'
+                        '(?m)^Version: 1\.0\.(?:202608(?:30|31)|202609(?:0[23]|1[23]))\.0\.$'
                     ).Count -ne 1) {
                     $listMissingHelp.Add('landing or repair helper Version')
                 }
@@ -7883,12 +7989,12 @@ if ($SelfTest) {
             [pscustomobject]@{
                 Source = $strValidatorSource
                 Path = '.github/workflows/Test-AgentInstructions.ps1'
-                ExpectedFunctionCount = 59
+                ExpectedFunctionCount = 60
             },
             [pscustomobject]@{
                 Source = $strTrustRootAuthorizationSource
                 Path = $strTrustRootAuthorizationPath
-                ExpectedFunctionCount = 7
+                ExpectedFunctionCount = 8
             },
             [pscustomobject]@{
                 Source = $strExtractedSelfTestSource
@@ -7910,7 +8016,7 @@ if ($SelfTest) {
                 Name = 'trust-root authorization helper'
                 Source = $strTrustRootAuthorizationSource
                 Path = $strTrustRootAuthorizationPath
-                ExpectedFunctionCount = 7
+                ExpectedFunctionCount = 8
                 FunctionName = 'Invoke-BoundedProcessByte'
             },
             [pscustomobject]@{
@@ -7959,9 +8065,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.9\.20260912\.0$'
+            '(?m)^# Version: 1\.9\.20260913\.3$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.9.20260912.0.'
+        throw 'The validator script version is not 1.9.20260913.3.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8823,9 +8929,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.2\.20260912\.0$'
+            '(?m)^# Version: 1\.2\.20260913\.2$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.2.20260912.0.'
+        throw 'The trust-root authorization script lacks version 1.2.20260913.2.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -8835,12 +8941,28 @@ if ($SelfTest) {
         -SelfTest
     foreach ($strProtectedValidationPath in @(
             '.github/actionlint.yaml',
+            '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+            '.github/workflows/pull-request-body-identity-cases.json',
+            '.github/workflows/pull-request-body-identity.yml',
+            '.github/workflows/workflow-policy-cases.json',
             '.pre-commit-config.yaml'
         )) {
         if (@($script:arrTrustRootPaths | Where-Object {
                     $_ -ceq $strProtectedValidationPath
                 }).Count -ne 1) {
             throw "$strProtectedValidationPath is outside trust-root governance."
+        }
+    }
+    foreach ($strIdentityTrustRootPath in @(
+            '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+            '.github/workflows/pull-request-body-identity-cases.json',
+            '.github/workflows/pull-request-body-identity.yml',
+            '.github/workflows/workflow-policy-cases.json'
+        )) {
+        if (@($script:arrPushGovernedExactPaths | Where-Object {
+                    $_ -ceq $strIdentityTrustRootPath
+                }).Count -ne 1) {
+            throw "$strIdentityTrustRootPath is outside exact push governance."
         }
     }
     if (@($script:arrTrustRootPaths | Where-Object {
@@ -12209,12 +12331,10 @@ if ($SelfTest) {
     finally {
         $script:boolTrustedMaintenanceAuthorizationValidated =
             $boolArrayFixtureOriginalAuthorization
-        if ([IO.Directory]::Exists($strArrayFixtureRoot) -and
-            $strArrayFixtureRoot.StartsWith(
-                $strArrayFixtureSystemTempRoot,
-                [StringComparison]::OrdinalIgnoreCase
-            )) {
-            Remove-Item -LiteralPath $strArrayFixtureRoot -Recurse -Force
+        if ([IO.Directory]::Exists($strArrayFixtureRoot)) {
+            Invoke-SafeTemporaryDirectoryRemoval `
+                -LiteralPath $strArrayFixtureRoot `
+                -SystemTemporaryRootPath $strArrayFixtureSystemTempRoot
         }
     }
 

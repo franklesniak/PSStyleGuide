@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260912.0
+# Version: 1.2.20260913.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -51,7 +51,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $intManifestMaximumBytes = 65536
-$intCandidateMaximumPaths = 16
+$intCandidateMaximumPaths = 19
+$intInactiveManifestMaximumPaths = 16
 $intCandidateMaximumBlobBytes = 573440
 $intCandidateMaximumCommits = 64
 $strObjectIdPattern = '^[0-9a-f]{40}$'
@@ -70,6 +71,10 @@ $arrTrustRootPaths = @(
     '.github/workflows/trust-root-authorization.json',
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
+    '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+    '.github/workflows/pull-request-body-identity-cases.json',
+    '.github/workflows/pull-request-body-identity.yml',
+    '.github/workflows/workflow-policy-cases.json',
     '.pre-commit-config.yaml'
 )
 $script:arrSpecialSemanticInvariant = @(
@@ -82,7 +87,11 @@ $script:arrSpecialSemanticInvariant = @(
     'parser-manifest-direct-roots-and-closure-is-exact',
     'pre-commit-actionlint-gate-is-exact',
     'published-path-array-binding-is-explicit',
+    'pull-request-body-identity-api-termination-is-bounded',
+    'pull-request-body-identity-cases-preserve-required-coverage',
+    'pull-request-body-identity-workflow-topology-is-exact',
     'workflow-policy-contract-identities-and-structure-are-exact',
+    'workflow-policy-identity-cases-are-exact',
     'workflow-policy-preflight-authenticates-deferred-yaml-import',
     'workflow-created-push-history-fetch-is-bounded',
     'current-base-status-helper-is-fail-closed'
@@ -97,10 +106,34 @@ $script:hashtableSemanticInvariantPath = @{
     'parser-manifest-direct-roots-and-closure-is-exact' =
         '.github/workflows/Test-AgentInstructionParserManifest.mjs'
     'pre-commit-actionlint-gate-is-exact' = '.pre-commit-config.yaml'
+    'pull-request-body-identity-api-termination-is-bounded' =
+        '.github/workflows/Sync-PullRequestBodyIdentity.mjs'
+    'pull-request-body-identity-cases-preserve-required-coverage' =
+        '.github/workflows/pull-request-body-identity-cases.json'
+    'pull-request-body-identity-workflow-topology-is-exact' =
+        '.github/workflows/pull-request-body-identity.yml'
     'workflow-policy-contract-identities-and-structure-are-exact' =
         '.github/workflows/workflow-policy-contract.json'
+    'workflow-policy-identity-cases-are-exact' =
+        '.github/workflows/workflow-policy-cases.json'
     'workflow-policy-preflight-authenticates-deferred-yaml-import' =
         '.github/workflows/Validate-WorkflowPolicy.mjs'
+}
+# These current/next pins close the one-way PR #188 transition. Task 67 must
+# replace transition-only pins before an ordinary R2 trust-root content update.
+$script:hashtableExactTransitionTextIdentity = @{
+    'pull-request-body-identity-api-termination-is-bounded' = @(
+        '7b61ea2116386f75726af33dccf3e18fc90b509c206d44e900be405388556766',
+        '03b0aa378cbf8b70d7b292ee2d904a03e808d52dae067af2af5f766f46cabecf'
+    )
+    'pull-request-body-identity-workflow-topology-is-exact' = @(
+        'b006c0ed4cc0dc2391199fe1a49431c06f9a45910db34fe143c2e6df3ada2dd0',
+        'ab795c9bbcadecacb4f6f16dbf3d983b492f7069ff11937f6c94c4266abada51'
+    )
+    'workflow-policy-identity-cases-are-exact' = @(
+        'c0221ac73687b9eb0cbe83fb21bbef6419f4359420fbdcafff73e36464bbe09e',
+        '5a79ee8fcacd64a4a502203957e7f3ca7ad3da34666aa047ad26905ad8ec0d3f'
+    )
 }
 $script:objCanonicalJsonOptions =
     [System.Text.Json.JsonSerializerOptions]::new()
@@ -615,13 +648,73 @@ $script:scriptblockConvertToCanonicalJsonText = {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260903.0.
+    # Version: 1.0.20260913.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter()][AllowNull()][object] $Value)
 
     if ($null -eq $Value) {
         return 'null'
+    }
+    if ($Value -is [System.Text.Json.JsonElement]) {
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::Object) {
+            [System.Text.Json.JsonProperty[]] $arrProperties =
+                @($Value.EnumerateObject())
+            [Array]::Sort(
+                $arrProperties,
+                [Comparison[System.Text.Json.JsonProperty]] {
+                    param($objLeft, $objRight)
+                    [StringComparer]::Ordinal.Compare(
+                        $objLeft.Name,
+                        $objRight.Name
+                    )
+                }
+            )
+            [string[]] $arrMembers = @(
+                foreach ($objProperty in $arrProperties) {
+                    $strEncodedKey =
+                        [System.Text.Json.JsonSerializer]::Serialize(
+                            [object] $objProperty.Name,
+                            [string],
+                            $script:objCanonicalJsonOptions
+                        )
+                    $strEncodedValue =
+                        & $script:scriptblockConvertToCanonicalJsonText `
+                        -Value $objProperty.Value
+                    $strEncodedKey + ':' + $strEncodedValue
+                }
+            )
+            return '{' + [string]::Join(',', [string[]] $arrMembers) + '}'
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::Array) {
+            [string[]] $arrItems = @(
+                foreach ($objItem in $Value.EnumerateArray()) {
+                    & $script:scriptblockConvertToCanonicalJsonText `
+                        -Value $objItem
+                }
+            )
+            return '[' + [string]::Join(',', [string[]] $arrItems) + ']'
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::String) {
+            return [System.Text.Json.JsonSerializer]::Serialize(
+                [object] $Value.GetString(),
+                [string],
+                $script:objCanonicalJsonOptions
+            )
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::Number) {
+            return $Value.GetRawText()
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::True) {
+            return 'true'
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::False) {
+            return 'false'
+        }
+        if ($Value.ValueKind -eq [System.Text.Json.JsonValueKind]::Null) {
+            return 'null'
+        }
+        throw 'Canonical JSON received an unsupported JSON value kind.'
     }
     if ($Value -is [Collections.IDictionary]) {
         $arrKeys = [string[]] @($Value.Keys)
@@ -816,6 +909,124 @@ process.stdin.on('end', () => {
     }
 }
 
+function Assert-WorkflowPolicyTransitionTuple {
+    # .SYNOPSIS
+    # Validates one complete workflow-policy identity transition tuple.
+    # .DESCRIPTION
+    # Accepts exactly the current tuple or the intended next tuple across the
+    # validator and contract. Rejects mixed, missing, and duplicate tuples.
+    # .PARAMETER ValidatorText
+    # The strict UTF-8 workflow-policy validator source text.
+    # .PARAMETER ContractText
+    # The strict UTF-8 workflow-policy contract source text.
+    # .EXAMPLE
+    # Assert-WorkflowPolicyTransitionTuple @hashtableArguments
+    #
+    # # Validates the cross-file identity tuple or throws.
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    # .OUTPUTS
+    # None. This helper returns no output.
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260913.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory)][string] $ValidatorText,
+        [Parameter(Mandatory)][string] $ContractText
+    )
+
+    $objContract = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $ContractText -Name 'The workflow-policy transition contract'
+    $strContractValidatorSha256 =
+        [string] $objContract.validatorIdentity.sha256
+    $strValidatorSha256 = [Convert]::ToHexString(
+        [Security.Cryptography.SHA256]::HashData(
+            [Text.UTF8Encoding]::new($false).GetBytes($ValidatorText)
+        )
+    ).ToLowerInvariant()
+    $objContractDocument = $null
+    try {
+        $objContractDocument =
+            [System.Text.Json.JsonDocument]::Parse($ContractText)
+        Assert-NoDuplicateJsonProperty `
+            -Element $objContractDocument.RootElement
+        $objContractIdentityView = [ordered]@{}
+        foreach ($objContractProperty in
+            $objContractDocument.RootElement.EnumerateObject()) {
+            if ($objContractProperty.Name -cne 'validatorIdentity') {
+                $objContractIdentityView[$objContractProperty.Name] =
+                    $objContractProperty.Value
+            }
+        }
+        $strContractCanonicalText =
+            & $script:scriptblockConvertToCanonicalJsonText `
+            -Value $objContractIdentityView
+    }
+    finally {
+        if ($null -ne $objContractDocument) {
+            $objContractDocument.Dispose()
+        }
+    }
+    $strContractCanonicalSha256 = [Convert]::ToHexString(
+        [Security.Cryptography.SHA256]::HashData(
+            [Text.UTF8Encoding]::new($false).GetBytes(
+                $strContractCanonicalText
+            )
+        )
+    ).ToLowerInvariant()
+    $arrTuple = @(
+        [pscustomobject]@{
+            VersionLiteral = "const VALIDATOR_VERSION = '1.2.2';"
+            DigestLiteral =
+                "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';"
+            ValidatorSha256 =
+                '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9'
+            ContractCanonicalSha256 =
+                '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6'
+        },
+        [pscustomobject]@{
+            VersionLiteral = "const VALIDATOR_VERSION = '1.2.3';"
+            DigestLiteral =
+                "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';"
+            ValidatorSha256 =
+                'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+            ContractCanonicalSha256 =
+                'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb'
+        }
+    )
+    $intVersionLiteralCount = 0
+    $intDigestLiteralCount = 0
+    $intMatchingTupleCount = 0
+    foreach ($objTuple in $arrTuple) {
+        $intVersionCount = [regex]::Matches(
+            $ValidatorText,
+            [regex]::Escape($objTuple.VersionLiteral)
+        ).Count
+        $intDigestCount = [regex]::Matches(
+            $ValidatorText,
+            [regex]::Escape($objTuple.DigestLiteral)
+        ).Count
+        $intVersionLiteralCount += $intVersionCount
+        $intDigestLiteralCount += $intDigestCount
+        if ($intVersionCount -eq 1 -and $intDigestCount -eq 1 -and
+            $strValidatorSha256 -ceq $objTuple.ValidatorSha256 -and
+            $strContractValidatorSha256 -ceq $objTuple.ValidatorSha256 -and
+            $strContractCanonicalSha256 -ceq
+                $objTuple.ContractCanonicalSha256) {
+            $intMatchingTupleCount++
+        }
+    }
+    if ($intVersionLiteralCount -ne 1 -or
+        $intDigestLiteralCount -ne 1 -or
+        $intMatchingTupleCount -ne 1) {
+        throw 'The workflow-policy identity transition tuple is mixed or invalid.'
+    }
+}
+
 function Assert-SemanticInvariant {
     # .SYNOPSIS
     # Validates one named trust-root semantic invariant.
@@ -841,7 +1052,7 @@ function Assert-SemanticInvariant {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20260913.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -853,6 +1064,19 @@ function Assert-SemanticInvariant {
     if ($script:hashtableSemanticInvariantPath.ContainsKey($Invariant) -and
         $Path -cne $script:hashtableSemanticInvariantPath[$Invariant]) {
         throw "$Path does not satisfy semantic invariant $Invariant."
+    }
+
+    if ($script:hashtableExactTransitionTextIdentity.ContainsKey($Invariant)) {
+        $strTextSha256 = [Convert]::ToHexString(
+            [Security.Cryptography.SHA256]::HashData(
+                [Text.UTF8Encoding]::new($false).GetBytes($Text)
+            )
+        ).ToLowerInvariant()
+        if ($script:hashtableExactTransitionTextIdentity[$Invariant] `
+            -cnotcontains $strTextSha256) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        return
     }
 
     if ($Invariant -ceq
@@ -1013,6 +1237,169 @@ function Assert-SemanticInvariant {
     }
 
     if ($Invariant -ceq
+        'pull-request-body-identity-cases-preserve-required-coverage') {
+        $objCatalogDocument = $null
+        try {
+            $objCatalogDocument = [System.Text.Json.JsonDocument]::Parse($Text)
+            Assert-NoDuplicateJsonProperty `
+                -Element $objCatalogDocument.RootElement
+        }
+        catch {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+        finally {
+            if ($null -ne $objCatalogDocument) {
+                $objCatalogDocument.Dispose()
+            }
+        }
+        $objCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
+            -Text $Text -Name $Path
+        & $script:scriptblockAssertExactDictionaryKeySet `
+            -Dictionary $objCatalog -Name $Path -Key @(
+                'schema', 'sourceCases', 'bodyCases', 'remoteCases'
+            )
+        if ($objCatalog.schema -cne
+            'PSStyleGuide.PullRequestBodyIdentityCases.v1') {
+            throw "$Path does not satisfy semantic invariant $Invariant."
+        }
+
+        $hashtableExpectedField = @{
+            sourceCases = @('id', 'mutation', 'expected')
+            bodyCases = @('id', 'operation', 'fixture', 'expected')
+            remoteCases = @(
+                'id', 'scenario', 'expected', 'expectedPatchCount'
+            )
+        }
+        $hashtableRequiredCase = @{
+            sourceCases = @(
+                'source-current|none|current',
+                'source-contract-malformed-json|contract-malformed-json|contract-json',
+                'source-contract-forbidden-key|contract-forbidden-key|contract-json',
+                'source-generator-version-malformed|generator-policy-version-malformed|generator-policy',
+                'source-generator-digest-malformed|generator-policy-digest-malformed|generator-policy',
+                'source-generator-version-drift|generator-version-drift|generator-identity',
+                'source-generator-duplicate-version|generator-duplicate-version|generator-version',
+                'source-generator-bom|generator-bom|generator-encoding',
+                'source-path-verifier-crlf|path-verifier-crlf|path-verifier-encoding',
+                'source-build-generator-drift|build-generator-drift|build-generator-version',
+                'source-build-path-verifier-drift|build-path-verifier-drift|build-path-verifier-version',
+                'source-validator-identity-drift|validator-identity-drift|validator-identity',
+                'source-validator-contract-digest-drift|validator-contract-digest-drift|contract-canonical-identity',
+                'source-contract-canonical-drift|contract-canonical-drift|contract-canonical-identity',
+                'source-wrong-mode|source-wrong-mode|source-identity',
+                'source-wrong-blob|source-wrong-blob|source-identity'
+            )
+            bodyCases = @(
+                'check-current|check|current|current',
+                'check-absent|check|absent|identity-block-absent',
+                'check-stale-head|check|stale-head|identity-block-stale',
+                'check-stale-tree|check|stale-tree|identity-block-stale',
+                'check-stale-one-digest|check|stale-digest|identity-block-stale',
+                'check-partial-start|check|partial-start|identity-block-malformed',
+                'check-partial-end|check|partial-end|identity-block-malformed',
+                'check-duplicate|check|duplicate|identity-block-malformed',
+                'check-reversed|check|reversed|identity-block-malformed',
+                'check-inline-marker|check|inline-marker|identity-block-malformed',
+                'check-null-character|check|null-character|body-invalid',
+                'update-current-no-change|update|current|no-change',
+                'update-absent-appends|update|absent|changed',
+                'update-stale-replaces|update|stale-head|changed',
+                'update-partial-refused|update|partial-start|identity-block-malformed',
+                'update-preserves-unrelated-text|update|surrounded-stale|changed-preserved'
+            )
+            remoteCases = @(
+                'remote-current-no-write|current|success-no-change|0',
+                'remote-update-readback|update-success|success-changed|1',
+                'remote-repository-name-case-insensitive|repository-name-case|success-changed|1',
+                'remote-head-changes-before-write|head-before-write|remote-changed-before-write|0',
+                'remote-body-changes-before-write|body-before-write|remote-changed-before-write|0',
+                'remote-initial-read-fails|initial-read-failure|api-read|0',
+                'remote-authentication-fails-before-write|authentication-failure|api-read|0',
+                'remote-rate-limit-fails-before-write|rate-limit-failure|api-read|0',
+                'remote-transport-fails-before-write|transport-read-failure|api-read|0',
+                'remote-write-rejected|write-rejected|api-write-rejected|1',
+                'remote-authorization-rejects-write|authorization-failure|api-write-rejected|1',
+                'remote-write-ambiguous|write-indeterminate|indeterminate|1',
+                'remote-patch-response-invalid|patch-response-invalid|indeterminate|1',
+                'remote-readback-unavailable|readback-failure|indeterminate|1',
+                'remote-readback-head-changed|readback-head-changed|indeterminate|1',
+                'remote-readback-body-mismatch|readback-body-mismatch|indeterminate|1',
+                'remote-unrelated-text-preserved|update-preserves-text|success-changed-preserved|1'
+            )
+        }
+        $setCaseId = [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::Ordinal
+        )
+        foreach ($strCollectionName in @(
+                'sourceCases', 'bodyCases', 'remoteCases'
+            )) {
+            $objCases = $objCatalog[$strCollectionName]
+            if ($objCases -isnot [Collections.IEnumerable] -or
+                $objCases -is [string] -or
+                $objCases -is [Collections.IDictionary]) {
+                throw "$Path does not satisfy semantic invariant $Invariant."
+            }
+            $hashtableActualCase = @{}
+            foreach ($objCase in @($objCases)) {
+                & $script:scriptblockAssertExactDictionaryKeySet `
+                    -Dictionary $objCase `
+                    -Name "$Path $strCollectionName case" `
+                    -Key $hashtableExpectedField[$strCollectionName]
+                $strCaseId = [string] $objCase.id
+                if ($strCaseId -cnotmatch '^[a-z0-9][a-z0-9-]{0,127}$' -or
+                    -not $setCaseId.Add($strCaseId) -or
+                    $objCase.expected -isnot [string]) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+                if ($strCollectionName -ceq 'sourceCases' -and
+                    $objCase.mutation -isnot [string]) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+                if ($strCollectionName -ceq 'bodyCases' -and
+                    ($objCase.operation -cnotin @('check', 'update') -or
+                        $objCase.fixture -isnot [string])) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+                if ($strCollectionName -ceq 'remoteCases' -and
+                    ($objCase.scenario -isnot [string] -or
+                        $objCase.expectedPatchCount -isnot [long] -or
+                        $objCase.expectedPatchCount -notin @(0, 1))) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+                $hashtableActualCase[$strCaseId] = $objCase
+            }
+            foreach ($strRequiredCase in
+                $hashtableRequiredCase[$strCollectionName]) {
+                $arrRequiredField = $strRequiredCase.Split('|')
+                $strRequiredId = $arrRequiredField[0]
+                if (-not $hashtableActualCase.ContainsKey($strRequiredId)) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+                $objActualCase = $hashtableActualCase[$strRequiredId]
+                $boolMatches = if ($strCollectionName -ceq 'sourceCases') {
+                    $objActualCase.mutation -ceq $arrRequiredField[1] -and
+                    $objActualCase.expected -ceq $arrRequiredField[2]
+                }
+                elseif ($strCollectionName -ceq 'bodyCases') {
+                    $objActualCase.operation -ceq $arrRequiredField[1] -and
+                    $objActualCase.fixture -ceq $arrRequiredField[2] -and
+                    $objActualCase.expected -ceq $arrRequiredField[3]
+                }
+                else {
+                    $objActualCase.scenario -ceq $arrRequiredField[1] -and
+                    $objActualCase.expected -ceq $arrRequiredField[2] -and
+                    $objActualCase.expectedPatchCount -eq
+                        [int] $arrRequiredField[3]
+                }
+                if (-not $boolMatches) {
+                    throw "$Path does not satisfy semantic invariant $Invariant."
+                }
+            }
+        }
+        return
+    }
+
+    if ($Invariant -ceq
         'workflow-policy-preflight-authenticates-deferred-yaml-import') {
         $arrStaticImports = @([regex]::Matches(
                 $Text,
@@ -1025,8 +1412,6 @@ function Assert-SemanticInvariant {
             "import process from 'node:process';",
             "import { fileURLToPath } from 'node:url';",
             "} = await import('yaml'));",
-            "const VALIDATOR_VERSION = '1.2.3';",
-            "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';",
             "const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';",
             'function readContractWithoutDependencies() {',
             "path.join(SCRIPT_DIRECTORY, 'workflow-policy-contract.json'),",
@@ -1061,6 +1446,41 @@ function Assert-SemanticInvariant {
                 )) {
                 throw "$Path does not satisfy semantic invariant $Invariant."
             }
+        }
+        $arrValidatorTuple = @(
+            [pscustomobject]@{
+                Version = "const VALIDATOR_VERSION = '1.2.2';"
+                Digest =
+                    "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';"
+            },
+            [pscustomobject]@{
+                Version = "const VALIDATOR_VERSION = '1.2.3';"
+                Digest =
+                    "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';"
+            }
+        )
+        $intVersionLiteralCount = 0
+        $intDigestLiteralCount = 0
+        $intMatchingTupleCount = 0
+        foreach ($objValidatorTuple in $arrValidatorTuple) {
+            $intVersionCount = [regex]::Matches(
+                $Text,
+                [regex]::Escape($objValidatorTuple.Version)
+            ).Count
+            $intDigestCount = [regex]::Matches(
+                $Text,
+                [regex]::Escape($objValidatorTuple.Digest)
+            ).Count
+            $intVersionLiteralCount += $intVersionCount
+            $intDigestLiteralCount += $intDigestCount
+            if ($intVersionCount -eq 1 -and $intDigestCount -eq 1) {
+                $intMatchingTupleCount++
+            }
+        }
+        if ($intVersionLiteralCount -ne 1 -or
+            $intDigestLiteralCount -ne 1 -or
+            $intMatchingTupleCount -ne 1) {
+            throw "$Path does not satisfy semantic invariant $Invariant."
         }
         $boolBuiltInOnly = $arrStaticImports.Count -eq 5
         foreach ($objImport in $arrStaticImports) {
@@ -1211,8 +1631,10 @@ function Assert-SemanticInvariant {
                 -Name 'validator identity' -Key @('path', 'sha256')
             if ($objContract.validatorIdentity.path -cne
                     'Validate-WorkflowPolicy.mjs' -or
-                $objContract.validatorIdentity.sha256 -cne
-                    'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202') {
+                ([string] $objContract.validatorIdentity.sha256) -cnotin @(
+                    '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9',
+                    'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+                )) {
                 throw 'The workflow validator identity is invalid.'
             }
             & $script:scriptblockAssertExactDictionaryKeySet `
@@ -2374,8 +2796,8 @@ if ($SelfTest) {
             Syntax = 'javascript'
             Invariant =
                 'workflow-policy-preflight-authenticates-deferred-yaml-import'
-            MutationFrom = "const VALIDATOR_VERSION = '1.2.3';"
-            MutationTo = "const VALIDATOR_VERSION = '1.2.4';"
+            MutationFrom = 'verifyPackageDigests(bootstrapContract);'
+            MutationTo = 'void bootstrapContract;'
         },
         [pscustomobject]@{
             Path = '.github/workflows/workflow-policy-contract.json'
@@ -2384,6 +2806,37 @@ if ($SelfTest) {
                 'workflow-policy-contract-identities-and-structure-are-exact'
             MutationFrom = '"path": "Validate-WorkflowPolicy.mjs"'
             MutationTo = '"path": "Other-Validator.mjs"'
+        },
+        [pscustomobject]@{
+            Path = '.github/workflows/Sync-PullRequestBodyIdentity.mjs'
+            Syntax = 'javascript'
+            Invariant =
+                'pull-request-body-identity-api-termination-is-bounded'
+            MutationFrom = 'import crypto from ''node:crypto'';'
+            MutationTo = 'import crypto from ''node:crypto2'';'
+        },
+        [pscustomobject]@{
+            Path = '.github/workflows/pull-request-body-identity-cases.json'
+            Syntax = 'json'
+            Invariant =
+                'pull-request-body-identity-cases-preserve-required-coverage'
+            MutationFrom = '"expected": "identity-block-absent"'
+            MutationTo = '"expected": "current"'
+        },
+        [pscustomobject]@{
+            Path = '.github/workflows/pull-request-body-identity.yml'
+            Syntax = 'yaml'
+            Invariant =
+                'pull-request-body-identity-workflow-topology-is-exact'
+            MutationFrom = 'name: Pull Request Body Identity'
+            MutationTo = 'name: Unreviewed Pull Request Body Identity'
+        },
+        [pscustomobject]@{
+            Path = '.github/workflows/workflow-policy-cases.json'
+            Syntax = 'json'
+            Invariant = 'workflow-policy-identity-cases-are-exact'
+            MutationFrom = '"PS-P1-WFPOL-057"'
+            MutationTo = '"PS-P1-WFPOL-056"'
         },
         [pscustomobject]@{
             Path = 'package.json'
@@ -2429,6 +2882,153 @@ if ($SelfTest) {
             -Invariant $objInvariantSpec.Invariant -Text $strMutation `
             -Path $objInvariantSpec.Path `
             -Name "$($objInvariantSpec.Invariant) targeted corruption"
+    }
+    $strIdentityCaseCatalogPath =
+        '.github/workflows/pull-request-body-identity-cases.json'
+    $objMissingIdentityCaseCatalog =
+        & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $hashtableNewInvariantText[$strIdentityCaseCatalogPath] `
+        -Name 'pull request body identity missing-case mutation'
+    $objMissingIdentityCaseCatalog.bodyCases = @(
+        $objMissingIdentityCaseCatalog.bodyCases | Where-Object {
+            $_.id -cne 'check-absent'
+        }
+    )
+    & $scriptblockExpectInvariantRejection `
+        -Invariant `
+            'pull-request-body-identity-cases-preserve-required-coverage' `
+        -Text (ConvertTo-Json -InputObject $objMissingIdentityCaseCatalog `
+            -Depth 8) `
+        -Path $strIdentityCaseCatalogPath `
+        -Name 'pull request body identity required case removal'
+    $strCurrentPolicyValidator = $hashtableNewInvariantText[
+        '.github/workflows/Validate-WorkflowPolicy.mjs'
+    ]
+    $strCurrentPolicyContract = $hashtableNewInvariantText[
+        '.github/workflows/workflow-policy-contract.json'
+    ]
+    $strOldVersionLiteral = "const VALIDATOR_VERSION = '1.2.2';"
+    $strNewVersionLiteral = "const VALIDATOR_VERSION = '1.2.3';"
+    $strOldDigestLiteral =
+        "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';"
+    $strNewDigestLiteral =
+        "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';"
+    $strOldValidatorSha256 =
+        '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9'
+    $strNewValidatorSha256 =
+        'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+    if ($strCurrentPolicyValidator.Contains(
+            $strOldVersionLiteral,
+            [StringComparison]::Ordinal
+        )) {
+        $strCurrentVersionLiteral = $strOldVersionLiteral
+        $strAlternateVersionLiteral = $strNewVersionLiteral
+        $strCurrentDigestLiteral = $strOldDigestLiteral
+        $strAlternateDigestLiteral = $strNewDigestLiteral
+        $strCurrentValidatorSha256 = $strOldValidatorSha256
+        $strAlternateValidatorSha256 = $strNewValidatorSha256
+    }
+    elseif ($strCurrentPolicyValidator.Contains(
+            $strNewVersionLiteral,
+            [StringComparison]::Ordinal
+        )) {
+        $strCurrentVersionLiteral = $strNewVersionLiteral
+        $strAlternateVersionLiteral = $strOldVersionLiteral
+        $strCurrentDigestLiteral = $strNewDigestLiteral
+        $strAlternateDigestLiteral = $strOldDigestLiteral
+        $strCurrentValidatorSha256 = $strNewValidatorSha256
+        $strAlternateValidatorSha256 = $strOldValidatorSha256
+    }
+    else {
+        throw 'The workflow-policy transition fixture has no recognized current tuple.'
+    }
+    $strAlternatePolicyValidator = $strCurrentPolicyValidator.Replace(
+        $strCurrentVersionLiteral,
+        $strAlternateVersionLiteral,
+        [StringComparison]::Ordinal
+    ).Replace(
+        $strCurrentDigestLiteral,
+        $strAlternateDigestLiteral,
+        [StringComparison]::Ordinal
+    )
+    $strAlternatePolicyContract = $strCurrentPolicyContract.Replace(
+        $strCurrentValidatorSha256,
+        $strAlternateValidatorSha256,
+        [StringComparison]::Ordinal
+    )
+    if ($strAlternatePolicyValidator -ceq $strCurrentPolicyValidator -or
+        $strAlternatePolicyContract -ceq $strCurrentPolicyContract) {
+        throw 'The workflow-policy transition fixture did not create an alternate tuple.'
+    }
+    Assert-SemanticInvariant `
+        -Invariant 'workflow-policy-preflight-authenticates-deferred-yaml-import' `
+        -Text $strAlternatePolicyValidator `
+        -Path '.github/workflows/Validate-WorkflowPolicy.mjs'
+    Assert-SemanticInvariant `
+        -Invariant 'workflow-policy-contract-identities-and-structure-are-exact' `
+        -Text $strAlternatePolicyContract `
+        -Path '.github/workflows/workflow-policy-contract.json'
+    Assert-WorkflowPolicyTransitionTuple `
+        -ValidatorText $strCurrentPolicyValidator `
+        -ContractText $strCurrentPolicyContract
+    $arrPolicyTupleMutation = @(
+        [pscustomobject]@{
+            Name = 'synthetic alternate tuple with wrong validator bytes'
+            Validator = $strAlternatePolicyValidator
+            Contract = $strAlternatePolicyContract
+        },
+        [pscustomobject]@{
+            Name = 'changed validator bytes with accepted literals'
+            Validator = $strCurrentPolicyValidator + "`n// unauthorized bytes"
+            Contract = $strCurrentPolicyContract
+        },
+        [pscustomobject]@{
+            Name = 'changed contract identity content'
+            Validator = $strCurrentPolicyValidator
+            Contract = $strCurrentPolicyContract.Replace(
+                '"contractVersion": 1',
+                '"contractVersion": 2',
+                [StringComparison]::Ordinal
+            )
+        },
+        [pscustomobject]@{
+            Name = 'mixed validator version and digest'
+            Validator = $strCurrentPolicyValidator.Replace(
+                $strCurrentVersionLiteral,
+                $strAlternateVersionLiteral,
+                [StringComparison]::Ordinal
+            )
+            Contract = $strCurrentPolicyContract
+        },
+        [pscustomobject]@{
+            Name = 'mismatched validator and contract'
+            Validator = $strCurrentPolicyValidator
+            Contract = $strAlternatePolicyContract
+        },
+        [pscustomobject]@{
+            Name = 'duplicate accepted validator tuples'
+            Validator = $strCurrentPolicyValidator + "`n" +
+                $strAlternatePolicyValidator
+            Contract = $strCurrentPolicyContract
+        }
+    )
+    foreach ($objPolicyTupleMutation in $arrPolicyTupleMutation) {
+        try {
+            Assert-WorkflowPolicyTransitionTuple `
+                -ValidatorText $objPolicyTupleMutation.Validator `
+                -ContractText $objPolicyTupleMutation.Contract
+            throw "Workflow-policy tuple mutation passed: $($objPolicyTupleMutation.Name)"
+        }
+        catch {
+            if ($_.Exception.Message -ceq
+                    "Workflow-policy tuple mutation passed: $($objPolicyTupleMutation.Name)" -or
+                -not $_.Exception.Message.Contains(
+                    'workflow-policy identity transition tuple',
+                    [StringComparison]::Ordinal
+                )) {
+                throw
+            }
+        }
     }
     $objShadowLock = & $script:scriptblockConvertFromStrictJsonHashtable `
         -Text $hashtableNewInvariantText['package-lock.json'] `
@@ -2520,6 +3120,32 @@ if ($SelfTest) {
                 )
             },
             [pscustomobject]@{
+                Path = '.github/workflows/Sync-PullRequestBodyIdentity.mjs'
+                Syntax = 'javascript'
+                Invariants = @(
+                    'pull-request-body-identity-api-termination-is-bounded'
+                )
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/pull-request-body-identity-cases.json'
+                Syntax = 'json'
+                Invariants = @(
+                    'pull-request-body-identity-cases-preserve-required-coverage'
+                )
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/pull-request-body-identity.yml'
+                Syntax = 'yaml'
+                Invariants = @(
+                    'pull-request-body-identity-workflow-topology-is-exact'
+                )
+            },
+            [pscustomobject]@{
+                Path = '.github/workflows/workflow-policy-cases.json'
+                Syntax = 'json'
+                Invariants = @('workflow-policy-identity-cases-are-exact')
+            },
+            [pscustomobject]@{
                 Path = '.pre-commit-config.yaml'
                 Syntax = 'yaml'
                 Invariants = @('pre-commit-actionlint-gate-is-exact')
@@ -2570,7 +3196,13 @@ if ($SelfTest) {
         )
         $listSchemaAllowedPath = [Collections.Generic.List[object]]::new()
         foreach ($objSchemaPath in $arrSchemaPathSpec) {
-            $strSchemaSourcePath = Join-Path $RepositoryRootPath $objSchemaPath.Path
+            $strSchemaBaselinePath =
+                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
+            [void] [IO.Directory]::CreateDirectory(
+                [IO.Path]::GetDirectoryName($strSchemaBaselinePath)
+            )
+            $strSchemaSourcePath =
+                Join-Path $RepositoryRootPath $objSchemaPath.Path
             $arrSchemaBytes = [IO.File]::ReadAllBytes($strSchemaSourcePath)
             $strSchemaBlob = ([string] (& git -C $strSchemaFixtureRoot `
                         hash-object -w -- $strSchemaSourcePath)).Trim()
@@ -2591,11 +3223,6 @@ if ($SelfTest) {
                     syntax = $objSchemaPath.Syntax
                     semantic_invariants = @($objSchemaPath.Invariants)
                 })
-            $strSchemaBaselinePath =
-                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
-            [void] [IO.Directory]::CreateDirectory(
-                [IO.Path]::GetDirectoryName($strSchemaBaselinePath)
-            )
             [IO.File]::WriteAllText(
                 $strSchemaBaselinePath,
                 "baseline placeholder for $($objSchemaPath.Path)`n",
@@ -2606,7 +3233,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-content-exact'
             limits = [ordered]@{
-                maximum_paths = 16
+                maximum_paths = 19
                 maximum_blob_bytes = 573440
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
@@ -2634,9 +3261,11 @@ if ($SelfTest) {
         $strSchemaTrusted = ([string] (& git -C $strSchemaFixtureRoot `
                     rev-parse --verify 'HEAD^{commit}')).Trim()
         foreach ($objSchemaPath in $arrSchemaPathSpec) {
+            $strSchemaCandidatePath =
+                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
             [IO.File]::Copy(
                 (Join-Path $RepositoryRootPath $objSchemaPath.Path),
-                (Join-Path $strSchemaFixtureRoot $objSchemaPath.Path),
+                $strSchemaCandidatePath,
                 $true
             )
         }
@@ -2695,6 +3324,61 @@ if ($SelfTest) {
         & $scriptblockExpectSchemaRejection -Base $strSchemaCandidate `
             -Head $strSchemaCandidate `
             -ExpectedMessage 'base must equal the trusted revision'
+
+        $objOverLimitManifest = ConvertFrom-Json -InputObject (
+            ConvertTo-Json -InputObject $objSchemaManifest -Depth 8
+        )
+        $objOverLimitManifest.authorization_id = 'self-test-path-limit-overflow'
+        $objOverLimitManifest.limits.maximum_paths = 20
+        [IO.File]::WriteAllText(
+            $strSchemaManifestPath,
+            ((ConvertTo-Json -InputObject $objOverLimitManifest -Depth 8) `
+                -replace "`r`n", "`n") + "`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strSchemaFixtureRoot add -- $strAuthorizationPath
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'path limit overflow trusted base'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the path-limit overflow trusted base.'
+        }
+        $strOverLimitTrusted = ([string] (
+                & git -C $strSchemaFixtureRoot rev-parse --verify 'HEAD^{commit}'
+            )).Trim()
+        foreach ($objSchemaPath in $arrSchemaPathSpec) {
+            $strSchemaCandidatePath =
+                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
+            [IO.File]::Copy(
+                (Join-Path $RepositoryRootPath $objSchemaPath.Path),
+                $strSchemaCandidatePath,
+                $true
+            )
+        }
+        & git -C $strSchemaFixtureRoot add -- .
+        & git -C $strSchemaFixtureRoot `
+            -c 'user.name=Trust root schema self-test' `
+            -c 'user.email=trust-root-schema@example.invalid' `
+            -c 'commit.gpgSign=false' `
+            -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'path limit overflow candidate'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the path-limit overflow candidate.'
+        }
+        $strOverLimitHead = ([string] (
+                & git -C $strSchemaFixtureRoot rev-parse --verify 'HEAD^{commit}'
+            )).Trim()
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strOverLimitTrusted
+        & $scriptblockExpectSchemaRejection -Trusted $strOverLimitTrusted `
+            -Base $strOverLimitTrusted -Head $strOverLimitHead `
+            -ExpectedMessage 'authorization limits exceed the trusted verifier limits'
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not restore the trusted schema fixture after path-limit testing.'
+        }
 
         foreach ($strStandaloneProtectedPath in @(
                 '.github/actionlint.yaml',
@@ -2823,9 +3507,11 @@ if ($SelfTest) {
             -c 'core.hooksPath=NUL' `
             commit --quiet --no-gpg-sign -m 'unexpected intermediate path'
         foreach ($objSchemaPath in $arrSchemaPathSpec) {
+            $strSchemaCandidatePath =
+                Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
             [IO.File]::Copy(
                 (Join-Path $RepositoryRootPath $objSchemaPath.Path),
-                (Join-Path $strSchemaFixtureRoot $objSchemaPath.Path),
+                $strSchemaCandidatePath,
                 $true
             )
         }
@@ -2944,7 +3630,7 @@ if ($SelfTest) {
                     parent_commits = @($strTransitionBase)
                 }
                 limits = [ordered]@{
-                    maximum_paths = 16
+                    maximum_paths = 19
                     maximum_blob_bytes = 573440
                     maximum_manifest_bytes = 65536
                 }
@@ -3031,7 +3717,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-same-base-deactivation'
             limits = [ordered]@{
-                maximum_paths = 16
+                maximum_paths = 19
                 maximum_blob_bytes = 573440
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
@@ -3175,7 +3861,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-noncanonical-deactivation-target'
             limits = [ordered]@{
-                maximum_paths = 16
+                maximum_paths = 19
                 maximum_blob_bytes = 573440
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
@@ -3447,6 +4133,10 @@ $setAllowedPaths = [Collections.Generic.HashSet[string]]::new(
 $setAssignedSemanticInvariants = [Collections.Generic.HashSet[string]]::new(
     [StringComparer]::Ordinal
 )
+$dictionaryWorkflowPolicyTransitionText =
+    [Collections.Generic.Dictionary[string, string]]::new(
+        [StringComparer]::Ordinal
+    )
 foreach ($objPath in $arrAllowedPaths) {
     Assert-ExactPropertySet -InputObject $objPath -Name 'An authorized path' `
         -PropertyName @(
@@ -3494,6 +4184,12 @@ foreach ($objPath in $arrAllowedPaths) {
         throw "$strPath has a mismatched SHA-256 value."
     }
     $strText = ConvertFrom-StrictUtf8Text -Bytes $arrBlobBytes -Name $strPath
+    if ($strPath -cin @(
+            '.github/workflows/Validate-WorkflowPolicy.mjs',
+            '.github/workflows/workflow-policy-contract.json'
+        )) {
+        $dictionaryWorkflowPolicyTransitionText[$strPath] = $strText
+    }
     Assert-CandidateSyntax -Syntax $objPath.syntax -Text $strText -Path $strPath
     $arrInvariants = @($objPath.semantic_invariants)
     $boolTransitionManifestPath =
@@ -3538,7 +4234,7 @@ foreach ($objPath in $arrAllowedPaths) {
                 $objCandidateManifest.authorization_id -cne
                     'no-active-trust-root-maintenance' -or
                 $objCandidateManifest.limits.maximum_paths -ne
-                    $intCandidateMaximumPaths -or
+                    $intInactiveManifestMaximumPaths -or
                 $objCandidateManifest.limits.maximum_blob_bytes -ne
                     $intCandidateMaximumBlobBytes -or
                 $objCandidateManifest.limits.maximum_manifest_bytes -ne
@@ -3568,6 +4264,16 @@ foreach ($objPath in $arrAllowedPaths) {
         }
     }
 }
+if ($dictionaryWorkflowPolicyTransitionText.Count -ne 2) {
+    throw 'The authorization lacks the complete workflow-policy transition tuple.'
+}
+Assert-WorkflowPolicyTransitionTuple `
+    -ValidatorText $dictionaryWorkflowPolicyTransitionText[
+        '.github/workflows/Validate-WorkflowPolicy.mjs'
+    ] `
+    -ContractText $dictionaryWorkflowPolicyTransitionText[
+        '.github/workflows/workflow-policy-contract.json'
+    ]
 $arrSupportedSemanticInvariants = @(
     $script:arrSpecialSemanticInvariant
     $script:hashtableSemanticInvariantPattern.Keys
