@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260913.4
+# Version: 1.2.20260913.5
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -129,12 +129,14 @@ $script:hashtableExactTransitionTextIdentity = @{
     'pull-request-body-identity-workflow-topology-is-exact' = @(
         'b006c0ed4cc0dc2391199fe1a49431c06f9a45910db34fe143c2e6df3ada2dd0',
         'ab795c9bbcadecacb4f6f16dbf3d983b492f7069ff11937f6c94c4266abada51',
-        '80be5df430e409ec51e5dac9cd8f10b88f3c49bf5afb35cfdcd7d2a782ce5100'
+        '80be5df430e409ec51e5dac9cd8f10b88f3c49bf5afb35cfdcd7d2a782ce5100',
+        '3cb05907e93698fbd1eeeb732604c41fd56e807e96e31799bafa502f388b8664'
     )
     'workflow-policy-identity-cases-are-exact' = @(
         'c0221ac73687b9eb0cbe83fb21bbef6419f4359420fbdcafff73e36464bbe09e',
         '5a79ee8fcacd64a4a502203957e7f3ca7ad3da34666aa047ad26905ad8ec0d3f',
-        '1b56b84abf049a1c1195cb7f8b2dc88a72e413ebd7c081f7032849290d9f030e'
+        '1b56b84abf049a1c1195cb7f8b2dc88a72e413ebd7c081f7032849290d9f030e',
+        '9ceab2b7fd5b6bfac9fc32b4ab945bd0b25a6fb645fadc5aed0dc1b651adca46'
     )
 }
 $script:objCanonicalJsonOptions =
@@ -1007,6 +1009,15 @@ function Assert-WorkflowPolicyTransitionTuple {
                 '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
             ContractCanonicalSha256 =
                 'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824'
+        },
+        [pscustomobject]@{
+            VersionLiteral = "const VALIDATOR_VERSION = '1.2.6';"
+            DigestLiteral =
+                "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '98ad8ff52efd053a1a0e48a54b7ce388ebba498446130051d34259564faf75d0';"
+            ValidatorSha256 =
+                '481b301a3557680ceef40dcfa15ab3f73bda0ff5d132afc15cd900221180cdc6'
+            ContractCanonicalSha256 =
+                '98ad8ff52efd053a1a0e48a54b7ce388ebba498446130051d34259564faf75d0'
         }
     )
     $intVersionLiteralCount = 0
@@ -1473,6 +1484,11 @@ function Assert-SemanticInvariant {
                 Version = "const VALIDATOR_VERSION = '1.2.4';"
                 Digest =
                     "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824';"
+            },
+            [pscustomobject]@{
+                Version = "const VALIDATOR_VERSION = '1.2.6';"
+                Digest =
+                    "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '98ad8ff52efd053a1a0e48a54b7ce388ebba498446130051d34259564faf75d0';"
             }
         )
         $intVersionLiteralCount = 0
@@ -1650,7 +1666,8 @@ function Assert-SemanticInvariant {
                 ([string] $objContract.validatorIdentity.sha256) -cnotin @(
                     '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9',
                     'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202',
-                    '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
+                    '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb',
+                    '481b301a3557680ceef40dcfa15ab3f73bda0ff5d132afc15cd900221180cdc6'
                 )) {
                 throw 'The workflow validator identity is invalid.'
             }
@@ -2961,11 +2978,25 @@ if ($SelfTest) {
             'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824'
         $strCurrentValidatorSha256 =
             '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
-        $strAlternateVersion = '1.2.3'
+        $strAlternateVersion = '1.2.6'
         $strAlternateDigest =
-            'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb'
+            '98ad8ff52efd053a1a0e48a54b7ce388ebba498446130051d34259564faf75d0'
         $strAlternateValidatorSha256 =
-            'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202'
+            '481b301a3557680ceef40dcfa15ab3f73bda0ff5d132afc15cd900221180cdc6'
+    } elseif ($strCurrentPolicyValidator.Contains(
+            "const VALIDATOR_VERSION = '1.2.6';",
+            [StringComparison]::Ordinal
+        )) {
+        $strCurrentVersion = '1.2.6'
+        $strCurrentDigest =
+            '98ad8ff52efd053a1a0e48a54b7ce388ebba498446130051d34259564faf75d0'
+        $strCurrentValidatorSha256 =
+            '481b301a3557680ceef40dcfa15ab3f73bda0ff5d132afc15cd900221180cdc6'
+        $strAlternateVersion = '1.2.4'
+        $strAlternateDigest =
+            'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824'
+        $strAlternateValidatorSha256 =
+            '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
     } else {
         throw 'The workflow policy validator does not contain an accepted version.'
     }
