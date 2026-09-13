@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260913.5
+# Version: 1.2.20260913.6
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -130,13 +130,15 @@ $script:hashtableExactTransitionTextIdentity = @{
         'b006c0ed4cc0dc2391199fe1a49431c06f9a45910db34fe143c2e6df3ada2dd0',
         'ab795c9bbcadecacb4f6f16dbf3d983b492f7069ff11937f6c94c4266abada51',
         '80be5df430e409ec51e5dac9cd8f10b88f3c49bf5afb35cfdcd7d2a782ce5100',
-        '3cb05907e93698fbd1eeeb732604c41fd56e807e96e31799bafa502f388b8664'
+        '3cb05907e93698fbd1eeeb732604c41fd56e807e96e31799bafa502f388b8664',
+        '472d0e417ac121814c696d4cbde3208adb0e26178ec817bb614b4c14b3201d3e'
     )
     'workflow-policy-identity-cases-are-exact' = @(
         'c0221ac73687b9eb0cbe83fb21bbef6419f4359420fbdcafff73e36464bbe09e',
         '5a79ee8fcacd64a4a502203957e7f3ca7ad3da34666aa047ad26905ad8ec0d3f',
         '1b56b84abf049a1c1195cb7f8b2dc88a72e413ebd7c081f7032849290d9f030e',
-        '9ceab2b7fd5b6bfac9fc32b4ab945bd0b25a6fb645fadc5aed0dc1b651adca46'
+        '9ceab2b7fd5b6bfac9fc32b4ab945bd0b25a6fb645fadc5aed0dc1b651adca46',
+        'b177a2e9ad6aa5362cf2b586739b1bfee82b9a83b30754f43dc4f90509d31418'
     )
 }
 $script:objCanonicalJsonOptions =
@@ -1018,6 +1020,15 @@ function Assert-WorkflowPolicyTransitionTuple {
                 '481b301a3557680ceef40dcfa15ab3f73bda0ff5d132afc15cd900221180cdc6'
             ContractCanonicalSha256 =
                 '98ad8ff52efd053a1a0e48a54b7ce388ebba498446130051d34259564faf75d0'
+        },
+        [pscustomobject]@{
+            VersionLiteral = "const VALIDATOR_VERSION = '1.2.7';"
+            DigestLiteral =
+                "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '0490a0fafe4e58a57990c8286771cec8d6605891d884ff30dc6a1c5193aeff2c';"
+            ValidatorSha256 =
+                '45452a233005379579f8eedf626cadf8b9af7a05767463c4f225ac82524f9791'
+            ContractCanonicalSha256 =
+                '0490a0fafe4e58a57990c8286771cec8d6605891d884ff30dc6a1c5193aeff2c'
         }
     )
     $intVersionLiteralCount = 0
@@ -1489,6 +1500,11 @@ function Assert-SemanticInvariant {
                 Version = "const VALIDATOR_VERSION = '1.2.6';"
                 Digest =
                     "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '98ad8ff52efd053a1a0e48a54b7ce388ebba498446130051d34259564faf75d0';"
+            },
+            [pscustomobject]@{
+                Version = "const VALIDATOR_VERSION = '1.2.7';"
+                Digest =
+                    "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '0490a0fafe4e58a57990c8286771cec8d6605891d884ff30dc6a1c5193aeff2c';"
             }
         )
         $intVersionLiteralCount = 0
@@ -1667,7 +1683,8 @@ function Assert-SemanticInvariant {
                     '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9',
                     'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202',
                     '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb',
-                    '481b301a3557680ceef40dcfa15ab3f73bda0ff5d132afc15cd900221180cdc6'
+                    '481b301a3557680ceef40dcfa15ab3f73bda0ff5d132afc15cd900221180cdc6',
+                    '45452a233005379579f8eedf626cadf8b9af7a05767463c4f225ac82524f9791'
                 )) {
                 throw 'The workflow validator identity is invalid.'
             }
@@ -2968,7 +2985,7 @@ if ($SelfTest) {
         $strAlternateDigest =
             'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824'
         $strAlternateValidatorSha256 =
-            '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
+            '386ed401ec8a348e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
     } elseif ($strCurrentPolicyValidator.Contains(
             "const VALIDATOR_VERSION = '1.2.4';",
             [StringComparison]::Ordinal
@@ -2992,11 +3009,25 @@ if ($SelfTest) {
             '98ad8ff52efd053a1a0e48a54b7ce388ebba498446130051d34259564faf75d0'
         $strCurrentValidatorSha256 =
             '481b301a3557680ceef40dcfa15ab3f73bda0ff5d132afc15cd900221180cdc6'
-        $strAlternateVersion = '1.2.4'
+        $strAlternateVersion = '1.2.7'
         $strAlternateDigest =
-            'd29855fa383bb5ef8255b18a4287e6da45e73814755eafa65dab060d80941824'
+            '0490a0fafe4e58a57990c8286771cec8d6605891d884ff30dc6a1c5193aeff2c'
         $strAlternateValidatorSha256 =
-            '386ed401ec8a3488e8d03a068a38b9fcd965c9f2a158c565a7cb7e20a03c0dbb'
+            '45452a233005379579f8eedf626cadf8b9af7a05767463c4f225ac82524f9791'
+    } elseif ($strCurrentPolicyValidator.Contains(
+            "const VALIDATOR_VERSION = '1.2.7';",
+            [StringComparison]::Ordinal
+        )) {
+        $strCurrentVersion = '1.2.7'
+        $strCurrentDigest =
+            '0490a0fafe4e58a57990c8286771cec8d6605891d884ff30dc6a1c5193aeff2c'
+        $strCurrentValidatorSha256 =
+            '45452a233005379579f8eedf626cadf8b9af7a05767463c4f225ac82524f9791'
+        $strAlternateVersion = '1.2.6'
+        $strAlternateDigest =
+            '98ad8ff52efd053a1a0e48a54b7ce388ebba498446130051d34259564faf75d0'
+        $strAlternateValidatorSha256 =
+            '481b301a3557680ceef40dcfa15ab3f73bda0ff5d132afc15cd900221180cdc6'
     } else {
         throw 'The workflow policy validator does not contain an accepted version.'
     }
