@@ -25,14 +25,16 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.2.2';
+const VALIDATOR_VERSION = '1.2.3';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';
-const MINIMUM_CASE_COUNT = 57;
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';
+const MINIMUM_CASE_COUNT = 83;
+const REQUIRED_IDENTITY_CASE_COUNT = 26;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
+const IDENTITY_WORKFLOW_FILE_NAME = 'pull-request-body-identity.yml';
 // Mapping keys that alias JavaScript object internals. Plain assignment to
 // '__proto__' mutates an object's prototype instead of creating an own property,
 // so these are rejected at the parse boundary and in JSON pointers rather than
@@ -57,6 +59,7 @@ const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 // an ordinary directory or file.
 const POLICY_ROOT = path.resolve(SCRIPT_DIRECTORY, '../..');
 const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
+const WORKFLOW_FILE_NAMES = [...REQUIRED_ARGUMENTS, IDENTITY_WORKFLOW_FILE_NAME];
 const REQUIRED_MARKDOWN_EXTENSIONS = ['md', 'mdc'];
 const REQUIRED_IGNORED_MARKDOWN_DIRECTORIES = ['node_modules', '.git', '.venv'];
 const REQUIRED_RETAINED_MARKDOWN_DOT_DIRECTORIES = ['.github', '.cursor'];
@@ -532,8 +535,16 @@ function validateWorkflowObject(fileName, workflow, rawText, contract) {
   if (workflow.name !== expectedWorkflow.name) {
     fail('workflow-name');
   }
-  expectDeepEqual(workflow.on, contract.workflowPolicy.events, 'workflow-events');
-  expectDeepEqual(workflow.permissions, contract.workflowPolicy.workflowPermissions, 'workflow-permissions');
+  expectDeepEqual(
+    workflow.on,
+    expectedWorkflow.events ?? contract.workflowPolicy.events,
+    'workflow-events',
+  );
+  expectDeepEqual(
+    workflow.permissions,
+    expectedWorkflow.workflowPermissions ?? contract.workflowPolicy.workflowPermissions,
+    'workflow-permissions',
+  );
   expectExactKeys(workflow.jobs, Object.keys(expectedWorkflow.jobs), 'workflow-jobs');
 
   let observedUses = 0;
@@ -565,6 +576,36 @@ function validateWorkflowObject(fileName, workflow, rawText, contract) {
     if (usesLines.length !== observedUses) {
       fail('action-cardinality');
     }
+  }
+  if (fileName === IDENTITY_WORKFLOW_FILE_NAME) {
+    validatePullRequestBodyIdentityPolicy(workflow, rawText);
+  }
+}
+
+function validatePullRequestBodyIdentityPolicy(workflow, rawText) {
+  const job = workflow.jobs.verify_identity;
+  const source = rawText ?? job.steps.map((step) => step.run ?? '').join('\n');
+  if (/\bGITHUB_TOKEN\b|\bACTIONS_RUNTIME_TOKEN\b|github\s*(?:\.|\[)\s*['"]?token|credential\.helper|extraheader|GIT_ASKPASS|\bAuthorization\b|\bBearer\b/iu.test(source)) {
+    fail('identity-credential-policy');
+  }
+  if (source.includes('${{')) {
+    fail('identity-expression-policy');
+  }
+  if (/continue-on-error/iu.test(source)) {
+    fail('identity-failure-policy');
+  }
+  if (/^[ \t]+uses:/gmu.test(source)) {
+    fail('identity-isolation-policy');
+  }
+  if (/--(?:update|generate)\b/iu.test(source)) {
+    fail('identity-mode-policy');
+  }
+  const runs = job.steps.map((step) => step.run ?? '').join('\n');
+  if ((runs.match(/& \$strCurlPath\b/gu) ?? []).length !== 1) {
+    fail('identity-node-policy');
+  }
+  if ((runs.match(/& \$strNodePath \$strTrustedCommandPath\b/gu) ?? []).length !== 2) {
+    fail('identity-command-policy');
   }
 }
 
@@ -858,6 +899,17 @@ function applyOperation(root, operation) {
     const temporary = parent[key];
     parent[key] = other.parent[other.key];
     other.parent[other.key] = temporary;
+  } else if (operation.type === 'replace') {
+    if (
+      typeof parent[key] !== 'string'
+      || typeof operation.from !== 'string'
+      || operation.from.length === 0
+      || typeof operation.to !== 'string'
+      || parent[key].split(operation.from).length - 1 !== 1
+    ) {
+      fail('case-operation');
+    }
+    parent[key] = parent[key].replace(operation.from, operation.to);
   } else {
     fail('case-operation');
   }
@@ -870,11 +922,12 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
   }
   const ids = new Set();
   const semanticKeys = new Set();
+  let identityCases = 0;
   let passed = 0;
   for (const testCase of catalog.cases) {
     if (
       typeof testCase.id !== 'string'
-      || !/^PS-P1-WFPOL-[0-9]{3}$/u.test(testCase.id)
+      || !/^PS-P1-(?:WFPOL|IDPOL)-[0-9]{3}$/u.test(testCase.id)
       || ids.has(testCase.id)
       || typeof testCase.semanticKey !== 'string'
       || !/^[a-z0-9-]+$/u.test(testCase.semanticKey)
@@ -885,6 +938,9 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
     }
     ids.add(testCase.id);
     semanticKeys.add(testCase.semanticKey);
+    if (testCase.id.startsWith('PS-P1-IDPOL-')) {
+      identityCases += 1;
+    }
     if (testCase.domain === 'workflow') {
       if (
         typeof testCase.workflow !== 'string'
@@ -944,7 +1000,7 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
     }
     passed += 1;
   }
-  if (passed < MINIMUM_CASE_COUNT) {
+  if (passed < MINIMUM_CASE_COUNT || identityCases !== REQUIRED_IDENTITY_CASE_COUNT) {
     fail('case-catalog');
   }
   return passed;
@@ -994,7 +1050,7 @@ async function main() {
   const catalog = parseStrictJson(caseCatalogBytes, contract.limits, 'case-json');
 
   const workflows = {};
-  for (const fileName of REQUIRED_ARGUMENTS) {
+  for (const fileName of WORKFLOW_FILE_NAMES) {
     const filePath = path.resolve(process.cwd(), fileName);
     if (filePath !== path.join(SCRIPT_DIRECTORY, fileName)) {
       fail('workflow-path');
@@ -1024,7 +1080,7 @@ async function main() {
     contractCanonicalSha256: sha256(canonicalJson(contractIdentityView(contract))),
     casesPassed: passedCases,
     workflowSha256: Object.fromEntries(
-      REQUIRED_ARGUMENTS.map((fileName) => [fileName, sha256(Buffer.from(workflows[fileName].text, 'utf8'))]),
+      WORKFLOW_FILE_NAMES.map((fileName) => [fileName, sha256(Buffer.from(workflows[fileName].text, 'utf8'))]),
     ),
   };
 }

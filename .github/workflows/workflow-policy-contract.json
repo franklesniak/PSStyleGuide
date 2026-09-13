@@ -136,11 +136,11 @@
   },
   "caseCatalog": {
     "path": "workflow-policy-cases.json",
-    "sha256": "c0221ac73687b9eb0cbe83fb21bbef6419f4359420fbdcafff73e36464bbe09e"
+    "sha256": "5a79ee8fcacd64a4a502203957e7f3ca7ad3da34666aa047ad26905ad8ec0d3f"
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9"
+    "sha256": "ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202"
   },
   "actions": {
     "checkout": {
@@ -254,6 +254,27 @@
               { "kind": "run", "role": "markdownlint.markdownlint.install_dependencies", "name": "Install frozen dependencies", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "1e0dd4669097c7ebc4ac5bdc376efafc8d29ec53d23478a960b8a8bb83ed1b9e" },
               { "kind": "run", "role": "markdownlint.markdownlint.validate_workflow_policy", "name": "Validate workflow policy offline", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "c2304b10b6aa72f6ba227739378cf412f713f21b3443b2ecad0bc5deb27a495b" },
               { "kind": "run", "role": "markdownlint.markdownlint.lint", "name": "Run both Markdown lint surfaces", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "ebf88f0dc100390363457571de315937b2dbe5de733941b2c6904e203cf5c521" }
+            ]
+          }
+        }
+      },
+      "pull-request-body-identity.yml": {
+        "name": "Pull Request Body Identity",
+        "events": {
+          "pull_request_target": {
+            "branches": ["main"],
+            "types": ["edited", "opened", "reopened", "synchronize"]
+          }
+        },
+        "workflowPermissions": {},
+        "jobs": {
+          "verify_identity": {
+            "runsOn": "ubuntu-24.04",
+            "permissions": {},
+            "steps": [
+              { "kind": "run", "role": "pull_request_body_identity.verify_identity.acquire", "name": "Acquire exact pull request head and verified Node.js", "id": "acquire", "shell": "pwsh", "runSha256": "0bb312633b52714e10220b99ffdf0d23ccfe7215b3d2b211887fbf39e1edccb1" },
+              { "kind": "run", "role": "pull_request_body_identity.verify_identity.test_pull_request_body_identity", "name": "Test pull request body identity command", "id": "test_pull_request_body_identity", "shell": "pwsh", "runSha256": "1da1e1bc600de17e14d8813b0bcd64579369ef93ba6fabcacfe69da22eed0172" },
+              { "kind": "run", "role": "pull_request_body_identity.verify_identity.verify_pull_request_body_identity", "name": "Verify pull request body identity", "id": "verify_pull_request_body_identity", "shell": "pwsh", "runSha256": "fe37f056e253ac3fb5d0a40ccda11e40788b8f6477945293a7a38c0f5c255c25" }
             ]
           }
         }

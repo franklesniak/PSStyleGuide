@@ -33,7 +33,7 @@
 # .OUTPUTS
 # [System.Boolean] True only for the exact authorized candidate.
 # .NOTES
-# Version: 1.2.20260904.2
+# Version: 1.2.20260912.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -1025,8 +1025,8 @@ function Assert-SemanticInvariant {
             "import process from 'node:process';",
             "import { fileURLToPath } from 'node:url';",
             "} = await import('yaml'));",
-            "const VALIDATOR_VERSION = '1.2.2';",
-            "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '99bbdec8c80cced95287b50707a70071fe785e0dc5a715bf7439c8d04d5d52d6';",
+            "const VALIDATOR_VERSION = '1.2.3';",
+            "const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'c54d390c79bcd7a17d2acc214ee412d8b40c2eee310c28917df2260837dda9bb';",
             "const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';",
             'function readContractWithoutDependencies() {',
             "path.join(SCRIPT_DIRECTORY, 'workflow-policy-contract.json'),",
@@ -1212,7 +1212,7 @@ function Assert-SemanticInvariant {
             if ($objContract.validatorIdentity.path -cne
                     'Validate-WorkflowPolicy.mjs' -or
                 $objContract.validatorIdentity.sha256 -cne
-                    '33554c001f6613be74db3644aa097e18322c2cf9ab7e064e721006ba456a58a9') {
+                    'ca9b76f363f2f94209cc1e33fe1ea5a61ce6ad2b1fedcafabd5e06e2e65e3202') {
                 throw 'The workflow validator identity is invalid.'
             }
             & $script:scriptblockAssertExactDictionaryKeySet `
@@ -2374,8 +2374,8 @@ if ($SelfTest) {
             Syntax = 'javascript'
             Invariant =
                 'workflow-policy-preflight-authenticates-deferred-yaml-import'
-            MutationFrom = "const VALIDATOR_VERSION = '1.2.2';"
-            MutationTo = "const VALIDATOR_VERSION = '1.2.3';"
+            MutationFrom = "const VALIDATOR_VERSION = '1.2.3';"
+            MutationTo = "const VALIDATOR_VERSION = '1.2.4';"
         },
         [pscustomobject]@{
             Path = '.github/workflows/workflow-policy-contract.json'

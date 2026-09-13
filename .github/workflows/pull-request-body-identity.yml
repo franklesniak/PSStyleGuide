@@ -1,7 +1,7 @@
 name: Pull Request Body Identity
 
 on:
-  pull_request:
+  pull_request_target:
     branches:
       - main
     types:
@@ -15,52 +15,205 @@ permissions: {}
 jobs:
   verify_identity:
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-    env:
-      NODE_VERSION: '24.18.1'
+    permissions: {}
 
     steps:
-      - name: Checkout pull request head
-        id: checkout_pull_request_head
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.sha }}
-          token: ${{ github.token }}
-          persist-credentials: false
-          clean: true
-          fetch-depth: 1
-          fetch-tags: false
-          show-progress: true
-          lfs: false
-          submodules: false
-          set-safe-directory: true
-          allow-unsafe-pr-checkout: false
-
-      - name: Set up Node.js
-        id: setup_node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Verify Node.js runtime
-        id: verify_node_runtime
-        shell: bash
+      - name: Acquire exact pull request head and verified Node.js
+        id: acquire
+        shell: pwsh
         run: |
-          set -euo pipefail
-          test "$(node --version)" = "v${NODE_VERSION}"
+          $ErrorActionPreference = 'Stop'
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
+          }
+
+          $strServerUrl = $env:GITHUB_SERVER_URL
+          $strRepository = $env:GITHUB_REPOSITORY
+          $strEventPath = $env:GITHUB_EVENT_PATH
+          $strWorkflowSha = $env:GITHUB_SHA
+          if ($strServerUrl -cne 'https://github.com') {
+              throw 'acquire: the runner named an unexpected server'
+          }
+          if ($strRepository -cnotmatch '^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$') {
+              throw 'acquire: the triggering repository is not a plain owner/name pair'
+          }
+          if ([string]::IsNullOrEmpty($strEventPath) -or
+              -not [System.IO.File]::Exists($strEventPath)) {
+              throw 'acquire: the pull request event is unavailable'
+          }
+          $objEvent = Get-Content -LiteralPath $strEventPath -Raw |
+              ConvertFrom-Json -Depth 32
+          if ($objEvent.repository.full_name -cne $strRepository -or
+              $objEvent.pull_request.base.repo.full_name -cne $strRepository) {
+              throw 'acquire: the event repository identity is inconsistent'
+          }
+          $strBaseSha = [string]$objEvent.pull_request.base.sha
+          $strHeadRepository = [string]$objEvent.pull_request.head.repo.full_name
+          $strHeadSha = [string]$objEvent.pull_request.head.sha
+          if ($strBaseSha -cnotmatch '^[0-9a-f]{40}$' -or
+              $strWorkflowSha -cne $strBaseSha) {
+              throw 'acquire: the trusted workflow revision is inconsistent'
+          }
+          if ($strHeadRepository -cnotmatch '^[A-Za-z0-9._-]+/[A-Za-z0-9._-]+$') {
+              throw 'acquire: the pull request head repository is invalid'
+          }
+          if ($strHeadSha -cnotmatch '^[0-9a-f]{40}$') {
+              throw 'acquire: the pull request head is not a full commit hash'
+          }
+          if (@([System.IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
+              throw 'acquire: the workspace is not empty'
+          }
+
+          $strResolvedGit = @('/usr/bin/git', '/bin/git') |
+              Where-Object { [System.IO.File]::Exists($_) } |
+              Select-Object -First 1
+          $strResolvedCurl = @('/usr/bin/curl', '/bin/curl') |
+              Where-Object { [System.IO.File]::Exists($_) } |
+              Select-Object -First 1
+          $strResolvedTar = @('/usr/bin/tar', '/bin/tar') |
+              Where-Object { [System.IO.File]::Exists($_) } |
+              Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strResolvedGit) -or
+              [string]::IsNullOrEmpty($strResolvedCurl) -or
+              [string]::IsNullOrEmpty($strResolvedTar)) {
+              throw 'acquire: a required native tool was not resolved'
+          }
+          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant
+          New-Variable -Name strCurlPath -Value $strResolvedCurl -Option Constant
+          New-Variable -Name strTarPath -Value $strResolvedTar -Option Constant
+
+          Get-ChildItem Env: |
+              Where-Object { $_.Name -clike 'GIT_*' } |
+              ForEach-Object { Remove-Item -LiteralPath "Env:$($_.Name)" }
+          $env:GIT_NO_REPLACE_OBJECTS = '1'
+          $env:GIT_OPTIONAL_LOCKS = '0'
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false init --quiet .
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git init exited $LASTEXITCODE" }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false remote add trusted "$strServerUrl/$strRepository"
+          if ($LASTEXITCODE -ne 0) { throw "acquire: trusted remote add exited $LASTEXITCODE" }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false fetch --depth 1 --no-tags --no-recurse-submodules trusted $strBaseSha
+          if ($LASTEXITCODE -ne 0) { throw "acquire: trusted fetch exited $LASTEXITCODE" }
+          $strTrustedRoot = [System.IO.Path]::Combine(
+              $env:RUNNER_TEMP,
+              'pr-body-identity-trusted'
+          )
+          if ([System.IO.Directory]::Exists($strTrustedRoot) -or
+              [System.IO.File]::Exists($strTrustedRoot)) {
+              throw 'acquire: the trusted worktree path is not empty'
+          }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false worktree add --quiet --detach $strTrustedRoot $strBaseSha
+          if ($LASTEXITCODE -ne 0) { throw "acquire: trusted worktree exited $LASTEXITCODE" }
+          $strObservedBase = (& $strGitPath -C $strTrustedRoot --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'HEAD^{commit}').Trim()
+          $arrTrustedEntries = @(& $strGitPath -C $strTrustedRoot --no-replace-objects -c core.fsmonitor=false ls-tree $strObservedBase -- .github/workflows/Sync-PullRequestBodyIdentity.mjs .github/workflows/pull-request-body-identity-cases.json .github/workflows/pull-request-body-identity.yml)
+          if ($LASTEXITCODE -ne 0 -or $strObservedBase -cne $strBaseSha -or
+              $arrTrustedEntries.Count -ne 3 -or
+              @($arrTrustedEntries | Where-Object {
+                  $_ -cnotmatch '^100644 blob [0-9a-f]{40}\t\.github/workflows/(Sync-PullRequestBodyIdentity\.mjs|pull-request-body-identity-cases\.json|pull-request-body-identity\.yml)$'
+              }).Count -ne 0) {
+              throw 'acquire: the trusted verifier inputs are invalid'
+          }
+          $strTrustedCommandPath = [System.IO.Path]::Combine(
+              $strTrustedRoot,
+              '.github',
+              'workflows',
+              'Sync-PullRequestBodyIdentity.mjs'
+          )
+          $strTrustedCasesPath = [System.IO.Path]::Combine(
+              $strTrustedRoot,
+              '.github',
+              'workflows',
+              'pull-request-body-identity-cases.json'
+          )
+          if (-not [System.IO.File]::Exists($strTrustedCommandPath) -or
+              -not [System.IO.File]::Exists($strTrustedCasesPath)) {
+              throw 'acquire: a trusted verifier input is absent'
+          }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false remote add proposed "$strServerUrl/$strHeadRepository"
+          if ($LASTEXITCODE -ne 0) { throw "acquire: proposed remote add exited $LASTEXITCODE" }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false fetch --depth 1 --no-tags --no-recurse-submodules proposed $strHeadSha
+          if ($LASTEXITCODE -ne 0) { throw "acquire: proposed fetch exited $LASTEXITCODE" }
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false checkout --quiet --detach FETCH_HEAD
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }
+          $strObservedHead = (& $strGitPath --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'HEAD^{commit}').Trim()
+          $strObservedTree = (& $strGitPath --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'HEAD^{tree}').Trim()
+          $arrReplacementRefs = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false for-each-ref --format='%(refname)' refs/replace/)
+          if ($LASTEXITCODE -ne 0 -or $strObservedHead -cne $strHeadSha -or
+              $strObservedTree -cnotmatch '^[0-9a-f]{40}$' -or
+              $arrReplacementRefs.Count -ne 0) {
+              throw 'acquire: the checked out revision is not the exact pull request head'
+          }
+          $arrProposedEntries = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false ls-tree $strObservedHead -- .github/workflows/Sync-PullRequestBodyIdentity.mjs .github/workflows/pull-request-body-identity-cases.json .github/workflows/pull-request-body-identity.yml)
+          if ($LASTEXITCODE -ne 0 -or $arrProposedEntries.Count -ne 3 -or
+              [string]::Join("`n", $arrProposedEntries) -cne
+              [string]::Join("`n", $arrTrustedEntries)) {
+              throw 'acquire: a trusted verifier input changed in the proposed head'
+          }
+
+          $strNodeUrl = 'https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz'
+          $strReviewedNodeSha256 = 'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0'
+          $strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'pr-body-identity-node24')
+          $strArchivePath = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'pr-body-identity-node24.tar.xz')
+          & $strCurlPath --silent --show-error --fail --location --proto '=https' --tlsv1.2 --output $strArchivePath $strNodeUrl
+          if ($LASTEXITCODE -ne 0) { throw "acquire: Node download exited $LASTEXITCODE" }
+          $strObservedNodeSha256 = (Get-FileHash -LiteralPath $strArchivePath -Algorithm SHA256).Hash
+          if ($strObservedNodeSha256 -cne $strReviewedNodeSha256) {
+              throw 'acquire: the Node archive does not match the reviewed digest'
+          }
+          [void][System.IO.Directory]::CreateDirectory($strNodeRoot)
+          & $strTarPath -xJf $strArchivePath -C $strNodeRoot --strip-components=1
+          if ($LASTEXITCODE -ne 0) { throw "acquire: Node extraction exited $LASTEXITCODE" }
+          $strNodePath = [System.IO.Path]::Combine($strNodeRoot, 'bin', 'node')
+          if (-not [System.IO.File]::Exists($strNodePath)) {
+              throw 'acquire: the reviewed Node executable is absent'
+          }
+          $strNodeVersion = (& $strNodePath --version).Trim()
+          if ($LASTEXITCODE -ne 0 -or $strNodeVersion -cne 'v24.18.1') {
+              throw 'acquire: the reviewed Node executable has an unexpected version'
+          }
+          Write-Information "acquire: trusted base $strObservedBase, pull request head $strObservedHead tree $strObservedTree, and reviewed Node $strNodeVersion" -InformationAction Continue
 
       - name: Test pull request body identity command
         id: test_pull_request_body_identity
-        shell: bash
-        run: >-
-          node .github/workflows/Sync-PullRequestBodyIdentity.mjs
-          --self-test
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $strNodePath = [System.IO.Path]::Combine(
+              $env:RUNNER_TEMP,
+              'pr-body-identity-node24',
+              'bin',
+              'node'
+          )
+          $strTrustedCommandPath = [System.IO.Path]::Combine(
+              $env:RUNNER_TEMP,
+              'pr-body-identity-trusted',
+              '.github',
+              'workflows',
+              'Sync-PullRequestBodyIdentity.mjs'
+          )
+          & $strNodePath $strTrustedCommandPath --self-test --repository-root $PWD.Path
+          if ($LASTEXITCODE -ne 0) {
+              throw "identity-self-test: command exited $LASTEXITCODE"
+          }
 
       - name: Verify pull request body identity
         id: verify_pull_request_body_identity
-        shell: bash
-        run: >-
-          node .github/workflows/Sync-PullRequestBodyIdentity.mjs
-          --check-event "$GITHUB_EVENT_PATH"
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $strNodePath = [System.IO.Path]::Combine(
+              $env:RUNNER_TEMP,
+              'pr-body-identity-node24',
+              'bin',
+              'node'
+          )
+          $strTrustedCommandPath = [System.IO.Path]::Combine(
+              $env:RUNNER_TEMP,
+              'pr-body-identity-trusted',
+              '.github',
+              'workflows',
+              'Sync-PullRequestBodyIdentity.mjs'
+          )
+          & $strNodePath $strTrustedCommandPath --check-event $env:GITHUB_EVENT_PATH --repository-root $PWD.Path
+          if ($LASTEXITCODE -ne 0) {
+              throw "identity-check: command exited $LASTEXITCODE"
+          }
