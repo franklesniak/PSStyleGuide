@@ -25,13 +25,13 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.2.6';
+const VALIDATOR_VERSION = '1.2.7';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '98ad8ff52efd053a1a0e48a54b7ce388ebba498446130051d34259564faf75d0';
-const MINIMUM_CASE_COUNT = 87;
-const REQUIRED_IDENTITY_CASE_COUNT = 30;
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '0490a0fafe4e58a57990c8286771cec8d6605891d884ff30dc6a1c5193aeff2c';
+const MINIMUM_CASE_COUNT = 96;
+const REQUIRED_IDENTITY_CASE_COUNT = 39;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
 const IDENTITY_WORKFLOW_FILE_NAME = 'pull-request-body-identity.yml';
@@ -601,11 +601,35 @@ function validatePullRequestBodyIdentityPolicy(workflow, rawText) {
     fail('identity-mode-policy');
   }
   const runs = job.steps.map((step) => step.run ?? '').join('\n');
-  if ((runs.match(/& \$strCurlPath\b/gu) ?? []).length !== 1) {
+  if ((runs.match(/& \$strCurlPath\b/gu) ?? []).length !== 2) {
     fail('identity-node-policy');
   }
   if ((runs.match(/& \$strNodePath \$strTrustedCommandPath\b/gu) ?? []).length !== 2) {
     fail('identity-command-policy');
+  }
+  const transferLiterals = [
+    'fetch --filter=blob:none --depth 65 --no-tags --no-recurse-submodules proposed $strHeadSha',
+    "$env:GIT_NO_LAZY_FETCH = '1'",
+    'https://raw.githubusercontent.com/$strHeadRepository/$strHeadSha/$strEscapedPath',
+    '--connect-timeout 15 --max-time 60',
+    '--speed-limit 1024 --speed-time 15',
+    '--max-filesize $longTransferLimit',
+    '--range "0-$MaximumBytes"',
+    '$MaximumBytes -gt 573440',
+    '$Sequence -lt 1 -or $Sequence -gt 24',
+    '$dictionaryProposedBlob.Count -gt 24',
+    '$longMaximumProposedBytes = 12599320',
+    '$longObservedProposedBytes -gt $longMaximumProposedBytes',
+    '$strObservedBlob.Trim() -cne $strTreeBlob',
+    '$strWrittenBlob.Trim() -cne $strTreeBlob',
+  ];
+  if (
+    transferLiterals.some((literal) => !runs.includes(literal))
+    || (runs.match(/hash-object --no-filters/gu) ?? []).length !== 2
+    || (runs.match(/Add-ProposedBlob\b/gu) ?? []).length !== 2
+    || /fetch --depth 65 --no-tags --no-recurse-submodules proposed/gu.test(runs)
+  ) {
+    fail('identity-transfer-policy');
   }
 }
 

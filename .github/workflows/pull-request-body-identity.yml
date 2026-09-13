@@ -87,6 +87,116 @@ jobs:
               ForEach-Object { Remove-Item -LiteralPath "Env:$($_.Name)" }
           $env:GIT_NO_REPLACE_OBJECTS = '1'
           $env:GIT_OPTIONAL_LOCKS = '0'
+
+          function Add-ProposedBlob {
+              [CmdletBinding(PositionalBinding = $false)]
+              [OutputType([long])]
+              param(
+                  [Parameter(Mandatory)][string] $RepositoryPath,
+                  [Parameter(Mandatory)][long] $MaximumBytes,
+                  [Parameter(Mandatory)][int] $Sequence,
+                  [Parameter()][AllowNull()][string] $ExpectedBlob,
+                  [Parameter()][AllowNull()][Nullable[long]] $ExpectedBytes
+              )
+
+              if ([string]::IsNullOrEmpty($RepositoryPath) -or
+                  [System.IO.Path]::IsPathRooted($RepositoryPath) -or
+                  $RepositoryPath.Contains('\', [StringComparison]::Ordinal) -or
+                  $RepositoryPath -match '(^|/)\.\.?(/|$)' -or
+                  $RepositoryPath.IndexOfAny([char[]]@("`0", "`r", "`n", "`t")) -ge 0 -or
+                  $MaximumBytes -lt 0 -or $MaximumBytes -gt 573440 -or
+                  $Sequence -lt 1 -or $Sequence -gt 24 -or
+                  (-not [string]::IsNullOrEmpty($ExpectedBlob) -and
+                      $ExpectedBlob -cnotmatch '^[0-9a-f]{40}$') -or
+                  ($null -ne $ExpectedBytes -and
+                      ($ExpectedBytes -lt 0 -or
+                          $ExpectedBytes -gt $MaximumBytes))) {
+                  throw 'acquire: a proposed blob request is invalid'
+              }
+              $strTreeEntry = [string](& $strGitPath -C $PWD.Path `
+                      --no-replace-objects -c core.fsmonitor=false ls-tree `
+                      $strHeadSha -- $RepositoryPath)
+              if ($LASTEXITCODE -ne 0 -or
+                  $strTreeEntry -cnotmatch '^100644 blob ([0-9a-f]{40})\t(.+)$' -or
+                  $Matches[2] -cne $RepositoryPath -or
+                  (-not [string]::IsNullOrEmpty($ExpectedBlob) -and
+                      $Matches[1] -cne $ExpectedBlob)) {
+                  throw "acquire: $RepositoryPath is not the expected regular blob"
+              }
+              $strTreeBlob = $Matches[1]
+              & $strGitPath -C $PWD.Path --no-replace-objects `
+                  -c core.fsmonitor=false cat-file -e "$strTreeBlob`^{blob}" 2>$null
+              if ($LASTEXITCODE -eq 0) {
+                  return 0
+              }
+              if ($LASTEXITCODE -ne 1 -and $LASTEXITCODE -ne 128) {
+                  throw "acquire: $RepositoryPath blob availability is indeterminate"
+              }
+
+              $strEscapedPath = [string]::Join(
+                  '/',
+                  @($RepositoryPath.Split('/') | ForEach-Object {
+                          [System.Uri]::EscapeDataString($_)
+                      })
+              )
+              $strBlobUrl =
+                  "https://raw.githubusercontent.com/$strHeadRepository/$strHeadSha/$strEscapedPath"
+              $strBlobRoot = [System.IO.Path]::Combine(
+                  $env:RUNNER_TEMP,
+                  'pr-body-identity-proposed-blobs'
+              )
+              [void][System.IO.Directory]::CreateDirectory($strBlobRoot)
+              $strDownloadPath = [System.IO.Path]::Combine(
+                  $strBlobRoot,
+                  "blob-$Sequence.bin"
+              )
+              if ([System.IO.File]::Exists($strDownloadPath) -or
+                  [System.IO.Directory]::Exists($strDownloadPath)) {
+                  throw 'acquire: a proposed blob download path already exists'
+              }
+              $longTransferLimit = $MaximumBytes + 1
+              try {
+                  & $strCurlPath --silent --show-error --fail `
+                      --proto '=https' --tlsv1.2 `
+                      --connect-timeout 15 --max-time 60 `
+                      --speed-limit 1024 --speed-time 15 `
+                      --max-filesize $longTransferLimit `
+                      --range "0-$MaximumBytes" `
+                      --output $strDownloadPath $strBlobUrl
+                  if ($LASTEXITCODE -ne 0 -or
+                      -not [System.IO.File]::Exists($strDownloadPath)) {
+                      throw "acquire: $RepositoryPath bounded download failed"
+                  }
+                  $longObservedBytes =
+                      [System.IO.FileInfo]::new($strDownloadPath).Length
+                  if ($longObservedBytes -gt $MaximumBytes -or
+                      ($null -ne $ExpectedBytes -and
+                          $longObservedBytes -ne $ExpectedBytes)) {
+                      throw "acquire: $RepositoryPath exceeds its byte contract"
+                  }
+                  $strObservedBlob = [string](& $strGitPath -C $PWD.Path `
+                          --no-replace-objects -c core.fsmonitor=false `
+                          hash-object --no-filters $strDownloadPath)
+                  if ($LASTEXITCODE -ne 0 -or
+                      $strObservedBlob.Trim() -cne $strTreeBlob) {
+                      throw "acquire: $RepositoryPath has a mismatched Git blob"
+                  }
+                  $strWrittenBlob = [string](& $strGitPath -C $PWD.Path `
+                          --no-replace-objects -c core.fsmonitor=false `
+                          hash-object --no-filters -w $strDownloadPath)
+                  if ($LASTEXITCODE -ne 0 -or
+                      $strWrittenBlob.Trim() -cne $strTreeBlob) {
+                      throw "acquire: $RepositoryPath could not be stored exactly"
+                  }
+                  return $longObservedBytes
+              }
+              finally {
+                  if ([System.IO.File]::Exists($strDownloadPath)) {
+                      Remove-Item -LiteralPath $strDownloadPath -Force
+                  }
+              }
+          }
+
           & $strGitPath --no-replace-objects -c core.fsmonitor=false init --quiet .
           if ($LASTEXITCODE -ne 0) { throw "acquire: git init exited $LASTEXITCODE" }
           & $strGitPath --no-replace-objects -c core.fsmonitor=false remote add trusted "$strServerUrl/$strRepository"
@@ -130,8 +240,9 @@ jobs:
           }
           & $strGitPath --no-replace-objects -c core.fsmonitor=false remote add proposed "$strServerUrl/$strHeadRepository"
           if ($LASTEXITCODE -ne 0) { throw "acquire: proposed remote add exited $LASTEXITCODE" }
-          & $strGitPath --no-replace-objects -c core.fsmonitor=false fetch --depth 65 --no-tags --no-recurse-submodules proposed $strHeadSha
+          & $strGitPath --no-replace-objects -c core.fsmonitor=false fetch --filter=blob:none --depth 65 --no-tags --no-recurse-submodules proposed $strHeadSha
           if ($LASTEXITCODE -ne 0) { throw "acquire: proposed fetch exited $LASTEXITCODE" }
+          $env:GIT_NO_LAZY_FETCH = '1'
           $strFetchedHead = (& $strGitPath --no-replace-objects -c core.fsmonitor=false rev-parse --verify 'FETCH_HEAD^{commit}').Trim()
           if ($LASTEXITCODE -ne 0 -or $strFetchedHead -cne $strHeadSha) {
               throw 'acquire: the fetched revision is not the exact pull request head'
@@ -160,6 +271,28 @@ jobs:
           $boolVerifierInputsChanged =
               [string]::Join("`n", $arrProposedEntries) -cne
               [string]::Join("`n", $arrTrustedEntries)
+
+          $dictionaryProposedBlob =
+              [Collections.Generic.Dictionary[string, object]]::new(
+                  [StringComparer]::Ordinal
+              )
+          $hashtableIdentitySourceLimit = [ordered]@{
+              '.github/workflows/Generate-StyleGuideArtifacts.ps1' = 262144
+              '.github/workflows/Test-ExactGitPathSet.ps1' = 524288
+              '.github/workflows/build.yml' = 131072
+              '.github/workflows/workflow-policy-contract.json' = 524288
+              '.github/workflows/Validate-WorkflowPolicy.mjs' = 262144
+          }
+          foreach ($objSourceLimit in $hashtableIdentitySourceLimit.GetEnumerator()) {
+              $dictionaryProposedBlob.Add(
+                  [string]$objSourceLimit.Key,
+                  [pscustomobject]@{
+                      MaximumBytes = [long]$objSourceLimit.Value
+                      ExpectedBlob = $null
+                      ExpectedBytes = $null
+                  }
+              )
+          }
           if ($boolVerifierInputsChanged) {
               $strTrustedAuthorizationPath = [System.IO.Path]::Combine(
                   $strTrustedRoot,
@@ -172,6 +305,101 @@ jobs:
                   )) {
                   throw 'acquire: the trusted trust-root verifier is absent'
               }
+              $strTrustedManifestPath = [System.IO.Path]::Combine(
+                  $strTrustedRoot,
+                  '.github',
+                  'workflows',
+                  ('trust-root-' + 'author' + 'ization.json')
+              )
+              if (-not [System.IO.File]::Exists($strTrustedManifestPath) -or
+                  [System.IO.FileInfo]::new($strTrustedManifestPath).Length -gt 65536) {
+                  throw 'acquire: the trusted authorizer manifest is unavailable'
+              }
+              try {
+                  $objTrustedManifest = Get-Content -LiteralPath `
+                      $strTrustedManifestPath -Raw |
+                      ConvertFrom-Json -Depth 32
+              }
+              catch {
+                  throw 'acquire: the trusted authorizer manifest is malformed'
+              }
+              $arrAuthorizedPath = @($objTrustedManifest.allowed_paths)
+              if ($objTrustedManifest.schema_version -notin @(1, 2) -or
+                  $objTrustedManifest.limits.maximum_paths -lt 1 -or
+                  $objTrustedManifest.limits.maximum_paths -gt 19 -or
+                  $objTrustedManifest.limits.maximum_blob_bytes -lt 1 -or
+                  $objTrustedManifest.limits.maximum_blob_bytes -gt 573440 -or
+                  $objTrustedManifest.limits.maximum_manifest_bytes -ne 65536 -or
+                  $arrAuthorizedPath.Count -lt 1 -or
+                  $arrAuthorizedPath.Count -gt
+                      $objTrustedManifest.limits.maximum_paths) {
+                  throw 'acquire: the trusted authorizer transfer plan is invalid'
+              }
+              $setAuthorizedPath =
+                  [Collections.Generic.HashSet[string]]::new(
+                      [StringComparer]::Ordinal
+                  )
+              foreach ($objAuthorizedPath in $arrAuthorizedPath) {
+                  $strAuthorizedPath = [string]$objAuthorizedPath.path
+                  $longAuthorizedBytes = 0
+                  if ([string]::IsNullOrEmpty($strAuthorizedPath) -or
+                      [System.IO.Path]::IsPathRooted($strAuthorizedPath) -or
+                      $strAuthorizedPath.Contains(
+                          '\',
+                          [StringComparison]::Ordinal
+                      ) -or
+                      $strAuthorizedPath -match '(^|/)\.\.?(/|$)' -or
+                      $strAuthorizedPath.IndexOfAny(
+                          [char[]]@("`0", "`r", "`n", "`t")
+                      ) -ge 0 -or
+                      -not $setAuthorizedPath.Add($strAuthorizedPath) -or
+                      $objAuthorizedPath.mode -cne '100644' -or
+                      [string]$objAuthorizedPath.blob -cnotmatch
+                          '^[0-9a-f]{40}$' -or
+                      -not [long]::TryParse(
+                          [string]$objAuthorizedPath.bytes,
+                          [ref]$longAuthorizedBytes
+                      ) -or
+                      $longAuthorizedBytes -lt 0 -or
+                      $longAuthorizedBytes -gt
+                          $objTrustedManifest.limits.maximum_blob_bytes) {
+                      throw 'acquire: an authorized blob transfer is invalid'
+                  }
+                  $dictionaryProposedBlob[$strAuthorizedPath] =
+                      [pscustomobject]@{
+                          MaximumBytes = $longAuthorizedBytes
+                          ExpectedBlob = [string]$objAuthorizedPath.blob
+                          ExpectedBytes = [Nullable[long]]$longAuthorizedBytes
+                      }
+              }
+          }
+
+          $longMaximumProposedBytes = 12599320
+          $longPlannedProposedBytes = 0
+          foreach ($objBlobSpec in $dictionaryProposedBlob.Values) {
+              $longPlannedProposedBytes += $objBlobSpec.MaximumBytes + 1
+          }
+          if ($dictionaryProposedBlob.Count -lt 5 -or
+              $dictionaryProposedBlob.Count -gt 24 -or
+              $longPlannedProposedBytes -gt $longMaximumProposedBytes) {
+              throw 'acquire: the proposed blob transfer plan exceeds its bounds'
+          }
+          $longObservedProposedBytes = 0
+          $intProposedBlobSequence = 0
+          foreach ($objBlobPlan in $dictionaryProposedBlob.GetEnumerator()) {
+              $intProposedBlobSequence++
+              $longObservedProposedBytes += Add-ProposedBlob `
+                  -RepositoryPath $objBlobPlan.Key `
+                  -MaximumBytes $objBlobPlan.Value.MaximumBytes `
+                  -Sequence $intProposedBlobSequence `
+                  -ExpectedBlob $objBlobPlan.Value.ExpectedBlob `
+                  -ExpectedBytes $objBlobPlan.Value.ExpectedBytes
+              if ($longObservedProposedBytes -gt $longMaximumProposedBytes) {
+                  throw 'acquire: proposed blob transfer bytes exceed the total limit'
+              }
+          }
+
+          if ($boolVerifierInputsChanged) {
               $arrAuthorization = @(
                   & $strTrustedAuthorizationPath `
                       -RepositoryRootPath $strTrustedRoot `
