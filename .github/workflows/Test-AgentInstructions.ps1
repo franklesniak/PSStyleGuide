@@ -940,7 +940,8 @@ function Read-GitPublishedEndpointChangedPath {
     # .DESCRIPTION
     # Uses authenticated endpoint trees. A created ref with one authenticated
     # outside-parent boundary compares that boundary tree with the final tree.
-    # Only a genuine root uses the complete final tree.
+    # Only a genuine root uses the complete final tree. A zero-introduction
+    # event has no supported comparison and must use explicit non-applicability.
     #
     # .PARAMETER RepositoryRootPath
     # The absolute path of the trusted Git repository.
@@ -1001,7 +1002,7 @@ function Read-GitPublishedEndpointChangedPath {
         }
     }
     $arrArguments = if ($BaselineAbsent -and $arrIntroducedCommits.Count -eq 0) {
-        return [string[]] @()
+        throw 'A zero-introduction created ref has no content-validation path range.'
     } elseif ($BaselineAbsent -and $arrBoundaries.Count -eq 0) {
         @('-C', $RepositoryRootPath, 'ls-tree', '-r', '-z', '--name-only',
             $FinalRevision)
@@ -4558,9 +4559,7 @@ function Get-CreatedRefBoundaryContext {
     return [pscustomobject]@{
         IntroducedCommitRevisions = @($arrIntroducedCommits | Sort-Object)
         BoundaryRevisions = @($arrBoundaries)
-        EffectiveBaselineRevision = if ($arrIntroducedCommits.Count -eq 0) {
-            $HeadRevision
-        } elseif ($arrBoundaries.Count -eq 1) {
+        EffectiveBaselineRevision = if ($arrBoundaries.Count -eq 1) {
             $arrBoundaries[0]
         } else {
             ''
@@ -4575,16 +4574,13 @@ function Get-CreatedRefMetadataBaselineRevision {
     # Selects the authenticated metadata baseline for one created ref.
     #
     # .DESCRIPTION
-    # Reuses the exact head when the ref introduces no commits, uses the sole
-    # outside-parent boundary for introduced non-root history, returns no
-    # baseline for a genuine root or valid ambiguity. The caller must classify
-    # ambiguity as non-applicable before any content validation can succeed.
+    # Uses the sole outside-parent boundary for introduced non-root history.
+    # Returns no baseline for a genuine root, zero introduction, or valid
+    # ambiguity. The caller must classify zero introduction and ambiguity as
+    # non-applicable before any content validation can succeed.
     #
     # .PARAMETER Context
     # The authenticated context returned by Get-CreatedRefBoundaryContext.
-    #
-    # .PARAMETER HeadRevision
-    # The exact created-ref final commit.
     #
     # .EXAMPLE
     # Get-CreatedRefMetadataBaselineRevision @hashtableArguments
@@ -4596,7 +4592,8 @@ function Get-CreatedRefMetadataBaselineRevision {
     #
     # .OUTPUTS
     # [string] The baseline commit, or an empty string for a genuine root or
-    # valid multi-boundary non-applicability. This is not a content-pass result.
+    # valid zero-introduction or multi-boundary non-applicability. This is not a
+    # content-pass result.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
@@ -4606,8 +4603,7 @@ function Get-CreatedRefMetadataBaselineRevision {
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
-        [Parameter(Mandatory)][pscustomobject] $Context,
-        [Parameter(Mandatory)][string] $HeadRevision
+        [Parameter(Mandatory)][pscustomobject] $Context
     )
 
     $arrIntroduced = @($Context.IntroducedCommitRevisions)
@@ -4622,10 +4618,10 @@ function Get-CreatedRefMetadataBaselineRevision {
     }
     if ($arrIntroduced.Count -eq 0) {
         if ($arrBoundaries.Count -ne 0 -or
-            $strEffectiveBaseline -cne $HeadRevision) {
+            -not [string]::IsNullOrEmpty($strEffectiveBaseline)) {
             throw 'The zero-introduction created-ref metadata context is inconsistent.'
         }
-        return $HeadRevision
+        return ''
     }
     if ($arrBoundaries.Count -eq 1 -and
         $strEffectiveBaseline -ceq $arrBoundaries[0]) {
@@ -7242,8 +7238,15 @@ if ($PublishedBaselineAbsent) {
         -OtherRefEvidenceJson $OtherRefEvidenceJson
     $strCreatedRefMetadataBaselineRevision =
         Get-CreatedRefMetadataBaselineRevision `
-            -Context $objCreatedRefContext `
-            -HeadRevision $PublishedFinalRevision
+            -Context $objCreatedRefContext
+    if (@($objCreatedRefContext.IntroducedCommitRevisions).Count -eq 0) {
+        # Reachability proves no prior content or transition validation. This
+        # branch-only result cannot replace the exact-base PR content gate.
+        Write-Output ('{"schema":"PSStyleGuide.AgentInstructionApplicability.v1",' +
+            '"result":"NOT_APPLICABLE","reason":"created-ref-no-introduced-commits",' +
+            '"requiredGate":"agent-instruction-current-base"}')
+        return
+    }
     if (@($objCreatedRefContext.BoundaryRevisions).Count -gt 1) {
         # No single published baseline exists. This branch push must not emit
         # the ordinary content-pass result or replace the exact-base PR gate.
@@ -10292,15 +10295,22 @@ if ($SelfTest) {
     }
     [string[]] $arrPublishedPathEmptyRevisions = @()
     [string[]] $arrPublishedPathHeadRevision = @($strCheckedOutRevision)
-    $arrNoIntroducedPublishedPaths = @(Read-GitPublishedEndpointChangedPath `
-        -RepositoryRootPath $strRepositoryRootPath `
-        -BaselineRevision '' -FinalRevision $strCheckedOutRevision `
-        -BaselineAbsent $true `
-        -NewRefBoundaryRevision $arrPublishedPathEmptyRevisions `
-        -NewRefIntroducedCommitRevision $arrPublishedPathEmptyRevisions `
-        -MaximumBytes $intGitPathListMaximumBytes)
-    if ($arrNoIntroducedPublishedPaths.Count -ne 0) {
-        throw 'A created ref with no introduced commits reported changed paths.'
+    try {
+        [void] @(Read-GitPublishedEndpointChangedPath `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -BaselineRevision '' -FinalRevision $strCheckedOutRevision `
+            -BaselineAbsent $true `
+            -NewRefBoundaryRevision $arrPublishedPathEmptyRevisions `
+            -NewRefIntroducedCommitRevision $arrPublishedPathEmptyRevisions `
+            -MaximumBytes $intGitPathListMaximumBytes)
+        throw 'A created ref with no introduced commits returned a path comparison.'
+    } catch {
+        if (-not $_.Exception.Message.Contains(
+                'A zero-introduction created ref has no content-validation path range.',
+                [StringComparison]::Ordinal
+            )) {
+            throw
+        }
     }
     $arrRootIntroductionPublishedPaths = @(Read-GitPublishedEndpointChangedPath `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -10416,8 +10426,7 @@ if ($SelfTest) {
         IsGenuineRootIntroduction = $true
     }
     if ((Get-CreatedRefMetadataBaselineRevision `
-            -Context $objRootMetadataContext `
-            -HeadRevision $strCheckedOutRevision) -cne '') {
+            -Context $objRootMetadataContext) -cne '') {
         throw 'A genuine-root introduction did not keep an empty inventory baseline.'
     }
     $objBoundaryMetadataContext = [pscustomobject]@{
@@ -10428,8 +10437,7 @@ if ($SelfTest) {
     }
     $strEffectiveInventoryFixtureRevision =
         Get-CreatedRefMetadataBaselineRevision `
-            -Context $objBoundaryMetadataContext `
-            -HeadRevision $strCheckedOutRevision
+            -Context $objBoundaryMetadataContext
     $arrEffectiveInventoryFixture = @(Read-GitTrackedPath `
             -RepositoryRootPath $strRepositoryRootPath `
             -Revision $strEffectiveInventoryFixtureRevision `

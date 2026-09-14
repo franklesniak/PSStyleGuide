@@ -366,16 +366,27 @@ try {
         -OtherRefEvidenceJson $strRootEvidence
     if (@($objZeroContext.IntroducedCommitRevisions).Count -ne 0 -or
         @($objZeroContext.BoundaryRevisions).Count -ne 0 -or
-        (Get-CreatedRefMetadataBaselineRevision `
-            -Context $objZeroContext -HeadRevision $strRootCommit) -cne
-            $strRootCommit -or
-        @(Read-GitPublishedEndpointChangedPath `
+        -not [string]::IsNullOrEmpty(
+            (Get-CreatedRefMetadataBaselineRevision `
+                -Context $objZeroContext)
+        )) {
+        throw 'The zero-introduced created-ref fixture invented a baseline.'
+    }
+    try {
+        [void] @(Read-GitPublishedEndpointChangedPath `
             -RepositoryRootPath $strTopologyRoot `
             -BaselineRevision ('0' * 40) -FinalRevision $strRootCommit `
             -BaselineAbsent $true -NewRefBoundaryRevision @() `
             -NewRefIntroducedCommitRevision @() `
-            -MaximumBytes $MaximumBytes).Count -ne 0) {
-        throw 'The zero-introduced created-ref fixture widened its baseline.'
+            -MaximumBytes $MaximumBytes)
+        throw 'The zero-introduction path helper returned a content comparison.'
+    } catch {
+        if (-not $_.Exception.Message.Contains(
+                'A zero-introduction created ref has no content-validation path range.',
+                [StringComparison]::Ordinal
+            )) {
+            throw
+        }
     }
     $objZeroFalseContext = Get-CreatedRefBoundaryContext `
         -RepositoryRootPath $strTopologyRoot `
@@ -384,9 +395,10 @@ try {
         -EventHeadDistinct 'false' -PushCommitEvidenceJson '[]' `
         -OtherRefEvidenceJson $strRootEvidence
     if (@($objZeroFalseContext.IntroducedCommitRevisions).Count -ne 0 -or
-        (Get-CreatedRefMetadataBaselineRevision -Context $objZeroFalseContext `
-            -HeadRevision $strRootCommit) -cne $strRootCommit) {
-        throw 'The distinct=false zero-introduction control changed its baseline.'
+        -not [string]::IsNullOrEmpty(
+            (Get-CreatedRefMetadataBaselineRevision -Context $objZeroFalseContext)
+        )) {
+        throw 'The distinct=false zero-introduction control invented a baseline.'
     }
 
     [IO.File]::WriteAllText(
@@ -465,7 +477,7 @@ try {
         @($objOneContext.BoundaryRevisions).Count -ne 1 -or
         $objOneContext.BoundaryRevisions[0] -cne $strRootCommit -or
         (Get-CreatedRefMetadataBaselineRevision `
-            -Context $objOneContext -HeadRevision $strOneCommit) -cne
+            -Context $objOneContext) -cne
             $strRootCommit -or
         $arrOnePaths.Count -ne 1 -or $arrOnePaths[0] -cne 'one.txt') {
         throw 'The one-introduced created-ref fixture found an incorrect boundary.'
@@ -523,7 +535,7 @@ try {
     if (@($objManyContext.IntroducedCommitRevisions).Count -ne 2 -or
         @($objManyContext.BoundaryRevisions).Count -ne 1 -or
         (Get-CreatedRefMetadataBaselineRevision `
-            -Context $objManyContext -HeadRevision $strTwoCommit) -cne
+            -Context $objManyContext) -cne
             $strRootCommit -or
         [string]::Join("`n", $arrManyPaths) -cne "one.txt`ntwo.txt") {
         throw 'The many-introduced created-ref fixture lost changed paths.'
@@ -577,8 +589,7 @@ try {
     if (@($objTransientContext.IntroducedCommitRevisions).Count -ne 4 -or
         @($objTransientContext.BoundaryRevisions).Count -ne 1 -or
         (Get-CreatedRefMetadataBaselineRevision `
-            -Context $objTransientContext `
-            -HeadRevision $strTransientDeleteCommit) -cne $strRootCommit -or
+            -Context $objTransientContext) -cne $strRootCommit -or
         [string]::Join("`n", $arrTransientPaths) -cne "one.txt`ntwo.txt") {
         throw 'A transient created-ref path escaped the published endpoint diff.'
     }
@@ -652,7 +663,7 @@ try {
     }
     if (-not [string]::IsNullOrEmpty(
             (Get-CreatedRefMetadataBaselineRevision `
-                -Context $objMergeContext -HeadRevision $strMergeCommit)
+                -Context $objMergeContext)
         )) {
         throw 'An ambiguous multi-boundary context invented a metadata baseline.'
     }
@@ -698,6 +709,73 @@ try {
         }
     }
 
+    foreach ($strZeroShape in @(
+            'exact-empty-true', 'exact-empty-false', 'exact-payload-false',
+            'ancestor-empty-false', 'ancestor-payload-false'
+        )) {
+        $strZeroOtherCommit = if ($strZeroShape.StartsWith(
+                'ancestor', [StringComparison]::Ordinal
+            )) {
+            $strMergeCommit
+        } else {
+            $strRootCommit
+        }
+        & git -C $strTopologyRoot update-ref `
+            refs/remotes/event/created-other-0000 $strZeroOtherCommit
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not set the zero-introduction other-ref fixture.'
+        }
+        $strZeroOtherEvidence = ConvertTo-Json -Compress -InputObject `
+            ([object[]] @([pscustomobject]@{
+                    ref = 'refs/heads/existing'
+                    object = $strZeroOtherCommit
+                    commit = $strZeroOtherCommit
+                    local_ref = 'refs/remotes/event/created-other-0000'
+                }))
+        $strZeroPayload = if ($strZeroShape.Contains(
+                'payload', [StringComparison]::Ordinal
+            )) {
+            ConvertTo-Json -Depth 4 -Compress -InputObject `
+                ([object[]] @((ConvertTo-CreatedPushCommitEvidenceObject `
+                            -Id $strRootCommit -Distinct $false)))
+        } else {
+            '[]'
+        }
+        $hashtableEntryPointArguments.InputRevision = $strRootCommit
+        $hashtableEntryPointArguments.PublishedFinalRevision = $strRootCommit
+        $hashtableEntryPointArguments.EventHeadRevision = $strRootCommit
+        $hashtableEntryPointArguments.EventHeadDistinct = if ($strZeroShape.EndsWith(
+                'true', [StringComparison]::Ordinal
+            )) {
+            'true'
+        } else {
+            'false'
+        }
+        $hashtableEntryPointArguments.PushCommitEvidenceJson = $strZeroPayload
+        $hashtableEntryPointArguments.OtherRefEvidenceJson = $strZeroOtherEvidence
+        $arrZeroOutput = @(& $strEntryPointPath @hashtableEntryPointArguments)
+        if ($arrZeroOutput.Count -ne 1 -or
+            -not [string]::Equals(
+                $arrZeroOutput[0],
+                '{"schema":"PSStyleGuide.AgentInstructionApplicability.v1","result":"NOT_APPLICABLE","reason":"created-ref-no-introduced-commits","requiredGate":"agent-instruction-current-base"}',
+                [StringComparison]::Ordinal
+            )) {
+            throw "The zero-introduction entry point reported content success: $strZeroShape"
+        }
+        $hashtableEntryPointArguments.InputRevision = $strMergeCommit
+        try {
+            & $strEntryPointPath @hashtableEntryPointArguments
+            throw 'A zero-introduction event accepted a mismatched input revision.'
+        } catch {
+            if (-not $_.Exception.Message.Contains(
+                    'The input revision must match the published final revision.',
+                    [StringComparison]::Ordinal
+                )) {
+                throw
+            }
+        }
+    }
+
     $strRootPayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
         ([object[]] @((ConvertTo-CreatedPushCommitEvidenceObject `
                     -Id $strRootCommit -Distinct $true)))
@@ -717,7 +795,7 @@ try {
     if (-not $objGenuineRootContext.IsGenuineRootIntroduction -or
         -not [string]::IsNullOrEmpty(
             (Get-CreatedRefMetadataBaselineRevision `
-                -Context $objGenuineRootContext -HeadRevision $strRootCommit)
+                -Context $objGenuineRootContext)
         ) -or
         $arrGenuineRootPaths.Count -ne 1 -or
         $arrGenuineRootPaths[0] -cne 'root.txt') {

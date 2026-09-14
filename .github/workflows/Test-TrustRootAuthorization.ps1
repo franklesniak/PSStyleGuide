@@ -2909,6 +2909,28 @@ function Assert-SemanticInvariant {
             '@\(\$arrBoundaries \+ \$arrIntroducedCommits\)\).*?' +
             '\[string\]::IsNullOrEmpty\(\$strRevision\).*?' +
             "throw 'The created-ref path range contains an invalid revision\.'"
+        $strZeroIntroductionRejectionPattern =
+            '(?s)\$arrArguments = if \(\$BaselineAbsent -and ' +
+            '\$arrIntroducedCommits\.Count -eq 0\) \{\s+' +
+            "throw 'A zero-introduction created ref has no content-validation path range\.'"
+        $strZeroIntroductionApplicabilityPattern =
+            '(?s)if \(@\(\$objCreatedRefContext\.IntroducedCommitRevisions\)' +
+            '\.Count -eq 0\) \{.*?' +
+            '"result":"NOT_APPLICABLE","reason":"created-ref-no-introduced-commits",' +
+            '.*?"requiredGate":"agent-instruction-current-base".*?return\s+\}'
+        $strZeroIntroductionAssertionPattern =
+            '(?s)try \{\s+\[void\] @\(Read-GitPublishedEndpointChangedPath.*?' +
+            '-NewRefIntroducedCommitRevision \$arrPublishedPathEmptyRevisions.*?' +
+            "throw 'A created ref with no introduced commits returned a path comparison\.'" +
+            '.*?catch \{\s+if \(-not \$_\.Exception\.Message\.Contains\(\s+' +
+            "'A zero-introduction created ref has no content-validation path range\.'," +
+            '\s+\[StringComparison\]::Ordinal'
+        $boolSupportedZeroIntroductionAssertion =
+            $Text -cmatch
+                'A created ref with no introduced commits reported changed paths\.' -or
+            ($Text -cmatch $strZeroIntroductionRejectionPattern -and
+                $Text -cmatch $strZeroIntroductionApplicabilityPattern -and
+                $Text -cmatch $strZeroIntroductionAssertionPattern)
         if ($arrParseErrors.Count -ne 0 -or
             $Text -cnotmatch $strExplicitCallPattern -or
             $Text -cnotmatch $strHelperValidationPattern -or
@@ -2916,8 +2938,7 @@ function Assert-SemanticInvariant {
                 '(?s)-NewRefBoundaryRevision\s+\$\(' -or
             $Text -cmatch
                 '(?s)-NewRefIntroducedCommitRevision\s+\$\(' -or
-            $Text -cnotmatch
-                'A created ref with no introduced commits reported changed paths\.' -or
+            -not $boolSupportedZeroIntroductionAssertion -or
             $Text -cnotmatch
                 'A zero-boundary created ref returned an incorrect ' +
                 'final-tree path set\.' -or
@@ -3562,6 +3583,37 @@ if ($SelfTest) {
             -Invariant $objInvariantSpec.Invariant -Text $strMutation `
             -Path $objInvariantSpec.Path `
             -Name "$($objInvariantSpec.Invariant) targeted corruption"
+    }
+    $strPublishedPathInvariantSource = $hashtableNewInvariantText[
+        '.github/workflows/Test-AgentInstructions.ps1'
+    ]
+    Assert-SemanticInvariant -Invariant 'published-path-array-binding-is-explicit' `
+        -Text $strPublishedPathInvariantSource `
+        -Path '.github/workflows/Test-AgentInstructions.ps1'
+    foreach ($strPublishedPathMutation in @(
+            'A created ref with no introduced commits returned a path comparison.',
+            'A zero-introduction created ref has no content-validation path range.',
+            'created-ref-no-introduced-commits',
+            '"requiredGate":"agent-instruction-current-base"',
+            '[string[]] $arrPublishedNewRefBoundaryRevisions = @()',
+            "Name = 'null boundary'",
+            "Name = 'empty boundary'",
+            "Name = 'invalid introduced revision'"
+        )) {
+        if (-not $strPublishedPathInvariantSource.Contains(
+                $strPublishedPathMutation, [StringComparison]::Ordinal
+            )) {
+            throw 'A published-path invariant mutation target is absent.'
+        }
+        $strPublishedPathMutationText = $strPublishedPathInvariantSource.Replace(
+            $strPublishedPathMutation, 'removed-invariant-fixture',
+            [StringComparison]::Ordinal
+        )
+        & $scriptblockExpectInvariantRejection `
+            -Invariant 'published-path-array-binding-is-explicit' `
+            -Text $strPublishedPathMutationText `
+            -Path '.github/workflows/Test-AgentInstructions.ps1' `
+            -Name 'published-path required assertion removal'
     }
     $strIdentityCaseCatalogPath =
         '.github/workflows/pull-request-body-identity-cases.json'
@@ -4727,6 +4779,60 @@ if ($SelfTest) {
             -Base $strNoncanonicalTrusted `
             -Head $strNoncanonicalCandidate `
             -ExpectedMessage 'does not land the exact inactive schema 2 manifest'
+
+        # Run only the trusted checkout's CLI. Candidate catalogs stay inert.
+        # This separate deadline does not reduce the Git builder's time budget.
+        $strOrdinaryCliProbe = @'
+import fs from 'node:fs';
+import path from 'node:path';
+import { spawnSync } from 'node:child_process';
+const source = process.argv[1];
+const directory = path.join(source, '.github/workflows');
+const catalog = JSON.parse(fs.readFileSync(path.join(directory, 'workflow-policy-cases.json'), 'utf8'));
+const next = Math.max(...catalog.cases.filter(item => item.id.startsWith('PS-P1-WFPOL-'))
+  .map(item => Number(item.id.slice(-3)))) + 1;
+const rows = [{ catalog, status: 0 }];
+for (const operation of [
+  { type: 'replace', path: '/name', from: 'THIS_NEEDLE_IS_ABSENT', to: 'changed' },
+  { type: 'append', path: '/name', value: 'extra' },
+]) {
+  rows.push({ catalog: { ...catalog, cases: [...catalog.cases, {
+    id: `PS-P1-WFPOL-${String(next).padStart(3, '0')}`,
+    semanticKey: 'ordinary-cli-preparation-self-test', domain: 'workflow',
+    workflow: 'build.yml', operation, expected: false,
+  }] }, status: 1 });
+}
+for (const row of rows) {
+  const child = spawnSync(process.execPath,
+    [path.join(directory, 'Validate-WorkflowPolicy.mjs'), '--ordinary-case-catalog-data'], {
+      input: Buffer.from(JSON.stringify(row.catalog)), encoding: 'utf8',
+      timeout: 10000, maxBuffer: 65536, windowsHide: true,
+    });
+  if (child.error || child.signal || child.status !== row.status) {
+    throw new Error('The ordinary CLI preparation control failed.');
+  }
+  const result = JSON.parse(child.stdout);
+  if (row.status === 0
+    ? result.success !== true || result.casesPassed !== catalog.cases.length || result.mergeApproval !== false
+    : result.success !== false || result.category !== 'case-operation') {
+    throw new Error('The ordinary CLI preparation result is invalid.');
+  }
+}
+process.stdout.write('ordinary-cli-preparation-passed');
+'@
+        $objOrdinaryCliProbe = Invoke-BoundedProcessByte -FileName 'node' `
+            -ArgumentList @('--input-type=module', '-e', $strOrdinaryCliProbe,
+                $RepositoryRootPath) `
+            -MaximumBytes 65536 -TimeoutMilliseconds 35000
+        if ($objOrdinaryCliProbe.ExitCode -ne 0 -or
+            -not [string]::Equals(
+                (ConvertFrom-StrictUtf8Text -Bytes $objOrdinaryCliProbe.Bytes `
+                    -Name 'The ordinary CLI preparation result'),
+                'ordinary-cli-preparation-passed',
+                [StringComparison]::Ordinal
+            )) {
+            throw 'The ordinary CLI preparation self-test failed.'
+        }
 
         # The builder makes inert Git objects. It does not run candidate code.
         $strOrdinaryFixtureBuilder = @'

@@ -1035,6 +1035,98 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
   return passed;
 }
 
+// Only the digest-authenticated catalog may retain historical setup-error
+// tests. New ordinary cases must finish mutation before policy rejection can
+// count as their expected negative result. Do not infer that stage from an
+// error category: categories can be shared or extended by future validators.
+function validateOrdinaryCasePreparation(catalog, trustedCatalog, workflows) {
+  expectExactKeys(catalog, ['schema', 'cases'], 'case-catalog');
+  if (
+    catalog.schema !== trustedCatalog.schema
+    || !Array.isArray(catalog.cases)
+    || catalog.cases.length < trustedCatalog.cases.length
+  ) {
+    fail('ordinary-case-prefix');
+  }
+  for (let index = 0; index < trustedCatalog.cases.length; index += 1) {
+    if (canonicalJson(catalog.cases[index]) !== canonicalJson(trustedCatalog.cases[index])) {
+      fail('ordinary-case-prefix');
+    }
+  }
+  for (const testCase of catalog.cases.slice(trustedCatalog.cases.length)) {
+    if (
+      testCase === null
+      || typeof testCase !== 'object'
+      || Array.isArray(testCase)
+      || testCase.domain !== 'workflow'
+      || testCase.expected !== false
+      || typeof testCase.workflow !== 'string'
+      || !Object.hasOwn(workflows, testCase.workflow)
+      || testCase.operation === null
+      || typeof testCase.operation !== 'object'
+      || Array.isArray(testCase.operation)
+    ) {
+      fail('ordinary-case-shape');
+    }
+    applyOperation(clone(workflows[testCase.workflow].value), testCase.operation);
+  }
+}
+
+function testOrdinaryCasePreparation(catalog, workflows, dependabot, contract) {
+  const nextNumber = Math.max(...catalog.cases
+    .filter((testCase) => testCase.id.startsWith('PS-P1-WFPOL-'))
+    .map((testCase) => Number(testCase.id.slice(-3)))) + 1;
+  const existingKeys = new Set(catalog.cases.map((testCase) => testCase.semanticKey));
+  let semanticKey = 'ordinary-preparation-self-test';
+  for (let suffix = 0; existingKeys.has(semanticKey); suffix += 1) {
+    semanticKey = `ordinary-preparation-self-test-${suffix}`;
+  }
+  const negative = {
+    id: `PS-P1-WFPOL-${String(nextNumber).padStart(3, '0')}`,
+    semanticKey,
+    domain: 'workflow',
+    workflow: 'build.yml',
+    operation: { type: 'set', path: '/permissions', value: { contents: 'write' } },
+    expected: false,
+  };
+  const append = (testCase) => ({ ...catalog, cases: [...catalog.cases, testCase] });
+  const reject = (candidate, category, runOutcomes = false) => {
+    try {
+      validateOrdinaryCasePreparation(candidate, catalog, workflows);
+      if (runOutcomes) runCaseCatalog(candidate, workflows, dependabot, contract);
+    } catch (error) {
+      if (error instanceof PolicyError && error.category === category) return;
+      throw error;
+    }
+    fail('ordinary-case-self-test');
+  };
+  validateOrdinaryCasePreparation(catalog, catalog, workflows);
+  validateOrdinaryCasePreparation(append(negative), catalog, workflows);
+  runCaseCatalog(append(negative), workflows, dependabot, contract);
+  for (const operation of [
+    { type: 'replace', path: '/name', from: 'THIS_NEEDLE_IS_ABSENT', to: 'changed' },
+    { type: 'replace', path: '/name', from: ' ', to: '-' },
+    { type: 'append', path: '/name', value: 'extra' },
+    { type: 'append', path: '/missing-array', value: 'extra' },
+  ]) {
+    reject(append({ ...negative, operation }), 'case-operation');
+  }
+  reject({ ...catalog, cases: catalog.cases.slice(1) }, 'ordinary-case-prefix');
+  const changedPrefix = clone(catalog);
+  changedPrefix.cases[0].expected = !changedPrefix.cases[0].expected;
+  reject(changedPrefix, 'ordinary-case-prefix');
+  const reorderedPrefix = clone(catalog);
+  [reorderedPrefix.cases[0], reorderedPrefix.cases[1]] = [reorderedPrefix.cases[1], reorderedPrefix.cases[0]];
+  reject(reorderedPrefix, 'ordinary-case-prefix');
+  for (const domain of ['contract', 'markdown-contract', 'dependabot']) {
+    reject(append({ ...negative, domain }), 'ordinary-case-shape');
+  }
+  reject(append({ ...negative, expected: true }), 'ordinary-case-shape');
+  reject(append({ ...negative, operation: {
+    type: 'set', path: '/name', value: workflows['build.yml'].value.name,
+  } }), 'case-result', true);
+}
+
 function validateArguments() {
   const args = process.argv.slice(2);
   if (canonicalJson(args) !== canonicalJson(REQUIRED_ARGUMENTS)) {
@@ -1100,6 +1192,7 @@ async function main() {
   validatePackageTuple(contract);
   validateMarkdownEntryPoints(contract);
   validateScriptVersions(contract);
+  testOrdinaryCasePreparation(catalog, workflows, dependabot, contract);
   const passedCases = runCaseCatalog(catalog, workflows, dependabot, contract);
 
   return {
@@ -1174,6 +1267,16 @@ async function validateOrdinaryCaseData() {
     'dependabot-file',
   ), contract.limits).value;
   validateContract(contract);
+  const trustedCaseBytes = readOrdinaryFile(
+    path.join(SCRIPT_DIRECTORY, CASE_CATALOG_FILE_NAME),
+    contract.limits.maximumJsonBytes,
+    'case-file',
+  );
+  if (sha256(trustedCaseBytes) !== contract.caseCatalog.sha256) {
+    fail('case-catalog-identity');
+  }
+  const trustedCatalog = parseStrictJson(trustedCaseBytes, contract.limits, 'case-json');
+  validateOrdinaryCasePreparation(catalog, trustedCatalog, workflows);
   const casesPassed = runCaseCatalog(catalog, workflows, dependabot, contract);
   return {
     schema: 'PSStyleGuide.OrdinaryCaseDataResult.v1',
