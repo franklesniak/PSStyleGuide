@@ -29,7 +29,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.2.20260902.4
+# Version: 1.3.20260914.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -54,28 +54,36 @@ $script:strMaximumMetadataUtcDate = $MaximumMetadataUtcDate
 function ConvertTo-CreatedPushCommitEvidenceObject {
     # .SYNOPSIS
     # Creates one Actions-shaped created-push commit evidence object.
+    #
     # .DESCRIPTION
     # Returns the exact bounded property shape that the created-push evidence
     # parser accepts, with optional timestamp data for focused self-tests.
+    #
     # .PARAMETER Id
     # The full Git object ID used for both commit and tree fixture fields.
+    #
     # .PARAMETER Distinct
     # Whether the fixture commit is distinct from every retained remote ref.
+    #
     # .PARAMETER Timestamp
     # The optional timestamp string included in the inert evidence object.
+    #
     # .EXAMPLE
     # ConvertTo-CreatedPushCommitEvidenceObject -Id $strId -Distinct $true
     #
     # # Returns one bounded created-push evidence fixture.
+    #
     # .INPUTS
     # None. This helper does not accept pipeline input.
+    #
     # .OUTPUTS
     # [System.Management.Automation.PSCustomObject] One evidence fixture object.
+    #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -354,7 +362,7 @@ try {
         -RepositoryRootPath $strTopologyRoot `
         -DestinationRef 'refs/heads/new-zero' `
         -HeadRevision $strRootCommit -EventHeadRevision $strRootCommit `
-        -EventHeadDistinct 'false' -PushCommitEvidenceJson '[]' `
+        -EventHeadDistinct 'true' -PushCommitEvidenceJson '[]' `
         -OtherRefEvidenceJson $strRootEvidence
     if (@($objZeroContext.IntroducedCommitRevisions).Count -ne 0 -or
         @($objZeroContext.BoundaryRevisions).Count -ne 0 -or
@@ -368,6 +376,17 @@ try {
             -NewRefIntroducedCommitRevision @() `
             -MaximumBytes $MaximumBytes).Count -ne 0) {
         throw 'The zero-introduced created-ref fixture widened its baseline.'
+    }
+    $objZeroFalseContext = Get-CreatedRefBoundaryContext `
+        -RepositoryRootPath $strTopologyRoot `
+        -DestinationRef 'refs/heads/new-zero' `
+        -HeadRevision $strRootCommit -EventHeadRevision $strRootCommit `
+        -EventHeadDistinct 'false' -PushCommitEvidenceJson '[]' `
+        -OtherRefEvidenceJson $strRootEvidence
+    if (@($objZeroFalseContext.IntroducedCommitRevisions).Count -ne 0 -or
+        (Get-CreatedRefMetadataBaselineRevision -Context $objZeroFalseContext `
+            -HeadRevision $strRootCommit) -cne $strRootCommit) {
+        throw 'The distinct=false zero-introduction control changed its baseline.'
     }
 
     [IO.File]::WriteAllText(
@@ -623,8 +642,7 @@ try {
                     $objMergeContext.IntroducedCommitRevisions `
                 -MaximumBytes $MaximumBytes)
         throw 'A multi-boundary created-ref path range was accepted.'
-    }
-    catch {
+    } catch {
         if (-not $_.Exception.Message.Contains(
                 'must have one boundary',
                 [StringComparison]::Ordinal
@@ -632,14 +650,48 @@ try {
             throw
         }
     }
-    try {
-        [void] (Get-CreatedRefMetadataBaselineRevision `
+    if (-not [string]::IsNullOrEmpty(
+            (Get-CreatedRefMetadataBaselineRevision `
                 -Context $objMergeContext -HeadRevision $strMergeCommit)
-        throw 'An ambiguous multi-boundary metadata baseline was accepted.'
+        )) {
+        throw 'An ambiguous multi-boundary context invented a metadata baseline.'
     }
-    catch {
+
+    $strEntryPointDirectory = Join-Path $strTopologyRoot '.github/workflows'
+    [void] [IO.Directory]::CreateDirectory($strEntryPointDirectory)
+    $strEntryPointPath = Join-Path $strEntryPointDirectory 'Test-AgentInstructions.ps1'
+    [IO.File]::Copy(
+        (Join-Path $RepositoryRootPath '.github/workflows/Test-AgentInstructions.ps1'),
+        $strEntryPointPath,
+        $true
+    )
+    $hashtableEntryPointArguments = @{
+        InputRevision = $strMergeCommit
+        PublishedBaselineRevision = ('0' * 40)
+        PublishedFinalRevision = $strMergeCommit
+        PublishedBaselineAbsent = $true
+        EventName = 'push'
+        TrustedEventTimestamp = [DateTime]::UtcNow.ToString(
+            'yyyy-MM-ddTHH:mm:ssZ', [Globalization.CultureInfo]::InvariantCulture)
+        DestinationRef = 'refs/heads/new-merge'
+        EventHeadRevision = $strMergeCommit
+        EventHeadDistinct = 'true'
+        PushCommitEvidenceJson = $strMergePayload
+        OtherRefEvidenceJson = $strMergeEvidence
+    }
+    $arrApplicabilityOutput = @(& $strEntryPointPath @hashtableEntryPointArguments)
+    if ($arrApplicabilityOutput.Count -ne 1 -or
+        $arrApplicabilityOutput[0] -cne
+        '{"schema":"PSStyleGuide.AgentInstructionApplicability.v1","result":"NOT_APPLICABLE","reason":"created-ref-ambiguous-baseline","requiredGate":"agent-instruction-current-base"}') {
+        throw 'The ambiguous created-ref entry point did not return only non-applicability.'
+    }
+    $hashtableEntryPointArguments.InputRevision = $strRootCommit
+    try {
+        & $strEntryPointPath @hashtableEntryPointArguments
+        throw 'An inconsistent input revision bypassed the applicability check.'
+    } catch {
         if (-not $_.Exception.Message.Contains(
-                'lacks one unambiguous metadata baseline',
+                'The input revision must match the published final revision.',
                 [StringComparison]::Ordinal
             )) {
             throw
@@ -709,8 +761,7 @@ try {
         if ($objRejectedFixture.Name -ceq 'other-ref drift') {
             & git -C $strTopologyRoot update-ref `
                 refs/remotes/event/created-other-0000 $strOneCommit
-        }
-        else {
+        } else {
             & git -C $strTopologyRoot update-ref `
                 refs/remotes/event/created-other-0000 $strRootCommit
         }
@@ -725,8 +776,7 @@ try {
                 -PushCommitEvidenceJson $objArguments.PushCommitEvidenceJson `
                 -OtherRefEvidenceJson $objArguments.OtherRefEvidenceJson
             throw "Rejected created-ref fixture passed: $($objRejectedFixture.Name)"
-        }
-        catch {
+        } catch {
             $strRejectedMessage = $_.Exception.Message
             if ($strRejectedMessage.StartsWith(
                     'Rejected created-ref fixture passed:',
@@ -766,6 +816,13 @@ try {
         '"url"'
     )
     $arrEvidenceParserRejections = @(
+        [pscustomobject]@{
+            Name = 'valid prefix before malformed final object'
+            Json = $strOnePayload.Substring(0, $strOnePayload.Length - 1) + ',{}]'
+            Head = $strOneCommit
+            Distinct = 'true'
+            Expected = 'invalid object shape'
+        },
         [pscustomobject]@{
             Name = 'malformed JSON'
             Json = '{'
@@ -841,16 +898,18 @@ try {
         }
     )
     foreach ($objParserRejection in $arrEvidenceParserRejections) {
+        $listEvidencePrefix = [Collections.Generic.List[pscustomobject]]::new()
         try {
-            $null = @(
-                Read-CreatedPushCommitEvidence `
-                    -PushCommitEvidenceJson $objParserRejection.Json `
-                    -EventHeadRevision $objParserRejection.Head `
-                    -EventHeadDistinct $objParserRejection.Distinct
-            )
+            Read-CreatedPushCommitEvidence `
+                -PushCommitEvidenceJson $objParserRejection.Json `
+                -EventHeadRevision $objParserRejection.Head `
+                -EventHeadDistinct $objParserRejection.Distinct |
+                ForEach-Object { $listEvidencePrefix.Add($_) }
             throw "Rejected evidence parser fixture passed: $($objParserRejection.Name)"
-        }
-        catch {
+        } catch {
+            if ($listEvidencePrefix.Count -ne 0) {
+                throw 'Rejected commit evidence emitted a partial result.'
+            }
             $strRejectedMessage = $_.Exception.Message
             if ($strRejectedMessage.StartsWith(
                     'Rejected evidence parser fixture passed:',
@@ -900,8 +959,7 @@ try {
                 -EventHeadDistinct 'false'
         )
         throw 'The 2048-object created-push evidence fixture passed.'
-    }
-    catch {
+    } catch {
         if ($_.Exception.Message -ceq
             'The 2048-object created-push evidence fixture passed.') {
             throw
@@ -913,8 +971,7 @@ try {
             throw "The 2048-object fixture returned: $($_.Exception.Message)"
         }
     }
-}
-finally {
+} finally {
     if ([IO.Directory]::Exists($strBoundedFetchClone) -and
         $strBoundedFetchClone.StartsWith(
             $strTempRoot,

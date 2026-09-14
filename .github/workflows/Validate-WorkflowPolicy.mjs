@@ -25,11 +25,11 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.2.8';
+const VALIDATOR_VERSION = '1.3.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = 'd6b5ad4774bbd4fed0608eec3e885d63f9c1b30951aa363a9a3e947a94cd0573';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '6abcc8d32e9c6b7797eab8bb1838b0cc4eec64acd3db26d328ddf05ff7b63fc3';
 const MINIMUM_CASE_COUNT = 99;
 const REQUIRED_IDENTITY_CASE_COUNT = 42;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
@@ -1114,10 +1114,84 @@ async function main() {
   };
 }
 
+// This mode is invoked only after the trusted authorizer binds the exact
+// candidate catalog and fixed-rule tuple. stdin contains inert JSON, never a
+// module path. It validates outcomes with this trusted revision's rules and
+// workflow objects; success is not independent review or merge approval.
+function readOrdinaryCaseInput(maximumBytes) {
+  return new Promise((resolve, reject) => {
+    const bytes = Buffer.alloc(maximumBytes);
+    let length = 0;
+    let settled = false;
+    const finish = (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      process.stdin.removeListener('data', onData);
+      process.stdin.removeListener('end', onEnd);
+      process.stdin.removeListener('error', onError);
+      process.stdin.pause();
+      if (error) reject(error);
+      else resolve(bytes.subarray(0, length));
+    };
+    const onData = (chunk) => {
+      if (chunk.length > maximumBytes - length) {
+        finish(new PolicyError('case-file'));
+        return;
+      }
+      chunk.copy(bytes, length);
+      length += chunk.length;
+    };
+    const onEnd = () => finish();
+    const onError = () => finish(new PolicyError('case-input'));
+    const timer = setTimeout(() => finish(new PolicyError('case-input-timeout')), 30000);
+    process.stdin.on('data', onData);
+    process.stdin.once('end', onEnd);
+    process.stdin.once('error', onError);
+  });
+}
+
+async function validateOrdinaryCaseData() {
+  const contract = readContractWithoutDependencies();
+  verifyValidatorIdentity(contract);
+  verifyPackageDigests(contract);
+  await loadYamlBindings();
+  const bytes = await readOrdinaryCaseInput(contract.limits.maximumJsonBytes);
+  const catalog = parseStrictJson(bytes, contract.limits, 'case-json');
+  const workflows = {};
+  for (const fileName of WORKFLOW_FILE_NAMES) {
+    const workflow = parseStrictYaml(readOrdinaryFile(
+      path.join(SCRIPT_DIRECTORY, fileName),
+      contract.limits.maximumWorkflowBytes,
+      'workflow-file',
+    ), contract.limits);
+    validateWorkflowObject(fileName, workflow.value, workflow.text, contract);
+    workflows[fileName] = workflow;
+  }
+  const dependabot = parseStrictYaml(readOrdinaryFile(
+    path.join(SCRIPT_DIRECTORY, '..', 'dependabot.yml'),
+    contract.limits.maximumWorkflowBytes,
+    'dependabot-file',
+  ), contract.limits).value;
+  validateContract(contract);
+  const casesPassed = runCaseCatalog(catalog, workflows, dependabot, contract);
+  return {
+    schema: 'PSStyleGuide.OrdinaryCaseDataResult.v1',
+    success: true,
+    catalogSha256: sha256(bytes),
+    casesPassed,
+    mergeApproval: false,
+  };
+}
+
 const isPreflight = canonicalJson(process.argv.slice(2)) === canonicalJson(PREFLIGHT_ARGUMENTS);
+const isOrdinaryCaseData = canonicalJson(process.argv.slice(2))
+  === canonicalJson(['--ordinary-case-catalog-data']);
 
 try {
-  process.stdout.write(`${JSON.stringify(isPreflight ? preflight() : await main())}\n`);
+  const result = isPreflight ? preflight()
+    : isOrdinaryCaseData ? await validateOrdinaryCaseData() : await main();
+  process.stdout.write(`${JSON.stringify(result)}\n`);
 } catch (error) {
   const category = error instanceof PolicyError ? error.category : 'tool-failure';
   process.stdout.write(`${JSON.stringify({

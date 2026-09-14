@@ -289,6 +289,27 @@ jobs:
           $boolVerifierInputsChanged =
               [string]::Join("`n", $arrProposedEntries) -cne
               [string]::Join("`n", $arrTrustedEntries)
+          $arrOrdinaryTuplePaths = @(
+              '.github/workflows/workflow-policy-cases.json',
+              '.github/workflows/workflow-policy-contract.json',
+              '.github/workflows/Validate-WorkflowPolicy.mjs'
+          )
+          $arrTrustedOrdinaryEntries = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false ls-tree $strBaseSha -- @arrOrdinaryTuplePaths)
+          if ($LASTEXITCODE -ne 0 -or $arrTrustedOrdinaryEntries.Count -ne 3) {
+              throw 'acquire: the trusted ordinary tuple is unavailable'
+          }
+          $arrProposedOrdinaryEntries = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false ls-tree $strHeadSha -- @arrOrdinaryTuplePaths)
+          if ($LASTEXITCODE -ne 0 -or $arrProposedOrdinaryEntries.Count -ne 3) {
+              throw 'acquire: the proposed ordinary tuple is unavailable'
+          }
+          foreach ($strOrdinaryEntry in @($arrTrustedOrdinaryEntries) + @($arrProposedOrdinaryEntries)) {
+              if ($strOrdinaryEntry -cnotmatch '^100644 blob [0-9a-f]{40}\t\.github/workflows/(workflow-policy-cases\.json|workflow-policy-contract\.json|Validate-WorkflowPolicy\.mjs)$') {
+                  throw 'acquire: an ordinary tuple input is not a regular blob'
+              }
+          }
+          $boolOrdinaryTupleChanged =
+              [string]::Join("`n", $arrProposedOrdinaryEntries) -cne
+              [string]::Join("`n", $arrTrustedOrdinaryEntries)
 
           $dictionaryProposedBlob =
               [Collections.Generic.Dictionary[string, object]]::new(
@@ -311,7 +332,7 @@ jobs:
                   }
               )
           }
-          if ($boolVerifierInputsChanged) {
+          if ($boolVerifierInputsChanged -or $boolOrdinaryTupleChanged) {
               $strTrustedAuthorizationPath = [System.IO.Path]::Combine(
                   $strTrustedRoot,
                   '.github',
@@ -342,16 +363,31 @@ jobs:
                   throw 'acquire: the trusted authorizer manifest is malformed'
               }
               $arrAuthorizedPath = @($objTrustedManifest.allowed_paths)
+              $strManifestDigest = (Get-FileHash -LiteralPath `
+                      $strTrustedManifestPath -Algorithm SHA256).Hash.ToLowerInvariant()
+              $boolOrdinaryContentPlan = $strManifestDigest -ceq
+                  'd30601d4b8c40672ac9e91414b88a88efcb50a32e168c473a128549fdf2d65f4'
               if ($objTrustedManifest.schema_version -notin @(1, 2) -or
                   $objTrustedManifest.limits.maximum_paths -lt 1 -or
                   $objTrustedManifest.limits.maximum_paths -gt 19 -or
                   $objTrustedManifest.limits.maximum_blob_bytes -lt 1 -or
                   $objTrustedManifest.limits.maximum_blob_bytes -gt 573440 -or
                   $objTrustedManifest.limits.maximum_manifest_bytes -ne 65536 -or
-                  $arrAuthorizedPath.Count -lt 1 -or
+                  ($arrAuthorizedPath.Count -lt 1 -and -not $boolOrdinaryContentPlan) -or
                   $arrAuthorizedPath.Count -gt
                       $objTrustedManifest.limits.maximum_paths) {
                   throw 'acquire: the trusted authorizer transfer plan is invalid'
+              }
+              if ($boolOrdinaryContentPlan) {
+                  # A permanent closed data domain, not a grant. The trusted
+                  # authorizer rejects every other endpoint and history path.
+                  $dictionaryProposedBlob[
+                      '.github/workflows/workflow-policy-cases.json'
+                  ] = [pscustomobject]@{
+                      MaximumBytes = 524288
+                      ExpectedBlob = $null
+                      ExpectedBytes = $null
+                  }
               }
               $setAuthorizedPath =
                   [Collections.Generic.HashSet[string]]::new(
@@ -417,7 +453,7 @@ jobs:
               }
           }
 
-          if ($boolVerifierInputsChanged) {
+          if ($boolVerifierInputsChanged -or $boolOrdinaryTupleChanged) {
               $arrAuthorization = @(
                   & $strTrustedAuthorizationPath `
                       -RepositoryRootPath $strTrustedRoot `

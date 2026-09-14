@@ -136,11 +136,11 @@
   },
   "caseCatalog": {
     "path": "workflow-policy-cases.json",
-    "sha256": "8598d3495776cf410260df595771b73a83b19ee8ad08debf6ec3def92f456cf5"
+    "sha256": "c2263636cca2d24bb79e71c7e7cd369665422dcf051867540311c3cb59adc0ee"
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "df9e8a124fcd62996b0d2e70571042deeaf9e248c0b9150850378271c974606c"
+    "sha256": "158183c40cea7748ede38aabb218eea7a3bb241e4548042563c47425a7e8efdc"
   },
   "actions": {
     "checkout": {
@@ -272,7 +272,7 @@
             "runsOn": "ubuntu-24.04",
             "permissions": {},
             "steps": [
-              { "kind": "run", "role": "pull_request_body_identity.verify_identity.acquire", "name": "Acquire exact pull request head and verified Node.js", "id": "acquire", "shell": "pwsh", "runSha256": "963fba2c77a4403cf310cbc3578421c757da32dbe35c4d85bcb453cb9ec5c954" },
+              { "kind": "run", "role": "pull_request_body_identity.verify_identity.acquire", "name": "Acquire exact pull request head and verified Node.js", "id": "acquire", "shell": "pwsh", "runSha256": "3727c9aa6403b3799047aea547c67a35eb78b7713caafb03c552b0b2744b1f6a" },
               { "kind": "run", "role": "pull_request_body_identity.verify_identity.test_pull_request_body_identity", "name": "Test pull request body identity command", "id": "test_pull_request_body_identity", "shell": "pwsh", "runSha256": "1da1e1bc600de17e14d8813b0bcd64579369ef93ba6fabcacfe69da22eed0172" },
               { "kind": "run", "role": "pull_request_body_identity.verify_identity.verify_pull_request_body_identity", "name": "Verify pull request body identity", "id": "verify_pull_request_body_identity", "shell": "pwsh", "runSha256": "fe37f056e253ac3fb5d0a40ccda11e40788b8f6477945293a7a38c0f5c255c25" }
             ]

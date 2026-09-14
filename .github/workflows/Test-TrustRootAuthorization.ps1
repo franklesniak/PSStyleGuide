@@ -1,5 +1,6 @@
 # .SYNOPSIS
 # Validates one bounded trust-root maintenance candidate as inert Git data.
+#
 # .DESCRIPTION
 # Reads the authorization manifest only from the authenticated trusted revision.
 # Schema 2 authorizes exact content on a descendant of that revision without an
@@ -7,33 +8,46 @@
 # manifest to the canonical inactive schema 2 manifest. Schema 1 is retained
 # only to bootstrap schema 2. Candidate blobs are decoded and parsed, but never
 # sourced, imported, invoked, built, or executed.
-# The inactive candidate revision records completion of that one-way authority.
+# The canonical inactive manifest also permits the closed ordinary workflow-policy
+# content domain. That result validates content shape, not independent review or
+# merge readiness. The exact-input CI, review and quality lifecycle remains required.
+#
 # .PARAMETER RepositoryRootPath
 # The trusted repository worktree.
+#
 # .PARAMETER TrustedRevision
 # The exact checked-out default-branch commit that owns the verifier and manifest.
+#
 # .PARAMETER BaseRevision
 # The event base. Schema 2 requires this commit to equal TrustedRevision.
+#
 # .PARAMETER HeadRevision
 # The descendant candidate head, or the exact schema 1 transition head.
+#
 # .PARAMETER AuthorizationApplicabilityOnly
 # When this switch is set, the script checks only whether the authorization
 # applies to the candidate. It returns one Boolean value and does not perform
 # the full authorization validation.
+#
 # .PARAMETER SelfTest
 # Runs focused verifier helper tests and returns before authorization evaluation.
+#
 # .PARAMETER AuthorizationManifestPath
 # The fixed trusted-revision authorization path.
+#
 # .EXAMPLE
 # ./Test-TrustRootAuthorization.ps1 @hashtableArguments
 #
 # # Validates a bounded candidate and writes one Boolean result.
+#
 # .INPUTS
 # None. This script does not accept pipeline input.
+#
 # .OUTPUTS
-# [System.Boolean] True only for the exact authorized candidate.
+# [System.Boolean] True for a bounded content-valid candidate, not merge approval.
+#
 # .NOTES
-# Version: 1.2.20260913.7
+# Version: 1.3.20260914.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -58,6 +72,8 @@ $intCandidateMaximumCommits = 64
 $strObjectIdPattern = '^[0-9a-f]{40}$'
 $strAuthorizationPath = '.github/workflows/trust-root-authorization.json'
 $strVerifierPath = '.github/workflows/Test-TrustRootAuthorization.ps1'
+$script:dictionaryPolicyReferenceText =
+    [Collections.Generic.Dictionary[string, string]]::new([StringComparer]::Ordinal)
 $arrTrustRootPaths = @(
     '.gitattributes',
     '.github/.gitattributes',
@@ -75,6 +91,8 @@ $arrTrustRootPaths = @(
     '.github/workflows/pull-request-body-identity-cases.json',
     '.github/workflows/pull-request-body-identity.yml',
     '.github/workflows/workflow-policy-cases.json',
+    '.github/workflows/workflow-policy-contract.json',
+    '.github/workflows/Validate-WorkflowPolicy.mjs',
     '.pre-commit-config.yaml'
 )
 $script:arrSpecialSemanticInvariant = @(
@@ -173,7 +191,7 @@ $script:hashtableSemanticInvariantPattern = @{
     'extracted-self-test-is-invoked' =
         '& \(Join-Path \$strRepositoryRootPath \$strExtractedSelfTestPath\)'
     'extracted-self-test-version-and-topology' =
-        '(?s)# Version: 1\.2\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext'
+        '(?s)# Version: 1\.3\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext'
     'new-ref-boundary-cap-is-64' =
         '\$intMetadataMaximumBoundaries = 64'
     'pr-merge-bases-use-all-and-cap' =
@@ -244,31 +262,40 @@ $script:hashtableSemanticInvariantPattern = @{
 function Invoke-BoundedProcessByte {
     # .SYNOPSIS
     # Runs one process with bounded output and execution time.
+    #
     # .DESCRIPTION
     # Starts the requested executable without a shell, captures standard output
     # as bytes, captures bounded error text, and stops on size or time overflow.
+    #
     # .PARAMETER FileName
     # The executable name or absolute executable path.
+    #
     # .PARAMETER ArgumentList
     # The exact ordered arguments supplied without shell interpolation.
+    #
     # .PARAMETER MaximumBytes
     # The positive maximum permitted standard-output byte count.
+    #
     # .PARAMETER TimeoutMilliseconds
     # The process time limit in milliseconds.
+    #
     # .EXAMPLE
     # Invoke-BoundedProcessByte -FileName 'git' -ArgumentList $arrArgs `
     #     -MaximumBytes 1024
     #
     # # Returns the exit code, output bytes, and bounded error text.
+    #
     # .INPUTS
     # None. This helper does not accept pipeline input.
+    #
     # .OUTPUTS
     # [System.Management.Automation.PSCustomObject] One bounded process result.
+    #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -347,28 +374,36 @@ function Invoke-BoundedProcessByte {
 function ConvertFrom-StrictUtf8Text {
     # .SYNOPSIS
     # Decodes bytes as strict UTF-8 text.
+    #
     # .DESCRIPTION
     # Rejects a byte-order mark, prohibited control bytes, carriage returns,
     # and invalid UTF-8 before returning decoded text.
+    #
     # .PARAMETER Bytes
     # The byte sequence to validate and decode. An empty sequence is permitted.
+    #
     # .PARAMETER Name
     # The diagnostic name for the byte sequence.
+    #
     # .PARAMETER AllowNul
     # Permits NUL separators for bounded Git path-list output.
+    #
     # .EXAMPLE
     # ConvertFrom-StrictUtf8Text -Bytes $arrBytes -Name 'manifest'
     #
     # # Returns strict decoded text.
+    #
     # .INPUTS
     # None. This helper does not accept pipeline input.
+    #
     # .OUTPUTS
     # [System.String] The decoded text.
+    #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -391,8 +426,7 @@ function ConvertFrom-StrictUtf8Text {
     }
     try {
         return [Text.UTF8Encoding]::new($false, $true).GetString($Bytes)
-    }
-    catch {
+    } catch {
         throw "$Name is not strict UTF-8."
     }
 }
@@ -400,30 +434,38 @@ function ConvertFrom-StrictUtf8Text {
 function Read-GitBlobByte {
     # .SYNOPSIS
     # Reads one exact Git blob within a byte limit.
+    #
     # .DESCRIPTION
     # Verifies the object size before reading it. A verified zero-byte blob
     # returns an explicit empty byte array without calling the positive-limit
     # process helper.
+    #
     # .PARAMETER RepositoryRootPath
     # The repository that contains the blob object.
+    #
     # .PARAMETER BlobId
     # The full exact Git blob object ID.
+    #
     # .PARAMETER MaximumBytes
     # The maximum permitted blob byte count, including zero.
+    #
     # .EXAMPLE
     # Read-GitBlobByte -RepositoryRootPath $strRoot -BlobId $strBlob `
     #     -MaximumBytes 65536
     #
     # # Returns the exact blob bytes.
+    #
     # .INPUTS
     # None. This helper does not accept pipeline input.
+    #
     # .OUTPUTS
     # [System.Byte] Zero or more bytes from the exact blob.
+    #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([byte])]
     param(
@@ -458,24 +500,30 @@ function Read-GitBlobByte {
 function Assert-NoDuplicateJsonProperty {
     # .SYNOPSIS
     # Rejects duplicate JSON object properties recursively.
+    #
     # .DESCRIPTION
     # Walks one parsed JSON element and throws when an object contains the same
     # property name more than once under ordinal comparison.
+    #
     # .PARAMETER Element
     # The JSON element to inspect recursively.
+    #
     # .EXAMPLE
     # Assert-NoDuplicateJsonProperty -Element $objDocument.RootElement
     #
     # # Returns only when the JSON property inventory is unique.
+    #
     # .INPUTS
     # None. This helper does not accept pipeline input.
+    #
     # .OUTPUTS
     # None. This helper returns no output.
+    #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][System.Text.Json.JsonElement] $Element)
@@ -490,8 +538,7 @@ function Assert-NoDuplicateJsonProperty {
             }
             Assert-NoDuplicateJsonProperty -Element $objProperty.Value
         }
-    }
-    elseif ($Element.ValueKind -eq [System.Text.Json.JsonValueKind]::Array) {
+    } elseif ($Element.ValueKind -eq [System.Text.Json.JsonValueKind]::Array) {
         foreach ($objItem in $Element.EnumerateArray()) {
             Assert-NoDuplicateJsonProperty -Element $objItem
         }
@@ -501,29 +548,37 @@ function Assert-NoDuplicateJsonProperty {
 function Assert-ExactPropertySet {
     # .SYNOPSIS
     # Requires one object to have an exact property set.
+    #
     # .DESCRIPTION
     # Compares actual and expected property names with ordinal values after
     # sorting and throws when a property is missing or unexpected.
+    #
     # .PARAMETER InputObject
     # The object whose properties are inspected.
+    #
     # .PARAMETER PropertyName
     # The complete expected property-name set.
+    #
     # .PARAMETER Name
     # The diagnostic name for the inspected object.
+    #
     # .EXAMPLE
     # Assert-ExactPropertySet -InputObject $objValue `
     #     -PropertyName @('a', 'b') -Name 'value'
     #
     # # Returns only when the property set is exact.
+    #
     # .INPUTS
     # None. This helper does not accept pipeline input.
+    #
     # .OUTPUTS
     # None. This helper returns no output.
+    #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -580,11 +635,9 @@ $script:scriptblockConvertFromStrictJsonHashtable = {
             throw "$Name must be one JSON object."
         }
         return $objValue
-    }
-    catch {
+    } catch {
         throw "$Name is malformed JSON."
-    }
-    finally {
+    } finally {
         if ($null -ne $objJsonDocument) {
             $objJsonDocument.Dispose()
         }
@@ -616,7 +669,7 @@ $script:scriptblockAssertExactDictionaryKeySet = {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260903.0.
+    # Version: 1.1.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -630,8 +683,9 @@ $script:scriptblockAssertExactDictionaryKeySet = {
     [Array]::Sort($arrActual, [StringComparer]::Ordinal)
     [Array]::Sort($arrExpected, [StringComparer]::Ordinal)
     if ($arrActual.Count -ne $arrExpected.Count -or
-        [string]::Join("`n", $arrActual) -cne
-            [string]::Join("`n", $arrExpected)) {
+        -not [StringComparer]::Ordinal.Equals(
+            [string]::Join("`n", $arrActual),
+            [string]::Join("`n", $arrExpected))) {
         throw "$Name has an unexpected key set."
     }
 }
@@ -656,7 +710,7 @@ $script:scriptblockConvertToCanonicalJsonText = {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260913.0.
+    # Version: 1.1.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter()][AllowNull()][object] $Value)
@@ -727,7 +781,7 @@ $script:scriptblockConvertToCanonicalJsonText = {
     if ($Value -is [Collections.IDictionary]) {
         $arrKeys = [string[]] @($Value.Keys)
         [Array]::Sort($arrKeys, [StringComparer]::Ordinal)
-        $arrMembers = foreach ($strKey in $arrKeys) {
+        $arrMembers = @(foreach ($strKey in $arrKeys) {
             $strEncodedKey = [System.Text.Json.JsonSerializer]::Serialize(
                 [object] ([string] $strKey),
                 [string],
@@ -737,14 +791,14 @@ $script:scriptblockConvertToCanonicalJsonText = {
                 & $script:scriptblockConvertToCanonicalJsonText `
                     -Value $Value[$strKey]
             $strEncodedKey + ':' + $strEncodedValue
-        }
+        })
         return '{' + [string]::Join(',', [string[]] $arrMembers) + '}'
     }
     if ($Value -is [Collections.IEnumerable] -and
         $Value -isnot [string]) {
-        $arrItems = foreach ($objItem in $Value) {
+        $arrItems = @(foreach ($objItem in $Value) {
             & $script:scriptblockConvertToCanonicalJsonText -Value $objItem
-        }
+        })
         return '[' + [string]::Join(',', [string[]] $arrItems) + ']'
     }
     if ($Value -is [string]) {
@@ -777,28 +831,36 @@ $script:scriptblockConvertToCanonicalJsonText = {
 function Assert-CandidateSyntax {
     # .SYNOPSIS
     # Validates candidate text for its declared syntax class.
+    #
     # .DESCRIPTION
     # Parses PowerShell, JavaScript, YAML, or JSON candidate text with trusted
     # parsers. Markdown is accepted as inert text, and unknown classes fail.
+    #
     # .PARAMETER Syntax
     # The declared syntax class: powershell, javascript, yaml, or markdown.
+    #
     # .PARAMETER Text
     # The strict UTF-8 candidate text to parse.
+    #
     # .PARAMETER Path
     # The repository-relative path used in diagnostics and parser context.
+    #
     # .EXAMPLE
     # Assert-CandidateSyntax -Syntax 'powershell' -Text $strText -Path $strPath
     #
     # # Returns only when the declared syntax is valid.
+    #
     # .INPUTS
     # None. This helper does not accept pipeline input.
+    #
     # .OUTPUTS
     # None. This helper returns no output.
+    #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -901,11 +963,9 @@ process.stdin.on('end', () => {
             $objJsonDocument = [System.Text.Json.JsonDocument]::Parse($Text)
             Assert-NoDuplicateJsonProperty -Element $objJsonDocument.RootElement
             [void] (ConvertFrom-Json -InputObject $Text -AsHashtable)
-        }
-        catch {
+        } catch {
             throw "$Path has invalid JSON syntax."
-        }
-        finally {
+        } finally {
             if ($null -ne $objJsonDocument) {
                 $objJsonDocument.Dispose()
             }
@@ -917,29 +977,569 @@ process.stdin.on('end', () => {
     }
 }
 
-function Assert-WorkflowPolicyTransitionTuple {
+function Assert-OrdinaryWorkflowPolicyContent {
     # .SYNOPSIS
-    # Validates one complete workflow-policy identity transition tuple.
-    # .DESCRIPTION
-    # Accepts exactly the current tuple or the intended next tuple across the
-    # validator and contract. Rejects mixed, missing, and duplicate tuples.
-    # .PARAMETER ValidatorText
-    # The strict UTF-8 workflow-policy validator source text.
-    # .PARAMETER ContractText
-    # The strict UTF-8 workflow-policy contract source text.
-    # .EXAMPLE
-    # Assert-WorkflowPolicyTransitionTuple @hashtableArguments
+    # Validates the closed ordinary workflow-policy tuple as inert Git data.
     #
-    # # Validates the cross-file identity tuple or throws.
+    # .DESCRIPTION
+    # Preserves every executable rule and existing case. Accepts sequential
+    # negative workflow fixtures, a derived identity tuple, the next patch
+    # version and inert trailing line comments. Audits the complete history.
+    # This shape check does not assert test results or authorize a merge.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute trusted repository path.
+    #
+    # .PARAMETER TrustedRevision
+    # The authenticated base commit that supplies every admission rule.
+    #
+    # .PARAMETER HeadRevision
+    # The exact descendant candidate commit to inspect without checkout.
+    #
+    # .EXAMPLE
+    # Assert-OrdinaryWorkflowPolicyContent @hashtableArguments
+    #
+    # # Returns no output when the complete candidate shape is valid.
+    #
     # .INPUTS
     # None. This helper does not accept pipeline input.
+    #
     # .OUTPUTS
-    # None. This helper returns no output.
+    # None. Throws for unsupported, inconsistent or incomplete content.
+    #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260913.0.
+    # Version: 1.0.20260914.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $TrustedRevision,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $HeadRevision
+    )
+
+    $arrOrdinaryPaths = @(
+        '.github/workflows/workflow-policy-cases.json',
+        '.github/workflows/workflow-policy-contract.json',
+        '.github/workflows/Validate-WorkflowPolicy.mjs'
+    )
+    $setOrdinaryPaths = [Collections.Generic.HashSet[string]]::new(
+        [string[]]$arrOrdinaryPaths, [StringComparer]::Ordinal)
+    $setOrdinaryWorkflows = [Collections.Generic.HashSet[string]]::new(
+        [string[]]@('build.yml', 'markdownlint.yml', 'pull-request-body-identity.yml'),
+        [StringComparer]::Ordinal)
+    $setOrdinaryOperations = [Collections.Generic.HashSet[string]]::new(
+        [string[]]@('set', 'delete', 'append', 'append-copy', 'swap', 'replace'),
+        [StringComparer]::Ordinal)
+    $objCommitCount = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 64 `
+        -ArgumentList @(
+            '-C', $RepositoryRootPath, 'rev-list', '--count', '--max-count=65',
+            $HeadRevision, '--not', $TrustedRevision
+        )
+    $strCommitCount = ConvertFrom-StrictUtf8Text -Bytes $objCommitCount.Bytes `
+        -Name 'The ordinary candidate commit count'
+    if ($objCommitCount.ExitCode -ne 0 -or
+        $strCommitCount.Trim() -cnotmatch '^[0-9]+$' -or
+        [int]$strCommitCount.Trim() -notin 1..64) {
+        throw 'The ordinary candidate history is empty or exceeds 64 commits.'
+    }
+    foreach ($arrArguments in @(
+            ,@('diff', '--name-only', '-z', '--no-renames', '--no-ext-diff',
+                '--no-textconv', $TrustedRevision, $HeadRevision, '--')
+        )) {
+        $objPathResult = Invoke-BoundedProcessByte -FileName 'git' `
+            -MaximumBytes 1048576 -ArgumentList (@('-C', $RepositoryRootPath) +
+                $arrArguments)
+        if ($objPathResult.ExitCode -ne 0) {
+            throw 'Could not inspect the complete ordinary candidate path set.'
+        }
+        $strPathText = ConvertFrom-StrictUtf8Text -Bytes $objPathResult.Bytes `
+            -Name 'The ordinary candidate path set' -AllowNul
+        $arrChangedPaths = @($strPathText -split "`0" | Where-Object {
+                -not [string]::IsNullOrEmpty($_)
+            })
+        if ($arrChangedPaths.Count -eq 0) {
+            throw 'The ordinary candidate has no content change.'
+        }
+        foreach ($strChangedPath in $arrChangedPaths) {
+            if (-not $setOrdinaryPaths.Contains($strChangedPath)) {
+                throw "Unsupported ordinary content shape at $strChangedPath; use the stronger reviewed path or a reviewed domain extension."
+            }
+        }
+    }
+
+    $objHistoryResult = Invoke-BoundedProcessByte -FileName 'git' `
+        -MaximumBytes 131072 -ArgumentList @(
+            '-C', $RepositoryRootPath, 'rev-list', '--parents', '--max-count=65',
+            $HeadRevision, '--not', $TrustedRevision, '--'
+        )
+    $strHistoryText = ConvertFrom-StrictUtf8Text -Bytes $objHistoryResult.Bytes `
+        -Name 'The ordinary candidate parent graph'
+    $arrHistoryRows = @($strHistoryText.TrimEnd("`n") -split "`n")
+    if ($objHistoryResult.ExitCode -ne 0 -or
+        $arrHistoryRows.Count -ne [int]$strCommitCount.Trim()) {
+        throw 'The ordinary candidate parent graph is incomplete.'
+    }
+    $intHistoryParentCount = 0
+    $intHistoryPathBytes = 0
+    $intHistoryGitCalls = 1
+    foreach ($strHistoryRow in $arrHistoryRows) {
+        if ($strHistoryRow -cnotmatch '^[0-9a-f]{40}(?: [0-9a-f]{40}){1,64}$') {
+            throw 'The ordinary candidate parent graph is incomplete or unbounded.'
+        }
+        $arrCommitAndParents = @($strHistoryRow -split ' ')
+        $strHistoryCommit = $arrCommitAndParents[0]
+        $arrHistoryParents = @($arrCommitAndParents | Select-Object -Skip 1)
+        $intHistoryParentCount += $arrHistoryParents.Count
+        if ($intHistoryParentCount -gt 256) {
+            throw 'The ordinary candidate graph exceeds 256 parent edges.'
+        }
+        if (++$intHistoryGitCalls -gt 512) {
+            throw 'The ordinary history exceeds 512 Git calls.'
+        }
+        $objHistoryPaths = Invoke-BoundedProcessByte -FileName 'git' `
+            -MaximumBytes (1048577 - $intHistoryPathBytes) -ArgumentList @(
+                '-C', $RepositoryRootPath, 'diff-tree', '--no-commit-id',
+                '--name-only', '-r', '-z', '--no-renames', '--no-ext-diff',
+                '--no-textconv', '-m', $strHistoryCommit, '--'
+            )
+        $intHistoryPathBytes += $objHistoryPaths.Bytes.Length
+        if ($objHistoryPaths.ExitCode -ne 0 -or $intHistoryPathBytes -gt 1048576) {
+            throw 'The ordinary candidate history paths are incomplete or unbounded.'
+        }
+        $strHistoryPaths = ConvertFrom-StrictUtf8Text -Bytes $objHistoryPaths.Bytes `
+            -Name 'The ordinary candidate history paths' -AllowNul
+        $setOutsidePaths = [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::Ordinal)
+        foreach ($strHistoryPath in ($strHistoryPaths -split "`0")) {
+            if (-not [string]::IsNullOrEmpty($strHistoryPath) -and
+                -not $setOrdinaryPaths.Contains($strHistoryPath)) {
+                [void]$setOutsidePaths.Add($strHistoryPath)
+            }
+        }
+        if ($setOutsidePaths.Count -eq 0) {
+            continue
+        }
+        $listTrustedParents = [Collections.Generic.List[string]]::new()
+        if ($arrHistoryParents.Count -gt 1) {
+            foreach ($strHistoryParent in $arrHistoryParents) {
+                if (++$intHistoryGitCalls -gt 512) {
+                    throw 'The ordinary history exceeds 512 Git calls.'
+                }
+                $objParentAncestry = Invoke-BoundedProcessByte -FileName 'git' `
+                    -MaximumBytes 64 -ArgumentList @(
+                        '-C', $RepositoryRootPath, 'merge-base', '--is-ancestor',
+                        $strHistoryParent, $TrustedRevision
+                    )
+                if ($objParentAncestry.ExitCode -eq 0) {
+                    $listTrustedParents.Add($strHistoryParent)
+                } elseif ($objParentAncestry.ExitCode -ne 1) {
+                    throw 'The ordinary merge parent is unavailable.'
+                }
+            }
+        }
+        foreach ($strOutsidePath in $setOutsidePaths) {
+            $boolTrustedContribution = $false
+            foreach ($strTrustedParent in $listTrustedParents) {
+                if (($intHistoryGitCalls += 2) -gt 512) {
+                    throw 'The ordinary history exceeds 512 Git calls.'
+                }
+                $objChildEntry = Invoke-BoundedProcessByte -FileName 'git' `
+                    -MaximumBytes 8192 -ArgumentList @(
+                        '--literal-pathspecs', '-C', $RepositoryRootPath,
+                        'ls-tree', '-z', $strHistoryCommit, '--', $strOutsidePath
+                    )
+                $objParentEntry = Invoke-BoundedProcessByte -FileName 'git' `
+                    -MaximumBytes 8192 -ArgumentList @(
+                        '--literal-pathspecs', '-C', $RepositoryRootPath,
+                        'ls-tree', '-z', $strTrustedParent, '--', $strOutsidePath
+                    )
+                if ($objChildEntry.ExitCode -ne 0 -or $objParentEntry.ExitCode -ne 0) {
+                    throw 'The ordinary merge contribution entry is unavailable.'
+                }
+                if ([Convert]::ToHexString($objChildEntry.Bytes) -ceq
+                    [Convert]::ToHexString($objParentEntry.Bytes)) {
+                    $boolTrustedContribution = $true
+                    break
+                }
+            }
+            if (-not $boolTrustedContribution) {
+                throw "Unsupported ordinary history shape at $strOutsidePath; no exact trusted merge contribution exists."
+            }
+        }
+    }
+
+    $dictionaryTrustedText = [Collections.Generic.Dictionary[string, string]]::new(
+        [StringComparer]::Ordinal
+    )
+    $dictionaryCandidateText = [Collections.Generic.Dictionary[string, string]]::new(
+        [StringComparer]::Ordinal
+    )
+    foreach ($strRevision in @($TrustedRevision, $HeadRevision)) {
+        foreach ($strPath in $arrOrdinaryPaths) {
+            $objEntry = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1024 `
+                -ArgumentList @('-C', $RepositoryRootPath, 'ls-tree', $strRevision,
+                    '--', $strPath)
+            $strEntry = ConvertFrom-StrictUtf8Text -Bytes $objEntry.Bytes `
+                -Name 'An ordinary candidate tree entry'
+            if ($objEntry.ExitCode -ne 0 -or
+                $strEntry -cnotmatch '^100644 blob ([0-9a-f]{40})\t([^\n]+)\n$' -or
+                -not [StringComparer]::Ordinal.Equals($Matches[2], $strPath)) {
+                throw 'An ordinary tuple path is missing, linked or not a regular blob.'
+            }
+            $arrBytes = @(Read-GitBlobByte -RepositoryRootPath $RepositoryRootPath `
+                    -BlobId $Matches[1] -MaximumBytes 524288)
+            $strText = ConvertFrom-StrictUtf8Text -Bytes $arrBytes -Name $strPath
+            if ($strRevision -ceq $TrustedRevision) {
+                $dictionaryTrustedText.Add($strPath, $strText)
+            } else {
+                $dictionaryCandidateText.Add($strPath, $strText)
+            }
+        }
+    }
+    $strCatalogPath = $arrOrdinaryPaths[0]
+    $strContractPath = $arrOrdinaryPaths[1]
+    $strValidatorPath = $arrOrdinaryPaths[2]
+    $objTrustedCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $dictionaryTrustedText[$strCatalogPath] -Name 'The trusted case catalog'
+    $objCandidateCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $dictionaryCandidateText[$strCatalogPath] -Name 'The candidate case catalog'
+    & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objCandidateCatalog `
+        -Name 'The ordinary case catalog' -Key @('schema', 'cases')
+    if ($objCandidateCatalog.schema -isnot [string] -or
+        -not [StringComparer]::Ordinal.Equals(
+            $objCandidateCatalog.schema, $objTrustedCatalog.schema) -or
+        $objCandidateCatalog.cases -isnot [array] -or
+        $objCandidateCatalog.cases.Count -lt $objTrustedCatalog.cases.Count -or
+        $objCandidateCatalog.cases.Count -gt 512 -or
+        $objCandidateCatalog.cases.Count -gt ($objTrustedCatalog.cases.Count + 32)) {
+        throw 'The ordinary case catalog has an invalid schema or count.'
+    }
+    $setCaseNames = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $objTrustedCatalogDocument = $null
+    $objCandidateCatalogDocument = $null
+    try {
+        $objTrustedCatalogDocument = [System.Text.Json.JsonDocument]::Parse(
+            $dictionaryTrustedText[$strCatalogPath])
+        $objCandidateCatalogDocument = [System.Text.Json.JsonDocument]::Parse(
+            $dictionaryCandidateText[$strCatalogPath])
+        $arrTrustedCaseElements = @(
+            $objTrustedCatalogDocument.RootElement.GetProperty('cases').EnumerateArray() |
+                ForEach-Object { $_.Clone() }
+        )
+        $arrCandidateCaseElements = @(
+            $objCandidateCatalogDocument.RootElement.GetProperty('cases').EnumerateArray() |
+                ForEach-Object { $_.Clone() }
+        )
+    } finally {
+        if ($null -ne $objTrustedCatalogDocument) {
+            $objTrustedCatalogDocument.Dispose()
+        }
+        if ($null -ne $objCandidateCatalogDocument) {
+            $objCandidateCatalogDocument.Dispose()
+        }
+    }
+    $intLastWorkflowCase = 0
+    for ($intIndex = 0; $intIndex -lt $objTrustedCatalog.cases.Count; $intIndex++) {
+        $strTrustedCase = & $script:scriptblockConvertToCanonicalJsonText `
+            -Value $arrTrustedCaseElements[$intIndex]
+        $strCandidateCase = & $script:scriptblockConvertToCanonicalJsonText `
+            -Value $arrCandidateCaseElements[$intIndex]
+        if (-not [StringComparer]::Ordinal.Equals($strTrustedCase, $strCandidateCase)) {
+            throw 'An ordinary update changed or removed an existing case.'
+        }
+        [void]$setCaseNames.Add([string]$objTrustedCatalog.cases[$intIndex].semanticKey)
+        if ($objTrustedCatalog.cases[$intIndex].id -cmatch '^PS-P1-WFPOL-([0-9]{3})$') {
+            $intLastWorkflowCase = [Math]::Max($intLastWorkflowCase, [int]$Matches[1])
+        }
+    }
+    for ($intIndex = $objTrustedCatalog.cases.Count;
+        $intIndex -lt $objCandidateCatalog.cases.Count; $intIndex++) {
+        $objCase = $objCandidateCatalog.cases[$intIndex]
+        & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objCase `
+            -Name 'An ordinary new case' `
+            -Key @('id', 'semanticKey', 'domain', 'workflow', 'operation', 'expected')
+        $intLastWorkflowCase++
+        if ($intLastWorkflowCase -gt 999 -or $objCase.id -isnot [string] -or
+            -not [StringComparer]::Ordinal.Equals(
+                $objCase.id, ('PS-P1-WFPOL-{0:D3}' -f $intLastWorkflowCase)) -or
+            $objCase.semanticKey -isnot [string] -or
+            $objCase.semanticKey -cnotmatch '^[a-z0-9-]{1,128}$' -or
+            -not $setCaseNames.Add($objCase.semanticKey) -or
+            $objCase.domain -isnot [string] -or
+            -not [StringComparer]::Ordinal.Equals($objCase.domain, 'workflow') -or
+            $objCase.workflow -isnot [string] -or
+            -not $setOrdinaryWorkflows.Contains($objCase.workflow) -or
+            $objCase.expected -isnot [bool] -or $objCase.expected -or
+            $objCase.operation -isnot [Collections.IDictionary]) {
+            throw 'An ordinary new case is not a sequential negative workflow fixture.'
+        }
+        if (-not $objCase.operation.Contains('type') -or
+            $objCase.operation.type -isnot [string] -or
+            -not $setOrdinaryOperations.Contains($objCase.operation.type)) {
+            throw 'An ordinary fixture uses an unsupported operation.'
+        }
+        $arrOperationKeys = switch -CaseSensitive ($objCase.operation.type) {
+            'set' {
+                @('type', 'path', 'value')
+            }
+            'delete' {
+                @('type', 'path')
+            }
+            'append' {
+                @('type', 'path', 'value')
+            }
+            'append-copy' {
+                @('type', 'path', 'source')
+            }
+            'swap' {
+                @('type', 'path', 'otherPath')
+            }
+            'replace' {
+                @('type', 'path', 'from', 'to')
+            }
+            default {
+                throw 'An ordinary fixture uses an unsupported operation.'
+            }
+        }
+        & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objCase.operation `
+            -Name 'An ordinary fixture operation' -Key $arrOperationKeys
+        foreach ($strPointerKey in @('path', 'source', 'otherPath')) {
+            if ($objCase.operation.Contains($strPointerKey) -and
+                ($objCase.operation[$strPointerKey] -isnot [string] -or
+                    $objCase.operation[$strPointerKey] -cnotmatch '^/[^\x00-\x20]{1,1023}$' -or
+                    $objCase.operation[$strPointerKey] -cmatch
+                    '(?:^|/)(?:__proto__|constructor|prototype)(?:/|$)')) {
+                throw 'An ordinary fixture has an unsafe or invalid JSON pointer.'
+            }
+        }
+        if ([StringComparer]::Ordinal.Equals($objCase.operation.type, 'replace') -and
+            ($objCase.operation.from -isnot [string] -or
+                [string]::IsNullOrEmpty($objCase.operation.from) -or
+                $objCase.operation.to -isnot [string])) {
+            throw 'An ordinary replacement fixture has invalid text operands.'
+        }
+    }
+
+    $objTrustedContract = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $dictionaryTrustedText[$strContractPath] -Name 'The trusted policy contract'
+    $objCandidateContract = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $dictionaryCandidateText[$strContractPath] -Name 'The candidate policy contract'
+    foreach ($strIdentity in @('caseCatalog', 'validatorIdentity')) {
+        & $script:scriptblockAssertExactDictionaryKeySet `
+            -Dictionary $objCandidateContract[$strIdentity] `
+            -Name 'An ordinary content identity' -Key @('path', 'sha256')
+        $strIdentityPath = if ($strIdentity -ceq 'caseCatalog') {
+            $strCatalogPath
+        } else {
+            $strValidatorPath
+        }
+        $strDigest = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData(
+                [Text.UTF8Encoding]::new($false).GetBytes(
+                    $dictionaryCandidateText[$strIdentityPath]
+                )
+            )).ToLowerInvariant()
+        if ($objCandidateContract[$strIdentity].sha256 -isnot [string] -or
+            -not [StringComparer]::Ordinal.Equals(
+                $objCandidateContract[$strIdentity].sha256, $strDigest)) {
+            throw 'The ordinary content tuple has a mismatched raw-byte digest.'
+        }
+        $objTrustedContract[$strIdentity].sha256 = $strDigest
+    }
+    $objTrustedDocument = $null
+    $objCandidateDocument = $null
+    try {
+        $objTrustedDocument = [System.Text.Json.JsonDocument]::Parse(
+            $dictionaryTrustedText[$strContractPath])
+        $objCandidateDocument = [System.Text.Json.JsonDocument]::Parse(
+            $dictionaryCandidateText[$strContractPath])
+        $objExpectedView = [ordered]@{}
+        foreach ($objProperty in $objTrustedDocument.RootElement.EnumerateObject()) {
+            $objExpectedView[$objProperty.Name] = if (
+                [StringComparer]::Ordinal.Equals($objProperty.Name, 'caseCatalog') -or
+                [StringComparer]::Ordinal.Equals($objProperty.Name, 'validatorIdentity')) {
+                $objTrustedContract[$objProperty.Name]
+            } else {
+                $objProperty.Value
+            }
+        }
+        $strExpectedContract = & $script:scriptblockConvertToCanonicalJsonText `
+            -Value $objExpectedView
+        $strCandidateContract = & $script:scriptblockConvertToCanonicalJsonText `
+            -Value $objCandidateDocument.RootElement
+        if (-not [StringComparer]::Ordinal.Equals($strExpectedContract, $strCandidateContract)) {
+            throw 'The ordinary update changes policy rules or contract structure.'
+        }
+        $objIdentityView = [ordered]@{}
+        foreach ($objProperty in $objCandidateDocument.RootElement.EnumerateObject()) {
+            if (-not [StringComparer]::Ordinal.Equals($objProperty.Name, 'validatorIdentity')) {
+                $objIdentityView[$objProperty.Name] = $objProperty.Value
+            }
+        }
+        $strIdentityView = & $script:scriptblockConvertToCanonicalJsonText `
+            -Value $objIdentityView
+    } finally {
+        if ($null -ne $objTrustedDocument) {
+            $objTrustedDocument.Dispose()
+        }
+        if ($null -ne $objCandidateDocument) {
+            $objCandidateDocument.Dispose()
+        }
+    }
+    $strCanonicalDigest = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData(
+            [Text.UTF8Encoding]::new($false).GetBytes($strIdentityView)
+        )).ToLowerInvariant()
+    $strTrustedValidator = $dictionaryTrustedText[$strValidatorPath]
+    $strCandidateValidator = $dictionaryCandidateText[$strValidatorPath]
+    $strVersionPattern = "(?m)^const VALIDATOR_VERSION = '([0-9]+)\.([0-9]+)\.([0-9]+)';$"
+    $strDigestPattern = "(?m)^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '[0-9a-f]{64}';$"
+    $arrVersionMatches = [regex]::Matches($strTrustedValidator, $strVersionPattern)
+    if ($arrVersionMatches.Count -ne 1 -or
+        [regex]::Matches($strTrustedValidator, $strDigestPattern).Count -ne 1 -or
+        [regex]::Matches($strCandidateValidator, $strVersionPattern).Count -ne 1 -or
+        [regex]::Matches($strCandidateValidator, $strDigestPattern).Count -ne 1) {
+        throw 'The ordinary validator has missing or duplicate identity literals.'
+    }
+    $objVersionMatch = $arrVersionMatches[0]
+    $intNextPatch = [int]$objVersionMatch.Groups[3].Value + 1
+    $strNextVersion = "const VALIDATOR_VERSION = '{0}.{1}.{2}';" -f
+        $objVersionMatch.Groups[1].Value, $objVersionMatch.Groups[2].Value, $intNextPatch
+    $strExpectedValidator = [regex]::Replace($strTrustedValidator,
+        $strVersionPattern, $strNextVersion)
+    $strExpectedValidator = [regex]::Replace($strExpectedValidator,
+        $strDigestPattern,
+        "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '$strCanonicalDigest';")
+    if (-not $strExpectedValidator.EndsWith("`n", [StringComparison]::Ordinal) -or
+        -not $strCandidateValidator.StartsWith($strExpectedValidator,
+            [StringComparison]::Ordinal)) {
+        throw 'Unsupported ordinary validator shape; executable rules must remain unchanged.'
+    }
+    $strCommentSuffix = $strCandidateValidator.Substring($strExpectedValidator.Length)
+    if ($strCommentSuffix.Length -gt 8192 -or
+        $strCommentSuffix -cnotmatch '\A(?:// [\x20-\x7e]*\n|\n)*\z' -or
+        $strCommentSuffix.Contains('EXPECTED_CONTRACT_CANONICAL_SHA256',
+            [StringComparison]::Ordinal) -or
+        $strCommentSuffix.Contains('VALIDATOR_VERSION', [StringComparison]::Ordinal)) {
+        throw 'An ordinary validator suffix is not bounded inert line comments.'
+    }
+}
+
+
+function Get-TrustedPolicyReferenceText {
+    # .SYNOPSIS
+    # Reads one fixed policy reference from the authenticated trusted revision.
+    #
+    # .DESCRIPTION
+    # Production reads a regular Git blob, never a worktree or candidate.
+    # SelfTest alone reads local fixture bytes and returns before admission.
+    # References are cached only within this script invocation.
+    #
+    # .PARAMETER Path
+    # One fixed policy path whose exact unchanged bytes can be recognized.
+    #
+    # .EXAMPLE
+    # Get-TrustedPolicyReferenceText -Path '.github/workflows/Validate-WorkflowPolicy.mjs'
+    #
+    # # Returns the exact trusted text or throws for a missing reference.
+    #
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # [string] Exact strict UTF-8 reference text, or empty when a historical
+    # detached verifier has no reference. Empty text never grants admission.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260914.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet('.github/workflows/Validate-WorkflowPolicy.mjs',
+            '.github/workflows/workflow-policy-contract.json',
+            '.github/workflows/workflow-policy-cases.json',
+            '.github/workflows/pull-request-body-identity.yml', IgnoreCase = $false)]
+        [string] $Path
+    )
+
+    $setReferencePaths = [Collections.Generic.HashSet[string]]::new(
+        [string[]]@('.github/workflows/Validate-WorkflowPolicy.mjs',
+            '.github/workflows/workflow-policy-contract.json',
+            '.github/workflows/workflow-policy-cases.json',
+            '.github/workflows/pull-request-body-identity.yml'),
+        [StringComparer]::Ordinal)
+    if (-not $setReferencePaths.Contains($Path)) {
+        throw 'The trusted policy reference path is not an exact fixed path.'
+    }
+    if (-not $script:dictionaryPolicyReferenceText.ContainsKey($Path)) {
+        $arrBytes = if ($SelfTest) {
+            $strFixturePath = $ExecutionContext.SessionState.Path.
+                GetUnresolvedProviderPathFromPSPath((Join-Path -Path $RepositoryRootPath -ChildPath $Path))
+            [IO.File]::ReadAllBytes($strFixturePath)
+        } else {
+            $objEntry = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1024 `
+                -ArgumentList @('-C', $RepositoryRootPath, 'ls-tree', $TrustedRevision,
+                    '--', $Path)
+            $strEntry = ConvertFrom-StrictUtf8Text -Bytes $objEntry.Bytes `
+                -Name 'The trusted policy reference tree entry'
+            if ($objEntry.ExitCode -eq 0 -and [string]::IsNullOrEmpty($strEntry)) {
+                # Historical detached verifier refs can omit policy files.
+                # Only their independent hardcoded exact tuples can pass.
+                return ''
+            }
+            if ($objEntry.ExitCode -ne 0 -or
+                $strEntry -cnotmatch '^100644 blob ([0-9a-f]{40})\t([^\n]+)\n$' -or
+                -not [StringComparer]::Ordinal.Equals($Matches[2], $Path)) {
+                throw 'The authenticated trusted policy reference is unavailable.'
+            }
+            @(Read-GitBlobByte -RepositoryRootPath $RepositoryRootPath `
+                -BlobId $Matches[1] -MaximumBytes 524288)
+        }
+        if ($arrBytes.Count -gt 524288) {
+            throw 'The trusted policy reference exceeds its byte bound.'
+        }
+        $script:dictionaryPolicyReferenceText.Add($Path,
+            (ConvertFrom-StrictUtf8Text -Bytes $arrBytes -Name $Path))
+    }
+    return $script:dictionaryPolicyReferenceText[$Path]
+}
+
+
+function Assert-WorkflowPolicyTransitionTuple {
+    # .SYNOPSIS
+    # Validates one complete workflow-policy identity transition tuple.
+    #
+    # .DESCRIPTION
+    # Accepts exactly the current tuple or the intended next tuple across the
+    # validator and contract. Rejects mixed, missing, and duplicate tuples.
+    #
+    # .PARAMETER ValidatorText
+    # The strict UTF-8 workflow-policy validator source text.
+    #
+    # .PARAMETER ContractText
+    # The strict UTF-8 workflow-policy contract source text.
+    #
+    # .EXAMPLE
+    # Assert-WorkflowPolicyTransitionTuple @hashtableArguments
+    #
+    # # Validates the cross-file identity tuple or throws.
+    #
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # None. This helper returns no output.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.1.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -947,6 +1547,16 @@ function Assert-WorkflowPolicyTransitionTuple {
         [Parameter(Mandatory)][string] $ContractText
     )
 
+    if (-not [string]::IsNullOrEmpty($ValidatorText) -and
+        -not [string]::IsNullOrEmpty($ContractText) -and
+        [StringComparer]::Ordinal.Equals($ValidatorText,
+            (Get-TrustedPolicyReferenceText `
+                -Path '.github/workflows/Validate-WorkflowPolicy.mjs')) -and
+        [StringComparer]::Ordinal.Equals($ContractText,
+            (Get-TrustedPolicyReferenceText `
+                -Path '.github/workflows/workflow-policy-contract.json'))) {
+        return
+    }
     $objContract = & $script:scriptblockConvertFromStrictJsonHashtable `
         -Text $ContractText -Name 'The workflow-policy transition contract'
     $strContractValidatorSha256 =
@@ -973,8 +1583,7 @@ function Assert-WorkflowPolicyTransitionTuple {
         $strContractCanonicalText =
             & $script:scriptblockConvertToCanonicalJsonText `
             -Value $objContractIdentityView
-    }
-    finally {
+    } finally {
         if ($null -ne $objContractDocument) {
             $objContractDocument.Dispose()
         }
@@ -1074,29 +1683,37 @@ function Assert-WorkflowPolicyTransitionTuple {
 function Assert-SemanticInvariant {
     # .SYNOPSIS
     # Validates one named trust-root semantic invariant.
+    #
     # .DESCRIPTION
     # Applies the trusted structural or exact-text check for one authorized
     # candidate path and rejects unknown or unsatisfied invariant names.
+    #
     # .PARAMETER Invariant
     # The exact trusted semantic-invariant identifier.
+    #
     # .PARAMETER Text
     # The strict UTF-8 candidate text to inspect as inert data.
+    #
     # .PARAMETER Path
     # The repository-relative path used in failure diagnostics.
+    #
     # .EXAMPLE
     # Assert-SemanticInvariant -Invariant $strInvariant `
     #     -Text $strText -Path $strPath
     #
     # # Returns only when the named invariant is satisfied.
+    #
     # .INPUTS
     # None. This helper does not accept pipeline input.
+    #
     # .OUTPUTS
     # None. This helper returns no output.
+    #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260913.0.
+    # Version: 1.1.20260914.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -1106,8 +1723,22 @@ function Assert-SemanticInvariant {
     )
 
     if ($script:hashtableSemanticInvariantPath.ContainsKey($Invariant) -and
-        $Path -cne $script:hashtableSemanticInvariantPath[$Invariant]) {
+        -not [StringComparer]::Ordinal.Equals(
+            $Path, $script:hashtableSemanticInvariantPath[$Invariant])) {
         throw "$Path does not satisfy semantic invariant $Invariant."
+    }
+
+    $setReferenceInvariants = [Collections.Generic.HashSet[string]]::new(
+        [string[]]@(
+            'workflow-policy-preflight-authenticates-deferred-yaml-import',
+            'workflow-policy-contract-identities-and-structure-are-exact',
+            'workflow-policy-identity-cases-are-exact',
+            'pull-request-body-identity-workflow-topology-is-exact'
+        ), [StringComparer]::Ordinal)
+    if ($setReferenceInvariants.Contains($Invariant) -and
+        -not [string]::IsNullOrEmpty($Text) -and
+        [StringComparer]::Ordinal.Equals($Text, (Get-TrustedPolicyReferenceText -Path $Path))) {
+        return
     }
 
     if ($script:hashtableExactTransitionTextIdentity.ContainsKey($Invariant)) {
@@ -1287,11 +1918,9 @@ function Assert-SemanticInvariant {
             $objCatalogDocument = [System.Text.Json.JsonDocument]::Parse($Text)
             Assert-NoDuplicateJsonProperty `
                 -Element $objCatalogDocument.RootElement
-        }
-        catch {
+        } catch {
             throw "$Path does not satisfy semantic invariant $Invariant."
-        }
-        finally {
+        } finally {
             if ($null -ne $objCatalogDocument) {
                 $objCatalogDocument.Dispose()
             }
@@ -1423,13 +2052,11 @@ function Assert-SemanticInvariant {
                 $boolMatches = if ($strCollectionName -ceq 'sourceCases') {
                     $objActualCase.mutation -ceq $arrRequiredField[1] -and
                     $objActualCase.expected -ceq $arrRequiredField[2]
-                }
-                elseif ($strCollectionName -ceq 'bodyCases') {
+                } elseif ($strCollectionName -ceq 'bodyCases') {
                     $objActualCase.operation -ceq $arrRequiredField[1] -and
                     $objActualCase.fixture -ceq $arrRequiredField[2] -and
                     $objActualCase.expected -ceq $arrRequiredField[3]
-                }
-                else {
+                } else {
                     $objActualCase.scenario -ceq $arrRequiredField[1] -and
                     $objActualCase.expected -ceq $arrRequiredField[2] -and
                     $objActualCase.expectedPatchCount -eq
@@ -1742,8 +2369,7 @@ function Assert-SemanticInvariant {
                 $objRootPackage.lintScript -cne $strRootLint) {
                 throw 'The root package identity is invalid.'
             }
-        }
-        catch {
+        } catch {
             throw (
                 "$Path does not satisfy semantic invariant ${Invariant}: " +
                     $_.Exception.Message
@@ -1826,8 +2452,7 @@ function Assert-SemanticInvariant {
                     throw "The package dependency $strDependencyName is invalid."
                 }
             }
-        }
-        catch {
+        } catch {
             throw "$Path does not satisfy semantic invariant $Invariant."
         }
         return
@@ -1950,8 +2575,7 @@ function Assert-SemanticInvariant {
                         $objDescriptor.Contains('peerDependenciesMeta')
                     ) {
                         $objDescriptor.peerDependenciesMeta
-                    }
-                    else {
+                    } else {
                         @{}
                     }
                     if ($objPeerMetadata -isnot [Collections.IDictionary]) {
@@ -1979,8 +2603,7 @@ function Assert-SemanticInvariant {
                             [string]::IsNullOrEmpty($strScope)
                         ) {
                             "node_modules/$strDependencyName"
-                        }
-                        else {
+                        } else {
                             "$strScope/node_modules/$strDependencyName"
                         }
                         if ($objLock.packages.Contains($strCandidatePath)) {
@@ -1996,8 +2619,7 @@ function Assert-SemanticInvariant {
                         )
                         $strScope = if ($intParentIndex -lt 0) {
                             ''
-                        }
-                        else {
+                        } else {
                             $strScope.Substring(0, $intParentIndex)
                         }
                     }
@@ -2117,8 +2739,7 @@ function Assert-SemanticInvariant {
                     $objDescriptor.Contains('dependencies')
                 ) {
                     $objDescriptor.dependencies
-                }
-                else {
+                } else {
                     @{}
                 }
                 if ($objActualDependencies -isnot [Collections.IDictionary]) {
@@ -2150,8 +2771,7 @@ function Assert-SemanticInvariant {
                     throw 'A parser dependency descriptor is invalid.'
                 }
             }
-        }
-        catch {
+        } catch {
             throw (
                 "$Path does not satisfy semantic invariant ${Invariant}: " +
                     $_.Exception.Message
@@ -2199,8 +2819,7 @@ function Assert-SemanticInvariant {
             }
             if ($boolHasSelfTestAncestor) {
                 $intSelfTestSwitchCalls++
-            }
-            else {
+            } else {
                 $intProductionSwitchCalls++
             }
         }
@@ -2696,8 +3315,7 @@ if ($SelfTest) {
             Assert-SemanticInvariant -Invariant 'docs-status-lifecycle-values' `
                 -Text $strEmptyText -Path 'empty.md'
             throw 'An empty governed document passed its content invariant.'
-        }
-        catch {
+        } catch {
             if ($_.Exception.Message -ceq
                 'An empty governed document passed its content invariant.' -or
                 -not $_.Exception.Message.Contains(
@@ -2707,8 +3325,7 @@ if ($SelfTest) {
                 throw
             }
         }
-    }
-    finally {
+    } finally {
         if ([IO.Directory]::Exists($strSelfTestRoot) -and
             $strSelfTestRoot.StartsWith(
                 $strSelfTestSystemTempRoot,
@@ -2724,8 +3341,7 @@ if ($SelfTest) {
         Assert-CandidateSyntax -Syntax 'javascript' `
             -Text "import from 'node:https';`n" -Path 'invalid.mjs'
         throw 'Invalid JavaScript syntax passed.'
-    }
-    catch {
+    } catch {
         if ($_.Exception.Message -ceq 'Invalid JavaScript syntax passed.' -or
             -not $_.Exception.Message.Contains(
                 'has invalid JavaScript syntax.',
@@ -2749,8 +3365,7 @@ if ($SelfTest) {
             -Text $strOwnerBoundaryMutation `
             -Path '.github/instructions/docs.instructions.md'
         throw 'The documentation owner-boundary mutation passed.'
-    }
-    catch {
+    } catch {
         if ($_.Exception.Message -ceq
             'The documentation owner-boundary mutation passed.' -or
             -not $_.Exception.Message.Contains(
@@ -2769,8 +3384,7 @@ if ($SelfTest) {
                 -Text $strOwnerBoundary `
                 -Path '.github/instructions/docs.instructions.md'
             throw "Removed semantic invariant $strRemovedInvariant passed."
-        }
-        catch {
+        } catch {
             if ($_.Exception.Message -ceq
                 "Removed semantic invariant $strRemovedInvariant passed." -or
                 -not $_.Exception.Message.Contains(
@@ -2788,8 +3402,7 @@ if ($SelfTest) {
             -Text '{"schema_version":2,"schema_version":2}' `
             -Path 'duplicate.json'
         throw 'Duplicate JSON syntax passed.'
-    }
-    catch {
+    } catch {
         if ($_.Exception.Message -ceq 'Duplicate JSON syntax passed.' -or
             -not $_.Exception.Message.Contains(
                 'has invalid JSON syntax.',
@@ -2810,8 +3423,7 @@ if ($SelfTest) {
             Assert-SemanticInvariant -Invariant $Invariant `
                 -Text $Text -Path $Path
             throw "Semantic invariant mutation passed: $Name"
-        }
-        catch {
+        } catch {
             if ($_.Exception.Message -ceq
                 "Semantic invariant mutation passed: $Name" -or
                 -not $_.Exception.Message.Contains(
@@ -2975,7 +3587,26 @@ if ($SelfTest) {
     $strCurrentPolicyContract = $hashtableNewInvariantText[
         '.github/workflows/workflow-policy-contract.json'
     ]
-    if ($strCurrentPolicyValidator.Contains(
+    if ($strCurrentPolicyValidator -cmatch
+        "(?m)^const VALIDATOR_VERSION = '(1\.3\.[0-9]+)';$") {
+        $strCurrentVersion = $Matches[1]
+        $arrCurrentDigest = [regex]::Matches($strCurrentPolicyValidator,
+            "(?m)^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '([0-9a-f]{64})';$")
+        if ($arrCurrentDigest.Count -ne 1) {
+            throw 'The current policy fixture has an ambiguous digest literal.'
+        }
+        $strCurrentDigest = $arrCurrentDigest[0].Groups[1].Value
+        $strCurrentValidatorSha256 = [Convert]::ToHexString(
+            [Security.Cryptography.SHA256]::HashData(
+                [Text.UTF8Encoding]::new($false).GetBytes($strCurrentPolicyValidator)
+            )
+        ).ToLowerInvariant()
+        $strAlternateVersion = '1.2.8'
+        $strAlternateDigest =
+            'd6b5ad4774bbd4fed0608eec3e885d63f9c1b30951aa363a9a3e947a94cd0573'
+        $strAlternateValidatorSha256 =
+            'df9e8a124fcd62996b0d2e70571042deeaf9e248c0b9150850378271c974606c'
+    } elseif ($strCurrentPolicyValidator.Contains(
             "const VALIDATOR_VERSION = '1.2.2';",
             [StringComparison]::Ordinal
         )) {
@@ -3076,18 +3707,31 @@ if ($SelfTest) {
         $strAlternateValidatorSha256,
         [StringComparison]::Ordinal
     )
-    Assert-SemanticInvariant `
-        -Invariant 'workflow-policy-preflight-authenticates-deferred-yaml-import' `
-        -Text $strAlternatePolicyValidator `
-        -Path '.github/workflows/Validate-WorkflowPolicy.mjs'
-    Assert-SemanticInvariant `
-        -Invariant 'workflow-policy-contract-identities-and-structure-are-exact' `
-        -Text $strAlternatePolicyContract `
-        -Path '.github/workflows/workflow-policy-contract.json'
+    if ($strCurrentVersion.StartsWith('1.2.', [StringComparison]::Ordinal)) {
+        Assert-SemanticInvariant `
+            -Invariant 'workflow-policy-preflight-authenticates-deferred-yaml-import' `
+            -Text $strAlternatePolicyValidator `
+            -Path '.github/workflows/Validate-WorkflowPolicy.mjs'
+        Assert-SemanticInvariant `
+            -Invariant 'workflow-policy-contract-identities-and-structure-are-exact' `
+            -Text $strAlternatePolicyContract `
+            -Path '.github/workflows/workflow-policy-contract.json'
+    } else {
+        & $scriptblockExpectInvariantRejection `
+            -Invariant 'workflow-policy-preflight-authenticates-deferred-yaml-import' `
+            -Text $strAlternatePolicyValidator `
+            -Path '.github/workflows/Validate-WorkflowPolicy.mjs' `
+            -Name 'current code falsely labelled with a historical tuple'
+    }
     Assert-WorkflowPolicyTransitionTuple `
         -ValidatorText $strCurrentPolicyValidator `
         -ContractText $strCurrentPolicyContract
     $arrPolicyTupleMutation = @(
+        [pscustomobject]@{
+            Name = 'Unicode-ignorable exact-reference drift'
+            Validator = $strCurrentPolicyValidator + [char]0x200B
+            Contract = $strCurrentPolicyContract
+        },
         [pscustomobject]@{
             Name = 'synthetic next tuple with wrong validator bytes'
             Validator = $strAlternatePolicyValidator
@@ -3134,8 +3778,7 @@ if ($SelfTest) {
                 -ValidatorText $objPolicyTupleMutation.Validator `
                 -ContractText $objPolicyTupleMutation.Contract
             throw "Workflow-policy tuple mutation passed: $($objPolicyTupleMutation.Name)"
-        }
-        catch {
+        } catch {
             if ($_.Exception.Message -ceq
                     "Workflow-policy tuple mutation passed: $($objPolicyTupleMutation.Name)" -or
                 -not $_.Exception.Message.Contains(
@@ -3310,7 +3953,8 @@ if ($SelfTest) {
                 Invariants = @('package-parser-roots-are-exact')
             }
         )
-        $listSchemaAllowedPath = [Collections.Generic.List[object]]::new()
+        $listSchemaAllowedPath =
+            [Collections.Generic.List[Collections.Specialized.OrderedDictionary]]::new()
         foreach ($objSchemaPath in $arrSchemaPathSpec) {
             $strSchemaBaselinePath =
                 Join-Path $strSchemaFixtureRoot $objSchemaPath.Path
@@ -3339,11 +3983,20 @@ if ($SelfTest) {
                     syntax = $objSchemaPath.Syntax
                     semantic_invariants = @($objSchemaPath.Invariants)
                 })
-            [IO.File]::WriteAllText(
-                $strSchemaBaselinePath,
-                "baseline placeholder for $($objSchemaPath.Path)`n",
-                [Text.UTF8Encoding]::new($false)
-            )
+            if ($objSchemaPath.Path -cin @(
+                    '.github/workflows/Validate-WorkflowPolicy.mjs',
+                    '.github/workflows/workflow-policy-contract.json',
+                    '.github/workflows/workflow-policy-cases.json',
+                    '.github/workflows/pull-request-body-identity.yml'
+                )) {
+                [IO.File]::WriteAllBytes($strSchemaBaselinePath, $arrSchemaBytes)
+            } else {
+                [IO.File]::WriteAllText(
+                    $strSchemaBaselinePath,
+                    "baseline placeholder for $($objSchemaPath.Path)`n",
+                    [Text.UTF8Encoding]::new($false)
+                )
+            }
         }
         $objSchemaManifest = [ordered]@{
             schema_version = 2
@@ -3425,8 +4078,7 @@ if ($SelfTest) {
                         -TrustedRevision $Trusted `
                         -BaseRevision $Base -HeadRevision $Head)
                 throw "Schema 2 mutation passed: $ExpectedMessage"
-            }
-            catch {
+            } catch {
                 if ($_.Exception.Message -ceq
                     "Schema 2 mutation passed: $ExpectedMessage" -or
                     -not $_.Exception.Message.Contains(
@@ -3665,8 +4317,18 @@ if ($SelfTest) {
             $strPlaceholderBlob = ([string] (& git -C $strSchemaFixtureRoot `
                         hash-object -w -- $strPlaceholderPath)).Trim()
             foreach ($objSchemaPath in $arrSchemaPathSpec) {
+                $strFixtureBaseBlob = $strPlaceholderBlob
+                if ($objSchemaPath.Path -cin @(
+                        '.github/workflows/Validate-WorkflowPolicy.mjs',
+                        '.github/workflows/workflow-policy-contract.json',
+                        '.github/workflows/workflow-policy-cases.json',
+                        '.github/workflows/pull-request-body-identity.yml'
+                    )) {
+                    $strFixtureBaseBlob = [string](@($listSchemaAllowedPath |
+                        Where-Object { $_.path -ceq $objSchemaPath.Path })[0].blob)
+                }
                 & git -C $strSchemaFixtureRoot update-index --add `
-                    --cacheinfo "100644,$strPlaceholderBlob,$($objSchemaPath.Path)"
+                    --cacheinfo "100644,$strFixtureBaseBlob,$($objSchemaPath.Path)"
             }
             $strTransitionBaseTree = ([string] (& git -C $strSchemaFixtureRoot `
                         write-tree)).Trim()
@@ -3773,6 +4435,20 @@ if ($SelfTest) {
             & git -C $strSchemaFixtureRoot update-index --add `
                 --cacheinfo `
                 "100644,$strTransitionManifestBlob,$strAuthorizationPath"
+            foreach ($objReferenceEntry in @($listSchemaAllowedPath | Where-Object {
+                        $_.path -cin @(
+                            '.github/workflows/Validate-WorkflowPolicy.mjs',
+                            '.github/workflows/workflow-policy-contract.json',
+                            '.github/workflows/workflow-policy-cases.json',
+                            '.github/workflows/pull-request-body-identity.yml'
+                        )
+                    })) {
+                & git -C $strSchemaFixtureRoot update-index --add `
+                    --cacheinfo "100644,$($objReferenceEntry.blob),$($objReferenceEntry.path)"
+                if ($LASTEXITCODE -ne 0) {
+                    throw 'Could not bind the detached trusted policy references.'
+                }
+            }
             $strTransitionTrustedTree = ([string] (
                     & git -C $strSchemaFixtureRoot write-tree
                 )).Trim()
@@ -3782,13 +4458,11 @@ if ($SelfTest) {
                         -c 'user.email=trust-root-schema@example.invalid' `
                         commit-tree $strTransitionTrustedTree
                 )).Trim()
-        }
-        finally {
+        } finally {
             if ([string]::IsNullOrEmpty($strOriginalIndexFile)) {
                 Remove-Item -LiteralPath 'Env:GIT_INDEX_FILE' `
                     -ErrorAction SilentlyContinue
-            }
-            else {
+            } else {
                 [Environment]::SetEnvironmentVariable(
                     'GIT_INDEX_FILE',
                     $strOriginalIndexFile
@@ -3817,8 +4491,7 @@ if ($SelfTest) {
                     -BaseRevision $strTransitionTrusted `
                     -HeadRevision $strTransitionCandidate)
             throw 'A same-base schema 1 authorization was accepted.'
-        }
-        catch {
+        } catch {
             if ($_.Exception.Message -ceq
                 'A same-base schema 1 authorization was accepted.' -or
                 -not $_.Exception.Message.Contains(
@@ -3922,13 +4595,11 @@ if ($SelfTest) {
                             commit-tree $strBadInactiveCandidateTree `
                             -p $strSameBaseTrusted
                 )).Trim()
-        }
-        finally {
+        } finally {
             if ([string]::IsNullOrEmpty($strOriginalIndexFile)) {
                 Remove-Item -LiteralPath 'Env:GIT_INDEX_FILE' `
                     -ErrorAction SilentlyContinue
-            }
-            else {
+            } else {
                 [Environment]::SetEnvironmentVariable(
                     'GIT_INDEX_FILE',
                     $strOriginalIndexFile
@@ -4036,13 +4707,11 @@ if ($SelfTest) {
                             commit-tree $strNoncanonicalCandidateTree `
                             -p $strNoncanonicalTrusted
                 )).Trim()
-        }
-        finally {
+        } finally {
             if ([string]::IsNullOrEmpty($strOriginalIndexFile)) {
                 Remove-Item -LiteralPath 'Env:GIT_INDEX_FILE' `
                     -ErrorAction SilentlyContinue
-            }
-            else {
+            } else {
                 [Environment]::SetEnvironmentVariable(
                     'GIT_INDEX_FILE',
                     $strOriginalIndexFile
@@ -4058,8 +4727,165 @@ if ($SelfTest) {
             -Base $strNoncanonicalTrusted `
             -Head $strNoncanonicalCandidate `
             -ExpectedMessage 'does not land the exact inactive schema 2 manifest'
+
+        # The builder makes inert Git objects. It does not run candidate code.
+        $strOrdinaryFixtureBuilder = @'
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+const [repo, source] = process.argv.slice(1);
+const git = (args, input) => execFileSync('git', ['-C', repo, ...args], {
+  input, encoding: 'utf8', windowsHide: true,
+  env: { ...process.env, GIT_INDEX_FILE: path.join(repo, 'ordinary.index') },
+  stdio: ['pipe', 'pipe', 'pipe'],
+}).trim();
+const prefix = '.github/workflows/';
+const names = ['workflow-policy-cases.json', 'workflow-policy-contract.json',
+  'Validate-WorkflowPolicy.mjs'];
+const digest = value => crypto.createHash('sha256').update(value).digest('hex');
+const canonical = value => Array.isArray(value) ? value.map(canonical)
+  : value && typeof value === 'object'
+    ? Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])])) : value;
+const commit = (base, texts, parents = [base]) => {
+  git(['read-tree', base]);
+  const entries = [];
+  for (const [name, text] of Object.entries(texts)) {
+    if (text === null) {
+      entries.push(`0 ${'0'.repeat(40)}\t${prefix}${name}\0`);
+      continue;
     }
-    finally {
+    const blob = git(['hash-object', '-w', '--stdin'], Buffer.from(text));
+    entries.push(`100644 ${blob}\t${prefix}${name}\0`);
+  }
+  git(['update-index', '-z', '--index-info'], Buffer.from(entries.join('')));
+  return git(['-c', 'user.name=Ordinary content self-test',
+    '-c', 'user.email=ordinary@example.invalid', 'commit-tree', git(['write-tree']),
+    ...parents.flatMap(parent => ['-p', parent]), '-m', 'Inert ordinary content fixture']);
+};
+const initial = Object.fromEntries([...names, 'trust-root-authorization.json'].map(name =>
+  [name, fs.readFileSync(path.join(source, prefix, name), 'utf8')]));
+const base = commit(git(['rev-parse', 'HEAD']), initial);
+const rows = [];
+const referenceTexts = new Map();
+const build = (name, mutate, expected = '', reference = base) => {
+  if (!referenceTexts.has(reference)) {
+    referenceTexts.set(reference, Object.fromEntries(names.map(file => [file,
+      execFileSync('git', ['-C', repo, 'show', `${reference}:${prefix}${file}`], { encoding: 'utf8' })])));
+  }
+  const texts = { ...referenceTexts.get(reference) };
+  const catalog = JSON.parse(texts[names[0]]);
+  const contract = JSON.parse(texts[names[1]]);
+  const state = { catalog, contract, validator: texts[names[2]] };
+  mutate(state);
+  texts[names[0]] = JSON.stringify(catalog) + '\n';
+  contract.caseCatalog.sha256 = digest(texts[names[0]]);
+  const view = structuredClone(contract);
+  delete view.validatorIdentity;
+  texts[names[2]] = state.validator.replace(/^const VALIDATOR_VERSION = '(\d+)\.(\d+)\.(\d+)';$/m,
+    (_, major, minor, patch) => `const VALIDATOR_VERSION = '${major}.${minor}.${Number(patch) + 1}';`)
+    .replace(/^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '[a-f0-9]{64}';$/m,
+      `const EXPECTED_CONTRACT_CANONICAL_SHA256 = '${digest(JSON.stringify(canonical(view)))}';`);
+  contract.validatorIdentity.sha256 = digest(texts[names[2]]);
+  texts[names[1]] = JSON.stringify(contract) + '\n';
+  const head = commit(reference, texts);
+  rows.push({ name, head, base: reference, expected });
+  return head;
+};
+const append = state => {
+  const next = 1 + Math.max(...state.catalog.cases.filter(value => /^PS-P1-WFPOL-\d{3}$/.test(value.id))
+    .map(value => Number(value.id.slice(-3))));
+  state.catalog.cases.push({ id: `PS-P1-WFPOL-${String(next).padStart(3, '0')}`,
+    semanticKey: `ordinary-negative-${next}`, domain: 'workflow', workflow: 'build.yml',
+    operation: { type: 'set', path: '/permissions', value: { contents: 'write' } }, expected: false });
+};
+const topic = build('meaningful negative append', append);
+build('comment with derived identities', state => { state.validator += '// Fixed ordinary-domain explanation.\n'; });
+const first = build('first ISO string update', state => {
+  append(state); state.catalog.cases.at(-1).operation.value = '2026-09-14T00:00:00.000Z';
+});
+build('second update retains ISO string', append, '', first);
+build('changed prior case', state => { state.catalog.cases[0].expected = false; }, 'changed or removed an existing case');
+build('retained Unicode string drift', state => { state.catalog.cases[0].semanticKey += '\u200b'; }, 'changed or removed an existing case');
+build('contract Unicode string drift', state => { state.contract.schema += '\u200b'; }, 'changes policy rules');
+build('schema Unicode string drift', state => { state.catalog.schema += '\u200b'; }, 'catalog has an invalid schema');
+build('case key Unicode drift', state => {
+  append(state); const item = state.catalog.cases.at(-1);
+  item['domain\u200b'] = item.domain; delete item.domain;
+}, 'unexpected key set');
+build('operation Unicode drift', state => { append(state); state.catalog.cases.at(-1).operation.type = 'se\u200bt'; }, 'unsupported operation');
+build('legitimate Unicode string data', state => {
+  append(state); state.catalog.cases.at(-1).operation.value = 'Ordinary \u200b Unicode data';
+});
+build('changed executable rules', state => { state.validator += 'process.exit(0);\n'; }, 'bounded inert line comments');
+build('uppercase operation', state => { append(state); state.catalog.cases.at(-1).operation.type = 'SET'; }, 'unsupported operation');
+for (const field of ['id', 'domain', 'workflow', 'semanticKey', 'operation']) {
+  for (const value of [true, 7, ['wrong']]) {
+    build(`${field} rejects ${JSON.stringify(value)}`, state => {
+      append(state);
+      if (field === 'operation') state.catalog.cases.at(-1).operation.type = value;
+      else state.catalog.cases.at(-1)[field] = value;
+    }, field === 'operation' ? 'unsupported operation' : 'ordinary new case');
+  }
+}
+for (const value of [true, 7, ['wrong']]) {
+  build(`schema rejects ${JSON.stringify(value)}`, state => { state.catalog.schema = value; }, 'catalog has an invalid schema');
+}
+const tuple = Object.fromEntries(names.map(file => [file,
+  execFileSync('git', ['-C', repo, 'show', `${topic}:${prefix}${file}`], { encoding: 'utf8' })]));
+const refreshed = commit(base, { 'outside-history.txt': 'Trusted main contribution\n' });
+const merged = commit(refreshed, tuple, [topic, refreshed]);
+rows.push({ name: 'ordinary merge imports exact trusted content', base: refreshed, head: merged, expected: '' });
+const badMerge = commit(refreshed, { ...tuple, 'outside-history.txt': 'Hostile resolution\n' }, [topic, refreshed]);
+const revertedMerge = commit(badMerge, { 'outside-history.txt': 'Trusted main contribution\n' });
+rows.push({ name: 'reverted hostile merge resolution', base: refreshed, head: revertedMerge, expected: 'Unsupported ordinary history shape' });
+const badSide = commit(base, { 'outside-side.txt': 'Hostile side edit\n' });
+const revertedSide = commit(badSide, { 'outside-side.txt': null });
+const octopus = commit(refreshed, tuple, [topic, refreshed, revertedSide]);
+rows.push({ name: 'octopus retains hostile side history rejection', base: refreshed, head: octopus, expected: 'Unsupported ordinary history shape' });
+const collisionStart = commit(base, { 'normal\u200b.txt': 'Original exact path\n' });
+const collisionBase = commit(collisionStart, { 'normal.txt': 'Trusted import\n' });
+const collisionTopic = build('Unicode data remains valid at exact base', append, '', collisionStart);
+const collisionTuple = Object.fromEntries(names.map(file => [file,
+  execFileSync('git', ['-C', repo, 'show', `${collisionTopic}:${prefix}${file}`], { encoding: 'utf8' })]));
+const collisionBad = commit(collisionBase, { ...collisionTuple, 'normal\u200b.txt': 'Hostile resolution\n' }, [collisionTopic, collisionBase]);
+const collisionRestored = commit(collisionBase, collisionTuple, [collisionBad, collisionBase]);
+rows.push({ name: 'ordinal path identity retains hostile history', base: collisionBase, head: collisionRestored, expected: 'Unsupported ordinary history shape' });
+process.stdout.write(JSON.stringify(rows));
+'@
+        $objOrdinaryFixtures = Invoke-BoundedProcessByte -FileName 'node' `
+            -ArgumentList @('--input-type=module', '-e', $strOrdinaryFixtureBuilder,
+                $strSchemaFixtureRoot, $RepositoryRootPath) `
+            -MaximumBytes 65536 -TimeoutMilliseconds 60000
+        if ($objOrdinaryFixtures.ExitCode -ne 0) {
+            throw 'Could not build the inert ordinary content fixtures.'
+        }
+        $arrOrdinaryFixtures = @(ConvertFrom-Json -InputObject (
+                ConvertFrom-StrictUtf8Text -Bytes $objOrdinaryFixtures.Bytes `
+                    -Name 'The inert ordinary fixture identities'
+            ))
+        if ($arrOrdinaryFixtures.Count -ne 36) {
+            throw 'The ordinary fixture catalog must contain exactly 36 cases.'
+        }
+        foreach ($objOrdinaryFixture in $arrOrdinaryFixtures) {
+            try {
+                Assert-OrdinaryWorkflowPolicyContent `
+                    -RepositoryRootPath $strSchemaFixtureRoot `
+                    -TrustedRevision $objOrdinaryFixture.base `
+                    -HeadRevision $objOrdinaryFixture.head
+                if (-not [string]::IsNullOrEmpty($objOrdinaryFixture.expected)) {
+                    throw "Ordinary hostile fixture passed: $($objOrdinaryFixture.name)"
+                }
+            } catch {
+                if ([string]::IsNullOrEmpty($objOrdinaryFixture.expected) -or
+                    -not $_.Exception.Message.Contains(
+                        $objOrdinaryFixture.expected, [StringComparison]::Ordinal
+                    )) {
+                    throw
+                }
+            }
+        }
+    } finally {
         if ([IO.Directory]::Exists($strSchemaFixtureRoot) -and
             $strSchemaFixtureRoot.StartsWith(
                 $strSchemaSystemTempRoot,
@@ -4107,8 +4933,7 @@ if ($AuthorizationApplicabilityOnly) {
             $strMergeBase $HeadRevision -- @arrTrustRootPaths
         if ($LASTEXITCODE -eq 1) {
             $boolTrustRootChanged = $true
-        }
-        elseif ($LASTEXITCODE -ne 0) {
+        } elseif ($LASTEXITCODE -ne 0) {
             throw 'Could not inspect trust-root maintenance applicability.'
         }
     }
@@ -4130,8 +4955,7 @@ try {
     $objJsonDocument = [System.Text.Json.JsonDocument]::Parse($strManifestText)
     Assert-NoDuplicateJsonProperty -Element $objJsonDocument.RootElement
     $objManifest = ConvertFrom-Json -InputObject $strManifestText
-}
-catch {
+} catch {
     throw 'The trusted authorization manifest is malformed JSON.'
 }
 if ($objManifest.schema_version -notin @(1, 2) -or
@@ -4191,8 +5015,7 @@ if ($boolTransitionAuthorization) {
         -PropertyName @(
             'maximum_paths', 'maximum_blob_bytes', 'maximum_manifest_bytes'
         )
-}
-else {
+} else {
     Assert-ExactPropertySet -InputObject $objManifest `
         -Name 'The content-exact authorization manifest' `
         -PropertyName @(
@@ -4239,6 +5062,20 @@ if ($objManifest.limits.maximum_paths -gt $intCandidateMaximumPaths -or
     throw 'The authorization limits exceed the trusted verifier limits.'
 }
 $arrAllowedPaths = @($objManifest.allowed_paths)
+if (-not $boolTransitionAuthorization -and $arrAllowedPaths.Count -eq 0) {
+    $strInactiveDigest = [Convert]::ToHexString(
+        [Security.Cryptography.SHA256]::HashData([byte[]]$arrManifestBytes)
+    ).ToLowerInvariant()
+    if ($strInactiveDigest -cne
+        'd30601d4b8c40672ac9e91414b88a88efcb50a32e168c473a128549fdf2d65f4' -or
+        $boolContentExactManifestDeactivation) {
+        throw 'Ordinary content requires the unchanged canonical inactive manifest.'
+    }
+    Assert-OrdinaryWorkflowPolicyContent -RepositoryRootPath $RepositoryRootPath `
+        -TrustedRevision $TrustedRevision -HeadRevision $HeadRevision
+    Write-Output $true
+    return
+}
 if ($arrAllowedPaths.Count -lt 1 -or
     $arrAllowedPaths.Count -gt $objManifest.limits.maximum_paths) {
     throw 'The authorization path count is outside its limit.'
@@ -4360,11 +5197,9 @@ foreach ($objPath in $arrAllowedPaths) {
                 @($objCandidateManifest.allowed_paths).Count -ne 0) {
                 throw 'The landed content-exact authorization manifest is active or invalid.'
             }
-        }
-        catch {
+        } catch {
             throw 'The transition does not land the exact inactive schema 2 manifest.'
-        }
-        finally {
+        } finally {
             if ($null -ne $objCandidateManifestDocument) {
                 $objCandidateManifestDocument.Dispose()
             }

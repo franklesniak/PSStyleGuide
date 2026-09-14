@@ -510,6 +510,7 @@ jobs:
               throw 'Trust-root applicability did not return one exact Boolean.'
           }
           $boolAuthorized = $false
+          $boolOrdinaryContent = $false
           if ($arrApplicability[0]) {
               $arrAuthorization = @(
                   & ./.github/workflows/Test-TrustRootAuthorization.ps1 `
@@ -524,12 +525,34 @@ jobs:
                   throw 'Trust-root authorization did not return one exact true result.'
               }
               $boolAuthorized = $true
+              $strManifestDigest = (Get-FileHash -LiteralPath `
+                      './.github/workflows/trust-root-authorization.json' `
+                      -Algorithm SHA256).Hash.ToLowerInvariant()
+              $boolOrdinaryContent = $strManifestDigest -ceq
+                  'd30601d4b8c40672ac9e91414b88a88efcb50a32e168c473a128549fdf2d65f4'
           }
           [System.IO.File]::AppendAllText(
               $env:GITHUB_OUTPUT,
-              "authorized=$($boolAuthorized.ToString().ToLowerInvariant())`n",
+              ("authorized=$($boolAuthorized.ToString().ToLowerInvariant())`n" +
+                  "ordinary=$($boolOrdinaryContent.ToString().ToLowerInvariant())`n"),
               [System.Text.UTF8Encoding]::new($false)
           )
+
+      - name: Validate ordinary candidate cases with trusted rules
+        if: steps.trust-root-authorization.outputs.ordinary == 'true'
+        shell: bash
+        env:
+          CANDIDATE_HEAD_REVISION: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          [[ "${CANDIDATE_HEAD_REVISION}" =~ ^[0-9a-f]{40}$ ]]
+          node .github/workflows/Validate-WorkflowPolicy.mjs --preflight
+          npm --prefix .github/workflows ci --ignore-scripts --no-audit \
+            --fund=false --include=dev --package-lock=true
+          git --no-replace-objects -c core.fsmonitor=false show \
+            "${CANDIDATE_HEAD_REVISION}:.github/workflows/workflow-policy-cases.json" |
+            node .github/workflows/Validate-WorkflowPolicy.mjs \
+              --ordinary-case-catalog-data
 
       - name: Validate instruction capacity and capabilities
         if: >-
