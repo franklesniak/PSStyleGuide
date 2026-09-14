@@ -3,7 +3,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.10.20260914.0
+# Version: 1.10.20260914.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -1684,7 +1684,7 @@ function Get-TomlParseContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20260914.1.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -1755,7 +1755,7 @@ function Get-TomlParseContext {
                 'import sys;sys.stdout.write("3.12" if sys.version_info[:2]==(3,12) else "")'
             )) {
             $objProbeInfo.ArgumentList.Add($strArgument)
-            }
+        }
         $objProbe = [Diagnostics.Process]::new()
         $objProbe.StartInfo = $objProbeInfo
         try {
@@ -8013,7 +8013,7 @@ if ($SelfTest) {
                 }
                 if ([regex]::Matches(
                         $strFunctionNotes,
-                        '(?m)^Version: 1\.(?:0\.(?:202608(?:30|31)|202609(?:0[23]|1[234]))|1\.20260914)\.0\.$'
+                        '(?m)^Version: 1\.(0\.(202608(30|31)|202609(0[23]|1[234]))\.0|0\.20260914\.1|1\.20260914\.0)\.$'
                     ).Count -ne 1) {
                     $listMissingHelp.Add('landing or repair helper Version')
                 }
@@ -8125,9 +8125,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.10\.20260914\.0$'
+            '(?m)^# Version: 1\.10\.20260914\.1$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.10.20260914.0.'
+        throw 'The validator script version is not 1.10.20260914.1.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
