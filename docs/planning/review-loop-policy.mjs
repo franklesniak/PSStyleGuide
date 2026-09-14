@@ -511,6 +511,14 @@ function compareRfc3339Instants(left, right, leftLabel, rightLabel) {
   return leftFraction === rightFraction ? 0 : leftFraction < rightFraction ? -1 : 1;
 }
 
+function getRfc3339InstantIdentity(value, label) {
+  const instant = parseRfc3339Instant(value, label);
+  return canonicalJson([
+    instant.epochSecond.toString(),
+    instant.fraction.replace(/0+$/u, ''),
+  ]);
+}
+
 function isRfc3339ElapsedAtLeastMilliseconds(
   start,
   end,
@@ -3203,7 +3211,10 @@ function validateTerminalResultReferences(requests, reviewState) {
     }
   }
 
-  const seenResultIdentities = new Set();
+  const seenImmutableResultIdentities = new Set();
+  const seenMutableConversationResultOccurrences = new Set();
+  const immutableFailureIdentities = new Set();
+  const mutableConversationIdentities = new Set();
   for (const request of requests.filter(
     (candidate) => candidate.confirmed === true && candidate.terminal === true,
   )) {
@@ -3224,13 +3235,67 @@ function validateTerminalResultReferences(requests, reviewState) {
         'A confirmed terminal request must reference one attributable terminal result or failure outcome.',
       );
     }
-    const identityNamespace = reference.kind;
-    const resultIdentities = getItemIdentities(matches[0])
-      .map((identity) => `${identityNamespace}:${identity}`);
-    if (resultIdentities.some((identity) => seenResultIdentities.has(identity))) {
+    const result = matches[0];
+    const resultIdentities = getItemIdentities(result);
+    const isMutableConversationResult = !isFailure &&
+      reference.kind === 'conversation-comment';
+    if (isMutableConversationResult) {
+      if (resultIdentities.some((identity) => immutableFailureIdentities.has(identity))) {
+        throw new TypeError(
+          'A native identity cannot identify both a clean mutable result and an immutable terminal failure.',
+        );
+      }
+      const resultTime = getConsistentItemTimestamp(result, [
+        ['updated_at', 'updatedAt'],
+        ['created_at', 'createdAt'],
+      ])?.value ?? null;
+      if (resultTime === null) {
+        throw new TypeError(
+          'A clean mutable terminal result requires one consistent authenticated observation time.',
+        );
+      }
+      const instantIdentity = getRfc3339InstantIdentity(
+        resultTime,
+        'clean mutable terminal result time',
+      );
+      const resultOccurrences = resultIdentities.map((identity) => canonicalJson([
+        reference.kind,
+        identity,
+        instantIdentity,
+      ]));
+      if (resultOccurrences.some(
+        (identity) => seenMutableConversationResultOccurrences.has(identity),
+      )) {
+        throw new TypeError('A terminal result is assigned to multiple requests.');
+      }
+      resultOccurrences.forEach(
+        (identity) => seenMutableConversationResultOccurrences.add(identity),
+      );
+      resultIdentities.forEach((identity) => mutableConversationIdentities.add(identity));
+      continue;
+    }
+
+    if (
+      isFailure &&
+      resultIdentities.some((identity) => mutableConversationIdentities.has(identity))
+    ) {
+      throw new TypeError(
+        'A native identity cannot identify both a clean mutable result and an immutable terminal failure.',
+      );
+    }
+    const immutableResultIdentities = resultIdentities
+      .map((identity) => `${reference.kind}:${identity}`);
+    if (immutableResultIdentities.some(
+      (identity) => seenImmutableResultIdentities.has(identity),
+    )) {
       throw new TypeError('A terminal result is assigned to multiple requests.');
     }
-    resultIdentities.forEach((identity) => seenResultIdentities.add(identity));
+    immutableResultIdentities.forEach(
+      (identity) => seenImmutableResultIdentities.add(identity),
+    );
+    if (isFailure) {
+      resultIdentities.forEach((identity) => immutableFailureIdentities.add(identity));
+    }
   }
 }
 

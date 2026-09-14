@@ -7138,6 +7138,187 @@ test('terminal result identities cannot be reused across reviewer channels', () 
   }
 });
 
+test('terminal result identity distinguishes clean mutable observations without weakening immutable use', () => {
+  const input1 = reviewInput({
+    head: 'da014a055f8fe4d62a265bbbfe195169e53a3d73',
+  });
+  const input2 = reviewInput({
+    head: '4e92e37ae60363426c222f411fcd944a5fe83a1d',
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const copilotRequest = (input, id, requestedAt, observedAt) => requestFor(
+    input,
+    'copilot',
+    {
+      confirmed: true,
+      terminal: true,
+      requestedAt,
+      terminalResultRef: {
+        kind: 'submitted-review',
+        id,
+        observedAt,
+      },
+    },
+  );
+  const codexRequest = (input, id, requestedAt, observedAt, baseline = {}) => requestFor(
+    input,
+    'codex',
+    {
+      confirmed: true,
+      terminal: true,
+      requestedAt,
+      baselineConversationComments: baseline,
+      terminalResultRef: {
+        kind: 'conversation-comment',
+        id,
+        observedAt,
+      },
+    },
+  );
+  const comment = (input, updatedAt) => ({
+    id: '5658285325',
+    nodeId: 'IC_kwDOQkjdhM8AAAABUUKVDQ',
+    actor: 'chatgpt-codex-connector[bot]',
+    updatedAt,
+    status: 'completed',
+    commitPrefix: input.head.slice(0, 7),
+  });
+
+  const distinctObservations = compactState(input2, {
+    mutationClass: 'CODE_OR_DIFF',
+    reviewRequests: [
+      copilotRequest(input1, 'COPILOT_ONE', '2026-09-14T05:50:00Z', '2026-09-14T05:54:55Z'),
+      codexRequest(
+        input1,
+        'IC_kwDOQkjdhM8AAAABUUKVDQ',
+        '2026-09-14T05:55:00Z',
+        '2026-09-14T05:56:18Z',
+        { IC_kwDOQkjdhM8AAAABUUKVDQ: '2026-09-14T05:00:00Z' },
+      ),
+      copilotRequest(input2, 'COPILOT_TWO', '2026-09-14T08:08:56Z', '2026-09-14T08:15:50Z'),
+      codexRequest(
+        input2,
+        'IC_kwDOQkjdhM8AAAABUUKVDQ',
+        '2026-09-14T08:13:06Z',
+        '2026-09-14T08:20:16Z',
+        { IC_kwDOQkjdhM8AAAABUUKVDQ: '2026-09-14T05:56:18Z' },
+      ),
+    ],
+    codexResults: {
+      submittedReviews: [],
+      conversationComments: [
+        comment(input1, '2026-09-14T05:56:18Z'),
+        comment(input2, '2026-09-14T08:20:16Z'),
+      ],
+    },
+  });
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(distinctObservations)),
+    distinctObservations,
+  );
+
+  const equivalentOccurrence = structuredClone(distinctObservations);
+  const equivalentRequests = equivalentOccurrence.current_task.review.reviewRequests;
+  equivalentRequests[1].terminalResultRef.observedAt = '2026-09-14T05:56:18.1000Z';
+  equivalentRequests[2].requestedAt = '2026-09-14T05:56:18.1Z';
+  equivalentRequests[2].readyAt = '2026-09-14T05:56:18.1Z';
+  equivalentRequests[2].terminalResultRef.observedAt = '2026-09-14T05:56:18.1Z';
+  equivalentOccurrence.current_task.review.copilotResults
+    .submittedReviews[1].submittedAt = '2026-09-14T05:56:18.1Z';
+  equivalentRequests[3].requestedAt = '2026-09-14T05:56:18.100000Z';
+  equivalentRequests[3].terminalResultRef.observedAt = '2026-09-14T05:56:18.100000Z';
+  equivalentRequests[3].baselineConversationComments = {};
+  const equivalentComments = equivalentOccurrence.current_task.review
+    .codexResults.conversationComments;
+  equivalentComments[0].updatedAt = '2026-09-14T05:56:18.1000Z';
+  equivalentComments[1].updatedAt = '2026-09-14T00:56:18.1-05:00';
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(equivalentOccurrence)),
+    /terminal result is assigned to multiple requests/u,
+  );
+
+  const failureRequest = (input, id, requestedAt, observedAt, summaryObservedAt) => requestFor(
+    input,
+    'codex',
+    {
+      confirmed: true,
+      terminal: true,
+      requestedAt,
+      terminalFailureRef: terminalFailureRef({
+        id,
+        observedAt,
+        summaryId: `${id}_SUMMARY`,
+        summaryObservedAt,
+      }),
+    },
+  );
+  const failureComment = (input, id, updatedAt, summaryObservedAt) => ({
+    id,
+    nodeId: 'IC_kwDOQkjdhM8AAAABUUKVDQ',
+    actor: 'chatgpt-codex-connector[bot]',
+    updatedAt,
+    status: 'failed',
+    commitPrefix: input.head.slice(0, 7),
+    terminalSummaryId: `${id}_SUMMARY`,
+    terminalSummaryUpdatedAt: summaryObservedAt,
+  });
+  const crossModeState = (failureFirst) => {
+    const failure = failureRequest(
+      failureFirst ? input1 : input2,
+      'FAILURE_DETAIL',
+      failureFirst ? '2026-09-04T10:01:00Z' : '2026-09-04T10:02:30Z',
+      failureFirst ? '2026-09-04T10:01:30Z' : '2026-09-04T10:03:00Z',
+      failureFirst ? '2026-09-04T10:01:31Z' : '2026-09-04T10:03:01Z',
+    );
+    const clean = codexRequest(
+      failureFirst ? input2 : input1,
+      'IC_kwDOQkjdhM8AAAABUUKVDQ',
+      failureFirst ? '2026-09-04T10:02:30Z' : '2026-09-04T10:01:00Z',
+      failureFirst ? '2026-09-04T10:03:00Z' : '2026-09-04T10:01:30Z',
+    );
+    return compactState(input2, {
+      mutationClass: 'CODE_OR_DIFF',
+      reviewRequests: [
+        copilotRequest(input1, 'COPILOT_ONE', '2026-09-04T10:00:00Z', '2026-09-04T10:00:30Z'),
+        failureFirst ? failure : clean,
+        copilotRequest(input2, 'COPILOT_TWO', '2026-09-04T10:02:00Z', '2026-09-04T10:02:20Z'),
+        failureFirst ? clean : failure,
+      ],
+      codexResults: {
+        submittedReviews: [],
+        conversationComments: failureFirst
+          ? [
+              failureComment(
+                input1,
+                'FAILURE_DETAIL',
+                '2026-09-04T10:01:30Z',
+                '2026-09-04T10:01:31Z',
+              ),
+              comment(input2, '2026-09-04T10:03:00Z'),
+            ]
+          : [
+              comment(input1, '2026-09-04T10:01:30Z'),
+              failureComment(
+                input2,
+                'FAILURE_DETAIL',
+                '2026-09-04T10:03:00Z',
+                '2026-09-04T10:03:01Z',
+              ),
+            ],
+      },
+    });
+  };
+  for (const failureFirst of [true, false]) {
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(crossModeState(failureFirst))),
+      /clean mutable result and an immutable terminal failure/u,
+      failureFirst ? 'failure before clean' : 'clean before failure',
+    );
+  }
+});
+
 test('semantic ingestion enforces the closed review-request field set', async () => {
   const schema = JSON.parse(
     await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
