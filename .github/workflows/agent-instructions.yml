@@ -480,13 +480,18 @@ jobs:
           --input-revision "${INPUT_REVISION}"
           --self-test
 
-      - name: Install locked Markdown parser
+      - name: Install locked validation dependencies
         if: >-
           github.event_name != 'push' ||
           steps.push-applicability.outputs.required == 'true'
-        run: >-
-          npm ci --ignore-scripts --no-audit --fund=false
-          --include=dev --package-lock=true
+        shell: bash
+        run: |
+          set -euo pipefail
+          node .github/workflows/Validate-WorkflowPolicy.mjs --preflight
+          npm ci --ignore-scripts --no-audit --fund=false \
+            --include=dev --package-lock=true
+          npm --prefix .github/workflows ci --ignore-scripts --no-audit \
+            --fund=false --include=dev --package-lock=true
 
       - name: Validate exact trust-root maintenance as inert data
         id: trust-root-authorization
@@ -547,8 +552,6 @@ jobs:
           set -euo pipefail
           [[ "${CANDIDATE_HEAD_REVISION}" =~ ^[0-9a-f]{40}$ ]]
           node .github/workflows/Validate-WorkflowPolicy.mjs --preflight
-          npm --prefix .github/workflows ci --ignore-scripts --no-audit \
-            --fund=false --include=dev --package-lock=true
           git --no-replace-objects -c core.fsmonitor=false show \
             "${CANDIDATE_HEAD_REVISION}:.github/workflows/workflow-policy-cases.json" |
             node .github/workflows/Validate-WorkflowPolicy.mjs \

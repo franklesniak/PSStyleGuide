@@ -10649,8 +10649,12 @@ if ($SelfTest) {
     $strValidatorSourceContent = [IO.File]::ReadAllText($PSCommandPath)
     $strParserManifestValidationCall =
         'node .github/workflows/Test-AgentInstructionParserManifest.mjs'
+    $strPolicyPreflightCall =
+        'node .github/workflows/Validate-WorkflowPolicy.mjs --preflight'
     $strLockedDependencyInstallCall =
         'npm ci --ignore-scripts --no-audit --fund=false'
+    $strWorkflowPolicyInstallCall =
+        'npm --prefix .github/workflows ci --ignore-scripts --no-audit'
     $strTrustRootAuthorizationCall =
         '& ./.github/workflows/Test-TrustRootAuthorization.ps1'
     $scriptBlockGetFixtureCloneSourceFailure = {
@@ -11046,20 +11050,53 @@ if ($SelfTest) {
             $strParserManifestValidationCall,
             [StringComparison]::Ordinal
         )
+        $intWorkflowPolicyBootstrap = $Content.IndexOf(
+            $strPolicyPreflightCall,
+            [StringComparison]::Ordinal
+        )
         $intLockedDependencyInstall = $Content.IndexOf(
             $strLockedDependencyInstallCall,
+            [StringComparison]::Ordinal
+        )
+        $intWorkflowPolicyDependencyInstall = $Content.IndexOf(
+            $strWorkflowPolicyInstallCall,
             [StringComparison]::Ordinal
         )
         $intTrustRootAuthorization = $Content.IndexOf(
             $strTrustRootAuthorizationCall,
             [StringComparison]::Ordinal
         )
-        if ($intParserManifestValidation -lt 0 -or
-            $intLockedDependencyInstall -le $intParserManifestValidation -or
-            $intTrustRootAuthorization -le $intLockedDependencyInstall) {
+        $intWorkflowPolicyUsePreflight = $Content.LastIndexOf(
+            $strPolicyPreflightCall,
+            [StringComparison]::Ordinal
+        )
+        $intOrdinaryCaseData = $Content.IndexOf(
+            '--ordinary-case-catalog-data',
+            [StringComparison]::Ordinal
+        )
+        $objDependencyStep = [regex]::Match(
+            $Content,
+            '(?ms)^      - name: Install locked validation dependencies\r?\n' +
+                '(?<Body>.*?)(?=^      - name: Validate exact trust-root)'
+        )
+        if ([regex]::Matches($Content,
+                [regex]::Escape($strPolicyPreflightCall)).Count -ne 2 -or
+            [regex]::Matches($Content,
+                [regex]::Escape($strWorkflowPolicyInstallCall)).Count -ne 1 -or
+            -not $objDependencyStep.Success -or
+            $objDependencyStep.Groups['Body'].Value -cnotmatch
+                "(?m)^          github.event_name != 'push' \|\|`r?`n" +
+                    "          steps\.push-applicability\.outputs\.required == 'true'`r?$" -or
+            $intParserManifestValidation -lt 0 -or
+            $intWorkflowPolicyBootstrap -le $intParserManifestValidation -or
+            $intLockedDependencyInstall -le $intWorkflowPolicyBootstrap -or
+            $intWorkflowPolicyDependencyInstall -le $intLockedDependencyInstall -or
+            $intTrustRootAuthorization -le $intWorkflowPolicyDependencyInstall -or
+            $intWorkflowPolicyUsePreflight -le $intTrustRootAuthorization -or
+            $intOrdinaryCaseData -le $intWorkflowPolicyUsePreflight) {
             (
-                'The executable parser closure must be validated before its ' +
-                    'trusted installation and privileged trust-root use.'
+                'Executable dependency closures must be validated before ' +
+                    'their single locked installation and use.'
             )
         }
         foreach ($strForbiddenTransitionLiteral in @(
@@ -11277,9 +11314,52 @@ if ($SelfTest) {
     )
     if ($strUnsafeParserOrderMutation -ceq $strAgentWorkflowContent -or
         $arrUnsafeParserOrderFailures -cnotcontains
-            ('The executable parser closure must be validated before its ' +
-                'trusted installation and privileged trust-root use.')) {
+            ('Executable dependency closures must be validated before ' +
+                'their single locked installation and use.')) {
         throw 'An unsafe executable parser validation order did not fail closed.'
+    }
+    $strPolicyOrderPlaceholder = [string]::new(
+        '_', $strWorkflowPolicyInstallCall.Length
+    )
+    if ($strAgentWorkflowContent.Contains($strPolicyOrderPlaceholder)) {
+        throw 'The order placeholder is not unique.'
+    }
+    $strPolicyOrderMutation = ([regex]::new(
+            [regex]::Escape($strPolicyPreflightCall)
+        )).Replace(
+        $strAgentWorkflowContent, $strPolicyOrderPlaceholder, 1
+    ).Replace(
+        $strWorkflowPolicyInstallCall,
+        $strPolicyPreflightCall
+    ).Replace($strPolicyOrderPlaceholder, $strWorkflowPolicyInstallCall)
+    if ([regex]::Matches($strPolicyOrderMutation,
+            [regex]::Escape($strPolicyPreflightCall)).Count -ne 2 -or
+        [regex]::Matches($strPolicyOrderMutation,
+            [regex]::Escape($strWorkflowPolicyInstallCall)).Count -ne 1) {
+        throw 'The order mutation changed dependency counts.'
+    }
+    foreach ($strUnsafeWorkflowPolicyMutation in @(
+            $strAgentWorkflowContent.Replace(
+                $strWorkflowPolicyInstallCall, ''),
+            $strAgentWorkflowContent.Replace(
+                $strWorkflowPolicyInstallCall,
+                $strWorkflowPolicyInstallCall +
+                    $strWorkflowPolicyInstallCall),
+            $strPolicyOrderMutation,
+            $strAgentWorkflowContent.Replace(
+                "          github.event_name != 'push' ||",
+                "          github.event_name == 'pull_request_target' &&")
+        )) {
+        $arrUnsafeWorkflowPolicyFailures = @(
+            & $scriptBlockGetAgentWorkflowFailure `
+                -Content $strUnsafeWorkflowPolicyMutation
+        )
+        if ($strUnsafeWorkflowPolicyMutation -ceq $strAgentWorkflowContent -or
+            $arrUnsafeWorkflowPolicyFailures -cnotcontains
+                ('Executable dependency closures must be validated before ' +
+                    'their single locked installation and use.')) {
+            throw 'An unsafe workflow policy dependency mutation did not fail closed.'
+        }
     }
 
     $strCreatedRefDepthSystemTempRoot =

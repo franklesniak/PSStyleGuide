@@ -1879,14 +1879,28 @@ function Assert-SemanticInvariant {
             'Name = ''unrelated exact two-cell Deployment Status data row''',
             '$strParserManifestValidationCall =',
             '''node .github/workflows/Test-AgentInstructionParserManifest.mjs''',
+            '$strPolicyPreflightCall =',
+            '''node .github/workflows/Validate-WorkflowPolicy.mjs --preflight''',
             '$strLockedDependencyInstallCall =',
             '''npm ci --ignore-scripts --no-audit --fund=false''',
+            '$strWorkflowPolicyInstallCall =',
+            '''npm --prefix .github/workflows ci --ignore-scripts --no-audit''',
             '$strTrustRootAuthorizationCall =',
             '''& ./.github/workflows/Test-TrustRootAuthorization.ps1''',
-            '$intLockedDependencyInstall -le $intParserManifestValidation -or',
-            '$intTrustRootAuthorization -le $intLockedDependencyInstall',
+            '[regex]::Escape($strPolicyPreflightCall)).Count -ne 2 -or',
+            '[regex]::Escape($strWorkflowPolicyInstallCall)).Count -ne 1 -or',
+            '-not $objDependencyStep.Success -or',
+            'github.event_name != ''push'' \|\|`r?`n',
+            '$intWorkflowPolicyBootstrap -le $intParserManifestValidation -or',
+            '$intLockedDependencyInstall -le $intWorkflowPolicyBootstrap -or',
+            '$intWorkflowPolicyDependencyInstall -le $intLockedDependencyInstall -or',
+            '$intTrustRootAuthorization -le $intWorkflowPolicyDependencyInstall -or',
+            '$intWorkflowPolicyUsePreflight -le $intTrustRootAuthorization -or',
+            '$intOrdinaryCaseData -le $intWorkflowPolicyUsePreflight',
             '$strUnsafeParserOrderMutation = $strAgentWorkflowContent.Replace(',
-            'throw ''An unsafe executable parser validation order did not fail closed.'''
+            'throw ''An unsafe executable parser validation order did not fail closed.''',
+            '$strPolicyOrderMutation =',
+            'throw ''An unsafe workflow policy dependency mutation did not fail closed.'''
         )
         foreach ($strRequiredLiteral in $arrRequiredLiteral) {
             if (-not $Text.Contains(
@@ -4787,6 +4801,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 const source = process.argv[1];
+const diagnosticControl = process.argv[2] ?? '';
 const directory = path.join(source, '.github/workflows');
 const catalog = JSON.parse(fs.readFileSync(path.join(directory, 'workflow-policy-cases.json'), 'utf8'));
 const next = Math.max(...catalog.cases.filter(item => item.id.startsWith('PS-P1-WFPOL-'))
@@ -4802,36 +4817,138 @@ for (const operation of [
     workflow: 'build.yml', operation, expected: false,
   }] }, status: 1 });
 }
-for (const row of rows) {
+function fail(kind, index, row, child, category) {
+  const status = Number.isInteger(child.status) && child.status >= 0 && child.status <= 255
+    ? String(child.status) : child.status == null ? 'NONE' : 'OTHER';
+  const signal = ['SIGABRT', 'SIGALRM', 'SIGHUP', 'SIGINT', 'SIGKILL', 'SIGQUIT', 'SIGTERM']
+    .includes(child.signal) ? child.signal : child.signal == null ? 'NONE' : 'OTHER';
+  const errorCode = ['EACCES', 'EAGAIN', 'EMFILE', 'ENFILE', 'ENOENT', 'ENOBUFS', 'ENOMEM',
+    'ETIMEDOUT'].includes(child.error?.code) ? child.error.code
+    : child.error?.code == null ? 'NONE' : 'OTHER';
+  const safeCategory = ['case-catalog', 'case-catalog-identity', 'case-operation', 'case-result',
+    'ordinary-case-prefix', 'ordinary-case-self-test', 'ordinary-case-shape', 'tool-failure']
+    .includes(category) ? category : category == null ? 'NONE' : 'OTHER';
+  fs.writeSync(1, `ordinary-cli-preparation-failed kind=${kind} row=${index} `
+    + `expected-status=${row.status} actual-status=${status} category=${safeCategory} `
+    + `signal=${signal} error-code=${errorCode}`);
+  process.exit(1);
+}
+for (const [index, row] of rows.entries()) {
   const child = spawnSync(process.execPath,
     [path.join(directory, 'Validate-WorkflowPolicy.mjs'), '--ordinary-case-catalog-data'], {
       input: Buffer.from(JSON.stringify(row.catalog)), encoding: 'utf8',
       timeout: 10000, maxBuffer: 65536, windowsHide: true,
     });
   if (child.error || child.signal || child.status !== row.status) {
-    throw new Error('The ordinary CLI preparation control failed.');
+    let category;
+    try { ({ category } = JSON.parse(child.stdout)); } catch {}
+    fail('process', index, row, child, category);
   }
-  const result = JSON.parse(child.stdout);
+  if (diagnosticControl === 'malformed') child.stdout = '{';
+  if (diagnosticControl === 'null') child.stdout = 'null';
+  if (diagnosticControl === 'array') child.stdout = '[]';
+  let result;
+  try { result = JSON.parse(child.stdout); } catch {
+    fail('result-json', index, row, child);
+  }
+  if (result === null || typeof result !== 'object' || Array.isArray(result)) {
+    fail('result-shape', index, row, child);
+  }
   if (row.status === 0
     ? result.success !== true || result.casesPassed !== catalog.cases.length || result.mergeApproval !== false
     : result.success !== false || result.category !== 'case-operation') {
-    throw new Error('The ordinary CLI preparation result is invalid.');
+    fail('result', index, row, child, result.category);
   }
 }
 process.stdout.write('ordinary-cli-preparation-passed');
 '@
+        $scriptBlockGetOrdinaryCliFailure = {
+            param([Parameter(Mandatory)][pscustomobject] $Result)
+
+            $strText = ConvertFrom-StrictUtf8Text -Bytes $Result.Bytes `
+                -Name 'The ordinary CLI preparation result'
+            if ($Result.ExitCode -eq 0) {
+                if ([string]::Equals(
+                        $strText,
+                        'ordinary-cli-preparation-passed',
+                        [StringComparison]::Ordinal
+                    )) {
+                    return ''
+                }
+            } elseif ($strText -cmatch (
+                    '^ordinary-cli-preparation-failed ' +
+                    'kind=(process|result-json|result-shape|result) row=[0-2] ' +
+                    'expected-status=[012] actual-status=(NONE|OTHER|[0-9]{1,3}) ' +
+                    'category=(NONE|OTHER|case-catalog|case-catalog-identity|' +
+                    'case-operation|case-result|ordinary-case-prefix|' +
+                    'ordinary-case-self-test|ordinary-case-shape|tool-failure) ' +
+                    'signal=(NONE|OTHER|SIGABRT|SIGALRM|SIGHUP|SIGINT|SIGKILL|' +
+                    'SIGQUIT|SIGTERM) error-code=(NONE|OTHER|EACCES|EAGAIN|' +
+                    'EMFILE|ENFILE|ENOENT|ENOBUFS|ENOMEM|ETIMEDOUT)$'
+                )) {
+                return "The ordinary CLI preparation self-test failed: $strText."
+            }
+            return 'The ordinary CLI preparation self-test failed without a valid diagnostic.'
+        }
+        $strOrdinaryCliFailureProbe = $strOrdinaryCliProbe.Replace(
+            'const rows = [{ catalog, status: 0 }];',
+            'const rows = [{ catalog, status: 2 }];'
+        )
+        if ($strOrdinaryCliFailureProbe -ceq $strOrdinaryCliProbe) {
+            throw 'The ordinary CLI diagnostic mutation changed zero bytes.'
+        }
+        $objOrdinaryCliFailureProbe = Invoke-BoundedProcessByte -FileName 'node' `
+            -ArgumentList @('--input-type=module', '-e',
+                $strOrdinaryCliFailureProbe, $RepositoryRootPath) `
+            -MaximumBytes 65536 -TimeoutMilliseconds 35000
+        $strOrdinaryCliFailure = & $scriptBlockGetOrdinaryCliFailure `
+            -Result $objOrdinaryCliFailureProbe
+        $strExpectedOrdinaryCliFailure =
+            'The ordinary CLI preparation self-test failed: ' +
+            'ordinary-cli-preparation-failed kind=process row=0 ' +
+            'expected-status=2 actual-status=0 category=NONE signal=NONE ' +
+            'error-code=NONE.'
+        if ($strOrdinaryCliFailure -cne $strExpectedOrdinaryCliFailure) {
+            throw 'The ordinary CLI diagnostic mutation was not propagated.'
+        }
+        foreach ($objOrdinaryCliResultControl in @(
+                [pscustomobject]@{
+                    Value = 'malformed'
+                    Kind = 'result-json'
+                },
+                [pscustomobject]@{
+                    Value = 'null'
+                    Kind = 'result-shape'
+                },
+                [pscustomobject]@{
+                    Value = 'array'
+                    Kind = 'result-shape'
+                }
+            )) {
+            $objOrdinaryCliFailureProbe = Invoke-BoundedProcessByte `
+                -FileName 'node' -ArgumentList @('--input-type=module', '-e',
+                    $strOrdinaryCliProbe, $RepositoryRootPath,
+                    $objOrdinaryCliResultControl.Value) `
+                -MaximumBytes 65536 -TimeoutMilliseconds 35000
+            $strOrdinaryCliFailure = & $scriptBlockGetOrdinaryCliFailure `
+                -Result $objOrdinaryCliFailureProbe
+            $strExpectedOrdinaryCliFailure =
+                'The ordinary CLI preparation self-test failed: ' +
+                'ordinary-cli-preparation-failed kind=' +
+                $objOrdinaryCliResultControl.Kind + ' row=0 expected-status=0 ' +
+                'actual-status=0 category=NONE signal=NONE error-code=NONE.'
+            if ($strOrdinaryCliFailure -cne $strExpectedOrdinaryCliFailure) {
+                throw 'An ordinary CLI result diagnostic was not propagated.'
+            }
+        }
         $objOrdinaryCliProbe = Invoke-BoundedProcessByte -FileName 'node' `
             -ArgumentList @('--input-type=module', '-e', $strOrdinaryCliProbe,
                 $RepositoryRootPath) `
             -MaximumBytes 65536 -TimeoutMilliseconds 35000
-        if ($objOrdinaryCliProbe.ExitCode -ne 0 -or
-            -not [string]::Equals(
-                (ConvertFrom-StrictUtf8Text -Bytes $objOrdinaryCliProbe.Bytes `
-                    -Name 'The ordinary CLI preparation result'),
-                'ordinary-cli-preparation-passed',
-                [StringComparison]::Ordinal
-            )) {
-            throw 'The ordinary CLI preparation self-test failed.'
+        $strOrdinaryCliFailure = & $scriptBlockGetOrdinaryCliFailure `
+            -Result $objOrdinaryCliProbe
+        if (-not [string]::IsNullOrEmpty($strOrdinaryCliFailure)) {
+            throw $strOrdinaryCliFailure
         }
 
         # The builder makes inert Git objects. It does not run candidate code.
