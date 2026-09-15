@@ -10,7 +10,7 @@ import path from 'node:path';
 import { TextDecoder } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
-const TOOL_VERSION = '1.0.20260912.3';
+const TOOL_VERSION = '1.0.20260915.0';
 const RESULT_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityResult.v1';
 const CASE_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityCases.v1';
 const START_MARKER = '<!-- psstyleguide-pr-body-identity:start -->';
@@ -1032,8 +1032,11 @@ function mutatedSnapshot(baseline, mutation) {
   if (mutation === 'contract-malformed-json') {
     setSnapshotBytes(snapshot, SOURCE_PATHS.contract, Buffer.from('{\n'));
   } else if (mutation === 'contract-forbidden-key') {
-    mutateText(snapshot, SOURCE_PATHS.contract, (text) =>
-      text.replace('{\n', '{\n  "__proto__": {},\n'));
+    mutateContract(snapshot, (contract) => {
+      Object.defineProperty(contract, '__proto__', {
+        value: {}, enumerable: true,
+      });
+    });
   } else if (mutation === 'generator-policy-version-malformed') {
     mutateContract(snapshot, (contract) => {
       contract.scriptVersions.generator.version = 'not-a-version';
@@ -1281,6 +1284,35 @@ async function runCaseCatalog(catalog, repositoryRoot) {
   passed += await runApiResponseEventSelfTests();
   passed += await runApiDeadlineSelfTests();
   const baselineSnapshot = collectSnapshot(repositoryRoot);
+  const baselineContract = JSON.parse(
+    baselineSnapshot.files[SOURCE_PATHS.contract].bytes.toString('utf8'),
+  );
+  for (const representation of [
+    `${JSON.stringify(baselineContract, null, 2)}\n`,
+    `${JSON.stringify(baselineContract)}\n`,
+    `\n  ${JSON.stringify(baselineContract)}\n`,
+  ]) {
+    const formatted = copySnapshot(baselineSnapshot);
+    setSnapshotBytes(formatted, SOURCE_PATHS.contract,
+      Buffer.from(representation, 'utf8'));
+    deriveIdentity(formatted);
+    const mutated = mutatedSnapshot(formatted, 'contract-forbidden-key');
+    const badBytes = mutated.files[SOURCE_PATHS.contract].bytes;
+    const badContract = JSON.parse(badBytes.toString('utf8'));
+    assert(!badBytes.equals(formatted.files[SOURCE_PATHS.contract].bytes) &&
+      Object.hasOwn(badContract, '__proto__') &&
+      Object.prototype.propertyIsEnumerable.call(badContract, '__proto__'),
+    'forbidden-key-mutation-self-test');
+    let rejected = false;
+    try {
+      deriveIdentity(mutated);
+    } catch (error) {
+      if (!(error instanceof IdentityError)) throw error;
+      rejected = error.category === 'contract-json';
+    }
+    assert(rejected, 'forbidden-key-category-self-test');
+    passed += 1;
+  }
   const originalGitDirectory = process.env.GIT_DIR;
   try {
     process.env.GIT_DIR = path.join(repositoryRoot, 'invalid-git-directory');

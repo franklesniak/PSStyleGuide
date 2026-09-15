@@ -47,7 +47,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.3.20260914.0
+# Version: 1.4.20260915.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -142,7 +142,8 @@ $script:hashtableSemanticInvariantPath = @{
 $script:hashtableExactTransitionTextIdentity = @{
     'pull-request-body-identity-api-termination-is-bounded' = @(
         '7b61ea2116386f75726af33dccf3e18fc90b509c206d44e900be405388556766',
-        '03b0aa378cbf8b70d7b292ee2d904a03e808d52dae067af2af5f766f46cabecf'
+        '03b0aa378cbf8b70d7b292ee2d904a03e808d52dae067af2af5f766f46cabecf',
+        '0458f240ed8415eb1a898a8c30d2fd90f717f034b9bec6e6d6ab878b3346305d'
     )
     'pull-request-body-identity-workflow-topology-is-exact' = @(
         'b006c0ed4cc0dc2391199fe1a49431c06f9a45910db34fe143c2e6df3ada2dd0',
@@ -977,14 +978,258 @@ process.stdin.on('end', () => {
     }
 }
 
+function Get-OrdinaryHelperStructure {
+    # .SYNOPSIS
+    # Describes one inert Add-ProposedBlob helper without resolving types.
+    #
+    # .DESCRIPTION
+    # Parses fixed-scope ASCII source. Retains exact significant tokens, token
+    # flags, and every AST node's kind, parent and token interval. Only complete
+    # single-line comments and layout can differ. Script requirements and
+    # signatures are forbidden. The sole OutputType attribute must use the
+    # exact truthful static form; only a historical trusted input can omit int.
+    # No AST StaticType, reflection type, GetScriptBlock or candidate execution
+    # is used. A signature describes syntax, not arbitrary semantic equivalence.
+    #
+    # .PARAMETER Text
+    # The complete fixed helper extent, decoded from bounded strict UTF-8.
+    #
+    # .PARAMETER HistoricalTrustedInput
+    # Allows the previously published incomplete OutputType on the trusted side.
+    #
+    # .EXAMPLE
+    # Get-OrdinaryHelperStructure -Text $strHelper
+    #
+    # # Returns one structural signature, or throws for unsupported syntax.
+    #
+    # .INPUTS
+    # None. Pipeline input is not supported.
+    #
+    # .OUTPUTS
+    # [string] The deterministic token and parse-tree signature.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260915.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $Text,
+        [Parameter()][switch] $HistoricalTrustedInput
+    )
+
+    if ($Text -cmatch '[^\x20-\x7e\n]' -or $Text.Length -gt 131072) {
+        throw 'The ordinary helper must be bounded ASCII and LF text.'
+    }
+    $arrTokens = $null
+    $arrErrors = $null
+    $objRoot = [Management.Automation.Language.Parser]::ParseInput(
+        $Text, [ref]$arrTokens, [ref]$arrErrors)
+    if ($arrTokens.Count -gt 8192) {
+        throw 'The ordinary helper exceeds the 8192-token parser bound.'
+    }
+    if ($arrErrors.Count -ne 0 -or $null -ne $objRoot.ScriptRequirements -or
+        $null -eq $objRoot.EndBlock -or $objRoot.EndBlock.Statements.Count -ne 1 -or
+        $objRoot.EndBlock.Statements[0] -isnot
+        [Management.Automation.Language.FunctionDefinitionAst] -or
+        $objRoot.EndBlock.Statements[0].Name -cne 'Add-ProposedBlob') {
+        throw 'The ordinary helper has unsupported scope, requirements or parser errors.'
+    }
+    $objFunction = $objRoot.EndBlock.Statements[0]
+    $arrFunctions = @($objRoot.FindAll({ param($objNode)
+                $objNode -is [Management.Automation.Language.FunctionDefinitionAst]
+            }, $true))
+    if ($arrFunctions.Count -ne 1 -or $null -eq $objFunction.Body.ParamBlock) {
+        throw 'The ordinary helper contains an extra function or no parameter block.'
+    }
+    $arrOutputAttributes = @($objFunction.Body.ParamBlock.Attributes | Where-Object {
+            $_.TypeName.FullName -ceq 'OutputType'
+        })
+    if ($arrOutputAttributes.Count -ne 1) {
+        throw 'The ordinary helper requires one exact static OutputType attribute.'
+    }
+    $objOutputAttribute = $arrOutputAttributes[0]
+    $strOutputText = $objOutputAttribute.Extent.Text
+    if ($strOutputText -cne '[OutputType([long], [int])]' -and
+        (-not $HistoricalTrustedInput -or $strOutputText -cne '[OutputType([long])]')) {
+        throw 'The ordinary helper requires the truthful static OutputType form.'
+    }
+    $listTokens = [Collections.Generic.List[Management.Automation.Language.Token]]::new()
+    $listSignature = [Collections.Generic.List[string]]::new()
+    foreach ($objToken in $arrTokens) {
+        if ($objToken.Kind -eq [Management.Automation.Language.TokenKind]::Comment) {
+            $intLineStart = $Text.LastIndexOf("`n", [Math]::Max(0, $objToken.Extent.StartOffset - 1)) + 1
+            $strPrefix = $Text.Substring($intLineStart, $objToken.Extent.StartOffset - $intLineStart)
+            if ($strPrefix.Trim(' ').Length -ne 0 -or
+                -not $objToken.Text.StartsWith('#', [StringComparison]::Ordinal) -or
+                $objToken.Text -imatch '^#(?:!|\s*(?:requires\b|SIG\b))') {
+                throw 'The ordinary helper contains an unsupported comment or signature directive.'
+            }
+            continue
+        }
+        if ($objToken.Extent.StartOffset -ge $objOutputAttribute.Extent.StartOffset -and
+            $objToken.Extent.EndOffset -le $objOutputAttribute.Extent.EndOffset) {
+            continue
+        }
+        if ($objToken.Kind -in @(
+                [Management.Automation.Language.TokenKind]::NewLine,
+                [Management.Automation.Language.TokenKind]::LineContinuation,
+                [Management.Automation.Language.TokenKind]::EndOfInput)) {
+            continue
+        }
+        $listTokens.Add($objToken)
+        $listSignature.Add(('{0}:{1}:{2}:{3}' -f
+                [int]$objToken.Kind, [int]$objToken.TokenFlags,
+                $objToken.Text.Length, $objToken.Text))
+    }
+    $arrNodes = @($objRoot.FindAll({ param($objNode) $null -ne $objNode }, $true) |
+            Where-Object {
+                -not ($_.Extent.StartOffset -ge $objOutputAttribute.Extent.StartOffset -and
+                    $_.Extent.EndOffset -le $objOutputAttribute.Extent.EndOffset)
+            })
+    if ($arrNodes.Count -gt 4096) {
+        throw 'The ordinary helper exceeds the 4096-node parser bound.'
+    }
+    $dictionaryNodeIndex = [Collections.Generic.Dictionary[Management.Automation.Language.Ast, int]]::new(
+        [Collections.Generic.ReferenceEqualityComparer]::Instance)
+    for ($intIndex = 0; $intIndex -lt $arrNodes.Count; $intIndex++) {
+        $dictionaryNodeIndex.Add($arrNodes[$intIndex], $intIndex)
+    }
+    for ($intNodeIndex = 0; $intNodeIndex -lt $arrNodes.Count; $intNodeIndex++) {
+        $objNode = $arrNodes[$intNodeIndex]
+        $intParentIndex = -1
+        if ($null -ne $objNode.Parent -and $dictionaryNodeIndex.ContainsKey($objNode.Parent)) {
+            $intParentIndex = $dictionaryNodeIndex[$objNode.Parent]
+        }
+        # Token offsets are ordered. Binary searches avoid quadratic work on
+        # hostile, still byte-bounded source without changing the signature.
+        $intFirstToken = 0
+        $intUpper = $listTokens.Count
+        while ($intFirstToken -lt $intUpper) {
+            $intMiddle = [int][Math]::Floor(($intFirstToken + $intUpper) / 2)
+            if ($listTokens[$intMiddle].Extent.StartOffset -lt $objNode.Extent.StartOffset) {
+                $intFirstToken = $intMiddle + 1
+            } else {
+                $intUpper = $intMiddle
+            }
+        }
+        $intLastToken = 0
+        $intUpper = $listTokens.Count
+        while ($intLastToken -lt $intUpper) {
+            $intMiddle = [int][Math]::Floor(($intLastToken + $intUpper) / 2)
+            if ($listTokens[$intMiddle].Extent.EndOffset -le $objNode.Extent.EndOffset) {
+                $intLastToken = $intMiddle + 1
+            } else {
+                $intUpper = $intMiddle
+            }
+        }
+        $listSignature.Add(('{0}:{1}:{2}:{3}' -f $objNode.GetType().FullName,
+                $intParentIndex, $intFirstToken, $intLastToken))
+    }
+    return [string]::Join("`n", $listSignature)
+}
+
+
+function Assert-OrdinaryHelperWorkflow {
+    # .SYNOPSIS
+    # Validates the fixed identity workflow's inert helper presentation domain.
+    #
+    # .DESCRIPTION
+    # Requires byte-identical workflow content outside one complete helper.
+    # Compares trusted parser structure inside it, then derives the acquire
+    # block digest from the exact candidate block. Never executes candidate code.
+    #
+    # .PARAMETER TrustedText
+    # Exact bounded workflow text from the authenticated trusted Git revision.
+    #
+    # .PARAMETER CandidateText
+    # Exact bounded workflow text from the proposed Git revision.
+    #
+    # .EXAMPLE
+    # Assert-OrdinaryHelperWorkflow -TrustedText $strTrusted -CandidateText $strCandidate
+    #
+    # # Returns the candidate acquire SHA-256 or throws for an unsupported edit.
+    #
+    # .INPUTS
+    # None. Pipeline input is not supported.
+    #
+    # .OUTPUTS
+    # [string] Lowercase acquire run-block SHA-256, not merge approval.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260915.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $TrustedText,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $CandidateText
+    )
+
+    # GitHub evaluates expressions before PowerShell tokenizes even comments.
+    if ($CandidateText.Contains('${{', [StringComparison]::Ordinal)) {
+        throw 'The ordinary workflow must not contain GitHub expressions.'
+    }
+    $strStart = '          function Add-ProposedBlob {' + "`n"
+    $strEnd = '          & $strGitPath --no-replace-objects -c core.fsmonitor=false init --quiet .' + "`n"
+    $listParts = [Collections.Generic.List[pscustomobject]]::new()
+    foreach ($strText in @($TrustedText, $CandidateText)) {
+        $intStart = $strText.IndexOf($strStart, [StringComparison]::Ordinal)
+        $intEnd = $strText.IndexOf($strEnd, [StringComparison]::Ordinal)
+        if ($intStart -lt 0 -or $intEnd -le $intStart -or
+            $strText.LastIndexOf($strStart, [StringComparison]::Ordinal) -ne $intStart -or
+            $strText.LastIndexOf($strEnd, [StringComparison]::Ordinal) -ne $intEnd) {
+            throw 'The ordinary workflow has ambiguous or missing helper boundaries.'
+        }
+        $listParts.Add([pscustomobject]@{
+                Prefix = $strText.Substring(0, $intStart)
+                Helper = $strText.Substring($intStart, $intEnd - $intStart)
+                Suffix = $strText.Substring($intEnd)
+            })
+    }
+    if ($listParts[0].Prefix -cne $listParts[1].Prefix -or
+        $listParts[0].Suffix -cne $listParts[1].Suffix) {
+        throw 'The ordinary workflow changes non-helper bytes.'
+    }
+    $strTrustedStructure = Get-OrdinaryHelperStructure -Text $listParts[0].Helper -HistoricalTrustedInput
+    $strCandidateStructure = Get-OrdinaryHelperStructure -Text $listParts[1].Helper
+    if (-not [StringComparer]::Ordinal.Equals($strTrustedStructure, $strCandidateStructure)) {
+        throw 'The ordinary helper changes significant tokens or parsed structure.'
+    }
+    $strRunStart = '        run: |' + "`n"
+    $intRunStart = $CandidateText.IndexOf($strRunStart, [StringComparison]::Ordinal)
+    $intRunEnd = $CandidateText.IndexOf("`n      - name:", $intRunStart, [StringComparison]::Ordinal)
+    if ($intRunStart -lt 0 -or $intRunEnd -le $intRunStart) {
+        throw 'The ordinary workflow acquisition block is unavailable.'
+    }
+    $strRun = $CandidateText.Substring($intRunStart + $strRunStart.Length,
+        $intRunEnd - $intRunStart - $strRunStart.Length).TrimEnd("`n") + "`n"
+    $listLines = [Collections.Generic.List[string]]::new()
+    foreach ($strLine in $strRun.Split("`n")) {
+        if ($strLine.Length -gt 0 -and -not $strLine.StartsWith('          ', [StringComparison]::Ordinal)) {
+            throw 'The ordinary workflow acquisition indentation is invalid.'
+        }
+        $listLines.Add($(if ($strLine.Length -eq 0) { '' } else { $strLine.Substring(10) }))
+    }
+    return [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData(
+            [Text.UTF8Encoding]::new($false).GetBytes([string]::Join("`n", $listLines))
+        )).ToLowerInvariant()
+}
+
+
 function Assert-OrdinaryWorkflowPolicyContent {
     # .SYNOPSIS
     # Validates the closed ordinary workflow-policy tuple as inert Git data.
     #
     # .DESCRIPTION
     # Preserves every executable rule and existing case. Accepts sequential
-    # negative workflow fixtures, a derived identity tuple, the next patch
-    # version and inert trailing line comments. Audits the complete history.
+    # negative workflow fixtures, fixed-helper presentation and truthful static
+    # OutputType metadata, derived identities, the next patch version and inert
+    # trailing line comments. Audits the complete history's path boundaries.
     # This shape check does not assert test results or authorize a merge.
     #
     # .PARAMETER RepositoryRootPath
@@ -1011,7 +1256,7 @@ function Assert-OrdinaryWorkflowPolicyContent {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.1.20260915.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -1023,7 +1268,8 @@ function Assert-OrdinaryWorkflowPolicyContent {
     $arrOrdinaryPaths = @(
         '.github/workflows/workflow-policy-cases.json',
         '.github/workflows/workflow-policy-contract.json',
-        '.github/workflows/Validate-WorkflowPolicy.mjs'
+        '.github/workflows/Validate-WorkflowPolicy.mjs',
+        '.github/workflows/pull-request-body-identity.yml'
     )
     $setOrdinaryPaths = [Collections.Generic.HashSet[string]]::new(
         [string[]]$arrOrdinaryPaths, [StringComparer]::Ordinal)
@@ -1189,8 +1435,9 @@ function Assert-OrdinaryWorkflowPolicyContent {
                 -not [StringComparer]::Ordinal.Equals($Matches[2], $strPath)) {
                 throw 'An ordinary tuple path is missing, linked or not a regular blob.'
             }
+            $intMaximumBytes = if ($strPath -ceq $arrOrdinaryPaths[3]) { 131072 } else { 524288 }
             $arrBytes = @(Read-GitBlobByte -RepositoryRootPath $RepositoryRootPath `
-                    -BlobId $Matches[1] -MaximumBytes 524288)
+                    -BlobId $Matches[1] -MaximumBytes $intMaximumBytes)
             $strText = ConvertFrom-StrictUtf8Text -Bytes $arrBytes -Name $strPath
             if ($strRevision -ceq $TrustedRevision) {
                 $dictionaryTrustedText.Add($strPath, $strText)
@@ -1202,6 +1449,10 @@ function Assert-OrdinaryWorkflowPolicyContent {
     $strCatalogPath = $arrOrdinaryPaths[0]
     $strContractPath = $arrOrdinaryPaths[1]
     $strValidatorPath = $arrOrdinaryPaths[2]
+    $strWorkflowPath = $arrOrdinaryPaths[3]
+    $strAcquireDigest = Assert-OrdinaryHelperWorkflow `
+        -TrustedText $dictionaryTrustedText[$strWorkflowPath] `
+        -CandidateText $dictionaryCandidateText[$strWorkflowPath]
     $objTrustedCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
         -Text $dictionaryTrustedText[$strCatalogPath] -Name 'The trusted case catalog'
     $objCandidateCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
@@ -1327,6 +1578,13 @@ function Assert-OrdinaryWorkflowPolicyContent {
         -Text $dictionaryTrustedText[$strContractPath] -Name 'The trusted policy contract'
     $objCandidateContract = & $script:scriptblockConvertFromStrictJsonHashtable `
         -Text $dictionaryCandidateText[$strContractPath] -Name 'The candidate policy contract'
+    $objTrustedAcquire = $objTrustedContract.workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.verify_identity.steps[0]
+    $objCandidateAcquire = $objCandidateContract.workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.verify_identity.steps[0]
+    if ($objCandidateAcquire.runSha256 -isnot [string] -or
+        $objCandidateAcquire.runSha256 -cne $strAcquireDigest) {
+        throw 'The ordinary helper acquisition digest is stale or inconsistent.'
+    }
+    $objTrustedAcquire.runSha256 = $strAcquireDigest
     foreach ($strIdentity in @('caseCatalog', 'validatorIdentity')) {
         & $script:scriptblockAssertExactDictionaryKeySet `
             -Dictionary $objCandidateContract[$strIdentity] `
@@ -1359,7 +1617,8 @@ function Assert-OrdinaryWorkflowPolicyContent {
         foreach ($objProperty in $objTrustedDocument.RootElement.EnumerateObject()) {
             $objExpectedView[$objProperty.Name] = if (
                 [StringComparer]::Ordinal.Equals($objProperty.Name, 'caseCatalog') -or
-                [StringComparer]::Ordinal.Equals($objProperty.Name, 'validatorIdentity')) {
+                [StringComparer]::Ordinal.Equals($objProperty.Name, 'validatorIdentity') -or
+                [StringComparer]::Ordinal.Equals($objProperty.Name, 'workflowPolicy')) {
                 $objTrustedContract[$objProperty.Name]
             } else {
                 $objProperty.Value
@@ -3654,7 +3913,7 @@ if ($SelfTest) {
         '.github/workflows/workflow-policy-contract.json'
     ]
     if ($strCurrentPolicyValidator -cmatch
-        "(?m)^const VALIDATOR_VERSION = '(1\.3\.[0-9]+)';$") {
+        "(?m)^const VALIDATOR_VERSION = '(1\.(?:3|4)\.[0-9]+)';$") {
         $strCurrentVersion = $Matches[1]
         $arrCurrentDigest = [regex]::Matches($strCurrentPolicyValidator,
             "(?m)^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '([0-9a-f]{64})';$")
@@ -4965,42 +5224,65 @@ const git = (args, input) => execFileSync('git', ['-C', repo, ...args], {
 }).trim();
 const prefix = '.github/workflows/';
 const names = ['workflow-policy-cases.json', 'workflow-policy-contract.json',
-  'Validate-WorkflowPolicy.mjs'];
+  'Validate-WorkflowPolicy.mjs', 'pull-request-body-identity.yml'];
 const digest = value => crypto.createHash('sha256').update(value).digest('hex');
 const canonical = value => Array.isArray(value) ? value.map(canonical)
   : value && typeof value === 'object'
     ? Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])])) : value;
+// Batch only inert fixture objects; keep the process deadline and every case.
+const original = git(['rev-parse', 'HEAD']);
+const trees = new Map([[original, new Map(git(['ls-tree', '-rz', original]).split('\0')
+  .filter(Boolean).map(entry => {
+    const match = /^(\d{6}) blob ([a-f0-9]{40})\t([\s\S]+)$/.exec(entry);
+    if (!match) throw new Error('Unsupported fixture tree entry');
+    return [match[3], { mode: match[1], blob: match[2] }];
+  }))]]);
+const chunks = [], expectedParents = new Map();
+let nextMark = 0;
 const commit = (base, texts, parents = [base]) => {
-  git(['read-tree', base]);
-  const entries = [];
+  const tree = new Map(trees.get(base));
   for (const [name, text] of Object.entries(texts)) {
-    if (text === null) {
-      entries.push(`0 ${'0'.repeat(40)}\t${prefix}${name}\0`);
-      continue;
-    }
-    const blob = git(['hash-object', '-w', '--stdin'], Buffer.from(text));
-    entries.push(`100644 ${blob}\t${prefix}${name}\0`);
+    if (text === null) tree.delete(prefix + name);
+    else tree.set(prefix + name, { mode: '100644', text });
   }
-  git(['update-index', '-z', '--index-info'], Buffer.from(entries.join('')));
-  return git(['-c', 'user.name=Ordinary content self-test',
-    '-c', 'user.email=ordinary@example.invalid', 'commit-tree', git(['write-tree']),
-    ...parents.flatMap(parent => ['-p', parent]), '-m', 'Inert ordinary content fixture']);
+  const mark = `:${++nextMark}`;
+  trees.set(mark, tree); expectedParents.set(mark, parents);
+  chunks.push(`commit refs/heads/task61-r3-ordinary-fixture\nmark ${mark}\n` +
+    'committer Ordinary content self-test <ordinary@example.invalid> 1789430400 +0000\n' +
+    'data 30\nInert ordinary content fixture\n' +
+    `from ${parents[0]}\n` + parents.slice(1).map(parent => `merge ${parent}\n`).join('') + 'deleteall\n');
+  for (const [name, value] of tree) {
+    const quoted = JSON.stringify(name);
+    if (value.text === undefined) chunks.push(`M ${value.mode} ${value.blob} ${quoted}\n`);
+    else chunks.push(`M ${value.mode} inline ${quoted}\ndata ${Buffer.byteLength(value.text)}\n${value.text}\n`);
+  }
+  chunks.push('\n');
+  return mark;
 };
-const initial = Object.fromEntries([...names, 'trust-root-authorization.json'].map(name =>
+const readTexts = reference => Object.fromEntries(names.map(name => {
+  const value = trees.get(reference).get(prefix + name);
+  if (value.text === undefined) throw new Error('Missing inert fixture text');
+  return [name, value.text];
+}));
+const initial = Object.fromEntries([...names, 'trust-root-authorization.json', 'Test-TrustRootAuthorization.ps1', 'Test-AgentInstructions.ps1', 'Sync-PullRequestBodyIdentity.mjs'].map(name =>
   [name, fs.readFileSync(path.join(source, prefix, name), 'utf8')]));
-const base = commit(git(['rev-parse', 'HEAD']), initial);
+const base = commit(original, initial);
 const rows = [];
 const referenceTexts = new Map();
 const build = (name, mutate, expected = '', reference = base) => {
   if (!referenceTexts.has(reference)) {
-    referenceTexts.set(reference, Object.fromEntries(names.map(file => [file,
-      execFileSync('git', ['-C', repo, 'show', `${reference}:${prefix}${file}`], { encoding: 'utf8' })])));
+    referenceTexts.set(reference, readTexts(reference));
   }
   const texts = { ...referenceTexts.get(reference) };
   const catalog = JSON.parse(texts[names[0]]);
   const contract = JSON.parse(texts[names[1]]);
-  const state = { catalog, contract, validator: texts[names[2]] };
+  const state = { catalog, contract, validator: texts[names[2]], workflow: texts[names[3]] };
   mutate(state);
+  texts[names[3]] = state.workflow;
+  const run = state.workflow.replaceAll('\r\n', '\n').split('        run: |\n')[1].split('\n      - name:')[0]
+    .replace(/\n+$/, '') + '\n';
+  contract.workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.verify_identity.steps[0].runSha256 =
+    digest(run.split('\n').map(line => line ? line.slice(10) : '').join('\n'));
   texts[names[0]] = JSON.stringify(catalog) + '\n';
   contract.caseCatalog.sha256 = digest(texts[names[0]]);
   const view = structuredClone(contract);
@@ -5024,6 +5306,81 @@ const append = state => {
 };
 const topic = build('meaningful negative append', append);
 build('comment with derived identities', state => { state.validator += '// Fixed ordinary-domain explanation.\n'; });
+const changeHelper = (state, before, after) => {
+  const start = state.workflow.indexOf('          function Add-ProposedBlob {\n');
+  const end = state.workflow.indexOf('          & $strGitPath --no-replace-objects -c core.fsmonitor=false init --quiet .\n');
+  const helper = state.workflow.slice(start, end);
+  if (helper.split(before).length !== 2) throw new Error('helper mutation is not unique');
+  state.workflow = state.workflow.slice(0, start) + helper.replace(before, after) + state.workflow.slice(end);
+};
+build('meaningful helper presentation', state => changeHelper(state,
+  '              # .SYNOPSIS', '              # Review note: downloads stay bounded and proposed code stays inert.\n              # .SYNOPSIS'));
+build('helper indentation and finally layout', state => changeHelper(state,
+  '              } finally {', '                }\n              finally {'));
+const historicalWorkflow = initial[names[3]].replace(/              # \.SYNOPSIS[\s\S]*?(?=              \[CmdletBinding)/,
+  '').replace('[OutputType([long], [int])]', '[OutputType([long])]')
+  .replace('              } finally {', '              }\n              finally {');
+const historicalTexts = { ...initial, [names[3]]: historicalWorkflow };
+const historicalContract = JSON.parse(historicalTexts[names[1]]);
+const historicalRun = historicalWorkflow.split('        run: |\n')[1].split('\n      - name:')[0]
+  .replace(/\n+$/, '') + '\n';
+historicalContract.workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.verify_identity.steps[0].runSha256 =
+  digest(historicalRun.split('\n').map(line => line ? line.slice(10) : '').join('\n'));
+const historicalView = structuredClone(historicalContract);
+delete historicalView.validatorIdentity;
+historicalTexts[names[2]] = historicalTexts[names[2]].replace(
+  /^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '[a-f0-9]{64}';$/m,
+  `const EXPECTED_CONTRACT_CANONICAL_SHA256 = '${digest(JSON.stringify(canonical(historicalView)))}';`);
+historicalContract.validatorIdentity.sha256 = digest(historicalTexts[names[2]]);
+historicalTexts[names[1]] = JSON.stringify(historicalContract) + '\n';
+const historicalBase = commit(base, historicalTexts);
+build('real D52 complete help and static metadata', state => {
+  state.workflow = initial[names[3]];
+}, '', historicalBase);
+const helperNegatives = [
+  ['metadata regression long', '[OutputType([long], [int])]', '[OutputType([long])]', 'truthful static OutputType'],
+  ['metadata regression int', '[OutputType([long], [int])]', '[OutputType([int])]', 'truthful static OutputType'],
+  ['metadata reversed', '[OutputType([long], [int])]', '[OutputType([int], [long])]', 'truthful static OutputType'],
+  ['unknown type', '[OutputType([long], [int])]', '[OutputType([NotARealType])]', 'truthful static OutputType'],
+  ['type expression inert', '[OutputType([long], [int])]', '[OutputType($([IO.File]::WriteAllText("SENTINEL", "bad")))]', 'parser errors'],
+  ['duplicate metadata', '[OutputType([long], [int])]', '[OutputType([long], [int])][OutputType([long], [int])]', 'one exact static OutputType'],
+  ['extra attribute', '[OutputType([long], [int])]', '[OutputType([long], [int])][Obsolete()]', 'significant tokens'],
+  ['changed binding', 'PositionalBinding = $false', 'PositionalBinding = $true', 'significant tokens'],
+  ['changed parameter', '[long] $MaximumBytes', '[int] $MaximumBytes', 'significant tokens'],
+  ['changed return', 'return 0', 'return 1', 'significant tokens'],
+  ['changed command', 'hash-object --no-filters -w', 'hash-object --no-filters', 'significant tokens'],
+  ['changed control flow', '$LASTEXITCODE -eq 0', '$LASTEXITCODE -ne 0', 'significant tokens'],
+  ['changed helper', 'function Add-ProposedBlob', 'function Add-AnotherBlob', 'helper boundaries'],
+  ['extra function', '              param(', '              function Invoke-Extra {}\n              param(', 'scope, requirements or parser errors'],
+  ['parser error', 'return 0', 'return (', 'parser errors'],
+  ['requires directive', '              # .SYNOPSIS', '              #requires -Version 99\n              # .SYNOPSIS', 'requirements'],
+  ['signature directive', '              # .SYNOPSIS', '              # SIG # Begin signature block\n              # .SYNOPSIS', 'parser errors'],
+  ['GitHub expression comment', '              # .SYNOPSIS', '              # ${{ github.token }}\n              # .SYNOPSIS', 'GitHub expressions'],
+  ['GitHub expression literal', "throw 'acquire: a proposed blob request is invalid'", "throw '${{ github.token }}'", 'GitHub expressions'],
+  ['shebang directive', '              # .SYNOPSIS', '              #!/bin/sh\n              # .SYNOPSIS', 'signature directive'],
+  ['block comment directive', '              # .SYNOPSIS', '              <# presentation #>\n              # .SYNOPSIS', 'comment or signature'],
+  ['comment-looking string', "throw 'acquire: a proposed blob request is invalid'", "throw '# harmless looking comment'", 'significant tokens'],
+  ['comment-looking here string', "throw 'acquire: a proposed blob request is invalid'", "throw @'\n# comment-looking literal\n'@", 'significant tokens'],
+  ['interpolation', '"blob-$Sequence.bin"', '"blob-$(1).bin"', 'significant tokens'],
+  ['semicolon boundary', 'return 0', 'return; 0', 'significant tokens'],
+  ['newline boundary', 'return 0', 'return\n0', 'parsed structure'],
+  ['Unicode space', 'return 0', 'return\u00a00', 'bounded ASCII'],
+  ['Unicode comment', '              # .SYNOPSIS', '              # \u200b\n              # .SYNOPSIS', 'bounded ASCII'],
+];
+for (const [name, before, after, expected] of helperNegatives) {
+  build(name, state => changeHelper(state, before, after), expected);
+}
+build('non-helper workflow graph', state => {
+  state.workflow = state.workflow.replace('    runs-on: ubuntu-24.04', '    runs-on: ubuntu-latest');
+}, 'non-helper bytes');
+build('helper YAML dedent', state => changeHelper(state, '              param(', ' param('),
+  'acquisition indentation');
+build('workflow BOM', state => { state.workflow = '\ufeff' + state.workflow; }, 'byte-order mark');
+build('workflow CRLF', state => { state.workflow = state.workflow.replaceAll('\n', '\r\n'); }, 'non-LF newline');
+build('helper parser token bound', state => changeHelper(state, '                  return 0',
+  '              #x\n'.repeat(4100) + '                  return 0'), '8192-token parser bound');
+build('helper parser node bound', state => changeHelper(state, '                  return 0',
+  '                  $null = 1\n'.repeat(1000) + '                  return 0'), '4096-node parser bound');
 const first = build('first ISO string update', state => {
   append(state); state.catalog.cases.at(-1).operation.value = '2026-09-14T00:00:00.000Z';
 });
@@ -5054,8 +5411,7 @@ for (const field of ['id', 'domain', 'workflow', 'semanticKey', 'operation']) {
 for (const value of [true, 7, ['wrong']]) {
   build(`schema rejects ${JSON.stringify(value)}`, state => { state.catalog.schema = value; }, 'catalog has an invalid schema');
 }
-const tuple = Object.fromEntries(names.map(file => [file,
-  execFileSync('git', ['-C', repo, 'show', `${topic}:${prefix}${file}`], { encoding: 'utf8' })]));
+const tuple = readTexts(topic);
 const refreshed = commit(base, { 'outside-history.txt': 'Trusted main contribution\n' });
 const merged = commit(refreshed, tuple, [topic, refreshed]);
 rows.push({ name: 'ordinary merge imports exact trusted content', base: refreshed, head: merged, expected: '' });
@@ -5069,12 +5425,27 @@ rows.push({ name: 'octopus retains hostile side history rejection', base: refres
 const collisionStart = commit(base, { 'normal\u200b.txt': 'Original exact path\n' });
 const collisionBase = commit(collisionStart, { 'normal.txt': 'Trusted import\n' });
 const collisionTopic = build('Unicode data remains valid at exact base', append, '', collisionStart);
-const collisionTuple = Object.fromEntries(names.map(file => [file,
-  execFileSync('git', ['-C', repo, 'show', `${collisionTopic}:${prefix}${file}`], { encoding: 'utf8' })]));
+const collisionTuple = readTexts(collisionTopic);
 const collisionBad = commit(collisionBase, { ...collisionTuple, 'normal\u200b.txt': 'Hostile resolution\n' }, [collisionTopic, collisionBase]);
 const collisionRestored = commit(collisionBase, collisionTuple, [collisionBad, collisionBase]);
 rows.push({ name: 'ordinal path identity retains hostile history', base: collisionBase, head: collisionRestored, expected: 'Unsupported ordinary history shape' });
-process.stdout.write(JSON.stringify(rows));
+const marksPath = path.join(repo, '.git', 'ordinary-fixture.marks');
+const input = Buffer.from(chunks.join('') + 'done\n');
+if (input.length > 134217728) throw new Error('Inert fixture batch exceeds 128 MiB');
+git(['fast-import', '--quiet', '--done', `--export-marks=${marksPath}`], input);
+const marks = new Map(fs.readFileSync(marksPath, 'utf8').trim().split('\n').map(line => line.split(' ')));
+const resolve = reference => reference.startsWith(':') ? marks.get(reference) : reference;
+if (marks.size !== nextMark || [...marks.values()].some(value => !/^[a-f0-9]{40}$/.test(value))) {
+  throw new Error('Invalid inert fixture object identities');
+}
+const observedParents = new Map(git(['rev-list', '--parents', '--no-walk=unsorted', ...marks.values()])
+  .split('\n').map(line => { const [head, ...parents] = line.split(' '); return [head, parents]; }));
+for (const [mark, parents] of expectedParents) {
+  if (JSON.stringify(observedParents.get(resolve(mark))) !== JSON.stringify(parents.map(resolve))) {
+    throw new Error('Inert fixture parent identity mismatch');
+  }
+}
+process.stdout.write(JSON.stringify(rows.map(row => ({ ...row, base: resolve(row.base), head: resolve(row.head) }))));
 '@
         $objOrdinaryFixtures = Invoke-BoundedProcessByte -FileName 'node' `
             -ArgumentList @('--input-type=module', '-e', $strOrdinaryFixtureBuilder,
@@ -5087,8 +5458,12 @@ process.stdout.write(JSON.stringify(rows));
                 ConvertFrom-StrictUtf8Text -Bytes $objOrdinaryFixtures.Bytes `
                     -Name 'The inert ordinary fixture identities'
             ))
-        if ($arrOrdinaryFixtures.Count -ne 36) {
-            throw 'The ordinary fixture catalog must contain exactly 36 cases.'
+        if ($arrOrdinaryFixtures.Count -ne 73) {
+            throw 'The ordinary fixture catalog must contain exactly 73 cases.'
+        }
+        $strCandidateSentinel = [IO.Path]::Combine($PWD.Path, 'SENTINEL')
+        if ([IO.File]::Exists($strCandidateSentinel)) {
+            throw 'The inert expression sentinel must be absent before validation.'
         }
         foreach ($objOrdinaryFixture in $arrOrdinaryFixtures) {
             try {
@@ -5107,6 +5482,9 @@ process.stdout.write(JSON.stringify(rows));
                     throw
                 }
             }
+        }
+        if ([IO.File]::Exists($strCandidateSentinel)) {
+            throw 'An inert candidate expression created its sentinel.'
         }
     } finally {
         if ([IO.Directory]::Exists($strSchemaFixtureRoot) -and
