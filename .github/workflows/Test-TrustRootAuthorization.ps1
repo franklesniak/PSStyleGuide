@@ -47,7 +47,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.4.20260915.0
+# Version: 1.4.20260915.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -143,7 +143,8 @@ $script:hashtableExactTransitionTextIdentity = @{
     'pull-request-body-identity-api-termination-is-bounded' = @(
         '7b61ea2116386f75726af33dccf3e18fc90b509c206d44e900be405388556766',
         '03b0aa378cbf8b70d7b292ee2d904a03e808d52dae067af2af5f766f46cabecf',
-        '0458f240ed8415eb1a898a8c30d2fd90f717f034b9bec6e6d6ab878b3346305d'
+        '0458f240ed8415eb1a898a8c30d2fd90f717f034b9bec6e6d6ab878b3346305d',
+        'd6682435e6a339085ceaef016f3902c9b4da2eae74bc9186c0bc7583224f9309'
     )
     'pull-request-body-identity-workflow-topology-is-exact' = @(
         'b006c0ed4cc0dc2391199fe1a49431c06f9a45910db34fe143c2e6df3ada2dd0',

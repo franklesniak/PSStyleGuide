@@ -10,7 +10,7 @@ import path from 'node:path';
 import { TextDecoder } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
-const TOOL_VERSION = '1.0.20260915.0';
+const TOOL_VERSION = '1.0.20260915.1';
 const RESULT_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityResult.v1';
 const CASE_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityCases.v1';
 const START_MARKER = '<!-- psstyleguide-pr-body-identity:start -->';
@@ -998,6 +998,163 @@ function copySnapshot(snapshot) {
   };
 }
 
+function createSelfTestEntry(repositoryPath, text) {
+  const bytes = Buffer.from(text, 'utf8');
+  return { path: repositoryPath, mode: '100644', blob: gitBlobId(bytes), bytes };
+}
+
+function bindSelfTestIdentities(snapshot, compact = false) {
+  const contract = JSON.parse(snapshot.files[SOURCE_PATHS.contract].bytes);
+  for (const [role, variable] of [
+    ['generator', 'strGeneratorVersion'],
+    ['pathVerifier', 'strVerifierVersion'],
+  ]) {
+    const entry = snapshot.files[SOURCE_PATHS[role]];
+    contract.scriptVersions[role].version = singleCapture(
+      entry.bytes.toString('utf8'),
+      new RegExp(`^\\$script:${variable} = '([^']+)'$`, 'gmu'),
+      'mutation-fixture-version-self-test',
+    );
+    contract.scriptVersions[role].sha256 = sha256(entry.bytes);
+  }
+  const identityView = clone(contract);
+  delete identityView.validatorIdentity;
+  const digest = sha256(canonicalJson(identityView));
+  const validator = snapshot.files[SOURCE_PATHS.validator].bytes.toString('utf8');
+  setSnapshotBytes(snapshot, SOURCE_PATHS.validator, Buffer.from(
+    validator.replace(
+      /^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '[0-9a-f]{64}';$/mu,
+      `const EXPECTED_CONTRACT_CANONICAL_SHA256 = '${digest}';`,
+    ),
+  ));
+  contract.validatorIdentity.sha256 = sha256(
+    snapshot.files[SOURCE_PATHS.validator].bytes,
+  );
+  setSnapshotBytes(snapshot, SOURCE_PATHS.contract,
+    Buffer.from(`${JSON.stringify(contract, null, compact ? undefined : 2)}\n`));
+}
+
+function createMutationSelfTestSnapshot(baselineSnapshot) {
+  // Keep accepted source sizes and semantic values out of mutation-only data.
+  const version = '1.0.20260915.0';
+  const contract = {
+    schema: 'PSStyleGuide.WorkflowPolicyContract.v1',
+    contractVersion: 1,
+    limits: { maximumJsonBytes: 524288 },
+    scriptVersions: Object.fromEntries(['generator', 'pathVerifier'].map(
+      (role) => [role, {
+        path: path.basename(SOURCE_PATHS[role]), version, sha256: '0'.repeat(64),
+      }],
+    )),
+    validatorIdentity: {
+      path: path.basename(SOURCE_PATHS.validator), sha256: '0'.repeat(64),
+    },
+    agentTest: { nested: ['keep', { value: true }] },
+  };
+  const texts = {
+    [SOURCE_PATHS.generator]: `$script:strGeneratorVersion = '${version}'\n`,
+    [SOURCE_PATHS.pathVerifier]: `$script:strVerifierVersion = '${version}'\n`,
+    [SOURCE_PATHS.build]: [
+      `$objResult.GeneratorVersion -cne '${version}'`,
+      `$objPathSetResult.VerifierVersion -cne '${version}'`, '',
+    ].join('\n'),
+    [SOURCE_PATHS.contract]: `${JSON.stringify(contract, null, 2)}\n`,
+    [SOURCE_PATHS.validator]: [
+      "const VALIDATOR_VERSION = '1.2.2';",
+      `const EXPECTED_CONTRACT_CANONICAL_SHA256 = '${'0'.repeat(64)}';`, '',
+    ].join('\n'),
+  };
+  const snapshot = {
+    repositoryRoot: baselineSnapshot.repositoryRoot,
+    commit: baselineSnapshot.commit,
+    tree: baselineSnapshot.tree,
+    files: Object.fromEntries(Object.entries(texts).map(
+      ([repositoryPath, text]) => [
+        repositoryPath, createSelfTestEntry(repositoryPath, text),
+      ],
+    )),
+  };
+  bindSelfTestIdentities(snapshot);
+  deriveIdentity(snapshot);
+  return snapshot;
+}
+
+function setSelfTestTextAtLimit(snapshot, repositoryPath, commentPrefix) {
+  const original = snapshot.files[repositoryPath].bytes;
+  const remaining = SOURCE_LIMITS[repositoryPath] - original.length;
+  assert(remaining > commentPrefix.length,
+    'mutation-fixture-limit-self-test');
+  setSnapshotBytes(snapshot, repositoryPath, Buffer.concat([
+    original,
+    Buffer.from(
+      `${commentPrefix}${'x'.repeat(remaining - commentPrefix.length - 1)}\n`,
+      'utf8',
+    ),
+  ]));
+  bindSelfTestIdentities(snapshot);
+}
+
+function setSelfTestContractAtLimit(snapshot) {
+  const contract = JSON.parse(snapshot.files[SOURCE_PATHS.contract].bytes);
+  contract.agentTest.padding = Array(9).fill('');
+  const empty = `${JSON.stringify(contract)}\n`;
+  let remaining = MAXIMUM_CONTRACT_BYTES - Buffer.byteLength(empty);
+  for (let index = 0; index < contract.agentTest.padding.length; index += 1) {
+    const length = Math.min(remaining, 60000);
+    contract.agentTest.padding[index] = 'x'.repeat(length);
+    remaining -= length;
+  }
+  assert(remaining === 0, 'mutation-fixture-limit-self-test');
+  setSnapshotBytes(snapshot, SOURCE_PATHS.contract,
+    Buffer.from(`${JSON.stringify(contract)}\n`));
+  bindSelfTestIdentities(snapshot, true);
+  assert(snapshot.files[SOURCE_PATHS.contract].bytes.length ===
+    MAXIMUM_CONTRACT_BYTES, 'mutation-fixture-limit-self-test');
+}
+
+function setSelfTestVersion(snapshot, role, version) {
+  const variable = role === 'generator' ? 'strGeneratorVersion' :
+    'strVerifierVersion';
+  mutateText(snapshot, SOURCE_PATHS[role], (text) => text.replace(
+    new RegExp(`^\\$script:${variable} = '[^']+'$`, 'mu'),
+    `$script:${variable} = '${version}'`,
+  ));
+  const field = role === 'generator' ? 'objResult.GeneratorVersion' :
+    'objPathSetResult.VerifierVersion';
+  mutateText(snapshot, SOURCE_PATHS.build, (text) => text.replace(
+    new RegExp(`\\$${field.replace('.', '\\.')} -cne '[^']+'`, 'u'),
+    `$${field} -cne '${version}'`,
+  ));
+  bindSelfTestIdentities(snapshot);
+}
+
+function runMutationBaselineIsolationSelfTests(boundedSnapshot, sourceCases) {
+  const scenarios = [
+    ...['generator', 'pathVerifier', 'build', 'validator'].map((role) =>
+      (snapshot) => setSelfTestTextAtLimit(snapshot, SOURCE_PATHS[role],
+        role === 'validator' ? '//' : '#')),
+    setSelfTestContractAtLimit,
+    (snapshot) => setSelfTestVersion(snapshot, 'generator', '1.0.20260912.9'),
+    (snapshot) => setSelfTestVersion(snapshot, 'generator', '1.0.20000101.0'),
+    (snapshot) => setSelfTestVersion(snapshot, 'pathVerifier', '1.0.20000101.0'),
+    (snapshot) => {
+      const contract = JSON.parse(snapshot.files[SOURCE_PATHS.contract].bytes);
+      contract.agentTest.padding = Array(7000).fill('x'.repeat(66));
+      setSnapshotBytes(snapshot, SOURCE_PATHS.contract,
+        Buffer.from(`${JSON.stringify(contract)}\n`));
+      bindSelfTestIdentities(snapshot, true);
+    },
+  ];
+  const acceptedInputs = [boundedSnapshot];
+  for (const configure of scenarios) {
+    const acceptedInput = copySnapshot(boundedSnapshot);
+    configure(acceptedInput);
+    acceptedInputs.push(acceptedInput);
+  }
+  return acceptedInputs.reduce((passed, acceptedInput) => passed +
+    runMutationSelfTestsForInput(acceptedInput, sourceCases), 0);
+}
+
 function setSnapshotBytes(snapshot, repositoryPath, bytes) {
   assert(Buffer.isBuffer(bytes) && bytes.length >= 1 &&
     bytes.length <= SOURCE_LIMITS[repositoryPath], 'source-mutation');
@@ -1264,6 +1421,180 @@ async function runApiDeadlineSelfTests() {
   return 2;
 }
 
+function runContractMutationSelfTests(baselineSnapshot) {
+  let passed = 0;
+  const baselineContract = JSON.parse(
+    baselineSnapshot.files[SOURCE_PATHS.contract].bytes.toString('utf8'),
+  );
+  for (const representation of [
+    `${JSON.stringify(baselineContract, null, 2)}\n`,
+    `${JSON.stringify(baselineContract)}\n`,
+    `\n  ${JSON.stringify(baselineContract)}\n`,
+  ]) {
+    const formatted = copySnapshot(baselineSnapshot);
+    setSnapshotBytes(formatted, SOURCE_PATHS.contract,
+      Buffer.from(representation, 'utf8'));
+    deriveIdentity(formatted);
+    const mutated = mutatedSnapshot(formatted, 'contract-forbidden-key');
+    const badBytes = mutated.files[SOURCE_PATHS.contract].bytes;
+    const badContract = JSON.parse(badBytes.toString('utf8'));
+    assert(!badBytes.equals(formatted.files[SOURCE_PATHS.contract].bytes) &&
+      Object.hasOwn(badContract, '__proto__') &&
+      Object.prototype.propertyIsEnumerable.call(badContract, '__proto__'),
+    'forbidden-key-mutation-self-test');
+    delete badContract.__proto__;
+    assert(canonicalJson(badContract) === canonicalJson(baselineContract) &&
+      Object.values(SOURCE_PATHS).filter((repositoryPath) =>
+        repositoryPath !== SOURCE_PATHS.contract).every((repositoryPath) =>
+        mutated.files[repositoryPath].bytes.equals(
+          formatted.files[repositoryPath].bytes,
+        )), 'forbidden-key-preservation-self-test');
+    let rejected = false;
+    try {
+      deriveIdentity(mutated);
+    } catch (error) {
+      if (!(error instanceof IdentityError)) throw error;
+      rejected = error.category === 'contract-json';
+    }
+    assert(rejected, 'forbidden-key-category-self-test');
+    passed += 1;
+  }
+  return passed;
+}
+
+function assertSourceMutation(baseline, mutated, mutation) {
+  const expected = Object.fromEntries(Object.entries(baseline.files).map(
+    ([repositoryPath, entry]) => [repositoryPath, Buffer.from(entry.bytes)],
+  ));
+  const contract = JSON.parse(expected[SOURCE_PATHS.contract]);
+  let contractChanged = true;
+  if (mutation === 'contract-forbidden-key') {
+    Object.defineProperty(contract, '__proto__', { value: {}, enumerable: true });
+  } else if (mutation === 'generator-policy-version-malformed') {
+    contract.scriptVersions.generator.version = 'not-a-version';
+  } else if (mutation === 'generator-policy-digest-malformed') {
+    contract.scriptVersions.generator.sha256 = 'not-a-digest';
+  } else if (mutation === 'contract-canonical-drift') {
+    contract.limits.maximumJsonBytes += 1;
+  } else if (mutation === 'validator-contract-digest-drift') {
+    const original = expected[SOURCE_PATHS.validator].toString('utf8');
+    const digest = singleCapture(original,
+      /^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '([0-9a-f]{64})';$/gmu,
+      'source-mutation-structure-self-test');
+    expected[SOURCE_PATHS.validator] = Buffer.from(original.replace(
+      digest, 'f'.repeat(64),
+    ));
+    contract.validatorIdentity.sha256 = sha256(expected[SOURCE_PATHS.validator]);
+  } else {
+    contractChanged = false;
+    if (mutation === 'contract-malformed-json') {
+      expected[SOURCE_PATHS.contract] = Buffer.from('{\n');
+    } else if (mutation === 'generator-version-drift') {
+      const version = contract.scriptVersions.generator.version;
+      expected[SOURCE_PATHS.generator] = Buffer.from(
+        expected[SOURCE_PATHS.generator].toString('utf8').replace(
+          version, '1.0.20260912.9',
+        ),
+      );
+    } else if (mutation === 'generator-duplicate-version') {
+      expected[SOURCE_PATHS.generator] = Buffer.concat([
+        expected[SOURCE_PATHS.generator],
+        Buffer.from("$script:strGeneratorVersion = '1.0.20260912.9'\n"),
+      ]);
+    } else if (mutation === 'generator-bom') {
+      expected[SOURCE_PATHS.generator] = Buffer.concat([
+        Buffer.from([0xef, 0xbb, 0xbf]), expected[SOURCE_PATHS.generator],
+      ]);
+    } else if (mutation === 'path-verifier-crlf') {
+      expected[SOURCE_PATHS.pathVerifier] = Buffer.from(
+        expected[SOURCE_PATHS.pathVerifier].toString('utf8').replace('\n', '\r\n'),
+      );
+    } else if (mutation === 'build-generator-drift' ||
+      mutation === 'build-path-verifier-drift') {
+      const lines = expected[SOURCE_PATHS.build].toString('utf8').split('\n');
+      const index = mutation === 'build-generator-drift' ? 0 : 1;
+      const role = index === 0 ? 'generator' : 'pathVerifier';
+      lines[index] = lines[index].replace(
+        contract.scriptVersions[role].version, '1.0.20000101.0',
+      );
+      expected[SOURCE_PATHS.build] = Buffer.from(lines.join('\n'));
+    } else if (mutation === 'validator-identity-drift') {
+      expected[SOURCE_PATHS.validator] = Buffer.concat([
+        expected[SOURCE_PATHS.validator], Buffer.from('// identity drift\n'),
+      ]);
+    } else {
+      assert(['none', 'source-wrong-mode', 'source-wrong-blob'].includes(mutation),
+        'source-mutation-structure-self-test');
+    }
+  }
+  for (const [repositoryPath, bytes] of Object.entries(expected)) {
+    const actual = mutated.files[repositoryPath];
+    const contentMatches = contractChanged && repositoryPath === SOURCE_PATHS.contract
+      ? canonicalJson(JSON.parse(actual.bytes)) === canonicalJson(contract)
+      : actual.bytes.equals(bytes);
+    const isBuild = repositoryPath === SOURCE_PATHS.build;
+    assert(contentMatches && actual.path === repositoryPath &&
+      actual.mode === (isBuild && mutation === 'source-wrong-mode' ? '100755' :
+        baseline.files[repositoryPath].mode) &&
+      actual.blob === (isBuild && mutation === 'source-wrong-blob' ? '0'.repeat(40) :
+        gitBlobId(actual.bytes)), 'source-mutation-structure-self-test');
+  }
+}
+
+function runSourceMutationSelfTests(baselineSnapshot, sourceCases) {
+  let passed = 0;
+  for (const testCase of sourceCases) {
+    let observed;
+    try {
+      const mutated = mutatedSnapshot(baselineSnapshot, testCase.mutation);
+      assertSourceMutation(baselineSnapshot, mutated, testCase.mutation);
+      deriveIdentity(mutated);
+      observed = 'current';
+    } catch (error) {
+      if (!(error instanceof IdentityError)) throw error;
+      observed = error.category;
+    }
+    assert(observed === testCase.expected, `case-result-${testCase.id}`);
+    passed += 1;
+  }
+  return passed;
+}
+
+function runMutationSelfTestsForInput(acceptedInput, sourceCases) {
+  deriveIdentity(acceptedInput);
+  const boundedSnapshot = createMutationSelfTestSnapshot(acceptedInput);
+  return runContractMutationSelfTests(boundedSnapshot) +
+    runSourceMutationSelfTests(boundedSnapshot, sourceCases);
+}
+
+function runActualInputRejectionSelfTests(boundedSnapshot, sourceCases) {
+  const rejectedInputs = Object.values(SOURCE_PATHS).map((repositoryPath) => {
+    const snapshot = copySnapshot(boundedSnapshot);
+    const entry = snapshot.files[repositoryPath];
+    entry.bytes = Buffer.alloc(SOURCE_LIMITS[repositoryPath] + 1, 120);
+    entry.blob = gitBlobId(entry.bytes);
+    return { snapshot, expected: 'source-identity' };
+  });
+  rejectedInputs.push({
+    snapshot: mutatedSnapshot(boundedSnapshot, 'contract-malformed-json'),
+    expected: 'contract-json',
+  }, {
+    snapshot: mutatedSnapshot(boundedSnapshot, 'generator-bom'),
+    expected: 'generator-encoding',
+  });
+  for (const { snapshot, expected } of rejectedInputs) {
+    let observed = 'current';
+    try {
+      runMutationSelfTestsForInput(snapshot, sourceCases);
+    } catch (error) {
+      if (!(error instanceof IdentityError)) throw error;
+      observed = error.category;
+    }
+    assert(observed === expected, 'actual-input-rejection-self-test');
+  }
+  return rejectedInputs.length;
+}
+
 async function runCaseCatalog(catalog, repositoryRoot) {
   const identity = fixtureIdentity();
   validateIdentity(identity);
@@ -1284,35 +1615,14 @@ async function runCaseCatalog(catalog, repositoryRoot) {
   passed += await runApiResponseEventSelfTests();
   passed += await runApiDeadlineSelfTests();
   const baselineSnapshot = collectSnapshot(repositoryRoot);
-  const baselineContract = JSON.parse(
-    baselineSnapshot.files[SOURCE_PATHS.contract].bytes.toString('utf8'),
+  deriveIdentity(baselineSnapshot);
+  const mutationSnapshot = createMutationSelfTestSnapshot(baselineSnapshot);
+  passed += runMutationBaselineIsolationSelfTests(
+    mutationSnapshot, catalog.sourceCases,
   );
-  for (const representation of [
-    `${JSON.stringify(baselineContract, null, 2)}\n`,
-    `${JSON.stringify(baselineContract)}\n`,
-    `\n  ${JSON.stringify(baselineContract)}\n`,
-  ]) {
-    const formatted = copySnapshot(baselineSnapshot);
-    setSnapshotBytes(formatted, SOURCE_PATHS.contract,
-      Buffer.from(representation, 'utf8'));
-    deriveIdentity(formatted);
-    const mutated = mutatedSnapshot(formatted, 'contract-forbidden-key');
-    const badBytes = mutated.files[SOURCE_PATHS.contract].bytes;
-    const badContract = JSON.parse(badBytes.toString('utf8'));
-    assert(!badBytes.equals(formatted.files[SOURCE_PATHS.contract].bytes) &&
-      Object.hasOwn(badContract, '__proto__') &&
-      Object.prototype.propertyIsEnumerable.call(badContract, '__proto__'),
-    'forbidden-key-mutation-self-test');
-    let rejected = false;
-    try {
-      deriveIdentity(mutated);
-    } catch (error) {
-      if (!(error instanceof IdentityError)) throw error;
-      rejected = error.category === 'contract-json';
-    }
-    assert(rejected, 'forbidden-key-category-self-test');
-    passed += 1;
-  }
+  passed += runActualInputRejectionSelfTests(
+    mutationSnapshot, catalog.sourceCases,
+  );
   const originalGitDirectory = process.env.GIT_DIR;
   try {
     process.env.GIT_DIR = path.join(repositoryRoot, 'invalid-git-directory');
@@ -1481,18 +1791,6 @@ async function runCaseCatalog(catalog, repositoryRoot) {
     fs.rmSync(resolved, { recursive: true, force: false });
   }
 
-  for (const testCase of catalog.sourceCases) {
-    let observed;
-    try {
-      deriveIdentity(mutatedSnapshot(baselineSnapshot, testCase.mutation));
-      observed = 'current';
-    } catch (error) {
-      if (!(error instanceof IdentityError)) throw error;
-      observed = error.category;
-    }
-    assert(observed === testCase.expected, `case-result-${testCase.id}`);
-    passed += 1;
-  }
   for (const testCase of catalog.bodyCases) {
     const body = fixtureBody(testCase.fixture, identity);
     let observed;
