@@ -89,8 +89,53 @@ jobs:
           $env:GIT_OPTIONAL_LOCKS = '0'
 
           function Add-ProposedBlob {
+              # .SYNOPSIS
+              # Acquires one bounded proposed blob without checking out its file.
+              #
+              # .DESCRIPTION
+              # Reads the exact head tree and rejects a non-regular or mismatched
+              # entry. Downloads an absent blob within fixed transport bounds,
+              # verifies its raw Git identity, and stores only that Git object.
+              # Invalid input, transfer, identity, or storage failures throw.
+              # An existing object needs no transfer; the trusted identity command
+              # subsequently validates its size, encoding, and role semantics.
+              #
+              # .PARAMETER RepositoryPath
+              # Fixed repository-relative path from the fixed transfer plan.
+              #
+              # .PARAMETER MaximumBytes
+              # Inclusive role byte limit, between zero and 573440 bytes.
+              #
+              # .PARAMETER Sequence
+              # Unique transfer sequence between one and 24 in this acquisition.
+              #
+              # .PARAMETER ExpectedBlob
+              # Optional exact Git blob identity; null omits this extra comparison.
+              #
+              # .PARAMETER ExpectedBytes
+              # Optional exact download size; null uses only MaximumBytes.
+              #
+              # .EXAMPLE
+              # $longBytes = Add-ProposedBlob -RepositoryPath '.github/workflows/build.yml' -MaximumBytes 131072 -Sequence 1
+              #
+              # # Returns the transferred byte count, or zero for an existing blob.
+              #
+              # .INPUTS
+              # None. Pipeline input is not supported.
+              #
+              # .OUTPUTS
+              # System.Int64. Transferred byte count for a downloaded blob.
+              # System.Int32. Zero when the blob is already present.
+              # Failure throws and does not return a success value.
+              #
+              # .NOTES
+              # PRIVATE/INTERNAL HELPER. This function is not a public API.
+              # Parameters, return shape, and positional contract can change
+              # without notice. All parameters must be named.
+              #
+              # Version: 1.0.20260914.0
               [CmdletBinding(PositionalBinding = $false)]
-              [OutputType([long])]
+              [OutputType([long], [int])]
               param(
                   [Parameter(Mandatory)][string] $RepositoryPath,
                   [Parameter(Mandatory)][long] $MaximumBytes,
@@ -189,8 +234,7 @@ jobs:
                       throw "acquire: $RepositoryPath could not be stored exactly"
                   }
                   return $longObservedBytes
-              }
-              finally {
+              } finally {
                   if ([System.IO.File]::Exists($strDownloadPath)) {
                       Remove-Item -LiteralPath $strDownloadPath -Force
                   }
@@ -385,6 +429,14 @@ jobs:
                       '.github/workflows/workflow-policy-cases.json'
                   ] = [pscustomobject]@{
                       MaximumBytes = 524288
+                      ExpectedBlob = $null
+                      ExpectedBytes = $null
+                  }
+                  # Bounded inert support input, not a sixth identity role.
+                  $dictionaryProposedBlob[
+                      '.github/workflows/pull-request-body-identity.yml'
+                  ] = [pscustomobject]@{
+                      MaximumBytes = 131072
                       ExpectedBlob = $null
                       ExpectedBytes = $null
                   }

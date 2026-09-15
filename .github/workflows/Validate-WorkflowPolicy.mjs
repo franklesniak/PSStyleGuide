@@ -25,11 +25,11 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.3.0';
+const VALIDATOR_VERSION = '1.4.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '6abcc8d32e9c6b7797eab8bb1838b0cc4eec64acd3db26d328ddf05ff7b63fc3';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '9de9291473c50be5289462de152ef055e53045f095f2e9859494205d54b95c4c';
 const MINIMUM_CASE_COUNT = 99;
 const REQUIRED_IDENTITY_CASE_COUNT = 42;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
@@ -631,7 +631,9 @@ function validatePullRequestBodyIdentityPolicy(workflow, rawText) {
   if (
     transferLiterals.some((literal) => !runs.includes(literal))
     || (runs.match(/hash-object --no-filters/gu) ?? []).length !== 2
-    || (runs.match(/Add-ProposedBlob\b/gu) ?? []).length !== 2
+    // Count the two fixed executable lines, not the new help examples. Exact
+    // run-byte identity remains mandatory above; this is not normalization.
+    || (runs.match(/^[ \t]*(?:function Add-ProposedBlob \{|\$longObservedProposedBytes \+= Add-ProposedBlob `)$/gmu) ?? []).length !== 2
     || /fetch --depth 65 --no-tags --no-recurse-submodules proposed/gu.test(runs)
   ) {
     fail('identity-transfer-policy');
