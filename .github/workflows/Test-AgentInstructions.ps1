@@ -3,7 +3,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.11.20260915.1
+# Version: 1.11.20260915.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -8053,7 +8053,7 @@ if ($SelfTest) {
             [pscustomobject]@{
                 Source = $strTrustRootAuthorizationSource
                 Path = $strTrustRootAuthorizationPath
-                ExpectedFunctionCount = 12
+                ExpectedFunctionCount = 13
             },
             [pscustomobject]@{
                 Source = $strExtractedSelfTestSource
@@ -8075,7 +8075,7 @@ if ($SelfTest) {
                 Name = 'trust-root authorization helper'
                 Source = $strTrustRootAuthorizationSource
                 Path = $strTrustRootAuthorizationPath
-                ExpectedFunctionCount = 12
+                ExpectedFunctionCount = 13
                 FunctionName = 'Invoke-BoundedProcessByte'
             },
             [pscustomobject]@{
@@ -8125,9 +8125,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.11\.20260915\.1$'
+            '(?m)^# Version: 1\.11\.20260915\.2$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.11.20260915.1.'
+        throw 'The validator script version is not 1.11.20260915.2.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8988,9 +8988,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.4\.20260915\.1$'
+            '(?m)^# Version: 1\.4\.20260915\.2$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.4.20260915.1.'
+        throw 'The trust-root authorization script lacks version 1.4.20260915.2.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `

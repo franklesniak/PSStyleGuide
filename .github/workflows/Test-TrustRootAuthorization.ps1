@@ -47,7 +47,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.4.20260915.1
+# Version: 1.4.20260915.2
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -72,6 +72,50 @@ $intCandidateMaximumCommits = 64
 $strObjectIdPattern = '^[0-9a-f]{40}$'
 $strAuthorizationPath = '.github/workflows/trust-root-authorization.json'
 $strVerifierPath = '.github/workflows/Test-TrustRootAuthorization.ps1'
+$script:arrIssue169RetirementPathSpec = @(
+    [pscustomobject]@{
+        Path = '.github/workflows/Generate-StyleGuideArtifacts.ps1'
+        Mode = '100644'
+        Blob = '32523e48ab7e8abc5bdc4c3494f4715e021cef2e'
+        Bytes = 94373
+        Sha256 = 'f2eddcb6305d09b55dcbc72911a9ec9b783fb9b3f649ef64847969f7b1482da3'
+    },
+    [pscustomobject]@{
+        Path = '.github/workflows/Test-AgentInstructions.ps1'
+        Mode = '100644'
+        Blob = 'a5bc3c83c9795baac5bbe8abedec87e85a3a16cd'
+        Bytes = 573430
+        Sha256 = '5ea22892e9aee948f1899fb4cdb03169a73dfc97e2f756048af78155a345a3c3'
+    },
+    [pscustomobject]@{
+        Path = '.github/workflows/Test-TrustRootAuthorization.ps1'
+        Mode = '100644'
+        Blob = 'dc4aa078b3177dd7c5185a5b805941e45d61799d'
+        Bytes = 285901
+        Sha256 = 'b282f8146c770a7cc998ded2fe100c0367f77185cc5c4ea034e0f756119451ef'
+    },
+    [pscustomobject]@{
+        Path = '.github/workflows/Validate-WorkflowPolicy.mjs'
+        Mode = '100644'
+        Blob = '6f06b72ab58b85a33633c3bee40f86b7f9741e8f'
+        Bytes = 52755
+        Sha256 = 'b83d5fc50dc69c0d1c2b531799e985dfd208cd07af23c4f4224cb2c92a84be02'
+    },
+    [pscustomobject]@{
+        Path = '.github/workflows/build.yml'
+        Mode = '100644'
+        Blob = 'c8b657169fe0175852230f82b21420ec6922629d'
+        Bytes = 8047
+        Sha256 = '7adbfeff06d55d3f156ff77539e630629650a0e054bf21b03032b5e3a338d77e'
+    },
+    [pscustomobject]@{
+        Path = '.github/workflows/workflow-policy-contract.json'
+        Mode = '100644'
+        Blob = '94bd5ac69eeefdee75fa22adb8203dcec4e8edd9'
+        Bytes = 23312
+        Sha256 = '7ca5d2581e155c82a9dd2177f910e978a3ba6caa31d8008ae1b1fa40fdb41209'
+    }
+)
 $script:dictionaryPolicyReferenceText =
     [Collections.Generic.Dictionary[string, string]]::new([StringComparer]::Ordinal)
 $arrTrustRootPaths = @(
@@ -1683,6 +1727,201 @@ function Assert-OrdinaryWorkflowPolicyContent {
             [StringComparison]::Ordinal) -or
         $strCommentSuffix.Contains('VALIDATOR_VERSION', [StringComparison]::Ordinal)) {
         throw 'An ordinary validator suffix is not bounded inert line comments.'
+    }
+}
+
+
+function Assert-ExactIssue169RetirementContent {
+    # .SYNOPSIS
+    # Validates the exact self-retiring issue 169 repair candidate.
+    #
+    # .DESCRIPTION
+    # Requires one descendant candidate whose final and complete-history path
+    # sets stay within six reviewed roles. Every final role must match its exact
+    # regular Git blob, byte count, SHA-256 value, strict UTF-8 encoding, and LF
+    # ending. The reviewed authorizer and validator retire the temporary rule.
+    # Candidate source is inspected only as inert Git data.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute trusted repository path.
+    #
+    # .PARAMETER TrustedRevision
+    # The exact trusted bootstrap commit.
+    #
+    # .PARAMETER HeadRevision
+    # The exact descendant repair candidate.
+    #
+    # .PARAMETER ExpectedPathSpec
+    # Six exact reviewed path identities. Production passes fixed local data;
+    # focused self-tests pass isolated fixture identities.
+    #
+    # .EXAMPLE
+    # Assert-ExactIssue169RetirementContent @hashtableArguments
+    #
+    # # Returns no output when the exact candidate and its history are valid.
+    #
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # None. Throws for missing, mixed, altered, replayed, or hostile content.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260915.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $TrustedRevision,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $HeadRevision,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][object[]] $ExpectedPathSpec
+    )
+
+    if ($ExpectedPathSpec.Count -ne 6) {
+        throw 'The issue 169 retirement identity set is incomplete.'
+    }
+    $setExpectedPaths = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal)
+    foreach ($objSpec in $ExpectedPathSpec) {
+        if ($null -eq $objSpec -or
+            [string] $objSpec.Path -cnotmatch '^(?:[^/\x00-\x1f\\]+/)*[^/\x00-\x1f\\]+$' -or
+            -not $setExpectedPaths.Add([string] $objSpec.Path) -or
+            [string] $objSpec.Mode -cne '100644' -or
+            [string] $objSpec.Blob -cnotmatch '^[0-9a-f]{40}$' -or
+            [int64] $objSpec.Bytes -lt 1 -or
+            [int64] $objSpec.Bytes -gt 573440 -or
+            [string] $objSpec.Sha256 -cnotmatch '^[0-9a-f]{64}$') {
+            throw 'The issue 169 retirement identity set is invalid.'
+        }
+    }
+
+    & git -C $RepositoryRootPath merge-base --is-ancestor `
+        $TrustedRevision $HeadRevision 2>$null
+    if ($LASTEXITCODE -eq 1) {
+        throw 'The issue 169 retirement candidate does not descend from the bootstrap.'
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The issue 169 retirement ancestry is indeterminate.'
+    }
+    $objCommitCount = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 64 `
+        -ArgumentList @(
+            '-C', $RepositoryRootPath, 'rev-list', '--count', '--max-count=65',
+            $HeadRevision, '--not', $TrustedRevision
+        )
+    $strCommitCount = ConvertFrom-StrictUtf8Text -Bytes $objCommitCount.Bytes `
+        -Name 'The issue 169 retirement commit count'
+    if ($objCommitCount.ExitCode -ne 0 -or
+        $strCommitCount.Trim() -cnotmatch '^[0-9]+$' -or
+        [int] $strCommitCount.Trim() -notin 1..64) {
+        throw 'The issue 169 retirement history is empty or exceeds 64 commits.'
+    }
+
+    $objParentGraph = Invoke-BoundedProcessByte -FileName 'git' `
+        -MaximumBytes 131072 -ArgumentList @(
+            '-C', $RepositoryRootPath, 'rev-list', '--parents', '--max-count=65',
+            $HeadRevision, '--not', $TrustedRevision, '--'
+        )
+    $strParentGraph = ConvertFrom-StrictUtf8Text -Bytes $objParentGraph.Bytes `
+        -Name 'The issue 169 retirement parent graph'
+    $arrParentGraphRows = @($strParentGraph.TrimEnd("`n") -split "`n")
+    if ($objParentGraph.ExitCode -ne 0 -or
+        $arrParentGraphRows.Count -ne [int] $strCommitCount.Trim()) {
+        throw 'The issue 169 retirement parent graph is incomplete.'
+    }
+    $intParentEdgeCount = 0
+    foreach ($strParentGraphRow in $arrParentGraphRows) {
+        if ($strParentGraphRow -cnotmatch
+            '^[0-9a-f]{40}(?: [0-9a-f]{40}){1,64}$') {
+            throw 'The issue 169 retirement parent graph is incomplete or unbounded.'
+        }
+        $intParentEdgeCount += @($strParentGraphRow -split ' ').Count - 1
+        if ($intParentEdgeCount -gt 256) {
+            throw 'The issue 169 retirement graph exceeds 256 parent edges.'
+        }
+    }
+
+    # The remaining graph-independent inspection has a fixed upper bound of 20
+    # Git calls: one final diff, one history-path read, and three object reads for
+    # each of six exact roles. No per-edge Git call occurs below.
+
+    $objDiff = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1048576 `
+        -ArgumentList @(
+            '-C', $RepositoryRootPath, 'diff', '--name-status', '-z',
+            '--no-renames', '--no-ext-diff', '--no-textconv',
+            $TrustedRevision, $HeadRevision, '--'
+        )
+    if ($objDiff.ExitCode -ne 0) {
+        throw 'Could not enumerate the issue 169 retirement path set.'
+    }
+    $strDiff = ConvertFrom-StrictUtf8Text -Bytes $objDiff.Bytes `
+        -Name 'The issue 169 retirement path set' -AllowNul
+    $arrDiffFields = @($strDiff -split "`0" | Where-Object { $_ -cne '' })
+    if ($arrDiffFields.Count -ne (2 * $ExpectedPathSpec.Count)) {
+        throw 'The issue 169 retirement path set is incomplete or contains extra paths.'
+    }
+    $setChangedPaths = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal)
+    for ($intIndex = 0; $intIndex -lt $arrDiffFields.Count; $intIndex += 2) {
+        if ($arrDiffFields[$intIndex] -cne 'M' -or
+            -not $setChangedPaths.Add($arrDiffFields[$intIndex + 1]) -or
+            -not $setExpectedPaths.Contains($arrDiffFields[$intIndex + 1])) {
+            throw 'The issue 169 retirement path set is incomplete or contains extra paths.'
+        }
+    }
+    if ($setChangedPaths.Count -ne $setExpectedPaths.Count) {
+        throw 'The issue 169 retirement path set is incomplete or contains extra paths.'
+    }
+
+    $objHistory = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1048576 `
+        -ArgumentList @(
+            '-C', $RepositoryRootPath, 'log', '--format=', '--name-only', '-z',
+            '--no-renames', '--no-ext-diff', '--no-textconv',
+            '--diff-merges=separate', '--root', $HeadRevision, '--not',
+            $TrustedRevision, '--'
+        )
+    if ($objHistory.ExitCode -ne 0) {
+        throw 'Could not enumerate the issue 169 retirement history.'
+    }
+    $strHistory = ConvertFrom-StrictUtf8Text -Bytes $objHistory.Bytes `
+        -Name 'The issue 169 retirement history path set' -AllowNul
+    foreach ($strHistoryPath in @(
+            $strHistory -split "`0" | Where-Object { $_ -cne '' }
+        )) {
+        if (-not $setExpectedPaths.Contains($strHistoryPath)) {
+            throw "The issue 169 retirement history contains unauthorized path $strHistoryPath."
+        }
+    }
+
+    foreach ($objSpec in $ExpectedPathSpec) {
+        $strTreeEntry = [string] (& git -C $RepositoryRootPath ls-tree `
+                $HeadRevision -- ([string] $objSpec.Path))
+        if ($LASTEXITCODE -ne 0 -or
+            $strTreeEntry -cnotmatch '^([0-7]{6}) blob ([0-9a-f]{40})\t(.+)$' -or
+            $Matches[1] -cne [string] $objSpec.Mode -or
+            $Matches[2] -cne [string] $objSpec.Blob -or
+            $Matches[3] -cne [string] $objSpec.Path) {
+            throw "$($objSpec.Path) has a mismatched issue 169 Git identity."
+        }
+        $arrBytes = @(Read-GitBlobByte -RepositoryRootPath $RepositoryRootPath `
+                -BlobId ([string] $objSpec.Blob) `
+                -MaximumBytes ([int] $objSpec.Bytes))
+        if ($arrBytes.Count -ne [int] $objSpec.Bytes) {
+            throw "$($objSpec.Path) has a mismatched issue 169 byte count."
+        }
+        $strSha256 = [Convert]::ToHexString(
+            [Security.Cryptography.SHA256]::HashData([byte[]] $arrBytes)
+        ).ToLowerInvariant()
+        if ($strSha256 -cne [string] $objSpec.Sha256) {
+            throw "$($objSpec.Path) has a mismatched issue 169 SHA-256 value."
+        }
+        $strText = ConvertFrom-StrictUtf8Text -Bytes ([byte[]] $arrBytes) `
+            -Name ([string] $objSpec.Path)
+        if (-not $strText.EndsWith("`n", [StringComparison]::Ordinal)) {
+            throw "$($objSpec.Path) lacks the reviewed LF ending."
+        }
     }
 }
 
@@ -3914,7 +4153,7 @@ if ($SelfTest) {
         '.github/workflows/workflow-policy-contract.json'
     ]
     if ($strCurrentPolicyValidator -cmatch
-        "(?m)^const VALIDATOR_VERSION = '(1\.(?:3|4)\.[0-9]+)';$") {
+        "(?m)^const VALIDATOR_VERSION = '(1\.(?:3|4|5)\.[0-9]+)';$") {
         $strCurrentVersion = $Matches[1]
         $arrCurrentDigest = [regex]::Matches($strCurrentPolicyValidator,
             "(?m)^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '([0-9a-f]{64})';$")
@@ -4134,6 +4373,316 @@ if ($SelfTest) {
         -Invariant 'package-lock-parser-closure-is-exact' `
         -Text $strShadowLock -Path 'package-lock.json' `
         -Name 'package-lock parser shadowing'
+
+    $strIssue169SystemTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strIssue169FixtureRoot = [IO.Path]::Combine(
+        $strIssue169SystemTempRoot,
+        'trust-root-issue169-' + [Guid]::NewGuid().ToString('N')
+    )
+    [void] [IO.Directory]::CreateDirectory($strIssue169FixtureRoot)
+    try {
+        & git -C $strIssue169FixtureRoot init --quiet --object-format=sha1
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not initialize the issue 169 retirement fixture.'
+        }
+        $arrIssue169FixturePath = @(
+            $script:arrIssue169RetirementPathSpec | ForEach-Object {
+                [string] $_.Path
+            }
+        )
+        foreach ($strFixturePath in $arrIssue169FixturePath) {
+            $strFixtureFullPath = Join-Path $strIssue169FixtureRoot $strFixturePath
+            [void] [IO.Directory]::CreateDirectory(
+                [IO.Path]::GetDirectoryName($strFixtureFullPath)
+            )
+            [IO.File]::WriteAllText(
+                $strFixtureFullPath,
+                "baseline:$strFixturePath`n",
+                [Text.UTF8Encoding]::new($false)
+            )
+        }
+        & git -C $strIssue169FixtureRoot add -A
+        & git -C $strIssue169FixtureRoot `
+            -c 'user.name=Issue 169 retirement self-test' `
+            -c 'user.email=issue169@example.invalid' `
+            -c 'commit.gpgSign=false' -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'trusted bootstrap fixture'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the issue 169 trusted fixture.'
+        }
+        $strIssue169Trusted = ([string] (& git -C $strIssue169FixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        $dictionaryIssue169FinalBytes =
+            [Collections.Generic.Dictionary[string, byte[]]]::new(
+                [StringComparer]::Ordinal)
+        foreach ($strFixturePath in $arrIssue169FixturePath) {
+            $arrFixtureBytes = [Text.UTF8Encoding]::new($false).GetBytes(
+                "retired:$strFixturePath`n"
+            )
+            $dictionaryIssue169FinalBytes[$strFixturePath] = $arrFixtureBytes
+            [IO.File]::WriteAllBytes(
+                (Join-Path $strIssue169FixtureRoot $strFixturePath),
+                $arrFixtureBytes
+            )
+        }
+        & git -C $strIssue169FixtureRoot add -A
+        & git -C $strIssue169FixtureRoot `
+            -c 'user.name=Issue 169 retirement self-test' `
+            -c 'user.email=issue169@example.invalid' `
+            -c 'commit.gpgSign=false' -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'exact retirement fixture'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the exact issue 169 retirement fixture.'
+        }
+        $strIssue169Head = ([string] (& git -C $strIssue169FixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        $listIssue169FixtureSpec =
+            [Collections.Generic.List[object]]::new()
+        foreach ($strFixturePath in $arrIssue169FixturePath) {
+            $strFixtureEntry = [string] (& git -C $strIssue169FixtureRoot `
+                    ls-tree $strIssue169Head -- $strFixturePath)
+            if ($LASTEXITCODE -ne 0 -or
+                $strFixtureEntry -cnotmatch
+                    '^([0-7]{6}) blob ([0-9a-f]{40})\t(.+)$') {
+                throw 'Could not resolve an issue 169 fixture identity.'
+            }
+            $strFixtureBlob = $Matches[2]
+            $arrFixtureBytes = @(Read-GitBlobByte `
+                    -RepositoryRootPath $strIssue169FixtureRoot `
+                    -BlobId $strFixtureBlob -MaximumBytes 573440)
+            $listIssue169FixtureSpec.Add([pscustomobject]@{
+                    Path = $strFixturePath
+                    Mode = $Matches[1]
+                    Blob = $strFixtureBlob
+                    Bytes = $arrFixtureBytes.Count
+                    Sha256 = [Convert]::ToHexString(
+                        [Security.Cryptography.SHA256]::HashData(
+                            [byte[]] $arrFixtureBytes
+                        )
+                    ).ToLowerInvariant()
+                })
+        }
+        Assert-ExactIssue169RetirementContent `
+            -RepositoryRootPath $strIssue169FixtureRoot `
+            -TrustedRevision $strIssue169Trusted `
+            -HeadRevision $strIssue169Head `
+            -ExpectedPathSpec @($listIssue169FixtureSpec)
+
+        $scriptblockExpectIssue169Rejection = {
+            param(
+                [Parameter(Mandatory)][string] $Head,
+                [Parameter(Mandatory)][object[]] $Spec,
+                [Parameter(Mandatory)][string] $ExpectedMessage,
+                [Parameter(Mandatory)][string] $Name
+            )
+            try {
+                Assert-ExactIssue169RetirementContent `
+                    -RepositoryRootPath $strIssue169FixtureRoot `
+                    -TrustedRevision $strIssue169Trusted `
+                    -HeadRevision $Head -ExpectedPathSpec $Spec
+                throw "Issue 169 retirement mutation passed: $Name"
+            } catch {
+                if ($_.Exception.Message -ceq
+                        "Issue 169 retirement mutation passed: $Name" -or
+                    -not $_.Exception.Message.Contains(
+                        $ExpectedMessage, [StringComparison]::Ordinal
+                    )) {
+                    throw
+                }
+            }
+        }
+
+        $strIssue169TrustedTree = ([string] (
+                & git -C $strIssue169FixtureRoot rev-parse `
+                    --verify "$strIssue169Trusted`^{tree}"
+            )).Trim()
+        $strOversizedHead = $strIssue169Trusted
+        foreach ($intCommitIndex in 1..65) {
+            $strOversizedHead = ([string] (
+                    "oversized $intCommitIndex`n" | & git `
+                        -C $strIssue169FixtureRoot `
+                        -c 'user.name=Issue 169 retirement self-test' `
+                        -c 'user.email=issue169@example.invalid' `
+                        commit-tree $strIssue169TrustedTree `
+                        -p $strOversizedHead
+                )).Trim()
+            if ($LASTEXITCODE -ne 0 -or
+                $strOversizedHead -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'Could not construct the oversized retirement history.'
+            }
+        }
+        & $scriptblockExpectIssue169Rejection -Head $strOversizedHead `
+            -Spec @($listIssue169FixtureSpec) `
+            -ExpectedMessage 'history is empty or exceeds 64 commits' `
+            -Name 'oversized retirement history'
+
+        $listWideParents = [Collections.Generic.List[string]]::new()
+        foreach ($intParentIndex in 1..59) {
+            $strWideParent = ([string] (
+                    "wide parent $intParentIndex`n" | & git `
+                        -C $strIssue169FixtureRoot `
+                        -c 'user.name=Issue 169 retirement self-test' `
+                        -c 'user.email=issue169@example.invalid' `
+                        commit-tree $strIssue169TrustedTree `
+                        -p $strIssue169Trusted
+                )).Trim()
+            if ($LASTEXITCODE -ne 0 -or
+                $strWideParent -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'Could not construct a wide retirement parent.'
+            }
+            $listWideParents.Add($strWideParent)
+        }
+        $strWideHead = $strIssue169Trusted
+        foreach ($intMergeIndex in 1..5) {
+            $listWideArguments = [Collections.Generic.List[string]]::new()
+            $listWideArguments.Add('-C')
+            $listWideArguments.Add($strIssue169FixtureRoot)
+            $listWideArguments.Add('-c')
+            $listWideArguments.Add('user.name=Issue 169 retirement self-test')
+            $listWideArguments.Add('-c')
+            $listWideArguments.Add('user.email=issue169@example.invalid')
+            $listWideArguments.Add('commit-tree')
+            $listWideArguments.Add($strIssue169TrustedTree)
+            $listWideArguments.Add('-p')
+            $listWideArguments.Add($strWideHead)
+            foreach ($strWideParent in $listWideParents) {
+                $listWideArguments.Add('-p')
+                $listWideArguments.Add($strWideParent)
+            }
+            $strWideHead = ([string] (
+                    "wide merge $intMergeIndex`n" | & git @listWideArguments
+                )).Trim()
+            if ($LASTEXITCODE -ne 0 -or
+                $strWideHead -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'Could not construct the wide retirement graph.'
+            }
+        }
+        & $scriptblockExpectIssue169Rejection -Head $strWideHead `
+            -Spec @($listIssue169FixtureSpec) `
+            -ExpectedMessage 'graph exceeds 256 parent edges' `
+            -Name 'wide retirement graph'
+
+        $arrMixedSpec = @($listIssue169FixtureSpec | ForEach-Object {
+                [pscustomobject]@{
+                    Path = $_.Path
+                    Mode = $_.Mode
+                    Blob = $_.Blob
+                    Bytes = $_.Bytes
+                    Sha256 = $_.Sha256
+                }
+            })
+        $arrMixedSpec[0].Blob = $arrMixedSpec[1].Blob
+        & $scriptblockExpectIssue169Rejection -Head $strIssue169Head `
+            -Spec $arrMixedSpec -ExpectedMessage 'mismatched issue 169 Git identity' `
+            -Name 'mixed reviewed identity'
+
+        & git -C $strIssue169FixtureRoot switch --quiet --detach $strIssue169Trusted
+        foreach ($strFixturePath in @($arrIssue169FixturePath | Where-Object {
+                    $_ -cne $strVerifierPath
+                })) {
+            [IO.File]::WriteAllBytes(
+                (Join-Path $strIssue169FixtureRoot $strFixturePath),
+                $dictionaryIssue169FinalBytes[$strFixturePath]
+            )
+        }
+        & git -C $strIssue169FixtureRoot add -A
+        & git -C $strIssue169FixtureRoot `
+            -c 'user.name=Issue 169 retirement self-test' `
+            -c 'user.email=issue169@example.invalid' `
+            -c 'commit.gpgSign=false' -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'missing retirement role'
+        $strMissingRoleHead = ([string] (& git -C $strIssue169FixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        & $scriptblockExpectIssue169Rejection -Head $strMissingRoleHead `
+            -Spec @($listIssue169FixtureSpec) `
+            -ExpectedMessage 'path set is incomplete or contains extra paths' `
+            -Name 'missing retirement role'
+
+        & git -C $strIssue169FixtureRoot switch --quiet --detach $strIssue169Trusted
+        foreach ($strFixturePath in $arrIssue169FixturePath) {
+            [IO.File]::WriteAllBytes(
+                (Join-Path $strIssue169FixtureRoot $strFixturePath),
+                $dictionaryIssue169FinalBytes[$strFixturePath]
+            )
+        }
+        [IO.File]::WriteAllText(
+            (Join-Path $strIssue169FixtureRoot 'unexpected.txt'),
+            "unexpected`n", [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strIssue169FixtureRoot add -A
+        & git -C $strIssue169FixtureRoot `
+            -c 'user.name=Issue 169 retirement self-test' `
+            -c 'user.email=issue169@example.invalid' `
+            -c 'commit.gpgSign=false' -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'extra retirement path'
+        $strExtraPathHead = ([string] (& git -C $strIssue169FixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        & $scriptblockExpectIssue169Rejection -Head $strExtraPathHead `
+            -Spec @($listIssue169FixtureSpec) `
+            -ExpectedMessage 'path set is incomplete or contains extra paths' `
+            -Name 'extra retirement path'
+
+        & git -C $strIssue169FixtureRoot switch --quiet --detach $strIssue169Trusted
+        [IO.File]::WriteAllText(
+            (Join-Path $strIssue169FixtureRoot 'unexpected.txt'),
+            "hostile`n", [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strIssue169FixtureRoot add -A
+        & git -C $strIssue169FixtureRoot `
+            -c 'user.name=Issue 169 retirement self-test' `
+            -c 'user.email=issue169@example.invalid' `
+            -c 'commit.gpgSign=false' -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'hostile retirement history'
+        Remove-Item -LiteralPath `
+            (Join-Path $strIssue169FixtureRoot 'unexpected.txt') -Force
+        foreach ($strFixturePath in $arrIssue169FixturePath) {
+            [IO.File]::WriteAllBytes(
+                (Join-Path $strIssue169FixtureRoot $strFixturePath),
+                $dictionaryIssue169FinalBytes[$strFixturePath]
+            )
+        }
+        & git -C $strIssue169FixtureRoot add -A
+        & git -C $strIssue169FixtureRoot `
+            -c 'user.name=Issue 169 retirement self-test' `
+            -c 'user.email=issue169@example.invalid' `
+            -c 'commit.gpgSign=false' -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'hide hostile retirement history'
+        $strHostileHistoryHead = ([string] (& git -C $strIssue169FixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        & $scriptblockExpectIssue169Rejection -Head $strHostileHistoryHead `
+            -Spec @($listIssue169FixtureSpec) `
+            -ExpectedMessage 'history contains unauthorized path' `
+            -Name 'reverted hostile retirement history'
+
+        & git -C $strIssue169FixtureRoot switch --quiet --detach $strIssue169Head
+        $strVerifierFixturePath =
+            '.github/workflows/Test-TrustRootAuthorization.ps1'
+        [IO.File]::WriteAllText(
+            (Join-Path $strIssue169FixtureRoot $strVerifierFixturePath),
+            "reintroduced bootstrap admission`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strIssue169FixtureRoot add -A
+        & git -C $strIssue169FixtureRoot `
+            -c 'user.name=Issue 169 retirement self-test' `
+            -c 'user.email=issue169@example.invalid' `
+            -c 'commit.gpgSign=false' -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'replay bootstrap admission'
+        $strReplayHead = ([string] (& git -C $strIssue169FixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        & $scriptblockExpectIssue169Rejection -Head $strReplayHead `
+            -Spec @($listIssue169FixtureSpec) `
+            -ExpectedMessage 'mismatched issue 169 Git identity' `
+            -Name 'bootstrap admission replay'
+    } finally {
+        if ([IO.Directory]::Exists($strIssue169FixtureRoot) -and
+            $strIssue169FixtureRoot.StartsWith(
+                $strIssue169SystemTempRoot,
+                [StringComparison]::OrdinalIgnoreCase
+            )) {
+            Remove-Item -LiteralPath $strIssue169FixtureRoot -Recurse -Force
+        }
+    }
 
     $strSchemaSystemTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
     $strSchemaFixtureRoot = [IO.Path]::Combine(
@@ -5673,8 +6222,33 @@ if (-not $boolTransitionAuthorization -and $arrAllowedPaths.Count -eq 0) {
         $boolContentExactManifestDeactivation) {
         throw 'Ordinary content requires the unchanged canonical inactive manifest.'
     }
-    Assert-OrdinaryWorkflowPolicyContent -RepositoryRootPath $RepositoryRootPath `
-        -TrustedRevision $TrustedRevision -HeadRevision $HeadRevision
+    $objInactivePathResult = Invoke-BoundedProcessByte -FileName 'git' `
+        -MaximumBytes 1048576 -ArgumentList @(
+            '-C', $RepositoryRootPath, 'diff', '--name-only', '-z',
+            '--no-renames', '--no-ext-diff', '--no-textconv',
+            $TrustedRevision, $HeadRevision, '--'
+        )
+    if ($objInactivePathResult.ExitCode -ne 0) {
+        throw 'Could not classify the inactive-manifest candidate path set.'
+    }
+    $strInactivePathText = ConvertFrom-StrictUtf8Text `
+        -Bytes $objInactivePathResult.Bytes `
+        -Name 'The inactive-manifest candidate path set' -AllowNul
+    $arrInactivePaths = @(
+        $strInactivePathText -split "`0" | Where-Object { $_ -cne '' }
+    )
+    $boolRetiresIssue169Authorizer =
+        $arrInactivePaths -ccontains $strVerifierPath
+    if ($boolRetiresIssue169Authorizer) {
+        Assert-ExactIssue169RetirementContent `
+            -RepositoryRootPath $RepositoryRootPath `
+            -TrustedRevision $TrustedRevision -HeadRevision $HeadRevision `
+            -ExpectedPathSpec $script:arrIssue169RetirementPathSpec
+    } else {
+        Assert-OrdinaryWorkflowPolicyContent `
+            -RepositoryRootPath $RepositoryRootPath `
+            -TrustedRevision $TrustedRevision -HeadRevision $HeadRevision
+    }
     Write-Output $true
     return
 }
