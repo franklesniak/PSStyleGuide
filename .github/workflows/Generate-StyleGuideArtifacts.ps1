@@ -10,13 +10,13 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260818.0
+Version: 1.0.20260915.0
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strGeneratorVersion = '1.0.20260818.0'
+$script:strGeneratorVersion = '1.0.20260915.0'
 $script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v2'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -932,8 +932,9 @@ function Get-OrdinaryFileIdentity {
     #
     # .DESCRIPTION
     # Reads the Windows volume serial and file index or the Unix device and inode
-    # from the supplied file. Both implementations require exactly one hard link
-    # so aliases cannot pass as distinct ordinary files.
+    # from the supplied file. Linux uses GNU stat syntax. macOS and FreeBSD use
+    # BSD stat syntax. Every implementation requires exactly one hard link so
+    # aliases cannot pass as distinct ordinary files.
     #
     # .PARAMETER LiteralPath
     # Literal path of the ordinary file whose identity is required.
@@ -953,17 +954,18 @@ function Get-OrdinaryFileIdentity {
     #
     # .OUTPUTS
     # System.String. Windows returns volume:file-index text; Unix returns
-    # device:inode text. Throws 'identity-failure' for a nonzero Unix stat exit,
-    # unexpected output cardinality, or malformed output, and 'hardlink-alias'
-    # for a non-unique link count. Parameter-binding, native invocation, and
-    # identity-read failures that prevent those Unix checks from running propagate.
+    # device:inode text. Throws 'unsupported-platform' for an unknown non-Windows
+    # host, 'identity-failure' for a nonzero Unix stat exit, unexpected output
+    # cardinality, or malformed output, and 'hardlink-alias' for a non-unique
+    # link count. Parameter-binding, native invocation, and identity-read failures
+    # that prevent those Unix checks from running propagate.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 1.0.20260915.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -979,7 +981,22 @@ function Get-OrdinaryFileIdentity {
         return [PSStyleGuide.NativeFileIdentity]::Read($LiteralPath)
     }
 
-    $arrStatOutput = @(& stat '-Lc' '%h:%d:%i' '--' $LiteralPath)
+    $boolHostIsLinux = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+        [System.Runtime.InteropServices.OSPlatform]::Linux
+    )
+    $boolHostIsMacOS = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+        [System.Runtime.InteropServices.OSPlatform]::OSX
+    )
+    $boolHostIsFreeBsd = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
+        [System.Runtime.InteropServices.OSPlatform]::Create('FREEBSD')
+    )
+    if ($boolHostIsMacOS -or $boolHostIsFreeBsd) {
+        $arrStatOutput = @(& stat '-f' '%l:%d:%i' $LiteralPath)
+    } elseif ($boolHostIsLinux) {
+        $arrStatOutput = @(& stat '-Lc' '%h:%d:%i' '--' $LiteralPath)
+    } else {
+        throw 'unsupported-platform'
+    }
     $intStatExit = $LASTEXITCODE
     if ($intStatExit -ne 0 -or $arrStatOutput.Count -ne 1 -or
         $arrStatOutput[0] -notmatch '^([1-9][0-9]*):([0-9]+):([0-9]+)$') {
@@ -1784,7 +1801,7 @@ function Write-StyleGuideArtifact {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 1.0.20260915.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1984,17 +2001,19 @@ function Write-StyleGuideArtifact {
         # above re-proves the candidate identity and bytes, but File.Replace and
         # File.Move resolve the source by PATH. Between that final proof and the
         # rename below, a second writer with write access to the parent directory
-        # could rename the verified candidate away and place different bytes at the
-        # same temporary path; the path-based rename would then publish the
-        # substituted bytes. No portable mechanism closes this: .NET exposes no
-        # handle-bound rename, POSIX rename is not fd-bound and does not honor a
-        # share mode, and a delete-denying handle held across the call would instead
-        # block the very rename this code must perform. The residual is bounded and
-        # never yields a false success -- the verify-publication phase below reads
-        # the published bytes and reports final-byte-drift / ReplacementStateUncertain
-        # on any mismatch, so a substitution fails closed with truthful evidence. The
-        # window requires a concurrent second writer racing a sub-second interval,
-        # which the single-actor CI trust root (docs/decisions/0001) does not have,
+        # could rename the verified candidate away and place a different object at
+        # the same temporary path, with either the same or different bytes; the
+        # path-based rename would then publish that substituted object. No portable
+        # mechanism closes this: .NET exposes no handle-bound rename, POSIX rename
+        # is not fd-bound and does not honor a share mode, and a delete-denying handle
+        # held across the call would instead block the very rename this code must
+        # perform. The residual is bounded and never yields a false success -- the
+        # verify-publication phase below binds the final object to the candidate
+        # identity and verifies its bytes. It reports a final-candidate-identity-mismatch
+        # or final-byte-drift under ReplacementStateUncertain, so a substitution fails
+        # closed with truthful evidence. The window requires a concurrent second
+        # writer racing a sub-second interval, which the single-actor CI trust root
+        # (docs/decisions/0001) does not have,
         # and such a writer already has directory write access and so gains nothing
         # beyond a truthfully reported failure it could cause by writing directly.
         $strPhase = 'publish-destination'
@@ -2022,14 +2041,14 @@ function Write-StyleGuideArtifact {
         }
         [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)
         # Bind the measured bytes to a single destination identity across the read.
-        # A second writer that replaces the destination between the byte read and the
-        # identity read would otherwise pair the correct candidate bytes with the
-        # replacement's identity, and every comparison below would still pass. Capture
-        # the identity before and after the read and require them to match; a change
-        # across the read fails closed. Publication already returned, so the catch
-        # reports ReplacementStateUncertain. A change before the byte read alters the
-        # bytes and is caught below as final-byte-drift; a change strictly after the
-        # second identity read is the accepted publication residual documented above.
+        # A second writer that replaces the destination during the read window could
+        # otherwise let the identity and byte measurements describe different objects.
+        # Capture the identity before and after the read and require them to match; a
+        # change across the read fails closed. Publication already returned, so the catch
+        # reports ReplacementStateUncertain. A change before the byte read can alter
+        # identity, bytes, or both and is caught below as final-candidate-identity-mismatch
+        # or final-byte-drift; a change strictly after the second identity read is the
+        # accepted publication residual documented above.
         $strFinalIdentityBeforeRead = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
         $arrFinalBytes = [System.IO.File]::ReadAllBytes($strDestinationPath)
         $hashtableRecord.FinalLength = $arrFinalBytes.Length
@@ -2037,6 +2056,9 @@ function Write-StyleGuideArtifact {
         $hashtableRecord.FinalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath
         if ($strFinalIdentityBeforeRead -cne $hashtableRecord.FinalOrdinaryIdentity) {
             throw 'final-identity-drift'
+        }
+        if ($hashtableRecord.FinalOrdinaryIdentity -cne $strCandidateIdentity) {
+            throw 'final-candidate-identity-mismatch'
         }
         if ($hashtableRecord.FinalLength -ne $CompletePayloadBytes.Length -or
             $hashtableRecord.FinalSha256 -cne $hashtableRecord.CandidateSha256 -or
