@@ -7015,6 +7015,20 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 - Pin and mutation-test platform dispatch and final-to-candidate equality. Run both PowerShell parsers, PSScriptAnalyzer with zero Warning/Error findings, GNU/BSD/unknown-platform controls, actual `File.Replace` and `File.Move` identity controls, the same-byte different-identity failure, policy preflight and catalog, and two generator passes on Windows PowerShell 5.1, Windows PowerShell 7, and native ext4 PowerShell 7.
 - Start only from Terraform PR #35's landed commit, tree, blobs, review result, and the Task 69 ordered comparison. Never copy from its deleted or moving feature branch.
 
+### Conditional reviewed trust-rule installation for issue #169
+
+The selected admission decision may add `.github/workflows/Test-TrustRootAuthorization.ps1` as the fifth and only additional implementation path. This exception is limited to a bounded temporary admission rule, its tests, and exact retirement of that rule in the final repair candidate. Keep the four product paths and all other exclusions above. Keep the canonical inactive authorization manifest unchanged. Do not weaken or bypass a control.
+
+1. Finish the independent four-path product validation. Pin the product bytes and the current trusted baseline.
+2. Prepare a separate bootstrap from current authenticated `main`. Permit only the reviewed product roles and the exact retirement form of the temporary authorizer change. Preserve bounded inert-data validation, the full path/history audit, and all unrelated admission behavior.
+3. Prove rejection of altered product bytes, mixed identities, extra paths, hostile history, replay, and missing or altered retirement. Test the actual default-branch push contract and the subsequent trusted-base PR contract. Preserve every failed result; do not report a proposed-input rejection as clean.
+4. Run the complete applicable local gates and obtain independent review of the bootstrap. An installation that requires a settings, permission, credential, protection, or gate bypass remains outside this authority.
+5. Only after those gates pass, install the exact reviewed bootstrap with a non-force default-branch update under the controller's R2 controls. Recheck the remote preimage immediately before the write. Read back the resulting ref and require applicable hosted checks to succeed. Do not install the product directly on `main`.
+6. Prepare the final product candidate from that installed baseline without rewriting published history or discarding work. Retire the temporary rule in this candidate, with valid version progression. Require the trusted authorizer to accept the complete final candidate and require all applicable local checks to pass.
+7. Return that candidate to the normal Tasks 73–76 PR, CI, review, independent-quality, and merge lifecycle. The final landed state must have no temporary admission clause or active grant. Do not create a second cleanup PR only to retire the rule.
+
+This conditional R2 bootstrap is the only default-branch publication permitted in this task. It does not authorize a product push to `main`, a PR-check exception, or a merge. If its entry-path tests show that a bypass is necessary, continue independent safe work and escalate only that exceptional action.
+
 ### Procedure
 
 1. If Task 71 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
@@ -7076,6 +7090,7 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 - Keep the Windows handle identity implementation. Select GNU `stat -Lc` only on Linux; select BSD `stat -f` on macOS and FreeBSD; reject an unknown non-Windows platform. Preserve exact link-count, device, inode, and hard-link refusal.
 - Keep both post-publication final identity reads and every byte and serialization check. Require the stable final identity to equal the captured candidate identity. Report a post-publication mismatch as `ReplacementStateUncertain`; do not claim rollback.
 - Limit the focused repair to `.github/workflows/Generate-StyleGuideArtifacts.ps1`, `.github/workflows/Validate-WorkflowPolicy.mjs`, `.github/workflows/build.yml`, and `.github/workflows/workflow-policy-contract.json`. Use the contract path only for the exact generator version/SHA, validator SHA, generator-caller `runSha256`, and corresponding canonical-contract identity required by issue #169; do not change any unrelated contract entry. Do not change guides, generated artifacts, package files, lockfiles, action pins or inputs, permissions, triggers, job topology, artifact roles, credential roles, or settings.
+- If Task 72 used its conditional reviewed trust-rule installation, permit `.github/workflows/Test-TrustRootAuthorization.ps1` only as the fifth path for exact retirement of that temporary rule and required version progression. Verify that the final candidate retains the original security behavior and contains no active grant or one-off admission clause. Do not add another control-file change or waive admission, CI, review, or merge requirements.
 - Pin and mutation-test platform dispatch and final-to-candidate equality. Run both PowerShell parsers, PSScriptAnalyzer with zero Warning/Error findings, GNU/BSD/unknown-platform controls, actual `File.Replace` and `File.Move` identity controls, the same-byte different-identity failure, policy preflight and catalog, and two generator passes on Windows PowerShell 5.1, Windows PowerShell 7, and native ext4 PowerShell 7.
 - Start only from Terraform PR #35's landed commit, tree, blobs, review result, and the Task 69 ordered comparison. Never copy from its deleted or moving feature branch.
 
