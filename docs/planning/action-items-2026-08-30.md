@@ -7785,7 +7785,7 @@ Only values enclosed in double braces are variables. Each token has exactly one 
 | --- | --- | --- |
 | Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
 | PS #170 issue URL | `{https://github.com/franklesniak/PSStyleGuide/issues/170}` | Verified existing PS #170 issue; re-query before execution |
-| Task 82 PR URL | `{{TASK_082_PR_URL}}` | Produced by this task; replace {{TASK_082_PR_URL}} globally when the exact URL is known |
+| Task 82 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/198` | Produced by this task; verified through authenticated PR readback |
 
 ### Record inputs
 
@@ -7868,7 +7868,7 @@ Only values enclosed in double braces are variables. Each token has exactly one 
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
 | Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 82 PR URL | `{{TASK_082_PR_URL}}` | Produced by Task 82; resolve globally before execution |
+| Task 82 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/198` | Produced by Task 82; resolve globally before execution |
 
 ### Record inputs
 
@@ -7957,7 +7957,7 @@ Only values enclosed in double braces are variables. Each token has exactly one 
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
 | Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 82 PR URL | `{{TASK_082_PR_URL}}` | Produced by Task 82; resolve globally before execution |
+| Task 82 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/198` | Produced by Task 82; resolve globally before execution |
 
 ### Record inputs
 
@@ -8045,7 +8045,7 @@ Only values enclosed in double braces are variables. Each token has exactly one 
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
 | Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 82 PR URL | `{{TASK_082_PR_URL}}` | Produced by Task 82; resolve globally before execution |
+| Task 82 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/198` | Produced by Task 82; resolve globally before execution |
 
 ### Record inputs
 
@@ -8111,7 +8111,7 @@ Only values enclosed in double braces are variables. Each token has exactly one 
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
 | Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 82 PR URL | `{{TASK_082_PR_URL}}` | Produced by Task 82; resolve globally before execution |
+| Task 82 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/198` | Produced by Task 82; resolve globally before execution |
 
 ### Record inputs
 
