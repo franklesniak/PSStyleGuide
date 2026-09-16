@@ -7065,7 +7065,7 @@ Only values enclosed in double braces are variables. Each token has exactly one 
 | --- | --- | --- |
 | Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
 | PS #169 issue URL | `{https://github.com/franklesniak/PSStyleGuide/issues/169}` | Verified existing PS #169 issue; re-query before execution |
-| Task 73 PR URL | `{{TASK_073_PR_URL}}` | Produced by this task; replace {{TASK_073_PR_URL}} globally when the exact URL is known |
+| Task 73 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/197` | Produced by Task 73; verified focused repair PR |
 
 ### Record inputs
 
@@ -7149,7 +7149,7 @@ Only values enclosed in double braces are variables. Each token has exactly one 
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
 | Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 73 PR URL | `{{TASK_073_PR_URL}}` | Produced by Task 73; resolve globally before execution |
+| Task 73 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/197` | Produced by Task 73; verified focused repair PR |
 
 ### Record inputs
 
@@ -7238,7 +7238,7 @@ Only values enclosed in double braces are variables. Each token has exactly one 
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
 | Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 73 PR URL | `{{TASK_073_PR_URL}}` | Produced by Task 73; resolve globally before execution |
+| Task 73 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/197` | Produced by Task 73; verified focused repair PR |
 
 ### Record inputs
 
@@ -7326,7 +7326,7 @@ Only values enclosed in double braces are variables. Each token has exactly one 
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
 | Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 73 PR URL | `{{TASK_073_PR_URL}}` | Produced by Task 73; resolve globally before execution |
+| Task 73 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/197` | Produced by Task 73; verified focused repair PR |
 
 ### Record inputs
 
@@ -7392,7 +7392,7 @@ Only values enclosed in double braces are variables. Each token has exactly one 
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
 | Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 73 PR URL | `{{TASK_073_PR_URL}}` | Produced by Task 73; resolve globally before execution |
+| Task 73 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/197` | Produced by Task 73; verified focused repair PR |
 
 ### Record inputs
 
