@@ -3,7 +3,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.11.20260915.4
+# Version: 1.11.20260916.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -8125,9 +8125,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.11\.20260915\.4$'
+            '(?m)^# Version: 1\.11\.20260916\.1$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.11.20260915.4.'
+        throw 'The validator script version is not 1.11.20260916.1.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8988,9 +8988,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.4\.20260915\.4$'
+            '(?m)^# Version: 1\.4\.20260916\.1$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.4.20260915.4.'
+        throw 'The trust-root authorization script lacks version 1.4.20260916.1.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
