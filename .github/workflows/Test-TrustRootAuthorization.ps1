@@ -47,7 +47,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.4.20260915.4
+# Version: 1.4.20260916.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -72,6 +72,50 @@ $intCandidateMaximumCommits = 64
 $strObjectIdPattern = '^[0-9a-f]{40}$'
 $strAuthorizationPath = '.github/workflows/trust-root-authorization.json'
 $strVerifierPath = '.github/workflows/Test-TrustRootAuthorization.ps1'
+$script:arrIssue170RetirementPathSpec = @(
+    [pscustomobject]@{
+        Path = '.github/workflows/Generate-StyleGuideArtifacts.ps1'
+        Mode = '100644'
+        Blob = 'd1fa0bb569309114c7517df9a2253ac70e331281'
+        Bytes = 94391
+        Sha256 = 'f3d5e8b68a516f048547aa17570d81501f7df53cde4c6a01212bc4e2d909bc1a'
+    },
+    [pscustomobject]@{
+        Path = '.github/workflows/Test-AgentInstructions.ps1'
+        Mode = '100644'
+        Blob = '8fcadec6a6c065db56d313aab5f188d1f53d3e73'
+        Bytes = 573430
+        Sha256 = 'a58dec65eae61d451b5058609a4829c875123212b52c5716e56fa4362ca1e5f7'
+    },
+    [pscustomobject]@{
+        Path = '.github/workflows/Test-TrustRootAuthorization.ps1'
+        Mode = '100644'
+        Blob = '7960658fd0acbc99fa4640be15a00d0256bb1c59'
+        Bytes = 285901
+        Sha256 = 'e4318932aad0df4d8fff73273e41e0590062d6945003bbd5b22b3106129696d9'
+    },
+    [pscustomobject]@{
+        Path = '.github/workflows/Validate-WorkflowPolicy.mjs'
+        Mode = '100644'
+        Blob = 'e8c64af22b72f3f7a425b4f2665d969bb22743b5'
+        Bytes = 54093
+        Sha256 = '5725c46a5c4aa1c0c4905d971ef2e91827d5fd29d26f18d7b58b92afbc9f8fad'
+    },
+    [pscustomobject]@{
+        Path = '.github/workflows/build.yml'
+        Mode = '100644'
+        Blob = 'e32142b72ec2dbef5c896576abb1f8a9470e48e1'
+        Bytes = 8047
+        Sha256 = 'd7069fed1a9d8e39cb43a2537b6886a67a01d8893ff7592671a5d0880b9d80ad'
+    },
+    [pscustomobject]@{
+        Path = '.github/workflows/workflow-policy-contract.json'
+        Mode = '100644'
+        Blob = '2d1d01fe0e98018ac50d66016528f8e2574c3111'
+        Bytes = 23312
+        Sha256 = 'fac935616e7abe531179a79fb73292e66dbc9b28ac578347fc2e529529fb2dd7'
+    }
+)
 $script:dictionaryPolicyReferenceText =
     [Collections.Generic.Dictionary[string, string]]::new([StringComparer]::Ordinal)
 $arrTrustRootPaths = @(
@@ -1683,6 +1727,273 @@ function Assert-OrdinaryWorkflowPolicyContent {
             [StringComparison]::Ordinal) -or
         $strCommentSuffix.Contains('VALIDATOR_VERSION', [StringComparison]::Ordinal)) {
         throw 'An ordinary validator suffix is not bounded inert line comments.'
+    }
+}
+
+
+function Assert-ExactIssue170RetirementContent {
+    # .SYNOPSIS
+    # Validates the exact self-retiring issue 170 repair candidate.
+    #
+    # .DESCRIPTION
+    # Requires the fixed bootstrap origin and published-product ancestry, then
+    # closes every bounded parent edge to that origin or bootstrap. The final and
+    # complete-history path sets stay within six reviewed roles. Each role must match its exact
+    # regular Git blob, byte count, SHA-256 value, strict UTF-8 encoding, and LF
+    # ending. The reviewed authorizer and validator retire the temporary rule.
+    # Candidate source is inspected only as inert Git data.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute trusted repository path.
+    #
+    # .PARAMETER TrustedRevision
+    # The exact trusted bootstrap commit.
+    #
+    # .PARAMETER HeadRevision
+    # The exact descendant repair candidate.
+    #
+    # .PARAMETER OriginRevision
+    # The fixed reviewed origin before the bootstrap and published product.
+    #
+    # .PARAMETER PublishedProductRevision
+    # The published repair commit that must remain in candidate ancestry.
+    #
+    # .PARAMETER ExpectedPathSpec
+    # Six exact reviewed path identities. Production passes fixed local data;
+    # focused self-tests pass isolated fixture identities.
+    #
+    # .EXAMPLE
+    # Assert-ExactIssue170RetirementContent @hashtableArguments
+    #
+    # # Returns no output when the exact candidate and its history are valid.
+    #
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # None. Throws for missing, mixed, altered, replayed, or hostile content.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260916.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $TrustedRevision,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $HeadRevision,
+        [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')]
+        [string] $OriginRevision,
+        [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')]
+        [string] $PublishedProductRevision,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][object[]] $ExpectedPathSpec
+    )
+
+    if ($ExpectedPathSpec.Count -ne 6) {
+        throw 'The issue 170 retirement identity set is incomplete.'
+    }
+    $setExpectedPaths = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal)
+    foreach ($objSpec in $ExpectedPathSpec) {
+        if ($null -eq $objSpec -or
+            [string] $objSpec.Path -cnotmatch '^(?:[^/\x00-\x1f\\]+/)*[^/\x00-\x1f\\]+$' -or
+            -not $setExpectedPaths.Add([string] $objSpec.Path) -or
+            [string] $objSpec.Mode -cne '100644' -or
+            [string] $objSpec.Blob -cnotmatch '^[0-9a-f]{40}$' -or
+            [int64] $objSpec.Bytes -lt 1 -or
+            [int64] $objSpec.Bytes -gt 573440 -or
+            [string] $objSpec.Sha256 -cnotmatch '^[0-9a-f]{64}$') {
+            throw 'The issue 170 retirement identity set is invalid.'
+        }
+    }
+
+    $objBootstrapParents = Invoke-BoundedProcessByte -FileName 'git' `
+        -MaximumBytes 4096 -ArgumentList @(
+            '-C', $RepositoryRootPath, 'rev-list', '--parents', '--max-count=1',
+            $TrustedRevision, '--'
+        )
+    $strBootstrapParents = ConvertFrom-StrictUtf8Text `
+        -Bytes $objBootstrapParents.Bytes -Name 'The issue 170 bootstrap origin'
+    if ($objBootstrapParents.ExitCode -ne 0 -or
+        $strBootstrapParents -cne "$TrustedRevision $OriginRevision`n") {
+        throw 'The issue 170 bootstrap is not a direct child of the fixed origin.'
+    }
+    $objBootstrapPaths = Invoke-BoundedProcessByte -FileName 'git' `
+        -MaximumBytes 1048576 -ArgumentList @(
+            '-C', $RepositoryRootPath, 'diff', '--name-status', '-z',
+            '--no-renames', '--no-ext-diff', '--no-textconv',
+            $OriginRevision, $TrustedRevision, '--'
+        )
+    $strBootstrapPaths = ConvertFrom-StrictUtf8Text `
+        -Bytes $objBootstrapPaths.Bytes -Name 'The issue 170 bootstrap paths' -AllowNul
+    $strExpectedBootstrapPaths =
+        "M`0.github/workflows/Test-AgentInstructions.ps1`0" +
+        "M`0.github/workflows/Test-TrustRootAuthorization.ps1`0"
+    if ($objBootstrapPaths.ExitCode -ne 0 -or
+        $strBootstrapPaths -cne $strExpectedBootstrapPaths) {
+        throw 'The issue 170 bootstrap changes paths outside its two reviewed roles.'
+    }
+    & git -C $RepositoryRootPath merge-base --is-ancestor `
+        $PublishedProductRevision $HeadRevision 2>$null
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The issue 170 candidate does not preserve the published product ancestry.'
+    }
+
+    & git -C $RepositoryRootPath merge-base --is-ancestor `
+        $TrustedRevision $HeadRevision 2>$null
+    if ($LASTEXITCODE -eq 1) {
+        throw 'The issue 170 retirement candidate does not descend from the bootstrap.'
+    }
+    if ($LASTEXITCODE -ne 0) {
+        throw 'The issue 170 retirement ancestry is indeterminate.'
+    }
+    $objCommitCount = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 64 `
+        -ArgumentList @(
+            '-C', $RepositoryRootPath, 'rev-list', '--count', '--max-count=65',
+            $HeadRevision, '--not', $TrustedRevision
+        )
+    $strCommitCount = ConvertFrom-StrictUtf8Text -Bytes $objCommitCount.Bytes `
+        -Name 'The issue 170 retirement commit count'
+    if ($objCommitCount.ExitCode -ne 0 -or
+        $strCommitCount.Trim() -cnotmatch '^[0-9]+$' -or
+        [int] $strCommitCount.Trim() -notin 1..64) {
+        throw 'The issue 170 retirement history is empty or exceeds 64 commits.'
+    }
+
+    $objParentGraph = Invoke-BoundedProcessByte -FileName 'git' `
+        -MaximumBytes 131072 -ArgumentList @(
+            '-C', $RepositoryRootPath, 'rev-list', '--parents', '--max-count=65',
+            $HeadRevision, '--not', $TrustedRevision, '--'
+        )
+    $strParentGraph = ConvertFrom-StrictUtf8Text -Bytes $objParentGraph.Bytes `
+        -Name 'The issue 170 retirement parent graph'
+    $arrParentGraphRows = @($strParentGraph.TrimEnd("`n") -split "`n")
+    if ($objParentGraph.ExitCode -ne 0 -or
+        $arrParentGraphRows.Count -ne [int] $strCommitCount.Trim()) {
+        throw 'The issue 170 retirement parent graph is incomplete.'
+    }
+    $setGraphCommits = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal)
+    $setGraphParents = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal)
+    $intParentEdgeCount = 0
+    foreach ($strParentGraphRow in $arrParentGraphRows) {
+        if ($strParentGraphRow -cnotmatch
+            '^[0-9a-f]{40}(?: [0-9a-f]{40}){1,64}$') {
+            throw 'The issue 170 retirement parent graph is incomplete or unbounded.'
+        }
+        $arrGraphIds = @($strParentGraphRow -split ' ')
+        if (-not $setGraphCommits.Add($arrGraphIds[0])) {
+            throw 'The issue 170 retirement graph contains a duplicate commit.'
+        }
+        $setRowParents = [Collections.Generic.HashSet[string]]::new(
+            [StringComparer]::Ordinal)
+        foreach ($strParentId in $arrGraphIds[1..($arrGraphIds.Count - 1)]) {
+            if (-not $setRowParents.Add($strParentId)) {
+                throw 'The issue 170 retirement graph contains a duplicate parent.'
+            }
+            [void] $setGraphParents.Add($strParentId)
+        }
+        $intParentEdgeCount += $arrGraphIds.Count - 1
+        if ($intParentEdgeCount -gt 256) {
+            throw 'The issue 170 retirement graph exceeds 256 parent edges.'
+        }
+    }
+
+    foreach ($strParentId in $setGraphParents) {
+        if (-not $setGraphCommits.Contains($strParentId) -and
+            $strParentId -cne $TrustedRevision -and
+            $strParentId -cne $OriginRevision) {
+            throw 'The issue 170 retirement graph has a parent outside its fixed boundary.'
+        }
+    }
+
+    # The remaining graph-independent inspection has a fixed upper bound of 20
+    # Git calls: one final diff, one history-path read, and three object reads for
+    # each of six exact roles. No per-edge Git call occurs below.
+
+    $objDiff = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1048576 `
+        -ArgumentList @(
+            '-C', $RepositoryRootPath, 'diff', '--name-status', '-z',
+            '--no-renames', '--no-ext-diff', '--no-textconv',
+            $TrustedRevision, $HeadRevision, '--'
+        )
+    if ($objDiff.ExitCode -ne 0) {
+        throw 'Could not enumerate the issue 170 retirement path set.'
+    }
+    $strDiff = ConvertFrom-StrictUtf8Text -Bytes $objDiff.Bytes `
+        -Name 'The issue 170 retirement path set' -AllowNul
+    $arrDiffFields = @($strDiff -split "`0" | Where-Object { $_ -cne '' })
+    if ($arrDiffFields.Count -ne (2 * $ExpectedPathSpec.Count)) {
+        throw 'The issue 170 retirement path set is incomplete or contains extra paths.'
+    }
+    $setChangedPaths = [Collections.Generic.HashSet[string]]::new(
+        [StringComparer]::Ordinal)
+    for ($intIndex = 0; $intIndex -lt $arrDiffFields.Count; $intIndex += 2) {
+        if ($arrDiffFields[$intIndex] -cne 'M' -or
+            -not $setChangedPaths.Add($arrDiffFields[$intIndex + 1]) -or
+            -not $setExpectedPaths.Contains($arrDiffFields[$intIndex + 1])) {
+            throw 'The issue 170 retirement path set is incomplete or contains extra paths.'
+        }
+    }
+    if ($setChangedPaths.Count -ne $setExpectedPaths.Count) {
+        throw 'The issue 170 retirement path set is incomplete or contains extra paths.'
+    }
+
+    $objHistory = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1048576 `
+        -ArgumentList @(
+            '-C', $RepositoryRootPath, 'log', '--format=', '--name-only', '-z',
+            '--no-renames', '--no-ext-diff', '--no-textconv',
+            '--diff-merges=separate', '--root', $HeadRevision, '--not',
+            $TrustedRevision, '--'
+        )
+    if ($objHistory.ExitCode -ne 0) {
+        throw 'Could not enumerate the issue 170 retirement history.'
+    }
+    $strHistory = ConvertFrom-StrictUtf8Text -Bytes $objHistory.Bytes `
+        -Name 'The issue 170 retirement history path set' -AllowNul
+    foreach ($strHistoryPath in @(
+            $strHistory -split "`0" | Where-Object { $_ -cne '' }
+        )) {
+        if (-not $setExpectedPaths.Contains($strHistoryPath)) {
+            throw "The issue 170 retirement history contains unauthorized path $strHistoryPath."
+        }
+    }
+
+    foreach ($objSpec in $ExpectedPathSpec) {
+        $objTreeEntry = Invoke-BoundedProcessByte -FileName 'git' `
+            -MaximumBytes 4096 -ArgumentList @(
+                '-C', $RepositoryRootPath, 'ls-tree',
+                $HeadRevision, '--', ([string] $objSpec.Path)
+            )
+        $strTreeEntry = (ConvertFrom-StrictUtf8Text -Bytes $objTreeEntry.Bytes `
+                -Name 'The issue 170 role tree entry').TrimEnd("`n")
+        if ($objTreeEntry.ExitCode -ne 0 -or
+            $strTreeEntry -cnotmatch '^([0-7]{6}) blob ([0-9a-f]{40})\t(.+)$' -or
+            $Matches[1] -cne [string] $objSpec.Mode -or
+            $Matches[2] -cne [string] $objSpec.Blob -or
+            $Matches[3] -cne [string] $objSpec.Path) {
+            throw "$($objSpec.Path) has a mismatched issue 170 Git identity."
+        }
+        $arrBytes = @(Read-GitBlobByte -RepositoryRootPath $RepositoryRootPath `
+                -BlobId ([string] $objSpec.Blob) `
+                -MaximumBytes ([int] $objSpec.Bytes))
+        if ($arrBytes.Count -ne [int] $objSpec.Bytes) {
+            throw "$($objSpec.Path) has a mismatched issue 170 byte count."
+        }
+        $strSha256 = [Convert]::ToHexString(
+            [Security.Cryptography.SHA256]::HashData([byte[]] $arrBytes)
+        ).ToLowerInvariant()
+        if ($strSha256 -cne [string] $objSpec.Sha256) {
+            throw "$($objSpec.Path) has a mismatched issue 170 SHA-256 value."
+        }
+        $strText = ConvertFrom-StrictUtf8Text -Bytes ([byte[]] $arrBytes) `
+            -Name ([string] $objSpec.Path)
+        if (-not $strText.EndsWith("`n", [StringComparison]::Ordinal)) {
+            throw "$($objSpec.Path) lacks the reviewed LF ending."
+        }
     }
 }
 
@@ -4135,6 +4446,328 @@ if ($SelfTest) {
         -Text $strShadowLock -Path 'package-lock.json' `
         -Name 'package-lock parser shadowing'
 
+
+    $strIssue170SystemTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strIssue170FixtureRoot = [IO.Path]::Combine(
+        $strIssue170SystemTempRoot,
+        'trust-root-issue170-' + [Guid]::NewGuid().ToString('N')
+    )
+    [void] [IO.Directory]::CreateDirectory($strIssue170FixtureRoot)
+    $strIssue170OriginalIndex = $env:GIT_INDEX_FILE
+    try {
+        $env:GIT_INDEX_FILE = Join-Path $strIssue170FixtureRoot 'fixture.index'
+        $scriptblockIssue170Git = {
+            param([Parameter(Mandatory)][string[]] $Argument)
+            $arrOutput = @(& git -C $strIssue170FixtureRoot `
+                    -c 'user.name=Issue 170 retirement self-test' `
+                    -c 'user.email=issue170@example.invalid' @Argument)
+            if ($LASTEXITCODE -ne 0) {
+                throw "Issue 170 fixture Git failed: $($Argument[0])"
+            }
+            return [string]::Join("`n", $arrOutput).Trim()
+        }
+        [void] (& $scriptblockIssue170Git -Argument @(
+                'init', '--quiet', '--object-format=sha1'
+            ))
+        $scriptblockIssue170Tree = {
+            param(
+                [Parameter()][string] $Base = '',
+                [Parameter(Mandatory)][hashtable] $Content,
+                [Parameter()][string] $SpecialModePath = ''
+            )
+            if ([string]::IsNullOrEmpty($Base)) {
+                [void] (& $scriptblockIssue170Git -Argument @('read-tree', '--empty'))
+            } else {
+                [void] (& $scriptblockIssue170Git -Argument @('read-tree', $Base))
+            }
+            foreach ($strPath in $Content.Keys) {
+                $strObjectFile = Join-Path $strIssue170FixtureRoot 'object.bytes'
+                [IO.File]::WriteAllBytes($strObjectFile, [byte[]] $Content[$strPath])
+                $strBlob = & $scriptblockIssue170Git -Argument @(
+                    'hash-object', '-w', '--no-filters', $strObjectFile
+                )
+                $strMode = if ($strPath -ceq $SpecialModePath) { '120000' } else { '100644' }
+                [void] (& $scriptblockIssue170Git -Argument @(
+                        'update-index', '--add', '--cacheinfo',
+                        "$strMode,$strBlob,$strPath"
+                    ))
+            }
+            return (& $scriptblockIssue170Git -Argument @('write-tree'))
+        }
+        $scriptblockIssue170Commit = {
+            param(
+                [Parameter(Mandatory)][string] $Tree,
+                [Parameter()][string[]] $Parent = @()
+            )
+            $listArguments = [Collections.Generic.List[string]]::new()
+            foreach ($strArgument in @('commit-tree', $Tree, '-m', 'issue 170 fixture')) {
+                $listArguments.Add($strArgument)
+            }
+            foreach ($strParent in $Parent) {
+                $listArguments.Add('-p')
+                $listArguments.Add($strParent)
+            }
+            return (& $scriptblockIssue170Git -Argument @($listArguments))
+        }
+        $hashtableIssue170OriginContent = @{}
+        $hashtableIssue170ProductContent = @{}
+        $hashtableIssue170BootstrapContent = @{}
+        $hashtableIssue170FinalContent = @{}
+        foreach ($objRole in $script:arrIssue170RetirementPathSpec) {
+            $strPath = [string] $objRole.Path
+            $hashtableIssue170OriginContent[$strPath] =
+                [Text.Encoding]::UTF8.GetBytes("origin:$strPath`n")
+            $hashtableIssue170FinalContent[$strPath] =
+                [Text.Encoding]::UTF8.GetBytes("retired:$strPath`n")
+            if ($strPath -cin @(
+                    '.github/workflows/Test-AgentInstructions.ps1',
+                    '.github/workflows/Test-TrustRootAuthorization.ps1'
+                )) {
+                $hashtableIssue170BootstrapContent[$strPath] =
+                    [Text.Encoding]::UTF8.GetBytes("bootstrap:$strPath`n")
+            } else {
+                $hashtableIssue170ProductContent[$strPath] =
+                    $hashtableIssue170FinalContent[$strPath]
+            }
+        }
+        $strOriginTree = & $scriptblockIssue170Tree `
+            -Content $hashtableIssue170OriginContent
+        $strOlderOrigin = & $scriptblockIssue170Commit -Tree $strOriginTree
+        $strOrigin = & $scriptblockIssue170Commit -Tree $strOriginTree -Parent $strOlderOrigin
+        $strProductTree = & $scriptblockIssue170Tree -Base $strOrigin `
+            -Content $hashtableIssue170ProductContent
+        $strProduct = & $scriptblockIssue170Commit -Tree $strProductTree -Parent $strOrigin
+        $strBootstrapTree = & $scriptblockIssue170Tree -Base $strOrigin `
+            -Content $hashtableIssue170BootstrapContent
+        $strBootstrap = & $scriptblockIssue170Commit -Tree $strBootstrapTree -Parent $strOrigin
+        $strFinalTree = & $scriptblockIssue170Tree -Base $strBootstrap `
+            -Content $hashtableIssue170FinalContent
+        $strFinal = & $scriptblockIssue170Commit -Tree $strFinalTree `
+            -Parent @($strBootstrap, $strProduct)
+        $listFixtureSpec = [Collections.Generic.List[object]]::new()
+        foreach ($objRole in $script:arrIssue170RetirementPathSpec) {
+            $strPath = [string] $objRole.Path
+            $strEntry = & $scriptblockIssue170Git -Argument @(
+                'ls-tree', $strFinal, '--', $strPath
+            )
+            if ($strEntry -cnotmatch '^100644 blob ([0-9a-f]{40})\t') {
+                throw 'The issue 170 fixture role is not one regular blob.'
+            }
+            $arrBytes = [byte[]] $hashtableIssue170FinalContent[$strPath]
+            $listFixtureSpec.Add([pscustomobject]@{
+                    Path = $strPath
+                    Mode = '100644'
+                    Blob = $Matches[1]
+                    Bytes = $arrBytes.Length
+                    Sha256 = [Convert]::ToHexString(
+                        [Security.Cryptography.SHA256]::HashData($arrBytes)
+                    ).ToLowerInvariant()
+                })
+        }
+        $hashtableIssue170Arguments = @{
+            RepositoryRootPath = $strIssue170FixtureRoot
+            TrustedRevision = $strBootstrap
+            OriginRevision = $strOrigin
+            PublishedProductRevision = $strProduct
+            ExpectedPathSpec = @($listFixtureSpec)
+        }
+        Assert-ExactIssue170RetirementContent @hashtableIssue170Arguments `
+            -HeadRevision $strFinal
+        $scriptblockExpectIssue170Rejection = {
+            param(
+                [Parameter(Mandatory)][string] $Head,
+                [Parameter(Mandatory)][string] $Expected,
+                [Parameter(Mandatory)][string] $Name,
+                [Parameter()][hashtable] $Overrides = @{}
+            )
+            $hashtableArguments = $hashtableIssue170Arguments.Clone()
+            foreach ($strKey in $Overrides.Keys) {
+                $hashtableArguments[$strKey] = $Overrides[$strKey]
+            }
+            try {
+                Assert-ExactIssue170RetirementContent @hashtableArguments -HeadRevision $Head
+                throw "Issue 170 hostile fixture passed: $Name"
+            } catch {
+                if ($_.Exception.Message -ceq "Issue 170 hostile fixture passed: $Name" -or
+                    -not $_.Exception.Message.Contains($Expected, [StringComparison]::Ordinal)) {
+                    throw
+                }
+            }
+        }
+        foreach ($objRole in $listFixtureSpec) {
+            $hashtableChanged = @{
+                ([string] $objRole.Path) = [Text.Encoding]::UTF8.GetBytes("altered`n")
+            }
+            $strAlteredTree = & $scriptblockIssue170Tree -Base $strFinal -Content $hashtableChanged
+            $strAltered = & $scriptblockIssue170Commit -Tree $strAlteredTree -Parent $strFinal
+            & $scriptblockExpectIssue170Rejection -Head $strAltered `
+                -Expected 'mismatched issue 170 Git identity' -Name "altered $($objRole.Path)"
+        }
+        $arrMixedSpec = @($listFixtureSpec | ForEach-Object {
+                [pscustomobject]@{
+                    Path = $_.Path; Mode = $_.Mode; Blob = $_.Blob
+                    Bytes = $_.Bytes; Sha256 = $_.Sha256
+                }
+            })
+        $arrMixedSpec[0].Blob = $arrMixedSpec[1].Blob
+        & $scriptblockExpectIssue170Rejection -Head $strFinal `
+            -Expected 'mismatched issue 170 Git identity' -Name 'mixed identities' `
+            -Overrides @{ ExpectedPathSpec = $arrMixedSpec }
+        foreach ($strField in @('Bytes', 'Sha256')) {
+            $arrFieldSpec = @($listFixtureSpec | ForEach-Object {
+                    [pscustomobject]@{
+                        Path = $_.Path; Mode = $_.Mode; Blob = $_.Blob
+                        Bytes = $_.Bytes; Sha256 = $_.Sha256
+                    }
+                })
+            if ($strField -ceq 'Bytes') {
+                $arrFieldSpec[0].Bytes++
+                $strExpected = 'mismatched issue 170 byte count'
+            } else {
+                $arrFieldSpec[0].Sha256 = '0' * 64
+                $strExpected = 'mismatched issue 170 SHA-256 value'
+            }
+            & $scriptblockExpectIssue170Rejection -Head $strFinal `
+                -Expected $strExpected -Name "independent $strField guard" `
+                -Overrides @{ ExpectedPathSpec = $arrFieldSpec }
+        }
+        $hashtableIssue170EncodingCase = @{}
+        foreach ($objEncodingCase in @(
+                @{ Name = 'invalid UTF-8'; Bytes = [byte[]] @(255, 10); Expected = 'not strict UTF-8' },
+                @{ Name = 'BOM'; Bytes = [byte[]] @(239, 187, 191, 10); Expected = 'byte-order mark' },
+                @{ Name = 'CR'; Bytes = [byte[]] @(13, 10); Expected = 'prohibited control byte' },
+                @{ Name = 'NUL'; Bytes = [byte[]] @(0, 10); Expected = 'prohibited control byte' },
+                @{ Name = 'missing LF'; Bytes = [byte[]] @(65); Expected = 'lacks the reviewed LF ending' }
+            )) {
+            $strEncodingPath = [string] $listFixtureSpec[0].Path
+            $strEncodingTree = & $scriptblockIssue170Tree -Base $strFinal -Content @{
+                $strEncodingPath = $objEncodingCase.Bytes
+            }
+            $strEncodingHead = & $scriptblockIssue170Commit -Tree $strEncodingTree -Parent $strFinal
+            $strEncodingEntry = & $scriptblockIssue170Git -Argument @(
+                'ls-tree', $strEncodingHead, '--', $strEncodingPath
+            )
+            if ($strEncodingEntry -cnotmatch '^100644 blob ([0-9a-f]{40})\t') {
+                throw 'The issue 170 encoding fixture is not one regular blob.'
+            }
+            $strEncodingBlob = $Matches[1]
+            $arrEncodingSpec = @($listFixtureSpec | ForEach-Object {
+                    [pscustomobject]@{
+                        Path = $_.Path; Mode = $_.Mode; Blob = $_.Blob
+                        Bytes = $_.Bytes; Sha256 = $_.Sha256
+                    }
+                })
+            $arrEncodingSpec[0].Blob = $strEncodingBlob
+            $arrEncodingSpec[0].Bytes = $objEncodingCase.Bytes.Length
+            $arrEncodingSpec[0].Sha256 = [Convert]::ToHexString(
+                [Security.Cryptography.SHA256]::HashData([byte[]] $objEncodingCase.Bytes)
+            ).ToLowerInvariant()
+            $hashtableIssue170EncodingCase[$objEncodingCase.Name] = @{
+                Head = $strEncodingHead; Spec = $arrEncodingSpec
+            }
+            & $scriptblockExpectIssue170Rejection -Head $strEncodingHead `
+                -Expected $objEncodingCase.Expected -Name $objEncodingCase.Name `
+                -Overrides @{ ExpectedPathSpec = $arrEncodingSpec }
+        }
+        $strBoundedDescendant = & $scriptblockIssue170Commit -Tree $strFinalTree -Parent $strFinal
+        Assert-ExactIssue170RetirementContent @hashtableIssue170Arguments `
+            -HeadRevision $strBoundedDescendant
+        foreach ($strTrustPath in $hashtableIssue170BootstrapContent.Keys) {
+            $strMissingTree = & $scriptblockIssue170Tree -Base $strFinal -Content @{
+                $strTrustPath = $hashtableIssue170BootstrapContent[$strTrustPath]
+            }
+            $strMissing = & $scriptblockIssue170Commit -Tree $strMissingTree -Parent $strFinal
+            & $scriptblockExpectIssue170Rejection -Head $strMissing `
+                -Expected 'path set is incomplete or contains extra paths' `
+                -Name "missing retirement $strTrustPath"
+        }
+        $strLinkTree = & $scriptblockIssue170Tree -Base $strFinal `
+            -Content $hashtableIssue170FinalContent -SpecialModePath $strVerifierPath
+        $strLink = & $scriptblockIssue170Commit -Tree $strLinkTree -Parent $strFinal
+        & $scriptblockExpectIssue170Rejection -Head $strLink `
+            -Expected 'path set is incomplete or contains extra paths' -Name 'linked role'
+        $strExtraTree = & $scriptblockIssue170Tree -Base $strFinal -Content @{
+            'unexpected.txt' = [Text.Encoding]::UTF8.GetBytes("unexpected`n")
+        }
+        $strExtra = & $scriptblockIssue170Commit -Tree $strExtraTree -Parent $strFinal
+        & $scriptblockExpectIssue170Rejection -Head $strExtra `
+            -Expected 'path set is incomplete or contains extra paths' -Name 'extra path'
+        $strHidden = & $scriptblockIssue170Commit -Tree $strFinalTree -Parent $strExtra
+        & $scriptblockExpectIssue170Rejection -Head $strHidden `
+            -Expected 'history contains unauthorized path' -Name 'reverted unrelated history'
+        $strMissingProduct = & $scriptblockIssue170Commit -Tree $strFinalTree -Parent $strBootstrap
+        & $scriptblockExpectIssue170Rejection -Head $strMissingProduct `
+            -Expected 'does not preserve the published product ancestry' -Name 'missing published head'
+        $strOrphan = & $scriptblockIssue170Commit -Tree $strFinalTree
+        $strOrphanMerge = & $scriptblockIssue170Commit -Tree $strFinalTree `
+            -Parent @($strFinal, $strOrphan)
+        & $scriptblockExpectIssue170Rejection -Head $strOrphanMerge `
+            -Expected 'parent graph is incomplete or unbounded' -Name 'orphan side history'
+        $strOlderMerge = & $scriptblockIssue170Commit -Tree $strFinalTree `
+            -Parent @($strFinal, $strOlderOrigin)
+        & $scriptblockExpectIssue170Rejection -Head $strOlderMerge `
+            -Expected 'parent outside its fixed boundary' -Name 'older trusted ancestor edge'
+        & $scriptblockExpectIssue170Rejection -Head $strFinal `
+            -Expected 'not a direct child of the fixed origin' -Name 'replay after retirement' `
+            -Overrides @{ TrustedRevision = $strFinal }
+        & $scriptblockExpectIssue170Rejection -Head $strFinal `
+            -Expected 'not a direct child of the fixed origin' -Name 'wrong origin' `
+            -Overrides @{ OriginRevision = $strOlderOrigin }
+        $strIndirectBootstrap = & $scriptblockIssue170Commit -Tree $strBootstrapTree -Parent $strBootstrap
+        $strIndirectHead = & $scriptblockIssue170Commit -Tree $strFinalTree `
+            -Parent @($strIndirectBootstrap, $strProduct)
+        & $scriptblockExpectIssue170Rejection -Head $strIndirectHead `
+            -Expected 'not a direct child of the fixed origin' -Name 'indirect bootstrap' `
+            -Overrides @{ TrustedRevision = $strIndirectBootstrap }
+        $strExtraBootstrapTree = & $scriptblockIssue170Tree -Base $strBootstrap -Content @{
+            'unexpected.txt' = [Text.Encoding]::UTF8.GetBytes("bootstrap extra`n")
+        }
+        $strExtraBootstrap = & $scriptblockIssue170Commit -Tree $strExtraBootstrapTree -Parent $strOrigin
+        $strExtraBootstrapFinalTree = & $scriptblockIssue170Tree -Base $strExtraBootstrap `
+            -Content $hashtableIssue170FinalContent
+        $strExtraBootstrapHead = & $scriptblockIssue170Commit -Tree $strExtraBootstrapFinalTree `
+            -Parent @($strExtraBootstrap, $strProduct)
+        & $scriptblockExpectIssue170Rejection -Head $strExtraBootstrapHead `
+            -Expected 'bootstrap changes paths outside its two reviewed roles' -Name 'extra bootstrap path' `
+            -Overrides @{ TrustedRevision = $strExtraBootstrap }
+        $strOversized = $strFinal
+        foreach ($intIndex in 1..63) {
+            $strOversized = & $scriptblockIssue170Commit -Tree $strFinalTree -Parent $strOversized
+        }
+        & $scriptblockExpectIssue170Rejection -Head $strOversized `
+            -Expected 'history is empty or exceeds 64 commits' -Name 'oversized history'
+        $listWideParents = [Collections.Generic.List[string]]::new()
+        foreach ($intIndex in 1..57) {
+            # A distinct message makes each inert parent object unique.
+            $strWideParent = & $scriptblockIssue170Git -Argument @(
+                'commit-tree', $strOriginTree, '-p', $strOrigin,
+                '-m', "issue 170 wide parent $intIndex"
+            )
+            $listWideParents.Add($strWideParent)
+        }
+        $strWide = $strFinal
+        foreach ($intIndex in 1..4) {
+            $strWide = & $scriptblockIssue170Commit -Tree $strFinalTree `
+                -Parent (@($strWide) + @($listWideParents))
+        }
+        $strWide = & $scriptblockIssue170Commit -Tree $strFinalTree `
+            -Parent (@($strWide) + @($listWideParents[0..20]))
+        & $scriptblockExpectIssue170Rejection -Head $strWide `
+            -Expected 'graph exceeds 256 parent edges' -Name 'wide bounded history'
+        Write-Information 'Issue 170 exact-retirement hostile controls passed.' -InformationAction Continue
+    } finally {
+        $env:GIT_INDEX_FILE = $strIssue170OriginalIndex
+        $strExpectedPrefix = [IO.Path]::GetFullPath($strIssue170SystemTempRoot).TrimEnd(
+            [IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar
+        ) + [IO.Path]::DirectorySeparatorChar
+        $strResolvedFixture = [IO.Path]::GetFullPath($strIssue170FixtureRoot)
+        if ([IO.Directory]::Exists($strResolvedFixture) -and
+            $strResolvedFixture.StartsWith($strExpectedPrefix, [StringComparison]::OrdinalIgnoreCase) -and
+            [IO.Path]::GetFileName($strResolvedFixture) -cmatch '^trust-root-issue170-[0-9a-f]{32}$') {
+            Remove-Item -LiteralPath $strResolvedFixture -Recurse -Force
+        }
+    }
+
     $strSchemaSystemTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
     $strSchemaFixtureRoot = [IO.Path]::Combine(
         $strSchemaSystemTempRoot,
@@ -5673,8 +6306,33 @@ if (-not $boolTransitionAuthorization -and $arrAllowedPaths.Count -eq 0) {
         $boolContentExactManifestDeactivation) {
         throw 'Ordinary content requires the unchanged canonical inactive manifest.'
     }
-    Assert-OrdinaryWorkflowPolicyContent -RepositoryRootPath $RepositoryRootPath `
-        -TrustedRevision $TrustedRevision -HeadRevision $HeadRevision
+    $objInactivePathResult = Invoke-BoundedProcessByte -FileName 'git' `
+        -MaximumBytes 1048576 -ArgumentList @(
+            '-C', $RepositoryRootPath, 'diff', '--name-only', '-z',
+            '--no-renames', '--no-ext-diff', '--no-textconv',
+            $TrustedRevision, $HeadRevision, '--'
+        )
+    if ($objInactivePathResult.ExitCode -ne 0) {
+        throw 'Could not classify the inactive-manifest candidate path set.'
+    }
+    $strInactivePathText = ConvertFrom-StrictUtf8Text `
+        -Bytes $objInactivePathResult.Bytes `
+        -Name 'The inactive-manifest candidate path set' -AllowNul
+    $arrInactivePaths = @(
+        $strInactivePathText -split "`0" | Where-Object { $_ -cne '' }
+    )
+    if ($arrInactivePaths -ccontains $strVerifierPath) {
+        Assert-ExactIssue170RetirementContent `
+            -RepositoryRootPath $RepositoryRootPath `
+            -TrustedRevision $TrustedRevision -HeadRevision $HeadRevision `
+            -OriginRevision 'da91e8ab731e499e539d678bcec60e15a20b13f1' `
+            -PublishedProductRevision '1fc3c875b7edf6f5c3fc87802c7cfebd089a9c5d' `
+            -ExpectedPathSpec $script:arrIssue170RetirementPathSpec
+    } else {
+        Assert-OrdinaryWorkflowPolicyContent `
+            -RepositoryRootPath $RepositoryRootPath `
+            -TrustedRevision $TrustedRevision -HeadRevision $HeadRevision
+    }
     Write-Output $true
     return
 }
