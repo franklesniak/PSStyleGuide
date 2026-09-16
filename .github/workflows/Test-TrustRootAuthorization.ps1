@@ -47,7 +47,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.4.20260915.2
+# Version: 1.4.20260915.3
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -83,23 +83,23 @@ $script:arrIssue169RetirementPathSpec = @(
     [pscustomobject]@{
         Path = '.github/workflows/Test-AgentInstructions.ps1'
         Mode = '100644'
-        Blob = 'a5bc3c83c9795baac5bbe8abedec87e85a3a16cd'
+        Blob = '6400b202764842a4466cf65bc5429d383f222ca4'
         Bytes = 573430
-        Sha256 = '5ea22892e9aee948f1899fb4cdb03169a73dfc97e2f756048af78155a345a3c3'
+        Sha256 = '2213efdb55456f852357e5f2083d23f70b81443273e2bcf36243bccb1a685fb1'
     },
     [pscustomobject]@{
         Path = '.github/workflows/Test-TrustRootAuthorization.ps1'
         Mode = '100644'
-        Blob = 'dc4aa078b3177dd7c5185a5b805941e45d61799d'
+        Blob = '8d6f30492a09fdcb3c72948f4b2f46101e363fb4'
         Bytes = 285901
-        Sha256 = 'b282f8146c770a7cc998ded2fe100c0367f77185cc5c4ea034e0f756119451ef'
+        Sha256 = '4ca7762797d99f2ffb059bc5221647af892bee767ed6ca50f0f14c343472ecbd'
     },
     [pscustomobject]@{
         Path = '.github/workflows/Validate-WorkflowPolicy.mjs'
         Mode = '100644'
-        Blob = '6f06b72ab58b85a33633c3bee40f86b7f9741e8f'
+        Blob = '42748161d779cc32175f681a990cda059ada0f5d'
         Bytes = 52755
-        Sha256 = 'b83d5fc50dc69c0d1c2b531799e985dfd208cd07af23c4f4224cb2c92a84be02'
+        Sha256 = 'eba961e0b5cda7da4c76228a762f59d7d089ee0b8e685a52a233751df9ba9660'
     },
     [pscustomobject]@{
         Path = '.github/workflows/build.yml'
@@ -111,11 +111,20 @@ $script:arrIssue169RetirementPathSpec = @(
     [pscustomobject]@{
         Path = '.github/workflows/workflow-policy-contract.json'
         Mode = '100644'
-        Blob = '94bd5ac69eeefdee75fa22adb8203dcec4e8edd9'
+        Blob = 'c42ebe4c96bcd16fbb360c558738eb262626bf46'
         Bytes = 23312
-        Sha256 = '7ca5d2581e155c82a9dd2177f910e978a3ba6caa31d8008ae1b1fa40fdb41209'
+        Sha256 = '88297aa134d885e8bbe55ee6e10e5566942d1c0030ec9095a7dfad898ddd16fe'
     }
 )
+$script:strIssue169PublishedPriorHead =
+    'f0e57574d1bffeb7c5f70329b4a6a0b47d075ed3'
+$script:objIssue169TrustedCarryPathSpec = [pscustomobject]@{
+    Path = '.github/workflows/pull-request-body-identity.yml'
+    Mode = '100644'
+    Blob = '816c31c0efeb76263120f1df34193f18eac087e2'
+    Bytes = 31833
+    Sha256 = 'fe6087d9708d787a9b7198f766c06c5d345e6e320e88000e6a762251fb13a59a'
+}
 $script:dictionaryPolicyReferenceText =
     [Collections.Generic.Dictionary[string, string]]::new([StringComparer]::Ordinal)
 $arrTrustRootPaths = @(
@@ -1737,7 +1746,9 @@ function Assert-ExactIssue169RetirementContent {
     #
     # .DESCRIPTION
     # Requires one descendant candidate whose final and complete-history path
-    # sets stay within six reviewed roles. Every final role must match its exact
+    # sets stay within six reviewed roles. A published-candidate continuation
+    # may use one exact two-parent merge whose inherited workflow matches the
+    # trusted bootstrap byte-for-byte. Every final role must match its exact
     # regular Git blob, byte count, SHA-256 value, strict UTF-8 encoding, and LF
     # ending. The reviewed authorizer and validator retire the temporary rule.
     # Candidate source is inspected only as inert Git data.
@@ -1754,6 +1765,14 @@ function Assert-ExactIssue169RetirementContent {
     # .PARAMETER ExpectedPathSpec
     # Six exact reviewed path identities. Production passes fixed local data;
     # focused self-tests pass isolated fixture identities.
+    #
+    # .PARAMETER PublishedPriorHead
+    # Optional exact already-published candidate that must be the merge's first
+    # parent. It is paired with TrustedCarryPathSpec.
+    #
+    # .PARAMETER TrustedCarryPathSpec
+    # Optional exact trusted-baseline path identity inherited unchanged by the
+    # merge. It is not a seventh final repair role.
     #
     # .EXAMPLE
     # Assert-ExactIssue169RetirementContent @hashtableArguments
@@ -1777,7 +1796,9 @@ function Assert-ExactIssue169RetirementContent {
         [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $RepositoryRootPath,
         [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $TrustedRevision,
         [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $HeadRevision,
-        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][object[]] $ExpectedPathSpec
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][object[]] $ExpectedPathSpec,
+        [Parameter()][AllowEmptyString()][string] $PublishedPriorHead = '',
+        [Parameter()][AllowNull()][object] $TrustedCarryPathSpec = $null
     )
 
     if ($ExpectedPathSpec.Count -ne 6) {
@@ -1797,6 +1818,20 @@ function Assert-ExactIssue169RetirementContent {
             throw 'The issue 169 retirement identity set is invalid.'
         }
     }
+    $boolPublishedMerge = -not [string]::IsNullOrEmpty($PublishedPriorHead)
+    if ($boolPublishedMerge -ne ($null -ne $TrustedCarryPathSpec) -or
+        ($boolPublishedMerge -and
+            ($PublishedPriorHead -cnotmatch '^[0-9a-f]{40}$' -or
+                [string] $TrustedCarryPathSpec.Path -cnotmatch
+                    '^(?:[^/\x00-\x1f\\]+/)*[^/\x00-\x1f\\]+$' -or
+                $setExpectedPaths.Contains([string] $TrustedCarryPathSpec.Path) -or
+                [string] $TrustedCarryPathSpec.Mode -cne '100644' -or
+                [string] $TrustedCarryPathSpec.Blob -cnotmatch '^[0-9a-f]{40}$' -or
+                [int64] $TrustedCarryPathSpec.Bytes -lt 1 -or
+                [int64] $TrustedCarryPathSpec.Bytes -gt 573440 -or
+                [string] $TrustedCarryPathSpec.Sha256 -cnotmatch '^[0-9a-f]{64}$'))) {
+        throw 'The issue 169 published continuation identity is invalid.'
+    }
 
     & git -C $RepositoryRootPath merge-base --is-ancestor `
         $TrustedRevision $HeadRevision 2>$null
@@ -1815,7 +1850,9 @@ function Assert-ExactIssue169RetirementContent {
         -Name 'The issue 169 retirement commit count'
     if ($objCommitCount.ExitCode -ne 0 -or
         $strCommitCount.Trim() -cnotmatch '^[0-9]+$' -or
-        [int] $strCommitCount.Trim() -notin 1..64) {
+        ($boolPublishedMerge -and [int] $strCommitCount.Trim() -ne 2) -or
+        (-not $boolPublishedMerge -and
+            [int] $strCommitCount.Trim() -notin 1..64)) {
         throw 'The issue 169 retirement history is empty or exceeds 64 commits.'
     }
 
@@ -1842,10 +1879,34 @@ function Assert-ExactIssue169RetirementContent {
             throw 'The issue 169 retirement graph exceeds 256 parent edges.'
         }
     }
+    if ($boolPublishedMerge) {
+        $dictionaryParentGraph =
+            [Collections.Generic.Dictionary[string, string[]]]::new(
+                [StringComparer]::Ordinal)
+        foreach ($strParentGraphRow in $arrParentGraphRows) {
+            $arrCommitAndParents = @($strParentGraphRow -split ' ')
+            $dictionaryParentGraph.Add(
+                $arrCommitAndParents[0],
+                @($arrCommitAndParents | Select-Object -Skip 1)
+            )
+        }
+        if ($dictionaryParentGraph.Count -ne 2 -or
+            -not $dictionaryParentGraph.ContainsKey($HeadRevision) -or
+            -not $dictionaryParentGraph.ContainsKey($PublishedPriorHead)) {
+            throw 'The issue 169 published continuation graph is incomplete.'
+        }
+        $arrHeadParents = @($dictionaryParentGraph[$HeadRevision])
+        if ($arrHeadParents.Count -ne 2 -or
+            $arrHeadParents[0] -cne $PublishedPriorHead -or
+            $arrHeadParents[1] -cne $TrustedRevision) {
+            throw 'The issue 169 published continuation has unexpected parents.'
+        }
+    }
 
-    # The remaining graph-independent inspection has a fixed upper bound of 20
-    # Git calls: one final diff, one history-path read, and three object reads for
-    # each of six exact roles. No per-edge Git call occurs below.
+    # The remaining graph-independent inspection has a fixed upper bound of 24
+    # Git calls: one final diff, one history-path read, three object reads for
+    # each of six exact roles, and four reads for one optional trusted carry.
+    # No per-edge Git call occurs below.
 
     $objDiff = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1048576 `
         -ArgumentList @(
@@ -1890,8 +1951,37 @@ function Assert-ExactIssue169RetirementContent {
     foreach ($strHistoryPath in @(
             $strHistory -split "`0" | Where-Object { $_ -cne '' }
         )) {
-        if (-not $setExpectedPaths.Contains($strHistoryPath)) {
+        if (-not $setExpectedPaths.Contains($strHistoryPath) -and
+            (-not $boolPublishedMerge -or
+                $strHistoryPath -cne [string] $TrustedCarryPathSpec.Path)) {
             throw "The issue 169 retirement history contains unauthorized path $strHistoryPath."
+        }
+    }
+
+    if ($boolPublishedMerge) {
+        foreach ($strCarryRevision in @($TrustedRevision, $HeadRevision)) {
+            $strCarryEntry = [string] (& git -C $RepositoryRootPath ls-tree `
+                    $strCarryRevision -- ([string] $TrustedCarryPathSpec.Path))
+            if ($LASTEXITCODE -ne 0 -or
+                $strCarryEntry -cnotmatch
+                    '^([0-7]{6}) blob ([0-9a-f]{40})\t(.+)$' -or
+                $Matches[1] -cne [string] $TrustedCarryPathSpec.Mode -or
+                $Matches[2] -cne [string] $TrustedCarryPathSpec.Blob -or
+                $Matches[3] -cne [string] $TrustedCarryPathSpec.Path) {
+                throw 'The issue 169 published continuation carry identity is mismatched.'
+            }
+        }
+        $arrCarryBytes = @(Read-GitBlobByte `
+                -RepositoryRootPath $RepositoryRootPath `
+                -BlobId ([string] $TrustedCarryPathSpec.Blob) `
+                -MaximumBytes ([int] $TrustedCarryPathSpec.Bytes))
+        if ($arrCarryBytes.Count -ne [int] $TrustedCarryPathSpec.Bytes -or
+            [Convert]::ToHexString(
+                [Security.Cryptography.SHA256]::HashData(
+                    [byte[]] $arrCarryBytes
+                )
+            ).ToLowerInvariant() -cne [string] $TrustedCarryPathSpec.Sha256) {
+            throw 'The issue 169 published continuation carry bytes are mismatched.'
         }
     }
 
@@ -4390,6 +4480,8 @@ if ($SelfTest) {
                 [string] $_.Path
             }
         )
+        $strIssue169CarryPath =
+            '.github/workflows/pull-request-body-identity.yml'
         foreach ($strFixturePath in $arrIssue169FixturePath) {
             $strFixtureFullPath = Join-Path $strIssue169FixtureRoot $strFixturePath
             [void] [IO.Directory]::CreateDirectory(
@@ -4401,6 +4493,16 @@ if ($SelfTest) {
                 [Text.UTF8Encoding]::new($false)
             )
         }
+        $strIssue169CarryFullPath =
+            Join-Path $strIssue169FixtureRoot $strIssue169CarryPath
+        [void] [IO.Directory]::CreateDirectory(
+            [IO.Path]::GetDirectoryName($strIssue169CarryFullPath)
+        )
+        [IO.File]::WriteAllText(
+            $strIssue169CarryFullPath,
+            "old trusted acquisition workflow`n",
+            [Text.UTF8Encoding]::new($false)
+        )
         & git -C $strIssue169FixtureRoot add -A
         & git -C $strIssue169FixtureRoot `
             -c 'user.name=Issue 169 retirement self-test' `
@@ -4467,6 +4569,199 @@ if ($SelfTest) {
             -TrustedRevision $strIssue169Trusted `
             -HeadRevision $strIssue169Head `
             -ExpectedPathSpec @($listIssue169FixtureSpec)
+
+        & git -C $strIssue169FixtureRoot switch --quiet --detach $strIssue169Trusted
+        [IO.File]::WriteAllText(
+            $strIssue169CarryFullPath,
+            "new trusted acquisition workflow`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strIssue169FixtureRoot add -- $strIssue169CarryPath
+        & git -C $strIssue169FixtureRoot `
+            -c 'user.name=Issue 169 retirement self-test' `
+            -c 'user.email=issue169@example.invalid' `
+            -c 'commit.gpgSign=false' -c 'core.hooksPath=NUL' `
+            commit --quiet --no-gpg-sign -m 'trusted acquisition bootstrap fixture'
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not commit the trusted acquisition bootstrap fixture.'
+        }
+        $strIssue169AcquisitionTrusted = ([string] (
+                & git -C $strIssue169FixtureRoot rev-parse --verify 'HEAD^{commit}'
+            )).Trim()
+        $strCarryEntry = [string] (& git -C $strIssue169FixtureRoot ls-tree `
+                $strIssue169AcquisitionTrusted -- $strIssue169CarryPath)
+        if ($LASTEXITCODE -ne 0 -or
+            $strCarryEntry -cnotmatch
+                '^([0-7]{6}) blob ([0-9a-f]{40})\t(.+)$') {
+            throw 'Could not resolve the trusted acquisition carry identity.'
+        }
+        $strCarryBlob = $Matches[2]
+        $arrCarryBytes = @(Read-GitBlobByte `
+                -RepositoryRootPath $strIssue169FixtureRoot `
+                -BlobId $strCarryBlob -MaximumBytes 573440)
+        $objIssue169CarryFixtureSpec = [pscustomobject]@{
+            Path = $strIssue169CarryPath
+            Mode = $Matches[1]
+            Blob = $strCarryBlob
+            Bytes = $arrCarryBytes.Count
+            Sha256 = [Convert]::ToHexString(
+                [Security.Cryptography.SHA256]::HashData(
+                    [byte[]] $arrCarryBytes
+                )
+            ).ToLowerInvariant()
+        }
+        & git -C $strIssue169FixtureRoot switch --quiet --detach $strIssue169Head
+        & git -C $strIssue169FixtureRoot `
+            -c 'user.name=Issue 169 retirement self-test' `
+            -c 'user.email=issue169@example.invalid' `
+            -c 'commit.gpgSign=false' -c 'core.hooksPath=NUL' `
+            merge --quiet --no-ff --no-edit $strIssue169AcquisitionTrusted
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not create the exact published continuation fixture.'
+        }
+        $strIssue169MergeHead = ([string] (& git -C $strIssue169FixtureRoot `
+                    rev-parse --verify 'HEAD^{commit}')).Trim()
+        Assert-ExactIssue169RetirementContent `
+            -RepositoryRootPath $strIssue169FixtureRoot `
+            -TrustedRevision $strIssue169AcquisitionTrusted `
+            -HeadRevision $strIssue169MergeHead `
+            -ExpectedPathSpec @($listIssue169FixtureSpec) `
+            -PublishedPriorHead $strIssue169Head `
+            -TrustedCarryPathSpec $objIssue169CarryFixtureSpec
+
+        $scriptblockExpectIssue169MergeRejection = {
+            param(
+                [Parameter(Mandatory)][string] $Head,
+                [Parameter(Mandatory)][string] $PriorHead,
+                [Parameter(Mandatory)][object] $CarrySpec,
+                [Parameter(Mandatory)][string] $ExpectedMessage,
+                [Parameter(Mandatory)][string] $Name
+            )
+            try {
+                Assert-ExactIssue169RetirementContent `
+                    -RepositoryRootPath $strIssue169FixtureRoot `
+                    -TrustedRevision $strIssue169AcquisitionTrusted `
+                    -HeadRevision $Head `
+                    -ExpectedPathSpec @($listIssue169FixtureSpec) `
+                    -PublishedPriorHead $PriorHead `
+                    -TrustedCarryPathSpec $CarrySpec
+                throw "Issue 169 continuation mutation passed: $Name"
+            } catch {
+                if ($_.Exception.Message -ceq
+                        "Issue 169 continuation mutation passed: $Name" -or
+                    -not $_.Exception.Message.Contains(
+                        $ExpectedMessage, [StringComparison]::Ordinal
+                    )) {
+                    throw
+                }
+            }
+        }
+        & $scriptblockExpectIssue169MergeRejection `
+            -Head $strIssue169MergeHead -PriorHead $strIssue169Trusted `
+            -CarrySpec $objIssue169CarryFixtureSpec `
+            -ExpectedMessage 'published continuation graph is incomplete' `
+            -Name 'wrong published predecessor'
+        $strMergeTree = ([string] (& git -C $strIssue169FixtureRoot `
+                    rev-parse --verify "$strIssue169MergeHead`^{tree}")).Trim()
+        $strExtraCommitHead = ([string] (
+                "extra continuation commit`n" | & git `
+                    -C $strIssue169FixtureRoot `
+                    -c 'user.name=Issue 169 retirement self-test' `
+                    -c 'user.email=issue169@example.invalid' `
+                    commit-tree $strMergeTree -p $strIssue169MergeHead
+            )).Trim()
+        & $scriptblockExpectIssue169MergeRejection `
+            -Head $strExtraCommitHead -PriorHead $strIssue169Head `
+            -CarrySpec $objIssue169CarryFixtureSpec `
+            -ExpectedMessage 'history is empty or exceeds 64 commits' `
+            -Name 'extra continuation commit'
+        $strReversedParentHead = ([string] (
+                "reversed continuation parents`n" | & git `
+                    -C $strIssue169FixtureRoot `
+                    -c 'user.name=Issue 169 retirement self-test' `
+                    -c 'user.email=issue169@example.invalid' `
+                    commit-tree $strMergeTree `
+                    -p $strIssue169AcquisitionTrusted -p $strIssue169Head
+            )).Trim()
+        & $scriptblockExpectIssue169MergeRejection `
+            -Head $strReversedParentHead -PriorHead $strIssue169Head `
+            -CarrySpec $objIssue169CarryFixtureSpec `
+            -ExpectedMessage 'published continuation has unexpected parents' `
+            -Name 'reversed continuation parents'
+        $objWrongCarrySpec = [pscustomobject]@{
+            Path = $objIssue169CarryFixtureSpec.Path
+            Mode = $objIssue169CarryFixtureSpec.Mode
+            Blob = '0000000000000000000000000000000000000000'
+            Bytes = $objIssue169CarryFixtureSpec.Bytes
+            Sha256 = $objIssue169CarryFixtureSpec.Sha256
+        }
+        & $scriptblockExpectIssue169MergeRejection `
+            -Head $strIssue169MergeHead -PriorHead $strIssue169Head `
+            -CarrySpec $objWrongCarrySpec `
+            -ExpectedMessage 'continuation carry identity is mismatched' `
+            -Name 'mismatched continuation carry'
+
+        & git -C $strIssue169FixtureRoot switch --quiet --detach $strIssue169MergeHead
+        [IO.File]::WriteAllText(
+            $strIssue169CarryFullPath,
+            "altered inherited acquisition workflow`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strIssue169FixtureRoot add -- $strIssue169CarryPath
+        $strAlteredCarryTree = ([string] (& git -C $strIssue169FixtureRoot `
+                    write-tree)).Trim()
+        $strAlteredCarryHead = ([string] (
+                "altered inherited acquisition workflow`n" | & git `
+                    -C $strIssue169FixtureRoot `
+                    -c 'user.name=Issue 169 retirement self-test' `
+                    -c 'user.email=issue169@example.invalid' `
+                    commit-tree $strAlteredCarryTree `
+                    -p $strIssue169Head -p $strIssue169AcquisitionTrusted
+            )).Trim()
+        & $scriptblockExpectIssue169MergeRejection `
+            -Head $strAlteredCarryHead -PriorHead $strIssue169Head `
+            -CarrySpec $objIssue169CarryFixtureSpec `
+            -ExpectedMessage 'path set is incomplete or contains extra paths' `
+            -Name 'altered inherited acquisition workflow'
+
+        & git -C $strIssue169FixtureRoot read-tree $strMergeTree
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not restore the exact continuation fixture index.'
+        }
+        [IO.File]::WriteAllText(
+            (Join-Path $strIssue169FixtureRoot 'unexpected.txt'),
+            "unexpected continuation path`n",
+            [Text.UTF8Encoding]::new($false)
+        )
+        & git -C $strIssue169FixtureRoot add -- unexpected.txt
+        $strExtraContinuationTree = ([string] (& git `
+                    -C $strIssue169FixtureRoot write-tree)).Trim()
+        $strExtraContinuationHead = ([string] (
+                "extra continuation path`n" | & git `
+                    -C $strIssue169FixtureRoot `
+                    -c 'user.name=Issue 169 retirement self-test' `
+                    -c 'user.email=issue169@example.invalid' `
+                    commit-tree $strExtraContinuationTree `
+                    -p $strIssue169Head -p $strIssue169AcquisitionTrusted
+            )).Trim()
+        & $scriptblockExpectIssue169MergeRejection `
+            -Head $strExtraContinuationHead -PriorHead $strIssue169Head `
+            -CarrySpec $objIssue169CarryFixtureSpec `
+            -ExpectedMessage 'path set is incomplete or contains extra paths' `
+            -Name 'extra continuation path'
+        & git -C $strIssue169FixtureRoot read-tree $strMergeTree
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Could not restore the exact continuation fixture index.'
+        }
+        [IO.File]::WriteAllBytes(
+            $strIssue169CarryFullPath,
+            [byte[]] $arrCarryBytes
+        )
+        $strUnexpectedContinuationPath =
+            Join-Path $strIssue169FixtureRoot 'unexpected.txt'
+        if ([IO.File]::Exists($strUnexpectedContinuationPath)) {
+            Remove-Item -LiteralPath $strUnexpectedContinuationPath -Force
+        }
 
         $scriptblockExpectIssue169Rejection = {
             param(
@@ -6243,7 +6538,9 @@ if (-not $boolTransitionAuthorization -and $arrAllowedPaths.Count -eq 0) {
         Assert-ExactIssue169RetirementContent `
             -RepositoryRootPath $RepositoryRootPath `
             -TrustedRevision $TrustedRevision -HeadRevision $HeadRevision `
-            -ExpectedPathSpec $script:arrIssue169RetirementPathSpec
+            -ExpectedPathSpec $script:arrIssue169RetirementPathSpec `
+            -PublishedPriorHead $script:strIssue169PublishedPriorHead `
+            -TrustedCarryPathSpec $script:objIssue169TrustedCarryPathSpec
     } else {
         Assert-OrdinaryWorkflowPolicyContent `
             -RepositoryRootPath $RepositoryRootPath `

@@ -440,6 +440,23 @@ jobs:
                       ExpectedBlob = $null
                       ExpectedBytes = $null
                   }
+                  # Bounded inert support inputs, not identity roles or grants.
+                  # The trusted authorizer may read them only after the exact
+                  # transfer plan is materialized and lazy fetching is disabled.
+                  $dictionaryProposedBlob[
+                      '.github/workflows/Test-AgentInstructions.ps1'
+                  ] = [pscustomobject]@{
+                      MaximumBytes = 573440
+                      ExpectedBlob = $null
+                      ExpectedBytes = $null
+                  }
+                  $dictionaryProposedBlob[
+                      '.github/workflows/Test-TrustRootAuthorization.ps1'
+                  ] = [pscustomobject]@{
+                      MaximumBytes = 573440
+                      ExpectedBlob = $null
+                      ExpectedBytes = $null
+                  }
               }
               $setAuthorizedPath =
                   [Collections.Generic.HashSet[string]]::new(
