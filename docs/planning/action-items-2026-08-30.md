@@ -7813,6 +7813,19 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 - Run both PowerShell parsers, PSScriptAnalyzer, extracted `en-US` and `tr-TR` `Identity`/`identity` controls for both helpers, policy preflight and every catalog case exactly once, the two-run three-host generator matrix, artifact byte equality and idempotence, generated-drift checks, exact scope, current-head CI, review, and landed handoff.
 - Keep this issue separate from #169 and link the landed Terraform repair in the final handoff.
 
+### Conditional reviewed trust-rule installation for issue #170
+
+The operator-approved admission repair may add `.github/workflows/Test-TrustRootAuthorization.ps1` and `.github/workflows/Test-AgentInstructions.ps1` to the four product paths validated by Task 81. Limit these additions to the temporary exact-content admission rule, its tests, necessary validator compatibility and version progression, and mandatory retirement in the final repair candidate. Preserve the canonical inactive authorization manifest, existing ordinary and stronger authorization rules, and all unrelated security controls. This authority applies only to issue #170; it does not renew the retired issue #169 grant or authorize a later repair.
+
+1. Retain passing product validation when its bytes, inputs, dependencies, and environment are unchanged. Pin the product bytes and the current authenticated trusted baseline.
+2. Prepare a separate bootstrap from current `main`. Bind the permitted product and retirement bytes to a closed path, mode, blob, byte-count, and SHA-256 identity set. Validate Git objects as inert data. Preserve the bounded history audit and encoding checks.
+3. Prove rejection of changed or mixed identities, extra paths, hostile history, replay, and absent or altered retirement. Test the actual default-branch push and subsequent trusted-base PR entry points. Run all applicable local gates and obtain independent review of the exact bootstrap before installation.
+4. Install only that reviewed bootstrap through a non-force default-branch update under the controller's R2 controls. Recheck the remote preimage, read back the resulting ref, and require applicable hosted checks to succeed. Do not push the product repair directly to `main`.
+5. Bring the installed baseline into the published repair branch without rewriting history or discarding work. Retire the temporary rule in the repair candidate. Require valid version progression, acceptance of the complete candidate by the trusted authorizer, applicable local checks, an accurate PR body, and successful initial CI.
+6. Continue through Tasks 83–86 for the normal review, independent quality check, merge, and landed handoff. Require the landed state to contain no temporary admission rule or active grant. Do not create a separate cleanup PR only to retire the rule.
+
+The bootstrap's independent review is a prerequisite within Task 82, not the product review loop owned by Task 83. This exception permits no force push, settings, credentials, permissions, protection change, administrator override, or security-control bypass. Narrow implementation, test, metadata, and task-scope corrections selected through the required decision process need no further approval within this repair.
+
 ### Procedure
 
 1. If Task 81 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
