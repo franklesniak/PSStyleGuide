@@ -7492,8 +7492,8 @@ Compare GNU/BSD/unknown-platform dispatch, link-count/device/inode semantics, ha
 
 1. Validate both predecessor records and re-query all current identities and review/check evidence.
 2. Build the complete role-to-path and property matrix from the immutable landed commits. Include repository-specific substitutions explicitly.
-3. Verify that every #169 requirement is present in the landed PS bytes and that the corresponding Terraform behavior is equal or a proved intentional difference.
-4. Verify that the only planned remaining blocker is the exact #170 scope. Do not treat an issue cross-reference as implementation or completion evidence.
+3. Verify that every #169 requirement is present in the landed PS bytes and that the corresponding Terraform behavior is equal or a proved intentional difference. No #169 property may remain a blocker.
+4. Verify that #170 is the exact next repair in the recorded order. Keep the already-recorded #171 and #162 work classified as later tracked blockers; this task does not claim whole-foundation completion. Do not treat an issue cross-reference as implementation or completion evidence.
 5. Publish one authenticated comparison record that states `REPAIR_REQUIRED` with target PS #170, exact pinned inputs, affected roles and paths, required validation, and expected terminal state.
 6. Read back the comment and verify its exact body identity. Recheck every #169 terminal condition. If all pass, close #169 as completed and verify the authenticated closed state and completion reason. If any condition fails, keep the issue open and report the precise unfinished requirement. Stop without starting Task 79.
 
@@ -7503,7 +7503,7 @@ Require complete GitHub pagination, exact commit/tree/blob identities, each appl
 
 ### Stop and escalation conditions
 
-Stop if the comparison can emit `FIXED_POINT_READY`, targets Terraform, identifies a blocker outside #170, finds #169 incomplete, or finds changed identities or unfinished review. Record the exact result and run a new ordering decision; do not force the expected branch.
+Stop if the comparison can emit `FIXED_POINT_READY`, targets Terraform, identifies a new or untracked blocker, requires a change to the recorded #170-then-#171 order or the separate later #162 scope, finds #169 incomplete, or finds changed identities or unfinished review. Preserve the already-recorded later blockers without treating them as new ordering defects. Record an actual conflict and run a new ordering decision; do not force the expected branch.
 
 ### Exact output
 
