@@ -25,15 +25,16 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.4.0';
+const VALIDATOR_VERSION = '1.5.0';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '9de9291473c50be5289462de152ef055e53045f095f2e9859494205d54b95c4c';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '30468a19f1870554a945189a3af159b5b0ff3c30028b7592d57f4958a74de72a';
 const MINIMUM_CASE_COUNT = 99;
 const REQUIRED_IDENTITY_CASE_COUNT = 42;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
 const VALIDATOR_FILE_NAME = 'Validate-WorkflowPolicy.mjs';
+const GENERATOR_FILE_NAME = 'Generate-StyleGuideArtifacts.ps1';
 const IDENTITY_WORKFLOW_FILE_NAME = 'pull-request-body-identity.yml';
 // Mapping keys that alias JavaScript object internals. Plain assignment to
 // '__proto__' mutates an object's prototype instead of creating an own property,
@@ -872,6 +873,77 @@ function validateScriptVersions(contract) {
   }
 }
 
+function replaceGeneratorSourceOnce(source, from, to) {
+  if (source.split(from).length - 1 !== 1) {
+    fail('generator-mutation');
+  }
+  return source.replace(from, to);
+}
+
+function validateGeneratorPolicy(source) {
+  const requiredFragments = Object.freeze([
+    ['Linux platform detection', '[System.Runtime.InteropServices.OSPlatform]::Linux', 1],
+    ['macOS platform detection', '[System.Runtime.InteropServices.OSPlatform]::OSX', 1],
+    ['FreeBSD platform detection', "[System.Runtime.InteropServices.OSPlatform]::Create('FREEBSD')", 1],
+    ['BSD platform dispatch', '    if ($boolHostIsMacOS -or $boolHostIsFreeBsd) {', 1],
+    ['BSD stat identity tuple', "        $arrStatOutput = @(& stat '-f' '%l:%d:%i' $LiteralPath)", 1],
+    ['Linux platform dispatch', '    } elseif ($boolHostIsLinux) {', 1],
+    ['GNU stat identity tuple', "        $arrStatOutput = @(& stat '-Lc' '%h:%d:%i' '--' $LiteralPath)", 1],
+    ['unknown platform refusal', "        throw 'unsupported-platform'", 1],
+    ['final candidate identity binding', '        if ($hashtableRecord.FinalOrdinaryIdentity -cne $strCandidateIdentity) {', 1],
+    ['final candidate mismatch failure', "            throw 'final-candidate-identity-mismatch'", 1],
+  ]);
+  for (const [label, fragment, expectedCount] of requiredFragments) {
+    if (source.split(fragment).length - 1 !== expectedCount) {
+      fail(`generator-source-${label.replaceAll(' ', '-')}`);
+    }
+  }
+}
+
+function testGeneratorPolicyMutations(source) {
+  const mutations = Object.freeze([
+    [
+      'PS-P1-GENERATOR-001',
+      'BSD platform dispatch is disabled',
+      '    if ($boolHostIsMacOS -or $boolHostIsFreeBsd) {',
+      '    if ($boolHostIsLinux) {',
+    ],
+    [
+      'PS-P1-GENERATOR-002',
+      'published destination loses candidate identity binding',
+      '        if ($hashtableRecord.FinalOrdinaryIdentity -cne $strCandidateIdentity) {',
+      '        if ($false) {',
+    ],
+  ]);
+  validateGeneratorPolicy(source);
+  for (const [id, description, from, to] of mutations) {
+    const fixture = replaceGeneratorSourceOnce(source, from, to);
+    let rejected = false;
+    try {
+      validateGeneratorPolicy(fixture);
+    } catch (error) {
+      if (error instanceof PolicyError && error.category.startsWith('generator-source-')) {
+        rejected = true;
+      } else {
+        throw error;
+      }
+    }
+    if (!rejected) {
+      fail(`generator-mutation-${id}-${description}`);
+    }
+  }
+  return mutations.length;
+}
+
+function validateGeneratorSource() {
+  const source = readOrdinaryFile(
+    path.join(SCRIPT_DIRECTORY, GENERATOR_FILE_NAME),
+    262144,
+    'generator-file',
+  ).toString('utf8');
+  return testGeneratorPolicyMutations(source);
+}
+
 function pointerParts(pointer) {
   if (!pointer.startsWith('/')) fail('case-operation');
   const parts = pointer.slice(1).split('/').map((part) => part.replaceAll('~1', '/').replaceAll('~0', '~'));
@@ -1194,6 +1266,7 @@ async function main() {
   validatePackageTuple(contract);
   validateMarkdownEntryPoints(contract);
   validateScriptVersions(contract);
+  const generatorSourceMutationsPassed = validateGeneratorSource();
   testOrdinaryCasePreparation(catalog, workflows, dependabot, contract);
   const passedCases = runCaseCatalog(catalog, workflows, dependabot, contract);
 
@@ -1203,6 +1276,7 @@ async function main() {
     success: true,
     contractCanonicalSha256: sha256(canonicalJson(contractIdentityView(contract))),
     casesPassed: passedCases,
+    generatorSourceMutationsPassed,
     workflowSha256: Object.fromEntries(
       WORKFLOW_FILE_NAMES.map((fileName) => [fileName, sha256(Buffer.from(workflows[fileName].text, 'utf8'))]),
     ),
