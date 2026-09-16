@@ -47,7 +47,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.4.20260915.3
+# Version: 1.4.20260915.4
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
