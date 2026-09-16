@@ -7447,7 +7447,7 @@ The landed repair handoff exists and is verified from the actual landed commit, 
 
 ## Task 78 — compare landed PS #169 with Terraform and authorize PS #170
 
-> **Execution class: Coding agent executable.** This is a read-only comparison plus evidence-publication leaf.
+> **Execution class: Coding agent executable.** This leaf compares landed bytes, publishes evidence, and closes PS #169 only after its terminal conditions pass.
 
 ### Task variables
 
@@ -7456,7 +7456,7 @@ Only values enclosed in double braces are variables. Replace each unresolved tok
 | Item | Value | Source or resolution rule |
 | --- | --- | --- |
 | Target repositories | `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide` | Fixed by this task |
-| Completed PS issue | `https://github.com/franklesniak/PSStyleGuide/issues/169` | Require closed-by-merged-PR evidence |
+| Landed PS repair issue | `https://github.com/franklesniak/PSStyleGuide/issues/169` | Require reviewed merged-PR evidence; close only after this task proves all issue terminal conditions |
 | Next PS issue | `https://github.com/franklesniak/PSStyleGuide/issues/170` | Verified open issue; this task does not edit it |
 
 ### Record inputs
@@ -7468,7 +7468,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
 | Task 69 | `FS` | Its pinned Terraform PR #35 and PS comparison evidence remains current for the property sequence. |
-| Task 77 | `FS` | PS #169 is closed by a reviewed merged PR and has an authenticated landed handoff. |
+| Task 77 | `FS` | The PS #169 repair is landed through a reviewed merged PR and has an authenticated landed handoff. The issue can remain open until this task proves the required reciprocal comparison. |
 
 ### Objective
 
@@ -7481,12 +7481,12 @@ Compare the landed PS #169 result with the immutable Terraform PR #35 implementa
 3. Compare the complete common foundation catalog and the property scope below. Classify each applicable row exactly once as `same`, `intentional difference`, or `blocker`.
 4. Prove every intentional difference with both behaviors, repository need, equal security and failure strength, owner, and review or expiry condition.
 5. Re-query issue #170, its body edits, comments, dependencies, cross-references, linked branches, closing references, and implementation markers with complete pagination.
-6. The only permitted public write is the exact comparison evidence comment on the applicable existing trackers or issues. Do not edit an issue body or relationship in this task.
+6. Publish the exact comparison evidence comment on the applicable existing trackers or issues. Close PS #169 as completed only after the authenticated comparison, landed handoff, successful landed checks, and all issue terminal conditions pass. Read back its state and completion reason. These are the only permitted public writes. Do not edit an issue body or relationship in this task.
 7. Stop if a new Terraform repair is required, #170 is not the next remaining blocker, a row changes direction twice, or any landed identity is unavailable. Use a new decision before changing the planned order.
 
 ### Property scope
 
-Compare GNU/BSD/unknown-platform dispatch, link-count/device/inode semantics, hard-link refusal, final identity stability, final-to-candidate equality, post-publication uncertainty truth, policy mutations, runtime matrices, and every coupled version or identity. Require #169 exact scope to be closed before #170 starts.
+Compare GNU/BSD/unknown-platform dispatch, link-count/device/inode semantics, hard-link refusal, final identity stability, final-to-candidate equality, post-publication uncertainty truth, policy mutations, runtime matrices, and every coupled version or identity. Keep #169 open while its required comparison is pending. Require its exact scope to be closed before #170 starts.
 
 ### Procedure
 
@@ -7495,7 +7495,7 @@ Compare GNU/BSD/unknown-platform dispatch, link-count/device/inode semantics, ha
 3. Verify that every #169 requirement is present in the landed PS bytes and that the corresponding Terraform behavior is equal or a proved intentional difference.
 4. Verify that the only planned remaining blocker is the exact #170 scope. Do not treat an issue cross-reference as implementation or completion evidence.
 5. Publish one authenticated comparison record that states `REPAIR_REQUIRED` with target PS #170, exact pinned inputs, affected roles and paths, required validation, and expected terminal state.
-6. Read back the comment, verify its exact body identity, and stop without starting Task 79.
+6. Read back the comment and verify its exact body identity. Recheck every #169 terminal condition. If all pass, close #169 as completed and verify the authenticated closed state and completion reason. If any condition fails, keep the issue open and report the precise unfinished requirement. Stop without starting Task 79.
 
 ### Validation and evidence
 
