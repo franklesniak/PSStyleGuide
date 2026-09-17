@@ -8215,7 +8215,7 @@ Compare both invariant anchor conversions, ASCII filtering and dash normalizatio
 1. Validate both predecessor records and re-query all current identities and review/check evidence.
 2. Build the complete role-to-path and property matrix from the immutable landed commits. Include repository-specific substitutions explicitly.
 3. Verify that every #170 requirement is present in the landed PS bytes and that the corresponding Terraform behavior is equal or a proved intentional difference.
-4. Verify that the only planned remaining blocker is the exact #171 scope. Do not treat an issue cross-reference as implementation or completion evidence.
+4. Verify that #171 is the exact next repair in the recorded order. Keep the already-recorded #162 work classified as later tracked blockers; this task does not claim whole-foundation completion. Do not treat an issue cross-reference as implementation or completion evidence.
 5. Publish one authenticated comparison record that states `REPAIR_REQUIRED` with target PS #171, exact pinned inputs, affected roles and paths, required validation, and expected terminal state.
 6. Read back the comment, verify its exact body identity, and stop without starting Task 88.
 
@@ -8225,7 +8225,7 @@ Require complete GitHub pagination, exact commit/tree/blob identities, each appl
 
 ### Stop and escalation conditions
 
-Stop if the comparison can emit `FIXED_POINT_READY`, targets Terraform, identifies a blocker outside #171, finds #170 incomplete, or finds changed identities or unfinished review. Record the exact result and run a new ordering decision; do not force the expected branch.
+Stop if the comparison can emit `FIXED_POINT_READY`, targets Terraform, identifies a new or untracked blocker, requires a change to the recorded #171-next order or the separate later #162 scope, finds #170 incomplete, or finds changed identities or unfinished review. Preserve the already-recorded later blockers without treating them as new ordering defects. Record an actual conflict and run a new ordering decision; do not force the expected branch.
 
 ### Exact output
 
