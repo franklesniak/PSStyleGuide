@@ -8013,7 +8013,7 @@ if ($SelfTest) {
                 }
                 if ([regex]::Matches(
                         $strFunctionNotes,
-                        '(?m)^Version: 1\.(?:0\.(?:202608(?:30|31)|202609(?:0[23]|1[2345]))|1\.2026091[45])\.0\.$'
+                        '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-5]))|1\.2026091[45]|2\.20260917)\.0\.$'
                     ).Count -ne 1) {
                     $listMissingHelp.Add('landing or repair helper Version')
                 }

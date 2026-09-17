@@ -51,6 +51,47 @@ if ($arrDeclaredOutputTypes.Count -ne 1 -or
 }
 $script:strMaximumMetadataUtcDate = $MaximumMetadataUtcDate
 
+$strHelperVersionPattern = '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-5]))|1\.2026091[45]|2\.20260917)\.0\.$'
+$strHelpValidatorSource = [IO.File]::ReadAllText(
+    (Join-Path $PSScriptRoot 'Test-AgentInstructions.ps1'))
+if ([regex]::Matches($strHelpValidatorSource,
+        [regex]::Escape("'$strHelperVersionPattern'")).Count -ne 1) {
+    throw 'The helper-version test does not bind the actual finite consumer.'
+}
+$arrExpectedHelperVersions = @(
+    '1.0.20260830.0', '1.0.20260831.0',
+    '1.0.20260902.0', '1.0.20260903.0',
+    '1.0.20260912.0', '1.0.20260913.0',
+    '1.0.20260914.0', '1.0.20260915.0',
+    '1.1.20260914.0', '1.1.20260915.0', '1.2.20260917.0'
+)
+$intHelperVersionCases = 0
+$intAcceptedHelperVersions = 0
+foreach ($intMinorVersion in 0..3) {
+    foreach ($intBuildMonth in 8..10) {
+        foreach ($intBuildDay in 0..32) {
+            foreach ($intRevisionVersion in 0..1) {
+                $strHelperVersion = '1.{0}.2026{1:D2}{2:D2}.{3}' -f
+                    $intMinorVersion, $intBuildMonth, $intBuildDay,
+                    $intRevisionVersion
+                $boolAcceptedHelperVersion = [regex]::IsMatch(
+                    "Version: $strHelperVersion.", $strHelperVersionPattern)
+                if ($boolAcceptedHelperVersion -ne
+                    ($arrExpectedHelperVersions -ccontains $strHelperVersion)) {
+                    throw 'The finite helper-version set changed unexpectedly.'
+                }
+                if ($boolAcceptedHelperVersion) {
+                    $intAcceptedHelperVersions++
+                }
+                $intHelperVersionCases++
+            }
+        }
+    }
+}
+if ($intHelperVersionCases -ne 792 -or $intAcceptedHelperVersions -ne 11) {
+    throw 'The helper-version fixture census is incomplete.'
+}
+
 $intCapacityMaximumBytes = 573440
 # Exercise the actual bounded reader at both sides of the finite role cap.
 foreach ($intBoundaryBytes in @(
