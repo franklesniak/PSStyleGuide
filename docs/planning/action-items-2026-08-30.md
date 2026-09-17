@@ -8925,6 +8925,8 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 
 Include the final landed admission maintenance and the #171 scalar-type correction in the applicable existing comparison rows. Do not assume they are permanent repository-specific differences. Compare the actual landed inputs; do not use a temporary bridge or a pre-maintenance snapshot as the final foundation.
 
+For this focused #169/#170/#171 instance and its required source sync-back, `FIXED_POINT_READY` means no remaining blocker for those issue properties, including scalar result predicates and their directly related regression evidence. Continue to report all sixteen foundation rows. Keep the separately scheduled PS #162 blockers visible: they prevent whole-foundation completion, but they do not require implementing #162 before Task 98. The closure conditions below apply to the focused properties; they do not waive the full common-foundation contract or permit a false whole-foundation claim.
+
 #### Reverse-comparison and closure controls
 
 1. Read both repositories only from the final pinned commits. Record every compared blob and map files by role.
@@ -8992,9 +8994,28 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 
 1. Re-query both repository main refs, relevant issues/PRs, and the Task-range handoff or no-repair record. Pin final commits, trees, and blobs.
 2. Repeat the applicable full or reduced matrix in the required direction. Apply every intentional-difference and row-direction control.
-3. If a blocker remains and no row-direction stop applies, output `REPAIR_REQUIRED` with the next target and repeat the applicable issue-through-handoff leaf range—Tasks 70–77 for #169, Tasks 79–86 for #170, or Tasks 88–95 for #171—as a new numbered-range instance; if Terraform is the target, create the equivalent eight discrete Terraform leaves before this recheck. After its new handoff, repeat Task 96.
+3. If a blocker for the focused properties remains and no unresolved row-direction stop applies, output `REPAIR_REQUIRED` with the next target and repeat the applicable issue-through-handoff leaf range—Tasks 70–77 for #169, Tasks 79–86 for #170, or Tasks 88–95 for #171—as a new numbered-range instance; if Terraform is the target, use the equivalent eight discrete Terraform leaves below. After its new handoff, repeat Task 96. Separately scheduled #162 blockers stay in the full matrix and do not enter this conditional repair range.
 4. If the same row changed direction twice, stop for a new finding-specific decision.
-5. When every common row is `same`, every intentional difference is proved, and no blocker remains, output `FIXED_POINT_READY` with both repositories' final pinned identities, matrix digest, validation, reviews, and no-change or non-applicability evidence. Do not publish or close the tracker in this task.
+5. When every focused common property is `same`, every applicable intentional difference is proved, and no focused blocker remains, output `FIXED_POINT_READY` with both repositories' final pinned identities, the complete matrix and its digest, validation, reviews, no-change or non-applicability evidence, and the explicit remaining #162 blockers. Do not publish or close the tracker in this task.
+
+### Conditional Terraform source sync-back
+
+Use the instance name `Task96-TF-sync-1` for the confirmed scalar-result correction. Adapt the common PS predicate semantics and regression protection to Terraform's caller and directly coupled policy. Preserve Terraform's bounded diagnostic presentation and existing security controls. Do not copy PS admission machinery without a separate demonstrated need and decision. A second row-direction change requires the fresh decision above; it does not by itself require a new generic operator approval.
+
+Execute these eight leaves in order. Apply the corresponding Tasks 88–95 lifecycle controls to the focused Terraform issue and its actual current inputs, without copying PS-specific repository literals or unrelated issue requirements.
+
+| Leaf | Action and completion condition | Lifecycle source |
+| --- | --- | --- |
+| `96-TF-1` | Prepare one focused issue with exact scope, acceptance criteria, pinned source roles and verified native relations. Do not implement. | Task 88 |
+| `96-TF-2` | Refresh refs, issue scope, native relations and the free serial slot. Record implementation commencement only. | Task 89 |
+| `96-TF-3` | Implement the candidate; require real trusted-base admission and all applicable initial tests to pass. Keep proposed code inert during privileged admission. | Task 90 |
+| `96-TF-4` | Publish the non-force topic branch and accurate PR only after local and admission gates pass. Require initial hosted checks. | Task 91 |
+| `96-TF-5` | Complete the required Copilot-and-Codex review loop for the exact final reviewed input. Repair actionable findings. | Task 92 |
+| `96-TF-6` | Obtain a fresh independent final quality result for the same final input. | Task 93 |
+| `96-TF-7` | Refresh all readiness conditions and perform the normal head-matched on-plan merge. Do not bypass controls. | Task 94 |
+| `96-TF-8` | Verify actual landed identity and checks; publish the permanent handoff and complete the issue only when its closure condition holds. | Task 95 |
+
+After leaf 8, repeat Task 96 against both actual final mains. Keep global task 96 active until the required repair and recheck produce `FIXED_POINT_READY`; record the current conditional leaf and its next action in the existing compact state and task record. Do not renumber later tasks, add state-schema fields, or create a separate receipt framework.
 
 ### Validation and evidence
 
@@ -9032,7 +9053,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 | Predecessor | Relationship | Requirement |
 | --- | --- | --- |
-| Task 96 | `FS` | Require an exact `FIXED_POINT_READY` result for the current final identities. |
+| Task 96 | `FS` | Require an exact `FIXED_POINT_READY` result for the current final identities and the focused #169/#170/#171 properties, including their required source sync-back. Retain the complete matrix and explicit separately scheduled #162 blockers. |
 
 ### Objective
 
@@ -9049,11 +9070,13 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 - The final comparison includes every requirement from all three issue bodies, every current intentional difference, and every effect of PS #162's future no-publication boundary.
 - A tracker record must not close a still-open implementation issue or convert a cross-reference into a false dependency.
 
+This task closes only the focused #169/#170/#171 reciprocal cycle and its required source sync-back. State explicitly that separately scheduled #162 blockers prevent whole-foundation completion. Do not close #162 or a broader tracker whose own completion condition is not satisfied.
+
 ### Procedure
 
 1. Re-query the final identities and the Task 96 result. Stop if the result is not `FIXED_POINT_READY` or if any relevant state changed.
-2. Verify that every common row is `same`, every intentional difference has complete owner and review/expiry evidence with equal security and failure strength, and no blocker, open repair, false dependency, or unfinished deferral remains.
-3. Publish one permanent closure record with both repositories' final commits, trees and blobs; matrix digest; issues and PRs; validation and runtimes; review and quality results; merge methods; no-change/non-applicability evidence; intentional differences; rollback; and closure state.
+2. Verify that every focused common property is `same`, every applicable intentional difference has complete owner and review/expiry evidence with equal security and failure strength, and no focused blocker, open repair, false dependency, or unfinished deferral remains. Keep all sixteen matrix rows and identify the remaining #162 blockers without relabeling them as complete or intentional differences.
+3. Publish one permanent focused-cycle closure record with both repositories' final commits, trees and blobs; complete matrix and its digest; issues and PRs; validation and runtimes; review and quality results; merge methods; no-change/non-applicability evidence; intentional differences; rollback; closure state; and the explicit remaining #162 scope owned by Task 98 onward.
 4. Close the task-local tracker or implementation issue only when its exact closure condition is satisfied. Read the record and issue state back and verify them.
 
 ### Validation and evidence
