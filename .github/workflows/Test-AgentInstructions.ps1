@@ -3,7 +3,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.11.20260916.1
+# Version: 1.12.20260917.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -8013,7 +8013,7 @@ if ($SelfTest) {
                 }
                 if ([regex]::Matches(
                         $strFunctionNotes,
-                        '(?m)^Version: 1\.(?:0\.(?:202608(?:30|31)|202609(?:0[23]|1[2345]))|1\.2026091[45])\.0\.$'
+                        '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-5]))|1\.2026091[45]|2\.20260917)\.0\.$'
                     ).Count -ne 1) {
                     $listMissingHelp.Add('landing or repair helper Version')
                 }
@@ -8125,9 +8125,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.11\.20260916\.1$'
+            '(?m)^# Version: 1\.12\.20260917\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.11.20260916.1.'
+        throw 'The validator script version is not 1.12.20260917.0.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8988,9 +8988,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.4\.20260916\.1$'
+            '(?m)^# Version: 1\.5\.20260917\.0$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.4.20260916.1.'
+        throw 'The trust-root authorization script lacks version 1.5.20260917.0.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -9055,9 +9055,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.3\.20260914\.0$'
+            '(?m)^# Version: 1\.3\.20260917\.0$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.3.20260914.0.'
+        throw 'The extracted self-test lacks version 1.3.20260917.0.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)
@@ -11071,7 +11071,7 @@ if ($SelfTest) {
             [StringComparison]::Ordinal
         )
         $intOrdinaryCaseData = $Content.IndexOf(
-            '--ordinary-case-catalog-data',
+            '-ValidateOrdinaryCaseCatalog',
             [StringComparison]::Ordinal
         )
         $objDependencyStep = [regex]::Match(
