@@ -59,11 +59,34 @@ jobs:
               throw 'The generator returned an unexpected output shape.'
           }
           $objResult = $arrResult[0] | ConvertFrom-Json
-          if ($intGeneratorExit -ne 0 -or
-              $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2' -or
-              $objResult.GeneratorVersion -cne '1.0.20260916.0' -or
-              $objResult.Overall -notin @('Success', 'NoChange')) {
-              throw "Artifact generation failed with native exit $intGeneratorExit."
+          # Only fixed labels enter this list; result values must never reach the diagnostic.
+          $listFailedChecks = [System.Collections.Generic.List[string]]::new()
+          if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {
+              [void]($listFailedChecks.Add('NativeExit'))
+          }
+          if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {
+              [void]($listFailedChecks.Add('Schema'))
+          }
+          if ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {
+              [void]($listFailedChecks.Add('GeneratorVersion'))
+          }
+          if ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {
+              [void]($listFailedChecks.Add('Overall'))
+          }
+          if ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {
+              [void]($listFailedChecks.Add('Phase'))
+          }
+          if ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {
+              [void]($listFailedChecks.Add('Category'))
+          }
+          if ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {
+              [void]($listFailedChecks.Add('NativeOutcome'))
+          }
+          if (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {
+              [void]($listFailedChecks.Add('ResultExitCode'))
+          }
+          if ($listFailedChecks.Count -ne 0) {
+              throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))
           }
 
       - name: Verify generated artifact drift

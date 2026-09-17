@@ -25,11 +25,11 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.5.2';
+const VALIDATOR_VERSION = '1.5.3';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '4d4a4c53b2e93eb44481a2f75593f96063759016a5e11ac5860bd02bacb85699';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '59e141020d355f8b3841cfc3257c7971c6bd9be0b925add03742368658c115df';
 const MINIMUM_CASE_COUNT = 99;
 const REQUIRED_IDENTITY_CASE_COUNT = 42;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
@@ -505,6 +505,62 @@ function validateActionStep(step, expectedStep, contract, rawText) {
   }
 }
 
+const GENERATOR_RESULT_PREDICATES = Object.freeze([
+  ['NativeExit', '$intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0'],
+  ['Schema', "$objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2'"],
+  ['GeneratorVersion', "$objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0'"],
+  ['Overall', "$objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')"],
+  ['Phase', "$objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete'"],
+  ['Category', "$objResult.Category -isnot [string] -or $objResult.Category -cne 'none'"],
+  ['NativeOutcome', "$objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success'"],
+  ['ResultExitCode', '($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0'],
+]);
+const GENERATOR_DIAGNOSTIC_PREFIX = 'Artifact generation failed result checks: ';
+
+// This closed construction binds semantics before the run-byte digest. No
+// caller value is used to form a name, separator or message. Exact tail shape
+// also rejects interleaved early exits and additional output statements.
+function validateGeneratorResultPolicy(source, contract) {
+  if (typeof source !== 'string') fail('generator-result-source');
+  const blocks = GENERATOR_RESULT_PREDICATES.map(([label, predicate]) => (
+    `if (${predicate}) {\n    [void]($listFailedChecks.Add('${label}'))\n}\n`
+  ));
+  const positions = blocks.map((block, index) => {
+    if (source.split(block).length - 1 !== 1) {
+      fail(`generator-result-predicate-${GENERATOR_RESULT_PREDICATES[index][0]}`);
+    }
+    return source.indexOf(block);
+  });
+  if (positions.some((position, index) => index > 0 && position <= positions[index - 1])) {
+    fail('generator-result-order');
+  }
+  const accumulator = '$listFailedChecks = [System.Collections.Generic.List[string]]::new()\n';
+  const guard = 'if ($listFailedChecks.Count -ne 0) {\n';
+  const output = `    throw ('${GENERATOR_DIAGNOSTIC_PREFIX}{0}.' -f ($listFailedChecks -join ', '))\n`;
+  for (const [fragment, category] of [
+    [accumulator, 'accumulator'], [guard, 'guard'], [output, 'output'],
+  ]) {
+    if (source.split(fragment).length - 1 !== 1) fail(`generator-result-${category}`);
+  }
+  const start = '$objResult = $arrResult[0] | ConvertFrom-Json\n';
+  const comment = '# Only fixed labels enter this list; result values must never reach the diagnostic.\n';
+  const tail = start + comment + accumulator + blocks.join('') + guard + output + '}\n';
+  if (source.split(start).length - 1 !== 1 || source.slice(source.indexOf(start)) !== tail) {
+    fail('generator-result-flow');
+  }
+  const labels = GENERATOR_RESULT_PREDICATES.map(([label]) => label);
+  const maximumMessage = GENERATOR_DIAGNOSTIC_PREFIX + labels.join(', ') + '.';
+  expectDeepEqual(contract.workflowPolicy.generatorResultPolicy, {
+    labels,
+    prefix: GENERATOR_DIAGNOSTIC_PREFIX,
+    separator: ', ',
+    suffix: '.',
+    maximumAsciiBytes: Buffer.byteLength(maximumMessage, 'ascii'),
+    actualValues: false,
+  }, 'generator-result-contract');
+  if (!/^[\x20-\x7e]+$/u.test(maximumMessage)) fail('generator-result-vocabulary');
+}
+
 function validateRunStep(step, expectedStep, contract) {
   const expectedKeys = ['name', 'shell', 'run'];
   if (expectedStep.id !== undefined) expectedKeys.push('id');
@@ -512,6 +568,9 @@ function validateRunStep(step, expectedStep, contract) {
   if (expectedStep.if !== undefined) expectedKeys.push('if');
   if (expectedStep.continueOnError !== undefined) expectedKeys.push('continue-on-error');
   expectExactKeys(step, expectedKeys, 'run-step-shape');
+  if (expectedStep.id === 'generate_style_guide_artifacts') {
+    validateGeneratorResultPolicy(step.run, contract);
+  }
   if (
     step.name !== expectedStep.name
     || step.id !== expectedStep.id
@@ -1043,6 +1102,58 @@ function applyOperation(root, operation) {
   }
 }
 
+function runCatalogCase(testCase, workflows, dependabot, contract) {
+  // Category-qualified cases must prepare successfully. A bad pointer or
+  // absent replacement needle cannot count as the intended policy rejection.
+  let preparedWorkflow;
+  if (testCase.expectedCategory !== undefined) {
+    if (
+      testCase.domain !== 'workflow'
+      || testCase.expected !== false
+      || typeof testCase.expectedCategory !== 'string'
+      || !/^[A-Za-z0-9-]+$/u.test(testCase.expectedCategory)
+    ) fail('case-category');
+    preparedWorkflow = clone(workflows[testCase.workflow].value);
+    applyOperation(preparedWorkflow, testCase.operation);
+  }
+  let observed = true;
+  let observedCategory;
+  try {
+    if (testCase.domain === 'baseline') {
+      for (const [fileName, workflow] of Object.entries(workflows)) {
+        validateWorkflowObject(fileName, workflow.value, workflow.text, contract);
+      }
+      validateDependabot(dependabot, contract);
+    } else if (testCase.domain === 'workflow') {
+      const fixture = preparedWorkflow ?? clone(workflows[testCase.workflow].value);
+      if (preparedWorkflow === undefined) applyOperation(fixture, testCase.operation);
+      validateWorkflowObject(testCase.workflow, fixture, null, contract);
+    } else if (testCase.domain === 'contract') {
+      const fixture = clone(contract);
+      applyOperation(fixture, testCase.operation);
+      validateContract(fixture);
+    } else if (testCase.domain === 'markdown-contract') {
+      const fixture = clone(contract.markdownPolicy);
+      applyOperation(fixture, testCase.operation);
+      validateMarkdownContract(fixture);
+    } else if (testCase.domain === 'dependabot') {
+      const fixture = clone(dependabot);
+      applyOperation(fixture, testCase.operation);
+      validateDependabot(fixture, contract);
+    } else {
+      parseStrictYaml(Buffer.from(testCase.text, 'utf8'), contract.limits);
+    }
+  } catch (error) {
+    if (!(error instanceof PolicyError)) throw error;
+    observed = false;
+    observedCategory = error.category;
+  }
+  if (observed !== testCase.expected) fail('case-result');
+  if (testCase.expectedCategory !== undefined && observedCategory !== testCase.expectedCategory) {
+    fail('case-category-result');
+  }
+}
+
 function runCaseCatalog(catalog, workflows, dependabot, contract) {
   expectExactKeys(catalog, ['schema', 'cases'], 'case-catalog');
   if (catalog.schema !== 'PSStyleGuide.WorkflowPolicyCases.v1' || !Array.isArray(catalog.cases)) {
@@ -1093,39 +1204,7 @@ function runCaseCatalog(catalog, workflows, dependabot, contract) {
     } else if (testCase.domain !== 'baseline') {
       fail('case-catalog');
     }
-    let observed = true;
-    try {
-      if (testCase.domain === 'baseline') {
-        for (const [fileName, workflow] of Object.entries(workflows)) {
-          validateWorkflowObject(fileName, workflow.value, workflow.text, contract);
-        }
-        validateDependabot(dependabot, contract);
-      } else if (testCase.domain === 'workflow') {
-        const fixture = clone(workflows[testCase.workflow].value);
-        applyOperation(fixture, testCase.operation);
-        validateWorkflowObject(testCase.workflow, fixture, null, contract);
-      } else if (testCase.domain === 'contract') {
-        const fixture = clone(contract);
-        applyOperation(fixture, testCase.operation);
-        validateContract(fixture);
-      } else if (testCase.domain === 'markdown-contract') {
-        const fixture = clone(contract.markdownPolicy);
-        applyOperation(fixture, testCase.operation);
-        validateMarkdownContract(fixture);
-      } else if (testCase.domain === 'dependabot') {
-        const fixture = clone(dependabot);
-        applyOperation(fixture, testCase.operation);
-        validateDependabot(fixture, contract);
-      } else {
-        parseStrictYaml(Buffer.from(testCase.text, 'utf8'), contract.limits);
-      }
-    } catch (error) {
-      if (!(error instanceof PolicyError)) throw error;
-      observed = false;
-    }
-    if (observed !== testCase.expected) {
-      fail('case-result');
-    }
+    runCatalogCase(testCase, workflows, dependabot, contract);
     passed += 1;
   }
   if (passed < MINIMUM_CASE_COUNT || identityCases !== REQUIRED_IDENTITY_CASE_COUNT) {
@@ -1192,7 +1271,7 @@ function testOrdinaryCasePreparation(catalog, workflows, dependabot, contract) {
   const reject = (candidate, category, runOutcomes = false) => {
     try {
       validateOrdinaryCasePreparation(candidate, catalog, workflows);
-      if (runOutcomes) runCaseCatalog(candidate, workflows, dependabot, contract);
+      if (runOutcomes) runCatalogCase(candidate.cases.at(-1), workflows, dependabot, contract);
     } catch (error) {
       if (error instanceof PolicyError && error.category === category) return;
       throw error;
@@ -1201,7 +1280,7 @@ function testOrdinaryCasePreparation(catalog, workflows, dependabot, contract) {
   };
   validateOrdinaryCasePreparation(catalog, catalog, workflows);
   validateOrdinaryCasePreparation(append(negative), catalog, workflows);
-  runCaseCatalog(append(negative), workflows, dependabot, contract);
+  runCatalogCase(negative, workflows, dependabot, contract);
   for (const operation of [
     { type: 'replace', path: '/name', from: 'THIS_NEEDLE_IS_ABSENT', to: 'changed' },
     { type: 'replace', path: '/name', from: ' ', to: '-' },
