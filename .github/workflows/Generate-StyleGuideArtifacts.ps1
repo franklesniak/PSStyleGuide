@@ -10,13 +10,13 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260915.0
+Version: 1.0.20260916.0
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strGeneratorVersion = '1.0.20260915.0'
+$script:strGeneratorVersion = '1.0.20260916.0'
 $script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v2'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -1387,7 +1387,7 @@ function New-FullPayload {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260916.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1421,7 +1421,7 @@ function New-FullPayload {
             if ($null -ne $strCurrentAnchor -and $intCurrentLevel -eq 3) {
                 $hashtableSections[$strCurrentAnchor] = $listCurrentBody.ToArray()
             }
-            $strAnchor = $strHeadingText.ToLower() -replace '[^a-z0-9 -]', '' -replace ' ', '-'
+            $strAnchor = $strHeadingText.ToLowerInvariant() -replace '[^a-z0-9 -]', '' -replace ' ', '-'
             $strAnchor = $strAnchor -replace '-+', '-' -replace '^-|-$', ''
             if ($intLevel -eq 3) {
                 $strCurrentAnchor = $strAnchor
@@ -1511,7 +1511,7 @@ function New-FullPayload {
         $listOutputLines.Add($strLine)
         if ($strLine -match '^(#{2,3}) (.+)$') {
             $strHeadingText = $Matches[2]
-            $strAnchor = $strHeadingText.ToLower() -replace '[^a-z0-9 -]', '' -replace ' ', '-'
+            $strAnchor = $strHeadingText.ToLowerInvariant() -replace '[^a-z0-9 -]', '' -replace ' ', '-'
             $strAnchor = $strAnchor -replace '-+', '-' -replace '^-|-$', ''
             if ($hashtableCleanSections.ContainsKey($strAnchor)) {
                 $listOutputLines.Add('')

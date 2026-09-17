@@ -125,8 +125,8 @@
   "scriptVersions": {
     "generator": {
       "path": "Generate-StyleGuideArtifacts.ps1",
-      "version": "1.0.20260915.0",
-      "sha256": "f2eddcb6305d09b55dcbc72911a9ec9b783fb9b3f649ef64847969f7b1482da3"
+      "version": "1.0.20260916.0",
+      "sha256": "f3d5e8b68a516f048547aa17570d81501f7df53cde4c6a01212bc4e2d909bc1a"
     },
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
@@ -140,7 +140,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "eba961e0b5cda7da4c76228a762f59d7d089ee0b8e685a52a233751df9ba9660"
+    "sha256": "5725c46a5c4aa1c0c4905d971ef2e91827d5fd29d26f18d7b58b92afbc9f8fad"
   },
   "actions": {
     "checkout": {
@@ -233,7 +233,7 @@
             "permissions": { "contents": "read" },
             "steps": [
               { "kind": "action", "role": "build.verify_generated_artifacts.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "2162a646aca0e8fa387d4edd54f084fb0d1253a246da116bd50623ba37edfc8d" },
+              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "992e186c6b6361480a7dbbdc6a231965efe560e5a8e3cca4e660939ea617158b" },
               { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "1d9f923ca35ed8408c71f7c0a1fff213d438e8620e0ba502318a91c61961ed97" },
               { "kind": "run", "role": "build.verify_generated_artifacts.create_failure_diagnostics", "name": "Create failure diagnostics", "id": "create_failure_diagnostics", "shell": "pwsh", "if": "${{ failure() && !cancelled() }}", "continueOnError": true, "runSha256": "c7ffffe2913b4fe43d733a7ba918b39b84903efb4822089393458d54d520ec45" },
               { "kind": "action", "role": "build.verify_generated_artifacts.upload_failure_diagnostics", "name": "Upload failure diagnostics", "id": "upload_failure_diagnostics", "action": "uploadArtifact", "if": "${{ failure() && !cancelled() }}", "continueOnError": true }

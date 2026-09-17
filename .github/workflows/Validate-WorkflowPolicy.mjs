@@ -25,11 +25,11 @@ async function loadYamlBindings() {
   } = await import('yaml'));
 }
 
-const VALIDATOR_VERSION = '1.5.1';
+const VALIDATOR_VERSION = '1.5.2';
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '63a2be8e6f3846b8df90d6dd2dc77252ec6225360e195c26e6d8005ccb265d1e';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '4d4a4c53b2e93eb44481a2f75593f96063759016a5e11ac5860bd02bacb85699';
 const MINIMUM_CASE_COUNT = 99;
 const REQUIRED_IDENTITY_CASE_COUNT = 42;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
@@ -880,6 +880,13 @@ function replaceGeneratorSourceOnce(source, from, to) {
   return source.replace(from, to);
 }
 
+// These distinct contexts bind each conversion to its own loop. A total call
+// count alone cannot prove that both independently reached paths stay invariant.
+const RATIONALE_ANCHOR_FRAGMENT = "            $strAnchor = $strHeadingText.ToLowerInvariant() -replace '[^a-z0-9 -]', '' -replace ' ', '-'";
+const RATIONALE_INDEX_FRAGMENT = '                $hashtableSections[$strCurrentAnchor] = $listCurrentBody.ToArray()\n'
+  + '            }\n' + RATIONALE_ANCHOR_FRAGMENT;
+const GUIDE_HEADING_FRAGMENT = '            $strHeadingText = $Matches[2]\n' + RATIONALE_ANCHOR_FRAGMENT;
+
 function validateGeneratorPolicy(source) {
   const requiredFragments = Object.freeze([
     ['Linux platform detection', '[System.Runtime.InteropServices.OSPlatform]::Linux', 1],
@@ -892,6 +899,8 @@ function validateGeneratorPolicy(source) {
     ['unknown platform refusal', "        throw 'unsupported-platform'", 1],
     ['final candidate identity binding', '        if ($hashtableRecord.FinalOrdinaryIdentity -cne $strCandidateIdentity) {', 1],
     ['final candidate mismatch failure', "            throw 'final-candidate-identity-mismatch'", 1],
+    ['invariant rationale index', RATIONALE_INDEX_FRAGMENT, 1],
+    ['invariant guide heading', GUIDE_HEADING_FRAGMENT, 1],
   ]);
   for (const [label, fragment, expectedCount] of requiredFragments) {
     if (source.split(fragment).length - 1 !== expectedCount) {
@@ -907,22 +916,38 @@ function testGeneratorPolicyMutations(source) {
       'BSD platform dispatch is disabled',
       '    if ($boolHostIsMacOS -or $boolHostIsFreeBsd) {',
       '    if ($boolHostIsLinux) {',
+      'generator-source-BSD-platform-dispatch',
     ],
     [
       'PS-P1-GENERATOR-002',
       'published destination loses candidate identity binding',
       '        if ($hashtableRecord.FinalOrdinaryIdentity -cne $strCandidateIdentity) {',
       '        if ($false) {',
+      'generator-source-final-candidate-identity-binding',
+    ],
+    [
+      'PS-P1-GENERATOR-003',
+      'rationale index returns to culture-sensitive casing',
+      RATIONALE_INDEX_FRAGMENT,
+      RATIONALE_INDEX_FRAGMENT.replace('.ToLowerInvariant()', '.ToLower()'),
+      'generator-source-invariant-rationale-index',
+    ],
+    [
+      'PS-P1-GENERATOR-004',
+      'guide heading returns to culture-sensitive casing',
+      GUIDE_HEADING_FRAGMENT,
+      GUIDE_HEADING_FRAGMENT.replace('.ToLowerInvariant()', '.ToLower()'),
+      'generator-source-invariant-guide-heading',
     ],
   ]);
   validateGeneratorPolicy(source);
-  for (const [id, description, from, to] of mutations) {
+  for (const [id, description, from, to, expectedCategory] of mutations) {
     const fixture = replaceGeneratorSourceOnce(source, from, to);
     let rejected = false;
     try {
       validateGeneratorPolicy(fixture);
     } catch (error) {
-      if (error instanceof PolicyError && error.category.startsWith('generator-source-')) {
+      if (error instanceof PolicyError && error.category === expectedCategory) {
         rejected = true;
       } else {
         throw error;
@@ -1265,8 +1290,8 @@ async function main() {
   validateDependabot(dependabot, contract);
   validatePackageTuple(contract);
   validateMarkdownEntryPoints(contract);
-  validateScriptVersions(contract);
   const generatorSourceMutationsPassed = validateGeneratorSource();
+  validateScriptVersions(contract);
   testOrdinaryCasePreparation(catalog, workflows, dependabot, contract);
   const passedCases = runCaseCatalog(catalog, workflows, dependabot, contract);
 
