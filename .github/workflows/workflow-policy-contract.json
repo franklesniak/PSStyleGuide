@@ -136,11 +136,11 @@
   },
   "caseCatalog": {
     "path": "workflow-policy-cases.json",
-    "sha256": "1abcb0f19725070292299317929d88b71f65f4eab8640582f5bc87486e736d01"
+    "sha256": "81928b7ddf5130fbc69f0f4a240cc7f4f6a7aec542d7cf617947046a66b5e81f"
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "5725c46a5c4aa1c0c4905d971ef2e91827d5fd29d26f18d7b58b92afbc9f8fad"
+    "sha256": "760ee8b9f560fc44b10bb2f6a42d601410130b4abf67156497f511be4f35cf21"
   },
   "actions": {
     "checkout": {
@@ -219,6 +219,23 @@
     }
   },
   "workflowPolicy": {
+    "generatorResultPolicy": {
+      "labels": [
+        "NativeExit",
+        "Schema",
+        "GeneratorVersion",
+        "Overall",
+        "Phase",
+        "Category",
+        "NativeOutcome",
+        "ResultExitCode"
+      ],
+      "prefix": "Artifact generation failed result checks: ",
+      "separator": ", ",
+      "suffix": ".",
+      "maximumAsciiBytes": 136,
+      "actualValues": false
+    },
     "events": {
       "push": { "branches": ["main"] },
       "pull_request": { "branches": ["main"] }
@@ -233,7 +250,7 @@
             "permissions": { "contents": "read" },
             "steps": [
               { "kind": "action", "role": "build.verify_generated_artifacts.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "992e186c6b6361480a7dbbdc6a231965efe560e5a8e3cca4e660939ea617158b" },
+              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "7d1dc4e25cfcb134ef6246da1ecc44ea9453dcdde39afcab1e497d17d4e0c7d2" },
               { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "1d9f923ca35ed8408c71f7c0a1fff213d438e8620e0ba502318a91c61961ed97" },
               { "kind": "run", "role": "build.verify_generated_artifacts.create_failure_diagnostics", "name": "Create failure diagnostics", "id": "create_failure_diagnostics", "shell": "pwsh", "if": "${{ failure() && !cancelled() }}", "continueOnError": true, "runSha256": "c7ffffe2913b4fe43d733a7ba918b39b84903efb4822089393458d54d520ec45" },
               { "kind": "action", "role": "build.verify_generated_artifacts.upload_failure_diagnostics", "name": "Upload failure diagnostics", "id": "upload_failure_diagnostics", "action": "uploadArtifact", "if": "${{ failure() && !cancelled() }}", "continueOnError": true }
