@@ -32,6 +32,10 @@
 # .PARAMETER SelfTest
 # Runs focused verifier helper tests and returns before authorization evaluation.
 #
+# .PARAMETER ValidateOrdinaryCaseCatalog
+# Also checks added ordinary cases with trusted rules. Strengthened generator
+# cases use the closed inert-data semantics; other cases use the trusted validator.
+#
 # .PARAMETER AuthorizationManifestPath
 # The fixed trusted-revision authorization path.
 #
@@ -47,7 +51,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.4.20260916.1
+# Version: 1.5.20260917.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -58,12 +62,14 @@ param(
     [Parameter(Mandatory)][string] $HeadRevision,
     [Parameter()][switch] $AuthorizationApplicabilityOnly,
     [Parameter()][switch] $SelfTest,
+    [Parameter()][switch] $ValidateOrdinaryCaseCatalog,
     [Parameter()][string] $AuthorizationManifestPath =
         '.github/workflows/trust-root-authorization.json'
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+$script:boolValidateOrdinaryCaseCatalog = [bool]$ValidateOrdinaryCaseCatalog
 $intManifestMaximumBytes = 65536
 $intCandidateMaximumPaths = 19
 $intInactiveManifestMaximumPaths = 16
@@ -1222,16 +1228,775 @@ function Assert-OrdinaryHelperWorkflow {
 }
 
 
+# The supported generator-result domain is a directional source language, not
+# a list of candidate identities. These complete reviewed regions are inert
+# recognition data. Every executable byte outside them must remain unchanged.
+$script:arrGeneratorResultSourceShape = @(
+    # Complete reviewed region 1; no candidate-selected code is evaluated.
+    @{
+        Before = @'
+  }
+}
+
+function validateRunStep(step, expectedStep, contract) {
+  const expectedKeys = ['name', 'shell', 'run'];
+  if (expectedStep.id !== undefined) expectedKeys.push('id');
+'@
+        After = @'
+  }
+}
+
+const GENERATOR_RESULT_PREDICATES = Object.freeze([
+  ['NativeExit', '$intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0'],
+  ['Schema', "$objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2'"],
+  ['GeneratorVersion', "$objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0'"],
+  ['Overall', "$objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')"],
+  ['Phase', "$objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete'"],
+  ['Category', "$objResult.Category -isnot [string] -or $objResult.Category -cne 'none'"],
+  ['NativeOutcome', "$objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success'"],
+  ['ResultExitCode', '($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0'],
+]);
+const GENERATOR_DIAGNOSTIC_PREFIX = 'Artifact generation failed result checks: ';
+
+// This closed construction binds semantics before the run-byte digest. No
+// caller value is used to form a name, separator or message. Exact tail shape
+// also rejects interleaved early exits and additional output statements.
+function validateGeneratorResultPolicy(source, contract) {
+  if (typeof source !== 'string') fail('generator-result-source');
+  const blocks = GENERATOR_RESULT_PREDICATES.map(([label, predicate]) => (
+    `if (${predicate}) {\n    [void]($listFailedChecks.Add('${label}'))\n}\n`
+  ));
+  const positions = blocks.map((block, index) => {
+    if (source.split(block).length - 1 !== 1) {
+      fail(`generator-result-predicate-${GENERATOR_RESULT_PREDICATES[index][0]}`);
+    }
+    return source.indexOf(block);
+  });
+  if (positions.some((position, index) => index > 0 && position <= positions[index - 1])) {
+    fail('generator-result-order');
+  }
+  const accumulator = '$listFailedChecks = [System.Collections.Generic.List[string]]::new()\n';
+  const guard = 'if ($listFailedChecks.Count -ne 0) {\n';
+  const output = `    throw ('${GENERATOR_DIAGNOSTIC_PREFIX}{0}.' -f ($listFailedChecks -join ', '))\n`;
+  for (const [fragment, category] of [
+    [accumulator, 'accumulator'], [guard, 'guard'], [output, 'output'],
+  ]) {
+    if (source.split(fragment).length - 1 !== 1) fail(`generator-result-${category}`);
+  }
+  const start = '$objResult = $arrResult[0] | ConvertFrom-Json\n';
+  const comment = '# Only fixed labels enter this list; result values must never reach the diagnostic.\n';
+  const tail = start + comment + accumulator + blocks.join('') + guard + output + '}\n';
+  if (source.split(start).length - 1 !== 1 || source.slice(source.indexOf(start)) !== tail) {
+    fail('generator-result-flow');
+  }
+  const labels = GENERATOR_RESULT_PREDICATES.map(([label]) => label);
+  const maximumMessage = GENERATOR_DIAGNOSTIC_PREFIX + labels.join(', ') + '.';
+  expectDeepEqual(contract.workflowPolicy.generatorResultPolicy, {
+    labels,
+    prefix: GENERATOR_DIAGNOSTIC_PREFIX,
+    separator: ', ',
+    suffix: '.',
+    maximumAsciiBytes: Buffer.byteLength(maximumMessage, 'ascii'),
+    actualValues: false,
+  }, 'generator-result-contract');
+  if (!/^[\x20-\x7e]+$/u.test(maximumMessage)) fail('generator-result-vocabulary');
+}
+
+function validateRunStep(step, expectedStep, contract) {
+  const expectedKeys = ['name', 'shell', 'run'];
+  if (expectedStep.id !== undefined) expectedKeys.push('id');
+'@
+    },
+    # Complete reviewed region 2; no candidate-selected code is evaluated.
+    @{
+        Before = @'
+  if (expectedStep.if !== undefined) expectedKeys.push('if');
+  if (expectedStep.continueOnError !== undefined) expectedKeys.push('continue-on-error');
+  expectExactKeys(step, expectedKeys, 'run-step-shape');
+  if (
+    step.name !== expectedStep.name
+    || step.id !== expectedStep.id
+'@
+        After = @'
+  if (expectedStep.if !== undefined) expectedKeys.push('if');
+  if (expectedStep.continueOnError !== undefined) expectedKeys.push('continue-on-error');
+  expectExactKeys(step, expectedKeys, 'run-step-shape');
+  if (expectedStep.id === 'generate_style_guide_artifacts') {
+    validateGeneratorResultPolicy(step.run, contract);
+  }
+  if (
+    step.name !== expectedStep.name
+    || step.id !== expectedStep.id
+'@
+    },
+    # Complete reviewed region 3; no candidate-selected code is evaluated.
+    @{
+        Before = @'
+  }
+}
+
+function runCaseCatalog(catalog, workflows, dependabot, contract) {
+  expectExactKeys(catalog, ['schema', 'cases'], 'case-catalog');
+  if (catalog.schema !== 'PSStyleGuide.WorkflowPolicyCases.v1' || !Array.isArray(catalog.cases)) {
+'@
+        After = @'
+  }
+}
+
+function runCatalogCase(testCase, workflows, dependabot, contract) {
+  // Category-qualified cases must prepare successfully. A bad pointer or
+  // absent replacement needle cannot count as the intended policy rejection.
+  let preparedWorkflow;
+  if (testCase.expectedCategory !== undefined) {
+    if (
+      testCase.domain !== 'workflow'
+      || testCase.expected !== false
+      || typeof testCase.expectedCategory !== 'string'
+      || !/^[A-Za-z0-9-]+$/u.test(testCase.expectedCategory)
+    ) fail('case-category');
+    preparedWorkflow = clone(workflows[testCase.workflow].value);
+    applyOperation(preparedWorkflow, testCase.operation);
+  }
+  let observed = true;
+  let observedCategory;
+  try {
+    if (testCase.domain === 'baseline') {
+      for (const [fileName, workflow] of Object.entries(workflows)) {
+        validateWorkflowObject(fileName, workflow.value, workflow.text, contract);
+      }
+      validateDependabot(dependabot, contract);
+    } else if (testCase.domain === 'workflow') {
+      const fixture = preparedWorkflow ?? clone(workflows[testCase.workflow].value);
+      if (preparedWorkflow === undefined) applyOperation(fixture, testCase.operation);
+      validateWorkflowObject(testCase.workflow, fixture, null, contract);
+    } else if (testCase.domain === 'contract') {
+      const fixture = clone(contract);
+      applyOperation(fixture, testCase.operation);
+      validateContract(fixture);
+    } else if (testCase.domain === 'markdown-contract') {
+      const fixture = clone(contract.markdownPolicy);
+      applyOperation(fixture, testCase.operation);
+      validateMarkdownContract(fixture);
+    } else if (testCase.domain === 'dependabot') {
+      const fixture = clone(dependabot);
+      applyOperation(fixture, testCase.operation);
+      validateDependabot(fixture, contract);
+    } else {
+      parseStrictYaml(Buffer.from(testCase.text, 'utf8'), contract.limits);
+    }
+  } catch (error) {
+    if (!(error instanceof PolicyError)) throw error;
+    observed = false;
+    observedCategory = error.category;
+  }
+  if (observed !== testCase.expected) fail('case-result');
+  if (testCase.expectedCategory !== undefined && observedCategory !== testCase.expectedCategory) {
+    fail('case-category-result');
+  }
+}
+
+function runCaseCatalog(catalog, workflows, dependabot, contract) {
+  expectExactKeys(catalog, ['schema', 'cases'], 'case-catalog');
+  if (catalog.schema !== 'PSStyleGuide.WorkflowPolicyCases.v1' || !Array.isArray(catalog.cases)) {
+'@
+    },
+    # Complete reviewed region 4; no candidate-selected code is evaluated.
+    @{
+        Before = @'
+    } else if (testCase.domain !== 'baseline') {
+      fail('case-catalog');
+    }
+    let observed = true;
+    try {
+      if (testCase.domain === 'baseline') {
+        for (const [fileName, workflow] of Object.entries(workflows)) {
+          validateWorkflowObject(fileName, workflow.value, workflow.text, contract);
+        }
+        validateDependabot(dependabot, contract);
+      } else if (testCase.domain === 'workflow') {
+        const fixture = clone(workflows[testCase.workflow].value);
+        applyOperation(fixture, testCase.operation);
+        validateWorkflowObject(testCase.workflow, fixture, null, contract);
+      } else if (testCase.domain === 'contract') {
+        const fixture = clone(contract);
+        applyOperation(fixture, testCase.operation);
+        validateContract(fixture);
+      } else if (testCase.domain === 'markdown-contract') {
+        const fixture = clone(contract.markdownPolicy);
+        applyOperation(fixture, testCase.operation);
+        validateMarkdownContract(fixture);
+      } else if (testCase.domain === 'dependabot') {
+        const fixture = clone(dependabot);
+        applyOperation(fixture, testCase.operation);
+        validateDependabot(fixture, contract);
+      } else {
+        parseStrictYaml(Buffer.from(testCase.text, 'utf8'), contract.limits);
+      }
+    } catch (error) {
+      if (!(error instanceof PolicyError)) throw error;
+      observed = false;
+    }
+    if (observed !== testCase.expected) {
+      fail('case-result');
+    }
+    passed += 1;
+  }
+  if (passed < MINIMUM_CASE_COUNT || identityCases !== REQUIRED_IDENTITY_CASE_COUNT) {
+'@
+        After = @'
+    } else if (testCase.domain !== 'baseline') {
+      fail('case-catalog');
+    }
+    runCatalogCase(testCase, workflows, dependabot, contract);
+    passed += 1;
+  }
+  if (passed < MINIMUM_CASE_COUNT || identityCases !== REQUIRED_IDENTITY_CASE_COUNT) {
+'@
+    },
+    # Complete reviewed region 5; no candidate-selected code is evaluated.
+    @{
+        Before = @'
+  const reject = (candidate, category, runOutcomes = false) => {
+    try {
+      validateOrdinaryCasePreparation(candidate, catalog, workflows);
+      if (runOutcomes) runCaseCatalog(candidate, workflows, dependabot, contract);
+    } catch (error) {
+      if (error instanceof PolicyError && error.category === category) return;
+      throw error;
+'@
+        After = @'
+  const reject = (candidate, category, runOutcomes = false) => {
+    try {
+      validateOrdinaryCasePreparation(candidate, catalog, workflows);
+      if (runOutcomes) runCatalogCase(candidate.cases.at(-1), workflows, dependabot, contract);
+    } catch (error) {
+      if (error instanceof PolicyError && error.category === category) return;
+      throw error;
+'@
+    },
+    # Complete reviewed region 6; no candidate-selected code is evaluated.
+    @{
+        Before = @'
+  };
+  validateOrdinaryCasePreparation(catalog, catalog, workflows);
+  validateOrdinaryCasePreparation(append(negative), catalog, workflows);
+  runCaseCatalog(append(negative), workflows, dependabot, contract);
+  for (const operation of [
+    { type: 'replace', path: '/name', from: 'THIS_NEEDLE_IS_ABSENT', to: 'changed' },
+    { type: 'replace', path: '/name', from: ' ', to: '-' },
+'@
+        After = @'
+  };
+  validateOrdinaryCasePreparation(catalog, catalog, workflows);
+  validateOrdinaryCasePreparation(append(negative), catalog, workflows);
+  runCatalogCase(negative, workflows, dependabot, contract);
+  for (const operation of [
+    { type: 'replace', path: '/name', from: 'THIS_NEEDLE_IS_ABSENT', to: 'changed' },
+    { type: 'replace', path: '/name', from: ' ', to: '-' },
+'@
+    }
+)
+$script:strLegacyGeneratorResultTail = @'
+          $objResult = $arrResult[0] | ConvertFrom-Json
+          if ($intGeneratorExit -ne 0 -or
+              $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2' -or
+              $objResult.GeneratorVersion -cne '1.0.20260916.0' -or
+              $objResult.Overall -notin @('Success', 'NoChange')) {
+              throw "Artifact generation failed with native exit $intGeneratorExit."
+          }
+'@
+$script:strBoundedGeneratorResultTail = @'
+          $objResult = $arrResult[0] | ConvertFrom-Json
+          # Only fixed labels enter this list; result values must never reach the diagnostic.
+          $listFailedChecks = [System.Collections.Generic.List[string]]::new()
+          if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {
+              [void]($listFailedChecks.Add('NativeExit'))
+          }
+          if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {
+              [void]($listFailedChecks.Add('Schema'))
+          }
+          if ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {
+              [void]($listFailedChecks.Add('GeneratorVersion'))
+          }
+          if ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {
+              [void]($listFailedChecks.Add('Overall'))
+          }
+          if ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {
+              [void]($listFailedChecks.Add('Phase'))
+          }
+          if ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {
+              [void]($listFailedChecks.Add('Category'))
+          }
+          if ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {
+              [void]($listFailedChecks.Add('NativeOutcome'))
+          }
+          if (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {
+              [void]($listFailedChecks.Add('ResultExitCode'))
+          }
+          if ($listFailedChecks.Count -ne 0) {
+              throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))
+          }
+'@
+$script:arrRequiredGeneratorResultCase = ConvertFrom-Json -AsHashtable -InputObject @'
+[
+  {
+    "id": "PS-P1-WFPOL-065",
+    "semanticKey": "generator-result-disabled-nativeexit",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {",
+      "to": "if ($false) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-NativeExit"
+  },
+  {
+    "id": "PS-P1-WFPOL-066",
+    "semanticKey": "generator-result-untyped-nativeexit",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {",
+      "to": "if ($intGeneratorExit -ne 0) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-NativeExit"
+  },
+  {
+    "id": "PS-P1-WFPOL-067",
+    "semanticKey": "generator-result-disabled-schema",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {",
+      "to": "if ($false) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-Schema"
+  },
+  {
+    "id": "PS-P1-WFPOL-068",
+    "semanticKey": "generator-result-untyped-schema",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {",
+      "to": "if ($objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-Schema"
+  },
+  {
+    "id": "PS-P1-WFPOL-069",
+    "semanticKey": "generator-result-disabled-generatorversion",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {",
+      "to": "if ($false) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-GeneratorVersion"
+  },
+  {
+    "id": "PS-P1-WFPOL-070",
+    "semanticKey": "generator-result-untyped-generatorversion",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {",
+      "to": "if ($objResult.GeneratorVersion -cne '1.0.20260916.0') {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-GeneratorVersion"
+  },
+  {
+    "id": "PS-P1-WFPOL-071",
+    "semanticKey": "generator-result-disabled-overall",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {",
+      "to": "if ($false) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-Overall"
+  },
+  {
+    "id": "PS-P1-WFPOL-072",
+    "semanticKey": "generator-result-untyped-overall",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {",
+      "to": "if ($objResult.Overall -notin @('Success', 'NoChange')) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-Overall"
+  },
+  {
+    "id": "PS-P1-WFPOL-073",
+    "semanticKey": "generator-result-disabled-phase",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {",
+      "to": "if ($false) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-Phase"
+  },
+  {
+    "id": "PS-P1-WFPOL-074",
+    "semanticKey": "generator-result-untyped-phase",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {",
+      "to": "if ($objResult.Phase -cne 'complete') {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-Phase"
+  },
+  {
+    "id": "PS-P1-WFPOL-075",
+    "semanticKey": "generator-result-disabled-category",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {",
+      "to": "if ($false) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-Category"
+  },
+  {
+    "id": "PS-P1-WFPOL-076",
+    "semanticKey": "generator-result-untyped-category",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {",
+      "to": "if ($objResult.Category -cne 'none') {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-Category"
+  },
+  {
+    "id": "PS-P1-WFPOL-077",
+    "semanticKey": "generator-result-disabled-nativeoutcome",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {",
+      "to": "if ($false) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-NativeOutcome"
+  },
+  {
+    "id": "PS-P1-WFPOL-078",
+    "semanticKey": "generator-result-untyped-nativeoutcome",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {",
+      "to": "if ($objResult.NativeOutcome -cne 'Success') {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-NativeOutcome"
+  },
+  {
+    "id": "PS-P1-WFPOL-079",
+    "semanticKey": "generator-result-disabled-resultexitcode",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {",
+      "to": "if ($false) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-ResultExitCode"
+  },
+  {
+    "id": "PS-P1-WFPOL-080",
+    "semanticKey": "generator-result-untyped-resultexitcode",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {",
+      "to": "if ($objResult.ExitCode -ne 0) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-ResultExitCode"
+  },
+  {
+    "id": "PS-P1-WFPOL-081",
+    "semanticKey": "generator-result-omitted-schema",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\n",
+      "to": ""
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-Schema"
+  },
+  {
+    "id": "PS-P1-WFPOL-082",
+    "semanticKey": "generator-result-reordered-predicates",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\n",
+      "to": "if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\n"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-order"
+  },
+  {
+    "id": "PS-P1-WFPOL-083",
+    "semanticKey": "generator-result-disabled-guard",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($listFailedChecks.Count -ne 0) {",
+      "to": "if ($false) {"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-guard"
+  },
+  {
+    "id": "PS-P1-WFPOL-084",
+    "semanticKey": "generator-result-untyped-accumulator",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "$listFailedChecks = [System.Collections.Generic.List[string]]::new()",
+      "to": "$listFailedChecks = @()"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-accumulator"
+  },
+  {
+    "id": "PS-P1-WFPOL-085",
+    "semanticKey": "generator-result-early-exit",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\n",
+      "to": "if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\nif ($listFailedChecks.Count -ne 0) { return }\n"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-flow"
+  },
+  {
+    "id": "PS-P1-WFPOL-086",
+    "semanticKey": "generator-result-actual-value-output",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))",
+      "to": "throw ('Artifact generation failed result checks: {0}.' -f $objResult.Schema)"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-output"
+  },
+  {
+    "id": "PS-P1-WFPOL-087",
+    "semanticKey": "generator-result-extra-output",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "$objResult = $arrResult[0] | ConvertFrom-Json\n",
+      "to": "$objResult = $arrResult[0] | ConvertFrom-Json\nWrite-Host $objResult.Schema\n"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-flow"
+  },
+  {
+    "id": "PS-P1-WFPOL-088",
+    "semanticKey": "generator-result-native-result-conflation",
+    "domain": "workflow",
+    "workflow": "build.yml",
+    "operation": {
+      "type": "replace",
+      "path": "/jobs/verify_generated_artifacts/steps/1/run",
+      "from": "$intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0",
+      "to": "$objResult.ExitCode -isnot [int] -or $objResult.ExitCode -ne 0"
+    },
+    "expected": false,
+    "expectedCategory": "generator-result-predicate-NativeExit"
+  }
+]
+'@
+$script:objGeneratorResultPolicy = ConvertFrom-Json -AsHashtable -InputObject @'
+{"labels":["NativeExit","Schema","GeneratorVersion","Overall","Phase","Category","NativeOutcome","ResultExitCode"],"prefix":"Artifact generation failed result checks: ","separator":", ","suffix":".","maximumAsciiBytes":136,"actualValues":false}
+'@
+$script:scriptblockConvertToStrengthenedValidator = {
+    param(
+        [Parameter(Mandatory)][string] $Text,
+        [Parameter(Mandatory)][bool] $TrustedStrengthened
+    )
+    foreach ($objShape in $script:arrGeneratorResultSourceShape) {
+        $strBefore = $objShape.Before + "`n"
+        $strAfter = $objShape.After + "`n"
+        $intBefore = [regex]::Matches($Text, [regex]::Escape($strBefore)).Count
+        $intAfter = [regex]::Matches($Text, [regex]::Escape($strAfter)).Count
+        if (-not $TrustedStrengthened -and $intBefore -eq 1 -and $intAfter -eq 0) {
+            $Text = $Text.Replace($strBefore, $strAfter)
+        } elseif ($TrustedStrengthened -and $intAfter -eq 1) {
+            $strOutsideRegion = $Text.Replace($strAfter, '')
+            if ($strOutsideRegion.Contains($strBefore, [StringComparison]::Ordinal) -or
+                $strOutsideRegion.Contains($strAfter, [StringComparison]::Ordinal)) {
+                throw 'The trusted generator-result source has an extra region anchor.'
+            }
+        } else {
+            throw 'The trusted generator-result source has an unsupported or mixed region.'
+        }
+    }
+    return $Text
+}
+$script:scriptblockGetGeneratorResultCategory = {
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Text)
+    $arrBlocks = @(
+        foreach ($objCase in ($script:arrRequiredGeneratorResultCase |
+                Select-Object -First 16 | Where-Object {
+                    $_.semanticKey.StartsWith('generator-result-disabled-',
+                        [StringComparison]::Ordinal)
+                })) {
+            $strLabel = $objCase.expectedCategory.Substring(
+                'generator-result-predicate-'.Length)
+            [pscustomobject]@{
+                Label = $strLabel
+                Text = $objCase.operation.from + "`n    [void](" +
+                    '$listFailedChecks.Add(' + "'" + $strLabel + "'))`n}`n"
+            }
+        }
+    )
+    $intPrevious = -1
+    $boolOutOfOrder = $false
+    foreach ($objBlock in $arrBlocks) {
+        if ([regex]::Matches($Text, [regex]::Escape($objBlock.Text)).Count -ne 1) {
+            return 'generator-result-predicate-' + $objBlock.Label
+        }
+        $intPosition = $Text.IndexOf($objBlock.Text, [StringComparison]::Ordinal)
+        if ($intPosition -le $intPrevious) { $boolOutOfOrder = $true }
+        $intPrevious = $intPosition
+    }
+    if ($boolOutOfOrder) { return 'generator-result-order' }
+    $strAccumulator = '$listFailedChecks = [System.Collections.Generic.List[string]]::new()' + "`n"
+    $strGuard = 'if ($listFailedChecks.Count -ne 0) {' + "`n"
+    $strOutput = "    throw ('Artifact generation failed result checks: {0}.' -f (" +
+        '$listFailedChecks' + " -join ', '))`n"
+    foreach ($objPart in @(
+            @{ Text = $strAccumulator; Category = 'accumulator' },
+            @{ Text = $strGuard; Category = 'guard' },
+            @{ Text = $strOutput; Category = 'output' }
+        )) {
+        if ([regex]::Matches($Text, [regex]::Escape($objPart.Text)).Count -ne 1) {
+            return 'generator-result-' + $objPart.Category
+        }
+    }
+    $strStart = '$objResult = $arrResult[0] | ConvertFrom-Json' + "`n"
+    $strExpectedTail = ($script:strBoundedGeneratorResultTail -split "`n" |
+        ForEach-Object { $_.Substring(10) }) -join "`n"
+    $strExpectedTail += "`n"
+    if ([regex]::Matches($Text, [regex]::Escape($strStart)).Count -ne 1 -or
+        $Text.Substring($Text.IndexOf($strStart, [StringComparison]::Ordinal)) -cne
+            $strExpectedTail) {
+        return 'generator-result-flow'
+    }
+    return ''
+}
+$script:scriptblockAssertGeneratorResultCase = {
+    param(
+        [Parameter(Mandatory)][Collections.IDictionary] $Case,
+        [Parameter(Mandatory)][string] $RunText
+    )
+    if ($Case.workflow -cne 'build.yml' -or
+        $Case.operation.type -cne 'replace' -or
+        $Case.operation.path -cne '/jobs/verify_generated_artifacts/steps/1/run' -or
+        $Case.expectedCategory -isnot [string] -or
+        $Case.expectedCategory -cnotmatch '^generator-result-[A-Za-z-]+$' -or
+        $Case.operation.from -isnot [string] -or
+        [string]::IsNullOrEmpty($Case.operation.from) -or
+        $Case.operation.to -isnot [string] -or
+        [regex]::Matches($RunText, [regex]::Escape($Case.operation.from)).Count -ne 1) {
+        throw 'A generator-result case cannot prepare one exact supported mutation.'
+    }
+    $strPrepared = $RunText.Replace($Case.operation.from, $Case.operation.to)
+    if ($strPrepared -ceq $RunText) {
+        throw 'A generator-result mutation changed no bytes.'
+    }
+    $strCategory = & $script:scriptblockGetGeneratorResultCategory -Text $strPrepared
+    if ([string]::IsNullOrEmpty($strCategory) -or
+        $strCategory -cne $Case.expectedCategory) {
+        throw 'A generator-result mutation did not fail in its declared category.'
+    }
+}
+
+
 function Assert-OrdinaryWorkflowPolicyContent {
     # .SYNOPSIS
     # Validates the closed ordinary workflow-policy tuple as inert Git data.
     #
     # .DESCRIPTION
-    # Preserves every executable rule and existing case. Accepts sequential
-    # negative workflow fixtures, fixed-helper presentation and truthful static
-    # OutputType metadata, derived identities, the next patch version and inert
-    # trailing line comments. Audits the complete history's path boundaries.
-    # This shape check does not assert test results or authorize a merge.
+    # Admits the complete reviewed old-to-strengthened generator-result form,
+    # never its downgrade. Preserves all executable bytes outside those regions
+    # and every existing case. Accepts bounded sequential negative fixtures,
+    # fixed-helper presentation, truthful static OutputType metadata, derived
+    # identities, the next patch and inert trailing comments. Audits the complete
+    # history's path boundaries and the caller/policy/category coupling.
+    # Content admission and optional trusted-case checks do not establish full
+    # CI, independent review or merge readiness.
     #
     # .PARAMETER RepositoryRootPath
     # The absolute trusted repository path.
@@ -1257,7 +2022,7 @@ function Assert-OrdinaryWorkflowPolicyContent {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.1.20260915.0.
+    # Version: 1.2.20260917.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -1270,7 +2035,8 @@ function Assert-OrdinaryWorkflowPolicyContent {
         '.github/workflows/workflow-policy-cases.json',
         '.github/workflows/workflow-policy-contract.json',
         '.github/workflows/Validate-WorkflowPolicy.mjs',
-        '.github/workflows/pull-request-body-identity.yml'
+        '.github/workflows/pull-request-body-identity.yml',
+        '.github/workflows/build.yml'
     )
     $setOrdinaryPaths = [Collections.Generic.HashSet[string]]::new(
         [string[]]$arrOrdinaryPaths, [StringComparer]::Ordinal)
@@ -1436,7 +2202,9 @@ function Assert-OrdinaryWorkflowPolicyContent {
                 -not [StringComparer]::Ordinal.Equals($Matches[2], $strPath)) {
                 throw 'An ordinary tuple path is missing, linked or not a regular blob.'
             }
-            $intMaximumBytes = if ($strPath -ceq $arrOrdinaryPaths[3]) { 131072 } else { 524288 }
+            $intMaximumBytes = if ($strPath -cin @(
+                    $arrOrdinaryPaths[3], $arrOrdinaryPaths[4]
+                )) { 131072 } else { 524288 }
             $arrBytes = @(Read-GitBlobByte -RepositoryRootPath $RepositoryRootPath `
                     -BlobId $Matches[1] -MaximumBytes $intMaximumBytes)
             $strText = ConvertFrom-StrictUtf8Text -Bytes $arrBytes -Name $strPath
@@ -1451,6 +2219,54 @@ function Assert-OrdinaryWorkflowPolicyContent {
     $strContractPath = $arrOrdinaryPaths[1]
     $strValidatorPath = $arrOrdinaryPaths[2]
     $strWorkflowPath = $arrOrdinaryPaths[3]
+    $strBuildPath = $arrOrdinaryPaths[4]
+    $boolTrustedStrengthened = $dictionaryTrustedText[$strValidatorPath].Contains(
+        'const GENERATOR_RESULT_PREDICATES = Object.freeze([',
+        [StringComparison]::Ordinal)
+    $boolCandidateStrengthened = $dictionaryCandidateText[$strValidatorPath].Contains(
+        'const GENERATOR_RESULT_PREDICATES = Object.freeze([',
+        [StringComparison]::Ordinal)
+    if ($boolTrustedStrengthened -and -not $boolCandidateStrengthened) {
+        throw 'The generator-result domain cannot downgrade strengthened rules.'
+    }
+    $strExpectedBuild = $dictionaryTrustedText[$strBuildPath]
+    if ($boolCandidateStrengthened) {
+        $strExpectedValidator = & $script:scriptblockConvertToStrengthenedValidator `
+            -Text $dictionaryTrustedText[$strValidatorPath] `
+            -TrustedStrengthened $boolTrustedStrengthened
+        $dictionaryTrustedText[$strValidatorPath] = $strExpectedValidator
+        $intLegacyTailCount = [regex]::Matches($strExpectedBuild,
+            [regex]::Escape($script:strLegacyGeneratorResultTail)).Count
+        $intBoundedTailCount = [regex]::Matches($strExpectedBuild,
+            [regex]::Escape($script:strBoundedGeneratorResultTail)).Count
+        if ($intLegacyTailCount -eq 1 -and $intBoundedTailCount -eq 0 -and
+            -not $boolTrustedStrengthened) {
+            $strExpectedBuild = $strExpectedBuild.Replace(
+                $script:strLegacyGeneratorResultTail,
+                $script:strBoundedGeneratorResultTail)
+        } elseif ($intLegacyTailCount -ne 0 -or $intBoundedTailCount -ne 1) {
+            throw 'The trusted generator caller does not match its validator form.'
+        }
+    }
+    if ($strExpectedBuild -cne $dictionaryCandidateText[$strBuildPath]) {
+        throw 'The ordinary update changes unsupported generator caller bytes.'
+    }
+    $strRunStart = "        run: |`n"
+    $intRunStart = $strExpectedBuild.IndexOf($strRunStart,
+        [StringComparison]::Ordinal) + $strRunStart.Length
+    $intRunEnd = $strExpectedBuild.IndexOf(
+        "`n      - name: Verify generated artifact drift", [StringComparison]::Ordinal)
+    if ($intRunStart -lt $strRunStart.Length -or $intRunEnd -le $intRunStart) {
+        throw 'The trusted generator run boundaries are unavailable.'
+    }
+    $strGeneratorRun = (($strExpectedBuild.Substring(
+                $intRunStart, $intRunEnd - $intRunStart).TrimEnd("`n") -split "`n" |
+            ForEach-Object { $_.Substring(10) }) -join "`n") + "`n"
+    if ($boolCandidateStrengthened -and
+        -not [string]::IsNullOrEmpty((& $script:scriptblockGetGeneratorResultCategory `
+                    -Text $strGeneratorRun))) {
+        throw 'The candidate generator result flow is outside the supported domain.'
+    }
     $strAcquireDigest = Assert-OrdinaryHelperWorkflow `
         -TrustedText $dictionaryTrustedText[$strWorkflowPath] `
         -CandidateText $dictionaryCandidateText[$strWorkflowPath]
@@ -1510,9 +2326,12 @@ function Assert-OrdinaryWorkflowPolicyContent {
     for ($intIndex = $objTrustedCatalog.cases.Count;
         $intIndex -lt $objCandidateCatalog.cases.Count; $intIndex++) {
         $objCase = $objCandidateCatalog.cases[$intIndex]
+        $arrCaseKeys = @('id', 'semanticKey', 'domain', 'workflow', 'operation', 'expected')
+        if ($objCase.Contains('expectedCategory') -and $boolCandidateStrengthened) {
+            $arrCaseKeys += 'expectedCategory'
+        }
         & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objCase `
-            -Name 'An ordinary new case' `
-            -Key @('id', 'semanticKey', 'domain', 'workflow', 'operation', 'expected')
+            -Name 'An ordinary new case' -Key $arrCaseKeys
         $intLastWorkflowCase++
         if ($intLastWorkflowCase -gt 999 -or $objCase.id -isnot [string] -or
             -not [StringComparer]::Ordinal.Equals(
@@ -1573,12 +2392,55 @@ function Assert-OrdinaryWorkflowPolicyContent {
                 $objCase.operation.to -isnot [string])) {
             throw 'An ordinary replacement fixture has invalid text operands.'
         }
+        if ($objCase.Contains('expectedCategory')) {
+            & $script:scriptblockAssertGeneratorResultCase -Case $objCase `
+                -RunText $strGeneratorRun
+        } elseif ($boolCandidateStrengthened -and -not $boolTrustedStrengthened) {
+            throw 'A strengthening transition may add only proved generator-result cases.'
+        }
+    }
+
+    if ($boolCandidateStrengthened -and -not $boolTrustedStrengthened) {
+        foreach ($objRequiredCase in $script:arrRequiredGeneratorResultCase) {
+            $arrMatches = @($objCandidateCatalog.cases | Where-Object {
+                    $_.semanticKey -ceq $objRequiredCase.semanticKey
+                })
+            if ($arrMatches.Count -ne 1 -or
+                (& $script:scriptblockConvertToCanonicalJsonText -Value $arrMatches[0]) -cne
+                (& $script:scriptblockConvertToCanonicalJsonText -Value $objRequiredCase)) {
+                throw 'The strengthening transition lacks an exact required semantic case.'
+            }
+        }
     }
 
     $objTrustedContract = & $script:scriptblockConvertFromStrictJsonHashtable `
         -Text $dictionaryTrustedText[$strContractPath] -Name 'The trusted policy contract'
     $objCandidateContract = & $script:scriptblockConvertFromStrictJsonHashtable `
         -Text $dictionaryCandidateText[$strContractPath] -Name 'The candidate policy contract'
+    if ($boolCandidateStrengthened) {
+        if (-not $objCandidateContract.workflowPolicy.Contains('generatorResultPolicy') -or
+            (& $script:scriptblockConvertToCanonicalJsonText `
+                    -Value $objCandidateContract.workflowPolicy.generatorResultPolicy) -cne
+            (& $script:scriptblockConvertToCanonicalJsonText `
+                    -Value $script:objGeneratorResultPolicy)) {
+            throw 'The strengthened generator result policy is missing or inconsistent.'
+        }
+        if ($boolTrustedStrengthened -and
+            (-not $objTrustedContract.workflowPolicy.Contains('generatorResultPolicy') -or
+                (& $script:scriptblockConvertToCanonicalJsonText `
+                        -Value $objTrustedContract.workflowPolicy.generatorResultPolicy) -cne
+                (& $script:scriptblockConvertToCanonicalJsonText `
+                        -Value $script:objGeneratorResultPolicy))) {
+            throw 'The trusted strengthened contract has an inconsistent policy.'
+        }
+        $objTrustedContract.workflowPolicy.generatorResultPolicy =
+            $script:objGeneratorResultPolicy
+        $strRunDigest = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData(
+                [Text.UTF8Encoding]::new($false).GetBytes($strGeneratorRun)
+            )).ToLowerInvariant()
+        $objTrustedContract.workflowPolicy.workflows['build.yml'].jobs.
+            verify_generated_artifacts.steps[1].runSha256 = $strRunDigest
+    }
     $objTrustedAcquire = $objTrustedContract.workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.verify_identity.steps[0]
     $objCandidateAcquire = $objCandidateContract.workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.verify_identity.steps[0]
     if ($objCandidateAcquire.runSha256 -isnot [string] -or
@@ -1683,6 +2545,19 @@ function Assert-OrdinaryWorkflowPolicyContent {
             [StringComparison]::Ordinal) -or
         $strCommentSuffix.Contains('VALIDATOR_VERSION', [StringComparison]::Ordinal)) {
         throw 'An ordinary validator suffix is not bounded inert line comments.'
+    }
+    if ($script:boolValidateOrdinaryCaseCatalog -and
+        (-not $boolCandidateStrengthened -or $boolTrustedStrengthened)) {
+        $null = & node (Join-Path $RepositoryRootPath $strValidatorPath) --preflight
+        if ($LASTEXITCODE -ne 0) {
+            throw 'The trusted ordinary catalog preflight failed.'
+        }
+        $null = $dictionaryCandidateText[$strCatalogPath] |
+            & node (Join-Path $RepositoryRootPath $strValidatorPath) `
+                --ordinary-case-catalog-data
+        if ($LASTEXITCODE -ne 0) {
+            throw 'The trusted ordinary case outcomes failed.'
+        }
     }
 }
 
@@ -3604,8 +4479,139 @@ if ($SelfTest) {
         }
         $strEmptyText = ConvertFrom-StrictUtf8Text `
             -Bytes ([byte[]]::new(0)) -Name 'empty.md'
+        foreach ($intBoundarySize in @(
+                $intCandidateMaximumBlobBytes, ($intCandidateMaximumBlobBytes + 1)
+            )) {
+            $strBoundaryPath = Join-Path $strSelfTestRoot 'capacity.txt'
+            [IO.File]::WriteAllBytes($strBoundaryPath, [byte[]]::new($intBoundarySize))
+            $strBoundaryBlob = ([string](& git -C $strSelfTestRoot `
+                        hash-object -w -- $strBoundaryPath)).Trim()
+            if ($LASTEXITCODE -ne 0 -or $strBoundaryBlob -cnotmatch $strObjectIdPattern) {
+                throw 'Could not create the bounded capacity fixture blob.'
+            }
+            $boolCapacityRejected = $false
+            try {
+                $arrCapacityBytes = @(Read-GitBlobByte `
+                        -RepositoryRootPath $strSelfTestRoot -BlobId $strBoundaryBlob `
+                        -MaximumBytes $intCandidateMaximumBlobBytes)
+                if ($arrCapacityBytes.Count -ne $intBoundarySize) {
+                    throw 'The authorizer capacity fixture returned incomplete bytes.'
+                }
+            } catch {
+                if ($intBoundarySize -le $intCandidateMaximumBlobBytes -or
+                    -not $_.Exception.Message.Contains('byte limit',
+                        [StringComparison]::Ordinal)) {
+                    throw
+                }
+                $boolCapacityRejected = $true
+            }
+            if ($boolCapacityRejected -ne ($intBoundarySize -gt $intCandidateMaximumBlobBytes)) {
+                throw 'The authorizer capacity boundary did not fail closed exactly.'
+            }
+        }
         Assert-CandidateSyntax -Syntax 'markdown' -Text $strEmptyText `
             -Path 'empty.md'
+        # Execute only the local trusted acquisition helper, with an offline
+        # transport double. Proposed objects remain inert throughout admission.
+        & {
+            param([string] $Root, [int] $Capacity)
+            $strWorkflow = [IO.File]::ReadAllText(
+                (Join-Path $PSScriptRoot 'pull-request-body-identity.yml'))
+            $objHelperMatch = [regex]::Match($strWorkflow,
+                '(?ms)^          function Add-ProposedBlob \{\n.*?(?=^          & \$strGitPath --no-replace-objects -c core.fsmonitor=false init --quiet \.\n)')
+            if (-not $objHelperMatch.Success) {
+                throw 'The trusted acquisition boundary helper is unavailable.'
+            }
+            $strHelper = [regex]::Replace($objHelperMatch.Value, '(?m)^          ', '')
+            $arrHelperToken = $null
+            $arrHelperError = $null
+            [void][Management.Automation.Language.Parser]::ParseInput(
+                $strHelper, [ref]$arrHelperToken, [ref]$arrHelperError)
+            if ($arrHelperError.Count -ne 0) {
+                throw 'The trusted acquisition boundary helper does not parse.'
+            }
+            . ([scriptblock]::Create($strHelper))
+            # The extracted trusted function resolves these fixture bindings.
+            $objFixtureGit = Get-Command git -CommandType Application |
+                Select-Object -First 1
+            if ($null -eq $objFixtureGit -or
+                -not [IO.Path]::IsPathRooted($objFixtureGit.Source) -or
+                -not [IO.File]::Exists($objFixtureGit.Source)) {
+                throw 'The acquisition fixture requires one resolved native Git application.'
+            }
+            $strFixtureGitVersion = [string](& $objFixtureGit.Source --version)
+            if ($LASTEXITCODE -ne 0 -or $strFixtureGitVersion -cnotmatch '^git version [0-9]+\.') {
+                throw 'The acquisition fixture native Git version check failed.'
+            }
+            Set-Variable -Name strGitPath -Value $objFixtureGit.Source
+            Set-Variable -Name strHeadRepository -Value 'fixture/offline'
+            $strPriorRunnerTemp = $env:RUNNER_TEMP
+            Set-Variable -Name strCurlPath -Value {
+                $arrArgument = @($args)
+                $intOutput = [Array]::IndexOf($arrArgument, '--output')
+                $intRange = [Array]::IndexOf($arrArgument, '--range')
+                $intMaximum = [Array]::IndexOf($arrArgument, '--max-filesize')
+                if ($intOutput -lt 0 -or $intRange -lt 0 -or $intMaximum -lt 0 -or
+                    $arrArgument[$intRange + 1] -cne "0-$Capacity" -or
+                    [long]$arrArgument[$intMaximum + 1] -ne ($Capacity + 1)) {
+                    throw 'The acquisition fixture did not retain finite transport bounds.'
+                }
+                [IO.File]::WriteAllBytes([string]$arrArgument[$intOutput + 1], $arrTransferBytes)
+                Set-Variable -Name LASTEXITCODE -Value 0 -Scope 1
+            }
+            Push-Location -LiteralPath $Root
+            try {
+                $env:RUNNER_TEMP = $Root
+                foreach ($intTransferBytes in @($Capacity, ($Capacity + 1))) {
+                    $strFixturePath = Join-Path $Root 'transfer.bin'
+                    $arrTransferBytes = [byte[]]::new($intTransferBytes)
+                    $arrTransferBytes[0] = 1
+                    [IO.File]::WriteAllBytes($strFixturePath, $arrTransferBytes)
+                    $strExpectedBlob = ([string](& git hash-object --no-filters $strFixturePath)).Trim()
+                    if ($LASTEXITCODE -ne 0) { throw 'Could not identify the transfer fixture.' }
+                    $strHeadSha = ([string]("100644 blob $strExpectedBlob`t`"transfer.bin`"" |
+                            git mktree --missing)).Trim()
+                    if ($LASTEXITCODE -ne 0) { throw 'Could not create the transfer fixture tree.' }
+                    $strFixtureEntry = [string](& git ls-tree $strHeadSha -- transfer.bin)
+                    if ($LASTEXITCODE -ne 0 -or
+                        $strFixtureEntry -cne "100644 blob $strExpectedBlob`ttransfer.bin") {
+                        throw 'The synthetic transfer fixture tree is not exact.'
+                    }
+                    $boolRejected = $false
+                    try {
+                        $longTransferred = Add-ProposedBlob -RepositoryPath 'transfer.bin' `
+                            -MaximumBytes $Capacity -Sequence 1 -ExpectedBlob $strExpectedBlob
+                        if ($longTransferred -ne $intTransferBytes) {
+                            throw 'The acquisition boundary returned an invalid byte count.'
+                        }
+                        if ((Add-ProposedBlob -RepositoryPath 'transfer.bin' `
+                                    -MaximumBytes $Capacity -Sequence 1 `
+                                    -ExpectedBlob $strExpectedBlob) -ne 0) {
+                            throw 'The cached acquisition fixture unexpectedly transferred bytes.'
+                        }
+                    } catch {
+                        if ($intTransferBytes -le $Capacity -or
+                            $_.Exception.Message -cne 'acquire: transfer.bin exceeds its byte contract') {
+                            throw
+                        }
+                        $boolRejected = $true
+                    }
+                    if ($boolRejected -ne ($intTransferBytes -gt $Capacity)) {
+                        throw 'The acquisition transfer boundary did not fail closed exactly.'
+                    }
+                }
+                try {
+                    [void](Add-ProposedBlob -RepositoryPath 'transfer.bin' `
+                            -MaximumBytes ($Capacity + 1) -Sequence 1)
+                    throw 'The acquisition accepted an excessive requested capacity.'
+                } catch {
+                    if ($_.Exception.Message -cne 'acquire: a proposed blob request is invalid') { throw }
+                }
+            } finally {
+                Pop-Location
+                $env:RUNNER_TEMP = $strPriorRunnerTemp
+            }
+        } -Root $strSelfTestRoot -Capacity $intCandidateMaximumBlobBytes
         try {
             Assert-SemanticInvariant -Invariant 'docs-status-lifecycle-values' `
                 -Text $strEmptyText -Path 'empty.md'
@@ -4329,7 +5335,7 @@ if ($SelfTest) {
             authorization_id = 'self-test-content-exact'
             limits = [ordered]@{
                 maximum_paths = 19
-                maximum_blob_bytes = 573440
+                maximum_blob_bytes = $intCandidateMaximumBlobBytes
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
             }
@@ -4735,7 +5741,7 @@ if ($SelfTest) {
                 }
                 limits = [ordered]@{
                     maximum_paths = 19
-                    maximum_blob_bytes = 573440
+                    maximum_blob_bytes = $intCandidateMaximumBlobBytes
                     maximum_manifest_bytes = 65536
                 }
                 allowed_paths = $arrTransitionAllowedPath
@@ -4833,7 +5839,7 @@ if ($SelfTest) {
             authorization_id = 'self-test-same-base-deactivation'
             limits = [ordered]@{
                 maximum_paths = 19
-                maximum_blob_bytes = 573440
+                maximum_blob_bytes = $intCandidateMaximumBlobBytes
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
             }
@@ -4975,7 +5981,7 @@ if ($SelfTest) {
             authorization_id = 'self-test-noncanonical-deactivation-target'
             limits = [ordered]@{
                 maximum_paths = 19
-                maximum_blob_bytes = 573440
+                maximum_blob_bytes = $intCandidateMaximumBlobBytes
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
             }
@@ -5225,7 +6231,7 @@ const git = (args, input) => execFileSync('git', ['-C', repo, ...args], {
 }).trim();
 const prefix = '.github/workflows/';
 const names = ['workflow-policy-cases.json', 'workflow-policy-contract.json',
-  'Validate-WorkflowPolicy.mjs', 'pull-request-body-identity.yml'];
+  'Validate-WorkflowPolicy.mjs', 'pull-request-body-identity.yml', 'build.yml'];
 const digest = value => crypto.createHash('sha256').update(value).digest('hex');
 const canonical = value => Array.isArray(value) ? value.map(canonical)
   : value && typeof value === 'object'
@@ -5277,9 +6283,14 @@ const build = (name, mutate, expected = '', reference = base) => {
   const texts = { ...referenceTexts.get(reference) };
   const catalog = JSON.parse(texts[names[0]]);
   const contract = JSON.parse(texts[names[1]]);
-  const state = { catalog, contract, validator: texts[names[2]], workflow: texts[names[3]] };
+  const state = { catalog, contract, validator: texts[names[2]], workflow: texts[names[3]], build: texts[names[4]] };
   mutate(state);
   texts[names[3]] = state.workflow;
+  texts[names[4]] = state.build;
+  const generatorRun = state.build.split('        run: |\n')[1].split('\n      - name:')[0]
+    .replace(/\n+$/, '') + '\n';
+  contract.workflowPolicy.workflows['build.yml'].jobs.verify_generated_artifacts.steps[1].runSha256 =
+    digest(generatorRun.split('\n').map(line => line ? line.slice(10) : '').join('\n'));
   const run = state.workflow.replaceAll('\r\n', '\n').split('        run: |\n')[1].split('\n      - name:')[0]
     .replace(/\n+$/, '') + '\n';
   contract.workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.verify_identity.steps[0].runSha256 =
@@ -5413,6 +6424,103 @@ for (const value of [true, 7, ['wrong']]) {
   build(`schema rejects ${JSON.stringify(value)}`, state => { state.catalog.schema = value; }, 'catalog has an invalid schema');
 }
 const tuple = readTexts(topic);
+// Exercise the same reviewed source language, with no candidate SHA tuple.
+const authorizerText = initial['Test-TrustRootAuthorization.ps1'];
+const sourceShapes = [...authorizerText.matchAll(/        Before = @'\n([\s\S]*?)\n'@\n        After = @'\n([\s\S]*?)\n'@/g)]
+  .map(match => ({ before: match[1] + '\n', after: match[2] + '\n' }));
+if (sourceShapes.length !== 6) throw new Error('Incomplete reviewed source-region fixture inventory');
+const literal = name => {
+  const marker = `$script:${name} = @'\n`;
+  const start = authorizerText.indexOf(marker);
+  if (start < 0 || authorizerText.indexOf(marker, start + 1) >= 0) throw new Error('Ambiguous trusted literal');
+  return authorizerText.slice(start + marker.length).split("\n'@")[0];
+};
+const jsonLiteral = name => {
+  const marker = `$script:${name} = ConvertFrom-Json -AsHashtable -InputObject @'\n`;
+  const start = authorizerText.indexOf(marker);
+  if (start < 0 || authorizerText.indexOf(marker, start + 1) >= 0) throw new Error('Ambiguous trusted JSON literal');
+  return JSON.parse(authorizerText.slice(start + marker.length).split("\n'@")[0]);
+};
+const oldTail = literal('strLegacyGeneratorResultTail');
+const newTail = literal('strBoundedGeneratorResultTail');
+const requiredCases = jsonLiteral('arrRequiredGeneratorResultCase');
+const requiredPolicy = jsonLiteral('objGeneratorResultPolicy');
+const strengthen = state => {
+  const alreadyStrengthened = state.validator.includes('const GENERATOR_RESULT_PREDICATES =');
+  for (const shape of sourceShapes) {
+    if (!alreadyStrengthened && state.validator.includes(shape.before)) state.validator = state.validator.replace(shape.before, shape.after);
+    else if (!alreadyStrengthened || !state.validator.includes(shape.after)) throw new Error('Unsupported fixture source region');
+  }
+  if (state.build.includes(oldTail)) state.build = state.build.replace(oldTail, newTail);
+  else if (!state.build.includes(newTail)) throw new Error('Unsupported fixture caller');
+  for (const item of requiredCases) {
+    if (!state.catalog.cases.some(prior => prior.semanticKey === item.semanticKey)) {
+      state.catalog.cases.push(structuredClone(item));
+    }
+  }
+  state.contract.workflowPolicy.generatorResultPolicy = structuredClone(requiredPolicy);
+};
+const strengthened = build('reviewed generator-result strengthening', strengthen);
+const appendGeneratorCase = state => {
+  const next = 1 + Math.max(...state.catalog.cases.filter(item => /^PS-P1-WFPOL-\d{3}$/.test(item.id))
+    .map(item => Number(item.id.slice(-3))));
+  state.catalog.cases.push({ id: `PS-P1-WFPOL-${String(next).padStart(3, '0')}`,
+    semanticKey: `generator-result-repeat-use-${next}`, domain: 'workflow', workflow: 'build.yml',
+    operation: { type: 'replace', path: '/jobs/verify_generated_artifacts/steps/1/run',
+      from: 'if ($listFailedChecks.Count -ne 0) {', to: 'if ($true) {' },
+    expected: false, expectedCategory: 'generator-result-guard' });
+};
+const repeated = build('second material generator-result candidate without verifier changes', appendGeneratorCase, '', strengthened);
+build('third material repeat uses same verifier', appendGeneratorCase, '', repeated);
+build('strengthened source recognition is idempotent', () => {}, '', strengthened);
+const extraBefore = build('candidate extra old anchor', state => {
+  state.validator += sourceShapes[2].before;
+}, 'bounded inert line comments', strengthened);
+build('trusted strengthened extra old anchor', appendGeneratorCase, 'extra region anchor', extraBefore);
+const extraAfter = build('candidate duplicate new region', state => {
+  state.validator += sourceShapes[2].after;
+}, 'bounded inert line comments', strengthened);
+build('trusted strengthened duplicate new region', appendGeneratorCase, 'unsupported or mixed region', extraAfter);
+build('strengthened validator downgrade', state => {
+  for (const shape of sourceShapes) state.validator = state.validator.replace(shape.after, shape.before);
+}, 'cannot downgrade', strengthened);
+build('strengthened caller downgrade', state => { state.build = state.build.replace(newTail, oldTail); },
+  'unsupported generator caller bytes', strengthened);
+build('strengthened missing policy', state => { delete state.contract.workflowPolicy.generatorResultPolicy; },
+  'policy is missing or inconsistent', strengthened);
+build('strengthened catalog downgrade', state => { state.catalog.cases = state.catalog.cases.slice(0, -1); },
+  'catalog has an invalid schema or count', strengthened);
+for (const [index, shape] of sourceShapes.entries()) {
+  build(`strengthened mixed source region ${index}`, state => {
+    state.validator = state.validator.replace(shape.after, shape.before);
+  }, index === 0 ? 'cannot downgrade' : 'Unsupported ordinary validator shape', strengthened);
+}
+build('outside-domain executable behavior', state => {
+  state.validator = state.validator.replace('function fail(category) {', 'function fail(category) { return;');
+}, 'Unsupported ordinary validator shape', strengthened);
+build('new category absent needle', state => {
+  appendGeneratorCase(state); state.catalog.cases.at(-1).operation.from = 'ABSENT-GENERATOR-NEEDLE';
+}, 'cannot prepare one exact supported mutation', strengthened);
+build('new category wrong expected category', state => {
+  appendGeneratorCase(state); state.catalog.cases.at(-1).expectedCategory = 'generator-result-output';
+}, 'did not fail in its declared category', strengthened);
+build('new category no-op mutation', state => {
+  appendGeneratorCase(state); state.catalog.cases.at(-1).operation.to = state.catalog.cases.at(-1).operation.from;
+}, 'mutation changed no bytes', strengthened);
+build('new category unsupported pointer', state => {
+  appendGeneratorCase(state); state.catalog.cases.at(-1).operation.path = '/permissions';
+}, 'cannot prepare one exact supported mutation', strengthened);
+build('new category malformed category type', state => {
+  appendGeneratorCase(state); state.catalog.cases.at(-1).expectedCategory = ['generator-result-guard'];
+}, 'cannot prepare one exact supported mutation', strengthened);
+build('literal-only policy cannot publish values', state => {
+  state.contract.workflowPolicy.generatorResultPolicy.actualValues = true;
+}, 'policy is missing or inconsistent', strengthened);
+const maintenanceImported = commit(base, { 'maintenance-import.txt': 'Trusted maintenance contribution\n' });
+const strengthenedTuple = readTexts(strengthened);
+const integratedStrengthened = commit(maintenanceImported, strengthenedTuple, [strengthened, maintenanceImported]);
+rows.push({ name: 'strengthening imports exact trusted maintenance history', base: maintenanceImported,
+  head: integratedStrengthened, expected: '' });
 const refreshed = commit(base, { 'outside-history.txt': 'Trusted main contribution\n' });
 const merged = commit(refreshed, tuple, [topic, refreshed]);
 rows.push({ name: 'ordinary merge imports exact trusted content', base: refreshed, head: merged, expected: '' });
@@ -5459,8 +6567,8 @@ process.stdout.write(JSON.stringify(rows.map(row => ({ ...row, base: resolve(row
                 ConvertFrom-StrictUtf8Text -Bytes $objOrdinaryFixtures.Bytes `
                     -Name 'The inert ordinary fixture identities'
             ))
-        if ($arrOrdinaryFixtures.Count -ne 73) {
-            throw 'The ordinary fixture catalog must contain exactly 73 cases.'
+        if ($arrOrdinaryFixtures.Count -ne 99) {
+            throw "The ordinary fixture catalog must contain exactly 99 cases; got $($arrOrdinaryFixtures.Count)."
         }
         $strCandidateSentinel = [IO.Path]::Combine($PWD.Path, 'SENTINEL')
         if ([IO.File]::Exists($strCandidateSentinel)) {
@@ -5791,7 +6899,7 @@ foreach ($objPath in $arrAllowedPaths) {
                 $objCandidateManifest.limits.maximum_paths -ne
                     $intInactiveManifestMaximumPaths -or
                 $objCandidateManifest.limits.maximum_blob_bytes -ne
-                    $intCandidateMaximumBlobBytes -or
+                    573440 -or
                 $objCandidateManifest.limits.maximum_manifest_bytes -ne
                     $intManifestMaximumBytes -or
                 $objCandidateManifest.limits.maximum_commits -ne

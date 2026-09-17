@@ -545,17 +545,23 @@ jobs:
 
       - name: Validate ordinary candidate cases with trusted rules
         if: steps.trust-root-authorization.outputs.ordinary == 'true'
-        shell: bash
+        shell: pwsh
         env:
+          TRUSTED_REVISION: ${{ github.sha }}
+          CANDIDATE_BASE_REVISION: ${{ github.event.pull_request.base.sha }}
           CANDIDATE_HEAD_REVISION: ${{ github.event.pull_request.head.sha }}
         run: |
-          set -euo pipefail
-          [[ "${CANDIDATE_HEAD_REVISION}" =~ ^[0-9a-f]{40}$ ]]
+          # The trusted authorizer checks the supported caller transition and
+          # prepared category mutations as inert data. It retains the original
+          # trusted-validator outcome gate for other ordinary candidate data.
           node .github/workflows/Validate-WorkflowPolicy.mjs --preflight
-          git --no-replace-objects -c core.fsmonitor=false show \
-            "${CANDIDATE_HEAD_REVISION}:.github/workflows/workflow-policy-cases.json" |
-            node .github/workflows/Validate-WorkflowPolicy.mjs \
-              --ordinary-case-catalog-data
+          if ($LASTEXITCODE -ne 0) { throw 'Trusted policy preflight failed.' }
+          & ./.github/workflows/Test-TrustRootAuthorization.ps1 `
+              -RepositoryRootPath $PWD `
+              -TrustedRevision $env:TRUSTED_REVISION `
+              -BaseRevision $env:CANDIDATE_BASE_REVISION `
+              -HeadRevision $env:CANDIDATE_HEAD_REVISION `
+              -ValidateOrdinaryCaseCatalog
 
       - name: Validate instruction capacity and capabilities
         if: >-
