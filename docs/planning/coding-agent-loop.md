@@ -32,6 +32,10 @@ Ask the operator when a merge is not on-plan, the task assigns a material decisi
 
 Notify the operator as soon as a future exceptional action and its readiness conditions are known. The notification is not a stop condition. While authority is pending, continue every safe in-scope action that does not cross that boundary, including implementation, local validation, non-force topic publication, PR correction, CI diagnosis, review requests, finding repair, and final readiness work. Enter `waiting_human` only when the next concrete action requires the operator and no independent safe in-scope work remains. If the exceptional action is itself necessary to clear one final gate, complete every independent gate, identify the exact residual gate and cause, and do not weaken or bypass it.
 
+When the operator explicitly authorizes a bounded maintenance outcome, apply that grant to its necessary coupled callers, tests, metadata, and task-scope corrections within the stated limits. Do not narrow the grant to an earlier estimated file list or request another approval for an in-scope correction. Reuse of an independently reviewed maintenance procedure within its established semantic domains can proceed under an explicit standing grant for that reuse. Neither the procedure nor a candidate's data grants authority to add a trust domain, change the procedure's security rules, or admit arbitrary replacement validation code. Preserve all applicable risk controls and exclusions.
+
+Before substantial work on protected validation code, inspect the admission and installation path, trusted authority source, coupled consumers, finite input limits, and required publication order. Distinguish an unsupported product candidate from failed validation of the maintenance installation itself. Use the existing mechanism where feasible; any temporary bridge needs a decision-supported purpose and a removal condition. Keep this information in the existing task record, not a new permission ledger. Prefer PR installation; use a direct non-force default-branch bootstrap only when the operator explicitly permits it, the normal PR route cannot install the prerequisite, exact-input independent review and applicable pre-publication tests pass, and native readback plus applicable landed CI verify the installation before dependent product publication.
+
 ## Risk tiers
 
 Use the highest tier that applies to any action in the task.
@@ -113,7 +117,7 @@ For each numbered task:
 2. Confirm each predecessor's actual completion condition. Use live state only when the condition is mutable.
 3. Locate and obey the applicable `AGENTS.md`. If no `AGENTS.md` applies, read the repository root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor.
 4. Classify the task as R0, R1, R2, or R3. Record the tier in compact state.
-5. Inspect only the repositories, refs, issues, PRs, checks, reviews, settings, and paths that can affect this task.
+5. Inspect only the repositories, refs, issues, PRs, checks, reviews, settings, and paths that can affect this task. For protected validation changes, perform the early admission and installation feasibility check before substantial implementation.
 6. Select the executor. Use `model-routing-advisor` once for a new coding task or a genuine capability-driven reroute. Do not create an activation receipt.
 7. Give one executor the task objective, repository, branch, base, allowed scope, risk tier, known findings, required validation, and completion test.
 8. Keep analysis and implementation in that executor while it remains healthy. Reuse it after an ordinary recoverable failure.

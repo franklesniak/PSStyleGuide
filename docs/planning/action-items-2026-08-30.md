@@ -34,6 +34,8 @@ The instruction to execute this plan authorizes in-scope R0 and R1 work. It also
 
 Request an operator decision when a merge is off-plan, work expands scope, or the task assigns a material decision to a human. Never infer permission for a force push, deletion, settings change, credential or permission change, protection change, administrator override, or gate bypass. These exceptional R3 actions require separate explicit authority even when a task names them.
 
+Apply an explicit bounded maintenance grant to necessary coupled changes within its stated limits; do not request new permission for each file, hash, or correction already covered by that grant. Before substantial protected-validation work, check admission, installation order, coupled callers, and finite input limits under `coding-agent-loop.md`. Reuse a reviewed procedure only within its established semantic domains and authorized security limits. A new trust domain or change to the procedure's security rules is not routine reuse.
+
 Notify the operator as soon as a future exceptional action and its readiness conditions are known. The notification is not a stop condition. While authority is pending, continue every safe in-scope action that does not cross that boundary, including implementation, local validation, non-force topic publication, PR correction, CI diagnosis, review requests, finding repair, and final readiness work. Enter `waiting_human` only when the next concrete action requires the operator and no independent safe in-scope work remains. If the exceptional action is itself necessary to clear one final gate, complete every independent gate, identify the exact residual gate and cause, and do not weaken or bypass it.
 
 Use `pending`, `active`, `validating`, `ready`, `waiting_external`, `waiting_human`, `complete`, and `blocked`. A failed validation or new finding returns the task to `active`. Use `waiting_human` only when the next concrete action needs a real human decision or exceptional authority and no independent safe in-scope work remains. Use `blocked` only when the same real blocker persists and no safe work remains.
@@ -8521,7 +8523,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 ### Objective
 
-Create or update only one focused repair PR and bring its initial checks to success. Do not run the formal review loop or merge.
+Install the authorized admission prerequisite, then create or update one focused product repair PR and bring its initial checks to success. Do not run the product's formal review loop or merge in this task.
 
 ### Execution controls
 
@@ -8535,23 +8537,33 @@ Apply the shared compact execution policy. Use the highest applicable risk tier.
 - Coordinate with open PS #162. Do not weaken its no-publication boundary. If actual values cannot safely appear in the current repository-code job, implement and document a stronger compatible channel that preserves named distinctions and fixed ordering without exposing checkout-controlled content.
 - Re-read the canonical baseline produced by Task 87 and current #162 body before design. Run both parsers, PSScriptAnalyzer, policy preflight and all cases once, hostile and valid controls, the complete two-run three-host generator matrix, generated-drift and exact-scope checks, current-head CI, review, and landed handoff.
 
+### Authorized admission prerequisite
+
+The operator expressly authorized maintenance for PS #171, including the admission scripts, directly coupled callers, existing manifest, focused tests or helpers, justified finite input-limit changes, and necessary issue or task-scope corrections. Retain the literal-only diagnostic design and #162's no-publication boundary. Select changes through the required finding-specific decision process; list affected paths and their purpose before editing. Do not request another approval for corrections within this grant.
+
+Use the existing maintenance mechanism where feasible. Prove actual admission of the repair and a second benign candidate in the same supported class without a new candidate-specific verifier tuple or human hash approval. Keep candidate code inert during privileged admission. Require hostile-input rejection, finite-limit boundary tests, and exact-input independent review. Do not treat a hash, manifest, review comment, or local test pass as authority for arbitrary replacement validation code.
+
+Prefer a maintenance PR when it can install the prerequisite. Complete that necessary maintenance PR's required checks, exact-input independent review, and on-plan merge before dependent product publication. If inspection proves that the normal PR route cannot install the prerequisite, the operator permits one narrowly necessary, independently reviewed, non-force fast-forward maintenance update to `main`. Complete required pre-publication validation, refresh the remote base immediately before writing, and verify native readback and applicable main CI before product publication. This allowance cannot install the product repair directly on `main`, waive a failed maintenance gate, or bypass platform controls. Required maintenance review is separate from the product review owned by Task 92.
+
+Prefer the permanent procedure. Use a temporary bridge only when the decision process proves it necessary; record its removal condition in the existing task record. Complete the permanent procedure and remove any bridge before Task 96. Commit and push the focused planning instructions only to `planning-CRT-PR-852`. Later numbered tasks can reuse the reviewed procedure within its established domains and security limits; new domains and changes to its security rules are not covered by routine reuse.
+
 ### Procedure
 
 1. If Task 90 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Re-query the issue, target main ref, remote branch, implementation slot, and current required checks. Push the committed candidate safely.
+2. Complete the authorized admission prerequisite. Require the real admission entrypoints to return native exit code 0 for the actual product candidate; do not hide failed results. Re-query the issue, target main ref, remote branch, implementation slot, and current required checks. Refresh affected identities and validation after maintenance, then push the committed candidate safely.
 3. Create or update one focused PR. Link the issue and describe the complete diff, source and target identities, validation, security and failure effects, intentional differences, generated artifacts, deferrals, rollback, and closing behavior accurately.
 4. Read the PR back. Record base, head/tree, commits, paths, blobs, body edit state, linked and closing issues, reviews/comments baseline, merge state, and checks.
-5. Require all initial checks to pass. Replace every placeholder. Stop before the formal review loop or merge.
+5. Require all initial product checks to pass. Replace every placeholder. Stop before the product's formal review loop or merge; the admission prerequisite has its own required maintenance review and installation above.
 
 ### Candidate preparation gate
 
 Before this task is complete:
 
-1. Create or update only the focused PR for the stated issue or approved task.
+1. Create or update only the focused product PR for this issue, plus a maintenance PR only when required by the authorized admission prerequisite above.
 2. Complete the issue scope, applicable local validation, an accurate PR body, and initial required checks.
 3. Record the base, candidate head SHA and tree, affected paths, issue links, and every task-specific source, destination, validation, runtime, and intentional-difference identity.
 4. Replace every placeholder and verify every posted identity.
-5. Stop before the Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later lifecycle action in this task.
+5. Stop before the product's Copilot-and-Codex review loop, independent final quality check, or merge. Do not perform a later product lifecycle action in this task. This restriction does not defer the maintenance prerequisite's required review or installation.
 
 ### Reviewer-facing body freeze gate
 
@@ -8899,7 +8911,7 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 | Task 69 | `FS` | Use the original pinned cycle-2 comparison and immutable PS #161 and Terraform #34 inputs. |
 | Task 78 | `FS` | PS #169 has its landed handoff and reciprocal comparison. |
 | Task 87 | `FS` | PS #170 has its landed handoff and reciprocal comparison. |
-| Task 95 | `FS` | PS #171 is closed by its reviewed merged PR and has an authenticated landed handoff. |
+| Task 95 | `FS` | PS #171 is closed by its reviewed merged PR and has an authenticated landed handoff. The authorized permanent admission procedure is complete, any temporary bridge is removed, and the focused planning instructions are committed and pushed to `planning-CRT-PR-852`. |
 
 ### Objective
 
@@ -8910,6 +8922,8 @@ Perform one reciprocal recheck and emit `FIXED_POINT_READY` or the exact next `R
 Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
 
 ### Task-local reciprocal controls
+
+Include the final landed admission maintenance and the #171 scalar-type correction in the applicable existing comparison rows. Do not assume they are permanent repository-specific differences. Compare the actual landed inputs; do not use a temporary bridge or a pre-maintenance snapshot as the final foundation.
 
 #### Reverse-comparison and closure controls
 
