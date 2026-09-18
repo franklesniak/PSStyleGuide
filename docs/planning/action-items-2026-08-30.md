@@ -9218,13 +9218,21 @@ Use predecessor results named in `Task variables` and `Dependencies` from compac
 
 ### Objective
 
-Implement and locally validate implement PS workflow isolation and policy convergence without creating or updating a pull request.
+Implement and locally validate PS workflow isolation and policy convergence without creating or updating its product pull request.
 
 ### Execution controls
 
 Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
 
 ### Task-specific scope and immutable inputs
+
+### Authorized admission prerequisite
+
+The owner authorized a bounded permanent admission-domain extension for issue #162 before its product implementation. Keep this prerequisite separate from the product candidate. Preserve the issue #171 ordinary domain, inactive-manifest model, finite bounds, inert candidate handling, frozen dependencies and advisory controls. Use fixed trusted rules or reference forms; do not add per-candidate verifier tuples or hash approvals. Include only necessary coupled callers, input transfer, helpers, limits and regression tests selected through the required decision process.
+
+Prefer normal PR installation. If the installed trusted rules cannot admit the prerequisite, the owner's new Task 99 grant permits one independently reviewed, fully tested, prerequisite-only non-force fast-forward update to PSStyleGuide `main`. This is separate from the consumed Task 91 allowance. Test the actual installation event, define a non-bypass recovery path, refresh the exact remote base and platform constraints, and read back the result. Require applicable landed CI before dependent product publication. Do not install product topology directly, assume a second direct update, change settings or protections, or treat an old-checker refusal as a passing installation test.
+
+This prerequisite does not renumber tasks or reopen completed work. Task 99 still owns local product implementation, tests and commit; Task 100 owns product publication and initial CI; Tasks 101–104 own review, quality, merge and handoff. Include the landed maintenance and product changes in the subsequent reciprocal comparison. Necessary in-scope corrections and changed hashes do not require renewed approval. Preserve all exceptional-action boundaries in the owner's grant and shared policy.
 
 ### Immutable inputs
 
@@ -9262,7 +9270,7 @@ The landed #161 baseline already contains the v2 generator and exact-path verifi
 3. Treat an action or repository-token scope in a repository-code job, an unverified Node distribution, an unexplained missing Terraform negative case, or a weaker failure postcondition as a blocker.
 4. Run all offline fixtures, both Markdown surfaces, generator drift, exact-path checks, clean installs, policy preflight and full validation, action/default provenance checks, and pull-request/push graph tests.
 5. Record the final case count and prove that every case runs exactly once. Require all initial checks to pass at the candidate head.
-6. Create or update one focused PS #162 PR. Record all source and candidate blobs, contract and catalog versions/digests, Node/npm/archive identities, action pins and manifest defaults, final topology, case allocation, runtime results, candidate head/tree, and intentional differences. Stop before merge.
+6. Prepare the handoff for Task 100's one focused PS #162 PR. Record all source and candidate blobs, contract and catalog versions/digests, Node/npm/archive identities, action pins and manifest defaults, final topology, case allocation, runtime results, candidate head/tree, and intentional differences. Do not publish the product candidate in Task 99.
 
 - Verified PR #164 starting-state build blob: `284b08257a48aacc0fe7e474b315f9eb482e5c62`.
 - Verified PR #164 starting-state policy-validator blob: `24e47314a62bb31cc6332cba6e56116efc7602bd`.
@@ -9316,11 +9324,11 @@ Each applicable row occurs exactly once. Record both repository URLs and commits
 
 ### Procedure
 
-1. Work from the exact commenced baseline in an isolated branch or worktree.
+1. Work from the exact commenced baseline in an isolated branch or worktree. Complete the separately authorized admission prerequisite first; use its verified landed baseline for the dependent product candidate.
 2. Implement the complete task-local contract and preserve every stated scope boundary.
-3. Run all task-specific local validation, commit the candidate, and record the commit, tree, paths, blobs, runtimes, exit codes, and results. Do not push or update a PR.
+3. Run all task-specific local validation, commit the product candidate, and record the commit, tree, paths, blobs, runtimes, exit codes, and results. Do not push the product branch or update its PR.
 
-Do not push the branch, create or update a PR, request review, or merge in this task.
+The product publication, review and merge restrictions do not prohibit the independently reviewed prerequisite installation expressly authorized above.
 
 ### Validation and evidence
 
@@ -9332,11 +9340,11 @@ Apply the shared stop policy and the task-specific stop conditions.
 
 ### Exact output
 
-A committed, locally validated implementation candidate exists with exact identities and no PR state changed, or the task has the authorized skip record.
+A committed, locally validated product candidate exists with exact identities and no product PR state changed, or the task has the authorized skip record.
 
 ### Complete when
 
-A committed, locally validated implementation candidate exists with exact identities and no PR state changed, or the task has the authorized skip record.
+A committed, locally validated product candidate exists with exact identities and no product PR state changed, or the task has the authorized skip record.
 
 ## Task 100 — create or update the candidate PR for PS workflow isolation and policy convergence
 

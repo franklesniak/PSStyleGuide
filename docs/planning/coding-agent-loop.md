@@ -36,6 +36,8 @@ When the operator explicitly authorizes a bounded maintenance outcome, apply tha
 
 Before substantial work on protected validation code, inspect the admission and installation path, trusted authority source, coupled consumers, finite input limits, and required publication order. Distinguish an unsupported product candidate from failed validation of the maintenance installation itself. Use the existing mechanism where feasible; any temporary bridge needs a decision-supported purpose and a removal condition. Keep this information in the existing task record, not a new permission ledger. Prefer PR installation; use a direct non-force default-branch bootstrap only when the operator explicitly permits it, the normal PR route cannot install the prerequisite, exact-input independent review and applicable pre-publication tests pass, and native readback plus applicable landed CI verify the installation before dependent product publication.
 
+An expressly authorized prerequisite has its own delivery boundary. Do not apply a numbered task's local-only product restriction to that separately authorized prerequisite, and do not use prerequisite authority to publish the product early. Keep one implementation owner, independent review, the applicable installation tests and landed-CI gate. A spent one-use installation grant cannot authorize a second update. Record this distinction in the existing task scope and state; do not create another approval ledger or restart completed tasks.
+
 ## Risk tiers
 
 Use the highest tier that applies to any action in the task.
