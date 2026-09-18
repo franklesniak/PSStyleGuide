@@ -3,7 +3,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.12.20260917.0
+# Version: 1.13.20260918.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -98,6 +98,11 @@ $script:arrTrustRootPaths = @(
     '.github/workflows/workflow-policy-cases.json',
     '.github/workflows/workflow-policy-contract.json',
     '.github/workflows/Validate-WorkflowPolicy.mjs',
+    '.github/workflows/workflow-isolation-reference.json',
+    '.github/workflows/workflow-isolation-validator.reference.txt',
+    '.github/workflows/workflow-ordinary-selftest-reference.json',
+    '.github/workflows/build.yml',
+    '.github/workflows/markdownlint.yml',
     '.pre-commit-config.yaml'
 )
 $script:arrGovernedInstructionRootPaths = @(
@@ -123,6 +128,11 @@ $script:arrPushGovernedExactPaths = @(
     '.github/workflows/workflow-policy-cases.json',
     '.github/workflows/workflow-policy-contract.json',
     '.github/workflows/Validate-WorkflowPolicy.mjs',
+    '.github/workflows/workflow-isolation-reference.json',
+    '.github/workflows/workflow-isolation-validator.reference.txt',
+    '.github/workflows/workflow-ordinary-selftest-reference.json',
+    '.github/workflows/build.yml',
+    '.github/workflows/markdownlint.yml',
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
     '.gitignore',
@@ -8013,7 +8023,7 @@ if ($SelfTest) {
                 }
                 if ([regex]::Matches(
                         $strFunctionNotes,
-                        '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-5]))|1\.2026091[45]|2\.20260917)\.0\.$'
+                        '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-58]))|1\.2026091[45]|2\.20260917)\.0\.$'
                     ).Count -ne 1) {
                     $listMissingHelp.Add('landing or repair helper Version')
                 }
@@ -8053,7 +8063,7 @@ if ($SelfTest) {
             [pscustomobject]@{
                 Source = $strTrustRootAuthorizationSource
                 Path = $strTrustRootAuthorizationPath
-                ExpectedFunctionCount = 12
+                ExpectedFunctionCount = 14
             },
             [pscustomobject]@{
                 Source = $strExtractedSelfTestSource
@@ -8075,7 +8085,7 @@ if ($SelfTest) {
                 Name = 'trust-root authorization helper'
                 Source = $strTrustRootAuthorizationSource
                 Path = $strTrustRootAuthorizationPath
-                ExpectedFunctionCount = 12
+                ExpectedFunctionCount = 14
                 FunctionName = 'Invoke-BoundedProcessByte'
             },
             [pscustomobject]@{
@@ -8125,9 +8135,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.12\.20260917\.0$'
+            '(?m)^# Version: 1\.13\.20260918\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.12.20260917.0.'
+        throw 'The validator script version is not 1.13.20260918.0.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8988,9 +8998,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.5\.20260917\.0$'
+            '(?m)^# Version: 1\.6\.20260918\.0$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.5.20260917.0.'
+        throw 'The trust-root authorization script lacks version 1.6.20260918.0.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -9004,6 +9014,11 @@ if ($SelfTest) {
             '.github/workflows/pull-request-body-identity-cases.json',
             '.github/workflows/pull-request-body-identity.yml',
             '.github/workflows/workflow-policy-cases.json',
+            '.github/workflows/workflow-isolation-reference.json',
+            '.github/workflows/workflow-isolation-validator.reference.txt',
+            '.github/workflows/workflow-ordinary-selftest-reference.json',
+            '.github/workflows/build.yml',
+            '.github/workflows/markdownlint.yml',
             '.pre-commit-config.yaml'
         )) {
         if (@($script:arrTrustRootPaths | Where-Object {
@@ -9016,7 +9031,12 @@ if ($SelfTest) {
             '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
             '.github/workflows/pull-request-body-identity-cases.json',
             '.github/workflows/pull-request-body-identity.yml',
-            '.github/workflows/workflow-policy-cases.json'
+            '.github/workflows/workflow-policy-cases.json',
+            '.github/workflows/workflow-isolation-reference.json',
+            '.github/workflows/workflow-isolation-validator.reference.txt',
+            '.github/workflows/workflow-ordinary-selftest-reference.json',
+            '.github/workflows/build.yml',
+            '.github/workflows/markdownlint.yml'
         )) {
         if (@($script:arrPushGovernedExactPaths | Where-Object {
                     $_ -ceq $strIdentityTrustRootPath
@@ -9055,9 +9075,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.3\.20260917\.0$'
+            '(?m)^# Version: 1\.4\.20260918\.0$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.3.20260917.0.'
+        throw 'The extracted self-test lacks version 1.4.20260918.0.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)
@@ -9434,129 +9454,7 @@ if ($SelfTest) {
         }
     }
 
-    Assert-RepositoryInputMetadataMutationRejected `
-        -Name 'missing Git index entry mutation' `
-        -GitIndexEntryCount 0 `
-        -Failure 'missing Git index entry mutation must have exactly one Git index entry.'
-
-    Assert-RepositoryInputMetadataMutationRejected `
-        -Name 'Git symlink mode mutation' `
-        -GitMode '120000' `
-        -Failure 'Git symlink mode mutation must be a stage-0 regular file with Git mode 100644.'
-
-    Assert-RepositoryInputMetadataMutationRejected `
-        -Name 'nonzero Git stage mutation' `
-        -GitStage '2' `
-        -Failure 'nonzero Git stage mutation must be a stage-0 regular file with Git mode 100644.'
-
-    Assert-RepositoryInputMetadataMutationRejected `
-        -Name 'non-file worktree item mutation' `
-        -IsFileInfo $false `
-        -Failure 'non-file worktree item mutation must be a regular worktree file.'
-
-    Assert-RepositoryInputMetadataMutationRejected `
-        -Name 'reparse-point mutation' `
-        -Attributes ([System.IO.FileAttributes]::Normal -bor [System.IO.FileAttributes]::ReparsePoint) `
-        -Failure 'reparse-point mutation must not be a symbolic link or reparse point.'
-
-    Assert-RepositoryInputMetadataMutationRejected `
-        -Name 'link-type mutation' `
-        -LinkType 'SymbolicLink' `
-        -Failure 'link-type mutation must not have a link type.'
-
-    Assert-RepositoryInputMetadataMutationRejected `
-        -Name 'Unix device mutation' `
-        -UnixMode 'crw-rw-rw-' `
-        -Failure 'Unix device mutation must have a regular Unix file type.'
-
-    $strPathSafetyTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
-    $strPathSafetyRoot = [IO.Path]::Combine(
-        $strPathSafetyTempRoot,
-        'agent-input-path-' + [Guid]::NewGuid().ToString('N')
-    )
-    if (-not $strPathSafetyRoot.StartsWith(
-            $strPathSafetyTempRoot,
-            [StringComparison]::OrdinalIgnoreCase
-        )) {
-        throw 'The repository-input path fixture root is unsafe.'
-    }
-    $strPathSafetyRepository = [IO.Path]::Combine($strPathSafetyRoot, 'repository')
-    $strPathSafetyLinkedDirectory =
-        [IO.Path]::Combine($strPathSafetyRepository, 'linked')
-    $strPathSafetyOutsideDirectory = [IO.Path]::Combine($strPathSafetyRoot, 'outside')
-    $strPathSafetyInput = [IO.Path]::Combine(
-        $strPathSafetyLinkedDirectory,
-        'input.md'
-    )
-    [void][IO.Directory]::CreateDirectory($strPathSafetyLinkedDirectory)
-    [IO.File]::WriteAllText(
-        $strPathSafetyInput,
-        'safe',
-        [Text.UTF8Encoding]::new($false)
-    )
-    try {
-        & git -C $strPathSafetyRepository init --quiet
-        & git -C $strPathSafetyRepository add -- linked/input.md
-        if ($LASTEXITCODE -ne 0) {
-            throw 'Could not create the repository-input path fixture index.'
-        }
-        $arrSafeRepositoryInput = [byte[]]@(Read-RepositoryInputData `
-                -Path $strPathSafetyInput `
-                -RepositoryRootPath $strPathSafetyRepository `
-                -RepositoryRelativePath 'linked/input.md' `
-                -DisplayName 'safe path fixture' `
-                -MaximumBytes 64)
-        if ([Text.Encoding]::UTF8.GetString($arrSafeRepositoryInput) -cne 'safe') {
-            throw 'The safe repository-input path fixture returned unexpected bytes.'
-        }
-
-        [IO.File]::Delete($strPathSafetyInput)
-        [IO.Directory]::Delete($strPathSafetyLinkedDirectory)
-        [void][IO.Directory]::CreateDirectory($strPathSafetyOutsideDirectory)
-        [IO.File]::WriteAllText(
-            [IO.Path]::Combine($strPathSafetyOutsideDirectory, 'input.md'),
-            'outside',
-            [Text.UTF8Encoding]::new($false)
-        )
-        if ([IO.Path]::DirectorySeparatorChar -eq '\') {
-            [void](New-Item -ItemType Junction `
-                    -Path $strPathSafetyLinkedDirectory `
-                    -Target $strPathSafetyOutsideDirectory)
-        } else {
-            [void](New-Item -ItemType SymbolicLink `
-                    -Path $strPathSafetyLinkedDirectory `
-                    -Target $strPathSafetyOutsideDirectory)
-        }
-        $boolLinkedComponentRejected = $false
-        try {
-            [void](Read-RepositoryInputData `
-                    -Path $strPathSafetyInput `
-                    -RepositoryRootPath $strPathSafetyRepository `
-                    -RepositoryRelativePath 'linked/input.md' `
-                    -DisplayName 'linked path fixture' `
-                    -MaximumBytes 64)
-        } catch {
-            $boolLinkedComponentRejected = $_.Exception.Message.Contains(
-                'unsafe linked path component: linked.',
-                [StringComparison]::Ordinal
-            )
-        }
-        if (-not $boolLinkedComponentRejected) {
-            throw 'An intermediate linked repository-input component was accepted.'
-        }
-    } finally {
-        if (Test-Path -LiteralPath $strPathSafetyLinkedDirectory) {
-            $objLinkedFixtureItem =
-                Get-Item -Force -LiteralPath $strPathSafetyLinkedDirectory
-            if (($objLinkedFixtureItem.Attributes -band
-                    [IO.FileAttributes]::ReparsePoint) -ne 0) {
-                Remove-Item -Force -LiteralPath $strPathSafetyLinkedDirectory
-            }
-        }
-        if ([IO.Directory]::Exists($strPathSafetyRoot)) {
-            Remove-Item -Recurse -Force -LiteralPath $strPathSafetyRoot
-        }
-    }
+    # Input metadata and linked-component mutations run in the extracted helper.
 
     Assert-OversizedStreamMutationRejected
 
@@ -9623,14 +9521,7 @@ if ($SelfTest) {
     if (@(ConvertFrom-GitPathListData -Bytes ([byte[]] @())).Count -ne 0) {
         throw 'Empty Git output changed inventory.'
     }
-    $arrIndexPaths = @(Read-GitTrackedPath -RepositoryRootPath `
-            $strRepositoryRootPath -MaximumBytes $intGitPathListMaximumBytes)
-    $arrRevisionPaths = @(Read-GitTrackedPath -RepositoryRootPath `
-            $strRepositoryRootPath -Revision $strCheckedOutRevision `
-            -MaximumBytes $intGitPathListMaximumBytes)
-    if ($null -ne (Compare-Object $arrIndexPaths $arrRevisionPaths -CaseSensitive)) {
-        throw 'Index and revision path lists differ.'
-    }
+    # Index/revision parity and staged-addition tests use the extracted fixture.
 
     Assert-Failure `
         -CodexConfigContent ($strCodexConfigContent + [Environment]::NewLine +

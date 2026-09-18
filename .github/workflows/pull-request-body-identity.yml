@@ -336,18 +336,22 @@ jobs:
           $arrOrdinaryTuplePaths = @(
               '.github/workflows/workflow-policy-cases.json',
               '.github/workflows/workflow-policy-contract.json',
-              '.github/workflows/Validate-WorkflowPolicy.mjs'
+              '.github/workflows/Validate-WorkflowPolicy.mjs',
+              '.github/workflows/build.yml',
+              '.github/workflows/markdownlint.yml',
+              '.github/workflows/workflow-isolation-reference.json',
+              '.github/workflows/workflow-isolation-validator.reference.txt'
           )
           $arrTrustedOrdinaryEntries = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false ls-tree $strBaseSha -- @arrOrdinaryTuplePaths)
-          if ($LASTEXITCODE -ne 0 -or $arrTrustedOrdinaryEntries.Count -ne 3) {
+          if ($LASTEXITCODE -ne 0 -or $arrTrustedOrdinaryEntries.Count -ne 7) {
               throw 'acquire: the trusted ordinary tuple is unavailable'
           }
           $arrProposedOrdinaryEntries = @(& $strGitPath --no-replace-objects -c core.fsmonitor=false ls-tree $strHeadSha -- @arrOrdinaryTuplePaths)
-          if ($LASTEXITCODE -ne 0 -or $arrProposedOrdinaryEntries.Count -ne 3) {
+          if ($LASTEXITCODE -ne 0 -or $arrProposedOrdinaryEntries.Count -ne 7) {
               throw 'acquire: the proposed ordinary tuple is unavailable'
           }
           foreach ($strOrdinaryEntry in @($arrTrustedOrdinaryEntries) + @($arrProposedOrdinaryEntries)) {
-              if ($strOrdinaryEntry -cnotmatch '^100644 blob [0-9a-f]{40}\t\.github/workflows/(workflow-policy-cases\.json|workflow-policy-contract\.json|Validate-WorkflowPolicy\.mjs)$') {
+              if ($strOrdinaryEntry -cnotmatch '^100644 blob [0-9a-f]{40}\t\.github/workflows/(workflow-policy-cases\.json|workflow-policy-contract\.json|Validate-WorkflowPolicy\.mjs|build\.yml|markdownlint\.yml|workflow-isolation-reference\.json|workflow-isolation-validator\.reference\.txt)$') {
                   throw 'acquire: an ordinary tuple input is not a regular blob'
               }
           }
@@ -435,6 +439,14 @@ jobs:
                   # Bounded inert support input, not a sixth identity role.
                   $dictionaryProposedBlob[
                       '.github/workflows/pull-request-body-identity.yml'
+                  ] = [pscustomobject]@{
+                      MaximumBytes = 131072
+                      ExpectedBlob = $null
+                      ExpectedBytes = $null
+                  }
+                  # Markdown is inert policy input, not a new identity role.
+                  $dictionaryProposedBlob[
+                      '.github/workflows/markdownlint.yml'
                   ] = [pscustomobject]@{
                       MaximumBytes = 131072
                       ExpectedBlob = $null

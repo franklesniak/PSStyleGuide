@@ -51,7 +51,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.5.20260917.0
+# Version: 1.6.20260918.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -70,6 +70,7 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $script:boolValidateOrdinaryCaseCatalog = [bool]$ValidateOrdinaryCaseCatalog
+$script:strIsolationMarkerPattern = '(?m)^const WORKFLOW_ISOLATION_POLICY_VERSION = 1;$'
 $intManifestMaximumBytes = 65536
 $intCandidateMaximumPaths = 19
 $intInactiveManifestMaximumPaths = 16
@@ -99,6 +100,11 @@ $arrTrustRootPaths = @(
     '.github/workflows/workflow-policy-cases.json',
     '.github/workflows/workflow-policy-contract.json',
     '.github/workflows/Validate-WorkflowPolicy.mjs',
+    '.github/workflows/workflow-isolation-reference.json',
+    '.github/workflows/workflow-isolation-validator.reference.txt',
+    '.github/workflows/workflow-ordinary-selftest-reference.json',
+    '.github/workflows/build.yml',
+    '.github/workflows/markdownlint.yml',
     '.pre-commit-config.yaml'
 )
 $script:arrSpecialSemanticInvariant = @(
@@ -199,7 +205,7 @@ $script:hashtableSemanticInvariantPattern = @{
     'extracted-self-test-is-invoked' =
         '& \(Join-Path \$strRepositoryRootPath \$strExtractedSelfTestPath\)'
     'extracted-self-test-version-and-topology' =
-        '(?s)# Version: 1\.3\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext'
+        '(?s)# Version: 1\.4\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext'
     'new-ref-boundary-cap-is-64' =
         '\$intMetadataMaximumBoundaries = 64'
     'pr-merge-bases-use-all-and-cap' =
@@ -274,6 +280,7 @@ function Invoke-BoundedProcessByte {
     # .DESCRIPTION
     # Starts the requested executable without a shell, captures standard output
     # as bytes, captures bounded error text, and stops on size or time overflow.
+    # Optional input bytes are written unchanged while both output pipes drain.
     #
     # .PARAMETER FileName
     # The executable name or absolute executable path.
@@ -286,6 +293,9 @@ function Invoke-BoundedProcessByte {
     #
     # .PARAMETER TimeoutMilliseconds
     # The process time limit in milliseconds.
+    #
+    # .PARAMETER InputBytes
+    # Optional exact stdin bytes, at most 524288. An empty array sends EOF.
     #
     # .EXAMPLE
     # Invoke-BoundedProcessByte -FileName 'git' -ArgumentList $arrArgs `
@@ -303,79 +313,102 @@ function Invoke-BoundedProcessByte {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20260918.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)][string] $FileName,
         [Parameter(Mandatory)][string[]] $ArgumentList,
         [Parameter(Mandatory)][ValidateRange(1, 2147483646)][int] $MaximumBytes,
-        [Parameter()][ValidateRange(100, 60000)][int] $TimeoutMilliseconds = 10000
+        [Parameter()][ValidateRange(100, 60000)][int] $TimeoutMilliseconds = 10000,
+        [Parameter()][ValidateNotNull()][AllowEmptyCollection()][byte[]] $InputBytes
     )
 
+    $boolHasInput = $PSBoundParameters.ContainsKey('InputBytes')
+    if ($boolHasInput -and $InputBytes.Length -gt 524288) {
+        throw 'Process input exceeds 524288 bytes.'
+    }
     $objStartInfo = [Diagnostics.ProcessStartInfo]::new($FileName)
     $objStartInfo.UseShellExecute = $false
     $objStartInfo.CreateNoWindow = $true
     $objStartInfo.RedirectStandardOutput = $true
     $objStartInfo.RedirectStandardError = $true
+    $objStartInfo.RedirectStandardInput = $boolHasInput
     foreach ($strArgument in $ArgumentList) {
         $objStartInfo.ArgumentList.Add($strArgument)
     }
     $objProcess = [Diagnostics.Process]::new()
     $objProcess.StartInfo = $objStartInfo
-    if (-not $objProcess.Start()) {
-        throw "Could not start $FileName."
-    }
-    $objMemory = [IO.MemoryStream]::new()
-    $arrBuffer = [byte[]]::new(8192)
-    $objStopwatch = [Diagnostics.Stopwatch]::StartNew()
-    $objErrorTask = $objProcess.StandardError.ReadToEndAsync()
-    while ($true) {
-        $intRemainingMilliseconds =
-            $TimeoutMilliseconds - [int] $objStopwatch.ElapsedMilliseconds
-        if ($intRemainingMilliseconds -le 0) {
-            $objProcess.Kill($true)
-            throw "$FileName exceeded its time limit."
-        }
-        $objReadTask = $objProcess.StandardOutput.BaseStream.ReadAsync(
-            $arrBuffer,
-            0,
-            $arrBuffer.Length
+    $boolStarted = $false
+    $arrPipe = @()
+    try {
+        $objStopwatch = [Diagnostics.Stopwatch]::StartNew()
+        $boolStarted = $objProcess.Start()
+        if (-not $boolStarted) { throw "Could not start $FileName." }
+        $arrPipe = @(
+            [pscustomobject]@{ Stream = $objProcess.StandardOutput.BaseStream; Limit = $MaximumBytes; Name = 'output'; Memory = [IO.MemoryStream]::new(); Buffer = [byte[]]::new(8192); Task = $null },
+            [pscustomobject]@{ Stream = $objProcess.StandardError.BaseStream; Limit = 65536; Name = 'error output'; Memory = [IO.MemoryStream]::new(); Buffer = [byte[]]::new(8192); Task = $null }
         )
-        $objCompletedTask = [Threading.Tasks.Task]::WhenAny(
-            $objReadTask,
-            [Threading.Tasks.Task]::Delay($intRemainingMilliseconds)
-        ).GetAwaiter().GetResult()
-        if (-not [object]::ReferenceEquals($objCompletedTask, $objReadTask)) {
-            $objProcess.Kill($true)
+        foreach ($objPipe in $arrPipe) {
+            $objPipe.Task = $objPipe.Stream.ReadAsync($objPipe.Buffer, 0, $objPipe.Buffer.Length)
+        }
+        $objInputTask = $null
+        if ($boolHasInput) {
+            $objInputTask = $objProcess.StandardInput.BaseStream.WriteAsync($InputBytes, 0, $InputBytes.Length)
+        }
+        while ($true) {
+            if ($null -ne $objInputTask -and $objInputTask.IsCompleted) {
+                $null = $objInputTask.GetAwaiter().GetResult()
+                $objProcess.StandardInput.Close()
+                $objInputTask = $null
+            }
+            foreach ($objPipe in $arrPipe) {
+                if ($null -eq $objPipe.Task -or -not $objPipe.Task.IsCompleted) { continue }
+                $intRead = $objPipe.Task.GetAwaiter().GetResult()
+                if ($intRead -eq 0) {
+                    $objPipe.Task = $null
+                    continue
+                }
+                if ($objPipe.Memory.Length + $intRead -gt $objPipe.Limit) {
+                    throw "$FileName $($objPipe.Name) exceeded $($objPipe.Limit) bytes."
+                }
+                $objPipe.Memory.Write($objPipe.Buffer, 0, $intRead)
+                $objPipe.Task = $objPipe.Stream.ReadAsync($objPipe.Buffer, 0, $objPipe.Buffer.Length)
+            }
+            $listTask = [Collections.Generic.List[Threading.Tasks.Task]]::new()
+            if ($null -ne $objInputTask) { $listTask.Add($objInputTask) }
+            foreach ($objPipe in $arrPipe) {
+                if ($null -ne $objPipe.Task) { $listTask.Add($objPipe.Task) }
+            }
+            if ($listTask.Count -eq 0) { break }
+            $intRemainingMilliseconds = $TimeoutMilliseconds - [int] $objStopwatch.ElapsedMilliseconds
+            if ($intRemainingMilliseconds -le 0 -or
+                [Threading.Tasks.Task]::WaitAny($listTask.ToArray(), $intRemainingMilliseconds) -lt 0) {
+                throw "$FileName exceeded its time limit."
+            }
+        }
+        $intRemainingMilliseconds = $TimeoutMilliseconds - [int] $objStopwatch.ElapsedMilliseconds
+        if ($intRemainingMilliseconds -le 0 -or -not $objProcess.WaitForExit($intRemainingMilliseconds)) {
             throw "$FileName exceeded its time limit."
         }
-        $intRead = $objReadTask.GetAwaiter().GetResult()
-        if ($intRead -eq 0) {
-            break
+        return [pscustomobject]@{
+            ExitCode = $objProcess.ExitCode
+            Bytes = $arrPipe[0].Memory.ToArray()
+            Error = [Text.Encoding]::UTF8.GetString($arrPipe[1].Memory.ToArray())
         }
-        if ($objMemory.Length + $intRead -gt $MaximumBytes) {
+    } catch {
+        if ($boolStarted -and -not $objProcess.HasExited) {
             $objProcess.Kill($true)
-            throw "$FileName output exceeded $MaximumBytes bytes."
+            if (-not $objProcess.WaitForExit(5000)) {
+                throw "$FileName could not be reaped after termination."
+            }
         }
-        $objMemory.Write($arrBuffer, 0, $intRead)
-    }
-    $intRemainingMilliseconds =
-        $TimeoutMilliseconds - [int] $objStopwatch.ElapsedMilliseconds
-    if ($intRemainingMilliseconds -le 0 -or
-        -not $objProcess.WaitForExit($intRemainingMilliseconds)) {
-        $objProcess.Kill($true)
-        throw "$FileName exceeded its time limit."
-    }
-    $strError = $objErrorTask.GetAwaiter().GetResult()
-    $arrBytes = $objMemory.ToArray()
-    if ([Text.Encoding]::UTF8.GetByteCount($strError) -gt 65536) {
-        throw "$FileName error output exceeded 65536 bytes."
-    }
-    return [pscustomobject]@{
-        ExitCode = $objProcess.ExitCode
-        Bytes = $arrBytes
-        Error = $strError
+        throw
+    } finally {
+        foreach ($objPipe in $arrPipe) {
+            if ($null -ne $objPipe.Memory) { $objPipe.Memory.Dispose() }
+        }
+        $objProcess.Dispose()
     }
 }
 
@@ -1984,6 +2017,528 @@ $script:scriptblockAssertGeneratorResultCase = {
 }
 
 
+$script:strIsolationGeneratorConversion = @'
+try {
+    $objResult = $arrResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop
+} catch {
+    throw 'The generator returned invalid JSON.'
+}
+if ($null -eq $objResult -or $objResult.GetType() -ne [System.Management.Automation.PSCustomObject]) {
+    throw 'The generator returned a non-object JSON result.'
+}
+'@ + "`n"
+$script:scriptblockGetIsolationGeneratorResultCategory = {
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Text)
+    if ([regex]::Matches($Text,
+            [regex]::Escape($script:strIsolationGeneratorConversion)).Count -ne 1) {
+        return 'generator-result-json'
+    }
+    $strNormalized = $Text.Replace($script:strIsolationGeneratorConversion,
+        ('$objResult = $arrResult[0] | ConvertFrom-Json' + "`n"))
+    return (& $script:scriptblockGetGeneratorResultCategory -Text $strNormalized)
+}
+
+function Read-IsolationPolicyText {
+    # .SYNOPSIS
+    # Reads one fixed isolation-policy blob without executing its contents.
+    #
+    # .DESCRIPTION
+    # Requires a regular Git blob at the specified immutable revision. The
+    # fixed paths and finite byte bound cannot be supplied by reference data.
+    # Candidate marker inspection confers no authority; the selected closed
+    # evaluator must still validate all candidate content and history.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute repository containing the authenticated Git objects.
+    #
+    # .PARAMETER Revision
+    # The exact commit from which to read the blob.
+    #
+    # .PARAMETER Path
+    # One fixed selector or trusted inert reference path.
+    #
+    # .EXAMPLE
+    # Read-IsolationPolicyText @hashtableArguments
+    #
+    # # Returns strict UTF-8 data, never an executable script block.
+    #
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # [string] Exact bounded blob text.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260918.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][ValidatePattern('^[0-9a-f]{40}$')][string] $Revision,
+        [Parameter(Mandatory)]
+        [ValidateSet('.github/workflows/Validate-WorkflowPolicy.mjs',
+            '.github/workflows/workflow-isolation-reference.json',
+            '.github/workflows/workflow-isolation-validator.reference.txt',
+            IgnoreCase = $false)]
+        [string] $Path
+    )
+
+    $objEntry = Invoke-BoundedProcessByte -FileName 'git' -MaximumBytes 1024 `
+        -ArgumentList @('--literal-pathspecs', '-C', $RepositoryRootPath,
+            'ls-tree', $Revision, '--', $Path)
+    $strEntry = ConvertFrom-StrictUtf8Text -Bytes $objEntry.Bytes `
+        -Name 'An isolation policy tree entry'
+    if ($objEntry.ExitCode -ne 0 -or
+        $strEntry -cnotmatch '^100644 blob ([0-9a-f]{40})\t([^\n]+)\n$' -or
+        -not [StringComparer]::Ordinal.Equals($Matches[2], $Path)) {
+        throw 'An isolation policy input is missing or is not a regular blob.'
+    }
+    $arrBytes = @(Read-GitBlobByte -RepositoryRootPath $RepositoryRootPath `
+            -BlobId $Matches[1] -MaximumBytes 524288)
+    return ConvertFrom-StrictUtf8Text -Bytes $arrBytes -Name $Path
+}
+
+function Assert-WorkflowIsolationReferenceContent {
+    # .SYNOPSIS
+    # Checks the closed P1 isolation domain against trusted inert references.
+    #
+    # .DESCRIPTION
+    # Reconstructs complete workflow and validator text from fixed reference
+    # blobs at the authenticated trusted revision. Permits only finite job
+    # timeouts, independently derived identities, the next patch version,
+    # existing identity-helper presentation and proved negative case additions.
+    # No reference text or candidate code is invoked, imported or evaluated.
+    # The caller first audits bounded history paths and modes, plus byte sizes
+    # for every consumed endpoint blob. Unused historical content is not read.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute trusted repository path.
+    #
+    # .PARAMETER TrustedRevision
+    # The authenticated commit that owns the reference blobs.
+    #
+    # .PARAMETER TrustedText
+    # The six fixed regular blobs read from the trusted revision.
+    #
+    # .PARAMETER CandidateText
+    # The same six fixed regular blobs read from the candidate revision.
+    #
+    # .EXAMPLE
+    # Assert-WorkflowIsolationReferenceContent @hashtableArguments
+    #
+    # # Returns no output when the complete inert tuple matches its rules.
+    #
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # None. Throws when any part of the closed tuple is unsupported.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260918.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][ValidateNotNullOrEmpty()][string] $TrustedRevision,
+        [Parameter(Mandatory)][Collections.Generic.Dictionary[string, string]] $TrustedText,
+        [Parameter(Mandatory)][Collections.Generic.Dictionary[string, string]] $CandidateText
+    )
+
+    $strPrefix = '.github/workflows/'
+    $strValidatorPath = $strPrefix + 'Validate-WorkflowPolicy.mjs'
+    $strContractPath = $strPrefix + 'workflow-policy-contract.json'
+    $strCatalogPath = $strPrefix + 'workflow-policy-cases.json'
+    $strHelperPath = $strPrefix + 'pull-request-body-identity.yml'
+    $strReferenceText = Read-IsolationPolicyText -RepositoryRootPath $RepositoryRootPath `
+        -Revision $TrustedRevision -Path ($strPrefix + 'workflow-isolation-reference.json')
+    $objReference = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $strReferenceText -Name 'The trusted isolation reference'
+    & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objReference `
+        -Name 'The isolation reference' `
+        -Key @('schema', 'workflowText', 'contractText', 'caseCatalogText')
+    if ($objReference.schema -isnot [string] -or
+        $objReference.schema -cne 'PSStyleGuide.WorkflowIsolationReference.v1' -or
+        $objReference.contractText -isnot [string] -or
+        $objReference.caseCatalogText -isnot [string] -or
+        $objReference.workflowText -isnot [Collections.IDictionary]) {
+        throw 'The trusted isolation reference has an unsupported shape.'
+    }
+    & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objReference.workflowText `
+        -Name 'The isolation workflow references' -Key @('build.yml', 'markdownlint.yml')
+
+    # These slots are code-owned, not a candidate- or reference-supplied schema.
+    $arrSlots = @(
+        @{ Workflow = 'build.yml'; Job = 'verify_generated_artifacts'; Token = 'VERIFY_TIMEOUT_MINUTES' },
+        @{ Workflow = 'markdownlint.yml'; Job = 'policy'; Token = 'POLICY_TIMEOUT_MINUTES' },
+        @{ Workflow = 'markdownlint.yml'; Job = 'markdownlint'; Token = 'LINT_TIMEOUT_MINUTES' }
+    )
+    $objExpectedContract = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $objReference.contractText -Name 'The trusted isolation contract'
+    foreach ($strWorkflow in @('build.yml', 'markdownlint.yml')) {
+        $strTemplate = $objReference.workflowText[$strWorkflow]
+        if ($strTemplate -isnot [string] -or
+            [Text.Encoding]::UTF8.GetByteCount($strTemplate) -gt 131072) {
+            throw 'An isolation workflow reference has invalid text or size.'
+        }
+        $strPattern = [regex]::Escape($strTemplate)
+        foreach ($objSlot in @($arrSlots | Where-Object { $_.Workflow -ceq $strWorkflow })) {
+            $strToken = '{{' + $objSlot.Token + '}}'
+            if ([regex]::Matches($strTemplate, [regex]::Escape($strToken)).Count -ne 1 -or
+                -not $strTemplate.Contains(('    timeout-minutes: ' + $strToken + "`n"),
+                    [StringComparison]::Ordinal)) {
+                throw 'An isolation timeout slot lacks its exact job-level form.'
+            }
+            $strPattern = $strPattern.Replace([regex]::Escape($strToken),
+                ('(?<' + $objSlot.Token + '>[1-9][0-9]?)'))
+        }
+        $objMatch = [regex]::Match($CandidateText[$strPrefix + $strWorkflow],
+            ('\A' + $strPattern + '\z'), [Text.RegularExpressions.RegexOptions]::CultureInvariant,
+            [TimeSpan]::FromSeconds(2))
+        if (-not $objMatch.Success) {
+            throw 'An isolation workflow changes bytes outside its fixed typed slots.'
+        }
+        foreach ($objSlot in @($arrSlots | Where-Object { $_.Workflow -ceq $strWorkflow })) {
+            $intTimeout = [int]$objMatch.Groups[$objSlot.Token].Value
+            if ($intTimeout -lt 5 -or $intTimeout -gt 60) {
+                throw 'An isolation job timeout is outside 5 through 60 minutes.'
+            }
+            $objExpectedContract.workflowPolicy.workflows[$strWorkflow].jobs[
+                $objSlot.Job].timeoutMinutes = $intTimeout
+        }
+    }
+    $strAcquireDigest = Assert-OrdinaryHelperWorkflow -TrustedText $TrustedText[$strHelperPath] `
+        -CandidateText $CandidateText[$strHelperPath]
+    $objExpectedContract.workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.
+        verify_identity.steps[0].runSha256 = $strAcquireDigest
+
+    $strBuild = $CandidateText[$strPrefix + 'build.yml']
+    $strGeneratorStep = "      - name: Generate and verify style guide artifacts`n"
+    $strPublisherJob = "`n  publish_committed_artifacts:`n"
+    $intGeneratorStep = $strBuild.IndexOf($strGeneratorStep,
+        [StringComparison]::Ordinal)
+    $strRunStart = "        run: |`n"
+    $intRunStart = if ($intGeneratorStep -ge 0) {
+        $strBuild.IndexOf($strRunStart, $intGeneratorStep, [StringComparison]::Ordinal)
+    } else { -1 }
+    $intRunEnd = $strBuild.IndexOf($strPublisherJob, [StringComparison]::Ordinal)
+    if ([regex]::Matches($strBuild, [regex]::Escape($strGeneratorStep)).Count -ne 1 -or
+        [regex]::Matches($strBuild, [regex]::Escape($strPublisherJob)).Count -ne 1 -or
+        $intRunStart -lt 0 -or $intRunEnd -le ($intRunStart + $strRunStart.Length)) {
+        throw 'The isolation generator has unsupported fixed run boundaries.'
+    }
+    $intRunStart += $strRunStart.Length
+    $arrRunLines = $strBuild.Substring($intRunStart,
+        $intRunEnd - $intRunStart).TrimEnd("`n") -split "`n"
+    foreach ($strRunLine in $arrRunLines) {
+        if ($strRunLine.Length -ne 0 -and
+            -not $strRunLine.StartsWith('          ', [StringComparison]::Ordinal)) {
+            throw 'The isolation generator has an unexpected later step or indentation.'
+        }
+    }
+    $strCombinedRun = (($arrRunLines | ForEach-Object {
+                if ($_.Length -eq 0) { '' } else { $_.Substring(10) }
+            }) -join "`n") + "`n"
+    $strRegionStart = "# BEGIN P1 GENERATOR RESULT`n"
+    $strRegionEnd = "# END P1 GENERATOR RESULT`n"
+    if ([regex]::Matches($strCombinedRun, [regex]::Escape($strRegionStart)).Count -ne 1 -or
+        [regex]::Matches($strCombinedRun, [regex]::Escape($strRegionEnd)).Count -ne 1) {
+        throw 'The isolation generator result region lacks unique fixed boundaries.'
+    }
+    $intRegionStart = $strCombinedRun.IndexOf($strRegionStart, [StringComparison]::Ordinal) +
+        $strRegionStart.Length
+    $intRegionEnd = $strCombinedRun.IndexOf($strRegionEnd, [StringComparison]::Ordinal)
+    if ($intRegionEnd -le $intRegionStart -or
+        ($intRegionEnd + $strRegionEnd.Length) -ge $strCombinedRun.Length) {
+        throw 'The isolation generator result region has no fixed postchecks.'
+    }
+    # Exact full-workflow reference comparison above binds the executable
+    # prefix and suffix. The old result recognizer remains strict within its
+    # complete region; it is not changed to ignore arbitrary trailing code.
+    $strGeneratorRun = $strCombinedRun.Substring($intRegionStart, $intRegionEnd - $intRegionStart)
+    if (-not [string]::IsNullOrEmpty((& $script:scriptblockGetIsolationGeneratorResultCategory `
+                -Text $strGeneratorRun))) {
+        throw 'The isolation generator result flow weakens the supported domain.'
+    }
+
+    $boolTrustedIsolation = [regex]::Matches($TrustedText[$strValidatorPath],
+        $script:strIsolationMarkerPattern).Count -eq 1
+    $objMandatoryCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $objReference.caseCatalogText -Name 'The trusted mapped case catalog'
+    $strBaselineCatalog = if ($boolTrustedIsolation) {
+        $TrustedText[$strCatalogPath]
+    } else { $objReference.caseCatalogText }
+    $objBaselineCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $strBaselineCatalog -Name 'The isolation baseline catalog'
+    $objCandidateCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $CandidateText[$strCatalogPath] -Name 'The isolation candidate catalog'
+    foreach ($objCatalog in @($objMandatoryCatalog, $objBaselineCatalog, $objCandidateCatalog)) {
+        & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objCatalog `
+            -Name 'An isolation case catalog' -Key @('schema', 'cases')
+        if ($objCatalog.schema -isnot [string] -or
+            $objCatalog.schema -cne $objMandatoryCatalog.schema -or
+            $objCatalog.cases -isnot [array] -or
+            $objCatalog.cases.Count -lt 130 -or $objCatalog.cases.Count -gt 512) {
+            throw 'An isolation case catalog has an invalid schema or count.'
+        }
+    }
+    if ($objBaselineCatalog.cases.Count -lt $objMandatoryCatalog.cases.Count -or
+        $objCandidateCatalog.cases.Count -lt $objBaselineCatalog.cases.Count -or
+        $objCandidateCatalog.cases.Count -gt ($objBaselineCatalog.cases.Count + 32)) {
+        throw 'An isolation update removes cases or exceeds its increment bound.'
+    }
+    $arrCatalogDocuments = @()
+    try {
+        foreach ($strCatalogText in @($objReference.caseCatalogText, $strBaselineCatalog,
+                $CandidateText[$strCatalogPath])) {
+            $arrCatalogDocuments += [System.Text.Json.JsonDocument]::Parse($strCatalogText)
+        }
+        for ($intCatalog = 0; $intCatalog -lt 2; $intCatalog++) {
+            $arrSourceCases = @($arrCatalogDocuments[$intCatalog].RootElement.
+                GetProperty('cases').EnumerateArray())
+            $arrTargetCases = @($arrCatalogDocuments[$intCatalog + 1].RootElement.
+                GetProperty('cases').EnumerateArray())
+            for ($intIndex = 0; $intIndex -lt $arrSourceCases.Count; $intIndex++) {
+                if ((& $script:scriptblockConvertToCanonicalJsonText -Value $arrSourceCases[$intIndex]) -cne
+                    (& $script:scriptblockConvertToCanonicalJsonText -Value $arrTargetCases[$intIndex])) {
+                    throw 'An isolation update changes or reorders a required or accepted case.'
+                }
+            }
+        }
+    } finally {
+        foreach ($objDocument in $arrCatalogDocuments) { $objDocument.Dispose() }
+    }
+    $setNames = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $setIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $intLastCase = 0
+    foreach ($objCase in $objBaselineCatalog.cases) {
+        if (-not $setNames.Add([string]$objCase.semanticKey) -or
+            -not $setIds.Add([string]$objCase.id)) {
+            throw 'The isolation baseline has duplicate case identities.'
+        }
+        if ($objCase.id -cmatch '^PS-P1-WFPOL-([0-9]{3})$') {
+            $intLastCase = [Math]::Max($intLastCase, [int]$Matches[1])
+        }
+    }
+    $boolNeedsTrustedCatalogValidation = $false
+    for ($intIndex = $objBaselineCatalog.cases.Count;
+        $intIndex -lt $objCandidateCatalog.cases.Count; $intIndex++) {
+        $objCase = $objCandidateCatalog.cases[$intIndex]
+        $arrKeys = @('id', 'semanticKey', 'domain', 'workflow', 'operation', 'expected')
+        if ($objCase.Contains('expectedCategory')) { $arrKeys += 'expectedCategory' }
+        & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objCase `
+            -Name 'An isolation new case' -Key $arrKeys
+        $intLastCase++
+        if ($intLastCase -gt 999 -or $objCase.id -isnot [string] -or
+            $objCase.id -cne ('PS-P1-WFPOL-{0:D3}' -f $intLastCase) -or
+            -not $setIds.Add($objCase.id) -or $objCase.semanticKey -isnot [string] -or
+            $objCase.semanticKey -cnotmatch '^[a-z0-9-]{1,128}$' -or
+            -not $setNames.Add($objCase.semanticKey) -or $objCase.domain -isnot [string] -or
+            $objCase.domain -cne 'workflow' -or $objCase.workflow -isnot [string] -or
+            $objCase.workflow -cnotin @('build.yml', 'markdownlint.yml',
+                'pull-request-body-identity.yml') -or
+            $objCase.expected -isnot [bool] -or $objCase.expected -or
+            $objCase.operation -isnot [Collections.IDictionary] -or
+            $objCase.operation.type -isnot [string] -or
+            $objCase.operation.path -isnot [string]) {
+            throw 'An isolation new case is not a sequential negative workflow fixture.'
+        }
+        if ($objCase.Contains('expectedCategory')) {
+            & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objCase.operation `
+                -Name 'An isolation generator fixture' -Key @('type', 'path', 'from', 'to')
+            # Only this exact P1 pointer maps to the existing independent proof.
+            if ($objCase.workflow -cne 'build.yml' -or
+                $objCase.operation.path -cne '/jobs/verify_generated_artifacts/steps/2/run') {
+                throw 'An isolation generator fixture targets an unsupported run.'
+            }
+            if ($objCase.operation.from -isnot [string] -or
+                [string]::IsNullOrEmpty($objCase.operation.from) -or
+                $objCase.operation.to -isnot [string] -or
+                [regex]::Matches($strCombinedRun,
+                    [regex]::Escape($objCase.operation.from)).Count -ne 1 -or
+                [regex]::Matches($strGeneratorRun,
+                    [regex]::Escape($objCase.operation.from)).Count -ne 1 -or
+                $objCase.operation.to.Contains('# BEGIN P1 GENERATOR RESULT',
+                    [StringComparison]::Ordinal) -or
+                $objCase.operation.to.Contains('# END P1 GENERATOR RESULT',
+                    [StringComparison]::Ordinal)) {
+                throw 'An isolation generator fixture escapes its fixed result region.'
+            }
+            if ($objCase.operation.type -cne 'replace' -or
+                $objCase.expectedCategory -isnot [string] -or
+                $objCase.expectedCategory -cnotmatch '^generator-result-[A-Za-z-]+$') {
+                throw 'An isolation generator fixture has an unsupported proof type.'
+            }
+            $strPreparedResult = $strGeneratorRun.Replace(
+                $objCase.operation.from, $objCase.operation.to)
+            $strPreparedCategory = & $script:scriptblockGetIsolationGeneratorResultCategory `
+                -Text $strPreparedResult
+            if ($strPreparedResult -ceq $strGeneratorRun -or
+                [string]::IsNullOrEmpty($strPreparedCategory) -or
+                $strPreparedCategory -cne $objCase.expectedCategory) {
+                throw 'An isolation generator mutation did not fail in its declared category.'
+            }
+        } else {
+            $arrOperationKeys = switch -CaseSensitive ($objCase.operation.type) {
+                'set' { @('type', 'path', 'value') }
+                'delete' { @('type', 'path') }
+                'append' { @('type', 'path', 'value') }
+                'append-copy' { @('type', 'path', 'source') }
+                'swap' { @('type', 'path', 'otherPath') }
+                'replace' { @('type', 'path', 'from', 'to') }
+                default { throw 'An isolation fixture uses an unsupported operation.' }
+            }
+            & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objCase.operation `
+                -Name 'An isolation fixture operation' -Key $arrOperationKeys
+            foreach ($strPointerKey in @('path', 'source', 'otherPath')) {
+                if ($objCase.operation.Contains($strPointerKey) -and
+                    ($objCase.operation[$strPointerKey] -isnot [string] -or
+                        $objCase.operation[$strPointerKey] -cnotmatch '^/[^\x00-\x20]{1,1023}$' -or
+                        $objCase.operation[$strPointerKey] -cmatch
+                        '(?:^|/)(?:__proto__|constructor|prototype)(?:/|$)')) {
+                    throw 'An isolation fixture has an unsafe or invalid JSON pointer.'
+                }
+            }
+            if ($objCase.operation.type -ceq 'replace' -and
+                ($objCase.operation.from -isnot [string] -or
+                    [string]::IsNullOrEmpty($objCase.operation.from) -or
+                    $objCase.operation.to -isnot [string])) {
+                throw 'An isolation replacement fixture has invalid text operands.'
+            }
+            $arrPermissionPaths = if ($objCase.workflow -ceq 'build.yml') {
+                @('/permissions', '/jobs/verify_generated_artifacts/permissions')
+            } elseif ($objCase.workflow -ceq 'markdownlint.yml') {
+                @('/permissions', '/jobs/policy/permissions', '/jobs/markdownlint/permissions')
+            } else { @() }
+            $boolClosedPermission = $objCase.operation.type -ceq 'set' -and
+                $objCase.operation.path -cin $arrPermissionPaths -and
+                (& $script:scriptblockConvertToCanonicalJsonText -Value $objCase.operation.value) -ceq
+                '{"contents":"write"}'
+            if (-not $boolClosedPermission) {
+                if (-not $boolTrustedIsolation) {
+                    throw 'An initial isolation fixture has no independent closed predicate.'
+                }
+                foreach ($strWorkflowName in @('build.yml', 'markdownlint.yml',
+                        'pull-request-body-identity.yml')) {
+                    if ($TrustedText[$strPrefix + $strWorkflowName] -cne
+                        $CandidateText[$strPrefix + $strWorkflowName]) {
+                        throw 'Generic isolation cases require unchanged trusted workflow inputs.'
+                    }
+                }
+                $boolNeedsTrustedCatalogValidation = $true
+            }
+        }
+    }
+
+    $objCandidateContract = & $script:scriptblockConvertFromStrictJsonHashtable `
+        -Text $CandidateText[$strContractPath] -Name 'The isolation candidate contract'
+    foreach ($strIdentity in @('caseCatalog', 'validatorIdentity')) {
+        & $script:scriptblockAssertExactDictionaryKeySet `
+            -Dictionary $objCandidateContract[$strIdentity] `
+            -Name 'An isolation content identity' -Key @('path', 'sha256')
+        $strIdentityPath = if ($strIdentity -ceq 'caseCatalog') {
+            $strCatalogPath
+        } else { $strValidatorPath }
+        $strDigest = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData(
+                [Text.UTF8Encoding]::new($false).GetBytes($CandidateText[$strIdentityPath])
+            )).ToLowerInvariant()
+        $objExpectedContract[$strIdentity].sha256 = $strDigest
+    }
+    $objContractDocument = $null
+    $objReferenceContractDocument = $null
+    try {
+        $objContractDocument = [System.Text.Json.JsonDocument]::Parse($CandidateText[$strContractPath])
+        $objReferenceContractDocument = [System.Text.Json.JsonDocument]::Parse($objReference.contractText)
+        $objExpectedView = [ordered]@{}
+        foreach ($objProperty in $objReferenceContractDocument.RootElement.EnumerateObject()) {
+            $objExpectedView[$objProperty.Name] = if ($objProperty.Name -cin
+                @('workflowPolicy', 'caseCatalog', 'validatorIdentity')) {
+                $objExpectedContract[$objProperty.Name]
+            } else { $objProperty.Value }
+        }
+        if ((& $script:scriptblockConvertToCanonicalJsonText -Value $objExpectedView) -cne
+            (& $script:scriptblockConvertToCanonicalJsonText -Value $objContractDocument.RootElement)) {
+            throw 'The isolation contract changes rules or has inconsistent derived identities.'
+        }
+        $objIdentityView = [ordered]@{}
+        foreach ($objProperty in $objContractDocument.RootElement.EnumerateObject()) {
+            if ($objProperty.Name -cne 'validatorIdentity') {
+                $objIdentityView[$objProperty.Name] = $objProperty.Value
+            }
+        }
+        $strCanonicalContract = & $script:scriptblockConvertToCanonicalJsonText -Value $objIdentityView
+    } finally {
+        if ($null -ne $objContractDocument) { $objContractDocument.Dispose() }
+        if ($null -ne $objReferenceContractDocument) { $objReferenceContractDocument.Dispose() }
+    }
+    $strCanonicalDigest = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData(
+            [Text.UTF8Encoding]::new($false).GetBytes($strCanonicalContract)
+        )).ToLowerInvariant()
+    $strReferenceValidator = Read-IsolationPolicyText -RepositoryRootPath $RepositoryRootPath `
+        -Revision $TrustedRevision -Path ($strPrefix + 'workflow-isolation-validator.reference.txt')
+    $strVersionPattern = "(?m)^const VALIDATOR_VERSION = '([0-9]+)\.([0-9]+)\.([0-9]+)';$"
+    $strDigestPattern = "(?m)^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '[0-9a-f]{64}';$"
+    foreach ($strValidator in @($TrustedText[$strValidatorPath], $strReferenceValidator,
+            $CandidateText[$strValidatorPath])) {
+        if ([regex]::Matches($strValidator, $strVersionPattern).Count -ne 1 -or
+            [regex]::Matches($strValidator, $strDigestPattern).Count -ne 1) {
+            throw 'An isolation validator has missing or duplicate identity literals.'
+        }
+    }
+    if ([regex]::Matches($strReferenceValidator,
+            $script:strIsolationMarkerPattern).Count -ne 1) {
+        throw 'The trusted isolation validator lacks its exact domain marker.'
+    }
+    $objVersion = [regex]::Match($TrustedText[$strValidatorPath], $strVersionPattern)
+    $objReferenceVersion = [regex]::Match($strReferenceValidator, $strVersionPattern)
+    $intNextPatch = [int]$objVersion.Groups[3].Value + 1
+    if ($objVersion.Groups[1].Value -cne $objReferenceVersion.Groups[1].Value -or
+        $objVersion.Groups[2].Value -cne $objReferenceVersion.Groups[2].Value -or
+        $intNextPatch -lt [int]$objReferenceVersion.Groups[3].Value -or $intNextPatch -gt 999999) {
+        throw 'The isolation validator version is outside its bounded patch series.'
+    }
+    $strNextVersion = "const VALIDATOR_VERSION = '{0}.{1}.{2}';" -f
+        $objVersion.Groups[1].Value, $objVersion.Groups[2].Value, $intNextPatch
+    $strExpectedValidator = [regex]::Replace($strReferenceValidator, $strVersionPattern, $strNextVersion)
+    $strExpectedValidator = [regex]::Replace($strExpectedValidator, $strDigestPattern,
+        "const EXPECTED_CONTRACT_CANONICAL_SHA256 = '$strCanonicalDigest';")
+    if (-not $strExpectedValidator.EndsWith("`n", [StringComparison]::Ordinal) -or
+        -not $CandidateText[$strValidatorPath].StartsWith($strExpectedValidator,
+            [StringComparison]::Ordinal)) {
+        throw 'An isolation candidate changes unsupported executable validator bytes.'
+    }
+    $strSuffix = $CandidateText[$strValidatorPath].Substring($strExpectedValidator.Length)
+    if ($strSuffix.Length -gt 8192 -or $strSuffix -cnotmatch '\A(?:// [\x20-\x7e]*\n|\n)*\z' -or
+        $strSuffix.Contains('EXPECTED_CONTRACT_CANONICAL_SHA256', [StringComparison]::Ordinal) -or
+        $strSuffix.Contains('VALIDATOR_VERSION', [StringComparison]::Ordinal)) {
+        throw 'An isolation validator suffix is not bounded inert line comments.'
+    }
+    if ($boolNeedsTrustedCatalogValidation -and $script:boolValidateOrdinaryCaseCatalog) {
+        # The earlier no-switch call establishes domain membership only. The
+        # instruction workflow requires this later outcome gate on the same
+        # inputs. Never execute the inert reference or candidate validator.
+        $objCatalogPreflight = Invoke-BoundedProcessByte -FileName 'node' `
+            -ArgumentList @((Join-Path $RepositoryRootPath $strValidatorPath), '--preflight') `
+            -MaximumBytes 65536 -TimeoutMilliseconds 60000
+        if ($objCatalogPreflight.ExitCode -ne 0) {
+            throw 'The trusted isolation catalog preflight failed.'
+        }
+        $objCatalogOutcome = Invoke-BoundedProcessByte -FileName 'node' `
+            -ArgumentList @((Join-Path $RepositoryRootPath $strValidatorPath), '--ordinary-case-catalog-data') `
+            -InputBytes ([Text.UTF8Encoding]::new($false, $true).GetBytes($CandidateText[$strCatalogPath])) `
+            -MaximumBytes 65536 -TimeoutMilliseconds 60000
+        if ($objCatalogOutcome.ExitCode -ne 0) {
+            throw 'The trusted isolation case outcomes failed.'
+        }
+    }
+}
+
 function Assert-OrdinaryWorkflowPolicyContent {
     # .SYNOPSIS
     # Validates the closed ordinary workflow-policy tuple as inert Git data.
@@ -2038,6 +2593,14 @@ function Assert-OrdinaryWorkflowPolicyContent {
         '.github/workflows/pull-request-body-identity.yml',
         '.github/workflows/build.yml'
     )
+    $strCandidateSelector = Read-IsolationPolicyText `
+        -RepositoryRootPath $RepositoryRootPath -Revision $HeadRevision `
+        -Path '.github/workflows/Validate-WorkflowPolicy.mjs'
+    $boolWorkflowIsolation = [regex]::Matches($strCandidateSelector,
+        $script:strIsolationMarkerPattern).Count -eq 1
+    if ($boolWorkflowIsolation) {
+        $arrOrdinaryPaths += '.github/workflows/markdownlint.yml'
+    }
     $setOrdinaryPaths = [Collections.Generic.HashSet[string]]::new(
         [string[]]$arrOrdinaryPaths, [StringComparer]::Ordinal)
     $setOrdinaryWorkflows = [Collections.Generic.HashSet[string]]::new(
@@ -2105,6 +2668,35 @@ function Assert-OrdinaryWorkflowPolicyContent {
         $arrCommitAndParents = @($strHistoryRow -split ' ')
         $strHistoryCommit = $arrCommitAndParents[0]
         $arrHistoryParents = @($arrCommitAndParents | Select-Object -Skip 1)
+        if ($boolWorkflowIsolation) {
+            if (++$intHistoryGitCalls -gt 512) {
+                throw 'The ordinary history exceeds 512 Git calls.'
+            }
+            $objHistoryEntry = Invoke-BoundedProcessByte -FileName 'git' `
+                -MaximumBytes 8192 -ArgumentList (
+                    @('--literal-pathspecs', '-C', $RepositoryRootPath,
+                        'ls-tree', '-z', $strHistoryCommit, '--') +
+                    $arrOrdinaryPaths)
+            $strHistoryEntry = ConvertFrom-StrictUtf8Text -Bytes $objHistoryEntry.Bytes `
+                -Name 'The isolation history entries' -AllowNul
+            $arrHistoryEntries = @($strHistoryEntry -split "`0" | Where-Object {
+                    -not [string]::IsNullOrEmpty($_)
+                })
+            if ($objHistoryEntry.ExitCode -ne 0 -or
+                $arrHistoryEntries.Count -ne $arrOrdinaryPaths.Count) {
+                throw 'The isolation history has missing or unbounded entries.'
+            }
+            $setHistoryEntryPaths = [Collections.Generic.HashSet[string]]::new(
+                [StringComparer]::Ordinal)
+            foreach ($strHistoryEntryRow in $arrHistoryEntries) {
+                if ($strHistoryEntryRow -cnotmatch
+                    '^100644 blob [0-9a-f]{40}\t([^\x00]+)$' -or
+                    -not $setOrdinaryPaths.Contains($Matches[1]) -or
+                    -not $setHistoryEntryPaths.Add($Matches[1])) {
+                    throw 'The isolation history contains a non-regular or duplicate entry.'
+                }
+            }
+        }
         $intHistoryParentCount += $arrHistoryParents.Count
         if ($intHistoryParentCount -gt 256) {
             throw 'The ordinary candidate graph exceeds 256 parent edges.'
@@ -2202,9 +2794,8 @@ function Assert-OrdinaryWorkflowPolicyContent {
                 -not [StringComparer]::Ordinal.Equals($Matches[2], $strPath)) {
                 throw 'An ordinary tuple path is missing, linked or not a regular blob.'
             }
-            $intMaximumBytes = if ($strPath -cin @(
-                    $arrOrdinaryPaths[3], $arrOrdinaryPaths[4]
-                )) { 131072 } else { 524288 }
+            $intMaximumBytes = if ($strPath.EndsWith('.yml',
+                    [StringComparison]::Ordinal)) { 131072 } else { 524288 }
             $arrBytes = @(Read-GitBlobByte -RepositoryRootPath $RepositoryRootPath `
                     -BlobId $Matches[1] -MaximumBytes $intMaximumBytes)
             $strText = ConvertFrom-StrictUtf8Text -Bytes $arrBytes -Name $strPath
@@ -2220,6 +2811,16 @@ function Assert-OrdinaryWorkflowPolicyContent {
     $strValidatorPath = $arrOrdinaryPaths[2]
     $strWorkflowPath = $arrOrdinaryPaths[3]
     $strBuildPath = $arrOrdinaryPaths[4]
+    if ($boolWorkflowIsolation) {
+        Assert-WorkflowIsolationReferenceContent `
+            -RepositoryRootPath $RepositoryRootPath -TrustedRevision $TrustedRevision `
+            -TrustedText $dictionaryTrustedText -CandidateText $dictionaryCandidateText
+        return
+    }
+    if ([regex]::Matches($dictionaryTrustedText[$strValidatorPath],
+            $script:strIsolationMarkerPattern).Count -eq 1) {
+        throw 'The isolation domain cannot downgrade to the ordinary topology.'
+    }
     $boolTrustedStrengthened = $dictionaryTrustedText[$strValidatorPath].Contains(
         'const GENERATOR_RESULT_PREDICATES = Object.freeze([',
         [StringComparison]::Ordinal)
@@ -2548,14 +3149,17 @@ function Assert-OrdinaryWorkflowPolicyContent {
     }
     if ($script:boolValidateOrdinaryCaseCatalog -and
         (-not $boolCandidateStrengthened -or $boolTrustedStrengthened)) {
-        $null = & node (Join-Path $RepositoryRootPath $strValidatorPath) --preflight
-        if ($LASTEXITCODE -ne 0) {
+        $objCatalogPreflight = Invoke-BoundedProcessByte -FileName 'node' `
+            -ArgumentList @((Join-Path $RepositoryRootPath $strValidatorPath), '--preflight') `
+            -MaximumBytes 65536 -TimeoutMilliseconds 60000
+        if ($objCatalogPreflight.ExitCode -ne 0) {
             throw 'The trusted ordinary catalog preflight failed.'
         }
-        $null = $dictionaryCandidateText[$strCatalogPath] |
-            & node (Join-Path $RepositoryRootPath $strValidatorPath) `
-                --ordinary-case-catalog-data
-        if ($LASTEXITCODE -ne 0) {
+        $objCatalogOutcome = Invoke-BoundedProcessByte -FileName 'node' `
+            -ArgumentList @((Join-Path $RepositoryRootPath $strValidatorPath), '--ordinary-case-catalog-data') `
+            -InputBytes ([Text.UTF8Encoding]::new($false, $true).GetBytes($dictionaryCandidateText[$strCatalogPath])) `
+            -MaximumBytes 65536 -TimeoutMilliseconds 60000
+        if ($objCatalogOutcome.ExitCode -ne 0) {
             throw 'The trusted ordinary case outcomes failed.'
         }
     }
@@ -4450,6 +5054,134 @@ function Assert-SemanticInvariant {
 }
 
 if ($SelfTest) {
+    $scriptblockTestBoundedProcessInput = {
+        param([Parameter(Mandatory)][string] $Root)
+        $strEcho = 'const fs=require("node:fs");process.stdout.write(fs.readFileSync(0));'
+        foreach ($strInput in @('', 'no-newline', "one-LF`n", "unicode-$([char]0xe9)-$([char]0x6f22)-$([char]0xd83d)$([char]0xde00)`n")) {
+            $arrInput = [Text.UTF8Encoding]::new($false, $true).GetBytes($strInput)
+            $objEcho = Invoke-BoundedProcessByte -FileName 'node' -ArgumentList @('-e', $strEcho) `
+                -InputBytes $arrInput -MaximumBytes 1024
+            if ($objEcho.ExitCode -ne 0 -or $objEcho.Error.Length -ne 0 -or
+                [Convert]::ToBase64String($objEcho.Bytes) -cne [Convert]::ToBase64String($arrInput)) {
+                throw 'Exact-byte stdin changed its content or EOF.'
+            }
+        }
+        $arrMaximum = [byte[]]::new(524288)
+        $objMaximum = Invoke-BoundedProcessByte -FileName 'node' -ArgumentList @('-e', $strEcho) `
+            -InputBytes $arrMaximum -MaximumBytes 524288
+        if ($objMaximum.ExitCode -ne 0 -or $objMaximum.Bytes.Length -ne 524288 -or
+            [Convert]::ToBase64String($objMaximum.Bytes) -cne [Convert]::ToBase64String($arrMaximum)) {
+            throw 'The maximum stdin buffer did not round trip.'
+        }
+        $strStartSentinel = Join-Path $Root 'oversized-input-started'
+        $boolInputRejected = $false
+        try {
+            $null = Invoke-BoundedProcessByte -FileName 'node' `
+                -ArgumentList @('-e', 'require("node:fs").writeFileSync(process.argv[1],"started");', $strStartSentinel) `
+                -InputBytes ([byte[]]::new(524289)) -MaximumBytes 1
+        } catch {
+            if (-not $_.Exception.Message.Contains('input exceeds 524288 bytes', [StringComparison]::Ordinal)) { throw }
+            $boolInputRejected = $true
+        }
+        if (-not $boolInputRejected -or [IO.File]::Exists($strStartSentinel)) {
+            throw 'Oversized stdin was not rejected before startup.'
+        }
+        $strBackpressure = 'process.stdout.write(Buffer.alloc(65536,65),()=>process.stderr.write(Buffer.alloc(65536,66),()=>process.stdin.resume()));'
+        $objBackpressure = Invoke-BoundedProcessByte -FileName 'node' -ArgumentList @('-e', $strBackpressure) `
+            -InputBytes $arrMaximum -MaximumBytes 65536
+        if ($objBackpressure.ExitCode -ne 0 -or $objBackpressure.Bytes.Length -ne 65536 -or
+            $objBackpressure.Error.Length -ne 65536) {
+            throw 'Concurrent bounded pipes did not drain.'
+        }
+        foreach ($objProbe in @(
+                @{ Code = 'process.stdin.resume();process.stdout.write(Buffer.alloc(1025));'; Maximum = 1024; Error = 'output exceeded 1024 bytes' },
+                @{ Code = 'process.stdin.resume();process.stdout.write(Buffer.alloc(65537));'; Maximum = 65536; Error = 'output exceeded 65536 bytes' },
+                @{ Code = 'process.stdin.resume();process.stderr.write(Buffer.alloc(65537));'; Maximum = 1; Error = 'error output exceeded 65536 bytes' },
+                @{ Code = 'setInterval(()=>{},1000);'; Maximum = 1; Error = 'exceeded its time limit' }
+            )) {
+            $strFailure = ''
+            try {
+                $null = Invoke-BoundedProcessByte -FileName 'node' -ArgumentList @('-e', $objProbe.Code) `
+                    -InputBytes $arrMaximum -MaximumBytes $objProbe.Maximum -TimeoutMilliseconds 1000
+            } catch {
+                $strFailure = $_.Exception.Message
+            }
+            if (-not $strFailure.Contains($objProbe.Error, [StringComparison]::Ordinal)) {
+                throw "A bounded process refusal failed: $($objProbe.Error)."
+            }
+        }
+        $objExit = Invoke-BoundedProcessByte -FileName 'node' -ArgumentList @('-e', 'process.exit(7);') `
+            -MaximumBytes 1
+        if ($objExit.ExitCode -ne 7) { throw 'A native failure was not preserved.' }
+        $boolEarlyExitRejected = $false
+        try {
+            $objEarlyExit = Invoke-BoundedProcessByte -FileName 'node' -ArgumentList @('-e', 'process.exit(7);') `
+                -InputBytes $arrMaximum -MaximumBytes 1
+            $boolEarlyExitRejected = $objEarlyExit.ExitCode -eq 7
+        } catch {
+            # A pipe-write failure is also rejection, never successful input.
+            $boolEarlyExitRejected = $_.Exception.Message -match '(?i)pipe|closed|ended'
+            if (-not $boolEarlyExitRejected) { throw }
+        }
+        if (-not $boolEarlyExitRejected) { throw 'Early child exit accepted incomplete input.' }
+        $objNoInput = Invoke-BoundedProcessByte -FileName 'git' -ArgumentList @('--version') -MaximumBytes 1024
+        if ($objNoInput.ExitCode -ne 0 -or $objNoInput.Bytes.Length -eq 0) {
+            throw 'The no-input process contract regressed.'
+        }
+    }
+    # Historical source is inert test data. Do not use the moving product as
+    # the old-domain fixture after the isolation product has been installed.
+    $scriptblockReadOrdinarySelfTestReference = {
+        param([Parameter(Mandatory)][string] $Path)
+        $objInfo = Get-Item -LiteralPath $Path -Force -ErrorAction Stop
+        if ($objInfo -isnot [IO.FileInfo] -or
+            ($objInfo.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw 'The ordinary self-test reference must be a regular file.'
+        }
+        if ($objInfo.Length -gt 262144) {
+            throw 'The ordinary self-test reference exceeds 262144 bytes.'
+        }
+        $arrBytes = [IO.File]::ReadAllBytes($Path)
+        if ($arrBytes.Length -gt 262144) {
+            throw 'The ordinary self-test reference exceeds 262144 bytes.'
+        }
+        $strText = ConvertFrom-StrictUtf8Text -Bytes $arrBytes -Name 'The ordinary self-test reference'
+        $objReference = & $script:scriptblockConvertFromStrictJsonHashtable `
+            -Text $strText -Name 'The ordinary self-test reference'
+        & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objReference `
+            -Key @('schema', 'files') -Name 'The ordinary self-test reference'
+        if ($objReference.schema -isnot [string] -or
+            $objReference.schema -cne 'PSStyleGuide.OrdinarySelfTestReference.v1' -or
+            $objReference.files -isnot [Collections.IDictionary]) {
+            throw 'The ordinary self-test reference has an invalid schema.'
+        }
+        & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objReference.files `
+            -Key @('build.yml', 'markdownlint.yml', 'pull-request-body-identity.yml',
+                'Validate-WorkflowPolicy.mjs', 'workflow-policy-contract.json',
+                'workflow-policy-cases.json') -Name 'The ordinary self-test file inventory'
+        foreach ($objText in $objReference.files.Values) {
+            if ($objText -isnot [string] -or [string]::IsNullOrEmpty($objText)) {
+                throw 'An ordinary self-test reference text is invalid.'
+            }
+            $null = ConvertFrom-StrictUtf8Text -Bytes ([Text.UTF8Encoding]::new($false, $true).GetBytes($objText)) `
+                -Name 'An ordinary self-test reference text'
+        }
+        return $objReference
+    }
+    $strOrdinarySelfTestReferencePath = Join-Path $RepositoryRootPath `
+        '.github/workflows/workflow-ordinary-selftest-reference.json'
+    $objOrdinarySelfTestReference = & $scriptblockReadOrdinarySelfTestReference `
+        -Path $strOrdinarySelfTestReferencePath
+    # Only this SelfTest invocation can substitute historical reference data.
+    # The production reader and its authenticated Git path remain unchanged.
+    $script:dictionaryPolicyReferenceText.Clear()
+    foreach ($strHistoricalReferenceName in @('Validate-WorkflowPolicy.mjs',
+            'workflow-policy-contract.json', 'workflow-policy-cases.json',
+            'pull-request-body-identity.yml')) {
+        $script:dictionaryPolicyReferenceText.Add(
+            '.github/workflows/' + $strHistoricalReferenceName,
+            $objOrdinarySelfTestReference.files[$strHistoricalReferenceName])
+    }
     $strSelfTestSystemTempRoot = [IO.Path]::GetFullPath(
         [IO.Path]::GetTempPath()
     )
@@ -4459,6 +5191,53 @@ if ($SelfTest) {
     )
     [void] [IO.Directory]::CreateDirectory($strSelfTestRoot)
     try {
+        & $scriptblockTestBoundedProcessInput -Root $strSelfTestRoot
+        $strFixtureProbe = Join-Path $strSelfTestRoot 'ordinary-reference.json'
+        $strFixtureSource = [IO.File]::ReadAllText($strOrdinarySelfTestReferencePath)
+        foreach ($objProbe in @(
+                @{ Name = 'maximum'; Text = $strFixtureSource + (' ' * (262144 - [Text.Encoding]::UTF8.GetByteCount($strFixtureSource))); Error = '' },
+                @{ Name = 'overflow'; Text = ' ' * 262145; Error = 'exceeds 262144 bytes' },
+                @{ Name = 'malformed'; Text = '{'; Error = 'is malformed JSON' },
+                @{ Name = 'duplicate'; Text = '{"schema":1,"schema":2}'; Error = 'is malformed JSON' },
+                @{ Name = 'extra'; Text = '{"schema":1,"files":{},"extra":true}'; Error = 'unexpected key set' },
+                @{ Name = 'schema'; Text = '{"schema":1,"files":{}}'; Error = 'invalid schema' }
+                @{ Name = 'schema-type'; Text = '{"schema":["PSStyleGuide.OrdinarySelfTestReference.v1"],"files":{}}'; Error = 'invalid schema' }
+            )) {
+            [IO.File]::WriteAllText($strFixtureProbe, $objProbe.Text, [Text.UTF8Encoding]::new($false))
+            $strProbeFailure = ''
+            try {
+                $null = & $scriptblockReadOrdinarySelfTestReference -Path $strFixtureProbe
+            } catch {
+                $strProbeFailure = $_.Exception.Message
+            }
+            if (($objProbe.Error.Length -eq 0 -and $strProbeFailure.Length -ne 0) -or
+                ($objProbe.Error.Length -gt 0 -and -not $strProbeFailure.Contains($objProbe.Error, [StringComparison]::Ordinal))) {
+                throw "The ordinary reference probe failed: $($objProbe.Name)."
+            }
+        }
+        foreach ($strInvalidFixturePath in @($strSelfTestRoot, (Join-Path $strSelfTestRoot 'missing-reference.json'))) {
+            $boolFixtureRejected = $false
+            try {
+                $null = & $scriptblockReadOrdinarySelfTestReference -Path $strInvalidFixturePath
+            } catch {
+                $boolFixtureRejected = $_.Exception.Message.Contains('must be a regular file', [StringComparison]::Ordinal) -or
+                    $_.CategoryInfo.Category -eq [Management.Automation.ErrorCategory]::ObjectNotFound
+                if (-not $boolFixtureRejected) { throw }
+            }
+            if (-not $boolFixtureRejected) { throw 'An unavailable ordinary fixture passed.' }
+        }
+        if ([Environment]::OSVersion.Platform -eq [PlatformID]::Unix) {
+            $strLinkedFixture = Join-Path $strSelfTestRoot 'linked-reference.json'
+            $null = [IO.File]::CreateSymbolicLink($strLinkedFixture, $strOrdinarySelfTestReferencePath)
+            $boolLinkedFixtureRejected = $false
+            try {
+                $null = & $scriptblockReadOrdinarySelfTestReference -Path $strLinkedFixture
+            } catch {
+                if (-not $_.Exception.Message.Contains('must be a regular file', [StringComparison]::Ordinal)) { throw }
+                $boolLinkedFixtureRejected = $true
+            }
+            if (-not $boolLinkedFixtureRejected) { throw 'A linked historical reference passed.' }
+        }
         & git -C $strSelfTestRoot init --quiet --object-format=sha1
         if ($LASTEXITCODE -ne 0) {
             throw 'Could not initialize the empty-blob self-test repository.'
@@ -4839,7 +5618,12 @@ if ($SelfTest) {
     foreach ($objInvariantSpec in $arrNewInvariantSpec) {
         $strInvariantSourcePath =
             Join-Path $RepositoryRootPath $objInvariantSpec.Path
-        $arrInvariantBytes = [IO.File]::ReadAllBytes($strInvariantSourcePath)
+        $strInvariantFileName = [IO.Path]::GetFileName($objInvariantSpec.Path)
+        $arrInvariantBytes = if ($objOrdinarySelfTestReference.files.Contains($strInvariantFileName)) {
+            [Text.UTF8Encoding]::new($false).GetBytes($objOrdinarySelfTestReference.files[$strInvariantFileName])
+        } else {
+            [IO.File]::ReadAllBytes($strInvariantSourcePath)
+        }
         $strInvariantText = ConvertFrom-StrictUtf8Text `
             -Bytes $arrInvariantBytes -Name $objInvariantSpec.Path
         $hashtableNewInvariantText[$objInvariantSpec.Path] = $strInvariantText
@@ -6062,12 +6846,49 @@ if ($SelfTest) {
 
         # Run only the trusted checkout's CLI. Candidate catalogs stay inert.
         # This separate deadline does not reduce the Git builder's time budget.
+        # Historical invariant/transition fixtures are complete. Live CLI
+        # probes below must use the installed product, not the old fixture.
+        $script:dictionaryPolicyReferenceText.Clear()
         $strOrdinaryCliProbe = @'
 import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 const source = process.argv[1];
 const diagnosticControl = process.argv[2] ?? '';
+const selectedRow = process.argv[3] ?? '0';
+const replayMode = process.argv[4];
+function rejectCapture(kind) {
+  process.stdout.write('ordinary-cli-capture-rejected kind=' + kind);
+  process.exit(1);
+}
+if (!/^[0-2]$/.test(selectedRow)) throw new Error('Invalid fixed CLI row selector');
+if (diagnosticControl === 'capture' && (selectedRow !== '0' || replayMode !== undefined)) {
+  rejectCapture('request');
+}
+let captured;
+if (replayMode !== undefined) {
+  if (replayMode !== 'replay' || selectedRow !== '0'
+    || !['none', 'malformed', 'null', 'array'].includes(diagnosticControl)) {
+    rejectCapture('request');
+  }
+  const bytes = Buffer.alloc(65537);
+  let length = 0;
+  while (length < bytes.length) {
+    const count = fs.readSync(0, bytes, length, bytes.length - length, null);
+    if (count === 0) break;
+    length += count;
+  }
+  if (length > 65536) rejectCapture('limit');
+  let capturedText;
+  try { capturedText = new TextDecoder('utf-8', { fatal: true }).decode(bytes.subarray(0, length)); }
+  catch { rejectCapture('encoding'); }
+  try { captured = JSON.parse(capturedText); } catch { rejectCapture('json'); }
+  if (captured === null || typeof captured !== 'object' || Array.isArray(captured)
+    || Object.keys(captured).sort().join(',') !== 'status,stdout' || captured.status !== 0
+    || typeof captured.stdout !== 'string' || Buffer.byteLength(captured.stdout) > 65536) {
+    rejectCapture('shape');
+  }
+}
 const directory = path.join(source, '.github/workflows');
 const catalog = JSON.parse(fs.readFileSync(path.join(directory, 'workflow-policy-cases.json'), 'utf8'));
 const next = Math.max(...catalog.cases.filter(item => item.id.startsWith('PS-P1-WFPOL-'))
@@ -6091,7 +6912,7 @@ function fail(kind, index, row, child, category) {
   const errorCode = ['EACCES', 'EAGAIN', 'EMFILE', 'ENFILE', 'ENOENT', 'ENOBUFS', 'ENOMEM',
     'ETIMEDOUT'].includes(child.error?.code) ? child.error.code
     : child.error?.code == null ? 'NONE' : 'OTHER';
-  const safeCategory = ['case-catalog', 'case-catalog-identity', 'case-operation', 'case-result',
+  const safeCategory = ['case-catalog', 'case-catalog-identity', 'case-operation', 'case-result', 'case-file',
     'ordinary-case-prefix', 'ordinary-case-self-test', 'ordinary-case-shape', 'tool-failure']
     .includes(category) ? category : category == null ? 'NONE' : 'OTHER';
   fs.writeSync(1, `ordinary-cli-preparation-failed kind=${kind} row=${index} `
@@ -6100,10 +6921,14 @@ function fail(kind, index, row, child, category) {
   process.exit(1);
 }
 for (const [index, row] of rows.entries()) {
-  const child = spawnSync(process.execPath,
+  if (index !== Number(selectedRow)) continue;
+  const input = Buffer.from(JSON.stringify(row.catalog));
+  const expectedCategory = input.length > 524288 ? 'case-file' : 'case-operation';
+  const deadline = Date.now() + 55000;
+  const child = captured ?? spawnSync(process.execPath,
     [path.join(directory, 'Validate-WorkflowPolicy.mjs'), '--ordinary-case-catalog-data'], {
-      input: Buffer.from(JSON.stringify(row.catalog)), encoding: 'utf8',
-      timeout: 10000, maxBuffer: 65536, windowsHide: true,
+      input, encoding: 'utf8',
+      timeout: 55000, maxBuffer: 65536, windowsHide: true,
     });
   if (child.error || child.signal || child.status !== row.status) {
     let category;
@@ -6122,8 +6947,35 @@ for (const [index, row] of rows.entries()) {
   }
   if (row.status === 0
     ? result.success !== true || result.casesPassed !== catalog.cases.length || result.mergeApproval !== false
-    : result.success !== false || result.category !== 'case-operation') {
+    : result.success !== false || result.category !== expectedCategory) {
     fail('result', index, row, child, result.category);
+  }
+  if (diagnosticControl === 'capture') {
+    const record = JSON.stringify({ status: child.status, stdout: child.stdout });
+    if (Buffer.byteLength(record) > 65536) throw new Error('Native baseline capture exceeds its limit');
+    process.stdout.write(record);
+    process.exit(0);
+  }
+  // At the transport maximum, a larger probe cannot reach preparation. Run
+  // the installed validator's direct object preparation tests instead. Row1
+  // covers both overflow probes once; the parent always runs all three rows.
+  if (index === 1 && rows.slice(1).some(item => Buffer.byteLength(JSON.stringify(item.catalog)) > 524288)) {
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) fail('process', index, { status: 0 }, { error: { code: 'ETIMEDOUT' } });
+    const full = spawnSync(process.execPath,
+      [path.join(directory, 'Validate-WorkflowPolicy.mjs'), 'build.yml', 'markdownlint.yml'], {
+        cwd: directory, encoding: 'utf8', timeout: remaining, maxBuffer: 65536, windowsHide: true,
+      });
+    if (full.error || full.signal || full.status !== 0) fail('process', index, { status: 0 }, full);
+    let fullResult;
+    try { fullResult = JSON.parse(full.stdout); } catch { fail('result-json', index, { status: 0 }, full); }
+    if (fullResult === null || typeof fullResult !== 'object' || Array.isArray(fullResult)) {
+      fail('result-shape', index, { status: 0 }, full);
+    }
+    if (fullResult.schema !== 'PSStyleGuide.WorkflowPolicyResult.v1' || fullResult.success !== true
+      || fullResult.casesPassed !== catalog.cases.length || fullResult.generatorSourceMutationsPassed !== 4) {
+      fail('result', index, { status: 0 }, full, fullResult.category);
+    }
   }
 }
 process.stdout.write('ordinary-cli-preparation-passed');
@@ -6146,7 +6998,7 @@ process.stdout.write('ordinary-cli-preparation-passed');
                     'kind=(process|result-json|result-shape|result) row=[0-2] ' +
                     'expected-status=[012] actual-status=(NONE|OTHER|[0-9]{1,3}) ' +
                     'category=(NONE|OTHER|case-catalog|case-catalog-identity|' +
-                    'case-operation|case-result|ordinary-case-prefix|' +
+                    'case-operation|case-result|case-file|ordinary-case-prefix|' +
                     'ordinary-case-self-test|ordinary-case-shape|tool-failure) ' +
                     'signal=(NONE|OTHER|SIGABRT|SIGALRM|SIGHUP|SIGINT|SIGKILL|' +
                     'SIGQUIT|SIGTERM) error-code=(NONE|OTHER|EACCES|EAGAIN|' +
@@ -6155,6 +7007,91 @@ process.stdout.write('ordinary-cli-preparation-passed');
                 return "The ordinary CLI preparation self-test failed: $strText."
             }
             return 'The ordinary CLI preparation self-test failed without a valid diagnostic.'
+        }
+        # Capture one real baseline result. Diagnostic replays test the same
+        # checker without repeating the full catalog or claiming a new run.
+        $objOrdinaryCliBaseline = Invoke-BoundedProcessByte -FileName 'node' `
+            -ArgumentList @('--input-type=module', '-e', $strOrdinaryCliProbe,
+                $RepositoryRootPath, 'capture', '0') `
+            -MaximumBytes 65536 -TimeoutMilliseconds 60000
+        if ($objOrdinaryCliBaseline.ExitCode -ne 0) {
+            throw (& $scriptBlockGetOrdinaryCliFailure -Result $objOrdinaryCliBaseline)
+        }
+        $scriptblockAssertCliReplay = {
+            param(
+                [byte[]] $Bytes,
+                [int] $ExpectedExit,
+                [string] $ExpectedText,
+                [string] $Control = 'none',
+                [string] $Row = '0',
+                [string] $Mode = 'replay'
+            )
+            $objReplay = Invoke-BoundedProcessByte -FileName 'node' `
+                -ArgumentList @('--input-type=module', '-e', $strOrdinaryCliProbe,
+                    $RepositoryRootPath, $Control, $Row, $Mode) `
+                -InputBytes $Bytes -MaximumBytes 65536 -TimeoutMilliseconds 60000
+            $strReplay = ConvertFrom-StrictUtf8Text -Bytes $objReplay.Bytes `
+                -Name 'The CLI replay boundary result'
+            if ($objReplay.ExitCode -ne $ExpectedExit -or $strReplay -cne $ExpectedText) {
+                throw 'A CLI replay boundary or result assertion failed.'
+            }
+        }
+        & $scriptblockAssertCliReplay -Bytes $objOrdinaryCliBaseline.Bytes `
+            -ExpectedExit 0 -ExpectedText 'ordinary-cli-preparation-passed'
+        $arrMaximumCapture = [byte[]]::new(65536)
+        for ($intCaptureByte = 0; $intCaptureByte -lt $arrMaximumCapture.Length; $intCaptureByte++) {
+            $arrMaximumCapture[$intCaptureByte] = 32
+        }
+        [Array]::Copy($objOrdinaryCliBaseline.Bytes, $arrMaximumCapture,
+            $objOrdinaryCliBaseline.Bytes.Length)
+        & $scriptblockAssertCliReplay -Bytes $arrMaximumCapture `
+            -ExpectedExit 0 -ExpectedText 'ordinary-cli-preparation-passed'
+        & $scriptblockAssertCliReplay -Bytes ([byte[]]($arrMaximumCapture + 32)) `
+            -ExpectedExit 1 -ExpectedText 'ordinary-cli-capture-rejected kind=limit'
+        & $scriptblockAssertCliReplay -Bytes ([byte[]]@(0xC3, 0x28)) `
+            -ExpectedExit 1 -ExpectedText 'ordinary-cli-capture-rejected kind=encoding'
+        & $scriptblockAssertCliReplay -Bytes ([Text.Encoding]::UTF8.GetBytes('{')) `
+            -ExpectedExit 1 -ExpectedText 'ordinary-cli-capture-rejected kind=json'
+        foreach ($strInvalidCapture in @(
+                'null', '[]', '{}', '{"status":1,"stdout":""}',
+                '{"status":"0","stdout":""}', '{"status":0,"stdout":5}',
+                '{"status":0,"stdout":"","extra":true}'
+            )) {
+            & $scriptblockAssertCliReplay `
+                -Bytes ([Text.Encoding]::UTF8.GetBytes($strInvalidCapture)) `
+                -ExpectedExit 1 -ExpectedText 'ordinary-cli-capture-rejected kind=shape'
+        }
+        foreach ($hashtableInvalidReplay in @(
+                @{ Control = 'unknown' }, @{ Row = '1' },
+                @{ Control = 'capture' }, @{ Mode = 'unknown' }
+            )) {
+            & $scriptblockAssertCliReplay -Bytes $objOrdinaryCliBaseline.Bytes `
+                -ExpectedExit 1 -ExpectedText 'ordinary-cli-capture-rejected kind=request' `
+                @hashtableInvalidReplay
+        }
+        $strCapturedBaseline = ConvertFrom-StrictUtf8Text `
+            -Bytes $objOrdinaryCliBaseline.Bytes -Name 'The captured CLI baseline'
+        foreach ($strFalseResponse in @(
+                '{"success":false,"casesPassed":0,"mergeApproval":false}',
+                '{"success":true,"casesPassed":0,"mergeApproval":false}',
+                '{"success":true,"casesPassed":0,"mergeApproval":true}'
+            )) {
+            $objFalseCapture = $strCapturedBaseline | ConvertFrom-Json
+            $objNativeResponse = $objFalseCapture.stdout | ConvertFrom-Json
+            $objFalseResponse = $strFalseResponse | ConvertFrom-Json
+            if ($objFalseResponse.mergeApproval) {
+                $objFalseResponse.casesPassed = $objNativeResponse.casesPassed
+            } elseif (-not $objFalseResponse.success) {
+                $objFalseResponse.casesPassed = $objNativeResponse.casesPassed
+            }
+            $objFalseCapture.stdout = ConvertTo-Json -InputObject $objFalseResponse -Compress
+            $strFalseCapture = ConvertTo-Json -InputObject $objFalseCapture -Compress
+            & $scriptblockAssertCliReplay `
+                -Bytes ([Text.Encoding]::UTF8.GetBytes($strFalseCapture)) `
+                -ExpectedExit 1 -ExpectedText (
+                    'ordinary-cli-preparation-failed kind=result row=0 ' +
+                    'expected-status=0 actual-status=0 category=NONE signal=NONE error-code=NONE'
+                )
         }
         $strOrdinaryCliFailureProbe = $strOrdinaryCliProbe.Replace(
             'const rows = [{ catalog, status: 0 }];',
@@ -6165,8 +7102,9 @@ process.stdout.write('ordinary-cli-preparation-passed');
         }
         $objOrdinaryCliFailureProbe = Invoke-BoundedProcessByte -FileName 'node' `
             -ArgumentList @('--input-type=module', '-e',
-                $strOrdinaryCliFailureProbe, $RepositoryRootPath) `
-            -MaximumBytes 65536 -TimeoutMilliseconds 35000
+                $strOrdinaryCliFailureProbe, $RepositoryRootPath, 'none', '0',
+                'replay') -InputBytes $objOrdinaryCliBaseline.Bytes `
+            -MaximumBytes 65536 -TimeoutMilliseconds 60000
         $strOrdinaryCliFailure = & $scriptBlockGetOrdinaryCliFailure `
             -Result $objOrdinaryCliFailureProbe
         $strExpectedOrdinaryCliFailure =
@@ -6194,8 +7132,9 @@ process.stdout.write('ordinary-cli-preparation-passed');
             $objOrdinaryCliFailureProbe = Invoke-BoundedProcessByte `
                 -FileName 'node' -ArgumentList @('--input-type=module', '-e',
                     $strOrdinaryCliProbe, $RepositoryRootPath,
-                    $objOrdinaryCliResultControl.Value) `
-                -MaximumBytes 65536 -TimeoutMilliseconds 35000
+                    $objOrdinaryCliResultControl.Value, '0',
+                    'replay') -InputBytes $objOrdinaryCliBaseline.Bytes `
+                -MaximumBytes 65536 -TimeoutMilliseconds 60000
             $strOrdinaryCliFailure = & $scriptBlockGetOrdinaryCliFailure `
                 -Result $objOrdinaryCliFailureProbe
             $strExpectedOrdinaryCliFailure =
@@ -6207,14 +7146,16 @@ process.stdout.write('ordinary-cli-preparation-passed');
                 throw 'An ordinary CLI result diagnostic was not propagated.'
             }
         }
-        $objOrdinaryCliProbe = Invoke-BoundedProcessByte -FileName 'node' `
-            -ArgumentList @('--input-type=module', '-e', $strOrdinaryCliProbe,
-                $RepositoryRootPath) `
-            -MaximumBytes 65536 -TimeoutMilliseconds 35000
-        $strOrdinaryCliFailure = & $scriptBlockGetOrdinaryCliFailure `
-            -Result $objOrdinaryCliProbe
-        if (-not [string]::IsNullOrEmpty($strOrdinaryCliFailure)) {
-            throw $strOrdinaryCliFailure
+        foreach ($strOrdinaryCliRow in @('1', '2')) {
+            $objOrdinaryCliProbe = Invoke-BoundedProcessByte -FileName 'node' `
+                -ArgumentList @('--input-type=module', '-e', $strOrdinaryCliProbe,
+                    $RepositoryRootPath, 'none', $strOrdinaryCliRow) `
+                -MaximumBytes 65536 -TimeoutMilliseconds 60000
+            $strOrdinaryCliFailure = & $scriptBlockGetOrdinaryCliFailure `
+                -Result $objOrdinaryCliProbe
+            if (-not [string]::IsNullOrEmpty($strOrdinaryCliFailure)) {
+                throw $strOrdinaryCliFailure
+            }
         }
 
         # The builder makes inert Git objects. It does not run candidate code.
@@ -6273,6 +7214,7 @@ const readTexts = reference => Object.fromEntries(names.map(name => {
 }));
 const initial = Object.fromEntries([...names, 'trust-root-authorization.json', 'Test-TrustRootAuthorization.ps1', 'Test-AgentInstructions.ps1', 'Sync-PullRequestBodyIdentity.mjs'].map(name =>
   [name, fs.readFileSync(path.join(source, prefix, name), 'utf8')]));
+Object.assign(initial, JSON.parse(fs.readFileSync(path.join(source, prefix, 'workflow-ordinary-selftest-reference.json'), 'utf8')).files);
 const base = commit(original, initial);
 const rows = [];
 const referenceTexts = new Map();
@@ -6594,6 +7536,293 @@ process.stdout.write(JSON.stringify(rows.map(row => ({ ...row, base: resolve(row
         }
         if ([IO.File]::Exists($strCandidateSentinel)) {
             throw 'An inert candidate expression created its sentinel.'
+        }
+
+        # P1 fixtures use real trusted Git blobs and the production history
+        # reader. Fixture construction must finish before refusal assertions.
+        $strIsolationFixtureBuilder = @'
+import fs from 'node:fs';
+import path from 'node:path';
+import crypto from 'node:crypto';
+import { execFileSync } from 'node:child_process';
+const [repo, source] = process.argv.slice(1);
+const prefix = '.github/workflows/';
+const names = ['build.yml', 'markdownlint.yml', 'pull-request-body-identity.yml',
+  'Validate-WorkflowPolicy.mjs', 'workflow-policy-contract.json', 'workflow-policy-cases.json'];
+const referenceNames = ['workflow-isolation-reference.json', 'workflow-isolation-validator.reference.txt'];
+const git = (args, input) => execFileSync('git', ['-C', repo, ...args], {
+  input, encoding: 'utf8', windowsHide: true, maxBuffer: 1048576,
+  stdio: ['pipe', 'pipe', 'pipe'],
+}).trim();
+const digest = value => crypto.createHash('sha256').update(value).digest('hex');
+const canonical = value => Array.isArray(value) ? value.map(canonical) : value && typeof value === 'object'
+  ? Object.fromEntries(Object.keys(value).sort().map(key => [key, canonical(value[key])])) : value;
+const initial = Object.fromEntries([...names, ...referenceNames,
+  'trust-root-authorization.json', 'Test-TrustRootAuthorization.ps1', 'Test-AgentInstructions.ps1',
+  'Sync-PullRequestBodyIdentity.mjs'].map(name => [name, fs.readFileSync(path.join(source, prefix, name), 'utf8').replaceAll('\r\n', '\n')]));
+Object.assign(initial, JSON.parse(fs.readFileSync(path.join(source, prefix, 'workflow-ordinary-selftest-reference.json'), 'utf8')).files);
+const reference = JSON.parse(initial[referenceNames[0]]);
+const original = git(['rev-parse', 'HEAD']);
+const trees = new Map([[original, new Map(git(['ls-tree', '-rz', original]).split('\0').filter(Boolean).map(entry => {
+  const match = /^(\d{6}) blob ([a-f0-9]{40})\t([\s\S]+)$/.exec(entry);
+  if (!match) throw new Error('Unsupported P1 fixture tree entry');
+  return [match[3], { mode: match[1], blob: match[2] }];
+}))]]);
+const chunks = [], parentsByMark = new Map(), blobMarks = new Map();
+let batchBytes = 0;
+const checkedBatchLength = (current, added) => {
+  const total = current + added;
+  if (total > 134217728) throw new Error('Inert P1 fixture batch exceeds 128 MiB');
+  return total;
+};
+if (checkedBatchLength(134217727, 1) !== 134217728) throw new Error('P1 batch maximum was rejected');
+let batchOverflowRejected = false;
+try { checkedBatchLength(134217728, 1); }
+catch (error) {
+  if (error.message !== 'Inert P1 fixture batch exceeds 128 MiB') throw error;
+  batchOverflowRejected = true;
+}
+if (!batchOverflowRejected) throw new Error('P1 batch maximum+1 was accepted');
+const appendBatch = text => {
+  batchBytes = checkedBatchLength(batchBytes, Buffer.byteLength(text));
+  chunks.push(text);
+};
+let nextMark = 0;
+const commit = (base, texts, modes = {}, parents = [base]) => {
+  const tree = new Map(trees.get(base));
+  for (const [name, text] of Object.entries(texts)) {
+    if (text === null) tree.delete(prefix + name);
+    else tree.set(prefix + name, { mode: modes[name] ?? '100644', text });
+  }
+  for (const value of tree.values()) {
+    if (value.text === undefined || value.blob !== undefined) continue;
+    if (!blobMarks.has(value.text)) {
+      const blobMark = `:${++nextMark}`;
+      appendBatch(`blob\nmark ${blobMark}\ndata ${Buffer.byteLength(value.text)}\n${value.text}\n`);
+      blobMarks.set(value.text, blobMark);
+    }
+    value.blob = blobMarks.get(value.text);
+  }
+  const mark = `:${++nextMark}`;
+  trees.set(mark, tree); parentsByMark.set(mark, parents);
+  const message = 'Inert P1 admission fixture\n';
+  appendBatch(`commit refs/heads/p1-admission-fixture\nmark ${mark}\n` +
+    'committer P1 admission self-test <p1@example.invalid> 1789689600 +0000\n' +
+    `data ${Buffer.byteLength(message)}\n${message}from ${parents[0]}\n` +
+    parents.slice(1).map(parent => `merge ${parent}\n`).join('') + 'deleteall\n');
+  for (const [name, value] of tree) {
+    appendBatch(`M ${value.mode} ${value.blob} ${JSON.stringify(name)}\n`);
+  }
+  appendBatch('\n');
+  return mark;
+};
+const base = commit(original, initial);
+const read = (ref, name) => trees.get(ref).get(prefix + name)?.text;
+const rows = [];
+const record = (name, base, head, expected = '') => rows.push({ name, base, head, expected });
+const derive = state => {
+  const catalogText = JSON.stringify(state.catalog) + '\n';
+  state.contract.caseCatalog.sha256 = digest(catalogText);
+  const view = structuredClone(state.contract);
+  delete view.validatorIdentity;
+  let validator = state.validator.replace(/^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '[a-f0-9]{64}';$/m,
+    () => `const EXPECTED_CONTRACT_CANONICAL_SHA256 = '${digest(JSON.stringify(canonical(view)))}';`);
+  state.contract.validatorIdentity.sha256 = digest(validator);
+  return { ...state.texts, 'workflow-policy-cases.json': catalogText,
+    'workflow-policy-contract.json': JSON.stringify(state.contract) + '\n', 'Validate-WorkflowPolicy.mjs': validator };
+};
+const prepare = (trusted = base) => {
+  const trustedVersion = /^const VALIDATOR_VERSION = '(\d+)\.(\d+)\.(\d+)';$/m.exec(read(trusted, names[3]));
+  if (!trustedVersion) throw new Error('Missing trusted version');
+  const contract = JSON.parse(reference.contractText);
+  const state = { contract, catalog: JSON.parse(read(trusted, names[3]).includes('const WORKFLOW_ISOLATION_POLICY_VERSION = 1;')
+    ? read(trusted, names[5]) : reference.caseCatalogText), texts: {
+      'build.yml': reference.workflowText['build.yml'].replace('{{VERIFY_TIMEOUT_MINUTES}}', '30'),
+      'markdownlint.yml': reference.workflowText['markdownlint.yml'].replace('{{POLICY_TIMEOUT_MINUTES}}', '30').replace('{{LINT_TIMEOUT_MINUTES}}', '30'),
+      'pull-request-body-identity.yml': read(trusted, names[2]),
+    }, validator: initial[referenceNames[1]].replace(/^const VALIDATOR_VERSION = '[0-9.]+';$/m,
+      () => `const VALIDATOR_VERSION = '${trustedVersion[1]}.${trustedVersion[2]}.${Number(trustedVersion[3]) + 1}';`) };
+  for (const [workflow, job] of [['build.yml', 'verify_generated_artifacts'], ['markdownlint.yml', 'policy'], ['markdownlint.yml', 'markdownlint']]) {
+    contract.workflowPolicy.workflows[workflow].jobs[job].timeoutMinutes = 30;
+  }
+  return state;
+};
+const build = (name, mutate = () => {}, expected = '', trusted = base) => {
+  const state = prepare(trusted);
+  mutate(state);
+  const head = commit(trusted, derive(state));
+  record(name, trusted, head, expected);
+  return head;
+};
+const append = (state, count = 1) => {
+  let next = Math.max(...state.catalog.cases.filter(item => /^PS-P1-WFPOL-\d{3}$/.test(item.id)).map(item => Number(item.id.slice(-3))));
+  for (let index = 0; index < count; index++) state.catalog.cases.push({
+    id: `PS-P1-WFPOL-${String(++next).padStart(3, '0')}`, semanticKey: `p1-selftest-permission-${next}`,
+    domain: 'workflow', workflow: 'build.yml', operation: { type: 'set', path: '/permissions', value: { contents: 'write' } }, expected: false,
+  });
+};
+const first = build('initial fixed P1 tuple');
+const second = build('distinct bounded P1 tuple', state => {
+  state.texts['build.yml'] = state.texts['build.yml'].replace('timeout-minutes: 30', 'timeout-minutes: 31');
+  state.contract.workflowPolicy.workflows['build.yml'].jobs.verify_generated_artifacts.timeoutMinutes = 31;
+  state.validator += '// Fixed second candidate explanation.\n'; append(state);
+});
+build('sequential P1 reuse', state => { append(state); state.validator += '// Fixed later candidate explanation.\n'; }, '', first);
+for (const value of [5, 60, 4, 61]) build(`P1 timeout ${value}`, state => {
+  state.texts['markdownlint.yml'] = state.texts['markdownlint.yml'].replace('timeout-minutes: 30', `timeout-minutes: ${value}`);
+  state.contract.workflowPolicy.workflows['markdownlint.yml'].jobs.policy.timeoutMinutes = value;
+}, value < 5 || value > 60 ? 'outside 5 through 60' : '');
+build('initial closed permission fixture', state => append(state));
+const maximumIncrement = build('32-case increment', state => append(state, 32));
+build('33-case increment rejected', state => append(state, 33), 'exceeds its increment bound');
+build('512 cases accepted', state => append(state, 512 - state.catalog.cases.length), '', maximumIncrement);
+build('513 cases rejected', state => append(state, 513 - state.catalog.cases.length), 'invalid schema or count', maximumIncrement);
+for (const length of [8192, 8193]) build(`P1 comment suffix ${length}`, state => {
+  state.validator += '// ' + 'x'.repeat(length - 4) + '\n';
+}, length === 8192 ? '' : 'not bounded inert line comments');
+build('candidate execution sentinel', state => {
+  state.validator = `(await import('node:fs')).writeFileSync(${JSON.stringify(path.join(repo, 'P1-SENTINEL'))}, 'P1_CANDIDATE_EXECUTED');\n` + state.validator;
+}, 'unsupported executable validator bytes');
+build('candidate executable replacement', state => { state.validator = state.validator.replace('function ', 'function hostile_'); }, 'unsupported executable validator bytes');
+build('candidate authority substitution', state => { state.texts[referenceNames[1]] = 'candidate supplied authority\n'; }, 'Unsupported ordinary content shape');
+build('contract weakening', state => { state.contract.limits.maximumWorkflowBytes++; }, 'changes rules or has inconsistent derived identities');
+build('required case removed', state => { state.catalog.cases.pop(); }, 'removes cases or exceeds its increment bound');
+build('required case weakened', state => { state.catalog.cases[0].expected = false; }, 'changes or reorders a required or accepted case');
+build('required case reordered', state => { [state.catalog.cases[0], state.catalog.cases[1]] = [state.catalog.cases[1], state.catalog.cases[0]]; }, 'changes or reorders a required or accepted case');
+for (const field of ['domain', 'workflow', 'type', 'path']) for (const value of [null, [], {}, ['set']]) build(`malformed appended ${field} ${JSON.stringify(value)}`, state => {
+  append(state); const item = state.catalog.cases.at(-1);
+  (['domain', 'workflow'].includes(field) ? item : item.operation)[field] = value;
+}, 'not a sequential negative workflow fixture');
+for (const [name, mutate, expected] of [
+  ['extra operation field', item => { item.operation.extra = true; }, 'unexpected key set'],
+  ['missing operation value', item => { delete item.operation.value; }, 'unexpected key set'],
+  ['repeated case identity', item => { item.id = 'PS-P1-WFPOL-001'; }, 'not a sequential negative workflow fixture'],
+  ['positive appended case', item => { item.expected = true; }, 'not a sequential negative workflow fixture'],
+  ['unsafe pointer', item => { item.operation.path = '/__proto__/polluted'; }, 'unsafe or invalid JSON pointer'],
+  ['unproved initial case', item => { item.operation.path = '/name'; item.operation.value = 'other'; }, 'no independent closed predicate'],
+]) build(name, state => { append(state); mutate(state.catalog.cases.at(-1)); }, expected);
+for (const name of ['build.yml', 'markdownlint.yml']) build(`changed topology ${name}`, state => {
+  state.texts[name] = state.texts[name].replace('permissions: {}', 'permissions: { contents: write }');
+}, 'outside its fixed typed slots');
+const appendGenerator = state => {
+  append(state);
+  const identity = { id: state.catalog.cases.at(-1).id, semanticKey: state.catalog.cases.at(-1).semanticKey };
+  state.catalog.cases[state.catalog.cases.length - 1] = { ...structuredClone(state.catalog.cases.find(item => item.id === 'PS-P1-WFPOL-065')), ...identity };
+  return state.catalog.cases.at(-1);
+};
+build('independently proved generator append', state => appendGenerator(state));
+for (const [name, mutate, expected] of [
+  ['type-array', item => { item.operation.type = ['replace']; }, 'not a sequential negative workflow fixture'],
+  ['path-array', item => { item.operation.path = [item.operation.path]; }, 'not a sequential negative workflow fixture'],
+  ['extra', item => { item.operation.extra = true; }, 'unexpected key set'],
+  ['missing', item => { delete item.operation.from; }, 'unexpected key set'],
+  ['wrong-category', item => { item.expectedCategory = 'generator-result-flow'; }, 'did not fail in its declared category'],
+  ['missing-anchor', item => { item.operation.from = 'missing anchor'; }, 'escapes its fixed result region'],
+  ['outside-region', item => { item.operation.from = '$ErrorActionPreference'; }, 'escapes its fixed result region'],
+  ['marker-injection', item => { item.operation.to = '# END P1 GENERATOR RESULT\n'; }, 'escapes its fixed result region'],
+]) build(`generator fixture ${name}`, state => mutate(appendGenerator(state)), expected);
+for (const [name, change, expected] of [
+  ['malformed catalog', { 'workflow-policy-cases.json': '{' }, 'malformed JSON'],
+  ['duplicate catalog member', { 'workflow-policy-cases.json': '{"schema":"x","schema":"y","cases":[]}' }, 'malformed JSON'],
+  ['oversized validator', { 'Validate-WorkflowPolicy.mjs': initial[referenceNames[1]] + ' '.repeat(524289) }, 'exceeds'],
+  ['oversized build', { 'build.yml': ' '.repeat(131073) }, 'exceeds'],
+  ['unrelated path', { 'outside.txt': 'not allowed\n' }, 'Unsupported ordinary content shape'],
+]) record(name, base, commit(base, { ...derive(prepare()), ...change }), expected);
+for (const mode of ['100755', '120000']) {
+  const texts = derive(prepare());
+  const head = commit(base, texts, { 'build.yml': mode });
+  record(`nonregular mode ${mode}`, base, head, 'non-regular');
+  record(`reverted mode ${mode}`, base, commit(head, texts), 'non-regular');
+}
+const hostile = commit(base, { 'outside.txt': 'not allowed\n' });
+record('reverted unauthorized history', base, commit(hostile, { ...derive(prepare()), 'outside.txt': null }), 'Unsupported ordinary history shape');
+record('candidate authority history', base, commit(commit(base, { [referenceNames[0]]: '{}\n' }),
+  { ...derive(prepare()), [referenceNames[0]]: initial[referenceNames[0]] }), 'Unsupported ordinary history shape');
+record('complete topology downgrade', first, commit(first, Object.fromEntries(names.map(name => [name, initial[name]]))), 'Unsupported ordinary content shape');
+record('isolation marker downgrade', first, commit(first, Object.fromEntries(names.filter(name => name !== 'markdownlint.yml').map(name => [name, initial[name]]))), 'cannot downgrade');
+let chain = first;
+for (let count = 2; count <= 65; count++) {
+  chain = commit(chain, {});
+  if (count === 64 || count === 65) record(`P1 history ${count} commits`, base, chain, count === 64 ? '' : 'exceeds 64 commits');
+}
+for (const name of referenceNames) {
+  for (const mode of ['100755', '120000']) {
+    const trusted = commit(base, { [name]: initial[name] }, { [name]: mode });
+    build(`trusted reference mode ${name} ${mode}`, () => {}, 'missing or is not a regular blob', trusted);
+  }
+  const missing = commit(base, { [name]: null });
+  build(`missing trusted reference ${name}`, () => {}, 'missing or is not a regular blob', missing);
+  const oversized = commit(base, { [name]: initial[name] + ' '.repeat(524289 - Buffer.byteLength(initial[name])) });
+  build(`oversized trusted reference ${name}`, () => {}, 'exceeds its byte limit', oversized);
+}
+const maximumReference = commit(base, { [referenceNames[0]]: initial[referenceNames[0]] + ' '.repeat(524288 - Buffer.byteLength(initial[referenceNames[0]])) });
+build('524288-byte trusted JSON reference accepted', () => {}, '', maximumReference);
+const marksPath = path.join(repo, '.git', 'p1-fixture.marks');
+git(['fast-import', '--quiet', `--export-marks=${marksPath}`], chunks.join(''));
+const marks = new Map(fs.readFileSync(marksPath, 'utf8').trim().split('\n').map(line => line.split(' ')));
+const resolve = value => marks.get(value) ?? value;
+if (marks.size !== nextMark || [...marks.values()].some(value => !/^[a-f0-9]{40}$/.test(value))) throw new Error('Invalid P1 object identities');
+const observedParents = new Map(git(['rev-list', '--parents', '--no-walk=unsorted', ...[...parentsByMark.keys()].map(resolve)])
+  .split('\n').map(line => { const [head, ...parents] = line.split(' '); return [head, parents]; }));
+for (const [mark, parents] of parentsByMark) {
+  if (JSON.stringify(observedParents.get(resolve(mark))) !== JSON.stringify(parents.map(resolve))) throw new Error('P1 fixture parent mismatch');
+}
+process.stdout.write(JSON.stringify(rows.map(row => ({ ...row, base: resolve(row.base), head: resolve(row.head) }))));
+'@
+        $strInvalidPreparation = $strIsolationFixtureBuilder.Replace(
+            'workflow-ordinary-selftest-reference.json', 'missing-ordinary-selftest-reference.json',
+            [StringComparison]::Ordinal)
+        if ($strInvalidPreparation -ceq $strIsolationFixtureBuilder) {
+            throw 'The P1 preparation failure control has no mutation target.'
+        }
+        $objInvalidPreparation = Invoke-BoundedProcessByte -FileName 'node' `
+            -ArgumentList @('--input-type=module', '-e', $strInvalidPreparation,
+                $strSchemaFixtureRoot, $RepositoryRootPath) `
+            -MaximumBytes 65536 -TimeoutMilliseconds 60000
+        if ($objInvalidPreparation.ExitCode -eq 0 -or $objInvalidPreparation.Bytes.Length -ne 0 -or
+            -not $objInvalidPreparation.Error.Contains('missing-ordinary-selftest-reference.json', [StringComparison]::Ordinal)) {
+            throw 'A fixture preparation failure was not kept separate from admission.'
+        }
+        $objIsolationFixtures = Invoke-BoundedProcessByte -FileName 'node' `
+            -ArgumentList @('--input-type=module', '-e', $strIsolationFixtureBuilder,
+                $strSchemaFixtureRoot, $RepositoryRootPath) `
+            -MaximumBytes 65536 -TimeoutMilliseconds 60000
+        if ($objIsolationFixtures.ExitCode -ne 0) {
+            throw 'Could not build the inert P1 content fixtures.'
+        }
+        $arrIsolationFixtures = @(ConvertFrom-Json -InputObject (
+                ConvertFrom-StrictUtf8Text -Bytes $objIsolationFixtures.Bytes `
+                    -Name 'The inert P1 fixture identities'
+            ))
+        if ($arrIsolationFixtures.Count -ne 78) {
+            throw 'The P1 fixture inventory must contain exactly 78 cases.'
+        }
+        $strIsolationSentinel = Join-Path $strSchemaFixtureRoot 'P1-SENTINEL'
+        if ([IO.File]::Exists($strIsolationSentinel)) {
+            throw 'The P1 sentinel must be absent before admission.'
+        }
+        foreach ($objIsolationFixture in $arrIsolationFixtures) {
+            $strIsolationFailure = ''
+            try {
+                Assert-OrdinaryWorkflowPolicyContent `
+                    -RepositoryRootPath $strSchemaFixtureRoot `
+                    -TrustedRevision $objIsolationFixture.base `
+                    -HeadRevision $objIsolationFixture.head
+            } catch {
+                $strIsolationFailure = $_.Exception.Message
+            }
+            if (([string]::IsNullOrEmpty($objIsolationFixture.expected) -and
+                    -not [string]::IsNullOrEmpty($strIsolationFailure)) -or
+                (-not [string]::IsNullOrEmpty($objIsolationFixture.expected) -and
+                    -not $strIsolationFailure.Contains(
+                        $objIsolationFixture.expected, [StringComparison]::Ordinal))) {
+                throw ('P1 fixture failed: ' + $objIsolationFixture.name +
+                    '; expected=' + $objIsolationFixture.expected +
+                    '; actual=' + $strIsolationFailure)
+            }
+        }
+        if ([IO.File]::Exists($strIsolationSentinel)) {
+            throw 'An inert P1 candidate created its execution sentinel.'
         }
     } finally {
         if ([IO.Directory]::Exists($strSchemaFixtureRoot) -and

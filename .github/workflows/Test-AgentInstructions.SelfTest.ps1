@@ -2,8 +2,9 @@
 # Runs the extracted metadata and bounded-input self-tests.
 #
 # .DESCRIPTION
-# Validates final-state metadata arithmetic and authenticated endpoint handling
-# and bounded input readers with functions loaded by Test-AgentInstructions.ps1.
+# Validates final-state metadata arithmetic, authenticated endpoint handling,
+# bounded input readers and linked-path rejection with functions loaded by
+# Test-AgentInstructions.ps1.
 #
 # .PARAMETER RepositoryRootPath
 # The absolute path of the repository that supplies Git and document fixtures.
@@ -29,7 +30,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.3.20260917.0
+# Version: 1.4.20260918.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -51,7 +52,7 @@ if ($arrDeclaredOutputTypes.Count -ne 1 -or
 }
 $script:strMaximumMetadataUtcDate = $MaximumMetadataUtcDate
 
-$strHelperVersionPattern = '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-5]))|1\.2026091[45]|2\.20260917)\.0\.$'
+$strHelperVersionPattern = '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-58]))|1\.2026091[45]|2\.20260917)\.0\.$'
 $strHelpValidatorSource = [IO.File]::ReadAllText(
     (Join-Path $PSScriptRoot 'Test-AgentInstructions.ps1'))
 if ([regex]::Matches($strHelpValidatorSource,
@@ -62,7 +63,7 @@ $arrExpectedHelperVersions = @(
     '1.0.20260830.0', '1.0.20260831.0',
     '1.0.20260902.0', '1.0.20260903.0',
     '1.0.20260912.0', '1.0.20260913.0',
-    '1.0.20260914.0', '1.0.20260915.0',
+    '1.0.20260914.0', '1.0.20260915.0', '1.0.20260918.0',
     '1.1.20260914.0', '1.1.20260915.0', '1.2.20260917.0'
 )
 $intHelperVersionCases = 0
@@ -88,7 +89,7 @@ foreach ($intMinorVersion in 0..3) {
         }
     }
 }
-if ($intHelperVersionCases -ne 792 -or $intAcceptedHelperVersions -ne 11) {
+if ($intHelperVersionCases -ne 792 -or $intAcceptedHelperVersions -ne 12) {
     throw 'The helper-version fixture census is incomplete.'
 }
 
@@ -135,6 +136,131 @@ $strCapacityAuthorizer = [IO.File]::ReadAllText(
 if ([regex]::Matches($strCapacityAuthorizer,
         [regex]::Escape('$intCandidateMaximumBlobBytes = 573440')).Count -ne 1) {
     throw 'The trusted authorizer disagrees on the finite candidate capacity.'
+}
+
+# These input-reader fixtures need no candidate code or parent-scope mutation.
+Assert-RepositoryInputMetadataMutationRejected `
+    -Name 'missing Git index entry mutation' `
+    -GitIndexEntryCount 0 `
+    -Failure 'missing Git index entry mutation must have exactly one Git index entry.'
+
+Assert-RepositoryInputMetadataMutationRejected `
+    -Name 'Git symlink mode mutation' `
+    -GitMode '120000' `
+    -Failure 'Git symlink mode mutation must be a stage-0 regular file with Git mode 100644.'
+
+Assert-RepositoryInputMetadataMutationRejected `
+    -Name 'nonzero Git stage mutation' `
+    -GitStage '2' `
+    -Failure 'nonzero Git stage mutation must be a stage-0 regular file with Git mode 100644.'
+
+Assert-RepositoryInputMetadataMutationRejected `
+    -Name 'non-file worktree item mutation' `
+    -IsFileInfo $false `
+    -Failure 'non-file worktree item mutation must be a regular worktree file.'
+
+Assert-RepositoryInputMetadataMutationRejected `
+    -Name 'reparse-point mutation' `
+    -Attributes ([System.IO.FileAttributes]::Normal -bor [System.IO.FileAttributes]::ReparsePoint) `
+    -Failure 'reparse-point mutation must not be a symbolic link or reparse point.'
+
+Assert-RepositoryInputMetadataMutationRejected `
+    -Name 'link-type mutation' `
+    -LinkType 'SymbolicLink' `
+    -Failure 'link-type mutation must not have a link type.'
+
+Assert-RepositoryInputMetadataMutationRejected `
+    -Name 'Unix device mutation' `
+    -UnixMode 'crw-rw-rw-' `
+    -Failure 'Unix device mutation must have a regular Unix file type.'
+
+$strPathSafetyTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+$strPathSafetyRoot = [IO.Path]::Combine(
+    $strPathSafetyTempRoot,
+    'agent-input-path-' + [Guid]::NewGuid().ToString('N')
+)
+if (-not $strPathSafetyRoot.StartsWith(
+        $strPathSafetyTempRoot,
+        [StringComparison]::OrdinalIgnoreCase
+    )) {
+    throw 'The repository-input path fixture root is unsafe.'
+}
+$strPathSafetyRepository = [IO.Path]::Combine($strPathSafetyRoot, 'repository')
+$strPathSafetyLinkedDirectory =
+    [IO.Path]::Combine($strPathSafetyRepository, 'linked')
+$strPathSafetyOutsideDirectory = [IO.Path]::Combine($strPathSafetyRoot, 'outside')
+$strPathSafetyInput = [IO.Path]::Combine(
+    $strPathSafetyLinkedDirectory,
+    'input.md'
+)
+[void][IO.Directory]::CreateDirectory($strPathSafetyLinkedDirectory)
+[IO.File]::WriteAllText(
+    $strPathSafetyInput,
+    'safe',
+    [Text.UTF8Encoding]::new($false)
+)
+try {
+    & git -C $strPathSafetyRepository init --quiet
+    & git -C $strPathSafetyRepository add -- linked/input.md
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not create the repository-input path fixture index.'
+    }
+    $arrSafeRepositoryInput = [byte[]]@(Read-RepositoryInputData `
+            -Path $strPathSafetyInput `
+            -RepositoryRootPath $strPathSafetyRepository `
+            -RepositoryRelativePath 'linked/input.md' `
+            -DisplayName 'safe path fixture' `
+            -MaximumBytes 64)
+    if ([Text.Encoding]::UTF8.GetString($arrSafeRepositoryInput) -cne 'safe') {
+        throw 'The safe repository-input path fixture returned unexpected bytes.'
+    }
+
+    [IO.File]::Delete($strPathSafetyInput)
+    [IO.Directory]::Delete($strPathSafetyLinkedDirectory)
+    [void][IO.Directory]::CreateDirectory($strPathSafetyOutsideDirectory)
+    [IO.File]::WriteAllText(
+        [IO.Path]::Combine($strPathSafetyOutsideDirectory, 'input.md'),
+        'outside',
+        [Text.UTF8Encoding]::new($false)
+    )
+    if ([IO.Path]::DirectorySeparatorChar -eq '\') {
+        [void](New-Item -ItemType Junction `
+                -Path $strPathSafetyLinkedDirectory `
+                -Target $strPathSafetyOutsideDirectory)
+    } else {
+        [void](New-Item -ItemType SymbolicLink `
+                -Path $strPathSafetyLinkedDirectory `
+                -Target $strPathSafetyOutsideDirectory)
+    }
+    $boolLinkedComponentRejected = $false
+    try {
+        [void](Read-RepositoryInputData `
+                -Path $strPathSafetyInput `
+                -RepositoryRootPath $strPathSafetyRepository `
+                -RepositoryRelativePath 'linked/input.md' `
+                -DisplayName 'linked path fixture' `
+                -MaximumBytes 64)
+    } catch {
+        $boolLinkedComponentRejected = $_.Exception.Message.Contains(
+            'unsafe linked path component: linked.',
+            [StringComparison]::Ordinal
+        )
+    }
+    if (-not $boolLinkedComponentRejected) {
+        throw 'An intermediate linked repository-input component was accepted.'
+    }
+} finally {
+    if (Test-Path -LiteralPath $strPathSafetyLinkedDirectory) {
+        $objLinkedFixtureItem =
+            Get-Item -Force -LiteralPath $strPathSafetyLinkedDirectory
+        if (($objLinkedFixtureItem.Attributes -band
+                [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            Remove-Item -Force -LiteralPath $strPathSafetyLinkedDirectory
+        }
+    }
+    if ([IO.Directory]::Exists($strPathSafetyRoot)) {
+        Remove-Item -Recurse -Force -LiteralPath $strPathSafetyRoot
+    }
 }
 
 function ConvertTo-CreatedPushCommitEvidenceObject {
@@ -432,6 +558,16 @@ try {
     & git -C $strTopologyRoot add -- root.txt
     & git -C $strTopologyRoot commit --quiet -m root
     $strRootCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
+    if ($LASTEXITCODE -ne 0 -or $strRootCommit -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Could not resolve the tracked-path baseline fixture.'
+    }
+    foreach ($strPathReaderRevision in @('', $strRootCommit)) {
+        $arrReadPaths = @(Read-GitTrackedPath -RepositoryRootPath $strTopologyRoot `
+                -Revision $strPathReaderRevision -MaximumBytes $MaximumBytes)
+        if ($arrReadPaths.Count -ne 1 -or $arrReadPaths[0] -cne 'root.txt') {
+            throw 'The index/revision readers changed the known baseline path.'
+        }
+    }
 
     & git -C $strTopologyRoot update-ref `
         refs/remotes/event/created-other-0000 $strRootCommit
@@ -493,8 +629,34 @@ try {
         $objUtf8
     )
     & git -C $strTopologyRoot add -- one.txt
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not stage the tracked-path addition fixture.'
+    }
+    $arrIndexPaths = @(Read-GitTrackedPath -RepositoryRootPath $strTopologyRoot `
+            -MaximumBytes $MaximumBytes)
+    $arrRevisionPaths = @(Read-GitTrackedPath -RepositoryRootPath $strTopologyRoot `
+            -Revision $strRootCommit -MaximumBytes $MaximumBytes)
+    if ($arrIndexPaths.Count -ne 2 -or $arrIndexPaths[0] -cne 'one.txt' -or
+        $arrIndexPaths[1] -cne 'root.txt' -or $arrRevisionPaths.Count -ne 1 -or
+        $arrRevisionPaths[0] -cne 'root.txt') {
+        throw 'The tracked-path readers confused staged and committed paths.'
+    }
     & git -C $strTopologyRoot commit --quiet -m one
+    if ($LASTEXITCODE -ne 0) {
+        throw 'Could not commit the tracked-path addition fixture.'
+    }
     $strOneCommit = ([string] (& git -C $strTopologyRoot rev-parse HEAD)).Trim()
+    if ($LASTEXITCODE -ne 0 -or $strOneCommit -cnotmatch '^[0-9a-f]{40}$') {
+        throw 'Could not resolve the tracked-path addition fixture.'
+    }
+    foreach ($strPathReaderRevision in @('', $strOneCommit)) {
+        $arrReadPaths = @(Read-GitTrackedPath -RepositoryRootPath $strTopologyRoot `
+                -Revision $strPathReaderRevision -MaximumBytes $MaximumBytes)
+        if ($arrReadPaths.Count -ne 2 -or $arrReadPaths[0] -cne 'one.txt' -or
+            $arrReadPaths[1] -cne 'root.txt') {
+            throw 'The index/revision readers changed the committed addition.'
+        }
+    }
     $objOnePayloadCommit = ConvertTo-CreatedPushCommitEvidenceObject `
         -Id $strOneCommit -Distinct $true
     $strOnePayload = ConvertTo-Json -Depth 4 -Compress -InputObject `
