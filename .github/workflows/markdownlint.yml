@@ -1,5 +1,4 @@
 name: Markdown Lint
-
 on:
   push:
     branches:
@@ -7,173 +6,674 @@ on:
   pull_request:
     branches:
       - main
-
 permissions: {}
-
 jobs:
-  markdownlint:
+  policy:
     runs-on: ubuntu-24.04
-    permissions:
-      contents: read
-
+    timeout-minutes: 30
+    permissions: {}
     steps:
-      - name: Checkout repository
-        id: checkout_repository
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ github.repository }}
-          ref: ${{ github.sha }}
-          token: ${{ github.token }}
-          persist-credentials: false
-          clean: true
-          fetch-depth: 1
-          fetch-tags: false
-          show-progress: true
-          lfs: false
-          submodules: false
-          set-safe-directory: true
-          allow-unsafe-pr-checkout: false
-
-      - name: Setup Node.js
-        id: setup_node
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
-        with:
-          node-version: '24.18.1'
-          check-latest: false
-          token: ${{ github.token }}
-          package-manager-cache: false
-
-      - name: Verify Node and npm identities
+      - name: Acquire triggering revision and pinned toolchain without an action
+        id: acquire
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $arrNodeCommands = @(Get-Command -Name node -CommandType Application -ErrorAction Stop)
-          $arrNpmCommands = @(Get-Command -Name npm -CommandType Application -ErrorAction Stop)
-          $strNodePath = [string]$arrNodeCommands[0].Source
-          $strNpmPath = [string]$arrNpmCommands[0].Source
-          $arrNodeVersion = @(& $strNodePath --version)
-          $intNodeExit = $LASTEXITCODE
-          $arrNpmVersion = @(& $strNpmPath --version)
-          $intNpmExit = $LASTEXITCODE
-          if ($intNodeExit -ne 0 -or $arrNodeVersion.Count -ne 1 -or
-              $arrNodeVersion[0] -cne 'v24.18.1') {
-              throw "Unexpected Node identity at $strNodePath."
+
+          # Do not load user/system Git credentials or hooks during anonymous acquisition.
+          $env:GIT_CONFIG_NOSYSTEM = '1'
+          $env:GIT_CONFIG_GLOBAL = '/dev/null'
+          $env:GIT_TERMINAL_PROMPT = '0'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
+              throw 'credential-policy: a token was projected into a code job'
           }
-          if ($intNpmExit -ne 0 -or $arrNpmVersion.Count -ne 1 -or
-              $arrNpmVersion[0] -cne '11.16.0') {
-              throw "Unexpected npm identity at $strNpmPath."
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
           }
 
-      - name: Install frozen dependencies
+          # Read from the environment rather than expanded as a workflow
+          # expression, because no governed script step in this repository
+          # contains an expression at all.
+          $strServerUrl = $env:GITHUB_SERVER_URL
+          $strRepository = $env:GITHUB_REPOSITORY
+          $strSha = $env:GITHUB_SHA
+          if ($strServerUrl -cne 'https://github.com') {
+              throw 'acquire: the runner named an unexpected server'
+          }
+          if ($strRepository -cne 'franklesniak/PSStyleGuide') {
+              throw 'acquire: the triggering repository is not a plain owner/name pair'
+          }
+          if ($strSha -cnotmatch '^[0-9a-f]{40}$') {
+              throw 'acquire: the triggering revision is not a full commit hash'
+          }
+          if (@([System.IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
+              throw 'acquire: the workspace is not empty'
+          }
+
+          # Resolved from a fixed candidate list rather than by name. Nothing has
+          # executed in this step yet, so name resolution is not attacker-
+          # influenced here -- but PowerShell aliases curl and wget to
+          # Invoke-WebRequest on the Desktop edition, this repository already
+          # pins the Git executable this way in the verify step, and relying on
+          # an alias being absent is a property of the host rather than
+          # something this file asserts. Constant, so nothing later can rebind
+          # it.
+          $strResolvedGit = @('/usr/bin/git', '/bin/git') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strResolvedGit)) { throw 'acquire: Git was not resolved as an application' }
+          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant
+          $strResolvedCurl = @('/usr/bin/curl', '/bin/curl') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
+          $strResolvedTar = @('/usr/bin/tar', '/bin/tar') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strResolvedCurl) -or [string]::IsNullOrEmpty($strResolvedTar)) { throw 'acquire: curl or tar was not resolved as an application' }
+          New-Variable -Name strCurlPath -Value $strResolvedCurl -Option Constant
+          New-Variable -Name strTarPath -Value $strResolvedTar -Option Constant
+
+          & $strGitPath -c core.hooksPath=/dev/null init --quiet .
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git init exited $LASTEXITCODE" }
+          & $strGitPath remote add origin "$strServerUrl/$strRepository"
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git remote add exited $LASTEXITCODE" }
+          & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strSha
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git fetch exited $LASTEXITCODE" }
+          & $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }
+          $strHead = (& $strGitPath rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0 -or $strHead -cne $strSha) {
+              throw 'acquire: the checked out revision is not the triggering revision'
+          }
+
+          # The Node distribution is fetched here rather than by setup-node.
+          # The archive URL and its expected digest are reviewed constants, so
+          # nothing here trusts what the server returns -- which is a stronger
+          # supply assertion than the action carried, since this repository
+          # never verified anything setup-node downloaded. The step already
+          # performs network I/O. A later step installs the frozen dependency tree.
+          $strNodeUrl = 'https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz'
+          $strReviewedNodeSha256 = 'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0'
+          $strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'node24')
+          $strArchivePath = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'node24.tar.xz')
+          & $strCurlPath --silent --show-error --fail --location --proto '=https' --tlsv1.2 --output $strArchivePath $strNodeUrl
+          if ($LASTEXITCODE -ne 0) { throw "acquire: node download exited $LASTEXITCODE" }
+          $strObservedNodeSha256 = (Get-FileHash -LiteralPath $strArchivePath -Algorithm SHA256).Hash
+          if ($strObservedNodeSha256 -cne $strReviewedNodeSha256) {
+              throw 'acquire: the Node archive does not match the reviewed digest'
+          }
+          [void][System.IO.Directory]::CreateDirectory($strNodeRoot)
+          & $strTarPath -xJf $strArchivePath -C $strNodeRoot --strip-components=1
+          if ($LASTEXITCODE -ne 0) { throw "acquire: node extraction exited $LASTEXITCODE" }
+          Write-Host "acquire: revision $strSha and the reviewed Node distribution"
+      - name: Verify checkout credential cleanup
+        id: verify-checkout-credentials
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          # Do not load user/system Git credentials or hooks during anonymous acquisition.
+          $env:GIT_CONFIG_NOSYSTEM = '1'
+          $env:GIT_CONFIG_GLOBAL = '/dev/null'
+          $env:GIT_TERMINAL_PROMPT = '0'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
+              throw 'credential-policy: a token was projected into a code job'
+          }
+          # git config exits 1 when a queried key is absent, which is the secure
+          # expected state this step asserts. If the runner enables native-command
+          # error mapping, that accepted status would terminate the step before the
+          # explicit capture below runs, so it is disabled the same way
+          # markdownlint.yml disables it.
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
+          }
+          # Resolved here too. Constants do not cross step boundaries, and this
+          # step asserts a credential property, so the executable it asks must
+          # not be chosen by name resolution either.
+          $strResolvedGit = @('/usr/bin/git', '/bin/git') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strResolvedGit)) { throw 'credential-policy: Git was not resolved as an application' }
+          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant
+          $arrRemoteUrls = @(& $strGitPath remote get-url --all origin)
+          if ($LASTEXITCODE -ne 0 -or $arrRemoteUrls.Count -ne 1) {
+              throw 'credential-policy: unable to resolve exactly one origin URL'
+          }
+          if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {
+              throw 'credential-policy: origin is not a credential-free GitHub HTTPS URL'
+          }
+          $arrHelpers = @(& $strGitPath config --local --get-all credential.helper)
+          $intHelperExit = $LASTEXITCODE
+          $global:LASTEXITCODE = 0
+          if (($intHelperExit -ne 0 -and $intHelperExit -ne 1) -or $arrHelpers.Count -ne 0) {
+              throw 'credential-policy: a local credential helper is configured'
+          }
+          $arrAuthorizationKeys = @(& $strGitPath config --local --name-only --get-regexp '^http\..*\.extraheader$')
+          $intAuthorizationExit = $LASTEXITCODE
+          $global:LASTEXITCODE = 0
+          if (($intAuthorizationExit -ne 0 -and $intAuthorizationExit -ne 1) -or $arrAuthorizationKeys.Count -ne 0) {
+              throw 'credential-policy: persisted HTTP authorization is configured'
+          }
+
+          $arrEffectiveConfig = @(& $strGitPath config --show-scope --name-only --list)
+          $intEffectiveConfigExit = $LASTEXITCODE
+          if ($intEffectiveConfigExit -ne 0 -or @($arrEffectiveConfig | Where-Object { $_ -cmatch '^(system|global)\s' }).Count -ne 0) {
+              throw 'credential-policy: external Git configuration was not excluded'
+          }
+      - name: Install without executing packages and validate workflow policy
+        id: validate
+        shell: pwsh
         working-directory: .github/workflows
-        shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $strContractPath = 'workflow-policy-contract.json'
-          $objContract = Get-Content -LiteralPath $strContractPath -Raw | ConvertFrom-Json
-          $strExpectedValidatorHash = [string]$objContract.validatorIdentity.sha256
-          if ($strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {
-              throw 'The contract did not record a reviewed validator digest.'
+
+          # Do not load user/system Git credentials or hooks during anonymous acquisition.
+          $env:GIT_CONFIG_NOSYSTEM = '1'
+          $env:GIT_CONFIG_GLOBAL = '/dev/null'
+          $env:GIT_TERMINAL_PROMPT = '0'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
+              throw 'credential-policy: a token was projected into a code job'
           }
-          $strValidatorPath = 'Validate-WorkflowPolicy.mjs'
-          $strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $strValidatorPath).Hash
-          if ($strValidatorHash -ine $strExpectedValidatorHash) {
-              throw 'The policy validator does not match the reviewed digest; refusing to run it.'
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
           }
-          $arrNodeCommands = @(Get-Command -Name node -CommandType Application -ErrorAction Stop)
-          $strNodePath = [string]$arrNodeCommands[0].Source
-          $arrPreflight = @(& $strNodePath Validate-WorkflowPolicy.mjs --preflight)
+
+          # Fixed paths into the distribution the previous step downloaded and
+          # verified against a reviewed digest, rather than a PATH lookup.
+          # Get-Command consults the command table and PATH, and this is the
+          # step that runs repository-controlled code, so resolving through
+          # either would let that code choose which node runs. The bin
+          # directory is still prepended to PATH because npm's shim resolves
+          # its interpreter through env.
+          $strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'node24')
+          $strNodePath = [System.IO.Path]::Combine($strNodeRoot, 'bin', 'node')
+          $strNpmPath = [System.IO.Path]::Combine($strNodeRoot, 'bin', 'npm')
+          if (-not [System.IO.File]::Exists($strNodePath) -or -not [System.IO.File]::Exists($strNpmPath)) {
+              throw 'toolchain: the reviewed Node distribution is not present'
+          }
+          $env:PATH = [System.IO.Path]::Combine($strNodeRoot, 'bin') + [System.IO.Path]::PathSeparator + $env:PATH
+          $strNodeVersion = (& $strNodePath --version).Trim()
+          $intNodeVersionExit = $LASTEXITCODE
+          $strNpmVersion = (& $strNpmPath --version).Trim()
+          $intNpmVersionExit = $LASTEXITCODE
+          if ($intNodeVersionExit -ne 0 -or $strNodeVersion -cne 'v24.18.1') {
+              throw "toolchain: node version check failed with exit $intNodeVersionExit"
+          }
+          if ($intNpmVersionExit -ne 0 -or $strNpmVersion -cne '11.16.0') {
+              throw "toolchain: npm version check failed with exit $intNpmVersionExit"
+          }
+          Write-Host "Node executable: $strNodePath ($strNodeVersion)"
+          Write-Host "npm executable: $strNpmPath ($strNpmVersion)"
+
+          # Reviewed baseline. The before/after comparison further below proves
+          # only that npm ci left these files alone; it cannot detect metadata
+          # that was already altered at review time. This gate runs before
+          # installation so unreviewed scripts are never installed and never run.
+          $strReviewedPackageHash = '59E676D981CFFA350CB72E7EA4B1AEEC2C49D56621958A095AA0E76733EC2CD9'
+          $strReviewedLockHash = '5EFC1286025CDC3AD03796C5F4E44CC697E674A30E61DE05E299B2A30ABAD1A2'
+          $strPackageBefore = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash
+          $strLockBefore = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash
+          if ($strPackageBefore -cne $strReviewedPackageHash -or $strLockBefore -cne $strReviewedLockHash) {
+              throw 'supply: package metadata does not match the reviewed supply digest'
+          }
+
+          # npm reads .npmrc from the project directory before it runs anything,
+          # and script-shell there replaces the interpreter for every npm run. A
+          # pull request can add one without altering either reviewed digest or
+          # any governed workflow, after which both lint phases exit zero with the
+          # command echoed and no linter ever executed. No .npmrc is reviewed in
+          # this repository, so any is refused here, ahead of installation, so npm
+          # never reads one.
+          foreach ($strNpmConfigPath in @('.npmrc', '../.npmrc', '../../.npmrc')) {
+              if (Test-Path -LiteralPath $strNpmConfigPath) {
+                  throw 'supply: repository-controlled npm configuration is present'
+              }
+          }
+
+          # The loop above walks project paths, which is where a committed
+          # .npmrc would sit -- but npm also loads a per-user file at
+          # $HOME/.npmrc and a global one, and neither is under the repository
+          # tree. A script-shell setting in either replaces the interpreter for
+          # every npm run, so both lint phases would exit zero with the command
+          # echoed and no linter executed, leaving installation, asset hashes,
+          # the policy validator and all three captured statuses intact.
+          # Enumerating those paths would be another list to be one entry
+          # short of, so npm is told where to read them from instead. Both are
+          # pointed at /dev/null rather than at an absent name: an absent name
+          # under RUNNER_TEMP is absent only until something creates it, and the
+          # first lint phase is repository-adjacent code that runs before the
+          # second one reads the file. /dev/null always reads as empty and no
+          # unprivileged process can make it read as anything else, so the
+          # neutralization holds across both phases instead of only until the
+          # check that observed it.
+          # npm refuses to load one file at two config levels -- it exits
+          # before config resolution with "double-loading config" -- so the two
+          # settings cannot both name /dev/null. They use the same property by
+          # two routes: a source this job cannot write.
+          $env:npm_config_userconfig = '/dev/null'
+          $env:npm_config_globalconfig = '/etc/npmrc-absent-by-policy'
+          if (-not [string]::IsNullOrEmpty((Get-Content -Raw -LiteralPath $env:npm_config_userconfig -ErrorAction SilentlyContinue))) {
+              throw 'supply: the neutralized npm configuration source is not empty'
+          }
+          if (Test-Path -LiteralPath $env:npm_config_globalconfig) {
+              throw 'supply: the neutralized npm configuration path exists'
+          }
+          # /dev/null reads as empty. The absent global path is under root-owned
+          # /etc on the hosted runner. The two distinct sources avoid npm rejecting
+          # the same file at two configuration levels. Neither lint phase can write
+          # the global source without a privilege change outside this job contract.
+          $strGlobalConfigDirectory = [System.IO.Path]::GetDirectoryName($env:npm_config_globalconfig)
+          if ($strGlobalConfigDirectory -cne '/etc') {
+              throw 'supply: the neutralized global npm configuration is not under a root-owned directory'
+          }
+
+          # Recorded before installation, so the baseline predates every file
+          # npm unpacks into this job. Handed to the validator rather than
+          # re-compared here: a comparison in PowerShell just before the
+          # invocation would be a check/use pair with an interval in it, while
+          # the validator hashes the text it actually parsed and has none.
+          $env:P1_EXPECTED_BUILD_DIGEST = (Get-FileHash -LiteralPath ./build.yml -Algorithm SHA256).Hash
+          $env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash
+
+          # Bind the exact executable bytes before this preflight invocation.
+          $objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json
+          $strExpectedValidatorHash = $objContract.validatorIdentity.sha256
+          if ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {
+              throw 'workflow-policy: invalid validator identity'
+          }
+          $strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash
+          if ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }
+          $arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)
           $intPreflightExit = $LASTEXITCODE
-          if ($intPreflightExit -ne 0 -or $arrPreflight.Count -ne 1) {
-              throw "Preflight identity check failed with native exit $intPreflightExit."
+          if ($intPreflightExit -isnot [int] -or $intPreflightExit -ne 0 -or
+              $arrPreflight.Count -ne 1 -or $arrPreflight[0] -isnot [string] -or
+              $arrPreflight[0].Length -gt 65536) {
+              throw 'workflow-policy: invalid preflight process result'
           }
-          $objPreflight = $arrPreflight[0] | ConvertFrom-Json
-          if ($objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or
-              $objPreflight.success -ne $true) {
-              throw 'Preflight identity check did not succeed; refusing to install.'
+          try { $objPreflight = $arrPreflight[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }
+          catch { throw 'workflow-policy: invalid preflight JSON' }
+          if ($null -eq $objPreflight -or $objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject] -or
+              $objPreflight.schema -isnot [string] -or $objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or
+              $objPreflight.success -isnot [bool] -or $objPreflight.success -ne $true) {
+              throw 'workflow-policy: rejected preflight result'
           }
-          $strManifestHashBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package.json').Hash
-          $strLockHashBefore = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package-lock.json').Hash
-          # Rooted here rather than read from the contract. The contract's
-          # authenticity rests on a constant inside the validator, and the
-          # validator is replaceable by the same pull request, so a gate that
-          # reads its expectations from the contract can be satisfied by an
-          # attacker who replaces both. These literals are independent of the
-          # validator and of the contract; keep them in step with
-          # supplyFreeze.reviewedWorkingBytes whenever the tuple is re-frozen.
-          $strExpectedManifestHash = '59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9'
-          $strExpectedLockHash = '5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2'
-          if ($strManifestHashBefore -ine $strExpectedManifestHash -or
-              $strLockHashBefore -ine $strExpectedLockHash) {
-              throw 'The npm package tuple does not match the reviewed digests; refusing to install.'
-          }
-          $arrNpmCommands = @(Get-Command -Name npm -CommandType Application -ErrorAction Stop)
-          $strNpmPath = [string]$arrNpmCommands[0].Source
-          $boolHadCi = Test-Path -LiteralPath Env:CI
-          $strPreviousCi = if ($boolHadCi) { $env:CI } else { $null }
+
+          $boolCiExisted = Test-Path Env:CI
+          $strPriorCi = $env:CI
           try {
               $env:CI = 'true'
               & $strNpmPath ci --ignore-scripts --no-audit --no-fund
               $intInstallExit = $LASTEXITCODE
           } finally {
-              if ($boolHadCi) {
-                  $env:CI = $strPreviousCi
+              if ($boolCiExisted) {
+                  $env:CI = $strPriorCi
               } else {
-                  Remove-Item -LiteralPath Env:CI -ErrorAction SilentlyContinue
+                  Remove-Item Env:CI -ErrorAction SilentlyContinue
               }
           }
-          if ($intInstallExit -ne 0) {
-              throw "npm ci failed with native exit $intInstallExit."
-          }
-          $strManifestHashAfter = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package.json').Hash
-          $strLockHashAfter = (Get-FileHash -Algorithm SHA256 -LiteralPath 'package-lock.json').Hash
-          if ($strManifestHashBefore -cne $strManifestHashAfter -or
-              $strLockHashBefore -cne $strLockHashAfter) {
-              throw 'The frozen npm consumer changed package metadata.'
+          if ($intInstallExit -ne 0) { throw "npm-ci: native exit $intInstallExit" }
+
+          $strPackageAfterInstall = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash
+          $strLockAfterInstall = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash
+          if ($strPackageAfterInstall -cne $strPackageBefore -or $strLockAfterInstall -cne $strLockBefore) {
+              throw 'npm-ci: package metadata changed during frozen installation'
           }
 
-      - name: Validate workflow policy offline
-        working-directory: .github/workflows
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw |
-              ConvertFrom-Json
-          $strExpectedValidatorHash = [string]$objContract.validatorIdentity.sha256
-          if ($strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {
-              throw 'The contract did not record a reviewed validator digest.'
+          # The policy job runs the preflight and full validator, but no lint phase.
+          # Preflight is the first repository-code execution in this job. Its
+          # identity/result checks are not independent authorization. The separate
+          # lint runner does not consume this job's files or outputs.
+          # Bind the exact executable bytes before this policy invocation.
+          $objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json
+          $strExpectedValidatorHash = $objContract.validatorIdentity.sha256
+          if ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {
+              throw 'workflow-policy: invalid validator identity'
           }
-          $strValidatorPath = 'Validate-WorkflowPolicy.mjs'
-          $strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $strValidatorPath).Hash
-          if ($strValidatorHash -ine $strExpectedValidatorHash) {
-              throw 'The policy validator does not match the reviewed digest; refusing to run it.'
-          }
-          $arrNodeCommands = @(Get-Command -Name node -CommandType Application -ErrorAction Stop)
-          $strNodePath = [string]$arrNodeCommands[0].Source
-          $arrPolicyResult = @(& $strNodePath Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)
+          $strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash
+          if ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }
+          $arrPolicy = @(& $strNodePath ./Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)
           $intPolicyExit = $LASTEXITCODE
-          if ($intPolicyExit -ne 0 -or $arrPolicyResult.Count -ne 1) {
-              throw "Workflow policy validation failed with native exit $intPolicyExit."
+          if ($intPolicyExit -isnot [int] -or $intPolicyExit -ne 0 -or
+              $arrPolicy.Count -ne 1 -or $arrPolicy[0] -isnot [string] -or
+              $arrPolicy[0].Length -gt 65536) {
+              throw 'workflow-policy: invalid policy process result'
           }
-          $objPolicyResult = $arrPolicyResult[0] | ConvertFrom-Json
-          if ($objPolicyResult.schema -cne 'PSStyleGuide.WorkflowPolicyResult.v1') {
-              throw 'The policy validator returned an unexpected result schema.'
+          try { $objPolicy = $arrPolicy[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }
+          catch { throw 'workflow-policy: invalid policy JSON' }
+          if ($null -eq $objPolicy -or $objPolicy.GetType() -ne [System.Management.Automation.PSCustomObject] -or
+              $objPolicy.schema -isnot [string] -or $objPolicy.schema -cne 'PSStyleGuide.WorkflowPolicyResult.v1' -or
+              $objPolicy.success -isnot [bool] -or $objPolicy.success -ne $true) {
+              throw 'workflow-policy: rejected policy result'
           }
-          if ($objPolicyResult.success -ne $true) {
-              throw "Workflow policy validation rejected the tree: $($objPolicyResult.category)."
-          }
+          Write-Host "workflow-policy native exit: $intPolicyExit"
 
-      - name: Run both Markdown lint surfaces
-        working-directory: .github/workflows
+          $strPackageFinal = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash
+          $strLockFinal = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash
+          if ($strPackageFinal -cne $strPackageBefore -or $strLockFinal -cne $strLockBefore) {
+              throw 'validation: package metadata changed after installation'
+          }
+          if ($intPolicyExit -ne 0) {
+              throw 'validation: workflow policy validation failed'
+          }
+  markdownlint:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions: {}
+    steps:
+      - name: Acquire triggering revision and pinned toolchain without an action
+        id: acquire
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          $arrNpmCommands = @(Get-Command -Name npm -CommandType Application -ErrorAction Stop)
-          $strNpmPath = [string]$arrNpmCommands[0].Source
+
+          # Do not load user/system Git credentials or hooks during anonymous acquisition.
+          $env:GIT_CONFIG_NOSYSTEM = '1'
+          $env:GIT_CONFIG_GLOBAL = '/dev/null'
+          $env:GIT_TERMINAL_PROMPT = '0'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
+              throw 'credential-policy: a token was projected into a code job'
+          }
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
+          }
+
+          # Read from the environment rather than expanded as a workflow
+          # expression, because no governed script step in this repository
+          # contains an expression at all.
+          $strServerUrl = $env:GITHUB_SERVER_URL
+          $strRepository = $env:GITHUB_REPOSITORY
+          $strSha = $env:GITHUB_SHA
+          if ($strServerUrl -cne 'https://github.com') {
+              throw 'acquire: the runner named an unexpected server'
+          }
+          if ($strRepository -cne 'franklesniak/PSStyleGuide') {
+              throw 'acquire: the triggering repository is not a plain owner/name pair'
+          }
+          if ($strSha -cnotmatch '^[0-9a-f]{40}$') {
+              throw 'acquire: the triggering revision is not a full commit hash'
+          }
+          if (@([System.IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
+              throw 'acquire: the workspace is not empty'
+          }
+
+          # Resolved from a fixed candidate list rather than by name. Nothing has
+          # executed in this step yet, so name resolution is not attacker-
+          # influenced here -- but PowerShell aliases curl and wget to
+          # Invoke-WebRequest on the Desktop edition, this repository already
+          # pins the Git executable this way in the verify step, and relying on
+          # an alias being absent is a property of the host rather than
+          # something this file asserts. Constant, so nothing later can rebind
+          # it.
+          $strResolvedGit = @('/usr/bin/git', '/bin/git') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strResolvedGit)) { throw 'acquire: Git was not resolved as an application' }
+          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant
+          $strResolvedCurl = @('/usr/bin/curl', '/bin/curl') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
+          $strResolvedTar = @('/usr/bin/tar', '/bin/tar') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strResolvedCurl) -or [string]::IsNullOrEmpty($strResolvedTar)) { throw 'acquire: curl or tar was not resolved as an application' }
+          New-Variable -Name strCurlPath -Value $strResolvedCurl -Option Constant
+          New-Variable -Name strTarPath -Value $strResolvedTar -Option Constant
+
+          & $strGitPath -c core.hooksPath=/dev/null init --quiet .
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git init exited $LASTEXITCODE" }
+          & $strGitPath remote add origin "$strServerUrl/$strRepository"
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git remote add exited $LASTEXITCODE" }
+          & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strSha
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git fetch exited $LASTEXITCODE" }
+          & $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD
+          if ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }
+          $strHead = (& $strGitPath rev-parse HEAD).Trim()
+          if ($LASTEXITCODE -ne 0 -or $strHead -cne $strSha) {
+              throw 'acquire: the checked out revision is not the triggering revision'
+          }
+
+          # The Node distribution is fetched here rather than by setup-node.
+          # The archive URL and its expected digest are reviewed constants, so
+          # nothing here trusts what the server returns -- which is a stronger
+          # supply assertion than the action carried, since this repository
+          # never verified anything setup-node downloaded. The step already
+          # performs network I/O. A later step installs the frozen dependency tree.
+          $strNodeUrl = 'https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz'
+          $strReviewedNodeSha256 = 'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0'
+          $strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'node24')
+          $strArchivePath = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'node24.tar.xz')
+          & $strCurlPath --silent --show-error --fail --location --proto '=https' --tlsv1.2 --output $strArchivePath $strNodeUrl
+          if ($LASTEXITCODE -ne 0) { throw "acquire: node download exited $LASTEXITCODE" }
+          $strObservedNodeSha256 = (Get-FileHash -LiteralPath $strArchivePath -Algorithm SHA256).Hash
+          if ($strObservedNodeSha256 -cne $strReviewedNodeSha256) {
+              throw 'acquire: the Node archive does not match the reviewed digest'
+          }
+          [void][System.IO.Directory]::CreateDirectory($strNodeRoot)
+          & $strTarPath -xJf $strArchivePath -C $strNodeRoot --strip-components=1
+          if ($LASTEXITCODE -ne 0) { throw "acquire: node extraction exited $LASTEXITCODE" }
+          Write-Host "acquire: revision $strSha and the reviewed Node distribution"
+      - name: Verify checkout credential cleanup
+        id: verify-checkout-credentials
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          # Do not load user/system Git credentials or hooks during anonymous acquisition.
+          $env:GIT_CONFIG_NOSYSTEM = '1'
+          $env:GIT_CONFIG_GLOBAL = '/dev/null'
+          $env:GIT_TERMINAL_PROMPT = '0'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
+              throw 'credential-policy: a token was projected into a code job'
+          }
+          # git config exits 1 when a queried key is absent, which is the secure
+          # expected state this step asserts. If the runner enables native-command
+          # error mapping, that accepted status would terminate the step before the
+          # explicit capture below runs, so it is disabled the same way
+          # markdownlint.yml disables it.
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
+          }
+          # Resolved here too. Constants do not cross step boundaries, and this
+          # step asserts a credential property, so the executable it asks must
+          # not be chosen by name resolution either.
+          $strResolvedGit = @('/usr/bin/git', '/bin/git') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strResolvedGit)) { throw 'credential-policy: Git was not resolved as an application' }
+          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant
+          $arrRemoteUrls = @(& $strGitPath remote get-url --all origin)
+          if ($LASTEXITCODE -ne 0 -or $arrRemoteUrls.Count -ne 1) {
+              throw 'credential-policy: unable to resolve exactly one origin URL'
+          }
+          if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {
+              throw 'credential-policy: origin is not a credential-free GitHub HTTPS URL'
+          }
+          $arrHelpers = @(& $strGitPath config --local --get-all credential.helper)
+          $intHelperExit = $LASTEXITCODE
+          $global:LASTEXITCODE = 0
+          if (($intHelperExit -ne 0 -and $intHelperExit -ne 1) -or $arrHelpers.Count -ne 0) {
+              throw 'credential-policy: a local credential helper is configured'
+          }
+          $arrAuthorizationKeys = @(& $strGitPath config --local --name-only --get-regexp '^http\..*\.extraheader$')
+          $intAuthorizationExit = $LASTEXITCODE
+          $global:LASTEXITCODE = 0
+          if (($intAuthorizationExit -ne 0 -and $intAuthorizationExit -ne 1) -or $arrAuthorizationKeys.Count -ne 0) {
+              throw 'credential-policy: persisted HTTP authorization is configured'
+          }
+
+          $arrEffectiveConfig = @(& $strGitPath config --show-scope --name-only --list)
+          $intEffectiveConfigExit = $LASTEXITCODE
+          if ($intEffectiveConfigExit -ne 0 -or @($arrEffectiveConfig | Where-Object { $_ -cmatch '^(system|global)\s' }).Count -ne 0) {
+              throw 'credential-policy: external Git configuration was not excluded'
+          }
+      - name: Install and lint both Markdown surfaces
+        id: lint
+        shell: pwsh
+        working-directory: .github/workflows
+        run: |
+          $ErrorActionPreference = 'Stop'
+
+          # Do not load user/system Git credentials or hooks during anonymous acquisition.
+          $env:GIT_CONFIG_NOSYSTEM = '1'
+          $env:GIT_CONFIG_GLOBAL = '/dev/null'
+          $env:GIT_TERMINAL_PROMPT = '0'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
+              throw 'credential-policy: a token was projected into a code job'
+          }
+          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
+              $PSNativeCommandUseErrorActionPreference = $false
+          }
+
+          # Fixed paths into the distribution the previous step downloaded and
+          # verified against a reviewed digest, rather than a PATH lookup.
+          # Get-Command consults the command table and PATH, and this is the
+          # step that runs repository-controlled code, so resolving through
+          # either would let that code choose which node runs. The bin
+          # directory is still prepended to PATH because npm's shim resolves
+          # its interpreter through env.
+          $strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'node24')
+          $strNodePath = [System.IO.Path]::Combine($strNodeRoot, 'bin', 'node')
+          $strNpmPath = [System.IO.Path]::Combine($strNodeRoot, 'bin', 'npm')
+          if (-not [System.IO.File]::Exists($strNodePath) -or -not [System.IO.File]::Exists($strNpmPath)) {
+              throw 'toolchain: the reviewed Node distribution is not present'
+          }
+          $env:PATH = [System.IO.Path]::Combine($strNodeRoot, 'bin') + [System.IO.Path]::PathSeparator + $env:PATH
+          $strNodeVersion = (& $strNodePath --version).Trim()
+          $intNodeVersionExit = $LASTEXITCODE
+          $strNpmVersion = (& $strNpmPath --version).Trim()
+          $intNpmVersionExit = $LASTEXITCODE
+          if ($intNodeVersionExit -ne 0 -or $strNodeVersion -cne 'v24.18.1') {
+              throw "toolchain: node version check failed with exit $intNodeVersionExit"
+          }
+          if ($intNpmVersionExit -ne 0 -or $strNpmVersion -cne '11.16.0') {
+              throw "toolchain: npm version check failed with exit $intNpmVersionExit"
+          }
+          Write-Host "Node executable: $strNodePath ($strNodeVersion)"
+          Write-Host "npm executable: $strNpmPath ($strNpmVersion)"
+
+          # Reviewed baseline. The before/after comparison further below proves
+          # only that npm ci left these files alone; it cannot detect metadata
+          # that was already altered at review time. This gate runs before
+          # installation so unreviewed scripts are never installed and never run.
+          $strReviewedPackageHash = '59E676D981CFFA350CB72E7EA4B1AEEC2C49D56621958A095AA0E76733EC2CD9'
+          $strReviewedLockHash = '5EFC1286025CDC3AD03796C5F4E44CC697E674A30E61DE05E299B2A30ABAD1A2'
+          $strPackageBefore = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash
+          $strLockBefore = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash
+          if ($strPackageBefore -cne $strReviewedPackageHash -or $strLockBefore -cne $strReviewedLockHash) {
+              throw 'supply: package metadata does not match the reviewed supply digest'
+          }
+
+          # npm reads .npmrc from the project directory before it runs anything,
+          # and script-shell there replaces the interpreter for every npm run. A
+          # pull request can add one without altering either reviewed digest or
+          # any governed workflow, after which both lint phases exit zero with the
+          # command echoed and no linter ever executed. No .npmrc is reviewed in
+          # this repository, so any is refused here, ahead of installation, so npm
+          # never reads one.
+          foreach ($strNpmConfigPath in @('.npmrc', '../.npmrc', '../../.npmrc')) {
+              if (Test-Path -LiteralPath $strNpmConfigPath) {
+                  throw 'supply: repository-controlled npm configuration is present'
+              }
+          }
+
+          # The loop above walks project paths, which is where a committed
+          # .npmrc would sit -- but npm also loads a per-user file at
+          # $HOME/.npmrc and a global one, and neither is under the repository
+          # tree. A script-shell setting in either replaces the interpreter for
+          # every npm run, so both lint phases would exit zero with the command
+          # echoed and no linter executed, leaving installation, asset hashes,
+          # the policy validator and all three captured statuses intact.
+          # Enumerating those paths would be another list to be one entry
+          # short of, so npm is told where to read them from instead. Both are
+          # pointed at /dev/null rather than at an absent name: an absent name
+          # under RUNNER_TEMP is absent only until something creates it, and the
+          # first lint phase is repository-adjacent code that runs before the
+          # second one reads the file. /dev/null always reads as empty and no
+          # unprivileged process can make it read as anything else, so the
+          # neutralization holds across both phases instead of only until the
+          # check that observed it.
+          # npm refuses to load one file at two config levels -- it exits
+          # before config resolution with "double-loading config" -- so the two
+          # settings cannot both name /dev/null. They use the same property by
+          # two routes: a source this job cannot write.
+          $env:npm_config_userconfig = '/dev/null'
+          $env:npm_config_globalconfig = '/etc/npmrc-absent-by-policy'
+          if (-not [string]::IsNullOrEmpty((Get-Content -Raw -LiteralPath $env:npm_config_userconfig -ErrorAction SilentlyContinue))) {
+              throw 'supply: the neutralized npm configuration source is not empty'
+          }
+          if (Test-Path -LiteralPath $env:npm_config_globalconfig) {
+              throw 'supply: the neutralized npm configuration path exists'
+          }
+          # /dev/null reads as empty. The absent global path is under root-owned
+          # /etc on the hosted runner. The two distinct sources avoid npm rejecting
+          # the same file at two configuration levels. Neither lint phase can write
+          # the global source without a privilege change outside this job contract.
+          $strGlobalConfigDirectory = [System.IO.Path]::GetDirectoryName($env:npm_config_globalconfig)
+          if ($strGlobalConfigDirectory -cne '/etc') {
+              throw 'supply: the neutralized global npm configuration is not under a root-owned directory'
+          }
+
+          # The reviewed digests above cover what is installed, not what the
+          # lint actually does. Both lint phases execute from the checkout: the
+          # rule configuration decides which rules run at all, and the
+          # nested-fence helper is the whole of the second phase. A pull
+          # request editing either keeps every npm command string, every
+          # captured status, and every digest intact while both phases report
+          # zero errors over nothing.
+          $strReviewedLintConfigHash = '5EB07BF7F30829E0091E82F235A96FDBA21BE1EF1160CA1E22CDBE8D82DA5300'
+          $strReviewedLintHelperHash = 'B20AAAB172224DA4377CDA75FA6CAD1A8EEB00F8BDD26737FFE0E6C2AD222492'
+          $strLintConfigHash = (Get-FileHash -LiteralPath .markdownlint.jsonc -Algorithm SHA256).Hash
+          $strLintHelperHash = (Get-FileHash -LiteralPath lint-nested-markdown.js -Algorithm SHA256).Hash
+          if ($strLintConfigHash -cne $strReviewedLintConfigHash -or $strLintHelperHash -cne $strReviewedLintHelperHash) {
+              throw 'supply: lint configuration or helper does not match the reviewed digest'
+          }
+
+          $boolCiExisted = Test-Path Env:CI
+          $strPriorCi = $env:CI
+          try {
+              $env:CI = 'true'
+              & $strNpmPath ci --ignore-scripts --no-audit --no-fund
+              $intInstallExit = $LASTEXITCODE
+          } finally {
+              if ($boolCiExisted) {
+                  $env:CI = $strPriorCi
+              } else {
+                  Remove-Item Env:CI -ErrorAction SilentlyContinue
+              }
+          }
+          if ($intInstallExit -ne 0) { throw "npm-ci: native exit $intInstallExit" }
+
+          $strPackageAfterInstall = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash
+          $strLockAfterInstall = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash
+          if ($strPackageAfterInstall -cne $strPackageBefore -or $strLockAfterInstall -cne $strLockBefore) {
+              throw 'npm-ci: package metadata changed during frozen installation'
+          }
+
+          # Re-taken after installation and before the phases that read them.
+          # This asserts one specific thing and no more: that npm ci did not
+          # disturb the two lint assets between the gate above and the linters
+          # below. It is not a boundary against a concurrent writer --
+          # Get-FileHash reads and closes, so any process still running could
+          # write the file after the hash and before the linter opens it. The
+          # boundary is established by ordering instead: npm ci installs the
+          # lockfile-pinned tree with --ignore-scripts, so no repository or
+          # package code runs between the gate and the linters. The name says
+          # installation because installation is what it spans. Policy code runs
+          # only in the separate policy job.
+          $strLintConfigAfterInstall = (Get-FileHash -LiteralPath .markdownlint.jsonc -Algorithm SHA256).Hash
+          $strLintHelperAfterInstall = (Get-FileHash -LiteralPath lint-nested-markdown.js -Algorithm SHA256).Hash
+          if ($strLintConfigAfterInstall -cne $strReviewedLintConfigHash -or $strLintHelperAfterInstall -cne $strReviewedLintHelperHash) {
+              throw 'supply: lint configuration or helper changed during installation'
+          }
+
           & $strNpmPath run lint:md
           $intOuterExit = $LASTEXITCODE
+          Write-Host "outer-markdown native exit: $intOuterExit"
+
           & $strNpmPath run lint:md:nested
           $intNestedExit = $LASTEXITCODE
+          Write-Host "nested-markdown native exit: $intNestedExit"
+
+          $strPackageFinal = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash
+          $strLockFinal = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash
+          if ($strPackageFinal -cne $strPackageBefore -or $strLockFinal -cne $strLockBefore) {
+              throw 'validation: package metadata changed after installation or linting'
+          }
           if ($intOuterExit -ne 0 -or $intNestedExit -ne 0) {
-              throw "Markdown lint failed: outer=$intOuterExit nested=$intNestedExit."
+              throw 'validation: one or more lint phases failed'
           }
