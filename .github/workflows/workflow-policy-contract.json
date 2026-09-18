@@ -5,7 +5,8 @@
     "maximumWorkflowBytes": 131072,
     "maximumJsonBytes": 524288,
     "maximumNodes": 5000,
-    "maximumDepth": 32
+    "maximumDepth": 32,
+    "maximumCaseNodes": 16384
   },
   "supplyFreeze": {
     "schema": "P1-SUPPLY-FREEZE-v1",
@@ -136,11 +137,11 @@
   },
   "caseCatalog": {
     "path": "workflow-policy-cases.json",
-    "sha256": "81928b7ddf5130fbc69f0f4a240cc7f4f6a7aec542d7cf617947046a66b5e81f"
+    "sha256": "d26f6af1e062c238293c10f64e3e026f8da78791136a4ad24d917db9e77690be"
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "12b085ba4678e7120ceec44725b64f61f393a3cfb78fc555fe6fabaa817f87e1"
+    "sha256": "2e673f1367bbd58af8b9b4740e16ab5fd566fc5a557a558916f412a457ed330f"
   },
   "actions": {
     "checkout": {
@@ -152,27 +153,111 @@
       "manifestSha256": "d59219cb79590abdb877deaa14e3b65a00c05318bf5a6f3b989b9162b5d08c35",
       "runsUsing": "node24",
       "inputs": {
-        "repository": { "default": "${{ github.repository }}", "required": null, "disposition": "Authored" },
-        "ref": { "default": null, "required": null, "disposition": "Authored" },
-        "token": { "default": "${{ github.token }}", "required": null, "disposition": "Authored" },
-        "ssh-key": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "ssh-known-hosts": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "ssh-strict": { "default": true, "required": null, "disposition": "NotApplicable" },
-        "ssh-user": { "default": "git", "required": null, "disposition": "NotApplicable" },
-        "persist-credentials": { "default": true, "required": null, "disposition": "Authored" },
-        "path": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "clean": { "default": true, "required": null, "disposition": "Authored" },
-        "filter": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "sparse-checkout": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "sparse-checkout-cone-mode": { "default": true, "required": null, "disposition": "NotApplicable" },
-        "fetch-depth": { "default": 1, "required": null, "disposition": "Authored" },
-        "fetch-tags": { "default": false, "required": null, "disposition": "Authored" },
-        "show-progress": { "default": true, "required": null, "disposition": "Authored" },
-        "lfs": { "default": false, "required": null, "disposition": "Authored" },
-        "submodules": { "default": false, "required": null, "disposition": "Authored" },
-        "set-safe-directory": { "default": true, "required": null, "disposition": "Authored" },
-        "github-server-url": { "default": null, "required": false, "disposition": "ReviewedDefault" },
-        "allow-unsafe-pr-checkout": { "default": false, "required": null, "disposition": "Authored" }
+        "repository": {
+          "default": "${{ github.repository }}",
+          "required": null,
+          "disposition": "Authored"
+        },
+        "ref": {
+          "default": null,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "token": {
+          "default": "${{ github.token }}",
+          "required": null,
+          "disposition": "Authored"
+        },
+        "ssh-key": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "ssh-known-hosts": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "ssh-strict": {
+          "default": true,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "ssh-user": {
+          "default": "git",
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "persist-credentials": {
+          "default": true,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "path": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "clean": {
+          "default": true,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "filter": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "sparse-checkout": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "sparse-checkout-cone-mode": {
+          "default": true,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "fetch-depth": {
+          "default": 1,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "fetch-tags": {
+          "default": false,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "show-progress": {
+          "default": true,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "lfs": {
+          "default": false,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "submodules": {
+          "default": false,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "set-safe-directory": {
+          "default": true,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "github-server-url": {
+          "default": null,
+          "required": false,
+          "disposition": "ReviewedDefault"
+        },
+        "allow-unsafe-pr-checkout": {
+          "default": false,
+          "required": null,
+          "disposition": "Authored"
+        }
       }
     },
     "setupNode": {
@@ -184,18 +269,66 @@
       "manifestSha256": "5d765941ab5d8bef27f08e81b0b041cdb2df2050ea0261dc925d157a2bafbd2b",
       "runsUsing": "node24",
       "inputs": {
-        "node-version": { "default": null, "required": null, "disposition": "Authored" },
-        "node-version-file": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "architecture": { "default": null, "required": null, "disposition": "ReviewedDefault" },
-        "check-latest": { "default": false, "required": null, "disposition": "Authored" },
-        "registry-url": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "scope": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "token": { "default": "${{ github.server_url == 'https://github.com' && github.token || '' }}", "required": null, "disposition": "Authored" },
-        "cache": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "package-manager-cache": { "default": true, "required": null, "disposition": "Authored" },
-        "cache-dependency-path": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "mirror": { "default": null, "required": null, "disposition": "NotApplicable" },
-        "mirror-token": { "default": null, "required": null, "disposition": "NotApplicable" }
+        "node-version": {
+          "default": null,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "node-version-file": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "architecture": {
+          "default": null,
+          "required": null,
+          "disposition": "ReviewedDefault"
+        },
+        "check-latest": {
+          "default": false,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "registry-url": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "scope": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "token": {
+          "default": "${{ github.server_url == 'https://github.com' && github.token || '' }}",
+          "required": null,
+          "disposition": "Authored"
+        },
+        "cache": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "package-manager-cache": {
+          "default": true,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "cache-dependency-path": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "mirror": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        },
+        "mirror-token": {
+          "default": null,
+          "required": null,
+          "disposition": "NotApplicable"
+        }
       }
     },
     "uploadArtifact": {
@@ -207,14 +340,46 @@
       "manifestSha256": "c5979822866a72362e609844b6ebe77d4b7e759af68cc1c2c425dcf51481fab4",
       "runsUsing": "node24",
       "inputs": {
-        "name": { "default": "artifact", "required": null, "disposition": "Authored" },
-        "path": { "default": null, "required": true, "disposition": "Authored" },
-        "if-no-files-found": { "default": "warn", "required": null, "disposition": "Authored" },
-        "retention-days": { "default": null, "required": null, "disposition": "Authored" },
-        "compression-level": { "default": "6", "required": null, "disposition": "Authored" },
-        "overwrite": { "default": "false", "required": null, "disposition": "Authored" },
-        "include-hidden-files": { "default": "false", "required": null, "disposition": "Authored" },
-        "archive": { "default": "true", "required": null, "disposition": "Authored" }
+        "name": {
+          "default": "artifact",
+          "required": null,
+          "disposition": "Authored"
+        },
+        "path": {
+          "default": null,
+          "required": true,
+          "disposition": "Authored"
+        },
+        "if-no-files-found": {
+          "default": "warn",
+          "required": null,
+          "disposition": "Authored"
+        },
+        "retention-days": {
+          "default": null,
+          "required": null,
+          "disposition": "Authored"
+        },
+        "compression-level": {
+          "default": "6",
+          "required": null,
+          "disposition": "Authored"
+        },
+        "overwrite": {
+          "default": "false",
+          "required": null,
+          "disposition": "Authored"
+        },
+        "include-hidden-files": {
+          "default": "false",
+          "required": null,
+          "disposition": "Authored"
+        },
+        "archive": {
+          "default": "true",
+          "required": null,
+          "disposition": "Authored"
+        }
       }
     }
   },
@@ -237,8 +402,16 @@
       "actualValues": false
     },
     "events": {
-      "push": { "branches": ["main"] },
-      "pull_request": { "branches": ["main"] }
+      "push": {
+        "branches": [
+          "main"
+        ]
+      },
+      "pull_request": {
+        "branches": [
+          "main"
+        ]
+      }
     },
     "workflowPermissions": {},
     "workflows": {
@@ -247,13 +420,57 @@
         "jobs": {
           "verify_generated_artifacts": {
             "runsOn": "ubuntu-24.04",
-            "permissions": { "contents": "read" },
+            "timeoutMinutes": 30,
+            "permissions": {},
             "steps": [
-              { "kind": "action", "role": "build.verify_generated_artifacts.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.generate_style_guide_artifacts", "name": "Generate style guide artifacts", "id": "generate_style_guide_artifacts", "shell": "pwsh", "runSha256": "7d1dc4e25cfcb134ef6246da1ecc44ea9453dcdde39afcab1e497d17d4e0c7d2" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.verify_generated_artifact_drift", "name": "Verify generated artifact drift", "id": "verify_generated_artifact_drift", "shell": "pwsh", "runSha256": "1d9f923ca35ed8408c71f7c0a1fff213d438e8620e0ba502318a91c61961ed97" },
-              { "kind": "run", "role": "build.verify_generated_artifacts.create_failure_diagnostics", "name": "Create failure diagnostics", "id": "create_failure_diagnostics", "shell": "pwsh", "if": "${{ failure() && !cancelled() }}", "continueOnError": true, "runSha256": "c7ffffe2913b4fe43d733a7ba918b39b84903efb4822089393458d54d520ec45" },
-              { "kind": "action", "role": "build.verify_generated_artifacts.upload_failure_diagnostics", "name": "Upload failure diagnostics", "id": "upload_failure_diagnostics", "action": "uploadArtifact", "if": "${{ failure() && !cancelled() }}", "continueOnError": true }
+              {
+                "kind": "run",
+                "role": "build.verify_generated_artifacts.acquire",
+                "name": "Acquire triggering revision without an action",
+                "id": "acquire",
+                "shell": "pwsh",
+                "runSha256": "6167b13a78cec16a994f8a57357022da819ac8a120ad21bbe16b734481c49a71"
+              },
+              {
+                "kind": "run",
+                "role": "build.verify_generated_artifacts.verify-checkout-credentials",
+                "name": "Verify checkout credential cleanup",
+                "id": "verify-checkout-credentials",
+                "shell": "pwsh",
+                "runSha256": "de810773ab7b720f47f731f6569ae7bb7c325517791687b2ab19d76256f2b7dc"
+              },
+              {
+                "kind": "run",
+                "role": "build.verify_generated_artifacts.generate_style_guide_artifacts",
+                "name": "Generate and verify style guide artifacts",
+                "id": "generate_style_guide_artifacts",
+                "shell": "pwsh",
+                "runSha256": "688c48db95693e14096c7f099d1387a26fb465374879b1487918718f53de6be2"
+              }
+            ]
+          },
+          "publish_committed_artifacts": {
+            "runsOn": "ubuntu-24.04",
+            "timeoutMinutes": 10,
+            "permissions": {
+              "contents": "read"
+            },
+            "needs": "verify_generated_artifacts",
+            "steps": [
+              {
+                "kind": "action",
+                "role": "build.publish_committed_artifacts.checkout_repository",
+                "name": "Checkout repository",
+                "id": "checkout_repository",
+                "action": "checkout"
+              },
+              {
+                "kind": "action",
+                "role": "build.publish_committed_artifacts.publish_committed_style_guide_artifacts",
+                "name": "Publish committed style guide artifacts",
+                "id": "publish_committed_style_guide_artifacts",
+                "action": "uploadArtifact"
+              }
             ]
           }
         }
@@ -261,16 +478,68 @@
       "markdownlint.yml": {
         "name": "Markdown Lint",
         "jobs": {
+          "policy": {
+            "runsOn": "ubuntu-24.04",
+            "timeoutMinutes": 30,
+            "permissions": {},
+            "steps": [
+              {
+                "kind": "run",
+                "role": "markdownlint.policy.acquire",
+                "name": "Acquire triggering revision and pinned toolchain without an action",
+                "id": "acquire",
+                "shell": "pwsh",
+                "runSha256": "8b55e9f187c8577695d110fa5fe62dd81702de62b72cd6c7ee44bdf3dd01b7a0"
+              },
+              {
+                "kind": "run",
+                "role": "markdownlint.policy.verify-checkout-credentials",
+                "name": "Verify checkout credential cleanup",
+                "id": "verify-checkout-credentials",
+                "shell": "pwsh",
+                "runSha256": "de810773ab7b720f47f731f6569ae7bb7c325517791687b2ab19d76256f2b7dc"
+              },
+              {
+                "kind": "run",
+                "role": "markdownlint.policy.validate",
+                "name": "Install without executing packages and validate workflow policy",
+                "id": "validate",
+                "shell": "pwsh",
+                "workingDirectory": ".github/workflows",
+                "runSha256": "98696ea63f3a3da03758958ff480335154fc07c545622185e96050a7f32eb657"
+              }
+            ]
+          },
           "markdownlint": {
             "runsOn": "ubuntu-24.04",
-            "permissions": { "contents": "read" },
+            "timeoutMinutes": 30,
+            "permissions": {},
             "steps": [
-              { "kind": "action", "role": "markdownlint.markdownlint.checkout_repository", "name": "Checkout repository", "id": "checkout_repository", "action": "checkout" },
-              { "kind": "action", "role": "markdownlint.markdownlint.setup_node", "name": "Setup Node.js", "id": "setup_node", "action": "setupNode" },
-              { "kind": "run", "role": "markdownlint.markdownlint.verify_node_npm", "name": "Verify Node and npm identities", "shell": "pwsh", "runSha256": "386c76b358d0dc5c588e73d3fa7be034ec01ce984f725e8bb09e7f468cc8c513" },
-              { "kind": "run", "role": "markdownlint.markdownlint.install_dependencies", "name": "Install frozen dependencies", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "1e0dd4669097c7ebc4ac5bdc376efafc8d29ec53d23478a960b8a8bb83ed1b9e" },
-              { "kind": "run", "role": "markdownlint.markdownlint.validate_workflow_policy", "name": "Validate workflow policy offline", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "c2304b10b6aa72f6ba227739378cf412f713f21b3443b2ecad0bc5deb27a495b" },
-              { "kind": "run", "role": "markdownlint.markdownlint.lint", "name": "Run both Markdown lint surfaces", "workingDirectory": ".github/workflows", "shell": "pwsh", "runSha256": "ebf88f0dc100390363457571de315937b2dbe5de733941b2c6904e203cf5c521" }
+              {
+                "kind": "run",
+                "role": "markdownlint.markdownlint.acquire",
+                "name": "Acquire triggering revision and pinned toolchain without an action",
+                "id": "acquire",
+                "shell": "pwsh",
+                "runSha256": "8b55e9f187c8577695d110fa5fe62dd81702de62b72cd6c7ee44bdf3dd01b7a0"
+              },
+              {
+                "kind": "run",
+                "role": "markdownlint.markdownlint.verify-checkout-credentials",
+                "name": "Verify checkout credential cleanup",
+                "id": "verify-checkout-credentials",
+                "shell": "pwsh",
+                "runSha256": "de810773ab7b720f47f731f6569ae7bb7c325517791687b2ab19d76256f2b7dc"
+              },
+              {
+                "kind": "run",
+                "role": "markdownlint.markdownlint.lint",
+                "name": "Install and lint both Markdown surfaces",
+                "id": "lint",
+                "shell": "pwsh",
+                "workingDirectory": ".github/workflows",
+                "runSha256": "2423673635070a546cb8ee3900d0527d6be1bfb289bc197ab6f526496433a3a7"
+              }
             ]
           }
         }
@@ -279,8 +548,15 @@
         "name": "Pull Request Body Identity",
         "events": {
           "pull_request_target": {
-            "branches": ["main"],
-            "types": ["edited", "opened", "reopened", "synchronize"]
+            "branches": [
+              "main"
+            ],
+            "types": [
+              "edited",
+              "opened",
+              "reopened",
+              "synchronize"
+            ]
           }
         },
         "workflowPermissions": {},
@@ -289,9 +565,30 @@
             "runsOn": "ubuntu-24.04",
             "permissions": {},
             "steps": [
-              { "kind": "run", "role": "pull_request_body_identity.verify_identity.acquire", "name": "Acquire exact pull request head and verified Node.js", "id": "acquire", "shell": "pwsh", "runSha256": "71ec938a932409fe7f975ad7290c48bb7a3689db092d08bdca94d66ac68fe1b2" },
-              { "kind": "run", "role": "pull_request_body_identity.verify_identity.test_pull_request_body_identity", "name": "Test pull request body identity command", "id": "test_pull_request_body_identity", "shell": "pwsh", "runSha256": "1da1e1bc600de17e14d8813b0bcd64579369ef93ba6fabcacfe69da22eed0172" },
-              { "kind": "run", "role": "pull_request_body_identity.verify_identity.verify_pull_request_body_identity", "name": "Verify pull request body identity", "id": "verify_pull_request_body_identity", "shell": "pwsh", "runSha256": "fe37f056e253ac3fb5d0a40ccda11e40788b8f6477945293a7a38c0f5c255c25" }
+              {
+                "kind": "run",
+                "role": "pull_request_body_identity.verify_identity.acquire",
+                "name": "Acquire exact pull request head and verified Node.js",
+                "id": "acquire",
+                "shell": "pwsh",
+                "runSha256": "71ec938a932409fe7f975ad7290c48bb7a3689db092d08bdca94d66ac68fe1b2"
+              },
+              {
+                "kind": "run",
+                "role": "pull_request_body_identity.verify_identity.test_pull_request_body_identity",
+                "name": "Test pull request body identity command",
+                "id": "test_pull_request_body_identity",
+                "shell": "pwsh",
+                "runSha256": "1da1e1bc600de17e14d8813b0bcd64579369ef93ba6fabcacfe69da22eed0172"
+              },
+              {
+                "kind": "run",
+                "role": "pull_request_body_identity.verify_identity.verify_pull_request_body_identity",
+                "name": "Verify pull request body identity",
+                "id": "verify_pull_request_body_identity",
+                "shell": "pwsh",
+                "runSha256": "fe37f056e253ac3fb5d0a40ccda11e40788b8f6477945293a7a38c0f5c255c25"
+              }
             ]
           }
         }
@@ -319,8 +616,8 @@
         "package-manager-cache": false
       },
       "uploadArtifact": {
-        "name": "style-guide-verification-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}",
-        "path": "${{ runner.temp }}/style-guide-verification-diagnostics",
+        "name": "style-guide-committed-${{ github.run_id }}-${{ github.run_attempt }}",
+        "path": "copilot-instructions.md\npowershell.instructions.md\nSTYLE_GUIDE_CHAT.md\nSTYLE_GUIDE_FULL.md\n",
         "if-no-files-found": "error",
         "retention-days": 7,
         "compression-level": 0,
@@ -337,12 +634,15 @@
       "actions/cache",
       "actions/download-artifact",
       "GIT_CONFIG_VALUE",
-      "http\\.extraheader"
+      "http\\.extraheader=(?!\\s|$)"
     ]
   },
   "markdownPolicy": {
     "schema": "PSStyleGuide.MarkdownEntryPointPolicy.v1",
-    "extensions": ["md", "mdc"],
+    "extensions": [
+      "md",
+      "mdc"
+    ],
     "entryPoints": {
       "rootPackageJson": {
         "path": "../../package.json",
@@ -362,20 +662,33 @@
         "sha256": "b20aaab172224da4377cda75fa6cad1a8eeb00f8bdd26737ffe0e6c2ad222492",
         "glob": "**/*.{md,mdc}",
         "includeDotDirectories": true,
-        "ignoredDirectoryNames": ["node_modules", ".git", ".venv"],
-        "retainedDotDirectoryNames": [".github", ".cursor"]
+        "ignoredDirectoryNames": [
+          "node_modules",
+          ".git",
+          ".venv"
+        ],
+        "retainedDotDirectoryNames": [
+          ".github",
+          ".cursor"
+        ]
       },
       "stagedSelector": {
         "path": "lint-staged-markdown.mjs",
         "length": 3448,
         "sha256": "971622e1fbbd54521a7fa7b3302556f5d64790e05b6f6e6dab7fe7d1cf7e091b",
-        "pathspecs": ["*.md", "*.mdc"]
+        "pathspecs": [
+          "*.md",
+          "*.mdc"
+        ]
       },
       "preCommit": {
         "path": "../../.pre-commit-config.yaml",
         "length": 3261,
         "sha256": "a4a7e28184356c8d6e337533aadfcec88d17debd78bf5d74dcf09a2bb3f7c8da",
-        "extensions": ["md", "mdc"],
+        "extensions": [
+          "md",
+          "mdc"
+        ],
         "linebreakArgument": "--markdown-linebreak-ext=md,mdc"
       }
     }
@@ -386,7 +699,9 @@
       {
         "package-ecosystem": "github-actions",
         "directory": "/",
-        "schedule": { "interval": "weekly" }
+        "schedule": {
+          "interval": "weekly"
+        }
       }
     ]
   },
@@ -401,22 +716,102 @@
     "terraformNormativeLocator": "https://github.com/franklesniak/TerraformStyleGuide/issues/20",
     "terraformNormativeSha256": "1f88627da6e9a5436898bf227dab6839afd90a16aa135e609619208c06fb08b3",
     "rows": [
-      { "id": "GF-PARAMETERS", "status": "same", "observed": "Production generators expose no caller root/source/destination/output-map authority.", "rationale": "Both contracts close production authority over repository paths." },
-      { "id": "GF-DESTINATION", "status": "intentional difference", "observed": "PS uses powershell.instructions.md; Terraform uses terraform.instructions.md.", "rationale": "Repository-specific leaves differ while containment, link, alias, and replacement guarantees remain equal." },
-      { "id": "GF-CONTENT", "status": "intentional difference", "observed": "Language-specific frontmatter and labels differ.", "rationale": "Repository payload identity differs; complete-payload ordering and failure strength remain equal." },
-      { "id": "GF-SERIALIZATION", "status": "same", "observed": "Both require final CR normalization and BOM-less UTF-8.", "rationale": "The byte boundary is symmetric." },
-      { "id": "GF-WRITE", "status": "same", "observed": "CreateNew, Flush(true), verification, and one atomic publication rename with no fallback: File.Replace to an existing destination, File.Move to an absent one.", "rationale": "The transaction boundary is symmetric: publication is a single atomic rename with no fallback." },
-      { "id": "GF-FAILURE", "status": "same", "observed": "Pre-replace cleanup and post-replace truth are explicit.", "rationale": "Neither contract claims cross-file atomicity or rollback." },
-      { "id": "GF-HOSTS", "status": "same", "observed": "Windows PowerShell 5.1 and PowerShell 7 on Windows/Ubuntu are required.", "rationale": "Host equality and idempotence are symmetric." },
-      { "id": "GF-VERSION", "status": "same", "observed": "The timeless four-component script-version profile is shared.", "rationale": "Grammar, expected identity, and authoring progression have equal strength." },
-      { "id": "GF-NODE-LOCK", "status": "same", "observed": "Node 24.18.1/npm 11.16.0 solely produces the yaml@2.9.0 lock addition.", "rationale": "Producer and frozen-consumer contracts are symmetric." },
-      { "id": "GF-YAML", "status": "same", "observed": "yaml@2.9.0 parses one strict YAML 1.2 core document offline.", "rationale": "Parser hazards and schema strictness are symmetric." },
-      { "id": "GF-ACTION-PINS", "status": "same", "observed": "Checkout, setup-node, and upload-artifact use the same reviewed full SHAs.", "rationale": "Provenance and runtime pins are symmetric." },
-      { "id": "GF-ACTION-INPUTS", "status": "intentional difference", "observed": "PS authors show-progress=true; Terraform plans show-progress=false.", "rationale": "Both are literal reviewed values with equal credential and failure containment; owners re-review on either action update." },
-      { "id": "GF-GIT", "status": "intentional difference", "observed": "PS adds a reusable raw path verifier; Terraform plans equivalent raw gates inline.", "rationale": "NUL parsing and native status truth are equal; repository packaging differs." },
-      { "id": "GF-GRAPH", "status": "intentional difference", "observed": "PS P1 is strictly read-only; Terraform T1 temporarily retains its pre-promotion writer.", "rationale": "PS has no publication requirement in P1; Terraform preserves current publication until T1B deletes it." },
-      { "id": "GF-CREDENTIALS", "status": "intentional difference", "observed": "PS has no push credential; Terraform confines one credential to its temporary push child.", "rationale": "Absence is stronger for PS, while Terraform retains an expiring reviewed compatibility boundary until T1B." },
-      { "id": "GF-EVIDENCE", "status": "intentional difference", "observed": "PS records read-only drift diagnostics; Terraform additionally requires temporary-writer drills.", "rationale": "Evidence follows each repository graph without weakening common cleanup or identity requirements." }
+      {
+        "id": "GF-PARAMETERS",
+        "status": "same",
+        "observed": "Production generators expose no caller root/source/destination/output-map authority.",
+        "rationale": "Both contracts close production authority over repository paths."
+      },
+      {
+        "id": "GF-DESTINATION",
+        "status": "intentional difference",
+        "observed": "PS uses powershell.instructions.md; Terraform uses terraform.instructions.md.",
+        "rationale": "Repository-specific leaves differ while containment, link, alias, and replacement guarantees remain equal."
+      },
+      {
+        "id": "GF-CONTENT",
+        "status": "intentional difference",
+        "observed": "Language-specific frontmatter and labels differ.",
+        "rationale": "Repository payload identity differs; complete-payload ordering and failure strength remain equal."
+      },
+      {
+        "id": "GF-SERIALIZATION",
+        "status": "same",
+        "observed": "Both require final CR normalization and BOM-less UTF-8.",
+        "rationale": "The byte boundary is symmetric."
+      },
+      {
+        "id": "GF-WRITE",
+        "status": "same",
+        "observed": "CreateNew, Flush(true), verification, and one atomic publication rename with no fallback: File.Replace to an existing destination, File.Move to an absent one.",
+        "rationale": "The transaction boundary is symmetric: publication is a single atomic rename with no fallback."
+      },
+      {
+        "id": "GF-FAILURE",
+        "status": "same",
+        "observed": "Pre-replace cleanup and post-replace truth are explicit.",
+        "rationale": "Neither contract claims cross-file atomicity or rollback."
+      },
+      {
+        "id": "GF-HOSTS",
+        "status": "same",
+        "observed": "Windows PowerShell 5.1 and PowerShell 7 on Windows/Ubuntu are required.",
+        "rationale": "Host equality and idempotence are symmetric."
+      },
+      {
+        "id": "GF-VERSION",
+        "status": "same",
+        "observed": "The timeless four-component script-version profile is shared.",
+        "rationale": "Grammar, expected identity, and authoring progression have equal strength."
+      },
+      {
+        "id": "GF-NODE-LOCK",
+        "status": "same",
+        "observed": "Node 24.18.1/npm 11.16.0 solely produces the yaml@2.9.0 lock addition.",
+        "rationale": "Producer and frozen-consumer contracts are symmetric."
+      },
+      {
+        "id": "GF-YAML",
+        "status": "same",
+        "observed": "yaml@2.9.0 parses one strict YAML 1.2 core document offline.",
+        "rationale": "Parser hazards and schema strictness are symmetric."
+      },
+      {
+        "id": "GF-ACTION-PINS",
+        "status": "same",
+        "observed": "Checkout, setup-node, and upload-artifact use the same reviewed full SHAs.",
+        "rationale": "Provenance and runtime pins are symmetric."
+      },
+      {
+        "id": "GF-ACTION-INPUTS",
+        "status": "intentional difference",
+        "observed": "PS authors show-progress=true; Terraform plans show-progress=false.",
+        "rationale": "Both are literal reviewed values with equal credential and failure containment; owners re-review on either action update."
+      },
+      {
+        "id": "GF-GIT",
+        "status": "intentional difference",
+        "observed": "PS adds a reusable raw path verifier; Terraform plans equivalent raw gates inline.",
+        "rationale": "NUL parsing and native status truth are equal; repository packaging differs."
+      },
+      {
+        "id": "GF-GRAPH",
+        "status": "intentional difference",
+        "observed": "PS P1 is strictly read-only; Terraform T1 temporarily retains its pre-promotion writer.",
+        "rationale": "PS has no publication requirement in P1; Terraform preserves current publication until T1B deletes it."
+      },
+      {
+        "id": "GF-CREDENTIALS",
+        "status": "intentional difference",
+        "observed": "PS has no push credential; Terraform confines one credential to its temporary push child.",
+        "rationale": "Absence is stronger for PS, while Terraform retains an expiring reviewed compatibility boundary until T1B."
+      },
+      {
+        "id": "GF-EVIDENCE",
+        "status": "intentional difference",
+        "observed": "PS records read-only drift diagnostics; Terraform additionally requires temporary-writer drills.",
+        "rationale": "Evidence follows each repository graph without weakening common cleanup or identity requirements."
+      }
     ]
   }
 }
