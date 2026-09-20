@@ -47,7 +47,7 @@ jobs:
               throw 'acquire: the runner named an unexpected server'
           }
           if ($strRepository -cne 'franklesniak/PSStyleGuide') {
-              throw 'acquire: the triggering repository is not a plain owner/name pair'
+              throw 'acquire: the triggering repository is not the expected repository'
           }
           # A full 40-hex commit is required rather than a ref. A ref would let
           # the fetch resolve to whatever the ref points at when the fetch runs,
@@ -91,7 +91,7 @@ jobs:
           if ($LASTEXITCODE -ne 0 -or $strHead -cne $strSha) {
               throw 'acquire: the checked out revision is not the triggering revision'
           }
-          Write-Host "acquire: anonymous shallow checkout of $strSha"
+          Write-Information "acquire: anonymous shallow checkout of $strSha" -InformationAction Continue
       - name: Verify checkout credential cleanup
         id: verify-checkout-credentials
         shell: pwsh
@@ -639,7 +639,9 @@ jobs:
           if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {
               [void]($listFailedChecks.Add('Schema'))
           }
-          if ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {
+          $objGeneratorResult = $objResult
+          $hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }
+          if ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {
               [void]($listFailedChecks.Add('GeneratorVersion'))
           }
           if ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {
@@ -682,7 +684,7 @@ jobs:
               }
           }
 
-          # Preserve the PS v2 exact-path verifier as an additional independent check.
+          # Preserve the v2 exact-path verifier as an additional independent check.
           $strVerifierCommand = '& ''./.github/workflows/Test-ExactGitPathSet.ps1'' -RepositoryRoot $env:GITHUB_WORKSPACE -GitExecutablePath ''/usr/bin/git'' -ExpectedPath @() -Mode Both -RequireCleanWorkingAgainstIndex'
           $strEncodedVerifierCommand = [System.Convert]::ToBase64String(
               [System.Text.Encoding]::Unicode.GetBytes($strVerifierCommand)

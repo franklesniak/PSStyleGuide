@@ -42,7 +42,7 @@ jobs:
               throw 'acquire: the runner named an unexpected server'
           }
           if ($strRepository -cne 'franklesniak/PSStyleGuide') {
-              throw 'acquire: the triggering repository is not a plain owner/name pair'
+              throw 'acquire: the triggering repository is not the expected repository'
           }
           if ($strSha -cnotmatch '^[0-9a-f]{40}$') {
               throw 'acquire: the triggering revision is not a full commit hash'
@@ -100,7 +100,7 @@ jobs:
           [void][System.IO.Directory]::CreateDirectory($strNodeRoot)
           & $strTarPath -xJf $strArchivePath -C $strNodeRoot --strip-components=1
           if ($LASTEXITCODE -ne 0) { throw "acquire: node extraction exited $LASTEXITCODE" }
-          Write-Host "acquire: revision $strSha and the reviewed Node distribution"
+          Write-Information "acquire: revision $strSha and the reviewed Node distribution" -InformationAction Continue
       - name: Verify checkout credential cleanup
         id: verify-checkout-credentials
         shell: pwsh
@@ -199,8 +199,8 @@ jobs:
           if ($intNpmVersionExit -ne 0 -or $strNpmVersion -cne '11.16.0') {
               throw "toolchain: npm version check failed with exit $intNpmVersionExit"
           }
-          Write-Host "Node executable: $strNodePath ($strNodeVersion)"
-          Write-Host "npm executable: $strNpmPath ($strNpmVersion)"
+          Write-Information "Node executable: $strNodePath ($strNodeVersion)" -InformationAction Continue
+          Write-Information "npm executable: $strNpmPath ($strNpmVersion)" -InformationAction Continue
 
           # Reviewed baseline. The before/after comparison further below proves
           # only that npm ci left these files alone; it cannot detect metadata
@@ -272,8 +272,56 @@ jobs:
           $env:P1_EXPECTED_BUILD_DIGEST = (Get-FileHash -LiteralPath ./build.yml -Algorithm SHA256).Hash
           $env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash
 
+          function Read-WorkflowPolicyContract {
+              # .SYNOPSIS
+              # Reads the closed workflow-policy contract.
+              # .DESCRIPTION
+              # Reads at most one byte beyond the reviewed limit, decodes strict UTF-8,
+              # and returns one JSON object without exposing parser diagnostics.
+              # .EXAMPLE
+              # $objContract = Read-WorkflowPolicyContract
+              # .INPUTS
+              # None.
+              # .OUTPUTS
+              # System.Management.Automation.PSCustomObject.
+              # .NOTES
+              # PRIVATE/INTERNAL. Version: 1.0.20260919.0.
+              [CmdletBinding()]
+              param()
+
+              try {
+                  $objContractItem = Get-Item -LiteralPath 'workflow-policy-contract.json' -Force -ErrorAction Stop
+                  if ($objContractItem -isnot [System.IO.FileInfo] -or
+                      $null -ne $objContractItem.LinkType -or
+                      ($objContractItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -or
+                      ($IsLinux -and [int]$objContractItem.UnixStat.ItemType -ne 1)) {
+                      throw 'contract-file'
+                  }
+                  $arrContractChunks = @(Get-Content -LiteralPath 'workflow-policy-contract.json' -AsByteStream -ReadCount 524289 -TotalCount 524289 -ErrorAction Stop)
+                  if ($arrContractChunks.Count -ne 1 -or
+                      @($arrContractChunks[0]).Count -eq 0 -or
+                      @($arrContractChunks[0]).Count -gt 524288) {
+                      throw 'contract-file'
+                  }
+                  $arrContractBytes = [byte[]]@($arrContractChunks[0])
+                  $objStrictUtf8 = [System.Text.UTF8Encoding]::new($false, $true)
+                  $strContract = $objStrictUtf8.GetString($arrContractBytes)
+                  if ([int]$strContract[0] -eq 0xfeff -or $strContract.Contains("`r")) {
+                      throw 'contract-encoding'
+                  }
+                  $objContract = $strContract | ConvertFrom-Json -NoEnumerate -Depth 32 -ErrorAction Stop
+                  if ($null -eq $objContract -or
+                      $objContract -isnot [System.Management.Automation.PSCustomObject]) {
+                      throw 'contract-json'
+                  }
+                  $objContract
+              } catch {
+                  throw 'workflow-policy: invalid contract JSON'
+              }
+          }
+
           # Bind the exact executable bytes before this preflight invocation.
-          $objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json
+          $objContract = Read-WorkflowPolicyContract
           $strExpectedValidatorHash = $objContract.validatorIdentity.sha256
           if ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {
               throw 'workflow-policy: invalid validator identity'
@@ -321,7 +369,7 @@ jobs:
           # identity/result checks are not independent authorization. The separate
           # lint runner does not consume this job's files or outputs.
           # Bind the exact executable bytes before this policy invocation.
-          $objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json
+          $objContract = Read-WorkflowPolicyContract
           $strExpectedValidatorHash = $objContract.validatorIdentity.sha256
           if ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {
               throw 'workflow-policy: invalid validator identity'
@@ -342,7 +390,7 @@ jobs:
               $objPolicy.success -isnot [bool] -or $objPolicy.success -ne $true) {
               throw 'workflow-policy: rejected policy result'
           }
-          Write-Host "workflow-policy native exit: $intPolicyExit"
+          Write-Information "workflow-policy native exit: $intPolicyExit" -InformationAction Continue
 
           $strPackageFinal = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash
           $strLockFinal = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash
@@ -386,7 +434,7 @@ jobs:
               throw 'acquire: the runner named an unexpected server'
           }
           if ($strRepository -cne 'franklesniak/PSStyleGuide') {
-              throw 'acquire: the triggering repository is not a plain owner/name pair'
+              throw 'acquire: the triggering repository is not the expected repository'
           }
           if ($strSha -cnotmatch '^[0-9a-f]{40}$') {
               throw 'acquire: the triggering revision is not a full commit hash'
@@ -444,7 +492,7 @@ jobs:
           [void][System.IO.Directory]::CreateDirectory($strNodeRoot)
           & $strTarPath -xJf $strArchivePath -C $strNodeRoot --strip-components=1
           if ($LASTEXITCODE -ne 0) { throw "acquire: node extraction exited $LASTEXITCODE" }
-          Write-Host "acquire: revision $strSha and the reviewed Node distribution"
+          Write-Information "acquire: revision $strSha and the reviewed Node distribution" -InformationAction Continue
       - name: Verify checkout credential cleanup
         id: verify-checkout-credentials
         shell: pwsh
@@ -543,8 +591,8 @@ jobs:
           if ($intNpmVersionExit -ne 0 -or $strNpmVersion -cne '11.16.0') {
               throw "toolchain: npm version check failed with exit $intNpmVersionExit"
           }
-          Write-Host "Node executable: $strNodePath ($strNodeVersion)"
-          Write-Host "npm executable: $strNpmPath ($strNpmVersion)"
+          Write-Information "Node executable: $strNodePath ($strNodeVersion)" -InformationAction Continue
+          Write-Information "npm executable: $strNpmPath ($strNpmVersion)" -InformationAction Continue
 
           # Reviewed baseline. The before/after comparison further below proves
           # only that npm ci left these files alone; it cannot detect metadata
@@ -663,11 +711,11 @@ jobs:
 
           & $strNpmPath run lint:md
           $intOuterExit = $LASTEXITCODE
-          Write-Host "outer-markdown native exit: $intOuterExit"
+          Write-Information "outer-markdown native exit: $intOuterExit" -InformationAction Continue
 
           & $strNpmPath run lint:md:nested
           $intNestedExit = $LASTEXITCODE
-          Write-Host "nested-markdown native exit: $intNestedExit"
+          Write-Information "nested-markdown native exit: $intNestedExit" -InformationAction Continue
 
           $strPackageFinal = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash
           $strLockFinal = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash

@@ -10,13 +10,13 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260916.0
+Version: 1.0.20260919.0
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strGeneratorVersion = '1.0.20260916.0'
+$script:strGeneratorVersion = '1.0.20260919.0'
 $script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v2'
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
@@ -1046,7 +1046,7 @@ function Assert-TrackedFile {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 1.0.20260919.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1061,7 +1061,7 @@ function Assert-TrackedFile {
         [string]$RepositoryPath
     )
 
-    $arrGitCommands = @(Get-Command -Name git -CommandType Application -ErrorAction Stop)
+    $arrGitCommands = @(Microsoft.PowerShell.Core\Get-Command -Name git -CommandType Application -ErrorAction Stop)
     $strGitPath = [string]$arrGitCommands[0].Source
     $arrOutput = @(& $strGitPath -C $RepositoryRoot ls-files --error-unmatch -- $RepositoryPath 2>$null)
     $intGitExit = $LASTEXITCODE

@@ -1423,7 +1423,7 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/verify_generated_artifacts/steps/2/run",
-        "from": "if ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {",
+        "from": "if ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {",
         "to": "if ($false) {"
       },
       "expected": false,
@@ -1437,8 +1437,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/verify_generated_artifacts/steps/2/run",
-        "from": "if ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {",
-        "to": "if ($objResult.GeneratorVersion -cne '1.0.20260916.0') {"
+        "from": "if ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {",
+        "to": "if (-not $hashtableGeneratorVersionCheck.Valid) {"
       },
       "expected": false,
       "expectedCategory": "generator-result-predicate-GeneratorVersion"
@@ -1878,8 +1878,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/policy/steps/2/run",
-        "from": "$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n$strPackageAfterInstall = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash\n$strLockAfterInstall = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash\nif ($strPackageAfterInstall -cne $strPackageBefore -or $strLockAfterInstall -cne $strLockBefore) {\n    throw 'npm-ci: package metadata changed during frozen installation'\n}\n\n# The policy job runs the preflight and full validator, but no lint phase.\n# Preflight is the first repository-code execution in this job. Its\n# identity/result checks are not independent authorization. The separate\n# lint runner does not consume this job's files or outputs.\n# Bind the exact executable bytes before this policy invocation.\n$objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPolicy = @(& $strNodePath ./Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)\n",
-        "to": "$arrPolicy = @(& $strNodePath ./Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n$strPackageAfterInstall = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash\n$strLockAfterInstall = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash\nif ($strPackageAfterInstall -cne $strPackageBefore -or $strLockAfterInstall -cne $strLockBefore) {\n    throw 'npm-ci: package metadata changed during frozen installation'\n}\n\n# The policy job runs the preflight and full validator, but no lint phase.\n# Preflight is the first repository-code execution in this job. Its\n# identity/result checks are not independent authorization. The separate\n# lint runner does not consume this job's files or outputs.\n# Bind the exact executable bytes before this policy invocation.\n$objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n"
+        "from": "$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n$strPackageAfterInstall = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash\n$strLockAfterInstall = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash\nif ($strPackageAfterInstall -cne $strPackageBefore -or $strLockAfterInstall -cne $strLockBefore) {\n    throw 'npm-ci: package metadata changed during frozen installation'\n}\n\n# The policy job runs the preflight and full validator, but no lint phase.\n# Preflight is the first repository-code execution in this job. Its\n# identity/result checks are not independent authorization. The separate\n# lint runner does not consume this job's files or outputs.\n# Bind the exact executable bytes before this policy invocation.\n$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPolicy = @(& $strNodePath ./Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)\n",
+        "to": "$arrPolicy = @(& $strNodePath ./Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n$strPackageAfterInstall = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash\n$strLockAfterInstall = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash\nif ($strPackageAfterInstall -cne $strPackageBefore -or $strLockAfterInstall -cne $strLockBefore) {\n    throw 'npm-ci: package metadata changed during frozen installation'\n}\n\n# The policy job runs the preflight and full validator, but no lint phase.\n# Preflight is the first repository-code execution in this job. Its\n# identity/result checks are not independent authorization. The separate\n# lint runner does not consume this job's files or outputs.\n# Bind the exact executable bytes before this policy invocation.\n$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n"
       },
       "expected": false,
       "expectedCategory": "markdown-policy",
@@ -1926,8 +1926,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/policy/steps/2/run",
-        "from": "foreach ($strNpmConfigPath in @('.npmrc', '../.npmrc', '../../.npmrc')) {\n    if (Test-Path -LiteralPath $strNpmConfigPath) {\n        throw 'supply: repository-controlled npm configuration is present'\n    }\n}\n\n# The loop above walks project paths, which is where a committed\n# .npmrc would sit -- but npm also loads a per-user file at\n# $HOME/.npmrc and a global one, and neither is under the repository\n# tree. A script-shell setting in either replaces the interpreter for\n# every npm run, so both lint phases would exit zero with the command\n# echoed and no linter executed, leaving installation, asset hashes,\n# the policy validator and all three captured statuses intact.\n# Enumerating those paths would be another list to be one entry\n# short of, so npm is told where to read them from instead. Both are\n# pointed at /dev/null rather than at an absent name: an absent name\n# under RUNNER_TEMP is absent only until something creates it, and the\n# first lint phase is repository-adjacent code that runs before the\n# second one reads the file. /dev/null always reads as empty and no\n# unprivileged process can make it read as anything else, so the\n# neutralization holds across both phases instead of only until the\n# check that observed it.\n# npm refuses to load one file at two config levels -- it exits\n# before config resolution with \"double-loading config\" -- so the two\n# settings cannot both name /dev/null. They use the same property by\n# two routes: a source this job cannot write.\n$env:npm_config_userconfig = '/dev/null'\n$env:npm_config_globalconfig = '/etc/npmrc-absent-by-policy'\nif (-not [string]::IsNullOrEmpty((Get-Content -Raw -LiteralPath $env:npm_config_userconfig -ErrorAction SilentlyContinue))) {\n    throw 'supply: the neutralized npm configuration source is not empty'\n}\nif (Test-Path -LiteralPath $env:npm_config_globalconfig) {\n    throw 'supply: the neutralized npm configuration path exists'\n}\n# /dev/null reads as empty. The absent global path is under root-owned\n# /etc on the hosted runner. The two distinct sources avoid npm rejecting\n# the same file at two configuration levels. Neither lint phase can write\n# the global source without a privilege change outside this job contract.\n$strGlobalConfigDirectory = [System.IO.Path]::GetDirectoryName($env:npm_config_globalconfig)\nif ($strGlobalConfigDirectory -cne '/etc') {\n    throw 'supply: the neutralized global npm configuration is not under a root-owned directory'\n}\n\n# Recorded before installation, so the baseline predates every file\n# npm unpacks into this job. Handed to the validator rather than\n# re-compared here: a comparison in PowerShell just before the\n# invocation would be a check/use pair with an interval in it, while\n# the validator hashes the text it actually parsed and has none.\n$env:P1_EXPECTED_BUILD_DIGEST = (Get-FileHash -LiteralPath ./build.yml -Algorithm SHA256).Hash\n$env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash\n\n# Bind the exact executable bytes before this preflight invocation.\n$objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)\n$intPreflightExit = $LASTEXITCODE\nif ($intPreflightExit -isnot [int] -or $intPreflightExit -ne 0 -or\n    $arrPreflight.Count -ne 1 -or $arrPreflight[0] -isnot [string] -or\n    $arrPreflight[0].Length -gt 65536) {\n    throw 'workflow-policy: invalid preflight process result'\n}\ntry { $objPreflight = $arrPreflight[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }\ncatch { throw 'workflow-policy: invalid preflight JSON' }\nif ($null -eq $objPreflight -or $objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject] -or\n    $objPreflight.schema -isnot [string] -or $objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or\n    $objPreflight.success -isnot [bool] -or $objPreflight.success -ne $true) {\n    throw 'workflow-policy: rejected preflight result'\n}\n\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n",
-        "to": "\n# The loop above walks project paths, which is where a committed\n# .npmrc would sit -- but npm also loads a per-user file at\n# $HOME/.npmrc and a global one, and neither is under the repository\n# tree. A script-shell setting in either replaces the interpreter for\n# every npm run, so both lint phases would exit zero with the command\n# echoed and no linter executed, leaving installation, asset hashes,\n# the policy validator and all three captured statuses intact.\n# Enumerating those paths would be another list to be one entry\n# short of, so npm is told where to read them from instead. Both are\n# pointed at /dev/null rather than at an absent name: an absent name\n# under RUNNER_TEMP is absent only until something creates it, and the\n# first lint phase is repository-adjacent code that runs before the\n# second one reads the file. /dev/null always reads as empty and no\n# unprivileged process can make it read as anything else, so the\n# neutralization holds across both phases instead of only until the\n# check that observed it.\n# npm refuses to load one file at two config levels -- it exits\n# before config resolution with \"double-loading config\" -- so the two\n# settings cannot both name /dev/null. They use the same property by\n# two routes: a source this job cannot write.\n$env:npm_config_userconfig = '/dev/null'\n$env:npm_config_globalconfig = '/etc/npmrc-absent-by-policy'\nif (-not [string]::IsNullOrEmpty((Get-Content -Raw -LiteralPath $env:npm_config_userconfig -ErrorAction SilentlyContinue))) {\n    throw 'supply: the neutralized npm configuration source is not empty'\n}\nif (Test-Path -LiteralPath $env:npm_config_globalconfig) {\n    throw 'supply: the neutralized npm configuration path exists'\n}\n# /dev/null reads as empty. The absent global path is under root-owned\n# /etc on the hosted runner. The two distinct sources avoid npm rejecting\n# the same file at two configuration levels. Neither lint phase can write\n# the global source without a privilege change outside this job contract.\n$strGlobalConfigDirectory = [System.IO.Path]::GetDirectoryName($env:npm_config_globalconfig)\nif ($strGlobalConfigDirectory -cne '/etc') {\n    throw 'supply: the neutralized global npm configuration is not under a root-owned directory'\n}\n\n# Recorded before installation, so the baseline predates every file\n# npm unpacks into this job. Handed to the validator rather than\n# re-compared here: a comparison in PowerShell just before the\n# invocation would be a check/use pair with an interval in it, while\n# the validator hashes the text it actually parsed and has none.\n$env:P1_EXPECTED_BUILD_DIGEST = (Get-FileHash -LiteralPath ./build.yml -Algorithm SHA256).Hash\n$env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash\n\n# Bind the exact executable bytes before this preflight invocation.\n$objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)\n$intPreflightExit = $LASTEXITCODE\nif ($intPreflightExit -isnot [int] -or $intPreflightExit -ne 0 -or\n    $arrPreflight.Count -ne 1 -or $arrPreflight[0] -isnot [string] -or\n    $arrPreflight[0].Length -gt 65536) {\n    throw 'workflow-policy: invalid preflight process result'\n}\ntry { $objPreflight = $arrPreflight[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }\ncatch { throw 'workflow-policy: invalid preflight JSON' }\nif ($null -eq $objPreflight -or $objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject] -or\n    $objPreflight.schema -isnot [string] -or $objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or\n    $objPreflight.success -isnot [bool] -or $objPreflight.success -ne $true) {\n    throw 'workflow-policy: rejected preflight result'\n}\n\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\nforeach ($strNpmConfigPath in @('.npmrc', '../.npmrc', '../../.npmrc')) {\n    if (Test-Path -LiteralPath $strNpmConfigPath) {\n        throw 'supply: repository-controlled npm configuration is present'\n    }\n}\n"
+        "from": "foreach ($strNpmConfigPath in @('.npmrc', '../.npmrc', '../../.npmrc')) {\n    if (Test-Path -LiteralPath $strNpmConfigPath) {\n        throw 'supply: repository-controlled npm configuration is present'\n    }\n}\n\n# The loop above walks project paths, which is where a committed\n# .npmrc would sit -- but npm also loads a per-user file at\n# $HOME/.npmrc and a global one, and neither is under the repository\n# tree. A script-shell setting in either replaces the interpreter for\n# every npm run, so both lint phases would exit zero with the command\n# echoed and no linter executed, leaving installation, asset hashes,\n# the policy validator and all three captured statuses intact.\n# Enumerating those paths would be another list to be one entry\n# short of, so npm is told where to read them from instead. Both are\n# pointed at /dev/null rather than at an absent name: an absent name\n# under RUNNER_TEMP is absent only until something creates it, and the\n# first lint phase is repository-adjacent code that runs before the\n# second one reads the file. /dev/null always reads as empty and no\n# unprivileged process can make it read as anything else, so the\n# neutralization holds across both phases instead of only until the\n# check that observed it.\n# npm refuses to load one file at two config levels -- it exits\n# before config resolution with \"double-loading config\" -- so the two\n# settings cannot both name /dev/null. They use the same property by\n# two routes: a source this job cannot write.\n$env:npm_config_userconfig = '/dev/null'\n$env:npm_config_globalconfig = '/etc/npmrc-absent-by-policy'\nif (-not [string]::IsNullOrEmpty((Get-Content -Raw -LiteralPath $env:npm_config_userconfig -ErrorAction SilentlyContinue))) {\n    throw 'supply: the neutralized npm configuration source is not empty'\n}\nif (Test-Path -LiteralPath $env:npm_config_globalconfig) {\n    throw 'supply: the neutralized npm configuration path exists'\n}\n# /dev/null reads as empty. The absent global path is under root-owned\n# /etc on the hosted runner. The two distinct sources avoid npm rejecting\n# the same file at two configuration levels. Neither lint phase can write\n# the global source without a privilege change outside this job contract.\n$strGlobalConfigDirectory = [System.IO.Path]::GetDirectoryName($env:npm_config_globalconfig)\nif ($strGlobalConfigDirectory -cne '/etc') {\n    throw 'supply: the neutralized global npm configuration is not under a root-owned directory'\n}\n\n# Recorded before installation, so the baseline predates every file\n# npm unpacks into this job. Handed to the validator rather than\n# re-compared here: a comparison in PowerShell just before the\n# invocation would be a check/use pair with an interval in it, while\n# the validator hashes the text it actually parsed and has none.\n$env:P1_EXPECTED_BUILD_DIGEST = (Get-FileHash -LiteralPath ./build.yml -Algorithm SHA256).Hash\n$env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash\n\nfunction Read-WorkflowPolicyContract {\n    # .SYNOPSIS\n    # Reads the closed workflow-policy contract.\n    # .DESCRIPTION\n    # Reads at most one byte beyond the reviewed limit, decodes strict UTF-8,\n    # and returns one JSON object without exposing parser diagnostics.\n    # .EXAMPLE\n    # $objContract = Read-WorkflowPolicyContract\n    # .INPUTS\n    # None.\n    # .OUTPUTS\n    # System.Management.Automation.PSCustomObject.\n    # .NOTES\n    # PRIVATE/INTERNAL. Version: 1.0.20260919.0.\n    [CmdletBinding()]\n    param()\n\n    try {\n        $objContractItem = Get-Item -LiteralPath 'workflow-policy-contract.json' -Force -ErrorAction Stop\n        if ($objContractItem -isnot [System.IO.FileInfo] -or\n            $null -ne $objContractItem.LinkType -or\n            ($objContractItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -or\n            ($IsLinux -and [int]$objContractItem.UnixStat.ItemType -ne 1)) {\n            throw 'contract-file'\n        }\n        $arrContractChunks = @(Get-Content -LiteralPath 'workflow-policy-contract.json' -AsByteStream -ReadCount 524289 -TotalCount 524289 -ErrorAction Stop)\n        if ($arrContractChunks.Count -ne 1 -or\n            @($arrContractChunks[0]).Count -eq 0 -or\n            @($arrContractChunks[0]).Count -gt 524288) {\n            throw 'contract-file'\n        }\n        $arrContractBytes = [byte[]]@($arrContractChunks[0])\n        $objStrictUtf8 = [System.Text.UTF8Encoding]::new($false, $true)\n        $strContract = $objStrictUtf8.GetString($arrContractBytes)\n        if ([int]$strContract[0] -eq 0xfeff -or $strContract.Contains(\"`r\")) {\n            throw 'contract-encoding'\n        }\n        $objContract = $strContract | ConvertFrom-Json -NoEnumerate -Depth 32 -ErrorAction Stop\n        if ($null -eq $objContract -or\n            $objContract -isnot [System.Management.Automation.PSCustomObject]) {\n            throw 'contract-json'\n        }\n        $objContract\n    } catch {\n        throw 'workflow-policy: invalid contract JSON'\n    }\n}\n\n# Bind the exact executable bytes before this preflight invocation.\n$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)\n$intPreflightExit = $LASTEXITCODE\nif ($intPreflightExit -isnot [int] -or $intPreflightExit -ne 0 -or\n    $arrPreflight.Count -ne 1 -or $arrPreflight[0] -isnot [string] -or\n    $arrPreflight[0].Length -gt 65536) {\n    throw 'workflow-policy: invalid preflight process result'\n}\ntry { $objPreflight = $arrPreflight[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }\ncatch { throw 'workflow-policy: invalid preflight JSON' }\nif ($null -eq $objPreflight -or $objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject] -or\n    $objPreflight.schema -isnot [string] -or $objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or\n    $objPreflight.success -isnot [bool] -or $objPreflight.success -ne $true) {\n    throw 'workflow-policy: rejected preflight result'\n}\n\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n",
+        "to": "# The loop above walks project paths, which is where a committed\n# .npmrc would sit -- but npm also loads a per-user file at\n# $HOME/.npmrc and a global one, and neither is under the repository\n# tree. A script-shell setting in either replaces the interpreter for\n# every npm run, so both lint phases would exit zero with the command\n# echoed and no linter executed, leaving installation, asset hashes,\n# the policy validator and all three captured statuses intact.\n# Enumerating those paths would be another list to be one entry\n# short of, so npm is told where to read them from instead. Both are\n# pointed at /dev/null rather than at an absent name: an absent name\n# under RUNNER_TEMP is absent only until something creates it, and the\n# first lint phase is repository-adjacent code that runs before the\n# second one reads the file. /dev/null always reads as empty and no\n# unprivileged process can make it read as anything else, so the\n# neutralization holds across both phases instead of only until the\n# check that observed it.\n# npm refuses to load one file at two config levels -- it exits\n# before config resolution with \"double-loading config\" -- so the two\n# settings cannot both name /dev/null. They use the same property by\n# two routes: a source this job cannot write.\n$env:npm_config_userconfig = '/dev/null'\n$env:npm_config_globalconfig = '/etc/npmrc-absent-by-policy'\nif (-not [string]::IsNullOrEmpty((Get-Content -Raw -LiteralPath $env:npm_config_userconfig -ErrorAction SilentlyContinue))) {\n    throw 'supply: the neutralized npm configuration source is not empty'\n}\nif (Test-Path -LiteralPath $env:npm_config_globalconfig) {\n    throw 'supply: the neutralized npm configuration path exists'\n}\n# /dev/null reads as empty. The absent global path is under root-owned\n# /etc on the hosted runner. The two distinct sources avoid npm rejecting\n# the same file at two configuration levels. Neither lint phase can write\n# the global source without a privilege change outside this job contract.\n$strGlobalConfigDirectory = [System.IO.Path]::GetDirectoryName($env:npm_config_globalconfig)\nif ($strGlobalConfigDirectory -cne '/etc') {\n    throw 'supply: the neutralized global npm configuration is not under a root-owned directory'\n}\n\n# Recorded before installation, so the baseline predates every file\n# npm unpacks into this job. Handed to the validator rather than\n# re-compared here: a comparison in PowerShell just before the\n# invocation would be a check/use pair with an interval in it, while\n# the validator hashes the text it actually parsed and has none.\n$env:P1_EXPECTED_BUILD_DIGEST = (Get-FileHash -LiteralPath ./build.yml -Algorithm SHA256).Hash\n$env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash\n\nfunction Read-WorkflowPolicyContract {\n    # .SYNOPSIS\n    # Reads the closed workflow-policy contract.\n    # .DESCRIPTION\n    # Reads at most one byte beyond the reviewed limit, decodes strict UTF-8,\n    # and returns one JSON object without exposing parser diagnostics.\n    # .EXAMPLE\n    # $objContract = Read-WorkflowPolicyContract\n    # .INPUTS\n    # None.\n    # .OUTPUTS\n    # System.Management.Automation.PSCustomObject.\n    # .NOTES\n    # PRIVATE/INTERNAL. Version: 1.0.20260919.0.\n    [CmdletBinding()]\n    param()\n\n    try {\n        $objContractItem = Get-Item -LiteralPath 'workflow-policy-contract.json' -Force -ErrorAction Stop\n        if ($objContractItem -isnot [System.IO.FileInfo] -or\n            $null -ne $objContractItem.LinkType -or\n            ($objContractItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -or\n            ($IsLinux -and [int]$objContractItem.UnixStat.ItemType -ne 1)) {\n            throw 'contract-file'\n        }\n        $arrContractChunks = @(Get-Content -LiteralPath 'workflow-policy-contract.json' -AsByteStream -ReadCount 524289 -TotalCount 524289 -ErrorAction Stop)\n        if ($arrContractChunks.Count -ne 1 -or\n            @($arrContractChunks[0]).Count -eq 0 -or\n            @($arrContractChunks[0]).Count -gt 524288) {\n            throw 'contract-file'\n        }\n        $arrContractBytes = [byte[]]@($arrContractChunks[0])\n        $objStrictUtf8 = [System.Text.UTF8Encoding]::new($false, $true)\n        $strContract = $objStrictUtf8.GetString($arrContractBytes)\n        if ([int]$strContract[0] -eq 0xfeff -or $strContract.Contains(\"`r\")) {\n            throw 'contract-encoding'\n        }\n        $objContract = $strContract | ConvertFrom-Json -NoEnumerate -Depth 32 -ErrorAction Stop\n        if ($null -eq $objContract -or\n            $objContract -isnot [System.Management.Automation.PSCustomObject]) {\n            throw 'contract-json'\n        }\n        $objContract\n    } catch {\n        throw 'workflow-policy: invalid contract JSON'\n    }\n}\n\n# Bind the exact executable bytes before this preflight invocation.\n$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)\n$intPreflightExit = $LASTEXITCODE\nif ($intPreflightExit -isnot [int] -or $intPreflightExit -ne 0 -or\n    $arrPreflight.Count -ne 1 -or $arrPreflight[0] -isnot [string] -or\n    $arrPreflight[0].Length -gt 65536) {\n    throw 'workflow-policy: invalid preflight process result'\n}\ntry { $objPreflight = $arrPreflight[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }\ncatch { throw 'workflow-policy: invalid preflight JSON' }\nif ($null -eq $objPreflight -or $objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject] -or\n    $objPreflight.schema -isnot [string] -or $objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or\n    $objPreflight.success -isnot [bool] -or $objPreflight.success -ne $true) {\n    throw 'workflow-policy: rejected preflight result'\n}\n\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\nforeach ($strNpmConfigPath in @('.npmrc', '../.npmrc', '../../.npmrc')) {\n    if (Test-Path -LiteralPath $strNpmConfigPath) {\n        throw 'supply: repository-controlled npm configuration is present'\n    }\n}\n\n"
       },
       "expected": false,
       "expectedCategory": "markdown-policy",
@@ -1958,8 +1958,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/markdownlint/steps/2/run",
-        "from": "Write-Host \"nested-markdown native exit: $intNestedExit\"\n",
-        "to": "Set-Variable -Name intPolicyExit -Value 0\nWrite-Host \"nested-markdown native exit: $intNestedExit\"\n"
+        "from": "Write-Information \"nested-markdown native exit: $intNestedExit\" -InformationAction Continue\n",
+        "to": "Set-Variable -Name intPolicyExit -Value 0\nWrite-Information \"nested-markdown native exit: $intNestedExit\" -InformationAction Continue\n"
       },
       "expected": false,
       "expectedCategory": "markdown-policy",
@@ -2137,8 +2137,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/policy/steps/0/run",
-        "from": "Write-Host \"acquire: revision $strSha and the reviewed Node distribution\"\n",
-        "to": "Write-Host \"acquire: revision $strSha and the reviewed Node distribution\"\n& $strCurlPath --silent --output $strNodeRoot/bin/node https://example.invalid/node\n"
+        "from": "Write-Information \"acquire: revision $strSha and the reviewed Node distribution\" -InformationAction Continue\n",
+        "to": "Write-Information \"acquire: revision $strSha and the reviewed Node distribution\" -InformationAction Continue\n& $strCurlPath --silent --output $strNodeRoot/bin/node https://example.invalid/node\n"
       },
       "expected": false,
       "expectedCategory": "acquire-policy",
@@ -2153,8 +2153,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/policy/steps/0/run",
-        "from": "Write-Host \"acquire: revision $strSha and the reviewed Node distribution\"\n",
-        "to": "Write-Host \"acquire: revision $strSha and the reviewed Node distribution\"\nCopy-Item -LiteralPath ./tools/node -Destination $strNodeRoot/bin/node -Force\n"
+        "from": "Write-Information \"acquire: revision $strSha and the reviewed Node distribution\" -InformationAction Continue\n",
+        "to": "Write-Information \"acquire: revision $strSha and the reviewed Node distribution\" -InformationAction Continue\nCopy-Item -LiteralPath ./tools/node -Destination $strNodeRoot/bin/node -Force\n"
       },
       "expected": false,
       "expectedCategory": "acquire-policy",
@@ -2329,8 +2329,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/policy/steps/2/run",
-        "from": "$env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash\n\n# Bind the exact executable bytes before this preflight invocation.\n$objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)\n$intPreflightExit = $LASTEXITCODE\nif ($intPreflightExit -isnot [int] -or $intPreflightExit -ne 0 -or\n    $arrPreflight.Count -ne 1 -or $arrPreflight[0] -isnot [string] -or\n    $arrPreflight[0].Length -gt 65536) {\n    throw 'workflow-policy: invalid preflight process result'\n}\ntry { $objPreflight = $arrPreflight[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }\ncatch { throw 'workflow-policy: invalid preflight JSON' }\nif ($null -eq $objPreflight -or $objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject] -or\n    $objPreflight.schema -isnot [string] -or $objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or\n    $objPreflight.success -isnot [bool] -or $objPreflight.success -ne $true) {\n    throw 'workflow-policy: rejected preflight result'\n}\n\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n",
-        "to": "\n# Bind the exact executable bytes before this preflight invocation.\n$objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)\n$intPreflightExit = $LASTEXITCODE\nif ($intPreflightExit -isnot [int] -or $intPreflightExit -ne 0 -or\n    $arrPreflight.Count -ne 1 -or $arrPreflight[0] -isnot [string] -or\n    $arrPreflight[0].Length -gt 65536) {\n    throw 'workflow-policy: invalid preflight process result'\n}\ntry { $objPreflight = $arrPreflight[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }\ncatch { throw 'workflow-policy: invalid preflight JSON' }\nif ($null -eq $objPreflight -or $objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject] -or\n    $objPreflight.schema -isnot [string] -or $objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or\n    $objPreflight.success -isnot [bool] -or $objPreflight.success -ne $true) {\n    throw 'workflow-policy: rejected preflight result'\n}\n\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n$env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash\n"
+        "from": "$env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash\n\nfunction Read-WorkflowPolicyContract {\n    # .SYNOPSIS\n    # Reads the closed workflow-policy contract.\n    # .DESCRIPTION\n    # Reads at most one byte beyond the reviewed limit, decodes strict UTF-8,\n    # and returns one JSON object without exposing parser diagnostics.\n    # .EXAMPLE\n    # $objContract = Read-WorkflowPolicyContract\n    # .INPUTS\n    # None.\n    # .OUTPUTS\n    # System.Management.Automation.PSCustomObject.\n    # .NOTES\n    # PRIVATE/INTERNAL. Version: 1.0.20260919.0.\n    [CmdletBinding()]\n    param()\n\n    try {\n        $objContractItem = Get-Item -LiteralPath 'workflow-policy-contract.json' -Force -ErrorAction Stop\n        if ($objContractItem -isnot [System.IO.FileInfo] -or\n            $null -ne $objContractItem.LinkType -or\n            ($objContractItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -or\n            ($IsLinux -and [int]$objContractItem.UnixStat.ItemType -ne 1)) {\n            throw 'contract-file'\n        }\n        $arrContractChunks = @(Get-Content -LiteralPath 'workflow-policy-contract.json' -AsByteStream -ReadCount 524289 -TotalCount 524289 -ErrorAction Stop)\n        if ($arrContractChunks.Count -ne 1 -or\n            @($arrContractChunks[0]).Count -eq 0 -or\n            @($arrContractChunks[0]).Count -gt 524288) {\n            throw 'contract-file'\n        }\n        $arrContractBytes = [byte[]]@($arrContractChunks[0])\n        $objStrictUtf8 = [System.Text.UTF8Encoding]::new($false, $true)\n        $strContract = $objStrictUtf8.GetString($arrContractBytes)\n        if ([int]$strContract[0] -eq 0xfeff -or $strContract.Contains(\"`r\")) {\n            throw 'contract-encoding'\n        }\n        $objContract = $strContract | ConvertFrom-Json -NoEnumerate -Depth 32 -ErrorAction Stop\n        if ($null -eq $objContract -or\n            $objContract -isnot [System.Management.Automation.PSCustomObject]) {\n            throw 'contract-json'\n        }\n        $objContract\n    } catch {\n        throw 'workflow-policy: invalid contract JSON'\n    }\n}\n\n# Bind the exact executable bytes before this preflight invocation.\n$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)\n$intPreflightExit = $LASTEXITCODE\nif ($intPreflightExit -isnot [int] -or $intPreflightExit -ne 0 -or\n    $arrPreflight.Count -ne 1 -or $arrPreflight[0] -isnot [string] -or\n    $arrPreflight[0].Length -gt 65536) {\n    throw 'workflow-policy: invalid preflight process result'\n}\ntry { $objPreflight = $arrPreflight[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }\ncatch { throw 'workflow-policy: invalid preflight JSON' }\nif ($null -eq $objPreflight -or $objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject] -or\n    $objPreflight.schema -isnot [string] -or $objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or\n    $objPreflight.success -isnot [bool] -or $objPreflight.success -ne $true) {\n    throw 'workflow-policy: rejected preflight result'\n}\n\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n",
+        "to": "\nfunction Read-WorkflowPolicyContract {\n    # .SYNOPSIS\n    # Reads the closed workflow-policy contract.\n    # .DESCRIPTION\n    # Reads at most one byte beyond the reviewed limit, decodes strict UTF-8,\n    # and returns one JSON object without exposing parser diagnostics.\n    # .EXAMPLE\n    # $objContract = Read-WorkflowPolicyContract\n    # .INPUTS\n    # None.\n    # .OUTPUTS\n    # System.Management.Automation.PSCustomObject.\n    # .NOTES\n    # PRIVATE/INTERNAL. Version: 1.0.20260919.0.\n    [CmdletBinding()]\n    param()\n\n    try {\n        $objContractItem = Get-Item -LiteralPath 'workflow-policy-contract.json' -Force -ErrorAction Stop\n        if ($objContractItem -isnot [System.IO.FileInfo] -or\n            $null -ne $objContractItem.LinkType -or\n            ($objContractItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -or\n            ($IsLinux -and [int]$objContractItem.UnixStat.ItemType -ne 1)) {\n            throw 'contract-file'\n        }\n        $arrContractChunks = @(Get-Content -LiteralPath 'workflow-policy-contract.json' -AsByteStream -ReadCount 524289 -TotalCount 524289 -ErrorAction Stop)\n        if ($arrContractChunks.Count -ne 1 -or\n            @($arrContractChunks[0]).Count -eq 0 -or\n            @($arrContractChunks[0]).Count -gt 524288) {\n            throw 'contract-file'\n        }\n        $arrContractBytes = [byte[]]@($arrContractChunks[0])\n        $objStrictUtf8 = [System.Text.UTF8Encoding]::new($false, $true)\n        $strContract = $objStrictUtf8.GetString($arrContractBytes)\n        if ([int]$strContract[0] -eq 0xfeff -or $strContract.Contains(\"`r\")) {\n            throw 'contract-encoding'\n        }\n        $objContract = $strContract | ConvertFrom-Json -NoEnumerate -Depth 32 -ErrorAction Stop\n        if ($null -eq $objContract -or\n            $objContract -isnot [System.Management.Automation.PSCustomObject]) {\n            throw 'contract-json'\n        }\n        $objContract\n    } catch {\n        throw 'workflow-policy: invalid contract JSON'\n    }\n}\n\n# Bind the exact executable bytes before this preflight invocation.\n$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)\n$intPreflightExit = $LASTEXITCODE\nif ($intPreflightExit -isnot [int] -or $intPreflightExit -ne 0 -or\n    $arrPreflight.Count -ne 1 -or $arrPreflight[0] -isnot [string] -or\n    $arrPreflight[0].Length -gt 65536) {\n    throw 'workflow-policy: invalid preflight process result'\n}\ntry { $objPreflight = $arrPreflight[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }\ncatch { throw 'workflow-policy: invalid preflight JSON' }\nif ($null -eq $objPreflight -or $objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject] -or\n    $objPreflight.schema -isnot [string] -or $objPreflight.schema -cne 'PSStyleGuide.WorkflowPreflightResult.v1' -or\n    $objPreflight.success -isnot [bool] -or $objPreflight.success -ne $true) {\n    throw 'workflow-policy: rejected preflight result'\n}\n\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n$env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash\n"
       },
       "expected": false,
       "expectedCategory": "markdown-policy",
@@ -2749,7 +2749,7 @@
             "id": "lint",
             "shell": "pwsh",
             "working-directory": ".github/workflows",
-            "run": "$ErrorActionPreference = 'Stop'\n\n# Do not load user/system Git credentials or hooks during anonymous acquisition.\n$env:GIT_CONFIG_NOSYSTEM = '1'\n$env:GIT_CONFIG_GLOBAL = '/dev/null'\n$env:GIT_TERMINAL_PROMPT = '0'\nif (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or\n    -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or\n    -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {\n    throw 'credential-policy: a token was projected into a code job'\n}\nif (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {\n    $PSNativeCommandUseErrorActionPreference = $false\n}\n\n# Fixed paths into the distribution the previous step downloaded and\n# verified against a reviewed digest, rather than a PATH lookup.\n# Get-Command consults the command table and PATH, and this is the\n# step that runs repository-controlled code, so resolving through\n# either would let that code choose which node runs. The bin\n# directory is still prepended to PATH because npm's shim resolves\n# its interpreter through env.\n$strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'node24')\n$strNodePath = [System.IO.Path]::Combine($strNodeRoot, 'bin', 'node')\n$strNpmPath = [System.IO.Path]::Combine($strNodeRoot, 'bin', 'npm')\nif (-not [System.IO.File]::Exists($strNodePath) -or -not [System.IO.File]::Exists($strNpmPath)) {\n    throw 'toolchain: the reviewed Node distribution is not present'\n}\n$env:PATH = [System.IO.Path]::Combine($strNodeRoot, 'bin') + [System.IO.Path]::PathSeparator + $env:PATH\n$strNodeVersion = (& $strNodePath --version).Trim()\n$intNodeVersionExit = $LASTEXITCODE\n$strNpmVersion = (& $strNpmPath --version).Trim()\n$intNpmVersionExit = $LASTEXITCODE\nif ($intNodeVersionExit -ne 0 -or $strNodeVersion -cne 'v24.18.1') {\n    throw \"toolchain: node version check failed with exit $intNodeVersionExit\"\n}\nif ($intNpmVersionExit -ne 0 -or $strNpmVersion -cne '11.16.0') {\n    throw \"toolchain: npm version check failed with exit $intNpmVersionExit\"\n}\nWrite-Host \"Node executable: $strNodePath ($strNodeVersion)\"\nWrite-Host \"npm executable: $strNpmPath ($strNpmVersion)\"\n\n# Reviewed baseline. The before/after comparison further below proves\n# only that npm ci left these files alone; it cannot detect metadata\n# that was already altered at review time. This gate runs before\n# installation so unreviewed scripts are never installed and never run.\n$strReviewedPackageHash = '59E676D981CFFA350CB72E7EA4B1AEEC2C49D56621958A095AA0E76733EC2CD9'\n$strReviewedLockHash = '5EFC1286025CDC3AD03796C5F4E44CC697E674A30E61DE05E299B2A30ABAD1A2'\n$strPackageBefore = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash\n$strLockBefore = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash\nif ($strPackageBefore -cne $strReviewedPackageHash -or $strLockBefore -cne $strReviewedLockHash) {\n    throw 'supply: package metadata does not match the reviewed supply digest'\n}\n\n# npm reads .npmrc from the project directory before it runs anything,\n# and script-shell there replaces the interpreter for every npm run. A\n# pull request can add one without altering either reviewed digest or\n# any governed workflow, after which both lint phases exit zero with the\n# command echoed and no linter ever executed. No .npmrc is reviewed in\n# this repository, so any is refused here, ahead of installation, so npm\n# never reads one.\nforeach ($strNpmConfigPath in @('.npmrc', '../.npmrc', '../../.npmrc')) {\n    if (Test-Path -LiteralPath $strNpmConfigPath) {\n        throw 'supply: repository-controlled npm configuration is present'\n    }\n}\n\n# The loop above walks project paths, which is where a committed\n# .npmrc would sit -- but npm also loads a per-user file at\n# $HOME/.npmrc and a global one, and neither is under the repository\n# tree. A script-shell setting in either replaces the interpreter for\n# every npm run, so both lint phases would exit zero with the command\n# echoed and no linter executed, leaving installation, asset hashes,\n# the policy validator and all three captured statuses intact.\n# Enumerating those paths would be another list to be one entry\n# short of, so npm is told where to read them from instead. Both are\n# pointed at /dev/null rather than at an absent name: an absent name\n# under RUNNER_TEMP is absent only until something creates it, and the\n# first lint phase is repository-adjacent code that runs before the\n# second one reads the file. /dev/null always reads as empty and no\n# unprivileged process can make it read as anything else, so the\n# neutralization holds across both phases instead of only until the\n# check that observed it.\n# npm refuses to load one file at two config levels -- it exits\n# before config resolution with \"double-loading config\" -- so the two\n# settings cannot both name /dev/null. They use the same property by\n# two routes: a source this job cannot write.\n$env:npm_config_userconfig = '/dev/null'\n$env:npm_config_globalconfig = '/etc/npmrc-absent-by-policy'\nif (-not [string]::IsNullOrEmpty((Get-Content -Raw -LiteralPath $env:npm_config_userconfig -ErrorAction SilentlyContinue))) {\n    throw 'supply: the neutralized npm configuration source is not empty'\n}\nif (Test-Path -LiteralPath $env:npm_config_globalconfig) {\n    throw 'supply: the neutralized npm configuration path exists'\n}\n# /dev/null reads as empty. The absent global path is under root-owned\n# /etc on the hosted runner. The two distinct sources avoid npm rejecting\n# the same file at two configuration levels. Neither lint phase can write\n# the global source without a privilege change outside this job contract.\n$strGlobalConfigDirectory = [System.IO.Path]::GetDirectoryName($env:npm_config_globalconfig)\nif ($strGlobalConfigDirectory -cne '/etc') {\n    throw 'supply: the neutralized global npm configuration is not under a root-owned directory'\n}\n\n# The reviewed digests above cover what is installed, not what the\n# lint actually does. Both lint phases execute from the checkout: the\n# rule configuration decides which rules run at all, and the\n# nested-fence helper is the whole of the second phase. A pull\n# request editing either keeps every npm command string, every\n# captured status, and every digest intact while both phases report\n# zero errors over nothing.\n$strReviewedLintConfigHash = '5EB07BF7F30829E0091E82F235A96FDBA21BE1EF1160CA1E22CDBE8D82DA5300'\n$strReviewedLintHelperHash = 'B20AAAB172224DA4377CDA75FA6CAD1A8EEB00F8BDD26737FFE0E6C2AD222492'\n$strLintConfigHash = (Get-FileHash -LiteralPath .markdownlint.jsonc -Algorithm SHA256).Hash\n$strLintHelperHash = (Get-FileHash -LiteralPath lint-nested-markdown.js -Algorithm SHA256).Hash\nif ($strLintConfigHash -cne $strReviewedLintConfigHash -or $strLintHelperHash -cne $strReviewedLintHelperHash) {\n    throw 'supply: lint configuration or helper does not match the reviewed digest'\n}\n\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n$strPackageAfterInstall = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash\n$strLockAfterInstall = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash\nif ($strPackageAfterInstall -cne $strPackageBefore -or $strLockAfterInstall -cne $strLockBefore) {\n    throw 'npm-ci: package metadata changed during frozen installation'\n}\n\n# Re-taken after installation and before the phases that read them.\n# This asserts one specific thing and no more: that npm ci did not\n# disturb the two lint assets between the gate above and the linters\n# below. It is not a boundary against a concurrent writer --\n# Get-FileHash reads and closes, so any process still running could\n# write the file after the hash and before the linter opens it. The\n# boundary is established by ordering instead: npm ci installs the\n# lockfile-pinned tree with --ignore-scripts, so no repository or\n# package code runs between the gate and the linters. The name says\n# installation because installation is what it spans. Policy code runs\n# only in the separate policy job.\n$strLintConfigAfterInstall = (Get-FileHash -LiteralPath .markdownlint.jsonc -Algorithm SHA256).Hash\n$strLintHelperAfterInstall = (Get-FileHash -LiteralPath lint-nested-markdown.js -Algorithm SHA256).Hash\nif ($strLintConfigAfterInstall -cne $strReviewedLintConfigHash -or $strLintHelperAfterInstall -cne $strReviewedLintHelperHash) {\n    throw 'supply: lint configuration or helper changed during installation'\n}\n\n& $strNpmPath run lint:md\n$intOuterExit = $LASTEXITCODE\nWrite-Host \"outer-markdown native exit: $intOuterExit\"\n\n& $strNpmPath run lint:md:nested\n$intNestedExit = $LASTEXITCODE\nWrite-Host \"nested-markdown native exit: $intNestedExit\"\n\n$strPackageFinal = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash\n$strLockFinal = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash\nif ($strPackageFinal -cne $strPackageBefore -or $strLockFinal -cne $strLockBefore) {\n    throw 'validation: package metadata changed after installation or linting'\n}\nif ($intOuterExit -ne 0 -or $intNestedExit -ne 0) {\n    throw 'validation: one or more lint phases failed'\n}\n"
+            "run": "$ErrorActionPreference = 'Stop'\n\n# Do not load user/system Git credentials or hooks during anonymous acquisition.\n$env:GIT_CONFIG_NOSYSTEM = '1'\n$env:GIT_CONFIG_GLOBAL = '/dev/null'\n$env:GIT_TERMINAL_PROMPT = '0'\nif (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or\n    -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or\n    -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {\n    throw 'credential-policy: a token was projected into a code job'\n}\nif (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {\n    $PSNativeCommandUseErrorActionPreference = $false\n}\n\n# Fixed paths into the distribution the previous step downloaded and\n# verified against a reviewed digest, rather than a PATH lookup.\n# Get-Command consults the command table and PATH, and this is the\n# step that runs repository-controlled code, so resolving through\n# either would let that code choose which node runs. The bin\n# directory is still prepended to PATH because npm's shim resolves\n# its interpreter through env.\n$strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, 'node24')\n$strNodePath = [System.IO.Path]::Combine($strNodeRoot, 'bin', 'node')\n$strNpmPath = [System.IO.Path]::Combine($strNodeRoot, 'bin', 'npm')\nif (-not [System.IO.File]::Exists($strNodePath) -or -not [System.IO.File]::Exists($strNpmPath)) {\n    throw 'toolchain: the reviewed Node distribution is not present'\n}\n$env:PATH = [System.IO.Path]::Combine($strNodeRoot, 'bin') + [System.IO.Path]::PathSeparator + $env:PATH\n$strNodeVersion = (& $strNodePath --version).Trim()\n$intNodeVersionExit = $LASTEXITCODE\n$strNpmVersion = (& $strNpmPath --version).Trim()\n$intNpmVersionExit = $LASTEXITCODE\nif ($intNodeVersionExit -ne 0 -or $strNodeVersion -cne 'v24.18.1') {\n    throw \"toolchain: node version check failed with exit $intNodeVersionExit\"\n}\nif ($intNpmVersionExit -ne 0 -or $strNpmVersion -cne '11.16.0') {\n    throw \"toolchain: npm version check failed with exit $intNpmVersionExit\"\n}\nWrite-Host \"Node executable: $strNodePath ($strNodeVersion)\"\nWrite-Information \"npm executable: $strNpmPath ($strNpmVersion)\" -InformationAction Continue\n\n# Reviewed baseline. The before/after comparison further below proves\n# only that npm ci left these files alone; it cannot detect metadata\n# that was already altered at review time. This gate runs before\n# installation so unreviewed scripts are never installed and never run.\n$strReviewedPackageHash = '59E676D981CFFA350CB72E7EA4B1AEEC2C49D56621958A095AA0E76733EC2CD9'\n$strReviewedLockHash = '5EFC1286025CDC3AD03796C5F4E44CC697E674A30E61DE05E299B2A30ABAD1A2'\n$strPackageBefore = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash\n$strLockBefore = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash\nif ($strPackageBefore -cne $strReviewedPackageHash -or $strLockBefore -cne $strReviewedLockHash) {\n    throw 'supply: package metadata does not match the reviewed supply digest'\n}\n\n# npm reads .npmrc from the project directory before it runs anything,\n# and script-shell there replaces the interpreter for every npm run. A\n# pull request can add one without altering either reviewed digest or\n# any governed workflow, after which both lint phases exit zero with the\n# command echoed and no linter ever executed. No .npmrc is reviewed in\n# this repository, so any is refused here, ahead of installation, so npm\n# never reads one.\nforeach ($strNpmConfigPath in @('.npmrc', '../.npmrc', '../../.npmrc')) {\n    if (Test-Path -LiteralPath $strNpmConfigPath) {\n        throw 'supply: repository-controlled npm configuration is present'\n    }\n}\n\n# The loop above walks project paths, which is where a committed\n# .npmrc would sit -- but npm also loads a per-user file at\n# $HOME/.npmrc and a global one, and neither is under the repository\n# tree. A script-shell setting in either replaces the interpreter for\n# every npm run, so both lint phases would exit zero with the command\n# echoed and no linter executed, leaving installation, asset hashes,\n# the policy validator and all three captured statuses intact.\n# Enumerating those paths would be another list to be one entry\n# short of, so npm is told where to read them from instead. Both are\n# pointed at /dev/null rather than at an absent name: an absent name\n# under RUNNER_TEMP is absent only until something creates it, and the\n# first lint phase is repository-adjacent code that runs before the\n# second one reads the file. /dev/null always reads as empty and no\n# unprivileged process can make it read as anything else, so the\n# neutralization holds across both phases instead of only until the\n# check that observed it.\n# npm refuses to load one file at two config levels -- it exits\n# before config resolution with \"double-loading config\" -- so the two\n# settings cannot both name /dev/null. They use the same property by\n# two routes: a source this job cannot write.\n$env:npm_config_userconfig = '/dev/null'\n$env:npm_config_globalconfig = '/etc/npmrc-absent-by-policy'\nif (-not [string]::IsNullOrEmpty((Get-Content -Raw -LiteralPath $env:npm_config_userconfig -ErrorAction SilentlyContinue))) {\n    throw 'supply: the neutralized npm configuration source is not empty'\n}\nif (Test-Path -LiteralPath $env:npm_config_globalconfig) {\n    throw 'supply: the neutralized npm configuration path exists'\n}\n# /dev/null reads as empty. The absent global path is under root-owned\n# /etc on the hosted runner. The two distinct sources avoid npm rejecting\n# the same file at two configuration levels. Neither lint phase can write\n# the global source without a privilege change outside this job contract.\n$strGlobalConfigDirectory = [System.IO.Path]::GetDirectoryName($env:npm_config_globalconfig)\nif ($strGlobalConfigDirectory -cne '/etc') {\n    throw 'supply: the neutralized global npm configuration is not under a root-owned directory'\n}\n\n# The reviewed digests above cover what is installed, not what the\n# lint actually does. Both lint phases execute from the checkout: the\n# rule configuration decides which rules run at all, and the\n# nested-fence helper is the whole of the second phase. A pull\n# request editing either keeps every npm command string, every\n# captured status, and every digest intact while both phases report\n# zero errors over nothing.\n$strReviewedLintConfigHash = '5EB07BF7F30829E0091E82F235A96FDBA21BE1EF1160CA1E22CDBE8D82DA5300'\n$strReviewedLintHelperHash = 'B20AAAB172224DA4377CDA75FA6CAD1A8EEB00F8BDD26737FFE0E6C2AD222492'\n$strLintConfigHash = (Get-FileHash -LiteralPath .markdownlint.jsonc -Algorithm SHA256).Hash\n$strLintHelperHash = (Get-FileHash -LiteralPath lint-nested-markdown.js -Algorithm SHA256).Hash\nif ($strLintConfigHash -cne $strReviewedLintConfigHash -or $strLintHelperHash -cne $strReviewedLintHelperHash) {\n    throw 'supply: lint configuration or helper does not match the reviewed digest'\n}\n\n$boolCiExisted = Test-Path Env:CI\n$strPriorCi = $env:CI\ntry {\n    $env:CI = 'true'\n    & $strNpmPath ci --ignore-scripts --no-audit --no-fund\n    $intInstallExit = $LASTEXITCODE\n} finally {\n    if ($boolCiExisted) {\n        $env:CI = $strPriorCi\n    } else {\n        Remove-Item Env:CI -ErrorAction SilentlyContinue\n    }\n}\nif ($intInstallExit -ne 0) { throw \"npm-ci: native exit $intInstallExit\" }\n\n$strPackageAfterInstall = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash\n$strLockAfterInstall = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash\nif ($strPackageAfterInstall -cne $strPackageBefore -or $strLockAfterInstall -cne $strLockBefore) {\n    throw 'npm-ci: package metadata changed during frozen installation'\n}\n\n# Re-taken after installation and before the phases that read them.\n# This asserts one specific thing and no more: that npm ci did not\n# disturb the two lint assets between the gate above and the linters\n# below. It is not a boundary against a concurrent writer --\n# Get-FileHash reads and closes, so any process still running could\n# write the file after the hash and before the linter opens it. The\n# boundary is established by ordering instead: npm ci installs the\n# lockfile-pinned tree with --ignore-scripts, so no repository or\n# package code runs between the gate and the linters. The name says\n# installation because installation is what it spans. Policy code runs\n# only in the separate policy job.\n$strLintConfigAfterInstall = (Get-FileHash -LiteralPath .markdownlint.jsonc -Algorithm SHA256).Hash\n$strLintHelperAfterInstall = (Get-FileHash -LiteralPath lint-nested-markdown.js -Algorithm SHA256).Hash\nif ($strLintConfigAfterInstall -cne $strReviewedLintConfigHash -or $strLintHelperAfterInstall -cne $strReviewedLintHelperHash) {\n    throw 'supply: lint configuration or helper changed during installation'\n}\n\n& $strNpmPath run lint:md\n$intOuterExit = $LASTEXITCODE\nWrite-Information \"outer-markdown native exit: $intOuterExit\" -InformationAction Continue\n\n& $strNpmPath run lint:md:nested\n$intNestedExit = $LASTEXITCODE\nWrite-Information \"nested-markdown native exit: $intNestedExit\" -InformationAction Continue\n\n$strPackageFinal = (Get-FileHash -LiteralPath package.json -Algorithm SHA256).Hash\n$strLockFinal = (Get-FileHash -LiteralPath package-lock.json -Algorithm SHA256).Hash\nif ($strPackageFinal -cne $strPackageBefore -or $strLockFinal -cne $strLockBefore) {\n    throw 'validation: package metadata changed after installation or linting'\n}\nif ($intOuterExit -ne 0 -or $intNestedExit -ne 0) {\n    throw 'validation: one or more lint phases failed'\n}\n"
           }
         ]
       },
@@ -3084,8 +3084,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/policy/steps/2/run",
-        "from": "Write-Host \"workflow-policy native exit: $intPolicyExit\"\n",
-        "to": "$local:intPolicyExit = 0\nWrite-Host \"workflow-policy native exit: $intPolicyExit\"\n"
+        "from": "Write-Information \"workflow-policy native exit: $intPolicyExit\" -InformationAction Continue\n",
+        "to": "$local:intPolicyExit = 0\nWrite-Information \"workflow-policy native exit: $intPolicyExit\" -InformationAction Continue\n"
       },
       "expected": false,
       "expectedCategory": "markdown-policy",
@@ -3100,8 +3100,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/policy/steps/2/run",
-        "from": "Write-Host \"workflow-policy native exit: $intPolicyExit\"\n",
-        "to": "${intPolicyExit} = 0\nWrite-Host \"workflow-policy native exit: $intPolicyExit\"\n"
+        "from": "Write-Information \"workflow-policy native exit: $intPolicyExit\" -InformationAction Continue\n",
+        "to": "${intPolicyExit} = 0\nWrite-Information \"workflow-policy native exit: $intPolicyExit\" -InformationAction Continue\n"
       },
       "expected": false,
       "expectedCategory": "markdown-policy",
@@ -3116,8 +3116,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/markdownlint/steps/2/run",
-        "from": "Write-Host \"nested-markdown native exit: $intNestedExit\"\n",
-        "to": "$private:intOuterExit = 0\nWrite-Host \"nested-markdown native exit: $intNestedExit\"\n"
+        "from": "Write-Information \"nested-markdown native exit: $intNestedExit\" -InformationAction Continue\n",
+        "to": "$private:intOuterExit = 0\nWrite-Information \"nested-markdown native exit: $intNestedExit\" -InformationAction Continue\n"
       },
       "expected": false,
       "expectedCategory": "markdown-policy",
@@ -3132,8 +3132,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/policy/steps/2/run",
-        "from": "Write-Host \"workflow-policy native exit: $intPolicyExit\"\n",
-        "to": "$intPolicyExit -= $intPolicyExit\nWrite-Host \"workflow-policy native exit: $intPolicyExit\"\n"
+        "from": "Write-Information \"workflow-policy native exit: $intPolicyExit\" -InformationAction Continue\n",
+        "to": "$intPolicyExit -= $intPolicyExit\nWrite-Information \"workflow-policy native exit: $intPolicyExit\" -InformationAction Continue\n"
       },
       "expected": false,
       "expectedCategory": "markdown-policy",
@@ -3148,8 +3148,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/policy/steps/2/run",
-        "from": "Write-Host \"workflow-policy native exit: $intPolicyExit\"\n",
-        "to": "$INTPOLICYEXIT = 0\nWrite-Host \"workflow-policy native exit: $intPolicyExit\"\n"
+        "from": "Write-Information \"workflow-policy native exit: $intPolicyExit\" -InformationAction Continue\n",
+        "to": "$INTPOLICYEXIT = 0\nWrite-Information \"workflow-policy native exit: $intPolicyExit\" -InformationAction Continue\n"
       },
       "expected": false,
       "expectedCategory": "markdown-policy",
@@ -4357,7 +4357,7 @@
       },
       "expected": false,
       "expectedCategory": "acquire-policy",
-      "expectedReason": "build.verify_generated_artifacts.acquire no longer asserts a plain owner/name repository"
+      "expectedReason": "build.verify_generated_artifacts.acquire no longer asserts the exact expected repository and its diagnostic"
     },
     {
       "id": "PS-P1-WFPOL-257",
@@ -4560,8 +4560,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/verify_generated_artifacts/steps/0/run",
-        "from": "Write-Host \"acquire: anonymous shallow checkout of $strSha\"\n",
-        "to": "Write-Host \"acquire: anonymous shallow checkout of $strSha\"\nCopy-Item -LiteralPath ./tools/gen.ps1 -Destination ./.github/workflows/Generate-StyleGuideArtifacts.ps1 -Force\n"
+        "from": "Write-Information \"acquire: anonymous shallow checkout of $strSha\" -InformationAction Continue\n",
+        "to": "Write-Information \"acquire: anonymous shallow checkout of $strSha\" -InformationAction Continue\nCopy-Item -LiteralPath ./tools/gen.ps1 -Destination ./.github/workflows/Generate-StyleGuideArtifacts.ps1 -Force\n"
       },
       "expected": false,
       "expectedCategory": "acquire-policy",
@@ -5512,7 +5512,7 @@
       "domain": "generator-source",
       "operation": {
         "type": "replace",
-        "from": "    $arrGitCommands = @(Get-Command -Name git -CommandType Application -ErrorAction Stop)\n",
+        "from": "    $arrGitCommands = @(Microsoft.PowerShell.Core\\Get-Command -Name git -CommandType Application -ErrorAction Stop)\n",
         "to": "    $arrGitCommands = @($ExecutionContext.InvokeCommand.GetCommand('git' -CommandType Application -ErrorAction Stop)\n"
       },
       "expected": false,
@@ -5610,8 +5610,8 @@
       "domain": "generator-source",
       "operation": {
         "type": "replace",
-        "from": "    $arrGitCommands = @(Get-Command -Name git -CommandType Application -ErrorAction Stop)\n",
-        "to": "    if ($true) { return }\n    $arrGitCommands = @(Get-Command -Name git -CommandType Application -ErrorAction Stop)\n"
+        "from": "    $arrGitCommands = @(Microsoft.PowerShell.Core\\Get-Command -Name git -CommandType Application -ErrorAction Stop)\n",
+        "to": "    if ($true) { return }\n    $arrGitCommands = @(Microsoft.PowerShell.Core\\Get-Command -Name git -CommandType Application -ErrorAction Stop)\n"
       },
       "expected": false,
       "expectedCategory": "supply-policy",
@@ -6157,8 +6157,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/verify_generated_artifacts/steps/2/run",
-        "from": "if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\nif ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\n",
-        "to": "if ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\n"
+        "from": "if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\n$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\nif ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\n",
+        "to": "$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\nif ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\n"
       },
       "expected": false,
       "expectedCategory": "generator-result-order"
@@ -6202,8 +6202,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/verify_generated_artifacts/steps/2/run",
-        "from": "# BEGIN P1 GENERATOR RESULT\ntry {\n    $objResult = $arrResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop\n} catch {\n    throw 'The generator returned invalid JSON.'\n}\nif ($null -eq $objResult -or $objResult.GetType() -ne [System.Management.Automation.PSCustomObject]) {\n    throw 'The generator returned a non-object JSON result.'\n}\n# Only fixed labels enter this list; result values must never reach the diagnostic.\n$listFailedChecks = [System.Collections.Generic.List[string]]::new()\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\nif ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\nif ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {\n    [void]($listFailedChecks.Add('Overall'))\n}\nif ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {\n    [void]($listFailedChecks.Add('Phase'))\n}\nif ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {\n    [void]($listFailedChecks.Add('Category'))\n}\nif ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {\n    [void]($listFailedChecks.Add('NativeOutcome'))\n}\nif (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {\n    [void]($listFailedChecks.Add('ResultExitCode'))\n}\nif ($listFailedChecks.Count -ne 0) {\n    throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))\n}\n# END P1 GENERATOR RESULT\n",
-        "to": "if ($false) {\n# BEGIN P1 GENERATOR RESULT\ntry {\n    $objResult = $arrResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop\n} catch {\n    throw 'The generator returned invalid JSON.'\n}\nif ($null -eq $objResult -or $objResult.GetType() -ne [System.Management.Automation.PSCustomObject]) {\n    throw 'The generator returned a non-object JSON result.'\n}\n# Only fixed labels enter this list; result values must never reach the diagnostic.\n$listFailedChecks = [System.Collections.Generic.List[string]]::new()\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\nif ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\nif ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {\n    [void]($listFailedChecks.Add('Overall'))\n}\nif ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {\n    [void]($listFailedChecks.Add('Phase'))\n}\nif ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {\n    [void]($listFailedChecks.Add('Category'))\n}\nif ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {\n    [void]($listFailedChecks.Add('NativeOutcome'))\n}\nif (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {\n    [void]($listFailedChecks.Add('ResultExitCode'))\n}\nif ($listFailedChecks.Count -ne 0) {\n    throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))\n}\n# END P1 GENERATOR RESULT\n}\n"
+        "from": "# BEGIN P1 GENERATOR RESULT\ntry {\n    $objResult = $arrResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop\n} catch {\n    throw 'The generator returned invalid JSON.'\n}\nif ($null -eq $objResult -or $objResult.GetType() -ne [System.Management.Automation.PSCustomObject]) {\n    throw 'The generator returned a non-object JSON result.'\n}\n# Only fixed labels enter this list; result values must never reach the diagnostic.\n$listFailedChecks = [System.Collections.Generic.List[string]]::new()\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\n$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\nif ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\nif ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {\n    [void]($listFailedChecks.Add('Overall'))\n}\nif ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {\n    [void]($listFailedChecks.Add('Phase'))\n}\nif ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {\n    [void]($listFailedChecks.Add('Category'))\n}\nif ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {\n    [void]($listFailedChecks.Add('NativeOutcome'))\n}\nif (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {\n    [void]($listFailedChecks.Add('ResultExitCode'))\n}\nif ($listFailedChecks.Count -ne 0) {\n    throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))\n}\n# END P1 GENERATOR RESULT\n",
+        "to": "if ($false) {\n# BEGIN P1 GENERATOR RESULT\ntry {\n    $objResult = $arrResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop\n} catch {\n    throw 'The generator returned invalid JSON.'\n}\nif ($null -eq $objResult -or $objResult.GetType() -ne [System.Management.Automation.PSCustomObject]) {\n    throw 'The generator returned a non-object JSON result.'\n}\n# Only fixed labels enter this list; result values must never reach the diagnostic.\n$listFailedChecks = [System.Collections.Generic.List[string]]::new()\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\n$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\nif ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\nif ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {\n    [void]($listFailedChecks.Add('Overall'))\n}\nif ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {\n    [void]($listFailedChecks.Add('Phase'))\n}\nif ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {\n    [void]($listFailedChecks.Add('Category'))\n}\nif ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {\n    [void]($listFailedChecks.Add('NativeOutcome'))\n}\nif (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {\n    [void]($listFailedChecks.Add('ResultExitCode'))\n}\nif ($listFailedChecks.Count -ne 0) {\n    throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))\n}\n# END P1 GENERATOR RESULT\n}\n"
       },
       "expected": false,
       "expectedCategory": "generator-result-reachability"
@@ -6217,8 +6217,8 @@
       "operation": {
         "type": "replace",
         "path": "/jobs/verify_generated_artifacts/steps/2/run",
-        "from": "try {\n    $objResult = $arrResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop\n} catch {\n    throw 'The generator returned invalid JSON.'\n}\nif ($null -eq $objResult -or $objResult.GetType() -ne [System.Management.Automation.PSCustomObject]) {\n    throw 'The generator returned a non-object JSON result.'\n}\n# Only fixed labels enter this list; result values must never reach the diagnostic.\n$listFailedChecks = [System.Collections.Generic.List[string]]::new()\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\nif ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\nif ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {\n    [void]($listFailedChecks.Add('Overall'))\n}\nif ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {\n    [void]($listFailedChecks.Add('Phase'))\n}\nif ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {\n    [void]($listFailedChecks.Add('Category'))\n}\nif ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {\n    [void]($listFailedChecks.Add('NativeOutcome'))\n}\nif (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {\n    [void]($listFailedChecks.Add('ResultExitCode'))\n}\nif ($listFailedChecks.Count -ne 0) {\n    throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))\n}\n",
-        "to": "if ($false) {\ntry {\n    $objResult = $arrResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop\n} catch {\n    throw 'The generator returned invalid JSON.'\n}\nif ($null -eq $objResult -or $objResult.GetType() -ne [System.Management.Automation.PSCustomObject]) {\n    throw 'The generator returned a non-object JSON result.'\n}\n# Only fixed labels enter this list; result values must never reach the diagnostic.\n$listFailedChecks = [System.Collections.Generic.List[string]]::new()\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\nif ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\nif ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {\n    [void]($listFailedChecks.Add('Overall'))\n}\nif ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {\n    [void]($listFailedChecks.Add('Phase'))\n}\nif ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {\n    [void]($listFailedChecks.Add('Category'))\n}\nif ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {\n    [void]($listFailedChecks.Add('NativeOutcome'))\n}\nif (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {\n    [void]($listFailedChecks.Add('ResultExitCode'))\n}\nif ($listFailedChecks.Count -ne 0) {\n    throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))\n}\n}\n"
+        "from": "try {\n    $objResult = $arrResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop\n} catch {\n    throw 'The generator returned invalid JSON.'\n}\nif ($null -eq $objResult -or $objResult.GetType() -ne [System.Management.Automation.PSCustomObject]) {\n    throw 'The generator returned a non-object JSON result.'\n}\n# Only fixed labels enter this list; result values must never reach the diagnostic.\n$listFailedChecks = [System.Collections.Generic.List[string]]::new()\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\n$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\nif ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\nif ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {\n    [void]($listFailedChecks.Add('Overall'))\n}\nif ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {\n    [void]($listFailedChecks.Add('Phase'))\n}\nif ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {\n    [void]($listFailedChecks.Add('Category'))\n}\nif ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {\n    [void]($listFailedChecks.Add('NativeOutcome'))\n}\nif (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {\n    [void]($listFailedChecks.Add('ResultExitCode'))\n}\nif ($listFailedChecks.Count -ne 0) {\n    throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))\n}\n",
+        "to": "if ($false) {\ntry {\n    $objResult = $arrResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop\n} catch {\n    throw 'The generator returned invalid JSON.'\n}\nif ($null -eq $objResult -or $objResult.GetType() -ne [System.Management.Automation.PSCustomObject]) {\n    throw 'The generator returned a non-object JSON result.'\n}\n# Only fixed labels enter this list; result values must never reach the diagnostic.\n$listFailedChecks = [System.Collections.Generic.List[string]]::new()\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    [void]($listFailedChecks.Add('NativeExit'))\n}\nif ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {\n    [void]($listFailedChecks.Add('Schema'))\n}\n$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\nif ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\nif ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {\n    [void]($listFailedChecks.Add('Overall'))\n}\nif ($objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete') {\n    [void]($listFailedChecks.Add('Phase'))\n}\nif ($objResult.Category -isnot [string] -or $objResult.Category -cne 'none') {\n    [void]($listFailedChecks.Add('Category'))\n}\nif ($objResult.NativeOutcome -isnot [string] -or $objResult.NativeOutcome -cne 'Success') {\n    [void]($listFailedChecks.Add('NativeOutcome'))\n}\nif (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -or $objResult.ExitCode -ne 0) {\n    [void]($listFailedChecks.Add('ResultExitCode'))\n}\nif ($listFailedChecks.Count -ne 0) {\n    throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))\n}\n}\n"
       },
       "expected": false,
       "expectedCategory": "generator-result-flow"
@@ -6756,7 +6756,8 @@
       "domain": "cli",
       "args": [],
       "expectedCategory": "arguments",
-      "expected": false
+      "expected": false,
+      "workingDirectory": "workflow-directory"
     },
     {
       "id": "PS-P1-WFPOL-428",
@@ -6767,7 +6768,8 @@
         "preflight"
       ],
       "expectedCategory": "arguments",
-      "expected": false
+      "expected": false,
+      "workingDirectory": "workflow-directory"
     },
     {
       "id": "PS-P1-WFPOL-429",
@@ -6779,7 +6781,8 @@
         "build.yml"
       ],
       "expectedCategory": "arguments",
-      "expected": false
+      "expected": false,
+      "workingDirectory": "workflow-directory"
     },
     {
       "id": "PS-P1-WFPOL-430",
@@ -6792,14 +6795,15 @@
         "extra.yml"
       ],
       "expectedCategory": "arguments",
-      "expected": false
+      "expected": false,
+      "workingDirectory": "workflow-directory"
     },
     {
       "id": "PS-P1-WFPOL-431",
       "semanticKey": "ps-version-lf-boundary-1",
       "sourceCase": "PS-F99-23-001",
       "domain": "script-version",
-      "text": "<#\n.NOTES Version: 1.0.20260916.0\n#>\nfunction X {}\n",
+      "text": "<#\n.NOTES Version: 1.0.20260919.0\n#>\nfunction X {}\n",
       "expected": false,
       "expectedCategory": "invalid-version"
     },
@@ -6808,7 +6812,7 @@
       "semanticKey": "ps-version-lf-boundary-2",
       "sourceCase": "PS-F99-23-002",
       "domain": "script-version",
-      "text": "<#\n.NOTES\nVersion: 1.0.20260916.0\n#> function X {}\n",
+      "text": "<#\n.NOTES\nVersion: 1.0.20260919.0\n#> function X {}\n",
       "expected": false,
       "expectedCategory": "invalid-version"
     },
@@ -6817,7 +6821,7 @@
       "semanticKey": "ps-version-lf-boundary-3",
       "sourceCase": "PS-F99-23-003",
       "domain": "script-version",
-      "text": "<#\n.NOTES\nVersion: 1.0.20260916.0 #>\nfunction X {}\n",
+      "text": "<#\n.NOTES\nVersion: 1.0.20260919.0 #>\nfunction X {}\n",
       "expected": false,
       "expectedCategory": "invalid-version"
     },
@@ -6826,7 +6830,7 @@
       "semanticKey": "ps-version-lf-boundary-4",
       "sourceCase": "PS-F99-23-004",
       "domain": "script-version",
-      "text": "<#\n.NOTES Version: 1.0.20260916.0\n#>\nfunction X {}\n",
+      "text": "<#\n.NOTES Version: 1.0.20260919.0\n#>\nfunction X {}\n",
       "expected": false,
       "expectedCategory": "invalid-version"
     },
@@ -6835,7 +6839,7 @@
       "semanticKey": "ps-version-lf-boundary-5",
       "sourceCase": "PS-F99-23-005",
       "domain": "script-version",
-      "text": "<#\n.NOTES\nVersion: 1.0.20260916.0\n#> function X {}\n",
+      "text": "<#\n.NOTES\nVersion: 1.0.20260919.0\n#> function X {}\n",
       "expected": false,
       "expectedCategory": "invalid-version"
     },
@@ -6844,7 +6848,7 @@
       "semanticKey": "ps-version-lf-boundary-6",
       "sourceCase": "PS-F99-23-006",
       "domain": "script-version",
-      "text": "<#\n.NOTES\nVersion: 1.0.20260916.0 #>\nfunction X {}\n",
+      "text": "<#\n.NOTES\nVersion: 1.0.20260919.0 #>\nfunction X {}\n",
       "expected": false,
       "expectedCategory": "invalid-version"
     },
@@ -6863,6 +6867,376 @@
       "expected": false,
       "expectedCategory": "identity-acquire-policy",
       "expectedReason": "exact bounded proposed-head fetch changed"
+    },
+    {
+      "id": "PS-P1-WFPOL-443",
+      "semanticKey": "tf-continue-before-log",
+      "domain": "workflow",
+      "workflow": "build.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/verify_generated_artifacts/steps/0/run",
+        "from": "Write-Information \"acquire: anonymous shallow checkout of $strSha\" -InformationAction Continue",
+        "to": "continue\nWrite-Information \"acquire: anonymous shallow checkout of $strSha\" -InformationAction Continue"
+      },
+      "expected": false,
+      "expectedCategory": "acquire-policy"
+    },
+    {
+      "id": "PS-P1-WFPOL-444",
+      "semanticKey": "tf-continue-after-log",
+      "domain": "workflow",
+      "workflow": "build.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/verify_generated_artifacts/steps/0/run",
+        "from": "Write-Information \"acquire: anonymous shallow checkout of $strSha\" -InformationAction Continue",
+        "to": "Write-Information \"acquire: anonymous shallow checkout of $strSha\" -InformationAction Continue\ncontinue"
+      },
+      "expected": false,
+      "expectedCategory": "acquire-policy"
+    },
+    {
+      "id": "PS-P1-WFPOL-445",
+      "semanticKey": "tf-continue-inside-log",
+      "domain": "workflow",
+      "workflow": "build.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/verify_generated_artifacts/steps/0/run",
+        "from": "Write-Information \"acquire: anonymous shallow checkout of $strSha\" -InformationAction Continue",
+        "to": "Write-Information \"acquire: anonymous shallow checkout of $(continue)\" -InformationAction Continue"
+      },
+      "expected": false,
+      "expectedCategory": "acquire-policy"
+    },
+    {
+      "id": "PS-P1-WFPOL-446",
+      "semanticKey": "tf-generator-version-unconditional-valid",
+      "domain": "workflow",
+      "workflow": "build.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/verify_generated_artifacts/steps/2/run",
+        "from": "$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\n",
+        "to": "$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $true }\n"
+      },
+      "expected": false,
+      "expectedCategory": "generator-result-predicate-GeneratorVersion"
+    },
+    {
+      "id": "PS-P1-WFPOL-447",
+      "semanticKey": "tf-generator-version-unrelated-binding",
+      "domain": "workflow",
+      "workflow": "build.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/verify_generated_artifacts/steps/2/run",
+        "from": "$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\n",
+        "to": "$objGeneratorResult = $null\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\n"
+      },
+      "expected": false,
+      "expectedCategory": "generator-result-predicate-GeneratorVersion"
+    },
+    {
+      "id": "PS-P1-WFPOL-448",
+      "semanticKey": "tf-cli-workflow-directory-profile",
+      "sourceCase": "TF-F110-CLI-001",
+      "domain": "cli",
+      "args": [
+        "build.yml",
+        "markdownlint.yml"
+      ],
+      "workingDirectory": "workflow-directory",
+      "expected": true
+    },
+    {
+      "id": "PS-P1-WFPOL-449",
+      "semanticKey": "tf-cli-repository-root-profile",
+      "sourceCase": "TF-F110-CLI-002",
+      "domain": "cli",
+      "args": [
+        ".github/workflows/build.yml",
+        ".github/workflows/markdownlint.yml"
+      ],
+      "workingDirectory": "repository-root",
+      "expected": true
+    },
+    {
+      "id": "PS-P1-WFPOL-450",
+      "semanticKey": "tf-cli-root-tuple-from-workflow-directory",
+      "sourceCase": "TF-F110-CLI-003",
+      "domain": "cli",
+      "args": [
+        ".github/workflows/build.yml",
+        ".github/workflows/markdownlint.yml"
+      ],
+      "workingDirectory": "workflow-directory",
+      "expectedCategory": "arguments",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-451",
+      "semanticKey": "tf-cli-workflow-tuple-from-repository-root",
+      "sourceCase": "TF-F110-CLI-004",
+      "domain": "cli",
+      "args": [
+        "build.yml",
+        "markdownlint.yml"
+      ],
+      "workingDirectory": "repository-root",
+      "expectedCategory": "arguments",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-452",
+      "semanticKey": "tf-cli-root-near-miss-spelling",
+      "sourceCase": "TF-F110-CLI-005",
+      "domain": "cli",
+      "args": [
+        "./.github/workflows/build.yml",
+        ".github/workflows/markdownlint.yml"
+      ],
+      "workingDirectory": "repository-root",
+      "expectedCategory": "arguments",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-453",
+      "semanticKey": "tf-cli-root-tuple-from-unrelated-directory",
+      "sourceCase": "TF-F110-CLI-006",
+      "domain": "cli",
+      "args": [
+        ".github/workflows/build.yml",
+        ".github/workflows/markdownlint.yml"
+      ],
+      "workingDirectory": "unrelated-directory",
+      "expectedCategory": "arguments",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-454",
+      "semanticKey": "tf-build-exact-repository-diagnostic",
+      "sourceCase": "TF-F110-DIAG-001",
+      "domain": "workflow",
+      "workflow": "build.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/verify_generated_artifacts/steps/0/run",
+        "from": "throw 'acquire: the triggering repository is not the expected repository'",
+        "to": "throw 'acquire: the triggering repository is not a plain owner/name pair'"
+      },
+      "expectedCategory": "acquire-policy",
+      "expectedReason": "build.verify_generated_artifacts.acquire no longer asserts the exact expected repository and its diagnostic",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-455",
+      "semanticKey": "tf-policy-exact-repository-guard",
+      "sourceCase": "TF-F110-DIAG-002",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/0/run",
+        "from": "if ($strRepository -cne 'franklesniak/PSStyleGuide') {",
+        "to": "if ([string]::IsNullOrEmpty($strRepository)) {"
+      },
+      "expectedCategory": "acquire-policy",
+      "expectedReason": "markdown.policy.acquire no longer asserts the exact expected repository and its diagnostic",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-456",
+      "semanticKey": "tf-policy-exact-repository-diagnostic",
+      "sourceCase": "TF-F110-DIAG-003",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/0/run",
+        "from": "throw 'acquire: the triggering repository is not the expected repository'",
+        "to": "throw 'acquire: the triggering repository is not a plain owner/name pair'"
+      },
+      "expectedCategory": "acquire-policy",
+      "expectedReason": "markdown.policy.acquire no longer asserts the exact expected repository and its diagnostic",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-457",
+      "semanticKey": "tf-markdownlint-exact-repository-guard",
+      "sourceCase": "TF-F110-DIAG-004",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/markdownlint/steps/0/run",
+        "from": "if ($strRepository -cne 'franklesniak/PSStyleGuide') {",
+        "to": "if ([string]::IsNullOrEmpty($strRepository)) {"
+      },
+      "expectedCategory": "acquire-policy",
+      "expectedReason": "markdown.markdownlint.acquire no longer asserts the exact expected repository and its diagnostic",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-458",
+      "semanticKey": "tf-markdownlint-exact-repository-diagnostic",
+      "sourceCase": "TF-F110-DIAG-005",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/markdownlint/steps/0/run",
+        "from": "throw 'acquire: the triggering repository is not the expected repository'",
+        "to": "throw 'acquire: the triggering repository is not a plain owner/name pair'"
+      },
+      "expectedCategory": "acquire-policy",
+      "expectedReason": "markdown.markdownlint.acquire no longer asserts the exact expected repository and its diagnostic",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-459",
+      "semanticKey": "tf-contract-reader-max-plus-one",
+      "sourceCase": "TF-F110-READER-001",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/2/run",
+        "from": "-AsByteStream -ReadCount 524289 -TotalCount 524289 -ErrorAction Stop",
+        "to": "-AsByteStream -ReadCount 524288 -TotalCount 524288 -ErrorAction Stop"
+      },
+      "expectedCategory": "markdown-policy",
+      "expectedReason": "markdown.policy.validate changes the closed bounded contract reader",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-460",
+      "semanticKey": "tf-contract-reader-fixed-diagnostic",
+      "sourceCase": "TF-F110-READER-002",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/2/run",
+        "from": "throw 'workflow-policy: invalid contract JSON'",
+        "to": "throw $_"
+      },
+      "expectedCategory": "markdown-policy",
+      "expectedReason": "markdown.policy.validate changes the closed bounded contract reader",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-461",
+      "semanticKey": "tf-contract-reader-linux-regular-file-kind",
+      "sourceCase": "TF-F110-READER-003",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/2/run",
+        "from": "($IsLinux -and [int]$objContractItem.UnixStat.ItemType -ne 1)",
+        "to": "($IsLinux -and [int]$objContractItem.UnixStat.ItemType -ne 5)"
+      },
+      "expectedCategory": "markdown-policy",
+      "expectedReason": "markdown.policy.validate changes the closed bounded contract reader",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-462",
+      "semanticKey": "tf-contract-reader-commented-preflight-decoy",
+      "sourceCase": "TF-F110-READER-004",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/2/run",
+        "from": "# Bind the exact executable bytes before this preflight invocation.\n$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256",
+        "to": "# Bind the exact executable bytes before this preflight invocation.\n# $objContract = Read-WorkflowPolicyContract\n$objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256"
+      },
+      "expectedCategory": "markdown-policy",
+      "expectedReason": "markdown.policy.validate must bind both validator invocations through the bounded contract reader",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-463",
+      "semanticKey": "tf-contract-reader-string-policy-decoy",
+      "sourceCase": "TF-F110-READER-005",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/2/run",
+        "from": "# Bind the exact executable bytes before this policy invocation.\n$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256",
+        "to": "# Bind the exact executable bytes before this policy invocation.\n$strReaderDecoy = '$objContract = Read-WorkflowPolicyContract'\n$objContract = Get-Content -LiteralPath 'workflow-policy-contract.json' -Raw | ConvertFrom-Json\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256"
+      },
+      "expectedCategory": "markdown-policy",
+      "expectedReason": "markdown.policy.validate must bind both validator invocations through the bounded contract reader",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-464",
+      "semanticKey": "tf-contract-reader-duplicate-helper",
+      "sourceCase": "TF-F110-READER-006",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/2/run",
+        "from": "function Read-WorkflowPolicyContract {",
+        "to": "function Read-WorkflowPolicyContract { }\nfunction Read-WorkflowPolicyContract {"
+      },
+      "expectedCategory": "markdown-policy",
+      "expectedReason": "markdown.policy.validate changes or rebinds the bounded contract reader",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-465",
+      "semanticKey": "tf-contract-reader-mixed-case-rebind",
+      "sourceCase": "TF-F110-READER-007",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/2/run",
+        "from": "function Read-WorkflowPolicyContract {",
+        "to": "function read-workflowpolicycontract { }\nfunction Read-WorkflowPolicyContract {"
+      },
+      "expectedCategory": "markdown-policy",
+      "expectedReason": "markdown.policy.validate changes or rebinds the bounded contract reader",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-466",
+      "semanticKey": "tf-contract-reader-out-of-helper-get-item",
+      "sourceCase": "TF-F110-READER-008",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/2/run",
+        "from": "$env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash",
+        "to": "$env:P1_EXPECTED_MARKDOWN_DIGEST = (Get-FileHash -LiteralPath ./markdownlint.yml -Algorithm SHA256).Hash\n$objUnreviewed = Get-Item -LiteralPath package.json"
+      },
+      "expectedCategory": "markdown-policy",
+      "expectedReason": "markdown.policy.validate runs an unreviewed bare command: Get-Item",
+      "expected": false
+    },
+    {
+      "id": "PS-P1-WFPOL-467",
+      "semanticKey": "tf-contract-reader-nested-preflight-call",
+      "sourceCase": "TF-F110-READER-009",
+      "domain": "workflow",
+      "workflow": "markdownlint.yml",
+      "operation": {
+        "type": "replace",
+        "path": "/jobs/policy/steps/2/run",
+        "from": "$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)",
+        "to": "if ($true) {\n$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256\n}\nif ($strExpectedValidatorHash -isnot [string] -or $strExpectedValidatorHash -cnotmatch '^[0-9a-f]{64}$') {\n    throw 'workflow-policy: invalid validator identity'\n}\n$strValidatorHash = (Get-FileHash -Algorithm SHA256 -LiteralPath 'Validate-WorkflowPolicy.mjs').Hash\nif ($strValidatorHash -ine $strExpectedValidatorHash) { throw 'workflow-policy: validator identity mismatch' }\n$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)"
+      },
+      "expectedCategory": "markdown-policy",
+      "expectedReason": "markdown.policy.validate nests a bounded contract-reader invocation",
+      "expected": false
     }
   ]
 }

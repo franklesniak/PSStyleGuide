@@ -101,12 +101,13 @@ function assertReviewedParserTree(root, reader) {
   if (foldParserTree(root, reader) !== REVIEWED_PARSER_TREE_SHA256) fail('parser-tree-identity');
 }
 
-const VALIDATOR_VERSION = '1.5.6';
+const VALIDATOR_VERSION = '1.5.7';
+const EXPECTED_VERSION = '1.0.20260919.0';
 const WORKFLOW_ISOLATION_POLICY_VERSION = 1;
 const RESULT_SCHEMA = 'PSStyleGuide.WorkflowPolicyResult.v1';
 const PREFLIGHT_SCHEMA = 'PSStyleGuide.WorkflowPreflightResult.v1';
 const PREFLIGHT_ARGUMENTS = ['--preflight'];
-const EXPECTED_CONTRACT_CANONICAL_SHA256 = '944f6431c1900b17b785f8e8596269b0d6503d6d5230a5cdf583c6781eaf80de';
+const EXPECTED_CONTRACT_CANONICAL_SHA256 = '7a2fe33092d9706bc8dd88ffe55b9105a4b42697dfdaf4b3cbed5d8f8c27fc41';
 const MINIMUM_CASE_COUNT = 99;
 const REQUIRED_IDENTITY_CASE_COUNT = 42;
 const CASE_CATALOG_FILE_NAME = 'workflow-policy-cases.json';
@@ -136,7 +137,15 @@ const SCRIPT_DIRECTORY = path.dirname(fileURLToPath(import.meta.url));
 // accepted path remains an exact contract literal and every component must be
 // an ordinary directory or file.
 const POLICY_ROOT = path.resolve(SCRIPT_DIRECTORY, '../..');
-const REQUIRED_ARGUMENTS = ['build.yml', 'markdownlint.yml'];
+const REQUIRED_ARGUMENTS = Object.freeze(['build.yml', 'markdownlint.yml']);
+const REPOSITORY_ROOT_ARGUMENTS = Object.freeze([
+  '.github/workflows/build.yml',
+  '.github/workflows/markdownlint.yml',
+]);
+const INVOCATION_PROFILES = Object.freeze([
+  Object.freeze({ directory: SCRIPT_DIRECTORY, arguments: REQUIRED_ARGUMENTS }),
+  Object.freeze({ directory: POLICY_ROOT, arguments: REPOSITORY_ROOT_ARGUMENTS }),
+]);
 const WORKFLOW_FILE_NAMES = [...REQUIRED_ARGUMENTS, IDENTITY_WORKFLOW_FILE_NAME];
 const REQUIRED_MARKDOWN_EXTENSIONS = ['md', 'mdc'];
 const REQUIRED_IGNORED_MARKDOWN_DIRECTORIES = ['node_modules', '.git', '.venv'];
@@ -593,7 +602,7 @@ function validateActionStep(step, expectedStep, contract, rawText) {
 const GENERATOR_RESULT_PREDICATES = Object.freeze([
   ['NativeExit', '$intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0'],
   ['Schema', "$objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2'"],
-  ['GeneratorVersion', "$objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0'"],
+  ['GeneratorVersion', "$objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid"],
   ['Overall', "$objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')"],
   ['Phase', "$objResult.Phase -isnot [string] -or $objResult.Phase -cne 'complete'"],
   ['Category', "$objResult.Category -isnot [string] -or $objResult.Category -cne 'none'"],
@@ -634,7 +643,8 @@ function validateGeneratorResultPolicy(source, contract) {
   if (source.split(conversion).length !== 2) fail('generator-result-json');
   source = source.replace(conversion, () => '$objResult = $arrResult[0] | ConvertFrom-Json\n');
   const blocks = GENERATOR_RESULT_PREDICATES.map(([label, predicate]) => (
-    `if (${predicate}) {\n    [void]($listFailedChecks.Add('${label}'))\n}\n`
+    (label === 'GeneratorVersion' ? "$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\n" : '')
+    + `if (${predicate}) {\n    [void]($listFailedChecks.Add('${label}'))\n}\n`
   ));
   const positions = blocks.map((block, index) => {
     if (source.split(block).length - 1 !== 1) {
@@ -721,12 +731,12 @@ const REVIEWED_ACQUIRE_CMDLETS = new Set([
   'select-object',
   'test-path',
   'where-object',
-  'write-host',
+  'write-information',
 ]);
 
 const REVIEWED_ACQUIRE_COMMANDS = Object.freeze([
   'Get-FileHash', 'New-Variable', 'Select-Object', 'Test-Path', 'Where-Object',
-  'Write-Host', 'if', 'throw',
+  'Write-Information', 'if', 'throw',
 ]);
 
 const REVIEWED_ACQUIRE_STATIC_CALLS = new Set([
@@ -749,7 +759,7 @@ const BUILD_ACQUIRE = Object.freeze({
   name: 'Acquire triggering revision without an action',
   classifiedStatuses: 5,
   networkClients: 0,
-  tail: '& $strGitPath -c core.hooksPath=/dev/null init --quiet .\nif ($LASTEXITCODE -ne 0) { throw "acquire: git init exited $LASTEXITCODE" }\n& $strGitPath remote add origin "$strServerUrl/$strRepository"\nif ($LASTEXITCODE -ne 0) { throw "acquire: git remote add exited $LASTEXITCODE" }\n# Fetching the commit itself, not a ref that names it. No credential\n# is supplied and none is configured, so nothing is persisted for the\n# next step to have to clean up.\n& $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strSha\nif ($LASTEXITCODE -ne 0) { throw "acquire: git fetch exited $LASTEXITCODE" }\n& $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD\nif ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }\n$strHead = (& $strGitPath rev-parse HEAD).Trim()\nif ($LASTEXITCODE -ne 0 -or $strHead -cne $strSha) {\n    throw \'acquire: the checked out revision is not the triggering revision\'\n}\nWrite-Host "acquire: anonymous shallow checkout of $strSha"',
+  tail: '& $strGitPath -c core.hooksPath=/dev/null init --quiet .\nif ($LASTEXITCODE -ne 0) { throw "acquire: git init exited $LASTEXITCODE" }\n& $strGitPath remote add origin "$strServerUrl/$strRepository"\nif ($LASTEXITCODE -ne 0) { throw "acquire: git remote add exited $LASTEXITCODE" }\n# Fetching the commit itself, not a ref that names it. No credential\n# is supplied and none is configured, so nothing is persisted for the\n# next step to have to clean up.\n& $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strSha\nif ($LASTEXITCODE -ne 0) { throw "acquire: git fetch exited $LASTEXITCODE" }\n& $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD\nif ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }\n$strHead = (& $strGitPath rev-parse HEAD).Trim()\nif ($LASTEXITCODE -ne 0 -or $strHead -cne $strSha) {\n    throw \'acquire: the checked out revision is not the triggering revision\'\n}\nWrite-Information "acquire: anonymous shallow checkout of $strSha" -InformationAction Continue',
   digest: '201af2ff2fad27dcb14f4c84867c853f3528ca48ff1aaf865c6c31039c82dd64',
 });
 
@@ -764,9 +774,9 @@ const MARKDOWN_ACQUIRE = Object.freeze({
     ['the reviewed Node archive digest',
       `$strReviewedNodeSha256 = '${REVIEWED_NODE_ARCHIVE_SHA256}'`],
     ['the download, its verification, and the extraction as one uninterrupted block',
-      '$strNodeUrl = \'https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz\'\n$strReviewedNodeSha256 = \'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0\'\n$strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, \'node24\')\n$strArchivePath = [System.IO.Path]::Combine($env:RUNNER_TEMP, \'node24.tar.xz\')\n& $strCurlPath --silent --show-error --fail --location --proto \'=https\' --tlsv1.2 --output $strArchivePath $strNodeUrl\nif ($LASTEXITCODE -ne 0) { throw "acquire: node download exited $LASTEXITCODE" }\n$strObservedNodeSha256 = (Get-FileHash -LiteralPath $strArchivePath -Algorithm SHA256).Hash\nif ($strObservedNodeSha256 -cne $strReviewedNodeSha256) {\n    throw \'acquire: the Node archive does not match the reviewed digest\'\n}\n[void][System.IO.Directory]::CreateDirectory($strNodeRoot)\n& $strTarPath -xJf $strArchivePath -C $strNodeRoot --strip-components=1\nif ($LASTEXITCODE -ne 0) { throw "acquire: node extraction exited $LASTEXITCODE" }\nWrite-Host "acquire: revision $strSha and the reviewed Node distribution"'],
+      '$strNodeUrl = \'https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz\'\n$strReviewedNodeSha256 = \'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0\'\n$strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, \'node24\')\n$strArchivePath = [System.IO.Path]::Combine($env:RUNNER_TEMP, \'node24.tar.xz\')\n& $strCurlPath --silent --show-error --fail --location --proto \'=https\' --tlsv1.2 --output $strArchivePath $strNodeUrl\nif ($LASTEXITCODE -ne 0) { throw "acquire: node download exited $LASTEXITCODE" }\n$strObservedNodeSha256 = (Get-FileHash -LiteralPath $strArchivePath -Algorithm SHA256).Hash\nif ($strObservedNodeSha256 -cne $strReviewedNodeSha256) {\n    throw \'acquire: the Node archive does not match the reviewed digest\'\n}\n[void][System.IO.Directory]::CreateDirectory($strNodeRoot)\n& $strTarPath -xJf $strArchivePath -C $strNodeRoot --strip-components=1\nif ($LASTEXITCODE -ne 0) { throw "acquire: node extraction exited $LASTEXITCODE" }\nWrite-Information "acquire: revision $strSha and the reviewed Node distribution" -InformationAction Continue'],
   ]),
-  tail: '$strNodeUrl = \'https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz\'\n$strReviewedNodeSha256 = \'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0\'\n$strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, \'node24\')\n$strArchivePath = [System.IO.Path]::Combine($env:RUNNER_TEMP, \'node24.tar.xz\')\n& $strCurlPath --silent --show-error --fail --location --proto \'=https\' --tlsv1.2 --output $strArchivePath $strNodeUrl\nif ($LASTEXITCODE -ne 0) { throw "acquire: node download exited $LASTEXITCODE" }\n$strObservedNodeSha256 = (Get-FileHash -LiteralPath $strArchivePath -Algorithm SHA256).Hash\nif ($strObservedNodeSha256 -cne $strReviewedNodeSha256) {\n    throw \'acquire: the Node archive does not match the reviewed digest\'\n}\n[void][System.IO.Directory]::CreateDirectory($strNodeRoot)\n& $strTarPath -xJf $strArchivePath -C $strNodeRoot --strip-components=1\nif ($LASTEXITCODE -ne 0) { throw "acquire: node extraction exited $LASTEXITCODE" }\nWrite-Host "acquire: revision $strSha and the reviewed Node distribution"',
+  tail: '$strNodeUrl = \'https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz\'\n$strReviewedNodeSha256 = \'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0\'\n$strNodeRoot = [System.IO.Path]::Combine($env:RUNNER_TEMP, \'node24\')\n$strArchivePath = [System.IO.Path]::Combine($env:RUNNER_TEMP, \'node24.tar.xz\')\n& $strCurlPath --silent --show-error --fail --location --proto \'=https\' --tlsv1.2 --output $strArchivePath $strNodeUrl\nif ($LASTEXITCODE -ne 0) { throw "acquire: node download exited $LASTEXITCODE" }\n$strObservedNodeSha256 = (Get-FileHash -LiteralPath $strArchivePath -Algorithm SHA256).Hash\nif ($strObservedNodeSha256 -cne $strReviewedNodeSha256) {\n    throw \'acquire: the Node archive does not match the reviewed digest\'\n}\n[void][System.IO.Directory]::CreateDirectory($strNodeRoot)\n& $strTarPath -xJf $strArchivePath -C $strNodeRoot --strip-components=1\nif ($LASTEXITCODE -ne 0) { throw "acquire: node extraction exited $LASTEXITCODE" }\nWrite-Information "acquire: revision $strSha and the reviewed Node distribution" -InformationAction Continue',
 });
 
 const REVIEWED_MARKDOWN_GATES = Object.freeze([
@@ -787,7 +797,7 @@ const QUALIFIED_ASSIGNMENT = /\$(?:\{([A-Za-z_][A-Za-z0-9_]*:[A-Za-z_][A-Za-z0-9
 
 const MARKDOWN_STEP_COMMANDS = Object.freeze([
   'Get-Content', 'ConvertFrom-Json',
-  'Get-Content', 'Get-FileHash', 'Remove-Item', 'Test-Path', 'Write-Host',
+  'Get-Content', 'Get-FileHash', 'Remove-Item', 'Test-Path', 'Write-Information',
 ]);
 
 const MARKDOWN_STEP_KEYWORDS = Object.freeze([
@@ -795,6 +805,59 @@ const MARKDOWN_STEP_KEYWORDS = Object.freeze([
   'if', 'elseif', 'else', 'foreach', 'for', 'while', 'do', 'switch',
   'try', 'finally', 'throw', 'break', 'continue',
 ]);
+
+const WORKFLOW_POLICY_CONTRACT_READER = Object.freeze({
+  source: [
+    'function Read-WorkflowPolicyContract {',
+    '    # .SYNOPSIS',
+    '    # Reads the closed workflow-policy contract.',
+    '    # .DESCRIPTION',
+    '    # Reads at most one byte beyond the reviewed limit, decodes strict UTF-8,',
+    '    # and returns one JSON object without exposing parser diagnostics.',
+    '    # .EXAMPLE',
+    '    # $objContract = Read-WorkflowPolicyContract',
+    '    # .INPUTS',
+    '    # None.',
+    '    # .OUTPUTS',
+    '    # System.Management.Automation.PSCustomObject.',
+    '    # .NOTES',
+    '    # PRIVATE/INTERNAL. Version: 1.0.20260919.0.',
+    '    [CmdletBinding()]',
+    '    param()',
+    '',
+    '    try {',
+    "        $objContractItem = Get-Item -LiteralPath 'workflow-policy-contract.json' -Force -ErrorAction Stop",
+    '        if ($objContractItem -isnot [System.IO.FileInfo] -or',
+    '            $null -ne $objContractItem.LinkType -or',
+    '            ($objContractItem.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -or',
+    '            ($IsLinux -and [int]$objContractItem.UnixStat.ItemType -ne 1)) {',
+    "            throw 'contract-file'",
+    '        }',
+    "        $arrContractChunks = @(Get-Content -LiteralPath 'workflow-policy-contract.json' -AsByteStream -ReadCount 524289 -TotalCount 524289 -ErrorAction Stop)",
+    '        if ($arrContractChunks.Count -ne 1 -or',
+    '            @($arrContractChunks[0]).Count -eq 0 -or',
+    '            @($arrContractChunks[0]).Count -gt 524288) {',
+    "            throw 'contract-file'",
+    '        }',
+    '        $arrContractBytes = [byte[]]@($arrContractChunks[0])',
+    '        $objStrictUtf8 = [System.Text.UTF8Encoding]::new($false, $true)',
+    '        $strContract = $objStrictUtf8.GetString($arrContractBytes)',
+    '        if ([int]$strContract[0] -eq 0xfeff -or $strContract.Contains("`r")) {',
+    "            throw 'contract-encoding'",
+    '        }',
+    '        $objContract = $strContract | ConvertFrom-Json -NoEnumerate -Depth 32 -ErrorAction Stop',
+    '        if ($null -eq $objContract -or',
+    '            $objContract -isnot [System.Management.Automation.PSCustomObject]) {',
+    "            throw 'contract-json'",
+    '        }',
+    '        $objContract',
+    '    } catch {',
+    "        throw 'workflow-policy: invalid contract JSON'",
+    '    }',
+    '}',
+  ].join('\n'),
+  binding: '$objContract = Read-WorkflowPolicyContract\n$strExpectedValidatorHash = $objContract.validatorIdentity.sha256',
+});
 
 const MARKDOWN_COMMAND_POSITION = /(?:^[ \t]*|(?<!\$)\{[ \t]*|[;}|=(,][ \t]*|&&[ \t]*|\|\|[ \t]*)([A-Za-z_.\/\\][^\s;{}()]*)/gmu;
 
@@ -812,7 +875,10 @@ const STATIC_MEMBER_CALL =
 const REFLECTION_SURFACE =
   /\b(?:GetType|GetMethods?|InvokeMember|GetProperty|GetField|GetConstructor|GetMember|MakeGenericMethod|Activator|Reflection|Assembly|CreateInstance|TypeHandle)\b/iu;
 
-const REVIEWED_PACKAGE_DIGESTS = {"package.json":"59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9","package-lock.json":"5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2"};
+const REVIEWED_PACKAGE_DIGESTS = {
+  'package.json': '59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9',
+  'package-lock.json': '5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2',
+};
 const REVIEWED_LINT_DIGESTS = {".markdownlint.jsonc":"5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300","lint-nested-markdown.js":"b20aaab172224da4377cda75fa6cad1a8eeb00f8bdd26737ffe0e6c2ad222492"};
 const REVIEWED_POLICY_STEP_DIGEST = '';
 const REVIEWED_LINT_STEP_DIGEST = '';
@@ -915,6 +981,48 @@ function assertReviewedGuards(strCode, arrGuards, strCategory, fnMessage) {
       }
     }
   }
+}
+
+function assertWorkflowPolicyContractReader(step, label) {
+  const strSource = WORKFLOW_POLICY_CONTRACT_READER.source;
+  if (step.run.split(strSource).length !== 2) {
+    reject('markdown-policy', `${label} changes the closed bounded contract reader`);
+  }
+  const intReader = step.run.indexOf(strSource);
+  if (powerShellBraceDepthAt(step.run, intReader) !== 0) {
+    reject('markdown-policy', `${label} no longer declares the bounded contract reader at top level`);
+  }
+  const strCode = powerShellCodeProjection(step.run);
+  const arrDefinitions = [...strCode.matchAll(/\bfunction[ \t]+Read-WorkflowPolicyContract\b/giu)];
+  if (arrDefinitions.length !== 1 || arrDefinitions[0].index !== intReader) {
+    reject('markdown-policy', `${label} changes or rebinds the bounded contract reader`);
+  }
+  const arrCalls = [...strCode.matchAll(/^\$objContract = Read-WorkflowPolicyContract$/gmu)];
+  if (arrCalls.length !== 2 || step.run.split(WORKFLOW_POLICY_CONTRACT_READER.binding).length !== 3) {
+    reject('markdown-policy', `${label} must bind both validator invocations through the bounded contract reader`);
+  }
+  const arrCallOffsets = arrCalls.map((objCall) => objCall.index);
+  if (arrCallOffsets.some((intAt) => powerShellBraceDepthAt(step.run, intAt) !== 0)) {
+    reject('markdown-policy', `${label} nests a bounded contract-reader invocation`);
+  }
+  const intExpectedDigest = step.run.indexOf('$env:P1_EXPECTED_MARKDOWN_DIGEST =');
+  const intPreflight = step.run.indexOf('$arrPreflight = @(& $strNodePath ./Validate-WorkflowPolicy.mjs --preflight)');
+  const intAfterInstall = step.run.indexOf('if ($strPackageAfterInstall -cne $strPackageBefore -or $strLockAfterInstall -cne $strLockBefore) {');
+  const intPolicy = step.run.indexOf('$arrPolicy = @(& $strNodePath ./Validate-WorkflowPolicy.mjs build.yml markdownlint.yml)');
+  if (!(intExpectedDigest >= 0 &&
+        intReader + strSource.length < arrCallOffsets[0] &&
+        intExpectedDigest < arrCallOffsets[0] && arrCallOffsets[0] < intPreflight &&
+        intPreflight < intAfterInstall && intAfterInstall < arrCallOffsets[1] &&
+        arrCallOffsets[1] < intPolicy)) {
+    reject('markdown-policy', `${label} moves a bounded contract read away from its validator identity check`);
+  }
+  return { intReader, arrCallOffsets };
+}
+
+function blankPowerShellSurfaceRange(strCode, intStart, intLength) {
+  return strCode.slice(0, intStart) +
+    strCode.slice(intStart, intStart + intLength).replace(/[^\n]/gu, ' ') +
+    strCode.slice(intStart + intLength);
 }
 
 function normalizeLineContinuations(strText) {
@@ -1090,8 +1198,6 @@ function validateAcquireStep(step, label, expected) {
       '}'],
     ['the server the runner named',
       "if ($strServerUrl -cne 'https://github.com') {"],
-    ['a plain owner/name repository',
-      "if ($strRepository -cne 'franklesniak/PSStyleGuide') {"],
     ['a full commit hash rather than a ref',
       "if ($strSha -cnotmatch '^[0-9a-f]{40}$') {"],
     ['an empty workspace before fetching',
@@ -1107,6 +1213,19 @@ function validateAcquireStep(step, label, expected) {
       reject('acquire-policy', `${label} no longer asserts ${requirement}`);
     }
   }
+  const repositoryGuard =
+    "if ($strRepository -cne 'franklesniak/PSStyleGuide') {\n" +
+    "    throw 'acquire: the triggering repository is not the expected repository'\n" +
+    '}';
+  const repositoryGuardIndex = step.run.indexOf(repositoryGuard);
+  if (
+    repositoryGuardIndex < 0 ||
+    step.run.indexOf(repositoryGuard, repositoryGuardIndex + 1) >= 0 ||
+    powerShellBraceDepthAt(step.run, repositoryGuardIndex) !== 0
+  ) {
+    reject('acquire-policy',
+      `${label} no longer asserts the exact expected repository and its diagnostic`);
+  }
   const credentialGuard = "$env:GIT_CONFIG_NOSYSTEM = '1'\n$env:GIT_CONFIG_GLOBAL = '/dev/null'\n$env:GIT_TERMINAL_PROMPT = '0'\nif (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or\n    -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or\n    -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {\n    throw 'credential-policy: a token was projected into a code job'\n}\n";
   if (step.run.split(credentialGuard).length !== 2) reject('acquire-policy', `${label} lacks the fixed credential absence guard`);
   const credentialView = step.run.replace(credentialGuard, '').replace('-c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch', 'fetch');
@@ -1117,7 +1236,10 @@ function validateAcquireStep(step, label, expected) {
   if (classifiedStatuses !== expected.classifiedStatuses) {
     reject('acquire-policy', `${label} native-status classification count changed`);
   }
-  if (/\b(?:exit|return|break|continue|trap)\b/iu.test(step.run) || PROCESS_TERMINATION.test(step.run)) {
+  // Continue is a literal parameter value only in this closed logging form.
+  // Keep every other occurrence subject to the control-flow rejection.
+  const controlFlowView = step.run.replace(/^(Write-Information "[^"\r\n]*" -InformationAction )Continue$/gmu, '$1');
+  if (/\b(?:exit|return|break|continue|trap)\b/iu.test(controlFlowView) || PROCESS_TERMINATION.test(step.run)) {
     reject('acquire-policy', `${label} adds control flow that can bypass a required assertion`);
   }
   const stepCode = powerShellTokenView(step.run);
@@ -1318,6 +1440,8 @@ function validateMarkdownGovernedStep(step, label, expected) {
   let catchView = step.run;
   const fixedCatches = ["try { $objPreflight = $arrPreflight[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }\ncatch { throw 'workflow-policy: invalid preflight JSON' }","try { $objPolicy = $arrPolicy[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }\ncatch { throw 'workflow-policy: invalid policy JSON' }"];
   if (expected.stepId === 'validate') {
+    assertWorkflowPolicyContractReader(step, label);
+    catchView = catchView.replace(WORKFLOW_POLICY_CONTRACT_READER.source, '');
     for (const fixed of fixedCatches) {
       if (catchView.split(fixed).length !== 2) reject('markdown-policy', `${label} changes a fixed result conversion guard`);
       catchView = catchView.replace(fixed, '');
@@ -1374,7 +1498,17 @@ function assertMarkdownStepInvocations(step, label, expected) {
 
 function assertMarkdownStepSurface(step, label, expected) {
   const stepCode = powerShellCodeProjection(step.run);
-  for (const command of stepCode.matchAll(MARKDOWN_COMMAND_POSITION)) {
+  let surfaceCode = stepCode;
+  if (expected.stepId === 'validate') {
+    const { intReader, arrCallOffsets } = assertWorkflowPolicyContractReader(step, label);
+    surfaceCode = blankPowerShellSurfaceRange(
+      surfaceCode, intReader, WORKFLOW_POLICY_CONTRACT_READER.source.length);
+    for (const intCall of arrCallOffsets) {
+      surfaceCode = blankPowerShellSurfaceRange(
+        surfaceCode, intCall, '$objContract = Read-WorkflowPolicyContract'.length);
+    }
+  }
+  for (const command of surfaceCode.matchAll(MARKDOWN_COMMAND_POSITION)) {
     const token = command[1];
     if (MARKDOWN_STEP_KEYWORDS.includes(token)) continue;
     if (MARKDOWN_STEP_COMMANDS.includes(token)) continue;
@@ -1397,8 +1531,11 @@ function assertMarkdownStepSurface(step, label, expected) {
   if (/GetEnvironmentVariable|SetEnvironmentVariable/iu.test(stepCode)) {
     reject('markdown-policy', `${label} resolves an environment variable through a computed name`);
   }
-  let staticCode = stepCode;
-  const typeGuards = ["$objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject]","$objPolicy.GetType() -ne [System.Management.Automation.PSCustomObject]"];
+  let staticCode = surfaceCode;
+  const typeGuards = [
+    '$objPreflight.GetType() -ne [System.Management.Automation.PSCustomObject]',
+    '$objPolicy.GetType() -ne [System.Management.Automation.PSCustomObject]',
+  ];
   if (expected.stepId === 'validate') {
     for (const guard of typeGuards) {
       if (staticCode.split(guard).length !== 2) reject('markdown-policy', `${label} changes a fixed result object-type guard`);
@@ -1512,7 +1649,9 @@ const REVIEWED_VERIFY_SINGLE_ASSIGNMENT = Object.freeze([
   "strEncodedVerifierCommand",
   "arrPathSetResult",
   "intPathSetExit",
-  "objPathSetResult"
+  "objPathSetResult",
+  "objGeneratorResult",
+  "hashtableGeneratorVersionCheck"
 ]);
 
 const REVIEWED_VERIFY_MEMBER_ACCESS = Object.freeze({
@@ -1563,13 +1702,18 @@ const REVIEWED_VERIFY_MEMBER_ACCESS = Object.freeze({
   "objResult": {
     ".GetType": 1,
     ".Schema": 2,
-    ".GeneratorVersion": 2,
     ".Overall": 2,
     ".Phase": 2,
     ".Category": 2,
     ".NativeOutcome": 2,
     ".ExitCode": 3,
     ".Artifacts": 2
+  },
+  "objGeneratorResult": {
+    ".GeneratorVersion": 2
+  },
+  "hashtableGeneratorVersionCheck": {
+    ".Valid": 1
   },
   "intGeneratorExit": {},
   "listFailedChecks": {
@@ -1595,7 +1739,9 @@ const REVIEWED_VERIFY_OCCURRENCES = Object.freeze({
   "intPathSetExit": 3,
   "objPathSetResult": 9,
   "arrResult": 3,
-  "objResult": 20,
+  "objResult": 19,
+  "objGeneratorResult": 3,
+  "hashtableGeneratorVersionCheck": 2,
   "intGeneratorExit": 3,
   "listFailedChecks": 11
 });
@@ -2607,6 +2753,7 @@ function validateScriptVersionText(source, expectedVersion) {
 }
 
 function validateScriptVersions(contract) {
+  if (contract.scriptVersions.generator.version !== EXPECTED_VERSION) fail('generator-version');
   for (const scriptPolicy of Object.values(contract.scriptVersions)) {
     const bytes = readOrdinaryFile(path.join(SCRIPT_DIRECTORY, scriptPolicy.path), 262144, 'script-file');
     if (sha256(bytes) !== scriptPolicy.sha256) {
@@ -2652,7 +2799,7 @@ function validateGeneratorPolicy(source) {
   }
 }
 
-// PS generator source proof: fixed reviewed bytes and a fresh process; not a generic unqualified-lookup exemption.
+// PS generator source proof: fixed reviewed bytes, a fresh process and retained module-qualified lookup.
 const REVIEWED_GENERATOR_COMMANDS = Object.freeze([
   "Add-Type",
   "ArtifactId",
@@ -2676,7 +2823,7 @@ const REVIEWED_GENERATOR_COMMANDS = Object.freeze([
   "FinalState",
   "ForEach-Object",
   "GeneratorVersion",
-  "Get-Command",
+  "Microsoft.PowerShell.Core\\Get-Command",
   "Get-FileSha256Hex",
   "Get-OrdinaryDestinationState",
   "Get-OrdinaryFileIdentity",
@@ -2864,7 +3011,7 @@ const REVIEWED_PS_GENERATOR_HELP_VERSIONS = Object.freeze({
   "Test-PathContainedByRoot": "1.0.20260813.0",
   "Initialize-WindowsFileIdentityType": "1.0.20260818.0",
   "Get-OrdinaryFileIdentity": "1.0.20260915.0",
-  "Assert-TrackedFile": "1.0.20260813.0",
+  "Assert-TrackedFile": "1.0.20260919.0",
   "ConvertFrom-StrictUtf8": "1.0.20260813.0",
   "ConvertTo-NormalizedUtf8": "1.0.20260813.0",
   "New-CopilotPayload": "1.0.20260813.0",
@@ -2879,7 +3026,7 @@ const REVIEWED_PS_GENERATOR_HELP_VERSIONS = Object.freeze({
 });
 
 function validateGeneratorIsolationPolicy(source) {
-  if ((source.match(/^Version: [0-9]+\.[0-9]+\.[0-9]{8}\.[0-9]+$/gmu) ?? []).join('') !== 'Version: 1.0.20260916.0') reject('supply-policy', 'the generator version marker differs from the fixed PS source');
+  if ((source.match(/^Version: [0-9]+\.[0-9]+\.[0-9]{8}\.[0-9]+$/gmu) ?? []).join('') !== 'Version: 1.0.20260919.0') reject('supply-policy', 'the generator version marker differs from the fixed PS source');
   const rawGeneratorCode = powerShellCodeProjection(source);
   const generatorCode = powerShellTokenView(normalizeLineContinuations(source));
   const staticCode = powerShellTokenView(normalizeLineContinuations(source.replaceAll("[char[]]'*?[]'", "'*?[]'").replace(/^    \$strNativeOutcome = \$_\.Exception\.GetType\(\)\.FullName$/gmu, '    $strNativeOutcome = $null'))).replaceAll('[void](Get-ScriptVersionRecord ', '(Get-ScriptVersionRecord ').replaceAll('[void](Assert-OrdinaryAbsolutePath ', '(Assert-OrdinaryAbsolutePath ');
@@ -2888,13 +3035,13 @@ function validateGeneratorIsolationPolicy(source) {
   if (/[^\t\n\x20-\x7e]/u.test(source)) {
     reject('supply-policy', 'the generator contains a character outside printable ASCII');
   }
-  const fixedLookup = '$arrGitCommands = @(Get-Command -Name git -CommandType Application -ErrorAction Stop)';
+  const fixedLookup = '$arrGitCommands = @(Microsoft.PowerShell.Core\\Get-Command -Name git -CommandType Application -ErrorAction Stop)';
   if (source.split(fixedLookup).length !== 2 || (generatorCode.match(/Get-Command/giu) ?? []).length !== 1) reject('supply-policy', 'the generator changes its fixed reviewed Git lookup');
   const gitPathAssignments = generatorCode.match(variableWritePattern('strGitPath')) ?? [];
   if (gitPathAssignments.length !== 1) {
     reject('supply-policy', 'the generator does not assign its Git path exactly once');
   }
-  if (!/\)\s*\$arrGitCommands = @\(Get-Command/u.test(generatorCode)) {
+  if (!/\)\s*\$arrGitCommands = @\(Microsoft\.PowerShell\.Core\\Get-Command/u.test(generatorCode)) {
     reject('supply-policy', 'the generator can reach its Git lookup only after unreviewed statements');
   }
   if (/\$ExecutionContext\s*\.\s*InvokeCommand|\.\s*InvokeCommand\s*\.\s*GetCommand|\[\s*(?:System\.)?Management\.Automation\.CommandTypes\s*\]/iu.test(generatorCode)) {
@@ -3034,7 +3181,7 @@ function validateGeneratorIsolationPolicy(source) {
     'supply-policy',
     'the generator',
   );
-  if (sha256(Buffer.from(source, 'utf8')) !== 'f3d5e8b68a516f048547aa17570d81501f7df53cde4c6a01212bc4e2d909bc1a') {
+  if (sha256(Buffer.from(source, 'utf8')) !== '4614ed3b1cbe8453667d5e26afeafc6bab4f26af12b324230bd379243b8f2ec3') {
     reject('supply-policy', 'generator does not match its reviewed digest');
   }
 }
@@ -3217,9 +3364,10 @@ function prepareInputCase(testCase, contract) {
   const payloadKeys = {
     'text-bytes': ['hex'], 'script-version': ['text'], 'package-object': ['target', 'operation'],
     'package-text': ['operation'], 'root-package': ['operation'], 'producer-contract': ['operation'],
-    cli: ['args'], 'lint-asset': ['target', 'text'], 'npm-config': ['presence'], 'parser-tree': ['nodes'],
+    cli: ['args', 'workingDirectory'], 'lint-asset': ['target', 'text'], 'npm-config': ['presence'], 'parser-tree': ['nodes'],
   };
-  expectExactKeys(testCase, ['id', 'semanticKey', 'sourceCase', 'domain', 'expected', 'expectedCategory',
+  expectExactKeys(testCase, ['id', 'semanticKey', 'sourceCase', 'domain', 'expected',
+    ...(testCase.expected === false || testCase.expectedCategory !== undefined ? ['expectedCategory'] : []),
     ...(testCase.expectedReason === undefined ? [] : ['expectedReason']), ...payloadKeys[testCase.domain]], 'case-catalog');
   const checkText = text => {
     if (typeof text !== 'string' || Buffer.byteLength(text, 'utf8') > 262144) fail('case-operation');
@@ -3262,7 +3410,14 @@ function prepareInputCase(testCase, contract) {
   if (testCase.domain === 'cli') {
     if (!Array.isArray(testCase.args) || testCase.args.length > 8
       || testCase.args.some(arg => typeof arg !== 'string' || arg.length > 128)) fail('case-operation');
-    return testCase.args;
+    const workingDirectories = {
+      'workflow-directory': SCRIPT_DIRECTORY,
+      'repository-root': POLICY_ROOT,
+      'unrelated-directory': path.dirname(POLICY_ROOT),
+    };
+    if (typeof testCase.workingDirectory !== 'string'
+      || !Object.hasOwn(workingDirectories, testCase.workingDirectory)) fail('case-operation');
+    return { args: testCase.args, workingDirectory: workingDirectories[testCase.workingDirectory] };
   }
   if (testCase.domain === 'lint-asset') {
     if (!['lint-config', 'nested-linter'].includes(testCase.target)) fail('case-operation');
@@ -3311,7 +3466,7 @@ function validateInputCase(testCase, prepared, contract) {
       validatePackageBytePair(prepared.manifestBytes, prepared.lockBytes, contract); break;
     case 'root-package': validateRootToolchain(prepared); break;
     case 'producer-contract': validateProducerToolchain(prepared); break;
-    case 'cli': validateArguments(prepared); break;
+    case 'cli': validateArguments(prepared.args, prepared.workingDirectory); break;
     case 'lint-asset': validateLintAsset(testCase.target, prepared); break;
     case 'npm-config': validateNpmConfigPresence(prepared); break;
     case 'parser-tree': validateParserTreeFixture(prepared); break;
@@ -3567,10 +3722,40 @@ function testOrdinaryCasePreparation(catalog, workflows, dependabot, contract) {
   reject(append({ ...negative, operation: {
     type: 'set', path: '/name', value: workflows['build.yml'].value.name,
   } }), 'case-result', true);
+
+  const validCliCase = catalog.cases.find(testCase => testCase.id === 'PS-P1-WFPOL-449');
+  if (validCliCase === undefined) fail('ordinary-case-self-test');
+  const expectCliRejection = (operation, expectedCategory) => {
+    try {
+      operation();
+    } catch (error) {
+      if (error instanceof PolicyError && error.category === expectedCategory) return;
+      throw error;
+    }
+    fail('ordinary-case-self-test');
+  };
+  expectCliRejection(() => prepareInputCase({ ...validCliCase, workingDirectory: ['repository-root'] }, contract), 'case-operation');
+  expectCliRejection(() => prepareInputCase({ ...validCliCase, workingDirectory: 'unknown-directory' }, contract), 'case-operation');
+  const negativeCliSource = catalog.cases.find(testCase => testCase.id === 'PS-P1-WFPOL-427');
+  if (negativeCliSource === undefined) fail('ordinary-case-self-test');
+  const negativeCliCase = clone(negativeCliSource);
+  delete negativeCliCase.expectedCategory;
+  expectCliRejection(() => prepareInputCase(negativeCliCase, contract), 'case-catalog');
+  expectCliRejection(() => runCatalogCase({ ...validCliCase, expectedCategory: 'arguments' },
+    workflows, dependabot, contract), 'case-category');
 }
 
-function validateArguments(args = process.argv.slice(2)) {
-  if (canonicalJson(args) !== canonicalJson(REQUIRED_ARGUMENTS)) {
+function directoryIdentity(directory) {
+  const resolved = path.resolve(directory);
+  return process.platform === 'win32' ? resolved.toLowerCase() : resolved;
+}
+
+function validateArguments(args = process.argv.slice(2), workingDirectory = process.cwd()) {
+  const directory = directoryIdentity(workingDirectory);
+  const matched = INVOCATION_PROFILES.some(profile =>
+    directory === directoryIdentity(profile.directory)
+    && canonicalJson(args) === canonicalJson(profile.arguments));
+  if (!matched) {
     fail('arguments');
   }
 }
@@ -3613,10 +3798,7 @@ async function main() {
 
   const workflows = {};
   for (const fileName of WORKFLOW_FILE_NAMES) {
-    const filePath = path.resolve(process.cwd(), fileName);
-    if (filePath !== path.join(SCRIPT_DIRECTORY, fileName)) {
-      fail('workflow-path');
-    }
+    const filePath = path.join(SCRIPT_DIRECTORY, fileName);
     workflows[fileName] = parseStrictYaml(
       readOrdinaryFile(filePath, contract.limits.maximumWorkflowBytes, 'workflow-file'),
       contract.limits,
