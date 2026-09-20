@@ -2,9 +2,10 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, linkSync, lstatSync, mkdirSync, mkdtempSync,
-  readFileSync, readdirSync, readlinkSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+  readFileSync, readdirSync, readlinkSync, realpathSync, rmSync, symlinkSync,
+  writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { delimiter, dirname, join } from 'node:path';
+import { delimiter, dirname, isAbsolute, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
@@ -72,6 +73,93 @@ test('AUDIT-STATUS: native success and advisory status are distinct from process
     { status: 1, signal: null, stdout: 'not JSON' },
   ]) assert.throws(() => auditFunction(() => { throw outcome; })(['audit']), /refusal:5/);
 });
+
+test('NPM-LINK-CONTAINMENT: production resolver rejects every uncovered resolution shape',
+  { skip: process.platform !== 'linux' }, () => {
+    const from = source.indexOf('const isInsideOrEqual = ');
+    const to = source.indexOf('\nfunction foldNpmInstallation(', from);
+    assert.ok(from >= 0 && to > from);
+    const classify = new Function('dirname', 'isAbsolute', 'lstatSync', 'readlinkSync',
+      'realpathSync', `${source.slice(from, to)}; return classifyContainedSymlink;`)(
+      dirname, isAbsolute, lstatSync, readlinkSync, realpathSync);
+    const foldFrom = to + 1;
+    const foldTo = source.indexOf('\n// Round 31', foldFrom);
+    assert.ok(foldTo > foldFrom);
+    const diagnostic = [];
+    const testProcess = {
+      execPath: process.execPath,
+      getuid: process.getuid.bind(process),
+      stderr: { write(value) { diagnostic.push(value); } },
+      exit(code) {
+        throw Object.assign(new Error(`refusal:${code}`), { refusal: code });
+      },
+    };
+    const hashFieldForFixture = (hash, value) => {
+      const bytes = Buffer.isBuffer(value) ? value : Buffer.from(String(value), 'utf8');
+      hash.update(String(bytes.length), 'utf8');
+      hash.update(':', 'utf8');
+      hash.update(bytes);
+    };
+    // Exercise the production npm fold itself. The injected functions are
+    // bounded fixture dependencies, including simplified hash framing; these
+    // outcomes prove containment/refusal control flow, not a production digest.
+    // The branch under test remains the exact source slice the recorder executes.
+    const foldNpm = new Function('createHash', 'dirname', 'isAbsolute', 'join',
+      'lstatSync', 'readlinkSync', 'realpathSync', 'readdirSync', 'readFileSync',
+      'process', 'formatUntrustedText', 'formatErrorLocation', 'hashField',
+      'statIdentity', 'sha256',
+      `${source.slice(from, foldTo)}; return foldNpmInstallation;`)(
+      createHash, dirname, isAbsolute, join, lstatSync, readlinkSync, realpathSync,
+      readdirSync, readFileSync, testProcess, String,
+      (error, path) => `  error              ${error?.code ?? 'unknown'} at ${path}\n`,
+      hashFieldForFixture, (stats) => `${stats.ino}:${stats.ctimeNs}`, sha);
+
+    const temporary = mkdtempSync(join(tmpdir(), 'npm-link-containment-'));
+    const root = join(temporary, 'npm');
+    const outside = join(temporary, 'outside');
+    mkdirSync(root);
+    mkdirSync(outside);
+    writeFileSync(join(root, 'target'), 'inside');
+    writeFileSync(join(outside, 'target'), 'outside');
+    try {
+      symlinkSync('target', join(root, 'contained-b'));
+      symlinkSync('contained-b', join(root, 'contained-a'));
+      assert.deepEqual(classify(root, join(root, 'contained-a'), 'contained-a'),
+        { status: 'contained' });
+      assert.equal(foldNpm(realpathSync(root)).symlinks, 2);
+
+      symlinkSync(join(outside, 'target'), join(root, 'direct-escape'));
+      assert.deepEqual(classify(root, join(root, 'direct-escape'), 'direct-escape'),
+        { status: 'escaping' });
+      assert.throws(() => foldNpm(realpathSync(root)), { refusal: 2 });
+      assert.doesNotMatch(diagnostic.join(''), new RegExp(outside.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+      rmSync(join(root, 'direct-escape'));
+
+      symlinkSync(join(root, 'target'), join(outside, 'return-hop'));
+      symlinkSync(join(outside, 'return-hop'), join(root, 'escape-return'));
+      assert.deepEqual(classify(root, join(root, 'escape-return'), 'escape-return'),
+        { status: 'escaping' });
+      assert.throws(() => foldNpm(realpathSync(root)), { refusal: 2 });
+      rmSync(join(root, 'escape-return'));
+
+      symlinkSync('missing', join(root, 'dangling'));
+      assert.deepEqual(classify(root, join(root, 'dangling'), 'dangling'),
+        { status: 'unresolved', code: 'ENOENT' });
+      assert.throws(() => foldNpm(realpathSync(root)), { refusal: 2 });
+      rmSync(join(root, 'dangling'));
+
+      symlinkSync('loop-b', join(root, 'loop-a'));
+      symlinkSync('loop-a', join(root, 'loop-b'));
+      assert.deepEqual(classify(root, join(root, 'loop-a'), 'loop-a'),
+        { status: 'unresolved', code: 'ELOOP' });
+
+      symlinkSync(Buffer.from([0x80]), join(root, 'invalid-utf8'));
+      assert.deepEqual(classify(root, join(root, 'invalid-utf8'), 'invalid-utf8'),
+        { status: 'unresolved', code: 'EILSEQ' });
+    } finally {
+      rmSync(temporary, { recursive: true, force: true });
+    }
+  });
 
 test('HOST: native unsupported host refuses without npm or output', { skip: process.platform === 'linux' }, () => {
   const result = spawnSync(process.execPath, [join(workflow, 'Get-SupplyFreezeDigest.mjs'), '--json'], { encoding: 'utf8' });

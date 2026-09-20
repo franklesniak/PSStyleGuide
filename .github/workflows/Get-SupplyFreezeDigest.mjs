@@ -1222,6 +1222,60 @@ function npmInstallationRootOrRefuse() {
 const isInsideOrEqual = (strChild, strParent) => strChild === strParent
   || strChild.startsWith(strParent === '/' ? '/' : `${strParent}/`);
 
+// Resolve one link component by component without ever accepting an excursion
+// outside the folded root. A final realpath containment check is insufficient:
+// `root/link -> /tmp/hop -> root/file` ends inside while an uncovered external
+// pointer still decides which bytes load. The explicit walk establishes the
+// boundary at every component; the kernel result is retained as an independent
+// agreement check for cases the userspace resolver did not anticipate.
+function classifyContainedSymlink(strRealRoot, strPath, strRelative) {
+  const funcInside = (strCandidate) => isInsideOrEqual(strCandidate, strRealRoot);
+  let boolLeavesTree = false;
+  try {
+    let strAt = strRealRoot;
+    let arrPending = strRelative.split('/').filter((strPart) => strPart.length > 0);
+    let intHops = 0;
+    while (arrPending.length > 0) {
+      const strPart = arrPending.shift();
+      if (strPart === '.') continue;
+      if (strPart === '..') {
+        strAt = dirname(strAt);
+        if (!funcInside(strAt)) { boolLeavesTree = true; break; }
+        continue;
+      }
+      const strCandidate = strAt === '/' ? `/${strPart}` : `${strAt}/${strPart}`;
+      if (!funcInside(strCandidate)) { boolLeavesTree = true; break; }
+      const objComponent = lstatSync(strCandidate);
+      if (objComponent.isSymbolicLink()) {
+        intHops += 1;
+        if (intHops > 40) {
+          throw Object.assign(new Error('too many levels of symbolic links'), { code: 'ELOOP' });
+        }
+        const bufLink = readlinkSync(strCandidate, { encoding: 'buffer' });
+        if (!Buffer.from(bufLink.toString('utf8'), 'utf8').equals(bufLink)) {
+          throw Object.assign(new Error('link target is not valid UTF-8'), { code: 'EILSEQ' });
+        }
+        const strTarget = bufLink.toString('utf8');
+        if (isAbsolute(strTarget)) strAt = '/';
+        arrPending = strTarget.split('/').filter((strPart2) => strPart2.length > 0)
+          .concat(arrPending);
+        continue;
+      }
+      if (arrPending.length > 0 && !objComponent.isDirectory()) {
+        throw Object.assign(new Error('not a directory'), { code: 'ENOTDIR' });
+      }
+      strAt = strCandidate;
+    }
+    if (!boolLeavesTree && !funcInside(strAt)) boolLeavesTree = true;
+    if (!boolLeavesTree && realpathSync(strPath) !== strAt) {
+      throw Object.assign(new Error('resolution disagreed with the kernel'), { code: 'EDIVERGE' });
+    }
+  } catch (objError) {
+    return { status: 'unresolved', code: objError?.code ?? 'unknown' };
+  }
+  return { status: boolLeavesTree ? 'escaping' : 'contained' };
+}
+
 function foldNpmInstallation(strRoot, strLauncherPath) {
   const objHash = createHash('sha256');
   const objChangeHash = createHash('sha256');
@@ -1416,6 +1470,25 @@ function foldNpmInstallation(strRoot, strLauncherPath) {
           intSymlinks += 1;
           hashField(objHash, 'l');
           hashField(objHash, strKey);
+          // The npm subprocess follows this link, so its full resolution must be
+          // decided only by entries this installation fold covers. This applies
+          // under --any-toolchain too: that flag waives the reviewed digest, not
+          // the promise that the two folds surround the same executing bytes.
+          const objContainment = classifyContainedSymlink(strRoot, strPath, strKey);
+          if (objContainment.status !== 'contained') {
+            process.stderr.write(
+              'supply-freeze: refusing to verify an npm installation whose link is '
+              + 'not contained in the folded installation.\n'
+              + `  entry              ${formatUntrustedText(strKey)}\n`
+              + (objContainment.status === 'unresolved'
+                ? `  resolution         could not be established (${objContainment.code})\n`
+                : '  resolution         leaves the folded installation\n')
+              + '  the link target is withheld because it can contain private path data.\n'
+              + '  npm follows this link while answering recorder subprocesses, but the\n'
+              + '  npmTree folds observe only entries inside this installation. An external\n'
+              + '  hop could therefore change the answers without moving either fold.\n');
+            process.exit(2);
+          }
           // Round 80/D, Codex. The installed-tree fold reads link targets as
           // buffers; this sibling decoded them. Measured: targets 0x80 and 0x81
           // both decode to U+FFFD, so two npm installations produced the same
@@ -2386,77 +2459,16 @@ function foldInstalledTree(strRoot) {
         // 40 is Linux MAXSYMLINKS. Past it the kernel returns ELOOP and so does
         // this walk, which routes to the unresolved-link refusal rather than to a
         // silent accept -- an unprovable containment claim is refused, per R39.
-        const funcInside = (strCandidate) =>
-          strCandidate === strRealRoot || strCandidate.startsWith(`${strRealRoot}/`);
-        let boolLeavesTree = false;
-        try {
-          let strAt = strRealRoot;
-          let arrPending = strChild.split('/').filter((strPart) => strPart.length > 0);
-          let intHops = 0;
-          while (arrPending.length > 0) {
-            const strPart = arrPending.shift();
-            if (strPart === '.') { continue; }
-            if (strPart === '..') {
-              strAt = dirname(strAt);
-              if (!funcInside(strAt)) { boolLeavesTree = true; break; }
-              continue;
-            }
-            const strCandidate = strAt === '/' ? `/${strPart}` : `${strAt}/${strPart}`;
-            // Round 42/G. EVERY resolved component is tested, not just the ones
-            // that turn out to be symlinks. This is where round 41 was wrong.
-            if (!funcInside(strCandidate)) { boolLeavesTree = true; break; }
-            const objComponent = lstatSync(strCandidate);
-            if (objComponent.isSymbolicLink()) {
-              intHops += 1;
-              if (intHops > 40) {
-                throw Object.assign(new Error('too many levels of symbolic links'), { code: 'ELOOP' });
-              }
-              // Same class as the root-hop fix above, swept rather than left as the
-              // sibling of a reported defect: this walk decoded its target too, so
-              // an undecodable target collapsed to U+FFFD and could match a decoy.
-              // Routed to the existing unresolved-link refusal, which already
-              // treats an undecidable containment claim as a refusal rather than a
-              // silent accept.
-              const bufLink = readlinkSync(strCandidate, { encoding: 'buffer' });
-              if (!Buffer.from(bufLink.toString('utf8'), 'utf8').equals(bufLink)) {
-                throw Object.assign(new Error('link target is not valid UTF-8'),
-                  { code: 'EILSEQ' });
-              }
-              const strTarget = bufLink.toString('utf8');
-              if (isAbsolute(strTarget)) { strAt = '/'; }
-              arrPending = strTarget.split('/').filter((strPart2) => strPart2.length > 0)
-                .concat(arrPending);
-              continue;
-            }
-            // Round 42/H. Anything that has a component after it must be a
-            // directory; the kernel answers ENOTDIR and this walk now does too.
-            if (arrPending.length > 0 && !objComponent.isDirectory()) {
-              throw Object.assign(new Error('not a directory'), { code: 'ENOTDIR' });
-            }
-            strAt = strCandidate;
-          }
-          if (!boolLeavesTree && !funcInside(strAt)) { boolLeavesTree = true; }
-          // Round 42/H. The kernel is the referee for every divergence this walk
-          // failed to anticipate. I have now written this resolver wrong twice --
-          // once resolving an outside hop instead of catching it, once accepting
-          // a path the filesystem rejects with ENOTDIR -- and in both cases the
-          // walk was self-consistent and simply disagreed with reality. Asking
-          // the kernel what the path resolves to, and refusing when the answers
-          // differ, catches the class rather than the two known members of it.
-          //
-          // Only reached for links this walk believes are contained, so it never
-          // resolves an escaping path, and realpathSync's own containment result
-          // is not what is trusted here -- agreement is.
-          if (!boolLeavesTree && realpathSync(strPath) !== strAt) {
-            throw Object.assign(new Error('resolution disagreed with the kernel'), { code: 'EDIVERGE' });
-          }
-        } catch (objError) {
+        const objContainment = classifyContainedSymlink(strRealRoot, strPath, strChild);
+        if (objContainment.status === 'unresolved') {
           // errno codes are a closed OS-defined set, so naming the code is safe
           // in a way that naming the target is not.
-          arrUnresolvedLinks.push({ path: formatUntrustedText(strChild), code: objError?.code ?? 'unknown' });
+          arrUnresolvedLinks.push({
+            path: formatUntrustedText(strChild), code: objContainment.code,
+          });
           continue;
         }
-        if (boolLeavesTree) {
+        if (objContainment.status === 'escaping') {
           // Round 39, reported by Codex. The resolved target is NOT retained.
           // It is chosen by whoever wrote the link, unbounded in length, and
           // can carry a username, internal layout or a path-borne token into a
