@@ -126,8 +126,8 @@
   "scriptVersions": {
     "generator": {
       "path": "Generate-StyleGuideArtifacts.ps1",
-      "version": "1.0.20260916.0",
-      "sha256": "f3d5e8b68a516f048547aa17570d81501f7df53cde4c6a01212bc4e2d909bc1a"
+      "version": "1.0.20260919.0",
+      "sha256": "4614ed3b1cbe8453667d5e26afeafc6bab4f26af12b324230bd379243b8f2ec3"
     },
     "pathVerifier": {
       "path": "Test-ExactGitPathSet.ps1",
@@ -137,11 +137,11 @@
   },
   "caseCatalog": {
     "path": "workflow-policy-cases.json",
-    "sha256": "d26f6af1e062c238293c10f64e3e026f8da78791136a4ad24d917db9e77690be"
+    "sha256": "de8768325908e2def41e92803a3e7a7477b93f8fcda79f17d13b7a7409c1de0c"
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "217b93976b561028ab7848b31ea0b2b08a7d689a2878b66e17d5ad849cd9ea18"
+    "sha256": "4238efaaf49dcab9e2b55f4a92c39930c43f48462be89fb860abb7368691562b"
   },
   "actions": {
     "checkout": {
@@ -429,7 +429,7 @@
                 "name": "Acquire triggering revision without an action",
                 "id": "acquire",
                 "shell": "pwsh",
-                "runSha256": "6167b13a78cec16a994f8a57357022da819ac8a120ad21bbe16b734481c49a71"
+                "runSha256": "50064dbb799eeece154c6f0f85d8f56d07658726d2fd6878df7bea2a2aaa1267"
               },
               {
                 "kind": "run",
@@ -445,7 +445,7 @@
                 "name": "Generate and verify style guide artifacts",
                 "id": "generate_style_guide_artifacts",
                 "shell": "pwsh",
-                "runSha256": "688c48db95693e14096c7f099d1387a26fb465374879b1487918718f53de6be2"
+                "runSha256": "c6c4d989b07b548bfa55e8ffab1b77ef544000c408c4225dbed6e40645bd7dbc"
               }
             ]
           },
@@ -489,7 +489,7 @@
                 "name": "Acquire triggering revision and pinned toolchain without an action",
                 "id": "acquire",
                 "shell": "pwsh",
-                "runSha256": "8b55e9f187c8577695d110fa5fe62dd81702de62b72cd6c7ee44bdf3dd01b7a0"
+                "runSha256": "671adadb5dd9f0f515dffcd00537ba446c75c56aa6ff2fac371f6afed2e9e41b"
               },
               {
                 "kind": "run",
@@ -506,7 +506,7 @@
                 "id": "validate",
                 "shell": "pwsh",
                 "workingDirectory": ".github/workflows",
-                "runSha256": "98696ea63f3a3da03758958ff480335154fc07c545622185e96050a7f32eb657"
+                "runSha256": "d7cddf7e1a84f84f49481f5fc5200e91217cfc4220e7909e006a9db8e413f036"
               }
             ]
           },
@@ -521,7 +521,7 @@
                 "name": "Acquire triggering revision and pinned toolchain without an action",
                 "id": "acquire",
                 "shell": "pwsh",
-                "runSha256": "8b55e9f187c8577695d110fa5fe62dd81702de62b72cd6c7ee44bdf3dd01b7a0"
+                "runSha256": "671adadb5dd9f0f515dffcd00537ba446c75c56aa6ff2fac371f6afed2e9e41b"
               },
               {
                 "kind": "run",
@@ -538,7 +538,7 @@
                 "id": "lint",
                 "shell": "pwsh",
                 "workingDirectory": ".github/workflows",
-                "runSha256": "2423673635070a546cb8ee3900d0527d6be1bfb289bc197ab6f526496433a3a7"
+                "runSha256": "b591ac772c07e44c65bfbcc448781667505856b3756c0796e8be03fda4e32a5e"
               }
             ]
           }
