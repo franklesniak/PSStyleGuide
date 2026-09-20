@@ -10,7 +10,9 @@
 
 ## Date
 
-Accepted on 2026-08-01 by Frank Lesniak, PSStyleGuide repository owner.
+- **Date:** 2026-08-01
+
+Accepted by Frank Lesniak, PSStyleGuide repository owner.
 
 This records a deliberate acceptance so the question is settled rather than rediscovered.
 If the review triggers in the last section fire, reopen it.
@@ -45,7 +47,7 @@ Note the distinction from its sibling `supplyFreeze.reviewedWorkingBytes`, which
 independently compares them against literals hard-coded in the workflow. The offline validator does not consume the historical baseline. The separate manual
 procedure below verifies it without adding a workflow gate.
 
-## 2. The defect that prompted this, and its correction
+## The defect that prompted this, and its correction
 
 Codex found during review of pull request #150 that `baseline.packageLockJson` recorded a
 length of 66,425 and a SHA-256 of `b62a8891…`, while `git cat-file blob 7e96fd1f…` yields
@@ -106,7 +108,7 @@ Verification remains a separate manual step with separately retained evidence. H
 | Add a separate Git-aware script run manually before merge. | Selected as a separate documented manual procedure under issue 158. It refuses missing objects and does not run in continuous integration. |
 | Delete the baseline fields entirely. | Rejected. Issue #145 explicitly requires the frozen supply tuple to record baseline blob identifiers and digests, so removal needs a scope change, and the provenance has genuine audit value when correct. |
 
-## 6. How to check it by hand
+## How to check it by hand
 
 Use the [complete raw-byte procedure](../P1-SUPPLY-FREEZE-v1.md#verify-historical-git-provenance-separately). It checks both baseline objects against historical commit `4346310e7deebffb4159c75e30d9546263dfd649`, fails on missing objects or native errors, and avoids checkout line-ending conversion. Run the explicitly documented acquisition step before verification when the objects are absent. Do not infer success from a command that only prints a hash.
 
@@ -115,7 +117,7 @@ Use the [complete raw-byte procedure](../P1-SUPPLY-FREEZE-v1.md#verify-historica
 - [STYLE_GUIDE.md](../../STYLE_GUIDE.md)
 - [STYLE_GUIDE_RATIONALE.md](../../STYLE_GUIDE_RATIONALE.md)
 
-## 7. When this decision must be revisited
+## When this decision must be revisited
 
 - A workflow or automatic gate starts relying on `supplyFreeze.baseline`. The new manual method does not authorize that integration.
 - The baseline is regenerated for a new supply freeze, at which point the values should be

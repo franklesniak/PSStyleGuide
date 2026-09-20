@@ -1561,6 +1561,29 @@ function npmChildEnv(objEnv) {
   return objScrubbed;
 }
 
+const NPM_DIAGNOSTIC_CATEGORIES = Object.freeze([
+  ['warning', /(?:^|\r?\n)npm warn(?:ing)?(?:\s|$)/iu],
+  ['notice', /(?:^|\r?\n)npm notice(?:\s|$)/iu],
+  ['error', /(?:^|\r?\n)npm error(?:\s|$)/iu],
+]);
+
+function writeNpmDiagnosticSummary(strOperation, objResult) {
+  const strStderr = typeof objResult.stderr === 'string' ? objResult.stderr : '';
+  const arrCategories = NPM_DIAGNOSTIC_CATEGORIES
+    .filter(([, objPattern]) => objPattern.test(strStderr))
+    .map(([strCategory]) => strCategory);
+  if (arrCategories.length === 0) arrCategories.push('other-output');
+  process.stderr.write(
+    'supply-freeze: npm diagnostic summary (child text withheld):\n' +
+    `  operation          ${formatUntrustedText(String(strOperation))}\n` +
+    `  native exit        ${Number.isInteger(objResult.status) ? objResult.status : 'none'}\n` +
+    `  signal             ${objResult.signal == null ? 'none' : 'present'}\n` +
+    `  stderr length      ${strStderr.length} characters\n` +
+    `  categories         ${arrCategories.join(', ')}\n` +
+    '  inspect npm logs only in the private external cache directory and treat their\n' +
+    '  contents as sensitive; this public summary does not reproduce child output.\n');
+}
+
 function runNpm(arrNpmArguments, objEnv) {
   // Round 60. Re-checked before every invocation rather than only at the fold,
   // because the path is re-resolved by the operating system at exec time: an
@@ -1604,11 +1627,11 @@ function runNpm(arrNpmArguments, objEnv) {
       maxBuffer: 64 * 1024 * 1024,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
-    // Keep warnings visible on success as well as failure; never echo raw npm
-    // output, which can contain credentials or terminal control characters.
+    // Keep the existence and fixed category of warnings visible on success as
+    // well as failure. Child text is never emitted: npm's own best-effort
+    // redaction does not cover arbitrary configuration values or paths.
     if (objResult.stderr) {
-      process.stderr.write(`supply-freeze: npm diagnostic: ${formatUntrustedText(objResult.stderr.slice(0, 8192))}\n`);
-      if (objResult.stderr.length > 8192) process.stderr.write('supply-freeze: npm diagnostic truncated after 8192 characters.\n');
+      writeNpmDiagnosticSummary(arrNpmArguments[0], objResult);
     }
     objNpmProcessResults.push({ operation: arrNpmArguments[0], nativeExit: objResult.status,
       signal: objResult.signal, stderrLength: objResult.stderr?.length ?? 0 });
@@ -1690,12 +1713,10 @@ function runNpmOrRefuse(arrNpmArguments, objEnv, intFailureExit, strMeaning) {
   try {
     return runNpm(arrNpmArguments, objEnv);
   } catch (objError) {
-    const strStderr = typeof objError?.stderr === 'string' ? objError.stderr.trim() : '';
     process.stderr.write(
       `supply-freeze: ${strMeaning}\n` +
       `  invocation         npm ${arrNpmArguments.map((strArgument) => formatUntrustedText(strArgument)).join(' ')}\n` +
       `  npm exit status    ${formatUntrustedText(String(objError?.status ?? objError?.code ?? 'unknown'))}\n` +
-      (strStderr ? `  npm said           ${formatUntrustedText(strStderr)}\n` : '') +
       '  npm ran and refused the invocation, so the value this run needed was never\n' +
       '  produced; nothing is recorded from a call that did not answer.\n');
     process.exit(intFailureExit);
@@ -3838,6 +3859,37 @@ function snapshotOrRefuse(strPath) {
   });
 }
 
+function snapshotContractOrRefuse(strPath) {
+  const refuseInitialContractRead = (objError) => {
+    process.stderr.write(
+      'supply-freeze: refusing to record an unreadable P1 contract.\n' +
+      `  ${strPath.split('/').pop().padEnd(18)} could not be read\n` +
+      formatErrorLocation(objError, strPath) +
+      '  the reviewed P1 contract must be a readable, regular, singly linked file\n' +
+      '  owned by this recording user before anything is recorded.\n');
+  };
+  try {
+    return readViaVerifiedDescriptor(strPath, 17, refuseInitialContractRead,
+      { exit: 17, what: 'P1 contract', holdable: true });
+  } catch (objError) {
+    // Open failures are translated inside readViaVerifiedDescriptor. This catch
+    // covers native fstat/read/close failures after the descriptor was opened.
+    refuseInitialContractRead(objError);
+    process.exit(17);
+  }
+}
+
+function readContractOrRefuse(strPath) {
+  try {
+    return readOrRefuse(strPath, { exit: 3, what: 'P1 contract', holdable: true });
+  } catch (objError) {
+    process.stderr.write(
+      'supply-freeze: the P1 contract became unreadable during recording; refusing.\n' +
+      formatErrorLocation(objError, strPath));
+    process.exit(3);
+  }
+}
+
 // Round 19, reported. This ceiling used to be captured after the snapshots and
 // after `npm ls`, so a manifest replaced after the snapshot and restored before
 // the ceiling escaped every check: the byte comparisons matched the restored
@@ -3849,7 +3901,7 @@ const intRecordingStartedAt = Date.now();
 const objPackageBefore = snapshotOrRefuse(strPackagePath);
 const objLockBefore = snapshotOrRefuse(strLockPath);
 const strContractPath = join(strWorkflowDirectory, 'workflow-policy-contract.json');
-const objContractBefore = snapshotOrRefuse(strContractPath);
+const objContractBefore = snapshotContractOrRefuse(strContractPath);
 function contractIdentityOrRefuse() {
   try { return lstatSync(strContractPath, { bigint: true }); } catch {
     process.stderr.write('supply-freeze: P1 contract became unreadable during recording; refusing.\n');
@@ -5099,11 +5151,14 @@ if (!boolAnyToolchain && objTree.unresolvedLinks.length > 0) {
 }
 
 if (boolSkipAudit) {
+  objRecord.registry = null;
   objRecord.auditSha256 = null;
   // No audit child ran, so nothing was scrubbed. Emitted anyway so the field is
   // present on every record shape and a reader never has to distinguish "absent
   // because nothing was scrubbed" from "absent because this build is older".
   objRecord.auditEnvironmentScrubbed = [];
+  objRecord.auditCounts = null;
+  objRecord.auditPackages = null;
 } else {
   // The advisory posture is a snapshot of whatever registry answers the audit
   // request, and nothing else in this script constrains which one that is.
@@ -5872,7 +5927,7 @@ function renderRecordRow(strLabel, objValue) {
   return `  ${strLabel.padEnd(21)}${formatUntrustedText(objValue)}\n`;
 }
 
-const objContractAfter = readOrRefuse(strContractPath);
+const objContractAfter = readContractOrRefuse(strContractPath);
 const objContractIdentityAfter = contractIdentityOrRefuse();
 if (!objContractBefore.equals(objContractAfter)
   || objContractIdentityBefore.ino !== objContractIdentityAfter.ino

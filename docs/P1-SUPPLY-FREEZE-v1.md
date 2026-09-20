@@ -29,7 +29,7 @@ The source is [TerraformStyleGuide PR 27](https://github.com/franklesniak/Terraf
 | Complete upstream method | [T1-SUPPLY-FREEZE-v1.md](https://github.com/franklesniak/TerraformStyleGuide/blob/aae05282b57f093cec8b63e59138db72c982f10e/docs/T1-SUPPLY-FREEZE-v1.md), Git blob `36010d2dac98631845d8e880689f7c315ccbcdb7` |
 | P1 policy input | [PS commit 986a78cf](https://github.com/franklesniak/PSStyleGuide/tree/986a78cfad02abe9698ee258735d8451abeb9249), tree `9d97ac36c2c75916e17070ad8d22c9417a896722`, contract blob `7b45290c0aedfce01b1d156012afa06ca367a560` |
 
-The installed-byte fold, npm-distribution authentication, configuration checks, JSON duplicate-key checks, advisory normalization, link containment, and quiescence checks retain the upstream implementation. The port changes four current-manifest constants, adds the unchanged P1 assertion envelope and contract snapshot, requires external npm housekeeping authority, preserves bounded successful stderr diagnostics, and restricts audit failures to the documented native outcome. These are explicit differences, not a claim of whole-recorder byte identity. Historical upstream review comments in the source describe T1; this method governs the P1 port.
+The installed-byte fold, npm-distribution authentication, configuration checks, JSON duplicate-key checks, advisory normalization, link containment, and quiescence checks retain the upstream implementation. The port changes four current-manifest constants, adds the unchanged P1 assertion envelope and contract snapshot, requires external npm housekeeping authority, emits explicit null/empty fields for an intentionally skipped audit, preserves structured stderr diagnostic summaries without publishing child text, and restricts audit failures to the documented native outcome. These are explicit differences, not a claim of whole-recorder byte identity. Historical upstream review comments in the source describe T1; this method governs the P1 port.
 
 The P1 assertion object is pinned by SHA-256 of recursive sorted-key JSON, without insignificant whitespace: `83c5138131de742734d22a818e21feb63d5ac11f8877adf52299809f04217362`. Changing an assertion requires a reviewed recorder change. Other contract fields can change without changing that assertion tuple; the complete raw contract identity is still reported and checked for changes during the run.
 
@@ -57,8 +57,8 @@ The JSON envelope has three objects: `supplyFreeze`, `provenance`, and `currentO
 | `currentObservation.manifest`, `.manifestBlobs` | objects with `package.json` and `package-lock.json` string properties | Derived SHA-256 and Git blob IDs of current raw files. No Git subprocess is used. |
 | `currentObservation.matchesReviewedManifest`, `.treeSatisfiesLockfile` | booleans | Exact current-file guard and actual `npm ls` result, including root path and complete declared top-level dependency set. |
 | `currentObservation.installedTreeSha256`, `installedTreeFiles`, `installedTreeSymlinks`, `installedTreeDirectories`, `installedTreeSpecials`, `installedTreeModes`, `installedTreeDirectoryModes`, `installedTreeRootMode` | string, four integers, two mode-count objects, string | Derived from the entire installed tree, including ignored files. Two folds compare every returned field. These fields use the upstream byte recipe, not the historical P1 canonical recipe. |
-| `currentObservation.registry`, `.auditSha256`, `.auditEnvironmentScrubbed`, `.auditCounts`, `.auditPackages` | string/null, string/null, array, counts object/null, object/null | Current registry response and upstream normalized advisory recipe. Skipped audit fields retain the upstream null/empty forms. Raw historical audit digests use a different recipe. |
-| `currentObservation.npmProcesses[]`: `operation`, `nativeExit`, `signal`, `stderrLength` | string, integer, null, integer | Actual child outcomes in a successful record; only audit may have native status 1. Stderr length counts decoded characters before bounded redaction, not raw bytes. |
+| `currentObservation.registry`, `.auditSha256`, `.auditEnvironmentScrubbed`, `.auditCounts`, `.auditPackages` | string/null, string/null, array, counts object/null, object/null | Current registry response and normalized advisory recipe. An intentionally skipped audit emits explicit null values and an empty scrub list. Raw historical audit digests use a different recipe. |
+| `currentObservation.npmProcesses[]`: `operation`, `nativeExit`, `signal`, `stderrLength` | string, integer, null, integer | Actual child outcomes in a successful record; only audit may have native status 1. Stderr length counts decoded child characters; public diagnostics expose fixed categories and lengths, not child text or raw bytes. |
 
 Audit counts use nonnegative safe integers for `info`, `low`, `moderate`, `high`, `critical`, and `total`; the buckets must sum to total. The complete upstream method specifies the byte-fold framing and advisory normalization. In brief: SHA-256 over sorted entries with single-byte kind tags and ASCII-decimal-length-prefixed UTF-8 paths, permission masks, raw link targets, and file bytes. The root, directories, and files include `mode & 0o555`; complete `mode & 0o777` histograms are separately compared. Link targets must resolve within the measured tree; undecodable names, special metadata, and mutable input shapes refuse under the documented guards.
 
@@ -66,16 +66,72 @@ Audit counts use nonnegative safe integers for `info`, `low`, `moderate`, `high`
 
 Use a trusted private checkout and verified Git/Node tools. Exclude concurrent changes by the same user to the checkout, Node distribution, cache directory, or their parents. Before starting any Node process, clear `NODE_OPTIONS`, `NODE_COMPILE_CACHE`, `NODE_V8_COVERAGE`, and `NODE_REDIRECT_WARNINGS`, and set `NODE_DISABLE_COMPILE_CACHE=1`. Node can configure output before the first JavaScript statement and write it at exit; a JavaScript refusal cannot undo those effects. This caller protocol applies independently to the recorder, test runner, and historical verifier. Bare invocation under arbitrary startup settings is not a read-only claim. The script cannot defend against code injected before its first statement, a hostile runtime, filesystem snapshots that are not atomic, ACL properties outside POSIX stat, or a hostile parent of the checkout. It creates no claim of physical fault injection or Windows PowerShell execution.
 
-Obtain the official Node `24.18.1` Linux/x64 archive and verify its SHA-256 **before extraction**. The pinned archive digest is `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0`. The authenticated bundled npm tree must contain 1,916 files and have digest `f58556342f8abc9245e168904a6579b9b09e7dc10606df7a52fcd454ccec8231`; the recorder checks both. The archive checksum establishes the selected distribution bytes; signed release verification is separate provenance work when required.
+Obtain the official Node `24.18.1` Linux/x64 archive and verify its SHA-256 **before extraction**. This binary recipe supports GNU/Linux x64 with kernel 4.18 or newer, glibc 2.28 or newer, and libstdc++ `GLIBCXX_3.4.25` or newer. It does not claim support for musl-based systems or vendor releases outside Node's supported binary platforms. The recipe requires Bash, `curl`, GNU Coreutils `env`, `id`, `mkdir`, `mktemp`, `sha256sum`, and `stat`, plus GNU `tar` with `xz` support. The separate historical procedure also requires a trusted Git executable. The pinned archive digest is `d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0`. The authenticated bundled npm tree must contain 1,916 files and have digest `f58556342f8abc9245e168904a6579b9b09e7dc10606df7a52fcd454ccec8231`; the recorder checks both. The archive checksum establishes the selected distribution bytes; signed release verification is separate provenance work when required.
 
-The following commands run from the repository root in a POSIX shell. Set `strExpectedRecorder` to the exact SHA-256 from the independently reviewed candidate or its permanent handoff. A value copied from the script's own output is not independent verification. Save the final JSON outside the checkout.
+The following commands run from the repository root in Bash. Set `strExpectedRecorder` to the exact SHA-256 from the independently reviewed candidate or its permanent handoff. A value copied from the script's own output is not independent verification. `SUPPLY_FREEZE_TEMP_BASE` can select an existing external base; otherwise the recipe checks `TMPDIR`, then `/tmp`. The selected base and every physical ancestor must be owned by root or the recording UID, and every group- or other-writable component must have the sticky bit. An unsafe selected value refuses rather than falling back. Physical checkout or base paths containing carriage returns or line feeds refuse before any file creation because the checksum-file syntax used below cannot represent those names safely. Save the final JSON outside the checkout.
 
 ```bash
 set -eu
 unset NODE_OPTIONS NODE_COMPILE_CACHE NODE_V8_COVERAGE NODE_REDIRECT_WARNINGS
 export NODE_DISABLE_COMPILE_CACHE=1
 strExpectedRecorder='PASTE_THE_INDEPENDENTLY_REVIEWED_RECORDER_SHA256'
-strTools="$(mktemp -d)"
+for strCommand in curl env id mkdir mktemp sha256sum stat tar xz; do
+  command -v "$strCommand" >/dev/null 2>&1 || {
+    printf 'Required command is unavailable: %s\n' "$strCommand" >&2
+    exit 1
+  }
+done
+strCanonicalSuffix=$'\n.'
+strCheckoutTagged="$(pwd -P && printf '.')" || {
+  printf 'Checkout path could not be resolved physically.\n' >&2
+  exit 1
+}
+case "$strCheckoutTagged" in
+  *"$strCanonicalSuffix") strCheckout="${strCheckoutTagged%"$strCanonicalSuffix"}" ;;
+  *) printf 'Checkout path could not be captured losslessly.\n' >&2; exit 1 ;;
+esac
+case "$strCheckout" in
+  *$'\n'*|*$'\r'*) printf 'Checkout path contains an unsupported line break.\n' >&2; exit 1 ;;
+esac
+strSelectedBase="${SUPPLY_FREEZE_TEMP_BASE:-${TMPDIR:-/tmp}}"
+case "$strSelectedBase" in
+  /*) ;;
+  *) printf 'Temporary base must be an absolute existing directory.\n' >&2; exit 1 ;;
+esac
+strExternalBaseTagged="$(cd -P -- "$strSelectedBase" 2>/dev/null && pwd -P && printf '.')" || {
+  printf 'Temporary base must be an accessible existing directory.\n' >&2
+  exit 1
+}
+case "$strExternalBaseTagged" in
+  *"$strCanonicalSuffix") strExternalBase="${strExternalBaseTagged%"$strCanonicalSuffix"}" ;;
+  *) printf 'Temporary base could not be captured losslessly.\n' >&2; exit 1 ;;
+esac
+case "$strExternalBase" in
+  *$'\n'*|*$'\r'*) printf 'Temporary base contains an unsupported line break.\n' >&2; exit 1 ;;
+esac
+strCheckoutPrefix="${strCheckout%/}/"
+case "$strExternalBase/" in
+  "$strCheckoutPrefix"*) printf 'Temporary base must be outside the checkout.\n' >&2; exit 1 ;;
+esac
+strUid="$(id -u)"
+strAt="$strExternalBase"
+while :; do
+  strStat="$(stat -Lc '%u %a' -- "$strAt")" || {
+    printf 'Temporary base ancestry could not be inspected.\n' >&2
+    exit 1
+  }
+  read -r strOwner strMode <<< "$strStat"
+  intMode=$((8#$strMode))
+  if { [ "$strOwner" != 0 ] && [ "$strOwner" != "$strUid" ]; } \
+    || { (( (intMode & 0022) != 0 )) && (( (intMode & 01000) == 0 )); }; then
+    printf 'Temporary base has an unsafe physical ancestor.\n' >&2
+    exit 1
+  fi
+  [ "$strAt" = / ] && break
+  strAt="${strAt%/*}"
+  [ -n "$strAt" ] || strAt=/
+done
+strTools="$(mktemp -d "$strExternalBase/supply-freeze-tools.XXXXXXXXXX")"
 curl -fsSLo "$strTools/node.tar.xz" \
   https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz
 printf '%s  %s\n' \
@@ -94,8 +150,8 @@ env -u NPM_CONFIG_WORKSPACE -u npm_config_workspace \
   "$strNode" "$strNpm" --prefix .github/workflows ci \
   --ignore-scripts --no-audit --no-fund --workspaces=false
 # The caller creates a fresh mode-0700 directory; do not reuse a populated one.
-strCache="$(mktemp -d)"
-strOutput="$(mktemp)"
+strCache="$(mktemp -d "$strExternalBase/supply-freeze-cache.XXXXXXXXXX")"
+strOutput="$(mktemp "$strExternalBase/supply-freeze-observation.XXXXXXXXXX")"
 env -u NODE_OPTIONS -u NODE_COMPILE_CACHE -u NODE_V8_COVERAGE \
   -u NODE_REDIRECT_WARNINGS NODE_DISABLE_COMPILE_CACHE=1 "$strNode" .github/workflows/Get-SupplyFreezeDigest.mjs \
   --json "--cache-directory=$strCache" > "$strOutput"
@@ -108,7 +164,7 @@ NODE
 printf 'Observation saved outside the repository: %s\n' "$strOutput"
 ```
 
-The external directory must be absolute, canonical, empty, owned by the recording UID, and mode `0700`. Symlink cache aliases and repository/toolchain overlap refuse. Both the measured checkout and the physical recorder source repository are excluded, including diagnostic invocation through a script alias. Ancestors must be owned by root or the recording UID; writable ancestors require the sticky bit. The caller must prevent same-UID interference during the run. npm cache and logs are forced beneath that directory before every npm subprocess, including version and configuration probes; timing and update notification are disabled. Ambient repository-local cache/log paths cannot override these flags. Each npm child also removes those four Node startup variables and forces `NODE_DISABLE_COMPILE_CACHE=1`; warning output remains on stderr. Observable active compile-cache, coverage, or warning-redirection settings refuse with exit 2 before npm, but this check cannot undo runtime effects. Empty values are inactive; compile caching is inactive when its disable flag is `1`. No existing directory permissions are changed. New warnings remain visible through bounded redacted stderr diagnostics.
+The recorder's external cache directory must be absolute, canonical, empty, owned by the recording UID, and mode `0700`. Symlink cache aliases and repository/toolchain overlap refuse. Both the measured checkout and the physical recorder source repository are excluded, including diagnostic invocation through a script alias. Ancestors must be owned by root or the recording UID; writable ancestors require the sticky bit. The caller must prevent same-UID interference during the run. npm cache and logs are forced beneath that directory before every npm subprocess, including version and configuration probes; timing and update notification are disabled. Ambient repository-local cache/log paths cannot override these flags. Each npm child also removes those four Node startup variables and forces `NODE_DISABLE_COMPILE_CACHE=1`; warnings remain visible as fixed categories and decoded-character lengths, while arbitrary child stderr text is withheld from public recorder diagnostics. Observable active compile-cache, coverage, or warning-redirection settings refuse with exit 2 before npm, but this check cannot undo runtime effects. Empty values are inactive; compile caching is inactive when its disable flag is `1`. No existing directory permissions are changed. npm's private log files can still contain sensitive data; retain and inspect that caller-owned external directory accordingly.
 
 ## Verify historical Git provenance separately
 
@@ -176,7 +232,7 @@ Arguments are `--json`, `--no-audit`, `--any-toolchain`, and one required `--cac
 | 14 | Unsafe installed-entry ownership, hard links, or special mode bits. |
 | 15 | Nonregular or multiply writable manifest/configuration input. |
 | 16 | Missing, repeated, unsafe, nonprivate, populated, or overlapping external cache directory. Never bypassed. |
-| 17 | Changed or malformed P1 assertion tuple. Never bypassed. |
+| 17 | Initial P1 contract missing, unreadable, nonregular, multiply writable, malformed, or different from the reviewed assertion tuple. Never bypassed. |
 
 The immutable upstream method gives the per-guard diagnostic-bypass distinctions for exits 2–15. Every refusal emits no JSON record. A sequential userspace walk is not an atomic filesystem snapshot; the two content folds and inode/change-time sweep have the upstream timestamp-granularity and concurrent-write limitations. The new contract snapshot has the same sequential-read limitation.
 
@@ -200,7 +256,7 @@ The reduced reciprocal matrix below applies to this narrow capability. The uncha
 | --- | --- | --- |
 | GF-PARAMETERS | Intentional difference | This method's invocation contract; recorder argument/cache validation. Retains upstream diagnostic flags; adds one external housekeeping directory. Cache refusal cases apply even with bypass. |
 | GF-DESTINATION | Intentional difference | Recorder `strWorkflowDirectory` and `validateCacheDirectory`; source roots remain fixed, output is stdout, external npm effects are explicitly bounded. No caller-controlled repository destination. |
-| GF-CONTENT | Intentional difference | Field-provenance table and `objOutput`; unchanged P1 assertions coexist with distinct Linux observations. Contract drift refuses; schema is not migrated to T1. |
+| GF-CONTENT | Intentional difference | Field-provenance table and `objOutput`; unchanged P1 assertions coexist with distinct Linux observations. Contract drift refuses, skipped audits retain an explicit null/empty envelope, and public npm diagnostics expose only structured categories and lengths; schema is not migrated to T1. |
 | GF-SERIALIZATION | Same applicable behavior | Upstream `canonicalize`, `hashField`, and JSON renderer; BOM-less UTF-8 with final LF, byte-based manifest/tree folds, same installed/advisory recipes. Historical P1 digests are not equated. |
 | GF-WRITE | Inapplicable | No generated-file writer, candidate publication, flush, replacement, or move is added. Child housekeeping is covered by GF-NODE-LOCK, not a generator transaction. |
 | GF-FAILURE | Intentional difference | Upstream refusals plus cache 16 and assertion 17; audit native failures tightened and observable unsafe startup settings refuse 2. AUDIT-STATUS and LINUX fixtures exercise no-record refusals. No rollback or atomic snapshot claim. |

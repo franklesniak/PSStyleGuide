@@ -41,6 +41,26 @@ test('NODE-CHILD-ENV: production child projection removes startup writers withou
   assert.equal(input.NODE_DISABLE_COMPILE_CACHE, '0');
 });
 
+test('NPM-DIAGNOSTIC: production summary preserves category and outcome without child text', () => {
+  const from = source.indexOf('const NPM_DIAGNOSTIC_CATEGORIES');
+  const functionStart = source.indexOf('function writeNpmDiagnosticSummary(', from);
+  const to = source.indexOf('\n}\n', functionStart) + 2;
+  assert.ok(from >= 0 && functionStart > from && to > functionStart);
+  let diagnostic = '';
+  const writeSummary = new Function('formatUntrustedText', 'process',
+    `${source.slice(from, to)}; return writeNpmDiagnosticSummary;`)(String, {
+    stderr: { write(value) { diagnostic += value; } },
+  });
+  const childText = 'npm warn deprecated UNIQUE_SECRET_WARNING\n';
+  writeSummary('config', { status: 0, signal: null, stderr: childText });
+  assert.match(diagnostic, /operation\s+config/);
+  assert.match(diagnostic, /native exit\s+0/);
+  assert.match(diagnostic, /signal\s+none/);
+  assert.match(diagnostic, new RegExp(`stderr length\\s+${childText.length} characters`));
+  assert.match(diagnostic, /categories\s+warning/);
+  assert.doesNotMatch(diagnostic, /UNIQUE_SECRET_WARNING|deprecated/);
+});
+
 test('AUDIT-STATUS: native success and advisory status are distinct from process failures', () => {
   assert.equal(auditFunction(() => report)(['audit']), report);
   assert.equal(auditFunction(() => { throw { status: 1, signal: null, stdout: report }; })(['audit']), report);
@@ -141,7 +161,16 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       assert.equal(partialRun.status, 0, partialRun.stderr);
       const partial = JSON.parse(partialRun.stdout);
       assert.equal(partial.currentObservation.complete, false);
+      assert.equal(Object.hasOwn(partial.currentObservation, 'registry'), true);
+      assert.equal(partial.currentObservation.registry, null);
+      assert.equal(Object.hasOwn(partial.currentObservation, 'auditSha256'), true);
       assert.equal(partial.currentObservation.auditSha256, null);
+      assert.equal(Object.hasOwn(partial.currentObservation, 'auditEnvironmentScrubbed'), true);
+      assert.deepEqual(partial.currentObservation.auditEnvironmentScrubbed, []);
+      assert.equal(Object.hasOwn(partial.currentObservation, 'auditCounts'), true);
+      assert.equal(partial.currentObservation.auditCounts, null);
+      assert.equal(Object.hasOwn(partial.currentObservation, 'auditPackages'), true);
+      assert.equal(partial.currentObservation.auditPackages, null);
       assert.equal(partial.currentObservation.installedTreeSha256, result.currentObservation.installedTreeSha256);
 
       const packagePath = join(fixture, 'package.json');
@@ -157,11 +186,35 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
 
       const contractPath = join(fixture, 'workflow-policy-contract.json');
       const contractBytes = readFileSync(contractPath);
+      rmSync(contractPath);
+      refuse(invoke(['--no-audit', '--any-toolchain']), 17);
+      writeFileSync(contractPath, contractBytes);
+      const contractAliasDirectory = join(temporary, 'contract-link-target');
+      mkdirSync(contractAliasDirectory);
+      linkSync(contractPath, join(contractAliasDirectory, 'contract-alias'));
+      refuse(invoke(['--no-audit', '--any-toolchain']), 17);
+      rmSync(contractAliasDirectory, { recursive: true });
+      rmSync(contractPath);
+      mkdirSync(contractPath);
+      refuse(invoke(['--no-audit', '--any-toolchain']), 17);
+      rmSync(contractPath, { recursive: true });
+      writeFileSync(contractPath, contractBytes);
       const altered = JSON.parse(contractBytes);
       altered.supplyFreeze.baseline.packageJson.length++;
       writeFileSync(contractPath, JSON.stringify(altered));
       refuse(invoke(['--no-audit', '--any-toolchain']), 17);
       writeFileSync(contractPath, contractBytes);
+
+      const privateConfig = join(temporary, 'UNIQUE_SECRET_CONFIG');
+      writeFileSync(privateConfig, '');
+      const configFailure = invoke(['--no-audit'], {
+        NPM_CONFIG_USERCONFIG: privateConfig,
+        NPM_CONFIG_GLOBALCONFIG: privateConfig,
+      });
+      refuse(configFailure, 2);
+      assert.doesNotMatch(configFailure.stderr, /UNIQUE_SECRET_CONFIG/);
+      assert.match(configFailure.stderr, /npm diagnostic summary \(child text withheld\)/);
+      assert.match(configFailure.stderr, /stderr length\s+\d+ characters/);
 
       const extra = join(fixture, 'node_modules', 'yaml', 'unexpected-file');
       writeFileSync(extra, 'changed bytes');
