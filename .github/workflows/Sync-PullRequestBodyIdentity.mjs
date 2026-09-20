@@ -10,7 +10,7 @@ import path from 'node:path';
 import { TextDecoder } from 'node:util';
 import { fileURLToPath } from 'node:url';
 
-const TOOL_VERSION = '1.0.20260915.1';
+const TOOL_VERSION = '1.1.20260919.0';
 const RESULT_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityResult.v1';
 const CASE_SCHEMA = 'PSStyleGuide.PullRequestBodyIdentityCases.v1';
 const START_MARKER = '<!-- psstyleguide-pr-body-identity:start -->';
@@ -301,6 +301,85 @@ function validateSourceEntry(entry, expectedPath, category) {
     gitBlobId(entry.bytes) === entry.blob, category);
 }
 
+
+function buildGeneratorVersion(text, validatorText) {
+  const expected = [...validatorText.matchAll(/^const EXPECTED_VERSION = '([^']+)';$/gmu)];
+  if (expected.length === 0) {
+    return singleCapture(text, /\$objResult\.GeneratorVersion -cne '([^']+)'/gu,
+      'build-generator-version');
+  }
+  assert(expected.length === 1, 'validator-generator-version');
+  const start = '          # BEGIN P1 GENERATOR RESULT\n';
+  const end = '          # END P1 GENERATOR RESULT\n';
+  assert(text.split(start).length === 2 && text.split(end).length === 2,
+    'build-generator-version');
+  const offset = text.indexOf(start) + start.length;
+  const stop = text.indexOf(end);
+  assert(stop > offset, 'build-generator-version');
+  const region = text.slice(offset, stop).split('\n').map(line => {
+    assert(line === '' || line.startsWith('          '), 'build-generator-version');
+    return line.slice(10);
+  }).join('\n');
+  const pattern = /^\$objGeneratorResult = \$objResult\n\$hashtableGeneratorVersionCheck = @\{ 'Name' = 'GeneratorVersion'; 'Valid' = \$objGeneratorResult\.GeneratorVersion -ceq '([^']+)' \}\nif \(\$objGeneratorResult\.GeneratorVersion -isnot \[string\] -or -not \$hashtableGeneratorVersionCheck\.Valid\) \{\n    \[void\]\(\$listFailedChecks\.Add\('GeneratorVersion'\)\)\n\}\n/gmu;
+  const matches = [...region.matchAll(pattern)];
+  assert(matches.length === 1 && matches[0][1] === expected[0][1],
+    'build-generator-version');
+  // This exact region is also bound by trusted admission. Mask comments and
+  // strings here so a disconnected display copy cannot supply the identity.
+  const projected = projectIdentityPowerShell(region);
+  assert(projected.slice(matches[0].index, matches[0].index + 38) ===
+    region.slice(matches[0].index, matches[0].index + 38), 'build-generator-version');
+  const before = projected.slice(0, matches[0].index);
+  assert([...before].reduce((n,c) => n + (c === '{' ? 1 : c === '}' ? -1 : 0), 0) === 0,
+    'build-generator-version');
+  assert((projected.match(/\$objGeneratorResult\s*=/gu) ?? []).length === 1 &&
+    (projected.match(/\$hashtableGeneratorVersionCheck\s*=/gu) ?? []).length === 1,
+  'build-generator-version');
+  return matches[0][1];
+}
+
+function projectIdentityPowerShell(text) {
+  const out = text.split('');
+  let i = 0;
+  const blank = (from, to) => {
+    for (let n = from; n < to; n += 1) if (text[n] !== '\n') out[n] = ' ';
+  };
+  while (i < text.length) {
+    const start = i;
+    if (text.slice(i, i + 2) === '<#') {
+      let depth = 1; i += 2;
+      while (i < text.length && depth) {
+        if (text.slice(i, i + 2) === '<#') { depth += 1; i += 2; }
+        else if (text.slice(i, i + 2) === '#>') { depth -= 1; i += 2; }
+        else i += 1;
+      }
+      blank(start, i);
+    } else if (text[i] === '#') {
+      while (i < text.length && text[i] !== '\n') i += 1;
+      blank(start, i);
+    } else if (text[i] === '@' && ["'", '"'].includes(text[i + 1]) && text[i + 2] === '\n') {
+      const quote = text[i + 1];
+      const close = text.indexOf('\n' + quote + '@', i + 3);
+      i = close < 0 ? text.length : close + 3;
+      blank(start, i);
+    } else if (["'", '"'].includes(text[i])) {
+      const quote = text[i++];
+      while (i < text.length) {
+        if (quote === '"' && text[i] === String.fromCharCode(96)) { i += 2; continue; }
+        if (text[i] === quote) {
+          if (text[i + 1] === quote) { i += 2; continue; }
+          i += 1; break;
+        }
+        i += 1;
+      }
+      blank(start, Math.min(i, text.length));
+    } else if (text[i] === String.fromCharCode(96)) {
+      i = Math.min(i + 2, text.length); blank(start, i);
+    } else i += 1;
+  }
+  return out.join('');
+}
+
 function deriveIdentity(snapshot) {
   assert(isRecord(snapshot) && SHA1_PATTERN.test(snapshot.commit) &&
     SHA1_PATTERN.test(snapshot.tree) && isRecord(snapshot.files),
@@ -382,17 +461,13 @@ function deriveIdentity(snapshot) {
     sha256(verifierEntry.bytes) === verifierPolicy.sha256,
   'path-verifier-identity');
 
-  const buildGeneratorVersion = singleCapture(
-    buildText,
-    /\$objResult\.GeneratorVersion -cne '([^']+)'/gu,
-    'build-generator-version',
-  );
+  const observedBuildGeneratorVersion = buildGeneratorVersion(buildText, validatorText);
   const buildVerifierVersion = singleCapture(
     buildText,
     /\$objPathSetResult\.VerifierVersion -cne '([^']+)'/gu,
     'build-path-verifier-version',
   );
-  assert(buildGeneratorVersion === generatorVersion,
+  assert(observedBuildGeneratorVersion === generatorVersion,
     'build-generator-version');
   assert(buildVerifierVersion === verifierVersion,
     'build-path-verifier-version');
@@ -1541,15 +1616,45 @@ function assertSourceMutation(baseline, mutated, mutation) {
   }
 }
 
+
+function runCommonCaptureCase(mutation) {
+  const version = '1.0.20260919.0';
+  let block = "$objGeneratorResult = $objResult\n$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }\nif ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {\n    [void]($listFailedChecks.Add('GeneratorVersion'))\n}\n";
+  let validator = "const EXPECTED_VERSION = '" + version + "';\n";
+  if (mutation === 'wrong-version') block = block.replace(version, '1.0.20000101.0');
+  else if (mutation === 'duplicate') block += block;
+  else if (mutation === 'block-comment') block = '<#\n' + block + '#>\n';
+  else if (mutation === 'here-string') block = "$display = @'\n" + block + "'@\n";
+  else if (mutation === 'disconnected-alias') block = block.replace('$objGeneratorResult = $objResult', '$objGeneratorResult = $other');
+  else if (mutation === 'unconditional') block = block.replace(/if \([^\n]+\) \{/u, 'if ($false) {');
+  else if (mutation === 'missing-string-guard') block = block.replace('$objGeneratorResult.GeneratorVersion -isnot [string] -or ', '');
+  else if (mutation === 'missing-expected-version') validator = '';
+  else if (mutation === 'duplicate-expected-version') validator += validator;
+  else if (mutation === 'wrong-expected-version') validator = validator.replace(version, '1.0.20000101.0');
+  else if (mutation === 'reassigned-alias') block += '$objGeneratorResult = $other\n';
+  else if (mutation === 'nested-block') block = 'if ($false) {\n' + block + '}\n';
+  else assert(mutation === 'valid', 'common-capture-mutation');
+  const build = '          # BEGIN P1 GENERATOR RESULT\n' +
+    block.trimEnd().split('\n').map(line => '          ' + line).join('\n') +
+    '\n          # END P1 GENERATOR RESULT\n';
+  const observed = buildGeneratorVersion(build, validator);
+  assert(observed === version, 'build-generator-version');
+}
+
 function runSourceMutationSelfTests(baselineSnapshot, sourceCases) {
   let passed = 0;
   for (const testCase of sourceCases) {
     let observed;
     try {
+      if (testCase.mutation.startsWith('common-capture-')) {
+        runCommonCaptureCase(testCase.mutation.slice('common-capture-'.length));
+        observed = 'current';
+      } else {
       const mutated = mutatedSnapshot(baselineSnapshot, testCase.mutation);
       assertSourceMutation(baselineSnapshot, mutated, testCase.mutation);
       deriveIdentity(mutated);
       observed = 'current';
+      }
     } catch (error) {
       if (!(error instanceof IdentityError)) throw error;
       observed = error.category;

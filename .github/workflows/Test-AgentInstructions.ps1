@@ -3,7 +3,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.13.20260918.0
+# Version: 1.14.20260919.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -100,6 +100,8 @@ $script:arrTrustRootPaths = @(
     '.github/workflows/Validate-WorkflowPolicy.mjs',
     '.github/workflows/workflow-isolation-reference.json',
     '.github/workflows/workflow-isolation-validator.reference.txt',
+    '.github/workflows/workflow-common-reference.json',
+    '.github/workflows/workflow-common-validator.reference.txt',
     '.github/workflows/workflow-ordinary-selftest-reference.json',
     '.github/workflows/build.yml',
     '.github/workflows/markdownlint.yml',
@@ -130,6 +132,8 @@ $script:arrPushGovernedExactPaths = @(
     '.github/workflows/Validate-WorkflowPolicy.mjs',
     '.github/workflows/workflow-isolation-reference.json',
     '.github/workflows/workflow-isolation-validator.reference.txt',
+    '.github/workflows/workflow-common-reference.json',
+    '.github/workflows/workflow-common-validator.reference.txt',
     '.github/workflows/workflow-ordinary-selftest-reference.json',
     '.github/workflows/build.yml',
     '.github/workflows/markdownlint.yml',
@@ -8023,7 +8027,7 @@ if ($SelfTest) {
                 }
                 if ([regex]::Matches(
                         $strFunctionNotes,
-                        '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-58]))|1\.2026091[45]|2\.20260917)\.0\.$'
+                        '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-58]))|1\.2026091[45]|2\.20260917|(?:1|3)\.20260919)\.0\.$'
                     ).Count -ne 1) {
                     $listMissingHelp.Add('landing or repair helper Version')
                 }
@@ -8135,9 +8139,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.13\.20260918\.0$'
+            '(?m)^# Version: 1\.14\.20260919\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.13.20260918.0.'
+        throw 'The validator script version is not 1.14.20260919.0.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -8998,9 +9002,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.6\.20260918\.0$'
+            '(?m)^# Version: 1\.7\.20260919\.0$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.6.20260918.0.'
+        throw 'The trust-root authorization script lacks version 1.7.20260919.0.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -9016,6 +9020,8 @@ if ($SelfTest) {
             '.github/workflows/workflow-policy-cases.json',
             '.github/workflows/workflow-isolation-reference.json',
             '.github/workflows/workflow-isolation-validator.reference.txt',
+            '.github/workflows/workflow-common-reference.json',
+            '.github/workflows/workflow-common-validator.reference.txt',
             '.github/workflows/workflow-ordinary-selftest-reference.json',
             '.github/workflows/build.yml',
             '.github/workflows/markdownlint.yml',
@@ -9034,6 +9040,8 @@ if ($SelfTest) {
             '.github/workflows/workflow-policy-cases.json',
             '.github/workflows/workflow-isolation-reference.json',
             '.github/workflows/workflow-isolation-validator.reference.txt',
+            '.github/workflows/workflow-common-reference.json',
+            '.github/workflows/workflow-common-validator.reference.txt',
             '.github/workflows/workflow-ordinary-selftest-reference.json',
             '.github/workflows/build.yml',
             '.github/workflows/markdownlint.yml'
@@ -9075,9 +9083,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.4\.20260918\.0$'
+            '(?m)^# Version: 1\.4\.20260919\.0$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.4.20260918.0.'
+        throw 'The extracted self-test lacks version 1.4.20260919.0.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)

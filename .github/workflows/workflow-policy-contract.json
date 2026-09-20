@@ -141,7 +141,7 @@
   },
   "validatorIdentity": {
     "path": "Validate-WorkflowPolicy.mjs",
-    "sha256": "2e673f1367bbd58af8b9b4740e16ab5fd566fc5a557a558916f412a457ed330f"
+    "sha256": "217b93976b561028ab7848b31ea0b2b08a7d689a2878b66e17d5ad849cd9ea18"
   },
   "actions": {
     "checkout": {
@@ -571,7 +571,7 @@
                 "name": "Acquire exact pull request head and verified Node.js",
                 "id": "acquire",
                 "shell": "pwsh",
-                "runSha256": "71ec938a932409fe7f975ad7290c48bb7a3689db092d08bdca94d66ac68fe1b2"
+                "runSha256": "d50254d860eb8ce61ba7a50e2cf54b0db9a6bfa5e222905adc4c633c15d13db6"
               },
               {
                 "kind": "run",

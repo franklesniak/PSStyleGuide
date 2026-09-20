@@ -51,7 +51,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.6.20260918.0
+# Version: 1.7.20260919.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -102,6 +102,8 @@ $arrTrustRootPaths = @(
     '.github/workflows/Validate-WorkflowPolicy.mjs',
     '.github/workflows/workflow-isolation-reference.json',
     '.github/workflows/workflow-isolation-validator.reference.txt',
+    '.github/workflows/workflow-common-reference.json',
+    '.github/workflows/workflow-common-validator.reference.txt',
     '.github/workflows/workflow-ordinary-selftest-reference.json',
     '.github/workflows/build.yml',
     '.github/workflows/markdownlint.yml',
@@ -153,6 +155,7 @@ $script:hashtableSemanticInvariantPath = @{
 # replace transition-only pins before an ordinary R2 trust-root content update.
 $script:hashtableExactTransitionTextIdentity = @{
     'pull-request-body-identity-api-termination-is-bounded' = @(
+        '7eddc775e5dc5f6325591c8efe8a005a07aab9b0d0f9f1b720f3b74fbcf0eafd',
         '7b61ea2116386f75726af33dccf3e18fc90b509c206d44e900be405388556766',
         '03b0aa378cbf8b70d7b292ee2d904a03e808d52dae067af2af5f766f46cabecf',
         '0458f240ed8415eb1a898a8c30d2fd90f717f034b9bec6e6d6ab878b3346305d',
@@ -2029,6 +2032,25 @@ if ($null -eq $objResult -or $objResult.GetType() -ne [System.Management.Automat
 '@ + "`n"
 $script:scriptblockGetIsolationGeneratorResultCategory = {
     param([Parameter(Mandatory)][AllowEmptyString()][string] $Text)
+    $strCommonVersionBlock = @'
+$objGeneratorResult = $objResult
+$hashtableGeneratorVersionCheck = @{ 'Name' = 'GeneratorVersion'; 'Valid' = $objGeneratorResult.GeneratorVersion -ceq '1.0.20260919.0' }
+if ($objGeneratorResult.GeneratorVersion -isnot [string] -or -not $hashtableGeneratorVersionCheck.Valid) {
+    [void]($listFailedChecks.Add('GeneratorVersion'))
+}
+'@ + "`n"
+    if ($Text.Contains('$objGeneratorResult', [StringComparison]::Ordinal) -or
+        $Text.Contains('$hashtableGeneratorVersionCheck', [StringComparison]::Ordinal)) {
+        if ([regex]::Matches($Text, [regex]::Escape($strCommonVersionBlock)).Count -ne 1) {
+            return 'generator-result-predicate-GeneratorVersion'
+        }
+        $strLegacyVersionBlock = @'
+if ($objResult.GeneratorVersion -isnot [string] -or $objResult.GeneratorVersion -cne '1.0.20260916.0') {
+    [void]($listFailedChecks.Add('GeneratorVersion'))
+}
+'@ + "`n"
+        $Text = $Text.Replace($strCommonVersionBlock, $strLegacyVersionBlock)
+    }
     if ([regex]::Matches($Text,
             [regex]::Escape($script:strIsolationGeneratorConversion)).Count -ne 1) {
         return 'generator-result-json'
@@ -2072,7 +2094,7 @@ function Read-IsolationPolicyText {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260918.0.
+    # Version: 1.1.20260919.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -2082,6 +2104,8 @@ function Read-IsolationPolicyText {
         [ValidateSet('.github/workflows/Validate-WorkflowPolicy.mjs',
             '.github/workflows/workflow-isolation-reference.json',
             '.github/workflows/workflow-isolation-validator.reference.txt',
+            '.github/workflows/workflow-common-reference.json',
+            '.github/workflows/workflow-common-validator.reference.txt',
             IgnoreCase = $false)]
         [string] $Path
     )
@@ -2121,10 +2145,10 @@ function Assert-WorkflowIsolationReferenceContent {
     # The authenticated commit that owns the reference blobs.
     #
     # .PARAMETER TrustedText
-    # The six fixed regular blobs read from the trusted revision.
+    # The seven fixed regular blobs read from the trusted revision.
     #
     # .PARAMETER CandidateText
-    # The same six fixed regular blobs read from the candidate revision.
+    # The same seven fixed regular blobs read from the candidate revision.
     #
     # .EXAMPLE
     # Assert-WorkflowIsolationReferenceContent @hashtableArguments
@@ -2141,7 +2165,7 @@ function Assert-WorkflowIsolationReferenceContent {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260918.0.
+    # Version: 1.1.20260919.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -2156,8 +2180,64 @@ function Assert-WorkflowIsolationReferenceContent {
     $strContractPath = $strPrefix + 'workflow-policy-contract.json'
     $strCatalogPath = $strPrefix + 'workflow-policy-cases.json'
     $strHelperPath = $strPrefix + 'pull-request-body-identity.yml'
+    $strGeneratorPath = $strPrefix + 'Generate-StyleGuideArtifacts.ps1'
+    $strCommonBinding = '$script:strGeneratorVersion = ''1.0.20260919.0'''
+    $boolTrustedCommon = $TrustedText[$strGeneratorPath].Contains(
+        $strCommonBinding, [StringComparison]::Ordinal)
+    $boolCandidateCommon = $CandidateText[$strGeneratorPath].Contains(
+        $strCommonBinding, [StringComparison]::Ordinal)
+    if ($boolTrustedCommon -and -not $boolCandidateCommon) {
+        throw 'The common workflow domain cannot downgrade its generator.'
+    }
+    if ($boolCandidateCommon -and -not $boolTrustedCommon) {
+        $strLegacyReferenceText = Read-IsolationPolicyText -RepositoryRootPath $RepositoryRootPath -Revision $TrustedRevision -Path ($strPrefix + 'workflow-isolation-reference.json')
+        $objLegacyReference = & $script:scriptblockConvertFromStrictJsonHashtable -Text $strLegacyReferenceText -Name 'The trusted legacy isolation reference'
+        $objLegacyCatalog = & $script:scriptblockConvertFromStrictJsonHashtable -Text $objLegacyReference.caseCatalogText -Name 'The reviewed legacy catalog'
+        $objTrustedCatalog = & $script:scriptblockConvertFromStrictJsonHashtable -Text $TrustedText[$strCatalogPath] -Name 'The accepted legacy catalog'
+        if ((& $script:scriptblockConvertToCanonicalJsonText -Value $objLegacyCatalog) -cne
+            (& $script:scriptblockConvertToCanonicalJsonText -Value $objTrustedCatalog)) {
+            throw 'The common transition requires the exact reviewed legacy catalog; accepted cases must not be lost.'
+        }
+        $strExpectedGenerator = $TrustedText[$strGeneratorPath]
+        foreach ($objReplacement in @(
+                @{ Before = "Version: 1.0.20260916.0" + "`n#>";
+                    After = "Version: 1.0.20260919.0" + "`n#>" },
+                @{ Before = '$script:strGeneratorVersion = ''1.0.20260916.0''';
+                    After = $strCommonBinding },
+                @{ Before = '$arrGitCommands = @(Get-Command -Name git -CommandType Application -ErrorAction Stop)';
+                    After = '$arrGitCommands = @(Microsoft.PowerShell.Core\Get-Command -Name git -CommandType Application -ErrorAction Stop)' }
+            )) {
+            if ([regex]::Matches($strExpectedGenerator,
+                    [regex]::Escape($objReplacement.Before)).Count -ne 1) {
+                throw 'The trusted generator lacks the exact common transition input.'
+            }
+            $strExpectedGenerator = $strExpectedGenerator.Replace(
+                $objReplacement.Before, $objReplacement.After)
+        }
+        $objTrackedFunction = [regex]::Match($strExpectedGenerator,
+            '(?ms)^function Assert-TrackedFile \{.*?^\}')
+        if (-not $objTrackedFunction.Success -or
+            [regex]::Matches($objTrackedFunction.Value,
+                [regex]::Escape('    # Version: 1.0.20260813.0')).Count -ne 1) {
+            throw 'The trusted tracked-file helper has an unsupported version.'
+        }
+        $strExpectedGenerator = $strExpectedGenerator.Replace(
+            $objTrackedFunction.Value, $objTrackedFunction.Value.Replace(
+                '    # Version: 1.0.20260813.0', '    # Version: 1.0.20260919.0'))
+        if ($CandidateText[$strGeneratorPath] -cne $strExpectedGenerator) {
+            throw 'The common generator changes bytes outside its exact qualification transition.'
+        }
+    } elseif ($CandidateText[$strGeneratorPath] -cne $TrustedText[$strGeneratorPath]) {
+        throw 'The ordinary generator is immutable outside its exact common transition.'
+    }
+    $strReferenceName = if ($boolCandidateCommon) {
+        'workflow-common-reference.json'
+    } else { 'workflow-isolation-reference.json' }
+    $strValidatorReferenceName = if ($boolCandidateCommon) {
+        'workflow-common-validator.reference.txt'
+    } else { 'workflow-isolation-validator.reference.txt' }
     $strReferenceText = Read-IsolationPolicyText -RepositoryRootPath $RepositoryRootPath `
-        -Revision $TrustedRevision -Path ($strPrefix + 'workflow-isolation-reference.json')
+        -Revision $TrustedRevision -Path ($strPrefix + $strReferenceName)
     $objReference = & $script:scriptblockConvertFromStrictJsonHashtable `
         -Text $strReferenceText -Name 'The trusted isolation reference'
     & $script:scriptblockAssertExactDictionaryKeySet -Dictionary $objReference `
@@ -2271,7 +2351,8 @@ function Assert-WorkflowIsolationReferenceContent {
         $script:strIsolationMarkerPattern).Count -eq 1
     $objMandatoryCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
         -Text $objReference.caseCatalogText -Name 'The trusted mapped case catalog'
-    $strBaselineCatalog = if ($boolTrustedIsolation) {
+    $strBaselineCatalog = if ($boolTrustedIsolation -and
+        (-not $boolCandidateCommon -or $boolTrustedCommon)) {
         $TrustedText[$strCatalogPath]
     } else { $objReference.caseCatalogText }
     $objBaselineCatalog = & $script:scriptblockConvertFromStrictJsonHashtable `
@@ -2481,7 +2562,7 @@ function Assert-WorkflowIsolationReferenceContent {
             [Text.UTF8Encoding]::new($false).GetBytes($strCanonicalContract)
         )).ToLowerInvariant()
     $strReferenceValidator = Read-IsolationPolicyText -RepositoryRootPath $RepositoryRootPath `
-        -Revision $TrustedRevision -Path ($strPrefix + 'workflow-isolation-validator.reference.txt')
+        -Revision $TrustedRevision -Path ($strPrefix + $strValidatorReferenceName)
     $strVersionPattern = "(?m)^const VALIDATOR_VERSION = '([0-9]+)\.([0-9]+)\.([0-9]+)';$"
     $strDigestPattern = "(?m)^const EXPECTED_CONTRACT_CANONICAL_SHA256 = '[0-9a-f]{64}';$"
     foreach ($strValidator in @($TrustedText[$strValidatorPath], $strReferenceValidator,
@@ -2577,7 +2658,7 @@ function Assert-OrdinaryWorkflowPolicyContent {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.2.20260917.0.
+    # Version: 1.3.20260919.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -2600,6 +2681,7 @@ function Assert-OrdinaryWorkflowPolicyContent {
         $script:strIsolationMarkerPattern).Count -eq 1
     if ($boolWorkflowIsolation) {
         $arrOrdinaryPaths += '.github/workflows/markdownlint.yml'
+        $arrOrdinaryPaths += '.github/workflows/Generate-StyleGuideArtifacts.ps1'
     }
     $setOrdinaryPaths = [Collections.Generic.HashSet[string]]::new(
         [string[]]$arrOrdinaryPaths, [StringComparer]::Ordinal)
@@ -7185,7 +7267,7 @@ const trees = new Map([[original, new Map(git(['ls-tree', '-rz', original]).spli
     if (!match) throw new Error('Unsupported fixture tree entry');
     return [match[3], { mode: match[1], blob: match[2] }];
   }))]]);
-const chunks = [], expectedParents = new Map();
+const chunks = [], expectedParents = new Map(), blobMarks = new Map();
 let nextMark = 0;
 const commit = (base, texts, parents = [base]) => {
   const tree = new Map(trees.get(base));
@@ -7193,7 +7275,16 @@ const commit = (base, texts, parents = [base]) => {
     if (text === null) tree.delete(prefix + name);
     else tree.set(prefix + name, { mode: '100644', text });
   }
-  const mark = `:${++nextMark}`;
+  for (const value of tree.values()) {
+    if (value.text === undefined || value.blob !== undefined) continue;
+    if (!blobMarks.has(value.text)) {
+      const blobMark = ':' + (++nextMark);
+      chunks.push('blob\nmark ' + blobMark + '\ndata ' + Buffer.byteLength(value.text) + '\n' + value.text + '\n');
+      blobMarks.set(value.text, blobMark);
+    }
+    value.blob = blobMarks.get(value.text);
+  }
+  const mark = ':' + (++nextMark);
   trees.set(mark, tree); expectedParents.set(mark, parents);
   chunks.push(`commit refs/heads/task61-r3-ordinary-fixture\nmark ${mark}\n` +
     'committer Ordinary content self-test <ordinary@example.invalid> 1789430400 +0000\n' +
@@ -7201,8 +7292,7 @@ const commit = (base, texts, parents = [base]) => {
     `from ${parents[0]}\n` + parents.slice(1).map(parent => `merge ${parent}\n`).join('') + 'deleteall\n');
   for (const [name, value] of tree) {
     const quoted = JSON.stringify(name);
-    if (value.text === undefined) chunks.push(`M ${value.mode} ${value.blob} ${quoted}\n`);
-    else chunks.push(`M ${value.mode} inline ${quoted}\ndata ${Buffer.byteLength(value.text)}\n${value.text}\n`);
+    chunks.push(`M ${value.mode} ${value.blob} ${quoted}\n`);
   }
   chunks.push('\n');
   return mark;
@@ -7489,7 +7579,7 @@ const resolve = reference => reference.startsWith(':') ? marks.get(reference) : 
 if (marks.size !== nextMark || [...marks.values()].some(value => !/^[a-f0-9]{40}$/.test(value))) {
   throw new Error('Invalid inert fixture object identities');
 }
-const observedParents = new Map(git(['rev-list', '--parents', '--no-walk=unsorted', ...marks.values()])
+const observedParents = new Map(git(['rev-list', '--parents', '--no-walk=unsorted', ...[...expectedParents.keys()].map(resolve)])
   .split('\n').map(line => { const [head, ...parents] = line.split(' '); return [head, parents]; }));
 for (const [mark, parents] of expectedParents) {
   if (JSON.stringify(observedParents.get(resolve(mark))) !== JSON.stringify(parents.map(resolve))) {
@@ -7561,6 +7651,34 @@ const initial = Object.fromEntries([...names, ...referenceNames,
   'trust-root-authorization.json', 'Test-TrustRootAuthorization.ps1', 'Test-AgentInstructions.ps1',
   'Sync-PullRequestBodyIdentity.mjs'].map(name => [name, fs.readFileSync(path.join(source, prefix, name), 'utf8').replaceAll('\r\n', '\n')]));
 Object.assign(initial, JSON.parse(fs.readFileSync(path.join(source, prefix, 'workflow-ordinary-selftest-reference.json'), 'utf8')).files);
+// Common-domain fixtures are inert Git data. Preserve the historical fixture
+// generator exactly even when this self-test runs from the common product.
+const replaceOnce = (text, before, after) => {
+  if (text.split(before).length !== 2) throw new Error('Common fixture input is not unique');
+  return text.replace(before, () => after);
+};
+const sourceGenerator = fs.readFileSync(path.join(source, prefix, 'Generate-StyleGuideArtifacts.ps1'), 'utf8').replaceAll('\r\n', '\n');
+let legacyGenerator = sourceGenerator;
+const commonBinding = "$script:strGeneratorVersion = '1.0.20260919.0'";
+const legacyBinding = "$script:strGeneratorVersion = '1.0.20260916.0'";
+if (legacyGenerator.includes(commonBinding)) {
+  legacyGenerator = replaceOnce(legacyGenerator, 'Version: 1.0.20260919.0\n#>', 'Version: 1.0.20260916.0\n#>');
+  legacyGenerator = replaceOnce(legacyGenerator, commonBinding, legacyBinding);
+  legacyGenerator = replaceOnce(legacyGenerator, 'Microsoft.PowerShell.Core\\Get-Command -Name git', 'Get-Command -Name git');
+  const tracked = /^function Assert-TrackedFile \{[\s\S]*?^\}/m.exec(legacyGenerator);
+  if (!tracked) throw new Error('Common fixture lacks tracked-file function');
+  legacyGenerator = replaceOnce(legacyGenerator, tracked[0], replaceOnce(tracked[0],
+    '# Version: 1.0.20260919.0', '# Version: 1.0.20260813.0'));
+}
+if (!legacyGenerator.includes(legacyBinding)) throw new Error('Unsupported historical generator fixture');
+if (digest(legacyGenerator) !== JSON.parse(initial['workflow-policy-contract.json']).scriptVersions.generator.sha256) {
+  throw new Error('Historical generator fixture does not match its reviewed contract identity');
+}
+initial['Generate-StyleGuideArtifacts.ps1'] = legacyGenerator;
+for (const name of ['workflow-common-reference.json', 'workflow-common-validator.reference.txt']) {
+  initial[name] = fs.readFileSync(path.join(source, prefix, name), 'utf8').replaceAll('\r\n', '\n');
+}
+
 const reference = JSON.parse(initial[referenceNames[0]]);
 const original = git(['rev-parse', 'HEAD']);
 const trees = new Map([[original, new Map(git(['ls-tree', '-rz', original]).split('\0').filter(Boolean).map(entry => {
@@ -7757,6 +7875,57 @@ for (const name of referenceNames) {
 }
 const maximumReference = commit(base, { [referenceNames[0]]: initial[referenceNames[0]] + ' '.repeat(524288 - Buffer.byteLength(initial[referenceNames[0]])) });
 build('524288-byte trusted JSON reference accepted', () => {}, '', maximumReference);
+const commonReference = JSON.parse(initial['workflow-common-reference.json']);
+const helperDigest = JSON.parse(fs.readFileSync(path.join(source, prefix, 'workflow-policy-contract.json'), 'utf8'))
+  .workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.verify_identity.steps[0].runSha256;
+const commonHelper = fs.readFileSync(path.join(source, prefix, 'pull-request-body-identity.yml'), 'utf8').replaceAll('\r\n', '\n');
+const maintenanceState = prepare();
+maintenanceState.texts['Generate-StyleGuideArtifacts.ps1'] = legacyGenerator;
+maintenanceState.texts['pull-request-body-identity.yml'] = commonHelper;
+maintenanceState.contract.workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.verify_identity.steps[0].runSha256 = helperDigest;
+maintenanceState.validator = maintenanceState.validator.replace(/^const VALIDATOR_VERSION = '[0-9.]+';$/m, "const VALIDATOR_VERSION = '1.5.6';");
+const commonMaintenance = commit(base, derive(maintenanceState));
+let commonGenerator = replaceOnce(legacyGenerator, 'Version: 1.0.20260916.0\n#>', 'Version: 1.0.20260919.0\n#>');
+commonGenerator = replaceOnce(commonGenerator, legacyBinding, commonBinding);
+commonGenerator = replaceOnce(commonGenerator, '$arrGitCommands = @(Get-Command -Name git', '$arrGitCommands = @(Microsoft.PowerShell.Core\\Get-Command -Name git');
+const legacyTracked = /^function Assert-TrackedFile \{[\s\S]*?^\}/m.exec(commonGenerator);
+if (!legacyTracked) throw new Error('Common fixture lacks legacy tracked-file function');
+commonGenerator = replaceOnce(commonGenerator, legacyTracked[0], replaceOnce(legacyTracked[0], '# Version: 1.0.20260813.0', '# Version: 1.0.20260919.0'));
+const prepareCommon = (trusted = commonMaintenance) => {
+  const version = /^const VALIDATOR_VERSION = '(\d+)\.(\d+)\.(\d+)';$/m.exec(read(trusted, names[3]));
+  const contract = JSON.parse(commonReference.contractText);
+  contract.workflowPolicy.workflows['pull-request-body-identity.yml'].jobs.verify_identity.steps[0].runSha256 = helperDigest;
+  return { contract, catalog: JSON.parse(commonReference.caseCatalogText), texts: {
+    'build.yml': commonReference.workflowText['build.yml'].replace('{{VERIFY_TIMEOUT_MINUTES}}', '30'),
+    'markdownlint.yml': commonReference.workflowText['markdownlint.yml'].replace('{{POLICY_TIMEOUT_MINUTES}}', '30').replace('{{LINT_TIMEOUT_MINUTES}}', '30'),
+    'pull-request-body-identity.yml': commonHelper, 'Generate-StyleGuideArtifacts.ps1': commonGenerator,
+  }, validator: initial['workflow-common-validator.reference.txt'].replace(/^const VALIDATOR_VERSION = '[0-9.]+';$/m,
+    "const VALIDATOR_VERSION = '" + version[1] + '.' + version[2] + '.' + (Number(version[3]) + 1) + "';") };
+};
+const commonBuild = (name, mutate = () => {}, expected = '', trusted = commonMaintenance) => {
+  const state = prepareCommon(trusted); mutate(state);
+  const head = commit(trusted, derive(state)); record(name, trusted, head, expected); return head;
+};
+const commonFirst = commonBuild('common exact initial transition');
+commonBuild('common later negative fixture', state => append(state), '', commonFirst);
+commonBuild('common maximum512 fixtures', state => append(state, 512 - state.catalog.cases.length), '', commonFirst);
+commonBuild('common maximum513 rejected', state => append(state, 513 - state.catalog.cases.length), 'invalid schema or count', commonFirst);
+const legacyAppendState = structuredClone(maintenanceState);
+append(legacyAppendState);
+legacyAppendState.validator = legacyAppendState.validator.replace("const VALIDATOR_VERSION = '1.5.6';", "const VALIDATOR_VERSION = '1.5.7';");
+const legacyAppended = commit(commonMaintenance, derive(legacyAppendState));
+record('legacy service remains available', commonMaintenance, legacyAppended);
+commonBuild('common transition preserves accepted legacy cases', () => {}, 'accepted cases must not be lost', legacyAppended);
+commonBuild('common lookup cannot downgrade', state => {
+  state.texts['Generate-StyleGuideArtifacts.ps1'] = commonGenerator.replace('Microsoft.PowerShell.Core\\Get-Command', 'Get-Command');
+}, 'immutable', commonFirst);
+commonBuild('common catalog cannot downgrade', state => { state.catalog = JSON.parse(reference.caseCatalogText); }, 'removes cases', commonFirst);
+commonBuild('common future positive rejected', state => { append(state); state.catalog.cases.at(-1).expected = true; }, 'sequential negative', commonFirst);
+commonBuild('common reference cannot self-authorize', state => { state.texts['workflow-common-reference.json'] = '{}\n'; }, 'Unsupported ordinary content shape', commonFirst);
+commonBuild('common candidate remains inert', state => {
+  state.validator += "\n(await import('node:fs')).writeFileSync(" + JSON.stringify(path.join(repo, 'P1-SENTINEL')) + ", 'EXECUTED');\n";
+}, 'not bounded inert line comments', commonFirst);
+
 const marksPath = path.join(repo, '.git', 'p1-fixture.marks');
 git(['fast-import', '--quiet', `--export-marks=${marksPath}`], chunks.join(''));
 const marks = new Map(fs.readFileSync(marksPath, 'utf8').trim().split('\n').map(line => line.split(' ')));
@@ -7794,8 +7963,8 @@ process.stdout.write(JSON.stringify(rows.map(row => ({ ...row, base: resolve(row
                 ConvertFrom-StrictUtf8Text -Bytes $objIsolationFixtures.Bytes `
                     -Name 'The inert P1 fixture identities'
             ))
-        if ($arrIsolationFixtures.Count -ne 78) {
-            throw 'The P1 fixture inventory must contain exactly 78 cases.'
+        if ($arrIsolationFixtures.Count -ne 89) {
+            throw 'The P1 fixture inventory must contain exactly 89 cases.'
         }
         $strIsolationSentinel = Join-Path $strSchemaFixtureRoot 'P1-SENTINEL'
         if ([IO.File]::Exists($strIsolationSentinel)) {

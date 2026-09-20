@@ -80,6 +80,71 @@
       "id": "source-wrong-blob",
       "mutation": "source-wrong-blob",
       "expected": "source-identity"
+    },
+    {
+      "id": "source-common-capture-valid",
+      "mutation": "common-capture-valid",
+      "expected": "current"
+    },
+    {
+      "id": "source-common-capture-wrong-version",
+      "mutation": "common-capture-wrong-version",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-common-capture-duplicate",
+      "mutation": "common-capture-duplicate",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-common-capture-block-comment",
+      "mutation": "common-capture-block-comment",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-common-capture-here-string",
+      "mutation": "common-capture-here-string",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-common-capture-disconnected-alias",
+      "mutation": "common-capture-disconnected-alias",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-common-capture-unconditional",
+      "mutation": "common-capture-unconditional",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-common-capture-missing-string-guard",
+      "mutation": "common-capture-missing-string-guard",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-common-capture-missing-expected-version",
+      "mutation": "common-capture-missing-expected-version",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-common-capture-duplicate-expected-version",
+      "mutation": "common-capture-duplicate-expected-version",
+      "expected": "validator-generator-version"
+    },
+    {
+      "id": "source-common-capture-wrong-expected-version",
+      "mutation": "common-capture-wrong-expected-version",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-common-capture-reassigned-alias",
+      "mutation": "common-capture-reassigned-alias",
+      "expected": "build-generator-version"
+    },
+    {
+      "id": "source-common-capture-nested-block",
+      "mutation": "common-capture-nested-block",
+      "expected": "build-generator-version"
     }
   ],
   "bodyCases": [
