@@ -74,6 +74,66 @@ test('NPM-DIAGNOSTIC: production summary preserves category and outcome without 
   assert.doesNotMatch(diagnostic, /UNIQUE_SECRET_WARNING|deprecated/);
 });
 
+test('FILESYSTEM-DIAGNOSTIC-PRIVACY: errno locations expose only fixed roles', () => {
+  const from = source.indexOf('function formatErrorLocation(');
+  const to = source.indexOf('\n}\n', from) + 2;
+  assert.ok(from >= 0 && to > from);
+  const formatLocation = new Function(
+    `${source.slice(from, to)}; return formatErrorLocation;`)();
+  const strSecretPath = '/tmp/TASK130_F33_BEARER_SECRET/package.json';
+  const strDiagnostic = formatLocation({ code: 'ENOENT', path: strSecretPath });
+  assert.equal(strDiagnostic,
+    '  error              ENOENT (filesystem location withheld)\n');
+  assert.doesNotMatch(strDiagnostic, /TASK130_F33|BEARER_SECRET|package\.json/);
+
+  const sweepStart = source.indexOf('if (objSweepDifference) {',
+    source.indexOf('const objSweepDifference = '));
+  const sweepEnd = source.indexOf('\n}\n', sweepStart) + 2;
+  assert.ok(sweepStart >= 0 && sweepEnd > sweepStart);
+  let strSweepDiagnostic = '';
+  assert.throws(() => new Function('objSweepDifference', 'process', 'formatSweepReading',
+    'objBaselineChange', 'objNewestChange', 'intRecordingStartedAt',
+    source.slice(sweepStart, sweepEnd))({
+    kind: 'changed during the run', label: '/tmp/TASK130_F33_SWEEP_SECRET', was: 1, now: 2,
+  }, {
+    stderr: { write(value) { strSweepDiagnostic += value; } },
+    exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+  }, String, { entries: new Map([['private', 1]]) },
+  { entries: new Map([['private', 2]]) }, 0), { refusal: 10 });
+  assert.match(strSweepDiagnostic, /watched filesystem path\/name withheld/);
+  assert.doesNotMatch(strSweepDiagnostic, /TASK130_F33|SWEEP_SECRET/);
+
+  const foldStart = source.indexOf('function formatInstalledTreeFoldDrift(');
+  const foldRefusalStart = source.indexOf('if (arrFoldDrift.length > 0) {', foldStart);
+  const foldEnd = source.indexOf('\n}\n', foldRefusalStart) + 2;
+  assert.ok(foldStart >= 0 && foldRefusalStart > foldStart && foldEnd > foldRefusalStart);
+  const objFirstFold = {
+    sha256: 'a'.repeat(64), files: 1, symlinks: 0, directories: 1,
+    escapingLinks: [], unresolvedLinks: [],
+  };
+  const objSecondFold = {
+    sha256: 'b'.repeat(64), files: 1, symlinks: 2, directories: 1,
+    escapingLinks: [{ path: 'TASK130_F33_SECOND_FOLD_BEARER_SECRET' }],
+    unresolvedLinks: [{ path: 'TASK130_F33_UNRESOLVED_SECRET', code: 'ENOENT' }],
+  };
+  // The actual refusal block is mode-independent. Execute it in both caller
+  // mode fixtures so a future diagnostic-mode guard cannot waive privacy.
+  for (const boolAnyToolchain of [false, true]) {
+    let strFoldDiagnostic = '';
+    assert.throws(() => new Function('objTree', 'objTreeAfter', 'process',
+      'boolAnyToolchain', source.slice(foldStart, foldEnd))(
+      objFirstFold, objSecondFold, {
+        stderr: { write(value) { strFoldDiagnostic += value; } },
+        exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+      }, boolAnyToolchain), { refusal: 10 });
+    assert.match(strFoldDiagnostic,
+      /content digest, symbolic-link count, escaping-link set, unresolved-link set/);
+    assert.doesNotMatch(strFoldDiagnostic,
+      /TASK130_F33|SECOND_FOLD_BEARER_SECRET|UNRESOLVED_SECRET|"path"/);
+    assert.match(strFoldDiagnostic, /changed field values withheld/);
+  }
+});
+
 test('AUDIT-STATUS: native success and advisory status are distinct from process failures', () => {
   assert.equal(auditFunction(() => report)(['audit']), report);
   assert.equal(auditFunction(() => { throw { status: 1, signal: null, stdout: report }; })(['audit']), report);
@@ -341,6 +401,83 @@ test('UTF8-INPUT: byte-lossy JSON sources refuse before parsing', () => {
   assert.doesNotMatch(diagnostic, /�|80/u);
 });
 
+test('NPM-STDOUT-UTF8: production npm adapter exact-decodes semantic stdout by phase', () => {
+  const summaryFrom = source.indexOf('const NPM_DIAGNOSTIC_CATEGORIES');
+  const summaryFunction = source.indexOf('function writeNpmDiagnosticSummary(', summaryFrom);
+  const summaryTo = source.indexOf('\n}\n', summaryFunction) + 2;
+  const decodeFrom = source.indexOf('function decodeUtf8ExactlyOrRefuse(');
+  const decodeTo = source.indexOf('\n}\n', decodeFrom) + 2;
+  const runFrom = source.indexOf('function runNpm(');
+  const runTo = source.indexOf('\nfunction runNpmOrRefuse(', runFrom);
+  assert.ok(summaryFrom >= 0 && summaryTo > summaryFunction
+    && decodeFrom >= 0 && decodeTo > decodeFrom && runFrom >= 0 && runTo > runFrom);
+  let objScenario;
+  let strDiagnostic = '';
+  const arrResults = [];
+  const objProcess = {
+    execPath: '/reviewed/node',
+    stderr: { write(value) { strDiagnostic += value; } },
+    exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+  };
+  const runNpm = new Function('lstatSync', 'strNpmCli', 'intNpmCliInode', 'process',
+    'spawnSync', 'npmChildEnv', 'join', 'strExternalCacheDirectory',
+    'strWorkflowDirectory', 'decodeUtf8ExactlyOrRefuse', 'objNpmProcessResults',
+    'Buffer', 'formatUntrustedText', 'REVIEWED_NPM',
+    `${source.slice(summaryFrom, summaryTo)}\n${source.slice(runFrom, runTo)}\n; return runNpm;`)(
+    () => ({ ino: 41n }), '/reviewed/npm-cli.js', 41n, objProcess,
+    () => objScenario, (value) => value ?? {}, join, '/private-cache', '/workflow',
+    new Function('Buffer', 'process',
+      `${source.slice(decodeFrom, decodeTo)}; return decodeUtf8ExactlyOrRefuse;`)(Buffer, objProcess),
+    arrResults, Buffer, String, '11.16.0');
+
+  objScenario = { stdout: Buffer.from('{"label":"�"}', 'utf8'),
+    stderr: Buffer.alloc(0), status: 0, signal: null };
+  assert.equal(runNpm(['config'], {}, 6), '{"label":"�"}');
+  objScenario = { stdout: Buffer.alloc(0), stderr: Buffer.alloc(0), status: 0, signal: null };
+  assert.equal(runNpm(['config'], {}, 6), '');
+
+  strDiagnostic = '';
+  objScenario = { stdout: Buffer.from('{"registry":"reviewed"}'),
+    stderr: Buffer.from([0x80]), status: 0, signal: null };
+  assert.equal(runNpm(['config', 'get', 'registry'], {}, 9), '{"registry":"reviewed"}');
+  assert.match(strDiagnostic, /stderr length\s+1 characters/);
+  assert.match(strDiagnostic, /categories\s+other-output/);
+  assert.doesNotMatch(strDiagnostic, /80/);
+
+  for (const [arrArguments, intPhase, intInvalidByte] of [
+    [['--version'], 2, 0x80], [['config', 'list', '--json'], 6, 0x81],
+    [['config', 'get', 'registry'], 9, 0x80], [['ls'], 7, 0x81], [['audit'], 5, 0x80],
+  ]) {
+    strDiagnostic = '';
+    objScenario = { stdout: Buffer.from(
+      [0x7b, 0x22, 0x78, 0x22, 0x3a, 0x22, intInvalidByte, 0x22, 0x7d]),
+    stderr: Buffer.alloc(0), status: 0, signal: null };
+    assert.throws(() => runNpm(arrArguments, {}, intPhase), { refusal: intPhase });
+    assert.match(strDiagnostic, new RegExp(`npm ${arrArguments[0]} stdout is not valid UTF-8`));
+    assert.doesNotMatch(strDiagnostic, /�|80|81/u);
+  }
+
+  strDiagnostic = '';
+  objScenario = { stdout: Buffer.from(report), stderr: Buffer.alloc(0), status: 1, signal: null };
+  assert.equal(auditFunction(runNpm)(['audit']), report);
+
+  strDiagnostic = '';
+  const strPrivateStderr = 'npm warn TASK130_F34_PRIVATE_PARTIAL_STDERR\n';
+  objScenario = { stdout: null, stderr: Buffer.from(strPrivateStderr), status: null, signal: null,
+    error: { syscall: 'spawnSync fixture', code: 'ENOBUFS', message: 'fixture' } };
+  assert.throws(() => runNpm(['config'], {}, 6), { refusal: 2 });
+  assert.match(strDiagnostic, /categories\s+warning/);
+  assert.match(strDiagnostic,
+    new RegExp(`stderr length\\s+${strPrivateStderr.length} characters`));
+  assert.match(strDiagnostic, /npm could not be run: ENOBUFS/);
+  assert.doesNotMatch(strDiagnostic, /TASK130_F34|PRIVATE_PARTIAL_STDERR/);
+
+  strDiagnostic = '';
+  objScenario = { stdout: null, stderr: null, status: 0, signal: null };
+  assert.throws(() => runNpm(['audit'], {}, 5), { refusal: 5 });
+  assert.match(strDiagnostic, /returned no stdout byte stream/);
+});
+
 test('AUDIT-PUBLIC-SUMMARY: response names affect the normalized digest but never display', () => {
   const severityFrom = source.indexOf('const SEVERITY_LEVELS');
   const severityTo = source.indexOf('\n// A Git blob identity', severityFrom);
@@ -384,6 +521,40 @@ return {normalizeAudit, canonicalize, auditPackageDisplaySummary, renderAuditPac
     },
   };
   const objNormalized = functions.normalizeAudit(objAudit);
+  const objNullUrl = structuredClone(objAudit);
+  objNullUrl.vulnerabilities.TASK130_F16_DIRECT_SECRET.via[0].url = null;
+  assert.deepEqual(functions.normalizeAudit(objNullUrl), objNormalized);
+  const objGhsaUrl = structuredClone(objAudit);
+  objGhsaUrl.vulnerabilities.TASK130_F16_DIRECT_SECRET.via[0].url =
+    'https://github.com/advisories/GHSA-aaaa-bbbb-cccc';
+  assert.match(JSON.stringify(functions.normalizeAudit(objGhsaUrl)),
+    /"id":"GHSA-aaaa-bbbb-cccc"/u);
+  for (const value of [7, false, [], { TASK130_F36_PRIVATE_URL_FIELD: true }]) {
+    const objInvalidUrl = structuredClone(objAudit);
+    objInvalidUrl.vulnerabilities.TASK130_F16_DIRECT_SECRET.via[0].url = value;
+    assert.throws(() => functions.normalizeAudit(objInvalidUrl), /url of type/);
+  }
+  const refusalFrom = source.indexOf('const JSON_RESPONSE_REFUSALS');
+  const refusalFunction = source.indexOf('function refuseJsonResponse(', refusalFrom);
+  const refusalTo = source.indexOf('\n}\n', refusalFunction) + 2;
+  const normalizeAdapterFrom = source.indexOf('function normalizeAuditOrRefuse(');
+  const normalizeAdapterTo = source.indexOf('\n}\n', normalizeAdapterFrom) + 2;
+  assert.ok(refusalFrom >= 0 && refusalTo > refusalFunction
+    && normalizeAdapterFrom >= 0 && normalizeAdapterTo > normalizeAdapterFrom);
+  let strUrlDiagnostic = '';
+  const normalizeOrRefuse = new Function('process', 'Buffer', 'normalizeAudit',
+    `${source.slice(refusalFrom, refusalTo)}\n${source.slice(normalizeAdapterFrom, normalizeAdapterTo)};`
+      + ' return normalizeAuditOrRefuse;')({
+    stderr: { write(value) { strUrlDiagnostic += value; } },
+    exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+  }, Buffer, functions.normalizeAudit);
+  const objPrivateUrl = structuredClone(objAudit);
+  objPrivateUrl.vulnerabilities.TASK130_F16_DIRECT_SECRET.via[0].url =
+    { TASK130_F36_PRIVATE_URL_FIELD: 'BEARER_SECRET' };
+  const strPrivateUrlBody = JSON.stringify(objPrivateUrl);
+  assert.throws(() => normalizeOrRefuse(strPrivateUrlBody, objPrivateUrl), { refusal: 5 });
+  assert.match(strUrlDiagnostic, /category\s+response normalization failed/);
+  assert.doesNotMatch(strUrlDiagnostic, /TASK130_F36|BEARER_SECRET|PRIVATE_URL_FIELD/);
   const objSummary = functions.auditPackageDisplaySummary(objNormalized.packages);
   const strJsonPublic = JSON.stringify(objSummary);
   const strTextPublic = functions.renderAuditPackageSummary(objSummary);
@@ -826,12 +997,14 @@ ${source.slice(from, foldTo)}; return foldNpmInstallation;`)(
         { status: 'contained' });
       assert.equal(foldNpm(realpathSync(root)).symlinks, 2);
 
-      const nestedDirectory = join(root, 'nested-directory');
+      const nestedDirectory = join(root, 'TASK130_F33_PRIVATE_NPM_DIRECTORY');
       mkdirSync(nestedDirectory);
       chmodSync(nestedDirectory, 0o755);
       assert.equal(foldNpm(realpathSync(root)).symlinks, 2);
       chmodSync(nestedDirectory, 0o775);
+      diagnostic.length = 0;
       assert.throws(() => foldNpm(realpathSync(root)), { refusal: 2 });
+      assert.doesNotMatch(diagnostic.join(''), /TASK130_F33|PRIVATE_NPM_DIRECTORY/);
       chmodSync(nestedDirectory, 0o755);
 
       chmodSync(root, 0o775);
@@ -857,21 +1030,28 @@ ${source.slice(from, foldTo)}; return foldNpmInstallation;`)(
       symlinkSync(join(outside, 'target'), join(root, 'direct-escape'));
       assert.deepEqual(classify(root, join(root, 'direct-escape'), 'direct-escape'),
         { status: 'escaping' });
+      diagnostic.length = 0;
       assert.throws(() => foldNpm(realpathSync(root)), { refusal: 2 });
       assert.doesNotMatch(diagnostic.join(''), new RegExp(outside.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
+      assert.doesNotMatch(diagnostic.join(''), /direct-escape/);
       rmSync(join(root, 'direct-escape'));
 
       symlinkSync(join(root, 'target'), join(outside, 'return-hop'));
       symlinkSync(join(outside, 'return-hop'), join(root, 'escape-return'));
       assert.deepEqual(classify(root, join(root, 'escape-return'), 'escape-return'),
         { status: 'escaping' });
+      diagnostic.length = 0;
       assert.throws(() => foldNpm(realpathSync(root)), { refusal: 2 });
+      assert.doesNotMatch(diagnostic.join(''), /escape-return/);
       rmSync(join(root, 'escape-return'));
 
       symlinkSync('missing', join(root, 'dangling'));
       assert.deepEqual(classify(root, join(root, 'dangling'), 'dangling'),
         { status: 'unresolved', code: 'ENOENT' });
+      diagnostic.length = 0;
       assert.throws(() => foldNpm(realpathSync(root)), { refusal: 2 });
+      assert.match(diagnostic.join(''), /resolution\s+could not be established \(ENOENT\)/);
+      assert.doesNotMatch(diagnostic.join(''), /dangling/);
       rmSync(join(root, 'dangling'));
 
       symlinkSync('loop-b', join(root, 'loop-a'));
@@ -977,6 +1157,30 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       assert.equal(existsSync(join(checkout, 'forbidden-cache')), false);
       assert.equal(existsSync(join(checkout, 'forbidden-logs')), false);
 
+      const strNpmrcCheckout = join(temporary, 'TASK130_F33_PRIVATE_NPMRC_CHECKOUT');
+      cpSync(checkout, strNpmrcCheckout, { recursive: true, verbatimSymlinks: true });
+      const strNpmrcFixture = join(strNpmrcCheckout, '.github', 'workflows');
+      const strPrivateNpmrc = join(strNpmrcFixture, '.npmrc');
+      mkdirSync(strPrivateNpmrc);
+      const objNpmrcRefusal = invokeFrom(strNpmrcFixture, ['--no-audit']);
+      refuse(objNpmrcRefusal, 13);
+      assert.match(objNpmrcRefusal.stderr, /project npm configuration that is not a regular file/);
+      assert.doesNotMatch(objNpmrcRefusal.stderr,
+        /TASK130_F33|PRIVATE_NPMRC_CHECKOUT|p1-recorder-tests/);
+
+      const strMissingToolchain = join(temporary, 'TASK130_F33_BEARER_SECRET', 'bin');
+      mkdirSync(strMissingToolchain, { recursive: true });
+      const strMissingNode = join(strMissingToolchain, 'node');
+      cpSync(process.execPath, strMissingNode);
+      chmodSync(strMissingNode, 0o755);
+      const objMissingNpm = spawnSync(strMissingNode, [
+        join(fixture, 'Get-SupplyFreezeDigest.mjs'), '--json', '--any-toolchain', '--no-audit',
+        `--cache-directory=${mkdtempSync(join(temporary, 'missing-npm-cache-'))}`,
+      ], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, env: process.env });
+      refuse(objMissingNpm, 2);
+      assert.match(objMissingNpm.stderr, /npm that is not bound to this Node installation/);
+      assert.doesNotMatch(objMissingNpm.stderr, /TASK130_F33|BEARER_SECRET/);
+
       const strVersionToolchain = join(temporary, 'version-toolchain');
       const strVersionBin = join(strVersionToolchain, 'bin');
       const strVersionNpmRoot = join(strVersionToolchain, 'lib', 'node_modules', 'npm');
@@ -995,41 +1199,63 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       assert.ok(intShebangEnd > 1);
       writeFileSync(strVersionNpmCli, Buffer.concat([
         bufVersionNpmCli.subarray(0, intShebangEnd),
-        Buffer.from(`if (process.argv.includes('--version') && process.env.TASK130_F26_CHILD_MARKER) { require('node:fs').writeFileSync(process.env.TASK130_F26_CHILD_MARKER, 'started'); process.exit(73); }\nif (process.argv.includes('--version')) { console.log(${JSON.stringify(strFakeVersion)}); process.exit(0); }\n`),
+        Buffer.from(`if (process.argv.includes('--version') && process.env.TASK130_F26_CHILD_MARKER) { require('node:fs').writeFileSync(process.env.TASK130_F26_CHILD_MARKER, 'started'); process.exit(73); }\nif (process.argv.includes('--version')) { console.log(${JSON.stringify(strFakeVersion)}); process.exit(0); }\nif (process.argv.includes('ls') && process.env.TASK130_F34_INVALID_LS) { process.stdout.write(Buffer.from([0x80])); process.exit(0); }\n`),
         bufVersionNpmCli.subarray(intShebangEnd),
       ]));
       symlinkSync('../lib/node_modules/npm/bin/npm-cli.js', join(strVersionBin, 'npm'));
-      const invokeVersionToolchain = (boolJson) => {
+      const invokeVersionToolchain = (objEnvironment = process.env, boolNoAudit = true) => {
         const arrArguments = [join(fixture, 'Get-SupplyFreezeDigest.mjs'), '--any-toolchain',
-          '--no-audit', `--cache-directory=${mkdtempSync(join(temporary, 'version-cache-'))}`];
-        if (boolJson) arrArguments.push('--json');
+          '--json', `--cache-directory=${mkdtempSync(join(temporary, 'version-cache-'))}`];
+        if (boolNoAudit) arrArguments.push('--no-audit');
         return spawnSync(join(strVersionBin, 'node'), arrArguments, {
-          encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, env: process.env,
+          encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, env: objEnvironment,
         });
       };
-      const objVersionJson = invokeVersionToolchain(true);
-      assert.equal(objVersionJson.status, 0, objVersionJson.stderr);
-      const strPublicVersion =
-        '11.16.0 (prerelease and build metadata withheld)';
-      assert.equal(JSON.parse(objVersionJson.stdout).currentObservation.toolchain.npm,
-        strPublicVersion);
-      assert.doesNotMatch(objVersionJson.stdout, /TASK130-F28|PRIVATE-PRERELEASE|PRIVATE-BUILD/);
-      const objVersionText = invokeVersionToolchain(false);
-      assert.equal(objVersionText.status, 0, objVersionText.stderr);
-      assert.match(objVersionText.stdout,
-        /npm\s+11\.16\.0 \(prerelease and build metadata withheld\)/);
-      assert.doesNotMatch(objVersionText.stdout, /TASK130-F28|PRIVATE-PRERELEASE|PRIVATE-BUILD/);
+      const strF35ChildMarker = join(temporary, 'TASK130_F35_CHILD_STARTED');
+      const objVersionRefusal = invokeVersionToolchain(
+        { ...process.env, TASK130_F26_CHILD_MARKER: strF35ChildMarker });
+      refuse(objVersionRefusal, 2);
+      assert.equal(existsSync(strF35ChildMarker), false);
+      assert.match(objVersionRefusal.stderr, /npm installation that is not the reviewed one/);
+      assert.doesNotMatch(`${objVersionRefusal.stdout}\n${objVersionRefusal.stderr}`,
+        /TASK130-F28|PRIVATE-PRERELEASE|PRIVATE-BUILD/);
+      const objObservedNpm = objVersionRefusal.stderr.match(
+        /observed\s+([0-9a-f]{64}) \(([0-9]+) files, 0 symlinks\)/u);
+      assert.ok(objObservedNpm, objVersionRefusal.stderr);
+      const strF35AuditMarker = join(temporary, 'TASK130_F35_AUDIT_CHILD_STARTED');
+      const objAuditEnabledRefusal = invokeVersionToolchain(
+        { ...process.env, TASK130_F26_CHILD_MARKER: strF35AuditMarker }, false);
+      refuse(objAuditEnabledRefusal, 2);
+      assert.equal(existsSync(strF35AuditMarker), false);
+      assert.match(objAuditEnabledRefusal.stderr, /npm installation that is not the reviewed one/);
 
       const strFifoCheckout = join(temporary, 'fifo-checkout');
       cpSync(checkout, strFifoCheckout, { recursive: true, verbatimSymlinks: true });
       const strFifoFixture = join(strFifoCheckout, '.github', 'workflows');
+      const strFifoRecorder = join(strFifoFixture, 'Get-SupplyFreezeDigest.mjs');
+      const strControlledRecorder = join(strFifoFixture,
+        'Get-SupplyFreezeDigest.f26-ordering.mjs');
+      const strFifoSource = readFileSync(strFifoRecorder, 'utf8')
+        .replace(/const REVIEWED_NPM_TREE_SHA256 = '[0-9a-f]{64}';/u,
+          `const REVIEWED_NPM_TREE_SHA256 = '${objObservedNpm[1]}';`)
+        .replace(/const REVIEWED_NPM_TREE_FILES = [0-9]+;/u,
+          `const REVIEWED_NPM_TREE_FILES = ${objObservedNpm[2]};`);
+      writeFileSync(strControlledRecorder, strFifoSource);
+      const objInvalidLs = spawnSync(join(strVersionBin, 'node'), [
+        strControlledRecorder, '--json', '--any-toolchain', '--no-audit',
+        `--cache-directory=${mkdtempSync(join(temporary, 'invalid-ls-cache-'))}`,
+      ], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
+        env: { ...process.env, TASK130_F34_INVALID_LS: '1' } });
+      refuse(objInvalidLs, 7);
+      assert.match(objInvalidLs.stderr, /npm ls stdout is not valid UTF-8/);
+      assert.doesNotMatch(objInvalidLs.stderr, /�|80/u);
       const strProjectFifo = join(strFifoFixture, 'node_modules', 'yaml', 'package.json');
       rmSync(strProjectFifo);
       const objMkfifo = spawnSync('mkfifo', [strProjectFifo], { encoding: 'utf8' });
       assert.equal(objMkfifo.status, 0, objMkfifo.stderr);
       const strNpmChildMarker = join(temporary, 'TASK130_F26_CHILD_STARTED');
       const objBeforeChild = spawnSync(join(strVersionBin, 'node'), [
-        join(strFifoFixture, 'Get-SupplyFreezeDigest.mjs'), '--json', '--any-toolchain',
+        strControlledRecorder, '--json', '--any-toolchain',
         '--no-audit', `--cache-directory=${mkdtempSync(join(temporary, 'fifo-cache-'))}`,
       ], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
         env: { ...process.env, TASK130_F26_CHILD_MARKER: strNpmChildMarker } });

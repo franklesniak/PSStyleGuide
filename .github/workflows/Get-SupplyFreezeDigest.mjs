@@ -810,21 +810,13 @@ function nonOwnerWriteReason(objStats) {
 //   ->  error              ENOENT at /tmp/gone43
 //       supply-freeze: all inputs quiescent, 0 problems     <-- column 0
 //
-// String() before escaping because objError.path is not guaranteed to be a
-// string; a Buffer path would otherwise reach String.prototype.replace as an
-// object.
-// Round 63, reported by Codex. This escaped control characters and stopped
-// there, so it was the one untrusted-text path that bypassed the redaction
-// funnel every other diagnostic in this file goes through. The path here is
-// attacker-chosen in exactly the cases this function exists for: a tree entry
-// that vanishes mid-scan is reported through here, and an entry may legally be
-// named `https:/user:SECRET@host/path?token=X`. formatUntrustedText falls back
-// to formatTreeName when it finds no url, so this is a strict widening -- the
-// same escaping as before on ordinary paths, plus redaction on the ones that
-// carry a credential.
-function formatErrorLocation(objError, strFallback) {
+// F33, reported by Codex on 39d82ac. Escaping or selectively redacting the
+// location still retained attacker-controlled path text. The fixed semantic
+// category and OS error code preserve the useful diagnosis without publishing
+// a checkout path, package name, symlink target or path-borne credential.
+function formatErrorLocation(objError) {
   return `  error              ${objError?.code ?? 'unknown'}`
-    + ` at ${formatUntrustedText(String(objError?.path ?? strFallback))}\n`;
+    + ' (filesystem location withheld)\n';
 }
 
 // Round 45, reported by Codex, and a defect in the escaper round 44 made
@@ -976,7 +968,7 @@ function readViaVerifiedDescriptor(strPath, intMissingExit, fnOnMissing,
       process.stderr.write(
         `supply-freeze: refusing to record digests for a ${objRefusal.what} that is `
         + 'not a regular file.\n'
-        + `  ${strPath.split('/').pop().padEnd(18)} is a symlink\n`
+        + `  input role         ${objRefusal.what}; path/name withheld; is a symlink\n`
         + '  refused by the kernel at open (O_NOFOLLOW), so no window exists between\n'
         + '  checking the type and reading the bytes. Only a regular file returns the\n'
         + '  same bytes to this process and to npm.\n');
@@ -1021,7 +1013,7 @@ function readViaVerifiedDescriptor(strPath, intMissingExit, fnOnMissing,
     process.stderr.write(
       `supply-freeze: refusing to record digests for a ${objRefusal.what} that is `
       + 'not a regular file.\n'
-      + `  ${strPath.split('/').pop().padEnd(18)} is ${strKind}\n`
+      + `  input role         ${objRefusal.what}; path/name withheld; is ${strKind}\n`
       + '  checked on the open descriptor, not by name: a name can be swapped between\n'
       + '  the check and the read, and only a regular file returns the same bytes to\n'
       + '  this process and to npm.\n');
@@ -1050,7 +1042,7 @@ function readViaVerifiedDescriptor(strPath, intMissingExit, fnOnMissing,
       process.stderr.write(
         `supply-freeze: refusing to record digests for a ${objRefusal.what} that `
         + 'the recording user does not solely control.\n'
-        + `  ${strPath.split('/').pop().padEnd(18)} ${strWhy}\n`
+        + `  input role         ${objRefusal.what}; path/name withheld; ${strWhy}\n`
         + '  checked on the open descriptor whose bytes are returned. The compared\n'
         + '  hashes must come from bytes only this run can hold stable; an alternate\n'
         + '  path, owner, or non-owner write grant lets npm read other bytes between\n'
@@ -1100,8 +1092,8 @@ function npmInstallationRootOrRefuse() {
   } catch (objError) {
     process.stderr.write(
       'supply-freeze: refusing to run an npm whose installation cannot be located.\n' +
-      `  node               ${formatUntrustedText(process.execPath)}\n` +
-      `  expected npm at    ${formatUntrustedText(strRoot)}\n` +
+      '  node runtime       filesystem location withheld\n' +
+      '  expected npm       adjacent installation location withheld\n' +
       formatErrorLocation(objError, strRoot) +
       '  a Node distribution keeps npm at lib/node_modules/npm and links bin/npm into\n' +
       '  it. Without that layout there is nothing to verify the executable against,\n' +
@@ -1114,14 +1106,14 @@ function npmInstallationRootOrRefuse() {
       // only on the reviewed Unix distribution layout. A Windows install writes
       // .cmd/.ps1 shims where this POSIX fold records symlinks and folds modes
       // Windows does not carry, so its tree is not comparable to the reviewed one
-      // whatever the flag. --any-toolchain relaxes which VERSIONS are acceptable,
-      // never this layout, so the honest answer to a non-Unix platform is to say
+      // whatever the flag. --any-toolchain relaxes listed runtime/version and
+      // comparison guards, never this layout or npm executable identity, so the honest answer is to say
       // so here rather than to half-discover npm and fold a tree that means nothing.
       (process.platform === 'win32'
         ? '  this is a non-Unix (Windows) layout: npm sits beside node.exe and bin\n' +
           '  entries are .cmd/.ps1 shims, not the symlinks this POSIX fold records, so\n' +
           '  the tree is not comparable to the reviewed one. --any-toolchain relaxes\n' +
-          '  which versions are acceptable, never this Unix-layout requirement.\n'
+          '  listed comparisons, never this Unix-layout or npm-identity requirement.\n'
         : ''));
     process.exit(2);
   }
@@ -1140,9 +1132,8 @@ function npmInstallationRootOrRefuse() {
   if (!isInsideOrEqual(strRealRoot, strDistribution)) {
     process.stderr.write(
       'supply-freeze: refusing an npm installation that resolves outside this Node distribution.\n' +
-      `  node               ${formatUntrustedText(process.execPath)}\n` +
-      `  distribution       ${formatUntrustedText(strDistribution)}\n` +
-      `  npm resolves to    ${formatUntrustedText(strRealRoot)}\n` +
+      '  node distribution  filesystem location withheld\n' +
+      '  npm installation   resolves outside that distribution\n' +
       '  the ancestors this script folds are the distribution\'s, so an installation\n' +
       '  reached through a link out of it is verified against the wrong directories --\n' +
       '  its real parents could be replaced without moving anything that is watched.\n');
@@ -1151,9 +1142,9 @@ function npmInstallationRootOrRefuse() {
   if (strRealNpm !== strRealRoot && !strRealNpm.startsWith(`${strRealRoot}/`)) {
     process.stderr.write(
       'supply-freeze: refusing to run an npm that is not part of this Node installation.\n' +
-      `  node               ${formatUntrustedText(process.execPath)}\n` +
-      `  npm resolves to    ${formatUntrustedText(strRealNpm)}\n` +
-      `  installation is    ${formatUntrustedText(strRealRoot)}\n` +
+      '  npm command line   filesystem location withheld\n' +
+      '  npm installation   filesystem location withheld\n' +
+      '  relation           command line resolves outside the installation\n' +
       '  the executable that would answer is outside the tree this script can verify,\n' +
       '  so folding that tree would vouch for bytes that are not the ones running.\n');
     process.exit(2);
@@ -1285,7 +1276,7 @@ function foldNpmInstallation(strRoot, strLauncherPath) {
     process.stderr.write(
       'supply-freeze: refusing an npm installation entry the recording user does not '
       + 'solely control.\n'
-      + `  entry              ${formatUntrustedText(strLabel)}\n`
+      + '  entry              npm installation path/name withheld\n'
       + `  observed           ${strWhy}\n`
       + `  metadata           nlink ${objStat.nlink}, uid ${objStat.uid}, mode `
       + `${Number(objStat.mode & 0o7777n).toString(8).padStart(4, '0')}, recorder uid `
@@ -1421,15 +1412,13 @@ function foldNpmInstallation(strRoot, strLauncherPath) {
           process.stderr.write(
             'supply-freeze: refusing to verify an npm installation with a name that '
             + 'is not valid UTF-8.\n'
-            + `  directory          ${formatUntrustedText(strDirectory)}\n`
+            + '  directory          npm installation location withheld\n'
             // Reported by Codex. The raw name is attacker-controlled and can carry
             // a username, path or token before the invalid byte; hex is trivially
             // reversible from a retained CI log, so it is withheld the same way the
-            // root-link target refusal below withholds its target -- a length and a
-            // digest prefix, which still tell two different bad names apart.
-            + `  entry              ${bufName.length} bytes, sha256 `
-            + `${createHash('sha256').update(bufName).digest('hex').slice(0, 16)} `
-            + '(not valid UTF-8)\n'
+            // root-link target refusal below withholds its target. Byte length says
+            // why decoding failed without publishing a stable name fingerprint.
+            + `  entry              ${bufName.length} bytes (name withheld; not valid UTF-8)\n`
             + '  the name cannot be folded distinctly from a sibling named U+FFFD, so\n'
             + '  two different installations could record the same npmTree digest.\n');
           process.exit(2);
@@ -1458,14 +1447,14 @@ function foldNpmInstallation(strRoot, strLauncherPath) {
           hashField(objHash, strKey);
           // The npm subprocess follows this link, so its full resolution must be
           // decided only by entries this installation fold covers. This applies
-          // under --any-toolchain too: that flag waives the reviewed digest, not
-          // the promise that the two folds surround the same executing bytes.
+          // under --any-toolchain too: that flag does not waive executable npm
+          // identity or the promise that the two folds surround the same bytes.
           const objContainment = classifyContainedSymlink(strRoot, strPath, strKey);
           if (objContainment.status !== 'contained') {
             process.stderr.write(
               'supply-freeze: refusing to verify an npm installation whose link is '
               + 'not contained in the folded installation.\n'
-              + `  entry              ${formatUntrustedText(strKey)}\n`
+              + '  entry              npm installation path/name withheld\n'
               + (objContainment.status === 'unresolved'
                 ? `  resolution         could not be established (${objContainment.code})\n`
                 : '  resolution         leaves the folded installation\n')
@@ -1645,7 +1634,7 @@ function writeNpmDiagnosticSummary(strOperation, objResult) {
     '  contents as sensitive; this public summary does not reproduce child output.\n');
 }
 
-function runNpm(arrNpmArguments, objEnv) {
+function runNpm(arrNpmArguments, objEnv, intResponseExit) {
   // Round 60. Re-checked before every invocation rather than only at the fold,
   // because the path is re-resolved by the operating system at exec time: an
   // ancestor renamed aside between the fold and this call would send the same
@@ -1658,7 +1647,7 @@ function runNpm(arrNpmArguments, objEnv) {
   if (intInodeNow !== intNpmCliInode) {
     process.stderr.write(
       'supply-freeze: the npm command line is no longer the file that was authenticated.\n' +
-      `  npm cli            ${formatUntrustedText(strNpmCli)}\n` +
+      '  npm cli            filesystem location withheld\n' +
       `  authenticated      inode ${intNpmCliInode}\n` +
       `  resolves now to    ${intInodeNow === null ? 'nothing' : `inode ${intInodeNow}`}\n` +
       '  the path was redirected after the installation was folded, so the program\n' +
@@ -1684,19 +1673,34 @@ function runNpm(arrNpmArguments, objEnv) {
         '--timing=false', '--update-notifier=false'], {
       cwd: strWorkflowDirectory,
       env: npmChildEnv(objEnv),
-      encoding: 'utf8',
       maxBuffer: 64 * 1024 * 1024,
       stdio: ['ignore', 'pipe', 'pipe'],
     });
-    // Keep the existence and fixed category of warnings visible on success as
-    // well as failure. Child text is never emitted: npm's own best-effort
-    // redaction does not cover arbitrary configuration values or paths.
+    // Stderr is diagnostic-only. Keep its documented decoded-character summary
+    // semantics and never publish the child text; it is not parsed into a record.
+    // Do this before launch/maxBuffer error classification so any bounded partial
+    // stderr still contributes its fixed category and length to the refusal.
+    const strStderr = Buffer.isBuffer(objResult.stderr)
+      ? objResult.stderr.toString('utf8') : '';
+    objResult.stderr = strStderr;
     if (objResult.stderr) {
       writeNpmDiagnosticSummary(arrNpmArguments[0], objResult);
     }
+    // Spawn failures can return null stdout. Classify those before the semantic
+    // decoder so ENOENT/E2BIG remains an exit-2 launch refusal rather than an
+    // uncaught null TypeError.
+    if (objResult.error) throw objResult.error;
+    if (!Buffer.isBuffer(objResult.stdout)) {
+      process.stderr.write(
+        `supply-freeze: npm ${arrNpmArguments[0]} returned no stdout byte stream; refusing.\n` +
+        '  child content and local paths are withheld; the response cannot be parsed.\n');
+      process.exit(intResponseExit);
+    }
+    const strStdout = decodeUtf8ExactlyOrRefuse(
+      objResult.stdout, `npm ${arrNpmArguments[0]} stdout`, intResponseExit);
+    objResult.stdout = strStdout;
     objNpmProcessResults.push({ operation: arrNpmArguments[0], nativeExit: objResult.status,
       signal: objResult.signal, stderrLength: objResult.stderr?.length ?? 0 });
-    if (objResult.error) throw objResult.error;
     if (objResult.status !== 0) {
       const objFailure = new Error('npm process returned a nonzero status or signal');
       Object.assign(objFailure, { status: objResult.status, signal: objResult.signal,
@@ -1772,7 +1776,7 @@ function runNpm(arrNpmArguments, objEnv) {
 // configuration problem, rather than everything becoming "unreviewed toolchain".
 function runNpmOrRefuse(arrNpmArguments, objEnv, intFailureExit, strMeaning) {
   try {
-    return runNpm(arrNpmArguments, objEnv);
+    return runNpm(arrNpmArguments, objEnv, intFailureExit);
   } catch (objError) {
     process.stderr.write(
       `supply-freeze: ${strMeaning}\n` +
@@ -1817,7 +1821,7 @@ function safeLsNativeStatus(value) {
 
 function runNpmAllowingFailure(arrNpmArguments, objEnv) {
   try {
-    return runNpm(arrNpmArguments, objEnv);
+    return runNpm(arrNpmArguments, objEnv, 5);
   } catch (objError) {
     // `npm audit` uses exit 1 to mean "advisories found", not "command failed".
     if (objError.status === 1 && objError.signal === null
@@ -1961,7 +1965,7 @@ function refuseUnreviewedInodeMetadata(strPath, strChild, objStats, strKind) {
   if (strProblem === null) return;
   process.stderr.write(
     'supply-freeze: refusing to record a tree entry the recorder does not solely control.\n' +
-    `  entry              ${formatUntrustedText(strChild)}\n` +
+    '  entry              installed-tree path/name withheld\n' +
     `  kind               ${strKind}\n` +
     `  observed           ${strProblem}\n` +
     '  the digest records permissions and bytes, but a snapshot of those values does\n' +
@@ -2018,16 +2022,14 @@ function readdirOrRefuseUndecodable(strDirectory, strRelative) {
     if (!Buffer.from(strName, 'utf8').equals(objEntry.name)) {
       process.stderr.write(
         'supply-freeze: refusing to fold a tree with an undecodable entry name.\n' +
-        `  directory          node_modules${strRelative ? `/${formatUntrustedText(strRelative)}` : ''}\n` +
+        '  directory          installed-tree path/name withheld\n' +
         // Reported by Codex. The entry name is attacker-controlled and can carry a
         // secret before the invalid byte (e.g. token_SUPPLYSECRET_<byte>); a full
         // hex dump is trivially reversible from a retained CI log. Withheld the
-        // same way the root-link target refusal withholds its target -- a length
-        // and a digest prefix, which still distinguish two different bad names.
+        // same way the root-link target refusal withholds its target. Byte length
+        // preserves the decoding diagnosis without a stable name fingerprint.
         `  entry              ${objEntry.name.length} byte`
-          + `${objEntry.name.length === 1 ? '' : 's'}, sha256 `
-          + `${createHash('sha256').update(objEntry.name).digest('hex').slice(0, 16)} `
-          + '(not valid UTF-8)\n' +
+          + `${objEntry.name.length === 1 ? '' : 's'} (name withheld; not valid UTF-8)\n` +
         '  such a name decodes to U+FFFD, so a sibling named U+FFFD shares it and both\n' +
         '  resolve to one file -- the other file is never read and never reaches the\n' +
         '  digest, which would report a tree it did not measure.\n' +
@@ -2219,8 +2221,8 @@ function refuseEscapingTreeRoot(strRoot) {
         process.stderr.write(
           'supply-freeze: refusing a node_modules symlink chain that leaves the '
           + 'watched boundary.\n'
-          + `  node_modules       ${formatUntrustedText(strRoot)}\n`
-          + `  hop ${intHop + 1} resolves outside ${formatUntrustedText(strWorkflowDirectory)}\n`
+          + '  node_modules       filesystem location withheld\n'
+          + `  hop ${intHop + 1} resolves outside the watched workflow boundary\n`
           + '  the chain may return inside the boundary, but a hop outside it has a\n'
           + '  parent nothing watches: that parent can be renamed aside, a different\n'
           + '  tree put in its place for npm ls and npm audit, and the original\n'
@@ -2238,11 +2240,10 @@ function refuseEscapingTreeRoot(strRoot) {
     && !strResolvedRoot.startsWith(`${strWorkflowDirectory}/`)) {
     process.stderr.write(
       'supply-freeze: refusing a node_modules symlink that leaves the watched boundary.\n' +
-      `  node_modules       ${formatUntrustedText(strRoot)}\n` +
-      // The resolved target is attacker-supplyable, so it is formatted rather
-      // than interpolated raw -- the same rule the escaping-link refusal was
-      // given in round 39.
-      `  resolves outside   ${formatUntrustedText(strWorkflowDirectory)}\n` +
+      '  node_modules       filesystem location withheld\n' +
+      // The resolved target is attacker-supplyable, so the diagnostic names only
+      // the fixed watched-boundary role and does not retain the target spelling.
+      '  resolves outside   the watched workflow boundary\n' +
       '  the sweep follows this link and watches its target, but nothing watches\n' +
       '  the directories ABOVE that target. One of them can be renamed aside, a\n' +
       '  different tree put in its place for npm ls and npm audit, and the original\n' +
@@ -2464,26 +2465,16 @@ function foldInstalledTree(strRoot) {
           // errno codes are a closed OS-defined set, so naming the code is safe
           // in a way that naming the target is not.
           arrUnresolvedLinks.push({
-            path: formatUntrustedText(strChild), code: objContainment.code,
+            path: strChild, code: objContainment.code,
           });
           continue;
         }
         if (objContainment.status === 'escaping') {
-          // Round 39, reported by Codex. The resolved target is NOT retained.
-          // It is chosen by whoever wrote the link, unbounded in length, and
-          // can carry a username, internal layout or a path-borne token into a
-          // CI log that outlives the run. The in-tree name is what an operator
-          // needs to act; `ls -l` on the tree answers "where did it point".
-          //
-          // Dropped at the point of COLLECTION rather than at the point of
-          // printing, which is the part that matters: rounds 35 through 38 were
-          // each a leak of a value that some earlier round had redacted at one
-          // print site while leaving it live in a variable. A value that was
-          // never stored cannot be printed by a later edit.
-          //
-          // Round 41 applies the same reasoning to the name's own BYTES, which
-          // this round showed were attacker-chosen too.
-          arrEscapingLinks.push({ path: formatUntrustedText(strChild) });
+          // Keep the raw relative name only in this private measurement result:
+          // it is part of the tree fold and quiescence comparison. F33 makes the
+          // public refusal count-only, so neither this name nor the target text
+          // reaches retained diagnostics.
+          arrEscapingLinks.push({ path: strChild });
         }
         continue;
       }
@@ -2562,19 +2553,10 @@ function foldInstalledTree(strRoot) {
         // takes an lstat -- charged only to entries that reach this branch,
         // which in a real install is none of them.
         //
-        // Folding this correctly matters independently of the exit-11 refusal
-        // below, because --any-toolchain waives that refusal and still runs the
-        // fold. A digest whose injectivity depends on a guard is not injective
-        // in exactly the runs where nothing else is checking.
-        //
-        // Round 48, swept rather than reported. This said the bypass "bypasses
-        // every guard" -- the same overclaim round 47 corrected in the record's
-        // Consumers section, left standing here because that round fixed the
-        // sentence it was shown rather than the claim. It does not: unsupported
-        // arguments, a missing or non-walkable root, malformed audit output, an
-        // undecodable entry name and integrity-during-run failures all still
-        // refuse. What is true is the narrow thing this argument actually needs
-        // -- the exit-11 refusal is waived and the fold still runs.
+        // Folding this correctly is independent of the unconditional exit-11
+        // refusal below. The representation remains injective so this private
+        // measurement stays internally sound even though no successful record
+        // can contain a special installed-tree entry.
         intSpecials += 1;
         // Round 64, reported by Codex, and the round-63 sweep for this exact
         // class returned the wrong answer. That round routed formatErrorLocation
@@ -2592,12 +2574,10 @@ function foldInstalledTree(strRoot) {
         //     special entries    1 (expected 0)
         //       node_modules/glob/https:_user:SECRET@host?token=X
         //
-        // Every one of the four sites now takes formatUntrustedText, which falls
-        // back to formatTreeName when it finds no url -- so an ordinary package
-        // path renders exactly as before and only a credential-shaped name is
-        // withheld. The operator keeps the diagnostic in every case that is not
-        // an attack.
-        arrSpecialPaths.push(formatUntrustedText(strChild));
+        // F33 replaces that heuristic with a uniform rule: the raw name remains
+        // a private fold input, while the public refusal reports only the count
+        // and fixed installed-tree role.
+        arrSpecialPaths.push(strChild);
         const objSpecial = lstatSync(strPath);
         const strTag = objSpecial.isFIFO() ? 'P'
           : objSpecial.isSocket() ? 'S'
@@ -2924,7 +2904,7 @@ function newestChangeTime(strRoot, arrExtraPaths) {
                   : 'not a regular file';
       process.stderr.write(
         'supply-freeze: refusing a project npm configuration that is not a regular file.\n' +
-        `  path               ${formatUntrustedText(strPath)}\n` +
+        '  path               project .npmrc location withheld\n' +
         `  observed           ${strKind}\n` +
         '  npm reads this as a configuration source, and only a regular file can be held\n' +
         '  still across the run: a link is opened through a target whose own parent can be\n' +
@@ -2970,7 +2950,7 @@ function newestChangeTime(strRoot, arrExtraPaths) {
         process.stderr.write(
           'supply-freeze: refusing a project npm configuration the recording user does not '
           + 'solely control.\n' +
-          `  path               ${formatUntrustedText(strPath)}\n` +
+          '  path               project .npmrc location withheld\n' +
           `  observed           ${strWhy}\n` +
           `  metadata           nlink ${objFdStats.nlink}, uid ${objFdStats.uid}, mode ` +
           `${Number(objFdStats.mode & 0o7777n).toString(8).padStart(4, '0')}, recorder uid ` +
@@ -3306,7 +3286,7 @@ function decodeUtf8ExactlyOrRefuse(bufContents, strWhat, intExit) {
       `supply-freeze: ${strWhat} is not valid UTF-8; refusing to parse it.\n` +
       `  byte length        ${bufContents.length}\n` +
       '  invalid bytes and decoded content are withheld; a lossy replacement character\n' +
-      '  could otherwise make different input bytes parse as the same JSON value.\n');
+      '  could otherwise make different input bytes parse as the same semantic value.\n');
     process.exit(intExit);
   }
   return strContents;
@@ -3517,7 +3497,11 @@ function normalizeAudit(objAudit) {
           `vulnerability ${strName} has a via member that is neither a package name`
           + ` nor an advisory object (got ${objVia === null ? 'null' : typeof objVia})`);
       }
-      const strUrl = typeof objVia.url === 'string' ? objVia.url : '';
+      if (objVia.url !== undefined && objVia.url !== null && typeof objVia.url !== 'string') {
+        throw new TypeError(
+          `advisory in ${strName} has a url of type ${typeof objVia.url}, expected string`);
+      }
+      const strUrl = objVia.url ?? '';
       // Round 49, reported by Codex. This was unanchored at both ends, so a
       // longer token that merely BEGINS with a GHSA-shaped prefix matched its
       // prefix and the remainder was discarded. Measured on three urls:
@@ -3894,7 +3878,7 @@ function snapshotOrRefuse(strPath) {
   return readViaVerifiedDescriptor(strPath, 4, (objError) => {
     process.stderr.write(
       'supply-freeze: refusing to record digests for an unreviewed manifest.\n' +
-      `  ${strPath.split('/').pop().padEnd(18)} could not be read\n` +
+      '  manifest input     path/name withheld; could not be read\n' +
       formatErrorLocation(objError, strPath) +
       '  the reviewed manifest must be present and readable before anything is recorded.\n');
   });
@@ -3904,7 +3888,7 @@ function snapshotContractOrRefuse(strPath) {
   const refuseInitialContractRead = (objError) => {
     process.stderr.write(
       'supply-freeze: refusing to record an unreadable P1 contract.\n' +
-      `  ${strPath.split('/').pop().padEnd(18)} could not be read\n` +
+      '  P1 contract        path/name withheld; could not be read\n' +
       formatErrorLocation(objError, strPath) +
       '  the reviewed P1 contract must be a readable, regular, singly linked file\n' +
       '  owned by this recording user before anything is recorded.\n');
@@ -4113,8 +4097,8 @@ const strNodeVersion = process.version;
 //
 // Checked before the first npm subprocess, because every later guard reads an
 // answer this one decides the provenance of. It is not gated on
-// --any-toolchain: that flag waives which VERSIONS are acceptable, never whether
-// the program answering is the one this process resolved.
+// --any-toolchain: that flag waives listed runtime/version comparisons, never
+// whether the program answering is the authenticated npm installation.
 //
 // Round 56, reported by Codex, and the round-55 fix above shown to be worth
 // almost nothing. Existence is not identity either. The reply that shipped it
@@ -4160,10 +4144,13 @@ const strNodeVersion = process.version;
 // from a local directory of unknown
 // provenance. Both fold to f5855634..., 1916 files and no symlinks.
 //
-// The byte comparison is gated on --any-toolchain and the containment check is
-// not, which is the same line the version guard draws: that flag waives which
-// VERSION is acceptable -- and a digest over a tree IS a version -- while never
-// waiving whether the program answering is the one this process resolved.
+// Codex P1 on 39d82ac. This byte comparison must be unconditional. A digest over
+// the tree identifies the JavaScript this recorder is about to execute; letting
+// --any-toolchain waive it allowed a copied Node plus arbitrary npm program to
+// write anywhere its uid could reach while the method promised npm child writes
+// stayed in the private external cache. The flag still relaxes the explicitly
+// documented runtime/configuration/manifest/tree comparisons. It never grants
+// authority to execute unauthenticated npm bytes.
 //
 // The residual, stated rather than implied, because the round-55 reply's
 // residual was wrong and this one should not be taken on trust: the tree is
@@ -4175,8 +4162,8 @@ const strNpmBesideNode = join(dirname(process.execPath), 'npm');
 if (!existsSync(strNpmBesideNode)) {
   process.stderr.write(
     'supply-freeze: refusing to run npm that is not bound to this Node installation.\n' +
-    `  node               ${formatUntrustedText(process.execPath)}\n` +
-    `  expected npm at    ${formatUntrustedText(strNpmBesideNode)}\n` +
+    '  node runtime       filesystem location withheld\n' +
+    '  expected npm       adjacent launcher location withheld\n' +
     // Round 61, reported by Codex, and this text is my own round-60 change left
     // undescribed. It still explained the PATH forgery that round 60 removed:
     // npm is no longer resolved through PATH at all, so "the ambient PATH
@@ -4222,7 +4209,7 @@ try {
 } catch (objError) {
   process.stderr.write(
     'supply-freeze: refusing to verify an npm installation that cannot be read.\n'
-    + `  npm command line   ${formatUntrustedText(strNpmCli)}\n`
+    + '  npm command line   filesystem location withheld\n'
     + formatErrorLocation(objError, strNpmCli)
     + '  it was located and authenticated moments ago, so the toolchain changed\n'
     + '  underneath this run.\n');
@@ -4235,12 +4222,12 @@ const objNpmTree = scanOrRefuse(
 // one. It is an independent backstop now -- the digest is the primary check and
 // the census fails on a different property, so an encoding weakness in one is
 // not a weakness in both.
-if (!boolAnyToolchain && (objNpmTree.sha256 !== REVIEWED_NPM_TREE_SHA256
-  || objNpmTree.files !== REVIEWED_NPM_TREE_FILES)) {
+if (objNpmTree.sha256 !== REVIEWED_NPM_TREE_SHA256
+  || objNpmTree.files !== REVIEWED_NPM_TREE_FILES) {
   process.stderr.write(
     'supply-freeze: refusing to trust an npm installation that is not the reviewed one.\n' +
-    `  node               ${formatUntrustedText(process.execPath)}\n` +
-    `  npm installation   ${formatUntrustedText(strNpmTreeRoot)}\n` +
+    '  node runtime       filesystem location withheld\n' +
+      '  npm installation   filesystem location withheld\n' +
     `  observed           ${objNpmTree.sha256} (${objNpmTree.files} files, ${objNpmTree.symlinks} symlinks)\n` +
     `  reviewed           ${REVIEWED_NPM_TREE_SHA256} (${REVIEWED_NPM_TREE_FILES} files, 0 symlinks)\n` +
     '  the version string npm prints is written by npm, so it cannot establish which\n' +
@@ -4248,8 +4235,9 @@ if (!boolAnyToolchain && (objNpmTree.sha256 !== REVIEWED_NPM_TREE_SHA256
     '  version check and an existence check alike, and then supplies the configuration,\n' +
     '  the lockfile assertion and the advisory posture -- measured, erasing every\n' +
     '  advisory while the output still said freezeRecord: true.\n' +
-    '  install the reviewed Node distribution whole, or pass --any-toolchain to record\n' +
-    '  explicitly-unreviewed output.\n');
+    '  install the reviewed Node distribution whole. --any-toolchain can relax runtime\n' +
+    '  and comparison guards, but it cannot execute an unauthenticated npm while this\n' +
+    '  recorder promises that child writes stay inside the external cache.\n');
   process.exit(2);
 }
 
@@ -4308,17 +4296,14 @@ if (objTree.escapingLinks.length > 0) {
   process.stderr.write(
     'supply-freeze: refusing to record digests for a tree whose links leave it.\n' +
     `  escaping links     ${objTree.escapingLinks.length} (expected 0)\n` +
-    `${objTree.escapingLinks.slice(0, 10).map((objLink) =>
-      `    node_modules/${objLink.path}\n`).join('')}` +
-    (objTree.escapingLinks.length > 10
-      ? `    ... and ${objTree.escapingLinks.length - 10} more\n` : '') +
-    '  each link above passes outside the tree root somewhere along its chain --\n' +
+    '  link names and targets are withheld because both are filesystem-controlled.\n' +
+    '  each link passes outside the tree root somewhere along its chain --\n' +
     '  which is not the same as ending outside it, and a chain that leaves and\n' +
     '  comes back is refused too: the hop outside decides which in-tree bytes load\n' +
     '  and nothing in this record covers that hop. the target is not\n' +
     '  printed: it is chosen by whoever wrote the link and CI logs are retained, so\n' +
-    '  a target carrying a username, internal layout or a path-borne token would\n' +
-    '  outlive this run. run `ls -l` on the names above to see where they point.\n' +
+    '  a name or target carrying a username, internal layout or path-borne token would\n' +
+    '  outlive this run. inspect node_modules locally to identify the links.\n' +
     '  the fold hashes a link\'s target text, not the bytes behind it, so a target\n' +
     '  outside node_modules is code this digest does not cover and cannot detect\n' +
     '  changes to. npm ci installs package contents in place; a package directory\n' +
@@ -4330,10 +4315,8 @@ if (objTree.unresolvedLinks.length > 0) {
   process.stderr.write(
     'supply-freeze: refusing to record digests for a tree with links it cannot resolve.\n' +
     `  unresolved links   ${objTree.unresolvedLinks.length} (expected 0)\n` +
-    `${objTree.unresolvedLinks.slice(0, 10).map((objLink) =>
-      `    node_modules/${objLink.path} (${objLink.code})\n`).join('')}` +
-    (objTree.unresolvedLinks.length > 10
-      ? `    ... and ${objTree.unresolvedLinks.length - 10} more\n` : '') +
+    `  error categories   ${[...new Set(objTree.unresolvedLinks.map((objLink) => objLink.code))].sort().join(', ')}\n` +
+    '  link names and targets are withheld because both are filesystem-controlled.\n' +
     '  resolution failing means this fold could not establish that the link stays\n' +
     '  inside the tree, so the containment the digest depends on is unproven rather\n' +
     '  than satisfied. a target that is absent while this runs and restored after it\n' +
@@ -5112,7 +5095,7 @@ try {
     strLsOutput = runNpm(['ls', '--all', '--json', '--long',
       '--package-lock-only=false', '--depth=4294967295',
       '--include=dev', '--include=optional', '--include=peer',
-      '--global=false', '--link=false']);
+      '--global=false', '--link=false'], undefined, 7);
   } catch (objLsError) {
     // Round 66, reported. This refusal used to be unconditional, which
     // contradicted the comment forty lines below -- "the bypass still applies to
@@ -5623,21 +5606,41 @@ refuseInstalledTreeSpecials(objTreeAfter);
 // the same "fixed the reported instance, not the class" mistake rounds 2 and 6
 // each made on the audit shape guard. Anything foldInstalledTree returns is now
 // held still between the folds, whether or not the digest covers it.
+// Public output names only recorder-authored field categories. Some private
+// fold fields contain relative path/name collections, so serializing the
+// changed values would undo the diagnostic boundary enforced elsewhere.
+function formatInstalledTreeFoldDrift(objTreeBefore, objTreeAfter, arrChangedFields) {
+  const objPublicFieldCategories = Object.freeze({
+    sha256: 'content digest',
+    files: 'file count',
+    symlinks: 'symbolic-link count',
+    directories: 'directory count',
+    specials: 'special-entry count',
+    specialPaths: 'special-entry set',
+    escapingLinks: 'escaping-link set',
+    unresolvedLinks: 'unresolved-link set',
+    modes: 'file-mode census',
+    directoryModes: 'directory-mode census',
+    rootMode: 'root mode',
+    rootIsDirectory: 'root type',
+  });
+  const arrPublicCategories = arrChangedFields.map((strField) =>
+    objPublicFieldCategories[strField] ?? 'unrecognized fold field');
+  return 'supply-freeze: the installed tree changed while recording; refusing to report.\n' +
+    `  fields that moved   ${arrPublicCategories.join(', ')}\n` +
+    `  first fold         ${objTreeBefore.sha256}\n` +
+    `  second fold        ${objTreeAfter.sha256}\n` +
+    `  counts             ${objTreeBefore.files}/${objTreeBefore.symlinks}/${objTreeBefore.directories}` +
+      ` then ${objTreeAfter.files}/${objTreeAfter.symlinks}/${objTreeAfter.directories}` +
+      ' (files/symlinks/directories)\n' +
+    '  changed field values withheld; something wrote to node_modules while this ran. ' +
+      'record against a quiescent tree.\n';
+}
+
 const arrFoldDrift = Object.keys(objTree).filter((strField) =>
   JSON.stringify(objTree[strField]) !== JSON.stringify(objTreeAfter[strField]));
 if (arrFoldDrift.length > 0) {
-  process.stderr.write(
-    'supply-freeze: the installed tree changed while recording; refusing to report.\n' +
-    `  fields that moved   ${arrFoldDrift.join(', ')}\n` +
-    `  first fold         ${objTree.sha256}\n` +
-    `  second fold        ${objTreeAfter.sha256}\n` +
-    `  counts             ${objTree.files}/${objTree.symlinks}/${objTree.directories}` +
-      ` then ${objTreeAfter.files}/${objTreeAfter.symlinks}/${objTreeAfter.directories}` +
-      ' (files/symlinks/directories)\n' +
-    arrFoldDrift.filter((strField) => strField !== 'sha256').map((strField) =>
-      `  ${strField.padEnd(18)} ${JSON.stringify(objTree[strField])}` +
-      ` then ${JSON.stringify(objTreeAfter[strField])}\n`).join('') +
-    '  something wrote to node_modules while this ran. record against a quiescent tree.\n');
+  process.stderr.write(formatInstalledTreeFoldDrift(objTree, objTreeAfter, arrFoldDrift));
   process.exit(10);
 }
 
@@ -5676,9 +5679,9 @@ if (arrFoldDrift.length > 0) {
 // no freeze record here to protect." Both halves of that were true and the
 // conclusion did not follow.
 //
-// The first fold's COMPARISON is gated because it tests this installation
-// against REVIEWED_NPM_TREE_SHA256, a constant a bypassed run has explicitly
-// waived. This check tests nothing of the kind: it compares the run's OWN
+// At the time of round 71 the first fold's COMPARISON was gated because it tested
+// against REVIEWED_NPM_TREE_SHA256. F35 later made executable npm identity
+// unconditional; this check still tests a separate property, comparing the run's OWN
 // before value against its OWN after value, so it needs no reviewed digest and
 // nothing about --any-toolchain makes it inapplicable. The fold itself
 // (foldNpmInstallation, above) already runs unconditionally, so the baseline
@@ -5695,8 +5698,8 @@ if (arrFoldDrift.length > 0) {
 //
 // This is round 66's finding AR again -- the npm ls exit 7 was bypassed by the
 // same reasoning and corrected the same way -- so the rule is now explicit:
-// --any-toolchain waives comparisons against REVIEWED_* constants, and nothing
-// else. Self-consistency checks run in every mode.
+// --any-toolchain waives only the explicitly listed comparison guards. It never
+// waives executable npm identity or self-consistency checks.
 {
   const objNpmTreeAfter = scanOrRefuse(
     () => foldNpmInstallation(strNpmTreeRoot, strNpmBesideNode), 'the second npm installation fold');
@@ -5704,7 +5707,7 @@ if (arrFoldDrift.length > 0) {
     || objNpmTreeAfter.changeSha256 !== objNpmTree.changeSha256) {
     process.stderr.write(
       'supply-freeze: the npm installation changed while it was being used.\n' +
-      `  npm installation   ${formatUntrustedText(strNpmTreeRoot)}\n` +
+    '  npm installation   filesystem location withheld\n' +
       `  when checked       ${objNpmTree.sha256} (${objNpmTree.files} files)\n` +
       `  after the run      ${objNpmTreeAfter.sha256} (${objNpmTreeAfter.files} files)\n` +
       `  what moved         ${objNpmTreeAfter.sha256 !== objNpmTree.sha256
@@ -5876,7 +5879,7 @@ if (objSweepDifference) {
     'supply-freeze: the recorded inputs changed while recording; refusing to report.\n' +
     '  detected by        per-entry inode identity and change time, not by the fold\n' +
     '                     comparison\n' +
-    `  entry              ${formatUntrustedText(objSweepDifference.label)}\n` +
+    '  entry              watched filesystem path/name withheld\n' +
     `  what changed       ${objSweepDifference.kind}\n` +
     (objSweepDifference.was === undefined
       ? ''
