@@ -3955,6 +3955,20 @@ function contractIdentityOrRefuse() {
 const objContractIdentityBefore = contractIdentityOrRefuse();
 const objContract = parseNpmJsonOrRefuse(
   decodeUtf8ExactlyOrRefuse(objContractBefore, 'P1 contract', 17), 'P1 contract', 17);
+// Task131 F131-1. JSON.parse accepts every JSON root, including null. Reading
+// supplyFreeze before checking that root used to throw a TypeError at native
+// exit 1 and expose a local script path, bypassing the fixed exit-17 contract
+// refusal. Keep this domain check local: npm-ls deliberately accepts different
+// diagnostic behavior, so the generic JSON parser must remain root-neutral.
+if (!isPlainObject(objContract)) {
+  process.stderr.write(
+    'supply-freeze: the P1 contract root has an unexpected response schema; refusing.\n' +
+    '  expected           JSON object\n' +
+    '  source content, root value, parser details, and local paths are withheld.\n' +
+    '  the initial P1 contract must be an object before its assertions are read;\n' +
+    '  nothing is recorded.\n');
+  process.exit(17);
+}
 const objSupplyFreeze = objContract.supplyFreeze;
 if (!isPlainObject(objSupplyFreeze)
   || sha256(canonicalize(objSupplyFreeze)) !== '83c5138131de742734d22a818e21feb63d5ac11f8877adf52299809f04217362') {
@@ -4894,6 +4908,14 @@ if (!boolAnyToolchain) {
   const objEffective = parseNpmJsonOrRefuse(
     runNpmOrRefuse(['config', 'list', '--json'], undefined, 6,
       'npm could not report its effective configuration.'), 'npm config list', 6);
+  if (!isPlainObject(objEffective)) {
+    process.stderr.write(
+      'supply-freeze: npm configuration has an unexpected response schema; refusing.\n' +
+      '  expected           JSON object\n' +
+      '  source content, root value, parser details, and local paths are withheld.\n' +
+      '  strict configuration comparison requires an object; nothing is recorded.\n');
+    process.exit(6);
+  }
   const arrDrift = configDrift(REVIEWED_NPM_CONFIG, objEffective);
   if (arrDrift.length > 0) {
     process.stderr.write(
@@ -5273,10 +5295,20 @@ if (boolSkipAudit) {
   // exposed. Refusing a `--no-audit` run on a mirror would be a false failure
   // for a reader whose tree is provably byte-identical.
   if (!boolAnyToolchain) {
+    const objTransportEffective = parseNpmJsonOrRefuse(
+      runNpmOrRefuse(['config', 'list', '--json'], undefined, 6,
+        'npm could not report its effective configuration.'), 'npm config list', 6);
+    if (!isPlainObject(objTransportEffective)) {
+      process.stderr.write(
+        'supply-freeze: npm configuration has an unexpected response schema; refusing.\n' +
+        '  expected           JSON object\n' +
+        '  source content, root value, parser details, and local paths are withheld.\n' +
+        '  strict configuration comparison requires an object; nothing is recorded.\n');
+      process.exit(6);
+    }
     const arrTransportDrift = configDrift(
       REVIEWED_NPM_TRANSPORT,
-      parseNpmJsonOrRefuse(runNpmOrRefuse(['config', 'list', '--json'], undefined, 6,
-        'npm could not report its effective configuration.'), 'npm config list', 6));
+      objTransportEffective);
     if (arrTransportDrift.length > 0) {
       process.stderr.write(
         'supply-freeze: npm transport configuration would change where the audit goes.\n' +

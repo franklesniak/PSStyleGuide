@@ -187,6 +187,80 @@ test('DESCRIPTOR-FAILURE: open, fstat, read, and close failures retain caller ex
   }
 });
 
+test('JSON-ROOT-GUARDS: production contract and strict config guards reject non-object roots', () => {
+  const plainFrom = source.indexOf('function isPlainObject(');
+  const plainTo = source.indexOf('\n}\n', plainFrom) + 2;
+  const contractFrom = source.indexOf('if (!isPlainObject(objContract))');
+  const contractTo = source.indexOf('\nif (!isPlainObject(objSupplyFreeze)', contractFrom);
+  const installFrom = source.indexOf('if (!isPlainObject(objEffective))');
+  const installTo = source.indexOf('\n  if (arrDrift.length > 0)', installFrom);
+  const transportFrom = source.indexOf('if (!isPlainObject(objTransportEffective))');
+  const transportTo = source.indexOf('\n    if (arrTransportDrift.length > 0)', transportFrom);
+  assert.ok(plainFrom >= 0 && plainTo > plainFrom);
+  assert.ok(contractFrom >= 0 && contractTo > contractFrom);
+  assert.ok(installFrom >= 0 && installTo > installFrom);
+  assert.ok(transportFrom >= 0 && transportTo > transportFrom);
+
+  const contractGuard = new Function('objContract', 'process',
+    `${source.slice(plainFrom, plainTo)}\n${source.slice(contractFrom, contractTo)}\n`
+    + 'return objSupplyFreeze;');
+  const configGuard = (from, to, name) => new Function(name, 'configDrift',
+    'REVIEWED_NPM_CONFIG', 'REVIEWED_NPM_TRANSPORT', 'process',
+    `${source.slice(plainFrom, plainTo)}\n${source.slice(from, to)}\n`
+    + `return ${name === 'objEffective' ? 'arrDrift' : 'arrTransportDrift'};`);
+  const installGuard = configGuard(installFrom, installTo, 'objEffective');
+  const transportGuard = configGuard(transportFrom, transportTo, 'objTransportEffective');
+  const objPrivateRoots = [
+    null,
+    ['TASK131_F31_PRIVATE_ARRAY'],
+    'TASK131_F31_PRIVATE_STRING',
+    17,
+    false,
+  ];
+  const invoke = (guard, value, intExit, strCategory, boolConfig = false) => {
+    let strDiagnostic = '';
+    const objProcess = {
+      stderr: { write(strValue) { strDiagnostic += strValue; } },
+      exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+    };
+    const configDrift = (_reviewed, effective) => {
+      assert.equal(effective !== null && typeof effective === 'object'
+        && !Array.isArray(effective), true, 'the production guard must run before configDrift');
+      return [];
+    };
+    assert.throws(() => boolConfig
+      ? guard(value, configDrift, {}, {}, objProcess)
+      : guard(value, objProcess), { refusal: intExit });
+    assert.match(strDiagnostic, strCategory);
+    assert.match(strDiagnostic, /expected\s+JSON object/);
+    assert.match(strDiagnostic, /nothing is recorded/);
+    assert.doesNotMatch(strDiagnostic,
+      /TASK131_F31|PRIVATE_(?:ARRAY|STRING)|TypeError|Get-SupplyFreezeDigest|file:\/\/|\n\s+at\s/u);
+  };
+  for (const value of objPrivateRoots) {
+    invoke(contractGuard, value, 17, /P1 contract root.*unexpected response schema/);
+    invoke(installGuard, value, 6, /npm configuration.*unexpected response schema/, true);
+    invoke(transportGuard, value, 6, /npm configuration.*unexpected response schema/, true);
+  }
+
+  const objContract = { supplyFreeze: { retained: true }, unrelated: 'allowed' };
+  const objUnexpectedRefusal = {
+    stderr: { write(value) { assert.fail(`valid object emitted a refusal: ${value}`); } },
+    exit(code) { assert.fail(`valid object exited with ${code}`); },
+  };
+  assert.equal(contractGuard(objContract, objUnexpectedRefusal),
+    objContract.supplyFreeze);
+  const objEffective = { registry: 'reviewed', unrelated: 'allowed' };
+  const configDrift = (_reviewed, effective) => {
+    assert.equal(effective, objEffective);
+    return ['valid-object-control'];
+  };
+  assert.deepEqual(installGuard(objEffective, configDrift, {}, {}, objUnexpectedRefusal),
+    ['valid-object-control']);
+  assert.deepEqual(transportGuard(objEffective, configDrift, {}, {}, objUnexpectedRefusal),
+    ['valid-object-control']);
+});
+
 test('JSON-RESPONSE-PRIVACY: parser, schema, and normalization refusals withhold source content', () => {
   const parseFrom = source.indexOf('function firstDuplicateJsonKey(');
   const parseFunction = source.indexOf('function parseAuditOrRefuse(', parseFrom);
@@ -842,7 +916,7 @@ function fingerprint(root) {
 test('LINUX: strict success, entire ignored tree preservation, and refusal properties',
   { skip: process.platform !== 'linux' || process.arch !== 'x64' }, () => {
     const temporary = mkdtempSync(join(tmpdir(), 'p1-recorder-tests-'));
-    const checkout = join(temporary, 'checkout');
+    const checkout = join(temporary, 'TASK131_F31_PRIVATE_PATH');
     const fixture = join(checkout, '.github', 'workflows');
     mkdirSync(fixture, { recursive: true });
     for (const name of ['Get-SupplyFreezeDigest.mjs', 'package.json', 'package-lock.json', 'workflow-policy-contract.json']) {
@@ -1056,6 +1130,17 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
 
       const contractPath = join(fixture, 'workflow-policy-contract.json');
       const contractBytes = readFileSync(contractPath);
+      for (const arrFlags of [['--no-audit'], ['--no-audit', '--any-toolchain']]) {
+        writeFileSync(contractPath, 'null');
+        const objNullContract = invoke(arrFlags);
+        refuse(objNullContract, 17);
+        assert.equal(objNullContract.signal, null);
+        assert.match(objNullContract.stderr,
+          /P1 contract root has an unexpected response schema/);
+        assert.doesNotMatch(objNullContract.stderr,
+          /TASK131_F31_PRIVATE_PATH|TypeError|Get-SupplyFreezeDigest|file:\/\/|\n\s+at\s/u);
+      }
+      writeFileSync(contractPath, contractBytes);
       rmSync(contractPath);
       refuse(invoke(['--no-audit', '--any-toolchain']), 17);
       writeFileSync(contractPath, contractBytes);
