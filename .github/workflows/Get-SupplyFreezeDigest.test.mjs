@@ -424,45 +424,56 @@ test('HISTORICAL-VERIFICATION: authored JavaScript block reports success only af
     const strExpectedSuccess =
       'Historical packageJson and packageLockJson blob, path, length, and SHA-256 verification completed.\n';
     const strProjectRoot = join(workflow, '..', '..');
-    const objGitDir = spawnSync('git', ['rev-parse', '--absolute-git-dir'], {
-      cwd: strProjectRoot, encoding: 'utf8',
+    const temporary = mkdtempSync(join(tmpdir(), 'historical-verification-'));
+    const strFixtureRepository = join(temporary, 'repository');
+    const objSetupEnvironment = { ...process.env, GIT_NO_LAZY_FETCH: '1',
+      GIT_NO_REPLACE_OBJECTS: '1', GIT_OPTIONAL_LOCKS: '0', GIT_CONFIG_NOSYSTEM: '1',
+      GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null', GIT_TRACE: '0',
+      GIT_TRACE2: '0', GIT_TRACE2_EVENT: '0', GIT_TRACE2_PERF: '0' };
+    delete objSetupEnvironment.GIT_DIR;
+    delete objSetupEnvironment.GIT_WORK_TREE;
+    delete objSetupEnvironment.GIT_OBJECT_DIRECTORY;
+    delete objSetupEnvironment.GIT_ALTERNATE_OBJECT_DIRECTORIES;
+    mkdirSync(strFixtureRepository);
+    const objInit = spawnSync('git', ['init', '-q'], {
+      cwd: strFixtureRepository, encoding: 'utf8', env: objSetupEnvironment,
     });
-    assert.equal(objGitDir.status, 0, objGitDir.stderr);
-    const strGitDirectory = objGitDir.stdout.trim();
-    const objHistoricalObject = spawnSync('git', ['--git-dir', strGitDirectory,
-      'cat-file', '-e', '4346310e7deebffb4159c75e30d9546263dfd649^{commit}'], {
-      encoding: 'utf8',
-      env: {
-        ...process.env,
-        GIT_NO_LAZY_FETCH: '1',
-        GIT_NO_REPLACE_OBJECTS: '1',
-        GIT_OPTIONAL_LOCKS: '0',
-      },
+    assert.equal(objInit.status, 0, objInit.stderr);
+    const objHistoricalPack = spawnSync('git', ['pack-objects', '--revs', '--stdout'], {
+      cwd: strProjectRoot, input: '4346310e7deebffb4159c75e30d9546263dfd649\n',
+      encoding: null, env: objSetupEnvironment, maxBuffer: 128 * 1024 * 1024,
+    });
+    assert.equal(objHistoricalPack.status, 0, objHistoricalPack.stderr.toString());
+    const objIndexPack = spawnSync('git', ['index-pack', '--stdin'], {
+      cwd: strFixtureRepository, input: objHistoricalPack.stdout,
+      encoding: 'utf8', env: objSetupEnvironment,
+    });
+    assert.equal(objIndexPack.status, 0, objIndexPack.stderr);
+    const objHistoricalObject = spawnSync('git', ['cat-file', '-e',
+      '4346310e7deebffb4159c75e30d9546263dfd649^{commit}'], {
+      cwd: strFixtureRepository, encoding: 'utf8', env: objSetupEnvironment,
     });
     assert.equal(objHistoricalObject.status, 0, objHistoricalObject.stderr);
-    const temporary = mkdtempSync(join(tmpdir(), 'historical-verification-'));
-    const strContractDirectory = join(temporary, '.github', 'workflows');
+    const strContractDirectory = join(strFixtureRepository, '.github', 'workflows');
     const strContractPath = join(strContractDirectory, 'workflow-policy-contract.json');
     const objContract = JSON.parse(readFileSync(join(workflow, 'workflow-policy-contract.json')));
     mkdirSync(strContractDirectory, { recursive: true });
-    const invokeVerifier = (objCandidate, objExtraEnv = {}) => {
+    const invokeVerifier = (objCandidate, objExtraEnv = {}, arrDeletedEnvironment = []) => {
       writeFileSync(strContractPath, JSON.stringify(objCandidate));
       const objEnvironment = {
         ...process.env,
-        GIT_DIR: strGitDirectory,
-        GIT_WORK_TREE: strProjectRoot,
-        GIT_NO_LAZY_FETCH: '1',
-        GIT_NO_REPLACE_OBJECTS: '1',
-        GIT_OPTIONAL_LOCKS: '0',
         NODE_DISABLE_COMPILE_CACHE: '1',
         ...objExtraEnv,
       };
+      delete objEnvironment.GIT_DIR;
+      delete objEnvironment.GIT_WORK_TREE;
       for (const strKey of ['NODE_OPTIONS', 'NODE_COMPILE_CACHE', 'NODE_V8_COVERAGE',
         'NODE_REDIRECT_WARNINGS', 'NODE_DEBUG', 'NODE_DEBUG_NATIVE']) {
         delete objEnvironment[strKey];
       }
+      for (const strKey of arrDeletedEnvironment) delete objEnvironment[strKey];
       return spawnSync(process.execPath, ['--input-type=module'], {
-        cwd: temporary,
+        cwd: strFixtureRepository,
         input: strVerifier,
         encoding: 'utf8',
         env: objEnvironment,
@@ -472,6 +483,42 @@ test('HISTORICAL-VERIFICATION: authored JavaScript block reports success only af
       const objSuccess = invokeVerifier(objContract);
       assert.equal(objSuccess.status, 0, objSuccess.stderr);
       assert.equal(objSuccess.stdout, strExpectedSuccess);
+
+      const strClassicTrace = join(temporary, 'classic-trace-TASK130_F27_PRIVATE');
+      const strNormalTrace = join(temporary, 'normal-trace-TASK130_F27_PRIVATE');
+      const strEventTrace = join(temporary, 'event-trace-TASK130_F27_PRIVATE');
+      const strPerfTrace = join(temporary, 'perf-trace-TASK130_F27_PRIVATE');
+      const strGlobalConfig = join(temporary, 'global-TASK130_F27_PRIVATE.config');
+      writeFileSync(strGlobalConfig,
+        `[trace2]\n\tnormalTarget = ${strNormalTrace}\n\teventTarget = ${strEventTrace}\n`
+        + `\tperfTarget = ${strPerfTrace}\n`);
+      const objTraceIsolated = invokeVerifier(objContract, {
+        GIT_TRACE: strClassicTrace,
+        GIT_TRACE2: strNormalTrace,
+        GIT_TRACE2_EVENT: strEventTrace,
+        GIT_TRACE2_PERF: strPerfTrace,
+      });
+      assert.equal(objTraceIsolated.status, 0, objTraceIsolated.stderr);
+      assert.equal(objTraceIsolated.stdout, strExpectedSuccess);
+      for (const strTraceTarget of [strClassicTrace, strNormalTrace, strEventTrace, strPerfTrace]) {
+        assert.equal(existsSync(strTraceTarget), false);
+      }
+
+      const objConfigIsolated = invokeVerifier(objContract, {
+        GIT_CONFIG_GLOBAL: strGlobalConfig, GIT_CONFIG_SYSTEM: strGlobalConfig,
+      }, ['GIT_TRACE', 'GIT_TRACE2', 'GIT_TRACE2_EVENT', 'GIT_TRACE2_PERF']);
+      assert.equal(objConfigIsolated.status, 0, objConfigIsolated.stderr);
+      assert.equal(objConfigIsolated.stdout, strExpectedSuccess);
+      for (const strTraceTarget of [strNormalTrace, strEventTrace, strPerfTrace]) {
+        assert.equal(existsSync(strTraceTarget), false);
+      }
+
+      const objObjectIsolated = invokeVerifier(objContract, {
+        GIT_OBJECT_DIRECTORY: join(temporary, 'TASK130_F27_PRIVATE_OBJECTS'),
+        GIT_ALTERNATE_OBJECT_DIRECTORIES: join(temporary, 'TASK130_F27_PRIVATE_ALTERNATES'),
+      });
+      assert.equal(objObjectIsolated.status, 0, objObjectIsolated.stderr);
+      assert.equal(objObjectIsolated.stdout, strExpectedSuccess);
 
       const objLengthMismatch = structuredClone(objContract);
       objLengthMismatch.supplyFreeze.baseline.packageLockJson.length += 1;
@@ -494,22 +541,20 @@ test('HISTORICAL-VERIFICATION: authored JavaScript block reports success only af
       writeFileSync(strWrapperPath, `#!/usr/bin/env node
 const fs = require('node:fs');
 const { spawnSync } = require('node:child_process');
-const countPath = process.env.TASK130_F24_COUNT_PATH;
+const countPath = ${JSON.stringify(strCountPath)};
 const count = fs.existsSync(countPath) ? Number(fs.readFileSync(countPath, 'utf8')) + 1 : 1;
 fs.writeFileSync(countPath, String(count));
 if (count === 4) {
   process.stderr.write('TASK130_F24_INJECTED_NATIVE_STATUS_73\\n');
   process.exit(73);
 }
-const result = spawnSync(process.env.TASK130_F24_REAL_GIT, process.argv.slice(2),
+const result = spawnSync(${JSON.stringify(objGitPath.stdout.trim())}, process.argv.slice(2),
   { stdio: 'inherit', env: process.env });
 process.exit(result.status ?? 74);
 `);
       chmodSync(strWrapperPath, 0o755);
       const objNativeFailure = invokeVerifier(objContract, {
         PATH: `${strWrapperDirectory}${delimiter}${process.env.PATH}`,
-        TASK130_F24_COUNT_PATH: strCountPath,
-        TASK130_F24_REAL_GIT: objGitPath.stdout.trim(),
       });
       assert.notEqual(objNativeFailure.status, 0);
       assert.equal(objNativeFailure.stdout, '');
@@ -519,6 +564,130 @@ process.exit(result.status ?? 74);
       rmSync(temporary, { recursive: true, force: true });
     }
   });
+
+test('INSTALLED-TREE-SPECIAL: both folds apply the fixed special-entry refusal', () => {
+  const from = source.indexOf('function refuseInstalledTreeSpecials(');
+  const to = source.indexOf('\n}\n', from) + 2;
+  assert.ok(from >= 0 && to > from);
+  const diagnostic = [];
+  const refuseSpecials = new Function('process',
+    `${source.slice(from, to)}; return refuseInstalledTreeSpecials;`)({
+    stderr: { write: (value) => diagnostic.push(value) },
+    exit: (code) => { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+  });
+  assert.doesNotThrow(() => refuseSpecials({ specials: 0, specialPaths: [] }));
+  assert.throws(() => refuseSpecials({ specials: 1,
+    specialPaths: ['TASK130_F26_PRIVATE_FIFO'] }), { refusal: 11 });
+  assert.match(diagnostic.join(''), /special entries\s+1 \(expected 0\)/);
+  assert.doesNotMatch(diagnostic.join(''), /TASK130_F26_PRIVATE_FIFO/);
+  assert.deepEqual(source.match(/refuseInstalledTreeSpecials\(objTree(?:After)?\);/gu),
+    ['refuseInstalledTreeSpecials(objTree);', 'refuseInstalledTreeSpecials(objTreeAfter);']);
+});
+
+test('NPM-VERSION-PRIVACY: raw npm labels never enter public toolchain sinks', () => {
+  const from = source.indexOf('function unicodeCodePointLength(');
+  const describeFrom = source.indexOf('function describeNpmVersion(', from);
+  const to = source.indexOf('\n}\n', describeFrom) + 2;
+  assert.ok(from >= 0 && describeFrom > from && to > describeFrom);
+  const functions = new Function(
+    `${source.slice(from, to)}; return { unicodeCodePointLength, describeNpmVersion };`)();
+  assert.equal(functions.describeNpmVersion('11.16.0'), '11.16.0');
+  const strDecorated = functions.describeNpmVersion(
+    '11.16.0-TASK130-F28-PRIVATE-PRERELEASE.1+TASK130-F28-PRIVATE-BUILD');
+  assert.equal(strDecorated, '11.16.0 (prerelease and build metadata withheld)');
+  assert.doesNotMatch(strDecorated, /TASK130-F28|PRIVATE/);
+  assert.equal(functions.describeNpmVersion('11.16.0+TASK130-F28-PRIVATE-BUILD'),
+    '11.16.0 (build metadata withheld)');
+  const strMalformed = functions.describeNpmVersion('TASK130_F28_PRIVATE_雪');
+  assert.equal(strMalformed,
+    'unrecognized npm version output (21 Unicode code points; value withheld)');
+  assert.doesNotMatch(strMalformed, /TASK130_F28|PRIVATE|雪/u);
+  const recordFrom = source.indexOf('npm: strNpmVersion');
+  const recordTo = source.indexOf('\n', recordFrom);
+  assert.ok(recordFrom >= 0 && recordTo > recordFrom);
+  const strRecordedVersion = new Function('strNpmVersionPublic', 'strNpmVersionRaw',
+    `return ({ ${source.slice(recordFrom, recordTo)} }).npm;`)(
+    strDecorated, '11.16.0-TASK130-F28-PRIVATE-PRERELEASE.1+TASK130-F28-PRIVATE-BUILD');
+  assert.equal(strRecordedVersion, strDecorated);
+  assert.doesNotMatch(strRecordedVersion, /TASK130-F28|PRIVATE/);
+  const guardFrom = source.indexOf('if (!boolAnyToolchain && (strNodeVersion !== REVIEWED_NODE');
+  const guardTo = source.indexOf('\n}\n', guardFrom) + 2;
+  assert.ok(guardFrom >= 0 && guardTo > guardFrom);
+  const arrDiagnostic = [];
+  const strRawSecret = 'TASK130_F28_PRIVATE_RAW_VERSION';
+  const strPublicSecret = functions.describeNpmVersion(strRawSecret);
+  assert.throws(() => new Function('boolAnyToolchain', 'strNodeVersion', 'REVIEWED_NODE',
+    'strNpmVersionRaw', 'REVIEWED_NPM', 'REVIEWED_PLATFORM', 'REVIEWED_ARCH',
+    'process', 'strNpmVersionPublic',
+    'formatUntrustedText', source.slice(guardFrom, guardTo))(
+    false, 'v24.18.1', 'v24.18.1', strRawSecret, '11.16.0', 'linux', 'x64', {
+      platform: 'linux', arch: 'x64', stderr: { write: (value) => arrDiagnostic.push(value) },
+      exit: (code) => { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+    }, strPublicSecret, String), { refusal: 2 });
+  assert.match(arrDiagnostic.join(''), /unrecognized npm version output \(31 Unicode code points; value withheld\)/);
+  assert.doesNotMatch(arrDiagnostic.join(''), /TASK130_F28|PRIVATE_RAW_VERSION/);
+});
+
+test('URL-PRIVACY: only the exact reviewed registry retains an authority', () => {
+  const registryFrom = source.indexOf("const REVIEWED_REGISTRY = '");
+  const registryTo = source.indexOf('\n', registryFrom);
+  const lengthFrom = source.indexOf('function unicodeCodePointLength(');
+  const lengthTo = source.indexOf('\n}\n', lengthFrom) + 2;
+  const redactFrom = source.indexOf('function redactUrl(');
+  const redactTo = source.indexOf('\n}\n', redactFrom) + 2;
+  assert.ok(registryFrom >= 0 && registryTo > registryFrom
+    && registryFrom < source.indexOf('const strInvokedPath = ')
+    && lengthFrom >= 0 && lengthTo > lengthFrom && redactFrom >= 0 && redactTo > redactFrom);
+  const reviewed = 'https://registry.npmjs.org/';
+  const redact = new Function(
+    `${source.slice(registryFrom, registryTo)}
+${source.slice(lengthFrom, lengthTo)}
+${source.slice(redactFrom, redactTo)}
+return redactUrl;`)();
+  assert.equal(redact(reviewed), reviewed);
+  for (const [strRaw, strExpected] of [
+    ['https://TASK130_F29_PRIVATE_HOST:8443/TASK130_F29_PRIVATE_PATH?token=PRIVATE',
+      'https://(authority and URL details withheld)'],
+    ['http://TASK130_F29_PRIVATE_HOST/', 'http://(authority and URL details withheld)'],
+    ['git+ssh://TASK130_F29_PRIVATE_PROTOCOL/path', 'URL authority and details withheld'],
+  ]) {
+    const strSafe = redact(strRaw);
+    assert.equal(strSafe, strExpected);
+    assert.doesNotMatch(strSafe, /TASK130_F29|PRIVATE|8443|git\+ssh/u);
+  }
+  assert.equal(redact('TASK130_F29_PRIVATE_雪'),
+    'unparseable, 21 Unicode code points (value not shown)');
+
+  const regexFrom = source.indexOf('const RE_PARSER_DELETES = ');
+  const regexTo = source.indexOf('\n\n', regexFrom);
+  const objRegex = new Function(
+    `${source.slice(regexFrom, regexTo)}; return { RE_PARSER_DELETES, RE_URL_IN_TEXT, RE_LINE_BREAK };`)();
+  const treeFrom = source.indexOf('function formatTreeName(');
+  const treeTo = source.indexOf('\n}\n', treeFrom) + 2;
+  const formatFrom = source.indexOf('function formatUntrustedText(');
+  const formatTo = source.indexOf('\n}\n', formatFrom) + 2;
+  const format = new Function('RE_PARSER_DELETES', 'RE_URL_IN_TEXT', 'RE_LINE_BREAK',
+    'redactUrl', `${source.slice(treeFrom, treeTo)}\n${source.slice(formatFrom, formatTo)}\nreturn formatUntrustedText;`)(
+    objRegex.RE_PARSER_DELETES, objRegex.RE_URL_IN_TEXT, objRegex.RE_LINE_BREAK, redact);
+  const strGeneral = format('prefix https://TASK130_F29_PRIVATE_GENERAL:9443/path?token=PRIVATE');
+  assert.equal(strGeneral, 'prefix https://(authority and URL details withheld)');
+  assert.doesNotMatch(strGeneral, /TASK130_F29|PRIVATE_GENERAL|9443|token=/u);
+
+  const assignmentFrom = source.indexOf('objRecord.registry = redactUrl(strRegistry);');
+  const assignmentTo = source.indexOf('\n', assignmentFrom);
+  const objRecord = {};
+  const strRegistry = 'git+ssh://TASK130_F29_PRIVATE_JSON/path';
+  new Function('objRecord', 'redactUrl', 'strRegistry',
+    source.slice(assignmentFrom, assignmentTo))(objRecord, redact, strRegistry);
+  assert.equal(JSON.stringify(objRecord), '{"registry":"URL authority and details withheld"}');
+  const renderFrom = source.indexOf('function renderRecordRow(');
+  const renderTo = source.indexOf('\n}\n', renderFrom) + 2;
+  const render = new Function('formatUntrustedText',
+    `${source.slice(renderFrom, renderTo)}; return renderRecordRow;`)(format);
+  assert.equal(render('registry', objRecord.registry),
+    '  registry             URL authority and details withheld\n');
+  assert.doesNotMatch(render('registry', objRecord.registry), /TASK130_F29|PRIVATE_JSON|git\+ssh/);
+});
 
 test('NPM-LINK-CONTAINMENT: production resolver rejects every uncovered resolution shape',
   { skip: process.platform !== 'linux' }, () => {
@@ -682,16 +851,17 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
     }
     cpSync(join(workflow, 'node_modules'), join(fixture, 'node_modules'), { recursive: true, verbatimSymlinks: true });
     const contract = JSON.parse(readFileSync(join(fixture, 'workflow-policy-contract.json')));
-    const invokeFrom = (strFixture, flags = [], env = {}, objBaseEnvironment = process.env) => {
+    const invokeFrom = (strFixture, flags = [], env = {}, objBaseEnvironment = process.env,
+      intTimeout = undefined) => {
       const cache = mkdtempSync(join(temporary, 'cache-'));
       return spawnSync(process.execPath, [join(strFixture, 'Get-SupplyFreezeDigest.mjs'),
         '--json', `--cache-directory=${cache}`, ...flags], {
         encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
-        env: { ...objBaseEnvironment, ...env },
+        env: { ...objBaseEnvironment, ...env }, timeout: intTimeout,
       });
     };
-    const invoke = (flags = [], env = {}, objBaseEnvironment = process.env) =>
-      invokeFrom(fixture, flags, env, objBaseEnvironment);
+    const invoke = (flags = [], env = {}, objBaseEnvironment = process.env,
+      intTimeout = undefined) => invokeFrom(fixture, flags, env, objBaseEnvironment, intTimeout);
     // A removed startup guard would enable child-process debug output before the
     // assertion runs. Use a fixed minimal environment so that failure output can
     // contain only the fake sentinel and synthetic fixture paths, never host secrets.
@@ -732,6 +902,71 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       assert.deepEqual(fingerprint(checkout), before);
       assert.equal(existsSync(join(checkout, 'forbidden-cache')), false);
       assert.equal(existsSync(join(checkout, 'forbidden-logs')), false);
+
+      const strVersionToolchain = join(temporary, 'version-toolchain');
+      const strVersionBin = join(strVersionToolchain, 'bin');
+      const strVersionNpmRoot = join(strVersionToolchain, 'lib', 'node_modules', 'npm');
+      mkdirSync(strVersionBin, { recursive: true });
+      mkdirSync(dirname(strVersionNpmRoot), { recursive: true });
+      cpSync(process.execPath, join(strVersionBin, 'node'));
+      chmodSync(join(strVersionBin, 'node'), 0o755);
+      const strActualNpmCli = realpathSync(join(dirname(process.execPath), 'npm'));
+      cpSync(dirname(dirname(strActualNpmCli)), strVersionNpmRoot,
+        { recursive: true, verbatimSymlinks: true });
+      const strVersionNpmCli = join(strVersionNpmRoot, 'bin', 'npm-cli.js');
+      const strFakeVersion =
+        '11.16.0-TASK130-F28-PRIVATE-PRERELEASE.1+TASK130-F28-PRIVATE-BUILD';
+      const bufVersionNpmCli = readFileSync(strVersionNpmCli);
+      const intShebangEnd = bufVersionNpmCli.indexOf(0x0A) + 1;
+      assert.ok(intShebangEnd > 1);
+      writeFileSync(strVersionNpmCli, Buffer.concat([
+        bufVersionNpmCli.subarray(0, intShebangEnd),
+        Buffer.from(`if (process.argv.includes('--version') && process.env.TASK130_F26_CHILD_MARKER) { require('node:fs').writeFileSync(process.env.TASK130_F26_CHILD_MARKER, 'started'); process.exit(73); }\nif (process.argv.includes('--version')) { console.log(${JSON.stringify(strFakeVersion)}); process.exit(0); }\n`),
+        bufVersionNpmCli.subarray(intShebangEnd),
+      ]));
+      symlinkSync('../lib/node_modules/npm/bin/npm-cli.js', join(strVersionBin, 'npm'));
+      const invokeVersionToolchain = (boolJson) => {
+        const arrArguments = [join(fixture, 'Get-SupplyFreezeDigest.mjs'), '--any-toolchain',
+          '--no-audit', `--cache-directory=${mkdtempSync(join(temporary, 'version-cache-'))}`];
+        if (boolJson) arrArguments.push('--json');
+        return spawnSync(join(strVersionBin, 'node'), arrArguments, {
+          encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, env: process.env,
+        });
+      };
+      const objVersionJson = invokeVersionToolchain(true);
+      assert.equal(objVersionJson.status, 0, objVersionJson.stderr);
+      const strPublicVersion =
+        '11.16.0 (prerelease and build metadata withheld)';
+      assert.equal(JSON.parse(objVersionJson.stdout).currentObservation.toolchain.npm,
+        strPublicVersion);
+      assert.doesNotMatch(objVersionJson.stdout, /TASK130-F28|PRIVATE-PRERELEASE|PRIVATE-BUILD/);
+      const objVersionText = invokeVersionToolchain(false);
+      assert.equal(objVersionText.status, 0, objVersionText.stderr);
+      assert.match(objVersionText.stdout,
+        /npm\s+11\.16\.0 \(prerelease and build metadata withheld\)/);
+      assert.doesNotMatch(objVersionText.stdout, /TASK130-F28|PRIVATE-PRERELEASE|PRIVATE-BUILD/);
+
+      const strFifoCheckout = join(temporary, 'fifo-checkout');
+      cpSync(checkout, strFifoCheckout, { recursive: true, verbatimSymlinks: true });
+      const strFifoFixture = join(strFifoCheckout, '.github', 'workflows');
+      const strProjectFifo = join(strFifoFixture, 'node_modules', 'yaml', 'package.json');
+      rmSync(strProjectFifo);
+      const objMkfifo = spawnSync('mkfifo', [strProjectFifo], { encoding: 'utf8' });
+      assert.equal(objMkfifo.status, 0, objMkfifo.stderr);
+      const strNpmChildMarker = join(temporary, 'TASK130_F26_CHILD_STARTED');
+      const objBeforeChild = spawnSync(join(strVersionBin, 'node'), [
+        join(strFifoFixture, 'Get-SupplyFreezeDigest.mjs'), '--json', '--any-toolchain',
+        '--no-audit', `--cache-directory=${mkdtempSync(join(temporary, 'fifo-cache-'))}`,
+      ], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
+        env: { ...process.env, TASK130_F26_CHILD_MARKER: strNpmChildMarker } });
+      assert.equal(existsSync(strNpmChildMarker), false);
+      refuse(objBeforeChild, 11);
+      for (const arrFlags of [['--no-audit'], ['--no-audit', '--any-toolchain']]) {
+        const objFifoRefusal = invokeFrom(strFifoFixture, arrFlags, {}, process.env, 5000);
+        refuse(objFifoRefusal, 11);
+        assert.match(objFifoRefusal.stderr, /tree containing special files/);
+        assert.doesNotMatch(objFifoRefusal.stderr, /node_modules\/yaml\/package\.json/);
+      }
 
       const problemCheckout = join(temporary, 'TASK130_F22_PRIVATE_PATH');
       cpSync(checkout, problemCheckout, { recursive: true, verbatimSymlinks: true });
@@ -879,6 +1114,15 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       assert.match(configFailure.stderr, /npm diagnostic summary \(child text withheld\)/);
       assert.match(configFailure.stderr, /stderr length\s+\d+ characters/);
 
+      const strPrivateRegistry =
+        'https://TASK130_F29_PRIVATE_HOST:8443/TASK130_F29_PRIVATE_PATH?token=PRIVATE';
+      const registryFailure = invoke([], { NPM_CONFIG_REGISTRY: strPrivateRegistry });
+      refuse(registryFailure, 9);
+      assert.match(registryFailure.stderr,
+        /observed https:\/\/\(authority and URL details withheld\)/);
+      assert.doesNotMatch(registryFailure.stderr,
+        /TASK130_F29|PRIVATE_HOST|PRIVATE_PATH|8443|token=/u);
+
       const extra = join(fixture, 'node_modules', 'yaml', 'unexpected-file');
       writeFileSync(extra, 'changed bytes');
       const changed = invoke(['--no-audit']);
@@ -964,8 +1208,12 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       const validAlias = aliasRun(mkdtempSync(join(temporary, 'alias-cache-')));
       assert.equal(validAlias.status, 0, validAlias.stderr);
       assert.equal(JSON.parse(validAlias.stdout).currentObservation.complete, false);
-      refuse(invoke(['--secret=https://user:UNIQUE_SECRET@example.test']), 2);
-      assert.doesNotMatch(invoke(['--secret=https://user:UNIQUE_SECRET@example.test']).stderr, /UNIQUE_SECRET/);
+      const earlyUrlFailure = invoke(['--secret=https://user:UNIQUE_SECRET@example.test']);
+      refuse(earlyUrlFailure, 2);
+      assert.doesNotMatch(earlyUrlFailure.stderr, /UNIQUE_SECRET|ReferenceError/);
+      const earlySchemeFailure = invoke(['--secret=git+ssh://TASK130_F29_PRIVATE_PROTOCOL/path']);
+      refuse(earlySchemeFailure, 2);
+      assert.doesNotMatch(earlySchemeFailure.stderr, /TASK130_F29|PRIVATE_PROTOCOL|git\+ssh/);
     } finally {
       // Every mutation is confined to this fresh, externally allocated fixture.
       rmSync(temporary, { recursive: true, force: true });

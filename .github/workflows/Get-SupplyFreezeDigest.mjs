@@ -89,6 +89,12 @@ const RE_PARSER_DELETES = /[\t\n\r]/gu;
 const RE_URL_IN_TEXT = /[A-Za-z][A-Za-z0-9+.\-\t\n\r]*:[\s\S]*/u;
 const RE_LINE_BREAK = /\r\n|[\n\r\u2028\u2029]/gu;
 
+// The registry whose advisory posture was reviewed. This literal is initialized
+// above every possible diagnostic call because redactUrl() is also used by early
+// startup refusals. Keeping it beside the literal regular expressions avoids a
+// temporal-dead-zone failure before the module reaches its configuration table.
+const REVIEWED_REGISTRY = 'https://registry.npmjs.org/';
+
 // Round 56, reported by Codex, and the round-55 fix caught in its own turn.
 // That round moved this block above SUPPORTED_ARGUMENTS and then wrote that it
 // "genuinely precedes every other statement". It did not: process.umask(), the
@@ -97,11 +103,11 @@ const RE_LINE_BREAK = /\r\n|[\n\r\u2028\u2029]/gu;
 // reviewer pointed at and restating the invariant as though the class were
 // closed is the habit this file keeps rediscovering.
 //
-// It is now the first executable statement in the module, ahead of every
-// constant that is not a compile-time regular expression. That is checkable
-// rather than asserted: nothing above this line executes except the four
-// literal RE_ constructions, and the block depends only on hoisted function
-// declarations and imports.
+// It is now the first filesystem observation in the module, ahead of every
+// constant that is not a compile-time literal. That is checkable rather than
+// asserted: nothing above this line executes except literal regular-expression
+// and registry-string initialization, and the block depends only on hoisted
+// function declarations and imports.
 //
 // The window between Node COMPILING this file and this read cannot be closed
 // from inside the script -- the record says so, and no reordering changes it.
@@ -537,11 +543,6 @@ const REVIEWED_UMASK = 0o022;
 // formatted once, used everywhere.
 const intObservedUmask = process.umask();
 const strObservedUmask = `0${intObservedUmask.toString(8).padStart(3, '0')}`;
-
-// The registry the recorded advisory posture was snapshotted from. Checked only
-// on the audit path -- see the comment at its use for why the installed tree is
-// not exposed to this and a --no-audit run therefore is not refused.
-const REVIEWED_REGISTRY = 'https://registry.npmjs.org/';
 
 const strWorkflowDirectory = dirname(fileURLToPath(import.meta.url));
 const arrRawArguments = process.argv.slice(2);
@@ -4237,8 +4238,132 @@ if (!boolAnyToolchain && (objNpmTree.sha256 !== REVIEWED_NPM_TREE_SHA256
     '  explicitly-unreviewed output.\n');
   process.exit(2);
 }
-const strNpmVersion = runNpmOrRefuse(['--version'], undefined, 2,
+
+// Round 83, reported by Codex. npm ls was the first operation to open project
+// package entries, but the first installed-tree fold and its special-entry
+// refusal ran only after npm ls completed. A FIFO in node_modules therefore
+// blocked inside npm before the recorder reached the check that rejected it.
+// Establish the complete initial tree shape before the first npm child instead.
+const boolRootWalkable = existsSync(strTreeRoot) && (() => {
+  try {
+    return statSync(strTreeRoot).isDirectory();
+  } catch {
+    return false;
+  }
+})();
+
+if (!boolRootWalkable) {
+  process.stderr.write(
+    'supply-freeze: refusing to record digests for a tree that is not the installed tree.\n' +
+    `  node_modules       ${existsSync(strTreeRoot) ? 'present, but not a directory' : 'MISSING'}\n` +
+    '  there is nothing to fold, so no digest exists to report -- with or without\n' +
+    '  --any-toolchain. install first with the documented command:\n' +
+    '    npm ci --ignore-scripts --no-audit --no-fund\n' +
+    strWorkspaceReinstallNote);
+  process.exit(7);
+}
+
+if (!boolAnyToolchain
+  && !scanOrRefuse(() => lstatSync(strTreeRoot), 'the root type check').isDirectory()) {
+  process.stderr.write(
+    'supply-freeze: refusing to record digests for a tree that is not the installed tree.\n' +
+    '  node_modules       present, but a symlink rather than a directory\n' +
+    '  npm ci creates node_modules as a real directory. A symlinked root points the\n' +
+    '  install somewhere this record does not describe, however identical its contents.\n');
+  process.exit(7);
+}
+
+function refuseInstalledTreeSpecials(objInstalledTree) {
+  if (objInstalledTree.specials === 0) return;
+  process.stderr.write(
+    'supply-freeze: refusing to record digests for a tree containing special files.\n' +
+    `  special entries    ${objInstalledTree.specials} (expected 0)\n` +
+    '  npm ci creates only files, directories and symlinks; a FIFO, socket or\n' +
+    '  device node under node_modules did not come from the install. Entry names\n' +
+    '  are withheld because they are filesystem-controlled diagnostic text.\n');
+  process.exit(11);
+}
+
+const objTree = scanOrRefuse(() => foldInstalledTree(strTreeRoot), 'the first fold');
+if (!boolAnyToolchain && !objTree.rootIsDirectory) {
+  refuseRootThatIsNotADirectory(objTree.rootMode);
+}
+refuseInstalledTreeSpecials(objTree);
+
+if (objTree.escapingLinks.length > 0) {
+  process.stderr.write(
+    'supply-freeze: refusing to record digests for a tree whose links leave it.\n' +
+    `  escaping links     ${objTree.escapingLinks.length} (expected 0)\n` +
+    `${objTree.escapingLinks.slice(0, 10).map((objLink) =>
+      `    node_modules/${objLink.path}\n`).join('')}` +
+    (objTree.escapingLinks.length > 10
+      ? `    ... and ${objTree.escapingLinks.length - 10} more\n` : '') +
+    '  each link above passes outside the tree root somewhere along its chain --\n' +
+    '  which is not the same as ending outside it, and a chain that leaves and\n' +
+    '  comes back is refused too: the hop outside decides which in-tree bytes load\n' +
+    '  and nothing in this record covers that hop. the target is not\n' +
+    '  printed: it is chosen by whoever wrote the link and CI logs are retained, so\n' +
+    '  a target carrying a username, internal layout or a path-borne token would\n' +
+    '  outlive this run. run `ls -l` on the names above to see where they point.\n' +
+    '  the fold hashes a link\'s target text, not the bytes behind it, so a target\n' +
+    '  outside node_modules is code this digest does not cover and cannot detect\n' +
+    '  changes to. npm ci installs package contents in place; a package directory\n' +
+    '  that is a link to somewhere else did not come from the install.\n');
+  process.exit(11);
+}
+
+if (objTree.unresolvedLinks.length > 0) {
+  process.stderr.write(
+    'supply-freeze: refusing to record digests for a tree with links it cannot resolve.\n' +
+    `  unresolved links   ${objTree.unresolvedLinks.length} (expected 0)\n` +
+    `${objTree.unresolvedLinks.slice(0, 10).map((objLink) =>
+      `    node_modules/${objLink.path} (${objLink.code})\n`).join('')}` +
+    (objTree.unresolvedLinks.length > 10
+      ? `    ... and ${objTree.unresolvedLinks.length - 10} more\n` : '') +
+    '  resolution failing means this fold could not establish that the link stays\n' +
+    '  inside the tree, so the containment the digest depends on is unproven rather\n' +
+    '  than satisfied. a target that is absent while this runs and restored after it\n' +
+    '  leaves the link text -- and therefore the digest -- completely unchanged.\n' +
+    '  reinstall with npm ci; npm ci does not create links it cannot resolve.\n');
+  process.exit(11);
+}
+
+function unicodeCodePointLength(strValue) {
+  let intCodePoints = 0;
+  for (let intIndex = 0; intIndex < strValue.length; intIndex += 1) {
+    const intCodeUnit = strValue.charCodeAt(intIndex);
+    if (intCodeUnit >= 0xD800 && intCodeUnit <= 0xDBFF && intIndex + 1 < strValue.length) {
+      const intNextCodeUnit = strValue.charCodeAt(intIndex + 1);
+      if (intNextCodeUnit >= 0xDC00 && intNextCodeUnit <= 0xDFFF) intIndex += 1;
+    }
+    intCodePoints += 1;
+  }
+  return intCodePoints;
+}
+
+function describeNpmVersion(strRawVersion) {
+  const intCodePoints = unicodeCodePointLength(strRawVersion);
+  const strWithheld = `unrecognized npm version output (${intCodePoints} Unicode code points; value withheld)`;
+  if (intCodePoints > 256) return strWithheld;
+
+  const objMatch = /^(0|[1-9]\d{0,8})\.(0|[1-9]\d{0,8})\.(0|[1-9]\d{0,8})(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/u
+    .exec(strRawVersion);
+  if (!objMatch) return strWithheld;
+  const [, strMajor, strMinor, strPatch, strPrerelease, strBuild] = objMatch;
+  if (strPrerelease?.split('.').some((strIdentifier) =>
+    /^\d+$/u.test(strIdentifier) && strIdentifier.length > 1 && strIdentifier.startsWith('0'))) {
+    return strWithheld;
+  }
+  const strCore = `${strMajor}.${strMinor}.${strPatch}`;
+  if (strPrerelease && strBuild) return `${strCore} (prerelease and build metadata withheld)`;
+  if (strPrerelease) return `${strCore} (prerelease metadata withheld)`;
+  if (strBuild) return `${strCore} (build metadata withheld)`;
+  return strCore;
+}
+
+const strNpmVersionRaw = runNpmOrRefuse(['--version'], undefined, 2,
   'the reviewed npm could not report its version.').trim();
+const strNpmVersionPublic = describeNpmVersion(strNpmVersionRaw);
 
 // Round 26, reported, and the most serious finding this script has taken.
 // NODE_OPTIONS=--require runs a module before the first statement of this file,
@@ -4313,18 +4438,18 @@ if (!boolAnyToolchain && boolEntryPointIsLink) {
   process.exit(2);
 }
 
-if (!boolAnyToolchain && (strNodeVersion !== REVIEWED_NODE || strNpmVersion !== REVIEWED_NPM
+if (!boolAnyToolchain && (strNodeVersion !== REVIEWED_NODE || strNpmVersionRaw !== REVIEWED_NPM
   || process.platform !== REVIEWED_PLATFORM || process.arch !== REVIEWED_ARCH)) {
   process.stderr.write(
     'supply-freeze: refusing to record digests on an unreviewed toolchain.\n' +
-    // Round 45, swept from the reported argument defect. strNpmVersion is the
+    // Round 45, swept from the reported argument defect. strNpmVersionRaw is the
     // stdout of a subprocess, so it is not a value this process computed. NOT
     // demonstrated exploitable: the PATH pin puts node's own directory first and
     // npm ships beside node, so a planted npm earlier in the inherited PATH never
     // wins -- measured, a fake npm printing a forged line was simply not reached.
     // That is one layout's accident rather than a property of this script, and
     // this refusal exists precisely to report a toolchain it does not trust.
-    `  observed Node ${formatUntrustedText(strNodeVersion)}, npm ${formatUntrustedText(strNpmVersion)}, ${process.platform}/${process.arch}\n` +
+    `  observed Node ${formatUntrustedText(strNodeVersion)}, npm ${strNpmVersionPublic}, ${process.platform}/${process.arch}\n` +
     `  reviewed Node ${REVIEWED_NODE}, npm ${REVIEWED_NPM}, ${REVIEWED_PLATFORM}/${REVIEWED_ARCH}\n` +
     '  pass --any-toolchain to compute anyway; the result is then not a freeze record.\n');
   process.exit(2);
@@ -4425,31 +4550,19 @@ const SENSITIVE_CONFIG_KEYS = Object.freeze(['proxy', 'https-proxy', 'noproxy', 
 // the class means every path by which a URL reaches output, so this is applied
 // at the three that exist rather than at the one reported.
 //
-// A URL carries its secrets in two places: userinfo (`https://user:token@host`)
-// and the query. Both are removed; scheme, host and path are kept, because a
-// reader needs to see WHICH registry was refused for the message to be worth
-// printing at all. Measured: the reviewed registry has neither part, so this is
-// a no-op on every non-bypassed run.
+// A URL can carry private or credential-like text in every authority component,
+// not only userinfo and query. Only the exact reviewed registry remains public.
+// Other HTTP(S) values retain a fixed scheme category; every authority, port,
+// path, query and fragment is withheld. Other schemes do not retain even their
+// protocol spelling because it is caller-controlled too.
 function redactUrl(strValue) {
+  if (strValue === REVIEWED_REGISTRY) return REVIEWED_REGISTRY;
   try {
     const objUrl = new URL(strValue);
-    // Round 38, reported by Codex, and it is this helper's own comment being
-    // wrong one round after it was written. That comment said scheme, host and
-    // path are kept "because a reader has to see WHICH registry was refused" --
-    // but the host answers that question, and the PATH is as free-form as the
-    // query. Measured: NPM_CONFIG_REGISTRY=https://host/SUPPLYSECRET/ is
-    // returned verbatim by npm, so the token rode out in the pathname of a value
-    // this function had already declared safe.
-    //
-    // The path is dropped rather than kept, and the boundary is exact: a
-    // pathname of `/` is what a bare origin produces, so the reviewed registry
-    // https://registry.npmjs.org/ is returned CHARACTER-IDENTICAL and the
-    // compared row does not move. Anything longer is withheld.
-    const boolPathCarries = objUrl.pathname !== '/' && objUrl.pathname !== '';
-    const boolCarriedSecret = objUrl.username !== '' || objUrl.password !== ''
-      || objUrl.search !== '' || objUrl.hash !== '' || boolPathCarries;
-    const strSafe = `${objUrl.protocol}//${objUrl.host}${boolPathCarries ? '/' : objUrl.pathname}`;
-    return boolCarriedSecret ? `${strSafe} (path, credentials and query redacted)` : strSafe;
+    if (objUrl.protocol === 'http:' || objUrl.protocol === 'https:') {
+      return `${objUrl.protocol}//(authority and URL details withheld)`;
+    }
+    return 'URL authority and details withheld';
   } catch {
     // Round 38, reported by Copilot, in the round-37 fix above and in the
     // sentence defending it. This returned strValue unchanged, on the reasoning
@@ -4467,7 +4580,7 @@ function redactUrl(strValue) {
     // Length and the fact of being unparseable are kept, matching what the
     // NODE_OPTIONS refusal reports. That is the whole of the diagnostic the old
     // branch was defending -- "this value is not a URL" -- without the payload.
-    return `unparseable, ${strValue.length} characters (value not shown)`;
+    return `unparseable, ${unicodeCodePointLength(strValue)} Unicode code points (value not shown)`;
   }
 }
 
@@ -4820,11 +4933,11 @@ const objRecord = {
   script: { sha256: strScriptSha256 },
   toolchain: {
     node: strNodeVersion,
-    npm: strNpmVersion,
+    npm: strNpmVersionPublic,
     // Round 56. Emitted because the guard that produced it refuses on mismatch,
     // so a reader holding this output can see WHICH npm answered rather than
-    // taking on faith that some check passed. `npm` above is what npm says
-    // about itself; this is what its bytes say.
+    // taking on faith that some check passed. `npm` above is the bounded public
+    // description of npm's response; this is what its installation bytes say.
     npmTree: objNpmTree.sha256,
     platform: process.platform,
     arch: process.arch,
@@ -5057,25 +5170,6 @@ try {
 // root that had been stable for the whole run. Walkability is checked with stat
 // rather than lstat, so a symlink to a real directory stays foldable and is
 // handled by the reviewed-run guard that already covers it.
-const boolRootWalkable = existsSync(strTreeRoot) && (() => {
-  try {
-    return statSync(strTreeRoot).isDirectory();
-  } catch {
-    return false;
-  }
-})();
-
-if (!boolRootWalkable) {
-  process.stderr.write(
-    'supply-freeze: refusing to record digests for a tree that is not the installed tree.\n' +
-    `  node_modules       ${existsSync(strTreeRoot) ? 'present, but not a directory' : 'MISSING'}\n` +
-    '  there is nothing to fold, so no digest exists to report -- with or without\n' +
-    '  --any-toolchain. install first with the documented command:\n' +
-    '    npm ci --ignore-scripts --no-audit --no-fund\n' +
-    strWorkspaceReinstallNote);
-  process.exit(7);
-}
-
 if (!boolAnyToolchain && (!existsSync(strTreeRoot) || !objRecord.treeSatisfiesLockfile)) {
   process.stderr.write(
     'supply-freeze: refusing to record digests for a tree that is not the installed tree.\n' +
@@ -5123,23 +5217,6 @@ function scanOrRefuse(fnScan, strWhat) {
   }
 }
 
-// Round 18, reported by Copilot. The symlinked-root refusal below read
-// objTree.rootIsDirectory, which only exists AFTER the whole redirected tree had
-// been walked and hashed -- so a reviewed run did the entire fold before
-// refusing, and a root pointed at an arbitrarily large tree would be scanned in
-// full before anything objected. lstat answers the same question before a single
-// entry is read.
-if (!boolAnyToolchain
-  && !scanOrRefuse(() => lstatSync(strTreeRoot), 'the root type check').isDirectory()) {
-  process.stderr.write(
-    'supply-freeze: refusing to record digests for a tree that is not the installed tree.\n' +
-    '  node_modules       present, but a symlink rather than a directory\n' +
-    '  npm ci creates node_modules as a real directory. A symlinked root points the\n' +
-    '  install somewhere this record does not describe, however identical its contents.\n');
-  process.exit(7);
-}
-
-const objTree = scanOrRefuse(() => foldInstalledTree(strTreeRoot), 'the first fold');
 objRecord.installedTreeSha256 = objTree.sha256;
 objRecord.installedTreeFiles = objTree.files;
 objRecord.installedTreeSymlinks = objTree.symlinks;
@@ -5148,85 +5225,6 @@ objRecord.installedTreeSpecials = objTree.specials;
 objRecord.installedTreeModes = objTree.modes;
 objRecord.installedTreeDirectoryModes = objTree.directoryModes;
 objRecord.installedTreeRootMode = objTree.rootMode;
-
-// Round 9. A FIFO, socket or device node under node_modules means this is not
-// an installed tree, which is the same thing refusal 7 asserts for a different
-// cause -- so it gets the same treatment rather than a digest.
-//
-// The fold above now distinguishes these entries from one another, so the
-// number reported under --any-toolchain is honest either way. This refusal is
-// about what a REVIEWED run is allowed to mint: `npm ci` produces no such
-// entry, so a record over a tree containing one would be a freeze record for
-// something npm cannot have built.
-// Round 12. `npm ci` creates node_modules as a real directory. A symlinked root
-// redirects where every installed module loads from while the contents behind it
-// can be byte-identical, so it is the same class as refusal 7 already covers --
-// this is not the installed tree -- and it reuses that exit rather than adding
-// an eleventh number for a tenth cause.
-// Round 44. Reached only when the root changed after the early rejection above,
-// since a symlinked root is refused before the baseline scan now.
-if (!boolAnyToolchain && !objTree.rootIsDirectory) {
-  refuseRootThatIsNotADirectory(objTree.rootMode);
-}
-
-if (!boolAnyToolchain && objTree.specials > 0) {
-  process.stderr.write(
-    'supply-freeze: refusing to record digests for a tree containing special files.\n' +
-    `  special entries    ${objTree.specials} (expected 0)\n` +
-    `${objTree.specialPaths.slice(0, 10).map((strPath) => `    node_modules/${strPath}\n`).join('')}` +
-    (objTree.specialPaths.length > 10
-      ? `    ... and ${objTree.specialPaths.length - 10} more\n` : '') +
-    '  npm ci creates only files, directories and symlinks; a FIFO, socket or\n' +
-    '  device node under node_modules did not come from the install.\n');
-  process.exit(11);
-}
-
-// Round 38, reported by Codex. Refused rather than recorded: a link out of the
-// tree makes the installed-tree digest silent about the code that actually
-// loads, which is the one thing that digest exists to pin.
-if (objTree.escapingLinks.length > 0) {
-  process.stderr.write(
-    'supply-freeze: refusing to record digests for a tree whose links leave it.\n' +
-    `  escaping links     ${objTree.escapingLinks.length} (expected 0)\n` +
-    `${objTree.escapingLinks.slice(0, 10).map((objLink) =>
-      `    node_modules/${objLink.path}\n`).join('')}` +
-    (objTree.escapingLinks.length > 10
-      ? `    ... and ${objTree.escapingLinks.length - 10} more\n` : '') +
-    '  each link above passes outside the tree root somewhere along its chain --\n' +
-    '  which is not the same as ending outside it, and a chain that leaves and\n' +
-    '  comes back is refused too: the hop outside decides which in-tree bytes load\n' +
-    '  and nothing in this record covers that hop. the target is not\n' +
-    '  printed: it is chosen by whoever wrote the link and CI logs are retained, so\n' +
-    '  a target carrying a username, internal layout or a path-borne token would\n' +
-    '  outlive this run. run `ls -l` on the names above to see where they point.\n' +
-    '  the fold hashes a link\'s target text, not the bytes behind it, so a target\n' +
-    '  outside node_modules is code this digest does not cover and cannot detect\n' +
-    '  changes to. npm ci installs package contents in place; a package directory\n' +
-    '  that is a link to somewhere else did not come from the install.\n');
-  process.exit(11);
-}
-
-// Round 39, reported by Codex. A link this fold could not resolve is refused
-// rather than skipped. Containment is what the guard above asserts, and a link
-// whose resolution failed is one whose containment was never established --
-// including the case where the target is absent for exactly as long as this
-// script is looking at it, which is invisible to the lstat-based sweep.
-if (objTree.unresolvedLinks.length > 0) {
-  process.stderr.write(
-    'supply-freeze: refusing to record digests for a tree with links it cannot resolve.\n' +
-    `  unresolved links   ${objTree.unresolvedLinks.length} (expected 0)\n` +
-    `${objTree.unresolvedLinks.slice(0, 10).map((objLink) =>
-      `    node_modules/${objLink.path} (${objLink.code})\n`).join('')}` +
-    (objTree.unresolvedLinks.length > 10
-      ? `    ... and ${objTree.unresolvedLinks.length - 10} more\n` : '') +
-    '  resolution failing means this fold could not establish that the link stays\n' +
-    '  inside the tree, so the containment the digest depends on is unproven rather\n' +
-    '  than satisfied. a target that is absent while this runs and restored after it\n' +
-    '  leaves the link text -- and therefore the digest -- completely unchanged.\n' +
-    '  reinstall with npm ci; npm ci does not create links it cannot resolve.\n');
-  process.exit(11);
-}
-
 function auditPackageDisplaySummary(objPackages) {
   const newSeverityCounts = () => Object.fromEntries(
     [...SEVERITY_LEVELS, 'unclassified'].map((strSeverity) => [strSeverity, 0]));
@@ -5576,6 +5574,7 @@ if (!readOrRefuse(strPackagePath).equals(objPackageBefore)
 // about is the defect this review found five times over; the cost is one extra
 // pass at roughly 0.1s.
 const objTreeAfter = scanOrRefuse(() => foldInstalledTree(strTreeRoot), 'the second fold');
+refuseInstalledTreeSpecials(objTreeAfter);
 // Round 35, reported by Codex. Every field is compared, not the digest alone.
 // The digest folds `mode & 0o555` -- read and execute -- so the write bits and
 // the setuid/setgid/sticky bits are outside it BY DESIGN, for the reasons the
