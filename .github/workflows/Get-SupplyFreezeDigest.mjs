@@ -691,6 +691,11 @@ function refuseCache() {
   process.stderr.write('supply-freeze: --cache-directory requires one existing empty private external directory; refusing before npm.\n');
   process.exit(16);
 }
+function hasUnsupportedNodeStartupEnvironment(objEnv) {
+  return Boolean((objEnv.NODE_COMPILE_CACHE && objEnv.NODE_DISABLE_COMPILE_CACHE !== '1')
+    || objEnv.NODE_V8_COVERAGE || objEnv.NODE_REDIRECT_WARNINGS
+    || objEnv.NODE_DEBUG || objEnv.NODE_DEBUG_NATIVE);
+}
 function validateCacheDirectory() {
   if (process.platform !== 'linux' || process.arch !== 'x64') {
     process.stderr.write('supply-freeze: this recorder supports Linux/x64 only.\n');
@@ -699,8 +704,7 @@ function validateCacheDirectory() {
   // Runtime cache/coverage/warning output can occur before or after our code.
   // This refusal prevents a complete claim, but cannot undo startup effects.
   // The caller must scrub these variables BEFORE Node starts; see the method.
-  if ((process.env.NODE_COMPILE_CACHE && process.env.NODE_DISABLE_COMPILE_CACHE !== '1')
-    || process.env.NODE_V8_COVERAGE || process.env.NODE_REDIRECT_WARNINGS) {
+  if (hasUnsupportedNodeStartupEnvironment(process.env)) {
     process.stderr.write('supply-freeze: unsupported Node startup-output environment; use the documented startup scrub.\n');
     process.exit(2);
   }
@@ -741,6 +745,16 @@ function sha256(objInput) {
   return createHash('sha256')
     .update(Buffer.isBuffer(objInput) ? objInput : Buffer.from(objInput, 'utf8'))
     .digest('hex');
+}
+
+function nonOwnerWriteReason(objStats) {
+  const objWriteMask = typeof objStats.mode === 'bigint' ? 0o022n : 0o022;
+  const objZero = typeof objStats.mode === 'bigint' ? 0n : 0;
+  const objWriteBits = objStats.mode & objWriteMask;
+  return objWriteBits === objZero
+    ? null
+    : `is writable by non-owner classes (write bits ${Number(objWriteBits)
+      .toString(8).padStart(4, '0')})`;
 }
 
 // Round 41, reported by Codex. Names read off the tree are attacker-chosen, and
@@ -1019,7 +1033,9 @@ function readViaVerifiedDescriptor(strPath, intMissingExit, fnOnMissing,
     // write path the quiescence sweep cannot see -- it compares this inode, and a
     // rewrite through the other path lands on this inode -- so npm could be fed
     // different bytes between the snapshot and the final re-read while the two
-    // byte-equality reads still compare equal. intUid is computed here, not
+    // byte-equality reads still compare equal. Group/other write bits grant the
+    // same capability to a non-owner even when uid and nlink look private.
+    // intUid is computed here, not
     // borrowed from a scope it does not belong to -- the borrowed reference in
     // the first cut of this class died with ReferenceError on every run.
     const intUid = typeof process.getuid === 'function' ? process.getuid() : null;
@@ -1027,16 +1043,17 @@ function readViaVerifiedDescriptor(strPath, intMissingExit, fnOnMissing,
       ? `is hard-linked ${objStats.nlink} times, so a second path can rewrite these bytes`
       : (intUid !== null && objStats.uid !== intUid)
         ? `is owned by uid ${objStats.uid}, but this recorder runs as uid ${intUid}`
-        : null;
+        : nonOwnerWriteReason(objStats);
     if (strWhy !== null) {
       closeDescriptorOnce();
       process.stderr.write(
         `supply-freeze: refusing to record digests for a ${objRefusal.what} that `
-        + 'another path can rewrite.\n'
+        + 'the recording user does not solely control.\n'
         + `  ${strPath.split('/').pop().padEnd(18)} ${strWhy}\n`
         + '  checked on the open descriptor whose bytes are returned. The compared\n'
-        + '  hashes must come from bytes only this run can reach; an alternate write\n'
-        + '  path lets npm read other bytes between the snapshot and the final read.\n');
+        + '  hashes must come from bytes only this run can hold stable; an alternate\n'
+        + '  path, owner, or non-owner write grant lets npm read other bytes between\n'
+        + '  the snapshot and the final read.\n');
       process.exit(objRefusal.exit);
     }
   }
@@ -1254,25 +1271,28 @@ function foldNpmInstallation(strRoot, strLauncherPath) {
   // only, matching the installed-tree walker: a directory's link count counts its
   // subdirectories and a symlink is not a byte source, so only a regular file's extra
   // link is a rewrite path. objStat comes from lstatSync(..., { bigint: true }), so
-  // nlink and uid are BigInt and are compared as BigInt.
+  // nlink, uid and mode are BigInt. Symlink mode is excluded because Linux reports
+  // pseudo-permissions on links; their targets are constrained by the resolver.
   const refuseExternallyMutableNpmEntry = (strPath, strLabel, objStat, boolRegularFile) => {
     const bigOwnUid = typeof process.getuid === 'function' ? BigInt(process.getuid()) : null;
     const strWhy = (boolRegularFile && objStat.nlink > 1n)
       ? `is hard-linked ${objStat.nlink} times, so a second path can rewrite these bytes`
       : (bigOwnUid !== null && objStat.uid !== bigOwnUid)
         ? `is owned by uid ${objStat.uid}, but this recorder runs as uid ${bigOwnUid}`
-        : null;
+        : (!objStat.isSymbolicLink() ? nonOwnerWriteReason(objStat) : null);
     if (strWhy === null) return;
     process.stderr.write(
-      'supply-freeze: refusing to verify an npm installation entry that another path can '
-      + 'rewrite.\n'
+      'supply-freeze: refusing an npm installation entry the recording user does not '
+      + 'solely control.\n'
       + `  entry              ${formatUntrustedText(strLabel)}\n`
       + `  observed           ${strWhy}\n`
-      + `  link count / uid   nlink ${objStat.nlink}, uid ${objStat.uid}, recorder uid `
+      + `  metadata           nlink ${objStat.nlink}, uid ${objStat.uid}, mode `
+      + `${Number(objStat.mode & 0o7777n).toString(8).padStart(4, '0')}, recorder uid `
       + `${bigOwnUid === null ? '(unknown)' : bigOwnUid}\n`
       + '  the npmTree fold reads these bytes and the quiescence sweep compares this\n'
-      + '  inode; a second hard link, or another owner, is a write path that sweep\n'
-      + '  cannot see, so npm could be fed other bytes while the digest compares equal.\n');
+      + '  inode; a second hard link, another owner, or a non-owner write grant is a\n'
+      + '  write path that sweep cannot exclude, so npm could be fed other bytes while\n'
+      + '  the digest compares equal.\n');
     process.exit(2);
   };
   const considerRootOrLauncher = (strPath, strLabel, boolEnforceSoleControl = false) => {
@@ -1427,6 +1447,7 @@ function foldNpmInstallation(strRoot, strLauncherPath) {
       try {
         const objStat = lstatSync(strPath, { bigint: true });
         if (objStat.isDirectory()) {
+          refuseExternallyMutableNpmEntry(strPath, strKey, objStat, false);
           hashField(objHash, 'd');
           hashField(objHash, strKey);
           walk(strPath, strKey);
@@ -1589,7 +1610,8 @@ function npmChildEnv(objEnv) {
   const objScrubbed = {};
   for (const [strKey, strValue] of Object.entries(objBase)) {
     if (/^npm_config_workspaces?$/i.test(strKey)) continue;
-    if (/^NODE_(?:OPTIONS|COMPILE_CACHE|V8_COVERAGE|REDIRECT_WARNINGS)$/i.test(strKey)) continue;
+    if (/^NODE_(?:OPTIONS|COMPILE_CACHE|V8_COVERAGE|REDIRECT_WARNINGS|DEBUG|DEBUG_NATIVE)$/i
+      .test(strKey)) continue;
     objScrubbed[strKey] = strValue;
   }
   objScrubbed.NODE_DISABLE_COMPILE_CACHE = '1';
@@ -1882,11 +1904,10 @@ function hashField(objHash, objField) {
 // and moves no digest, so the frozen values stay valid.
 //
 // gid is deliberately NOT refused on. A differing gid is only exploitable when
-// the group can also write, and group-write already shows up as 664/775 in the
-// mode histograms, which have been COMPARED fields since the POSIX ACL finding.
-// Refusing on gid as well would false-refuse every tree installed under a setgid
-// directory, which inherits the parent's gid by design, and would buy nothing
-// the histogram does not already catch.
+// the group can also write, and group-write now refuses through the shared
+// non-owner-write predicate. Refusing on gid as well would false-refuse every
+// tree installed under a setgid directory, which inherits the parent's gid by
+// design, without closing another write path.
 //
 // This is the containment rule the tree already applies to symlinks that leave
 // it, one property over: an entry the recorder does not own, or that a second
@@ -1921,17 +1942,17 @@ function refuseUnreviewedInodeMetadata(strPath, strChild, objStats, strKind) {
       ? `hard-linked ${objStats.nlink} times, so a second path can rewrite these bytes`
       : (intOwnUid !== null && objStats.uid !== intOwnUid)
         ? `owned by uid ${objStats.uid}, but this recorder runs as uid ${intOwnUid}`
-        : null;
+        : nonOwnerWriteReason(objStats);
   if (strProblem === null) return;
   process.stderr.write(
     'supply-freeze: refusing to record a tree entry the recorder does not solely control.\n' +
     `  entry              ${formatUntrustedText(strChild)}\n` +
     `  kind               ${strKind}\n` +
     `  observed           ${strProblem}\n` +
-    '  the digest folds permission bits and bytes, so none of these move it: an\n' +
-    '  entry owned by another uid can be rewritten by that owner after the final\n' +
-    '  sweep, a second hard link can be written through while this path looks\n' +
-    '  untouched, and a setuid bit does not appear in a 0o777 histogram at all.\n' +
+    '  the digest records permissions and bytes, but a snapshot of those values does\n' +
+    '  not keep them stable: another owner, a non-owner write grant, or a second hard\n' +
+    '  link can rewrite the inode after the final sweep, and a setuid bit does not\n' +
+    '  appear in a 0o777 histogram at all.\n' +
     '  reinstall the tree as the recording user with the documented command:\n' +
     '    npm ci --ignore-scripts --no-audit --no-fund\n' +
     strWorkspaceReinstallNote);
@@ -2903,7 +2924,7 @@ function newestChangeTime(strRoot, arrExtraPaths) {
     // the change sweep cannot see, because it compares this inode and a rewrite
     // through the other path lands on it -- went unrefused. Apply the descriptor-
     // bound guard the manifests use (readViaVerifiedDescriptor): open once with
-    // O_NOFOLLOW, fstat the descriptor, and refuse a file another path can rewrite,
+    // O_NOFOLLOW, fstat the descriptor, and refuse a file the recording user does not solely control,
     // bound to that descriptor so a name swap between the lstat above and this check
     // cannot outrun it. npm reads this as a configuration source, so the bytes must
     // be ones only this run can vouch for -- the same property the manifest read
@@ -2929,17 +2950,20 @@ function newestChangeTime(strRoot, arrExtraPaths) {
         ? `is hard-linked ${objFdStats.nlink} times, so a second path can rewrite these bytes`
         : (bigOwnUid !== null && objFdStats.uid !== bigOwnUid)
           ? `is owned by uid ${objFdStats.uid}, but this recorder runs as uid ${bigOwnUid}`
-          : null;
+          : nonOwnerWriteReason(objFdStats);
       if (strWhy !== null) {
         process.stderr.write(
-          'supply-freeze: refusing a project npm configuration that another path can rewrite.\n' +
+          'supply-freeze: refusing a project npm configuration the recording user does not '
+          + 'solely control.\n' +
           `  path               ${formatUntrustedText(strPath)}\n` +
           `  observed           ${strWhy}\n` +
-          `  link count / uid   nlink ${objFdStats.nlink}, uid ${objFdStats.uid}, recorder uid ` +
+          `  metadata           nlink ${objFdStats.nlink}, uid ${objFdStats.uid}, mode ` +
+          `${Number(objFdStats.mode & 0o7777n).toString(8).padStart(4, '0')}, recorder uid ` +
           `${bigOwnUid === null ? '(unknown)' : bigOwnUid}\n` +
           '  checked on the open descriptor whose inode npm reads; a second hard link,\n' +
-          '  or another owner, is a write path this sweep cannot see, so npm could be\n' +
-          '  fed other bytes while the recorded change time still compares equal.\n');
+          '  another owner, or a non-owner write grant is a write path this sweep cannot\n' +
+          '  exclude, so npm could be fed other bytes while the recorded change time\n' +
+          '  still compares equal.\n');
         process.exit(15);
       }
     } finally {
@@ -3258,6 +3282,19 @@ function refuseJsonResponse(strWhat, strReasonKey, strBody, intExit, boolAudit =
     '  this is an input or format failure; nothing is recorded.\n' +
     (boolAudit ? '  pass --no-audit to record the lockfile-derived fields alone.\n' : ''));
   process.exit(intExit);
+}
+
+function decodeUtf8ExactlyOrRefuse(bufContents, strWhat, intExit) {
+  const strContents = bufContents.toString('utf8');
+  if (!Buffer.from(strContents, 'utf8').equals(bufContents)) {
+    process.stderr.write(
+      `supply-freeze: ${strWhat} is not valid UTF-8; refusing to parse it.\n` +
+      `  byte length        ${bufContents.length}\n` +
+      '  invalid bytes and decoded content are withheld; a lossy replacement character\n' +
+      '  could otherwise make different input bytes parse as the same JSON value.\n');
+    process.exit(intExit);
+  }
+  return strContents;
 }
 
 // Round 56. Every npm-controlled JSON body this script parses goes through here,
@@ -3890,6 +3927,8 @@ const intRecordingStartedAt = Date.now();
 
 const objPackageBefore = snapshotOrRefuse(strPackagePath);
 const objLockBefore = snapshotOrRefuse(strLockPath);
+const strPackageJsonBefore = decodeUtf8ExactlyOrRefuse(
+  objPackageBefore, 'package manifest', 4);
 const strContractPath = join(strWorkflowDirectory, 'workflow-policy-contract.json');
 const objContractBefore = snapshotContractOrRefuse(strContractPath);
 function contractIdentityOrRefuse() {
@@ -3899,7 +3938,8 @@ function contractIdentityOrRefuse() {
   }
 }
 const objContractIdentityBefore = contractIdentityOrRefuse();
-const objContract = parseNpmJsonOrRefuse(objContractBefore.toString('utf8'), 'P1 contract', 17);
+const objContract = parseNpmJsonOrRefuse(
+  decodeUtf8ExactlyOrRefuse(objContractBefore, 'P1 contract', 17), 'P1 contract', 17);
 const objSupplyFreeze = objContract.supplyFreeze;
 if (!isPlainObject(objSupplyFreeze)
   || sha256(canonicalize(objSupplyFreeze)) !== '83c5138131de742734d22a818e21feb63d5ac11f8877adf52299809f04217362') {
@@ -4812,6 +4852,62 @@ if (!boolAnyToolchain && !objRecord.matchesReviewedManifest) {
 // `npm ls` is kept, but as a consistency assertion rather than a digest source:
 // it exits non-zero when the installed tree does not satisfy the lockfile, which
 // is the one question it answers that the byte fold cannot.
+function treeCheckFailure(strCategory, objSafeDetail = {}) {
+  return Object.assign(new Error(strCategory), {
+    treeCheck: { category: strCategory, ...objSafeDetail },
+  });
+}
+
+function validateNpmLsTree(objLs, strExpectedDirectory, strPackageJson) {
+  if (typeof objLs.path !== 'string') {
+    throw treeCheckFailure('missing path');
+  }
+  let strReportedDirectory;
+  let strExpectedRealDirectory;
+  try {
+    strReportedDirectory = realpathSync(objLs.path);
+    strExpectedRealDirectory = realpathSync(strExpectedDirectory);
+  } catch {
+    throw treeCheckFailure('path resolution failed');
+  }
+  if (strReportedDirectory !== strExpectedRealDirectory) {
+    throw treeCheckFailure('path mismatch');
+  }
+  let objManifest;
+  try {
+    objManifest = JSON.parse(strPackageJson);
+  } catch {
+    throw treeCheckFailure('manifest JSON invalid');
+  }
+  const arrDeclared = [...new Set([
+    ...Object.keys(objManifest.dependencies ?? {}),
+    ...Object.keys(objManifest.devDependencies ?? {}),
+    ...Object.keys(objManifest.optionalDependencies ?? {}),
+    ...Object.keys(objManifest.peerDependencies ?? {}),
+  ])].sort();
+  const arrReported = Object.keys(objLs.dependencies ?? {}).sort();
+  if (JSON.stringify(arrDeclared) !== JSON.stringify(arrReported)) {
+    throw treeCheckFailure('dependency-set mismatch',
+      { declared: arrDeclared.length, reported: arrReported.length });
+  }
+}
+
+function describeTreeCheckFailure(objError) {
+  if (objError?.status !== undefined) {
+    const strStatus = Number.isSafeInteger(objError.status) ? String(objError.status) : 'unknown';
+    return `npm ls native-status failure (exit ${strStatus})`;
+  }
+  const objDetail = objError?.treeCheck;
+  if (objDetail?.category === 'dependency-set mismatch') {
+    return `dependency-set mismatch (declared ${objDetail.declared}, reported ${objDetail.reported})`;
+  }
+  if (['missing path', 'path resolution failed', 'path mismatch', 'manifest JSON invalid']
+    .includes(objDetail?.category)) {
+    return objDetail.category;
+  }
+  return 'tree validation failed';
+}
+
 let strTreeCheckDetail = '';
 try {
   // Round 19, reported. This reloaded `omit` from whatever .npmrc exists when it
@@ -4914,33 +5010,14 @@ try {
   // flag that redirects the tree fails the first check; one that empties it
   // fails the second, whatever the flag turns out to be called.
   const objLs = parseNpmJsonOrRefuse(strLsOutput, 'npm ls', 7);
-  if (typeof objLs.path !== 'string') {
-    throw new TypeError('npm ls did not report the path of the tree it examined');
-  }
-  if (realpathSync(objLs.path) !== realpathSync(strWorkflowDirectory)) {
-    throw new Error(`npm ls examined ${objLs.path}, not ${strWorkflowDirectory}`);
-  }
-  const objManifest = JSON.parse(objPackageBefore.toString('utf8'));
-  const arrDeclared = [...new Set([
-    ...Object.keys(objManifest.dependencies ?? {}),
-    ...Object.keys(objManifest.devDependencies ?? {}),
-    ...Object.keys(objManifest.optionalDependencies ?? {}),
-    ...Object.keys(objManifest.peerDependencies ?? {}),
-  ])].sort();
-  const arrReported = Object.keys(objLs.dependencies ?? {}).sort();
-  if (JSON.stringify(arrDeclared) !== JSON.stringify(arrReported)) {
-    throw new Error(
-      `npm ls reported [${arrReported}] at the top level, declared [${arrDeclared}]`);
-  }
+  validateNpmLsTree(objLs, strWorkflowDirectory, strPackageJsonBefore);
   objRecord.treeSatisfiesLockfile = true;
 } catch (objError) {
   objRecord.treeSatisfiesLockfile = false;
   // The reason used to be discarded, which left every failure looking identical
   // in the refusal below -- "satisfies lockfile false" and nothing else. The two
   // checks above fail for reasons an operator cannot guess from that line.
-  strTreeCheckDetail = objError?.status !== undefined
-    ? `npm ls exited ${objError.status}: the tree does not satisfy the lockfile`
-    : String(objError?.message ?? objError).split('\n')[0].slice(0, 200);
+  strTreeCheckDetail = describeTreeCheckFailure(objError);
 }
 
 // Round 3. Carried across from the package-lock-only finding rather than
@@ -4991,14 +5068,11 @@ if (!boolAnyToolchain && (!existsSync(strTreeRoot) || !objRecord.treeSatisfiesLo
     'supply-freeze: refusing to record digests for a tree that is not the installed tree.\n' +
     `  node_modules       ${existsSync(strTreeRoot) ? 'present' : 'MISSING'}\n` +
     `  satisfies lockfile ${objRecord.treeSatisfiesLockfile}\n` +
-    // Round 47, swept from the reported argument defect rather than reported.
-    // NOT exploitable, and said so rather than counted: this is either a fixed
-    // string or Node's own error message over the `npm ls` argument list, which
-    // carries no registry -- so nothing here is endpoint- or caller-supplied.
-    // Routed through the funnel anyway, because "npm's text cannot reach this"
-    // is a non-local argument that has to keep being true through future edits,
-    // and this file already documents that npm's error text embeds request URLs.
-    (strTreeCheckDetail ? `  because            ${formatUntrustedText(strTreeCheckDetail)}\n` : '') +
+    // Only allowlisted categories and safe counts/status reach this line. npm's
+    // reported path, package names, and raw error text are never retained in the
+    // detail object, so a local private path or endpoint-controlled dependency
+    // name cannot become durable diagnostic output.
+    (strTreeCheckDetail ? `  because            ${strTreeCheckDetail}\n` : '') +
     '  install first with the documented command, then record:\n' +
     '    npm ci --ignore-scripts --no-audit --no-fund\n' +
     '  note that package-lock-only=true makes npm ci a no-op that reports success.\n' +
@@ -5097,7 +5171,7 @@ if (!boolAnyToolchain && objTree.specials > 0) {
 // Round 38, reported by Codex. Refused rather than recorded: a link out of the
 // tree makes the installed-tree digest silent about the code that actually
 // loads, which is the one thing that digest exists to pin.
-if (!boolAnyToolchain && objTree.escapingLinks.length > 0) {
+if (objTree.escapingLinks.length > 0) {
   process.stderr.write(
     'supply-freeze: refusing to record digests for a tree whose links leave it.\n' +
     `  escaping links     ${objTree.escapingLinks.length} (expected 0)\n` +
@@ -5124,7 +5198,7 @@ if (!boolAnyToolchain && objTree.escapingLinks.length > 0) {
 // whose resolution failed is one whose containment was never established --
 // including the case where the target is absent for exactly as long as this
 // script is looking at it, which is invisible to the lstat-based sweep.
-if (!boolAnyToolchain && objTree.unresolvedLinks.length > 0) {
+if (objTree.unresolvedLinks.length > 0) {
   process.stderr.write(
     'supply-freeze: refusing to record digests for a tree with links it cannot resolve.\n' +
     `  unresolved links   ${objTree.unresolvedLinks.length} (expected 0)\n` +
@@ -5138,6 +5212,24 @@ if (!boolAnyToolchain && objTree.unresolvedLinks.length > 0) {
     '  leaves the link text -- and therefore the digest -- completely unchanged.\n' +
     '  reinstall with npm ci; npm ci does not create links it cannot resolve.\n');
   process.exit(11);
+}
+
+function auditPackageDisplaySummary(objPackages) {
+  const newSeverityCounts = () => Object.fromEntries(
+    [...SEVERITY_LEVELS, 'unclassified'].map((strSeverity) => [strSeverity, 0]));
+  const objSummary = {
+    directAdvisory: newSeverityCounts(),
+    inheritedOnly: newSeverityCounts(),
+  };
+  for (const objValue of Object.values(objPackages)) {
+    const strCause = objValue.advisories.length > 0 ? 'directAdvisory' : 'inheritedOnly';
+    objSummary[strCause][objValue.severity ?? 'unclassified'] += 1;
+  }
+  return objSummary;
+}
+
+function renderAuditPackageSummary(objSummary) {
+  return renderRecordRow('audit package summary', JSON.stringify(objSummary));
 }
 
 if (boolSkipAudit) {
@@ -5427,21 +5519,13 @@ if (boolSkipAudit) {
   // registry cleanly is a statement about this machine.
   objRecord.auditEnvironmentScrubbed = [...arrScrubbedTrustVariables].sort();
   objRecord.auditCounts = objNormalizedAudit.counts;
-  objRecord.auditPackages = Object.fromEntries(
-    Object.entries(objNormalizedAudit.packages).map(([strName, objValue]) => [
-      strName,
-      // An empty advisory list is not a missing entry: the package is reached
-      // only through a vulnerable dependency, so its `via` names packages
-      // rather than advisories. Saying so beats printing empty parentheses.
-      objValue.advisories.length > 0
-        ? `${objValue.severity} (${objValue.advisories.map((objAdvisory) => objAdvisory.id).join(', ')})`
-        // Round 47. The digest now distinguishes these; the human line did not,
-        // and a reader comparing two records by eye would have seen the same
-        // sentence for different causes. Named where npm supplied a name. This
-        // map is built after auditSha256 is taken, so it is display only.
-        : `${objValue.severity} (inherited through ${objValue.viaPackages.length > 0
-          ? objValue.viaPackages.join(', ') : 'dependencies'})`,
-    ]));
+  // The normalized response, including package keys, advisory ids and `via`
+  // names, remains input to auditSha256 above. The public display is deliberately a
+  // fixed vocabulary of numeric summaries: registry-controlled strings are
+  // response content and can contain credentials or private package names.
+  // “Direct advisory” retains the prior display distinction (advisories.length
+  // > 0); it is not npm's separate isDirect project-dependency flag.
+  objRecord.auditPackages = auditPackageDisplaySummary(objNormalizedAudit.packages);
 }
 
 // Read-only is an assertion, not a claim. `npm ls` and `npm audit` are supposed
@@ -5933,8 +6017,6 @@ if (boolJson) {
       ? renderRecordRow('registry', objRecord.registry) +
         renderRecordRow('advisory posture', objRecord.auditSha256) +
         renderRecordRow('advisory counts', JSON.stringify(objRecord.auditCounts)) +
-        Object.entries(objRecord.auditPackages)
-          .map(([strName, strValue]) =>
-            `    ${formatUntrustedText(strName).padEnd(20)} ${formatUntrustedText(strValue)}\n`).join('')
+        renderAuditPackageSummary(objRecord.auditPackages)
       : '  advisory posture     (skipped)\n'));
 }
