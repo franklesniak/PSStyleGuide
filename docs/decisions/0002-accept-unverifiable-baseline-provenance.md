@@ -1,20 +1,23 @@
-# Decision 0002: Accept that the supply-freeze baseline cannot be machine-verified
+<!-- markdownlint-disable MD013 -->
+# Decision 0002: Keep historical baseline verification outside the offline validator
 
 ## Metadata
 
-- **Status:** Active
+- **Status:** Accepted
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-30
-- **Scope:** Records the accepted limitation on machine-verifying supply-freeze baseline provenance and its reconsideration conditions. Does not redefine enforcement of current reviewed bytes.
+- **Last Updated:** 2026-09-21
+- **Scope:** Records the accepted limitation on automatic offline verification of supply-freeze baseline provenance, the separate manual verification method, and reconsideration conditions. Does not redefine enforcement of current reviewed bytes.
 
-## Status
+## Date
 
-Accepted on 2026-08-01 by Frank Lesniak, PSStyleGuide repository owner.
+- **Date:** 2026-08-01
+
+Accepted by Frank Lesniak, PSStyleGuide repository owner.
 
 This records a deliberate acceptance so the question is settled rather than rediscovered.
 If the review triggers in the last section fire, reopen it.
 
-## 1. What the fields are
+## Context
 
 `workflow-policy-contract.json` contains a `supplyFreeze.baseline` object recording what
 `package.json` and `package-lock.json` looked like on `main` before the dependency change,
@@ -41,10 +44,10 @@ reconstructing the change. It is required by issue #145's frozen supply tuple.
 Note the distinction from its sibling `supplyFreeze.reviewedWorkingBytes`, which records the
 *current* reviewed bytes and **is** enforced — `verifyPackageDigests()` compares the real
 `package.json` and `package-lock.json` against it before `npm ci` runs, and `markdownlint.yml`
-independently compares them against literals hard-coded in the workflow. The baseline has no
-such consumer.
+independently compares them against literals hard-coded in the workflow. The offline validator does not consume the historical baseline. The separate
+[manual procedure](../P1-SUPPLY-FREEZE-v1.md#verify-historical-git-provenance-separately) verifies it without adding a workflow gate.
 
-## 2. The defect that prompted this, and its correction
+## The defect that prompted this, and its correction
 
 Codex found during review of pull request #150 that `baseline.packageLockJson` recorded a
 length of 66,425 and a SHA-256 of `b62a8891…`, while `git cat-file blob 7e96fd1f…` yields
@@ -61,68 +64,63 @@ stays LF.
 The lockfile entry now describes the blob it names. That correction is not what this decision
 accepts.
 
-## 3. What is accepted
+## Decision
 
-**Nothing verifies that these three values remain mutually consistent.**
+**The offline validator does not verify that these three values remain mutually consistent.**
+
+This issue 158 amendment was first committed on 2026-09-20. The [P1 reproduction method](../P1-SUPPLY-FREEZE-v1.md#verify-historical-git-provenance-separately) now provides separate raw-byte Git verification. It checks the historical commit type, both commit/path relationships, exact blob identifiers, byte lengths, and SHA-256 values. Missing objects and mismatches refuse. Object acquisition is a separate explicit fetch before the read-only interval; the verification disables lazy fetch, replacement objects, and optional lock writes. The recorder does not invoke Git or claim this external step ran.
 
 `validateContract()` checks the field's *shape* but cannot check its *content*, because
 proving that a blob identifier matches a length and a digest requires reading Git objects,
 and the validator is deliberately offline and Git-free. It also runs from a checkout made
 with `fetch-depth: 1`, where the historical object need not be present at all.
 
-So if these values are edited incorrectly in future, no test will catch it.
+An incorrect value can now be detected by that explicit manual procedure. It remains outside the offline validator and CI. A recorder observation alone does not establish historical provenance.
 
-## 4. Why that is acceptable
+## Consequences
 
 | Question | Answer |
 | --- | --- |
-| Does any gate read these fields? | No. Nothing in the validator, the workflows, or the generator branches on them. |
+| Does any automated gate read these fields? | No. The separate manual procedure verifies them; the validator, workflows, and generator retain their existing authority. |
 | Can a wrong value cause a bad install? | No. The install is gated by `reviewedWorkingBytes` and by literals in `markdownlint.yml`, neither of which involves the baseline. |
-| Can a wrong value cause a policy check to pass that should fail? | No. The baseline is not an input to any comparison. |
+| Can a wrong value authorize a current install? | No. The current reviewed bytes remain the installation authority. The manual provenance comparison refuses a mismatch. |
 | What is the actual harm? | A future auditor reconstructing the change is misled about the starting state. |
 | Is the harm detectable? | Yes, trivially, by anyone who runs `git cat-file blob <id>` and hashes the output. |
 
-The exposure is a documentation-accuracy problem with a one-command manual check, not a
-security or correctness problem. Building offline enforcement for it would mean either
-teaching the validator to shell out to Git — abandoning the offline property that makes it
-trustworthy in the first place — or adding a second, Git-aware verification step whose only
-purpose is to check a field nothing consumes.
+The original exposure was misleading historical documentation rather than current installation authority. The manual procedure now checks the relevant historical facts. Putting that procedure inside the offline validator would expand its execution boundary and require historical objects in shallow CI.
 
-Neither is proportionate.
+Keeping Git outside the offline validator remains proportionate. Issue 158 authorizes the separate manual verification method, which is now available without adding Git subprocesses to the recorder.
 
-## 5. Options considered
+### Positive
+
+The new procedure makes baseline consistency reproducible while preserving the offline validator and unchanged P1 schema. Missing shallow-clone objects are an explicit refusal.
+
+### Negative
+
+Verification remains a separate manual step with separately retained evidence. Historical producer signatures, original audit bytes, and unknown canonical installed-tree recipes are not reconstructed.
+
+## Alternatives considered
 
 | Option | Verdict |
 | --- | --- |
-| **Accept and document.** Leave the fields as accurate provenance with no automated check. | **Selected.** Proportionate to a field with no runtime consumer. |
-| Add Git-aware verification inside the validator. | Rejected. Destroys the offline, dependency-free property that the preflight gate depends on, to check something nothing reads. |
-| Add a separate Git-aware script run manually before merge. | Rejected for now, but the cheapest escalation if this ever matters. Roughly twenty lines. Would not run in continuous integration, since the objects may be absent under `fetch-depth: 1`. |
+| **Accept and document.** Leave the fields as accurate provenance with no automated check. | Historical selection, now amended by issue 158 to provide a separate manual verification procedure. |
+| Add Git-aware verification inside the validator. | Rejected. Expands the offline preflight gate's execution boundary to verify historical provenance that is not current installation authority. |
+| Add a separate Git-aware script run manually before merge. | Selected as a separate documented manual procedure under issue 158. It refuses missing objects and does not run in continuous integration. |
 | Delete the baseline fields entirely. | Rejected. Issue #145 explicitly requires the frozen supply tuple to record baseline blob identifiers and digests, so removal needs a scope change, and the provenance has genuine audit value when correct. |
 
-## 6. How to check it by hand
+## How to check it by hand
 
-If you ever need to confirm the baseline, from a clone with full history:
-
-```text
-git cat-file blob 7e96fd1fd41765ba31488762f60c2f74ba17d3a8 | wc -c
-git cat-file blob 7e96fd1fd41765ba31488762f60c2f74ba17d3a8 | sha256sum
-```
-
-These must equal `length` and `sha256` for `packageLockJson`, and the same two commands with
-blob `923106fc4ee5508b7a03930b3d8b774db9fcd009` must equal the values for `packageJson`. A
-shallow clone will not have the objects; use `git fetch --unshallow` first.
+Use the [complete raw-byte procedure](../P1-SUPPLY-FREEZE-v1.md#verify-historical-git-provenance-separately). It checks both baseline objects against historical commit `4346310e7deebffb4159c75e30d9546263dfd649`, fails on missing objects or native errors, and avoids checkout line-ending conversion. Run the explicitly documented acquisition step before verification when the objects are absent. Do not infer success from a command that only prints a hash.
 
 ## Canonical guides
 
 - [STYLE_GUIDE.md](../../STYLE_GUIDE.md)
 - [STYLE_GUIDE_RATIONALE.md](../../STYLE_GUIDE_RATIONALE.md)
 
-## 7. When this decision must be revisited
+## When this decision must be revisited
 
-- Any gate, script, or workflow starts reading `supplyFreeze.baseline`. It then stops being
-  inert provenance and needs real verification.
+- A workflow or automatic gate starts relying on `supplyFreeze.baseline`. The new manual method does not authorize that integration.
 - The baseline is regenerated for a new supply freeze, at which point the values should be
   produced from `git cat-file` output rather than from a working tree, so the platform
   line-ending difference cannot recur.
-- The repository gains a Git-aware pre-merge verification step for other reasons, which would
-  make the rejected third option nearly free.
+- A new Git-aware verification capability changes the tradeoff between a separate manual step and automatic enforcement.
