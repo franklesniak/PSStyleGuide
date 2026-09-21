@@ -563,36 +563,6 @@ const boolSkipAudit = arrArguments.includes('--no-audit');
 // Refused rather than warned: a warning on stderr is invisible to `--json`
 // consumers, which are the callers most likely to be scripted.
 
-// Renders an unrecognized argument without ever emitting its value. Declared as
-// a function so it is hoisted above the refusal below, matching how
-// formatUntrustedText is reached from the same block.
-//
-// Round 64, reported by Codex, and it is the round-63 fix caught one shape
-// short. That round withheld everything after the first `=`, on the stated
-// reasoning that "a flag name cannot carry a credential and a value always
-// can". The reasoning is right; the implementation only recognised ONE spelling
-// of a value. `--token hunter2` is two argv entries, both land in
-// arrUnsupported, and `hunter2` has no `=` -- so it took the flag-name branch
-// and printed verbatim. Measured on the shipped script:
-//
-//   node Get-SupplyFreezeDigest.mjs --token hunter2
-//     unrecognized       --token hunter2          <- the secret, in a kept log
-//
-// The discriminator is not `=`, it is whether the token is a FLAG. A flag
-// begins with `-`; anything else in an unrecognized invocation is an operand,
-// which is where a separated value lands. So operands are withheld whole and
-// flags render only their name.
-//
-// The residual, stated rather than left to be found: a separated value that
-// itself begins with `-` (`--token -sekrit`) is indistinguishable from a flag
-// by this rule and is still rendered. Closing that would mean withholding every
-// argument after the first unrecognized one, which loses the diagnostic that
-// makes this refusal useful -- a caller who typed `--no-audti` needs to see
-// which flag was rejected.
-function formatWithheldValue(strValue) {
-  return `(value withheld, ${strValue.length} characters)`;
-}
-
 // The identity of an inode, for the checks that ask "is this the same file it
 // was a moment ago". Round 71, reported by Codex, and this is the round-67
 // inode half caught being only as wide as the type carrying it. Those sites
@@ -643,53 +613,17 @@ function formatSweepReading(objReading) {
   return `inode ${strInode}, ctime ${new Date(intChangedAt).toISOString()}`;
 }
 
-// Round 67, reported by Copilot. The rule below said "the VALUE is never
-// rendered", and one spelling still rendered it: a value passed as its own argv
-// token that happens to begin with `-`. `--token -sekrit` printed `--token
-// -sekrit` verbatim, because the second token looked like a flag. Measured, with
-// the two working spellings as controls: `--token sekrit` and `--token=sekrit`
-// both withheld, `--token -sekrit` leaked into a retained log.
-//
-// Shape cannot decide this. `-sekrit` is indistinguishable from a short flag by
-// any pattern -- it is alphanumeric after the dash, exactly like a real option --
-// and the comment below already records that widening a pattern has found the
-// next gap five times running. What DOES decide it is POSITION: a token's role
-// comes from the token before it, not from how it is spelled. So the walk is
-// positional, and the first token after an unrecognized bare flag is treated as
-// that flag's value whatever it looks like.
-//
-// The cost is that a second unknown flag written straight after a first --
-// `--bogus --alsobogus` -- has its name withheld too, since nothing here can tell
-// that spelling apart from a flag followed by its value. That is the fail-closed
-// direction, and the diagnostic still names the FIRST rejected flag, which is
-// what a caller needs to fix the invocation.
+// A caller controls the complete argv token, including the part before `=` and
+// every apparent flag name. That token can itself be a credential, so no spelling
+// is a safe disclosure boundary. Keep only the argument position and decoded
+// character length. The fixed supported list below supplies the useful repair
+// guidance without echoing any caller bytes into a retained diagnostic.
 function formatUnsupportedInvocation(arrAllArguments, objSupportedArguments) {
-  const arrRendered = [];
-  let boolPreviousWasBareUnsupportedFlag = false;
-  for (const strArg of arrAllArguments) {
-    if (objSupportedArguments.has(strArg)) {
-      boolPreviousWasBareUnsupportedFlag = false;
-      continue;
-    }
-    if (boolPreviousWasBareUnsupportedFlag) {
-      arrRendered.push(formatWithheldValue(strArg));
-      boolPreviousWasBareUnsupportedFlag = false;
-      continue;
-    }
-    const intEquals = strArg.indexOf('=');
-    if (intEquals >= 0) {
-      arrRendered.push(`${formatUntrustedText(strArg.slice(0, intEquals))}`
-        + `=${formatWithheldValue(strArg.slice(intEquals + 1))}`);
-      continue;
-    }
-    if (!strArg.startsWith('-')) {
-      arrRendered.push(formatWithheldValue(strArg));
-      continue;
-    }
-    arrRendered.push(formatUntrustedText(strArg));
-    boolPreviousWasBareUnsupportedFlag = true;
-  }
-  return arrRendered.join(' ');
+  return arrAllArguments.flatMap((strArg, intIndex) => (
+    objSupportedArguments.has(strArg) || strArg.startsWith('--cache-directory=')
+      ? []
+      : [`argument ${intIndex + 1} (${[...strArg].length} Unicode code points withheld)`]
+  )).join(', ');
 }
 
 const SUPPORTED_ARGUMENTS = new Set(['--json', '--any-toolchain', '--no-audit']);
@@ -717,13 +651,10 @@ if (arrUnsupported.length > 0) {
     // There is no pattern to derive, which is why every attempt to widen one has
     // found another shape.
     //
-    // So the VALUE is never rendered. A flag name cannot carry a credential and
-    // a value always can, so the name goes through the funnel and everything
-    // after the first `=` is replaced by its length. This is fail-closed by
-    // construction rather than by pattern, and it holds for a secret that is not
-    // URL-shaped at all -- `--token=hunter2` was never covered by any of this.
-    // The diagnostic keeps what a caller needs, which is which flag was rejected.
-    `  unrecognized       ${formatUnsupportedInvocation(arrArguments, SUPPORTED_ARGUMENTS)}\n` +
+    // No part of an unsupported token is rendered. Its position and length, plus
+    // the fixed supported list, identify where to repair the invocation without
+    // treating caller-controlled flag spelling as public metadata.
+    `  unrecognized       ${formatUnsupportedInvocation(arrRawArguments, SUPPORTED_ARGUMENTS)}\n` +
     `  supported          ${[...SUPPORTED_ARGUMENTS, '--cache-directory=<path>'].join(' ')}\n` +
     '  a mistyped option would otherwise be ignored in silence, and the run would\n' +
     '  record something other than what was asked for.\n');
@@ -1039,55 +970,88 @@ function readViaVerifiedDescriptor(strPath, intMissingExit, fnOnMissing,
     fnOnMissing(objError);
     process.exit(intMissingExit);
   }
+  let boolCloseAttempted = false;
+  const closeDescriptorOnce = () => {
+    if (boolCloseAttempted) return null;
+    boolCloseAttempted = true;
+    try {
+      closeSync(intFd);
+      return null;
+    } catch (objError) {
+      return objError;
+    }
+  };
+  const refuseDescriptorFailure = (objError) => {
+    // close(2) can report a late I/O failure after releasing the fd. Never retry
+    // an uncertain fd: it may already have been reused. If fstat/read failed
+    // first, preserve that failure and make one close attempt only for cleanup.
+    closeDescriptorOnce();
+    fnOnMissing(objError);
+    process.exit(intMissingExit);
+  };
+  let objStats;
   try {
-    const objStats = fstatSync(intFd);
-    if (!objStats.isFile()) {
-      const strKind = objStats.isSymbolicLink() ? 'a symlink'
-        : objStats.isDirectory() ? 'a directory'
-          : objStats.isFIFO() ? 'a FIFO'
-            : objStats.isSocket() ? 'a socket'
-              : objStats.isCharacterDevice() || objStats.isBlockDevice() ? 'a device node'
-                : 'not a regular file';
+    objStats = fstatSync(intFd);
+  } catch (objError) {
+    refuseDescriptorFailure(objError);
+  }
+  if (!objStats.isFile()) {
+    const strKind = objStats.isSymbolicLink() ? 'a symlink'
+      : objStats.isDirectory() ? 'a directory'
+        : objStats.isFIFO() ? 'a FIFO'
+          : objStats.isSocket() ? 'a socket'
+            : objStats.isCharacterDevice() || objStats.isBlockDevice() ? 'a device node'
+              : 'not a regular file';
+    closeDescriptorOnce();
+    process.stderr.write(
+      `supply-freeze: refusing to record digests for a ${objRefusal.what} that is `
+      + 'not a regular file.\n'
+      + `  ${strPath.split('/').pop().padEnd(18)} is ${strKind}\n`
+      + '  checked on the open descriptor, not by name: a name can be swapped between\n'
+      + '  the check and the read, and only a regular file returns the same bytes to\n'
+      + '  this process and to npm.\n');
+    process.exit(objRefusal.exit);
+  }
+  if (objRefusal.holdable) {
+    // Codex P2 on 57ec78c, bound to the descriptor this time. nlink and uid are
+    // read from the OPEN fd whose bytes are about to be returned, not from a
+    // by-name lstat a swap can outrun. A second hard link, or another owner, is a
+    // write path the quiescence sweep cannot see -- it compares this inode, and a
+    // rewrite through the other path lands on this inode -- so npm could be fed
+    // different bytes between the snapshot and the final re-read while the two
+    // byte-equality reads still compare equal. intUid is computed here, not
+    // borrowed from a scope it does not belong to -- the borrowed reference in
+    // the first cut of this class died with ReferenceError on every run.
+    const intUid = typeof process.getuid === 'function' ? process.getuid() : null;
+    const strWhy = (objStats.nlink > 1)
+      ? `is hard-linked ${objStats.nlink} times, so a second path can rewrite these bytes`
+      : (intUid !== null && objStats.uid !== intUid)
+        ? `is owned by uid ${objStats.uid}, but this recorder runs as uid ${intUid}`
+        : null;
+    if (strWhy !== null) {
+      closeDescriptorOnce();
       process.stderr.write(
-        `supply-freeze: refusing to record digests for a ${objRefusal.what} that is `
-        + 'not a regular file.\n'
-        + `  ${strPath.split('/').pop().padEnd(18)} is ${strKind}\n`
-        + '  checked on the open descriptor, not by name: a name can be swapped between\n'
-        + '  the check and the read, and only a regular file returns the same bytes to\n'
-        + '  this process and to npm.\n');
+        `supply-freeze: refusing to record digests for a ${objRefusal.what} that `
+        + 'another path can rewrite.\n'
+        + `  ${strPath.split('/').pop().padEnd(18)} ${strWhy}\n`
+        + '  checked on the open descriptor whose bytes are returned. The compared\n'
+        + '  hashes must come from bytes only this run can reach; an alternate write\n'
+        + '  path lets npm read other bytes between the snapshot and the final read.\n');
       process.exit(objRefusal.exit);
     }
-    if (objRefusal.holdable) {
-      // Codex P2 on 57ec78c, bound to the descriptor this time. nlink and uid are
-      // read from the OPEN fd whose bytes are about to be returned, not from a
-      // by-name lstat a swap can outrun. A second hard link, or another owner, is a
-      // write path the quiescence sweep cannot see -- it compares this inode, and a
-      // rewrite through the other path lands on this inode -- so npm could be fed
-      // different bytes between the snapshot and the final re-read while the two
-      // byte-equality reads still compare equal. intUid is computed here, not
-      // borrowed from a scope it does not belong to -- the borrowed reference in
-      // the first cut of this class died with ReferenceError on every run.
-      const intUid = typeof process.getuid === 'function' ? process.getuid() : null;
-      const strWhy = (objStats.nlink > 1)
-        ? `is hard-linked ${objStats.nlink} times, so a second path can rewrite these bytes`
-        : (intUid !== null && objStats.uid !== intUid)
-          ? `is owned by uid ${objStats.uid}, but this recorder runs as uid ${intUid}`
-          : null;
-      if (strWhy !== null) {
-        process.stderr.write(
-          `supply-freeze: refusing to record digests for a ${objRefusal.what} that `
-          + 'another path can rewrite.\n'
-          + `  ${strPath.split('/').pop().padEnd(18)} ${strWhy}\n`
-          + '  checked on the open descriptor whose bytes are returned. The compared\n'
-          + '  hashes must come from bytes only this run can reach; an alternate write\n'
-          + '  path lets npm read other bytes between the snapshot and the final read.\n');
-        process.exit(objRefusal.exit);
-      }
-    }
-    return readFileSync(intFd);
-  } finally {
-    closeSync(intFd);
   }
+  let bufContents;
+  try {
+    bufContents = readFileSync(intFd);
+  } catch (objError) {
+    refuseDescriptorFailure(objError);
+  }
+  const objCloseError = closeDescriptorOnce();
+  if (objCloseError !== null) {
+    fnOnMissing(objCloseError);
+    process.exit(intMissingExit);
+  }
+  return bufContents;
 }
 
 function readOrRefuse(strPath, objRefusal = { exit: 15, what: 'manifest', holdable: true }) {
@@ -3275,6 +3239,27 @@ function firstDuplicateJsonKey(strText) {
   return null;
 }
 
+const JSON_RESPONSE_REFUSALS = Object.freeze({
+  invalidJson: 'invalid JSON',
+  repeatedKey: 'repeated object key',
+  unexpectedSchema: 'unexpected response schema',
+  normalizationFailure: 'response normalization failed',
+});
+
+function refuseJsonResponse(strWhat, strReasonKey, strBody, intExit, boolAudit = false) {
+  const strReason = JSON_RESPONSE_REFUSALS[strReasonKey];
+  if (strReason === undefined) throw new Error('unknown internal JSON refusal category');
+  process.stderr.write(
+    `supply-freeze: ${strWhat} returned an unusable response.\n` +
+    `  category           ${strReason}\n` +
+    `  decoded length     ${Buffer.byteLength(strBody, 'utf8')} UTF-8 bytes\n` +
+    '  source content and parser details are withheld because JSON inputs can contain\n' +
+    '  registry credentials, package names, and other private configuration.\n' +
+    '  this is an input or format failure; nothing is recorded.\n' +
+    (boolAudit ? '  pass --no-audit to record the lockfile-derived fields alone.\n' : ''));
+  process.exit(intExit);
+}
+
 // Round 56. Every npm-controlled JSON body this script parses goes through here,
 // rather than the audit alone that was reported. `ls --all --json` decides
 // treeSatisfiesLockfile and `config list --json` decides whether the install and
@@ -3285,24 +3270,11 @@ function parseNpmJsonOrRefuse(strBody, strWhat, intExit) {
   let objParsed;
   try {
     objParsed = JSON.parse(strBody);
-  } catch (objError) {
-    process.stderr.write(
-      `supply-freeze: ${strWhat} did not return JSON.\n` +
-      `  npm emitted output that is not valid JSON: ${formatUntrustedText(objError.message)}\n` +
-      '  this is an endpoint or format failure; nothing is recorded.\n');
-    process.exit(intExit);
+  } catch {
+    refuseJsonResponse(strWhat, 'invalidJson', strBody, intExit);
   }
   const strDuplicate = firstDuplicateJsonKey(strBody);
-  if (strDuplicate !== null) {
-    process.stderr.write(
-      `supply-freeze: ${strWhat} returned an object with a repeated key.\n` +
-      `  repeated key       ${formatUntrustedText(strDuplicate)}\n` +
-      '  JSON.parse keeps only the last value for a repeated key, so the earlier one\n' +
-      '  is discarded before any shape check or digest sees it. A report can hide an\n' +
-      '  advisory behind a duplicate of its own package name and still look complete.\n' +
-      '  nothing is recorded from a body whose members are ambiguous.\n');
-    process.exit(intExit);
-  }
+  if (strDuplicate !== null) refuseJsonResponse(strWhat, 'repeatedKey', strBody, intExit);
   return objParsed;
 }
 
@@ -3317,31 +3289,12 @@ function parseAuditOrRefuse(strBody) {
   let objParsed;
   try {
     objParsed = JSON.parse(strBody);
-  } catch (objError) {
-    process.stderr.write(
-      'supply-freeze: npm audit did not return an audit report.\n' +
-      // Round 40, found by sweeping every refusal rather than the reported one.
-      // A JSON.parse SyntaxError embeds a slice of the offending input --
-      // measured: `Unexpected token '<', "<html>prox"... is not valid JSON` --
-      // so npm output that begins with a credential-bearing URL puts part of it
-      // here. The sibling refusal three blocks down already wrapped its message;
-      // this one and the normalization one below did not.
-      `  npm emitted output that is not valid JSON: ${formatUntrustedText(objError.message)}\n` +
-      '  this is an endpoint or format failure, not an advisory posture; nothing is recorded.\n' +
-      '  pass --no-audit to record the lockfile-derived fields alone.\n');
-    process.exit(5);
+  } catch {
+    refuseJsonResponse('npm audit', 'invalidJson', strBody, 5, true);
   }
   const strDuplicate = firstDuplicateJsonKey(strBody);
   if (strDuplicate !== null) {
-    process.stderr.write(
-      'supply-freeze: npm audit returned a report with a repeated key.\n' +
-      `  repeated key       ${formatUntrustedText(strDuplicate)}\n` +
-      '  JSON.parse keeps only the last value for a repeated key, so the earlier one\n' +
-      '  is discarded before the shape guard or auditSha256 sees it -- an endpoint can\n' +
-      '  hide an advisory behind a duplicate of its own package name and the report\n' +
-      '  still validates and still folds to a stable digest.\n' +
-      '  pass --no-audit to record the lockfile-derived fields alone.\n');
-    process.exit(5);
+    refuseJsonResponse('npm audit', 'repeatedKey', strBody, 5, true);
   }
   return objParsed;
 }
@@ -3750,6 +3703,30 @@ function normalizeAudit(objAudit) {
   return objOutput;
 }
 
+function auditCountsOrRefuse(strAuditResponse, objAudit) {
+  if (!isPlainObject(objAudit)) {
+    refuseJsonResponse('npm audit', 'unexpectedSchema', strAuditResponse, 5, true);
+  }
+  const objCounts = objAudit.metadata?.vulnerabilities;
+  if (!(Number.isSafeInteger(objAudit.auditReportVersion) && objAudit.auditReportVersion > 0)
+    || !isPlainObject(objAudit.vulnerabilities)
+    || !isPlainObject(objCounts)
+    || !SEVERITY_ORDER.every((strSeverity) => Number.isSafeInteger(objCounts[strSeverity])
+      && objCounts[strSeverity] >= 0)
+    || !Object.values(objAudit.vulnerabilities).every(isPlainObject)) {
+    refuseJsonResponse('npm audit', 'unexpectedSchema', strAuditResponse, 5, true);
+  }
+  return objCounts;
+}
+
+function normalizeAuditOrRefuse(strAuditResponse, objAudit) {
+  try {
+    return normalizeAudit(objAudit);
+  } catch {
+    refuseJsonResponse('npm audit', 'normalizationFailure', strAuditResponse, 5, true);
+  }
+}
+
 const strPackagePath = join(strWorkflowDirectory, 'package.json');
 const strLockPath = join(strWorkflowDirectory, 'package-lock.json');
 
@@ -3884,8 +3861,9 @@ function snapshotContractOrRefuse(strPath) {
     return readViaVerifiedDescriptor(strPath, 17, refuseInitialContractRead,
       { exit: 17, what: 'P1 contract', holdable: true });
   } catch (objError) {
-    // Open failures are translated inside readViaVerifiedDescriptor. This catch
-    // covers native fstat/read/close failures after the descriptor was opened.
+    // readViaVerifiedDescriptor translates every native descriptor-operation
+    // failure. This boundary preserves the initial-contract fallback for an
+    // unexpected exception outside that translation.
     refuseInitialContractRead(objError);
     process.exit(17);
   }
@@ -5257,7 +5235,7 @@ if (boolSkipAudit) {
   // is returned by runNpmAllowingFailure and then thrown on by JSON.parse as a
   // raw SyntaxError -- exit 1, before the shape guard below could call it what
   // it is. Unparseable output is exactly "not an audit report".
-  const objAudit = parseAuditOrRefuse(runNpmAllowingFailure([
+  const strAuditResponse = runNpmAllowingFailure([
     'audit', '--json',
     `--registry=${strRegistry}`,
     '--include=dev', '--include=optional', '--include=peer',
@@ -5335,7 +5313,8 @@ if (boolSkipAudit) {
     // and says so in notFreezeRecordBecause.
   ].filter((strArgument) => boolAnyToolchain
     ? !Object.keys(REVIEWED_NPM_TRANSPORT).some((strKey) => strArgument.startsWith(`--${strKey}=`))
-    : true), boolAnyToolchain ? undefined : transportEnvironment()));
+    : true), boolAnyToolchain ? undefined : transportEnvironment());
+  const objAudit = parseAuditOrRefuse(strAuditResponse);
   // Reported and confirmed, and the most serious of the round. `npm audit`
   // exits nonzero for two completely different reasons: advisories were found,
   // and the audit endpoint failed. Under --json it prints a JSON object either
@@ -5370,15 +5349,7 @@ if (boolSkipAudit) {
   // Round 19, reported. Valid JSON whose root is `null` reached this line and
   // threw before the shape refusal below could speak. The root is checked first
   // now, with the same predicate every other shape test uses.
-  if (!isPlainObject(objAudit)) {
-    process.stderr.write(
-      'supply-freeze: npm audit did not return an audit report.\n' +
-      `  the report root is ${objAudit === null ? 'null' : typeof objAudit}, not an object\n` +
-      '  this is an endpoint or format failure, not an advisory posture; nothing is recorded.\n' +
-      '  pass --no-audit to record the lockfile-derived fields alone.\n');
-    process.exit(5);
-  }
-  const objCounts = objAudit.metadata?.vulnerabilities;
+  const objCounts = auditCountsOrRefuse(strAuditResponse, objAudit);
   // Round 44, reported by Codex. SAFE integers, the same class round 43 closed on
   // the advisory source id and did not sweep to its siblings here. Past 2^53-1
   // distinct JSON integers stop having distinct doubles, so two different reports
@@ -5395,26 +5366,9 @@ if (boolSkipAudit) {
   // levels. The sum check downstream stays sound once these are safe: a bucket sum
   // that is inexact necessarily exceeds 2^53-1, and the total it is compared to
   // cannot, so an inexact sum can never compare equal.
-  if (!(Number.isSafeInteger(objAudit.auditReportVersion) && objAudit.auditReportVersion > 0)
-    || !isPlainObject(objAudit.vulnerabilities)
-    || !isPlainObject(objCounts)
-    || !SEVERITY_ORDER.every((strSeverity) => Number.isSafeInteger(objCounts[strSeverity])
-      && objCounts[strSeverity] >= 0)
-    // Round 17, reported. The guard validated the top level and stopped there,
-    // so `vulnerabilities: {"x": null}` with correct counts passed -- and
-    // normalizeAudit then dereferenced that null and threw a TypeError, exit 1,
-    // where exit 5 exists to say "not an audit report". Each entry is checked
-    // here, and the normalization itself is wrapped below, because validating
-    // the shapes I thought of and trusting the rest is the mistake this guard
-    // has now been widened for four times.
-    || !Object.values(objAudit.vulnerabilities).every(isPlainObject)) {
-    process.stderr.write(
-      'supply-freeze: npm audit did not return an audit report.\n' +
-      `  npm said: ${formatUntrustedText(typeof objAudit.message === 'string' ? objAudit.message : JSON.stringify(objAudit).slice(0, 300))}\n` +
-      '  this is an endpoint or format failure, not an advisory posture; nothing is recorded.\n' +
-      '  pass --no-audit to record the lockfile-derived fields alone.\n');
-    process.exit(5);
-  }
+  // auditCountsOrRefuse also checks each vulnerability entry. Round 17 found
+  // that a valid top level with `{"x": null}` otherwise reaches normalization
+  // and throws at exit 1 instead of using the audit response refusal at exit 5.
   // Round 33, swept from the reported severity defect. Integer-ness was the only
   // test these counts got, so `total: -1` and buckets summing to 9 against a
   // total of 1 both recorded at exit 0. The total is the sum of its parts
@@ -5465,19 +5419,7 @@ if (boolSkipAudit) {
       '  pass --no-audit to record the lockfile-derived fields alone.\n');
     process.exit(5);
   }
-  let objNormalizedAudit;
-  try {
-    objNormalizedAudit = normalizeAudit(objAudit);
-  } catch (objError) {
-    process.stderr.write(
-      'supply-freeze: npm audit did not return an audit report.\n' +
-      // Round 40, same sweep. normalizeAudit's TypeErrors embed the report's own
-      // package names and field values, which come from the audit response.
-      `  the report could not be normalized: ${formatUntrustedText(objError.message)}\n` +
-      '  this is a format failure, not an advisory posture; nothing is recorded.\n' +
-      '  pass --no-audit to record the lockfile-derived fields alone.\n');
-    process.exit(5);
-  }
+  const objNormalizedAudit = normalizeAuditOrRefuse(strAuditResponse, objAudit);
   objRecord.auditSha256 = sha256(canonicalize(objNormalizedAudit));
   // Sorted so two runs that scrubbed the same set produce the same list. Not
   // folded into auditSha256: the advisory posture is a statement about the

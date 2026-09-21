@@ -74,6 +74,166 @@ test('AUDIT-STATUS: native success and advisory status are distinct from process
   ]) assert.throws(() => auditFunction(() => { throw outcome; })(['audit']), /refusal:5/);
 });
 
+test('ARGUMENT-PRIVACY: unsupported tokens expose only original position and code-point length', () => {
+  const strFlag = '--TASK130_F11_🔑=BEARER_SECRET';
+  const strOperand = 'TASK130_F11_SEPARATED_SECRET';
+  const strConcatenated = '--TASK130_F11_CONCATENATED_SECRET';
+  const result = spawnSync(process.execPath, [join(workflow, 'Get-SupplyFreezeDigest.mjs'),
+    '--cache-directory=/not-used', strFlag, strOperand, strConcatenated, '--json'], { encoding: 'utf8' });
+  assert.equal(result.status, 2, result.stderr);
+  assert.equal(result.stdout, '');
+  assert.match(result.stderr,
+    new RegExp(`argument 2 \\(${[...strFlag].length} Unicode code points withheld\\)`));
+  assert.match(result.stderr,
+    new RegExp(`argument 3 \\(${[...strOperand].length} Unicode code points withheld\\)`));
+  assert.match(result.stderr,
+    new RegExp(`argument 4 \\(${[...strConcatenated].length} Unicode code points withheld\\)`));
+  assert.match(result.stderr, /supported\s+--json --any-toolchain --no-audit --cache-directory=<path>/);
+  assert.doesNotMatch(result.stderr, /TASK130_F11|BEARER_SECRET|SEPARATED_SECRET|CONCATENATED_SECRET|🔑/u);
+});
+
+test('DESCRIPTOR-FAILURE: open, fstat, read, and close failures retain caller exits and close once', () => {
+  const from = source.indexOf('function readViaVerifiedDescriptor(');
+  const to = source.indexOf('\n}\n', from) + 2;
+  assert.ok(from >= 0 && to > from);
+  const objRegular = {
+    isFile: () => true, isSymbolicLink: () => false, isDirectory: () => false,
+    isFIFO: () => false, isSocket: () => false, isCharacterDevice: () => false,
+    isBlockDevice: () => false, nlink: 1, uid: 1000,
+  };
+  const fixture = (objScenario = {}, intMissingExit = 17) => {
+    const arrMissing = [];
+    const arrDiagnostic = [];
+    let intCloseCalls = 0;
+    const readVerified = new Function('openSync', 'fsConstants', 'fstatSync',
+      'readFileSync', 'closeSync', 'process',
+      `${source.slice(from, to)}; return readViaVerifiedDescriptor;`)(
+      () => {
+        if (objScenario.openError) throw objScenario.openError;
+        return 41;
+      }, { O_RDONLY: 1, O_NONBLOCK: 2, O_NOFOLLOW: 4 }, () => {
+        if (objScenario.fstatError) throw objScenario.fstatError;
+        return objScenario.stats ?? objRegular;
+      }, () => {
+        if (objScenario.readError) throw objScenario.readError;
+        return Buffer.from('fixture bytes');
+      }, () => {
+        intCloseCalls += 1;
+        if (objScenario.closeError) throw objScenario.closeError;
+      }, {
+        getuid: () => 1000,
+        stderr: { write(value) { arrDiagnostic.push(value); } },
+        exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+      });
+    return {
+      invoke: () => readVerified('/fixture/input', intMissingExit, (error) => arrMissing.push(error),
+        { exit: 15, what: 'contract', holdable: true }),
+      arrMissing, arrDiagnostic, closeCalls: () => intCloseCalls,
+    };
+  };
+
+  const objSuccess = fixture();
+  assert.deepEqual(objSuccess.invoke(), Buffer.from('fixture bytes'));
+  assert.equal(objSuccess.closeCalls(), 1);
+  assert.deepEqual(objSuccess.arrMissing, []);
+
+  for (const intMissingExit of [4, 3, 17]) {
+    for (const strStage of ['open', 'fstat', 'read', 'close']) {
+      const objPrimary = Object.assign(new Error(`${strStage}-primary`), { code: 'EIO' });
+      const objClose = Object.assign(new Error('close-secondary'), { code: 'EIO' });
+      const objScenario = strStage === 'open'
+        ? { openError: objPrimary }
+        : strStage === 'fstat'
+          ? { fstatError: objPrimary, closeError: objClose }
+          : strStage === 'read'
+            ? { readError: objPrimary, closeError: objClose }
+            : { closeError: objPrimary };
+      const objFixture = fixture(objScenario, intMissingExit);
+      assert.throws(objFixture.invoke, (error) => error.refusal === intMissingExit);
+      assert.equal(objFixture.arrMissing.length, 1);
+      assert.equal(objFixture.arrMissing[0], objPrimary);
+      assert.equal(objFixture.closeCalls(), strStage === 'open' ? 0 : 1);
+    }
+  }
+
+  const objEloop = fixture({ openError: Object.assign(new Error('link'), { code: 'ELOOP' }) });
+  assert.throws(objEloop.invoke, (error) => error.refusal === 15);
+  assert.equal(objEloop.closeCalls(), 0);
+  assert.deepEqual(objEloop.arrMissing, []);
+
+  for (const stats of [
+    { ...objRegular, isFile: () => false, isDirectory: () => true },
+    { ...objRegular, nlink: 2 },
+    { ...objRegular, uid: 1001 },
+  ]) {
+    const objIntentional = fixture({ stats, closeError: new Error('close-secondary') });
+    assert.throws(objIntentional.invoke, (error) => error.refusal === 15);
+    assert.equal(objIntentional.closeCalls(), 1);
+    assert.deepEqual(objIntentional.arrMissing, []);
+  }
+});
+
+test('JSON-RESPONSE-PRIVACY: parser, schema, and normalization refusals withhold source content', () => {
+  const parseFrom = source.indexOf('function firstDuplicateJsonKey(');
+  const parseFunction = source.indexOf('function parseAuditOrRefuse(', parseFrom);
+  const parseTo = source.indexOf('\n}\n', parseFunction) + 2;
+  const auditFrom = source.indexOf('function auditCountsOrRefuse(');
+  const normalizeFunction = source.indexOf('function normalizeAuditOrRefuse(', auditFrom);
+  const auditTo = source.indexOf('\n}\n', normalizeFunction) + 2;
+  assert.ok(parseFrom >= 0 && parseTo > parseFunction && auditFrom >= 0 && auditTo > normalizeFunction);
+  let strDiagnostic = '';
+  const objFunctions = new Function('process', 'Buffer', 'isPlainObject',
+    'SEVERITY_ORDER', 'normalizeAudit',
+    `${source.slice(parseFrom, parseTo)}\n${source.slice(auditFrom, auditTo)}; return {`
+      + 'parseNpmJsonOrRefuse, parseAuditOrRefuse, auditCountsOrRefuse, normalizeAuditOrRefuse};')({
+    stderr: { write(value) { strDiagnostic += value; } },
+    exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+  }, Buffer, (value) => value !== null && typeof value === 'object' && !Array.isArray(value),
+  ['info', 'low', 'moderate', 'high', 'critical', 'total'], () => {
+    throw new TypeError('TASK130_F13_NORMALIZATION_SECRET');
+  });
+  const assertPrivateRefusal = (fn, intExit, strCategory, strSecret) => {
+    strDiagnostic = '';
+    assert.throws(fn, (error) => error.refusal === intExit);
+    assert.match(strDiagnostic, new RegExp(`category\\s+${strCategory}`));
+    assert.match(strDiagnostic, /decoded length\s+\d+ UTF-8 bytes/);
+    assert.doesNotMatch(strDiagnostic, new RegExp(strSecret));
+  };
+
+  assertPrivateRefusal(
+    () => objFunctions.parseAuditOrRefuse('<TASK130_F13_INVALID_SECRET'),
+    5, 'invalid JSON', 'TASK130_F13_INVALID_SECRET');
+  assertPrivateRefusal(
+    () => objFunctions.parseAuditOrRefuse('{"TASK130_F13_DUPLICATE_SECRET":1,"TASK130_F13_DUPLICATE_SECRET":2}'),
+    5, 'repeated object key', 'TASK130_F13_DUPLICATE_SECRET');
+  assertPrivateRefusal(
+    () => objFunctions.parseNpmJsonOrRefuse(
+      '{"TASK130_F13_CONTRACT_SECRET":1,"TASK130_F13_CONTRACT_SECRET":2}', 'P1 contract', 17),
+    17, 'repeated object key', 'TASK130_F13_CONTRACT_SECRET');
+  assertPrivateRefusal(
+    () => objFunctions.parseNpmJsonOrRefuse('<TASK130_F13_CONTRACT_INVALID_SECRET', 'P1 contract', 17),
+    17, 'invalid JSON', 'TASK130_F13_CONTRACT_INVALID_SECRET');
+  const strSchema = '{"message":"TASK130_F13_SCHEMA_SECRET","error":{}}';
+  assertPrivateRefusal(
+    () => objFunctions.auditCountsOrRefuse(strSchema, JSON.parse(strSchema)),
+    5, 'unexpected response schema', 'TASK130_F13_SCHEMA_SECRET');
+  assertPrivateRefusal(
+    () => objFunctions.auditCountsOrRefuse('null', null),
+    5, 'unexpected response schema', 'null');
+  const strArraySchema = '["TASK130_F13_ARRAY_SCHEMA_SECRET"]';
+  assertPrivateRefusal(
+    () => objFunctions.auditCountsOrRefuse(strArraySchema, JSON.parse(strArraySchema)),
+    5, 'unexpected response schema', 'TASK130_F13_ARRAY_SCHEMA_SECRET');
+  const objValidCounts = { info: 0, low: 0, moderate: 0, high: 0, critical: 0, total: 0 };
+  const objValidAudit = { auditReportVersion: 2, vulnerabilities: {},
+    metadata: { vulnerabilities: objValidCounts } };
+  assert.equal(objFunctions.auditCountsOrRefuse(JSON.stringify(objValidAudit), objValidAudit), objValidCounts);
+  const strNormalization = '{"package":"TASK130_F13_NORMALIZATION_SECRET"}';
+  assertPrivateRefusal(
+    () => objFunctions.normalizeAuditOrRefuse(strNormalization, JSON.parse(strNormalization)),
+    5, 'response normalization failed', 'TASK130_F13_NORMALIZATION_SECRET');
+});
+
 test('NPM-LINK-CONTAINMENT: production resolver rejects every uncovered resolution shape',
   { skip: process.platform !== 'linux' }, () => {
     const from = source.indexOf('const isInsideOrEqual = ');
@@ -83,7 +243,9 @@ test('NPM-LINK-CONTAINMENT: production resolver rejects every uncovered resoluti
       'realpathSync', `${source.slice(from, to)}; return classifyContainedSymlink;`)(
       dirname, isAbsolute, lstatSync, readlinkSync, realpathSync);
     const foldFrom = to + 1;
-    const foldTo = source.indexOf('\n// Round 31', foldFrom);
+    // Match the repository's column-zero function-close convention instead of
+    // coupling this production slice to an unrelated review-history comment.
+    const foldTo = source.indexOf('\n}\n', foldFrom) + 2;
     assert.ok(foldTo > foldFrom);
     const diagnostic = [];
     const testProcess = {
