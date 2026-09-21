@@ -5,7 +5,7 @@
 
 - **Status:** Accepted
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-09-20
+- **Last Updated:** 2026-09-21
 - **Scope:** Records the accepted limitation on automatic offline verification of supply-freeze baseline provenance, the separate manual verification method, and reconsideration conditions. Does not redefine enforcement of current reviewed bytes.
 
 ## Date
