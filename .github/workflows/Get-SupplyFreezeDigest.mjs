@@ -1490,23 +1490,24 @@ function foldNpmInstallation(strRoot, strLauncherPath) {
           hashField(objHash, strKey);
           hashField(objHash, sha256(readFileSync(strPath)));
         } else {
-          // Round 80, reported by Codex as a P3. This branch folded a bare '?'
-          // and the path, so a FIFO and a character device at the same path
-          // produced the SAME toolchain.npmTree value while the record claims to
-          // describe the npm installation that answered.
-          //
-          // This is round 9's finding C3 -- "special-file types collide in the ?
-          // branch" -- fixed in the installed-tree fold and never applied here.
-          // The corrected version sat thirty lines away for seventy rounds. Same
-          // tags, same rdev, so the two folds now agree.
-          const strSpecialTag = objStat.isFIFO() ? 'P'
-            : objStat.isSocket() ? 'S'
-              : objStat.isCharacterDevice() ? 'C'
-                : objStat.isBlockDevice() ? 'B'
-                  : '?';
-          objHash.update(strSpecialTag, 'utf8');
-          hashField(objHash, strKey);
-          hashField(objHash, String(objStat.rdev));
+          // Codex P2 on d78dbd5. Type/path/rdev metadata distinguishes special
+          // entries from one another but cannot identify the bytes a FIFO, socket
+          // or device supplies when npm opens it. Both installation folds can
+          // therefore compare equal while the subprocess executes unrecorded
+          // bytes. Diagnostic mode can record some explicitly incomplete
+          // results, but it cannot make npmTree identify bytes neither fold read.
+          const strSpecialKind = objStat.isFIFO() ? 'FIFO'
+            : objStat.isSocket() ? 'socket'
+              : objStat.isCharacterDevice() ? 'character device'
+                : objStat.isBlockDevice() ? 'block device'
+                  : 'unknown special entry';
+          process.stderr.write(
+            'supply-freeze: refusing an npm installation containing a special entry.\n'
+            + `  observed type      ${strSpecialKind}\n`
+            + '  entry name and contents are withheld because the entry can supply\n'
+            + '  different bytes on each open; only regular files, directories and\n'
+            + '  contained symbolic links can be covered by both npmTree folds.\n');
+          process.exit(2);
         }
         // Round 57, and this half exists because the reply that shipped the
         // content fold argued its way out of it and was wrong.
@@ -1782,22 +1783,35 @@ function runNpmOrRefuse(arrNpmArguments, objEnv, intFailureExit, strMeaning) {
   }
 }
 
-// Round 60. npm writes its ls problems as `<kind>: <spec>, required by <x>`,
-// and the round-59 redactor treats any RFC 3986 scheme token as the start of a
-// URL -- so `extraneous:` reads as a scheme and the entire diagnostic is
-// withheld. Measured, every line of a real refusal came back as
-// `extraneous:/// (path, credentials and query redacted)`, which names nothing.
-//
-// That over-matching was a deliberate trade and it is still the right one; what
-// was wrong is feeding this string to the funnel whole. The kind is a fixed
-// lowercase vocabulary npm controls, so it is separated and checked rather than
-// redacted, and everything after it -- the part that can carry a registry URL
-// with credentials -- goes through the funnel unchanged.
-const RE_LS_PROBLEM_KIND = /^([a-z]+): ([\s\S]*)$/u;
-function formatLsProblem(strProblem) {
-  const arrParts = RE_LS_PROBLEM_KIND.exec(strProblem);
-  if (arrParts === null) return formatUntrustedText(strProblem);
-  return `${arrParts[1]}: ${formatUntrustedText(arrParts[2])}`;
+// Codex P2 on d78dbd5. npm 11's problem strings use a small fixed kind before
+// the colon, then interpolate package ids, versions and absolute paths. The
+// general text funnel protects URL-shaped and control content; it deliberately
+// leaves ordinary text readable, so it cannot make this endpoint payload safe.
+// Keep only an allowlisted kind census. Unknown, malformed and non-string entries
+// share one fixed bucket and no raw prefix or tail reaches retained stderr.
+const LS_PROBLEM_KINDS = ['missing', 'invalid', 'extraneous'];
+const RE_LS_PROBLEM_KIND = /^([a-z]+):(?: |$)/u;
+function summarizeLsProblems(arrProblems) {
+  const objCounts = { missing: 0, invalid: 0, extraneous: 0, other: 0 };
+  for (const value of arrProblems) {
+    const arrParts = typeof value === 'string' ? RE_LS_PROBLEM_KIND.exec(value) : null;
+    const strKind = arrParts?.[1];
+    if (LS_PROBLEM_KINDS.includes(strKind)) objCounts[strKind] += 1;
+    else objCounts.other += 1;
+  }
+  return { total: arrProblems.length, ...objCounts };
+}
+
+function formatLsProblemSummary(arrProblems) {
+  const objSummary = summarizeLsProblems(arrProblems);
+  return `  problem count      ${objSummary.total}\n`
+    + '  problem categories '
+    + `missing ${objSummary.missing}, invalid ${objSummary.invalid}, `
+    + `extraneous ${objSummary.extraneous}, other ${objSummary.other}\n`;
+}
+
+function safeLsNativeStatus(value) {
+  return Number.isSafeInteger(value) ? String(value) : 'unknown';
 }
 
 function runNpmAllowingFailure(arrNpmArguments, objEnv) {
@@ -4986,13 +5000,12 @@ try {
         return Array.isArray(objBody?.problems) ? objBody.problems : [];
       } catch { return []; }
     })();
+    const strLsStatus = safeLsNativeStatus(objLsError?.status);
     process.stderr.write(
       'supply-freeze: refusing to record digests for a tree that is not the installed tree.\n' +
-      '  npm ls exit status ' + formatUntrustedText(String(objLsError?.status ?? 'unknown')) + '\n' +
+      `  npm ls exit status ${strLsStatus}\n` +
       (arrProblems.length > 0
-        ? arrProblems.slice(0, 8).map((strProblem) =>
-          `  problem            ${formatLsProblem(String(strProblem))}\n`).join('')
-          + (arrProblems.length > 8 ? `  (and ${arrProblems.length - 8} more)\n` : '')
+        ? formatLsProblemSummary(arrProblems)
         : '  npm reported no problem list with the failure.\n') +
       '  npm ls exits non-zero for extraneous, missing and invalid packages, and\n' +
       '  still prints a tree, so the report cannot be read as agreement.\n' +

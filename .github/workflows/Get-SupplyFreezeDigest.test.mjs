@@ -384,6 +384,142 @@ test('TREE-CHECK-PRIVACY: production classifier emits only fixed categories and 
   assert.doesNotMatch(arrDetails.join('\n'), /TASK130_F20|PRIVATE|SECRET/);
 });
 
+test('LS-PROBLEM-PRIVACY: production summary emits only allowlisted kinds and counts', () => {
+  const from = source.indexOf('const LS_PROBLEM_KINDS');
+  const to = source.indexOf('\nfunction runNpmAllowingFailure(', from);
+  assert.ok(from >= 0 && to > from);
+  const functions = new Function(
+    `${source.slice(from, to)}; return {summarizeLsProblems, formatLsProblemSummary,
+      safeLsNativeStatus};`)();
+  const arrProblems = [
+    'missing: TASK130_F22_MISSING_SECRET /TASK130_F22_PRIVATE_PATH',
+    'invalid: pkg@TASK130_F22_VERSION_SECRET /TASK130_F22_PRIVATE_PATH',
+    'extraneous: TASK130_F22_EXTRA_SECRET',
+    'privatekindsecret: TASK130_F22_LOWERCASE_UNKNOWN_SECRET',
+    'TASK130_F22_UNKNOWN_KIND: TASK130_F22_UNKNOWN_SECRET',
+    'malformed TASK130_F22_MALFORMED_SECRET',
+    { TASK130_F22_OBJECT_SECRET: true },
+    null,
+  ];
+  assert.deepEqual(functions.summarizeLsProblems(arrProblems), {
+    total: 8, missing: 1, invalid: 1, extraneous: 1, other: 5,
+  });
+  const strSummary = functions.formatLsProblemSummary(arrProblems);
+  assert.equal(strSummary,
+    '  problem count      8\n'
+    + '  problem categories missing 1, invalid 1, extraneous 1, other 5\n');
+  assert.doesNotMatch(strSummary, /TASK130_F22|PRIVATE|SECRET|privatekindsecret/);
+  assert.equal(functions.safeLsNativeStatus(7), '7');
+  for (const value of ['7', 7.5, Number.MAX_SAFE_INTEGER + 1, null, undefined]) {
+    assert.equal(functions.safeLsNativeStatus(value), 'unknown');
+  }
+});
+
+test('HISTORICAL-VERIFICATION: authored JavaScript block reports success only after both blobs pass',
+  { skip: process.platform !== 'linux' }, () => {
+    const strMethod = readFileSync(join(workflow, '..', '..', 'docs', 'P1-SUPPLY-FREEZE-v1.md'), 'utf8');
+    const arrVerifier = /## Verify historical Git provenance separately[\s\S]*?```bash\r?\n[\s\S]*?<<'NODE'\r?\n([\s\S]*?)\r?\nNODE\r?\n```/u.exec(strMethod);
+    assert.notEqual(arrVerifier, null);
+    const strVerifier = arrVerifier[1];
+    const strExpectedSuccess =
+      'Historical packageJson and packageLockJson blob, path, length, and SHA-256 verification completed.\n';
+    const strProjectRoot = join(workflow, '..', '..');
+    const objGitDir = spawnSync('git', ['rev-parse', '--absolute-git-dir'], {
+      cwd: strProjectRoot, encoding: 'utf8',
+    });
+    assert.equal(objGitDir.status, 0, objGitDir.stderr);
+    const strGitDirectory = objGitDir.stdout.trim();
+    const objHistoricalObject = spawnSync('git', ['--git-dir', strGitDirectory,
+      'cat-file', '-e', '4346310e7deebffb4159c75e30d9546263dfd649^{commit}'], {
+      encoding: 'utf8',
+      env: {
+        ...process.env,
+        GIT_NO_LAZY_FETCH: '1',
+        GIT_NO_REPLACE_OBJECTS: '1',
+        GIT_OPTIONAL_LOCKS: '0',
+      },
+    });
+    assert.equal(objHistoricalObject.status, 0, objHistoricalObject.stderr);
+    const temporary = mkdtempSync(join(tmpdir(), 'historical-verification-'));
+    const strContractDirectory = join(temporary, '.github', 'workflows');
+    const strContractPath = join(strContractDirectory, 'workflow-policy-contract.json');
+    const objContract = JSON.parse(readFileSync(join(workflow, 'workflow-policy-contract.json')));
+    mkdirSync(strContractDirectory, { recursive: true });
+    const invokeVerifier = (objCandidate, objExtraEnv = {}) => {
+      writeFileSync(strContractPath, JSON.stringify(objCandidate));
+      const objEnvironment = {
+        ...process.env,
+        GIT_DIR: strGitDirectory,
+        GIT_WORK_TREE: strProjectRoot,
+        GIT_NO_LAZY_FETCH: '1',
+        GIT_NO_REPLACE_OBJECTS: '1',
+        GIT_OPTIONAL_LOCKS: '0',
+        NODE_DISABLE_COMPILE_CACHE: '1',
+        ...objExtraEnv,
+      };
+      for (const strKey of ['NODE_OPTIONS', 'NODE_COMPILE_CACHE', 'NODE_V8_COVERAGE',
+        'NODE_REDIRECT_WARNINGS', 'NODE_DEBUG', 'NODE_DEBUG_NATIVE']) {
+        delete objEnvironment[strKey];
+      }
+      return spawnSync(process.execPath, ['--input-type=module'], {
+        cwd: temporary,
+        input: strVerifier,
+        encoding: 'utf8',
+        env: objEnvironment,
+      });
+    };
+    try {
+      const objSuccess = invokeVerifier(objContract);
+      assert.equal(objSuccess.status, 0, objSuccess.stderr);
+      assert.equal(objSuccess.stdout, strExpectedSuccess);
+
+      const objLengthMismatch = structuredClone(objContract);
+      objLengthMismatch.supplyFreeze.baseline.packageLockJson.length += 1;
+      const objLengthFailure = invokeVerifier(objLengthMismatch);
+      assert.notEqual(objLengthFailure.status, 0);
+      assert.equal(objLengthFailure.stdout, '');
+
+      const objHashMismatch = structuredClone(objContract);
+      objHashMismatch.supplyFreeze.baseline.packageLockJson.sha256 = '0'.repeat(64);
+      const objHashFailure = invokeVerifier(objHashMismatch);
+      assert.notEqual(objHashFailure.status, 0);
+      assert.equal(objHashFailure.stdout, '');
+
+      const objGitPath = spawnSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' });
+      assert.equal(objGitPath.status, 0, objGitPath.stderr);
+      const strWrapperDirectory = join(temporary, 'native-failure-bin');
+      const strWrapperPath = join(strWrapperDirectory, 'git');
+      const strCountPath = join(temporary, 'git-call-count');
+      mkdirSync(strWrapperDirectory);
+      writeFileSync(strWrapperPath, `#!/usr/bin/env node
+const fs = require('node:fs');
+const { spawnSync } = require('node:child_process');
+const countPath = process.env.TASK130_F24_COUNT_PATH;
+const count = fs.existsSync(countPath) ? Number(fs.readFileSync(countPath, 'utf8')) + 1 : 1;
+fs.writeFileSync(countPath, String(count));
+if (count === 4) {
+  process.stderr.write('TASK130_F24_INJECTED_NATIVE_STATUS_73\\n');
+  process.exit(73);
+}
+const result = spawnSync(process.env.TASK130_F24_REAL_GIT, process.argv.slice(2),
+  { stdio: 'inherit', env: process.env });
+process.exit(result.status ?? 74);
+`);
+      chmodSync(strWrapperPath, 0o755);
+      const objNativeFailure = invokeVerifier(objContract, {
+        PATH: `${strWrapperDirectory}${delimiter}${process.env.PATH}`,
+        TASK130_F24_COUNT_PATH: strCountPath,
+        TASK130_F24_REAL_GIT: objGitPath.stdout.trim(),
+      });
+      assert.notEqual(objNativeFailure.status, 0);
+      assert.equal(objNativeFailure.stdout, '');
+      assert.equal(readFileSync(strCountPath, 'utf8'), '4');
+      assert.match(objNativeFailure.stderr, /TASK130_F24_INJECTED_NATIVE_STATUS_73/);
+    } finally {
+      rmSync(temporary, { recursive: true, force: true });
+    }
+  });
+
 test('NPM-LINK-CONTAINMENT: production resolver rejects every uncovered resolution shape',
   { skip: process.platform !== 'linux' }, () => {
     const metadataFrom = source.indexOf('function nonOwnerWriteReason(');
@@ -426,7 +562,7 @@ test('NPM-LINK-CONTAINMENT: production resolver rejects every uncovered resoluti
 ${source.slice(from, foldTo)}; return foldNpmInstallation;`)(
       createHash, dirname, isAbsolute, join, lstatSync, readlinkSync, realpathSync,
       readdirSync, readFileSync, testProcess, String,
-      (error, path) => `  error              ${error?.code ?? 'unknown'} at ${path}\n`,
+      (error) => `  error              ${error?.code ?? 'unknown'}\n`,
       hashFieldForFixture, (stats) => `${stats.ino}:${stats.ctimeNs}`, sha);
 
     const temporary = mkdtempSync(join(tmpdir(), 'npm-link-containment-'));
@@ -461,6 +597,18 @@ ${source.slice(from, foldTo)}; return foldNpmInstallation;`)(
       chmodSync(join(root, 'target'), 0o664);
       assert.throws(() => foldNpm(realpathSync(root)), { refusal: 2 });
       chmodSync(join(root, 'target'), 0o644);
+      assert.equal(foldNpm(realpathSync(root)).symlinks, 2);
+
+      const special = join(root, 'TASK130_F23_PRIVATE_FIFO');
+      const makeFifo = spawnSync('mkfifo', [special], { encoding: 'utf8' });
+      assert.equal(makeFifo.status, 0, makeFifo.stderr);
+      diagnostic.length = 0;
+      assert.throws(() => foldNpm(realpathSync(root)), { refusal: 2 });
+      assert.match(diagnostic.join(''), /npm installation containing a special entry/);
+      assert.match(diagnostic.join(''), /observed type\s+FIFO/);
+      assert.doesNotMatch(diagnostic.join(''), /TASK130_F23|PRIVATE_FIFO/);
+      rmSync(special);
+      diagnostic.length = 0;
       assert.equal(foldNpm(realpathSync(root)).symlinks, 2);
 
       symlinkSync(join(outside, 'target'), join(root, 'direct-escape'));
@@ -534,14 +682,16 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
     }
     cpSync(join(workflow, 'node_modules'), join(fixture, 'node_modules'), { recursive: true, verbatimSymlinks: true });
     const contract = JSON.parse(readFileSync(join(fixture, 'workflow-policy-contract.json')));
-    const invoke = (flags = [], env = {}, objBaseEnvironment = process.env) => {
+    const invokeFrom = (strFixture, flags = [], env = {}, objBaseEnvironment = process.env) => {
       const cache = mkdtempSync(join(temporary, 'cache-'));
-      return spawnSync(process.execPath, [join(fixture, 'Get-SupplyFreezeDigest.mjs'),
+      return spawnSync(process.execPath, [join(strFixture, 'Get-SupplyFreezeDigest.mjs'),
         '--json', `--cache-directory=${cache}`, ...flags], {
         encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
         env: { ...objBaseEnvironment, ...env },
       });
     };
+    const invoke = (flags = [], env = {}, objBaseEnvironment = process.env) =>
+      invokeFrom(fixture, flags, env, objBaseEnvironment);
     // A removed startup guard would enable child-process debug output before the
     // assertion runs. Use a fixed minimal environment so that failure output can
     // contain only the fake sentinel and synthetic fixture paths, never host secrets.
@@ -583,6 +733,16 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       assert.equal(existsSync(join(checkout, 'forbidden-cache')), false);
       assert.equal(existsSync(join(checkout, 'forbidden-logs')), false);
 
+      const problemCheckout = join(temporary, 'TASK130_F22_PRIVATE_PATH');
+      cpSync(checkout, problemCheckout, { recursive: true, verbatimSymlinks: true });
+      const problemFixture = join(problemCheckout, '.github', 'workflows');
+      rmSync(join(problemFixture, 'node_modules', 'minimatch'), { recursive: true });
+      const problemRefusal = invokeFrom(problemFixture, ['--no-audit']);
+      refuse(problemRefusal, 7);
+      assert.doesNotMatch(problemRefusal.stderr,
+        /TASK130_F22_PRIVATE_PATH|minimatch@|required by glob|balanced-match@|brace-expansion@|p1-recorder-tests/u);
+      assert.match(problemRefusal.stderr, /problem count\s+[1-9][0-9]*/);
+      assert.match(problemRefusal.stderr, /problem categories\s+missing \d+, invalid \d+, extraneous \d+, other \d+/);
       const startupTargets = ['node-cache', 'node-coverage', 'node-warnings'].map((name) => join(checkout, name));
       const scrubbed = spawnSync('env', ['-u', 'NODE_OPTIONS', '-u', 'NODE_COMPILE_CACHE',
         '-u', 'NODE_V8_COVERAGE', '-u', 'NODE_REDIRECT_WARNINGS', '-u', 'NODE_DEBUG',

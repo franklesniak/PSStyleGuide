@@ -68,7 +68,7 @@ accepts.
 
 **The offline validator does not verify that these three values remain mutually consistent.**
 
-Amended on 2026-09-20 under issue 158: the [P1 reproduction method](../P1-SUPPLY-FREEZE-v1.md#verify-historical-git-provenance-separately) now provides separate raw-byte Git verification. It checks the historical commit type, both commit/path relationships, exact blob identifiers, byte lengths, and SHA-256 values. Missing objects and mismatches refuse. Object acquisition is a separate explicit fetch before the read-only interval; the verification disables lazy fetch, replacement objects, and optional lock writes. The recorder does not invoke Git or claim this external step ran.
+This issue 158 amendment was first committed on 2026-09-20. The [P1 reproduction method](../P1-SUPPLY-FREEZE-v1.md#verify-historical-git-provenance-separately) now provides separate raw-byte Git verification. It checks the historical commit type, both commit/path relationships, exact blob identifiers, byte lengths, and SHA-256 values. Missing objects and mismatches refuse. Object acquisition is a separate explicit fetch before the read-only interval; the verification disables lazy fetch, replacement objects, and optional lock writes. The recorder does not invoke Git or claim this external step ran.
 
 `validateContract()` checks the field's *shape* but cannot check its *content*, because
 proving that a blob identifier matches a length and a digest requires reading Git objects,
