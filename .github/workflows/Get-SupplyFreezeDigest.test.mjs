@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { chmodSync, cpSync, existsSync, linkSync, lstatSync, mkdirSync, mkdtempSync,
-  readFileSync, readdirSync, readlinkSync, realpathSync, rmSync, symlinkSync,
-  writeFileSync } from 'node:fs';
+import { chmodSync, cpSync, existsSync,
+  linkSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync,
+  readlinkSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { delimiter, dirname, isAbsolute, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import test from 'node:test';
 
 const workflow = dirname(fileURLToPath(import.meta.url));
@@ -247,6 +247,166 @@ test('DESCRIPTOR-FAILURE: open, fstat, read, and close failures retain caller ex
   }
 });
 
+test('INITIAL-SELF-SNAPSHOT: resolution and descriptor failures use fixed exit 3', () => {
+  const from = source.indexOf('function refuseInitialScriptRead(');
+  const to = source.indexOf('\nconst strInvokedPath = ', from);
+  assert.ok(from >= 0 && to > from);
+  let objScenario;
+  let strDiagnostic = '';
+  const objProcess = {
+    stderr: { write(value) { strDiagnostic += value; } },
+    exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+  };
+  const initialSnapshot = new Function('realpathSync', 'readViaVerifiedDescriptor',
+    'process', 'formatErrorLocation', `${source.slice(from, to)}; return initialScriptSnapshotOrRefuse;`)(
+    () => {
+      if (objScenario.resolveError) throw objScenario.resolveError;
+      return '/resolved/recorder.mjs';
+    }, (strPath, intExit, fnOnMissing, objRefusal) => {
+      assert.equal(strPath, '/resolved/recorder.mjs');
+      assert.equal(intExit, 3);
+      assert.deepEqual(objRefusal, { exit: 3, what: 'script', holdable: false });
+      if (objScenario.readError) fnOnMissing(objScenario.readError);
+      return Buffer.from('reviewed source');
+    }, objProcess, (objError) =>
+      `  error              ${objError?.code ?? 'unknown'} (filesystem location withheld)\n`);
+
+  objScenario = {};
+  assert.deepEqual(initialSnapshot('/invoked/recorder.mjs'), {
+    path: '/resolved/recorder.mjs', bytes: Buffer.from('reviewed source'),
+  });
+  for (const strStage of ['resolve', 'read']) {
+    strDiagnostic = '';
+    objScenario = { [`${strStage}Error`]: Object.assign(new Error('TASK130_F37_PRIVATE_PATH'),
+      { code: 'EIO', path: '/tmp/TASK130_F37_PRIVATE_PATH' }) };
+    assert.throws(() => initialSnapshot('/tmp/TASK130_F37_PRIVATE_PATH'), { refusal: 3 });
+    assert.match(strDiagnostic, /initial snapshot/);
+    assert.match(strDiagnostic, /EIO \(filesystem location withheld\)/);
+    assert.doesNotMatch(strDiagnostic, /TASK130_F37|PRIVATE_PATH|Error:| at /);
+  }
+});
+
+test('INITIAL-SELF-SNAPSHOT: active module initializer refuses a post-load missing source', () => {
+  const temporary = mkdtempSync(join(tmpdir(), 'p1-active-initial-snapshot-'));
+  const recorder = join(temporary, 'TASK130_F37_PRIVATE_SOURCE.mjs');
+  const loader = join(temporary, 'loader.mjs');
+  const registration = join(temporary, 'register.mjs');
+  try {
+    cpSync(join(workflow, 'Get-SupplyFreezeDigest.mjs'), recorder);
+    const strTarget = pathToFileURL(recorder).href;
+    writeFileSync(loader, `import { unlinkSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+const target = ${JSON.stringify(strTarget)};
+export async function load(url, context, nextLoad) {
+  const result = await nextLoad(url, context);
+  if (url === target) unlinkSync(fileURLToPath(url));
+  return result;
+}
+`);
+    writeFileSync(registration, `import { register } from 'node:module';
+register(${JSON.stringify(pathToFileURL(loader).href)}, import.meta.url);
+`);
+    const result = spawnSync(process.execPath, ['--import', pathToFileURL(registration).href,
+      recorder], { encoding: 'utf8' });
+    assert.equal(result.status, 3, result.stderr);
+    assert.equal(result.stdout, '');
+    assert.match(result.stderr, /initial snapshot/);
+    assert.match(result.stderr, /ENOENT \(filesystem location withheld\)/);
+    assert.doesNotMatch(result.stderr,
+      /TASK130_F37|PRIVATE_SOURCE|p1-active-initial-snapshot|Error:| at /);
+  } finally {
+    rmSync(temporary, { recursive: true, force: true });
+  }
+});
+
+test('INITIAL-SELF-SNAPSHOT: active module initializer refuses a post-load FIFO',
+  { skip: process.platform !== 'linux' }, () => {
+    const temporary = mkdtempSync(join(tmpdir(), 'p1-active-initial-fifo-'));
+    const recorder = join(temporary, 'TASK130_F37_PRIVATE_FIFO.mjs');
+    const loader = join(temporary, 'loader.mjs');
+    const registration = join(temporary, 'register.mjs');
+    try {
+      cpSync(join(workflow, 'Get-SupplyFreezeDigest.mjs'), recorder);
+      const strTarget = pathToFileURL(recorder).href;
+      writeFileSync(loader, `import { unlinkSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
+const target = ${JSON.stringify(strTarget)};
+export async function load(url, context, nextLoad) {
+  const result = await nextLoad(url, context);
+  if (url === target) {
+    const path = fileURLToPath(url);
+    unlinkSync(path);
+    const made = spawnSync('mkfifo', [path]);
+    if (made.status !== 0) throw new Error('fixture could not create FIFO');
+  }
+  return result;
+}
+`);
+      writeFileSync(registration, `import { register } from 'node:module';
+register(${JSON.stringify(pathToFileURL(loader).href)}, import.meta.url);
+`);
+      const result = spawnSync(process.execPath, ['--import', pathToFileURL(registration).href,
+        recorder], { encoding: 'utf8', timeout: 5000 });
+      assert.equal(result.status, 3, result.stderr);
+      assert.equal(result.stdout, '');
+      assert.match(result.stderr, /input role\s+script; path\/name withheld; is a FIFO/);
+      assert.doesNotMatch(result.stderr,
+        /TASK130_F37|PRIVATE_FIFO|p1-active-initial-fifo|Error:| at /);
+    } finally {
+      rmSync(temporary, { recursive: true, force: true });
+    }
+  });
+
+test('INPUT-DIRECTORY-CONTROL: internal ancestors apply owner, sticky, and direct-parent rules', () => {
+  const from = source.indexOf('function refuseUncontrolledInputDirectory(');
+  const to = source.indexOf('\nvalidateRecordedInputDirectoryChain();', from);
+  assert.ok(from >= 0 && to > from);
+  const strWorkflowDirectory = '/repo/.github/workflows';
+  const makeStats = (uid = 1000n, mode = 0o755n, boolDirectory = true,
+    boolSymlink = false) => ({ uid, mode, isDirectory: () => boolDirectory,
+    isSymbolicLink: () => boolSymlink });
+  const invoke = (objByPath) => {
+    let strDiagnostic = '';
+    const validate = new Function('lstatSync', 'process', 'dirname',
+      'strWorkflowDirectory', 'formatErrorLocation',
+      `${source.slice(from, to)}; return validateRecordedInputDirectoryChain;`)(
+      (strPath) => {
+        const value = objByPath[strPath];
+        if (value instanceof Error) throw value;
+        return value;
+      }, {
+        getuid: () => 1000,
+        stderr: { write(value) { strDiagnostic += value; } },
+        exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+      }, dirname, strWorkflowDirectory, (objError) =>
+        `  error              ${objError?.code ?? 'unknown'} (filesystem location withheld)\n`);
+    return { validate, diagnostic: () => strDiagnostic };
+  };
+  const accepted = {
+    '/repo': makeStats(0n, 0o1777n),
+    '/repo/.github': makeStats(1000n, 0o1777n),
+    '/repo/.github/workflows': makeStats(1000n, 0o755n),
+  };
+  invoke(accepted).validate();
+  for (const [strCase, objChanged] of [
+    ['nonsticky ancestor', { '/repo': makeStats(1000n, 0o775n) }],
+    ['writable direct parent', { '/repo/.github/workflows': makeStats(1000n, 0o1777n) }],
+    ['foreign owner', { '/repo/.github': makeStats(2000n, 0o755n) }],
+    ['symlink', { '/repo/.github': makeStats(1000n, 0o755n, true, true) }],
+  ]) {
+    const objFixture = invoke({ ...accepted, ...objChanged });
+    assert.throws(objFixture.validate, { refusal: 15 }, strCase);
+    assert.match(objFixture.diagnostic(), /path\/name withheld/);
+    assert.doesNotMatch(objFixture.diagnostic(), /\/repo/);
+  }
+  const objErrorFixture = invoke({ ...accepted,
+    '/repo/.github': Object.assign(new Error('TASK130_F38_PRIVATE_PATH'), { code: 'EIO' }) });
+  assert.throws(objErrorFixture.validate, { refusal: 15 });
+  assert.match(objErrorFixture.diagnostic(), /EIO \(filesystem location withheld\)/);
+  assert.doesNotMatch(objErrorFixture.diagnostic(), /TASK130_F38|PRIVATE_PATH|\/repo/);
+});
+
 test('JSON-ROOT-GUARDS: production contract and strict config guards reject non-object roots', () => {
   const plainFrom = source.indexOf('function isPlainObject(');
   const plainTo = source.indexOf('\n}\n', plainFrom) + 2;
@@ -461,22 +621,87 @@ test('NPM-STDOUT-UTF8: production npm adapter exact-decodes semantic stdout by p
   objScenario = { stdout: Buffer.from(report), stderr: Buffer.alloc(0), status: 1, signal: null };
   assert.equal(auditFunction(runNpm)(['audit']), report);
 
-  strDiagnostic = '';
   const strPrivateStderr = 'npm warn TASK130_F34_PRIVATE_PARTIAL_STDERR\n';
-  objScenario = { stdout: null, stderr: Buffer.from(strPrivateStderr), status: null, signal: null,
-    error: { syscall: 'spawnSync fixture', code: 'ENOBUFS', message: 'fixture' } };
-  assert.throws(() => runNpm(['config'], {}, 6), { refusal: 2 });
-  assert.match(strDiagnostic, /categories\s+warning/);
-  assert.match(strDiagnostic,
-    new RegExp(`stderr length\\s+${strPrivateStderr.length} characters`));
-  assert.match(strDiagnostic, /npm could not be run: ENOBUFS/);
-  assert.doesNotMatch(strDiagnostic, /TASK130_F34|PRIVATE_PARTIAL_STDERR/);
+  for (const [arrArguments, intPhase] of [
+    [['--version'], 2], [['config', 'list', '--json'], 6],
+    [['config', 'get', 'registry'], 9], [['ls', '--all', '--json'], 7],
+    [['audit', '--json'], 5],
+  ]) {
+    strDiagnostic = '';
+    objScenario = { stdout: Buffer.alloc(8192), stderr: Buffer.from(strPrivateStderr),
+      status: null, signal: 'SIGTERM', pid: 41,
+      error: { syscall: 'spawnSync fixture', code: 'ENOBUFS', message: 'fixture' } };
+    assert.throws(() => runNpm(arrArguments, {}, intPhase), { refusal: intPhase });
+    assert.match(strDiagnostic, /categories\s+warning/);
+    assert.match(strDiagnostic,
+      new RegExp(`stderr length\\s+${strPrivateStderr.length} characters`));
+    assert.match(strDiagnostic, new RegExp(`npm ${arrArguments[0]} exceeded the bounded response size`));
+    assert.match(strDiagnostic, /truncated response cannot be parsed/);
+    assert.doesNotMatch(strDiagnostic, /TASK130_F34|PRIVATE_PARTIAL_STDERR|npm could not be run/);
+  }
+
+  for (const strCode of ['ENOENT', 'EACCES', 'E2BIG']) {
+    strDiagnostic = '';
+    objScenario = { stdout: null, stderr: Buffer.alloc(0), status: null, signal: null,
+      error: { syscall: 'spawnSync fixture', code: strCode, message: 'fixture' } };
+    assert.throws(() => runNpm(['config'], {}, 6), { refusal: 2 });
+    assert.match(strDiagnostic, new RegExp(`npm could not be run: ${strCode}`));
+  }
 
   strDiagnostic = '';
   objScenario = { stdout: null, stderr: null, status: 0, signal: null };
   assert.throws(() => runNpm(['audit'], {}, 5), { refusal: 5 });
   assert.match(strDiagnostic, /returned no stdout byte stream/);
 });
+
+test('NPM-RESPONSE-LIMIT: real child overflow uses the owning phase before a catch',
+  { skip: process.platform !== 'linux' || process.arch !== 'x64' }, () => {
+    const summaryFrom = source.indexOf('const NPM_DIAGNOSTIC_CATEGORIES');
+    const summaryFunction = source.indexOf('function writeNpmDiagnosticSummary(', summaryFrom);
+    const summaryTo = source.indexOf('\n}\n', summaryFunction) + 2;
+    const runFrom = source.indexOf('function runNpm(');
+    const runTo = source.indexOf('\nfunction runNpmOrRefuse(', runFrom);
+    assert.ok(summaryFrom >= 0 && summaryTo > summaryFunction && runFrom >= 0 && runTo > runFrom);
+    const temporary = mkdtempSync(join(tmpdir(), 'p1-response-limit-'));
+    const npmCli = join(temporary, 'npm-cli.cjs');
+    const runner = join(temporary, 'runner.mjs');
+    try {
+      writeFileSync(npmCli,
+        `process.stdout.write(Buffer.alloc(65 * 1024 * 1024, 0x78));\n`);
+      writeFileSync(runner, `import { spawnSync } from 'node:child_process';
+import { lstatSync } from 'node:fs';
+import { join } from 'node:path';
+const strNpmCli = ${JSON.stringify(npmCli)};
+const intNpmCliInode = lstatSync(strNpmCli, { bigint: true }).ino;
+const strExternalCacheDirectory = ${JSON.stringify(temporary)};
+const strWorkflowDirectory = ${JSON.stringify(temporary)};
+const objNpmProcessResults = [];
+const REVIEWED_NPM = '11.16.0';
+const npmChildEnv = () => ({});
+const decodeUtf8ExactlyOrRefuse = () => { throw new Error('truncated stdout reached decoder'); };
+const formatUntrustedText = String;
+${source.slice(summaryFrom, summaryTo)}
+${source.slice(runFrom, runTo)}
+try {
+  runNpm(['ls', '--all', '--json'], {}, 7);
+  process.exit(98);
+} catch (error) {
+  process.stderr.write('response-limit refusal was catchable: ' + error.message + '\\n');
+  process.exit(99);
+}
+`);
+      const result = spawnSync(process.execPath, [runner], {
+        encoding: 'utf8', maxBuffer: 1024 * 1024, timeout: 15000,
+      });
+      assert.equal(result.status, 7, result.stderr);
+      assert.equal(result.stdout, '');
+      assert.match(result.stderr, /npm ls exceeded the bounded response size/);
+      assert.match(result.stderr, /truncated response cannot be parsed/);
+      assert.doesNotMatch(result.stderr, /catchable|truncated stdout reached decoder/);
+    } finally {
+      rmSync(temporary, { recursive: true, force: true });
+    }
+  });
 
 test('AUDIT-PUBLIC-SUMMARY: response names affect the normalized digest but never display', () => {
   const severityFrom = source.indexOf('const SEVERITY_LEVELS');
@@ -1156,6 +1381,30 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       assert.deepEqual(fingerprint(checkout), before);
       assert.equal(existsSync(join(checkout, 'forbidden-cache')), false);
       assert.equal(existsSync(join(checkout, 'forbidden-logs')), false);
+
+      const strStickyCheckout = join(temporary, 'sticky-internal-ancestors');
+      cpSync(checkout, strStickyCheckout, { recursive: true, verbatimSymlinks: true });
+      const strStickyFixture = join(strStickyCheckout, '.github', 'workflows');
+      chmodSync(strStickyCheckout, 0o1777);
+      chmodSync(join(strStickyCheckout, '.github'), 0o1777);
+      chmodSync(strStickyFixture, 0o755);
+      const objStickyAccepted = invokeFrom(strStickyFixture, ['--no-audit']);
+      assert.equal(objStickyAccepted.status, 0, objStickyAccepted.stderr);
+
+      const strWritableCheckout = join(temporary, 'TASK130_F38_PRIVATE_REPOSITORY');
+      cpSync(checkout, strWritableCheckout, { recursive: true, verbatimSymlinks: true });
+      const strWritableFixture = join(strWritableCheckout, '.github', 'workflows');
+      chmodSync(strWritableCheckout, 0o775);
+      const objWritableAncestor = invokeFrom(strWritableFixture, ['--no-audit']);
+      refuse(objWritableAncestor, 15);
+      assert.match(objWritableAncestor.stderr, /repository root; path\/name withheld/);
+      assert.doesNotMatch(objWritableAncestor.stderr, /TASK130_F38|PRIVATE_REPOSITORY/);
+      chmodSync(strWritableCheckout, 0o755);
+      chmodSync(strWritableFixture, 0o1777);
+      const objWritableDirect = invokeFrom(strWritableFixture, ['--no-audit']);
+      refuse(objWritableDirect, 15);
+      assert.match(objWritableDirect.stderr, /workflow directory; path\/name withheld/);
+      assert.doesNotMatch(objWritableDirect.stderr, /TASK130_F38|PRIVATE_REPOSITORY/);
 
       const strNpmrcCheckout = join(temporary, 'TASK130_F33_PRIVATE_NPMRC_CHECKOUT');
       cpSync(checkout, strNpmrcCheckout, { recursive: true, verbatimSymlinks: true });

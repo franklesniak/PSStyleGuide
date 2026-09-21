@@ -167,10 +167,38 @@ const REVIEWED_REGISTRY = 'https://registry.npmjs.org/';
 // the script -- the record says so -- but it can be kept as small as the
 // language allows, which is what the comment claimed and did not deliver. The
 // snapshot and its ctime baseline now genuinely precede every other statement.
+// F37, reported by Codex on 662b3a7. The first filesystem observation used two
+// unguarded path operations. An ordinary resolution/read failure therefore
+// escaped as exit 1 with a Node stack, and a FIFO substituted after Node loaded
+// the module could block the raw path read. Keep this first in the same place,
+// but use the verified nonblocking descriptor reader declared below. Function
+// declarations are hoisted; its imports and literal-only diagnostic dependencies
+// are initialized above this call. The script intentionally does not apply the
+// manifest holdability rule here, matching the final self-read contract.
+function refuseInitialScriptRead(objError) {
+  process.stderr.write(
+    'supply-freeze: this script could not be read for its initial snapshot; refusing to report.\n' +
+    formatErrorLocation(objError));
+  process.exit(3);
+}
+function initialScriptSnapshotOrRefuse(strInvokedPath) {
+  let strResolvedPath;
+  try {
+    strResolvedPath = realpathSync(strInvokedPath);
+  } catch (objError) {
+    refuseInitialScriptRead(objError);
+  }
+  return {
+    path: strResolvedPath,
+    bytes: readViaVerifiedDescriptor(strResolvedPath, 3, refuseInitialScriptRead,
+      { exit: 3, what: 'script', holdable: false }),
+  };
+}
 const strInvokedPath = fileURLToPath(import.meta.url);
-const strScriptPath = realpathSync(strInvokedPath);
+const objInitialScriptSnapshot = initialScriptSnapshotOrRefuse(strInvokedPath);
+const strScriptPath = objInitialScriptSnapshot.path;
 const boolEntryPointIsLink = strInvokedPath !== strScriptPath;
-const objScriptBefore = readFileSync(strScriptPath);
+const objScriptBefore = objInitialScriptSnapshot.bytes;
 const strScriptSha256 = sha256(objScriptBefore);
 // Round 18, reported. Math.round can round the uptime DOWN, which places the
 // computed start LATER than the real one -- and anything changed inside that
@@ -740,6 +768,64 @@ function validateCacheDirectory() {
   } catch { refuseCache(); }
 }
 const strExternalCacheDirectory = validateCacheDirectory();
+
+// F38, reported by Codex on 662b3a7. Descriptor checks prove which leaf inode
+// supplied bytes, but npm opens the project inputs again BY NAME. A non-owner
+// with write authority on an internal containing directory could replace that
+// name without changing the original leaf inode. Admit the repository-internal
+// path chain before any project input or npm child is read.
+//
+// Sticky protection is sufficient for the repository root and .github because
+// their existing next components are also required to have a trusted owner. It
+// is not sufficient for the direct workflows directory: an unrelated writer can
+// create an absent .npmrc even when sticky prevents replacement of owned files.
+// The documented hostile-parent-of-checkout and same-uid exclusions remain; this
+// check stops at the repository root and does not claim an atomic snapshot.
+function refuseUncontrolledInputDirectory(strRole, strReason, objError = null) {
+  process.stderr.write(
+    'supply-freeze: refusing to record from an input directory the recording user does not solely control.\n' +
+    `  input role         ${strRole}; path/name withheld; ${strReason}\n` +
+    (objError === null ? '' : formatErrorLocation(objError)) +
+    '  repository-internal path components must prevent another uid from replacing\n' +
+    '  an existing input name or injecting an absent project configuration.\n');
+  process.exit(15);
+}
+function validateRecordedInputDirectoryChain() {
+  const arrDirectories = [
+    { path: dirname(dirname(strWorkflowDirectory)), role: 'repository root' },
+    { path: dirname(strWorkflowDirectory), role: 'workflow parent directory' },
+    { path: strWorkflowDirectory, role: 'workflow directory' },
+  ];
+  const intUid = BigInt(process.getuid());
+  const arrStats = arrDirectories.map((objDirectory) => {
+    let objStats;
+    try {
+      objStats = lstatSync(objDirectory.path, { bigint: true });
+    } catch (objError) {
+      refuseUncontrolledInputDirectory(objDirectory.role, 'could not be inspected', objError);
+    }
+    if (!objStats.isDirectory() || objStats.isSymbolicLink()) {
+      refuseUncontrolledInputDirectory(objDirectory.role, 'is not a real directory');
+    }
+    if (objStats.uid !== 0n && objStats.uid !== intUid) {
+      refuseUncontrolledInputDirectory(objDirectory.role, 'has an untrusted owner');
+    }
+    return objStats;
+  });
+  for (let intIndex = 0; intIndex < arrStats.length; intIndex += 1) {
+    const boolNonOwnerWritable = (arrStats[intIndex].mode & 0o022n) !== 0n;
+    if (!boolNonOwnerWritable) continue;
+    const boolDirectInputDirectory = intIndex === arrStats.length - 1;
+    const boolSticky = (arrStats[intIndex].mode & 0o1000n) !== 0n;
+    if (boolDirectInputDirectory || !boolSticky) {
+      refuseUncontrolledInputDirectory(arrDirectories[intIndex].role,
+        boolDirectInputDirectory
+          ? 'grants non-owner write access to the directory that contains project inputs'
+          : 'grants non-owner write access without sticky protection');
+    }
+  }
+}
+validateRecordedInputDirectoryChain();
 const objNpmProcessResults = [];
 
 function sha256(objInput) {
@@ -970,8 +1056,8 @@ function readViaVerifiedDescriptor(strPath, intMissingExit, fnOnMissing,
         + 'not a regular file.\n'
         + `  input role         ${objRefusal.what}; path/name withheld; is a symlink\n`
         + '  refused by the kernel at open (O_NOFOLLOW), so no window exists between\n'
-        + '  checking the type and reading the bytes. Only a regular file returns the\n'
-        + '  same bytes to this process and to npm.\n');
+        + '  checking the type and reading the bytes. Only a regular file can supply\n'
+        + '  stable bytes through this descriptor and later named-path reads.\n');
       process.exit(objRefusal.exit);
     }
     fnOnMissing(objError);
@@ -1015,8 +1101,8 @@ function readViaVerifiedDescriptor(strPath, intMissingExit, fnOnMissing,
       + 'not a regular file.\n'
       + `  input role         ${objRefusal.what}; path/name withheld; is ${strKind}\n`
       + '  checked on the open descriptor, not by name: a name can be swapped between\n'
-      + '  the check and the read, and only a regular file returns the same bytes to\n'
-      + '  this process and to npm.\n');
+      + '  the check and the read, and only a regular file can supply stable bytes\n'
+      + '  through this descriptor and later named-path reads.\n');
     process.exit(objRefusal.exit);
   }
   if (objRefusal.holdable) {
@@ -1689,6 +1775,18 @@ function runNpm(arrNpmArguments, objEnv, intResponseExit) {
     // Spawn failures can return null stdout. Classify those before the semantic
     // decoder so ENOENT/E2BIG remains an exit-2 launch refusal rather than an
     // uncaught null TypeError.
+    // F39, reported by Codex on 662b3a7. spawnSync labels output-buffer
+    // exhaustion with the same syscall prefix as a failure to launch. ENOBUFS
+    // means npm started, exceeded this phase's 64 MiB response boundary, and was
+    // terminated. Refuse at the owning response phase before any truncated bytes
+    // reach the decoder. Other spawn errors retain the existing exit-2 handling;
+    // this does not claim every possible spawnSync error is pre-launch.
+    if (objResult.error?.code === 'ENOBUFS') {
+      process.stderr.write(
+        `supply-freeze: npm ${arrNpmArguments[0]} exceeded the bounded response size; refusing.\n` +
+        '  child content and local paths are withheld; a truncated response cannot be parsed.\n');
+      process.exit(intResponseExit);
+    }
     if (objResult.error) throw objResult.error;
     if (!Buffer.isBuffer(objResult.stdout)) {
       process.stderr.write(
