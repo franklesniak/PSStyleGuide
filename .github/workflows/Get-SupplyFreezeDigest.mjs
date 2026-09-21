@@ -1027,6 +1027,22 @@ function canonicalize(objValue) {
   return JSON.stringify(objValue ?? null);
 }
 
+// Task131 F131-2. A valid object can still exceed the runtime's recursion
+// limit while the reviewed assertion tuple is canonicalized. Translate that
+// recoverable comparison failure at its owning contract boundary so a local
+// source path and stack cannot replace the documented exit-17 refusal.
+function supplyFreezeTupleDigestOrRefuse(objValue) {
+  try {
+    return sha256(canonicalize(objValue));
+  } catch {
+    process.stderr.write(
+      'supply-freeze: P1 historical assertions could not be compared safely; refusing.\n' +
+      '  source content, comparison details, and local paths are withheld.\n' +
+      '  nothing is recorded.\n');
+    process.exit(17);
+  }
+}
+
 // Round 16, reported. Every manifest read after the first snapshot was a bare
 // readFileSync, so a manifest deleted or made unreadable mid-run threw before
 // the comparison it feeds could issue the documented exit 3 -- exit 1 and a raw
@@ -4105,7 +4121,8 @@ if (!isPlainObject(objContract)) {
 }
 const objSupplyFreeze = objContract.supplyFreeze;
 if (!isPlainObject(objSupplyFreeze)
-  || sha256(canonicalize(objSupplyFreeze)) !== '83c5138131de742734d22a818e21feb63d5ac11f8877adf52299809f04217362') {
+  || supplyFreezeTupleDigestOrRefuse(objSupplyFreeze)
+    !== '83c5138131de742734d22a818e21feb63d5ac11f8877adf52299809f04217362') {
   process.stderr.write('supply-freeze: P1 historical assertions differ from the reviewed tuple; refusing.\n');
   process.exit(17);
 }
@@ -5037,6 +5054,22 @@ function formatObservedConfig(objObserved) {
   return describe(objObserved);
 }
 
+// Task131 F131-2. The strict configuration boundary owns both recursive
+// canonical comparison and diagnostic rendering. Keep configDrift unchanged,
+// but translate a recoverable exception from either operation before it can
+// expose the runtime stack or a caller-controlled value.
+function configDriftOrRefuse(objReviewed, objEffective) {
+  try {
+    return configDrift(objReviewed, objEffective);
+  } catch {
+    process.stderr.write(
+      'supply-freeze: npm configuration could not be compared safely; refusing.\n' +
+      '  observed values, comparison details, and local paths are withheld.\n' +
+      '  nothing is recorded.\n');
+    process.exit(6);
+  }
+}
+
 if (!boolAnyToolchain) {
   const objEffective = parseNpmJsonOrRefuse(
     runNpmOrRefuse(['config', 'list', '--json'], undefined, 6,
@@ -5049,7 +5082,7 @@ if (!boolAnyToolchain) {
       '  strict configuration comparison requires an object; nothing is recorded.\n');
     process.exit(6);
   }
-  const arrDrift = configDrift(REVIEWED_NPM_CONFIG, objEffective);
+  const arrDrift = configDriftOrRefuse(REVIEWED_NPM_CONFIG, objEffective);
   if (arrDrift.length > 0) {
     process.stderr.write(
       'supply-freeze: npm configuration would shape the install away from the reviewed tree.\n' +
@@ -5439,7 +5472,7 @@ if (boolSkipAudit) {
         '  strict configuration comparison requires an object; nothing is recorded.\n');
       process.exit(6);
     }
-    const arrTransportDrift = configDrift(
+    const arrTransportDrift = configDriftOrRefuse(
       REVIEWED_NPM_TRANSPORT,
       objTransportEffective);
     if (arrTransportDrift.length > 0) {

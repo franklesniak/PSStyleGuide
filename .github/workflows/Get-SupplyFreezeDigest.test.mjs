@@ -621,7 +621,7 @@ test('JSON-ROOT-GUARDS: production contract and strict config guards reject non-
   const contractGuard = new Function('objContract', 'process',
     `${source.slice(plainFrom, plainTo)}\n${source.slice(contractFrom, contractTo)}\n`
     + 'return objSupplyFreeze;');
-  const configGuard = (from, to, name) => new Function(name, 'configDrift',
+  const configGuard = (from, to, name) => new Function(name, 'configDriftOrRefuse',
     'REVIEWED_NPM_CONFIG', 'REVIEWED_NPM_TRANSPORT', 'process',
     `${source.slice(plainFrom, plainTo)}\n${source.slice(from, to)}\n`
     + `return ${name === 'objEffective' ? 'arrDrift' : 'arrTransportDrift'};`);
@@ -640,13 +640,14 @@ test('JSON-ROOT-GUARDS: production contract and strict config guards reject non-
       stderr: { write(strValue) { strDiagnostic += strValue; } },
       exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
     };
-    const configDrift = (_reviewed, effective) => {
+    const configDriftOrRefuse = (_reviewed, effective) => {
       assert.equal(effective !== null && typeof effective === 'object'
-        && !Array.isArray(effective), true, 'the production guard must run before configDrift');
+        && !Array.isArray(effective), true,
+      'the production guard must run before configDriftOrRefuse');
       return [];
     };
     assert.throws(() => boolConfig
-      ? guard(value, configDrift, {}, {}, objProcess)
+      ? guard(value, configDriftOrRefuse, {}, {}, objProcess)
       : guard(value, objProcess), { refusal: intExit });
     assert.match(strDiagnostic, strCategory);
     assert.match(strDiagnostic, /expected\s+JSON object/);
@@ -668,14 +669,143 @@ test('JSON-ROOT-GUARDS: production contract and strict config guards reject non-
   assert.equal(contractGuard(objContract, objUnexpectedRefusal),
     objContract.supplyFreeze);
   const objEffective = { registry: 'reviewed', unrelated: 'allowed' };
-  const configDrift = (_reviewed, effective) => {
+  const configDriftOrRefuse = (_reviewed, effective) => {
     assert.equal(effective, objEffective);
     return ['valid-object-control'];
   };
-  assert.deepEqual(installGuard(objEffective, configDrift, {}, {}, objUnexpectedRefusal),
+  assert.deepEqual(installGuard(objEffective, configDriftOrRefuse, {}, {}, objUnexpectedRefusal),
     ['valid-object-control']);
-  assert.deepEqual(transportGuard(objEffective, configDrift, {}, {}, objUnexpectedRefusal),
+  assert.deepEqual(transportGuard(objEffective, configDriftOrRefuse, {}, {}, objUnexpectedRefusal),
     ['valid-object-control']);
+});
+
+test('RECURSIVE-COMPARISON-REFUSAL: contract and strict config boundaries translate recursion failure', () => {
+  const canonicalFrom = source.indexOf('function canonicalize(');
+  const tupleFunction = source.indexOf('function supplyFreezeTupleDigestOrRefuse(', canonicalFrom);
+  const tupleTo = source.indexOf('\n}\n', tupleFunction) + 2;
+  const contractFrom = source.indexOf('const objSupplyFreeze = objContract.supplyFreeze;');
+  const contractTo = source.indexOf('\n\n\n// Round 29', contractFrom);
+  const configFrom = source.indexOf('function normalizeConfigValue(');
+  const configFunction = source.indexOf('function configDriftOrRefuse(', configFrom);
+  const configTo = source.indexOf('\n}\n', configFunction) + 2;
+  const installFrom = source.indexOf('if (!isPlainObject(objEffective))');
+  const installTo = source.indexOf('\n  if (arrDrift.length > 0)', installFrom);
+  const transportFrom = source.indexOf('if (!isPlainObject(objTransportEffective))');
+  const transportTo = source.indexOf('\n    if (arrTransportDrift.length > 0)', transportFrom);
+  assert.ok(canonicalFrom >= 0 && tupleFunction > canonicalFrom && tupleTo > tupleFunction);
+  assert.ok(contractFrom >= 0 && contractTo > contractFrom);
+  assert.ok(configFrom >= 0 && configFunction > configFrom && configTo > configFunction);
+  assert.ok(installFrom >= 0 && installTo > installFrom);
+  assert.ok(transportFrom >= 0 && transportTo > transportFrom);
+
+  const nested = (intDepth, objLeaf = 0) => {
+    let objValue = objLeaf;
+    for (let intAt = 0; intAt < intDepth; intAt++) objValue = [objValue];
+    return objValue;
+  };
+  const nestedObject = (intDepth, objLeaf = 0) => {
+    let objValue = objLeaf;
+    for (let intAt = 0; intAt < intDepth; intAt++) objValue = { next: objValue };
+    return objValue;
+  };
+  const objDeep = nested(10000, 'TASK131_F2_PRIVATE_RECURSIVE_VALUE');
+  const objContract = JSON.parse(
+    readFileSync(join(workflow, 'workflow-policy-contract.json'), 'utf8'));
+  let strDiagnostic = '';
+  const objProcess = {
+    stderr: { write(strValue) { strDiagnostic += strValue; } },
+    exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+  };
+  const objTupleFunctions = new Function('sha256', 'process',
+    `${source.slice(canonicalFrom, tupleTo)};
+return { canonicalize, supplyFreezeTupleDigestOrRefuse };`)(sha, objProcess);
+  const contractBoundary = new Function('objContract', 'isPlainObject',
+    'supplyFreezeTupleDigestOrRefuse', 'sha256', 'canonicalize', 'process',
+    `${source.slice(contractFrom, contractTo)};
+return objSupplyFreeze;`);
+  const isPlainObject = (value) => value !== null
+    && typeof value === 'object' && !Array.isArray(value);
+
+  assert.equal(objTupleFunctions.supplyFreezeTupleDigestOrRefuse(objContract.supplyFreeze),
+    '83c5138131de742734d22a818e21feb63d5ac11f8877adf52299809f04217362');
+  assert.doesNotThrow(() => objTupleFunctions.supplyFreezeTupleDigestOrRefuse({
+    retained: nested(20), unrelated: 'allowed',
+  }));
+  assert.equal(contractBoundary({ ...objContract, unrelated: 'allowed' }, isPlainObject,
+    objTupleFunctions.supplyFreezeTupleDigestOrRefuse, sha,
+    objTupleFunctions.canonicalize, objProcess), objContract.supplyFreeze);
+  strDiagnostic = '';
+  assert.throws(() => contractBoundary({ supplyFreeze: { recursive: objDeep },
+    unrelated: 'allowed' }, isPlainObject,
+  objTupleFunctions.supplyFreezeTupleDigestOrRefuse, sha,
+  objTupleFunctions.canonicalize, objProcess), { refusal: 17 });
+  assert.match(strDiagnostic, /historical assertions could not be compared safely/);
+  assert.match(strDiagnostic, /nothing is recorded/);
+  assert.doesNotMatch(strDiagnostic,
+    /TASK131_F2|PRIVATE_RECURSIVE_VALUE|RangeError|Maximum call stack|Get-SupplyFreezeDigest|file:\/\/|\n\s+at\s/u);
+  strDiagnostic = '';
+  assert.throws(() => objTupleFunctions.supplyFreezeTupleDigestOrRefuse(
+    nestedObject(10000, 'TASK131_F2_PRIVATE_OBJECT_VALUE')), { refusal: 17 });
+  assert.match(strDiagnostic, /historical assertions could not be compared safely/);
+  assert.doesNotMatch(strDiagnostic,
+    /TASK131_F2|PRIVATE_OBJECT_VALUE|RangeError|Maximum call stack|Get-SupplyFreezeDigest|file:\/\/|\n\s+at\s/u);
+
+  const objConfigFunctions = new Function('canonicalize', 'process',
+    `${source.slice(configFrom, configTo)};
+return { configDrift, formatObservedConfig, configDriftOrRefuse };`)(
+    objTupleFunctions.canonicalize, objProcess);
+  const configBoundary = (from, to, name, reviewedName, resultName) =>
+    new Function(name, 'isPlainObject', 'configDriftOrRefuse', 'configDrift',
+      reviewedName, 'process',
+      `${source.slice(from, to)};
+return ${resultName};`);
+  const installBoundary = configBoundary(installFrom, installTo, 'objEffective',
+    'REVIEWED_NPM_CONFIG', 'arrDrift');
+  const transportBoundary = configBoundary(transportFrom, transportTo,
+    'objTransportEffective', 'REVIEWED_NPM_TRANSPORT', 'arrTransportDrift');
+
+  const objUnexpectedRefusal = {
+    stderr: { write(value) { assert.fail(`valid config emitted a refusal: ${value}`); } },
+    exit(code) { assert.fail(`valid config exited with ${code}`); },
+  };
+  assert.deepEqual(installBoundary({ 'bin-links': true, unrelated: 'allowed' },
+    isPlainObject, objConfigFunctions.configDriftOrRefuse, objConfigFunctions.configDrift,
+    { 'bin-links': true }, objUnexpectedRefusal), []);
+  assert.deepEqual(transportBoundary({ proxy: null, unrelated: 'allowed' },
+    isPlainObject, objConfigFunctions.configDriftOrRefuse, objConfigFunctions.configDrift,
+    { proxy: null }, objUnexpectedRefusal), []);
+
+  // The getter returns a small drifting value to the comparison and the deep
+  // value to the formatter. This exercises the actual recursive formatter,
+  // not a synthetic exception substituted for configDrift.
+  let intReads = 0;
+  const objFormatterFailure = {};
+  Object.defineProperty(objFormatterFailure, 'bin-links', {
+    enumerable: true,
+    get() {
+      intReads += 1;
+      return intReads === 1 ? 'different' : objDeep;
+    },
+  });
+  strDiagnostic = '';
+  assert.throws(() => installBoundary(objFormatterFailure, isPlainObject,
+    objConfigFunctions.configDriftOrRefuse, objConfigFunctions.configDrift,
+    { 'bin-links': true }, objProcess),
+  { refusal: 6 });
+  assert.equal(intReads, 2);
+  assert.match(strDiagnostic, /npm configuration could not be compared safely/);
+  assert.doesNotMatch(strDiagnostic,
+    /TASK131_F2|PRIVATE_RECURSIVE_VALUE|RangeError|Maximum call stack|Get-SupplyFreezeDigest|file:\/\/|\n\s+at\s/u);
+
+  strDiagnostic = '';
+  assert.throws(() => transportBoundary({ proxy: objDeep }, isPlainObject,
+    objConfigFunctions.configDriftOrRefuse, objConfigFunctions.configDrift,
+    { proxy: null }, objProcess),
+  { refusal: 6 });
+  assert.match(strDiagnostic, /npm configuration could not be compared safely/);
+  assert.match(strDiagnostic, /nothing is recorded/);
+  assert.doesNotMatch(strDiagnostic,
+    /TASK131_F2|PRIVATE_RECURSIVE_VALUE|RangeError|Maximum call stack|Get-SupplyFreezeDigest|file:\/\/|\n\s+at\s/u);
 });
 
 test('JSON-RESPONSE-PRIVACY: parser, schema, and normalization refusals withhold source content', () => {
@@ -1870,6 +2000,24 @@ const realpathSync = (strPath, ...arrArguments) => {
           /P1 contract root has an unexpected response schema/);
         assert.doesNotMatch(objNullContract.stderr,
           /TASK131_F31_PRIVATE_PATH|TypeError|Get-SupplyFreezeDigest|file:\/\/|\n\s+at\s/u);
+      }
+      writeFileSync(contractPath, contractBytes);
+      const strRecursiveValue = '['.repeat(10000)
+        + '"TASK131_F2_PRIVATE_CONTRACT_VALUE"' + ']'.repeat(10000);
+      const strRecursiveContract = `{"supplyFreeze":{"recursive":${strRecursiveValue}}`
+        + `,"TASK131_F2_PRIVATE_CONTRACT_ROOT":"withheld"}`;
+      assert.equal(JSON.parse(strRecursiveContract).TASK131_F2_PRIVATE_CONTRACT_ROOT,
+        'withheld');
+      for (const arrFlags of [['--no-audit'], ['--no-audit', '--any-toolchain']]) {
+        writeFileSync(contractPath, strRecursiveContract);
+        const objRecursiveContract = invoke(arrFlags);
+        refuse(objRecursiveContract, 17);
+        assert.equal(objRecursiveContract.signal, null);
+        assert.match(objRecursiveContract.stderr,
+          /P1 historical assertions could not be compared safely/);
+        assert.match(objRecursiveContract.stderr, /nothing is recorded/);
+        assert.doesNotMatch(objRecursiveContract.stderr,
+          /TASK131_F2|PRIVATE_CONTRACT|RangeError|Maximum call stack|Get-SupplyFreezeDigest|file:\/\/|\n\s+at\s/u);
       }
       writeFileSync(contractPath, contractBytes);
       rmSync(contractPath);
