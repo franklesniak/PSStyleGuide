@@ -725,6 +725,28 @@ function hasUnsupportedNodeStartupEnvironment(objEnv) {
     || objEnv.NODE_V8_COVERAGE || objEnv.NODE_REDIRECT_WARNINGS
     || objEnv.NODE_DEBUG || objEnv.NODE_DEBUG_NATIVE);
 }
+// F43, reported by Codex on 15d14ed. Distribution resolution is a toolchain check at
+// each of its three observation points. The npm-root call could escape as a native
+// exit-1 stack, the fold call was translated by its surrounding scanOrRefuse to
+// exit 10, and the cache call reported exit 16 if the running executable's path
+// was renamed or became unsearchable. Preserve the distinct formulas and timings
+// -- resolving once would discard the later checks -- while giving every native
+// failure one phase-specific fixed exit-2, location-withholding result. The fold's
+// earlier generic exit 10 was safe and allowed, but named tree drift rather than
+// the executable-distribution failure the operator must repair.
+function resolveNodeDistributionOrRefuse(funcResolve) {
+  try {
+    return funcResolve();
+  } catch (objError) {
+    process.stderr.write(
+      'supply-freeze: refusing to record digests on an unreviewed toolchain.\n' +
+      '  node runtime       filesystem location withheld\n' +
+      formatErrorLocation(objError, process.execPath) +
+      '  the running Node executable must remain resolvable while its adjacent npm\n' +
+      '  installation is admitted and folded; nothing is recorded after a failure.\n');
+    process.exit(2);
+  }
+}
 function validateCacheDirectory() {
   if (process.platform !== 'linux' || process.arch !== 'x64') {
     process.stderr.write('supply-freeze: this recorder supports Linux/x64 only.\n');
@@ -740,13 +762,19 @@ function validateCacheDirectory() {
   if (arrCacheArguments.length !== 1) refuseCache();
   const strCandidate = arrCacheArguments[0].slice('--cache-directory='.length);
   if (!isAbsolute(strCandidate) || strCandidate.includes('\0')) refuseCache();
+  let strResolved;
+  let strRepository;
+  let strPhysicalRepository;
   try {
-    const strResolved = realpathSync(strCandidate);
+    strResolved = realpathSync(strCandidate);
     // Reject aliases, dot segments and symlink ancestors, not just a linked leaf.
     if (strCandidate !== strResolved) refuseCache();
-    const strRepository = realpathSync(dirname(dirname(strWorkflowDirectory)));
-    const strPhysicalRepository = realpathSync(dirname(dirname(dirname(strScriptPath))));
-    const strDistribution = realpathSync(dirname(dirname(process.execPath)));
+    strRepository = realpathSync(dirname(dirname(strWorkflowDirectory)));
+    strPhysicalRepository = realpathSync(dirname(dirname(dirname(strScriptPath))));
+  } catch { refuseCache(); }
+  const strDistribution = resolveNodeDistributionOrRefuse(
+    () => realpathSync(dirname(dirname(process.execPath))));
+  try {
     const inside = (a, b) => a === b || a.startsWith(`${b === '/' ? '' : b}/`);
     const overlaps = (a, b) => inside(a, b) || inside(b, a);
     if (overlaps(strResolved, strRepository) || overlaps(strResolved, strPhysicalRepository)
@@ -1214,7 +1242,8 @@ function npmInstallationRootOrRefuse() {
   //
   // The root must therefore be inside the distribution before containment means
   // anything, because every other check in this chain is relative to it.
-  const strDistribution = dirname(dirname(realpathSync(process.execPath)));
+  const strDistribution = resolveNodeDistributionOrRefuse(
+    () => dirname(dirname(realpathSync(process.execPath))));
   if (!isInsideOrEqual(strRealRoot, strDistribution)) {
     process.stderr.write(
       'supply-freeze: refusing an npm installation that resolves outside this Node distribution.\n' +
@@ -1445,7 +1474,8 @@ function foldNpmInstallation(strRoot, strLauncherPath) {
   // pre-invocation recheck of the npm command line's inode narrows the window to
   // the gap before exec without eliminating it. See docs/T1-SUPPLY-FREEZE-v1.md,
   // "What this script cannot check about itself".
-  const strDistributionRoot = dirname(dirname(realpathSync(process.execPath)));
+  const strDistributionRoot = resolveNodeDistributionOrRefuse(
+    () => dirname(dirname(realpathSync(process.execPath))));
   const arrSeen = [];
   const foldAncestors = (strLeaf) => {
     let strCurrent = dirname(strLeaf);
@@ -1697,6 +1727,36 @@ function npmChildEnv(objEnv) {
   return objScrubbed;
 }
 
+// F42, reported by Codex on 15d14ed. A registry value can contain credentials even
+// when it is not URL-shaped. Putting that checked value in the audit argv made
+// it visible through process listings and through either wrapper's argument
+// diagnostic. Bind it at npm's environment-precedence layer instead: env still
+// outranks every npmrc file, while another uid cannot read /proc/<pid>/environ
+// under the supported Linux boundary. Same-uid and privileged readers remain
+// explicit exclusions. Remove every case spelling before setting one canonical
+// key so npm never has two environment answers for the same setting.
+function npmEnvironmentWithRegistry(objEnv, strRegistry) {
+  const objBase = objEnv ?? process.env;
+  const objBound = {};
+  for (const [strKey, strValue] of Object.entries(objBase)) {
+    if (/^npm_config_registry$/iu.test(strKey)) continue;
+    objBound[strKey] = strValue;
+  }
+  objBound.NPM_CONFIG_REGISTRY = strRegistry;
+  return objBound;
+}
+
+const NPM_OPERATION_LABELS = Object.freeze({
+  '--version': 'version query',
+  config: 'configuration query',
+  ls: 'installed-tree query',
+  audit: 'advisory audit',
+});
+function npmOperationLabel(arrNpmArguments) {
+  return Object.hasOwn(NPM_OPERATION_LABELS, arrNpmArguments[0])
+    ? NPM_OPERATION_LABELS[arrNpmArguments[0]] : 'unclassified operation';
+}
+
 const NPM_DIAGNOSTIC_CATEGORIES = Object.freeze([
   ['warning', /(?:^|\r?\n)npm warn(?:ing)?(?:\s|$)/iu],
   ['notice', /(?:^|\r?\n)npm notice(?:\s|$)/iu],
@@ -1825,21 +1885,13 @@ function runNpm(arrNpmArguments, objEnv, intResponseExit) {
       process.stderr.write(
         'supply-freeze: refusing to record digests on an unreviewed toolchain.\n' +
         `  npm could not be run: ${formatUntrustedText(String(objError.code ?? objError.message))}\n` +
-        // Round 47, reported by Codex, and this is round 45's sweep caught one
-        // line below where it stopped. That round escaped the message above and
-        // recorded this refusal as safe because it is "built from a constant
-        // command name" -- true of the line above, and this line prints the
-        // ARGUMENTS. The audit invocation carries `--registry=${strRegistry}`,
-        // which under --any-toolchain is an unvalidated, possibly credentialed
-        // value. Measured, with npm removed after `config get registry`:
-        //
-        //   invocation  npm audit --json --registry=https://user:hunter2@…?token=SUPPLYSECRET
-        //
-        // at exit 2, while npm's own error text on the adjacent path redacted
-        // the same URL correctly. The invocation is kept rather than dropped --
-        // knowing WHICH call failed is the whole diagnostic -- with every
-        // argument through the funnel.
-        `  invocation         npm ${arrNpmArguments.map((strArgument) => formatUntrustedText(strArgument)).join(' ')}\n` +
+        // Round 47 removed raw argument text through the general output funnel.
+        // F42 found that still answered the wrong question: an argument is
+        // already exposed through /proc/<pid>/cmdline while npm runs, and the
+        // funnel deliberately preserves ordinary non-URL strings. No argument
+        // is public metadata. An allowlisted operation label identifies the
+        // failing phase without reproducing values now or after a future edit.
+        `  operation          ${npmOperationLabel(arrNpmArguments)} (arguments withheld)\n` +
         `  reviewed npm       ${REVIEWED_NPM}\n` +
         '  the reviewed npm must be runnable before anything is recorded; its version\n' +
         '  is itself a compared field, so an npm that cannot report one cannot be\n' +
@@ -1878,7 +1930,7 @@ function runNpmOrRefuse(arrNpmArguments, objEnv, intFailureExit, strMeaning) {
   } catch (objError) {
     process.stderr.write(
       `supply-freeze: ${strMeaning}\n` +
-      `  invocation         npm ${arrNpmArguments.map((strArgument) => formatUntrustedText(strArgument)).join(' ')}\n` +
+      `  operation          ${npmOperationLabel(arrNpmArguments)} (arguments withheld)\n` +
       `  npm exit status    ${formatUntrustedText(String(objError?.status ?? objError?.code ?? 'unknown'))}\n` +
       '  npm ran and refused the invocation, so the value this run needed was never\n' +
       '  produced; nothing is recorded from a call that did not answer.\n');
@@ -5425,15 +5477,16 @@ if (boolSkipAudit) {
   // different registry while objRecord.registry still named the validated one
   // -- a schema-valid answer from a mirror, recorded under the wrong source.
   //
-  // Passing the validated value on the command line closes it by construction
-  // rather than by a second check afterwards: npm gives command-line config the
-  // highest precedence, so this invocation cannot be redirected by any file or
-  // environment variable. The value passed is the one already compared against
-  // REVIEWED_REGISTRY and the one recorded, so all three agree by construction.
+  // Bind the checked value into a fresh child environment rather than checking
+  // a second time afterwards. npm's environment configuration outranks project,
+  // user and global files, and every case-insensitive registry alias is removed
+  // before one canonical setting is added. The value used is therefore the one
+  // already compared (in strict mode) and the one recorded, without exposing it
+  // through the process argument vector.
   //
   // Round 12, reported, and this is the previous round's fix caught being
-  // partial. Pinning the registry on this command line closed one input and
-  // left the rest reloading: the audit subprocess still reads `omit` and
+  // partial. The earlier registry binding closed one input and left the rest
+  // reloading: the audit subprocess still reads `omit` and
   // `include` from whatever .npmrc exists when it starts, and npm's own
   // `npm audit --help` lists `[--omit <dev|optional|peer> ...]`.
   //
@@ -5451,9 +5504,10 @@ if (boolSkipAudit) {
   // is returned by runNpmAllowingFailure and then thrown on by JSON.parse as a
   // raw SyntaxError -- exit 1, before the shape guard below could call it what
   // it is. Unparseable output is exactly "not an audit report".
+  const objAuditEnvironment = npmEnvironmentWithRegistry(
+    boolAnyToolchain ? undefined : transportEnvironment(), strRegistry);
   const strAuditResponse = runNpmAllowingFailure([
     'audit', '--json',
-    `--registry=${strRegistry}`,
     '--include=dev', '--include=optional', '--include=peer',
     // Round 16, reported. npm's metavulnerability calculation loads packuments
     // through the cache, and npm documents prefer-offline as bypassing staleness
@@ -5529,7 +5583,7 @@ if (boolSkipAudit) {
     // and says so in notFreezeRecordBecause.
   ].filter((strArgument) => boolAnyToolchain
     ? !Object.keys(REVIEWED_NPM_TRANSPORT).some((strKey) => strArgument.startsWith(`--${strKey}=`))
-    : true), boolAnyToolchain ? undefined : transportEnvironment());
+    : true), objAuditEnvironment);
   const objAudit = parseAuditOrRefuse(strAuditResponse);
   // Reported and confirmed, and the most serious of the round. `npm audit`
   // exits nonzero for two completely different reasons: advisories were found,

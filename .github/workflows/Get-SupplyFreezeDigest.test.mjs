@@ -54,6 +54,203 @@ test('NODE-CHILD-ENV: production child projection removes startup writers withou
   assert.equal(input.NODE_DISABLE_COMPILE_CACHE, '0');
 });
 
+test('NPM-REGISTRY-TRANSPORT: the audit binds one checked environment value and withholds argv', () => {
+  const environmentFrom = source.indexOf('function npmEnvironmentWithRegistry(');
+  const operationFrom = source.indexOf('const NPM_OPERATION_LABELS', environmentFrom);
+  const operationFunction = source.indexOf('function npmOperationLabel(', operationFrom);
+  const operationTo = source.indexOf('\n}\n', operationFunction) + 2;
+  assert.ok(environmentFrom >= 0 && operationFrom > environmentFrom
+    && operationFunction > operationFrom && operationTo > operationFunction);
+  const objSyntheticProcess = { env: {
+    npm_config_registry: 'TASK130_F42_LOWERCASE_SECRET',
+    NPM_CONFIG_REGISTRY: 'TASK130_F42_UPPERCASE_SECRET',
+    NpM_CoNfIg_ReGiStRy: 'TASK130_F42_MIXED_SECRET',
+    KEEP_PARENT: 'yes',
+  } };
+  const functions = new Function('process',
+    `${source.slice(environmentFrom, operationTo)};
+return { npmEnvironmentWithRegistry, npmOperationLabel };`)(objSyntheticProcess);
+  const strRegistry = 'TASK130_F42_BEARER_SENTINEL';
+  const objParentBound = functions.npmEnvironmentWithRegistry(undefined, strRegistry);
+  assert.deepEqual(objParentBound, {
+    KEEP_PARENT: 'yes', NPM_CONFIG_REGISTRY: strRegistry,
+  });
+  assert.equal(objSyntheticProcess.env.NPM_CONFIG_REGISTRY,
+    'TASK130_F42_UPPERCASE_SECRET');
+  const objStrictInput = { npm_config_registry: 'TASK130_F42_STRICT_SECRET',
+    KeepStrict: 'yes' };
+  assert.deepEqual(functions.npmEnvironmentWithRegistry(objStrictInput, strRegistry), {
+    KeepStrict: 'yes', NPM_CONFIG_REGISTRY: strRegistry,
+  });
+  assert.equal(objStrictInput.npm_config_registry, 'TASK130_F42_STRICT_SECRET');
+  assert.deepEqual([
+    functions.npmOperationLabel(['--version']),
+    functions.npmOperationLabel(['config', 'get', 'registry']),
+    functions.npmOperationLabel(['ls', '--json']),
+    functions.npmOperationLabel(['audit', '--json']),
+    functions.npmOperationLabel(['TASK130_F42_UNKNOWN_OPERATION']),
+  ], ['version query', 'configuration query', 'installed-tree query',
+    'advisory audit', 'unclassified operation']);
+
+  const auditFrom = source.indexOf('  const objAuditEnvironment = npmEnvironmentWithRegistry(');
+  const auditTo = source.indexOf('\n  const objAudit = parseAuditOrRefuse(', auditFrom);
+  assert.ok(auditFrom >= 0 && auditTo > auditFrom);
+  const arrCalls = [];
+  const buildAudit = new Function('boolAnyToolchain', 'strRegistry',
+    'transportEnvironment', 'transportFlags', 'REVIEWED_NPM_TRANSPORT',
+    'npmEnvironmentWithRegistry', 'runNpmAllowingFailure',
+    `${source.slice(auditFrom, auditTo)};
+return { strAuditResponse, objAuditEnvironment };`);
+  const funcTransport = () => ({ npm_config_registry: 'TASK130_F42_FILE_OR_ENV_SECRET',
+    KEEP_TRANSPORT: 'yes' });
+  const funcFlags = () => ['--fetch-retries=0'];
+  const funcRun = (arrArguments, objEnvironment) => {
+    arrCalls.push({ arrArguments, objEnvironment });
+    return report;
+  };
+  const objStrict = buildAudit(false, strRegistry, funcTransport, funcFlags,
+    { 'fetch-retries': 0 }, functions.npmEnvironmentWithRegistry, funcRun);
+  const objDiagnostic = buildAudit(true, strRegistry, funcTransport, funcFlags,
+    { 'fetch-retries': 0 }, functions.npmEnvironmentWithRegistry, funcRun);
+  assert.equal(objStrict.strAuditResponse, report);
+  assert.equal(objDiagnostic.strAuditResponse, report);
+  assert.equal(arrCalls.length, 2);
+  for (const objCall of arrCalls) {
+    assert.equal(objCall.arrArguments[0], 'audit');
+    assert.equal(objCall.arrArguments.some((value) => value.startsWith('--registry=')), false);
+    assert.equal(objCall.arrArguments.join(' ').includes(strRegistry), false);
+    assert.equal(objCall.objEnvironment.NPM_CONFIG_REGISTRY, strRegistry);
+    assert.equal(Object.keys(objCall.objEnvironment)
+      .filter((strKey) => /^npm_config_registry$/iu.test(strKey)).length, 1);
+  }
+  assert.equal(arrCalls[0].objEnvironment.KEEP_TRANSPORT, 'yes');
+  assert.equal(Object.hasOwn(arrCalls[0].objEnvironment, 'KEEP_PARENT'), false);
+  assert.equal(arrCalls[0].arrArguments.includes('--fetch-retries=0'), true);
+  assert.equal(arrCalls[1].objEnvironment.KEEP_PARENT, 'yes');
+  assert.equal(Object.hasOwn(arrCalls[1].objEnvironment, 'KEEP_TRANSPORT'), false);
+  assert.equal(arrCalls[1].arrArguments.includes('--fetch-retries=0'), false);
+
+  const labelFrom = source.indexOf('const NPM_OPERATION_LABELS');
+  const summaryFrom = source.indexOf('const NPM_DIAGNOSTIC_CATEGORIES', labelFrom);
+  const summaryFunction = source.indexOf('function writeNpmDiagnosticSummary(', summaryFrom);
+  const summaryTo = source.indexOf('\n}\n', summaryFunction) + 2;
+  const runFrom = source.indexOf('function runNpm(');
+  const wrapperTo = source.indexOf('\n}\n', source.indexOf('function runNpmOrRefuse(', runFrom)) + 2;
+  let objScenario;
+  let strDiagnostic = '';
+  const objProcess = {
+    execPath: '/reviewed/node',
+    stderr: { write(value) { strDiagnostic += value; } },
+    exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+  };
+  const arrResults = [];
+  const objWrappers = new Function('lstatSync', 'strNpmCli', 'intNpmCliInode', 'process',
+    'spawnSync', 'npmChildEnv', 'join', 'strExternalCacheDirectory',
+    'strWorkflowDirectory', 'decodeUtf8ExactlyOrRefuse', 'objNpmProcessResults',
+    'Buffer', 'formatUntrustedText', 'REVIEWED_NPM',
+    `${source.slice(labelFrom, summaryTo)}
+${source.slice(runFrom, wrapperTo)}
+return { runNpm, runNpmOrRefuse };`)(
+    () => ({ ino: 41n }), '/reviewed/npm-cli.js', 41n, objProcess,
+    () => objScenario, (value) => value ?? {}, join, '/private-cache', '/workflow',
+    (value) => value.toString('utf8'), arrResults, Buffer, String, '11.16.0');
+  const arrPrivateAudit = ['audit', '--json', `--registry=${strRegistry}`];
+  objScenario = { stdout: null, stderr: Buffer.alloc(0), status: null, signal: null,
+    error: { syscall: 'spawnSync fixture', code: 'ENOENT', message: strRegistry } };
+  assert.throws(() => objWrappers.runNpm(arrPrivateAudit, {}, 5), { refusal: 2 });
+  assert.match(strDiagnostic, /operation\s+advisory audit \(arguments withheld\)/);
+  assert.doesNotMatch(strDiagnostic, /TASK130_F42|BEARER_SENTINEL|--registry/);
+  strDiagnostic = '';
+  objScenario = { stdout: Buffer.from('{}'), stderr: Buffer.alloc(0),
+    status: 7, signal: null };
+  assert.throws(() => objWrappers.runNpmOrRefuse(
+    arrPrivateAudit, {}, 9, 'fixture refusal'), { refusal: 9 });
+  assert.match(strDiagnostic, /operation\s+advisory audit \(arguments withheld\)/);
+  assert.doesNotMatch(strDiagnostic, /TASK130_F42|BEARER_SENTINEL|--registry/);
+});
+
+test('NODE-DISTRIBUTION-RESOLUTION: every production observation maps native failure to exit 2', () => {
+  const helperFrom = source.indexOf('function resolveNodeDistributionOrRefuse(');
+  const helperTo = source.indexOf('\n}\n', helperFrom) + 2;
+  const cacheFrom = source.indexOf('function validateCacheDirectory(');
+  const cacheTo = source.indexOf('\n}\n', cacheFrom) + 2;
+  const rootFrom = source.indexOf('function npmInstallationRootOrRefuse(');
+  const rootTo = source.indexOf('\n}\n', rootFrom) + 2;
+  const insideFrom = source.indexOf('const isInsideOrEqual = ');
+  const insideTo = source.indexOf('\n\n', insideFrom);
+  assert.ok(helperFrom >= 0 && helperTo > helperFrom && cacheFrom >= 0 && cacheTo > cacheFrom
+    && rootFrom >= 0 && rootTo > rootFrom && insideFrom >= 0 && insideTo > insideFrom);
+  const arrDiagnostic = [];
+  const objProcess = {
+    platform: 'linux', arch: 'x64', execPath: '/dist/bin/node', env: {},
+    getuid: () => 1000,
+    stderr: { write(value) { arrDiagnostic.push(value); } },
+    exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+  };
+  const formatLocation = (objError) =>
+    `  error              ${objError?.code ?? 'unknown'} (filesystem location withheld)\n`;
+  const resolveDistribution = new Function('process', 'formatErrorLocation',
+    `${source.slice(helperFrom, helperTo)}; return resolveNodeDistributionOrRefuse;`)(
+    objProcess, formatLocation);
+  assert.equal(resolveDistribution(() => '/dist'), '/dist');
+  const objSecretError = Object.assign(new Error('TASK130_F43_PRIVATE_STACK'), {
+    code: 'ENOENT', path: '/TASK130_F43_PRIVATE_PATH',
+  });
+  const failDistribution = (strPath) => {
+    if (strPath === '/dist' || strPath === '/dist/bin/node') throw objSecretError;
+    return strPath;
+  };
+  const validateCache = new Function('process', 'arrCacheArguments', 'isAbsolute',
+    'refuseCache', 'hasUnsupportedNodeStartupEnvironment', 'realpathSync', 'dirname',
+    'strWorkflowDirectory', 'strScriptPath', 'resolveNodeDistributionOrRefuse',
+    'lstatSync', 'readdirSync',
+    `${source.slice(cacheFrom, cacheTo)}; return validateCacheDirectory;`)(
+    objProcess, ['--cache-directory=/cache'], isAbsolute,
+    () => { throw Object.assign(new Error('cache refusal'), { refusal: 16 }); },
+    () => false, failDistribution, dirname, '/repo/.github/workflows',
+    '/physical/.github/workflows/Get-SupplyFreezeDigest.mjs', resolveDistribution,
+    () => { throw new Error('cache validation continued after distribution failure'); }, () => []);
+  arrDiagnostic.length = 0;
+  assert.throws(() => validateCache(), { refusal: 2 });
+  assert.match(arrDiagnostic.join(''), /unreviewed toolchain/);
+  assert.doesNotMatch(arrDiagnostic.join(''), /TASK130_F43|PRIVATE_PATH|PRIVATE_STACK/);
+
+  const root = new Function('join', 'dirname', 'process', 'realpathSync',
+    'formatErrorLocation', 'resolveNodeDistributionOrRefuse',
+    `${source.slice(insideFrom, insideTo)}
+${source.slice(rootFrom, rootTo)}; return npmInstallationRootOrRefuse;`)(
+    join, dirname, objProcess, (strPath) => {
+      if (strPath === '/dist/lib/node_modules/npm') return strPath;
+      if (strPath === '/dist/bin/npm') return '/dist/lib/node_modules/npm/bin/npm-cli.js';
+      return failDistribution(strPath);
+    }, formatLocation, resolveDistribution);
+  arrDiagnostic.length = 0;
+  assert.throws(() => root(), { refusal: 2 });
+  assert.match(arrDiagnostic.join(''), /unreviewed toolchain/);
+  assert.doesNotMatch(arrDiagnostic.join(''), /TASK130_F43|PRIVATE_PATH|PRIVATE_STACK/);
+
+  // The fold caller already had a general scan boundary. Before the selected
+  // phase wrapper, a raw executable-resolution error therefore became safe but
+  // misleading exit 10 rather than the native exit 1 seen at the npm-root call.
+  const scanFrom = source.indexOf('function scanOrRefuse(');
+  const scanTo = source.indexOf('\n}\n', scanFrom) + 2;
+  assert.ok(scanFrom >= 0 && scanTo > scanFrom);
+  const scan = new Function('process', 'formatErrorLocation',
+    `${source.slice(scanFrom, scanTo)}; return scanOrRefuse;`)(objProcess, formatLocation);
+  arrDiagnostic.length = 0;
+  assert.throws(() => scan(() => { throw objSecretError; },
+    'the npm installation fold'), { refusal: 10 });
+  assert.match(arrDiagnostic.join(''), /recorded inputs changed while recording/);
+  assert.doesNotMatch(arrDiagnostic.join(''), /TASK130_F43|PRIVATE_PATH|PRIVATE_STACK/);
+
+  assert.equal((source.match(/resolveNodeDistributionOrRefuse\(/gu) ?? []).length, 4);
+  assert.match(source,
+    /resolveNodeDistributionOrRefuse\(\s*\(\) => realpathSync\(dirname\(dirname\(process\.execPath\)\)\)\)/u);
+  assert.equal((source.match(
+    /resolveNodeDistributionOrRefuse\(\s*\(\) => dirname\(dirname\(realpathSync\(process\.execPath\)\)\)\)/gu)
+    ?? []).length, 2);
+});
+
 test('NPM-DIAGNOSTIC: production summary preserves category and outcome without child text', () => {
   const from = source.indexOf('const NPM_DIAGNOSTIC_CATEGORIES');
   const functionStart = source.indexOf('function writeNpmDiagnosticSummary(', from);
@@ -562,7 +759,7 @@ test('UTF8-INPUT: byte-lossy JSON sources refuse before parsing', () => {
 });
 
 test('NPM-STDOUT-UTF8: production npm adapter exact-decodes semantic stdout by phase', () => {
-  const summaryFrom = source.indexOf('const NPM_DIAGNOSTIC_CATEGORIES');
+  const summaryFrom = source.indexOf('const NPM_OPERATION_LABELS');
   const summaryFunction = source.indexOf('function writeNpmDiagnosticSummary(', summaryFrom);
   const summaryTo = source.indexOf('\n}\n', summaryFunction) + 2;
   const decodeFrom = source.indexOf('function decodeUtf8ExactlyOrRefuse(');
@@ -1183,6 +1380,22 @@ test('NPM-LINK-CONTAINMENT: production resolver rejects every uncovered resoluti
         throw Object.assign(new Error(`refusal:${code}`), { refusal: code });
       },
     };
+    let boolDistributionFailure = false;
+    const realpathForFixture = (strPath) => {
+      if (boolDistributionFailure && strPath === process.execPath) {
+        throw Object.assign(new Error('TASK130_F43_PRIVATE_STACK'), {
+          code: 'ENOENT', path: '/TASK130_F43_PRIVATE_DISTRIBUTION',
+        });
+      }
+      return realpathSync(strPath);
+    };
+    const resolveFrom = source.indexOf('function resolveNodeDistributionOrRefuse(');
+    const resolveTo = source.indexOf('\n}\n', resolveFrom) + 2;
+    assert.ok(resolveFrom >= 0 && resolveTo > resolveFrom);
+    const resolveDistribution = new Function('process', 'formatErrorLocation',
+      `${source.slice(resolveFrom, resolveTo)}; return resolveNodeDistributionOrRefuse;`)(
+      testProcess, (error) =>
+        `  error              ${error?.code ?? 'unknown'} (filesystem location withheld)\n`);
     const hashFieldForFixture = (hash, value) => {
       const bytes = Buffer.isBuffer(value) ? value : Buffer.from(String(value), 'utf8');
       hash.update(String(bytes.length), 'utf8');
@@ -1196,13 +1409,14 @@ test('NPM-LINK-CONTAINMENT: production resolver rejects every uncovered resoluti
     const foldNpm = new Function('createHash', 'dirname', 'isAbsolute', 'join',
       'lstatSync', 'readlinkSync', 'realpathSync', 'readdirSync', 'readFileSync',
       'process', 'formatUntrustedText', 'formatErrorLocation', 'hashField',
-      'statIdentity', 'sha256',
+      'statIdentity', 'sha256', 'resolveNodeDistributionOrRefuse',
       `${source.slice(metadataFrom, metadataTo)}
 ${source.slice(from, foldTo)}; return foldNpmInstallation;`)(
-      createHash, dirname, isAbsolute, join, lstatSync, readlinkSync, realpathSync,
+      createHash, dirname, isAbsolute, join, lstatSync, readlinkSync, realpathForFixture,
       readdirSync, readFileSync, testProcess, String,
       (error) => `  error              ${error?.code ?? 'unknown'}\n`,
-      hashFieldForFixture, (stats) => `${stats.ino}:${stats.ctimeNs}`, sha);
+      hashFieldForFixture, (stats) => `${stats.ino}:${stats.ctimeNs}`, sha,
+      resolveDistribution);
 
     const temporary = mkdtempSync(join(tmpdir(), 'npm-link-containment-'));
     const root = join(temporary, 'npm');
@@ -1214,8 +1428,15 @@ ${source.slice(from, foldTo)}; return foldNpmInstallation;`)(
     chmodSync(root, 0o755);
     chmodSync(outside, 0o755);
     chmodSync(join(root, 'target'), 0o644);
-    chmodSync(join(outside, 'target'), 0o644);
+      chmodSync(join(outside, 'target'), 0o644);
     try {
+      boolDistributionFailure = true;
+      diagnostic.length = 0;
+      assert.throws(() => foldNpm(realpathSync(root)), { refusal: 2 });
+      assert.match(diagnostic.join(''), /unreviewed toolchain/);
+      assert.doesNotMatch(diagnostic.join(''), /TASK130_F43|PRIVATE_DISTRIBUTION|PRIVATE_STACK/);
+      boolDistributionFailure = false;
+
       symlinkSync('target', join(root, 'contained-b'));
       symlinkSync('contained-b', join(root, 'contained-a'));
       assert.deepEqual(classify(root, join(root, 'contained-a'), 'contained-a'),
@@ -1381,6 +1602,41 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       assert.deepEqual(fingerprint(checkout), before);
       assert.equal(existsSync(join(checkout, 'forbidden-cache')), false);
       assert.equal(existsSync(join(checkout, 'forbidden-logs')), false);
+
+      // Exercise the real module and its surrounding scanOrRefuse call with a
+      // bounded test-only failure at the THIRD executable-resolution observation.
+      // The first npm-root observation passes; the later fold observation exits 2
+      // from the shared phase boundary before scanOrRefuse can translate it to 10.
+      const strF43Checkout = join(temporary, 'f43-probe-checkout');
+      cpSync(checkout, strF43Checkout, { recursive: true, verbatimSymlinks: true });
+      const strF43Fixture = join(strF43Checkout, '.github', 'workflows');
+      const strF43Recorder = join(strF43Fixture, 'Get-SupplyFreezeDigest.f43-probe.mjs');
+      const strImport = "  readdirSync, readFileSync, readlinkSync, realpathSync, statSync } from 'node:fs';";
+      const strInstrumentedImport = "  readdirSync, readFileSync, readlinkSync, realpathSync as realpathSyncNative, statSync } from 'node:fs';";
+      const strUrlImport = "import { fileURLToPath } from 'node:url';\n";
+      const strF43Source = source.replace(strImport, strInstrumentedImport).replace(strUrlImport,
+        `${strUrlImport}let intTask130F43Observations = 0;
+const realpathSync = (strPath, ...arrArguments) => {
+  if (strPath === process.execPath && (intTask130F43Observations += 1) === 2) {
+    throw Object.assign(new Error('TASK130_F43_PRIVATE_STACK'), {
+      code: 'ENOENT', path: '/TASK130_F43_PRIVATE_DISTRIBUTION',
+    });
+  }
+  return realpathSyncNative(strPath, ...arrArguments);
+};
+`);
+      assert.notEqual(strF43Source, source);
+      writeFileSync(strF43Recorder, strF43Source);
+      const objF43FoldFailure = spawnSync(process.execPath, [strF43Recorder,
+        '--json', '--any-toolchain', '--no-audit',
+        `--cache-directory=${mkdtempSync(join(temporary, 'f43-cache-'))}`], {
+        encoding: 'utf8', maxBuffer: 16 * 1024 * 1024, env: process.env,
+      });
+      refuse(objF43FoldFailure, 2);
+      assert.match(objF43FoldFailure.stderr, /unreviewed toolchain/);
+      assert.doesNotMatch(objF43FoldFailure.stderr,
+        /TASK130_F43|PRIVATE_DISTRIBUTION|PRIVATE_STACK|Get-SupplyFreezeDigest\.f43-probe/);
+      rmSync(strF43Checkout, { recursive: true, force: true });
 
       const strStickyCheckout = join(temporary, 'sticky-internal-ancestors');
       cpSync(checkout, strStickyCheckout, { recursive: true, verbatimSymlinks: true });

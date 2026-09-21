@@ -44,8 +44,8 @@ reconstructing the change. It is required by issue #145's frozen supply tuple.
 Note the distinction from its sibling `supplyFreeze.reviewedWorkingBytes`, which records the
 *current* reviewed bytes and **is** enforced — `verifyPackageDigests()` compares the real
 `package.json` and `package-lock.json` against it before `npm ci` runs, and `markdownlint.yml`
-independently compares them against literals hard-coded in the workflow. The offline validator does not consume the historical baseline. The separate manual
-procedure below verifies it without adding a workflow gate.
+independently compares them against literals hard-coded in the workflow. The offline validator does not consume the historical baseline. The separate
+[manual procedure](../P1-SUPPLY-FREEZE-v1.md#verify-historical-git-provenance-separately) verifies it without adding a workflow gate.
 
 ## The defect that prompted this, and its correction
 
