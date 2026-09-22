@@ -804,8 +804,8 @@ function parseMountInfo(strContents) {
     if (intSeparator < 0) throw new Error('invalid mountinfo separator');
     const arrFields = strLine.slice(0, intSeparator).split(' ');
     const arrPostSeparator = strLine.slice(intSeparator + 3).split(' ');
-    if (arrFields.length < 6 || !/^[1-9][0-9]*$/u.test(arrFields[0])
-      || !/^[1-9][0-9]*$/u.test(arrFields[1])
+    if (arrFields.length < 6 || !/^(?:0|[1-9][0-9]*)$/u.test(arrFields[0])
+      || !/^(?:0|[1-9][0-9]*)$/u.test(arrFields[1])
       || !/^(?:0|[1-9][0-9]*):(?:0|[1-9][0-9]*)$/u.test(arrFields[2])
       || arrFields.some((strField) => strField.length === 0)
       || arrPostSeparator.length < 3
@@ -844,28 +844,152 @@ function mountPathContains(strParent, strChild) {
     || strChild.startsWith(strParent === '/' ? '/' : `${strParent}/`);
 }
 
-function mountCoordinateForPath(strPath, arrMounts) {
-  const arrMatches = arrMounts.filter((objMount) =>
-    mountPathContains(objMount.mountPoint, strPath));
-  if (arrMatches.length === 0) throw new Error('path has no visible mount');
-  const intLongest = Math.max(...arrMatches.map((objMount) => objMount.mountPoint.length));
-  const arrLongest = arrMatches.filter((objMount) => objMount.mountPoint.length === intLongest);
-  // Multiple mounts at one point are a stack. Refuse rather than infer the
-  // topmost entry from enumeration order or a reusable numeric mount id.
-  if (arrLongest.length !== 1) throw new Error('stacked mount is ambiguous');
-  const objSelected = arrLongest[0];
-  const objById = new Map(arrMounts.map((objMount) => [objMount.id, objMount]));
-  const objAncestors = new Set([objSelected.id]);
-  let objAt = objSelected;
-  while (objAt.parentId !== objAt.id && objById.has(objAt.parentId)
-    && !objAncestors.has(objAt.parentId)) {
-    objAncestors.add(objAt.parentId);
-    objAt = objById.get(objAt.parentId);
+function newMountTrieNode() {
+  return { children: new Map(), mounts: [], nearestMounts: null,
+    chainValid: true, deepestId: null };
+}
+
+function mountTrieKey(strPath) {
+  return strPath === '/' ? '/' : `${strPath}/`;
+}
+
+function insertMountTrie(objRoot, strKey) {
+  let objNode = objRoot;
+  let strRemaining = strKey;
+  while (strRemaining.length > 0) {
+    const strFirst = strRemaining[0];
+    const objEdge = objNode.children.get(strFirst);
+    if (objEdge === undefined) {
+      const objChild = newMountTrieNode();
+      objNode.children.set(strFirst, { label: strRemaining, node: objChild });
+      return objChild;
+    }
+    let intCommon = 0;
+    const intLimit = Math.min(strRemaining.length, objEdge.label.length);
+    while (intCommon < intLimit
+      && strRemaining[intCommon] === objEdge.label[intCommon]) intCommon += 1;
+    if (intCommon === objEdge.label.length) {
+      objNode = objEdge.node;
+      strRemaining = strRemaining.slice(intCommon);
+      continue;
+    }
+    const objBranch = newMountTrieNode();
+    objNode.children.set(strFirst,
+      { label: objEdge.label.slice(0, intCommon), node: objBranch });
+    const strOldRemainder = objEdge.label.slice(intCommon);
+    objBranch.children.set(strOldRemainder[0],
+      { label: strOldRemainder, node: objEdge.node });
+    strRemaining = strRemaining.slice(intCommon);
+    if (strRemaining.length === 0) return objBranch;
+    const objChild = newMountTrieNode();
+    objBranch.children.set(strRemaining[0], { label: strRemaining, node: objChild });
+    return objChild;
   }
-  // A longer mount entry can remain listed below a mount that hides it. Its
-  // parent chain will not include the governing visible ancestor.
-  if (arrMatches.some((objMount) => objMount.mountPoint !== objSelected.mountPoint
-    && !objAncestors.has(objMount.id))) throw new Error('hidden mount is ambiguous');
+  return objNode;
+}
+
+function indexMountInfo(arrMounts) {
+  const objById = new Map(arrMounts.map((objMount) => [objMount.id, objMount]));
+  const objChildren = new Map(arrMounts.map((objMount) => [objMount.id, []]));
+  const arrRoots = [];
+  for (const objMount of arrMounts) {
+    if (objMount.parentId === objMount.id || !objById.has(objMount.parentId)) {
+      arrRoots.push(objMount);
+    } else {
+      objChildren.get(objMount.parentId).push(objMount);
+    }
+  }
+
+  // The parser has already refused cycles. Iterative forest traversal avoids
+  // consuming the JavaScript call stack for a deep accepted parent chain.
+  const objIntervals = new Map();
+  let intClock = 0;
+  for (const objRoot of arrRoots) {
+    const arrStack = [{ mount: objRoot, exit: false }];
+    while (arrStack.length > 0) {
+      const objFrame = arrStack.pop();
+      if (objFrame.exit) {
+        objIntervals.get(objFrame.mount.id).end = intClock;
+        intClock += 1;
+        continue;
+      }
+      objIntervals.set(objFrame.mount.id, { start: intClock, end: null });
+      intClock += 1;
+      arrStack.push({ mount: objFrame.mount, exit: true });
+      const arrChildren = objChildren.get(objFrame.mount.id);
+      for (let intIndex = arrChildren.length - 1; intIndex >= 0; intIndex -= 1) {
+        arrStack.push({ mount: arrChildren[intIndex], exit: false });
+      }
+    }
+  }
+  if (objIntervals.size !== arrMounts.length) throw new Error('mountinfo parent cycle');
+  const isAncestor = (intAncestor, intDescendant) => {
+    const objAncestor = objIntervals.get(intAncestor);
+    const objDescendant = objIntervals.get(intDescendant);
+    return objAncestor.start <= objDescendant.start && objDescendant.end <= objAncestor.end;
+  };
+
+  // A compressed character trie has at most two nodes per distinct mount
+  // point. Trailing slashes make string prefixes match path-component
+  // ancestry: /repo/ is a prefix of /repo/cache/, but not /repo-copy/.
+  const objTrieRoot = newMountTrieNode();
+  const objByMountPoint = new Map();
+  for (const objMount of arrMounts) {
+    const objNode = insertMountTrie(objTrieRoot, mountTrieKey(objMount.mountPoint));
+    objNode.mounts.push(objMount);
+    objByMountPoint.set(objMount.mountPoint, objNode);
+  }
+  const arrTrieStack = [{ node: objTrieRoot, nearestMounts: null,
+    chainValid: true, deepestId: null }];
+  while (arrTrieStack.length > 0) {
+    const objFrame = arrTrieStack.pop();
+    const objNode = objFrame.node;
+    let boolChainValid = objFrame.chainValid;
+    let intDeepestId = objFrame.deepestId;
+    for (const objMount of objNode.mounts) {
+      if (intDeepestId === null) intDeepestId = objMount.id;
+      else if (isAncestor(intDeepestId, objMount.id)) intDeepestId = objMount.id;
+      else if (!isAncestor(objMount.id, intDeepestId)) boolChainValid = false;
+    }
+    objNode.nearestMounts = objNode.mounts.length > 0
+      ? objNode.mounts : objFrame.nearestMounts;
+    objNode.chainValid = boolChainValid;
+    objNode.deepestId = intDeepestId;
+    for (const objEdge of objNode.children.values()) {
+      arrTrieStack.push({ node: objEdge.node, nearestMounts: objNode.nearestMounts,
+        chainValid: boolChainValid, deepestId: intDeepestId });
+    }
+  }
+  return { root: objTrieRoot, byMountPoint: objByMountPoint };
+}
+
+function mountTrieStateForPath(strPath, objMountIndex) {
+  const objExact = objMountIndex.byMountPoint.get(strPath);
+  if (objExact !== undefined) return objExact;
+  let objNode = objMountIndex.root;
+  let strRemaining = mountTrieKey(strPath);
+  while (strRemaining.length > 0) {
+    const objEdge = objNode.children.get(strRemaining[0]);
+    if (objEdge === undefined || !strRemaining.startsWith(objEdge.label)) break;
+    strRemaining = strRemaining.slice(objEdge.label.length);
+    objNode = objEdge.node;
+  }
+  return objNode;
+}
+
+function mountCoordinateForPath(strPath, objMountIndex) {
+  const objState = mountTrieStateForPath(strPath, objMountIndex);
+  if (objState.nearestMounts === null) throw new Error('path has no visible mount');
+  // Multiple mounts at the selected point are a stack. Refuse rather than
+  // infer the topmost entry from enumeration order or a reusable numeric id.
+  if (objState.nearestMounts.length !== 1) throw new Error('stacked mount is ambiguous');
+  const objSelected = objState.nearestMounts[0];
+  // Every mount at a shorter matching point must be in the selected mount's
+  // parent chain. DFS intervals and inherited trie state prove that relation
+  // without rebuilding ancestor sets for every protected descendant.
+  if (!objState.chainValid || objState.deepestId !== objSelected.id) {
+    throw new Error('hidden mount is ambiguous');
+  }
   const strSuffix = objSelected.mountPoint === '/'
     ? strPath.slice(1) : strPath === objSelected.mountPoint
       ? '' : strPath.slice(objSelected.mountPoint.length + 1);
@@ -874,19 +998,16 @@ function mountCoordinateForPath(strPath, arrMounts) {
 }
 
 function cacheMountAliasesProtected(strCache, arrProtectedRoots, arrMounts) {
-  const objCache = mountCoordinateForPath(strCache, arrMounts);
+  const objMountIndex = indexMountInfo(arrMounts);
+  const objCache = mountCoordinateForPath(strCache, objMountIndex);
   const arrProtected = [];
   for (const strProtectedRoot of new Set(arrProtectedRoots)) {
-    arrProtected.push(mountCoordinateForPath(strProtectedRoot, arrMounts));
-    const objMountPoints = new Map();
-    for (const objMount of arrMounts) {
-      if (objMount.mountPoint !== strProtectedRoot
-        && mountPathContains(strProtectedRoot, objMount.mountPoint)) {
-        objMountPoints.set(objMount.mountPoint, true);
+    arrProtected.push(mountCoordinateForPath(strProtectedRoot, objMountIndex));
+    for (const strMountPoint of objMountIndex.byMountPoint.keys()) {
+      if (strMountPoint !== strProtectedRoot
+        && mountPathContains(strProtectedRoot, strMountPoint)) {
+        arrProtected.push(mountCoordinateForPath(strMountPoint, objMountIndex));
       }
-    }
-    for (const strMountPoint of objMountPoints.keys()) {
-      arrProtected.push(mountCoordinateForPath(strMountPoint, arrMounts));
     }
   }
   return arrProtected.some((objProtected) => objCache.device === objProtected.device
@@ -955,11 +1076,13 @@ function validateCacheDirectory() {
     if (!objRoot.isDirectory() || objRoot.isSymbolicLink()
       || objRoot.uid !== BigInt(process.getuid()) || (objRoot.mode & 0o7777n) !== 0o700n
       || readdirSync(strResolved).length !== 0) refuseCache();
-    let arrMounts;
-    try { arrMounts = parseMountInfo(readMountInfoOrRefuse()); }
-    catch { refuseCacheMountTopology(); }
-    if (cacheMountAliasesProtected(strResolved,
-      [strRepository, strPhysicalRepository, strDistribution], arrMounts)) {
+    let boolMountAliasesProtected;
+    try {
+      const arrMounts = parseMountInfo(readMountInfoOrRefuse());
+      boolMountAliasesProtected = cacheMountAliasesProtected(strResolved,
+        [strRepository, strPhysicalRepository, strDistribution], arrMounts);
+    } catch { refuseCacheMountTopology(); }
+    if (boolMountAliasesProtected) {
       refuseCacheMountTopology();
     }
     // A sticky shared parent (e.g. /tmp) protects this owned leaf from another
