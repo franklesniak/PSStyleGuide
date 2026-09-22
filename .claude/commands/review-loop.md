@@ -19,7 +19,11 @@ argument-hint: <pull-request-url>
 
 Target pull request: **$ARGUMENTS**
 
-If the value above is empty or is not a pull-request URL, ask the caller for the pull-request URL. Do not start the review loop before the caller supplies it.
+Before starting the review loop or changing remote state, confirm that the URL uses `github.com` and names `franklesniak/PSStyleGuide`. Then use an authenticated GitHub readback to verify the canonical pull-request identity, including its number, and confirm that its owning/base repository is exactly `franklesniak/PSStyleGuide`. Do not use an unverified URL as an authentication target.
+
+Treat an empty or malformed value and a different host or repository as invalid. Tell the caller the specific reason and ask for a valid `franklesniak/PSStyleGuide` pull-request URL.
+
+If the authenticated readback is unavailable, failed, unauthenticated, or ambiguous, stop and report the specific reason. Retry only after access is restored. Do not guess the target, change remote state, or start the review loop until the authenticated readback succeeds and matches the expected repository and pull-request number.
 
 ## Authoritative protocol
 
@@ -32,8 +36,14 @@ Use the current steps, gates, limits, pause conditions, and termination conditio
 ## Input examples
 
 - **Valid input:** The caller supplies `https://github.com/franklesniak/PSStyleGuide/pull/205`.
-  **Result:** Use that pull request as the target and load the protocol from the local root `CLAUDE.md`.
-  **Explanation:** The URL identifies one pull request without duplicating the protocol.
+  **Result:** Read the pull request through authenticated GitHub tooling, confirm its canonical identity and owning/base repository, and then load the protocol from the local root `CLAUDE.md`.
+  **Explanation:** Verified canonical identity identifies one pull request without duplicating the protocol.
 - **Missing input:** The caller supplies no pull-request URL.
   **Result:** Ask for a pull-request URL before taking any review-loop action.
   **Explanation:** A required target prevents the command from acting on an ambiguous pull request.
+- **Wrong repository:** The caller supplies `https://github.com/example/other-repository/pull/123`.
+  **Result:** Explain that the pull request is outside `franklesniak/PSStyleGuide` and ask for the correct URL before changing remote state.
+  **Explanation:** Canonical repository verification keeps this repository-local command within its authorized boundary.
+- **Unavailable readback:** GitHub cannot return an authenticated canonical identity for the supplied URL.
+  **Result:** Stop, report the readback failure, and retry only after access is restored.
+  **Explanation:** A failed or ambiguous lookup is not evidence that the target is safe.
