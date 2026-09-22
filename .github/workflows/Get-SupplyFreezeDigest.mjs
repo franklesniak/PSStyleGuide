@@ -30,8 +30,8 @@
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 import { closeSync, constants as fsConstants, existsSync, fstatSync, lstatSync, openSync,
-  readdirSync, readFileSync, readlinkSync, realpathSync, statSync } from 'node:fs';
-import { basename, delimiter, dirname, isAbsolute, join } from 'node:path';
+  readdirSync, readFileSync, readlinkSync, readSync, realpathSync, statSync } from 'node:fs';
+import { basename, delimiter, dirname, isAbsolute, join, posix as pathPosix } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // Round 52, reported by Codex. These three lived beside formatUntrustedText,
@@ -720,6 +720,11 @@ function refuseCache() {
   process.stderr.write('supply-freeze: --cache-directory requires one existing empty private external directory; refusing before npm.\n');
   process.exit(16);
 }
+function refuseCacheMountTopology() {
+  process.stderr.write(
+    'supply-freeze: --cache-directory mount topology is unavailable, ambiguous, or aliases a protected surface; refusing before npm.\n');
+  process.exit(16);
+}
 function hasUnsupportedNodeStartupEnvironment(objEnv) {
   return Boolean((objEnv.NODE_COMPILE_CACHE && objEnv.NODE_DISABLE_COMPILE_CACHE !== '1')
     || objEnv.NODE_V8_COVERAGE || objEnv.NODE_REDIRECT_WARNINGS
@@ -747,6 +752,173 @@ function resolveNodeDistributionOrRefuse(funcResolve) {
     process.exit(2);
   }
 }
+
+// F139-4, reported by Codex on 2152d21. realpathSync resolves symbolic links,
+// not mount aliases. A bind mount such as /external/cache -> /checkout/empty can
+// therefore pass every spelling, owner, mode and emptiness check below, after
+// which npm writes through the alias into the protected checkout. Linux exposes
+// the process's visible mount mapping in /proc/self/mountinfo: major:minor names
+// the filesystem, `root` names the mounted subtree within it, and `mount point`
+// names where that subtree is visible. Translate each path to that coordinate
+// and compare coordinates, including visible submounts below a protected root.
+//
+// The file is read with a hard byte and entry ceiling. Malformed input, stacked
+// mounts at a relevant point, or a mount hidden by a different ancestor refuses;
+// guessing which mapping applies would reopen the alias. This proves only the
+// stable mount namespace visible to this process. It does not claim separation
+// across opaque storage-provider internals or defend against a privileged or
+// same-uid concurrent remount, which remain caller exclusions.
+const MOUNTINFO_MAX_BYTES = 4 * 1024 * 1024;
+const MOUNTINFO_MAX_ENTRIES = 16384;
+
+function decodeMountInfoPath(strEncoded) {
+  let strDecoded = '';
+  const objEscapes = { '040': ' ', '011': '\t', '012': '\n', '134': '\\' };
+  for (let intIndex = 0; intIndex < strEncoded.length; intIndex += 1) {
+    if (strEncoded[intIndex] !== '\\') {
+      strDecoded += strEncoded[intIndex];
+      continue;
+    }
+    const strEscape = strEncoded.slice(intIndex + 1, intIndex + 4);
+    if (!Object.hasOwn(objEscapes, strEscape)) throw new Error('invalid mountinfo path escape');
+    strDecoded += objEscapes[strEscape];
+    intIndex += 3;
+  }
+  if (!pathPosix.isAbsolute(strDecoded) || strDecoded.includes('\0')
+    || pathPosix.normalize(strDecoded) !== strDecoded) {
+    throw new Error('invalid mountinfo path');
+  }
+  return strDecoded;
+}
+
+function parseMountInfo(strContents) {
+  const arrLines = strContents.endsWith('\n')
+    ? strContents.slice(0, -1).split('\n') : strContents.split('\n');
+  if (arrLines.length === 0 || arrLines.length > MOUNTINFO_MAX_ENTRIES
+    || arrLines.some((strLine) => strLine.length === 0)) {
+    throw new Error('invalid mountinfo line count');
+  }
+  const objIds = new Set();
+  const arrMounts = arrLines.map((strLine) => {
+    const intSeparator = strLine.indexOf(' - ');
+    if (intSeparator < 0) throw new Error('invalid mountinfo separator');
+    const arrFields = strLine.slice(0, intSeparator).split(' ');
+    const arrPostSeparator = strLine.slice(intSeparator + 3).split(' ');
+    if (arrFields.length < 6 || !/^[1-9][0-9]*$/u.test(arrFields[0])
+      || !/^[1-9][0-9]*$/u.test(arrFields[1])
+      || !/^(?:0|[1-9][0-9]*):(?:0|[1-9][0-9]*)$/u.test(arrFields[2])
+      || arrFields.some((strField) => strField.length === 0)
+      || arrPostSeparator.length < 3
+      || arrPostSeparator.some((strField) => strField.length === 0)) {
+      throw new Error('invalid mountinfo fields');
+    }
+    const intId = Number(arrFields[0]);
+    const intParentId = Number(arrFields[1]);
+    if (!Number.isSafeInteger(intId) || !Number.isSafeInteger(intParentId)
+      || objIds.has(intId)) throw new Error('invalid mountinfo ids');
+    objIds.add(intId);
+    return { id: intId, parentId: intParentId, device: arrFields[2],
+      root: decodeMountInfoPath(arrFields[3]),
+      mountPoint: decodeMountInfoPath(arrFields[4]) };
+  });
+  const objById = new Map(arrMounts.map((objMount) => [objMount.id, objMount]));
+  const objVisitState = new Map();
+  for (const objStart of arrMounts) {
+    if (objVisitState.get(objStart.id) === 2) continue;
+    const arrPath = [];
+    let objAt = objStart;
+    while (objVisitState.get(objAt.id) !== 2) {
+      if (objVisitState.get(objAt.id) === 1) throw new Error('mountinfo parent cycle');
+      objVisitState.set(objAt.id, 1);
+      arrPath.push(objAt.id);
+      if (objAt.parentId === objAt.id || !objById.has(objAt.parentId)) break;
+      objAt = objById.get(objAt.parentId);
+    }
+    for (const intId of arrPath) objVisitState.set(intId, 2);
+  }
+  return arrMounts;
+}
+
+function mountPathContains(strParent, strChild) {
+  return strChild === strParent
+    || strChild.startsWith(strParent === '/' ? '/' : `${strParent}/`);
+}
+
+function mountCoordinateForPath(strPath, arrMounts) {
+  const arrMatches = arrMounts.filter((objMount) =>
+    mountPathContains(objMount.mountPoint, strPath));
+  if (arrMatches.length === 0) throw new Error('path has no visible mount');
+  const intLongest = Math.max(...arrMatches.map((objMount) => objMount.mountPoint.length));
+  const arrLongest = arrMatches.filter((objMount) => objMount.mountPoint.length === intLongest);
+  // Multiple mounts at one point are a stack. Refuse rather than infer the
+  // topmost entry from enumeration order or a reusable numeric mount id.
+  if (arrLongest.length !== 1) throw new Error('stacked mount is ambiguous');
+  const objSelected = arrLongest[0];
+  const objById = new Map(arrMounts.map((objMount) => [objMount.id, objMount]));
+  const objAncestors = new Set([objSelected.id]);
+  let objAt = objSelected;
+  while (objAt.parentId !== objAt.id && objById.has(objAt.parentId)
+    && !objAncestors.has(objAt.parentId)) {
+    objAncestors.add(objAt.parentId);
+    objAt = objById.get(objAt.parentId);
+  }
+  // A longer mount entry can remain listed below a mount that hides it. Its
+  // parent chain will not include the governing visible ancestor.
+  if (arrMatches.some((objMount) => objMount.mountPoint !== objSelected.mountPoint
+    && !objAncestors.has(objMount.id))) throw new Error('hidden mount is ambiguous');
+  const strSuffix = objSelected.mountPoint === '/'
+    ? strPath.slice(1) : strPath === objSelected.mountPoint
+      ? '' : strPath.slice(objSelected.mountPoint.length + 1);
+  return { device: objSelected.device,
+    path: pathPosix.normalize(pathPosix.join(objSelected.root, strSuffix)) };
+}
+
+function cacheMountAliasesProtected(strCache, arrProtectedRoots, arrMounts) {
+  const objCache = mountCoordinateForPath(strCache, arrMounts);
+  const arrProtected = [];
+  for (const strProtectedRoot of new Set(arrProtectedRoots)) {
+    arrProtected.push(mountCoordinateForPath(strProtectedRoot, arrMounts));
+    const objMountPoints = new Map();
+    for (const objMount of arrMounts) {
+      if (objMount.mountPoint !== strProtectedRoot
+        && mountPathContains(strProtectedRoot, objMount.mountPoint)) {
+        objMountPoints.set(objMount.mountPoint, true);
+      }
+    }
+    for (const strMountPoint of objMountPoints.keys()) {
+      arrProtected.push(mountCoordinateForPath(strMountPoint, arrMounts));
+    }
+  }
+  return arrProtected.some((objProtected) => objCache.device === objProtected.device
+    && (mountPathContains(objCache.path, objProtected.path)
+      || mountPathContains(objProtected.path, objCache.path)));
+}
+
+function readMountInfoOrRefuse() {
+  const bufContents = Buffer.alloc(MOUNTINFO_MAX_BYTES + 1);
+  let intDescriptor;
+  let intLength = 0;
+  try {
+    intDescriptor = openSync('/proc/self/mountinfo',
+      fsConstants.O_RDONLY | fsConstants.O_NOFOLLOW);
+    while (intLength < bufContents.length) {
+      const intRead = readSync(intDescriptor, bufContents, intLength,
+        bufContents.length - intLength, null);
+      if (intRead === 0) break;
+      intLength += intRead;
+    }
+  } catch {
+    if (intDescriptor !== undefined) {
+      try { closeSync(intDescriptor); } catch { /* the refusal below is authoritative */ }
+    }
+    refuseCacheMountTopology();
+  }
+  try { closeSync(intDescriptor); } catch { refuseCacheMountTopology(); }
+  if (intLength > MOUNTINFO_MAX_BYTES) refuseCacheMountTopology();
+  return decodeUtf8ExactlyOrRefuse(bufContents.subarray(0, intLength),
+    'Linux mount topology', 16);
+}
+
 function validateCacheDirectory() {
   if (process.platform !== 'linux' || process.arch !== 'x64') {
     process.stderr.write('supply-freeze: this recorder supports Linux/x64 only.\n');
@@ -783,6 +955,13 @@ function validateCacheDirectory() {
     if (!objRoot.isDirectory() || objRoot.isSymbolicLink()
       || objRoot.uid !== BigInt(process.getuid()) || (objRoot.mode & 0o7777n) !== 0o700n
       || readdirSync(strResolved).length !== 0) refuseCache();
+    let arrMounts;
+    try { arrMounts = parseMountInfo(readMountInfoOrRefuse()); }
+    catch { refuseCacheMountTopology(); }
+    if (cacheMountAliasesProtected(strResolved,
+      [strRepository, strPhysicalRepository, strDistribution], arrMounts)) {
+      refuseCacheMountTopology();
+    }
     // A sticky shared parent (e.g. /tmp) protects this owned leaf from another
     // uid's rename. Same-uid concurrent mutation remains a caller exclusion.
     for (let strAt = dirname(strResolved); ; strAt = dirname(strAt)) {

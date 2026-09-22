@@ -5,7 +5,7 @@ import { chmodSync, cpSync, existsSync,
   linkSync, lstatSync, mkdirSync, mkdtempSync, readFileSync, readdirSync,
   readlinkSync, realpathSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { delimiter, dirname, isAbsolute, join } from 'node:path';
+import { delimiter, dirname, isAbsolute, join, posix as pathPosix } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import test from 'node:test';
 
@@ -948,6 +948,12 @@ test('NPM-STDOUT-UTF8: production npm adapter exact-decodes semantic stdout by p
   objScenario = { stdout: Buffer.from(report), stderr: Buffer.alloc(0), status: 1, signal: null };
   assert.equal(auditFunction(runNpm)(['audit']), report);
 
+  objScenario = { stdout: Buffer.from('{"problems":[]}'), stderr: Buffer.alloc(0),
+    status: null, signal: 'SIGTERM' };
+  assert.throws(() => runNpm(['ls'], {}, 7), /nonzero status or signal/);
+  assert.deepEqual(arrResults.at(-1),
+    { operation: 'ls', nativeExit: null, signal: 'SIGTERM', stderrLength: 0 });
+
   const strPrivateStderr = 'npm warn TASK130_F34_PRIVATE_PARTIAL_STDERR\n';
   for (const [arrArguments, intPhase] of [
     [['--version'], 2], [['config', 'list', '--json'], 6],
@@ -980,6 +986,258 @@ test('NPM-STDOUT-UTF8: production npm adapter exact-decodes semantic stdout by p
   assert.throws(() => runNpm(['audit'], {}, 5), { refusal: 5 });
   assert.match(strDiagnostic, /returned no stdout byte stream/);
 });
+
+test('CACHE-MOUNT-TOPOLOGY: visible backing coordinates reject protected aliases', () => {
+  const from = source.indexOf('const MOUNTINFO_MAX_BYTES');
+  const to = source.indexOf('\nfunction readMountInfoOrRefuse(', from);
+  assert.ok(from >= 0 && to > from);
+  const strTopologySource = source.slice(from, to);
+  const objFunctions = new Function('pathPosix',
+    `${strTopologySource}; return { parseMountInfo, cacheMountAliasesProtected };`)(pathPosix);
+  const parse = (...arrLines) => objFunctions.parseMountInfo(`${arrLines.join('\n')}\n`);
+  const strRoot = '1 1 8:1 / / rw - ext4 /dev/root rw';
+
+  assert.equal(objFunctions.cacheMountAliasesProtected('/tmp/cache', ['/repo'],
+    parse(strRoot)), false);
+  assert.equal(objFunctions.cacheMountAliasesProtected('/cache', ['/repo'], parse(
+    strRoot,
+    '2 1 8:1 /repo/empty /cache rw - none /repo/empty rw')), true);
+  assert.equal(objFunctions.cacheMountAliasesProtected('/cache-root/empty', ['/repo'], parse(
+    strRoot,
+    '2 1 8:1 /repo /cache-root rw - none /repo rw')), true);
+  assert.equal(objFunctions.cacheMountAliasesProtected('/source/repo/empty', ['/repo'], parse(
+    strRoot,
+    '2 1 8:1 /source/repo /repo rw - none /source/repo rw')), true);
+  assert.equal(objFunctions.cacheMountAliasesProtected('/source/repo/empty', ['/visible/repo'], parse(
+    strRoot,
+    '2 1 8:1 /source /visible rw - none /source rw')), true);
+  assert.equal(objFunctions.cacheMountAliasesProtected('/cache', ['/repo'], parse(
+    strRoot,
+    '2 1 8:2 / /repo/vendor rw - ext4 /dev/other rw',
+    '3 1 8:2 /private-cache /cache rw - none /private-cache rw')), true);
+  assert.equal(objFunctions.cacheMountAliasesProtected('/cache', ['/repo'], parse(
+    strRoot,
+    '2 1 9:1 / /cache rw - tmpfs tmpfs rw')), false);
+
+  assert.throws(() => objFunctions.cacheMountAliasesProtected('/cache', ['/repo'], parse(
+    strRoot,
+    '2 1 8:1 /first /cache rw - none /first rw',
+    '3 2 8:1 /second /cache rw - none /second rw')), /stacked mount is ambiguous/);
+  assert.throws(() => objFunctions.cacheMountAliasesProtected('/cache/sub', ['/repo'], parse(
+    strRoot,
+    '2 1 8:1 /hidden /cache/sub rw - none /hidden rw',
+    '3 1 9:1 / /cache rw - tmpfs tmpfs rw')), /hidden mount is ambiguous/);
+
+  const arrEscaped = parse(strRoot,
+    '2 1 8:1 /repo\\040space /cache\\040space rw - none /repo\\040space rw');
+  assert.equal(objFunctions.cacheMountAliasesProtected('/cache space', ['/repo space'],
+    arrEscaped), true);
+  assert.throws(() => parse('2 1 8:1 /bad\\777 /cache rw - none none rw'),
+    /invalid mountinfo path escape/);
+  assert.throws(() => parse('2 1 08:1 / / rw - ext4 /dev/root rw'),
+    /invalid mountinfo fields/);
+  assert.throws(() => parse('2 1 8:1 / / rw - '), /invalid mountinfo fields/);
+  assert.throws(() => parse(
+    '1 2 8:1 / / rw - ext4 /dev/root rw',
+    '2 1 8:1 /nested /nested rw - none /nested rw'), /mountinfo parent cycle/);
+
+  const strDescendantBlock = `    const objMountPoints = new Map();
+    for (const objMount of arrMounts) {
+      if (objMount.mountPoint !== strProtectedRoot
+        && mountPathContains(strProtectedRoot, objMount.mountPoint)) {
+        objMountPoints.set(objMount.mountPoint, true);
+      }
+    }
+    for (const strMountPoint of objMountPoints.keys()) {
+      arrProtected.push(mountCoordinateForPath(strMountPoint, arrMounts));
+    }
+`;
+  const strWithoutDescendants = strTopologySource.replace(strDescendantBlock, '');
+  assert.notEqual(strWithoutDescendants, strTopologySource);
+  const objWithoutDescendants = new Function('pathPosix',
+    `${strWithoutDescendants}; return { parseMountInfo, cacheMountAliasesProtected };`)(pathPosix);
+  assert.equal(objWithoutDescendants.cacheMountAliasesProtected('/cache', ['/repo'], parse(
+    strRoot,
+    '2 1 8:2 / /repo/vendor rw - ext4 /dev/other rw',
+    '3 1 8:2 /private-cache /cache rw - none /private-cache rw')), false);
+
+  const strOverlapBlock = `  return arrProtected.some((objProtected) => objCache.device === objProtected.device
+    && (mountPathContains(objCache.path, objProtected.path)
+      || mountPathContains(objProtected.path, objCache.path)));
+`;
+  const strWithoutOverlap = strTopologySource.replace(strOverlapBlock, '  return false;\n');
+  assert.notEqual(strWithoutOverlap, strTopologySource);
+  const objWithoutOverlap = new Function('pathPosix',
+    `${strWithoutOverlap}; return { parseMountInfo, cacheMountAliasesProtected };`)(pathPosix);
+  assert.equal(objWithoutOverlap.cacheMountAliasesProtected('/cache', ['/repo'], parse(
+    strRoot,
+    '2 1 8:1 /repo/empty /cache rw - none /repo/empty rw')), false);
+});
+
+test('CACHE-MOUNTINFO-READ: production reader is bounded, exact, and closes once', () => {
+  const refusalFrom = source.indexOf('function refuseCacheMountTopology(');
+  const refusalTo = source.indexOf('\n}\n', refusalFrom) + 2;
+  const from = source.indexOf('const MOUNTINFO_MAX_BYTES');
+  const readerFrom = source.indexOf('function readMountInfoOrRefuse(', from);
+  const to = source.indexOf('\n}\n', readerFrom) + 2;
+  const decodeFrom = source.indexOf('function decodeUtf8ExactlyOrRefuse(');
+  const decodeTo = source.indexOf('\n}\n', decodeFrom) + 2;
+  assert.ok(refusalFrom >= 0 && refusalTo > refusalFrom && from >= 0
+    && readerFrom > from && to > readerFrom && decodeFrom >= 0 && decodeTo > decodeFrom);
+  const fixture = (openSyncFixture, readSyncFixture, closeSyncFixture) => {
+    let strDiagnostic = '';
+    const objProcess = {
+      stderr: { write(value) { strDiagnostic += value; } },
+      exit(code) { throw Object.assign(new Error(`refusal:${code}`), { refusal: code }); },
+    };
+    const read = new Function('Buffer', 'pathPosix', 'openSync', 'readSync', 'closeSync',
+      'fsConstants', 'process',
+      `${source.slice(refusalFrom, refusalTo)}\n${source.slice(from, to)}\n`
+      + `${source.slice(decodeFrom, decodeTo)}\nreturn readMountInfoOrRefuse;`)(
+      Buffer, pathPosix, openSyncFixture, readSyncFixture, closeSyncFixture,
+      { O_RDONLY: 0, O_NOFOLLOW: 0 }, objProcess);
+    return { read, diagnostic: () => strDiagnostic };
+  };
+
+  const bufValid = Buffer.from('1 1 8:1 / / rw - ext4 /dev/root rw\n');
+  let intOffset = 0;
+  let intCloses = 0;
+  const objValid = fixture(() => 41, (_fd, bufTarget, intAt, intLength) => {
+    if (intOffset === bufValid.length) return 0;
+    const intRead = Math.min(7, intLength, bufValid.length - intOffset);
+    bufValid.copy(bufTarget, intAt, intOffset, intOffset + intRead);
+    intOffset += intRead;
+    return intRead;
+  }, () => { intCloses += 1; });
+  assert.equal(objValid.read(), bufValid.toString('utf8'));
+  assert.equal(intCloses, 1);
+
+  intCloses = 0;
+  const objReadFailure = fixture(() => 42, () => { throw new Error('read failure'); },
+    () => { intCloses += 1; });
+  assert.throws(() => objReadFailure.read(), { refusal: 16 });
+  assert.equal(intCloses, 1);
+
+  intCloses = 0;
+  const objCloseFailure = fixture(() => 43, () => 0, () => {
+    intCloses += 1;
+    throw new Error('close failure');
+  });
+  assert.throws(() => objCloseFailure.read(), { refusal: 16 });
+  assert.equal(intCloses, 1);
+
+  const objOpenFailure = fixture(() => { throw new Error('open failure'); }, () => 0,
+    () => { throw new Error('unexpected close'); });
+  assert.throws(() => objOpenFailure.read(), { refusal: 16 });
+
+  intCloses = 0;
+  let boolInvalidRead = false;
+  const objInvalidUtf8 = fixture(() => 44, (_fd, bufTarget, intAt) => {
+    if (boolInvalidRead) return 0;
+    boolInvalidRead = true;
+    bufTarget[intAt] = 0x80;
+    return 1;
+  }, () => { intCloses += 1; });
+  assert.throws(() => objInvalidUtf8.read(), { refusal: 16 });
+  assert.equal(intCloses, 1);
+  assert.match(objInvalidUtf8.diagnostic(), /Linux mount topology is not valid UTF-8/);
+
+  intCloses = 0;
+  const objOverflow = fixture(() => 45, (_fd, _bufTarget, _intAt, intLength) => intLength,
+    () => { intCloses += 1; });
+  assert.throws(() => objOverflow.read(), { refusal: 16 });
+  assert.equal(intCloses, 1);
+});
+
+test('AUDIT-LAUNCH-FAILURE: native spawn failure exits 2 before audit classification', () => {
+  const summaryFrom = source.indexOf('const NPM_OPERATION_LABELS');
+  const summaryFunction = source.indexOf('function writeNpmDiagnosticSummary(', summaryFrom);
+  const summaryTo = source.indexOf('\n}\n', summaryFunction) + 2;
+  const runFrom = source.indexOf('function runNpm(');
+  const runTo = source.indexOf('\nfunction runNpmOrRefuse(', runFrom);
+  assert.ok(summaryFrom >= 0 && summaryTo > summaryFunction && runFrom >= 0 && runTo > runFrom);
+  const strRunner = `
+import { spawnSync } from 'node:child_process';
+import { join } from 'node:path';
+const objProcess = { execPath: '/TASK139_F2_ABSENT_NODE', stderr: process.stderr,
+  exit: process.exit.bind(process) };
+const arrResults = [];
+const runNpm = new Function('lstatSync', 'strNpmCli', 'intNpmCliInode', 'process',
+  'spawnSync', 'npmChildEnv', 'join', 'strExternalCacheDirectory',
+  'strWorkflowDirectory', 'decodeUtf8ExactlyOrRefuse', 'objNpmProcessResults',
+  'Buffer', 'formatUntrustedText', 'REVIEWED_NPM',
+  ${JSON.stringify(`${source.slice(summaryFrom, summaryTo)}\n${source.slice(runFrom, runTo)}\n; return runNpm;`) })(
+  () => ({ ino: 41n }), '/reviewed/npm-cli.js', 41n, objProcess, spawnSync,
+  () => ({}), join, '/private-cache', '/workflow',
+  (value) => value.toString('utf8'), arrResults, Buffer, String, '11.16.0');
+runNpm(['audit', '--json'], {}, 5);
+`;
+  const objResult = spawnSync(process.execPath, ['--input-type=module'], {
+    input: strRunner, encoding: 'utf8', timeout: 5000,
+  });
+  assert.equal(objResult.status, 2, objResult.stderr);
+  assert.equal(objResult.stdout, '');
+  assert.match(objResult.stderr, /npm could not be run: ENOENT/);
+  assert.match(objResult.stderr, /operation\s+advisory audit \(arguments withheld\)/);
+  assert.doesNotMatch(objResult.stderr, /outside the accepted native 0\/1 outcomes|Error:| at /);
+});
+
+test('CACHE-MOUNT-GUARD-CALL: whole process refuses a forced alias before npm',
+  { skip: process.platform !== 'linux' || process.arch !== 'x64' }, () => {
+    const strCall = `    if (cacheMountAliasesProtected(strResolved,
+      [strRepository, strPhysicalRepository, strDistribution], arrMounts)) {
+      refuseCacheMountTopology();
+    }
+`;
+    const strFunction = 'function cacheMountAliasesProtected(strCache, arrProtectedRoots, arrMounts) {\n';
+    const strChildImport = "import { spawnSync } from 'node:child_process';";
+    assert.equal(source.split(strCall).length - 1, 1);
+    assert.equal(source.split(strFunction).length - 1, 1);
+    assert.equal(source.split(strChildImport).length - 1, 1);
+    const temporary = mkdtempSync(join(tmpdir(), 'cache-mount-call-'));
+    const repository = join(temporary, 'repository');
+    const workflow = join(repository, '.github', 'workflows');
+    const marker = join(temporary, 'npm-started');
+    mkdirSync(workflow, { recursive: true });
+    const strInstrumented = source
+      .replace(strFunction, `${strFunction}  if (process.env.TASK139_FORCE_CACHE_ALIAS === '1') return true;\n`)
+      .replace(strChildImport, `import { spawnSync as spawnSyncNative } from 'node:child_process';
+import { writeFileSync as writeTask139Marker } from 'node:fs';
+const spawnSync = (...arrArguments) => {
+  writeTask139Marker(process.env.TASK139_NPM_MARKER, 'started');
+  return spawnSyncNative(...arrArguments);
+};`);
+    assert.notEqual(strInstrumented, source);
+    const invoke = (strCandidate, arrFlags) => {
+      const recorder = join(workflow, 'Get-SupplyFreezeDigest.mjs');
+      writeFileSync(recorder, strCandidate);
+      chmodSync(recorder, 0o644);
+      const cache = mkdtempSync(join(temporary, 'cache-'));
+      return { result: spawnSync(process.execPath, [recorder, '--json',
+        `--cache-directory=${cache}`, ...arrFlags], {
+        encoding: 'utf8', maxBuffer: 16 * 1024 * 1024,
+        env: { ...process.env, TASK139_FORCE_CACHE_ALIAS: '1', TASK139_NPM_MARKER: marker },
+      }), cache };
+    };
+    try {
+      for (const arrFlags of [[], ['--any-toolchain', '--no-audit']]) {
+        const objRun = invoke(strInstrumented, arrFlags);
+        assert.equal(objRun.result.status, 16, objRun.result.stderr);
+        assert.equal(objRun.result.stdout, '');
+        assert.match(objRun.result.stderr, /mount topology.*aliases a protected surface/);
+        assert.equal(existsSync(marker), false);
+        assert.deepEqual(readdirSync(objRun.cache), []);
+      }
+      const strWithoutCall = strInstrumented.replace(strCall, '');
+      assert.notEqual(strWithoutCall, strInstrumented);
+      const objMutant = invoke(strWithoutCall, ['--any-toolchain', '--no-audit']);
+      assert.notEqual(objMutant.result.status, 16,
+        'removing the production guard call must defeat the exit-16 expectation');
+      assert.equal(existsSync(marker), false);
+    } finally {
+      rmSync(temporary, { recursive: true, force: true });
+    }
+  });
 
 test('NPM-RESPONSE-LIMIT: real child overflow uses the owning phase before a catch',
   { skip: process.platform !== 'linux' || process.arch !== 'x64' }, () => {
@@ -1212,12 +1470,165 @@ test('LS-PROBLEM-PRIVACY: production summary emits only allowlisted kinds and co
   }
 });
 
+function historicalMethodBlocks() {
+  const strMethod = readFileSync(join(workflow, '..', '..', 'docs', 'P1-SUPPLY-FREEZE-v1.md'), 'utf8');
+  const extract = (strHeading) => {
+    const intStart = strMethod.indexOf(`### ${strHeading}\n`);
+    assert.ok(intStart >= 0);
+    const arrBlock = /```bash\n([\s\S]*?)\n```/u.exec(strMethod.slice(intStart));
+    assert.notEqual(arrBlock, null);
+    const arrPayload = /<<'NODE'\n([\s\S]*?)\nNODE$/u.exec(arrBlock[1]);
+    assert.notEqual(arrPayload, null);
+    return { shell: arrBlock[1], payload: arrPayload[1] };
+  };
+  const acquisition = extract('Acquire and verify');
+  const offline = extract('Verify offline');
+  assert.equal(acquisition.payload, offline.payload,
+    'both authored recipes must retain the same complete verifier');
+  return { acquisition, offline };
+}
+
+test('HISTORICAL-RECIPE-IDENTITY: paired and offline verifiers have identical payloads', () => {
+  historicalMethodBlocks();
+});
+
+test('HISTORICAL-ACQUISITION: exact authored shell gates verification on native fetch success',
+  { skip: process.platform !== 'linux' }, () => {
+    const { acquisition, offline } = historicalMethodBlocks();
+    const strCommit = '4346310e7deebffb4159c75e30d9546263dfd649';
+    const arrBlobs = ['923106fc4ee5508b7a03930b3d8b774db9fcd009',
+      '7e96fd1fd41765ba31488762f60c2f74ba17d3a8'];
+    const strProject = join(workflow, '..', '..');
+    const temporary = mkdtempSync(join(tmpdir(), 'p1-historical-acquisition-'));
+    const objEnvironment = { ...process.env, NODE_DISABLE_COMPILE_CACHE: '1',
+      GIT_NO_LAZY_FETCH: '1', GIT_NO_REPLACE_OBJECTS: '1', GIT_OPTIONAL_LOCKS: '0',
+      GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null', GIT_CONFIG_SYSTEM: '/dev/null' };
+    for (const strKey of Object.keys(objEnvironment)) {
+      if (strKey.startsWith('GIT_') && !['GIT_NO_LAZY_FETCH', 'GIT_NO_REPLACE_OBJECTS',
+        'GIT_OPTIONAL_LOCKS', 'GIT_CONFIG_NOSYSTEM', 'GIT_CONFIG_GLOBAL', 'GIT_CONFIG_SYSTEM'].includes(strKey)) {
+        delete objEnvironment[strKey];
+      }
+    }
+    for (const strKey of ['NODE_OPTIONS', 'NODE_COMPILE_CACHE', 'NODE_V8_COVERAGE',
+      'NODE_REDIRECT_WARNINGS', 'NODE_DEBUG', 'NODE_DEBUG_NATIVE']) delete objEnvironment[strKey];
+    const objGitPath = spawnSync('sh', ['-c', 'command -v git'], { encoding: 'utf8', env: objEnvironment });
+    assert.equal(objGitPath.status, 0, objGitPath.stderr);
+    const strGit = objGitPath.stdout.trim();
+    const git = (cwd, args, input) => spawnSync(strGit, args, {
+      cwd, input, env: objEnvironment, maxBuffer: 128 * 1024 * 1024,
+    });
+    const requireSuccess = (objResult) => {
+      assert.equal(objResult.status, 0, objResult.stderr.toString());
+      assert.equal(objResult.signal, null);
+      return objResult.stdout;
+    };
+    try {
+      const bufComplete = requireSuccess(git(strProject, ['pack-objects', '--revs', '--stdout'], `${strCommit}\n`));
+      const bufTreeIds = requireSuccess(git(strProject,
+        ['rev-list', '--objects', '--filter=blob:none', '--no-object-names', strCommit]));
+      const bufTrees = requireSuccess(git(strProject, ['pack-objects', '--stdout'], bufTreeIds));
+      const strPack = join(temporary, 'complete.pack');
+      writeFileSync(strPack, bufComplete);
+      const objContract = JSON.parse(readFileSync(join(workflow, 'workflow-policy-contract.json')));
+      const run = (strName, strInitial, intFetchStatus, strShell, boolBadHash = false) => {
+        const strRepository = join(temporary, strName);
+        const strBin = join(temporary, `${strName}-bin`);
+        const strLog = join(temporary, `${strName}-calls.jsonl`);
+        mkdirSync(strRepository);
+        mkdirSync(strBin);
+        requireSuccess(git(strRepository, ['init', '-q']));
+        if (strInitial !== 'absent') {
+          requireSuccess(git(strRepository, ['index-pack', '--stdin'], strInitial === 'complete' ? bufComplete : bufTrees));
+          requireSuccess(git(strRepository, ['cat-file', '-e', `${strCommit}^{commit}`]));
+        } else assert.notEqual(git(strRepository, ['cat-file', '-e', `${strCommit}^{commit}`]).status, 0);
+        for (const strBlob of arrBlobs) {
+          assert.equal(git(strRepository, ['cat-file', '-e', strBlob]).status === 0, strInitial === 'complete');
+        }
+        const strContractDirectory = join(strRepository, '.github', 'workflows');
+        mkdirSync(strContractDirectory, { recursive: true });
+        const objCandidate = structuredClone(objContract);
+        if (boolBadHash) objCandidate.supplyFreeze.baseline.packageLockJson.sha256 = '0'.repeat(64);
+        writeFileSync(join(strContractDirectory, 'workflow-policy-contract.json'), JSON.stringify(objCandidate));
+        // A transport fixture supplies real pinned objects without network. Every
+        // verifier Git child still executes the real Git binary with its closed env.
+        const strShim = join(strBin, 'git');
+        writeFileSync(strShim, `#!${process.execPath}
+import assert from 'node:assert/strict';
+import { appendFileSync, readFileSync } from 'node:fs';
+import { spawnSync } from 'node:child_process';
+const args = process.argv.slice(2);
+appendFileSync(${JSON.stringify(strLog)}, JSON.stringify(args) + '\\n');
+if (args[0] === 'fetch') {
+  assert.deepEqual(args, ['fetch', '--no-tags', '--refetch',
+    'https://github.com/franklesniak/PSStyleGuide.git', ${JSON.stringify(strCommit)}]);
+  if (${intFetchStatus} !== 0) process.exit(${intFetchStatus});
+  const result = spawnSync(${JSON.stringify(strGit)}, ['index-pack', '--stdin'],
+    { input: readFileSync(${JSON.stringify(strPack)}), env: process.env });
+  process.exit(result.status ?? 74);
+}
+assert.equal(process.env.GIT_NO_LAZY_FETCH, '1');
+assert.equal(process.env.GIT_NO_REPLACE_OBJECTS, '1');
+assert.equal(process.env.GIT_OPTIONAL_LOCKS, '0');
+assert.equal(process.env.GIT_CONFIG_NOSYSTEM, '1');
+const result = spawnSync(${JSON.stringify(strGit)}, args, { stdio: 'inherit', env: process.env });
+process.exit(result.status ?? 74);
+`);
+        chmodSync(strShim, 0o755);
+        const objResult = spawnSync('bash', ['--noprofile', '--norc', '-c', strShell], {
+          cwd: strRepository, encoding: 'utf8',
+          env: { ...objEnvironment, strNode: process.execPath, PATH: `${strBin}${delimiter}${process.env.PATH}` },
+          timeout: 30000, maxBuffer: 1024 * 1024,
+        });
+        assert.equal(objResult.signal, null);
+        assert.equal(objResult.error, undefined);
+        const calls = existsSync(strLog) ? readFileSync(strLog, 'utf8').trim().split('\n').map(JSON.parse) : [];
+        return { result: objResult, calls, repository: strRepository };
+      };
+      const strSuccess = 'Historical packageJson and packageLockJson blob, path, length, and SHA-256 verification completed.\n';
+      for (const strInitial of ['absent', 'trees', 'complete']) {
+        const objRun = run(`acquire-${strInitial}`, strInitial, 0, acquisition.shell);
+        assert.equal(objRun.result.status, 0, objRun.result.stderr);
+        assert.equal(objRun.result.stdout, strSuccess);
+        assert.equal(objRun.calls.filter((args) => args[0] === 'fetch').length, 1);
+        assert.equal(objRun.calls.length, 6);
+        for (const strBlob of arrBlobs) requireSuccess(git(objRun.repository, ['cat-file', '-e', strBlob]));
+      }
+      for (const strInitial of ['absent', 'trees', 'complete']) {
+        const objRun = run(`fetch-fails-${strInitial}`, strInitial, 73, acquisition.shell);
+        assert.equal(objRun.result.status, 73, objRun.result.stderr);
+        assert.equal(objRun.result.stdout, '');
+        assert.equal(objRun.calls.length, 1, 'failed fetch must not start verification');
+      }
+      const objLateFailure = run('late-verification-fails', 'absent', 0, acquisition.shell, true);
+      assert.notEqual(objLateFailure.result.status, 0);
+      assert.equal(objLateFailure.result.stdout, '');
+      assert.equal(objLateFailure.calls.length, 6);
+      const objOffline = run('offline-complete', 'complete', 73, offline.shell);
+      assert.equal(objOffline.result.status, 0, objOffline.result.stderr);
+      assert.equal(objOffline.result.stdout, strSuccess);
+      assert.equal(objOffline.calls.length, 5);
+      assert.equal(objOffline.calls.some((args) => args[0] === 'fetch'), false);
+      for (const strInitial of ['absent', 'trees']) {
+        const objRun = run(`offline-${strInitial}`, strInitial, 73, offline.shell);
+        assert.notEqual(objRun.result.status, 0);
+        assert.equal(objRun.result.stdout, '');
+        assert.equal(objRun.calls.some((args) => args[0] === 'fetch'), false);
+      }
+      const strMutant = acquisition.shell.replace(' && \\\n', ';\n');
+      assert.notEqual(strMutant, acquisition.shell);
+      const objMutant = run('ungated-mutant', 'complete', 73, strMutant);
+      assert.equal(objMutant.result.status, 0, objMutant.result.stderr);
+      assert.equal(objMutant.result.stdout, strSuccess);
+      assert.ok(objMutant.calls.length > 1,
+        'removing the connector must defeat the failed-acquisition expectation');
+    } finally {
+      rmSync(temporary, { recursive: true, force: true });
+    }
+  });
+
 test('HISTORICAL-VERIFICATION: authored JavaScript block reports success only after both blobs pass',
   { skip: process.platform !== 'linux' }, () => {
-    const strMethod = readFileSync(join(workflow, '..', '..', 'docs', 'P1-SUPPLY-FREEZE-v1.md'), 'utf8');
-    const arrVerifier = /## Verify historical Git provenance separately[\s\S]*?```bash\r?\n[\s\S]*?<<'NODE'\r?\n([\s\S]*?)\r?\nNODE\r?\n```/u.exec(strMethod);
-    assert.notEqual(arrVerifier, null);
-    const strVerifier = arrVerifier[1];
+    const strVerifier = historicalMethodBlocks().offline.payload;
     const strExpectedSuccess =
       'Historical packageJson and packageLockJson blob, path, length, and SHA-256 verification completed.\n';
     const strProjectRoot = join(workflow, '..', '..');
@@ -1329,6 +1740,12 @@ test('HISTORICAL-VERIFICATION: authored JavaScript block reports success only af
       assert.notEqual(objHashFailure.status, 0);
       assert.equal(objHashFailure.stdout, '');
 
+      const objBlobMismatch = structuredClone(objContract);
+      objBlobMismatch.supplyFreeze.baseline.packageLockJson.blob = '0'.repeat(40);
+      const objBlobFailure = invokeVerifier(objBlobMismatch);
+      assert.notEqual(objBlobFailure.status, 0);
+      assert.equal(objBlobFailure.stdout, '');
+
       const objGitPath = spawnSync('sh', ['-c', 'command -v git'], { encoding: 'utf8' });
       assert.equal(objGitPath.status, 0, objGitPath.stderr);
       const strWrapperDirectory = join(temporary, 'native-failure-bin');
@@ -1357,6 +1774,34 @@ process.exit(result.status ?? 74);
       assert.equal(objNativeFailure.stdout, '');
       assert.equal(readFileSync(strCountPath, 'utf8'), '4');
       assert.match(objNativeFailure.stderr, /TASK130_F24_INJECTED_NATIVE_STATUS_73/);
+
+      for (const [strCase, intCall, strAction] of [
+        ['wrong-path-blob', 4, "process.stdout.write('0'.repeat(40) + '\\n'); process.exit(0);"],
+        ['final-native-read', 5, 'process.exit(73);'],
+      ]) {
+        const strCaseDirectory = join(temporary, strCase);
+        const strCaseCounter = join(temporary, `${strCase}-count`);
+        mkdirSync(strCaseDirectory);
+        const strCaseWrapper = join(strCaseDirectory, 'git');
+        writeFileSync(strCaseWrapper, `#!${process.execPath}
+const fs = require('node:fs');
+const { spawnSync } = require('node:child_process');
+const counter = ${JSON.stringify(strCaseCounter)};
+const count = fs.existsSync(counter) ? Number(fs.readFileSync(counter, 'utf8')) + 1 : 1;
+fs.writeFileSync(counter, String(count));
+if (count === ${intCall}) { ${strAction} }
+const result = spawnSync(${JSON.stringify(objGitPath.stdout.trim())}, process.argv.slice(2),
+  { stdio: 'inherit', env: process.env });
+process.exit(result.status ?? 74);
+`);
+        chmodSync(strCaseWrapper, 0o755);
+        const objFailure = invokeVerifier(objContract, {
+          PATH: `${strCaseDirectory}${delimiter}${process.env.PATH}`,
+        });
+        assert.notEqual(objFailure.status, 0, strCase);
+        assert.equal(objFailure.stdout, '');
+        assert.equal(readFileSync(strCaseCounter, 'utf8'), String(intCall));
+      }
     } finally {
       rmSync(temporary, { recursive: true, force: true });
     }
@@ -1741,8 +2186,8 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
       cpSync(checkout, strF43Checkout, { recursive: true, verbatimSymlinks: true });
       const strF43Fixture = join(strF43Checkout, '.github', 'workflows');
       const strF43Recorder = join(strF43Fixture, 'Get-SupplyFreezeDigest.f43-probe.mjs');
-      const strImport = "  readdirSync, readFileSync, readlinkSync, realpathSync, statSync } from 'node:fs';";
-      const strInstrumentedImport = "  readdirSync, readFileSync, readlinkSync, realpathSync as realpathSyncNative, statSync } from 'node:fs';";
+      const strImport = "  readdirSync, readFileSync, readlinkSync, readSync, realpathSync, statSync } from 'node:fs';";
+      const strInstrumentedImport = "  readdirSync, readFileSync, readlinkSync, readSync, realpathSync as realpathSyncNative, statSync } from 'node:fs';";
       const strUrlImport = "import { fileURLToPath } from 'node:url';\n";
       const strF43Source = source.replace(strImport, strInstrumentedImport).replace(strUrlImport,
         `${strUrlImport}let intTask130F43Observations = 0;
