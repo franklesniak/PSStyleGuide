@@ -110,6 +110,7 @@ const REVIEW_REQUEST_ALLOWED_FIELDS = new Set([
   'readyAt',
   'terminalResultRef',
   'terminalFailureRef',
+  'terminalNonfunctionalOutcome',
   'terminalDisposition',
 ]);
 
@@ -129,6 +130,9 @@ const PREDECESSOR_TASK_PATTERN = /^[1-9]\d{0,2}$/u;
 const PREDECESSOR_OUTPUT_PATTERN = /^[A-Z][A-Z0-9_]{0,127}$/u;
 const DISALLOWED_CONTROL_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/u;
 const RFC3339_PATTERN = /^(?<year>\d{4})-(?<month>0[1-9]|1[0-2])-(?<day>0[1-9]|[12]\d|3[01])[Tt](?<hour>[01]\d|2[0-3]):(?<minute>[0-5]\d):(?<second>[0-5]\d)(?:\.(?<fraction>\d+))?(?<zone>[Zz]|(?<offsetSign>[+-])(?<offsetHour>0\d|1[0-4]):(?<offsetMinute>[0-5]\d))$/u;
+const COPILOT_NO_FILES_REVIEWED_HEADLINE =
+  "Copilot wasn't able to review any files in this pull request.";
+const COPILOT_NO_FILES_REVIEWED_BODY_PATTERN = /^Copilot wasn't able to review any files in this pull request\.\n{6}---\n\n💡 <a href="\/(?<repository>[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)\/new\/[^"?\r\n]+\?filename=\.github\/skills\/code-review\/SKILL\.md" class="Link--inTextBlock" target="_blank" rel="noopener noreferrer">Add a `code-review` agent skill<\/a> or configure MCP servers for context-aware, tailored reviews\. <a href="https:\/\/docs\.github\.com\/copilot\/how-tos\/use-copilot-agents\/request-a-code-review\/use-code-review\?tool=webui#mcp-servers-and-agent-skills" class="Link--inTextBlock" target="_blank" rel="noopener noreferrer">Learn more in the docs\.<\/a>$/u;
 const TASK_STATES = new Set([
   'pending',
   'active',
@@ -239,6 +243,35 @@ const REVIEWER_EXHAUSTION_AUTHORITY_FIELDS = Object.freeze([
   'channel',
   'maximumChannelAttempts',
   'completedReviewRounds',
+  'authorizedAt',
+  'authority',
+  'reason',
+]);
+const COPILOT_AVAILABILITY_EXCEPTION_STATE =
+  'OPERATOR_AUTHORIZED_COPILOT_AVAILABILITY_EXCEPTION';
+const COPILOT_NONFUNCTIONAL_CLASSIFICATION = 'COPILOT_NO_FILES_REVIEWED';
+const TERMINAL_NONFUNCTIONAL_OUTCOME_FIELDS = Object.freeze([
+  'state',
+  'resultRef',
+  'authority',
+]);
+const TERMINAL_NONFUNCTIONAL_RESULT_REF_FIELDS = Object.freeze([
+  'kind',
+  'classification',
+  'databaseId',
+  'nodeId',
+  'submittedAt',
+  'bodySha256',
+]);
+const COPILOT_AVAILABILITY_AUTHORITY_FIELDS = Object.freeze([
+  'repository',
+  'pullRequest',
+  'reviewInputKey',
+  'head',
+  'tree',
+  'channel',
+  'channelAttempt',
+  'requestedAt',
   'authorizedAt',
   'authority',
   'reason',
@@ -874,6 +907,10 @@ export function parseCompactStateJson(text) {
       reviewState.reviewRequests,
       reviewState,
     );
+    validateCopilotAvailabilityAuthorities(requests, {
+      repository: parsed.current_task.repository,
+      reviewInput: reviewState.reviewInput,
+    });
     if (Object.hasOwn(reviewState, 'reviewerExhaustionAuthority')) {
       validateReviewerExhaustionAuthority(
         reviewState.reviewerExhaustionAuthority,
@@ -1697,6 +1734,7 @@ export function decideReviewRequest({
   existingRequests = [],
   supersededInputs = {},
   reviewMetrics = null,
+  copilotResults = null,
   codexResults = null,
   decisionAt = null,
   repository = null,
@@ -1777,6 +1815,17 @@ export function decideReviewRequest({
   }
   validateReviewChannelAttemptHistory(requests);
   validateTerminalFailureReferences(requests, codexResults);
+  if (requests.some(
+    (request) => Object.hasOwn(request, 'terminalNonfunctionalOutcome'),
+  )) {
+    validateTerminalResultReferences(requests, { copilotResults, codexResults });
+  }
+  validateCopilotAvailabilityAuthorities(requests, {
+    repository,
+    pullRequest,
+    reviewInput: currentReviewInput,
+    requirePullRequest: true,
+  });
   if (reviewerExhaustionAuthority !== null) {
     validateReviewerExhaustionAuthority(reviewerExhaustionAuthority, {
       repository,
@@ -1819,9 +1868,9 @@ export function decideReviewRequest({
     const channels = new Set(pair.map((request) => request.channel));
     const heads = new Set(pair.map((request) => request.head));
     const supersession = supersessionByKey.get(key);
-    const pairIsClean = channels.size === 2 &&
+    const pairIsSatisfied = channels.size === 2 &&
       ['copilot', 'codex'].every(
-        (channel) => hasSuccessfulTerminalChannelOutcome(pair, channel),
+        (channel) => isTerminalChannelSatisfied(pair, channel),
       );
     const canSupersede = isTerminalIncompletePair(pair) &&
       heads.size === 1 &&
@@ -1830,7 +1879,7 @@ export function decideReviewRequest({
       key,
       needsSupersession: canSupersede && supersession === undefined,
       pending: supersession === undefined &&
-        !pairIsClean &&
+        !pairIsSatisfied &&
         !canSupersede,
     };
   });
@@ -2538,6 +2587,10 @@ function isReviewRequestRecord(request) {
   const hasTerminalDisposition = Object.hasOwn(request ?? {}, 'terminalDisposition');
   const hasTerminalResultRef = Object.hasOwn(request ?? {}, 'terminalResultRef');
   const hasTerminalFailureRef = Object.hasOwn(request ?? {}, 'terminalFailureRef');
+  const hasTerminalNonfunctionalOutcome = Object.hasOwn(
+    request ?? {},
+    'terminalNonfunctionalOutcome',
+  );
   const attemptCountIsValid = !Object.hasOwn(request ?? {}, 'attemptCount') ||
     (
       Number.isInteger(request.attemptCount) &&
@@ -2557,6 +2610,7 @@ function isReviewRequestRecord(request) {
       request.confirmed === true &&
       isTerminalResultRef(request.terminalResultRef) &&
       !hasTerminalFailureRef &&
+      !hasTerminalNonfunctionalOutcome &&
       !(request.channel === 'copilot' &&
         request.terminalResultRef.kind !== 'submitted-review')
     : true;
@@ -2565,12 +2619,29 @@ function isReviewRequestRecord(request) {
       request.terminal === true &&
       request.confirmed === true &&
       !hasTerminalResultRef &&
+      !hasTerminalNonfunctionalOutcome &&
       isTerminalFailureRef(request.terminalFailureRef)
+    : true;
+  const terminalNonfunctionalOutcomeIsValid = hasTerminalNonfunctionalOutcome
+    ? request.channel === 'copilot' &&
+      request.terminal === true &&
+      request.confirmed === true &&
+      !hasTerminalDisposition &&
+      !hasTerminalResultRef &&
+      !hasTerminalFailureRef &&
+      isCopilotTerminalNonfunctionalOutcome(
+        request.terminalNonfunctionalOutcome,
+        request,
+      )
     : true;
   const confirmedTerminalOutcomeIsValid = !(
     request?.terminal === true &&
     request?.confirmed === true
-  ) || hasTerminalResultRef !== hasTerminalFailureRef;
+  ) || [
+    hasTerminalResultRef,
+    hasTerminalFailureRef,
+    hasTerminalNonfunctionalOutcome,
+  ].filter(Boolean).length === 1;
   const readyAtIsValid = readyAtIsRequired === hasReadyAt &&
     (!hasReadyAt || (
       request.channel === 'copilot' &&
@@ -2611,6 +2682,7 @@ function isReviewRequestRecord(request) {
     terminalDispositionIsValid &&
     terminalResultRefIsValid &&
     terminalFailureRefIsValid &&
+    terminalNonfunctionalOutcomeIsValid &&
     confirmedTerminalOutcomeIsValid &&
     readyAtIsValid;
 }
@@ -2888,6 +2960,147 @@ function validateReviewerExhaustionAuthority(authority, {
   return authority;
 }
 
+function isTerminalNonfunctionalResultRef(reference) {
+  return reference !== null &&
+    typeof reference === 'object' &&
+    !Array.isArray(reference) &&
+    Object.keys(reference).length === TERMINAL_NONFUNCTIONAL_RESULT_REF_FIELDS.length &&
+    TERMINAL_NONFUNCTIONAL_RESULT_REF_FIELDS.every(
+      (field) => Object.hasOwn(reference, field),
+    ) &&
+    reference.kind === 'submitted-review' &&
+    reference.classification === COPILOT_NONFUNCTIONAL_CLASSIFICATION &&
+    Number.isSafeInteger(reference.databaseId) &&
+    reference.databaseId > 0 &&
+    isNonemptyTransportText(reference.nodeId) &&
+    reference.nodeId.length <= 256 &&
+    getItemTimestamp(reference, ['submittedAt']) !== null &&
+    typeof reference.bodySha256 === 'string' &&
+    SHA256_PATTERN.test(reference.bodySha256);
+}
+
+function isCopilotAvailabilityAuthorityForRequest(authority, request, resultRef) {
+  const requestedAt = getItemTimestamp(request, ['requestedAt']);
+  const authorityRequestedAt = getItemTimestamp(authority, ['requestedAt']);
+  const submittedAt = getItemTimestamp(resultRef, ['submittedAt']);
+  const authorizedAt = getItemTimestamp(authority, ['authorizedAt']);
+  return authority !== null &&
+    typeof authority === 'object' &&
+    !Array.isArray(authority) &&
+    Object.keys(authority).length === COPILOT_AVAILABILITY_AUTHORITY_FIELDS.length &&
+    COPILOT_AVAILABILITY_AUTHORITY_FIELDS.every(
+      (field) => Object.hasOwn(authority, field),
+    ) &&
+    isNonemptyTransportText(authority.repository) &&
+    Number.isSafeInteger(authority.pullRequest) &&
+    authority.pullRequest > 0 &&
+    authority.reviewInputKey === request?.reviewInputKey &&
+    authority.head === request?.head &&
+    typeof authority.tree === 'string' &&
+    SHA1_PATTERN.test(authority.tree) &&
+    authority.channel === 'copilot' &&
+    authority.channelAttempt === getReviewChannelAttempt(request) &&
+    requestedAt !== null &&
+    authorityRequestedAt !== null &&
+    compareRfc3339Instants(
+      authorityRequestedAt,
+      requestedAt,
+      'availability authority requestedAt',
+      'request requestedAt',
+    ) === 0 &&
+    submittedAt !== null &&
+    compareRfc3339Instants(
+      submittedAt,
+      requestedAt,
+      'nonfunctional result submittedAt',
+      'request requestedAt',
+    ) >= 0 &&
+    authorizedAt !== null &&
+    compareRfc3339Instants(
+      authorizedAt,
+      submittedAt,
+      'availability authority authorizedAt',
+      'nonfunctional result submittedAt',
+    ) >= 0 &&
+    isNonemptyTransportText(authority.authority) &&
+    isNonemptyTransportText(authority.reason);
+}
+
+function isCopilotTerminalNonfunctionalOutcome(outcome, request) {
+  return outcome !== null &&
+    typeof outcome === 'object' &&
+    !Array.isArray(outcome) &&
+    Object.keys(outcome).length === TERMINAL_NONFUNCTIONAL_OUTCOME_FIELDS.length &&
+    TERMINAL_NONFUNCTIONAL_OUTCOME_FIELDS.every(
+      (field) => Object.hasOwn(outcome, field),
+    ) &&
+    outcome.state === COPILOT_AVAILABILITY_EXCEPTION_STATE &&
+    isTerminalNonfunctionalResultRef(outcome.resultRef) &&
+    isCopilotAvailabilityAuthorityForRequest(
+      outcome.authority,
+      request,
+      outcome.resultRef,
+    );
+}
+
+function isKnownCopilotNoFilesReviewedBody(body, repository) {
+  if (typeof body !== 'string') {
+    return false;
+  }
+  try {
+    validateTransport(body);
+  } catch {
+    return false;
+  }
+  const match = COPILOT_NO_FILES_REVIEWED_BODY_PATTERN.exec(body);
+  return match !== null &&
+    match[0] === body &&
+    match.groups?.repository === repository;
+}
+
+function hasCopilotNoFilesReviewedDeclaration(body) {
+  return typeof body === 'string' && (
+    body === COPILOT_NO_FILES_REVIEWED_HEADLINE ||
+    body.startsWith(`${COPILOT_NO_FILES_REVIEWED_HEADLINE}\n`)
+  );
+}
+
+function validateCopilotAvailabilityAuthorities(requests, {
+  repository,
+  pullRequest = null,
+  reviewInput = null,
+  requirePullRequest = false,
+}) {
+  const exceptionRequests = requests.filter(
+    (request) => Object.hasOwn(request, 'terminalNonfunctionalOutcome'),
+  );
+  for (const request of exceptionRequests) {
+    const outcome = request.terminalNonfunctionalOutcome;
+    const authority = outcome.authority;
+    const currentInputMatches = reviewInput !== null &&
+      request.reviewInputKey === getReviewInputKey(reviewInput);
+    if (
+      !isCopilotTerminalNonfunctionalOutcome(outcome, request) ||
+      typeof repository !== 'string' ||
+      authority.repository !== repository ||
+      (requirePullRequest && (
+        !Number.isSafeInteger(pullRequest) ||
+        pullRequest < 1 ||
+        authority.pullRequest !== pullRequest
+      )) ||
+      (currentInputMatches && (
+        authority.reviewInputKey !== getReviewInputKey(reviewInput) ||
+        authority.head !== reviewInput.head ||
+        authority.tree !== reviewInput.tree
+      ))
+    ) {
+      throw new TypeError(
+        'A Copilot availability exception must be exact, typed, input-bound, result-bound, and operator-authenticated.',
+      );
+    }
+  }
+}
+
 function isRepositoryAuthorizedNonfunctionalDisposition(disposition, request) {
   if (
     disposition === null ||
@@ -3002,7 +3215,11 @@ function isReferencedTerminalResult(result, request, reference, requests) {
   if (reference.kind === 'submitted-review') {
     const baselines = new Set(request.baselineReviewNodeIds);
     return getCommitOid(result) === request.head &&
-      identities.every((identity) => !baselines.has(identity));
+      identities.every((identity) => !baselines.has(identity)) &&
+      !(
+        request.channel === 'copilot' &&
+        hasCopilotNoFilesReviewedDeclaration(result.body)
+      );
   }
 
   if (
@@ -3041,6 +3258,62 @@ function isReferencedTerminalResult(result, request, reference, requests) {
       'conversation baseline time',
     ) > 0,
   );
+}
+
+function isReferencedTerminalNonfunctionalResult(result, request, outcome, requests) {
+  const reference = outcome.resultRef;
+  const requestTime = getItemTimestamp(request, ['requestedAt']);
+  const submittedTime = getConsistentItemTimestamp(
+    result,
+    [['submitted_at', 'submittedAt']],
+  )?.value ?? null;
+  const referenceTime = getItemTimestamp(reference, ['submittedAt']);
+  const identities = getItemIdentities(result);
+  const expectedIdentities = new Set([
+    String(reference.databaseId),
+    reference.nodeId,
+  ]);
+  const baselines = new Set(request.baselineReviewNodeIds);
+  const nextDifferentInputTime = getNextDifferentInputRequestTime(request, requests);
+  const bodyHash = typeof result?.body === 'string'
+    ? createHash('sha256').update(result.body, 'utf8').digest('hex')
+    : null;
+  return request.channel === 'copilot' &&
+    isCopilotTerminalNonfunctionalOutcome(outcome, request) &&
+    requestTime !== null &&
+    submittedTime !== null &&
+    referenceTime !== null &&
+    compareRfc3339Instants(
+      submittedTime,
+      referenceTime,
+      'nonfunctional result submittedAt',
+      'nonfunctional reference submittedAt',
+    ) === 0 &&
+    isItemAtOrAfterRequestWithAliases(
+      result,
+      [['submitted_at', 'submittedAt']],
+      requestTime,
+    ) &&
+    (
+      nextDifferentInputTime === null ||
+      compareRfc3339Instants(
+        submittedTime,
+        nextDifferentInputTime,
+        'nonfunctional result submittedAt',
+        'successor requestedAt',
+      ) <= 0
+    ) &&
+    identities.length === expectedIdentities.size &&
+    identities.every((identity) => expectedIdentities.has(identity)) &&
+    [...expectedIdentities].every((identity) => identities.includes(identity)) &&
+    identities.every((identity) => !baselines.has(identity)) &&
+    isResultActorForChannel(result, 'copilot') &&
+    getCommitOid(result) === request.head &&
+    bodyHash === reference.bodySha256 &&
+    isKnownCopilotNoFilesReviewedBody(
+      result.body,
+      outcome.authority.repository,
+    );
 }
 
 function isReferencedTerminalFailure(result, request, reference, requests) {
@@ -3219,25 +3492,37 @@ function validateTerminalResultReferences(requests, reviewState) {
     (candidate) => candidate.confirmed === true && candidate.terminal === true,
   )) {
     const isFailure = Object.hasOwn(request, 'terminalFailureRef');
+    const isNonfunctional = Object.hasOwn(request, 'terminalNonfunctionalOutcome');
     const reference = isFailure
       ? request.terminalFailureRef
-      : request.terminalResultRef;
+      : isNonfunctional
+        ? request.terminalNonfunctionalOutcome.resultRef
+        : request.terminalResultRef;
     const collection = reference.kind === 'submitted-review'
       ? resultCollections[request.channel].submittedReviews
       : resultCollections[request.channel].conversationComments;
-    const matches = collection.filter(
-      (result) => isFailure
-        ? isReferencedTerminalFailure(result, request, reference, requests)
-        : isReferencedTerminalResult(result, request, reference, requests),
-    );
+    const matches = collection.filter((result) => {
+      if (isFailure) {
+        return isReferencedTerminalFailure(result, request, reference, requests);
+      }
+      if (isNonfunctional) {
+        return isReferencedTerminalNonfunctionalResult(
+          result,
+          request,
+          request.terminalNonfunctionalOutcome,
+          requests,
+        );
+      }
+      return isReferencedTerminalResult(result, request, reference, requests);
+    });
     if (matches.length !== 1) {
       throw new TypeError(
-        'A confirmed terminal request must reference one attributable terminal result or failure outcome.',
+        'A confirmed terminal request must reference one attributable terminal result, failure, or authorized nonfunctional outcome.',
       );
     }
     const result = matches[0];
     const resultIdentities = getItemIdentities(result);
-    const isMutableConversationResult = !isFailure &&
+    const isMutableConversationResult = !isFailure && !isNonfunctional &&
       reference.kind === 'conversation-comment';
     if (isMutableConversationResult) {
       if (resultIdentities.some((identity) => immutableFailureIdentities.has(identity))) {
@@ -3334,6 +3619,12 @@ function getRequestTerminalTimestamp(request) {
   }
   if (Object.hasOwn(request, 'terminalFailureRef')) {
     return getTerminalFailureBoundary(request.terminalFailureRef);
+  }
+  if (Object.hasOwn(request, 'terminalNonfunctionalOutcome')) {
+    return getItemTimestamp(
+      request.terminalNonfunctionalOutcome.authority,
+      ['authorizedAt'],
+    );
   }
   const reference = request.terminalResultRef;
   return getItemTimestamp(reference, ['observedAt']);
@@ -3443,18 +3734,37 @@ function isSupersededReviewInputRecord(disposition) {
     isNonemptyTransportText(disposition.reason);
 }
 
-function hasSuccessfulTerminalChannelOutcome(pair, channel) {
+function getTerminalChannelOutcome(pair, channel) {
   const attempts = pair.filter((request) => request.channel === channel);
   if (attempts.length === 0) {
-    return false;
+    return 'pending';
   }
   const latest = attempts.at(-1);
-  return latest.terminal === true && (
-    Object.hasOwn(latest, 'terminalResultRef') ||
+  if (latest.terminal !== true) {
+    return 'pending';
+  }
+  if (Object.hasOwn(latest, 'terminalResultRef')) {
+    return 'clean';
+  }
+  if (
+    channel === 'copilot' &&
     (
-      channel === 'copilot' &&
-      Object.hasOwn(latest, 'terminalDisposition')
+      Object.hasOwn(latest, 'terminalDisposition') ||
+      Object.hasOwn(latest, 'terminalNonfunctionalOutcome')
     )
+  ) {
+    return 'authorized-nonfunctional';
+  }
+  if (Object.hasOwn(latest, 'terminalFailureRef')) {
+    return 'failure';
+  }
+  return 'pending';
+}
+
+function isTerminalChannelSatisfied(pair, channel) {
+  const outcome = getTerminalChannelOutcome(pair, channel);
+  return outcome === 'clean' || (
+    channel === 'copilot' && outcome === 'authorized-nonfunctional'
   );
 }
 
@@ -3462,7 +3772,7 @@ function isTerminalIncompletePair(pair) {
   return pair.length > 0 &&
     pair.every((request) => request.terminal === true) &&
     ['copilot', 'codex'].some(
-      (channel) => !hasSuccessfulTerminalChannelOutcome(pair, channel),
+      (channel) => !isTerminalChannelSatisfied(pair, channel),
     );
 }
 
@@ -3511,12 +3821,21 @@ export function evaluateReviewMergeReadiness({
     reviewState.reviewRequests,
     reviewState,
   );
+  validateCopilotAvailabilityAuthorities(requests, {
+    repository,
+    pullRequest,
+    reviewInput: reviewState.reviewInput,
+    requirePullRequest: true,
+  });
   const currentKey = getReviewInputKey(reviewState.reviewInput);
   const pair = requests.filter((request) => request.reviewInputKey === currentKey);
-  const copilotSatisfied = hasSuccessfulTerminalChannelOutcome(pair, 'copilot');
+  const copilotOutcome = getTerminalChannelOutcome(pair, 'copilot');
+  const copilotClean = copilotOutcome === 'clean';
+  const authorizedNonfunctional = copilotOutcome === 'authorized-nonfunctional';
+  const copilotSatisfied = copilotClean || authorizedNonfunctional;
   const codexAttempts = pair.filter((request) => request.channel === 'codex');
   const latestCodex = codexAttempts.at(-1);
-  const codexClean = hasSuccessfulTerminalChannelOutcome(pair, 'codex');
+  const codexClean = getTerminalChannelOutcome(pair, 'codex') === 'clean';
   const codexExhausted = latestCodex !== undefined &&
     codexAttempts.length === REVIEW_MAX_CHANNEL_ATTEMPTS &&
     getReviewChannelAttempt(latestCodex) === REVIEW_MAX_CHANNEL_ATTEMPTS &&
@@ -3536,22 +3855,27 @@ export function evaluateReviewMergeReadiness({
     authorizedExhaustion = codexExhausted;
   }
 
-  const reviewerClean = copilotSatisfied && codexClean;
-  const reviewerSatisfied = reviewerClean || (copilotSatisfied && authorizedExhaustion);
+  const reviewerClean = copilotClean && codexClean;
+  const reviewerSatisfied = copilotSatisfied && (codexClean || authorizedExhaustion);
   const independentQualityGatesPass = INDEPENDENT_QUALITY_READINESS_GATE_FIELDS.every(
     (field) => gates[field],
   );
   const otherGatesPass = MERGE_READINESS_GATE_FIELDS.every((field) => gates[field]);
   const reviewerState = reviewerClean
     ? 'clean'
-    : authorizedExhaustion
-      ? 'exhausted-not-clean'
-      : codexExhausted
-        ? 'exhausted-blocked'
-        : 'incomplete';
+    : authorizedNonfunctional && authorizedExhaustion
+      ? 'authorized-nonfunctional-and-exhausted-not-clean'
+      : authorizedNonfunctional && codexClean
+        ? 'authorized-nonfunctional'
+        : authorizedExhaustion
+          ? 'exhausted-not-clean'
+          : codexExhausted
+            ? 'exhausted-blocked'
+            : 'incomplete';
   return Object.freeze({
     reviewerState,
     clean: reviewerClean,
+    authorizedNonfunctional,
     authorizedExhaustion,
     mayProceedToIndependentQuality: reviewerSatisfied && independentQualityGatesPass,
     mergeReady: reviewerSatisfied && otherGatesPass,

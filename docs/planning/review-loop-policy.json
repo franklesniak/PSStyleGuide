@@ -436,6 +436,9 @@
         "terminalFailureRef": {
           "$ref": "#/$defs/terminalFailureRef"
         },
+        "terminalNonfunctionalOutcome": {
+          "$ref": "#/$defs/terminalNonfunctionalOutcome"
+        },
         "baselineRequestEventIds": {
           "type": "array",
           "items": {
@@ -578,6 +581,11 @@
                 "required": [
                   "terminalFailureRef"
                 ]
+              },
+              {
+                "required": [
+                  "terminalNonfunctionalOutcome"
+                ]
               }
             ]
           }
@@ -598,8 +606,17 @@
               }
             },
             "not": {
-              "required": [
-                "terminalFailureRef"
+              "anyOf": [
+                {
+                  "required": [
+                    "terminalFailureRef"
+                  ]
+                },
+                {
+                  "required": [
+                    "terminalNonfunctionalOutcome"
+                  ]
+                }
               ]
             }
           }
@@ -623,8 +640,56 @@
               }
             },
             "not": {
-              "required": [
-                "terminalResultRef"
+              "anyOf": [
+                {
+                  "required": [
+                    "terminalResultRef"
+                  ]
+                },
+                {
+                  "required": [
+                    "terminalNonfunctionalOutcome"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "if": {
+            "required": [
+              "terminalNonfunctionalOutcome"
+            ]
+          },
+          "then": {
+            "properties": {
+              "channel": {
+                "const": "copilot"
+              },
+              "confirmed": {
+                "const": true
+              },
+              "terminal": {
+                "const": true
+              }
+            },
+            "not": {
+              "anyOf": [
+                {
+                  "required": [
+                    "terminalResultRef"
+                  ]
+                },
+                {
+                  "required": [
+                    "terminalFailureRef"
+                  ]
+                },
+                {
+                  "required": [
+                    "terminalDisposition"
+                  ]
+                }
               ]
             }
           }
@@ -735,6 +800,122 @@
             "timed_out",
             "expired"
           ]
+        }
+      }
+    },
+    "terminalNonfunctionalOutcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "resultRef",
+        "authority"
+      ],
+      "properties": {
+        "state": {
+          "const": "OPERATOR_AUTHORIZED_COPILOT_AVAILABILITY_EXCEPTION"
+        },
+        "resultRef": {
+          "$ref": "#/$defs/terminalNonfunctionalResultRef"
+        },
+        "authority": {
+          "$ref": "#/$defs/copilotAvailabilityAuthority"
+        }
+      }
+    },
+    "terminalNonfunctionalResultRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "classification",
+        "databaseId",
+        "nodeId",
+        "submittedAt",
+        "bodySha256"
+      ],
+      "properties": {
+        "kind": {
+          "const": "submitted-review"
+        },
+        "classification": {
+          "const": "COPILOT_NO_FILES_REVIEWED"
+        },
+        "databaseId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "nodeId": {
+          "$ref": "#/$defs/terminalEvidenceIdentity"
+        },
+        "submittedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "bodySha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "copilotAvailabilityAuthority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "pullRequest",
+        "reviewInputKey",
+        "head",
+        "tree",
+        "channel",
+        "channelAttempt",
+        "requestedAt",
+        "authorizedAt",
+        "authority",
+        "reason"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "pullRequest": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "reviewInputKey": {
+          "$ref": "#/$defs/sha256"
+        },
+        "head": {
+          "$ref": "#/$defs/sha1"
+        },
+        "tree": {
+          "$ref": "#/$defs/sha1"
+        },
+        "channel": {
+          "const": "copilot"
+        },
+        "channelAttempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "requestedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "authorizedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "authority": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
         }
       }
     },

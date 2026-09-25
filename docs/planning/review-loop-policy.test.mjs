@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
@@ -37,6 +38,53 @@ const HASHES = Object.freeze({
   body1: '1'.repeat(64),
   body2: '2'.repeat(64),
 });
+
+function copilotNoFilesReviewedBody(
+  repository = 'franklesniak/PSStyleGuide',
+  branch = 'main',
+) {
+  return "Copilot wasn't able to review any files in this pull request.\n\n\n\n\n\n" +
+    '---\n\n' +
+    `💡 <a href="/${repository}/new/${branch}?filename=.github/skills/code-review/SKILL.md" class="Link--inTextBlock" target="_blank" rel="noopener noreferrer">Add a \`code-review\` agent skill</a> or configure MCP servers for context-aware, tailored reviews. ` +
+    '<a href="https://docs.github.com/copilot/how-tos/use-copilot-agents/request-a-code-review/use-code-review?tool=webui#mcp-servers-and-agent-skills" class="Link--inTextBlock" target="_blank" rel="noopener noreferrer">Learn more in the docs.</a>';
+}
+
+function sha256Utf8(value) {
+  return createHash('sha256').update(value, 'utf8').digest('hex');
+}
+
+function terminalNonfunctionalOutcome(input, overrides = {}) {
+  const repository = overrides.repository ?? 'franklesniak/PSStyleGuide';
+  const body = overrides.body ?? copilotNoFilesReviewedBody(repository);
+  const requestedAt = overrides.requestedAt ?? '2026-09-04T10:00:00Z';
+  const submittedAt = overrides.submittedAt ?? '2026-09-04T10:01:00Z';
+  return {
+    state: 'OPERATOR_AUTHORIZED_COPILOT_AVAILABILITY_EXCEPTION',
+    resultRef: {
+      kind: 'submitted-review',
+      classification: 'COPILOT_NO_FILES_REVIEWED',
+      databaseId: overrides.databaseId ?? 71,
+      nodeId: overrides.nodeId ?? 'COPILOT_NONFUNCTIONAL_NODE',
+      submittedAt,
+      bodySha256: overrides.bodySha256 ?? sha256Utf8(body),
+    },
+    authority: {
+      repository,
+      pullRequest: overrides.pullRequest ?? 182,
+      reviewInputKey: getReviewInputKey(input),
+      head: input.head,
+      tree: input.tree,
+      channel: 'copilot',
+      channelAttempt: overrides.channelAttempt ?? 1,
+      requestedAt,
+      authorizedAt: overrides.authorizedAt ?? '2026-09-04T10:02:00Z',
+      authority: overrides.authority ?? 'Repository operator authorization.',
+      reason: overrides.reason ?? 'Copilot returned the recognized no-files-reviewed response.',
+      ...overrides.authorityOverrides,
+    },
+    ...overrides.outcomeOverrides,
+  };
+}
 
 function reviewInput(overrides = {}) {
   return createReviewInput({
@@ -113,7 +161,9 @@ function state(input, overrides = {}) {
     if (!Object.hasOwn(overrides, field)) {
       const results = value.reviewRequests
         .filter((request) => request.channel === channel && (
-          request.terminalResultRef || request.terminalFailureRef
+          request.terminalResultRef ||
+          request.terminalFailureRef ||
+          request.terminalNonfunctionalOutcome
         ))
         .map((request) => resultForRequest(request));
       value[field] = {
@@ -182,7 +232,8 @@ function requestFor(input, channel, overrides = {}) {
     request.confirmed === true &&
     request.terminal === true &&
     !Object.hasOwn(request, 'terminalResultRef') &&
-    !Object.hasOwn(request, 'terminalFailureRef')
+    !Object.hasOwn(request, 'terminalFailureRef') &&
+    !Object.hasOwn(request, 'terminalNonfunctionalOutcome')
   ) {
     request.terminalResultRef = {
       kind: 'submitted-review',
@@ -191,6 +242,23 @@ function requestFor(input, channel, overrides = {}) {
     };
   }
   return request;
+}
+
+function nonfunctionalCopilotRequest(input, overrides = {}) {
+  const requestedAt = overrides.requestedAt ?? '2026-09-04T10:00:00Z';
+  const channelAttempt = overrides.channelAttempt ?? 1;
+  return requestFor(input, 'copilot', {
+    channelAttempt,
+    requestedAt,
+    confirmed: true,
+    terminal: true,
+    ...overrides.requestOverrides,
+    terminalNonfunctionalOutcome: terminalNonfunctionalOutcome(input, {
+      ...overrides,
+      requestedAt,
+      channelAttempt,
+    }),
+  });
 }
 
 function resultForRequest(request) {
@@ -208,6 +276,21 @@ function resultForRequest(request) {
         commitPrefix: request.head.slice(0, 7),
         terminalSummaryId: request.terminalFailureRef.summaryId,
         terminalSummaryUpdatedAt: request.terminalFailureRef.summaryObservedAt,
+      },
+    };
+  }
+  if (Object.hasOwn(request, 'terminalNonfunctionalOutcome')) {
+    const outcome = request.terminalNonfunctionalOutcome;
+    return {
+      kind: 'submitted-review',
+      value: {
+        id: outcome.resultRef.databaseId,
+        node_id: outcome.resultRef.nodeId,
+        actor,
+        body: copilotNoFilesReviewedBody(outcome.authority.repository),
+        state: 'COMMENTED',
+        submitted_at: outcome.resultRef.submittedAt,
+        commit_id: request.head,
       },
     };
   }
@@ -3033,6 +3116,9 @@ test('review-task terminal gates and later quality loops preserve their exact re
   const task34 = taskBody(34);
   const task35 = taskBody(35);
   const task36 = taskBody(36);
+  const task186 = taskBody(186);
+  const task187 = taskBody(187);
+  const task188 = taskBody(188);
 
   for (const task of [task6, task15, task25, task34]) {
     assert.match(
@@ -3074,6 +3160,28 @@ test('review-task terminal gates and later quality loops preserve their exact re
   assert.doesNotMatch(task35, /Tasks 34 and 25|Task 32 or 23/u);
   assert.match(task36, /Tasks 34 and 35/u);
   assert.doesNotMatch(task36, /Tasks 34 and 25/u);
+
+  assert.match(task186, /complete 583-byte response/u);
+  assert.match(
+    task186,
+    /6907a12b07a48f84290ba01b6c4490ae1bb4b92cd9a6174bd50e4979afbf4213/u,
+  );
+  assert.match(task186, /`AUTHORIZED_NONFUNCTIONAL` with `clean: false`/u);
+  assert.match(task186, /reject the withdrawn headline-only digest/u);
+  assert.match(
+    task186,
+    /explicit result `TERMINALLY CLEAN`, `AUTHORIZED_NONFUNCTIONAL`, `EXHAUSTED_NOT_CLEAN`, or `NOT CLEAN`/u,
+  );
+  assert.match(task187, /state `OPERATOR_AUTHORIZED_COPILOT_AVAILABILITY_EXCEPTION`/u);
+  assert.match(task187, /classification `COPILOT_NO_FILES_REVIEWED`/u);
+  assert.match(task187, /Parse and inventory the complete response as review evidence/u);
+  assert.match(task187, /If both exceptions apply, verify both exact authorities/u);
+  assert.match(task188, /independently revalidate its exact input-bound Copilot result and authority/u);
+  assert.match(
+    task188,
+    /Require a clean Codex result unless the separate exact `EXHAUSTED_NOT_CLEAN` authority validates/u,
+  );
+  assert.match(task188, /If both exceptions apply, revalidate both authorities/u);
 });
 
 test('schema-defined nested review-state fields classify deterministically', () => {
@@ -4677,6 +4785,492 @@ test('confirmed terminal requests require one attributable persisted result', as
     () => parseCompactStateJson(JSON.stringify(copilotConversation)),
     /persisted review request is malformed/u,
   );
+});
+
+test('the exact PR 58 Copilot availability exception is satisfied but not clean', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = createReviewInput({
+    head: 'f91428b26ed649ecf5da7b1f267ca4a622d2fde6',
+    tree: 'cea119a666dbee3eba275df62d5de0a7c7cc2d3d',
+    diffSha256: 'dc432b39de59fffff8a1ef954bdf72e6cc490c6237d61378428b556c4d815e89',
+    bodySha256: '257bed30a37647a7cb453ec79c5afae9f3bc68a56c13b2b41ba13716a087fb5c',
+    scope: 'Exactly four added standalone Terraform candidate-validation files: helper, invocation-context manager, adversarial harness, and versioned catalog; no workflow activation, generated output, dependency, permission, or protected governance change.',
+    behavior: 'Validate one retained candidate archive and exact four-file manifest with bounded limits, strict stateful UTF-8 per extracted file, and authenticated candidate/context cleanup; permanent 456-row catalog and harness cover three required PowerShell runtimes without skips.',
+    risk: 'Filesystem/archive validation trusts fixed native executables and a job-owned root without an untrusted concurrent writer; uncertain cleanup is retained; no production workflow invokes the new layer yet.',
+  });
+  assert.equal(
+    getReviewInputKey(input),
+    '95da3502e53dcf75c5497231cf7cb43c8d16fe0d25cea7458f0a2973b369a593',
+  );
+  const repository = 'franklesniak/TerraformStyleGuide';
+  const body = copilotNoFilesReviewedBody(repository);
+  assert.equal(Buffer.byteLength(body, 'utf8'), 583);
+  assert.equal(
+    sha256Utf8(body),
+    '6907a12b07a48f84290ba01b6c4490ae1bb4b92cd9a6174bd50e4979afbf4213',
+  );
+  const copilot = nonfunctionalCopilotRequest(input, {
+    repository,
+    pullRequest: 58,
+    databaseId: 5312111344,
+    nodeId: 'PRR_kwDOSAZRhc8AAAABPKBi8A',
+    requestedAt: '2026-09-25T01:08:43Z',
+    submittedAt: '2026-09-25T01:08:53Z',
+    authorizedAt: '2026-09-25T02:38:01.549Z',
+    requestOverrides: {
+      readyAt: '2026-09-25T01:09:04.425Z',
+      attemptCount: 1,
+      baselineCapturedAt: '2026-09-25T01:08:43Z',
+    },
+  });
+  const codex = requestFor(input, 'codex', {
+    requestedAt: '2026-09-25T01:11:01Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'conversation-comment',
+      id: 'IC_kwDOSAZRhc8AAAABWwIcow',
+      observedAt: '2026-09-25T01:13:58Z',
+    },
+  });
+  const reviewState = state(input, { reviewRequests: [copilot, codex] });
+  const persisted = compactState(input, reviewState, { repository });
+  assertSchemaValid(persisted, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(persisted)), persisted);
+  assert.equal(reviewState.metrics.reviewerRequestsPerHead[input.head], 2);
+  assert.deepEqual(reviewState.metrics.sameHeadRerequestReasons, []);
+  assert.equal(reviewState.metrics.cleanReviewRecognitionMilliseconds, null);
+
+  const gates = {
+    exactHeadCiClean: true,
+    copilotOutcomeCleanOrAuthorized: true,
+    noUnresolvedActionableFindings: true,
+    independentQualityAuditPassed: true,
+    exactHeadFinalValidationPassed: true,
+    frozenInputAccurate: true,
+    mergeable: true,
+    otherRequiredGatesPassed: true,
+  };
+  const readiness = evaluateReviewMergeReadiness({
+    repository,
+    pullRequest: 58,
+    currentHead: input.head,
+    currentTree: input.tree,
+    reviewState,
+    gates,
+  });
+  assert.deepEqual(readiness, {
+    reviewerState: 'authorized-nonfunctional',
+    clean: false,
+    authorizedNonfunctional: true,
+    authorizedExhaustion: false,
+    mayProceedToIndependentQuality: true,
+    mergeReady: true,
+  });
+  for (const gate of Object.keys(gates)) {
+    const result = evaluateReviewMergeReadiness({
+      repository,
+      pullRequest: 58,
+      currentHead: input.head,
+      currentTree: input.tree,
+      reviewState,
+      gates: { ...gates, [gate]: false },
+    });
+    assert.equal(result.clean, false);
+    assert.equal(result.authorizedNonfunctional, true);
+    assert.equal(
+      result.mayProceedToIndependentQuality,
+      gate === 'independentQualityAuditPassed',
+    );
+    assert.equal(result.mergeReady, false);
+  }
+  assert.equal(decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: reviewState.reviewRequests,
+    copilotResults: reviewState.copilotResults,
+    codexResults: reviewState.codexResults,
+    repository,
+    pullRequest: 58,
+  }).status, 'NO_REQUEST');
+  for (const [wrongRepository, wrongPullRequest] of [
+    ['franklesniak/OtherRepository', 58],
+    [repository, 59],
+  ]) {
+    assert.throws(
+      () => evaluateReviewMergeReadiness({
+        repository: wrongRepository,
+        pullRequest: wrongPullRequest,
+        currentHead: input.head,
+        currentTree: input.tree,
+        reviewState,
+        gates,
+      }),
+      /availability exception must be exact/u,
+    );
+  }
+});
+
+test('Copilot availability evidence and authority fail closed under mutation', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const copilot = nonfunctionalCopilotRequest(input);
+  const valid = compactState(input, { reviewRequests: [copilot] });
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  const semanticMutations = [
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.authority.repository = 'franklesniak/Other'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.authority.reviewInputKey = HASHES.diff2; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.authority.head = HASHES.head2; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.authority.tree = HASHES.tree2; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.authority.requestedAt = '2026-09-04T10:00:01Z'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.authority.authorizedAt = '2026-09-04T10:00:59Z'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.resultRef.databaseId = 72; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.resultRef.nodeId = 'OTHER_NODE'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.resultRef.submittedAt = '2026-09-04T10:01:01Z'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].baselineReviewNodeIds = ['71']; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].baselineReviewNodeIds = ['COPILOT_NONFUNCTIONAL_NODE']; },
+    (candidate) => { candidate.current_task.review.copilotResults.submittedReviews[0].actor = 'untrusted-reviewer[bot]'; },
+    (candidate) => { candidate.current_task.review.copilotResults.submittedReviews[0].commit_id = HASHES.head2; },
+    (candidate) => { candidate.current_task.review.copilotResults.submittedReviews[0].submittedAt = '2026-09-04T10:01:01Z'; },
+    (candidate) => { delete candidate.current_task.review.copilotResults.submittedReviews[0].node_id; },
+    (candidate) => { candidate.current_task.review.copilotResults.submittedReviews[0].databaseId = 72; },
+    (candidate) => { candidate.current_task.review.copilotResults.submittedReviews.push(structuredClone(candidate.current_task.review.copilotResults.submittedReviews[0])); },
+  ];
+  for (const mutate of semanticMutations) {
+    const invalid = structuredClone(valid);
+    mutate(invalid);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /availability exception|nonfunctional|attributable|persisted review request/u,
+    );
+  }
+
+  for (const changedBody of [
+    `${copilotNoFilesReviewedBody()}\n`,
+    `${copilotNoFilesReviewedBody()}\r`,
+    `${copilotNoFilesReviewedBody()}\nActionable finding.`,
+    "Copilot wasn't able to review any files in this pull request.",
+    'Ordinary review body with no findings.',
+  ]) {
+    const invalid = structuredClone(valid);
+    const result = invalid.current_task.review.copilotResults.submittedReviews[0];
+    result.body = changedBody;
+    invalid.current_task.review.reviewRequests[0]
+      .terminalNonfunctionalOutcome.resultRef.bodySha256 = sha256Utf8(changedBody);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /authorized nonfunctional outcome/u,
+    );
+  }
+
+  for (const mutate of [
+    (outcome) => { outcome.extra = true; },
+    (outcome) => { outcome.state = 'OTHER'; },
+    (outcome) => { outcome.resultRef.classification = 'OTHER'; },
+    (outcome) => { outcome.authority.channel = 'codex'; },
+    (outcome) => { outcome.authority.authority = ' '; },
+    (outcome) => { outcome.authority.reason = ' '; },
+  ]) {
+    const invalid = structuredClone(valid);
+    mutate(invalid.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome);
+    assert.throws(() => assertSchemaValid(invalid, schema, schema));
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /persisted review request/u,
+    );
+  }
+});
+
+test('the known no-files response cannot enter the ordinary clean-result path', () => {
+  const input = reviewInput();
+  const nonfunctional = nonfunctionalCopilotRequest(input);
+  const ordinary = structuredClone(nonfunctional);
+  const resultRef = nonfunctional.terminalNonfunctionalOutcome.resultRef;
+  delete ordinary.terminalNonfunctionalOutcome;
+  ordinary.terminalResultRef = {
+    kind: 'submitted-review',
+    id: resultRef.nodeId,
+    observedAt: resultRef.submittedAt,
+  };
+  const invalid = compactState(input, {
+    reviewRequests: [ordinary],
+    copilotResults: state(input, {
+      reviewRequests: [nonfunctional],
+    }).copilotResults,
+  });
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(invalid)),
+    /one attributable terminal result/u,
+  );
+  const gates = Object.fromEntries([
+    'exactHeadCiClean',
+    'copilotOutcomeCleanOrAuthorized',
+    'noUnresolvedActionableFindings',
+    'independentQualityAuditPassed',
+    'exactHeadFinalValidationPassed',
+    'frozenInputAccurate',
+    'mergeable',
+    'otherRequiredGatesPassed',
+  ].map((field) => [field, true]));
+  assert.throws(
+    () => evaluateReviewMergeReadiness({
+      repository: 'franklesniak/PSStyleGuide',
+      pullRequest: 182,
+      currentHead: input.head,
+      currentTree: input.tree,
+      reviewState: invalid.current_task.review,
+      gates,
+    }),
+    /one attributable terminal result/u,
+  );
+});
+
+test('availability decisions deduplicate submitted reviews by every native alias and preserve kind namespaces', () => {
+  const input = reviewInput();
+  const copilot = nonfunctionalCopilotRequest(input);
+  const codexSubmitted = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: 'CODEX_REVIEW_NODE',
+      observedAt: '2026-09-04T10:01:00Z',
+    },
+  });
+  const sharedDatabaseIdentity = state(input, {
+    reviewRequests: [copilot, codexSubmitted],
+    codexResults: {
+      submittedReviews: [{
+        id: 71,
+        node_id: 'CODEX_REVIEW_NODE',
+        actor: 'chatgpt-codex-connector[bot]',
+        commit_id: input.head,
+        submitted_at: '2026-09-04T10:01:00Z',
+      }],
+      conversationComments: [],
+    },
+  });
+  const decide = (reviewState) => decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: reviewState.reviewRequests,
+    copilotResults: reviewState.copilotResults,
+    codexResults: reviewState.codexResults,
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 182,
+  });
+  assert.throws(
+    () => decide(sharedDatabaseIdentity),
+    /terminal result is assigned to multiple requests/u,
+  );
+
+  const sharedNodeIdentity = structuredClone(sharedDatabaseIdentity);
+  sharedNodeIdentity.codexResults.submittedReviews[0].id = 72;
+  sharedNodeIdentity.codexResults.submittedReviews[0].node_id =
+    'COPILOT_NONFUNCTIONAL_NODE';
+  sharedNodeIdentity.reviewRequests[1].terminalResultRef.id =
+    'COPILOT_NONFUNCTIONAL_NODE';
+  assert.throws(
+    () => decide(sharedNodeIdentity),
+    /terminal result is assigned to multiple requests/u,
+  );
+
+  const codexComment = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'conversation-comment',
+      id: '71',
+      observedAt: '2026-09-04T10:01:00Z',
+    },
+  });
+  const differentKind = state(input, {
+    reviewRequests: [copilot, codexComment],
+  });
+  assert.equal(decide(differentKind).status, 'NO_REQUEST');
+});
+
+test('availability authority is terminal for successor ordering but never authorizes a retry', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const copilot = nonfunctionalCopilotRequest(input1);
+  const codex = requestFor(input1, 'codex', {
+    requestedAt: '2026-09-04T10:00:30Z',
+    confirmed: true,
+    terminal: true,
+  });
+  const successor = requestFor(input2, 'copilot', {
+    requestedAt: '2026-09-04T10:02:00Z',
+  });
+  const requests = [copilot, codex, successor];
+  const results = state(input2, { reviewRequests: requests });
+  const decide = (requestHistory) => decideReviewRequest({
+    previousReviewInput: input1,
+    currentReviewInput: input2,
+    mutationClass: 'CODE_OR_DIFF',
+    existingRequests: requestHistory,
+    copilotResults: results.copilotResults,
+    codexResults: results.codexResults,
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 182,
+  });
+  assert.equal(decide(requests).status, 'WAIT_FOR_CURRENT_CHANNEL');
+
+  const earlySuccessor = structuredClone(requests);
+  earlySuccessor[2].requestedAt = '2026-09-04T10:01:59.999Z';
+  assert.throws(
+    () => decide(earlySuccessor),
+    /earlier-input request to be terminal first/u,
+  );
+
+  const retry = requestFor(input1, 'copilot', {
+    channelAttempt: 2,
+    requestedAt: '2026-09-04T10:03:00Z',
+    baselineCapturedAt: '2026-09-04T10:02:30Z',
+  });
+  assert.throws(
+    () => decideReviewRequest({
+      previousReviewInput: input1,
+      currentReviewInput: input1,
+      mutationClass: 'RESULT_OR_STATE',
+      existingRequests: [copilot, retry],
+      copilotResults: results.copilotResults,
+      codexResults: results.codexResults,
+      repository: 'franklesniak/PSStyleGuide',
+      pullRequest: 182,
+    }),
+    /attempt 2 requires one confirmed attributable terminal failure/u,
+  );
+});
+
+test('legacy unconfirmed Copilot disposition remains authorized nonfunctional and not clean', () => {
+  const input = reviewInput();
+  const copilot = requestFor(input, 'copilot', {
+    terminal: true,
+    terminalDisposition: nonfunctionalDisposition(),
+  });
+  const codex = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:01:00Z',
+    confirmed: true,
+    terminal: true,
+  });
+  const reviewState = state(input, { reviewRequests: [copilot, codex] });
+  const gates = Object.fromEntries([
+    'exactHeadCiClean',
+    'copilotOutcomeCleanOrAuthorized',
+    'noUnresolvedActionableFindings',
+    'independentQualityAuditPassed',
+    'exactHeadFinalValidationPassed',
+    'frozenInputAccurate',
+    'mergeable',
+    'otherRequiredGatesPassed',
+  ].map((field) => [field, true]));
+  assert.deepEqual(evaluateReviewMergeReadiness({
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 182,
+    currentHead: input.head,
+    currentTree: input.tree,
+    reviewState,
+    gates,
+  }), {
+    reviewerState: 'authorized-nonfunctional',
+    clean: false,
+    authorizedNonfunctional: true,
+    authorizedExhaustion: false,
+    mayProceedToIndependentQuality: true,
+    mergeReady: true,
+  });
+});
+
+test('availability and Codex exhaustion authorities compose without becoming clean', () => {
+  const input = reviewInput();
+  const copilot = nonfunctionalCopilotRequest(input);
+  const first = failedCodexRequest(input);
+  const second = failedCodexRequest(input, {
+    channelAttempt: 2,
+    requestedAt: '2026-09-04T10:03:01Z',
+    baselineCapturedAt: '2026-09-04T10:02:30Z',
+    baselineConversationComments: {
+      CODEX_FAILURE_ONE: '2026-09-04T10:02:00Z',
+      CODEX_SUMMARY: '2026-09-04T10:02:01Z',
+    },
+    terminalFailureRef: terminalFailureRef({
+      id: 'CODEX_FAILURE_TWO',
+      observedAt: '2026-09-04T10:04:00Z',
+      summaryObservedAt: '2026-09-04T10:04:01Z',
+    }),
+  });
+  const third = failedCodexRequest(input, {
+    channelAttempt: 3,
+    requestedAt: '2026-09-04T10:05:01Z',
+    baselineCapturedAt: '2026-09-04T10:04:30Z',
+    baselineConversationComments: {
+      CODEX_FAILURE_ONE: '2026-09-04T10:02:00Z',
+      CODEX_FAILURE_TWO: '2026-09-04T10:04:00Z',
+      CODEX_SUMMARY: '2026-09-04T10:04:01Z',
+    },
+    terminalFailureRef: terminalFailureRef({
+      id: 'CODEX_FAILURE_THREE',
+      observedAt: '2026-09-04T10:06:00Z',
+      summaryObservedAt: '2026-09-04T10:06:01Z',
+    }),
+  });
+  const requests = [copilot, first, second, third];
+  const gates = Object.fromEntries([
+    'exactHeadCiClean',
+    'copilotOutcomeCleanOrAuthorized',
+    'noUnresolvedActionableFindings',
+    'independentQualityAuditPassed',
+    'exactHeadFinalValidationPassed',
+    'frozenInputAccurate',
+    'mergeable',
+    'otherRequiredGatesPassed',
+  ].map((field) => [field, true]));
+  const evaluate = (reviewState) => evaluateReviewMergeReadiness({
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 182,
+    currentHead: input.head,
+    currentTree: input.tree,
+    reviewState,
+    gates,
+  });
+  const blocked = state(input, { reviewRequests: requests });
+  assert.deepEqual(evaluate(blocked), {
+    reviewerState: 'exhausted-blocked',
+    clean: false,
+    authorizedNonfunctional: true,
+    authorizedExhaustion: false,
+    mayProceedToIndependentQuality: false,
+    mergeReady: false,
+  });
+
+  const authorized = state(input, {
+    reviewRequests: requests,
+    reviewerExhaustionAuthority: reviewerExhaustionAuthority(input),
+  });
+  assert.deepEqual(evaluate(authorized), {
+    reviewerState: 'authorized-nonfunctional-and-exhausted-not-clean',
+    clean: false,
+    authorizedNonfunctional: true,
+    authorizedExhaustion: true,
+    mayProceedToIndependentQuality: true,
+    mergeReady: true,
+  });
 });
 
 test('compact-state ingestion cross-validates supersessions and causal ordering', () => {
@@ -7969,6 +8563,7 @@ test('only the exact typed PR 182 authority makes exhausted-not-clean review mer
   assert.deepEqual(ready, {
     reviewerState: 'exhausted-not-clean',
     clean: false,
+    authorizedNonfunctional: false,
     authorizedExhaustion: true,
     mayProceedToIndependentQuality: true,
     mergeReady: true,
@@ -7993,6 +8588,7 @@ test('only the exact typed PR 182 authority makes exhausted-not-clean review mer
   assert.deepEqual(evaluate(unapproved), {
     reviewerState: 'exhausted-blocked',
     clean: false,
+    authorizedNonfunctional: false,
     authorizedExhaustion: false,
     mayProceedToIndependentQuality: false,
     mergeReady: false,
@@ -8181,6 +8777,7 @@ test('non-Codex gates control independent-quality progression after a clean revi
   assert.deepEqual(evaluate(allGates), {
     reviewerState: 'clean',
     clean: true,
+    authorizedNonfunctional: false,
     authorizedExhaustion: false,
     mayProceedToIndependentQuality: true,
     mergeReady: true,
@@ -8334,6 +8931,7 @@ test('a clean Codex result cannot make an incomplete Copilot pair clean', () => 
   assert.deepEqual(result, {
     reviewerState: 'incomplete',
     clean: false,
+    authorizedNonfunctional: false,
     authorizedExhaustion: false,
     mayProceedToIndependentQuality: false,
     mergeReady: false,
