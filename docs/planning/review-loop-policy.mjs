@@ -132,6 +132,10 @@ const DISALLOWED_CONTROL_PATTERN = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007
 const RFC3339_PATTERN = /^(?<year>\d{4})-(?<month>0[1-9]|1[0-2])-(?<day>0[1-9]|[12]\d|3[01])[Tt](?<hour>[01]\d|2[0-3]):(?<minute>[0-5]\d):(?<second>[0-5]\d)(?:\.(?<fraction>\d+))?(?<zone>[Zz]|(?<offsetSign>[+-])(?<offsetHour>0\d|1[0-4]):(?<offsetMinute>[0-5]\d))$/u;
 const COPILOT_NO_FILES_REVIEWED_HEADLINE =
   "Copilot wasn't able to review any files in this pull request.";
+const COPILOT_NO_FILES_REVIEWED_DEFAULT_EXCLUSIONS_BODY =
+  `${COPILOT_NO_FILES_REVIEWED_HEADLINE} ` +
+  'Check if the **Files changed** in this pull request are included in ' +
+  '[default exclusions](https://docs.github.com/en/copilot/reference/review-excluded-files).\n\n\n\n';
 const COPILOT_NO_FILES_REVIEWED_BODY_PATTERN = /^Copilot wasn't able to review any files in this pull request\.\n{6}---\n\n💡 <a href="\/(?<repository>[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)\/new\/[^"?\r\n]+\?filename=\.github\/skills\/code-review\/SKILL\.md" class="Link--inTextBlock" target="_blank" rel="noopener noreferrer">Add a `code-review` agent skill<\/a> or configure MCP servers for context-aware, tailored reviews\. <a href="https:\/\/docs\.github\.com\/copilot\/how-tos\/use-copilot-agents\/request-a-code-review\/use-code-review\?tool=webui#mcp-servers-and-agent-skills" class="Link--inTextBlock" target="_blank" rel="noopener noreferrer">Learn more in the docs\.<\/a>$/u;
 const TASK_STATES = new Set([
   'pending',
@@ -1815,10 +1819,20 @@ export function decideReviewRequest({
   }
   validateReviewChannelAttemptHistory(requests);
   validateTerminalFailureReferences(requests, codexResults);
-  if (requests.some(
+  const hasTerminalNonfunctionalOutcome = requests.some(
     (request) => Object.hasOwn(request, 'terminalNonfunctionalOutcome'),
-  )) {
+  );
+  if (
+    hasTerminalNonfunctionalOutcome ||
+    (copilotResults !== null && codexResults !== null)
+  ) {
     validateTerminalResultReferences(requests, { copilotResults, codexResults });
+  } else if (copilotResults !== null) {
+    validateTerminalResultReferences(
+      requests,
+      { copilotResults },
+      new Set(['copilot']),
+    );
   }
   validateCopilotAvailabilityAuthorities(requests, {
     repository,
@@ -3052,17 +3066,18 @@ function isKnownCopilotNoFilesReviewedBody(body, repository) {
   } catch {
     return false;
   }
-  const match = COPILOT_NO_FILES_REVIEWED_BODY_PATTERN.exec(body);
-  return match !== null &&
-    match[0] === body &&
-    match.groups?.repository === repository;
+  if (body === COPILOT_NO_FILES_REVIEWED_DEFAULT_EXCLUSIONS_BODY) {
+    return true;
+  }
+  const historicalMatch = COPILOT_NO_FILES_REVIEWED_BODY_PATTERN.exec(body);
+  return historicalMatch !== null &&
+    historicalMatch[0] === body &&
+    historicalMatch.groups?.repository === repository;
 }
 
 function hasCopilotNoFilesReviewedDeclaration(body) {
-  return typeof body === 'string' && (
-    body === COPILOT_NO_FILES_REVIEWED_HEADLINE ||
-    body.startsWith(`${COPILOT_NO_FILES_REVIEWED_HEADLINE}\n`)
-  );
+  return typeof body === 'string' &&
+    body.startsWith(COPILOT_NO_FILES_REVIEWED_HEADLINE);
 }
 
 function validateCopilotAvailabilityAuthorities(requests, {
@@ -3467,12 +3482,17 @@ function validateTerminalFailureReferences(requests, codexResults) {
   }
 }
 
-function validateTerminalResultReferences(requests, reviewState) {
+function validateTerminalResultReferences(
+  requests,
+  reviewState,
+  channels = new Set(['copilot', 'codex']),
+) {
   const resultCollections = {
     copilot: reviewState?.copilotResults,
     codex: reviewState?.codexResults,
   };
-  for (const [channel, results] of Object.entries(resultCollections)) {
+  for (const channel of channels) {
+    const results = resultCollections[channel];
     if (
       results === null ||
       typeof results !== 'object' ||
@@ -3489,7 +3509,8 @@ function validateTerminalResultReferences(requests, reviewState) {
   const immutableFailureIdentities = new Set();
   const mutableConversationIdentities = new Set();
   for (const request of requests.filter(
-    (candidate) => candidate.confirmed === true && candidate.terminal === true,
+    (candidate) => channels.has(candidate.channel) &&
+      candidate.confirmed === true && candidate.terminal === true,
   )) {
     const isFailure = Object.hasOwn(request, 'terminalFailureRef');
     const isNonfunctional = Object.hasOwn(request, 'terminalNonfunctionalOutcome');

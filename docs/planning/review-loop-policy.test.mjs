@@ -49,6 +49,12 @@ function copilotNoFilesReviewedBody(
     '<a href="https://docs.github.com/copilot/how-tos/use-copilot-agents/request-a-code-review/use-code-review?tool=webui#mcp-servers-and-agent-skills" class="Link--inTextBlock" target="_blank" rel="noopener noreferrer">Learn more in the docs.</a>';
 }
 
+function copilotDefaultExclusionsNoFilesReviewedBody() {
+  return "Copilot wasn't able to review any files in this pull request. " +
+    'Check if the **Files changed** in this pull request are included in ' +
+    '[default exclusions](https://docs.github.com/en/copilot/reference/review-excluded-files).\n\n\n\n';
+}
+
 function sha256Utf8(value) {
   return createHash('sha256').update(value, 'utf8').digest('hex');
 }
@@ -3161,22 +3167,33 @@ test('review-task terminal gates and later quality loops preserve their exact re
   assert.match(task36, /Tasks 34 and 35/u);
   assert.doesNotMatch(task36, /Tasks 34 and 25/u);
 
-  assert.match(task186, /complete 583-byte response/u);
+  assert.match(task186, /historical 583-byte skill-and-MCP footer response/u);
   assert.match(
     task186,
     /6907a12b07a48f84290ba01b6c4490ae1bb4b92cd9a6174bd50e4979afbf4213/u,
   );
+  assert.match(task186, /fixed 223-byte default-exclusions response/u);
+  assert.match(
+    task186,
+    /e5663a8860bbfb03664b8de007296238e23a4dbbeba6085d238e37e41ca3fac2/u,
+  );
   assert.match(task186, /`AUTHORIZED_NONFUNCTIONAL` with `clean: false`/u);
-  assert.match(task186, /reject the withdrawn headline-only digest/u);
+  assert.match(task186, /[Rr]eject the withdrawn headline-only digest/u);
   assert.match(
     task186,
     /explicit result `TERMINALLY CLEAN`, `AUTHORIZED_NONFUNCTIONAL`, `EXHAUSTED_NOT_CLEAN`, or `NOT CLEAN`/u,
   );
   assert.match(task187, /state `OPERATOR_AUTHORIZED_COPILOT_AVAILABILITY_EXCEPTION`/u);
   assert.match(task187, /classification `COPILOT_NO_FILES_REVIEWED`/u);
+  assert.match(task187, /complete fixed 223-byte default-exclusions body/u);
+  assert.match(
+    task187,
+    /e5663a8860bbfb03664b8de007296238e23a4dbbeba6085d238e37e41ca3fac2/u,
+  );
   assert.match(task187, /Parse and inventory the complete response as review evidence/u);
   assert.match(task187, /If both exceptions apply, verify both exact authorities/u);
   assert.match(task188, /independently revalidate its exact input-bound Copilot result and authority/u);
+  assert.match(task188, /complete fixed 223-byte default-exclusions response/u);
   assert.match(
     task188,
     /Require a clean Codex result unless the separate exact `EXHAUSTED_NOT_CLEAN` authority validates/u,
@@ -4911,6 +4928,238 @@ test('the exact PR 58 Copilot availability exception is satisfied but not clean'
       }),
       /availability exception must be exact/u,
     );
+  }
+});
+
+test('the exact default-exclusions response is authorized-nonfunctional and never clean', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const repository = 'franklesniak/PSStyleGuide';
+  const body = copilotDefaultExclusionsNoFilesReviewedBody();
+  assert.equal(Buffer.byteLength(body, 'utf8'), 223);
+  assert.equal(
+    sha256Utf8(body),
+    'e5663a8860bbfb03664b8de007296238e23a4dbbeba6085d238e37e41ca3fac2',
+  );
+
+  const copilot = nonfunctionalCopilotRequest(input, {
+    repository,
+    pullRequest: 182,
+    body,
+    databaseId: 72,
+    nodeId: 'SYNTHETIC_DEFAULT_EXCLUSIONS_RESPONSE',
+    requestedAt: '2026-09-04T10:00:00Z',
+    submittedAt: '2026-09-04T10:01:00Z',
+    authorizedAt: '2026-09-04T10:01:30Z',
+    authority: 'Synthetic test authority only; this is not a repository decision.',
+    reason: 'Exercise the exact default-exclusions response grammar.',
+    requestOverrides: {
+      readyAt: '2026-09-04T10:00:30Z',
+    },
+  });
+  const codex = requestFor(input, 'codex', {
+    requestedAt: '2026-09-04T10:02:00Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: 'SYNTHETIC_CODEX_CLEAN_AFTER_DEFAULT_EXCLUSIONS',
+      observedAt: '2026-09-04T10:03:00Z',
+    },
+  });
+  const reviewState = state(input, { reviewRequests: [copilot, codex] });
+  reviewState.copilotResults.submittedReviews[0].body = body;
+  const persisted = compactState(input, reviewState, { repository });
+  assertSchemaValid(persisted, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(persisted)), persisted);
+
+  const gates = Object.fromEntries([
+    'exactHeadCiClean',
+    'copilotOutcomeCleanOrAuthorized',
+    'noUnresolvedActionableFindings',
+    'independentQualityAuditPassed',
+    'exactHeadFinalValidationPassed',
+    'frozenInputAccurate',
+    'mergeable',
+    'otherRequiredGatesPassed',
+  ].map((field) => [field, true]));
+  const readinessArguments = {
+    repository,
+    pullRequest: 182,
+    currentHead: input.head,
+    currentTree: input.tree,
+    reviewState,
+    gates,
+  };
+  assert.deepEqual(evaluateReviewMergeReadiness(readinessArguments), {
+    reviewerState: 'authorized-nonfunctional',
+    clean: false,
+    authorizedNonfunctional: true,
+    authorizedExhaustion: false,
+    mayProceedToIndependentQuality: true,
+    mergeReady: true,
+  });
+  for (const gate of Object.keys(gates)) {
+    const result = evaluateReviewMergeReadiness({
+      ...readinessArguments,
+      gates: { ...gates, [gate]: false },
+    });
+    assert.equal(result.clean, false);
+    assert.equal(result.authorizedNonfunctional, true);
+    assert.equal(
+      result.mayProceedToIndependentQuality,
+      gate === 'independentQualityAuditPassed',
+    );
+    assert.equal(result.mergeReady, false);
+  }
+  assert.equal(decideReviewRequest({
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: reviewState.reviewRequests,
+    copilotResults: reviewState.copilotResults,
+    codexResults: reviewState.codexResults,
+    repository,
+    pullRequest: 182,
+  }).status, 'NO_REQUEST');
+
+  const ordinary = structuredClone(persisted);
+  const ordinaryCopilot = ordinary.current_task.review.reviewRequests[0];
+  const resultRef = ordinaryCopilot.terminalNonfunctionalOutcome.resultRef;
+  delete ordinaryCopilot.terminalNonfunctionalOutcome;
+  ordinaryCopilot.terminalResultRef = {
+    kind: 'submitted-review',
+    id: resultRef.nodeId,
+    observedAt: resultRef.submittedAt,
+  };
+  for (const ordinaryBody of [
+    body,
+    `${body}\n`,
+    `${body}\r`,
+    `${body}Actionable finding.`,
+    "Copilot wasn't able to review any files in this pull request. Unknown status text.",
+  ]) {
+    const invalid = structuredClone(ordinary);
+    invalid.current_task.review.copilotResults.submittedReviews[0].body = ordinaryBody;
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /one attributable terminal result/u,
+    );
+    assert.throws(
+      () => decideReviewRequest({
+        previousReviewInput: input,
+        currentReviewInput: input,
+        mutationClass: 'RESULT_OR_STATE',
+        existingRequests: invalid.current_task.review.reviewRequests,
+        copilotResults: invalid.current_task.review.copilotResults,
+        codexResults: invalid.current_task.review.codexResults,
+        repository,
+        pullRequest: 182,
+      }),
+      /one attributable terminal result/u,
+    );
+    assert.throws(
+      () => decideReviewRequest({
+        previousReviewInput: input,
+        currentReviewInput: input,
+        mutationClass: 'RESULT_OR_STATE',
+        existingRequests: invalid.current_task.review.reviewRequests,
+        copilotResults: invalid.current_task.review.copilotResults,
+        repository,
+        pullRequest: 182,
+      }),
+      /one attributable terminal result/u,
+    );
+    assert.throws(
+      () => evaluateReviewMergeReadiness({
+        repository,
+        pullRequest: 182,
+        currentHead: input.head,
+        currentTree: input.tree,
+        reviewState: invalid.current_task.review,
+        gates,
+      }),
+      /one attributable terminal result/u,
+    );
+  }
+
+  const newInputAuthority = structuredClone(persisted);
+  newInputAuthority.current_task.review.reviewRequests[0]
+    .terminalNonfunctionalOutcome.authority.reviewInputKey = getReviewInputKey(
+      reviewInput({
+        head: HASHES.head2,
+        tree: HASHES.tree2,
+        diffSha256: HASHES.diff2,
+        bodySha256: HASHES.body2,
+      }),
+    );
+  assertSchemaValid(newInputAuthority, schema, schema);
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(newInputAuthority)),
+    /persisted review request|availability exception must be exact/u,
+  );
+
+  const missingAuthority = structuredClone(persisted);
+  delete missingAuthority.current_task.review.reviewRequests[0]
+    .terminalNonfunctionalOutcome.authority.authority;
+  assert.throws(() => assertSchemaValid(missingAuthority, schema, schema));
+  assert.throws(
+    () => parseCompactStateJson(JSON.stringify(missingAuthority)),
+    /persisted review request is malformed/u,
+  );
+
+  const strictBodyMutations = [
+    `X${body}`,
+    body.slice(1),
+    body.replace('default exclusions', 'review exclusions'),
+    body.replace(
+      'https://docs.github.com/en/copilot/reference/review-excluded-files',
+      'https://docs.github.com/en/copilot/reference/other-path',
+    ),
+    body.replace('Files changed', 'Changed files'),
+    body.trimEnd(),
+    `${body}\n`,
+    `${body}\r`,
+    `${body}Additional text.`,
+  ];
+  for (const changedBody of strictBodyMutations) {
+    const invalid = structuredClone(persisted);
+    invalid.current_task.review.copilotResults.submittedReviews[0].body = changedBody;
+    invalid.current_task.review.reviewRequests[0]
+      .terminalNonfunctionalOutcome.resultRef.bodySha256 = sha256Utf8(changedBody);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /authorized nonfunctional outcome/u,
+    );
+  }
+});
+
+test('decision evidence validation preserves complete, partial, and omitted clean callers', () => {
+  const input = reviewInput();
+  const clean = state(input, { reviewRequests: pairFor(input) });
+  const baseArguments = {
+    previousReviewInput: input,
+    currentReviewInput: input,
+    mutationClass: 'RESULT_OR_STATE',
+    existingRequests: clean.reviewRequests,
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 182,
+  };
+  for (const resultArguments of [
+    {
+      copilotResults: clean.copilotResults,
+      codexResults: clean.codexResults,
+    },
+    { copilotResults: clean.copilotResults },
+    { codexResults: clean.codexResults },
+    {},
+  ]) {
+    assert.equal(decideReviewRequest({
+      ...baseArguments,
+      ...resultArguments,
+    }).status, 'NO_REQUEST');
   }
 });
 
