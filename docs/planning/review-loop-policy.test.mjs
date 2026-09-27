@@ -55,6 +55,16 @@ function copilotDefaultExclusionsNoFilesReviewedBody() {
     '[default exclusions](https://docs.github.com/en/copilot/reference/review-excluded-files).\n\n\n\n';
 }
 
+function copilotPromptBudgetErrorBody() {
+  return 'Copilot encountered an error and was unable to review this pull request. ' +
+    'You can try again by re-requesting a review.\n\n' +
+    '> [!NOTE]\n' +
+    '> This error may be related to your runner configuration. You can now configure ' +
+    'runners for Copilot code review separately from Copilot cloud agent by creating a ' +
+    '`copilot-code-review.yml` file with your setup steps. ' +
+    '[Read the docs](https://gh.io/AA11tgch) for details.';
+}
+
 function sha256Utf8(value) {
   return createHash('sha256').update(value, 'utf8').digest('hex');
 }
@@ -86,6 +96,88 @@ function terminalNonfunctionalOutcome(input, overrides = {}) {
       authorizedAt: overrides.authorizedAt ?? '2026-09-04T10:02:00Z',
       authority: overrides.authority ?? 'Repository operator authorization.',
       reason: overrides.reason ?? 'Copilot returned the recognized no-files-reviewed response.',
+      ...overrides.authorityOverrides,
+    },
+    ...overrides.outcomeOverrides,
+  };
+}
+
+function promptBudgetFailureEvidence(input, overrides = {}) {
+  return {
+    repository: overrides.repository ?? 'franklesniak/PSStyleGuide',
+    pullRequest: overrides.pullRequest ?? 208,
+    workflowRunDatabaseId: overrides.workflowRunDatabaseId ?? 81,
+    workflowRunNodeId: overrides.workflowRunNodeId ?? 'COPILOT_PROMPT_RUN_NODE',
+    workflowRunHead: input.head,
+    workflowRunAttempt: overrides.workflowRunAttempt ?? 1,
+    workflowRunName: overrides.workflowRunName ?? 'Running Copilot Code Review',
+    workflowRunPath: 'dynamic/agents/copilot-pull-request-reviewer',
+    workflowRunEvent: 'dynamic',
+    workflowActorLogin: 'Copilot',
+    workflowActorDatabaseId: 175728472,
+    workflowActorNodeId: 'BOT_kgDOCnlnWA',
+    workflowActorType: 'Bot',
+    workflowRunStatus: 'completed',
+    workflowRunConclusion: 'failure',
+    workflowRunStartedAt: overrides.workflowRunStartedAt ?? '2026-09-04T10:00:10Z',
+    workflowRunUpdatedAt: overrides.workflowRunUpdatedAt ?? '2026-09-04T10:01:20Z',
+    jobDatabaseId: overrides.jobDatabaseId ?? 82,
+    jobNodeId: overrides.jobNodeId ?? 'COPILOT_PROMPT_JOB_NODE',
+    jobRunDatabaseId: overrides.jobRunDatabaseId ??
+      overrides.workflowRunDatabaseId ?? 81,
+    jobHead: input.head,
+    jobName: 'copilot-pull-request-reviewer',
+    jobStatus: 'completed',
+    jobConclusion: 'failure',
+    jobStartedAt: overrides.jobStartedAt ?? '2026-09-04T10:00:20Z',
+    jobCompletedAt: overrides.jobCompletedAt ?? '2026-09-04T10:01:10Z',
+    failedStepNumber: overrides.failedStepNumber ?? 59,
+    failedStepName: overrides.failedStepName ?? 'Processing Request (Linux)',
+    failedStepStatus: 'completed',
+    failedStepConclusion: 'failure',
+    failedStepStartedAt: overrides.failedStepStartedAt ?? '2026-09-04T10:00:30Z',
+    failedStepCompletedAt: overrides.failedStepCompletedAt ?? '2026-09-04T10:00:50Z',
+    failureLogObservedAt: overrides.failureLogObservedAt ??
+      '2026-09-04T10:00:49.5651136Z',
+    failureCause: 'Error creating PR review request: Error: all files are too large to fit within the prompt budget',
+    maxPromptTokens: overrides.maxPromptTokens ?? 110000,
+    ...overrides.evidenceOverrides,
+  };
+}
+
+function terminalPromptBudgetOutcome(input, overrides = {}) {
+  const repository = overrides.repository ?? 'franklesniak/PSStyleGuide';
+  const pullRequest = overrides.pullRequest ?? 208;
+  const requestedAt = overrides.requestedAt ?? '2026-09-04T10:00:00Z';
+  const submittedAt = overrides.submittedAt ?? '2026-09-04T10:01:00Z';
+  const body = overrides.body ?? copilotPromptBudgetErrorBody();
+  return {
+    state: 'OPERATOR_AUTHORIZED_COPILOT_AVAILABILITY_EXCEPTION',
+    resultRef: {
+      kind: 'submitted-review',
+      classification: 'COPILOT_PROMPT_BUDGET_EXCEEDED',
+      databaseId: overrides.databaseId ?? 83,
+      nodeId: overrides.nodeId ?? 'COPILOT_PROMPT_RESULT_NODE',
+      submittedAt,
+      bodySha256: overrides.bodySha256 ?? sha256Utf8(body),
+    },
+    failureEvidence: promptBudgetFailureEvidence(input, {
+      ...overrides,
+      repository,
+      pullRequest,
+    }),
+    authority: {
+      repository,
+      pullRequest,
+      reviewInputKey: getReviewInputKey(input),
+      head: input.head,
+      tree: input.tree,
+      channel: 'copilot',
+      channelAttempt: overrides.channelAttempt ?? 1,
+      requestedAt,
+      authorizedAt: overrides.authorizedAt ?? '2026-09-04T10:02:00Z',
+      authority: overrides.authority ?? 'Repository operator standing authorization.',
+      reason: overrides.reason ?? 'Copilot exceeded its authenticated prompt budget.',
       ...overrides.authorityOverrides,
     },
     ...overrides.outcomeOverrides,
@@ -267,6 +359,23 @@ function nonfunctionalCopilotRequest(input, overrides = {}) {
   });
 }
 
+function promptBudgetCopilotRequest(input, overrides = {}) {
+  const requestedAt = overrides.requestedAt ?? '2026-09-04T10:00:00Z';
+  const channelAttempt = overrides.channelAttempt ?? 1;
+  return requestFor(input, 'copilot', {
+    channelAttempt,
+    requestedAt,
+    confirmed: true,
+    terminal: true,
+    ...overrides.requestOverrides,
+    terminalNonfunctionalOutcome: terminalPromptBudgetOutcome(input, {
+      ...overrides,
+      requestedAt,
+      channelAttempt,
+    }),
+  });
+}
+
 function resultForRequest(request) {
   const actor = request.channel === 'copilot'
     ? 'copilot-pull-request-reviewer[bot]'
@@ -293,7 +402,9 @@ function resultForRequest(request) {
         id: outcome.resultRef.databaseId,
         node_id: outcome.resultRef.nodeId,
         actor,
-        body: copilotNoFilesReviewedBody(outcome.authority.repository),
+        body: outcome.resultRef.classification === 'COPILOT_PROMPT_BUDGET_EXCEEDED'
+          ? copilotPromptBudgetErrorBody()
+          : copilotNoFilesReviewedBody(outcome.authority.repository),
         state: 'COMMENTED',
         submitted_at: outcome.resultRef.submittedAt,
         commit_id: request.head,
@@ -4927,6 +5038,325 @@ test('the exact PR 58 Copilot availability exception is satisfied but not clean'
         gates,
       }),
       /availability exception must be exact/u,
+    );
+  }
+});
+
+test('the exact PR 208 prompt-budget failure is authorized-nonfunctional and never clean', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = createReviewInput({
+    head: 'fa00dae88da046f346ef9f6eda07c8f5c1923a76',
+    tree: '62d34febe617642a574f96ce18aadaee8faa0207',
+    diffSha256: 'aab604814115710537f92b881950cb045856456681666b969352361fc304c90d',
+    bodySha256: 'bcb8d854328e9aef0886fce58e56efe44585d5ba0a6400eb3baec571474e0159',
+    scope: 'Four candidate-validator roles for PS207.',
+    behavior: 'Fail-closed candidate validation with closed adversarial evidence.',
+    risk: 'R2 security-sensitive candidate validation.',
+  });
+  const body = copilotPromptBudgetErrorBody();
+  assert.equal(Buffer.byteLength(body, 'utf8'), 397);
+  assert.equal(
+    sha256Utf8(body),
+    '53a4b0381b4d2e578bf5b1661eb5c027fb20e3883085558d4afb9a5552a423d5',
+  );
+  const copilot = promptBudgetCopilotRequest(input, {
+    pullRequest: 208,
+    databaseId: 5330817592,
+    nodeId: 'PRR_kwDOQkjdhM8AAAABPb3SOA',
+    requestedAt: '2026-09-27T15:06:26Z',
+    submittedAt: '2026-09-27T15:07:29Z',
+    authorizedAt: '2026-09-27T15:20:00Z',
+    workflowRunDatabaseId: 36328340976,
+    workflowRunNodeId: 'WFR_kwLOQkjdhM8AAAAIdVZ98A',
+    workflowRunStartedAt: '2026-09-27T15:06:36Z',
+    workflowRunUpdatedAt: '2026-09-27T15:07:33Z',
+    jobDatabaseId: 108645334784,
+    jobNodeId: 'CR_kwDOQkjdhM8AAAAZS8Q_AA',
+    jobStartedAt: '2026-09-27T15:06:41Z',
+    jobCompletedAt: '2026-09-27T15:07:32Z',
+    failedStepNumber: 59,
+    failedStepName: 'Processing Request (Linux)',
+    failedStepStartedAt: '2026-09-27T15:07:16Z',
+    failedStepCompletedAt: '2026-09-27T15:07:28Z',
+    failureLogObservedAt: '2026-09-27T15:07:27.5651136Z',
+    maxPromptTokens: 110000,
+    authority: 'Standing repository-operator authorization recorded in public issue comment 5836719401.',
+    reason: 'The exact-head Copilot run exceeded its authenticated 110000-token prompt budget.',
+    requestOverrides: {
+      readyAt: '2026-09-27T15:06:43.7601936Z',
+      attemptCount: 1,
+      baselineCapturedAt: '2026-09-27T15:05:31.8426044Z',
+    },
+  });
+  const codex = requestFor(input, 'codex', {
+    requestedAt: '2026-09-27T15:08:54Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'conversation-comment',
+      id: 'IC_kwDOQkjdhM8AAAABXRfFoA',
+      observedAt: '2026-09-27T15:13:18Z',
+    },
+  });
+  const reviewState = state(input, { reviewRequests: [copilot, codex] });
+  const persisted = compactState(input, reviewState, {
+    repository: 'franklesniak/PSStyleGuide',
+  });
+  assertSchemaValid(persisted, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(persisted)), persisted);
+
+  const gates = Object.fromEntries([
+    'exactHeadCiClean',
+    'copilotOutcomeCleanOrAuthorized',
+    'noUnresolvedActionableFindings',
+    'independentQualityAuditPassed',
+    'exactHeadFinalValidationPassed',
+    'frozenInputAccurate',
+    'mergeable',
+    'otherRequiredGatesPassed',
+  ].map((field) => [field, true]));
+  const readinessArguments = {
+    repository: 'franklesniak/PSStyleGuide',
+    pullRequest: 208,
+    currentHead: input.head,
+    currentTree: input.tree,
+    reviewState,
+    gates,
+  };
+  assert.deepEqual(evaluateReviewMergeReadiness(readinessArguments), {
+    reviewerState: 'authorized-nonfunctional',
+    clean: false,
+    authorizedNonfunctional: true,
+    authorizedExhaustion: false,
+    mayProceedToIndependentQuality: true,
+    mergeReady: true,
+  });
+  for (const gate of Object.keys(gates)) {
+    const result = evaluateReviewMergeReadiness({
+      ...readinessArguments,
+      gates: { ...gates, [gate]: false },
+    });
+    assert.equal(result.clean, false);
+    assert.equal(result.authorizedNonfunctional, true);
+    assert.equal(
+      result.mayProceedToIndependentQuality,
+      gate === 'independentQualityAuditPassed',
+    );
+    assert.equal(result.mergeReady, false);
+  }
+
+  const providerVariation = structuredClone(persisted);
+  const variedEvidence = providerVariation.current_task.review.reviewRequests[0]
+    .terminalNonfunctionalOutcome.failureEvidence;
+  variedEvidence.failedStepNumber = 60;
+  variedEvidence.maxPromptTokens = 120000;
+  assertSchemaValid(providerVariation, schema, schema);
+  assert.deepEqual(
+    parseCompactStateJson(JSON.stringify(providerVariation)),
+    providerVariation,
+  );
+});
+
+test('prompt-budget evidence and authority fail closed under adverse mutation', async () => {
+  const schema = JSON.parse(
+    await readFile(new URL('./review-loop-policy.json', import.meta.url), 'utf8'),
+  );
+  const input = reviewInput();
+  const copilot = promptBudgetCopilotRequest(input);
+  const valid = compactState(input, { reviewRequests: [copilot] });
+  assertSchemaValid(valid, schema, schema);
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+
+  const semanticMutations = [
+    (candidate) => { delete candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.resultRef.classification = 'COPILOT_NO_FILES_REVIEWED'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.resultRef.databaseId += 1; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.resultRef.nodeId = 'OTHER_RESULT'; },
+    (candidate) => { candidate.current_task.review.copilotResults.submittedReviews[0].actor = 'other-reviewer[bot]'; },
+    (candidate) => { candidate.current_task.review.copilotResults.submittedReviews[0].commit_id = HASHES.head2; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].baselineReviewRunIds = ['81']; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].baselineReviewRunIds = ['COPILOT_PROMPT_RUN_NODE']; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.repository = 'franklesniak/Other'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.pullRequest = 209; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowRunHead = HASHES.head2; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowRunPath = 'dynamic/other'; },
+    (candidate) => { delete candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowActorLogin; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowActorLogin = 'github-actions[bot]'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowActorDatabaseId = 1; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowActorDatabaseId = '175728472'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowActorNodeId = 'OTHER_NODE'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowActorNodeId = null; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowActorType = 'bot'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowRunStatus = 'in_progress'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowRunConclusion = 'success'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.jobRunDatabaseId = 999; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.jobHead = HASHES.head2; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.jobConclusion = 'success'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.failedStepNumber = 0; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.failedStepConclusion = 'success'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.failureCause += '.'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.maxPromptTokens = 0; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.failureLogObservedAt = '2026-09-04T10:00:50.1Z'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.failureEvidence.workflowRunUpdatedAt = '2026-09-04T10:00:59Z'; },
+    (candidate) => { candidate.current_task.review.reviewRequests[0].terminalNonfunctionalOutcome.authority.authorizedAt = '2026-09-04T10:01:19Z'; },
+  ];
+  for (const mutate of semanticMutations) {
+    const invalid = structuredClone(valid);
+    mutate(invalid);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /availability exception|nonfunctional|attributable|persisted review request/u,
+    );
+  }
+
+  for (const changedBody of [
+    `X${copilotPromptBudgetErrorBody()}`,
+    copilotPromptBudgetErrorBody().slice(1),
+    `${copilotPromptBudgetErrorBody()}\n`,
+    `${copilotPromptBudgetErrorBody()}Additional text.`,
+    copilotPromptBudgetErrorBody().replace('runner configuration', 'runner setup'),
+  ]) {
+    const invalid = structuredClone(valid);
+    invalid.current_task.review.copilotResults.submittedReviews[0].body = changedBody;
+    invalid.current_task.review.reviewRequests[0]
+      .terminalNonfunctionalOutcome.resultRef.bodySha256 = sha256Utf8(changedBody);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /authorized nonfunctional outcome|persisted review request/u,
+    );
+  }
+});
+
+test('prompt-budget run and job identities and successor boundaries are single-use', () => {
+  const input1 = reviewInput();
+  const input2 = reviewInput({
+    head: HASHES.head2,
+    tree: HASHES.tree2,
+    diffSha256: HASHES.diff2,
+    bodySha256: HASHES.body2,
+  });
+  const firstCopilot = promptBudgetCopilotRequest(input1);
+  const firstCodex = requestFor(input1, 'codex', {
+    requestedAt: '2026-09-04T10:02:10Z',
+    confirmed: true,
+    terminal: true,
+    terminalResultRef: {
+      kind: 'submitted-review',
+      id: 'FIRST_INPUT_CODEX_RESULT',
+      observedAt: '2026-09-04T10:03:00Z',
+    },
+  });
+  const secondCopilot = promptBudgetCopilotRequest(input2, {
+    requestedAt: '2026-09-04T10:03:30Z',
+    submittedAt: '2026-09-04T11:01:00Z',
+    authorizedAt: '2026-09-04T11:02:00Z',
+    databaseId: 183,
+    nodeId: 'SECOND_PROMPT_RESULT_NODE',
+    workflowRunDatabaseId: 181,
+    workflowRunNodeId: 'SECOND_PROMPT_RUN_NODE',
+    workflowRunStartedAt: '2026-09-04T11:00:10Z',
+    workflowRunUpdatedAt: '2026-09-04T11:01:20Z',
+    jobDatabaseId: 182,
+    jobNodeId: 'SECOND_PROMPT_JOB_NODE',
+    jobStartedAt: '2026-09-04T11:00:20Z',
+    jobCompletedAt: '2026-09-04T11:01:10Z',
+    failedStepStartedAt: '2026-09-04T11:00:30Z',
+    failedStepCompletedAt: '2026-09-04T11:00:50Z',
+    failureLogObservedAt: '2026-09-04T11:00:49.5651136Z',
+  });
+  const valid = compactState(input2, {
+    reviewRequests: [firstCopilot, firstCodex, secondCopilot],
+  }, { head: input2.head });
+  assert.deepEqual(parseCompactStateJson(JSON.stringify(valid)), valid);
+  const decide = (candidate) => {
+    const reviewState = candidate.current_task.review;
+    return decideReviewRequest({
+      previousReviewInput: input2,
+      currentReviewInput: input2,
+      mutationClass: 'RESULT_OR_STATE',
+      existingRequests: reviewState.reviewRequests,
+      copilotResults: reviewState.copilotResults,
+      codexResults: reviewState.codexResults,
+      repository: 'franklesniak/PSStyleGuide',
+      pullRequest: 208,
+    });
+  };
+
+  const firstEvidence = firstCopilot.terminalNonfunctionalOutcome.failureEvidence;
+  for (const mutate of [
+    (evidence) => {
+      evidence.workflowRunDatabaseId = firstEvidence.workflowRunDatabaseId;
+      evidence.jobRunDatabaseId = firstEvidence.workflowRunDatabaseId;
+    },
+    (evidence) => { evidence.workflowRunNodeId = firstEvidence.workflowRunNodeId; },
+    (evidence) => { evidence.jobDatabaseId = firstEvidence.jobDatabaseId; },
+    (evidence) => { evidence.jobNodeId = firstEvidence.jobNodeId; },
+  ]) {
+    const invalid = structuredClone(valid);
+    mutate(invalid.current_task.review.reviewRequests[2]
+      .terminalNonfunctionalOutcome.failureEvidence);
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /workflow run or job is assigned to multiple requests/u,
+    );
+  }
+
+  const runAfterSuccessor = structuredClone(valid);
+  const lateRunOutcome = runAfterSuccessor.current_task.review.reviewRequests[0]
+    .terminalNonfunctionalOutcome;
+  lateRunOutcome.failureEvidence.workflowRunUpdatedAt = '2026-09-04T10:03:31Z';
+  lateRunOutcome.authority.authorizedAt = '2026-09-04T10:03:32Z';
+  assert.throws(
+    () => decide(runAfterSuccessor),
+    /attributable terminal result/u,
+  );
+
+  const resultAfterSuccessor = structuredClone(valid);
+  const lateResultRequest = resultAfterSuccessor.current_task.review.reviewRequests[0];
+  const lateResultOutcome = lateResultRequest.terminalNonfunctionalOutcome;
+  lateResultOutcome.resultRef.submittedAt = '2026-09-04T10:03:31Z';
+  lateResultOutcome.failureEvidence.jobCompletedAt = '2026-09-04T10:03:32Z';
+  lateResultOutcome.failureEvidence.workflowRunUpdatedAt = '2026-09-04T10:03:33Z';
+  lateResultOutcome.authority.authorizedAt = '2026-09-04T10:03:34Z';
+  resultAfterSuccessor.current_task.review.copilotResults.submittedReviews
+    .find((result) => result.node_id === lateResultOutcome.resultRef.nodeId)
+    .submitted_at = lateResultOutcome.resultRef.submittedAt;
+  assert.throws(
+    () => decide(resultAfterSuccessor),
+    /attributable terminal result/u,
+  );
+});
+
+test('a Copilot service-error declaration cannot enter the ordinary clean-result path', () => {
+  const input = reviewInput();
+  const nonfunctional = promptBudgetCopilotRequest(input);
+  const ordinary = structuredClone(nonfunctional);
+  const resultRef = nonfunctional.terminalNonfunctionalOutcome.resultRef;
+  delete ordinary.terminalNonfunctionalOutcome;
+  ordinary.terminalResultRef = {
+    kind: 'submitted-review',
+    id: resultRef.nodeId,
+    observedAt: resultRef.submittedAt,
+  };
+  const results = state(input, {
+    reviewRequests: [nonfunctional],
+  }).copilotResults;
+  for (const body of [
+    copilotPromptBudgetErrorBody(),
+    `Prefix text.\n${copilotPromptBudgetErrorBody()}`,
+    `${copilotPromptBudgetErrorBody()}\nAppended text.`,
+  ]) {
+    const invalidResults = structuredClone(results);
+    invalidResults.submittedReviews[0].body = body;
+    const invalid = compactState(input, {
+      reviewRequests: [ordinary],
+      copilotResults: invalidResults,
+    });
+    assert.throws(
+      () => parseCompactStateJson(JSON.stringify(invalid)),
+      /one attributable terminal result/u,
     );
   }
 });

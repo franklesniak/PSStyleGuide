@@ -137,6 +137,19 @@ const COPILOT_NO_FILES_REVIEWED_DEFAULT_EXCLUSIONS_BODY =
   'Check if the **Files changed** in this pull request are included in ' +
   '[default exclusions](https://docs.github.com/en/copilot/reference/review-excluded-files).\n\n\n\n';
 const COPILOT_NO_FILES_REVIEWED_BODY_PATTERN = /^Copilot wasn't able to review any files in this pull request\.\n{6}---\n\n💡 <a href="\/(?<repository>[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+)\/new\/[^"?\r\n]+\?filename=\.github\/skills\/code-review\/SKILL\.md" class="Link--inTextBlock" target="_blank" rel="noopener noreferrer">Add a `code-review` agent skill<\/a> or configure MCP servers for context-aware, tailored reviews\. <a href="https:\/\/docs\.github\.com\/copilot\/how-tos\/use-copilot-agents\/request-a-code-review\/use-code-review\?tool=webui#mcp-servers-and-agent-skills" class="Link--inTextBlock" target="_blank" rel="noopener noreferrer">Learn more in the docs\.<\/a>$/u;
+const COPILOT_SERVICE_ERROR_HEADLINE =
+  'Copilot encountered an error and was unable to review this pull request.';
+const COPILOT_PROMPT_BUDGET_ERROR_BODY =
+  `${COPILOT_SERVICE_ERROR_HEADLINE} You can try again by re-requesting a review.\n\n` +
+  '> [!NOTE]\n' +
+  '> This error may be related to your runner configuration. You can now configure ' +
+  'runners for Copilot code review separately from Copilot cloud agent by creating a ' +
+  '`copilot-code-review.yml` file with your setup steps. ' +
+  '[Read the docs](https://gh.io/AA11tgch) for details.';
+const COPILOT_PROMPT_BUDGET_ERROR_BODY_SHA256 =
+  '53a4b0381b4d2e578bf5b1661eb5c027fb20e3883085558d4afb9a5552a423d5';
+const COPILOT_PROMPT_BUDGET_FAILURE_CAUSE =
+  'Error creating PR review request: Error: all files are too large to fit within the prompt budget';
 const TASK_STATES = new Set([
   'pending',
   'active',
@@ -254,9 +267,16 @@ const REVIEWER_EXHAUSTION_AUTHORITY_FIELDS = Object.freeze([
 const COPILOT_AVAILABILITY_EXCEPTION_STATE =
   'OPERATOR_AUTHORIZED_COPILOT_AVAILABILITY_EXCEPTION';
 const COPILOT_NONFUNCTIONAL_CLASSIFICATION = 'COPILOT_NO_FILES_REVIEWED';
+const COPILOT_PROMPT_BUDGET_CLASSIFICATION = 'COPILOT_PROMPT_BUDGET_EXCEEDED';
 const TERMINAL_NONFUNCTIONAL_OUTCOME_FIELDS = Object.freeze([
   'state',
   'resultRef',
+  'authority',
+]);
+const TERMINAL_PROMPT_BUDGET_OUTCOME_FIELDS = Object.freeze([
+  'state',
+  'resultRef',
+  'failureEvidence',
   'authority',
 ]);
 const TERMINAL_NONFUNCTIONAL_RESULT_REF_FIELDS = Object.freeze([
@@ -279,6 +299,43 @@ const COPILOT_AVAILABILITY_AUTHORITY_FIELDS = Object.freeze([
   'authorizedAt',
   'authority',
   'reason',
+]);
+const COPILOT_PROMPT_BUDGET_FAILURE_EVIDENCE_FIELDS = Object.freeze([
+  'repository',
+  'pullRequest',
+  'workflowRunDatabaseId',
+  'workflowRunNodeId',
+  'workflowRunHead',
+  'workflowRunAttempt',
+  'workflowRunName',
+  'workflowRunPath',
+  'workflowRunEvent',
+  'workflowActorLogin',
+  'workflowActorDatabaseId',
+  'workflowActorNodeId',
+  'workflowActorType',
+  'workflowRunStatus',
+  'workflowRunConclusion',
+  'workflowRunStartedAt',
+  'workflowRunUpdatedAt',
+  'jobDatabaseId',
+  'jobNodeId',
+  'jobRunDatabaseId',
+  'jobHead',
+  'jobName',
+  'jobStatus',
+  'jobConclusion',
+  'jobStartedAt',
+  'jobCompletedAt',
+  'failedStepNumber',
+  'failedStepName',
+  'failedStepStatus',
+  'failedStepConclusion',
+  'failedStepStartedAt',
+  'failedStepCompletedAt',
+  'failureLogObservedAt',
+  'failureCause',
+  'maxPromptTokens',
 ]);
 const MERGE_READINESS_GATE_FIELDS = Object.freeze([
   'exactHeadCiClean',
@@ -2983,7 +3040,10 @@ function isTerminalNonfunctionalResultRef(reference) {
       (field) => Object.hasOwn(reference, field),
     ) &&
     reference.kind === 'submitted-review' &&
-    reference.classification === COPILOT_NONFUNCTIONAL_CLASSIFICATION &&
+    (
+      reference.classification === COPILOT_NONFUNCTIONAL_CLASSIFICATION ||
+      reference.classification === COPILOT_PROMPT_BUDGET_CLASSIFICATION
+    ) &&
     Number.isSafeInteger(reference.databaseId) &&
     reference.databaseId > 0 &&
     isNonemptyTransportText(reference.nodeId) &&
@@ -2991,6 +3051,96 @@ function isTerminalNonfunctionalResultRef(reference) {
     getItemTimestamp(reference, ['submittedAt']) !== null &&
     typeof reference.bodySha256 === 'string' &&
     SHA256_PATTERN.test(reference.bodySha256);
+}
+
+function isCopilotPromptBudgetFailureEvidence(evidence, outcome, request) {
+  if (
+    evidence === null ||
+    typeof evidence !== 'object' ||
+    Array.isArray(evidence) ||
+    Object.keys(evidence).length !== COPILOT_PROMPT_BUDGET_FAILURE_EVIDENCE_FIELDS.length ||
+    COPILOT_PROMPT_BUDGET_FAILURE_EVIDENCE_FIELDS.some(
+      (field) => !Object.hasOwn(evidence, field),
+    )
+  ) {
+    return false;
+  }
+
+  const times = {
+    requested: getItemTimestamp(request, ['requestedAt']),
+    runStarted: getItemTimestamp(evidence, ['workflowRunStartedAt']),
+    runUpdated: getItemTimestamp(evidence, ['workflowRunUpdatedAt']),
+    jobStarted: getItemTimestamp(evidence, ['jobStartedAt']),
+    jobCompleted: getItemTimestamp(evidence, ['jobCompletedAt']),
+    stepStarted: getItemTimestamp(evidence, ['failedStepStartedAt']),
+    stepCompleted: getItemTimestamp(evidence, ['failedStepCompletedAt']),
+    logObserved: getItemTimestamp(evidence, ['failureLogObservedAt']),
+    submitted: getItemTimestamp(outcome.resultRef, ['submittedAt']),
+    authorized: getItemTimestamp(outcome.authority, ['authorizedAt']),
+  };
+  if (Object.values(times).some((value) => value === null)) {
+    return false;
+  }
+  const orderedTimes = [
+    ['request', times.requested, 'workflow run start', times.runStarted],
+    ['workflow run start', times.runStarted, 'job start', times.jobStarted],
+    ['job start', times.jobStarted, 'failed step start', times.stepStarted],
+    ['failed step start', times.stepStarted, 'failure log observation', times.logObserved],
+    ['failure log observation', times.logObserved, 'failed step completion', times.stepCompleted],
+    ['failed step completion', times.stepCompleted, 'submitted review', times.submitted],
+    ['submitted review', times.submitted, 'job completion', times.jobCompleted],
+    ['job completion', times.jobCompleted, 'workflow run update', times.runUpdated],
+    ['workflow run update', times.runUpdated, 'availability authorization', times.authorized],
+  ];
+  if (orderedTimes.some(([leftLabel, left, rightLabel, right]) =>
+    compareRfc3339Instants(left, right, leftLabel, rightLabel) > 0)) {
+    return false;
+  }
+
+  const positiveIntegerWithin = (value, maximum) =>
+    Number.isSafeInteger(value) && value > 0 && value <= maximum;
+  const boundedIdentity = (value) =>
+    isNonemptyTransportText(value) && value.length <= 256;
+  const workflowActor = {
+    actor: {
+      login: evidence.workflowActorLogin,
+      id: evidence.workflowActorDatabaseId,
+      node_id: evidence.workflowActorNodeId,
+      type: evidence.workflowActorType,
+    },
+  };
+  return evidence.repository === outcome.authority.repository &&
+    evidence.pullRequest === outcome.authority.pullRequest &&
+    positiveIntegerWithin(evidence.workflowRunDatabaseId, Number.MAX_SAFE_INTEGER) &&
+    boundedIdentity(evidence.workflowRunNodeId) &&
+    evidence.workflowRunHead === request.head &&
+    positiveIntegerWithin(evidence.workflowRunAttempt, 1_000) &&
+    isNonemptyTransportText(evidence.workflowRunName) &&
+    evidence.workflowRunPath === 'dynamic/agents/copilot-pull-request-reviewer' &&
+    evidence.workflowRunEvent === 'dynamic' &&
+    isNonemptyTransportText(evidence.workflowActorLogin) &&
+    positiveIntegerWithin(
+      evidence.workflowActorDatabaseId,
+      Number.MAX_SAFE_INTEGER,
+    ) &&
+    boundedIdentity(evidence.workflowActorNodeId) &&
+    evidence.workflowActorType === 'Bot' &&
+    isCopilotIdentity(workflowActor) &&
+    evidence.workflowRunStatus === 'completed' &&
+    evidence.workflowRunConclusion === 'failure' &&
+    positiveIntegerWithin(evidence.jobDatabaseId, Number.MAX_SAFE_INTEGER) &&
+    boundedIdentity(evidence.jobNodeId) &&
+    evidence.jobRunDatabaseId === evidence.workflowRunDatabaseId &&
+    evidence.jobHead === request.head &&
+    evidence.jobName === 'copilot-pull-request-reviewer' &&
+    evidence.jobStatus === 'completed' &&
+    evidence.jobConclusion === 'failure' &&
+    positiveIntegerWithin(evidence.failedStepNumber, 10_000) &&
+    isNonemptyTransportText(evidence.failedStepName) &&
+    evidence.failedStepStatus === 'completed' &&
+    evidence.failedStepConclusion === 'failure' &&
+    evidence.failureCause === COPILOT_PROMPT_BUDGET_FAILURE_CAUSE &&
+    positiveIntegerWithin(evidence.maxPromptTokens, 100_000_000);
 }
 
 function isCopilotAvailabilityAuthorityForRequest(authority, request, resultRef) {
@@ -3041,20 +3191,36 @@ function isCopilotAvailabilityAuthorityForRequest(authority, request, resultRef)
 }
 
 function isCopilotTerminalNonfunctionalOutcome(outcome, request) {
-  return outcome !== null &&
+  if (outcome === null ||
     typeof outcome === 'object' &&
-    !Array.isArray(outcome) &&
-    Object.keys(outcome).length === TERMINAL_NONFUNCTIONAL_OUTCOME_FIELDS.length &&
-    TERMINAL_NONFUNCTIONAL_OUTCOME_FIELDS.every(
-      (field) => Object.hasOwn(outcome, field),
-    ) &&
-    outcome.state === COPILOT_AVAILABILITY_EXCEPTION_STATE &&
-    isTerminalNonfunctionalResultRef(outcome.resultRef) &&
-    isCopilotAvailabilityAuthorityForRequest(
+    Array.isArray(outcome)) {
+    return false;
+  }
+  if (
+    typeof outcome !== 'object' ||
+    outcome.state !== COPILOT_AVAILABILITY_EXCEPTION_STATE ||
+    !isTerminalNonfunctionalResultRef(outcome.resultRef) ||
+    !isCopilotAvailabilityAuthorityForRequest(
       outcome.authority,
       request,
       outcome.resultRef,
-    );
+    )
+  ) {
+    return false;
+  }
+  if (outcome.resultRef.classification === COPILOT_NONFUNCTIONAL_CLASSIFICATION) {
+    return Object.keys(outcome).length === TERMINAL_NONFUNCTIONAL_OUTCOME_FIELDS.length &&
+      TERMINAL_NONFUNCTIONAL_OUTCOME_FIELDS.every(
+        (field) => Object.hasOwn(outcome, field),
+      );
+  }
+  return Object.keys(outcome).length === TERMINAL_PROMPT_BUDGET_OUTCOME_FIELDS.length &&
+    TERMINAL_PROMPT_BUDGET_OUTCOME_FIELDS.every(
+      (field) => Object.hasOwn(outcome, field),
+    ) &&
+    outcome.resultRef.classification === COPILOT_PROMPT_BUDGET_CLASSIFICATION &&
+    outcome.resultRef.bodySha256 === COPILOT_PROMPT_BUDGET_ERROR_BODY_SHA256 &&
+    isCopilotPromptBudgetFailureEvidence(outcome.failureEvidence, outcome, request);
 }
 
 function isKnownCopilotNoFilesReviewedBody(body, repository) {
@@ -3078,6 +3244,14 @@ function isKnownCopilotNoFilesReviewedBody(body, repository) {
 function hasCopilotNoFilesReviewedDeclaration(body) {
   return typeof body === 'string' &&
     body.startsWith(COPILOT_NO_FILES_REVIEWED_HEADLINE);
+}
+
+function isKnownCopilotPromptBudgetErrorBody(body) {
+  return body === COPILOT_PROMPT_BUDGET_ERROR_BODY;
+}
+
+function hasCopilotServiceErrorDeclaration(body) {
+  return typeof body === 'string' && body.includes(COPILOT_SERVICE_ERROR_HEADLINE);
 }
 
 function validateCopilotAvailabilityAuthorities(requests, {
@@ -3233,7 +3407,10 @@ function isReferencedTerminalResult(result, request, reference, requests) {
       identities.every((identity) => !baselines.has(identity)) &&
       !(
         request.channel === 'copilot' &&
-        hasCopilotNoFilesReviewedDeclaration(result.body)
+        (
+          hasCopilotNoFilesReviewedDeclaration(result.body) ||
+          hasCopilotServiceErrorDeclaration(result.body)
+        )
       );
   }
 
@@ -3289,11 +3466,13 @@ function isReferencedTerminalNonfunctionalResult(result, request, outcome, reque
     reference.nodeId,
   ]);
   const baselines = new Set(request.baselineReviewNodeIds);
+  const runBaselines = new Set(request.baselineReviewRunIds);
   const nextDifferentInputTime = getNextDifferentInputRequestTime(request, requests);
+  const nextSameChannelTime = getNextSameChannelRequestTime(request, requests);
   const bodyHash = typeof result?.body === 'string'
     ? createHash('sha256').update(result.body, 'utf8').digest('hex')
     : null;
-  return request.channel === 'copilot' &&
+  const commonResultMatches = request.channel === 'copilot' &&
     isCopilotTerminalNonfunctionalOutcome(outcome, request) &&
     requestTime !== null &&
     submittedTime !== null &&
@@ -3324,11 +3503,42 @@ function isReferencedTerminalNonfunctionalResult(result, request, outcome, reque
     identities.every((identity) => !baselines.has(identity)) &&
     isResultActorForChannel(result, 'copilot') &&
     getCommitOid(result) === request.head &&
-    bodyHash === reference.bodySha256 &&
-    isKnownCopilotNoFilesReviewedBody(
+    bodyHash === reference.bodySha256;
+  if (!commonResultMatches) {
+    return false;
+  }
+  if (reference.classification === COPILOT_NONFUNCTIONAL_CLASSIFICATION) {
+    return isKnownCopilotNoFilesReviewedBody(
       result.body,
       outcome.authority.repository,
     );
+  }
+
+  const evidence = outcome.failureEvidence;
+  const runIdentities = [
+    String(evidence.workflowRunDatabaseId),
+    evidence.workflowRunNodeId,
+  ];
+  const runUpdatedAt = getItemTimestamp(evidence, ['workflowRunUpdatedAt']);
+  const withinBoundary = (boundary) => boundary === null || (
+    compareRfc3339Instants(
+      submittedTime,
+      boundary,
+      'prompt-budget result submittedAt',
+      'successor requestedAt',
+    ) <= 0 &&
+    compareRfc3339Instants(
+      runUpdatedAt,
+      boundary,
+      'prompt-budget workflow run updatedAt',
+      'successor requestedAt',
+    ) <= 0
+  );
+  return reference.classification === COPILOT_PROMPT_BUDGET_CLASSIFICATION &&
+    isKnownCopilotPromptBudgetErrorBody(result.body) &&
+    runIdentities.every((identity) => !runBaselines.has(identity)) &&
+    withinBoundary(nextSameChannelTime) &&
+    withinBoundary(nextDifferentInputTime);
 }
 
 function isReferencedTerminalFailure(result, request, reference, requests) {
@@ -3505,6 +3715,7 @@ function validateTerminalResultReferences(
   }
 
   const seenImmutableResultIdentities = new Set();
+  const seenNonfunctionalEvidenceIdentities = new Set();
   const seenMutableConversationResultOccurrences = new Set();
   const immutableFailureIdentities = new Set();
   const mutableConversationIdentities = new Set();
@@ -3543,6 +3754,28 @@ function validateTerminalResultReferences(
     }
     const result = matches[0];
     const resultIdentities = getItemIdentities(result);
+    if (
+      isNonfunctional &&
+      reference.classification === COPILOT_PROMPT_BUDGET_CLASSIFICATION
+    ) {
+      const evidence = request.terminalNonfunctionalOutcome.failureEvidence;
+      const evidenceIdentities = [
+        `workflow-run:${evidence.workflowRunDatabaseId}`,
+        `workflow-run:${evidence.workflowRunNodeId}`,
+        `workflow-job:${evidence.jobDatabaseId}`,
+        `workflow-job:${evidence.jobNodeId}`,
+      ];
+      if (evidenceIdentities.some(
+        (identity) => seenNonfunctionalEvidenceIdentities.has(identity),
+      )) {
+        throw new TypeError(
+          'A prompt-budget workflow run or job is assigned to multiple requests.',
+        );
+      }
+      evidenceIdentities.forEach(
+        (identity) => seenNonfunctionalEvidenceIdentities.add(identity),
+      );
+    }
     const isMutableConversationResult = !isFailure && !isNonfunctional &&
       reference.kind === 'conversation-comment';
     if (isMutableConversationResult) {

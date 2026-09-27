@@ -818,10 +818,46 @@
         "resultRef": {
           "$ref": "#/$defs/terminalNonfunctionalResultRef"
         },
+        "failureEvidence": {
+          "$ref": "#/$defs/copilotPromptBudgetFailureEvidence"
+        },
         "authority": {
           "$ref": "#/$defs/copilotAvailabilityAuthority"
         }
-      }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "resultRef": {
+                "properties": {
+                  "classification": {
+                    "const": "COPILOT_PROMPT_BUDGET_EXCEEDED"
+                  }
+                },
+                "required": [
+                  "classification"
+                ]
+              }
+            },
+            "required": [
+              "resultRef"
+            ]
+          },
+          "then": {
+            "required": [
+              "failureEvidence"
+            ]
+          },
+          "else": {
+            "not": {
+              "required": [
+                "failureEvidence"
+              ]
+            }
+          }
+        }
+      ]
     },
     "terminalNonfunctionalResultRef": {
       "type": "object",
@@ -839,7 +875,10 @@
           "const": "submitted-review"
         },
         "classification": {
-          "const": "COPILOT_NO_FILES_REVIEWED"
+          "enum": [
+            "COPILOT_NO_FILES_REVIEWED",
+            "COPILOT_PROMPT_BUDGET_EXCEEDED"
+          ]
         },
         "databaseId": {
           "type": "integer",
@@ -854,6 +893,176 @@
         },
         "bodySha256": {
           "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "copilotPromptBudgetFailureEvidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "pullRequest",
+        "workflowRunDatabaseId",
+        "workflowRunNodeId",
+        "workflowRunHead",
+        "workflowRunAttempt",
+        "workflowRunName",
+        "workflowRunPath",
+        "workflowRunEvent",
+        "workflowActorLogin",
+        "workflowActorDatabaseId",
+        "workflowActorNodeId",
+        "workflowActorType",
+        "workflowRunStatus",
+        "workflowRunConclusion",
+        "workflowRunStartedAt",
+        "workflowRunUpdatedAt",
+        "jobDatabaseId",
+        "jobNodeId",
+        "jobRunDatabaseId",
+        "jobHead",
+        "jobName",
+        "jobStatus",
+        "jobConclusion",
+        "jobStartedAt",
+        "jobCompletedAt",
+        "failedStepNumber",
+        "failedStepName",
+        "failedStepStatus",
+        "failedStepConclusion",
+        "failedStepStartedAt",
+        "failedStepCompletedAt",
+        "failureLogObservedAt",
+        "failureCause",
+        "maxPromptTokens"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "pullRequest": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "workflowRunDatabaseId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "workflowRunNodeId": {
+          "$ref": "#/$defs/terminalEvidenceIdentity"
+        },
+        "workflowRunHead": {
+          "$ref": "#/$defs/sha1"
+        },
+        "workflowRunAttempt": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1000
+        },
+        "workflowRunName": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "workflowRunPath": {
+          "const": "dynamic/agents/copilot-pull-request-reviewer"
+        },
+        "workflowRunEvent": {
+          "const": "dynamic"
+        },
+        "workflowActorLogin": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "workflowActorDatabaseId": {
+          "const": 175728472
+        },
+        "workflowActorNodeId": {
+          "const": "BOT_kgDOCnlnWA"
+        },
+        "workflowActorType": {
+          "const": "Bot"
+        },
+        "workflowRunStatus": {
+          "const": "completed"
+        },
+        "workflowRunConclusion": {
+          "const": "failure"
+        },
+        "workflowRunStartedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "workflowRunUpdatedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "jobDatabaseId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "jobNodeId": {
+          "$ref": "#/$defs/terminalEvidenceIdentity"
+        },
+        "jobRunDatabaseId": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 9007199254740991
+        },
+        "jobHead": {
+          "$ref": "#/$defs/sha1"
+        },
+        "jobName": {
+          "const": "copilot-pull-request-reviewer"
+        },
+        "jobStatus": {
+          "const": "completed"
+        },
+        "jobConclusion": {
+          "const": "failure"
+        },
+        "jobStartedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "jobCompletedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "failedStepNumber": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10000
+        },
+        "failedStepName": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "\\S"
+        },
+        "failedStepStatus": {
+          "const": "completed"
+        },
+        "failedStepConclusion": {
+          "const": "failure"
+        },
+        "failedStepStartedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "failedStepCompletedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "failureLogObservedAt": {
+          "$ref": "#/$defs/rfc3339"
+        },
+        "failureCause": {
+          "const": "Error creating PR review request: Error: all files are too large to fit within the prompt budget"
+        },
+        "maxPromptTokens": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100000000
         }
       }
     },
