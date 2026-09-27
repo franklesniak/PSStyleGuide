@@ -7,8 +7,8 @@ Runs the permanent adversarial style-guide candidate validation suite.
 .DESCRIPTION
 Authenticates the fixed helper and context-manager blobs against HEAD, the
 stage-0 index, and the no-filter working object before loading them. It then
-executes the versioned 115-case catalog and emits one bounded canonical JSONL
-result per catalog row.
+executes the versioned 465-case catalog and emits one bounded canonical JSONL
+result per catalog row, plus two separately identified harness proof records.
 
 .PARAMETER HelperPath
 Specifies the raw, fixed path claim for the candidate-expansion helper.
@@ -31,7 +31,7 @@ None. You can't pipe objects to this script.
 stream. The process exit code reports the aggregate result.
 
 .NOTES
-Version: 1.0.20260811.0
+Version: 1.0.20260927.0
 #>
 
 [CmdletBinding(PositionalBinding = $false)]
@@ -53,12 +53,12 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:versionCandidateHarness = [System.Version]'1.0.20260811.0'
+$script:versionCandidateHarness = [System.Version]'1.0.20260927.0'
 $script:objCandidateHelperPathClaim = $HelperPath
 $script:objCandidateContextManagerPathClaim = $ContextManagerPath
-$script:strCandidateExpectedHelperVersion = '1.0.20260811.0'
-$script:strCandidateExpectedContextVersion = '1.0.20260811.0'
-$script:strCandidateCatalogVersion = '1.0.20260805.1'
+$script:strCandidateExpectedHelperVersion = '1.0.20260926.0'
+$script:strCandidateExpectedContextVersion = '1.0.20260926.0'
+$script:strCandidateCatalogVersion = '1.0.20260927.0'
 # The documented ceiling on what an authenticated native query may return, the
 # buffer each pipe is read into, and how long a killed child is given to let its
 # outstanding read finish.
@@ -68,8 +68,8 @@ $script:intCandidateNativeDrainMilliseconds = 10000
 # The physical allocation size, stated once. It was previously two bare literals
 # inside the header check, which is why growing the catalog failed with an
 # unhelpful 'header' detail rather than naming the count.
-$script:intCandidateCaseCount = 115
-$script:strCandidateAllocationSha256 = '1670cdfcfdd2c7c22ca21b4ace19f59cd7bdb104d2503d8791b8639a28918c0e'
+$script:intCandidateCaseCount = 465
+$script:strCandidateAllocationSha256 = '864d5f8c40e824cd6beae05e2ac8e5db78030d2d654110250edef08c4325b437'
 $script:strCandidateHelperRelativePath = '.github/workflows/Expand-StyleGuideCandidateArtifact.ps1'
 $script:strCandidateContextRelativePath = '.github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1'
 $script:strCandidateCatalogRelativePath = '.github/workflows/style-guide-candidate-cases.json'
@@ -84,35 +84,33 @@ $script:arrCandidateComputedDiagnosticPhase = [string[]]@(
     'archive', 'containment', 'destination', 'digest', 'download',
     'extraction', 'manifest', 'parameter', 'post-extraction', 'root'
 )
-$script:hashtableCandidateSubreasonFamily = [ordered]@{
-    type = [string[]]@(
-        'ArtifactId', 'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory',
-        'ExpectedDigest', 'RunAttempt', 'RunId', 'TrustedTemporaryRoot'
+$script:hashtableTerraformSubreasonFamily = @{
+    'ParameterName-type' = [string[]]@(
+        'ArtifactId-type', 'CandidateDirectory-type', 'CheckoutRoot-type', 'DownloadDirectory-type', 'ExpectedDigest-type', 'RunAttempt-type', 'RunId-type', 'TrustedTemporaryRoot-type'
     )
-    empty = [string[]]@(
-        'ArtifactId', 'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory',
-        'ExpectedDigest', 'RunAttempt', 'RunId', 'TrustedTemporaryRoot'
+    'ParameterName-length' = [string[]]@(
+        'ArtifactId-length', 'CandidateDirectory-length', 'CheckoutRoot-length', 'DownloadDirectory-length', 'ExpectedDigest-length', 'RunAttempt-length', 'RunId-length', 'TrustedTemporaryRoot-length'
     )
-    control = [string[]]@(
-        'ArtifactId', 'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory',
-        'ExpectedDigest', 'RunAttempt', 'RunId', 'TrustedTemporaryRoot'
+    'ParameterName-empty' = [string[]]@(
+        'ArtifactId-empty', 'CandidateDirectory-empty', 'CheckoutRoot-empty', 'DownloadDirectory-empty', 'ExpectedDigest-empty', 'RunAttempt-empty', 'RunId-empty', 'TrustedTemporaryRoot-empty'
     )
-    length = [string[]]@('ArtifactId', 'RunAttempt', 'RunId')
-    wildcard = [string[]]@(
-        'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory', 'TrustedTemporaryRoot'
+    'ParameterName-control' = [string[]]@(
+        'ArtifactId-control', 'CandidateDirectory-control', 'CheckoutRoot-control', 'DownloadDirectory-control', 'ExpectedDigest-control', 'RunAttempt-control', 'RunId-control', 'TrustedTemporaryRoot-control'
     )
-    provider = [string[]]@(
-        'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory', 'TrustedTemporaryRoot'
+    'ParameterName-wildcard' = [string[]]@(
+        'CandidateDirectory-wildcard', 'CheckoutRoot-wildcard', 'DownloadDirectory-wildcard', 'TrustedTemporaryRoot-wildcard'
     )
-    relative = [string[]]@(
-        'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory', 'TrustedTemporaryRoot'
+    'ParameterName-provider' = [string[]]@(
+        'CandidateDirectory-provider', 'CheckoutRoot-provider', 'DownloadDirectory-provider', 'TrustedTemporaryRoot-provider'
     )
-    normalization = [string[]]@(
-        'CandidateDirectory', 'CheckoutRoot', 'DownloadDirectory', 'TrustedTemporaryRoot'
+    'ParameterName-relative' = [string[]]@(
+        'CandidateDirectory-relative', 'CheckoutRoot-relative', 'DownloadDirectory-relative', 'TrustedTemporaryRoot-relative'
     )
-    missing = [string[]]@(
-        'CandidateDirectory', 'CheckoutRoot', 'Context', 'DownloadDirectory',
-        'ExpectedDigest', 'TrustedTemporaryRoot'
+    'ParameterName-normalization' = [string[]]@(
+        'CandidateDirectory-normalization', 'CheckoutRoot-normalization', 'DownloadDirectory-normalization', 'TrustedTemporaryRoot-normalization'
+    )
+    'strRequiredParameter-missing' = [string[]]@(
+        'CandidateDirectory-missing', 'CheckoutRoot-missing', 'Context-missing', 'DownloadDirectory-missing', 'ExpectedDigest-missing', 'TrustedTemporaryRoot-missing'
     )
 }
 $script:arrCandidateExpectedName = [string[]]@(
@@ -230,22 +228,33 @@ foreach ($strCandidateCompressionType in @(
 
 $script:scriptBlockAssertRawString = {
     param (
-        [AllowNull()]
+        [AllowNull()][AllowEmptyString()][AllowEmptyCollection()]
         [object]$Value,
 
         [Parameter(Mandatory = $true)]
         [string]$Name
     )
 
-    if ($null -eq $Value -or $Value.GetType() -ne [System.String]) {
+    if ($null -eq $Value) {
+        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-type"
+    }
+    if ($Value -isnot [System.String]) {
         & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-type"
     }
     $strValue = [string]$Value
-    if ($strValue.Length -eq 0 -or [System.String]::IsNullOrWhiteSpace($strValue)) {
+    if ($strValue.Length -eq 0) {
         & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-empty"
     }
-    foreach ($chrValue in $strValue.ToCharArray()) {
-        if ([System.Char]::IsControl($chrValue)) {
+    # The uniform public grammar shares the helper's defensive UTF-16 bound.
+    # Refuse oversize before scans or normalization, under the F184-5 decision.
+    if ($strValue.Length -gt 32767) {
+        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-length"
+    }
+    if ([System.String]::IsNullOrWhiteSpace($strValue)) {
+        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-empty"
+    }
+    for ($intIndex = 0; $intIndex -lt $strValue.Length; $intIndex++) {
+        if ([System.Char]::IsControl($strValue[$intIndex])) {
             & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-control"
         }
     }
@@ -394,8 +403,10 @@ $script:scriptBlockInvokeNativeRaw = {
     # disabling global config also drops any ownership grant recorded there;
     # command-line config is protected configuration, so Git honors it.
     $arrEffectiveArgument = @(
-        '--no-pager',
         '--no-replace-objects',
+        '--no-pager',
+        '-C',
+        $WorkingDirectory,
         '-c',
         ('safe.directory=' + $WorkingDirectory)
     ) + $ArgumentList
@@ -415,7 +426,9 @@ $script:scriptBlockInvokeNativeRaw = {
     $objStandardOutputStream = New-Object System.IO.MemoryStream
     $objStandardErrorStream = New-Object System.IO.MemoryStream
     try {
-        if (-not $objProcess.Start()) {
+        try { $boolStarted = $objProcess.Start() }
+        catch { & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-start' }
+        if (-not $boolStarted) {
             & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-start'
         }
         $objProcess.StandardInput.Close()
@@ -553,6 +566,335 @@ $script:scriptBlockConvertFromStrictUtf8 = {
     }
 }
 
+$script:scriptBlockAssertContextDefinitionPin = {
+    param ([string]$HelperLiteralPath, [string]$ContextLiteralPath)
+
+    $hashtableAst = @{}
+    foreach ($strRole in @('helper', 'context')) {
+        $strPath = if ($strRole -ceq 'helper') { $HelperLiteralPath } else { $ContextLiteralPath }
+        $objErrors = $null
+        $objAst = [System.Management.Automation.Language.Parser]::ParseFile($strPath, [ref]$null, [ref]$objErrors)
+        if (@($objErrors).Count -ne 0) { throw 'context-definition-pin-parse' }
+        $hashtableAst[$strRole] = $objAst
+    }
+    $arrDefinition = @($hashtableAst.context.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left.Extent.Text -ceq '$scriptBlockContextModuleDefinition'
+    })
+    $arrPin = @($hashtableAst.helper.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        ($Node.Left.VariablePath.UserPath -ireplace '^(script|local|private|global):', '') -ieq 'strExpectedContextDefinitionSha256'
+    }, $true))
+    if ($arrDefinition.Count -ne 1 -or $arrPin.Count -ne 1 -or
+        $arrPin[0].Left.Extent.Text -cne '$script:strExpectedContextDefinitionSha256') { throw 'context-definition-pin-binding' }
+    $objLiteral = $arrDefinition[0].Right.Find({ param ($Node)
+        $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+    }, $false)
+    $objPin = $arrPin[0].Right.Find({ param ($Node)
+        $Node -is [System.Management.Automation.Language.StringConstantExpressionAst]
+    }, $false)
+    if ($null -eq $objLiteral -or $null -eq $objPin -or
+        $arrPin[0].Right.Extent.Text -cne ("'" + $objPin.Value + "'") -or
+        $objPin.Value -cnotmatch '^[0-9a-f]{64}$') { throw 'context-definition-pin-shape' }
+    $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false, $true)).GetBytes($objLiteral.ScriptBlock.Extent.Text))
+    if ($strHash -cne $objPin.Value) { throw 'context-definition-pin-mismatch' }
+}
+
+$script:scriptBlockAssertContextDefinitionPinControls = {
+    param ([string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertContextDefinitionPin -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    $strHelper = [System.IO.File]::ReadAllText($HelperLiteralPath)
+    $strManager = [System.IO.File]::ReadAllText($ContextLiteralPath)
+    $objMatch = [regex]::Match($strHelper, '\$script:strExpectedContextDefinitionSha256 = ''([0-9a-f]{64})''')
+    if (-not $objMatch.Success -or [regex]::Matches($strHelper, [regex]::Escape($objMatch.Value)).Count -ne 1) { throw 'context-definition-pin-control-anchor' }
+    foreach ($strMode in @('wrong-pin', 'missing-pin', 'wrong-type', 'script-alias', 'local-alias', 'private-alias', 'global-alias', 'case-alias', 'changed-definition')) {
+        $strHelperCopy = $strHelper
+        $strManagerCopy = $strManager
+        $strExpected = 'context-definition-pin-binding'
+        switch -Exact ($strMode) {
+            'wrong-pin' { $strHelperCopy = $strHelper.Replace($objMatch.Value, $objMatch.Value.Replace($objMatch.Groups[1].Value, ('0' * 64))); $strExpected = 'context-definition-pin-mismatch' }
+            'missing-pin' { $strHelperCopy = $strHelper.Replace($objMatch.Value, '') }
+            'wrong-type' { $strHelperCopy = $strHelper.Replace($objMatch.Value, '$script:strExpectedContextDefinitionSha256 = 1'); $strExpected = 'context-definition-pin-shape' }
+            'changed-definition' {
+                $strMarker = '$scriptBlockContextModuleDefinition = {'
+                if ([regex]::Matches($strManager, [regex]::Escape($strMarker)).Count -ne 1) { throw 'context-definition-pin-manager-anchor' }
+                $strManagerCopy = $strManager.Replace($strMarker, ($strMarker + "`n    # changed complete definition"))
+                $strExpected = 'context-definition-pin-mismatch'
+            }
+            default {
+                $strVariable = if ($strMode -ceq 'case-alias') { '$STREXPECTEDCONTEXTDEFINITIONSHA256' }
+                    else { '$' + $strMode.Substring(0, $strMode.IndexOf('-')) + ':strExpectedContextDefinitionSha256' }
+                $strHelperCopy = $strHelper + "`n" + $strVariable + " = '" + ('0' * 64) + "'`n"
+            }
+        }
+        if ($strHelperCopy -ceq $strHelper -and $strManagerCopy -ceq $strManager) { throw 'context-definition-pin-mutant-unchanged' }
+        $strHelperPath = [System.IO.Path]::Combine($RunRoot, 'definition-pin-helper.ps1')
+        $strManagerPath = [System.IO.Path]::Combine($RunRoot, 'definition-pin-manager.ps1')
+        try {
+            [System.IO.File]::WriteAllText($strHelperPath, $strHelperCopy, (New-Object System.Text.UTF8Encoding($false)))
+            [System.IO.File]::WriteAllText($strManagerPath, $strManagerCopy, (New-Object System.Text.UTF8Encoding($false)))
+            $strFailure = $null
+            try { & $script:scriptBlockAssertContextDefinitionPin -HelperLiteralPath $strHelperPath -ContextLiteralPath $strManagerPath }
+            catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne $strExpected) { throw ('context-definition-pin-mutant-' + $strMode) }
+        } finally {
+            [System.IO.File]::Delete($strHelperPath)
+            [System.IO.File]::Delete($strManagerPath)
+        }
+    }
+}
+
+$script:scriptBlockGetModuleBridgeAllowance = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.Language.ScriptBlockAst]$Ast,
+        [Parameter(Mandatory = $true)]
+        [ValidateSet('helper', 'context')]
+        [string]$Role
+    )
+
+    # These pins cover only the small module bridges, not the production bodies.
+    # All literal bodies still undergo the complete command/member traversal.
+    # Trim indentation only so the required module-body indentation has no
+    # bearing on the pin. No token, statement or interior string is discarded.
+    $scriptBlockGetBridgeHash = {
+        param ([string]$Text)
+        $strCanonical = (($Text -split '\r?\n' | ForEach-Object { $_.Trim() }) -join "`n").Trim()
+        & $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($strCanonical))
+    }
+    $strModuleVariable = if ($Role -ceq 'helper') { 'scriptBlockCandidateModuleDefinition' } else { 'scriptBlockContextModuleDefinition' }
+    $arrModule = @($Ast.FindAll({
+        param ($SyntaxNode)
+        $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $SyntaxNode.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        $SyntaxNode.Left.VariablePath.UserPath -ceq $strModuleVariable
+    }, $true))
+    if ($arrModule.Count -ne 1 -or -not [object]::ReferenceEquals($arrModule[0].Parent, $Ast.EndBlock)) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-bridge-definition'
+    }
+    $objModuleLiteral = $arrModule[0].Right.Find({
+        param ($SyntaxNode)
+        $SyntaxNode -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+    }, $false)
+    if ($null -eq $objModuleLiteral -or
+        $arrModule[0].Right.Extent.Text.Trim() -cne $objModuleLiteral.Extent.Text.Trim()) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-bridge-literal'
+    }
+    $strTailVariable = if ($Role -ceq 'helper') { 'strCandidateModuleName' } else { 'strContextModuleName' }
+    $arrTail = @($Ast.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        $_.Left.VariablePath.UserPath -ceq $strTailVariable
+    })
+    if ($arrTail.Count -ne 1 -or $arrTail[0].Extent.StartOffset -le $arrModule[0].Extent.EndOffset) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-bridge-tail'
+    }
+    $strTailHash = if ($Role -ceq 'helper') {
+        'b8c26a55792135c22aab32c7d48bffd7d898154ad18a06b82e22435d52048836'
+    } else { '8f5c37dbd808c2aaab0f64ec784070835b6c53edd58ed3617f07588d0a8103ea' }
+    $intTailStart = $arrTail[0].Extent.StartOffset
+    if ((& $scriptBlockGetBridgeHash -Text $Ast.Extent.Text.Substring($intTailStart)) -cne $strTailHash) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-bridge-tail-changed'
+    }
+    $objAllowed = New-Object 'System.Collections.Generic.HashSet[int]'
+    $arrCommands = @($Ast.FindAll({param ($SyntaxNode)
+        $SyntaxNode -is [System.Management.Automation.Language.CommandAst]
+    }, $true))
+    $hashtableModuleCalls = @{}
+    if ($Role -ceq 'helper') {
+        $hashtableModuleCalls['a39682ea23f77f9bb6626e0a73223e9fa5df2067bd3c7655459993953b2060bc'] = 1
+    }
+    $intBootstrapStart = -1
+    $intBootstrapEnd = -1
+    $intBindingStart = -1
+    $intBindingEnd = -1
+    if ($Role -ceq 'helper') {
+        foreach ($strBoundVariable in @('script:objBoundContext', 'script:scriptBlockBoundContextCleanup', 'script:scriptBlockBoundContextIssued',
+            'script:strBoundContextDefinition', 'script:strExpectedContextDefinitionSha256', 'script:scriptBlockAssertContextBinding')) {
+            $arrBoundAssignment = @($Ast.FindAll({param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $SyntaxNode.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                ($SyntaxNode.Left.VariablePath.UserPath -ireplace '^(script|local|private|global):', '') -ieq ($strBoundVariable -ireplace '^(script|local|private|global):', '')
+            }, $true))
+            $intExpected = if ($strBoundVariable -cin @('script:strExpectedContextDefinitionSha256', 'script:scriptBlockAssertContextBinding')) { 1 } else { 2 }
+            $arrInitial = @($arrBoundAssignment | Where-Object {
+                [object]::ReferenceEquals($_.Parent, $objModuleLiteral.ScriptBlock.EndBlock)
+            })
+            if ($arrBoundAssignment.Count -ne $intExpected -or $arrInitial.Count -ne 1 -or
+                $arrInitial[0].Left.VariablePath.UserPath -cne $strBoundVariable) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-bound-reference-reassigned'
+            }
+        }
+        $arrBootstrap = @($objModuleLiteral.ScriptBlock.EndBlock.Statements | Where-Object {
+            $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $_.Left.Extent.Text -ceq '$script:strExpectedContextDefinitionSha256'
+        })
+        $arrCapture = @($objModuleLiteral.ScriptBlock.EndBlock.Statements | Where-Object {
+            $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $_.Left.Extent.Text -ceq '$script:scriptBlockBoundContextIssued'
+        })
+        $arrBinding = @($objModuleLiteral.ScriptBlock.EndBlock.Statements | Where-Object {
+            $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $_.Left.Extent.Text -ceq '$script:scriptBlockAssertContextBinding'
+        })
+        if ($arrBootstrap.Count -ne 1 -or $arrCapture.Count -ne 1 -or $arrBinding.Count -ne 1) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-bridge-bootstrap-shape'
+        }
+        $intBootstrapStart = $arrBootstrap[0].Extent.StartOffset
+        $intBootstrapEnd = $arrCapture[0].Extent.EndOffset
+        $intBindingStart = $arrBinding[0].Extent.StartOffset
+        $intBindingEnd = $arrBinding[0].Extent.EndOffset
+        if ($intBootstrapEnd -le $intBootstrapStart -or
+            (& $scriptBlockGetBridgeHash -Text $Ast.Extent.Text.Substring($intBootstrapStart, $intBootstrapEnd - $intBootstrapStart)) -cne
+                'a514ec7b483cc2c7d1503a377a30e1532eb67a4f3db24bafbb7778cd279c5e44' -or
+            (& $scriptBlockGetBridgeHash -Text $arrBinding[0].Extent.Text) -cne
+                '7323976b13cba5e259155ec8af60a09bfbe563784b0846ac7ec5309f13a10528') {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-bridge-bootstrap-changed'
+        }
+    }
+    $intExportCount = 0
+    foreach ($objCommand in $arrCommands) {
+        $strName = [string]$objCommand.GetCommandName()
+        $strTarget = $objCommand.CommandElements[0].Extent.Text
+        if ($strName -ceq 'Microsoft.PowerShell.Core\Export-ModuleMember') {
+            $strExpected = if ($Role -ceq 'helper') { '71de170d5cfbc835425fc31f133b5d74aa0ffbcf091546c79e712917a80744dd' } else { '3d1896c9e6f2747d96ddec3a7b95a0072ec91fe17e9b369a2b099c8541b94cfe' }
+            if ((& $scriptBlockGetBridgeHash -Text $objCommand.Extent.Text) -cne $strExpected -or
+                -not [object]::ReferenceEquals($objCommand.Parent.Parent, $objModuleLiteral.ScriptBlock.EndBlock)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-bridge-export'
+            }
+            $intExportCount++
+            [void]$objAllowed.Add($objCommand.Extent.StartOffset)
+        } elseif ($strName -cin @('Microsoft.PowerShell.Core\Get-Module', 'Microsoft.PowerShell.Core\New-Module', 'Microsoft.PowerShell.Core\Import-Module')) {
+            if ($objCommand.Extent.StartOffset -lt $intTailStart -and
+                -not ($objCommand.Extent.StartOffset -ge $intBootstrapStart -and $objCommand.Extent.EndOffset -le $intBootstrapEnd) -and
+                -not ($objCommand.Extent.StartOffset -ge $intBindingStart -and $objCommand.Extent.EndOffset -le $intBindingEnd)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-command-outside-bridge'
+            }
+            [void]$objAllowed.Add($objCommand.Extent.StartOffset)
+        } elseif ($strTarget -cin @('$objCandidateModule')) {
+            $strHash = & $scriptBlockGetBridgeHash -Text $objCommand.Extent.Text
+            if (-not $hashtableModuleCalls.ContainsKey($strHash) -or $hashtableModuleCalls[$strHash] -ne 1) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-call-shape'
+            }
+            $hashtableModuleCalls[$strHash] = 0
+            [void]$objAllowed.Add($objCommand.Extent.StartOffset)
+            # These exact literal bridge bodies call only helper blocks whose
+            # complete definitions are checked in the companion helper surface.
+            foreach ($objChild in @($objCommand.FindAll({param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.CommandAst] -and
+                $SyntaxNode.CommandElements[0].Extent.Text -cin @('$script:scriptBlockAssertCandidateHelperRawString', '$script:scriptBlockConvertToCandidateHelperNormalizedPath')
+            }, $true))) { [void]$objAllowed.Add($objChild.Extent.StartOffset) }
+        } elseif ($Role -ceq 'helper' -and $strTarget -cin @('$script:scriptBlockBoundContextCleanup', '$script:scriptBlockBoundContextIssued')) {
+            if ($objCommand.Extent.StartOffset -le $intBootstrapEnd) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-bound-call-before-capture'
+            }
+            [void]$objAllowed.Add($objCommand.Extent.StartOffset)
+        }
+    }
+    if ($intExportCount -ne 1 -or @($hashtableModuleCalls.Values | Where-Object { $_ -ne 0 }).Count -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-bridge-count'
+    }
+    foreach ($objMember in @($Ast.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.InvokeMemberExpressionAst]
+    }, $true))) {
+        if (($objMember.Extent.StartOffset -ge $intBootstrapStart -and $objMember.Extent.EndOffset -le $intBootstrapEnd) -or
+            ($objMember.Extent.StartOffset -ge $intBindingStart -and $objMember.Extent.EndOffset -le $intBindingEnd) -or
+            $objMember.Extent.StartOffset -ge $intTailStart) {
+            [void]$objAllowed.Add($objMember.Extent.StartOffset)
+        }
+    }
+    return ,$objAllowed
+}
+
+$script:scriptBlockGetTerraformPrivatePredicates = {
+    param ([string]$HelperLiteralPath, [string]$ContextLiteralPath)
+
+    # The caller completes both-role identity verification before loading. This
+    # additional binding check matches the loaded module to the literal module
+    # definition in those exact verified files before capturing finite private
+    # predicates. No callable is resolved by a caller-supplied function name.
+    $hashtableModule = @{}
+    foreach ($hashtableRole in @(
+        @{ Name = 'helper'; Path = $HelperLiteralPath; Module = 'PSStyleGuideCandidateArtifact_1_0_20260926_0'; Variable = 'scriptBlockCandidateModuleDefinition' },
+        @{ Name = 'context'; Path = $ContextLiteralPath; Module = 'PSStyleGuideCandidateContext_1_0_20260926_0'; Variable = 'scriptBlockContextModuleDefinition' }
+    )) {
+        $arrErrors = $null
+        $objAst = [Management.Automation.Language.Parser]::ParseFile($hashtableRole.Path, [ref]$null, [ref]$arrErrors)
+        if ($arrErrors.Count -ne 0) { throw 'private-predicate-source-parse' }
+        $arrAssignment = @($objAst.FindAll({ param ($Node)
+            $Node -is [Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [Management.Automation.Language.VariableExpressionAst] -and
+            $Node.Left.VariablePath.UserPath -ceq $hashtableRole.Variable
+        }, $true))
+        if ($arrAssignment.Count -ne 1) { throw 'private-predicate-source-definition' }
+        $arrLiteral = @($arrAssignment[0].Right.FindAll({ param ($Node)
+            $Node -is [Management.Automation.Language.ScriptBlockExpressionAst]
+        }, $false))
+        $arrModule = @(Microsoft.PowerShell.Core\Get-Module -Name $hashtableRole.Module -All)
+        if ($arrLiteral.Count -ne 1 -or $arrModule.Count -ne 1 -or
+            $arrModule[0].Definition -cne $arrLiteral[0].ScriptBlock.Extent.Text) { throw 'private-predicate-module-identity' }
+        $hashtableModule[$hashtableRole.Name] = $arrModule[0]
+    }
+    $hashtableHelper = & $hashtableModule.helper {
+        @{
+            Entry = $script:scriptBlockGetCandidateHelperEntry
+            Regular = $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile
+            NewRecord = $script:scriptBlockNewCandidateHelperRecord
+            AssertContext = $script:scriptBlockAssertCandidateHelperContext
+            AddRecord = $script:scriptBlockAddCandidateHelperRecord
+            JournalCurrent = $script:scriptBlockAssertCandidateHelperJournalCurrent
+            RecordUnchanged = $script:scriptBlockAssertCandidateHelperRecordUnchanged
+            ArchiveEntryCount = $script:scriptBlockAssertCandidateHelperArchiveEntryCount
+            NegativeZip64Length = $script:scriptBlockTestCandidateHelperNegativeZip64Length
+            ReadValidated = $script:scriptBlockReadCandidateHelperValidatedFile
+            ActualLength = $script:scriptBlockAddCandidateHelperActualLength
+            DeclaredLength = $script:scriptBlockAddCandidateHelperDeclaredLength
+            Contained = $script:scriptBlockTestCandidateHelperPathContained
+            RecordTypeName = $script:strCandidateHelperRecordTypeName
+        }
+    }
+    $hashtableContext = & $hashtableModule.context {
+        @{
+            Entry = $scriptBlockGetCandidateImmediateEntry
+            Regular = $scriptBlockAssertCandidateOrdinaryRegularFile
+            New = $scriptBlockNewContextFunction
+            Remove = $scriptBlockRemoveContextFunction
+            Test = $scriptBlockTestContextFunction
+            SetState = $scriptBlockSetCandidateIssuedState
+        }
+    }
+    foreach ($objValue in @($hashtableHelper.Entry, $hashtableHelper.Regular, $hashtableContext.Entry, $hashtableContext.Regular,
+        $hashtableHelper.NewRecord, $hashtableHelper.AssertContext, $hashtableHelper.AddRecord,
+        $hashtableHelper.ReadValidated, $hashtableHelper.ActualLength, $hashtableHelper.DeclaredLength, $hashtableHelper.Contained,
+        $hashtableHelper.JournalCurrent, $hashtableHelper.RecordUnchanged, $hashtableHelper.ArchiveEntryCount, $hashtableHelper.NegativeZip64Length, $hashtableContext.New, $hashtableContext.Remove, $hashtableContext.Test, $hashtableContext.SetState)) {
+        if ($objValue -isnot [scriptblock]) { throw 'private-predicate-capture' }
+    }
+    return @{
+        HelperEntry = $hashtableHelper.Entry
+        HelperRegular = $hashtableHelper.Regular
+        ContextEntry = $hashtableContext.Entry
+        ContextRegular = $hashtableContext.Regular
+        SourceNew = $hashtableContext.New
+        SourceRemove = $hashtableContext.Remove
+        SourceTest = $hashtableContext.Test
+        SourceSetState = $hashtableContext.SetState
+        HelperNewRecord = $hashtableHelper.NewRecord
+        HelperAssertContext = $hashtableHelper.AssertContext
+        HelperAddRecord = $hashtableHelper.AddRecord
+        HelperJournalCurrent = $hashtableHelper.JournalCurrent
+        HelperRecordUnchanged = $hashtableHelper.RecordUnchanged
+        HelperArchiveEntryCount = $hashtableHelper.ArchiveEntryCount
+        HelperNegativeZip64Length = $hashtableHelper.NegativeZip64Length
+        HelperReadValidated = $hashtableHelper.ReadValidated
+        HelperActualLength = $hashtableHelper.ActualLength
+        HelperDeclaredLength = $hashtableHelper.DeclaredLength
+        HelperContained = $hashtableHelper.Contained
+        HelperRecordTypeName = $hashtableHelper.RecordTypeName
+    }
+}
+
 $script:scriptBlockAssertVersionMarkersConsistent = {
     param (
         [Parameter(Mandatory = $true)]
@@ -610,8 +952,8 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
             },
             $true
         ))
-    $arrOwnConstant = @()
-    $arrForeignConstant = @()
+    $listOwnConstant = New-Object 'System.Collections.Generic.List[System.Management.Automation.Language.ConvertExpressionAst]'
+    $listForeignConstant = New-Object 'System.Collections.Generic.List[System.Management.Automation.Language.ConvertExpressionAst]'
     $hashtableConstantSeen = @{}
     foreach ($objConvert in $arrVersionConvert) {
         # The conversion sits under a command expression under the assignment,
@@ -666,11 +1008,13 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
                 -Detail 'version-marker-constant-value'
         }
         if ($strAssignedName -ceq $OwnVersionVariableName) {
-            $arrOwnConstant += $objConvert
+            $listOwnConstant.Add($objConvert)
         } else {
-            $arrForeignConstant += $objConvert
+            $listForeignConstant.Add($objConvert)
         }
     }
+    $arrOwnConstant = [object[]]@($listOwnConstant.ToArray())
+    $arrForeignConstant = [object[]]@($listForeignConstant.ToArray())
     if ($hashtableConstantSeen.Count -ne $VersionConstantMap.Count) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
             -Detail ('version-marker-constant-missing-' + $hashtableConstantSeen.Count)
@@ -748,7 +1092,13 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
     # carries three. Writing a number here would be the same kind of defect
     # this assertion exists to catch, and was: the first revision hard-coded
     # three and silently accepted a deletion from the two-function file.
-    $intRequiredMarker = 2 + [int]$ExpectedFunctionCount
+    # The three preserved manager algorithms are now private script blocks.
+    # Their original markers remain required at their exact named definitions;
+    # they are additional locations, never substitutes for public markers.
+    $arrPrivateMarkerName = [string[]]@(if ($OwnVersionVariableName -ceq 'versionCandidateContext') {
+        [string[]]@('scriptBlockSourceNewContext', 'scriptBlockSourceTestContext', 'scriptBlockSourceRemoveContext')
+    })
+    $intRequiredMarker = 2 + [int]$ExpectedFunctionCount + $arrPrivateMarkerName.Count
     if ($intExpectedMarker -ne $intRequiredMarker) {
         & $script:scriptBlockStopHarness `
             -Code 'script-identity-invalid' -Detail 'version-marker'
@@ -786,7 +1136,7 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
             -Detail ('version-marker-function-count-' + $arrPublicFunction.Count)
     }
-    if ($arrMarkerComment.Count -ne [int]$ExpectedFunctionCount) {
+    if ($arrMarkerComment.Count -ne ([int]$ExpectedFunctionCount + $arrPrivateMarkerName.Count)) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
             -Detail ('version-marker-comment-count-' + $arrMarkerComment.Count)
     }
@@ -801,6 +1151,32 @@ $script:scriptBlockAssertVersionMarkersConsistent = {
         if ($intInside -ne 1) {
             & $script:scriptBlockStopHarness -Code 'script-identity-invalid' `
                 -Detail ('version-marker-in-' + $objFunction.Name + '-' + $intInside)
+        }
+    }
+    foreach ($strPrivateMarkerName in $arrPrivateMarkerName) {
+        $arrPrivateAssignment = @($objMarkerAst.FindAll({
+            param ($SyntaxNode)
+            $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $SyntaxNode.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+            $SyntaxNode.Left.VariablePath.UserPath -ceq $strPrivateMarkerName
+        }, $true))
+        if ($arrPrivateAssignment.Count -ne 1) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'version-marker-private-definition'
+        }
+        $arrPrivateBlock = @($arrPrivateAssignment[0].Right.FindAll({
+            param ($SyntaxNode)
+            $SyntaxNode -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+        }, $false))
+        if ($arrPrivateBlock.Count -ne 1) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'version-marker-private-body'
+        }
+        $intInside = 0
+        foreach ($objComment in $arrMarkerComment) {
+            if ($objComment.Extent.StartOffset -ge $arrPrivateBlock[0].Extent.StartOffset -and
+                $objComment.Extent.EndOffset -le $arrPrivateBlock[0].Extent.EndOffset) { $intInside++ }
+        }
+        if ($intInside -ne 1) {
+            & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail ('version-marker-private-' + $strPrivateMarkerName)
         }
     }
 
@@ -987,8 +1363,10 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
                 param ($SyntaxNode)
                 return ($SyntaxNode -is
                     [System.Management.Automation.Language.CommandAst] -and
-                    ([string]$SyntaxNode.GetCommandName()) -ceq
-                    'Test-StyleGuideCandidateInvocationContextIssued')
+                    $SyntaxNode.CommandElements[0] -is
+                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $SyntaxNode.CommandElements[0].VariablePath.UserPath -ceq
+                    'script:scriptBlockBoundContextIssued')
             },
             $true
         ))
@@ -999,6 +1377,11 @@ $script:scriptBlockAssertContextReadsAreCaptured = {
         while ($null -ne $objScope) {
             if ($objScope -is
                 [System.Management.Automation.Language.FunctionDefinitionAst] -or
+                ($objScope -is [System.Management.Automation.Language.ScriptBlockAst] -and
+                    $objScope.Parent -is [System.Management.Automation.Language.ScriptBlockExpressionAst] -and
+                    $objScope.Parent.Parent -is [System.Management.Automation.Language.CommandExpressionAst] -and
+                    $objScope.Parent.Parent.Parent -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $objScope.Parent.Parent.Parent.Left.Extent.Text -ceq '$script:scriptBlockInvokeCandidateArtifactExpansion') -or
                 $null -eq $objScope.Parent) {
                 return [int]$objScope.Extent.StartOffset
             }
@@ -1260,7 +1643,8 @@ $script:scriptBlockAssertResourceGuardsReached = {
         [string]$LiteralPath,
 
         [Parameter(Mandatory = $true)]
-        [string]$RunRoot
+        [string]$RunRoot,
+        [string]$ContextLiteralPath
     )
 
     # The assertion above proves each guard is named in an executable command
@@ -1306,76 +1690,22 @@ $script:scriptBlockAssertResourceGuardsReached = {
 
     $strProbeRoot = [System.IO.Path]::Combine($RunRoot, 'resource-guard-reached')
     [void][System.IO.Directory]::CreateDirectory($strProbeRoot)
-    $strCheckoutRoot = [System.IO.Path]::Combine($strProbeRoot, 'checkout')
-    [void][System.IO.Directory]::CreateDirectory($strCheckoutRoot)
-    $strTrustedRoot = [System.IO.Path]::Combine($strProbeRoot, 'trusted')
-    [void][System.IO.Directory]::CreateDirectory($strTrustedRoot)
-
     # One expansion of one freshly created context through whichever copy is
     # named. Each call builds its own context and archive: sharing them would
     # let one variant's outcome decide the next one's.
     $scriptBlockDriveOneExpansion = {
-        param (
-            [Parameter(Mandatory = $true)]
-            [string]$ScriptPath
-        )
-
-        $objProbeContext = New-StyleGuideCandidateInvocationContext `
-            -TrustedTemporaryRoot $strTrustedRoot
-        $strArchivePath = [System.IO.Path]::Combine(
-            $objProbeContext.DownloadDirectoryPath,
-            'artifact.zip'
-        )
-        $objArchive = [System.IO.Compression.ZipFile]::Open(
-            $strArchivePath,
-            [System.IO.Compression.ZipArchiveMode]::Create
-        )
+        param ([string]$ScriptPath, [string]$ContextPath)
+        $objMemory = New-Object System.IO.MemoryStream
+        $objArchive = New-Object System.IO.Compression.ZipArchive($objMemory, [IO.Compression.ZipArchiveMode]::Create, $true)
         try {
-            foreach ($strEntryName in @(
-                'copilot-instructions.md',
-                'powershell.instructions.md',
-                'STYLE_GUIDE_CHAT.md',
-                'STYLE_GUIDE_FULL.md'
-            )) {
-                $objEntry = $objArchive.CreateEntry($strEntryName)
-                $objEntryWriter = New-Object System.IO.StreamWriter($objEntry.Open())
-                try {
-                    $objEntryWriter.Write('# ' + $strEntryName)
-                } finally {
-                    $objEntryWriter.Dispose()
-                }
+            foreach ($strName in $script:arrCandidateExpectedName) {
+                $objWriter = New-Object System.IO.StreamWriter($objArchive.CreateEntry($strName).Open())
+                try { $objWriter.Write('# ' + $strName) } finally { $objWriter.Dispose() }
             }
-        } finally {
-            $objArchive.Dispose()
-        }
-        $objSha256 = [System.Security.Cryptography.SHA256]::Create()
-        try {
-            $objArchiveStream = [System.IO.File]::OpenRead($strArchivePath)
-            try {
-                $strExpectedDigest = (
-                    [System.BitConverter]::ToString(
-                        $objSha256.ComputeHash($objArchiveStream)
-                    ) -replace '-', ''
-                ).ToLowerInvariant()
-            } finally {
-                $objArchiveStream.Dispose()
-            }
-        } finally {
-            $objSha256.Dispose()
-        }
-
-        try {
-            [void](& $ScriptPath `
-                -Context $objProbeContext `
-                -CheckoutRoot $strCheckoutRoot `
-                -TrustedTemporaryRoot $strTrustedRoot `
-                -DownloadDirectory $objProbeContext.DownloadDirectoryPath `
-                -CandidateDirectory $objProbeContext.CandidatePath `
-                -ExpectedDigest $strExpectedDigest)
-            return $true
-        } catch {
-            return $false
-        }
+        } finally { $objArchive.Dispose() }
+        try { $arrArchive = $objMemory.ToArray() } finally { $objMemory.Dispose() }
+        $objObserved = & $script:scriptBlockInvokeTerraformSourceExpansion -RunRoot $strProbeRoot -HelperLiteralPath $ScriptPath -ContextLiteralPath $ContextPath -ArchiveBytes $arrArchive
+        return [bool]$objObserved.Accepted
     }
 
     # A throw with no diagnostic code of its own. The helper maps it through its
@@ -1431,7 +1761,7 @@ $script:scriptBlockAssertResourceGuardsReached = {
                 $strPoisonedPath
             }
             $hashtableOutcome[$strVariant] = & $scriptBlockDriveOneExpansion `
-                -ScriptPath $strVariantPath
+                -ScriptPath $strVariantPath -ContextPath $ContextLiteralPath
         }
 
         # Verbatim must succeed, or the probe proves nothing about the poison.
@@ -1488,7 +1818,7 @@ $script:scriptBlockAssertResourceGuardsReached = {
     }
     # Splice from the last definition backwards so an earlier replacement cannot
     # move the offsets of a later one.
-    $listDefinition = New-Object 'System.Collections.Generic.List[object]'
+    $listDefinition = New-Object 'System.Collections.Generic.List[pscustomobject]'
     foreach ($strGuardName in $arrGuardName) {
         $arrAssignment = @($objScriptAst.FindAll(
             {
@@ -1522,7 +1852,7 @@ $script:scriptBlockAssertResourceGuardsReached = {
         [System.IO.File]::Delete($strTracePath)
     }
 
-    $boolTracedSucceeded = & $scriptBlockDriveOneExpansion -ScriptPath $strTracedPath
+    $boolTracedSucceeded = & $scriptBlockDriveOneExpansion -ScriptPath $strTracedPath -ContextPath $ContextLiteralPath
     if (-not $boolTracedSucceeded -or -not [System.IO.File]::Exists($strTracePath)) {
         & $script:scriptBlockStopHarness `
             -Code 'catalog-invalid' -Detail 'production-resource-guard-reached'
@@ -1583,6 +1913,10 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
         [string]$RunRoot
     )
 
+    $hashtablePredicates = & $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $LiteralPath -ContextLiteralPath $ContextLiteralPath
+    $scriptBlockHelperEntry = $hashtablePredicates.HelperEntry
+    $scriptBlockContextEntry = $hashtablePredicates.ContextEntry
+
     # Reading a whole directory to decide whether it holds exactly one entry
     # costs memory proportional to what is there, and at the download check no
     # archive ceiling is in force yet because no archive has been opened. The
@@ -1610,9 +1944,9 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
         )
     }
 
-    $arrBounded = [string[]]@(& $script:scriptBlockGetCandidateHelperEntry `
+    $arrBounded = [string[]]@(& $scriptBlockHelperEntry `
             -LiteralPath $strCrowded -Phase 'download' -MaximumEntry 2)
-    $arrContextBounded = [string[]]@(& $scriptBlockGetCandidateImmediateEntry `
+    $arrContextBounded = [string[]]@(& $scriptBlockContextEntry `
             -LiteralPath $strCrowded -FailureCode 'root-invalid' `
             -FailurePhase 'root' -MaximumEntry 1)
     if ($arrBounded.Count -ne 2 -or $arrContextBounded.Count -ne 1) {
@@ -1632,22 +1966,22 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
     $arrRefusedShape = @(
         @{
             Name = 'helper-neither'
-            Probe = { & $script:scriptBlockGetCandidateHelperEntry `
+            Probe = { & $scriptBlockHelperEntry `
                     -LiteralPath $strCrowded -Phase 'download' }
         },
         @{
             Name = 'helper-absurd'
-            Probe = { & $script:scriptBlockGetCandidateHelperEntry `
+            Probe = { & $scriptBlockHelperEntry `
                     -LiteralPath $strCrowded -Phase 'download' -MaximumEntry 999999 }
         },
         @{
             Name = 'context-neither'
-            Probe = { & $scriptBlockGetCandidateImmediateEntry `
+            Probe = { & $scriptBlockContextEntry `
                     -LiteralPath $strCrowded -FailureCode 'root-invalid' -FailurePhase 'root' }
         },
         @{
             Name = 'context-absurd'
-            Probe = { & $scriptBlockGetCandidateImmediateEntry `
+            Probe = { & $scriptBlockContextEntry `
                     -LiteralPath $strCrowded -FailureCode 'root-invalid' `
                     -FailurePhase 'root' -MaximumEntry 999999 }
         }
@@ -1682,17 +2016,17 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
     # substring of the former.
     $arrFilterProbe = @(
         @{ Name = 'helper-star'
-            Probe = { & $script:scriptBlockGetCandidateHelperEntry `
+            Probe = { & $scriptBlockHelperEntry `
                     -LiteralPath $strCrowded -Phase 'download' -MatchPath 'e*.bin' } }
         @{ Name = 'helper-question'
-            Probe = { & $script:scriptBlockGetCandidateHelperEntry `
+            Probe = { & $scriptBlockHelperEntry `
                     -LiteralPath $strCrowded -Phase 'download' -MatchPath 'e?.bin' } }
         @{ Name = 'context-star'
-            Probe = { & $scriptBlockGetCandidateImmediateEntry `
+            Probe = { & $scriptBlockContextEntry `
                     -LiteralPath $strCrowded -FailureCode 'root-invalid' `
                     -FailurePhase 'root' -MatchPath 'e*.bin' } }
         @{ Name = 'context-question'
-            Probe = { & $scriptBlockGetCandidateImmediateEntry `
+            Probe = { & $scriptBlockContextEntry `
                     -LiteralPath $strCrowded -FailureCode 'root-invalid' `
                     -FailurePhase 'root' -MatchPath 'e?.bin' } }
     )
@@ -1718,7 +2052,7 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
     [void][System.IO.Directory]::CreateDirectory($strSparse)
     [System.IO.File]::WriteAllBytes(
         [System.IO.Path]::Combine($strSparse, 'only.bin'), [byte[]]@())
-    if ([string[]]@(& $script:scriptBlockGetCandidateHelperEntry `
+    if ([string[]]@(& $scriptBlockHelperEntry `
                 -LiteralPath $strSparse -Phase 'download' -MaximumEntry 2).Count -ne 1) {
         & $script:scriptBlockStopHarness `
             -Code 'catalog-invalid' -Detail 'bounded-directory-read'
@@ -1753,10 +2087,10 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
         }
         $strLeafPath = [System.IO.Path]::Combine($strLeafProbe, $strLeaf)
         [System.IO.File]::WriteAllBytes($strLeafPath, [byte[]]@())
-        if ([string[]]@(& $script:scriptBlockGetCandidateHelperEntry `
+        if ([string[]]@(& $scriptBlockHelperEntry `
                     -LiteralPath $strLeafProbe -Phase 'download' `
                     -MatchPath $strLeafPath) -cnotcontains $strLeafPath -or
-            [string[]]@(& $scriptBlockGetCandidateImmediateEntry `
+            [string[]]@(& $scriptBlockContextEntry `
                     -LiteralPath $strLeafProbe -FailureCode 'root-invalid' `
                     -FailurePhase 'root' -MatchPath $strLeafPath) -cnotcontains $strLeafPath) {
             & $script:scriptBlockStopHarness `
@@ -1770,7 +2104,7 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
     foreach ($strExpanding in [string[]]@('star*.zip', 'quest?.zip')) {
         $boolRefused = $false
         try {
-            [void](& $script:scriptBlockGetCandidateHelperEntry `
+            [void](& $scriptBlockHelperEntry `
                 -LiteralPath $strLeafProbe -Phase 'download' `
                 -MatchPath ([System.IO.Path]::Combine($strLeafProbe, $strExpanding)))
         } catch {
@@ -1791,7 +2125,9 @@ $script:scriptBlockAssertDirectoryReadsBounded = {
     # cleanup read deriving its expected set after the read instead of before it.
     # Round 32 moved the candidate-cleanup read from the helper to the context
     # manager along with the deletions it bounded, so the helper is one lower
-    # and the context one higher than before.
+    # and the context one higher than before. Terraform's separate candidate
+    # capability adds one bounded helper cleanup read; its exact call shape and
+    # private journal-derived bound are also pinned by EnumerationBoundsDeclared.
     $hashtableBoundedSite = [ordered]@{
         $LiteralPath = [int]3
         $ContextLiteralPath = [int]6
@@ -2014,7 +2350,7 @@ $script:strCandidateRunStartedUtc = [System.DateTime]::UtcNow.ToString(
 # Whether each adversarial trailer fixture is a live bypass is a property of the
 # reader and differs by .NET version, so what this runtime actually observed is
 # recorded rather than left implicit in a passing suite.
-$script:arrCandidateFixtureClassification = @()
+$script:listCandidateFixtureClassification = New-Object 'System.Collections.Generic.List[object]'
 
 $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
     param (
@@ -2022,7 +2358,8 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
         [string]$LiteralPath,
 
         [Parameter(Mandatory = $true)]
-        [string]$RunRoot
+        [string]$RunRoot,
+        [string]$ContextLiteralPath
     )
 
     # The entry-count pre-check exists to bound what ZipArchive materializes, and
@@ -2044,6 +2381,7 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
     # manifest's four entries from those bytes. A fixture that stopped being a
     # bypass would otherwise keep passing while proving nothing, which is how an
     # earlier version of this file asserted a property it did not hold.
+    $hashtableBindings = & $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $LiteralPath -ContextLiteralPath $ContextLiteralPath
     $intFixtureEntryCount = @($script:arrCandidateExpectedName).Count
     $intFatEntryCount = 2000
 
@@ -2108,7 +2446,7 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
         }
         # -1 means the reader threw rather than materializing anything.
         $intReaderSeen = [int](& $scriptBlockCountReaderEntry -ArchiveByte $arrHostileByte)
-        $script:arrCandidateFixtureClassification += , ([ordered]@{
+        $script:listCandidateFixtureClassification.Add([ordered]@{
             Fixture = if ($strHostileVariant -ceq 'decoy') {
                 'archive.trailer.decoy'
             } else {
@@ -2130,52 +2468,15 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
 
     $strProbeRoot = [System.IO.Path]::Combine($RunRoot, 'archive-trailer-agreement')
     [void][System.IO.Directory]::CreateDirectory($strProbeRoot)
-    $strProbeCheckout = [System.IO.Path]::Combine($strProbeRoot, 'checkout')
-    [void][System.IO.Directory]::CreateDirectory($strProbeCheckout)
-    $strProbeTrusted = [System.IO.Path]::Combine($strProbeRoot, 'trusted')
-    [void][System.IO.Directory]::CreateDirectory($strProbeTrusted)
-
     # Driven through the production entry point rather than the internal guard,
     # so no rewrite of the guard's shape can satisfy this without the archive
     # actually being refused before extraction.
     $scriptBlockRunProbeExpansion = {
-        param (
-            [byte[]]$ArchiveByte,
-            [string]$ScriptPath
-        )
-        if ([string]::IsNullOrEmpty($ScriptPath)) {
-            $ScriptPath = $LiteralPath
-        }
-        # Each call builds its own context, as the resource-guard probe does, so
-        # one fixture's outcome cannot decide the next one's. The contexts are
-        # left in place: they live under the harness run root, which is removed
-        # when the run ends, and cleaning up a succeeded expansion here would
-        # mean asserting on cleanup's result instead of the archive's.
-        $objProbeContext = New-StyleGuideCandidateInvocationContext `
-            -TrustedTemporaryRoot $strProbeTrusted
-        $strProbeArchive = [System.IO.Path]::Combine(
-            $objProbeContext.DownloadDirectoryPath, 'artifact.zip')
-        [System.IO.File]::WriteAllBytes($strProbeArchive, $ArchiveByte)
-        $objProbeSha256 = [System.Security.Cryptography.SHA256]::Create()
-        try {
-            $strProbeDigest = ([System.BitConverter]::ToString(
-                    $objProbeSha256.ComputeHash($ArchiveByte)) -replace '-', ''
-            ).ToLowerInvariant()
-        } finally {
-            $objProbeSha256.Dispose()
-        }
-        try {
-            [void](& $ScriptPath `
-                    -Context $objProbeContext `
-                    -CheckoutRoot $strProbeCheckout `
-                    -TrustedTemporaryRoot $strProbeTrusted `
-                    -DownloadDirectory $objProbeContext.DownloadDirectoryPath `
-                    -CandidateDirectory $objProbeContext.CandidatePath `
-                    -ExpectedDigest $strProbeDigest)
-            return 'accepted'
-        } catch {
-            return [string]$_.Exception.Data['PSStyleGuideDiagnosticCode']
-        }
+        param ([byte[]]$ArchiveByte, [string]$ScriptPath)
+        if ([string]::IsNullOrEmpty($ScriptPath)) { $ScriptPath = $LiteralPath }
+        $objObserved = & $script:scriptBlockInvokeTerraformSourceExpansion -RunRoot $strProbeRoot -HelperLiteralPath $ScriptPath -ContextLiteralPath $ContextLiteralPath -ArchiveBytes $ArchiveByte
+        if ($objObserved.Accepted) { return 'accepted' }
+        return [string]$objObserved.Code
     }
 
     foreach ($strHostileVariant in @('decoy', 'zip64')) {
@@ -2212,7 +2513,7 @@ $script:scriptBlockAssertArchiveTrailerAgreementEnforced = {
         param ([byte[]]$ArchiveByte)
         $objProbeStream = New-Object System.IO.MemoryStream(, $ArchiveByte)
         try {
-            [void](& $script:scriptBlockAssertCandidateHelperArchiveEntryCount `
+            [void](& $hashtableBindings.HelperArchiveEntryCount `
                     -Stream $objProbeStream)
             return $false
         } catch {
@@ -2518,9 +2819,9 @@ $script:scriptBlockAssertEnumerationBoundsDeclared = {
 # the suite the first time somebody wrote .Trim(). Refusing legitimate work is
 # the round-19 defect, and it does not become acceptable by being a test.
 #
-# Reflection is denied everywhere rather than outside the helper, because it is
+# Reflection is denied outside the exact captured-metadata primitives, because it is
 # the generic escape from any rule that matches a name: GetMethod('...').Invoke()
-# reaches a listing without ever spelling one. Neither script uses it.
+# reaches a listing without ever spelling one. Fixed metadata getters are pinned separately.
 $script:strCandidateListingMemberPattern =
     '^(Enumerate|Get)(Directories|Files|FileSystemEntries|FileSystemInfos)$'
 $script:strCandidateReflectionMemberPattern =
@@ -2541,6 +2842,7 @@ $script:arrCandidateNativePathVariable = [string[]]@(
 $script:strCandidateHelperNativeResolver = 'scriptBlockResolveCandidateHelperNativePath'
 $script:strCandidateContextNativeResolver = 'scriptBlockResolveCandidateNativePath'
 $script:arrCandidateHelperPermittedCommand = [string[]]@(
+    'Microsoft.PowerShell.Utility\Get-FileHash',
     'Add-Type',
     'Get-Command',
     'New-Object',
@@ -2702,15 +3004,20 @@ $script:hashtableCandidateHelperMemberReceiver = @{
     'Delete' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
     'Dispose' = @{ Static = [string[]]@(); Instance = $true }
     'EnumerateFileSystemEntries' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
-    'Equals' = @{ Static = [string[]]@('System.String'); Instance = $false }
+    'Equals' = @{ Static = [string[]]@('System.String', 'string'); Instance = $false }
     'Exists' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
     'Flush' = @{ Static = [string[]]@(); Instance = $true }
     'GetAttributes' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
+    'get_Entries' = @{ Static = [string[]]@(); Instance = $true }
+    'GetChars' = @{ Static = [string[]]@(); Instance = $true }
+    'GetDecoder' = @{ Static = [string[]]@(); Instance = $true }
+    'GetMaxCharCount' = @{ Static = [string[]]@(); Instance = $true }
+    'GetUnresolvedProviderPathFromPSPath' = @{ Static = [string[]]@(); Instance = $true }
     'GetEnumerator' = @{ Static = [string[]]@(); Instance = $true }
     'GetFileName' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
     'GetFullPath' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'GetPathRoot' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
     'GetInvalidFileNameChars' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
-    'GetType' = @{ Static = [string[]]@(); Instance = $true }
     'IndexOf' = @{ Static = [string[]]@(); Instance = $true }
     'IndexOfAny' = @{ Static = [string[]]@(); Instance = $true }
     'Insert' = @{ Static = [string[]]@(); Instance = $true }
@@ -2763,17 +3070,17 @@ $script:hashtableCandidateContextMemberReceiver = @{
     'Delete' = @{ Static = [string[]]@('System.IO.Directory', 'System.IO.File'); Instance = $false }
     'Dispose' = @{ Static = [string[]]@(); Instance = $true }
     'EnumerateFileSystemEntries' = @{ Static = [string[]]@('System.IO.Directory'); Instance = $false }
-    'Equals' = @{ Static = [string[]]@('System.String'); Instance = $false }
+    'Equals' = @{ Static = [string[]]@('System.String', 'string'); Instance = $false }
     'GetAttributes' = @{ Static = [string[]]@('System.IO.File'); Instance = $false }
     'GetCurrent' = @{ Static = [string[]]@('System.Security.Principal.WindowsIdentity'); Instance = $false }
     'GetEnumerator' = @{ Static = [string[]]@(); Instance = $true }
     'GetFileName' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
     'GetFullPath' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
+    'GetPathRoot' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
     'GetInvalidFileNameChars' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
     'GetNewClosure' = @{ Static = [string[]]@(); Instance = $true }
     'GetRandomFileName' = @{ Static = [string[]]@('System.IO.Path'); Instance = $false }
-    'GetResolvedProviderPathFromPSPath' = @{ Static = [string[]]@(); Instance = $true }
-    'GetType' = @{ Static = [string[]]@(); Instance = $true }
+    'GetUnresolvedProviderPathFromPSPath' = @{ Static = [string[]]@(); Instance = $true }
     'IndexOf' = @{ Static = [string[]]@(); Instance = $true }
     'IndexOfAny' = @{ Static = [string[]]@(); Instance = $true }
     'Insert' = @{ Static = [string[]]@(); Instance = $true }
@@ -2807,8 +3114,8 @@ $script:arrCandidateHelperPermittedMember = [string[]]@(
     'Add', 'Append', 'Combine', 'ComputeHash', 'Contains', 'ContainsKey',
     'ContainsWildcardCharacters', 'Copy', 'Create', 'CreateDirectory',
     'Delete', 'Dispose', 'EnumerateFileSystemEntries', 'Equals', 'Exists',
-    'Flush', 'GetAttributes', 'GetEnumerator', 'GetFileName', 'GetFullPath',
-    'GetInvalidFileNameChars', 'GetType', 'IndexOf', 'IndexOfAny', 'Insert',
+    'Flush', 'GetAttributes', 'get_Entries', 'GetChars', 'GetDecoder', 'GetMaxCharCount', 'GetEnumerator', 'GetFileName', 'GetFullPath', 'GetPathRoot',
+    'GetInvalidFileNameChars', 'GetUnresolvedProviderPathFromPSPath', 'IndexOf', 'IndexOfAny', 'Insert',
     'IsControl', 'IsLetter', 'IsNullOrWhiteSpace', 'IsPathRooted', 'Min',
     'MoveNext', 'NewGuid', 'Open', 'Read', 'ReadAllLines', 'ReferenceEquals',
     'Split',
@@ -2820,9 +3127,9 @@ $script:arrCandidateContextPermittedMember = [string[]]@(
     'Add', 'AddAccessRule', 'Combine', 'Contains', 'ContainsKey',
     'ContainsWildcardCharacters', 'Create', 'CreateDirectory', 'Delete',
     'Dispose', 'EnumerateFileSystemEntries', 'Equals', 'GetAttributes',
-    'GetCurrent', 'GetEnumerator', 'GetFileName', 'GetFullPath',
+    'GetCurrent', 'GetEnumerator', 'GetFileName', 'GetFullPath', 'GetPathRoot',
     'GetInvalidFileNameChars', 'GetNewClosure', 'GetRandomFileName',
-    'GetResolvedProviderPathFromPSPath', 'GetType', 'IndexOf', 'IndexOfAny',
+    'GetUnresolvedProviderPathFromPSPath', 'IndexOf', 'IndexOfAny',
     'Insert', 'IsControl', 'IsLetter', 'IsNullOrWhiteSpace', 'IsPathRooted',
     'MoveNext', 'NewGuid', 'Read', 'ReferenceEquals', 'RemoveAt',
     'SetAccessRuleProtection',
@@ -2830,6 +3137,1303 @@ $script:arrCandidateContextPermittedMember = [string[]]@(
     'Substring', 'ToArray', 'ToCharArray', 'ToInt32', 'ToLowerInvariant',
     'ToObject', 'ToString', 'TransformBlock', 'TransformFinalBlock', 'TrimEnd'
 )
+$script:scriptBlockGetTerraformArchiveHashAllowance = {
+    param (
+        [System.Management.Automation.Language.ScriptBlockAst]$Ast,
+        [ValidateSet('helper', 'context')]
+        [string]$Role
+    )
+
+    $scriptBlockGetVariableAssignment = {
+        param ([string]$Name)
+
+        $strAssignmentName = $Name
+        return @($Ast.FindAll({
+                    param ($Node)
+                    if ($Node -isnot
+                        [System.Management.Automation.Language.AssignmentStatementAst] -or
+                        $Node.Left -isnot
+                            [System.Management.Automation.Language.VariableExpressionAst]) {
+                        return $false
+                    }
+                    $strPath = [string]$Node.Left.VariablePath.UserPath
+                    return ($strPath -ceq $strAssignmentName -or
+                        $strPath -cmatch (':' + [regex]::Escape($strAssignmentName) + '\z'))
+                }, $true))
+    }
+    $scriptBlockCollapseSource = {
+        param ([string]$Source)
+
+        return (($Source -replace '\s+', ' ').Trim())
+    }
+    $arrHashCommand = @($Ast.FindAll({
+                param ($Node)
+                if ($Node -isnot [System.Management.Automation.Language.CommandAst]) {
+                    return $false
+                }
+                $strName = [string]$Node.GetCommandName()
+                return ($strName -ceq 'Get-FileHash' -or
+                    $strName.EndsWith('\Get-FileHash', [System.StringComparison]::Ordinal))
+            }, $true))
+    if ($Role -ceq 'context') {
+        if ($arrHashCommand.Count -ne 0) { throw 'archive-hash-context-command' }
+        return -1
+    }
+    if ($Role -cne 'helper' -or $arrHashCommand.Count -ne 1) {
+        throw 'archive-hash-command-cardinality'
+    }
+    $objHashCommand = $arrHashCommand[0]
+    $arrElement = @($objHashCommand.CommandElements)
+    if ($objHashCommand.GetCommandName() -cne 'Microsoft.PowerShell.Utility\Get-FileHash' -or
+        $objHashCommand.InvocationOperator -ne [System.Management.Automation.Language.TokenKind]::Unknown -or
+        @($objHashCommand.Redirections).Count -ne 0 -or $arrElement.Count -ne 7 -or
+        $arrElement[1] -isnot [System.Management.Automation.Language.CommandParameterAst] -or
+        $arrElement[1].ParameterName -cne 'InputStream' -or
+        $arrElement[2] -isnot [System.Management.Automation.Language.VariableExpressionAst] -or
+        $arrElement[2].VariablePath.UserPath -cne 'objArchiveBuffer' -or
+        $arrElement[2].Splatted -or
+        $arrElement[3] -isnot [System.Management.Automation.Language.CommandParameterAst] -or
+        $arrElement[3].ParameterName -cne 'Algorithm' -or
+        $arrElement[4] -isnot [System.Management.Automation.Language.StringConstantExpressionAst] -or
+        [string]$arrElement[4].Value -cne 'SHA256' -or
+        $arrElement[5] -isnot [System.Management.Automation.Language.CommandParameterAst] -or
+        $arrElement[5].ParameterName -cne 'ErrorAction' -or
+        $arrElement[6] -isnot [System.Management.Automation.Language.StringConstantExpressionAst] -or
+        [string]$arrElement[6].Value -cne 'Stop') {
+        throw 'archive-hash-command-shape'
+    }
+    $objHashAssignment = $objHashCommand.Parent.Parent.Parent.Parent.Parent
+    if ($objHashCommand.Parent -isnot [System.Management.Automation.Language.PipelineAst] -or
+        @($objHashCommand.Parent.PipelineElements).Count -ne 1 -or
+        $objHashCommand.Parent.Parent -isnot
+            [System.Management.Automation.Language.StatementBlockAst] -or
+        $objHashCommand.Parent.Parent.Statements.Count -ne 1 -or
+        $objHashCommand.Parent.Parent.Parent -isnot
+            [System.Management.Automation.Language.ArrayExpressionAst] -or
+        $objHashCommand.Parent.Parent.Parent.Parent -isnot
+            [System.Management.Automation.Language.CommandExpressionAst] -or
+        $objHashAssignment -isnot
+            [System.Management.Automation.Language.AssignmentStatementAst] -or
+        $objHashAssignment.Left -isnot
+            [System.Management.Automation.Language.VariableExpressionAst] -or
+        $objHashAssignment.Left.VariablePath.UserPath -cne 'arrArchiveHash') {
+        throw 'archive-hash-result-binding'
+    }
+    $objHashBlock = $objHashAssignment.Parent
+    $objOuterTry = $objHashBlock.Parent
+    if ($objHashBlock -isnot [System.Management.Automation.Language.StatementBlockAst] -or
+        $objOuterTry -isnot [System.Management.Automation.Language.TryStatementAst] -or
+        -not [object]::ReferenceEquals($objOuterTry.Body, $objHashBlock)) {
+        throw 'archive-hash-enclosing-block'
+    }
+    $arrExpansion = @($Ast.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                $Node.Left.VariablePath.UserPath -ceq
+                    'script:scriptBlockInvokeCandidateArtifactExpansion'
+            }, $true))
+    if ($arrExpansion.Count -ne 1) { throw 'archive-hash-expansion-count' }
+    $arrExpansionLiteral = @($arrExpansion[0].Right.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+            }, $false))
+    if ($arrExpansionLiteral.Count -ne 1) { throw 'archive-hash-expansion-body' }
+    $objExpansionBlock = $arrExpansionLiteral[0].ScriptBlock.EndBlock
+    if (-not [object]::ReferenceEquals($objOuterTry.Parent, $objExpansionBlock)) {
+        throw 'archive-hash-expansion-placement'
+    }
+
+    $arrByteAssignment = @(& $scriptBlockGetVariableAssignment 'arrArchiveByte')
+    if ($arrByteAssignment.Count -ne 1 -or
+        -not [object]::ReferenceEquals($arrByteAssignment[0].Parent, $objHashBlock) -or
+        (& $scriptBlockCollapseSource $arrByteAssignment[0].Extent.Text) -cne
+            '$arrArchiveByte = New-Object byte[] ([int]$uintArchiveByteCount)') {
+        throw 'archive-hash-byte-provenance'
+    }
+    $arrBufferAssignment = @(& $scriptBlockGetVariableAssignment 'objArchiveBuffer')
+    $arrBufferInitial = @($arrBufferAssignment | Where-Object {
+            $_.Right.Extent.Text -ceq '$null' -and
+            [object]::ReferenceEquals($_.Parent, $objExpansionBlock)
+        })
+    $arrBufferCreation = @($arrBufferAssignment | Where-Object {
+            (& $scriptBlockCollapseSource $_.Extent.Text) -ceq
+                '$objArchiveBuffer = New-Object System.IO.MemoryStream(, $arrArchiveByte)' -and
+            [object]::ReferenceEquals($_.Parent, $objHashBlock)
+        })
+    if ($arrBufferAssignment.Count -ne 2 -or $arrBufferInitial.Count -ne 1 -or
+        $arrBufferCreation.Count -ne 1) {
+        throw 'archive-hash-buffer-provenance'
+    }
+    $arrResultAssignment = @(& $scriptBlockGetVariableAssignment 'arrArchiveHash')
+    if ($arrResultAssignment.Count -ne 1 -or
+        -not [object]::ReferenceEquals($arrResultAssignment[0], $objHashAssignment)) {
+        throw 'archive-hash-result-reassignment'
+    }
+
+    $arrShapeGuard = @($Ast.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.IfStatementAst] -and
+                $Node.Extent.Text -cmatch '\$arrArchiveHash\.Count'
+            }, $true))
+    $strExpectedCondition = @'
+$arrArchiveHash.Count -ne 1 -or
+                $arrArchiveHash[0].Algorithm -isnot [string] -or
+                $arrArchiveHash[0].Hash -isnot [string] -or
+                $arrArchiveHash[0].Algorithm -cne 'SHA256' -or
+                $arrArchiveHash[0].Hash -cnotmatch '\A[0-9A-Fa-f]{64}\z'
+'@
+    $strExpectedBody = @'
+{
+                & $script:scriptBlockStopCandidateHelperOperation `
+                    -Code 'archive-invalid' -Phase 'digest' -Subreason 'hash-shape'
+            }
+'@
+    if ($arrShapeGuard.Count -ne 1 -or $arrShapeGuard[0].Clauses.Count -ne 1 -or
+        $null -ne $arrShapeGuard[0].ElseClause -or
+        -not [object]::ReferenceEquals($arrShapeGuard[0].Parent, $objHashBlock) -or
+        (& $scriptBlockCollapseSource $arrShapeGuard[0].Clauses[0].Item1.Extent.Text) -cne
+            (& $scriptBlockCollapseSource $strExpectedCondition) -or
+        (& $scriptBlockCollapseSource $arrShapeGuard[0].Clauses[0].Item2.Extent.Text) -cne
+            (& $scriptBlockCollapseSource $strExpectedBody)) {
+        throw 'archive-hash-result-guard'
+    }
+    $arrDigestAssignment = @(& $scriptBlockGetVariableAssignment 'strActualDigest')
+    if ($arrDigestAssignment.Count -ne 1 -or
+        -not [object]::ReferenceEquals($arrDigestAssignment[0].Parent, $objHashBlock) -or
+        $arrDigestAssignment[0].Right.Extent.Text -cne
+            '$arrArchiveHash[0].Hash.ToLowerInvariant()') {
+        throw 'archive-hash-digest-binding'
+    }
+    $arrMismatchGuard = @($Ast.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.IfStatementAst] -and
+                $Node.Extent.Text -cmatch "-Subreason 'mismatch'"
+            }, $true))
+    if ($arrMismatchGuard.Count -ne 1 -or
+        -not [object]::ReferenceEquals($arrMismatchGuard[0].Parent, $objHashBlock)) {
+        throw 'archive-hash-mismatch-guard'
+    }
+    $arrRewind = @($Ast.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $Node.Left -is [System.Management.Automation.Language.MemberExpressionAst] -and
+                $Node.Left.Expression -is
+                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                $Node.Left.Expression.VariablePath.UserPath -ceq 'objArchiveBuffer' -and
+                $Node.Left.Member -is
+                    [System.Management.Automation.Language.StringConstantExpressionAst] -and
+                [string]$Node.Left.Member.Value -ceq 'Position'
+            }, $true))
+    if ($arrRewind.Count -ne 1 -or
+        -not [object]::ReferenceEquals($arrRewind[0].Parent, $objHashBlock) -or
+        (& $scriptBlockCollapseSource $arrRewind[0].Extent.Text) -cne
+            '$objArchiveBuffer.Position = 0') {
+        throw 'archive-hash-rewind'
+    }
+    $arrZipAssignment = @($Ast.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                $Node.Left.VariablePath.UserPath -ceq 'objZipArchive' -and
+                $Node.Right -is [System.Management.Automation.Language.PipelineAst]
+            }, $true))
+    if ($arrZipAssignment.Count -ne 1 -or
+        -not [object]::ReferenceEquals($arrZipAssignment[0].Parent, $objHashBlock)) {
+        throw 'archive-hash-zip-binding'
+    }
+
+    $arrStreamAssignment = @(& $scriptBlockGetVariableAssignment 'objArchiveStream')
+    $arrStreamInitial = @($arrStreamAssignment | Where-Object {
+            $_.Right.Extent.Text -ceq '$null' -and
+            [object]::ReferenceEquals($_.Parent, $objExpansionBlock)
+        })
+    $arrStreamClosed = @($arrStreamAssignment | Where-Object {
+            $_.Right.Extent.Text -ceq '$null' -and
+            [object]::ReferenceEquals($_.Parent, $objHashBlock)
+        })
+    $arrStreamOpen = @($arrStreamAssignment | Where-Object {
+            $_.Right.Extent.Text -cmatch '\ANew-Object\s+System\.IO\.FileStream\('
+        })
+    if ($arrStreamAssignment.Count -ne 3 -or $arrStreamInitial.Count -ne 1 -or
+        $arrStreamClosed.Count -ne 1 -or $arrStreamOpen.Count -ne 1) {
+        throw 'archive-hash-stream-provenance'
+    }
+    $arrArchivePathOpen = @($Ast.FindAll({
+                param ($Node)
+                if ($Node -isnot [System.Management.Automation.Language.CommandAst] -or
+                    $Node.GetCommandName() -cne 'New-Object' -or
+                    @($Node.CommandElements).Count -lt 2 -or
+                    $Node.CommandElements[1].Extent.Text -cne 'System.IO.FileStream') {
+                    return $false
+                }
+                return ($null -ne $Node.Find({
+                            param ($Inner)
+                            $Inner -is
+                                [System.Management.Automation.Language.VariableExpressionAst] -and
+                            $Inner.VariablePath.UserPath -ceq 'strArchivePath'
+                        }, $true))
+            }, $true))
+    if ($arrArchivePathOpen.Count -ne 1 -or
+        -not [object]::ReferenceEquals(
+            $arrArchivePathOpen[0].Parent.Parent,
+            $arrStreamOpen[0])) {
+        throw 'archive-hash-stream-open'
+    }
+    $arrArchiveRead = @($Ast.FindAll({
+                param ($Node)
+                if ($Node -isnot
+                    [System.Management.Automation.Language.InvokeMemberExpressionAst] -or
+                    $Node.Member -isnot
+                        [System.Management.Automation.Language.StringConstantExpressionAst] -or
+                    [string]$Node.Member.Value -cne 'Read') {
+                    return $false
+                }
+                $boolArchiveReceiver = $Node.Expression -is
+                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $Node.Expression.VariablePath.UserPath -ceq 'objArchiveStream'
+                $boolArchiveBuffer = $null -ne $Node.Find({
+                        param ($Inner)
+                        $Inner -is
+                            [System.Management.Automation.Language.VariableExpressionAst] -and
+                        $Inner.VariablePath.UserPath -ceq 'arrArchiveByte'
+                    }, $true)
+                return ($boolArchiveReceiver -or $boolArchiveBuffer)
+            }, $true))
+    if ($arrArchiveRead.Count -ne 1 -or
+        $arrArchiveRead[0].Expression.VariablePath.UserPath -cne 'objArchiveStream' -or
+        @($arrArchiveRead[0].Arguments).Count -ne 3 -or
+        $arrArchiveRead[0].Arguments[0].Extent.Text -cne '$arrArchiveByte' -or
+        $arrArchiveRead[0].Arguments[1].Extent.Text -cne '$intArchiveFilled' -or
+        (& $scriptBlockCollapseSource $arrArchiveRead[0].Arguments[2].Extent.Text) -cne
+            '$arrArchiveByte.Length - $intArchiveFilled') {
+        throw 'archive-hash-stream-read'
+    }
+    $objReadLoop = $arrArchiveRead[0]
+    while ($null -ne $objReadLoop -and
+        $objReadLoop -isnot [System.Management.Automation.Language.WhileStatementAst]) {
+        $objReadLoop = $objReadLoop.Parent
+    }
+    if ($null -eq $objReadLoop -or
+        (& $scriptBlockCollapseSource $objReadLoop.Condition.Extent.Text) -cne
+            '$intArchiveFilled -lt $arrArchiveByte.Length') {
+        throw 'archive-hash-stream-read-loop'
+    }
+    $arrStreamDispose = @($Ast.FindAll({
+                param ($Node)
+                $Node -is
+                    [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+                $Node.Expression -is
+                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                $Node.Expression.VariablePath.UserPath -ceq 'objArchiveStream' -and
+                $Node.Member -is
+                    [System.Management.Automation.Language.StringConstantExpressionAst] -and
+                [string]$Node.Member.Value -ceq 'Dispose' -and
+                ($null -eq $Node.Arguments -or $Node.Arguments.Count -eq 0)
+            }, $true))
+    $arrStreamPreHashDispose = @($arrStreamDispose | Where-Object {
+            [object]::ReferenceEquals($_.Parent.Parent.Parent, $objHashBlock)
+        })
+    if ($arrStreamDispose.Count -ne 2 -or $arrStreamPreHashDispose.Count -ne 1) {
+        throw 'archive-hash-stream-disposal'
+    }
+
+    $objZipCommand = $arrZipAssignment[0].Right.PipelineElements[0]
+    if ($objZipCommand -isnot [System.Management.Automation.Language.CommandAst] -or
+        @($objZipCommand.CommandElements).Count -ne 3 -or
+        $objZipCommand.CommandElements[2] -isnot
+            [System.Management.Automation.Language.VariableExpressionAst]) {
+        throw 'archive-hash-zip-command'
+    }
+    $arrBufferSourceReference = @($arrBufferCreation[0].Right.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                $Node.VariablePath.UserPath -ceq 'arrArchiveByte'
+            }, $true))
+    $intRetainedStart = $arrBufferCreation[0].Right.Extent.StartOffset
+    $intRetainedEnd = $arrZipAssignment[0].Extent.EndOffset
+    $arrLengthObservation = @($Ast.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.MemberExpressionAst] -and
+                $Node.Expression -is
+                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                $Node.Expression.VariablePath.UserPath -ceq 'arrArchiveByte' -and
+                $Node.Member -is
+                    [System.Management.Automation.Language.StringConstantExpressionAst] -and
+                [string]$Node.Member.Value -ceq 'Length' -and
+                $Node.Extent.StartOffset -ge $intRetainedStart -and
+                $Node.Extent.EndOffset -le $intRetainedEnd
+            }, $true))
+    $arrRetainedArrayUse = @($Ast.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                $Node.VariablePath.UserPath -ceq 'arrArchiveByte' -and
+                $Node.Extent.StartOffset -ge $intRetainedStart -and
+                $Node.Extent.EndOffset -le $intRetainedEnd
+            }, $true))
+    if ($arrBufferSourceReference.Count -ne 1 -or
+        $arrLengthObservation.Count -ne 1 -or $arrRetainedArrayUse.Count -ne 2 -or
+        @($arrRetainedArrayUse | Where-Object {
+                [object]::ReferenceEquals($_, $arrBufferSourceReference[0]) -or
+                [object]::ReferenceEquals($_, $arrLengthObservation[0].Expression)
+            }).Count -ne 2) {
+        throw 'archive-hash-retained-array-use'
+    }
+    $arrRetainedBufferUse = @($Ast.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                $Node.VariablePath.UserPath -ceq 'objArchiveBuffer' -and
+                $Node.Extent.StartOffset -ge $intRetainedStart -and
+                $Node.Extent.EndOffset -le $intRetainedEnd
+            }, $true))
+    if ($arrRetainedBufferUse.Count -ne 3 -or
+        @($arrRetainedBufferUse | Where-Object {
+                [object]::ReferenceEquals($_, $arrElement[2]) -or
+                [object]::ReferenceEquals($_, $arrRewind[0].Left.Expression) -or
+                [object]::ReferenceEquals($_, $objZipCommand.CommandElements[2])
+            }).Count -ne 3) {
+        throw 'archive-hash-retained-buffer-use'
+    }
+
+    $arrOrderedNode = @(
+        $arrByteAssignment[0],
+        $objReadLoop,
+        $arrStreamPreHashDispose[0],
+        $arrStreamClosed[0],
+        $arrBufferCreation[0],
+        $objHashAssignment,
+        $arrShapeGuard[0],
+        $arrDigestAssignment[0],
+        $arrMismatchGuard[0],
+        $arrRewind[0],
+        $arrZipAssignment[0]
+    )
+    for ($intNode = 1; $intNode -lt $arrOrderedNode.Count; $intNode++) {
+        if ($arrOrderedNode[$intNode - 1].Extent.EndOffset -ge
+            $arrOrderedNode[$intNode].Extent.StartOffset) {
+            throw 'archive-hash-operation-order'
+        }
+    }
+    return [int]$objHashCommand.Extent.StartOffset
+}
+
+$script:scriptBlockAssertTerraformArchiveHashMutants = {
+    param (
+        [string]$RunRoot,
+        [string]$HelperLiteralPath,
+        [string]$ContextLiteralPath,
+        [switch]$EmitObservations
+    )
+
+    $strMutantRoot = [System.IO.Path]::Combine($RunRoot, 'archive-hash-mutants')
+    if ([System.IO.Directory]::Exists($strMutantRoot)) {
+        throw 'archive-hash-mutant-root-occupied'
+    }
+    [void][System.IO.Directory]::CreateDirectory($strMutantRoot)
+    try {
+        $strSource = [System.IO.File]::ReadAllText($HelperLiteralPath)
+        $strContext = [System.IO.File]::ReadAllText($ContextLiteralPath)
+        $arrControlError = $null
+        $objControlAst = [System.Management.Automation.Language.Parser]::ParseInput(
+            $strSource, [ref]$null, [ref]$arrControlError)
+        if (@($arrControlError).Count -ne 0 -or
+            (& $script:scriptBlockGetTerraformArchiveHashAllowance `
+                -Ast $objControlAst -Role helper) -lt 0) {
+            throw 'archive-hash-mutant-control'
+        }
+        $arrContextError = $null
+        $objContextAst = [System.Management.Automation.Language.Parser]::ParseInput(
+            $strContext, [ref]$null, [ref]$arrContextError)
+        if (@($arrContextError).Count -ne 0 -or
+            (& $script:scriptBlockGetTerraformArchiveHashAllowance `
+                -Ast $objContextAst -Role context) -ne -1) {
+            throw 'archive-hash-mutant-context-control'
+        }
+
+        $strMemoryCreation =
+            '$objArchiveBuffer = New-Object System.IO.MemoryStream(, $arrArchiveByte)'
+        $strHashCommand = 'Microsoft.PowerShell.Utility\Get-FileHash `' + "`n" +
+            '                    -InputStream $objArchiveBuffer `' + "`n" +
+            '                    -Algorithm SHA256 `' + "`n" +
+            '                    -ErrorAction Stop'
+        $strRewind = '$objArchiveBuffer.Position = 0'
+        $strZipOpen = '$objZipArchive = & $script:scriptBlockOpenCandidateHelperValidatedArchive `' +
+            "`n" + '                -Buffer $objArchiveBuffer'
+        $strStreamRelease = '$objArchiveStream.Dispose()' + "`n" +
+            '            $objArchiveStream = $null'
+        $strPostHashSite = '                    -ErrorAction Stop' + "`n" +
+            '            )'
+        $strDigestMismatch =
+            'if (-not [System.String]::Equals(' + "`n" +
+            '                    $strActualDigest,' + "`n" +
+            '                    $strExpectedDigest,' + "`n" +
+            '                    [System.StringComparison]::OrdinalIgnoreCase' + "`n" +
+            '                )) {'
+        $intZip = $strSource.IndexOf($strZipOpen, [System.StringComparison]::Ordinal)
+        $intMismatch = $strSource.IndexOf(
+            $strDigestMismatch, [System.StringComparison]::Ordinal)
+        if ($intZip -lt 0 -or $intMismatch -lt 0 -or
+            $strSource.IndexOf(
+                $strZipOpen, $intZip + $strZipOpen.Length,
+                [System.StringComparison]::Ordinal) -ge 0 -or
+            $strSource.IndexOf(
+                $strDigestMismatch, $intMismatch + $strDigestMismatch.Length,
+                [System.StringComparison]::Ordinal) -ge 0) {
+            throw 'archive-hash-mutant-site'
+        }
+        $strZipBeforeMismatch = $strSource.Remove($intZip, $strZipOpen.Length)
+        $strZipBeforeMismatch = $strZipBeforeMismatch.Insert(
+            $intMismatch, $strZipOpen + "`n            ")
+        $strRewindAfterZip = $strSource.Replace($strRewind, '')
+        $intRewindZip = $strRewindAfterZip.IndexOf(
+            $strZipOpen, [System.StringComparison]::Ordinal)
+        $strRewindAfterZip = $strRewindAfterZip.Insert(
+            $intRewindZip + $strZipOpen.Length,
+            "`n            " + $strRewind)
+        $strDisposeAfterHash = $strSource.Replace($strStreamRelease, '')
+        $strDisposeAfterHash = $strDisposeAfterHash.Replace(
+            $strPostHashSite,
+            $strPostHashSite + "`n            " + $strStreamRelease)
+
+        $arrMutant = @(
+            @{ Id = 'unqualified-command'; Source = $strSource.Replace(
+                    'Microsoft.PowerShell.Utility\Get-FileHash', 'Get-FileHash') },
+            @{ Id = 'wrong-module'; Source = $strSource.Replace(
+                    'Microsoft.PowerShell.Utility\Get-FileHash',
+                    'Microsoft.PowerShell.Management\Get-FileHash') },
+            @{ Id = 'path-parameter'; Source = $strSource.Replace(
+                    '-InputStream $objArchiveBuffer', '-Path $strArchivePath') },
+            @{ Id = 'live-file-stream'; Source = $strSource.Replace(
+                    '-InputStream $objArchiveBuffer', '-InputStream $objArchiveStream') },
+            @{ Id = 'splatted-input'; Source = $strSource.Replace(
+                    '-InputStream $objArchiveBuffer', '-InputStream @objArchiveBuffer') },
+            @{ Id = 'wrong-algorithm'; Source = $strSource.Replace(
+                    '-Algorithm SHA256', '-Algorithm SHA1') },
+            @{ Id = 'error-action-removed'; Source = $strSource.Replace(
+                    (' ' + [char]96 + "`n" + '                    -ErrorAction Stop'),
+                    '') },
+            @{ Id = 'duplicate-command'; Source = $strSource.Replace(
+                    $strHashCommand, $strHashCommand + "`n                " +
+                        $strHashCommand.TrimStart()) },
+            @{ Id = 'buffer-rebound'; Source = $strSource.Replace(
+                    $strMemoryCreation,
+                    $strMemoryCreation + "`n            `$objArchiveBuffer = `$null") },
+            @{ Id = 'wrong-byte-array'; Source = $strSource.Replace(
+                    $strMemoryCreation,
+                    '$objArchiveBuffer = New-Object System.IO.MemoryStream(, $arrOtherByte)') },
+            @{ Id = 'zero-result-guard'; Source = $strSource.Replace(
+                    '$arrArchiveHash.Count -ne 1', '$arrArchiveHash.Count -ne 0') },
+            @{ Id = 'duplicate-result-guard'; Source = $strSource.Replace(
+                    '$arrArchiveHash.Count -ne 1', '$arrArchiveHash.Count -ne 2') },
+            @{ Id = 'algorithm-type-guard-removed'; Source = $strSource.Replace(
+                    '$arrArchiveHash[0].Algorithm -isnot [string] -or', '$false -or') },
+            @{ Id = 'hash-type-guard-removed'; Source = $strSource.Replace(
+                    '$arrArchiveHash[0].Hash -isnot [string] -or', '$false -or') },
+            @{ Id = 'trailing-newline-grammar'; Source = $strSource.Replace(
+                    "'\A[0-9A-Fa-f]{64}\z'", "'\A[0-9A-Fa-f]{64}$'") },
+            @{ Id = 'malformed-hash-grammar'; Source = $strSource.Replace(
+                    "'\A[0-9A-Fa-f]{64}\z'", "'\A[0-9A-Fa-f]{1,64}\z'") },
+            @{ Id = 'wrong-digest-result'; Source = $strSource.Replace(
+                    '$arrArchiveHash[0].Hash.ToLowerInvariant()',
+                    '$arrArchiveHash[1].Hash.ToLowerInvariant()') },
+            @{ Id = 'rewind-removed'; Source = $strSource.Replace(
+                    $strRewind, '[void]$objArchiveBuffer') },
+            @{ Id = 'wrong-rewind-buffer'; Source = $strSource.Replace(
+                    $strRewind, '$objOtherBuffer.Position = 0') },
+            @{ Id = 'rewind-after-zip'; Source = $strRewindAfterZip },
+            @{ Id = 'zip-before-mismatch'; Source = $strZipBeforeMismatch },
+            @{ Id = 'second-file-open'; Source = $strSource.Replace(
+                    $strMemoryCreation,
+                    $strMemoryCreation + "`n            if (`$false) {" +
+                        "`n                `$objOtherArchive = New-Object System.IO.FileStream(" +
+                        "`n                    `$strArchivePath," +
+                        "`n                    [System.IO.FileMode]::Open," +
+                        "`n                    [System.IO.FileAccess]::Read," +
+                        "`n                    [System.IO.FileShare]::Read" +
+                        "`n                )" + "`n            }") },
+            @{ Id = 'second-archive-read'; Source = $strSource.Replace(
+                    $strMemoryCreation,
+                    $strMemoryCreation + "`n            if (`$false) {" +
+                        "`n                `$null = `$objArchiveStream.Read(`$arrArchiveByte, 0, 0)" +
+                        "`n            }") },
+            @{ Id = 'dispose-after-hash'; Source = $strDisposeAfterHash },
+            @{ Id = 'buffer-setlength'; Source = $strSource.Replace(
+                    $strPostHashSite,
+                    $strPostHashSite +
+                        "`n            `$objArchiveBuffer.SetLength(0)") },
+            @{ Id = 'buffer-writebyte'; Source = $strSource.Replace(
+                    $strPostHashSite,
+                    $strPostHashSite +
+                        "`n            `$objArchiveBuffer.WriteByte(0)") },
+            @{ Id = 'buffer-alias-mutation'; Source = $strSource.Replace(
+                    $strPostHashSite,
+                    $strPostHashSite +
+                        "`n            `$objArchiveAlias = `$objArchiveBuffer" +
+                        "`n            `$objArchiveAlias.WriteByte(0)") },
+            @{ Id = 'stream-computehash'; SurfaceOnly = $true; Source = $strSource.Replace(
+                    $strMemoryCreation,
+                    $strMemoryCreation + "`n            if (`$false) {" +
+                        "`n                `$null = `$objArchiveSha256.ComputeHash(`$objHashSource)" +
+                        "`n            }") }
+        )
+        foreach ($hashtableMutant in $arrMutant) {
+            if ([string]$hashtableMutant.Source -ceq $strSource) {
+                throw ('archive-hash-mutant-no-change-' + $hashtableMutant.Id)
+            }
+            $arrMutantError = $null
+            $objMutantAst = [System.Management.Automation.Language.Parser]::ParseInput(
+                [string]$hashtableMutant.Source,
+                [ref]$null,
+                [ref]$arrMutantError
+            )
+            if (@($arrMutantError).Count -ne 0) {
+                throw ('archive-hash-mutant-parse-' + $hashtableMutant.Id)
+            }
+            $boolDirectRejected = $false
+            try {
+                $null = & $script:scriptBlockGetTerraformArchiveHashAllowance `
+                    -Ast $objMutantAst -Role helper
+            } catch {
+                $boolDirectRejected = $_.Exception.Message -cmatch '^archive-hash-'
+            }
+            $boolSurfaceOnly = $hashtableMutant.ContainsKey('SurfaceOnly') -and
+                [bool]$hashtableMutant.SurfaceOnly
+            if ($boolSurfaceOnly -eq $boolDirectRejected) {
+                throw ('archive-hash-mutant-direct-verdict-' + $hashtableMutant.Id)
+            }
+            $strMutantPath = [System.IO.Path]::Combine(
+                $strMutantRoot, [string]$hashtableMutant.Id + '.ps1')
+            [System.IO.File]::WriteAllText(
+                $strMutantPath,
+                [string]$hashtableMutant.Source,
+                [System.Text.UTF8Encoding]::new($false)
+            )
+            $boolSurfaceRejected = $false
+            try {
+                & $script:scriptBlockAssertEnumerationPrimitiveExclusive `
+                    -HelperLiteralPath $strMutantPath `
+                    -ContextLiteralPath $ContextLiteralPath
+            } catch {
+                $boolSurfaceRejected = $_.Exception.Message -cmatch
+                    '^(archive-hash-|PSStyleGuide\.CandidateHarness\.v1\|)'
+            }
+            if (-not $boolSurfaceRejected) {
+                throw ('archive-hash-mutant-surface-accepted-' + $hashtableMutant.Id)
+            }
+            if ($EmitObservations) {
+                [pscustomobject]@{
+                    Scope = 'archive-hash-mutation'
+                    Id = [string]$hashtableMutant.Id
+                    DirectRejected = $boolDirectRejected
+                    SurfaceRejected = $boolSurfaceRejected
+                }
+            }
+        }
+    } finally {
+        & $script:scriptBlockRemoveTestTree `
+            -LiteralPath $strMutantRoot `
+            -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockGetTerraformZipGetterAllowance = {
+    param ([System.Management.Automation.Language.ScriptBlockAst]$Ast, [string]$Role)
+
+    $arrGetter = @($Ast.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+        $Node.Member -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
+        $Node.Member.Value -ceq 'get_Entries'
+    }, $true))
+    if ($Role -ceq 'context') {
+        if ($arrGetter.Count -ne 0) { throw 'zip-getter-context' }
+        return -1
+    }
+    if ($Role -cne 'helper' -or $arrGetter.Count -ne 1) { throw 'zip-getter-cardinality' }
+    $objGetter = $arrGetter[0]
+    if ($objGetter.Static -or $objGetter.Expression -isnot [System.Management.Automation.Language.VariableExpressionAst] -or
+        $objGetter.Expression.VariablePath.UserPath -cne 'objZipArchive' -or
+        ($null -ne $objGetter.Arguments -and @($objGetter.Arguments).Count -ne 0)) { throw 'zip-getter-shape' }
+    $objAssignment = $objGetter.Parent.Parent
+    if ($objGetter.Parent -isnot [System.Management.Automation.Language.CommandExpressionAst] -or
+        $objAssignment -isnot [System.Management.Automation.Language.AssignmentStatementAst] -or
+        $objAssignment.Left.Extent.Text -cne '$objMaterializedEntries' -or
+        -not [object]::ReferenceEquals($objAssignment.Right, $objGetter.Parent)) { throw 'zip-getter-assignment' }
+    $objGetterTry = $objAssignment.Parent.Parent
+    if ($objGetterTry -isnot [System.Management.Automation.Language.TryStatementAst] -or
+        -not [object]::ReferenceEquals($objGetterTry.Body, $objAssignment.Parent) -or
+        $objGetterTry.Body.Statements.Count -ne 1) { throw 'zip-getter-try' }
+    $arrExpansion = @($Ast.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        $Node.Left.VariablePath.UserPath -ceq 'script:scriptBlockInvokeCandidateArtifactExpansion'
+    }, $true))
+    if ($arrExpansion.Count -ne 1) { throw 'zip-getter-expansion-count' }
+    $arrLiteral = @($arrExpansion[0].Right.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+    }, $false))
+    if ($arrLiteral.Count -ne 1) { throw 'zip-getter-expansion-body' }
+    $objExpansionBody = $arrLiteral[0].ScriptBlock.EndBlock
+    $arrArchiveAssignment = @($Ast.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        $Node.Left.VariablePath.UserPath -ceq 'objZipArchive'
+    }, $true))
+    if ($arrArchiveAssignment.Count -ne 2) { throw 'zip-getter-reassignment' }
+    $arrInitial = @($arrArchiveAssignment | Where-Object { $_.Right.Extent.Text -ceq '$null' })
+    $arrGuarded = @($arrArchiveAssignment | Where-Object { $_.Right -is [System.Management.Automation.Language.PipelineAst] })
+    if ($arrInitial.Count -ne 1 -or $arrGuarded.Count -ne 1 -or
+        -not [object]::ReferenceEquals($arrInitial[0].Parent, $objExpansionBody)) { throw 'zip-getter-archive-binding' }
+    $objGuarded = $arrGuarded[0]
+    if ($objGuarded.Right.PipelineElements.Count -ne 1) { throw 'zip-getter-guard-pipeline' }
+    $objGuardCall = $objGuarded.Right.PipelineElements[0]
+    if ($objGuardCall -isnot [System.Management.Automation.Language.CommandAst] -or
+        $objGuardCall.InvocationOperator -ne [System.Management.Automation.Language.TokenKind]::Ampersand -or
+        $objGuardCall.CommandElements.Count -ne 3 -or $objGuardCall.Redirections.Count -ne 0 -or
+        $objGuardCall.CommandElements[0].Extent.Text -cne '$script:scriptBlockOpenCandidateHelperValidatedArchive' -or
+        $objGuardCall.CommandElements[1].Extent.Text -cne '-Buffer' -or
+        $objGuardCall.CommandElements[2].Extent.Text -cne '$objArchiveBuffer') { throw 'zip-getter-guard-call' }
+    $objOuterTry = $objGuarded.Parent.Parent
+    if ($objOuterTry -isnot [System.Management.Automation.Language.TryStatementAst] -or
+        -not [object]::ReferenceEquals($objOuterTry.Parent, $objExpansionBody) -or
+        -not [object]::ReferenceEquals($objOuterTry.Body, $objGuarded.Parent) -or
+        -not [object]::ReferenceEquals($objGetterTry.Parent, $objGuarded.Parent) -or
+        $objGuarded.Extent.EndOffset -ge $objGetterTry.Extent.StartOffset) { throw 'zip-getter-guard-order' }
+    $arrProtectedOpen = @($Ast.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        $Node.Left.VariablePath.UserPath -ceq 'script:scriptBlockOpenCandidateHelperValidatedArchive'
+    }, $true))
+    if ($arrProtectedOpen.Count -ne 1) { throw 'zip-getter-open-count' }
+    $arrOpenLiteral = @($arrProtectedOpen[0].Right.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+    }, $false))
+    if ($arrOpenLiteral.Count -ne 1 -or $arrOpenLiteral[0].ScriptBlock.EndBlock.Statements.Count -lt 1 -or
+        $arrOpenLiteral[0].ScriptBlock.EndBlock.Statements[0].Extent.Text -cne
+            '[void](& $script:scriptBlockAssertCandidateHelperArchiveEntryCount -Stream $Buffer)') { throw 'zip-getter-preflight' }
+    return [int]$objGetter.Extent.StartOffset
+}
+
+$script:scriptBlockAssertTerraformZipGetterMutants = {
+    param ([string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath, [switch]$EmitObservations)
+
+    $strMutantRoot = [IO.Path]::Combine($RunRoot, 'zip-getter-mutants')
+    if ([IO.Directory]::Exists($strMutantRoot)) { throw 'zip-getter-mutant-root-occupied' }
+    [void][IO.Directory]::CreateDirectory($strMutantRoot)
+    try {
+        $strSource = [IO.File]::ReadAllText($HelperLiteralPath)
+        $strContext = [IO.File]::ReadAllText($ContextLiteralPath)
+        $strGetter = '$objMaterializedEntries = $objZipArchive.get_Entries()'
+        $strGuard = '$objZipArchive = & $script:scriptBlockOpenCandidateHelperValidatedArchive `' + "`n" +
+            '                -Buffer $objArchiveBuffer'
+        if ($strSource.Split([string[]]@($strGetter), [StringSplitOptions]::None).Count -ne 2 -or
+            $strSource.Split([string[]]@($strGuard), [StringSplitOptions]::None).Count -ne 2) { throw 'zip-getter-mutant-site' }
+        foreach ($hashtableControl in @(@{ Role = 'helper'; Source = $strSource }, @{ Role = 'context'; Source = $strContext })) {
+            $arrErrors = $null
+            $objAst = [Management.Automation.Language.Parser]::ParseInput($hashtableControl.Source, [ref]$null, [ref]$arrErrors)
+            if ($arrErrors.Count -ne 0) { throw 'zip-getter-control-parse' }
+            $intAllowed = & $script:scriptBlockGetTerraformZipGetterAllowance -Ast $objAst -Role $hashtableControl.Role
+            if (($hashtableControl.Role -ceq 'helper' -and $intAllowed -lt 0) -or
+                ($hashtableControl.Role -ceq 'context' -and $intAllowed -ne -1)) { throw 'zip-getter-control' }
+        }
+        foreach ($hashtableMutant in @(
+            @{ Id = 'receiver'; Role = 'helper'; Source = $strSource.Replace('$objZipArchive.get_Entries()', '$objArchiveBuffer.get_Entries()') },
+            @{ Id = 'static'; Role = 'helper'; Source = $strSource.Replace('$objZipArchive.get_Entries()', '[IO.Compression.ZipArchive]::get_Entries()') },
+            @{ Id = 'argument'; Role = 'helper'; Source = $strSource.Replace('$objZipArchive.get_Entries()', '$objZipArchive.get_Entries($null)') },
+            @{ Id = 'computed'; Role = 'helper'; Source = $strSource.Replace('$objZipArchive.get_Entries()', '$objZipArchive.(''get_'' + ''Entries'')()') },
+            @{ Id = 'duplicate'; Role = 'helper'; Source = $strSource.Replace($strGetter, $strGetter + '; ' + $strGetter) },
+            @{ Id = 'context'; Role = 'context'; Source = $strContext.Replace('    Microsoft.PowerShell.Core\Export-ModuleMember -Function ', ($strGetter + "`n    Microsoft.PowerShell.Core\Export-ModuleMember -Function ")) },
+            @{ Id = 'guard-removed'; Role = 'helper'; Source = $strSource.Replace($strGuard, '$objZipArchive = $null') },
+            @{ Id = 'preflight-removed'; Role = 'helper'; Source = $strSource.Replace('[void](& $script:scriptBlockAssertCandidateHelperArchiveEntryCount -Stream $Buffer)', '[void]$Buffer') },
+            @{ Id = 'reassigned'; Role = 'helper'; Source = $strSource.Replace($strGetter, '$objZipArchive = $null; ' + $strGetter) },
+            @{ Id = 'before-guard'; Role = 'helper'; Source = $strSource.Replace($strGetter, '$objMaterializedEntries = $null').Replace($strGuard, $strGetter + '; ' + $strGuard) }
+        )) {
+            $arrErrors = $null
+            $objAst = [Management.Automation.Language.Parser]::ParseInput($hashtableMutant.Source, [ref]$null, [ref]$arrErrors)
+            if ($arrErrors.Count -ne 0) { throw ('zip-getter-mutant-parse-' + $hashtableMutant.Id) }
+            $boolRejected = $false
+            try { $null = & $script:scriptBlockGetTerraformZipGetterAllowance -Ast $objAst -Role $hashtableMutant.Role }
+            catch { $boolRejected = $_.Exception.Message -cmatch '^zip-getter-' }
+            if (-not $boolRejected) { throw ('zip-getter-mutant-accepted-' + $hashtableMutant.Id) }
+            $strMutantPath = [IO.Path]::Combine($strMutantRoot, $hashtableMutant.Id + '.ps1')
+            [IO.File]::WriteAllText($strMutantPath, $hashtableMutant.Source, [Text.UTF8Encoding]::new($false))
+            $strHelperClaim = if ($hashtableMutant.Role -ceq 'helper') { $strMutantPath } else { $HelperLiteralPath }
+            $strContextClaim = if ($hashtableMutant.Role -ceq 'context') { $strMutantPath } else { $ContextLiteralPath }
+            $boolSurfaceRejected = $false
+            try { & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $strHelperClaim -ContextLiteralPath $strContextClaim }
+            catch { $boolSurfaceRejected = $_.Exception.Message -cmatch '^zip-getter-' }
+            if (-not $boolSurfaceRejected) { throw ('zip-getter-surface-mutant-accepted-' + $hashtableMutant.Id) }
+
+            if ($EmitObservations) { [pscustomobject]@{ Scope = 'zip-getter-mutation'; Id = $hashtableMutant.Id; Rejected = $boolRejected; SurfaceRejected = $boolSurfaceRejected } }
+        }
+    } finally { & $script:scriptBlockRemoveTestTree -LiteralPath $strMutantRoot -ApprovedParent $RunRoot }
+}
+
+$script:scriptBlockAssertEqualsReceiverAliasBounded = {
+    param ([string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$RunRoot)
+
+    $strSource = [System.IO.File]::ReadAllText($HelperLiteralPath)
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseInput($strSource, [ref]$null, [ref]$objErrors)
+    $arrModule = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left.Extent.Text -ceq '$scriptBlockCandidateModuleDefinition'
+    })
+    $arrTail = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left.Extent.Text -ceq '$strCandidateModuleName'
+    })
+    if (@($objErrors).Count -ne 0 -or $arrModule.Count -ne 1 -or $arrTail.Count -ne 1 -or
+        $arrTail[0].Extent.StartOffset -le $arrModule[0].Extent.EndOffset) { throw 'equals-alias-source-layout' }
+    $objModuleLiteral = $arrModule[0].Right.Find({ param ($Node)
+        $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+    }, $false)
+    if ($null -eq $objModuleLiteral) { throw 'equals-alias-source-layout' }
+    $arrNormalization = @($objModuleLiteral.ScriptBlock.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left.Extent.Text -ceq '$script:scriptBlockConvertToCandidateHelperNormalizedPath'
+    })
+    if ($arrNormalization.Count -ne 1) { throw 'equals-alias-source-cardinality' }
+    $arrCalls = @($arrNormalization[0].Right.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and $Node.Static -and
+        $Node.Expression -is [System.Management.Automation.Language.TypeExpressionAst] -and
+        $Node.Expression.TypeName.FullName -ceq 'string' -and
+        $Node.Member -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
+        $Node.Member.Value -ceq 'Equals'
+    }, $true))
+    if ($arrCalls.Count -ne 1 -or $arrCalls[0].Arguments.Count -ne 3 -or
+        $arrCalls[0].Arguments[0].Extent.Text -cne '$objDrive.Root' -or
+        $arrCalls[0].Arguments[1].Extent.Text -cne '$strNativeRoot' -or
+        $arrCalls[0].Arguments[2].Extent.Text -cne '[StringComparison]::OrdinalIgnoreCase') { throw 'equals-alias-source-call' }
+    $objReceiver = $arrCalls[0].Expression
+    $strReplacement = '[System.DateTime]'
+    $strMutant = $strSource.Remove($objReceiver.Extent.StartOffset, $objReceiver.Extent.EndOffset - $objReceiver.Extent.StartOffset).Insert($objReceiver.Extent.StartOffset, $strReplacement)
+    if ($strMutant -ceq $strSource -or
+        $strMutant.Remove($objReceiver.Extent.StartOffset, $strReplacement.Length).Insert($objReceiver.Extent.StartOffset, $objReceiver.Extent.Text) -cne $strSource) { throw 'equals-alias-source-reversal' }
+    $objMutantErrors = $null
+    $objMutantAst = [System.Management.Automation.Language.Parser]::ParseInput($strMutant, [ref]$null, [ref]$objMutantErrors)
+    if (@($objMutantErrors).Count -ne 0) { throw 'equals-alias-mutant-parse' }
+    $arrMutantTail = @($objMutantAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left.Extent.Text -ceq '$strCandidateModuleName'
+    })
+    if ($arrMutantTail.Count -ne 1 -or
+        $strMutant.Substring($arrMutantTail[0].Extent.StartOffset) -cne $strSource.Substring($arrTail[0].Extent.StartOffset)) { throw 'equals-alias-mutant-tail' }
+    $arrMutatedCalls = @($objMutantAst.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and $Node.Static -and
+        $Node.Expression -is [System.Management.Automation.Language.TypeExpressionAst] -and
+        $Node.Expression.TypeName.FullName -ceq 'System.DateTime' -and
+        $Node.Member -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
+        $Node.Member.Value -ceq 'Equals'
+    }, $true))
+    if ($arrMutatedCalls.Count -ne 1 -or $arrMutatedCalls[0].Extent.StartOffset -ne $arrCalls[0].Extent.StartOffset) { throw 'equals-alias-mutant-call' }
+    $strExpected = 'PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=member-receiver-not-permitted-Equals-' + [string]$arrMutatedCalls[0].Extent.StartLineNumber
+    & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    $strMutantPath = [System.IO.Path]::Combine($RunRoot, 'equals-unapproved-receiver.ps1')
+    try {
+        [System.IO.File]::WriteAllText($strMutantPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+        $boolRejected = $false
+        try {
+            & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $strMutantPath -ContextLiteralPath $ContextLiteralPath
+        } catch {
+            $boolRejected = $_.Exception.Data['PSStyleGuideHarnessCode'] -ceq 'catalog-invalid' -and
+                $_.Exception.Message -ceq $strExpected
+        }
+        if (-not $boolRejected) { throw 'equals-unapproved-receiver-not-refused' }
+    } finally {
+        if ([System.IO.File]::Exists($strMutantPath)) { [System.IO.File]::Delete($strMutantPath) }
+    }
+}
+
+$script:scriptBlockGetManagerQualifiedPathAllowance = {
+    param ([System.Management.Automation.Language.ScriptBlockAst]$Ast, [ValidateSet('helper', 'context')][string]$Role)
+
+    $objAllowed = New-Object 'System.Collections.Generic.HashSet[int]'
+    if ($Role -ceq 'helper') { return ,$objAllowed }
+    $strModuleName = if ($Role -ceq 'helper') { 'scriptBlockCandidateModuleDefinition' } else { 'scriptBlockContextModuleDefinition' }
+    $arrModule = @($Ast.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        $_.Left.VariablePath.UserPath -ceq $strModuleName
+    })
+    if ($arrModule.Count -ne 1) { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'manager-path-call-binding' }
+    $objModuleLiteral = $arrModule[0].Right.Find({ param ($Node)
+        $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+    }, $false)
+    if ($null -eq $objModuleLiteral) { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'manager-path-call-binding' }
+    $arrAssignments = @($Ast.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        ($Node.Left.VariablePath.UserPath -ireplace '\A(?:script|local|private|global):', '') -ieq 'scriptBlockAssertCandidateSafePathText'
+    }, $true))
+    $arrInitial = @($arrAssignments | Where-Object {
+        $_.Left.VariablePath.UserPath -ceq 'scriptBlockAssertCandidateSafePathText'
+    })
+    if ($arrAssignments.Count -ne 1 -or $arrInitial.Count -ne 1 -or
+        -not [object]::ReferenceEquals($arrInitial[0].Parent, $objModuleLiteral.ScriptBlock.EndBlock)) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'manager-path-call-binding'
+    }
+    $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false)).GetBytes($arrInitial[0].Extent.Text))
+    if ($strHash -cne '41ef68e559de3e7c1196836d98a12ef1efc3314303851e6bd9be71570fb59942') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'manager-path-call-source'
+    }
+    $arrCalls = @($arrInitial[0].Right.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+        $Node.Member -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
+        $Node.Member.Value -ceq 'StartsWith'
+    }, $true))
+    if ($arrCalls.Count -ne 1 -or $arrCalls[0].Static -or
+        $arrCalls[0].Expression.Extent.Text -cne '$strProviderPath' -or
+        $arrCalls[0].Arguments.Count -ne 2 -or $arrCalls[0].Arguments[0].Extent.Text -cne "'/'" -or
+        $arrCalls[0].Arguments[1].Extent.Text -cne '[System.StringComparison]::Ordinal') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'manager-path-call-shape'
+    }
+    [void]$objAllowed.Add($arrCalls[0].Extent.StartOffset)
+    return ,$objAllowed
+}
+
+$script:scriptBlockAssertRegisterRemovalControls = {
+    param ([string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    $strSource = [System.IO.File]::ReadAllText($ContextLiteralPath)
+    $strList = "@(`n            'arrCandidateIssuedContext',`n            'arrCandidateActiveCleanup',`n            'arrCandidateIssuedSnapshot',`n            'arrCandidateIssuedState'`n        )"
+    $strLoop = 'foreach ($strCandidateRegisterName in ' + $strList + ')'
+    $strCall = 'Remove-Variable -Name $strCandidateRegisterName -Force -ErrorAction SilentlyContinue'
+    if ([regex]::Matches($strSource, [regex]::Escape($strLoop)).Count -ne 1 -or
+        [regex]::Matches($strSource, [regex]::Escape($strCall)).Count -ne 1) { throw 'register-removal-control-anchor' }
+    foreach ($strMode in @('missing-active', 'extra-callable', 'duplicate', 'reorder', 'computed-list', 'wrong-loop-variable', 'positional', 'splat')) {
+        switch ($strMode) {
+            'missing-active' { $strMutant = $strSource.Replace($strList, $strList.Replace("            'arrCandidateActiveCleanup'," + "`n", '')) }
+            'extra-callable' { $strMutant = $strSource.Replace($strList, $strList.Replace("            'arrCandidateIssuedState'", "            'arrCandidateIssuedState',`n            'scriptBlockSourceRemoveContext'")) }
+            'duplicate' { $strMutant = $strSource.Replace($strList, $strList.Replace("            'arrCandidateActiveCleanup',", "            'arrCandidateIssuedContext',")) }
+            'reorder' { $strMutant = $strSource.Replace($strList, $strList.Replace("            'arrCandidateIssuedContext',`n            'arrCandidateActiveCleanup',", "            'arrCandidateActiveCleanup',`n            'arrCandidateIssuedContext',")) }
+            'computed-list' { $strMutant = $strSource.Replace($strLoop, 'foreach ($strCandidateRegisterName in $arrCandidateIssuedContext)') }
+            'wrong-loop-variable' { $strMutant = $strSource.Replace($strLoop, ('foreach ($strOtherRegisterName in ' + $strList + ')')) }
+            'positional' { $strMutant = $strSource.Replace($strCall, 'Remove-Variable $strCandidateRegisterName -Force -ErrorAction SilentlyContinue') }
+            'splat' { $strMutant = $strSource.Replace($strCall, 'Remove-Variable @hashtableRemovalArguments') }
+        }
+        if ($strMutant -ceq $strSource) { throw 'register-removal-control-unchanged' }
+        $objErrors = $null
+        $objAst = [System.Management.Automation.Language.Parser]::ParseInput($strMutant, [ref]$null, [ref]$objErrors)
+        if (@($objErrors).Count -ne 0) { throw 'register-removal-control-parse' }
+        $arrCalls = @($objAst.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.CommandAst] -and $Node.GetCommandName() -ceq 'Remove-Variable'
+        }, $true))
+        if ($arrCalls.Count -ne 1) { throw 'register-removal-control-call-count' }
+        $strExpected = 'PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=remove-variable-not-canonical-' + [string]$arrCalls[0].Extent.StartLineNumber
+        $strPath = [System.IO.Path]::Combine($RunRoot, ('register-removal-' + $strMode + '.ps1'))
+        $objFailure = $null
+        try {
+            [System.IO.File]::WriteAllText($strPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+            & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $strPath
+        } catch { $objFailure = $_ }
+        finally { if ([System.IO.File]::Exists($strPath)) { [System.IO.File]::Delete($strPath) } }
+        if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne $strExpected) { throw ('register-removal-control-' + $strMode) }
+    }
+}
+
+$script:scriptBlockAssertManagerQualifiedPathAllowanceMutants = {
+    param ([string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    $strSource = [System.IO.File]::ReadAllText($ContextLiteralPath)
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseInput($strSource, [ref]$null, [ref]$objErrors)
+    $arrDefinition = @($objAst.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left.Extent.Text -ceq '$scriptBlockAssertCandidateSafePathText' -and $Node.Right.Extent.Text -notmatch 'GetNewClosure\('
+    }, $true))
+    if (@($objErrors).Count -ne 0 -or $arrDefinition.Count -ne 1) { throw 'manager-path-mutant-definition' }
+    $arrModule = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left.Extent.Text -ceq '$scriptBlockContextModuleDefinition'
+    })
+    $arrTail = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left.Extent.Text -ceq '$strContextModuleName'
+    })
+    $arrInsertion = @($objAst.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left.Extent.Text -ceq '$scriptBlockResolveCandidateExistingDirectory'
+    }, $true))
+    if ($arrModule.Count -ne 1 -or $arrTail.Count -ne 1 -or $arrInsertion.Count -ne 1) { throw 'manager-path-mutant-layout' }
+    $objModuleLiteral = $arrModule[0].Right.Find({ param ($Node)
+        $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+    }, $false)
+    if ($null -eq $objModuleLiteral -or
+        -not [object]::ReferenceEquals($arrInsertion[0].Parent, $objModuleLiteral.ScriptBlock.EndBlock) -or
+        $arrTail[0].Extent.StartOffset -le $arrModule[0].Extent.EndOffset) { throw 'manager-path-mutant-layout' }
+    $strInsertion = '$scriptBlockResolveCandidateExistingDirectory = {'
+    if ([regex]::Matches($strSource, [regex]::Escape($strInsertion)).Count -ne 1 -or
+        -not $arrInsertion[0].Extent.Text.StartsWith($strInsertion, [System.StringComparison]::Ordinal)) { throw 'manager-path-mutant-anchor' }
+    $strTail = $strSource.Substring($arrTail[0].Extent.StartOffset)
+    $strDefinition = $arrDefinition[0].Extent.Text
+    $strCall = '$strProviderPath.StartsWith(''/'', [System.StringComparison]::Ordinal)'
+    if ([regex]::Matches($strDefinition, [regex]::Escape($strCall)).Count -ne 1) { throw 'manager-path-mutant-call-cardinality' }
+    foreach ($strMode in @('receiver', 'argument', 'enclosing-block', 'duplicate-definition', 'extra-assignment', 'outside-call',
+        'script-alias', 'local-alias', 'private-alias', 'global-alias', 'case-alias')) {
+        $strDetail = 'manager-path-call-source'
+        $strBefore = $strInsertion
+        $strAfter = ''
+        switch ($strMode) {
+            'receiver' { $strBefore = $strCall; $strAfter = '$strProviderName.StartsWith(''/'', [System.StringComparison]::Ordinal)' }
+            'argument' { $strBefore = $strCall; $strAfter = '$strProviderPath.StartsWith(''x'', [System.StringComparison]::Ordinal)' }
+            'enclosing-block' { $strBefore = $strDefinition; $strAfter = '& {' + "`n" + $strDefinition + "`n}"; $strDetail = 'manager-path-call-binding' }
+            'duplicate-definition' { $strAfter = $strDefinition + "`n" + $strInsertion; $strDetail = 'manager-path-call-binding' }
+            'extra-assignment' { $strAfter = '$scriptBlockAssertCandidateSafePathText = { return ''/'' }' + "`n" + $strInsertion; $strDetail = 'manager-path-call-binding' }
+            { $_ -cin @('script-alias', 'local-alias', 'private-alias', 'global-alias', 'case-alias') } {
+                $strVariable = if ($strMode -ceq 'case-alias') { '$SCRIPTBLOCKASSERTCANDIDATESAFEPATHTEXT' }
+                else { '$' + $strMode.Substring(0, $strMode.IndexOf('-')) + ':scriptBlockAssertCandidateSafePathText' }
+                $strAfter = $strVariable + ' = { return ''/'' }' + "`n" + $strInsertion
+                $strDetail = 'manager-path-call-binding'
+            }
+            'outside-call' { $strAfter = '$strUnexpectedPath = ''/''; [void]$strUnexpectedPath.StartsWith(''/'')' + "`n" + $strInsertion }
+        }
+        if ($strAfter.Length -eq 0 -or [regex]::Matches($strSource, [regex]::Escape($strBefore)).Count -ne 1) { throw 'manager-path-mutant-anchor' }
+        $strMutant = $strSource.Replace($strBefore, $strAfter)
+        if ($strMutant -ceq $strSource -or
+            [regex]::Matches($strMutant, [regex]::Escape($strAfter)).Count -ne 1 -or
+            $strMutant.Replace($strAfter, $strBefore) -cne $strSource) { throw 'manager-path-mutant-reversal' }
+        $objMutantErrors = $null
+        $objMutantAst = [System.Management.Automation.Language.Parser]::ParseInput($strMutant, [ref]$null, [ref]$objMutantErrors)
+        if (@($objMutantErrors).Count -ne 0) { throw 'manager-path-mutant-parse' }
+        $arrMutantTail = @($objMutantAst.EndBlock.Statements | Where-Object {
+            $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $_.Left.Extent.Text -ceq '$strContextModuleName'
+        })
+        if ($arrMutantTail.Count -ne 1 -or
+            $strMutant.Substring($arrMutantTail[0].Extent.StartOffset) -cne $strTail) { throw 'manager-path-mutant-tail' }
+        if ($strMode -ceq 'outside-call') {
+            $arrOutside = @($objMutantAst.FindAll({ param ($Node)
+                $Node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+                $Node.Expression.Extent.Text -ceq '$strUnexpectedPath' -and
+                $Node.Member -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
+                $Node.Member.Value -ceq 'StartsWith'
+            }, $true))
+            if ($arrOutside.Count -ne 1) { throw 'manager-path-mutant-outside-call' }
+            $strDetail = 'member-not-permitted-StartsWith-' + [string]$arrOutside[0].Extent.StartLineNumber
+        }
+        $strPath = [System.IO.Path]::Combine($RunRoot, ('manager-path-call-' + $strMode + '.ps1'))
+        [System.IO.File]::WriteAllText($strPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+        $objFailure = $null
+        try { & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $strPath } catch { $objFailure = $_ }
+        finally { [System.IO.File]::Delete($strPath) }
+        if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strDetail)) { throw ('manager-path-call-mutant-' + $strMode) }
+    }
+}
+
+
+$script:scriptBlockGetCapturedMetadataAllowance = {
+    param ([System.Management.Automation.Language.ScriptBlockAst]$Ast, [ValidateSet('helper', 'context')][string]$Role)
+
+    # Only these complete, reviewed primitive definitions admit reflective
+    # access. Their arguments are fixed CLR members. Calls elsewhere still pass
+    # through the ordinary command/member/receiver restrictions.
+    $hashtablePins = @{
+        helper = @{
+            objCandidateExactTypeMethod = '3c5c5699ccec298e9c7b92c81a8f3c00fb377a73b124e618e68a45df896bcc62'
+            objCandidateArrayLengthGetter = '379a1042219e3fbe4f36950792b913e5b56a341d00ee1c2b9d6f89bf48e7ebac'
+            objCandidatePropertiesGetter = 'da3317ab46ea928b97fb067dbf27e5ac44fddd613500b397458e3897486077ef'
+            objCandidateTypeNamesGetter = '093f7f57766d67886001ccf6ff2a074b3fa470a409bfca5a9eb33daaaaed8a47'
+            objCandidateTypeNameCountGetter = '501cd449a5ec11aa0eac427cf253522cda49a54cc6f75e052f90d5221105ce59'
+            objCandidateTypeNameItemGetter = '58daa4d5035173dfec03f571f531bb43079303dfd8450f1e5db7b8460367fb6c'
+            objCandidateNoteNameGetter = 'a8c163200bae360f24d35af9023a157dae6c5fd0e01377cfe72f37e4f6039dce'
+            objCandidateNoteKindGetter = '3d20300df4b757c302458a45d15a904eb3724804119341e1912891efdc297eec'
+            scriptBlockTestCandidatePublicTypeName = '184b981d75cf61a5c2eea41be9c81bc9c2ecc12308e57d892c96dab825af67d7'
+            scriptBlockGetCandidatePropertyMetadata = '89092540fb823759abf96f7889e675e87d45a37fd8d0478a5b6ea0b9e7b55cbf'
+            scriptBlockGetCandidateExactRuntimeType = '2382d7fa7d3207d69439aa505789754f4cbf672b2dbb1af021e5a33f99471cef'
+            scriptBlockGetCandidatePublicArrayLength = '137c70466c6c2e9b34ae6a38436b2149e64645845bc15388b6e22be6b0bc0d94'
+        }
+        context = @{
+            objCandidateExactTypeMethod = 'ce3ea19e08ea488c7884ac612d53ef3592ea5c87c89d662e60963430d43550d6'
+            objCandidateArrayLengthGetter = '6706e2ad619d14940388ce87373d050f963419e79b8e263a19997c5cf01ed436'
+            objCandidatePropertiesGetter = 'd34767936db9440ba2af7976e2e346a1d702d282b4ab7108f21744ca19df0f9c'
+            objCandidateTypeNamesGetter = 'b284b88ab76271fb3c565911a9102212c14fd8ec9d7d3e30dfcbb4b30c0f197e'
+            objCandidateTypeNameCountGetter = '894a1024572027088049c5e57884201aeae9c1c52b7aa385fa5427e85c9607c0'
+            objCandidateTypeNameItemGetter = '23f3e493325d9e57fb8d96bdb2a1c8266f42ebfbd0b4aa82168d51487b89cb5f'
+            objCandidateNoteNameGetter = 'ca34c890d2be4d0bfdff213bbdbf792767a85bc11d8a7e31b423a582b3c9cf2d'
+            objCandidateNoteKindGetter = 'ea6f50b63494627f115228d483ac3a9cf4adb6aa43e51d97dd52f9f7d3956093'
+            scriptBlockTestCandidatePublicTypeName = '462b2bbecd749d22bd6a6d77ead7db96fbc07e57129a593283933e4805ecf7b0'
+            scriptBlockGetCandidatePropertyMetadata = '5e795cd77f25445b5bb42356b3c43a516191cec329b069b7693fbb38239739d8'
+            scriptBlockGetCandidateExactRuntimeType = '30393ed09954cd7c725f1b66350c4d46154b984e729d2c74267810bf1e785f63'
+            scriptBlockGetCandidatePublicArrayLength = 'b0fd52f52850131ba4552adbc39e1ba400210d8f2255f6d07dee0df7d9ffe2df'
+        }
+    }
+    $strModuleName = if ($Role -ceq 'helper') { 'scriptBlockCandidateModuleDefinition' } else { 'scriptBlockContextModuleDefinition' }
+    $arrModule = @($Ast.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        $_.Left.VariablePath.UserPath -ceq $strModuleName
+    })
+    if ($arrModule.Count -ne 1) { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'captured-metadata-binding' }
+    $objModuleLiteral = $arrModule[0].Right.Find({ param ($Node)
+        $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+    }, $false)
+    if ($null -eq $objModuleLiteral) { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'captured-metadata-binding' }
+    $objAllowed = New-Object 'System.Collections.Generic.HashSet[int]'
+    foreach ($strName in $hashtablePins[$Role].Keys) {
+        $strQualified = if ($Role -ceq 'helper') { 'script:' + $strName } else { $strName }
+        $arrAssignments = @($Ast.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+            $Node.Left.VariablePath.UserPath -ceq $strQualified
+        }, $true))
+        $arrInitial = @($arrAssignments | Where-Object { $_.Right.Extent.Text -notmatch 'GetNewClosure\(' })
+        $intExpected = if ($Role -ceq 'context' -and $strName.StartsWith('scriptBlock', [System.StringComparison]::Ordinal)) { 2 } else { 1 }
+        if ($arrAssignments.Count -ne $intExpected -or $arrInitial.Count -ne 1 -or
+            -not [object]::ReferenceEquals($arrInitial[0].Parent, $objModuleLiteral.ScriptBlock.EndBlock)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'captured-metadata-binding'
+        }
+        if ($intExpected -eq 2) {
+            $arrClosure = @($arrAssignments | Where-Object { $_.Right.Extent.Text -match 'GetNewClosure\(' })
+            if ($arrClosure.Count -ne 1 -or
+                -not [object]::ReferenceEquals($arrClosure[0].Parent, $objModuleLiteral.ScriptBlock.EndBlock) -or
+                $arrClosure[0].Extent.Text -cne ('$' + $strName + ' = $' + $strName + '.GetNewClosure()') -or
+                $arrClosure[0].Extent.StartOffset -le $arrInitial[0].Extent.EndOffset) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'captured-metadata-closure'
+            }
+        }
+        $arrBytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($arrInitial[0].Extent.Text)
+        $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes $arrBytes
+        if ($strHash -cne $hashtablePins[$Role][$strName]) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'captured-metadata-source'
+        }
+        foreach ($objMember in @($arrInitial[0].Right.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.InvokeMemberExpressionAst]
+        }, $true))) { [void]$objAllowed.Add($objMember.Extent.StartOffset) }
+    }
+    return ,$objAllowed
+}
+
+$script:scriptBlockAssertCapturedMetadataMutants = {
+    param ([string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    foreach ($strRole in @('helper', 'context')) {
+        $strPath = if ($strRole -ceq 'helper') { $HelperLiteralPath } else { $ContextLiteralPath }
+        $strSource = [System.IO.File]::ReadAllText($strPath)
+        foreach ($strMutation in @('type-binding', 'length-binding', 'properties-binding', 'getter-receiver', 'outside-reflection', 'dynamic-gettype')) {
+            $strBefore = ''
+            $strAfter = ''
+            switch ($strMutation) {
+                'type-binding' { $strBefore = "[System.Object].GetMethod('GetType')"; $strAfter = "[System.Object].GetMethod('ToString')" }
+                'length-binding' { $strBefore = "[System.Array].GetProperty('Length')"; $strAfter = "[System.Array].GetProperty('Rank')" }
+                'properties-binding' { $strBefore = "[System.Management.Automation.PSObject].GetProperty('Properties')"; $strAfter = "[System.Management.Automation.PSObject].GetProperty('Members')" }
+                'getter-receiver' { $strBefore = 'objCandidateExactTypeMethod.Invoke($Value.PSObject.BaseObject, $null)'; $strAfter = 'objCandidateArrayLengthGetter.Invoke($Value.PSObject.BaseObject, $null)' }
+            }
+            if ($strMutation -cin @('outside-reflection', 'dynamic-gettype')) {
+                $strInsertion = if ($strMutation -ceq 'outside-reflection') { "[void][System.Object].GetMethod('ToString')" } else { '$null = $untrusted.GetType()' }
+                $strExport = '    Microsoft.PowerShell.Core\Export-ModuleMember -Function '
+                if ([regex]::Matches($strSource, [regex]::Escape($strExport)).Count -ne 1) { throw 'captured-metadata-export-anchor' }
+                $strMutant = $strSource.Replace($strExport, ($strInsertion + "`n" + $strExport))
+            }
+            else {
+                if ([regex]::Matches($strSource, [regex]::Escape($strBefore)).Count -ne 1) { throw 'captured-metadata-mutant-anchor' }
+                $strMutant = $strSource.Replace($strBefore, $strAfter)
+            }
+            if ($strMutant -ceq $strSource) { throw 'captured-metadata-mutant-unchanged' }
+            $strMutantPath = [System.IO.Path]::Combine($RunRoot, ('captured-' + $strRole + '-' + $strMutation + '.ps1'))
+            [System.IO.File]::WriteAllText($strMutantPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+            $strHelper = if ($strRole -ceq 'helper') { $strMutantPath } else { $HelperLiteralPath }
+            $strContext = if ($strRole -ceq 'context') { $strMutantPath } else { $ContextLiteralPath }
+            $objFailure = $null
+            try { & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $strHelper -ContextLiteralPath $strContext }
+            catch { $objFailure = $_ }
+            finally { [System.IO.File]::Delete($strMutantPath) }
+            $strExpected = if ($strMutation -ceq 'outside-reflection') {
+                '^PSStyleGuide\.CandidateHarness\.v1\|code=catalog-invalid\|detail=reflection-not-permitted-[0-9]+$'
+            } elseif ($strMutation -ceq 'dynamic-gettype') {
+                '^PSStyleGuide\.CandidateHarness\.v1\|code=catalog-invalid\|detail=member-not-permitted-GetType-[0-9]+$'
+            } else {
+                '^PSStyleGuide\.CandidateHarness\.v1\|code=catalog-invalid\|detail=captured-metadata-source$'
+            }
+            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+                $objFailure.Exception.Message -cnotmatch $strExpected) { throw 'captured-metadata-mutant-not-rejected' }
+        }
+    }
+}
+
+$script:scriptBlockAssertCaptureMutantsRefused = {
+    param (
+        [Parameter(Mandatory = $true)][string]$RunRoot,
+        [Parameter(Mandatory = $true)][string]$HelperLiteralPath,
+        [Parameter(Mandatory = $true)][string]$ContextLiteralPath
+    )
+
+    $strHelperSource = [System.IO.File]::ReadAllText($HelperLiteralPath)
+    $strContextSource = [System.IO.File]::ReadAllText($ContextLiteralPath)
+    & $script:scriptBlockAssertContextReadsAreCaptured -LiteralPath $HelperLiteralPath
+    & $script:scriptBlockAssertTerminalCapabilityClosure -Source $strHelperSource -Role helper
+    & $script:scriptBlockAssertTerminalCapabilityClosure -Source $strContextSource -Role context
+    $strMarker = '            $strCheckoutPath = & $script:scriptBlockConvertToCandidateHelperNormalizedPath -Value $strCheckoutRoot -ParameterName ''CheckoutRoot'''
+    $strCapture = '$objCapturedJournal = & $script:scriptBlockAssertCandidateHelperContext `' + "`n" + '                -ContextValue $Context'
+    # The PS API captures its combined journal from Context. Keep each source
+    # mutation distinct, using real public fields and the actual capture call.
+    $arrMutants = @(
+        @{ Role = 'helper'; Marker = $strMarker; Insert = '$objSneak = $Context.CandidatePath'; Check = 'reads'; Detail = 'context-read-not-captured' },
+        @{ Role = 'helper'; Marker = $strMarker; Insert = '$objSneak = ($Context).CandidatePath'; Check = 'reads'; Detail = 'context-read-not-captured' },
+        @{ Role = 'helper'; Marker = $strMarker; Insert = '$objSneak = ([object]$Context).CandidatePath'; Check = 'reads'; Detail = 'context-read-not-captured' },
+        @{ Role = 'helper'; Marker = $strMarker; Insert = '$objAlias = $Context; $objSneak = $objAlias.CandidatePath'; Check = 'reads'; Detail = 'context-read-not-captured' },
+        @{ Role = 'helper'; Marker = $strMarker; Insert = '$objSneak = @($Context | Select-Object -First 1)'; Check = 'reads'; Detail = 'context-read-piped' },
+        @{ Role = 'helper'; Marker = $strMarker; Insert = '$Context.NextSequence += 1'; Check = 'reads'; Detail = 'context-read-not-captured' },
+        @{ Role = 'context'; Marker = '            $strPreviousState = $objCleanupPlan.LifecycleState'; Insert = '$objClaim = $Context; $objSneak = ($objClaim).LifecycleState'; Check = 'closure'; Detail = 'terminal-closure-content' },
+        @{ Role = 'helper'; Marker = $strCapture; Replacement = ('if ($false) { ' + $strCapture + ' }'); Check = 'closure'; Detail = 'terminal-closure-content' },
+        @{ Role = 'helper'; Marker = $strCapture; Replacement = ($strCapture + ' | ForEach-Object { [pscustomobject]@{} }'); Check = 'closure'; Detail = 'terminal-closure-content' }
+    )
+    $intOrdinal = 0
+    foreach ($hashtableMutant in $arrMutants) {
+        $intOrdinal++
+        $strSource = if ($hashtableMutant.Role -ceq 'helper') { $strHelperSource } else { $strContextSource }
+        $strNeedle = [string]$hashtableMutant.Marker
+        if ($strSource.Split([string[]]@($strNeedle), [System.StringSplitOptions]::None).Count -ne 2) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'capture-mutant-anchor'
+        }
+        $strReplacement = if ($hashtableMutant.ContainsKey('Replacement')) {
+            [string]$hashtableMutant.Replacement
+        } else {
+            [string]$hashtableMutant.Insert + "`n" + $strNeedle
+        }
+        $strDerived = $strSource.Replace($strNeedle, $strReplacement)
+        if ($strDerived -ceq $strSource -or $strDerived.Replace($strReplacement, $strNeedle) -cne $strSource) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'capture-mutant-reversal'
+        }
+        $strCopy = [System.IO.Path]::Combine($RunRoot, ('capture-mutant-' + $intOrdinal + '.ps1'))
+        try {
+            [System.IO.File]::WriteAllText($strCopy, $strDerived, (New-Object System.Text.UTF8Encoding($false)))
+            $objErrors = $null
+            $objMutantAst = [System.Management.Automation.Language.Parser]::ParseFile($strCopy, [ref]$null, [ref]$objErrors)
+            if (@($objErrors).Count -ne 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'capture-mutant-parse'
+            }
+            $strHelperClaim = if ($hashtableMutant.Role -ceq 'helper') { $strCopy } else { $HelperLiteralPath }
+            $strExpectedDetail = [string]$hashtableMutant.Detail
+            if ($hashtableMutant.Check -ceq 'reads') {
+                # These six insertions occupy one exact line after authentication.
+                # The compound write is a member access too; the pipeline is
+                # rejected at its source pipeline rather than a field read.
+                $strInserted = [string]$hashtableMutant.Insert
+                $intStart = $strDerived.IndexOf($strInserted, [System.StringComparison]::Ordinal)
+                if ($intStart -lt 0 -or $strDerived.LastIndexOf($strInserted, [System.StringComparison]::Ordinal) -ne $intStart) {
+                    & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'capture-mutant-line'
+                }
+                $intLine = 1 + [regex]::Matches($strDerived.Substring(0, $intStart), "`n").Count
+                $strExpectedDetail += '-' + $intLine
+            }
+            $boolRejected = $false
+            try {
+                if ($hashtableMutant.Check -ceq 'reads') {
+                    & $script:scriptBlockAssertContextReadsAreCaptured -LiteralPath $strHelperClaim
+                } else {
+                    & $script:scriptBlockAssertTerminalCapabilityClosure -Source $objMutantAst.Extent.Text -Role $hashtableMutant.Role
+                }
+            } catch {
+                if ($hashtableMutant.Check -ceq 'reads') {
+                    $boolRejected = $_.Exception.Data['PSStyleGuideHarnessCode'] -ceq 'catalog-invalid' -and
+                        $_.Exception.Message -ceq ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strExpectedDetail)
+                } else { $boolRejected = $_.Exception.Message -ceq $strExpectedDetail }
+            }
+            if (-not $boolRejected) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail ('capture-mutant-accepted-' + $intOrdinal)
+            }
+        } finally {
+            [System.IO.File]::Delete($strCopy)
+        }
+    }
+}
+
+$script:scriptBlockAssertModuleBridgeMutantsRefused = {
+    param (
+        [Parameter(Mandatory = $true)][string]$RunRoot,
+        [Parameter(Mandatory = $true)][string]$HelperLiteralPath,
+        [Parameter(Mandatory = $true)][string]$ContextLiteralPath
+    )
+
+    $strHelperSource = [System.IO.File]::ReadAllText($HelperLiteralPath)
+    $strContextSource = [System.IO.File]::ReadAllText($ContextLiteralPath)
+    & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    $strCapture = '$script:scriptBlockRemoveCandidateOwnershipState =' + "`n" + '        ${function:Remove-StyleGuideCandidateInvocationState}'
+    $strBootstrap = 'if ($strDefinitionHash -cne $script:strExpectedContextDefinitionSha256) {'
+    $strBinding = '$script:scriptBlockAssertContextBinding = {'
+    $strLazyEnumerator = '$objEnumerator = [System.IO.Directory]::EnumerateFileSystemEntries(' + "`n" + '                $LiteralPath).GetEnumerator()'
+    $strEagerEnumerator = '$objEnumerator = ([string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))).GetEnumerator()'
+    $strResolvingMarker = '$scriptBlockResolveCandidateExistingDirectory = {'
+    $arrMutants = @(
+        @{ Role = 'helper'; Marker = $strCapture; Replacement = ('if ($false) {' + "`n" + $strCapture + "`n" + '}'); Detail = 'module-function-capture-shape' },
+        @{ Role = 'helper'; Marker = $strCapture; Replacement = ($strCapture + "`n" + 'if ($false) { $script:scriptBlockRemoveCandidateOwnershipState = { Get-ChildItem } }'); Detail = 'module-function-capture-count' },
+        @{ Role = 'helper'; Marker = '& $script:scriptBlockInvokeCandidateArtifactExpansion -RawParameters $RawParameters'; Replacement = '& $script:scriptBlockInvokeCandidateArtifactExpansion -RawParameters $RawParameters | ForEach-Object { Get-ChildItem }'; Detail = 'module-bridge-tail-changed' },
+        @{ Role = 'helper'; Marker = 'Microsoft.PowerShell.Core\Get-Module -Name $strCandidateModuleName -All'; Replacement = 'Get-Module -Name $strCandidateModuleName -All'; Detail = 'module-bridge-tail-changed' },
+        @{ Role = 'helper'; Marker = $strBinding; Replacement = ($strBinding + "`n" + 'if ($false) { $script:scriptBlockBoundContextCleanup = { Get-ChildItem } }'); Detail = 'module-bound-reference-reassigned' },
+        @{ Role = 'helper'; Marker = $strBinding; Replacement = ($strBinding + "`n" + 'if ($false) { $script:objBoundContext = $null }'); Detail = 'module-bound-reference-reassigned' },
+        @{ Role = 'helper'; Marker = $strBootstrap; Replacement = 'if ($false) {'; Detail = 'module-bridge-bootstrap-changed' },
+        @{ Role = 'context'; Marker = '$scriptBlockNewContextFunction = $scriptBlockSourceNewContext.GetNewClosure()'; Replacement = '$scriptBlockNewContextFunction = if ($false) { $scriptBlockSourceNewContext.GetNewClosure() } else { { Get-ChildItem } }'; Detail = 'source-context-closure-capture' },
+        @{ Role = 'helper'; Marker = '$arrLoaded[0].ExportedFunctions[''Remove-StyleGuideCandidateInvocationContext''].ScriptBlock'; Replacement = '$arrLoaded[0].ExportedFunctions[''Other-Callable''].ScriptBlock'; Detail = 'module-bridge-bootstrap-changed' },
+        @{ Role = 'helper'; Marker = $strLazyEnumerator; Replacement = $strEagerEnumerator; Detail = 'enumeration-unfiltered-source-shape' },
+        @{ Role = 'context'; Marker = $strLazyEnumerator; Replacement = $strEagerEnumerator; Detail = 'enumeration-unfiltered-source-shape' },
+        @{ Role = 'context'; Marker = $strResolvingMarker; Replacement = ('    if ($false) { [void]$ExecutionContext.SessionState.Path.GetResolvedProviderPathFromPSPath(''.'', [ref]$null) }' + "`n" + $strResolvingMarker); Detail = 'bounded-member-count-GetResolvedProviderPathFromPSPath-1' }
+    )
+    $listAdditionalMutants = New-Object 'System.Collections.Generic.List[hashtable]'
+    foreach ($strRole in @('helper', 'context')) {
+        $strScope = if ($strRole -ceq 'helper') { 'script:' } else { '' }
+        $strBindingMarker = '$' + $strScope + 'objCandidateExactTypeMethod = [System.Object].GetMethod(''GetType'')'
+        $strGetterMarker = 'return [int]$' + $strScope + 'objCandidateArrayLengthGetter.Invoke($Value.PSObject.BaseObject, $null)'
+        $strOutsideMarker = if ($strRole -ceq 'helper') {
+            '$script:scriptBlockConvertToCandidateHelperNormalizedPath = {'
+        } else { '$scriptBlockResolveCandidateExistingDirectory = {' }
+        [void]$listAdditionalMutants.AddRange([hashtable[]]@(
+            @{ Role = $strRole; Marker = $strBindingMarker; Replacement = $strBindingMarker.Replace("'GetType'", "'ToString'"); Detail = 'captured-metadata-source' },
+            @{ Role = $strRole; Marker = $strGetterMarker; Replacement = $strGetterMarker.Replace('BaseObject', 'ImmediateBaseObject'); Detail = 'captured-metadata-source' },
+            @{ Role = $strRole; Marker = $strOutsideMarker; Replacement = ('if ($false) { [void][System.Object].GetMethod(''ToString'') }' + "`n" + $strOutsideMarker); Detail = 'reflection-outside-fixed-closure' }
+        ))
+    }
+    $arrMutants = [object[]]@($arrMutants; $listAdditionalMutants.ToArray())
+    $intOrdinal = 0
+    foreach ($hashtableMutant in $arrMutants) {
+        $intOrdinal++
+        $strSource = if ($hashtableMutant.Role -ceq 'helper') { $strHelperSource } else { $strContextSource }
+        $strNeedle = [string]$hashtableMutant.Marker
+        if ($strSource.Split([string[]]@($strNeedle), [System.StringSplitOptions]::None).Count -ne 2) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'bridge-mutant-anchor'
+        }
+        $strCopy = [System.IO.Path]::Combine($RunRoot, ('bridge-mutant-' + $intOrdinal + '.ps1'))
+        try {
+            $strReplacement = [string]$hashtableMutant.Replacement
+            $strDerived = $strSource.Replace($strNeedle, $strReplacement)
+            if ($strDerived -ceq $strSource -or $strDerived.Replace($strReplacement, $strNeedle) -cne $strSource) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'bridge-mutant-reversal'
+            }
+            [System.IO.File]::WriteAllText($strCopy, $strDerived, (New-Object System.Text.UTF8Encoding($false)))
+            $objErrors = $null
+            $objMutantAst = [System.Management.Automation.Language.Parser]::ParseFile($strCopy, [ref]$null, [ref]$objErrors)
+            if (@($objErrors).Count -ne 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'bridge-mutant-parse'
+            }
+            $strHelperClaim = if ($hashtableMutant.Role -ceq 'helper') { $strCopy } else { $HelperLiteralPath }
+            $strContextClaim = if ($hashtableMutant.Role -ceq 'context') { $strCopy } else { $ContextLiteralPath }
+            $strExpectedDetail = [string]$hashtableMutant.Detail
+            if ($strExpectedDetail -ceq 'reflection-outside-fixed-closure') {
+                $arrInjected = @($objMutantAst.FindAll({ param ($Node)
+                    $Node -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+                    $Node.Extent.Text -ceq '[System.Object].GetMethod(''ToString'')'
+                }, $true))
+                if ($arrInjected.Count -ne 1) { throw 'bridge-reflection-mutant-shape' }
+                $strExpectedDetail = 'reflection-not-permitted-' + $arrInjected[0].Extent.StartLineNumber
+            }
+            $boolRejected = $false
+            try {
+                & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $strHelperClaim -ContextLiteralPath $strContextClaim
+            } catch {
+                $boolRejected = $_.Exception.Data['PSStyleGuideHarnessCode'] -ceq 'catalog-invalid' -and
+                    $_.Exception.Message -ceq ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strExpectedDetail)
+            }
+            if (-not $boolRejected) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail ('bridge-mutant-accepted-' + $intOrdinal)
+            }
+        } finally { [System.IO.File]::Delete($strCopy) }
+    }
+}
+
 $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
     param (
         [Parameter(Mandatory = $true)]
@@ -2845,7 +4449,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             Member = $script:arrCandidateHelperPermittedMember
             SetItemPath = [string[]]@()
             SetItemValue = [string[]]@()
-            SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 0 }
+            SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 0; GetUnresolvedProviderPathFromPSPath = 1 }
             NativeResolver = $script:strCandidateHelperNativeResolver
             MemberReceiver = $script:hashtableCandidateHelperMemberReceiver },
         @{ Path = $ContextLiteralPath
@@ -2853,7 +4457,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             Member = $script:arrCandidateContextPermittedMember
             SetItemPath = $script:arrCandidateContextPermittedSetItemPath
             SetItemValue = $script:arrCandidateContextPermittedSetItemValue
-            SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 1 }
+            SingleUseMember = @{ GetResolvedProviderPathFromPSPath = 0; GetUnresolvedProviderPathFromPSPath = 1 }
             NativeResolver = $script:strCandidateContextNativeResolver
             MemberReceiver = $script:hashtableCandidateContextMemberReceiver }
     )
@@ -2866,6 +4470,13 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'enumeration-primitive-parse'
         }
+        $strRole = if ($strScriptPath -ceq $HelperLiteralPath) { 'helper' } else { 'context' }
+        $objModuleBridgeAllowance = & $script:scriptBlockGetModuleBridgeAllowance -Ast $objAst -Role $strRole
+        $objManagerPathAllowance = & $script:scriptBlockGetManagerQualifiedPathAllowance -Ast $objAst -Role $strRole
+        $objCapturedMetadataAllowance = & $script:scriptBlockGetCapturedMetadataAllowance -Ast $objAst -Role $strRole
+        & $script:scriptBlockAssertTerminalCapabilityClosure -Source $objAst.Extent.Text -Role $strRole
+        [void](& $script:scriptBlockGetTerraformZipGetterAllowance -Ast $objAst -Role $strRole)
+        [void](& $script:scriptBlockGetTerraformArchiveHashAllowance -Ast $objAst -Role $strRole)
         # The variables this file actually defines as script blocks. An earlier
         # revision matched the NAME instead -- anything starting 'scriptBlock' --
         # which is a convention rather than a property: measured, assigning a
@@ -3049,6 +4660,95 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     }).Count -eq 0
                 } | ForEach-Object { [string]$_.Name })
 
+        # The source manager functions were preserved as private literal blocks.
+        # Their three aliases retain the original Remove-before-New closure order.
+        # Both ends must be unique unconditional siblings in this module; a
+        # nested reassignment or a caller-supplied block is never an allowance.
+        if ($strRole -ceq 'context') {
+            $intPreviousClosure = -1
+            $listAdditionalClosureVariable = New-Object 'System.Collections.Generic.List[string]'
+            foreach ($strStem in @('Remove', 'New', 'Test')) {
+                $strAlias = 'scriptBlock' + $strStem + 'ContextFunction'
+                $strSource = 'scriptBlockSource' + $strStem + 'Context'
+                $arrAlias = @($objAst.FindAll({param ($SyntaxNode)
+                    $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $SyntaxNode.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                    ($SyntaxNode.Left.VariablePath.UserPath -creplace '^script:', '') -ceq $strAlias
+                }, $true))
+                $arrSource = @($objAst.FindAll({param ($SyntaxNode)
+                    $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $SyntaxNode.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                    ($SyntaxNode.Left.VariablePath.UserPath -creplace '^script:', '') -ceq $strSource
+                }, $true))
+                if ($arrAlias.Count -ne 1 -or $arrSource.Count -ne 1 -or
+                    $arrAlias[0].Right.Extent.Text -cne ('$' + $strSource + '.GetNewClosure()') -or
+                    -not [object]::ReferenceEquals($arrAlias[0].Parent, $arrSource[0].Parent) -or
+                    $arrAlias[0].Parent -isnot [System.Management.Automation.Language.NamedBlockAst] -or
+                    $arrSource[0].Extent.EndOffset -ge $arrAlias[0].Extent.StartOffset -or
+                    $arrAlias[0].Extent.StartOffset -le $intPreviousClosure -or
+                    $arrScriptBlockVariable -cnotcontains $strSource) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-context-closure-capture'
+                }
+                $objSourceModuleAssignment = $arrAlias[0].Parent.Parent.Parent.Parent.Parent
+                if ($objSourceModuleAssignment -isnot [System.Management.Automation.Language.AssignmentStatementAst] -or
+                    $objSourceModuleAssignment.Left.Extent.Text -cne '$scriptBlockContextModuleDefinition' -or
+                    -not [object]::ReferenceEquals($objSourceModuleAssignment.Parent, $objAst.EndBlock)) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-context-closure-container'
+                }
+                $intPreviousClosure = $arrAlias[0].Extent.StartOffset
+                $listAdditionalClosureVariable.Add([string]$strAlias)
+            }
+            $arrOwnClosureVariable = $arrOwnClosureVariable + $listAdditionalClosureVariable.ToArray()
+        }
+
+        # The adapted helper stores one direct function reference inside its
+        # private module. A module-bound ScriptBlock already carries that module
+        # session; GetNewClosure would make a different session. Admit only the
+        # exact unconditional definition/capture siblings, not an arbitrary read
+        # from the Function provider in caller scope.
+        $arrModuleFunctionCapture = [string[]]@()
+        if ($strScriptPath -ceq $HelperLiteralPath) {
+            $arrCaptureAssignment = @($objAst.FindAll({
+                param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $SyntaxNode.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                ($SyntaxNode.Left.VariablePath.UserPath -creplace '^script:', '') -ceq 'scriptBlockRemoveCandidateOwnershipState'
+            }, $true))
+            if ($arrCaptureAssignment.Count -ne 1) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-function-capture-count'
+            }
+            $objCapture = $arrCaptureAssignment[0]
+            $arrDefinition = @($objAst.FindAll({
+                param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+                $SyntaxNode.Name -ceq 'Remove-StyleGuideCandidateInvocationState'
+            }, $true))
+            $objCaptureContainer = $objCapture.Parent
+            $objModuleAssignment = $objCaptureContainer.Parent.Parent.Parent.Parent
+            if ($arrDefinition.Count -ne 1 -or
+                $objCapture.Right.Extent.Text -cne '${function:Remove-StyleGuideCandidateInvocationState}' -or
+                $objCaptureContainer -isnot [System.Management.Automation.Language.NamedBlockAst] -or
+                -not [object]::ReferenceEquals($arrDefinition[0].Parent, $objCaptureContainer) -or
+                $arrDefinition[0].Extent.EndOffset -ge $objCapture.Extent.StartOffset -or
+                $objModuleAssignment -isnot [System.Management.Automation.Language.AssignmentStatementAst] -or
+                $objModuleAssignment.Left -isnot [System.Management.Automation.Language.VariableExpressionAst] -or
+                $objModuleAssignment.Left.VariablePath.UserPath -cne 'scriptBlockCandidateModuleDefinition' -or
+                -not [object]::ReferenceEquals($objModuleAssignment.Parent, $objAst.EndBlock)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-function-capture-shape'
+            }
+            foreach ($objCaptureCall in @($objAst.FindAll({
+                param ($SyntaxNode)
+                $SyntaxNode -is [System.Management.Automation.Language.CommandAst] -and
+                $SyntaxNode.CommandElements[0] -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                $SyntaxNode.CommandElements[0].VariablePath.UserPath -ceq 'script:scriptBlockRemoveCandidateOwnershipState'
+            }, $true))) {
+                if ($objCaptureCall.Extent.StartOffset -le $objCapture.Extent.EndOffset) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'module-function-use-before-capture'
+                }
+            }
+            $arrModuleFunctionCapture = [string[]]@('scriptBlockRemoveCandidateOwnershipState')
+        }
+
         # Every named command in the file, against the allow-list. A call
         # through a variable -- `& $script:scriptBlockFoo` -- has no command
         # name and is not one of these; those are the internal script blocks the
@@ -3061,6 +4761,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     $true
                 ))) {
             $strCommandName = [string]$objCommand.GetCommandName()
+            if ($objModuleBridgeAllowance.Contains([int]$objCommand.Extent.StartOffset)) { continue }
             if ([string]::IsNullOrEmpty($strCommandName)) {
                 # A command with no name is an invocation through something.
                 # Skipping those outright is what let `& ('Get-' + 'Item')` do
@@ -3088,7 +4789,8 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 if ($strTarget.Length -eq 0 -or
                     -not ($arrScriptBlockVariable -ccontains $strTarget -or
                         $arrNativePathVariable -ccontains $strTarget -or
-                        $arrOwnClosureVariable -ccontains $strTarget)) {
+                        $arrOwnClosureVariable -ccontains $strTarget -or
+                        $arrModuleFunctionCapture -ccontains $strTarget)) {
                     & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                         -Detail ('nameless-command-not-permitted-' +
                             [string]$objCommand.Extent.StartLineNumber)
@@ -3127,6 +4829,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 # is the only property that has held up in this loop.
                 $arrRemovableName = [string[]]@(
                     'arrCandidateIssuedContext',
+                    'arrCandidateActiveCleanup',
                     'arrCandidateIssuedSnapshot',
                     'arrCandidateIssuedState'
                 )
@@ -3172,7 +4875,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 # as evidence, again, in the rule written to stop exactly that.
                 # Measured green with a computed list planted. The names are now
                 # read out of the parse tree: anything that is not an array
-                # literal of exactly these three constants, in this order, is
+                # literal of exactly these four constants, in this order, is
                 # not the permitted shape.
                 if ($boolCanonical) {
                     $objRegisterLoop = $null
@@ -3509,9 +5212,8 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 -Detail ('translatable-stat-format-' +
                     [string]$objProse.Extent.StartLineNumber)
         }
-        # Reflection is refused across the whole file, helper definition
-        # included: it reaches a listing without spelling one, and neither
-        # script has any use for it.
+        # Reflection is refused outside complete source-pinned metadata primitives.
+        # A general reflective call could reach a listing without spelling one.
         foreach ($objReflection in @($objAst.FindAll(
                     {
                         param ($SyntaxNode)
@@ -3530,6 +5232,7 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                     },
                     $true
                 ))) {
+            if ($objCapturedMetadataAllowance.Contains($objReflection.Extent.StartOffset)) { continue }
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail ('reflection-not-permitted-' +
                     [string]$objReflection.Extent.StartLineNumber)
@@ -3591,8 +5294,11 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
                 [System.Management.Automation.Language.StringConstantExpressionAst]) {
                 continue
             }
+            if ($objCapturedMetadataAllowance.Contains($objMember.Extent.StartOffset)) { continue }
+            if ($objModuleBridgeAllowance.Contains([int]$objMember.Extent.StartOffset)) { continue }
             $strMemberName = [string]$objMember.Member.Value
-            if (@($hashtableSurface.Member) -cnotcontains $strMemberName) {
+            $boolManagerPathCall = $objManagerPathAllowance.Contains($objMember.Extent.StartOffset)
+            if (-not $boolManagerPathCall -and @($hashtableSurface.Member) -cnotcontains $strMemberName) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('member-not-permitted-' + $strMemberName + '-' +
                         [string]$objMember.Extent.StartLineNumber)
@@ -3600,12 +5306,13 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
             # The name is permitted; now the receiver has to be one production
             # uses it on. Without this, a permitted name is permitted on
             # anything -- see the note above the table.
-            if (-not $hashtableSurface.MemberReceiver.ContainsKey($strMemberName)) {
+            if (-not $boolManagerPathCall -and -not $hashtableSurface.MemberReceiver.ContainsKey($strMemberName)) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                     -Detail ('member-receiver-undeclared-' + $strMemberName + '-' +
                         [string]$objMember.Extent.StartLineNumber)
             }
-            $hashtableReceiver = $hashtableSurface.MemberReceiver[$strMemberName]
+            if ($boolManagerPathCall) { $hashtableReceiver = @{ Static = [string[]]@(); Instance = $true } }
+            else { $hashtableReceiver = $hashtableSurface.MemberReceiver[$strMemberName] }
             if ($objMember.Static) {
                 $strReceiverType = ''
                 if ($objMember.Expression -is
@@ -3644,6 +5351,42 @@ $script:scriptBlockAssertEnumerationPrimitiveExclusive = {
         }
         $intDefinitionStart = [int]@($arrDefinition)[0].Extent.StartOffset
         $intDefinitionEnd = [int]@($arrDefinition)[0].Extent.EndOffset
+        # H01's traced primitive must obtain its enumerator directly from the
+        # lazy unfiltered sequence. An array collected before GetEnumerator
+        # defeats the N+1 bound even when the later loop is unchanged.
+        $arrUnfilteredSource = @($arrDefinition[0].Right.FindAll({param ($SyntaxNode)
+            $SyntaxNode -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+            $SyntaxNode.Member -is [System.Management.Automation.Language.StringConstantExpressionAst] -and
+            $SyntaxNode.Member.Value -ceq 'EnumerateFileSystemEntries' -and
+            $SyntaxNode.Arguments.Count -eq 1
+        }, $true))
+        $boolLazyShape = $arrUnfilteredSource.Count -eq 1
+        if ($boolLazyShape) {
+            $objSourceCall = $arrUnfilteredSource[0]
+            $objEnumeratorCall = $objSourceCall.Parent
+            $boolLazyShape = $objSourceCall.Static -and
+                $objSourceCall.Expression.Extent.Text -ceq '[System.IO.Directory]' -and
+                $objSourceCall.Arguments[0].Extent.Text -ceq '$LiteralPath' -and
+                $objEnumeratorCall -is [System.Management.Automation.Language.InvokeMemberExpressionAst] -and
+                $objEnumeratorCall.Member.Extent.Text -ceq 'GetEnumerator' -and
+                ($null -eq $objEnumeratorCall.Arguments -or @($objEnumeratorCall.Arguments).Count -eq 0) -and
+                [object]::ReferenceEquals($objEnumeratorCall.Expression, $objSourceCall)
+            if ($boolLazyShape) {
+                $objEnumeratorAssignment = $objEnumeratorCall.Parent.Parent
+                $objPrimitiveLiteral = $arrDefinition[0].Right.Find({param ($SyntaxNode)
+                    $SyntaxNode -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+                }, $false)
+                $objEnumerationTry = $objEnumeratorAssignment.Parent.Parent
+                $boolLazyShape = $objEnumeratorAssignment -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $objEnumeratorAssignment.Left.Extent.Text -ceq '$objEnumerator' -and
+                    $objEnumerationTry -is [System.Management.Automation.Language.TryStatementAst] -and
+                    [object]::ReferenceEquals($objEnumeratorAssignment.Parent, $objEnumerationTry.Body) -and
+                    [object]::ReferenceEquals($objEnumerationTry.Parent, $objPrimitiveLiteral.ScriptBlock.EndBlock)
+            }
+        }
+        if (-not $boolLazyShape) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'enumeration-unfiltered-source-shape'
+        }
 
         $arrListing = @($objAst.FindAll(
                 {
@@ -3730,6 +5473,8 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
         [string]$ContextLiteralPath
     )
 
+    $hashtablePredicates = & $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+
     if ($script:boolCandidateIsWindows) {
         # Windows has no mkfifo and no filesystem pipes under the invocation
         # root, so the pipe refusal is unobservable there. What IS observable is
@@ -3740,19 +5485,12 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
         # Only the unambiguous case is judged -- an allow entry for Everyone or
         # for the built-in Users group -- because what else belongs on a runner
         # cannot be settled from a machine that has none. An ACL that cannot be
-        # read at all is skipped rather than failed, so a mis-guess here cannot
-        # block the Windows run that exists to answer this.
+        # read is required evidence; an unavailable inspection fails this check.
         $objRootContext = New-StyleGuideCandidateInvocationContext `
-            -TrustedTemporaryRoot $RunRoot `
-            -DiagnosticLabel 'invocation-root-acl'
+            -TrustedTemporaryRoot $RunRoot
         try {
-            $objRootAcl = $null
-            try {
-                $objRootAcl = (New-Object System.IO.DirectoryInfo(
-                    [string]$objRootContext.InvocationRootPath)).GetAccessControl()
-            } catch {
-                $objRootAcl = $null
-            }
+            $objRootAcl = Microsoft.PowerShell.Security\Get-Acl -LiteralPath $objRootContext.InvocationRootPath -ErrorAction Stop
+            if ($null -eq $objRootAcl) { throw 'invocation-root-acl-unavailable' }
             if ($null -ne $objRootAcl) {
                 foreach ($objRule in @($objRootAcl.GetAccessRules(
                             $true, $true, [System.Security.Principal.SecurityIdentifier]))) {
@@ -3807,8 +5545,7 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
     $strModeProbeParent = [System.IO.Path]::Combine($strProbeRoot, 'mode')
     [void][System.IO.Directory]::CreateDirectory($strModeProbeParent)
     $objModeContext = New-StyleGuideCandidateInvocationContext `
-        -TrustedTemporaryRoot $strModeProbeParent `
-        -DiagnosticLabel 'invocation-root-mode'
+        -TrustedTemporaryRoot $strModeProbeParent
     $strStatPathForMode = [string](& $script:scriptBlockResolveHarnessNativePath `
         -CandidatePath ([string[]]@('/usr/bin/stat', '/bin/stat')))
     if ($strStatPathForMode.Length -eq 0) {
@@ -3860,9 +5597,9 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
     # suite stays green while a post-extraction open would accept a FIFO. Both
     # predicates are now exercised against the same two fixtures.
     foreach ($hashtableProof in @(
-            @{ Block = $scriptBlockAssertCandidateOrdinaryRegularFile
+            @{ Block = $hashtablePredicates.ContextRegular
                 Label = 'regular-file-proof' },
-            @{ Block = $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile
+            @{ Block = $hashtablePredicates.HelperRegular
                 Label = 'helper-regular-file-proof' })) {
         foreach ($hashtableCase in @(
                 @{ Path = $strEmptyPath; MustPass = $true; Name = 'empty-regular' },
@@ -3884,10 +5621,60 @@ $script:scriptBlockAssertRegularFileProofExecutes = {
     }
 }
 
+
+$script:scriptBlockAssertRegularFileProofSource = {
+    param ([string]$LiteralPath)
+
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($LiteralPath, [ref]$null, [ref]$objErrors)
+    if (@($objErrors).Count -ne 0) { throw 'regular-file-proof-source-parse' }
+    $arrBindings = @($objAst.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        ($Node.Left.VariablePath.UserPath -ireplace '^(script|local|private|global):', '') -ieq 'scriptBlockAssertRegularFileProofExecutes'
+    }, $true))
+    if ($arrBindings.Count -ne 1 -or $arrBindings[0].Left.Extent.Text -cne '$script:scriptBlockAssertRegularFileProofExecutes' -or
+        -not [object]::ReferenceEquals($arrBindings[0].Parent, $objAst.EndBlock)) { throw 'regular-file-proof-source-binding' }
+    if ((& $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($arrBindings[0].Extent.Text))) -cne '695f144708a290fb46792fab774dbde4084f342aca7b3d07451d54c264d2f4fc') { throw 'regular-file-proof-source-content' }
+}
+
+$script:scriptBlockAssertRegularFileProofSourceMutants = {
+    param ([string]$LiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertRegularFileProofSource -LiteralPath $LiteralPath
+    $strSource = [System.IO.File]::ReadAllText($LiteralPath)
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($LiteralPath, [ref]$null, [ref]$null)
+    $objAssignment = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and $_.Left.Extent.Text -ceq '$script:scriptBlockAssertRegularFileProofExecutes'
+    })[0]
+    $strBlock = $objAssignment.Extent.Text
+    $strRead = '$objRootAcl = Microsoft.PowerShell.Security\Get-Acl -LiteralPath $objRootContext.InvocationRootPath -ErrorAction Stop'
+    $strNull = "if (`$null -eq `$objRootAcl) { throw 'invocation-root-acl-unavailable' }"
+    $intIndex = 0
+    foreach ($hashtableMutation in @(
+        @{ Marker = $strRead; Replacement = ('try { ' + $strRead + ' } catch { $objRootAcl = $null }') },
+        @{ Marker = $strNull; Replacement = '' },
+        @{ Marker = $strRead; Replacement = $strRead.Replace(' -ErrorAction Stop', '') }
+    )) {
+        $intIndex++
+        if ([regex]::Matches($strBlock, [regex]::Escape($hashtableMutation.Marker)).Count -ne 1) { throw 'regular-file-proof-mutant-anchor' }
+        $strMutant = $strSource.Substring(0, $objAssignment.Extent.StartOffset) + $strBlock.Replace($hashtableMutation.Marker, $hashtableMutation.Replacement) + $strSource.Substring($objAssignment.Extent.EndOffset)
+        $strPath = [System.IO.Path]::Combine($RunRoot, 'regular-file-proof-' + $intIndex + '.ps1')
+        try {
+            [System.IO.File]::WriteAllText($strPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+            $strFailure = $null
+            try { & $script:scriptBlockAssertRegularFileProofSource -LiteralPath $strPath } catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne 'regular-file-proof-source-content') { throw 'regular-file-proof-mutant-evidence' }
+        } finally { if ([System.IO.File]::Exists($strPath)) { [System.IO.File]::Delete($strPath) } }
+    }
+}
+
 $script:scriptBlockAssertJournalSwapRefused = {
     param (
         [Parameter(Mandatory = $true)]
-        [string]$RunRoot
+        [string]$RunRoot,
+        [string]$HelperLiteralPath,
+        [string]$ContextLiteralPath
     )
 
     # Round 52's reference-identity check in scriptBlockAddCandidateHelperRecord
@@ -3907,12 +5694,15 @@ $script:scriptBlockAssertJournalSwapRefused = {
     # applied to a deterministic guard.
     $strSwapRoot = [System.IO.Path]::Combine($RunRoot, 'journal-swap')
     [void][System.IO.Directory]::CreateDirectory($strSwapRoot)
-    $objContext = New-StyleGuideCandidateInvocationContext `
+    $hashtableBindings = & $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    $objContext = & $hashtableBindings.SourceNew `
         -TrustedTemporaryRoot $strSwapRoot -DiagnosticLabel 'journal-swap'
+    $objOriginalJournal = $objContext.OwnershipJournal
+    $uintOriginalSequence = [uint32]$objContext.NextSequence
     try {
         $objAuthenticatedJournal = $objContext.OwnershipJournal
         $uintAuthenticatedSequence = [uint32]$objContext.NextSequence
-        $objRecord = & $script:scriptBlockNewCandidateHelperRecord `
+        $objRecord = & $hashtableBindings.HelperNewRecord `
             -Sequence $uintAuthenticatedSequence `
             -Kind 'DownloadFile' `
             -Path ([System.IO.Path]::Combine(
@@ -3937,7 +5727,7 @@ $script:scriptBlockAssertJournalSwapRefused = {
         # NextSequence -- so each attack now targets exactly one branch.
         $boolControlSucceeded = $true
         try {
-            $objAuthenticatedJournal = & $script:scriptBlockAddCandidateHelperRecord `
+            $objAuthenticatedJournal = & $hashtableBindings.HelperAddRecord `
                 -ContextValue $objContext -Record $objRecord `
                 -JournalValue $objAuthenticatedJournal `
                 -NextSequenceValue $uintAuthenticatedSequence -PhaseValue 'download'
@@ -3967,7 +5757,7 @@ $script:scriptBlockAssertJournalSwapRefused = {
             $boolSwapRefused = $false
             $strSwapSubreason = 'none'
             try {
-                [void](& $script:scriptBlockAddCandidateHelperRecord `
+                [void](& $hashtableBindings.HelperAddRecord `
                     -ContextValue $objContext -Record $objRecord `
                     -JournalValue $objAuthenticatedJournal `
                     -NextSequenceValue ([uint32]$hashtableAttack.Sequence) `
@@ -3990,9 +5780,219 @@ $script:scriptBlockAssertJournalSwapRefused = {
             $objContext.OwnershipJournal = $objAuthenticatedJournal
         }
     } finally {
-        # The context was deliberately corrupted, so its own cleanup is not
-        # trusted to dispose the tree; remove the probe root directly.
+        $objContext.OwnershipJournal = $objOriginalJournal
+        $objContext.NextSequence = $uintOriginalSequence
+        $objCleanup = & $hashtableBindings.SourceRemove -Context $objContext
+        if (-not $objCleanup.Success -or $objContext.LifecycleState -cne 'Disposed') { throw 'journal-swap-cleanup' }
         [System.IO.Directory]::Delete($strSwapRoot, $true)
+    }
+}
+
+$script:scriptBlockTerraformRetainedCaptureWorker = {
+    param ([string]$Roles, [string]$FixtureRoot)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    . ([IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))
+    $strHelper = [IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1')
+    $hashtableFixtureState = & $script:scriptBlockGetTerraformDerivedFixtureState -Roles $Roles -Role context
+    $listResults = New-Object 'System.Collections.Generic.List[pscustomobject]'
+    foreach ($strMode in @('control', 'partial', 'swap')) {
+        $strRoot = [IO.Path]::Combine($FixtureRoot, $strMode)
+        $strCheckout = [IO.Path]::Combine($strRoot, 'checkout')
+        $strTrusted = [IO.Path]::Combine($strRoot, 'trusted')
+        [void][IO.Directory]::CreateDirectory($strCheckout)
+        [void][IO.Directory]::CreateDirectory($strTrusted)
+        $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrusted
+        $strArchive = [IO.Path]::Combine($objContext.DownloadDirectoryPath, 'artifact.zip')
+        $objZip = [IO.Compression.ZipFile]::Open($strArchive, [IO.Compression.ZipArchiveMode]::Create)
+        try {
+            foreach ($strName in @('copilot-instructions.md', 'powershell.instructions.md', 'STYLE_GUIDE_CHAT.md', 'STYLE_GUIDE_FULL.md')) {
+                $objStream = $objZip.CreateEntry($strName).Open()
+                try { $arrBytes = [Text.Encoding]::UTF8.GetBytes("fixture`n"); $objStream.Write($arrBytes, 0, $arrBytes.Length) }
+                finally { $objStream.Dispose() }
+            }
+        } finally { $objZip.Dispose() }
+        $strDigest = (Microsoft.PowerShell.Utility\Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash
+        $objResult = & $strHelper -Context $objContext -CheckoutRoot $strCheckout -TrustedTemporaryRoot $strTrusted `
+            -DownloadDirectory $objContext.DownloadDirectoryPath -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $strDigest
+        $objOriginalJournal = $objContext.OwnershipJournal
+        if (-not [object]::ReferenceEquals($objResult, $objContext) -or $objContext.LifecycleState -cne 'Active' -or
+            $objOriginalJournal.Count -ne 8 -or @($objOriginalJournal | Where-Object { $_.Kind -ceq 'CandidateFile' }).Count -ne 4) { throw 'retained-capture-expansion' }
+        $hashtableBytes = @{}
+        foreach ($objRecord in $objOriginalJournal) {
+            if ($objRecord.ExpectedEntryType -ceq 'File') { $hashtableBytes[$objRecord.Path] = [Convert]::ToBase64String([IO.File]::ReadAllBytes($objRecord.Path)) }
+        }
+        if ($hashtableBytes.Count -ne 5) { throw 'retained-capture-original-files' }
+        $hashtableCounter = @{ Calls = 0 }
+        $scriptBlockDecoyPath = { $hashtableCounter.Calls++; return 'decoy' }.GetNewClosure()
+        $objCounterControl = [pscustomobject]@{}
+        Add-Member -InputObject $objCounterControl -MemberType ScriptProperty -Name Path -Value $scriptBlockDecoyPath
+        $null = $objCounterControl.Path
+        if ($hashtableCounter.Calls -ne 1) { throw 'retained-capture-counter-control' }
+        $hashtableCounter.Calls = 0
+        $arrDecoy = New-Object object[] 4096
+        for ($intIndex = 0; $intIndex -lt $arrDecoy.Length; $intIndex++) {
+            $arrDecoy[$intIndex] = [pscustomobject]@{ EntryState = 'RetainedUncertain'; Sequence = [uint32]$intIndex }
+            Add-Member -InputObject $arrDecoy[$intIndex] -MemberType ScriptProperty -Name Path -Value $scriptBlockDecoyPath
+        }
+        $hashtableFixtureState.Mode = $strMode
+        $hashtableFixtureState.BeforeCalls = 0
+        $hashtableFixtureState.AfterCalls = 0
+        $hashtableFixtureState.BeforeCount = [uint32]0
+        $hashtableFixtureState.LastCount = [uint32]0
+        $hashtableFixtureState.RemovedPath = $null
+        $hashtableFixtureState.Plan = $null
+        $hashtableFixtureState.Before = {
+            param ([object]$Context, [object]$Plan, [uint32]$FilesystemCount)
+            $hashtableFixtureState.BeforeCalls++
+            if (-not [object]::ReferenceEquals($Context, $objContext) -or $Context.LifecycleState -cne 'Active' -or $Plan.Journal.Count -ne 8) { throw 'retained-capture-captured-plan' }
+            $hashtableFixtureState.Plan = $Plan
+            $hashtableFixtureState.BeforeCount = $FilesystemCount
+            if ($hashtableFixtureState.Mode -ceq 'swap') {
+                $Context.OwnershipJournal = $arrDecoy
+                throw 'retained-capture-controlled-swap'
+            }
+        }.GetNewClosure()
+        $hashtableFixtureState.After = {
+            param ([string]$RemovedPath, [object]$PlanRecord, [uint32]$FilesystemCount)
+            $hashtableFixtureState.AfterCalls++
+            $hashtableFixtureState.LastCount = $FilesystemCount
+            if ([IO.File]::Exists($RemovedPath) -or $PlanRecord.EntryState -cne 'Deleted' -or $PlanRecord.Record.EntryState -cne 'Deleted') { throw 'retained-capture-delete-not-observed' }
+            if ($hashtableFixtureState.Mode -ceq 'partial') {
+                $hashtableFixtureState.RemovedPath = $RemovedPath
+                throw 'retained-capture-controlled-partial'
+            }
+        }.GetNewClosure()
+        $objObserved = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+        if ($hashtableFixtureState.BeforeCalls -ne 1 -or $null -eq $hashtableFixtureState.Plan -or $hashtableCounter.Calls -ne 0) { throw 'retained-capture-hook-counts' }
+        $arrPlan = $hashtableFixtureState.Plan.Journal
+        $arrRetained = [uint32[]]@($arrPlan | Where-Object { $_.EntryState -ceq 'RetainedUncertain' } | ForEach-Object { $_.Sequence })
+        $arrRemoved = @($arrPlan | Where-Object { $_.EntryState -ceq 'Deleted' })
+        $arrActualRetained = [uint32[]]@($objObserved.RetainedRecordSequences)
+        if ($arrActualRetained.Length -ne $arrRetained.Length) { throw 'retained-capture-count' }
+        for ($intIndex = 0; $intIndex -lt $arrRetained.Length; $intIndex++) {
+            if ($arrActualRetained[$intIndex] -ne $arrRetained[$intIndex]) { throw 'retained-capture-private-sequences' }
+        }
+        for ($intIndex = 0; $intIndex -lt 8; $intIndex++) {
+            if (-not [object]::ReferenceEquals($arrPlan[$intIndex].Record, $objOriginalJournal[$intIndex]) -or
+                $arrPlan[$intIndex].Path -cne $objOriginalJournal[$intIndex].Path -or
+                $arrPlan[$intIndex].EntryState -cne $objOriginalJournal[$intIndex].EntryState) { throw 'retained-capture-original-plan' }
+        }
+        if ($strMode -ceq 'control') {
+            if (-not $objObserved.Success -or $objObserved.DiagnosticCode -cne 'cleanup-succeeded' -or $objContext.LifecycleState -cne 'Disposed' -or
+                $arrRemoved.Count -ne 8 -or $arrRetained.Count -ne 0 -or $hashtableFixtureState.AfterCalls -ne 5 -or
+                $objObserved.FilesystemCallCount -ne ($hashtableFixtureState.BeforeCount + 16) -or
+                [IO.Directory]::Exists($objContext.InvocationRootPath)) { throw 'retained-capture-control' }
+        } else {
+            if ($objObserved.Success -or $objObserved.DiagnosticCode -cne 'cleanup-owned-entry-uncertain' -or $objContext.LifecycleState -cne 'CleanupFailed') { throw 'retained-capture-controlled-failure' }
+            if ($strMode -ceq 'partial') {
+                if ($hashtableFixtureState.AfterCalls -ne 1 -or $arrRemoved.Count -ne 1 -or $arrRetained.Count -ne 7 -or
+                    $arrRemoved[0].Path -cne $hashtableFixtureState.RemovedPath -or
+                    $objObserved.FilesystemCallCount -ne $hashtableFixtureState.LastCount -or
+                    $objObserved.FilesystemCallCount -ne ($hashtableFixtureState.BeforeCount + 2)) { throw 'retained-capture-partial-count' }
+            } elseif ($hashtableFixtureState.AfterCalls -ne 0 -or $arrRemoved.Count -ne 0 -or $arrRetained.Count -ne 8 -or
+                $objObserved.FilesystemCallCount -ne $hashtableFixtureState.BeforeCount -or
+                -not [object]::ReferenceEquals($objContext.OwnershipJournal, $arrDecoy)) { throw 'retained-capture-swap-reference' }
+        }
+        foreach ($strPath in $hashtableBytes.Keys) {
+            if ($strMode -ceq 'control' -or $strPath -ceq $hashtableFixtureState.RemovedPath) {
+                if ([IO.File]::Exists($strPath)) { throw 'retained-capture-removed-file-returned' }
+            } elseif ([Convert]::ToBase64String([IO.File]::ReadAllBytes($strPath)) -cne $hashtableBytes[$strPath]) { throw 'retained-capture-file-changed' }
+        }
+        if ($hashtableCounter.Calls -ne 0) { throw 'retained-capture-decoy-traversal' }
+        $listResults.Add([pscustomobject][ordered]@{
+            Mode = $strMode; ContextState = $objContext.LifecycleState
+            RemovedCount = [int]$arrRemoved.Count; RetainedCount = [int]$arrRetained.Count
+            DecoyPathCallbacks = [int]$hashtableCounter.Calls
+            BeforeCalls = [int]$hashtableFixtureState.BeforeCalls; AfterCalls = [int]$hashtableFixtureState.AfterCalls
+            BeforeFilesystemCalls = [uint32]$hashtableFixtureState.BeforeCount
+            ActualFilesystemCalls = [uint32]$objObserved.FilesystemCallCount
+            ActualPrivateRecordsMatched = $true; CounterPositiveControlPassed = $true
+        })
+    }
+    [IO.File]::WriteAllText([IO.Path]::Combine($FixtureRoot, 'result.json'),
+        (ConvertTo-Json -InputObject $listResults.ToArray() -Depth 5 -Compress), (New-Object Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockAssertRetainedCaptureProduction = {
+    param ([string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath)
+
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId 'source-retained-capture'
+    $hashtableWorker = $null
+    try {
+        & $script:scriptBlockAssertContextDefinitionPin -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+        $strManager = [IO.File]::ReadAllText($ContextLiteralPath)
+        $strHelper = [IO.File]::ReadAllText($HelperLiteralPath)
+        $strBeforeMarker = '            $arrFilesToDelete = @($objCleanupPlan.Journal | Where-Object {'
+        $strAfterMarker = '            }' + "`n`n" + '            # Descending sequence puts the candidate directory before the download'
+        foreach ($strMarker in @($strBeforeMarker, $strAfterMarker)) {
+            if ([regex]::Matches($strManager, [regex]::Escape($strMarker)).Count -ne 1) { throw 'retained-capture-hook-cardinality' }
+        }
+        $strBeforeHook = '            & $hashtableTask184FixtureState.Before $Context $objCleanupPlan $uintFilesystemCallCount' + "`n"
+        $strAfterHook = '                & $hashtableTask184FixtureState.After $strDeletePath $objRecord $uintFilesystemCallCount' + "`n"
+        $strDerived = & $script:scriptBlockAddTerraformDerivedFixtureState -Source $strManager -Role context
+        $strDerived = $strDerived.Replace($strBeforeMarker, $strBeforeHook + $strBeforeMarker).Replace($strAfterMarker, $strAfterHook + $strAfterMarker)
+        $strStateInitializer = "`n" + '    $hashtableTask184FixtureState = @{}'
+        foreach ($strInsertion in @($strBeforeHook, $strAfterHook, $strStateInitializer)) {
+            if ([regex]::Matches($strDerived, [regex]::Escape($strInsertion)).Count -ne 1) { throw 'retained-capture-transform-cardinality' }
+        }
+        if ($strDerived.Replace($strBeforeHook, '').Replace($strAfterHook, '').Replace($strStateInitializer, '') -cne $strManager) { throw 'retained-capture-manager-transform' }
+        $strDerivedHelper = & $script:scriptBlockSetDerivedContextDefinitionPin -HelperSource $strHelper -ContextSource $strDerived
+        if ((& $script:scriptBlockSetDerivedContextDefinitionPin -HelperSource $strDerivedHelper -ContextSource $strManager) -cne $strHelper -or
+            $strDerivedHelper -ceq $strHelper) { throw 'retained-capture-helper-transform' }
+        $strRoles = [IO.Path]::Combine($hashtableLayout.CaseRoot, 'roles')
+        [void][IO.Directory]::CreateDirectory($strRoles)
+        $strManagerCopy = [IO.Path]::Combine($strRoles, 'Manage-StyleGuideCandidateInvocationContext.ps1')
+        $strHelperCopy = [IO.Path]::Combine($strRoles, 'Expand-StyleGuideCandidateArtifact.ps1')
+        [IO.File]::WriteAllText($strManagerCopy, $strDerived, (New-Object Text.UTF8Encoding($false)))
+        [IO.File]::WriteAllText($strHelperCopy, $strDerivedHelper, (New-Object Text.UTF8Encoding($false)))
+        & $script:scriptBlockAssertContextDefinitionPin -HelperLiteralPath $strHelperCopy -ContextLiteralPath $strManagerCopy
+        $strWorkerPath = [IO.Path]::Combine($hashtableLayout.CaseRoot, 'worker.ps1')
+        $strWorker = "param ([string]`$Roles, [string]`$FixtureRoot)`n"
+        foreach ($strName in @('scriptBlockInitializeTerraformWorkerCompression', 'scriptBlockGetTerraformDerivedFixtureState')) {
+            $objBlock = (Get-Variable -Name $strName -Scope Script -ErrorAction Stop).Value
+            $strWorker += '$script:' + $strName + ' = {' + $objBlock.ToString() + "}`n"
+        }
+        $strWorker += '& $script:scriptBlockInitializeTerraformWorkerCompression' + "`n" +
+            '& {' + $script:scriptBlockTerraformRetainedCaptureWorker.ToString() + '} -Roles $Roles -FixtureRoot $FixtureRoot'
+        [IO.File]::WriteAllText($strWorkerPath, $strWorker, (New-Object Text.UTF8Encoding($false)))
+        $hashtableInputEvidence = @{}
+        foreach ($strPath in @($HelperLiteralPath, $ContextLiteralPath, $strHelperCopy, $strManagerCopy, $strWorkerPath)) {
+            $hashtableInputEvidence[$strPath] = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath
+        }
+        $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath -WorkingDirectory $hashtableLayout.CaseRoot `
+            -Arguments @('-Roles', $strRoles, '-FixtureRoot', $hashtableLayout.Trusted)
+        while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [Threading.Thread]::Sleep(10) }
+        if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'retained-capture-worker-failed' }
+        $arrResults = @(& $script:scriptBlockReadTerraformProofResult -LiteralPath ([IO.Path]::Combine($hashtableLayout.Trusted, 'result.json')))
+        if ($arrResults.Count -ne 3) { throw 'retained-capture-result-count' }
+        for ($intIndex = 0; $intIndex -lt 3; $intIndex++) {
+            $objRow = $arrResults[$intIndex]
+            & $script:scriptBlockAssertExactPropertyNames -Value $objRow -Names @('Mode', 'ContextState', 'RemovedCount', 'RetainedCount',
+                'DecoyPathCallbacks', 'BeforeCalls', 'AfterCalls', 'BeforeFilesystemCalls', 'ActualFilesystemCalls',
+                'ActualPrivateRecordsMatched', 'CounterPositiveControlPassed') -Detail 'retained-capture-result'
+            foreach ($strField in @('Mode', 'ContextState')) { if ($objRow.$strField -isnot [string]) { throw 'retained-capture-result-type' } }
+            foreach ($strField in @('RemovedCount', 'RetainedCount', 'DecoyPathCallbacks', 'BeforeCalls', 'AfterCalls', 'BeforeFilesystemCalls', 'ActualFilesystemCalls')) {
+                if ($objRow.$strField -isnot [int] -and $objRow.$strField -isnot [long]) { throw 'retained-capture-result-type' }
+            }
+            foreach ($strField in @('ActualPrivateRecordsMatched', 'CounterPositiveControlPassed')) {
+                if ($objRow.$strField -isnot [bool] -or -not $objRow.$strField) { throw 'retained-capture-result-type' }
+            }
+            $strExpectedState = if ($intIndex -eq 0) { 'Disposed' } else { 'CleanupFailed' }
+            if ($objRow.Mode -cne @('control', 'partial', 'swap')[$intIndex] -or $objRow.ContextState -cne $strExpectedState -or
+                $objRow.RemovedCount -ne @(8, 1, 0)[$intIndex] -or $objRow.RetainedCount -ne @(0, 7, 8)[$intIndex] -or
+                $objRow.BeforeCalls -ne 1 -or $objRow.AfterCalls -ne @(5, 1, 0)[$intIndex] -or $objRow.DecoyPathCallbacks -ne 0 -or
+                $objRow.BeforeFilesystemCalls -ne 17 -or $objRow.ActualFilesystemCalls -ne ($objRow.BeforeFilesystemCalls + @(16, 2, 0)[$intIndex])) { throw 'retained-capture-result' }
+        }
+        foreach ($strPath in $hashtableInputEvidence.Keys) {
+            $objAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath
+            if ($objAfter.Length -ne $hashtableInputEvidence[$strPath].Length -or $objAfter.Sha256 -cne $hashtableInputEvidence[$strPath].Sha256) { throw 'retained-capture-input-changed' }
+        }
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { throw 'retained-capture-sentinel' }
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
     }
 }
 
@@ -4018,9 +6018,16 @@ $script:scriptBlockAssertRetainedSequenceFromCapture = {
     # that swaps the journal for a decoy full of RetainedUncertain records and
     # throws must still report the captured journal's own set -- empty, for a
     # fresh context -- so a catch that reads $Context reports the decoy and fails.
-    $scriptBlockRealCleanup = (Get-Command `
-        -Name Remove-StyleGuideCandidateInvocationContext `
-        -CommandType Function).ScriptBlock
+    # This is privileged fixture fault injection into the authenticated cached
+    # cleanup boundary. Public-name rebinding is independently proved inert by
+    # ContextBindingControls. Restore the actual cached callable in finally;
+    # this test makes no security claim against deliberate module reflection.
+    $arrFixtureHelperModules = @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateArtifact_1_0_20260926_0 -All)
+    if ($arrFixtureHelperModules.Count -ne 1) { throw 'cleanup-fixture-helper-module' }
+    $objFixtureHelperModule = $arrFixtureHelperModules[0]
+    & $objFixtureHelperModule { & $script:scriptBlockAssertContextBinding }
+    $scriptBlockRealCleanup = & $objFixtureHelperModule { return $script:scriptBlockBoundContextCleanup }
+    if ($scriptBlockRealCleanup -isnot [scriptblock]) { throw 'cleanup-fixture-bound-callable' }
 
     $strControlRoot = [System.IO.Path]::Combine($RunRoot, 'retained-control')
     [void][System.IO.Directory]::CreateDirectory($strControlRoot)
@@ -4029,7 +6036,7 @@ $script:scriptBlockAssertRetainedSequenceFromCapture = {
     $uintControlSequence = [uint32]$objControlContext.OwnershipJournal[1].Sequence
     $objControlResult = $null
     try {
-        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext -Value {
+        & $objFixtureHelperModule { param ($Value) $script:scriptBlockBoundContextCleanup = $Value } {
             param (
                 [Parameter(Mandatory = $true)]
                 [AllowNull()]
@@ -4037,12 +6044,11 @@ $script:scriptBlockAssertRetainedSequenceFromCapture = {
             )
             $Context.OwnershipJournal[1].EntryState = 'RetainedUncertain'
             throw 'retained-control-throw'
-        } -Force
+        }
         $objControlResult = Remove-StyleGuideCandidateInvocationState `
             -Context $objControlContext
     } finally {
-        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext `
-            -Value $scriptBlockRealCleanup -Force
+        & $objFixtureHelperModule { param ($Value) $script:scriptBlockBoundContextCleanup = $Value } $scriptBlockRealCleanup
         [System.IO.Directory]::Delete($strControlRoot, $true)
     }
     $arrControlRetained = [uint32[]]@($objControlResult.RetainedRecordSequences)
@@ -4058,7 +6064,7 @@ $script:scriptBlockAssertRetainedSequenceFromCapture = {
         -TrustedTemporaryRoot $strAttackRoot -DiagnosticLabel 'retained-attack'
     $objAttackResult = $null
     try {
-        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext -Value {
+        & $objFixtureHelperModule { param ($Value) $script:scriptBlockBoundContextCleanup = $Value } {
             param (
                 [Parameter(Mandatory = $true)]
                 [AllowNull()]
@@ -4074,12 +6080,11 @@ $script:scriptBlockAssertRetainedSequenceFromCapture = {
             }
             $Context.OwnershipJournal = [object[]]$arrDecoy
             throw 'retained-attack-throw'
-        } -Force
+        }
         $objAttackResult = Remove-StyleGuideCandidateInvocationState `
             -Context $objAttackContext
     } finally {
-        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext `
-            -Value $scriptBlockRealCleanup -Force
+        & $objFixtureHelperModule { param ($Value) $script:scriptBlockBoundContextCleanup = $Value } $scriptBlockRealCleanup
         [System.IO.Directory]::Delete($strAttackRoot, $true)
     }
     $intAttackRetained = @($objAttackResult.RetainedRecordSequences).Count
@@ -4090,6 +6095,9 @@ $script:scriptBlockAssertRetainedSequenceFromCapture = {
 }
 
 $script:scriptBlockAssertCandidateRecordUnchangedRefused = {
+    param ([string]$HelperLiteralPath, [string]$ContextLiteralPath)
+
+    $hashtableBindings = & $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
     # Round 64 (Codex): the pre-create candidate-record guard must refuse a
     # same-session flip of EVERY invariant field, not just the Kind/Sequence/Path
     # round 63 covered. The production check is factored into
@@ -4113,7 +6121,7 @@ $script:scriptBlockAssertCandidateRecordUnchangedRefused = {
             ContentSha256     = $null
         }
         $objRecord.PSObject.TypeNames.Insert(
-            0, $script:strCandidateHelperRecordTypeName)
+            0, $hashtableBindings.HelperRecordTypeName)
         $objRecord
     }
     $objSnapshot = [pscustomobject]@{
@@ -4125,7 +6133,7 @@ $script:scriptBlockAssertCandidateRecordUnchangedRefused = {
 
     $boolControlPassed = $true
     try {
-        & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+        & $hashtableBindings.HelperRecordUnchanged `
             -Record (& $scriptBlockFreshRecord) -Snapshot $objSnapshot `
             -PhaseValue 'destination'
     } catch {
@@ -4235,7 +6243,7 @@ $script:scriptBlockAssertCandidateRecordUnchangedRefused = {
         $boolRefused = $false
         $strSubreason = 'none'
         try {
-            [void](& $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+            [void](& $hashtableBindings.HelperRecordUnchanged `
                 -Record $objRecord -Snapshot $objSnapshot -PhaseValue 'destination')
         } catch {
             $boolRefused = $true
@@ -4253,10 +6261,45 @@ $script:scriptBlockAssertCandidateRecordUnchangedRefused = {
     }
 }
 
+$script:scriptBlockGetTerraformCandidatePresence = {
+    param ([string]$LiteralPath)
+
+    $strParent = [System.IO.Path]::GetDirectoryName($LiteralPath)
+    $strLeaf = [System.IO.Path]::GetFileName($LiteralPath)
+    try { $objAttributes = [System.IO.File]::GetAttributes($strParent) }
+    catch [System.IO.FileNotFoundException] { return 'absent' }
+    catch [System.IO.DirectoryNotFoundException] { return 'absent' }
+    catch { return 'uncertain' }
+    if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { return 'uncertain' }
+    if (($objAttributes -band [System.IO.FileAttributes]::Directory) -eq 0) {
+        try {
+            & $script:scriptBlockAssertOrdinaryInputFileType -LiteralPath $strParent
+            return 'absent'
+        } catch { return 'uncertain' }
+    }
+    $objEnumerator = $null
+    try {
+        $objEnumerator = [System.IO.Directory]::EnumerateFileSystemEntries($strParent).GetEnumerator()
+        $intCount = 0
+        while ($objEnumerator.MoveNext()) {
+            $intCount++
+            if ($intCount -gt 64) { return 'uncertain' }
+            $strEntry = [string]$objEnumerator.Current
+            if ([string]::Equals([System.IO.Path]::GetFileName($strEntry), $strLeaf, $script:objCandidatePathComparison)) {
+                return 'present'
+            }
+        }
+        return 'absent'
+    } catch { return 'uncertain' }
+    finally { if ($null -ne $objEnumerator) { $objEnumerator.Dispose() } }
+}
+
 $script:scriptBlockAssertPreexistingRecordReproofRefused = {
     param (
         [Parameter(Mandatory = $true)]
-        [string]$RunRoot
+        [string]$RunRoot,
+        [string]$HelperLiteralPath,
+        [string]$ContextLiteralPath
     )
 
     # Round 71 (Codex P2): before the irreversible destination create, expansion
@@ -4273,23 +6316,16 @@ $script:scriptBlockAssertPreexistingRecordReproofRefused = {
     # at the journal-swap probe), so the guard sequence is replayed here on the real
     # production scriptblocks, in production's order.
     #
-    # Behavioural, with a positive control, like the journal-swap probe. The HONEST
-    # guard sequence must PASS; the sequence run after the seq-0 EntryState flip
-    # must be REFUSED with subreason candidate-record BEFORE any create. Requiring
-    # the control to pass gives it teeth: a guard that always threw would fail the
-    # control. And if the attack is NOT refused -- the state a reverted fix returns
-    # to -- the probe replays the create, the marking, the post-create context
-    # assertion, and the real rollback exactly as expansion does, and fails on the
-    # leak the manager then retains: rollback validates the corrupted journal,
-    # refuses with FilesystemCallCount 0, and leaves the issued root on disk.
-    # Removing the pre-existing EntryState re-proof reddens this probe on that leak;
-    # removing the re-proof calls is pinned by scriptBlockAssertRound63JournalPlanWired.
+    # The genuine shared Context is obtained from its authenticated manager issuer.
+    # Replay the preserved guard order, then independently mutate root and download.
+    # A missing refusal fails immediately; this does not replay the obsolete public
+    # source-context rollback interface or claim a measured leak in this adapter.
     $strReproofRoot = [System.IO.Path]::Combine($RunRoot, 'preexisting-reproof')
     [void][System.IO.Directory]::CreateDirectory($strReproofRoot)
-    $objReproofContext = New-StyleGuideCandidateInvocationContext `
-        -TrustedTemporaryRoot $strReproofRoot -DiagnosticLabel 'preexisting-reproof'
+    $hashtableBindings = & $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    $objReproofContext = & $hashtableBindings.SourceNew -TrustedTemporaryRoot $strReproofRoot -DiagnosticLabel 'preexisting-reproof'
     try {
-        $objReproofJournal = & $script:scriptBlockAssertCandidateHelperContext `
+        $objReproofJournal = & $hashtableBindings.HelperAssertContext `
             -ContextValue $objReproofContext
         $uintReproofSequence = [uint32]$objReproofJournal.Count
         $scriptBlockReproofSnapshot = {
@@ -4308,7 +6344,6 @@ $script:scriptBlockAssertPreexistingRecordReproofRefused = {
         $objDownloadSnapshot = & $scriptBlockReproofSnapshot (@($objReproofJournal |
             Where-Object { $_.Kind -eq 'DownloadDirectory' })[0])
         $strReproofCandidateDirectory = [string]$objReproofContext.CandidatePath
-        $strReproofRootDirectory = [string]$objReproofContext.InvocationRootPath
 
         # The pre-create guard sequence expansion runs, on the real scriptblocks
         # and in the real order: the journal-current reference guard, then the
@@ -4322,18 +6357,18 @@ $script:scriptBlockAssertPreexistingRecordReproofRefused = {
                 $RootSnapshot,
                 $DownloadSnapshot
             )
-            & $script:scriptBlockAssertCandidateHelperJournalCurrent `
+            & $hashtableBindings.HelperJournalCurrent `
                 -ContextValue $Context -JournalValue $Journal `
                 -NextSequenceValue $Sequence -PhaseValue 'destination'
-            & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+            & $hashtableBindings.HelperRecordUnchanged `
                 -Record $Journal[$CandidateSnapshot.Sequence] `
                 -Snapshot $CandidateSnapshot `
                 -PhaseValue 'destination'
-            & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+            & $hashtableBindings.HelperRecordUnchanged `
                 -Record $Journal[$RootSnapshot.Sequence] -Snapshot $RootSnapshot `
                 -ExpectedKind 'InvocationRootDirectory' -ExpectedEntryState 'Created' `
                 -PhaseValue 'destination'
-            & $script:scriptBlockAssertCandidateHelperRecordUnchanged `
+            & $hashtableBindings.HelperRecordUnchanged `
                 -Record $Journal[$DownloadSnapshot.Sequence] -Snapshot $DownloadSnapshot `
                 -ExpectedKind 'DownloadDirectory' -ExpectedEntryState 'Created' `
                 -PhaseValue 'destination'
@@ -4353,61 +6388,29 @@ $script:scriptBlockAssertPreexistingRecordReproofRefused = {
                 -Detail 'preexisting-reproof-control-refused'
         }
 
-        # Attack: flip the seq-0 root record's EntryState after authentication, in
-        # place -- the journal array reference and NextSequence are unchanged, so
-        # the journal-current guard cannot see it. Only the pre-existing-record
-        # re-proof can.
-        $objReproofJournal[$objRootSnapshot.Sequence].EntryState = 'Deleted'
-        $boolReproofRefused = $false
-        $strReproofSubreason = 'none'
-        try {
-            & $scriptBlockReproofGuards $objReproofContext $objReproofJournal `
-                $uintReproofSequence $objCandidateSnapshot $objRootSnapshot `
-                $objDownloadSnapshot
-        } catch {
-            $boolReproofRefused = $true
-            $objReproofMatch = [regex]::Match(
-                [string]$_.Exception.Message, 'subreason=([a-z][a-z0-9-]*)')
-            if ($objReproofMatch.Success) {
-                $strReproofSubreason = $objReproofMatch.Groups[1].Value
-            }
-        }
-
-        if ($boolReproofRefused) {
-            # Refused before the create, as clean production does. The subreason
-            # must name the record guard, and nothing may have been created.
-            if ($strReproofSubreason -cne 'candidate-record') {
-                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                    -Detail ('preexisting-reproof-subreason-' + $strReproofSubreason)
-            }
-            if ([System.IO.Directory]::Exists($strReproofCandidateDirectory)) {
-                & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                    -Detail 'preexisting-reproof-created-despite-refusal'
-            }
-        } else {
-            # NOT refused: the state a reverted pre-existing-record re-proof returns
-            # to. Replay the create, the marking, the post-create context assertion
-            # and the real rollback exactly as expansion does, then fail on the leak
-            # the manager retains.
-            $null = [System.IO.Directory]::CreateDirectory($strReproofCandidateDirectory)
-            $objReproofCandidateLive =
-                $objReproofContext.OwnershipJournal[$objCandidateSnapshot.Sequence]
-            $objReproofCandidateLive.CreationPhase = 'destination'
-            $objReproofCandidateLive.EntryState = 'Created'
+        foreach ($objMutationSnapshot in @($objRootSnapshot, $objDownloadSnapshot)) {
+            $objRecord = $objReproofJournal[$objMutationSnapshot.Sequence]
+            $strOriginalState = $objRecord.EntryState
+            $strReproofSubreason = 'none'
             try {
-                [void](& $script:scriptBlockAssertCandidateHelperContext `
-                    -ContextValue $objReproofContext)
-            } catch {
-                Write-Debug ('Expected corrupted-context refusal: {0}' -f $_)
-            }
-            [void](Remove-StyleGuideCandidateInvocationState -Context $objReproofContext)
-            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                -Detail ('preexisting-reproof-attack-not-refused-rootleak-' +
-                    [string]([System.IO.Directory]::Exists($strReproofRootDirectory)))
+                $objRecord.EntryState = 'Deleted'
+                try {
+                    & $scriptBlockReproofGuards $objReproofContext $objReproofJournal `
+                        $uintReproofSequence $objCandidateSnapshot $objRootSnapshot $objDownloadSnapshot
+                } catch {
+                    $strReproofSubreason = [string]$_.Exception.Data['PSStyleGuideSubreason']
+                }
+                if ($strReproofSubreason -cne 'candidate-record') {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'preexisting-reproof-not-refused'
+                }
+                if ((& $script:scriptBlockGetTerraformCandidatePresence -LiteralPath $strReproofCandidateDirectory) -cne 'absent') {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'preexisting-reproof-created-despite-refusal'
+                }
+            } finally { $objRecord.EntryState = $strOriginalState }
         }
     } finally {
-        # The context was deliberately corrupted, so its own cleanup is not trusted
-        # to dispose the tree; remove the probe root directly.
+        $objCleanup = & $hashtableBindings.SourceRemove -Context $objReproofContext
+        if (-not $objCleanup.Success -or $objReproofContext.LifecycleState -cne 'Disposed') { throw 'preexisting-reproof-cleanup' }
         if ([System.IO.Directory]::Exists($strReproofRoot)) {
             [System.IO.Directory]::Delete($strReproofRoot, $true)
         }
@@ -4467,6 +6470,11 @@ $script:scriptBlockAssertRound63JournalPlanWired = {
     if (@($arrJournalRead).Count -ne 2) {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
             -Detail ('round63-journal-read-count-' + [string]@($arrJournalRead).Count)
+    }
+    foreach ($objRead in $arrJournalRead) {
+        if ($objRead.Extent.Text -cne '$ContextValue.OwnershipJournal') {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'round63-journal-read-site'
+        }
     }
 
     $strText = [System.IO.File]::ReadAllText($LiteralPath)
@@ -4627,6 +6635,7 @@ $script:scriptBlockAssertDownloadLeafGuardExecutes = {
     # cannot serve as the literal search pattern cleanup will need.
     foreach ($hashtableCase in @(
             @{ Leaf = 'build[1].zip'; MustSucceed = $true },
+            @{ Leaf = 'build[1]\part.zip'; MustSucceed = $true },
             @{ Leaf = 'star*.zip'; MustSucceed = $false })) {
         $strLeaf = [string]$hashtableCase.Leaf
         $boolNameable = $true
@@ -4693,11 +6702,8 @@ $script:scriptBlockAssertDownloadLeafGuardExecutes = {
                 -ExpectedDigest $strExpectedDigest)
             $boolSucceeded = $true
         } catch {
-            $objSubreason = [regex]::Match(
-                [string]$_.Exception.Message, 'subreason=([a-z][a-z0-9-]*)')
-            if ($objSubreason.Success) {
-                $strObservedSubreason = $objSubreason.Groups[1].Value
-            }
+            $objSubreason = $_.Exception.Data['PSStyleGuideSubreason']
+            if ($objSubreason -is [string]) { $strObservedSubreason = $objSubreason }
         }
         if ($boolSucceeded -ne [bool]$hashtableCase.MustSucceed) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
@@ -4719,7 +6725,53 @@ $script:scriptBlockAssertDownloadLeafGuardExecutes = {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                 -Detail ('download-leaf-guard-late-' + $strObservedSubreason)
         }
+
+        if ($hashtableCase.MustSucceed) {
+            $objCleanup = Remove-StyleGuideCandidateInvocationState -Context $objProbeContext
+            if (-not $objCleanup.Success -or $objProbeContext.LifecycleState -cne 'Disposed' -or
+                [System.IO.Directory]::Exists($objProbeContext.InvocationRootPath) -or [System.IO.File]::Exists($strArchivePath)) {
+                throw 'download-leaf-success-cleanup'
+            }
+        }
     }
+
+    # The public PS API owns the archive through its genuine context journal.
+    # It has no separate OwnedPaths argument that can accept a provider claim.
+    $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrustedRoot
+    $strArchivePath = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'build[1].zip')
+    $objArchiveEvidence = & $script:scriptBlockNewZipFixture -LiteralPath $strArchivePath -SemanticCase 'archive.valid.exact'
+    $objResult = & $HelperLiteralPath -Context $objContext -CheckoutRoot $strCheckoutRoot -TrustedTemporaryRoot $strTrustedRoot -DownloadDirectory $objContext.DownloadDirectoryPath -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $objArchiveEvidence.Sha256
+    if (-not [object]::ReferenceEquals($objResult, $objContext) -or $objContext.OwnershipJournal.Count -ne 8) { throw 'download-leaf-neighbor-control' }
+    $objArchiveRecord = $objContext.OwnershipJournal[3]
+    if ($objArchiveRecord.Kind -cne 'DownloadFile' -or $objArchiveRecord.Path -cne $strArchivePath) { throw 'download-leaf-archive-record' }
+    $strSavedPath = $objArchiveRecord.Path
+    try {
+        $objArchiveRecord.Path = $strSavedPath + [System.IO.Path]::DirectorySeparatorChar
+        $strBefore = ConvertTo-Json -InputObject $objContext -Depth 12 -Compress
+        $objRefusal = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+        if ($objRefusal.Success -or $objRefusal.DiagnosticCode -cne 'cleanup-context-invalid' -or $objRefusal.FilesystemCallCount -ne 0 -or
+            (ConvertTo-Json -InputObject $objContext -Depth 12 -Compress) -cne $strBefore) { throw 'download-leaf-trailing-separator' }
+    } finally { $objArchiveRecord.Path = $strSavedPath }
+    $objCandidateBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $objContext.CandidatePath
+    # Only the fixture removes the exact owned archive. The neighbor must never
+    # be selected through wildcard expansion by production cleanup.
+    [System.IO.File]::Delete($strArchivePath)
+    $strNeighbor = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'build1.zip')
+    [System.IO.File]::WriteAllBytes($strNeighbor, [byte[]]@(110, 101, 105, 103, 104, 98, 111, 114))
+    $objBeforeCleanup = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $objContext.InvocationRootPath
+    $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+    if ($objCleanup.Success -or $objCleanup.DiagnosticCode -cne 'cleanup-owned-entry-uncertain' -or
+        $objContext.LifecycleState -cne 'CleanupFailed' -or
+        @($objContext.OwnershipJournal | Where-Object EntryState -CEQ 'Deleted').Count -ne 0 -or
+        -not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBeforeCleanup -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $objContext.InvocationRootPath)) -or
+        -not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objCandidateBefore -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $objContext.CandidatePath)) -or
+        [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strNeighbor)) -cne 'bmVpZ2hib3I=') { throw 'download-leaf-literal-neighbor' }
+    foreach ($strEntryPoint in @('helper', 'context')) {
+        $objRepeat = & $script:scriptBlockInvokeTerminalContextProbe -Context $objContext -EntryPoint $strEntryPoint
+        if ($objRepeat.Result.Success -or $objRepeat.Result.DiagnosticCode -cne 'cleanup-terminal-failure' -or
+            $objRepeat.Result.FilesystemCallCount -ne 0) { throw 'download-leaf-terminal-repeat' }
+    }
+    if (-not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBeforeCleanup -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $objContext.InvocationRootPath))) { throw 'download-leaf-repeat-changed-bytes' }
 }
 
 # This used to assert that the validator was the first command naming
@@ -5063,8 +7115,8 @@ $script:scriptBlockAssertStaticMembersResolve = {
         foreach ($objCall in $arrStaticCall) {
             $strTypeName = [string]$objCall.Expression.TypeName.FullName
             $strMember = [string]$objCall.Member.Value
-            $typeTarget = $strTypeName -as [type]
-            if ($null -eq $typeTarget) {
+            $objTargetType = $strTypeName -as [type]
+            if ($null -eq $objTargetType) {
                 # Absent on this runtime, so nothing here can be decided. The
                 # production branch that reaches it must resolve the type first.
                 $intSkippedType++
@@ -5081,12 +7133,12 @@ $script:scriptBlockAssertStaticMembersResolve = {
             # the arity and argument-type checks below need no special case --
             # only the overload set is chosen differently.
             if ($strMember -ceq 'new') {
-                $arrOverload = @($typeTarget.GetConstructors(
+                $arrOverload = @($objTargetType.GetConstructors(
                         [System.Reflection.BindingFlags]::Public -bor
                         [System.Reflection.BindingFlags]::Instance
                     ))
             } else {
-                $arrOverload = @($typeTarget.GetMethods(
+                $arrOverload = @($objTargetType.GetMethods(
                         [System.Reflection.BindingFlags]::Public -bor
                         [System.Reflection.BindingFlags]::Static
                     ) | Where-Object { ([string]$_.Name) -ceq $strMember })
@@ -5118,7 +7170,7 @@ $script:scriptBlockAssertStaticMembersResolve = {
             # Argument types, where the AST alone settles them. A variable is
             # usable only when every assignment to it named the same literal
             # type; anything else leaves the call proven by name and arity only.
-            $arrArgumentType = New-Object System.Collections.ArrayList
+            $listArgumentType = New-Object 'System.Collections.Generic.List[System.Type]'
             $boolTyped = $true
             foreach ($objArgument in $arrArgument) {
                 $strArgumentType = & $script:scriptBlockResolveCandidateArgumentType `
@@ -5128,12 +7180,12 @@ $script:scriptBlockAssertStaticMembersResolve = {
                     $boolTyped = $false
                     break
                 }
-                $typeArgument = $strArgumentType -as [type]
-                if ($null -eq $typeArgument) {
+                $objArgumentType = $strArgumentType -as [type]
+                if ($null -eq $objArgumentType) {
                     $boolTyped = $false
                     break
                 }
-                $null = $arrArgumentType.Add($typeArgument)
+                $listArgumentType.Add($objArgumentType)
             }
             if (-not $boolTyped) {
                 $intSkippedArgument++
@@ -5145,7 +7197,7 @@ $script:scriptBlockAssertStaticMembersResolve = {
                 $boolMatch = $true
                 for ($intIndex = 0; $intIndex -lt $arrParameter.Count; $intIndex++) {
                     if (-not $arrParameter[$intIndex].ParameterType.IsAssignableFrom(
-                            $arrArgumentType[$intIndex])) {
+                            $listArgumentType[$intIndex])) {
                         $boolMatch = $false
                         break
                     }
@@ -5180,8 +7232,13 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
         [string]$RunRoot,
 
         [Parameter(Mandatory = $true)]
-        [string]$HelperLiteralPath
+        [string]$HelperLiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ContextLiteralPath
     )
+
+    $hashtableBindings = & $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
 
     # Both production validators pair each lifecycle state with the exact set of
     # record states that state admits. That pairing is the only thing between a
@@ -5277,7 +7334,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # register that closed it cannot quietly stop being consulted.
     $strForgedStateRoot = [System.IO.Path]::Combine($RunRoot, 'forged-terminal-state')
     [void][System.IO.Directory]::CreateDirectory($strForgedStateRoot)
-    $objForgedContext = New-StyleGuideCandidateInvocationContext `
+    $objForgedContext = & $hashtableBindings.SourceNew `
         -TrustedTemporaryRoot $strForgedStateRoot `
         -DiagnosticLabel 'forged-terminal-state'
     $objForgedContext.LifecycleState = 'Disposed'
@@ -5286,7 +7343,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
             $objForgedRecord.EntryState = 'Deleted'
         }
     }
-    $objForgedResult = Remove-StyleGuideCandidateInvocationContext -Context $objForgedContext
+    $objForgedResult = & $hashtableBindings.SourceRemove -Context $objForgedContext
     if ($objForgedResult.Success -or
         ([string]$objForgedResult.DiagnosticCode) -cne 'cleanup-context-altered') {
         & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
@@ -5316,7 +7373,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # no schema defect, no state defect.
     $strUnissuedRoot = [System.IO.Path]::Combine($RunRoot, 'unissued-expansion')
     [void][System.IO.Directory]::CreateDirectory($strUnissuedRoot)
-    $objUnissuedContext = New-StyleGuideCandidateInvocationContext `
+    $objUnissuedContext = & $hashtableBindings.SourceNew `
         -TrustedTemporaryRoot $strUnissuedRoot `
         -DiagnosticLabel 'unissued-expansion'
     $strUnissuedTree = [System.IO.Path]::Combine($strUnissuedRoot, 'aaaaaaaa.unissued')
@@ -5356,7 +7413,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # a suite that stops being read.
     $strRacedRoot = [System.IO.Path]::Combine($RunRoot, 'raced-delete')
     [void][System.IO.Directory]::CreateDirectory($strRacedRoot)
-    $objRacedContext = New-StyleGuideCandidateInvocationContext `
+    $objRacedContext = & $hashtableBindings.SourceNew `
         -TrustedTemporaryRoot $strRacedRoot `
         -DiagnosticLabel 'raced-delete'
     [void][System.IO.Directory]::CreateDirectory(
@@ -5369,7 +7426,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     $objRacedContext.OwnershipJournal[1].EntryState = 'Created'
     $objRacedContext.OwnershipJournal[2].EntryState = 'Created'
     $objRacedContext.OwnershipJournal[2].CreationPhase = 'destination'
-    $arrRacedRecord = @()
+    $listRacedRecord = New-Object 'System.Collections.Generic.List[PSCustomObject]'
     foreach ($hashtableRacedFile in @(
         @{ Sequence = [uint32]3; Leaf = 'target.txt'; Byte = [byte]0x74 },
         @{ Sequence = [uint32]4; Leaf = 'trigger.txt'; Byte = [byte]0x67 }
@@ -5389,8 +7446,9 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
         $objRacedRecord.EntryState = 'Created'
         $objRacedRecord.ContentLength = [uint64]$arrRacedByte.Length
         $objRacedRecord.ContentSha256 = & $script:scriptBlockGetByteArraySha256 -Bytes $arrRacedByte
-        $arrRacedRecord += $objRacedRecord
+        $listRacedRecord.Add($objRacedRecord)
     }
+    $arrRacedRecord = [object[]]@($listRacedRecord.ToArray())
     $strRacedTarget = [string]$arrRacedRecord[0].Path
     $strRacedTrigger = [string]$arrRacedRecord[1].Path
     $objRacedContext.OwnershipJournal = [object[]]@(
@@ -5434,7 +7492,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
         while (-not $hashtableRacedSignal.Running -and
             $objRacedStart.ElapsedMilliseconds -lt 5000) {
         }
-        [void](Remove-StyleGuideCandidateInvocationContext -Context $objRacedContext)
+        [void](& $hashtableBindings.SourceRemove -Context $objRacedContext)
         [void]$objRacedShell.EndInvoke($objRacedHandle)
     } finally {
         $objRacedShell.Dispose()
@@ -5463,23 +7521,30 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # only record that a call happened, which round 20 established is not the
     # same as recording what it decided.
     #
-    # The substitution is undone in a finally. The saved value is the real
-    # function's ScriptBlock, and rebinding it restores the closure over the
-    # manager's private register -- verified by the cases that run after this.
+    # The privileged fixture substitution is undone in finally. Restore the
+    # genuine cached module-bound cleanup ScriptBlock, whose closure retains
+    # the manager's private register. Public names are not this fault boundary.
     $strFakeManagerRoot = [System.IO.Path]::Combine($RunRoot, 'fake-manager')
     [void][System.IO.Directory]::CreateDirectory($strFakeManagerRoot)
-    $objFakeManagerContext = New-StyleGuideCandidateInvocationContext `
+    $objFakeManagerContext = & $hashtableBindings.SourceNew `
         -TrustedTemporaryRoot $strFakeManagerRoot `
         -DiagnosticLabel 'fake-manager'
     [void][System.IO.Directory]::CreateDirectory(
         [string]$objFakeManagerContext.DownloadDirectoryPath)
     $objFakeManagerContext.OwnershipJournal[1].EntryState = 'Created'
-    $scriptBlockRealContextCleanup = (Get-Command `
-        -Name Remove-StyleGuideCandidateInvocationContext `
-        -CommandType Function).ScriptBlock
+    # This is privileged fixture fault injection into the authenticated cached
+    # cleanup boundary. Public-name rebinding is independently proved inert by
+    # ContextBindingControls. Restore the actual cached callable in finally;
+    # this test makes no security claim against deliberate module reflection.
+    $arrFixtureHelperModules = @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateArtifact_1_0_20260926_0 -All)
+    if ($arrFixtureHelperModules.Count -ne 1) { throw 'cleanup-fixture-helper-module' }
+    $objFixtureHelperModule = $arrFixtureHelperModules[0]
+    & $objFixtureHelperModule { & $script:scriptBlockAssertContextBinding }
+    $scriptBlockRealContextCleanup = & $objFixtureHelperModule { return $script:scriptBlockBoundContextCleanup }
+    if ($scriptBlockRealContextCleanup -isnot [scriptblock]) { throw 'cleanup-fixture-bound-callable' }
     $objFakeManagerResult = $null
     try {
-        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext -Value {
+        & $objFixtureHelperModule { param ($Value) $script:scriptBlockBoundContextCleanup = $Value } {
             param (
                 [Parameter(Mandatory = $true)]
                 [AllowNull()]
@@ -5498,12 +7563,11 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
             }
             $objLie.PSObject.TypeNames.Insert(0, 'PSStyleGuide.CandidateCleanupResult.v1')
             return $objLie
-        } -Force
+        }
         $objFakeManagerResult = Remove-StyleGuideCandidateInvocationState `
             -Context $objFakeManagerContext
     } finally {
-        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext `
-            -Value $scriptBlockRealContextCleanup -Force
+        & $objFixtureHelperModule { param ($Value) $script:scriptBlockBoundContextCleanup = $Value } $scriptBlockRealContextCleanup
     }
     if ($null -eq $objFakeManagerResult -or
         $objFakeManagerResult.Success -or
@@ -5574,9 +7638,9 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # context the register only ever recorded Active, and a helper that relayed it
     # would tell the caller the tree is permanently retained and stop it retrying
     # over a tree still present. The fix (commit c99d6a9) authenticates the claim
-    # against the register exactly as the entry gate does -- the negative-control
-    # probe rejecting a binding that answers true for everything, then the CAPTURED
-    # values and the claimed state -- and, when it cannot, DOWNGRADES to the
+    # against the source-authenticated private register using the captured
+    # values and claimed state. This privileged fixture replaces only the cached
+    # cleanup callable. When authentication fails, the helper DOWNGRADES to the
     # captured previous state with the retryable 'cleanup-context-altered', taking
     # the retained sequences from the journal bounded at entry rather than the
     # untrusted result.
@@ -5589,18 +7653,25 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # does; the cases that run after this verify the restored closure.
     $strAlteredTerminalRoot = [System.IO.Path]::Combine($RunRoot, 'altered-terminal-relay')
     [void][System.IO.Directory]::CreateDirectory($strAlteredTerminalRoot)
-    $objAlteredTerminalContext = New-StyleGuideCandidateInvocationContext `
+    $objAlteredTerminalContext = & $hashtableBindings.SourceNew `
         -TrustedTemporaryRoot $strAlteredTerminalRoot `
         -DiagnosticLabel 'altered-terminal-relay'
     [void][System.IO.Directory]::CreateDirectory(
         [string]$objAlteredTerminalContext.DownloadDirectoryPath)
     $objAlteredTerminalContext.OwnershipJournal[1].EntryState = 'Created'
-    $scriptBlockRealContextCleanupTerminal = (Get-Command `
-        -Name Remove-StyleGuideCandidateInvocationContext `
-        -CommandType Function).ScriptBlock
+    # This is privileged fixture fault injection into the authenticated cached
+    # cleanup boundary. Public-name rebinding is independently proved inert by
+    # ContextBindingControls. Restore the actual cached callable in finally;
+    # this test makes no security claim against deliberate module reflection.
+    $arrFixtureHelperModules = @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateArtifact_1_0_20260926_0 -All)
+    if ($arrFixtureHelperModules.Count -ne 1) { throw 'cleanup-fixture-helper-module' }
+    $objFixtureHelperModule = $arrFixtureHelperModules[0]
+    & $objFixtureHelperModule { & $script:scriptBlockAssertContextBinding }
+    $scriptBlockRealContextCleanupTerminal = & $objFixtureHelperModule { return $script:scriptBlockBoundContextCleanup }
+    if ($scriptBlockRealContextCleanupTerminal -isnot [scriptblock]) { throw 'cleanup-fixture-bound-callable' }
     $objAlteredTerminalResult = $null
     try {
-        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext -Value {
+        & $objFixtureHelperModule { param ($Value) $script:scriptBlockBoundContextCleanup = $Value } {
             param (
                 [Parameter(Mandatory = $true)]
                 [AllowNull()]
@@ -5620,13 +7691,12 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
             $objForgedTerminal.PSObject.TypeNames.Insert(0,
                 'PSStyleGuide.CandidateCleanupResult.v1')
             return $objForgedTerminal
-        } -Force
+        }
         Write-Verbose 'lifecycle-record-state: altered-terminal-relay probe executing'
         $objAlteredTerminalResult = Remove-StyleGuideCandidateInvocationState `
             -Context $objAlteredTerminalContext
     } finally {
-        Set-Item -LiteralPath Function:\Remove-StyleGuideCandidateInvocationContext `
-            -Value $scriptBlockRealContextCleanupTerminal -Force
+        & $objFixtureHelperModule { param ($Value) $script:scriptBlockBoundContextCleanup = $Value } $scriptBlockRealContextCleanupTerminal
     }
     if ($null -eq $objAlteredTerminalResult -or
         $objAlteredTerminalResult.Success -or
@@ -5656,14 +7726,14 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # true.
     $strSentinelRoot = [System.IO.Path]::Combine($RunRoot, 'issued-capture-sentinel')
     [void][System.IO.Directory]::CreateDirectory($strSentinelRoot)
-    $objSentinelContext = New-StyleGuideCandidateInvocationContext `
+    $objSentinelContext = & $hashtableBindings.SourceNew `
         -TrustedTemporaryRoot $strSentinelRoot `
         -DiagnosticLabel 'issued-capture-sentinel'
-    $boolSentinelDefault = [bool](Test-StyleGuideCandidateInvocationContextIssued `
+    $boolSentinelDefault = [bool](& $hashtableBindings.SourceTest `
         -Context $objSentinelContext)
-    $boolSentinelNullValues = [bool](Test-StyleGuideCandidateInvocationContextIssued `
+    $boolSentinelNullValues = [bool](& $hashtableBindings.SourceTest `
         -Context $objSentinelContext -ExpectedValues $null)
-    $boolSentinelEmptyState = [bool](Test-StyleGuideCandidateInvocationContextIssued `
+    $boolSentinelEmptyState = [bool](& $hashtableBindings.SourceTest `
         -Context $objSentinelContext -ExpectedState '')
     if ((-not $boolSentinelDefault) -or $boolSentinelNullValues -or $boolSentinelEmptyState) {
         & $script:scriptBlockStopHarness -Code 'orchestration-failed' `
@@ -5710,7 +7780,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # the swapped LifecycleState property is never consulted.
     $strRefusedTransitionRoot = [System.IO.Path]::Combine($RunRoot, 'refused-transition')
     [void][System.IO.Directory]::CreateDirectory($strRefusedTransitionRoot)
-    $objRefusedContext = New-StyleGuideCandidateInvocationContext `
+    $objRefusedContext = & $hashtableBindings.SourceNew `
         -TrustedTemporaryRoot $strRefusedTransitionRoot `
         -DiagnosticLabel 'refused-transition'
     [void][System.IO.Directory]::CreateDirectory(
@@ -5720,7 +7790,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     $objRefusedContext.OwnershipJournal[1].EntryState = 'Created'
     $objRefusedContext.OwnershipJournal[2].EntryState = 'Created'
     $objRefusedContext.OwnershipJournal[2].CreationPhase = 'destination'
-    $arrRefusedFileRecord = @()
+    $listRefusedFileRecord = New-Object 'System.Collections.Generic.List[PSCustomObject]'
     $uintRefusedSequence = [uint32]3
     foreach ($strRefusedLeaf in @('aaaa.txt', 'bbbb.txt', 'cccc.txt', 'dddd.txt')) {
         $strRefusedFilePath = [System.IO.Path]::Combine(
@@ -5738,9 +7808,10 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
         $objRefusedRecord.EntryState = 'Created'
         $objRefusedRecord.ContentLength = [uint64]$arrRefusedByte.Length
         $objRefusedRecord.ContentSha256 = & $script:scriptBlockGetByteArraySha256 -Bytes $arrRefusedByte
-        $arrRefusedFileRecord += $objRefusedRecord
+        $listRefusedFileRecord.Add($objRefusedRecord)
         $uintRefusedSequence = [uint32]($uintRefusedSequence + 1)
     }
+    $arrRefusedFileRecord = [object[]]@($listRefusedFileRecord.ToArray())
     $objRefusedContext.OwnershipJournal = [object[]]@(
         $objRefusedContext.OwnershipJournal[0],
         $objRefusedContext.OwnershipJournal[1],
@@ -5799,7 +7870,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
         while (-not $hashtableRefusedSignal.Running -and
             $objRefusedStart.ElapsedMilliseconds -lt 5000) {
         }
-        $objRefusedResult = Remove-StyleGuideCandidateInvocationContext -Context $objRefusedContext
+        $objRefusedResult = & $hashtableBindings.SourceRemove -Context $objRefusedContext
         [void]$objRefusedShell.EndInvoke($objRefusedHandle)
     } finally {
         $objRefusedShell.Dispose()
@@ -5810,7 +7881,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # context? Asked through the issuance gate on the captured paths, so the
     # swapped LifecycleState is not read.
     $boolRefusedRegisterTerminal = [bool](
-        Test-StyleGuideCandidateInvocationContextIssued `
+        & $hashtableBindings.SourceTest `
             -Context $objRefusedContext -ExpectedState 'CleanupFailed' `
             -ExpectedValues $objRefusedCaptured)
     $boolRefusedAnyRetainedUncertain = $false
@@ -5864,7 +7935,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # violates the invariant on every run the holder wins the race.
     $strRecordRefusedRoot = [System.IO.Path]::Combine($RunRoot, 'record-write-refused')
     [void][System.IO.Directory]::CreateDirectory($strRecordRefusedRoot)
-    $objRecordRefusedContext = New-StyleGuideCandidateInvocationContext `
+    $objRecordRefusedContext = & $hashtableBindings.SourceNew `
         -TrustedTemporaryRoot $strRecordRefusedRoot -DiagnosticLabel 'record-write-refused'
     [void][System.IO.Directory]::CreateDirectory(
         [string]$objRecordRefusedContext.DownloadDirectoryPath)
@@ -5873,7 +7944,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     $objRecordRefusedContext.OwnershipJournal[1].EntryState = 'Created'
     $objRecordRefusedContext.OwnershipJournal[2].EntryState = 'Created'
     $objRecordRefusedContext.OwnershipJournal[2].CreationPhase = 'destination'
-    $arrRecordRefusedFile = @()
+    $listRecordRefusedFile = New-Object 'System.Collections.Generic.List[PSCustomObject]'
     $uintRecordRefusedSequence = [uint32]3
     foreach ($strRecordRefusedLeaf in @('aaaa.txt', 'bbbb.txt', 'cccc.txt', 'dddd.txt')) {
         $strRecordRefusedFilePath = [System.IO.Path]::Combine(
@@ -5893,9 +7964,10 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
         $objRecordRefusedRecord.ContentLength = [uint64]$arrRecordRefusedByte.Length
         $objRecordRefusedRecord.ContentSha256 = & $script:scriptBlockGetByteArraySha256 `
             -Bytes $arrRecordRefusedByte
-        $arrRecordRefusedFile += $objRecordRefusedRecord
+        $listRecordRefusedFile.Add($objRecordRefusedRecord)
         $uintRecordRefusedSequence = [uint32]($uintRecordRefusedSequence + 1)
     }
+    $arrRecordRefusedFile = [object[]]@($listRecordRefusedFile.ToArray())
     $objRecordRefusedContext.OwnershipJournal = [object[]]@(
         $objRecordRefusedContext.OwnershipJournal[0],
         $objRecordRefusedContext.OwnershipJournal[1],
@@ -5957,7 +8029,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
         while (-not $hashtableRecordRefusedSignal.Running -and
             $objRecordRefusedStart.ElapsedMilliseconds -lt 5000) {
         }
-        $objRecordRefusedResult = Remove-StyleGuideCandidateInvocationContext `
+        $objRecordRefusedResult = & $hashtableBindings.SourceRemove `
             -Context $objRecordRefusedContext
         [void]$objRecordRefusedShell.EndInvoke($objRecordRefusedHandle)
     } finally {
@@ -5970,7 +8042,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     # Does the register hold a terminal Disposed for this context? Asked through the
     # issuance gate on the captured paths, so the swapped record field is not read.
     $boolRecordRefusedRegisterDisposed = [bool](
-        Test-StyleGuideCandidateInvocationContextIssued `
+        & $hashtableBindings.SourceTest `
             -Context $objRecordRefusedContext -ExpectedState 'Disposed' `
             -ExpectedValues $objRecordRefusedCaptured)
     # Assigned directly, not from an if-block: an empty array emitted as a block's
@@ -6020,7 +8092,7 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
                 [System.IO.Path]::GetRandomFileName()
             )
             [void][System.IO.Directory]::CreateDirectory($strTrustedParent)
-            $objContext = New-StyleGuideCandidateInvocationContext `
+            $objContext = & $hashtableBindings.SourceNew `
                 -TrustedTemporaryRoot $strTrustedParent
             if ($objContext.OwnershipJournal.Count -ne 3) {
                 & $script:scriptBlockStopHarness `
@@ -6056,19 +8128,10 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
                 }
             }
 
-            # A terminal REFUSAL still costs nothing. A terminal SUCCESS
-            # through the helper now costs exactly one call, because round 37
-            # made every success it reports prove the invocation root is gone
-            # -- it no longer answers already-disposed from a property it read
-            # and a verifier it resolved by name. The manager's own entry point
-            # still costs nothing, because it authenticates against a register
-            # rather than against the filesystem. Stated as an exact expected
-            # count per entry point rather than relaxed to "0 or 1", so a call
-            # appearing where none belongs is still a failure.
-            $uintExpectedCalls = if (
-                $strEntryPoint -ceq 'Remove-StyleGuideCandidateInvocationState' -and
-                ([string]$hashtableScenario.ExpectedDiagnosticCode) -ceq 'cleanup-already-disposed'
-            ) { [uint32]1 } else { [uint32]0 }
+            # Both authenticated terminal branches use only the captured context
+            # and private issuance register. Neither cleanup entry point performs
+            # a provider, path, filesystem, or native call for a terminal repeat.
+            $uintExpectedCalls = [uint32]0
             $objResult = & $strEntryPoint -Context $objContext
             if ($objResult.DiagnosticCode -cne $hashtableScenario.ExpectedDiagnosticCode -or
                 $objResult.FilesystemCallCount -ne $uintExpectedCalls) {
@@ -6091,327 +8154,205 @@ $script:scriptBlockAssertLifecycleRecordStatesRejected = {
     }
 }
 
-$script:scriptBlockAssertRound73RegisterLeakDeregistered = {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$RunRoot,
+$script:scriptBlockTerraformRegisterWorker = {
+    param ([string]$Roles, [string]$FixtureRoot)
 
-        [Parameter(Mandatory = $true)]
-        [string]$ContextLiteralPath
-    )
-
-    # Round 73 (Codex P2): scriptBlockNewCandidateContext appended the context, its
-    # issuance snapshot, and its lifecycle state to the three parallel, Add-only
-    # issuance registers the instant it built the context -- before it created a
-    # single directory. A creation failure AFTER that append (the trusted parent
-    # cannot be written, so the invocation root create throws) ran the filesystem
-    # rollback, threw, and returned no context, but never withdrew the three register
-    # entries. Each failed New therefore leaked one strong reference into EACH
-    # register, and repeated failures grew all three without bound -- entries
-    # describing contexts the caller never received and can never pass back to be
-    # disposed. The fix added scriptBlockDeregisterCandidateContext, called from both
-    # New-failure branches AFTER the rollback (which needs the context still issued):
-    # a context New never returns now leaves no register entry.
-    #
-    # The registers are script-private and, since the round-50 hardening, removed from
-    # the dot-sourcing caller's reach, so their counts cannot be read off the loaded
-    # production. This probe therefore mirrors the reproduction exactly: it writes an
-    # INSTRUMENTED copy of the REAL context-manager bytes into the run root --
-    # byte-identical but for three runspace-global aliases captured at the register-declaration
-    # site, BEFORE the load-time Remove-Variable takes the names away -- and drives it
-    # in a FRESH runspace, so neither the instrumented copy's functions nor the
-    # register aliases touch the outer session's already-loaded production. (A
-    # dot-source's Set-Item Function: leaks out of a '&' child scope and would clobber
-    # the loaded production for every later case; a separate runspace is the only clean
-    # isolation, and it is disposed in a finally.)
-    #
-    # Behavioural, with a positive control. The control -- one SUCCESSFUL New -- must
-    # grow all three registers by exactly one, which proves the instrumentation
-    # aliases the real registers and that New registers at all; a probe whose aliases
-    # were wrong, or whose New never registered, would fail the control. The failing
-    # calls must then grow all three by ZERO. Reverting either deregister call reddens
-    # this on the leak: growth returns to one-per-failed-call.
-    #
-    # The fix is called from BOTH New-failure branches, and the two are distinct:
-    #   * the NO-ROLLBACK branch (Manage ~2302-2303), taken when the invocation-root
-    #     create itself fails so $boolRootCreated is still false and nothing was
-    #     rolled back; and
-    #   * the POST-ROLLBACK branch (Manage ~2272-2280), taken when the root (and
-    #     download) were created, the failure came later, and the manager runs its
-    #     filesystem rollback FIRST and then deregisters.
-    # A single lever exercises only one branch (Codex round 74: chattr +i on the
-    # parent fails the root create, so it drives the no-rollback branch only, and
-    # reverting just the post-rollback deregister would leave this probe green). So
-    # this probe drives BOTH, with a separate growth-zero assertion for each, and is
-    # mutation-proven per branch: reverting the no-rollback deregister reddens the
-    # chattr batch, reverting the post-rollback deregister reddens the forced batch.
-    #
-    #   * No-rollback lever: chattr +i on the trusted parent (root on ext4) makes the
-    #     invocation-root create throw before it is made. Where chattr is unavailable
-    #     or ineffective the failure cannot be provoked, so that batch records the
-    #     miss and is not asserted -- a missing lever is not a production regression.
-    #   * Post-rollback lever: a throw injected into the instrumented copy at the end
-    #     of a SUCCESSFUL build -- after the root and download dirs exist and the
-    #     context is registered, immediately before New returns -- gated by a runspace-global flag
-    #     the probe sets only for that batch. Deterministic and needs no chattr, so
-    #     the post-rollback branch is always exercised; the forced failures must also
-    #     leave the parent empty, proving the manager's rollback ran before it
-    #     deregistered.
-    $intFailingCallCount = 3
-    $strLeakProbeRoot = [System.IO.Path]::Combine($RunRoot, 'round73-register-leak')
-    [void][System.IO.Directory]::CreateDirectory($strLeakProbeRoot)
-    $objLeakRunspace = [runspacefactory]::CreateRunspace()
-    $objLeakRunspace.Open()
-    $objLeakRunspace.SessionStateProxy.SetVariable('strManageSourcePath', $ContextLiteralPath)
-    $objLeakRunspace.SessionStateProxy.SetVariable('strProbeRoot', $strLeakProbeRoot)
-    $objLeakRunspace.SessionStateProxy.SetVariable('intFailingCallCount', $intFailingCallCount)
-    $objLeakShell = [powershell]::Create()
-    $objLeakShell.Runspace = $objLeakRunspace
-    [void]$objLeakShell.AddScript({
-        Set-StrictMode -Version Latest
-        $ErrorActionPreference = 'Stop'
-        $objOutcome = [pscustomobject]@{
-            InstrumentationApplied = $false
-            ControlGrowth          = @([int]-1, [int]-1, [int]-1)
-            ImmutableEffective     = $false
-            ThrewCount             = [int]0
-            ReturnedAnyContext     = $false
-            FailureGrowth          = @([int]-1, [int]-1, [int]-1)
-            PostRootThrewCount     = [int]0
-            PostRootReturnedAny    = $false
-            PostRootGrowth         = @([int]-1, [int]-1, [int]-1)
-            PostRootTreeRetained   = $false
-            Error                  = ''
-        }
-        $strImmutableParent = [System.IO.Path]::Combine($strProbeRoot, 'immutable')
-        $arrChattrCommand = @(
-            Get-Command -Name 'chattr' -CommandType Application -ErrorAction SilentlyContinue
-        )
-        $strChattrPath = ''
-        if ($arrChattrCommand.Count -ne 0) {
-            $strChattrPath = [string]$arrChattrCommand[0].Source
-        }
-        try {
-            $strAnchor = '$arrCandidateIssuedState = New-Object System.Collections.ArrayList'
-            $strManageText = [System.IO.File]::ReadAllText($strManageSourcePath)
-            if (([regex]::Matches($strManageText, [regex]::Escape($strAnchor))).Count -ne 1) {
-                $objOutcome.Error = 'anchor-count'
-                return $objOutcome
-            }
-            $strInstrumented = $strAnchor + [System.Environment]::NewLine +
-                'Set-Variable -Name ''objRound73RegisterContext'' -Scope Global ' +
-                '-Value $arrCandidateIssuedContext' +
-                [System.Environment]::NewLine +
-                'Set-Variable -Name ''objRound73RegisterSnapshot'' -Scope Global ' +
-                '-Value $arrCandidateIssuedSnapshot' +
-                [System.Environment]::NewLine +
-                'Set-Variable -Name ''objRound73RegisterState'' -Scope Global ' +
-                '-Value $arrCandidateIssuedState'
-            $strManageText = $strManageText.Replace($strAnchor, $strInstrumented)
-            # The post-rollback failure lever: a throw at the end of a successful
-            # build, gated by a runspace-global flag set only for the post-rollback batch. The
-            # anchor is New-context's final in-memory assertion, immediately before
-            # it returns -- root and download created, context registered -- so the
-            # throw takes the manager's $boolRootCreated (rollback-then-deregister)
-            # branch. Must match exactly once.
-            $strForceAnchor = '[void](& $scriptBlockAssertCandidateInMemoryContext -Context $objContext)'
-            if (([regex]::Matches($strManageText, [regex]::Escape($strForceAnchor))).Count -ne 1) {
-                $objOutcome.Error = 'force-anchor-count'
-                return $objOutcome
-            }
-            $strForceInjected =
-                'if ((Get-Variable -Name ''boolRound73ForcePostRootFailure'' ' +
-                '-Scope Global -ValueOnly)) { throw ''round73-forced-post-root-failure'' }' +
-                [System.Environment]::NewLine + '            ' + $strForceAnchor
-            $strManageText = $strManageText.Replace($strForceAnchor, $strForceInjected)
-            $strInstrumentedPath = [System.IO.Path]::Combine($strProbeRoot, 'Manage-instrumented.ps1')
-            [System.IO.File]::WriteAllText($strInstrumentedPath, $strManageText)
-            . $strInstrumentedPath
-            # The instrumented manager owns a distinct script scope. These explicitly
-            # global variables are confined to this disposable runspace and bridge only
-            # the manager and its probe.
-            Set-Variable -Name 'boolRound73ForcePostRootFailure' -Scope Global -Value $false
-
-            $scriptBlockRegisterCounts = {
-                $objRegisterContext = Get-Variable -Name 'objRound73RegisterContext' -Scope Global -ValueOnly
-                $objRegisterSnapshot = Get-Variable -Name 'objRound73RegisterSnapshot' -Scope Global -ValueOnly
-                $objRegisterState = Get-Variable -Name 'objRound73RegisterState' -Scope Global -ValueOnly
-                @([int]$objRegisterContext.Count,
-                    [int]$objRegisterSnapshot.Count,
-                    [int]$objRegisterState.Count)
-            }
-
-            # Control: one successful New bumps all three registers by one.
-            $strGoodParent = [System.IO.Path]::Combine($strProbeRoot, 'good')
-            [void][System.IO.Directory]::CreateDirectory($strGoodParent)
-            $arrControlBefore = & $scriptBlockRegisterCounts
-            $objControlContext = New-StyleGuideCandidateInvocationContext `
-                -TrustedTemporaryRoot $strGoodParent -DiagnosticLabel 'round73-register-control'
-            $arrControlAfter = & $scriptBlockRegisterCounts
-            $objOutcome.ControlGrowth = @(
-                ($arrControlAfter[0] - $arrControlBefore[0]),
-                ($arrControlAfter[1] - $arrControlBefore[1]),
-                ($arrControlAfter[2] - $arrControlBefore[2]))
-            $objOutcome.InstrumentationApplied = $true
-            try {
-                [void](Remove-StyleGuideCandidateInvocationContext -Context $objControlContext)
-            } catch {
-                $null = $_
-            }
-
-            # No-rollback branch: an immutable trusted parent makes the
-            # post-registration invocation-root create throw before the root is made.
-            # Confirm the immutability actually took before trusting the growth.
-            [void][System.IO.Directory]::CreateDirectory($strImmutableParent)
-            if ($strChattrPath.Length -ne 0) {
-                $null = & $strChattrPath +i $strImmutableParent 2>&1
-                try {
-                    $strWriteProbe = [System.IO.Path]::Combine($strImmutableParent, 'writeprobe')
-                    [void][System.IO.Directory]::CreateDirectory($strWriteProbe)
-                    [void][System.IO.Directory]::Delete($strWriteProbe, $true)
-                    $objOutcome.ImmutableEffective = $false
-                } catch {
-                    $objOutcome.ImmutableEffective = $true
-                }
-            }
-            if ($objOutcome.ImmutableEffective) {
-                $arrFailBefore = & $scriptBlockRegisterCounts
-                try {
-                    for ($intCall = 0; $intCall -lt $intFailingCallCount; $intCall++) {
-                        $objFailContext = $null
-                        try {
-                            $objFailContext = New-StyleGuideCandidateInvocationContext `
-                                -TrustedTemporaryRoot $strImmutableParent `
-                                -DiagnosticLabel ('round73-register-fail-' + [string]$intCall)
-                        } catch {
-                            $objOutcome.ThrewCount = [int]($objOutcome.ThrewCount + 1)
-                        }
-                        if ($null -ne $objFailContext) { $objOutcome.ReturnedAnyContext = $true }
-                    }
-                } finally {
-                    $null = & $strChattrPath -i $strImmutableParent 2>&1
-                }
-                $arrFailAfter = & $scriptBlockRegisterCounts
-                $objOutcome.FailureGrowth = @(
-                    ($arrFailAfter[0] - $arrFailBefore[0]),
-                    ($arrFailAfter[1] - $arrFailBefore[1]),
-                    ($arrFailAfter[2] - $arrFailBefore[2]))
-            }
-
-            # Post-rollback branch: force a failure AFTER root and download exist and
-            # the context is registered, so the manager rolls the tree back and THEN
-            # deregisters. Deterministic (no chattr), so this branch is always
-            # exercised. Growth must be zero and, because every forced failure ran the
-            # rollback, the parent must hold no leftover invocation root.
-            $strPostRootParent = [System.IO.Path]::Combine($strProbeRoot, 'postroot')
-            [void][System.IO.Directory]::CreateDirectory($strPostRootParent)
-            Set-Variable -Name 'boolRound73ForcePostRootFailure' -Scope Global -Value $true
-            $arrPostBefore = & $scriptBlockRegisterCounts
-            try {
-                for ($intCall = 0; $intCall -lt $intFailingCallCount; $intCall++) {
-                    $objPostContext = $null
-                    try {
-                        $objPostContext = New-StyleGuideCandidateInvocationContext `
-                            -TrustedTemporaryRoot $strPostRootParent `
-                            -DiagnosticLabel ('round73-register-postroot-' + [string]$intCall)
-                    } catch {
-                        $objOutcome.PostRootThrewCount = [int]($objOutcome.PostRootThrewCount + 1)
-                    }
-                    if ($null -ne $objPostContext) { $objOutcome.PostRootReturnedAny = $true }
-                }
-            } finally {
-                Set-Variable -Name 'boolRound73ForcePostRootFailure' -Scope Global -Value $false
-            }
-            $arrPostAfter = & $scriptBlockRegisterCounts
-            $objOutcome.PostRootGrowth = @(
-                ($arrPostAfter[0] - $arrPostBefore[0]),
-                ($arrPostAfter[1] - $arrPostBefore[1]),
-                ($arrPostAfter[2] - $arrPostBefore[2]))
-            $objOutcome.PostRootTreeRetained =
-                ((@([System.IO.Directory]::GetFileSystemEntries($strPostRootParent))).Count -ne 0)
-        } catch {
-            $objOutcome.Error = [string]$_.Exception.Message
-            if ($strChattrPath.Length -ne 0) {
-                try { $null = & $strChattrPath -i $strImmutableParent 2>&1 } catch { $null = $_ }
-            }
-        }
-        return $objOutcome
-    })
-    $objLeakOutcome = $null
-    try {
-        $objLeakOutcome = $objLeakShell.Invoke() | Select-Object -Last 1
-    } finally {
-        $objLeakShell.Dispose()
-        $objLeakRunspace.Close()
-        $objLeakRunspace.Dispose()
-        if ([System.IO.Directory]::Exists($strLeakProbeRoot)) {
-            try {
-                $null = & chattr -i ([System.IO.Path]::Combine($strLeakProbeRoot, 'immutable')) 2>&1
-            } catch {
-                $null = $_
-            }
-            [System.IO.Directory]::Delete($strLeakProbeRoot, $true)
-        }
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    . ([IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))
+    $hashtableState = & $script:scriptBlockGetTerraformDerivedFixtureState -Roles $Roles -Role context
+    if ($hashtableState.Registers.Count -ne 3 -or $hashtableState.New -isnot [scriptblock] -or $hashtableState.Remove -isnot [scriptblock]) { throw 'register-proof-bindings' }
+    $scriptBlockCounts = { return , ([int[]]@($hashtableState.Registers | ForEach-Object { $_.Count })) }
+    $arrBefore = & $scriptBlockCounts
+    $strControl = [IO.Path]::Combine($FixtureRoot, 'control')
+    [void][IO.Directory]::CreateDirectory($strControl)
+    $hashtableState.Mode = 'control'
+    $objControl = & $hashtableState.New -TrustedTemporaryRoot $strControl
+    $arrAfter = & $scriptBlockCounts
+    $arrControlGrowth = [int[]]::new(3)
+    for ($intIndex = 0; $intIndex -lt 3; $intIndex++) {
+        $arrControlGrowth[$intIndex] = $arrAfter[$intIndex] - $arrBefore[$intIndex]
+        if ($arrControlGrowth[$intIndex] -ne 1) { throw 'register-proof-positive-growth' }
     }
-
-    if ($null -eq $objLeakOutcome -or -not $objLeakOutcome.InstrumentationApplied) {
-        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail ('round73-register-leak-instrumentation-' + $(if ($null -eq $objLeakOutcome) {
-                'no-result'
+    $objControlCleanup = & $hashtableState.Remove -Context $objControl
+    if (-not $objControlCleanup.Success -or $objControl.LifecycleState -cne 'Disposed' -or [IO.Directory]::Exists($objControl.InvocationRootPath)) { throw 'register-proof-positive-cleanup' }
+    $listResults = New-Object 'System.Collections.Generic.List[pscustomobject]'
+    foreach ($strMode in @('no-root', 'post-root')) {
+        $strParent = [IO.Path]::Combine($FixtureRoot, $strMode)
+        [void][IO.Directory]::CreateDirectory($strParent)
+        $arrBefore = & $scriptBlockCounts
+        $intThrows = 0
+        $hashtableState.Mode = $strMode
+        for ($intAttempt = 0; $intAttempt -lt 3; $intAttempt++) {
+            $hashtableState.Observed = $null
+            $hashtableState.Rollback = $null
+            $objReturned = $null
+            $objFailure = $null
+            try { $objReturned = & $hashtableState.New -TrustedTemporaryRoot $strParent } catch { $objFailure = $_; $intThrows++ }
+            if ($null -ne $objReturned -or $null -eq $objFailure -or $null -eq $hashtableState.Observed) { throw 'register-proof-failure-not-reached' }
+            $objObserved = $hashtableState.Observed
+            if ($objObserved.Mode -cne $strMode -or $objObserved.PriorState -cne 'Active' -or $objObserved.JournalCount -ne 3 -or
+                -not $objObserved.IssuedReferenceObserved) { throw 'register-proof-real-issued-context' }
+            if ($strMode -ceq 'no-root') {
+                if ($objObserved.CreatedCount -ne 0 -or $null -ne $hashtableState.Rollback -or
+                    $objFailure.Exception.Data['PSStyleGuideDiagnosticCode'] -cne 'context-create-failed') { throw 'register-proof-no-root-branch' }
             } else {
-                [string]$objLeakOutcome.Error
-            }))
+                if ($objObserved.CreatedCount -ne 2 -or $null -eq $hashtableState.Rollback -or
+                    -not $hashtableState.Rollback.Success -or $hashtableState.Rollback.FinalState -cne 'Disposed' -or
+                    $objObserved.Context.LifecycleState -cne 'Disposed' -or
+                    $objFailure.Exception.Data['PSStyleGuideDiagnosticCode'] -cne 'context-create-composite-failure') { throw 'register-proof-post-root-branch' }
+            }
+            foreach ($objRegistered in $hashtableState.Registers[0]) {
+                if ([object]::ReferenceEquals($objRegistered, $objObserved.Context)) { throw 'register-proof-context-not-deregistered' }
+            }
+            $boolTreeAbsent = -not [IO.Directory]::Exists($objObserved.Context.InvocationRootPath) -and
+                @([IO.Directory]::EnumerateFileSystemEntries($strParent)).Count -eq 0
+            if (-not $boolTreeAbsent) { throw 'register-proof-tree-retained' }
+            $arrCurrent = & $scriptBlockCounts
+            $arrGrowth = [int[]]::new(3)
+            for ($intIndex = 0; $intIndex -lt 3; $intIndex++) {
+                $arrGrowth[$intIndex] = $arrCurrent[$intIndex] - $arrBefore[$intIndex]
+                if ($arrGrowth[$intIndex] -ne 0) { throw 'register-proof-failure-growth' }
+            }
+        }
+        if ($intThrows -ne 3) { throw 'register-proof-failure-count' }
+        $listResults.Add([pscustomobject]@{ Mode = $strMode; Throws = $intThrows; Growth = $arrGrowth; TreeAbsent = $boolTreeAbsent; IssuedReferenceObserved = $objObserved.IssuedReferenceObserved })
     }
-    if (-not [string]::IsNullOrEmpty($objLeakOutcome.Error)) {
-        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail ('round73-register-leak-runtime-' + [string]$objLeakOutcome.Error)
+    $strResultJson = ConvertTo-Json -InputObject ([pscustomobject]@{ ControlGrowth = $arrControlGrowth; Batches = $listResults.ToArray() }) -Depth 5 -Compress
+    $objRoundTrip = ConvertFrom-Json -InputObject $strResultJson -ErrorAction Stop
+    if ($objRoundTrip.Batches -isnot [object[]] -or $objRoundTrip.Batches.Count -ne 2) { throw 'register-proof-json-batches' }
+    foreach ($hashtableArrayProof in @(
+        @{ Actual = $objRoundTrip.ControlGrowth; Expected = $arrControlGrowth },
+        @{ Actual = $objRoundTrip.Batches[0].Growth; Expected = $listResults[0].Growth },
+        @{ Actual = $objRoundTrip.Batches[1].Growth; Expected = $listResults[1].Growth }
+    )) {
+        if ($hashtableArrayProof.Actual -isnot [object[]] -or $hashtableArrayProof.Actual.Count -ne 3) { throw 'register-proof-json-array' }
+        for ($intIndex = 0; $intIndex -lt 3; $intIndex++) {
+            $objActualValue = $hashtableArrayProof.Actual[$intIndex]
+            if (($objActualValue -isnot [int] -and $objActualValue -isnot [long]) -or
+                $objActualValue -ne $hashtableArrayProof.Expected[$intIndex]) { throw 'register-proof-json-value' }
+        }
     }
-    $arrControlGrowth = [int[]]@($objLeakOutcome.ControlGrowth)
-    if ($arrControlGrowth[0] -ne 1 -or $arrControlGrowth[1] -ne 1 -or $arrControlGrowth[2] -ne 1) {
-        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail ('round73-register-leak-control-' + ($arrControlGrowth -join '-'))
-    }
-    # Post-rollback branch, asserted unconditionally: the forced failure needs no
-    # chattr, so this batch always ran. Every forced call must have thrown, returned
-    # no context, rolled its tree back (empty parent), and left the registers
-    # unchanged. Reverting the post-rollback deregister reddens the growth check here.
-    if ($objLeakOutcome.PostRootThrewCount -ne $intFailingCallCount -or $objLeakOutcome.PostRootReturnedAny) {
-        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail ('round73-register-leak-postroot-precondition-t' +
-                [string]$objLeakOutcome.PostRootThrewCount + '-r' + [string]$objLeakOutcome.PostRootReturnedAny)
-    }
-    if ($objLeakOutcome.PostRootTreeRetained) {
-        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail 'round73-register-leak-postroot-tree-retained'
-    }
-    $arrPostRootGrowth = [int[]]@($objLeakOutcome.PostRootGrowth)
-    if ($arrPostRootGrowth[0] -ne 0 -or $arrPostRootGrowth[1] -ne 0 -or $arrPostRootGrowth[2] -ne 0) {
-        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail ('round73-register-leak-postroot-' + ($arrPostRootGrowth -join '-'))
-    }
-    # A missing or ineffective immutability lever is not a production regression; the
-    # no-rollback-branch growth was never provoked, so there is nothing to assert.
-    if (-not $objLeakOutcome.ImmutableEffective) {
-        return
-    }
-    if ($objLeakOutcome.ThrewCount -ne $intFailingCallCount -or $objLeakOutcome.ReturnedAnyContext) {
-        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail ('round73-register-leak-precondition-t' + [string]$objLeakOutcome.ThrewCount +
-                '-r' + [string]$objLeakOutcome.ReturnedAnyContext)
-    }
-    $arrFailureGrowth = [int[]]@($objLeakOutcome.FailureGrowth)
-    if ($arrFailureGrowth[0] -ne 0 -or $arrFailureGrowth[1] -ne 0 -or $arrFailureGrowth[2] -ne 0) {
-        & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-            -Detail ('round73-register-leak-' + ($arrFailureGrowth -join '-'))
+    [IO.File]::WriteAllText([IO.Path]::Combine($FixtureRoot, 'result.json'), $strResultJson, [Text.UTF8Encoding]::new($false))
+}
+
+$script:scriptBlockAssertRound73RegisterLeakDeregistered = {
+    param ([string]$RunRoot, [string]$ContextLiteralPath, [string]$HelperLiteralPath)
+
+    # Observe the genuine three registers without global aliases. Deterministic
+    # throws exercise both production catch branches; no permission mutation is
+    # needed. Successful issuance must first grow each real register by one.
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId 'source-register-leak'
+    $hashtableWorker = $null
+    try {
+        $hashtableSourceEvidence = @{}
+        foreach ($strPath in @($ContextLiteralPath, $HelperLiteralPath)) { $hashtableSourceEvidence[$strPath] = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath }
+        $strSource = [IO.File]::ReadAllText($ContextLiteralPath)
+        $strNewline = if ($strSource.Contains("`r`n")) { "`r`n" } else { "`n" }
+        $strRegisters = '    $arrCandidateIssuedState = New-Object System.Collections.ArrayList'
+        $strCaptured = '    $scriptBlockTestContextFunction = $scriptBlockSourceTestContext.GetNewClosure()'
+        $strBefore = '                # Private at creation on Unix, not private a moment afterwards.'
+        $strAfter = '                [void](& $scriptBlockAssertCandidateInMemoryContext -Context $objContext)' + $strNewline + '                return $objContext'
+        $strRollback = '                $objCleanupResult = & $scriptBlockRemoveContextFunction -Context $objContext'
+        foreach ($strAnchor in @($strRegisters, $strCaptured, $strBefore, $strAfter, $strRollback)) {
+            if ([regex]::Matches($strSource, [regex]::Escape($strAnchor)).Count -ne 1) { throw 'register-proof-transform-cardinality' }
+        }
+        $strDerived = & $script:scriptBlockAddTerraformDerivedFixtureState -Source $strSource -Role context
+        $strRegistersInjection = $strRegisters + $strNewline +
+            '    $hashtableTask184FixtureState.Registers = New-Object object[] 3' + $strNewline +
+            '    $hashtableTask184FixtureState.Registers[0] = $arrCandidateIssuedContext' + $strNewline +
+            '    $hashtableTask184FixtureState.Registers[1] = $arrCandidateIssuedSnapshot' + $strNewline +
+            '    $hashtableTask184FixtureState.Registers[2] = $arrCandidateIssuedState'
+        $strDerived = $strDerived.Replace($strRegisters, $strRegistersInjection)
+        $strCapturedInjection = $strCaptured + $strNewline +
+            '    $hashtableTask184FixtureState.New = $scriptBlockNewContextFunction' + $strNewline +
+            '    $hashtableTask184FixtureState.Remove = $scriptBlockRemoveContextFunction'
+        $strDerived = $strDerived.Replace($strCaptured, $strCapturedInjection)
+        $strObservation = @'
+                $boolTask184Issued = $false
+                foreach ($objTask184Registered in $hashtableTask184FixtureState.Registers[0]) {
+                    if ([object]::ReferenceEquals($objTask184Registered, $objContext)) { $boolTask184Issued = $true }
+                }
+                $hashtableTask184FixtureState.Observed = [pscustomobject]@{
+                    Mode = $hashtableTask184FixtureState.Mode; Context = $objContext
+                    PriorState = $objContext.LifecycleState; JournalCount = $objContext.OwnershipJournal.Count
+                    CreatedCount = @($objContext.OwnershipJournal | Where-Object { $_.EntryState -ceq 'Created' }).Count
+                    IssuedReferenceObserved = $boolTask184Issued
+                }
+'@
+        $strObservation = $strObservation.Replace("`r`n", "`n").Replace("`n", $strNewline)
+        $strBeforeInjection = "                if (`$hashtableTask184FixtureState.Mode -ceq 'no-root') {" + $strNewline + $strObservation + $strNewline +
+            "                    throw 'register-proof-controlled-no-root'" + $strNewline + '                }' + $strNewline + $strBefore
+        $strDerived = $strDerived.Replace($strBefore, $strBeforeInjection)
+        $strAfterInjection = $strAfter.Replace('                return $objContext',
+            "                if (`$hashtableTask184FixtureState.Mode -ceq 'post-root') {" + $strNewline + $strObservation + $strNewline +
+            "                    throw 'register-proof-controlled-post-root'" + $strNewline + '                }' + $strNewline + '                return $objContext')
+        $strDerived = $strDerived.Replace($strAfter, $strAfterInjection)
+        $strRollbackInjection = $strRollback + $strNewline + '                $hashtableTask184FixtureState.Rollback = $objCleanupResult'
+        $strDerived = $strDerived.Replace($strRollback, $strRollbackInjection)
+        $strRestored = $strDerived
+        foreach ($arrTransform in @(
+            @($strRollbackInjection, $strRollback), @($strAfterInjection, $strAfter),
+            @($strBeforeInjection, $strBefore), @($strCapturedInjection, $strCaptured),
+            @($strRegistersInjection, $strRegisters))) {
+            if ([regex]::Matches($strRestored, [regex]::Escape($arrTransform[0])).Count -ne 1) { throw 'register-proof-reverse-cardinality' }
+            $strRestored = $strRestored.Replace($arrTransform[0], $arrTransform[1])
+        }
+        $strInitializer = $strNewline + '    $hashtableTask184FixtureState = @{}'
+        if ([regex]::Matches($strRestored, [regex]::Escape($strInitializer)).Count -ne 1) { throw 'register-proof-initializer-cardinality' }
+        $strRestored = $strRestored.Replace($strInitializer, '')
+        if ($strRestored -cne $strSource) { throw 'register-proof-source-reversal' }
+        $arrErrors = $null
+        $null = [Management.Automation.Language.Parser]::ParseInput($strDerived, [ref]$null, [ref]$arrErrors)
+        if ($arrErrors.Count -ne 0) { throw 'register-proof-derived-parse' }
+        $strRoles = [IO.Path]::Combine($hashtableLayout.CaseRoot, 'roles')
+        [void][IO.Directory]::CreateDirectory($strRoles)
+        [IO.File]::WriteAllText([IO.Path]::Combine($strRoles, 'Manage-StyleGuideCandidateInvocationContext.ps1'), $strDerived, [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllBytes([IO.Path]::Combine($strRoles, 'Expand-StyleGuideCandidateArtifact.ps1'), [IO.File]::ReadAllBytes($HelperLiteralPath))
+        $strWorker = [IO.Path]::Combine($hashtableLayout.CaseRoot, 'worker.ps1')
+        $strWorkerSource = "param ([string]`$Roles, [string]`$FixtureRoot)`n" +
+            '$script:scriptBlockGetTerraformDerivedFixtureState = {' + $script:scriptBlockGetTerraformDerivedFixtureState.ToString() + "}`n" +
+            '& {' + $script:scriptBlockTerraformRegisterWorker.ToString() + '} -Roles $Roles -FixtureRoot $FixtureRoot'
+        [IO.File]::WriteAllText($strWorker, $strWorkerSource, [Text.UTF8Encoding]::new($false))
+        foreach ($strPath in @([IO.Path]::Combine($strRoles, 'Manage-StyleGuideCandidateInvocationContext.ps1'), [IO.Path]::Combine($strRoles, 'Expand-StyleGuideCandidateArtifact.ps1'), $strWorker)) {
+            $hashtableSourceEvidence[$strPath] = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath
+        }
+        $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorker -WorkingDirectory $hashtableLayout.CaseRoot `
+            -Arguments @('-Roles', $strRoles, '-FixtureRoot', $hashtableLayout.Trusted)
+        while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [Threading.Thread]::Sleep(10) }
+        if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'register-proof-worker-failed' }
+        $objObserved = & $script:scriptBlockReadTerraformProofResult -LiteralPath ([IO.Path]::Combine($hashtableLayout.Trusted, 'result.json'))
+        if ($objObserved.ControlGrowth.Count -ne 3 -or $objObserved.Batches.Count -ne 2) { throw 'register-proof-result-shape' }
+        foreach ($intGrowth in $objObserved.ControlGrowth) { if ($intGrowth -ne 1) { throw 'register-proof-result-control' } }
+        for ($intIndex = 0; $intIndex -lt 2; $intIndex++) {
+            $objBatch = $objObserved.Batches[$intIndex]
+            if ($objBatch.Mode -cne @('no-root', 'post-root')[$intIndex] -or $objBatch.Throws -ne 3 -or
+                $objBatch.Growth.Count -ne 3 -or -not $objBatch.TreeAbsent -or -not $objBatch.IssuedReferenceObserved) { throw 'register-proof-result-batch' }
+            foreach ($intGrowth in $objBatch.Growth) { if ($intGrowth -ne 0) { throw 'register-proof-result-growth' } }
+        }
+        foreach ($strPath in $hashtableSourceEvidence.Keys) {
+            $objAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath
+            if ($objAfter.Length -ne $hashtableSourceEvidence[$strPath].Length -or $objAfter.Sha256 -cne $hashtableSourceEvidence[$strPath].Sha256) { throw 'register-proof-source-changed' }
+        }
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { throw 'register-proof-sentinel' }
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
     }
 }
 
 $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
     param (
         [Parameter(Mandatory = $true)]
-        [string]$RunRoot
+        [string]$RunRoot,
+        [string]$HelperLiteralPath,
+        [string]$ContextLiteralPath
     )
 
+    $hashtableBindings = & $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+
+    # This assertion drives preserved private SourceNew/SourceRemove protocols,
+    # captured from the exact verified loaded module; no public name rebinding.
     # Round 73 (Codex P2): the round-71 refused-write branch -- entered when a
     # same-session holder rigs a live record's EntryState setter to throw so the
     # best-effort courtesy write in the delete loop is refused (RecordWriteRefused) --
@@ -6447,12 +8388,9 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
     #       live InvocationId zeroed); a holder that never fired asserts nothing.
     #
     #   (b) refused EntryState ONLY, no unrelated mutation: still Disposed / success /
-    #       cleanup-succeeded, tree gone. ONE-SIDED -- clean production reports that
-    #       whether the rig wins the race (RecordWriteRefused set, tolerated
-    #       re-assertion passes) or the rig lands after the call returns (the full
-    #       re-assertion already passed on the true Deleted state), so a lost race is
-    #       only a weaker pass. This is the control the narrowed tolerance must not
-    #       break.
+    #       cleanup-succeeded, tree gone. The fixture requires a measured setter
+    #       invocation; late races retry within the same fixed attempt bound. This
+    #       preserves the success control while proving the tolerated path ran.
     #
     #   (c) NO refused write, only an unrelated InvocationId=Empty: the round-77 fix
     #       (Codex P2 "#B") must REFUSE the NO-refusal branch as Disposed / cleanup-
@@ -6479,14 +8417,14 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
             [Parameter(Mandatory = $true)]
             [string]$TrustedParent
         )
-        $objContext = New-StyleGuideCandidateInvocationContext `
+        $objContext = & $hashtableBindings.SourceNew `
             -TrustedTemporaryRoot $TrustedParent -DiagnosticLabel 'round73-tolerance'
         [void][System.IO.Directory]::CreateDirectory([string]$objContext.DownloadDirectoryPath)
         [void][System.IO.Directory]::CreateDirectory([string]$objContext.CandidatePath)
         $objContext.OwnershipJournal[1].EntryState = 'Created'
         $objContext.OwnershipJournal[2].EntryState = 'Created'
         $objContext.OwnershipJournal[2].CreationPhase = 'destination'
-        $arrFileRecord = @()
+        $listFileRecord = New-Object 'System.Collections.Generic.List[PSCustomObject]'
         $uintSequence = [uint32]3
         foreach ($strLeaf in @('aaaa.txt', 'bbbb.txt', 'cccc.txt', 'dddd.txt')) {
             $strFilePath = [System.IO.Path]::Combine([string]$objContext.CandidatePath, $strLeaf)
@@ -6503,9 +8441,10 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
             $objRecord.EntryState = 'Created'
             $objRecord.ContentLength = [uint64]$arrByte.Length
             $objRecord.ContentSha256 = & $script:scriptBlockGetByteArraySha256 -Bytes $arrByte
-            $arrFileRecord += $objRecord
+            $listFileRecord.Add($objRecord)
             $uintSequence = [uint32]($uintSequence + 1)
         }
+        $arrFileRecord = [object[]]@($listFileRecord.ToArray())
         $objContext.OwnershipJournal = [object[]]@(
             $objContext.OwnershipJournal[0],
             $objContext.OwnershipJournal[1],
@@ -6542,7 +8481,7 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
             $objMainContext = & $scriptBlockBuildToleranceContext -TrustedParent $strMainParent
             $objMainTargetRecord = $objMainContext.OwnershipJournal[0]
             $strMainTrigger = [string]$objMainContext.OwnershipJournal[6].Path
-            $hashtableMainSignal = [hashtable]::Synchronized(@{ Running = $false })
+            $hashtableMainSignal = [hashtable]::Synchronized(@{ Running = $false; Mutated = $false; RefusedWrites = 0 })
             $objMainRunspace = [runspacefactory]::CreateRunspace()
             $objMainRunspace.Open()
             $objMainRunspace.SessionStateProxy.SetVariable('objTarget', $objMainTargetRecord)
@@ -6563,8 +8502,9 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
                         Add-Member -InputObject $objTarget -MemberType ScriptProperty `
                             -Name EntryState -Force `
                             -Value { 'Created' } `
-                            -SecondValue { throw 'entrystate-refused-by-same-session-holder' }
+                            -SecondValue ({ $hashtableSignal.RefusedWrites++; throw 'entrystate-refused-by-same-session-holder' }.GetNewClosure())
                         $objContext.InvocationId = [System.Guid]::Empty
+                        $hashtableSignal.Mutated = $true
                         return
                     }
                 }
@@ -6576,7 +8516,7 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
                 while (-not $hashtableMainSignal.Running -and
                     $objMainStart.ElapsedMilliseconds -lt 5000) {
                 }
-                $objMainResult = Remove-StyleGuideCandidateInvocationContext -Context $objMainContext
+                $objMainResult = & $hashtableBindings.SourceRemove -Context $objMainContext
                 [void]$objMainShell.EndInvoke($objMainHandle)
             } finally {
                 $objMainShell.Dispose()
@@ -6592,7 +8532,8 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
             # state after the call.
             if (($null -ne $objMainResult) -and
                 (-not [bool]$objMainResult.Success) -and
-                (([string]$objMainResult.DiagnosticCode) -ceq 'cleanup-context-altered')) {
+                (([string]$objMainResult.DiagnosticCode) -ceq 'cleanup-context-altered') -and
+                $hashtableMainSignal.Mutated -and $hashtableMainSignal.RefusedWrites -gt 0) {
                 $boolMainRefusedAsAltered = $true
             }
         }
@@ -6608,67 +8549,61 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
         }
 
         # ---- Case (b): refused write ONLY still reports Disposed / success ----
-        $strControlParent = [System.IO.Path]::Combine($strToleranceRoot, 'refused-only')
-        [void][System.IO.Directory]::CreateDirectory($strControlParent)
-        $objControlContext = & $scriptBlockBuildToleranceContext -TrustedParent $strControlParent
-        $strControlRootDirectory = [string]$objControlContext.InvocationRootPath
-        $objControlTargetRecord = $objControlContext.OwnershipJournal[0]
-        $strControlTrigger = [string]$objControlContext.OwnershipJournal[6].Path
-        $hashtableControlSignal = [hashtable]::Synchronized(@{ Running = $false })
-        $objControlRunspace = [runspacefactory]::CreateRunspace()
-        $objControlRunspace.Open()
-        $objControlRunspace.SessionStateProxy.SetVariable('objTarget', $objControlTargetRecord)
-        $objControlRunspace.SessionStateProxy.SetVariable('strTrigger', $strControlTrigger)
-        $objControlRunspace.SessionStateProxy.SetVariable('hashtableSignal', $hashtableControlSignal)
-        $objControlShell = [powershell]::Create()
-        $objControlShell.Runspace = $objControlRunspace
-        [void]$objControlShell.AddScript({
-            $objWatch = [System.Diagnostics.Stopwatch]::StartNew()
-            $hashtableSignal.Running = $true
-            while ($objWatch.ElapsedMilliseconds -lt 5000) {
-                if (-not [System.IO.File]::Exists($strTrigger)) {
-                    # Refuse the seq-0 courtesy write only; nothing else is touched.
-                    Add-Member -InputObject $objTarget -MemberType ScriptProperty `
-                        -Name EntryState -Force `
-                        -Value { 'Created' } `
-                        -SecondValue { throw 'entrystate-refused-by-same-session-holder' }
-                    return
+        $boolControlObserved = $false
+        for ($intControlAttempt = 0; $intControlAttempt -lt $intToleranceMaxAttempt -and -not $boolControlObserved; $intControlAttempt++) {
+            $strControlParent = [System.IO.Path]::Combine($strToleranceRoot, 'refused-only')
+            [void][System.IO.Directory]::CreateDirectory($strControlParent)
+            $objControlContext = & $scriptBlockBuildToleranceContext -TrustedParent $strControlParent
+            $strControlRootDirectory = [string]$objControlContext.InvocationRootPath
+            $objControlTargetRecord = $objControlContext.OwnershipJournal[0]
+            $strControlTrigger = [string]$objControlContext.OwnershipJournal[6].Path
+            $hashtableControlSignal = [hashtable]::Synchronized(@{ Running = $false; Mutated = $false; RefusedWrites = 0 })
+            $objControlRunspace = [runspacefactory]::CreateRunspace()
+            $objControlRunspace.Open()
+            $objControlRunspace.SessionStateProxy.SetVariable('objTarget', $objControlTargetRecord)
+            $objControlRunspace.SessionStateProxy.SetVariable('strTrigger', $strControlTrigger)
+            $objControlRunspace.SessionStateProxy.SetVariable('hashtableSignal', $hashtableControlSignal)
+            $objControlShell = [powershell]::Create()
+            $objControlShell.Runspace = $objControlRunspace
+            [void]$objControlShell.AddScript({
+                $objWatch = [System.Diagnostics.Stopwatch]::StartNew()
+                $hashtableSignal.Running = $true
+                while ($objWatch.ElapsedMilliseconds -lt 5000) {
+                    if (-not [System.IO.File]::Exists($strTrigger)) {
+                        # Refuse the seq-0 courtesy write only; nothing else is touched.
+                        Add-Member -InputObject $objTarget -MemberType ScriptProperty `
+                            -Name EntryState -Force `
+                            -Value { 'Created' } `
+                            -SecondValue ({ $hashtableSignal.RefusedWrites++; throw 'entrystate-refused-by-same-session-holder' }.GetNewClosure())
+                        $hashtableSignal.Mutated = $true
+                        return
+                    }
                 }
+            })
+            $objControlResult = $null
+            try {
+                $objControlHandle = $objControlShell.BeginInvoke()
+                $objControlStart = [System.Diagnostics.Stopwatch]::StartNew()
+                while (-not $hashtableControlSignal.Running -and
+                    $objControlStart.ElapsedMilliseconds -lt 5000) {
+                }
+                $objControlResult = & $hashtableBindings.SourceRemove -Context $objControlContext
+                [void]$objControlShell.EndInvoke($objControlHandle)
+            } finally {
+                $objControlShell.Dispose()
+                $objControlRunspace.Close()
+                $objControlRunspace.Dispose()
             }
-        })
-        $objControlResult = $null
-        try {
-            $objControlHandle = $objControlShell.BeginInvoke()
-            $objControlStart = [System.Diagnostics.Stopwatch]::StartNew()
-            while (-not $hashtableControlSignal.Running -and
-                $objControlStart.ElapsedMilliseconds -lt 5000) {
+            $boolControlTreeGone = (-not [System.IO.Directory]::Exists($strControlRootDirectory))
+            # Require the real setter to run. A late race is retried, never counted
+            # as evidence that the tolerated reassertion branch executed.
+            if ($null -ne $objControlResult -and $objControlResult.FinalState -ceq 'Disposed' -and
+                $objControlResult.Success -and $objControlResult.DiagnosticCode -ceq 'cleanup-succeeded' -and
+                $boolControlTreeGone -and $hashtableControlSignal.Mutated -and $hashtableControlSignal.RefusedWrites -gt 0) {
+                $boolControlObserved = $true
             }
-            $objControlResult = Remove-StyleGuideCandidateInvocationContext -Context $objControlContext
-            [void]$objControlShell.EndInvoke($objControlHandle)
-        } finally {
-            $objControlShell.Dispose()
-            $objControlRunspace.Close()
-            $objControlRunspace.Dispose()
         }
-        $boolControlTreeGone = (-not [System.IO.Directory]::Exists($strControlRootDirectory))
-        # ONE-SIDED: whether or not the rig wins its race, clean production disposes and
-        # succeeds. A regression that OVER-refused the pure refused-write case would
-        # redden this.
-        if (($null -eq $objControlResult) -or
-            (([string]$objControlResult.FinalState) -cne 'Disposed') -or
-            (-not [bool]$objControlResult.Success) -or
-            (([string]$objControlResult.DiagnosticCode) -cne 'cleanup-succeeded') -or
-            (-not $boolControlTreeGone)) {
-            & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
-                -Detail ('round73-tolerance-control-' + $(if ($null -eq $objControlResult) {
-                    'no-result'
-                } else {
-                    [string]$objControlResult.FinalState +
-                        '-s' + [string]$objControlResult.Success +
-                        '-' + [string]$objControlResult.DiagnosticCode +
-                        '-tg' + [string]$boolControlTreeGone
-                }))
-        }
+        if (-not $boolControlObserved) { throw 'round73-tolerance-control-race-not-observed' }
 
         # ---- Case (c): NO refused write + unrelated InvocationId=Empty must REFUSE
         # as Disposed / cleanup-context-altered on the no-refusal re-assertion path ----
@@ -6699,7 +8634,7 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
             [void][System.IO.Directory]::CreateDirectory($strNoRefusalParent)
             $objNoRefusalContext = & $scriptBlockBuildToleranceContext -TrustedParent $strNoRefusalParent
             $strNoRefusalTrigger = [string]$objNoRefusalContext.OwnershipJournal[6].Path
-            $hashtableNoRefusalSignal = [hashtable]::Synchronized(@{ Running = $false })
+            $hashtableNoRefusalSignal = [hashtable]::Synchronized(@{ Running = $false; Mutated = $false; RefusedWrites = 0 })
             $objNoRefusalRunspace = [runspacefactory]::CreateRunspace()
             $objNoRefusalRunspace.Open()
             $objNoRefusalRunspace.SessionStateProxy.SetVariable('objContext', $objNoRefusalContext)
@@ -6719,6 +8654,7 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
                         # so RecordWriteRefused stays clear and production takes the no-
                         # refusal branch rather than the tolerated one.
                         $objContext.InvocationId = [System.Guid]::Empty
+                        $hashtableSignal.Mutated = $true
                         return
                     }
                 }
@@ -6731,7 +8667,7 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
                     $objNoRefusalStart.ElapsedMilliseconds -lt 5000) {
                 }
                 $objNoRefusalResult = `
-                    Remove-StyleGuideCandidateInvocationContext -Context $objNoRefusalContext
+                    & $hashtableBindings.SourceRemove -Context $objNoRefusalContext
                 [void]$objNoRefusalShell.EndInvoke($objNoRefusalHandle)
             } finally {
                 $objNoRefusalShell.Dispose()
@@ -6751,7 +8687,8 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
                 (-not [bool]$objNoRefusalResult.Success) -and
                 (([string]$objNoRefusalResult.FinalState) -ceq 'Disposed') -and
                 (([string]$objNoRefusalResult.DiagnosticCode) -ceq 'cleanup-context-altered') -and
-                (@([uint32[]]@($objNoRefusalResult.RetainedRecordSequences)).Count -eq 0)) {
+                (@([uint32[]]@($objNoRefusalResult.RetainedRecordSequences)).Count -eq 0) -and
+                $hashtableNoRefusalSignal.Mutated -and $hashtableNoRefusalSignal.RefusedWrites -eq 0) {
                 $boolNoRefusalAlteredDisposed = $true
             }
         }
@@ -6767,7 +8704,7 @@ $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow = {
         }
     } finally {
         if ([System.IO.Directory]::Exists($strToleranceRoot)) {
-            [System.IO.Directory]::Delete($strToleranceRoot, $true)
+            & $script:scriptBlockRemoveTestTree -LiteralPath $strToleranceRoot -ApprovedParent $RunRoot
         }
     }
 }
@@ -6808,6 +8745,128 @@ $script:arrCandidateDiagnosticPropagated = [string[]]@(
     '$objContextResult.DiagnosticCode'
 )
 
+$script:scriptBlockGetContextForwardingPins = {
+    return @{
+        'New-StyleGuideCandidateInvocationContext' = @{ Binding = 'scriptBlockNewContextFunction'; FunctionSha256 = 'c138e5f2523c03a1bd02fa2400622223d9214c3c31ddf76b4ceb96e4d282acdb'; BindingSha256 = '56b79e3b35c01bcae5179b4b91b3f0f774df48f75a2435e2bde0548a21d6b86c' }
+        'Remove-StyleGuideCandidateInvocationContext' = @{ Binding = 'scriptBlockRemoveContextFunction'; FunctionSha256 = 'ce47e2ccd409a31c635807c30ef03874e7cf731a5d9a43f24a00d80b28a95c38'; BindingSha256 = '5f5853025570a5fcb6b61abd05439b054c7add2d9a0e1633050e75332bc417ae' }
+        'Test-StyleGuideCandidateInvocationContextIssued' = @{ Binding = 'scriptBlockTestContextFunction'; FunctionSha256 = '322fd88b1f73a1ca287bcce3901958b948af2c60f820385272139b7a23b83603'; BindingSha256 = '3799f250a7130b71991b1ed3f2303a239196dbf6c2d84cb9b00bdcc670a13c61' }
+    }
+}
+
+$script:scriptBlockGetContextForwardingAllowance = {
+    param ([System.Management.Automation.Language.ScriptBlockAst]$Ast)
+
+    $hashtablePins = & $script:scriptBlockGetContextForwardingPins
+    $arrModule = @($Ast.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        ($Node.Left.VariablePath.UserPath -ireplace '^(script|local|private|global):', '') -ieq 'scriptBlockContextModuleDefinition'
+    }, $true))
+    if ($arrModule.Count -ne 1 -or $arrModule[0].Left.VariablePath.UserPath -cne 'scriptBlockContextModuleDefinition' -or
+        -not [object]::ReferenceEquals($arrModule[0].Parent, $Ast.EndBlock)) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'context-forwarding-definition'
+    }
+    $objModule = $arrModule[0].Right.Find({ param ($Node)
+        $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst]
+    }, $false)
+    if ($null -eq $objModule) { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'context-forwarding-definition' }
+    $objAllowed = New-Object 'System.Collections.Generic.HashSet[int]'
+    foreach ($strName in $hashtablePins.Keys) {
+        $hashtablePin = $hashtablePins[$strName]
+        $arrFunctions = @($Ast.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+            ($Node.Name -ireplace '^(script|local|private|global):', '') -ieq $strName
+        }, $true))
+        if ($arrFunctions.Count -ne 1 -or $arrFunctions[0].Name -cne $strName -or
+            -not [object]::ReferenceEquals($arrFunctions[0].Parent, $objModule.ScriptBlock.EndBlock)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'context-forwarding-definition'
+        }
+        $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($arrFunctions[0].Extent.Text))
+        if ($strHash -cne $hashtablePin.FunctionSha256) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'context-forwarding-content'
+        }
+        $arrBindings = @($Ast.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+            ($Node.Left.VariablePath.UserPath -ireplace '^(script|local|private|global):', '') -ieq $hashtablePin.Binding
+        }, $true))
+        if ($arrBindings.Count -ne 1 -or $arrBindings[0].Left.VariablePath.UserPath -cne $hashtablePin.Binding -or
+            -not [object]::ReferenceEquals($arrBindings[0].Parent, $objModule.ScriptBlock.EndBlock)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'context-forwarding-binding'
+        }
+        $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($arrBindings[0].Extent.Text))
+        if ($strHash -cne $hashtablePin.BindingSha256) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'context-forwarding-binding'
+        }
+        $arrCalls = @($arrFunctions[0].Body.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.CommandAst] -and
+            @($Node.CommandElements | Where-Object { $_ -is [System.Management.Automation.Language.VariableExpressionAst] -and $_.Splatted }).Count -ne 0
+        }, $true))
+        if ($arrCalls.Count -ne 1 -or
+            $arrCalls[0].Extent.Text -cne ('& $' + $hashtablePin.Binding + ' @PSBoundParameters')) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'context-forwarding-call'
+        }
+        [void]$objAllowed.Add($arrCalls[0].Extent.StartOffset)
+    }
+    return ,$objAllowed
+}
+
+$script:scriptBlockAssertDiagnosticSplatControls = {
+    param ([object]$Catalog, [string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertProductionTaxonomyClosed -Catalog $Catalog -LiteralPath @($HelperLiteralPath, $ContextLiteralPath)
+    $strHelper = [System.IO.File]::ReadAllText($HelperLiteralPath)
+    $strContext = [System.IO.File]::ReadAllText($ContextLiteralPath)
+    $objAst = [System.Management.Automation.Language.Parser]::ParseInput($strContext, [ref]$null, [ref]$null)
+    $listCases = New-Object 'System.Collections.Generic.List[object]'
+    $strHelperCall = 'Microsoft.PowerShell.Core\New-Module @hashtableModuleParameters'
+    foreach ($strReplacement in @('Microsoft.PowerShell.Core\New-Module @OtherParameters',
+        ('Microsoft.PowerShell.Core\New-Module @hashtableModuleParameters' + "`n" + '    Microsoft.PowerShell.Core\New-Module @hashtableModuleParameters'))) {
+        $listCases.Add(@{ Source = $strHelper; Marker = $strHelperCall; Replacement = $strReplacement; Detail = 'module-bridge-tail-changed' })
+    }
+    $listCases.Add(@{ Source = $strHelper; Marker = 'Name = $strCandidateModuleName'; Replacement = "Name = 'other-module'"; Detail = 'module-bridge-tail-changed' })
+    $hashtablePins = & $script:scriptBlockGetContextForwardingPins
+    foreach ($strName in $hashtablePins.Keys) {
+        $hashtablePin = $hashtablePins[$strName]
+        $objFunction = @($objAst.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $Node.Name -ceq $strName
+        }, $true))[0]
+        $strCall = '& $' + $hashtablePin.Binding + ' @PSBoundParameters'
+        $listCases.Add(@{ Source = $strContext; Marker = $strCall; Replacement = '& $WrongTarget @PSBoundParameters'; Detail = 'context-forwarding-content' })
+        $listCases.Add(@{ Source = $strContext; Marker = $strCall; Replacement = ('& $' + $hashtablePin.Binding + ' @OtherParameters'); Detail = 'context-forwarding-content' })
+        $listCases.Add(@{ Source = $strContext; Marker = ('return (' + $strCall + ')'); Replacement = ('$PSBoundParameters.Clear(); return (' + $strCall + ')'); Detail = 'context-forwarding-content' })
+        $listCases.Add(@{ Source = $strContext; Marker = ('return (' + $strCall + ')'); Replacement = ('$PSBoundParameters = @{}; return (' + $strCall + ')'); Detail = 'context-forwarding-content' })
+        $listCases.Add(@{ Source = $strContext; Marker = $objFunction.Extent.Text; Replacement = ($objFunction.Extent.Text + "`n" + $objFunction.Extent.Text); Detail = 'context-forwarding-definition' })
+        $listCases.Add(@{ Source = $strContext; Marker = ('return (' + $strCall + ')'); Replacement = 'return'; Detail = 'context-forwarding-content' })
+        foreach ($strScope in @('script:', 'local:', 'private:', 'global:', '')) {
+            $strAlias = if ($strScope.Length -eq 0) { $hashtablePin.Binding.ToUpperInvariant() } else { $strScope + $hashtablePin.Binding }
+            $listCases.Add(@{ Source = $strContext; Marker = $objFunction.Extent.Text; Replacement = ('$' + $strAlias + ' = { return }' + "`n" + $objFunction.Extent.Text); Detail = 'context-forwarding-binding' })
+        }
+        $listCases.Add(@{ Source = $strContext; Marker = $objFunction.Extent.Text; Replacement = ($objFunction.Extent.Text + "`n" + $strCall); Detail = 'production-diagnostic-splat-[0-9]+' })
+    }
+    $intIndex = 0
+    foreach ($hashtableCase in $listCases) {
+        $intIndex++
+        if ([regex]::Matches($hashtableCase.Source, [regex]::Escape($hashtableCase.Marker)).Count -ne 1) { throw 'diagnostic-splat-control-anchor' }
+        $strMutant = $hashtableCase.Source.Replace($hashtableCase.Marker, $hashtableCase.Replacement)
+        if ($strMutant -ceq $hashtableCase.Source) { throw 'diagnostic-splat-control-unchanged' }
+        $objErrors = $null
+        [void][System.Management.Automation.Language.Parser]::ParseInput($strMutant, [ref]$null, [ref]$objErrors)
+        if (@($objErrors).Count -ne 0) { throw 'diagnostic-splat-control-parse' }
+        $strPath = [System.IO.Path]::Combine($RunRoot, 'diagnostic-splat-' + $intIndex + '.ps1')
+        try {
+            [System.IO.File]::WriteAllText($strPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+            $objFailure = $null
+            try { & $script:scriptBlockAssertProductionTaxonomyClosed -Catalog $Catalog -LiteralPath @($strPath) } catch { $objFailure = $_ }
+            $strPattern = '\APSStyleGuide\.CandidateHarness\.v1\|code=catalog-invalid\|detail=' + $hashtableCase.Detail + '\z'
+            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+                -not [regex]::IsMatch($objFailure.Exception.Message, $strPattern, [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)) {
+                throw ('diagnostic-splat-control-evidence-' + $intIndex)
+            }
+        } finally { if ([System.IO.File]::Exists($strPath)) { [System.IO.File]::Delete($strPath) } }
+    }
+}
+
 $script:scriptBlockAssertProductionTaxonomyClosed = {
     param (
         [Parameter(Mandatory = $true)]
@@ -6820,20 +8879,25 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
     $objSubreason = New-Object 'System.Collections.Generic.HashSet[string]' (
         [System.StringComparer]::Ordinal
     )
-    foreach ($strValue in $Catalog.ClosedSets.Subreason) {
+    foreach ($strValue in $Catalog.DiagnosticDomains.ProductionSubreason) {
         [void]$objSubreason.Add([string]$strValue)
     }
     $objDiagnostic = New-Object 'System.Collections.Generic.HashSet[string]' (
         [System.StringComparer]::Ordinal
     )
-    foreach ($strValue in $Catalog.ClosedSets.DiagnosticCode) {
+    foreach ($strValue in $Catalog.DiagnosticDomains.ProductionDiagnosticCode) {
         [void]$objDiagnostic.Add([string]$strValue)
     }
     $objPhase = New-Object 'System.Collections.Generic.HashSet[string]' (
         [System.StringComparer]::Ordinal
     )
-    foreach ($strValue in $Catalog.ClosedSets.Phase) {
+    foreach ($strValue in $Catalog.DiagnosticDomains.ProductionPhase) {
         [void]$objPhase.Add([string]$strValue)
+    }
+
+    $strFamilyJson = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $script:hashtableTerraformSubreasonFamily
+    if ((& $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($strFamilyJson))) -cne '43df61e15fb5585eea9d35f899e1c2dff3d482e0d6dbaa6152cc6ac31b169763') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'production-subreason-family'
     }
 
     foreach ($strLiteralPath in $LiteralPath) {
@@ -6850,6 +8914,17 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
             & $script:scriptBlockStopHarness `
                 -Code 'catalog-invalid' -Detail 'production-diagnostic-parse'
         }
+        $arrAssignments = @($objShapeAst.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst]
+        }, $true))
+        $arrHelperBuilders = @($arrAssignments | Where-Object {
+            $_.Left.VariablePath.UserPath -ceq 'script:scriptBlockNewCandidateHelperException'
+        })
+        $strRole = if ($arrHelperBuilders.Count -eq 1) { 'helper' } else { 'context' }
+        $objModuleBridgeCalls = & $script:scriptBlockGetModuleBridgeAllowance -Ast $objShapeAst -Role $strRole
+        $objForwardingCalls = $null
+        if ($strRole -ceq 'context') { $objForwardingCalls = & $script:scriptBlockGetContextForwardingAllowance -Ast $objShapeAst }
         foreach ($objShapeCommand in @($objShapeAst.FindAll(
                     {
                         param ($SyntaxNode)
@@ -6871,6 +8946,15 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                 if ($objSplatElement -is
                     [System.Management.Automation.Language.VariableExpressionAst] -and
                     $objSplatElement.Splatted) {
+                    # The helper's exact pinned module bootstrap supplies only
+                    # Name, ScriptBlock, and ArgumentList to New-Module. This one non-diagnostic
+                    # splat is bound by the complete tail pin; no diagnostic
+                    # call or other splatted command receives an exemption.
+                    if ($strRole -ceq 'helper' -and
+                        $objShapeCommand.Extent.Text -ceq 'Microsoft.PowerShell.Core\New-Module @hashtableModuleParameters' -and
+                        $objModuleBridgeCalls.Contains($objShapeCommand.Extent.StartOffset)) { continue }
+                    if ($strRole -ceq 'context' -and
+                        $objForwardingCalls.Contains($objShapeCommand.Extent.StartOffset)) { continue }
                     & $script:scriptBlockStopHarness -Code 'catalog-invalid' `
                         -Detail ('production-diagnostic-splat-' +
                             [string]$objShapeCommand.Extent.StartLineNumber)
@@ -7087,12 +9171,12 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
             if ($strAssignField -ceq 'Phase') { $objAssignSet = $objPhase }
             elseif ($strAssignField -ceq 'Subreason') { $objAssignSet = $objSubreason }
             elseif ($strAssignField -ceq 'Fallback') {
-                $objAssignSet = if ($hashtableFallbackDestination.ContainsKey(
+                if ($hashtableFallbackDestination.ContainsKey(
                         [string]$objAssign.Left.VariablePath.UserPath)) {
-                    $hashtableFallbackDestination[
+                    $objAssignSet = $hashtableFallbackDestination[
                         [string]$objAssign.Left.VariablePath.UserPath]
                 } else {
-                    New-Object 'System.Collections.Generic.HashSet[string]' (
+                    $objAssignSet = New-Object 'System.Collections.Generic.HashSet[string]' (
                         [System.StringComparer]::Ordinal)
                 }
             }
@@ -7188,14 +9272,14 @@ $script:scriptBlockAssertProductionTaxonomyClosed = {
                     -Code 'catalog-invalid' -Detail 'production-diagnostic'
             }
         }
-        foreach ($objMatch in [regex]::Matches($strText, '-Subreason\s+"\$[A-Za-z0-9_]+-([A-Za-z]+)"')) {
-            $strSuffix = $objMatch.Groups[1].Value
-            if (-not $script:hashtableCandidateSubreasonFamily.Contains($strSuffix)) {
+        foreach ($objMatch in [regex]::Matches($strText, '-Subreason\s+"\$([A-Za-z0-9_]+)-([A-Za-z]+)"')) {
+            $strFamily = $objMatch.Groups[1].Value + '-' + $objMatch.Groups[2].Value
+            if (-not $script:hashtableTerraformSubreasonFamily.ContainsKey($strFamily)) {
                 & $script:scriptBlockStopHarness `
                     -Code 'catalog-invalid' -Detail 'production-subreason-family'
             }
-            foreach ($strParameter in $script:hashtableCandidateSubreasonFamily[$strSuffix]) {
-                if (-not $objSubreason.Contains($strParameter + '-' + $strSuffix)) {
+            foreach ($strValue in $script:hashtableTerraformSubreasonFamily[$strFamily]) {
+                if (-not $objSubreason.Contains($strValue)) {
                     & $script:scriptBlockStopHarness `
                         -Code 'catalog-invalid' -Detail 'production-subreason-family'
                 }
@@ -7297,22 +9381,24 @@ $script:scriptBlockAssertProductionValidateSetsClosed = {
         [string]$ContextLiteralPath
     )
 
+    & $script:scriptBlockAssertDiagnosticDomains -Catalog $Catalog
+
     $objDiagnostic = New-Object 'System.Collections.Generic.HashSet[string]' (
         [System.StringComparer]::Ordinal
     )
-    foreach ($strValue in $Catalog.ClosedSets.DiagnosticCode) {
+    foreach ($strValue in $Catalog.DiagnosticDomains.ProductionDiagnosticCode) {
         [void]$objDiagnostic.Add([string]$strValue)
     }
     $objPhase = New-Object 'System.Collections.Generic.HashSet[string]' (
         [System.StringComparer]::Ordinal
     )
-    foreach ($strValue in $Catalog.ClosedSets.Phase) {
+    foreach ($strValue in $Catalog.DiagnosticDomains.ProductionPhase) {
         [void]$objPhase.Add([string]$strValue)
     }
     $objSubreason = New-Object 'System.Collections.Generic.HashSet[string]' (
         [System.StringComparer]::Ordinal
     )
-    foreach ($strValue in $Catalog.ClosedSets.Subreason) {
+    foreach ($strValue in $Catalog.DiagnosticDomains.ProductionSubreason) {
         [void]$objSubreason.Add([string]$strValue)
     }
 
@@ -7462,7 +9548,7 @@ $script:scriptBlockGetScriptVersionRecord = {
 
     $objFirstFunction = [regex]::Match(
         $ScriptText,
-        '(?m)^function[\x20\x09]+[A-Za-z0-9_-]+[\x20\x09]*\{'
+        '(?m)^(?: {4})?function[\x20\x09]+[A-Za-z0-9_-]+[\x20\x09]*\{'
     )
     if (-not $objFirstFunction.Success) {
         & $script:scriptBlockStopHarness -Code 'invalid-version' -Detail 'function'
@@ -7575,7 +9661,7 @@ $script:scriptBlockAssertOrdinaryDirectoryEnvelope = {
 
 $script:scriptBlockResolveFixedScriptClaim = {
     param (
-        [AllowNull()]
+        [AllowNull()][AllowEmptyString()][AllowEmptyCollection()]
         [object]$Value,
 
         [Parameter(Mandatory = $true)]
@@ -7585,40 +9671,67 @@ $script:scriptBlockResolveFixedScriptClaim = {
         [string]$ExpectedPath
     )
 
-    $strValue = & $script:scriptBlockAssertRawString -Value $Value -Name $Name
-    if ([System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($strValue)) {
-        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-wildcard"
+    $Value = & $script:scriptBlockAssertRawString -Value $Value -Name $Name
+    if ([System.Management.Automation.WildcardPattern]::ContainsWildcardCharacters($Value)) {
+        & $script:scriptBlockStopHarness `
+            -Code 'parameter' -Detail "$Name-wildcard"
     }
-    $strProviderPath = $strValue
-    $intSeparator = $strValue.IndexOf('::', [System.StringComparison]::Ordinal)
-    if ($intSeparator -ge 0) {
-        $strProviderName = $strValue.Substring(0, $intSeparator)
-        if ($strProviderName -cnotin @(
-            'FileSystem',
-            'Microsoft.PowerShell.Core\FileSystem'
-        )) {
-            & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-provider"
+    $strProviderPath = $Value
+    $strProviderName = 'FileSystem'
+    $intProviderSeparator = $Value.IndexOf('::', [System.StringComparison]::Ordinal)
+    if ($intProviderSeparator -ge 0) {
+        $strProviderName = $Value.Substring(0, $intProviderSeparator)
+        $strProviderPath = $Value.Substring($intProviderSeparator + 2)
+        if ($strProviderName.Length -eq 0 -or $strProviderPath.Contains('::') -or
+            $strProviderName -cnotmatch '\A[A-Za-z][A-Za-z0-9.\\]*\z') {
+            & $script:scriptBlockStopHarness `
+                -Code 'parameter' -Detail "$Name-provider"
         }
-        $strProviderPath = $strValue.Substring($intSeparator + 2)
     }
     $boolDriveRelative = $strProviderPath.Length -ge 2 -and
         [System.Char]::IsLetter($strProviderPath[0]) -and
-        $strProviderPath[1] -eq [char]':' -and
+        $strProviderPath[1] -eq ':' -and
         ($strProviderPath.Length -eq 2 -or
             ($strProviderPath[2] -ne [char]'\' -and $strProviderPath[2] -ne [char]'/'))
-    if ($boolDriveRelative -or -not [System.IO.Path]::IsPathRooted($strProviderPath)) {
-        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-relative"
+    $boolFullyQualified = if ($script:boolCandidateIsWindows) {
+        $strProviderPath -cmatch '\A(?:[A-Za-z]:[\\/]|\\\\[^\\/]+[\\/][^\\/]+(?:[\\/]|\z))'
+    } else {
+        $strProviderPath.StartsWith('/', [System.StringComparison]::Ordinal)
+    }
+    if ($boolDriveRelative -or -not $boolFullyQualified) {
+        & $script:scriptBlockStopHarness `
+            -Code 'parameter' -Detail "$Name-relative"
+    }
+    if ($strProviderName -cnotin @('FileSystem', 'Microsoft.PowerShell.Core\FileSystem')) {
+        & $script:scriptBlockStopHarness `
+            -Code 'parameter' -Detail "$Name-provider"
     }
     try {
-        $strFullPath = [System.IO.Path]::GetFullPath($strProviderPath)
+        $objProvider = $null
+        $objDrive = $null
+        $strNormalizedPath = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath(
+            $strProviderPath, [ref]$objProvider, [ref]$objDrive)
+        if ($null -eq $objProvider -or $objProvider.Name -cne 'FileSystem') {
+            throw 'path-provider'
+        }
+        if ($script:boolCandidateIsWindows -and $strProviderPath -cmatch '\A[A-Za-z]:') {
+            $strNativeRoot = $strProviderPath.Substring(0, 2) + '\'
+            if ($null -eq $objDrive -or -not [string]::Equals(
+                    $objDrive.Root, $strNativeRoot, [StringComparison]::OrdinalIgnoreCase)) {
+                throw 'path-provider'
+            }
+        }
+        $strFullPath = [System.IO.Path]::GetFullPath($strNormalizedPath)
     } catch {
-        & $script:scriptBlockStopHarness -Code 'parameter' -Detail "$Name-normalization"
+        if ($_.Exception.Message -ceq 'path-provider') {
+            & $script:scriptBlockStopHarness `
+                -Code 'parameter' -Detail "$Name-provider"
+        }
+        & $script:scriptBlockStopHarness `
+            -Code 'parameter' -Detail "$Name-normalization"
     }
     if (-not [System.String]::Equals(
-        $strFullPath,
-        $ExpectedPath,
-        $script:objCandidatePathComparison
-    )) {
+            $strFullPath, $ExpectedPath, $script:objCandidatePathComparison)) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail "$Name-fixed-path"
     }
     return $strFullPath
@@ -7701,6 +9814,1073 @@ $script:scriptBlockSplitOneNulGitRecord = {
     return & $script:scriptBlockConvertFromAsciiMetadata -Bytes $arrMetadata
 }
 
+$script:scriptBlockAssertUtf8DecoderWired = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath
+    )
+
+    $objParseErrors = $null
+    $objScriptAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $LiteralPath,
+        [ref]$null,
+        [ref]$objParseErrors
+    )
+    if ($null -eq $objScriptAst -or @($objParseErrors).Count -ne 0) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'utf8-decoder-parse'
+    }
+    $arrValidatorAssignment = @($objScriptAst.FindAll(
+            {
+                param ($SyntaxNode)
+                $SyntaxNode -is
+                    [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $SyntaxNode.Left -is
+                    [System.Management.Automation.Language.VariableExpressionAst] -and
+                $SyntaxNode.Left.VariablePath.UserPath -ceq
+                    'script:scriptBlockReadCandidateHelperValidatedFile'
+            },
+            $true
+        ))
+    if ($arrValidatorAssignment.Count -ne 1) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'utf8-decoder-validator-count'
+    }
+    $arrValidatorLiteral = @($arrValidatorAssignment[0].Right.FindAll(
+            {
+                param ($SyntaxNode)
+                $SyntaxNode -is
+                    [System.Management.Automation.Language.ScriptBlockExpressionAst]
+            },
+            $true
+        ))
+    if ($arrValidatorLiteral.Count -ne 1) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'utf8-decoder-validator-shape'
+    }
+    $objValidatorLiteral = $arrValidatorLiteral[0]
+    $objValidatorAst = $objValidatorLiteral.ScriptBlock
+    $strValidator = $objValidatorLiteral.Extent.Text
+
+    # The decoder and each receiver originate inside the per-file validator.
+    # Pinning both definition and use here prevents a broadened method allow-list
+    # from admitting a caller- or module-shared decoder with mutable cross-file
+    # state.
+    foreach ($strVariableName in @(
+            'objUtf8Encoding',
+            'objUtf8Decoder',
+            'arrCharacterBuffer',
+            'uintDecodedByteCount'
+        )) {
+        $arrAssignment = @($objValidatorAst.FindAll(
+                {
+                    param ($SyntaxNode)
+                    $SyntaxNode -is
+                        [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $SyntaxNode.Operator -eq
+                        [System.Management.Automation.Language.TokenKind]::Equals -and
+                    $SyntaxNode.Left -is
+                        [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $SyntaxNode.Left.VariablePath.UserPath -ceq $strVariableName
+                },
+                $true
+            ))
+        if ($arrAssignment.Count -ne 1) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' `
+                -Detail ('utf8-decoder-local-' + $strVariableName)
+        }
+    }
+
+    $hashtableAssignmentSource = @{
+        objUtf8Encoding = 'New-ObjectSystem.Text.UTF8Encoding($false,$true)'
+        objUtf8Decoder = '$objUtf8Encoding.GetDecoder()'
+        arrCharacterBuffer = 'New-Objectchar[]($objUtf8Encoding.GetMaxCharCount($arrBuffer.Length))'
+        uintDecodedByteCount = '[uint64]0'
+    }
+    foreach ($strVariableName in $hashtableAssignmentSource.Keys) {
+        $objAssignment = @($objValidatorAst.FindAll(
+                {
+                    param ($SyntaxNode)
+                    $SyntaxNode -is
+                        [System.Management.Automation.Language.AssignmentStatementAst] -and
+                    $SyntaxNode.Operator -eq
+                        [System.Management.Automation.Language.TokenKind]::Equals -and
+                    $SyntaxNode.Left -is
+                        [System.Management.Automation.Language.VariableExpressionAst] -and
+                    $SyntaxNode.Left.VariablePath.UserPath -ceq $strVariableName
+                },
+                $true
+            ))[0]
+        if (($objAssignment.Right.Extent.Text -replace '\s', '') -cne
+            $hashtableAssignmentSource[$strVariableName]) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' `
+                -Detail ('utf8-decoder-provenance-' + $strVariableName)
+        }
+    }
+
+    if (@([regex]::Matches(
+                $strValidator,
+                '(?m)^\s*\$objUtf8Encoding = New-Object System\.Text\.UTF8Encoding\(\$false, \$true\)\s*$'
+            )).Count -ne 1 -or
+        @([regex]::Matches(
+                $strValidator,
+                '(?m)^\s*\$uintDecodedByteCount \+= \[uint64\]\$intRead\s*$'
+            )).Count -ne 1 -or
+        @([regex]::Matches(
+                $strValidator,
+                'catch \[System\.Text\.DecoderFallbackException\]'
+            )).Count -ne 2) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'utf8-decoder-strict-progress'
+    }
+
+    foreach ($objMemberCall in @($objScriptAst.FindAll(
+                {
+                    param ($SyntaxNode)
+                    $SyntaxNode -is
+                        [System.Management.Automation.Language.InvokeMemberExpressionAst]
+                },
+                $true
+            ))) {
+        if ($objMemberCall.Member -isnot
+            [System.Management.Automation.Language.StringConstantExpressionAst] -or
+            [string]$objMemberCall.Member.Value -cnotin @(
+                'GetDecoder', 'GetMaxCharCount', 'GetChars'
+            )) {
+            continue
+        }
+        if ($objMemberCall.Extent.StartOffset -lt
+                $objValidatorLiteral.Extent.StartOffset -or
+            $objMemberCall.Extent.EndOffset -gt
+                $objValidatorLiteral.Extent.EndOffset) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'utf8-decoder-member-scope'
+        }
+    }
+
+    $intGetDecoder = 0
+    $intGetMaxCharCount = 0
+    $intChunkDecode = 0
+    $intFinalFlush = 0
+    foreach ($objMemberCall in @($objValidatorAst.FindAll(
+                {
+                    param ($SyntaxNode)
+                    $SyntaxNode -is
+                        [System.Management.Automation.Language.InvokeMemberExpressionAst]
+                },
+                $true
+            ))) {
+        if ($objMemberCall.Member -isnot
+            [System.Management.Automation.Language.StringConstantExpressionAst]) {
+            continue
+        }
+        $strMemberName = [string]$objMemberCall.Member.Value
+        $strReceiver = [string]$objMemberCall.Expression.Extent.Text
+        $arrArgument = @($objMemberCall.Arguments | Where-Object { $null -ne $_ })
+        if ($strMemberName -ceq 'GetDecoder') {
+            if ($strReceiver -cne '$objUtf8Encoding' -or
+                $arrArgument.Count -ne 0) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'utf8-decoder-construction'
+            }
+            $intGetDecoder++
+        } elseif ($strMemberName -ceq 'GetMaxCharCount') {
+            if ($strReceiver -cne '$objUtf8Encoding' -or
+                $arrArgument.Count -ne 1 -or
+                $arrArgument[0].Extent.Text -cne '$arrBuffer.Length') {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'utf8-decoder-character-buffer'
+            }
+            $intGetMaxCharCount++
+        } elseif ($strMemberName -ceq 'GetChars') {
+            if ($strReceiver -cne '$objUtf8Decoder' -or
+                $arrArgument.Count -ne 6 -or
+                $arrArgument[1].Extent.Text -cne '0' -or
+                $arrArgument[3].Extent.Text -cne '$arrCharacterBuffer' -or
+                $arrArgument[4].Extent.Text -cne '0') {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'utf8-decoder-call-shape'
+            }
+            if ($arrArgument[0].Extent.Text -ceq '$arrBuffer' -and
+                $arrArgument[2].Extent.Text -ceq '$intRead' -and
+                $arrArgument[5].Extent.Text -ceq '$false') {
+                $intChunkDecode++
+            } elseif ($arrArgument[0].Extent.Text -ceq '$arrEmptyBuffer' -and
+                $arrArgument[2].Extent.Text -ceq '0' -and
+                $arrArgument[5].Extent.Text -ceq '$true') {
+                $intFinalFlush++
+            } else {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' -Detail 'utf8-decoder-call-source'
+            }
+        }
+    }
+    if ($intGetDecoder -ne 1 -or $intGetMaxCharCount -ne 1 -or
+        $intChunkDecode -ne 1 -or $intFinalFlush -ne 1) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'utf8-decoder-call-count'
+    }
+
+    $intCarriageReturn = $strValidator.IndexOf(
+        "-Subreason 'cr'", [System.StringComparison]::Ordinal)
+    $arrLength = @([regex]::Matches(
+            $strValidator,
+            [regex]::Escape("-Subreason 'length'")
+        ) | ForEach-Object { $_.Index })
+    $intBom = $strValidator.IndexOf(
+        "-Subreason 'bom'", [System.StringComparison]::Ordinal)
+    $intSha256 = $strValidator.IndexOf(
+        "-Subreason 'sha256'", [System.StringComparison]::Ordinal)
+    $intUtf8 = $strValidator.IndexOf(
+        "-Subreason 'utf8'", [System.StringComparison]::Ordinal)
+    if ($arrLength.Count -ne 3 -or
+        $arrLength[0] -lt 0 -or
+        $arrLength[1] -le $arrLength[0] -or
+        $intCarriageReturn -le $arrLength[1] -or
+        $arrLength[2] -le $intCarriageReturn -or
+        $intBom -le $arrLength[2] -or
+        $intSha256 -le $intBom -or $intUtf8 -le $intSha256 -or
+        $strValidator.LastIndexOf(
+            "-Subreason 'utf8'", [System.StringComparison]::Ordinal) -ne
+            $intUtf8) {
+        & $script:scriptBlockStopHarness `
+            -Code 'catalog-invalid' -Detail 'utf8-decoder-diagnostic-precedence'
+    }
+}
+
+$script:scriptBlockAssertUtf8DecoderMutants = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$LiteralPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    $strSource = [System.IO.File]::ReadAllText($LiteralPath)
+    $arrMutation = @(
+        @{
+            Name = 'replacement-fallback'
+            Old = '$objUtf8Encoding = New-Object System.Text.UTF8Encoding($false, $true)'
+            New = '$objUtf8Encoding = New-Object System.Text.UTF8Encoding($false, $false)'
+            Count = 1
+            Detail = 'utf8-decoder-provenance-objUtf8Encoding'
+        },
+        @{
+            Name = 'decoder-arguments'
+            Old = '$objUtf8Encoding.GetDecoder()'
+            New = '$objUtf8Encoding.GetDecoder($false)'
+            Count = 1
+            Detail = 'utf8-decoder-provenance-objUtf8Decoder'
+        },
+        @{
+            Name = 'character-buffer-capacity'
+            Old = '$objUtf8Encoding.GetMaxCharCount($arrBuffer.Length)'
+            New = '$objUtf8Encoding.GetMaxCharCount(1)'
+            Count = 1
+            Detail = 'utf8-decoder-provenance-arrCharacterBuffer'
+        },
+        @{
+            Name = 'stateful-consumer'
+            Old = '$objUtf8Decoder.GetChars('
+            New = '$objUtf8Decoder.GetCharCount('
+            Count = 2
+            Detail = 'utf8-decoder-call-count'
+        },
+        @{
+            Name = 'byte-progress'
+            Old = '$uintDecodedByteCount += [uint64]$intRead'
+            New = '$uintDecodedByteCount += [uint64]0'
+            Count = 1
+            Detail = 'utf8-decoder-strict-progress'
+        },
+        @{
+            Name = 'chunk-flush'
+            Old = "`$intRead,`n                                `$arrCharacterBuffer,`n                                0,`n                                `$false"
+            New = "`$intRead,`n                                `$arrCharacterBuffer,`n                                0,`n                                `$true"
+            Count = 1
+            Detail = 'utf8-decoder-call-source'
+        },
+        @{
+            Name = 'final-flush'
+            Old = "`$arrEmptyBuffer,`n                            0,`n                            0,`n                            `$arrCharacterBuffer,`n                            0,`n                            `$true"
+            New = "`$arrEmptyBuffer,`n                            0,`n                            0,`n                            `$arrCharacterBuffer,`n                            0,`n                            `$false"
+            Count = 1
+            Detail = 'utf8-decoder-call-source'
+        },
+        @{
+            Name = 'diagnostic-precedence'
+            Old = "-Subreason 'utf8'"
+            New = "-Subreason 'sha256'"
+            Count = 1
+            Detail = 'utf8-decoder-diagnostic-precedence'
+        },
+        @{
+            Name = 'decoder-constructor-hoisted'
+            Old = '$objUtf8Decoder = $objUtf8Encoding.GetDecoder()'
+            New = '$objUtf8Decoder = $script:objUtf8Decoder'
+            Count = 1
+            Detail = 'utf8-decoder-provenance-objUtf8Decoder'
+        },
+        @{
+            Name = 'member-outside-validator'
+            Old = '$script:scriptBlockReadCandidateHelperValidatedFile = {'
+            New = "`$null = `$script:objUtf8Decoder.GetDecoder()`n`n`$script:scriptBlockReadCandidateHelperValidatedFile = {"
+            Count = 1
+            Detail = 'utf8-decoder-member-scope'
+        }
+    )
+    foreach ($hashtableMutation in $arrMutation) {
+        $intOccurrence = $strSource.Split(
+            [string[]]@([string]$hashtableMutation.Old),
+            [System.StringSplitOptions]::None
+        ).Count - 1
+        if ($intOccurrence -ne [int]$hashtableMutation.Count) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' `
+                -Detail ('utf8-mutant-anchor-' + [string]$hashtableMutation.Name)
+        }
+        $strMutantPath = [System.IO.Path]::Combine(
+            $RunRoot,
+            'utf8-mutant-' + [string]$hashtableMutation.Name + '.ps1'
+        )
+        try {
+            $strMutant = $strSource.Replace(
+                [string]$hashtableMutation.Old,
+                [string]$hashtableMutation.New
+            )
+            [System.IO.File]::WriteAllText(
+                $strMutantPath,
+                $strMutant,
+                (New-Object System.Text.UTF8Encoding($false))
+            )
+            $objRefusal = $null
+            try {
+                & $script:scriptBlockAssertUtf8DecoderWired `
+                    -LiteralPath $strMutantPath
+            } catch {
+                $objRefusal = $_
+            }
+            if ($null -eq $objRefusal -or
+                $objRefusal.Exception.Data['PSStyleGuideHarnessCode'] -cne
+                    'catalog-invalid' -or
+                $objRefusal.Exception.Message -cne
+                    ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' +
+                        [string]$hashtableMutation.Detail)) {
+                & $script:scriptBlockStopHarness `
+                    -Code 'catalog-invalid' `
+                    -Detail ('utf8-mutant-refusal-' + [string]$hashtableMutation.Name)
+            }
+        } finally {
+            if ([System.IO.File]::Exists($strMutantPath)) {
+                [System.IO.File]::Delete($strMutantPath)
+            }
+        }
+    }
+}
+
+$script:scriptBlockAssertUtf8DecoderStateIsolated = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot
+    )
+
+    $strFixtureRoot = [System.IO.Path]::Combine($RunRoot, 'utf8-decoder-state')
+    [void][System.IO.Directory]::CreateDirectory($strFixtureRoot)
+    try {
+        $strTruncatedPath = [System.IO.Path]::Combine($strFixtureRoot, 'truncated.md')
+        $strValidPath = [System.IO.Path]::Combine($strFixtureRoot, 'valid.md')
+        $arrTruncated = [byte[]](0x78, 0xE2, 0x82)
+        $arrValid = [byte[]](0xF0, 0x9F, 0x98, 0x80, 0x0A)
+        [System.IO.File]::WriteAllBytes($strTruncatedPath, $arrTruncated)
+        [System.IO.File]::WriteAllBytes($strValidPath, $arrValid)
+        $strTruncatedHash = & $script:scriptBlockGetByteArraySha256 -Bytes $arrTruncated
+        $strValidHash = & $script:scriptBlockGetByteArraySha256 -Bytes $arrValid
+        $objModule = @(Microsoft.PowerShell.Core\Get-Module `
+                -Name PSStyleGuideCandidateArtifact_1_0_20260926_0 `
+                -All)
+        if ($objModule.Count -ne 1) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'utf8-state-module-cardinality'
+        }
+        $objObservation = & $objModule[0] {
+            param (
+                [string]$TruncatedPath,
+                [string]$TruncatedHash,
+                [string]$ValidPath,
+                [string]$ValidHash
+            )
+
+            $strFirstSubreason = 'none'
+            try {
+                [void](& $script:scriptBlockReadCandidateHelperValidatedFile `
+                        -LiteralPath $TruncatedPath `
+                        -ExpectedLength ([uint64]3) `
+                        -ExpectedSha256 $TruncatedHash)
+            } catch {
+                $strFirstSubreason = [string]$_.Exception.Data[
+                    'PSStyleGuideSubreason'
+                ]
+            }
+            $boolSecondAccepted = $true
+            try {
+                [void](& $script:scriptBlockReadCandidateHelperValidatedFile `
+                        -LiteralPath $ValidPath `
+                        -ExpectedLength ([uint64]5) `
+                        -ExpectedSha256 $ValidHash)
+            } catch {
+                $boolSecondAccepted = $false
+            }
+            [pscustomobject]@{
+                FirstSubreason = $strFirstSubreason
+                SecondAccepted = $boolSecondAccepted
+            }
+        } $strTruncatedPath $strTruncatedHash $strValidPath $strValidHash
+        if ($objObservation.FirstSubreason -cne 'utf8' -or
+            $objObservation.SecondAccepted -cne $true) {
+            & $script:scriptBlockStopHarness `
+                -Code 'catalog-invalid' -Detail 'utf8-state-isolation'
+        }
+    } finally {
+        & $script:scriptBlockRemoveTestTree `
+            -LiteralPath $strFixtureRoot `
+            -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockAssertTerraformVersionLayoutControls = {
+    param ([string]$HelperSource, [string]$ContextSource)
+
+    foreach ($objRole in @(
+        [pscustomobject]@{ Source = $HelperSource; Expected = $script:strCandidateExpectedHelperVersion },
+        [pscustomobject]@{ Source = $ContextSource; Expected = $script:strCandidateExpectedContextVersion }
+    )) {
+        if ((& $script:scriptBlockGetScriptVersionRecord -ScriptText $objRole.Source -ExpectedVersion $objRole.Expected).ToString() -cne $objRole.Expected) { throw 'version-layout-positive-control' }
+        $strMarker = 'Version: ' + $objRole.Expected
+        $arrMutants = @(
+            [pscustomobject]@{ Source = $objRole.Source.Replace($strMarker, 'Version: 1.0.20260925.1'); Code = 'unexpected-version'; Reason = 'binding' },
+            [pscustomobject]@{ Source = $objRole.Source.Replace($strMarker, $strMarker + "`n" + $strMarker); Code = 'invalid-version'; Reason = 'marker-count' },
+            [pscustomobject]@{ Source = $objRole.Source.Replace($strMarker, 'Version: malformed'); Code = 'invalid-version'; Reason = 'marker-grammar' },
+            [pscustomobject]@{ Source = [regex]::Replace($objRole.Source, '(?m)^(?: {4})?function', '  function'); Code = 'invalid-version'; Reason = 'function' }
+        )
+        foreach ($objMutant in $arrMutants) {
+            if ($objMutant.Source -ceq $objRole.Source) { throw 'version-layout-mutant-not-derived' }
+            $objFailure = $null
+            try { [void](& $script:scriptBlockGetScriptVersionRecord -ScriptText $objMutant.Source -ExpectedVersion $objRole.Expected) }
+            catch { $objFailure = $_ }
+            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne $objMutant.Code -or
+                $objFailure.Exception.Message -cne ('PSStyleGuide.CandidateHarness.v1|code=' + $objMutant.Code + '|detail=' + $objMutant.Reason)) { throw 'version-layout-mutant-refusal' }
+        }
+    }
+}
+
+
+
+$script:scriptBlockGetCandidateVersionProgression = {
+    param (
+        [AllowNull()]
+        [object]$Record
+    )
+
+    # This evaluator is deliberately pure. Implementation and merge validation
+    # build one record per affected script from the native merge base and the
+    # exact staged bytes. A prior pull-request head is never a baseline. The
+    # caller records the accountable implementation author and truthful UTC date;
+    # this code does not infer either value from a clock, Git metadata or a file.
+    $scriptBlockNewResult = {
+        param (
+            [bool]$Valid,
+            [bool]$Included,
+            [AllowNull()][object]$ExpectedVersion,
+            [string]$Reason
+        )
+
+        return [pscustomobject][ordered]@{
+            Schema = 'PSStyleGuide.CandidateVersionProgressionResult.v1'
+            Valid = $Valid
+            Included = $Included
+            ExpectedVersion = $ExpectedVersion
+            Reason = $Reason
+        }
+    }
+    $scriptBlockReject = {
+        param ([string]$Reason)
+        return (& $scriptBlockNewResult `
+                -Valid $false `
+                -Included $false `
+                -ExpectedVersion $null `
+                -Reason $Reason)
+    }
+    $scriptBlockGetCanonicalVersion = {
+        param (
+            [AllowNull()]
+            [object]$Value
+        )
+
+        if ($null -eq $Value -or $Value.GetType() -ne [System.String]) {
+            return
+        }
+        $objMatch = [regex]::Match(
+            $Value,
+            '\A(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.([0-9]{8})\.(0|[1-9][0-9]*)\z'
+        )
+        if (-not $objMatch.Success) {
+            return
+        }
+        $arrPart = [string[]]@(
+            $objMatch.Groups[1].Value,
+            $objMatch.Groups[2].Value,
+            $objMatch.Groups[3].Value,
+            $objMatch.Groups[4].Value
+        )
+        $arrInteger = New-Object 'System.Collections.Generic.List[int]'
+        foreach ($strPart in $arrPart) {
+            $intPart = 0
+            if (-not [int]::TryParse(
+                    $strPart,
+                    [System.Globalization.NumberStyles]::None,
+                    [System.Globalization.CultureInfo]::InvariantCulture,
+                    [ref]$intPart
+                )) {
+                return
+            }
+            [void]$arrInteger.Add($intPart)
+        }
+        $objDate = [datetime]::MinValue
+        if (-not [datetime]::TryParseExact(
+                $arrPart[2],
+                'yyyyMMdd',
+                [System.Globalization.CultureInfo]::InvariantCulture,
+                [System.Globalization.DateTimeStyles]::None,
+                [ref]$objDate
+            )) {
+            return
+        }
+        $objVersion = New-Object System.Version(
+            $arrInteger[0],
+            $arrInteger[1],
+            $arrInteger[2],
+            $arrInteger[3]
+        )
+        if ($objVersion.ToString() -cne $Value) {
+            return
+        }
+        return $objVersion
+    }
+
+    if ($null -eq $Record -or
+        $Record.GetType() -ne [System.Management.Automation.PSCustomObject]) {
+        return (& $scriptBlockReject -Reason 'record-type')
+    }
+    $arrExpectedProperty = [string[]]@(
+        'SchemaVersion',
+        'Path',
+        'BaselineBlob',
+        'BaselineVersion',
+        'StagedBlob',
+        'StagedVersion',
+        'ChangeClass',
+        'AccountableAuthor',
+        'FinalMaterialEditUtcDate'
+    )
+    $arrActualProperty = [string[]]@($Record.PSObject.Properties.Name)
+    if ($arrActualProperty.Count -ne $arrExpectedProperty.Count) {
+        return (& $scriptBlockReject -Reason 'record-schema')
+    }
+    foreach ($strProperty in $arrExpectedProperty) {
+        if ($arrActualProperty -cnotcontains $strProperty) {
+            return (& $scriptBlockReject -Reason 'record-schema')
+        }
+    }
+    if ($null -eq $Record.SchemaVersion -or
+        $Record.SchemaVersion.GetType() -ne [uint32] -or
+        $Record.SchemaVersion -ne [uint32]1) {
+        return (& $scriptBlockReject -Reason 'schema-version')
+    }
+    if ($null -eq $Record.Path -or
+        $Record.Path.GetType() -ne [System.String]) {
+        return (& $scriptBlockReject -Reason 'path-type')
+    }
+    if ($Record.Path.Length -eq 0 -or
+        $Record.Path.Trim() -cne $Record.Path -or
+        $Record.Path -cmatch '[\x00-\x1f\x7f]') {
+        return (& $scriptBlockReject -Reason 'path-grammar')
+    }
+    if ($null -eq $Record.BaselineBlob -or
+        $Record.BaselineBlob.GetType() -ne [System.String]) {
+        return (& $scriptBlockReject -Reason 'baseline-blob-type')
+    }
+    if ($Record.BaselineBlob -cne 'absent' -and
+        $Record.BaselineBlob -cnotmatch '\A(?:[0-9a-f]{40}|[0-9a-f]{64})\z') {
+        return (& $scriptBlockReject -Reason 'baseline-blob-grammar')
+    }
+    if ($null -eq $Record.StagedBlob -or
+        $Record.StagedBlob.GetType() -ne [System.String]) {
+        return (& $scriptBlockReject -Reason 'staged-blob-type')
+    }
+    if ($Record.StagedBlob -cnotmatch '\A(?:[0-9a-f]{40}|[0-9a-f]{64})\z') {
+        return (& $scriptBlockReject -Reason 'staged-blob-grammar')
+    }
+    if ($null -ne $Record.BaselineVersion -and
+        $Record.BaselineVersion.GetType() -ne [System.String]) {
+        return (& $scriptBlockReject -Reason 'baseline-version-type')
+    }
+    if ($null -eq $Record.StagedVersion -or
+        $Record.StagedVersion.GetType() -ne [System.String]) {
+        return (& $scriptBlockReject -Reason 'staged-version-type')
+    }
+    if ($null -eq $Record.ChangeClass -or
+        $Record.ChangeClass.GetType() -ne [System.String]) {
+        return (& $scriptBlockReject -Reason 'change-class-type')
+    }
+    if ($Record.ChangeClass -cnotin @(
+            'new',
+            'breaking',
+            'compatible-capability',
+            'correction',
+            'unchanged'
+        )) {
+        return (& $scriptBlockReject -Reason 'change-class')
+    }
+    if ($null -ne $Record.AccountableAuthor -and
+        $Record.AccountableAuthor.GetType() -ne [System.String]) {
+        return (& $scriptBlockReject -Reason 'author-type')
+    }
+    if ($null -ne $Record.FinalMaterialEditUtcDate -and
+        $Record.FinalMaterialEditUtcDate.GetType() -ne [System.String]) {
+        return (& $scriptBlockReject -Reason 'final-edit-date-type')
+    }
+
+    $objStagedVersion = & $scriptBlockGetCanonicalVersion -Value $Record.StagedVersion
+    if ($null -eq $objStagedVersion) {
+        return (& $scriptBlockReject -Reason 'staged-version')
+    }
+    $boolBaselineAbsent = $Record.BaselineBlob -ceq 'absent'
+    $objBaselineVersion = $null
+    if ($boolBaselineAbsent) {
+        if ($null -ne $Record.BaselineVersion) {
+            return (& $scriptBlockReject -Reason 'baseline-ambiguity')
+        }
+    } else {
+        $objBaselineVersion = & $scriptBlockGetCanonicalVersion `
+            -Value $Record.BaselineVersion
+        if ($null -eq $objBaselineVersion) {
+            return (& $scriptBlockReject -Reason 'baseline-ambiguity')
+        }
+    }
+
+    if ($Record.ChangeClass -ceq 'unchanged') {
+        if ($boolBaselineAbsent) {
+            return (& $scriptBlockReject -Reason 'baseline-class')
+        }
+        if ($null -ne $Record.AccountableAuthor -or
+            $null -ne $Record.FinalMaterialEditUtcDate) {
+            return (& $scriptBlockReject -Reason 'unchanged-metadata')
+        }
+        if ($Record.StagedBlob -cne $Record.BaselineBlob) {
+            return (& $scriptBlockReject -Reason 'unchanged-identity')
+        }
+        if ($Record.StagedVersion -cne $Record.BaselineVersion) {
+            return (& $scriptBlockReject -Reason 'unchanged-version')
+        }
+        return (& $scriptBlockNewResult `
+                -Valid $true `
+                -Included $false `
+                -ExpectedVersion $Record.BaselineVersion `
+                -Reason 'unchanged-excluded')
+    }
+
+    if ($boolBaselineAbsent -ne ($Record.ChangeClass -ceq 'new')) {
+        return (& $scriptBlockReject -Reason 'baseline-class')
+    }
+    if (-not $boolBaselineAbsent -and
+        $Record.StagedBlob -ceq $Record.BaselineBlob) {
+        return (& $scriptBlockReject -Reason 'source-identity')
+    }
+    if ($null -eq $Record.AccountableAuthor -or
+        $Record.AccountableAuthor.Length -eq 0 -or
+        $Record.AccountableAuthor.Trim() -cne $Record.AccountableAuthor -or
+        $Record.AccountableAuthor -cmatch '[\x00-\x1f\x7f]') {
+        return (& $scriptBlockReject -Reason 'author')
+    }
+    if ($null -eq $Record.FinalMaterialEditUtcDate -or
+        $Record.FinalMaterialEditUtcDate -cnotmatch '\A[0-9]{8}\z') {
+        return (& $scriptBlockReject -Reason 'final-edit-date')
+    }
+    $objFinalEditDate = [datetime]::MinValue
+    if (-not [datetime]::TryParseExact(
+            $Record.FinalMaterialEditUtcDate,
+            'yyyyMMdd',
+            [System.Globalization.CultureInfo]::InvariantCulture,
+            [System.Globalization.DateTimeStyles]::None,
+            [ref]$objFinalEditDate
+        )) {
+        return (& $scriptBlockReject -Reason 'final-edit-date')
+    }
+    $intFinalEditDate = [int]$Record.FinalMaterialEditUtcDate
+    if ($objStagedVersion.Build -ne $intFinalEditDate) {
+        return (& $scriptBlockReject -Reason 'build-date')
+    }
+    if (-not $boolBaselineAbsent -and
+        $intFinalEditDate -lt $objBaselineVersion.Build) {
+        return (& $scriptBlockReject -Reason 'date-decrease')
+    }
+
+    $strExpectedVersion = $null
+    if ($Record.ChangeClass -ceq 'new') {
+        $strExpectedVersion = '1.0.{0}.0' -f $intFinalEditDate
+    } elseif ($Record.ChangeClass -ceq 'breaking') {
+        if ($objBaselineVersion.Major -eq [int]::MaxValue) {
+            return (& $scriptBlockReject -Reason 'component-overflow')
+        }
+        $strExpectedVersion = '{0}.0.{1}.0' -f `
+            ($objBaselineVersion.Major + 1), $intFinalEditDate
+    } elseif ($Record.ChangeClass -ceq 'compatible-capability') {
+        if ($objBaselineVersion.Minor -eq [int]::MaxValue) {
+            return (& $scriptBlockReject -Reason 'component-overflow')
+        }
+        $strExpectedVersion = '{0}.{1}.{2}.0' -f `
+            $objBaselineVersion.Major,
+            ($objBaselineVersion.Minor + 1),
+            $intFinalEditDate
+    } else {
+        if ($intFinalEditDate -eq $objBaselineVersion.Build) {
+            if ($objBaselineVersion.Revision -eq [int]::MaxValue) {
+                return (& $scriptBlockReject -Reason 'component-overflow')
+            }
+            $intRevision = $objBaselineVersion.Revision + 1
+        } else {
+            $intRevision = 0
+        }
+        $strExpectedVersion = '{0}.{1}.{2}.{3}' -f `
+            $objBaselineVersion.Major,
+            $objBaselineVersion.Minor,
+            $intFinalEditDate,
+            $intRevision
+    }
+    if ($Record.StagedVersion -cne $strExpectedVersion) {
+        return (& $scriptBlockReject -Reason 'version-mismatch')
+    }
+    return (& $scriptBlockNewResult `
+            -Valid $true `
+            -Included $true `
+            -ExpectedVersion $strExpectedVersion `
+            -Reason 'complete')
+}
+
+$script:scriptBlockAssertCandidateVersionProgressionControls = {
+    $scriptBlockNewRecord = {
+        param (
+            [object]$BaselineBlob,
+            [AllowNull()][object]$BaselineVersion,
+            [object]$StagedBlob,
+            [object]$StagedVersion,
+            [object]$ChangeClass,
+            [AllowNull()][object]$AccountableAuthor,
+            [AllowNull()][object]$FinalMaterialEditUtcDate
+        )
+
+        return [pscustomobject][ordered]@{
+            SchemaVersion = [uint32]1
+            Path = '.github/workflows/Test-Fixture.ps1'
+            BaselineBlob = $BaselineBlob
+            BaselineVersion = $BaselineVersion
+            StagedBlob = $StagedBlob
+            StagedVersion = $StagedVersion
+            ChangeClass = $ChangeClass
+            AccountableAuthor = $AccountableAuthor
+            FinalMaterialEditUtcDate = $FinalMaterialEditUtcDate
+        }
+    }
+    $scriptBlockChangeRecord = {
+        param (
+            [object]$Source,
+            [ValidateSet('replace', 'remove', 'add')]
+            [string]$Mode,
+            [string]$Property,
+            [AllowNull()][object]$Value
+        )
+
+        $hashtableRecord = [ordered]@{}
+        foreach ($objProperty in $Source.PSObject.Properties) {
+            if ($Mode -ceq 'remove' -and $objProperty.Name -ceq $Property) {
+                continue
+            }
+            if ($Mode -ceq 'replace' -and $objProperty.Name -ceq $Property) {
+                $hashtableRecord[$objProperty.Name] = $Value
+            } else {
+                $hashtableRecord[$objProperty.Name] = $objProperty.Value
+            }
+        }
+        if ($Mode -ceq 'add') {
+            $hashtableRecord[$Property] = $Value
+        }
+        return [pscustomobject]$hashtableRecord
+    }
+
+    $strBaselineBlob = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa'
+    $strStagedBlob = 'bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb'
+    $objNew = & $scriptBlockNewRecord `
+        -BaselineBlob 'absent' `
+        -BaselineVersion $null `
+        -StagedBlob $strStagedBlob `
+        -StagedVersion '1.0.20260925.0' `
+        -ChangeClass 'new' `
+        -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20260925'
+    $objCorrectionNewDate = & $scriptBlockNewRecord `
+        -BaselineBlob $strBaselineBlob `
+        -BaselineVersion '1.0.20260924.2' `
+        -StagedBlob $strStagedBlob `
+        -StagedVersion '1.0.20260925.0' `
+        -ChangeClass 'correction' `
+        -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20260925'
+    $objCorrectionSameDate = & $scriptBlockNewRecord `
+        -BaselineBlob $strBaselineBlob `
+        -BaselineVersion '1.0.20260925.2' `
+        -StagedBlob $strStagedBlob `
+        -StagedVersion '1.0.20260925.3' `
+        -ChangeClass 'correction' `
+        -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20260925'
+    $objCompatible = & $scriptBlockNewRecord `
+        -BaselineBlob $strBaselineBlob `
+        -BaselineVersion '1.2.20260924.7' `
+        -StagedBlob $strStagedBlob `
+        -StagedVersion '1.3.20260925.0' `
+        -ChangeClass 'compatible-capability' `
+        -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20260925'
+    $objBreaking = & $scriptBlockNewRecord `
+        -BaselineBlob $strBaselineBlob `
+        -BaselineVersion '1.9.20260924.7' `
+        -StagedBlob $strStagedBlob `
+        -StagedVersion '2.0.20260925.0' `
+        -ChangeClass 'breaking' `
+        -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20260925'
+    $objUnchanged = & $scriptBlockNewRecord `
+        -BaselineBlob $strBaselineBlob `
+        -BaselineVersion '1.2.20260924.7' `
+        -StagedBlob $strBaselineBlob `
+        -StagedVersion '1.2.20260924.7' `
+        -ChangeClass 'unchanged' `
+        -AccountableAuthor $null `
+        -FinalMaterialEditUtcDate $null
+    $objOldDate = & $scriptBlockNewRecord `
+        -BaselineBlob 'absent' `
+        -BaselineVersion $null `
+        -StagedBlob $strStagedBlob `
+        -StagedVersion '1.0.20000101.0' `
+        -ChangeClass 'new' `
+        -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20000101'
+    $objFutureDate = & $scriptBlockNewRecord `
+        -BaselineBlob $strBaselineBlob `
+        -BaselineVersion '1.0.20260925.0' `
+        -StagedBlob $strStagedBlob `
+        -StagedVersion '1.0.20991231.0' `
+        -ChangeClass 'correction' `
+        -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20991231'
+    $arrPositive = @(
+        [pscustomobject]@{ Id = 'new-baseline-absent'; Record = $objNew; Included = $true; Expected = '1.0.20260925.0' },
+        [pscustomobject]@{ Id = 'correction-new-date-reset'; Record = $objCorrectionNewDate; Included = $true; Expected = '1.0.20260925.0' },
+        [pscustomobject]@{ Id = 'correction-same-date-increment'; Record = $objCorrectionSameDate; Included = $true; Expected = '1.0.20260925.3' },
+        [pscustomobject]@{ Id = 'compatible-capability-reset'; Record = $objCompatible; Included = $true; Expected = '1.3.20260925.0' },
+        [pscustomobject]@{ Id = 'breaking-reset'; Record = $objBreaking; Included = $true; Expected = '2.0.20260925.0' },
+        [pscustomobject]@{ Id = 'unchanged-excluded'; Record = $objUnchanged; Included = $false; Expected = '1.2.20260924.7' },
+        [pscustomobject]@{ Id = 'old-calendar-date'; Record = $objOldDate; Included = $true; Expected = '1.0.20000101.0' },
+        [pscustomobject]@{ Id = 'future-calendar-date'; Record = $objFutureDate; Included = $true; Expected = '1.0.20991231.0' }
+    )
+    if ($arrPositive.Count -ne 8) {
+        throw 'version-progression-positive-count'
+    }
+    $objSeenCase = New-Object 'System.Collections.Generic.HashSet[string]' (
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($objCase in $arrPositive) {
+        if (-not $objSeenCase.Add($objCase.Id)) {
+            throw ('version-progression-duplicate-case-' + $objCase.Id)
+        }
+        $strExpectedReason = if ($objCase.Included) {
+            'complete'
+        } else {
+            'unchanged-excluded'
+        }
+        $objResult = & $script:scriptBlockGetCandidateVersionProgression `
+            -Record $objCase.Record
+        if ($objResult.GetType() -ne [System.Management.Automation.PSCustomObject] -or
+            $objResult.Schema -cne 'PSStyleGuide.CandidateVersionProgressionResult.v1' -or
+            $objResult.Valid.GetType() -ne [System.Boolean] -or
+            $objResult.Valid -ne $true -or
+            $objResult.Included.GetType() -ne [System.Boolean] -or
+            $objResult.Included -ne $objCase.Included -or
+            $objResult.ExpectedVersion -cne $objCase.Expected -or
+            $objResult.Reason -cne $strExpectedReason) {
+            throw ('version-progression-positive-' + $objCase.Id)
+        }
+    }
+
+    $listNegative = New-Object 'System.Collections.Generic.List[pscustomobject]'
+    $scriptBlockAddNegative = {
+        param ([string]$Id, [AllowNull()][object]$Record, [string]$Reason)
+        [void]$listNegative.Add([pscustomobject]@{
+                Id = $Id
+                Record = $Record
+                Reason = $Reason
+            })
+    }
+    & $scriptBlockAddNegative 'record-null' $null 'record-type'
+    & $scriptBlockAddNegative 'record-hashtable' ([ordered]@{}) 'record-type'
+    & $scriptBlockAddNegative 'schema-missing' `
+        (& $scriptBlockChangeRecord $objNew remove 'Path' $null) 'record-schema'
+    & $scriptBlockAddNegative 'schema-missing-change-class' `
+        (& $scriptBlockChangeRecord $objNew remove 'ChangeClass' $null) 'record-schema'
+    & $scriptBlockAddNegative 'schema-missing-author' `
+        (& $scriptBlockChangeRecord $objNew remove 'AccountableAuthor' $null) 'record-schema'
+    & $scriptBlockAddNegative 'schema-missing-final-edit-date' `
+        (& $scriptBlockChangeRecord $objNew remove 'FinalMaterialEditUtcDate' $null) 'record-schema'
+    & $scriptBlockAddNegative 'schema-extra' `
+        (& $scriptBlockChangeRecord $objNew add 'Extra' 'x') 'record-schema'
+    & $scriptBlockAddNegative 'schema-version-type' `
+        (& $scriptBlockChangeRecord $objNew replace 'SchemaVersion' ([int]1)) 'schema-version'
+    & $scriptBlockAddNegative 'schema-version-value' `
+        (& $scriptBlockChangeRecord $objNew replace 'SchemaVersion' ([uint32]2)) 'schema-version'
+    & $scriptBlockAddNegative 'path-type' `
+        (& $scriptBlockChangeRecord $objNew replace 'Path' ([string[]]@('x'))) 'path-type'
+    & $scriptBlockAddNegative 'path-control' `
+        (& $scriptBlockChangeRecord $objNew replace 'Path' "fixture`npath") 'path-grammar'
+    & $scriptBlockAddNegative 'baseline-blob-type' `
+        (& $scriptBlockChangeRecord $objNew replace 'BaselineBlob' ([int]1)) 'baseline-blob-type'
+    & $scriptBlockAddNegative 'baseline-blob-grammar' `
+        (& $scriptBlockChangeRecord $objCorrectionNewDate replace 'BaselineBlob' ('A' * 40)) 'baseline-blob-grammar'
+    & $scriptBlockAddNegative 'baseline-version-type' `
+        (& $scriptBlockChangeRecord $objCorrectionNewDate replace 'BaselineVersion' ([string[]]@('1.0.20260924.2'))) 'baseline-version-type'
+    & $scriptBlockAddNegative 'baseline-absent-with-version' `
+        (& $scriptBlockChangeRecord $objNew replace 'BaselineVersion' '1.0.20260924.2') 'baseline-ambiguity'
+    & $scriptBlockAddNegative 'baseline-present-without-version' `
+        (& $scriptBlockChangeRecord $objCorrectionNewDate replace 'BaselineVersion' $null) 'baseline-ambiguity'
+    & $scriptBlockAddNegative 'baseline-version-component-overflow' `
+        (& $scriptBlockChangeRecord $objCorrectionNewDate replace 'BaselineVersion' '2147483648.0.20260924.0') 'baseline-ambiguity'
+    & $scriptBlockAddNegative 'staged-blob-type' `
+        (& $scriptBlockChangeRecord $objNew replace 'StagedBlob' ([int]1)) 'staged-blob-type'
+    & $scriptBlockAddNegative 'staged-blob-grammar' `
+        (& $scriptBlockChangeRecord $objNew replace 'StagedBlob' 'not-an-object-id') 'staged-blob-grammar'
+    & $scriptBlockAddNegative 'staged-version-type' `
+        (& $scriptBlockChangeRecord $objNew replace 'StagedVersion' ([version]'1.0.20260925.0')) 'staged-version-type'
+    & $scriptBlockAddNegative 'staged-version-grammar' `
+        (& $scriptBlockChangeRecord $objNew replace 'StagedVersion' '1.0.20260925') 'staged-version'
+    & $scriptBlockAddNegative 'staged-version-leading-zero' `
+        (& $scriptBlockChangeRecord $objNew replace 'StagedVersion' '01.0.20260925.0') 'staged-version'
+    & $scriptBlockAddNegative 'staged-version-negative-component' `
+        (& $scriptBlockChangeRecord $objNew replace 'StagedVersion' '1.-1.20260925.0') 'staged-version'
+    & $scriptBlockAddNegative 'staged-version-date' `
+        (& $scriptBlockChangeRecord $objNew replace 'StagedVersion' '1.0.20260229.0') 'staged-version'
+    & $scriptBlockAddNegative 'staged-version-component-overflow' `
+        (& $scriptBlockChangeRecord $objNew replace 'StagedVersion' '2147483648.0.20260925.0') 'staged-version'
+    & $scriptBlockAddNegative 'change-class-type' `
+        (& $scriptBlockChangeRecord $objNew replace 'ChangeClass' ([string[]]@('new'))) 'change-class-type'
+    & $scriptBlockAddNegative 'change-class-value' `
+        (& $scriptBlockChangeRecord $objNew replace 'ChangeClass' 'feature') 'change-class'
+    & $scriptBlockAddNegative 'author-type' `
+        (& $scriptBlockChangeRecord $objNew replace 'AccountableAuthor' ([int]1)) 'author-type'
+    & $scriptBlockAddNegative 'author-missing' `
+        (& $scriptBlockChangeRecord $objNew replace 'AccountableAuthor' $null) 'author'
+    & $scriptBlockAddNegative 'author-ambiguous' `
+        (& $scriptBlockChangeRecord $objNew replace 'AccountableAuthor' ' fixture-author ') 'author'
+    & $scriptBlockAddNegative 'final-edit-date-type' `
+        (& $scriptBlockChangeRecord $objNew replace 'FinalMaterialEditUtcDate' ([int]20260925)) 'final-edit-date-type'
+    & $scriptBlockAddNegative 'final-edit-date-missing' `
+        (& $scriptBlockChangeRecord $objNew replace 'FinalMaterialEditUtcDate' $null) 'final-edit-date'
+    & $scriptBlockAddNegative 'final-edit-date-invalid' `
+        (& $scriptBlockChangeRecord $objNew replace 'FinalMaterialEditUtcDate' '20260229') 'final-edit-date'
+    & $scriptBlockAddNegative 'new-version-nonzero' `
+        (& $scriptBlockChangeRecord $objNew replace 'StagedVersion' '1.0.20260925.1') 'version-mismatch'
+    & $scriptBlockAddNegative 'new-with-baseline' `
+        (& $scriptBlockChangeRecord $objCorrectionNewDate replace 'ChangeClass' 'new') 'baseline-class'
+    & $scriptBlockAddNegative 'changed-without-baseline' `
+        (& $scriptBlockChangeRecord $objNew replace 'ChangeClass' 'correction') 'baseline-class'
+    & $scriptBlockAddNegative 'changed-blob-reused' `
+        (& $scriptBlockChangeRecord $objCorrectionNewDate replace 'StagedBlob' $strBaselineBlob) 'source-identity'
+    & $scriptBlockAddNegative 'wrong-final-edit-date' `
+        (& $scriptBlockChangeRecord $objNew replace 'FinalMaterialEditUtcDate' '20260924') 'build-date'
+    $objDateDecrease = & $scriptBlockNewRecord `
+        -BaselineBlob $strBaselineBlob -BaselineVersion '1.0.20260925.0' `
+        -StagedBlob $strStagedBlob -StagedVersion '1.0.20260924.0' `
+        -ChangeClass 'correction' -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20260924'
+    & $scriptBlockAddNegative 'date-decrease' $objDateDecrease 'date-decrease'
+    $objMajorOverflow = & $scriptBlockNewRecord `
+        -BaselineBlob $strBaselineBlob -BaselineVersion '2147483647.0.20260924.0' `
+        -StagedBlob $strStagedBlob -StagedVersion '2147483647.0.20260925.0' `
+        -ChangeClass 'breaking' -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20260925'
+    & $scriptBlockAddNegative 'breaking-major-overflow' $objMajorOverflow 'component-overflow'
+    $objMinorOverflow = & $scriptBlockNewRecord `
+        -BaselineBlob $strBaselineBlob -BaselineVersion '1.2147483647.20260924.0' `
+        -StagedBlob $strStagedBlob -StagedVersion '1.2147483647.20260925.0' `
+        -ChangeClass 'compatible-capability' -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20260925'
+    & $scriptBlockAddNegative 'capability-minor-overflow' $objMinorOverflow 'component-overflow'
+    $objRevisionOverflow = & $scriptBlockNewRecord `
+        -BaselineBlob $strBaselineBlob -BaselineVersion '1.0.20260925.2147483647' `
+        -StagedBlob $strStagedBlob -StagedVersion '1.0.20260925.2147483647' `
+        -ChangeClass 'correction' -AccountableAuthor 'fixture-author' `
+        -FinalMaterialEditUtcDate '20260925'
+    & $scriptBlockAddNegative 'correction-revision-overflow' $objRevisionOverflow 'component-overflow'
+    & $scriptBlockAddNegative 'correction-revision-reused' `
+        (& $scriptBlockChangeRecord $objCorrectionSameDate replace 'StagedVersion' '1.0.20260925.2') 'version-mismatch'
+    & $scriptBlockAddNegative 'correction-revision-jump' `
+        (& $scriptBlockChangeRecord $objCorrectionSameDate replace 'StagedVersion' '1.0.20260925.4') 'version-mismatch'
+    & $scriptBlockAddNegative 'correction-reset-violation' `
+        (& $scriptBlockChangeRecord $objCorrectionNewDate replace 'StagedVersion' '1.0.20260925.1') 'version-mismatch'
+    & $scriptBlockAddNegative 'correction-major-change' `
+        (& $scriptBlockChangeRecord $objCorrectionNewDate replace 'StagedVersion' '2.0.20260925.0') 'version-mismatch'
+    & $scriptBlockAddNegative 'capability-minor-jump' `
+        (& $scriptBlockChangeRecord $objCompatible replace 'StagedVersion' '1.4.20260925.0') 'version-mismatch'
+    & $scriptBlockAddNegative 'capability-reset-violation' `
+        (& $scriptBlockChangeRecord $objCompatible replace 'StagedVersion' '1.3.20260925.1') 'version-mismatch'
+    & $scriptBlockAddNegative 'breaking-major-jump' `
+        (& $scriptBlockChangeRecord $objBreaking replace 'StagedVersion' '3.0.20260925.0') 'version-mismatch'
+    & $scriptBlockAddNegative 'breaking-minor-not-reset' `
+        (& $scriptBlockChangeRecord $objBreaking replace 'StagedVersion' '2.1.20260925.0') 'version-mismatch'
+    & $scriptBlockAddNegative 'breaking-revision-not-reset' `
+        (& $scriptBlockChangeRecord $objBreaking replace 'StagedVersion' '2.0.20260925.1') 'version-mismatch'
+    & $scriptBlockAddNegative 'unchanged-blob-changed' `
+        (& $scriptBlockChangeRecord $objUnchanged replace 'StagedBlob' $strStagedBlob) 'unchanged-identity'
+    & $scriptBlockAddNegative 'unchanged-version-changed' `
+        (& $scriptBlockChangeRecord $objUnchanged replace 'StagedVersion' '1.2.20260924.8') 'unchanged-version'
+    & $scriptBlockAddNegative 'unchanged-author-present' `
+        (& $scriptBlockChangeRecord $objUnchanged replace 'AccountableAuthor' 'fixture-author') 'unchanged-metadata'
+    & $scriptBlockAddNegative 'unchanged-date-present' `
+        (& $scriptBlockChangeRecord $objUnchanged replace 'FinalMaterialEditUtcDate' '20260925') 'unchanged-metadata'
+
+    if ($listNegative.Count -ne 55) {
+        throw 'version-progression-negative-count'
+    }
+    foreach ($objCase in $listNegative) {
+        if (-not $objSeenCase.Add($objCase.Id)) {
+            throw ('version-progression-duplicate-case-' + $objCase.Id)
+        }
+        $objResult = & $script:scriptBlockGetCandidateVersionProgression `
+            -Record $objCase.Record
+        if ($objResult.GetType() -ne [System.Management.Automation.PSCustomObject] -or
+            $objResult.Schema -cne 'PSStyleGuide.CandidateVersionProgressionResult.v1' -or
+            $objResult.Valid.GetType() -ne [System.Boolean] -or
+            $objResult.Valid -ne $false -or
+            $objResult.Included.GetType() -ne [System.Boolean] -or
+            $objResult.Included -ne $false -or
+            $null -ne $objResult.ExpectedVersion -or
+            $objResult.Reason -cne $objCase.Reason) {
+            throw ('version-progression-negative-' + $objCase.Id)
+        }
+    }
+}
+
 $script:scriptBlockGetTrimmedAsciiLine = {
     param (
         [Parameter(Mandatory = $true)]
@@ -7708,27 +10888,14 @@ $script:scriptBlockGetTrimmedAsciiLine = {
         [byte[]]$Bytes
     )
 
-    $intContentLength = $Bytes.Length
-    if ($intContentLength -gt 0 -and $Bytes[$intContentLength - 1] -eq 0x0A) {
-        $intContentLength--
-        if ($intContentLength -gt 0 -and $Bytes[$intContentLength - 1] -eq 0x0D) {
-            $intContentLength--
-        }
-    }
-    if ($intContentLength -eq 0) {
+    if ($Bytes.Length -lt 2 -or $Bytes[$Bytes.Length - 1] -ne 0x0A) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-line'
     }
+    $intContentLength = $Bytes.Length - 1
     for ($intIndex = 0; $intIndex -lt $intContentLength; $intIndex++) {
         if ($Bytes[$intIndex] -lt 0x20 -or $Bytes[$intIndex] -gt 0x7E) {
             & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-line'
         }
-    }
-    $intExpectedLength = $intContentLength
-    if ($Bytes.Length -gt $intContentLength) {
-        $intExpectedLength += if ($Bytes[$intContentLength] -eq 0x0D) { 2 } else { 1 }
-    }
-    if ($Bytes.Length -ne $intExpectedLength) {
-        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-line'
     }
     return [System.Text.Encoding]::ASCII.GetString($Bytes, 0, $intContentLength)
 }
@@ -7801,6 +10968,41 @@ $script:scriptBlockAssertCandidateWorkingObjectId = {
     }
 }
 
+$script:scriptBlockAssertOrdinaryInputFileType = {
+    param ([string]$LiteralPath)
+
+    & $script:scriptBlockAssertOrdinaryDirectoryEnvelope -LiteralPath ([System.IO.Path]::GetDirectoryName($LiteralPath))
+    try {
+        $objAttributes = [System.IO.File]::GetAttributes($LiteralPath)
+        if (($objAttributes -band ([System.IO.FileAttributes]::Directory -bor
+                    [System.IO.FileAttributes]::ReparsePoint)) -ne 0) {
+            throw 'nonordinary'
+        }
+        if ($script:boolCandidateIsWindows) { return }
+        $strStatPath = ''
+        foreach ($strCandidate in [string[]]@('/usr/bin/stat', '/bin/stat', '/usr/local/bin/stat')) {
+            try { $objNativeAttributes = [System.IO.File]::GetAttributes($strCandidate) }
+            catch { continue }
+            if (($objNativeAttributes -band ([System.IO.FileAttributes]::Directory -bor
+                        [System.IO.FileAttributes]::ReparsePoint)) -eq 0) {
+                $strStatPath = $strCandidate
+                break
+            }
+        }
+        if ($strStatPath.Length -eq 0) { throw 'stat-unavailable' }
+        $arrMode = @(& $strStatPath '-c' '%f' '--' $LiteralPath 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $arrMode.Count -ne 1 -or
+            [string]$arrMode[0] -notmatch '^[0-9A-Fa-f]{1,8}$') {
+            throw 'stat-invalid'
+        }
+        if (([System.Convert]::ToInt32([string]$arrMode[0], 16) -band 0xF000) -ne 0x8000) {
+            throw 'nonordinary'
+        }
+    } catch {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'working-file-type'
+    }
+}
+
 $script:scriptBlockAssertTrackedBlobIdentity = {
     param (
         [Parameter(Mandatory = $true)]
@@ -7824,10 +11026,22 @@ $script:scriptBlockAssertTrackedBlobIdentity = {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'working-file-type'
     }
     [void](& $script:scriptBlockAssertOrdinaryDirectoryEnvelope -LiteralPath $objFile.Directory.FullName)
+    & $script:scriptBlockAssertOrdinaryInputFileType -LiteralPath $LiteralPath
 
+    $objInsideResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
+        -ArgumentList @('rev-parse', '--is-inside-work-tree')
+    $objPrefixResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
+        -ArgumentList @('rev-parse', '--show-prefix')
+    if ($objInsideResult.ExitCode -ne 0 -or $objPrefixResult.ExitCode -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'repository-status'
+    }
+    if (-not (& $script:scriptBlockTestByteSequenceEqual -Left $objInsideResult.StandardOutput -Right ([byte[]]@(116, 114, 117, 101, 10))) -or
+        -not (& $script:scriptBlockTestByteSequenceEqual -Left $objPrefixResult.StandardOutput -Right ([byte[]]@(10)))) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'repository-output'
+    }
     $arrRelativeBytes = [System.Text.Encoding]::ASCII.GetBytes($RelativePath)
     $objFormatResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
-        -ArgumentList @('rev-parse', '--show-object-format')
+        -ArgumentList @('rev-parse', '--show-object-format=storage')
     if ($objFormatResult.ExitCode -ne 0) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'object-format-status'
     }
@@ -7840,11 +11054,23 @@ $script:scriptBlockAssertTrackedBlobIdentity = {
     } else {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'object-format'
     }
+    $objHeadResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
+        -ArgumentList @('rev-parse', '--verify', 'HEAD^{commit}')
+    if ($objHeadResult.ExitCode -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'head-status'
+    }
+    $strHeadCommit = & $script:scriptBlockGetTrimmedAsciiLine -Bytes $objHeadResult.StandardOutput
+    if ($strHeadCommit.Length -ne $intObjectIdLength -or $strHeadCommit -cnotmatch '^[0-9a-f]+$') {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'head-object'
+    }
 
     $objTreeResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
-        -ArgumentList @('ls-tree', '-z', 'HEAD', '--', $RelativePath)
+        -ArgumentList @('ls-tree', '--full-tree', '-r', '-z', 'HEAD', '--', $RelativePath)
     if ($objTreeResult.ExitCode -ne 0) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'tree-status'
+    }
+    if ($objTreeResult.StandardOutput.Length -eq 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'tree-record'
     }
     $strTreeMetadata = & $script:scriptBlockSplitOneNulGitRecord `
         -Bytes $objTreeResult.StandardOutput `
@@ -7854,7 +11080,10 @@ $script:scriptBlockAssertTrackedBlobIdentity = {
         -ObjectIdLength $intObjectIdLength
 
     $objIndexResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
-        -ArgumentList @('ls-files', '--stage', '-z', '--', $RelativePath)
+        -ArgumentList @('ls-files', '--cached', '--stage', '--full-name', '-z', '--error-unmatch', '--', $RelativePath)
+    if ($objIndexResult.ExitCode -eq 1 -and $objIndexResult.StandardOutput.Length -eq 0) {
+        & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'tree-record'
+    }
     if ($objIndexResult.ExitCode -ne 0) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'index-status'
     }
@@ -7867,7 +11096,7 @@ $script:scriptBlockAssertTrackedBlobIdentity = {
         -ExpectedObjectId $strHeadObjectId)
 
     $objWorkingResult = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot `
-        -ArgumentList @('hash-object', '--no-filters', '--', $RelativePath)
+        -ArgumentList @('hash-object', '--no-filters', '--', $LiteralPath)
     if ($objWorkingResult.ExitCode -ne 0) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'working-status'
     }
@@ -7902,6 +11131,7 @@ $script:scriptBlockAssertTrackedScriptIdentity = {
         [uint32]$ExpectedFunctionCount
     )
 
+    & $script:scriptBlockAssertOrdinaryInputFileType -LiteralPath $LiteralPath
     $strHeadObjectId = & $script:scriptBlockAssertTrackedBlobIdentity `
         -RepositoryRoot $RepositoryRoot `
         -GitPath $GitPath `
@@ -7961,6 +11191,1071 @@ $script:scriptBlockAssertExactPropertyNames = {
     }
 }
 
+$script:scriptBlockConvertToCanonicalCatalogJson = {
+    param (
+        [AllowNull()]
+        [AllowEmptyCollection()]
+        [AllowEmptyString()]
+        [object]$Value
+    )
+
+    if ($null -eq $Value) { return 'null' }
+    if ($Value -is [string]) {
+        $objBuilder = New-Object System.Text.StringBuilder
+        [void]$objBuilder.Append('"')
+        foreach ($charValue in $Value.ToCharArray()) {
+            if ($charValue -eq [char]34) { [void]$objBuilder.Append('\"') }
+            elseif ($charValue -eq [char]92) { [void]$objBuilder.Append('\\') }
+            elseif ([int]$charValue -lt 32) {
+                [void]$objBuilder.Append('\u')
+                [void]$objBuilder.Append(([int]$charValue).ToString('x4', [System.Globalization.CultureInfo]::InvariantCulture))
+            } else { [void]$objBuilder.Append($charValue) }
+        }
+        [void]$objBuilder.Append('"')
+        return $objBuilder.ToString()
+    }
+    if ($Value -is [bool]) {
+        if ($Value) { return 'true' }
+        return 'false'
+    }
+    if ($Value.GetType() -in @([int], [long], [uint32], [uint64], [decimal])) {
+        return $Value.ToString([System.Globalization.CultureInfo]::InvariantCulture)
+    }
+    if ($Value -is [System.Array]) {
+        $listItems = New-Object 'System.Collections.Generic.List[string]'
+        foreach ($objItem in $Value) {
+            $listItems.Add((& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objItem))
+        }
+        return '[' + [string]::Join(',', $listItems.ToArray()) + ']'
+    }
+    if ($Value -is [System.Management.Automation.PSCustomObject] -or
+        $Value -is [System.Collections.IDictionary]) {
+        $arrNames = [string[]]@()
+        if ($Value -is [System.Collections.IDictionary]) { $arrNames = [string[]]@($Value.Keys) }
+        else {
+            $listNames = New-Object 'System.Collections.Generic.List[string]'
+            foreach ($objProperty in $Value.PSObject.Properties) { $listNames.Add($objProperty.Name) }
+            $arrNames = $listNames.ToArray()
+        }
+        [System.Array]::Sort($arrNames, [System.StringComparer]::Ordinal)
+        $listPairs = New-Object 'System.Collections.Generic.List[string]'
+        foreach ($strName in $arrNames) {
+            $objChild = $null
+            if ($Value -is [System.Collections.IDictionary]) { $objChild = $Value[$strName] }
+            else { $objChild = $Value.PSObject.Properties[$strName].Value }
+            $strKey = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $strName
+            $strChild = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $objChild
+            $listPairs.Add($strKey + ':' + $strChild)
+        }
+        return '{' + [string]::Join(',', $listPairs.ToArray()) + '}'
+    }
+    & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'canonical-value-type'
+}
+
+$script:scriptBlockAssertTerraformCanonicalNumericTypes = {
+    foreach ($hashtableCase in @(
+            @{ Value = [uint32]0; Expected = '0' },
+            @{ Value = [uint32]1; Expected = '1' },
+            @{ Value = [uint32]::MaxValue; Expected = '4294967295' },
+            @{ Value = [int]1; Expected = '1' },
+            @{ Value = [long]1; Expected = '1' },
+            @{ Value = [uint64]1; Expected = '1' })) {
+        if ((& $script:scriptBlockConvertToCanonicalCatalogJson -Value $hashtableCase.Value) -cne $hashtableCase.Expected) {
+            throw 'canonical-integer-control'
+        }
+    }
+    $objSummary = [pscustomobject][ordered]@{
+        SchemaVersion = [uint32]1
+        PassCount = [uint32]437
+        AdversarialFixtureClassification = [object[]]@(
+            [ordered]@{ Fixture = 'archive.trailer.decoy'; ReaderRefused = $true; ReaderEntryCount = $null },
+            [ordered]@{ Fixture = 'archive.trailer.zip64-gate'; ReaderRefused = $false; ReaderEntryCount = [uint32]2000 }
+        )
+    }
+    $strExpected = '{"AdversarialFixtureClassification":[{"Fixture":"archive.trailer.decoy","ReaderEntryCount":null,"ReaderRefused":true},{"Fixture":"archive.trailer.zip64-gate","ReaderEntryCount":2000,"ReaderRefused":false}],"PassCount":437,"SchemaVersion":1}'
+    if ((& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objSummary) -cne $strExpected) {
+        throw 'canonical-summary-control'
+    }
+    foreach ($objUnsupported in @([single]1, [double]1, (New-Object System.Object))) {
+        $objFailure = $null
+        try { [void](& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objUnsupported) }
+        catch { $objFailure = $_ }
+        if ($null -eq $objFailure -or
+            $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne 'PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=canonical-value-type') {
+            throw 'canonical-unsupported-control'
+        }
+    }
+}
+
+$script:scriptBlockAssertSourceCatalogSeals = {
+    param ([object]$Catalog)
+
+    $objProvenance = $Catalog.SourceProvenance
+    & $script:scriptBlockAssertExactPropertyNames -Value $objProvenance -Names @(
+        'PSRepository', 'PSCommit', 'PSCatalogSha256', 'PSCatalog',
+        'TerraformRepository', 'TerraformCommit', 'TerraformCatalogSha256',
+        'TerraformCatalog', 'AllocatedTerraformMeanings', 'SourceMappings'
+    ) -Detail 'source-provenance'
+    if ($objProvenance.PSRepository -cne 'franklesniak/PSStyleGuide' -or
+        $objProvenance.PSCommit -cne '2d56357d9f52c76734027174bf62278e6f3d4cd6' -or
+        $objProvenance.PSCatalogSha256 -cne '5373c14916ed6d696ca3f0f1e5d10011cf33d3036b90b2415a535f2a629f6bbc' -or
+        $objProvenance.TerraformRepository -cne 'franklesniak/TerraformStyleGuide' -or
+        $objProvenance.TerraformCommit -cne '6035c174502a8b6e62c1430018e7d0deb2d67138' -or
+        $objProvenance.TerraformCatalogSha256 -cne 'f2abd3c9a4960b467179f53ae8b6ab2f63b68f0358f0fc2391002ba7a1c4c1fa') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-provenance-identity'
+    }
+    $hashtableExpectedSeals = @{
+        PSCatalog = '570c55b6332c878a28246fc73efe9cb1f0e691e8de1ee64ae74c3438849e5e7d'
+        TerraformCatalog = '61907a9065fb9cf5754b8c397b31bc316891100c20be078d29dd87a276122970'
+        AllocatedTerraformMeanings = 'f7270245164657efd8dd40bc5d3381a3934dc224916823b74c877e927f6a78a1'
+    }
+    $objUtf8 = New-Object System.Text.UTF8Encoding($false)
+    foreach ($strName in @('PSCatalog', 'TerraformCatalog', 'AllocatedTerraformMeanings')) {
+        $strCanonical = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $objProvenance.PSObject.Properties[$strName].Value
+        $strActual = & $script:scriptBlockGetByteArraySha256 -Bytes $objUtf8.GetBytes($strCanonical)
+        if ($strActual -cne $hashtableExpectedSeals[$strName]) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-provenance-content'
+        }
+    }
+    if ($objProvenance.PSCatalog.Cases.Count -ne 115 -or
+        $objProvenance.TerraformCatalog.Cases.Count -ne 456 -or
+        $objProvenance.AllocatedTerraformMeanings.Count -ne 141) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-provenance-count'
+    }
+}
+
+$script:scriptBlockAssertDiagnosticDomains = {
+    param ([object]$Catalog)
+
+    & $script:scriptBlockAssertSourceCatalogSeals -Catalog $Catalog
+    & $script:scriptBlockAssertExactPropertyNames -Value $Catalog.DiagnosticDomains -Names @(
+        'ProductionSubreason', 'ObservationOnlySubreason', 'ProductionPhase',
+        'ObservationOnlyPhase', 'ProductionDiagnosticCode', 'ObservationOnlyDiagnosticCode'
+    ) -Detail 'diagnostic-domains'
+    $hashtableObservationSeals = @{
+        Subreason = 'f6a37d95e48f0da467fe31ef3eb2b290b260da5ca1b7d01a691e3ba5e05d68d6'
+        Phase = '4a87c8c36ca6d33945333e9de23fdfd466054a2b6c3cc3c58f2cb760217ab652'
+        DiagnosticCode = 'ade0c9c5429cdb54d0c7d9d7096f1cd306501b60dbca00032ff7d7b5e5f50b5a'
+    }
+    foreach ($strField in @('Subreason', 'Phase', 'DiagnosticCode')) {
+        $objProduction = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+        foreach ($strValue in $Catalog.SourceProvenance.PSCatalog.ClosedSets.PSObject.Properties[$strField].Value) {
+            [void]$objProduction.Add($strValue)
+        }
+        if ($strField -ceq 'Subreason' -and -not $objProduction.Add('utf8')) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-domains-source'
+        }
+        $arrObservation = $Catalog.ClosedSets.PSObject.Properties[$strField].Value
+        $objObservation = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+        foreach ($strValue in $arrObservation) { [void]$objObservation.Add($strValue) }
+        $strCanonical = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $arrObservation
+        $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false)).GetBytes($strCanonical))
+        if ($strHash -cne $hashtableObservationSeals[$strField]) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-domains-observation'
+        }
+        $objExpectedOnly = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+        foreach ($strValue in $objObservation) {
+            if (-not $objProduction.Contains($strValue)) { [void]$objExpectedOnly.Add($strValue) }
+        }
+        foreach ($strPrefix in @('Production', 'ObservationOnly')) {
+            $arrActual = $Catalog.DiagnosticDomains.PSObject.Properties[($strPrefix + $strField)].Value
+            if ($arrActual -isnot [System.Array]) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-domains-type'
+            }
+            $objActual = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+            foreach ($objValue in $arrActual) {
+                if ($objValue -isnot [string] -or -not $objActual.Add($objValue)) {
+                    & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-domains-value'
+                }
+            }
+            if ($strPrefix -ceq 'Production') { $objExpected = $objProduction } else { $objExpected = $objExpectedOnly }
+            if (-not $objActual.SetEquals($objExpected)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-domains-membership'
+            }
+        }
+    }
+}
+
+$script:scriptBlockAssertCandidateSubreasonFamilyControls = {
+    param ([object]$Catalog, [string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertProductionTaxonomyClosed -Catalog $Catalog -LiteralPath @($HelperLiteralPath, $ContextLiteralPath)
+    $strSource = [System.IO.File]::ReadAllText($HelperLiteralPath)
+    $strAnchor = '-Subreason "$strRequiredParameter-missing"'
+    if ([regex]::Matches($strSource, [regex]::Escape($strAnchor)).Count -ne 1) { throw 'subreason-family-anchor' }
+    foreach ($strReplacement in @('-Subreason "$Unknown-missing"', '-Subreason "$strRequiredParameter-unknown"', '-Subreason "$ParameterName-missing"')) {
+        $strMutant = $strSource.Replace($strAnchor, $strReplacement)
+        $strPath = [System.IO.Path]::Combine($RunRoot, 'subreason-family-mutant.ps1')
+        try {
+            [System.IO.File]::WriteAllText($strPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+            $objFailure = $null
+            try { & $script:scriptBlockAssertProductionTaxonomyClosed -Catalog $Catalog -LiteralPath @($strPath, $ContextLiteralPath) }
+            catch { $objFailure = $_ }
+            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+                $objFailure.Exception.Message -cne 'PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=production-subreason-family') { throw 'subreason-family-source-mutant' }
+        } finally { [System.IO.File]::Delete($strPath) }
+    }
+    $hashtableOriginal = $script:hashtableTerraformSubreasonFamily
+    try {
+        foreach ($strMode in @('missing-family', 'missing-map-value', 'missing-domain-value')) {
+            $script:hashtableTerraformSubreasonFamily = $hashtableOriginal.Clone()
+            $objCatalog = $Catalog
+            switch -Exact ($strMode) {
+                'missing-family' { $script:hashtableTerraformSubreasonFamily.Remove('ParameterName-type') }
+                'missing-map-value' { $script:hashtableTerraformSubreasonFamily['ParameterName-type'] = [string[]]@($hashtableOriginal['ParameterName-type'] | Where-Object { $_ -cne 'ArtifactId-type' }) }
+                'missing-domain-value' {
+                    $objCatalog = $Catalog | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+                    $objCatalog.DiagnosticDomains.ProductionSubreason = @($objCatalog.DiagnosticDomains.ProductionSubreason | Where-Object { $_ -cne 'ArtifactId-type' })
+                }
+            }
+            $objFailure = $null
+            try { & $script:scriptBlockAssertProductionTaxonomyClosed -Catalog $objCatalog -LiteralPath @($HelperLiteralPath, $ContextLiteralPath) }
+            catch { $objFailure = $_ }
+            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+                $objFailure.Exception.Message -cne 'PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=production-subreason-family') { throw 'subreason-family-map-mutant' }
+        }
+    } finally { $script:hashtableTerraformSubreasonFamily = $hashtableOriginal }
+    & $script:scriptBlockAssertProductionTaxonomyClosed -Catalog $Catalog -LiteralPath @($HelperLiteralPath, $ContextLiteralPath)
+}
+
+$script:scriptBlockAssertCandidateStaticAdaptationControls = {
+    param ([string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$RunRoot, [object]$Catalog)
+
+    $strHelper = [System.IO.File]::ReadAllText($HelperLiteralPath)
+    $strContext = [System.IO.File]::ReadAllText($ContextLiteralPath)
+    $listCases = New-Object 'System.Collections.Generic.List[object]'
+    foreach ($strReplacement in @('not-declared', 'archive')) {
+        $listCases.Add(@{ Check = 'taxonomy'; Role = 'helper'; Block = 'scriptBlockOpenCandidateHelperValidatedArchive'; Marker = "-Subreason 'zip-open'"; Replacement = ("-Subreason '" + $strReplacement + "'"); Detail = 'production-subreason' })
+        $listCases.Add(@{ Check = 'taxonomy'; Role = 'context'; Block = ''; Marker = '$strCreationCategory = ''context-create-failed'''; Replacement = ('$strCreationCategory = ''' + $strReplacement + ''''); Detail = 'production-passthrough-literal-[0-9]+' })
+        $listCases.Add(@{ Check = 'set'; Role = 'helper'; Block = 'scriptBlockNewCandidateHelperException'; Marker = "'utf8', 'zip-open'"; Replacement = ("'utf8', 'zip-open', '" + $strReplacement + "'"); Detail = ('validateset-extra-scriptBlockNewCandidateHelperException-Subreason-' + $strReplacement) })
+        $listCases.Add(@{ Check = 'set'; Role = 'context'; Block = 'scriptBlockNewCandidateException'; Marker = "'cleanup-owned-entry-uncertain'"; Replacement = ("'cleanup-owned-entry-uncertain', '" + $strReplacement + "'"); Detail = ('validateset-extra-scriptBlockNewCandidateException-Code-' + $strReplacement) })
+    }
+    $listCases.Add(@{ Check = 'taxonomy'; Role = 'helper'; Block = ''; Marker = '-Subreason $strPrimarySubreason'; Replacement = '-Phase $strPrimarySubreason'; Detail = 'production-diagnostic-passthrough-[0-9]+' })
+    $listCases.Add(@{ Check = 'taxonomy'; Role = 'helper'; Block = ''; Marker = '-Subreason $strPrimarySubreason'; Replacement = '@UnknownDiagnostics'; Detail = 'production-diagnostic-splat-[0-9]+' })
+    $listCases.Add(@{ Check = 'journal'; Role = 'helper'; Block = ''; Marker = '$objJournal = $ContextValue.OwnershipJournal'; Replacement = '$objJournal = $ContextValue.OwnershipJournal; $objDecoy = $ContextValue.OwnershipJournal'; Detail = 'round63-journal-read-count-3' })
+    $listCases.Add(@{ Check = 'journal'; Role = 'helper'; Block = ''; Marker = '$objJournal = $ContextValue.OwnershipJournal'; Replacement = '$objJournal = $Decoy.OwnershipJournal'; Detail = 'round63-journal-read-site' })
+    $listCases.Add(@{ Check = 'journal'; Role = 'helper'; Block = ''; Marker = ('$objCapturedJournal = & $script:scriptBlockAssertCandidateHelperContext `' + "`n" + '                -ContextValue $Context'); Replacement = '$objCapturedJournal = $Context.OwnershipJournal'; Detail = 'round63-journal-read-count-3' })
+    $listCases.Add(@{ Check = 'journal'; Role = 'helper'; Block = 'scriptBlockGetCandidateHelperRetainedSequence'; Marker = 'foreach ($objRecord in $JournalValue)'; Replacement = 'foreach ($objRecord in $Context.OwnershipJournal)'; Detail = 'round63-journal-read-count-3' })
+    $listCases.Add(@{ Check = 'journal'; Role = 'helper'; Block = ''; Marker = '$script:scriptBlockAddCandidateHelperRecord = {'; Replacement = ('$objDecoy = $Context.OwnershipJournal' + "`n" + '$script:scriptBlockAddCandidateHelperRecord = {'); Detail = 'round63-journal-read-count-3' })
+    $objContextAst = [System.Management.Automation.Language.Parser]::ParseInput($strContext, [ref]$null, [ref]$null)
+    foreach ($strName in @('scriptBlockSourceNewContext', 'scriptBlockSourceTestContext', 'scriptBlockSourceRemoveContext')) {
+        $arrAssignments = @($objContextAst.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+            $Node.Left.VariablePath.UserPath -ceq $strName
+        }, $true))
+        if ($arrAssignments.Count -ne 1) { throw 'adaptation-version-anchor' }
+        $strMarker = $arrAssignments[0].Extent.Text
+        $strVersion = '# Version: ' + $script:strCandidateExpectedContextVersion
+        if ([regex]::Matches($strMarker, [regex]::Escape($strVersion)).Count -ne 1) { throw 'adaptation-version-anchor' }
+        $strRemoved = $strMarker.Replace($strVersion, '# Marker removed by static control')
+        $listCases.Add(@{ Check = 'version'; Role = 'context'; Block = ''; Marker = $strMarker; Replacement = $strRemoved; Detail = 'version-marker' })
+        $listCases.Add(@{ Check = 'version'; Role = 'context'; Block = ''; Marker = $strMarker; Replacement = ($strVersion + "`n" + $strRemoved); Detail = ('version-marker-private-' + $strName) })
+        $listCases.Add(@{ Check = 'version'; Role = 'context'; Block = ''; Marker = $strMarker; Replacement = ($strVersion + "`n" + $strMarker); Detail = 'version-marker' })
+    }
+    & $script:scriptBlockAssertRound63JournalPlanWired -LiteralPath $HelperLiteralPath
+    & $script:scriptBlockAssertVersionMarkersConsistent -LiteralPath $ContextLiteralPath -ExpectedVersion $script:strCandidateExpectedContextVersion -ExpectedFunctionCount 3 -OwnVersionVariableName 'versionCandidateContext' -VersionConstantMap @{'versionCandidateContext' = $script:strCandidateExpectedContextVersion}
+    & $script:scriptBlockAssertProductionTaxonomyClosed -Catalog $Catalog -LiteralPath @($HelperLiteralPath, $ContextLiteralPath)
+    & $script:scriptBlockAssertProductionValidateSetsClosed -Catalog $Catalog -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    $intIndex = 0
+    foreach ($hashtableCase in $listCases) {
+        $intIndex++
+        $strSource = if ($hashtableCase.Role -ceq 'helper') { $strHelper } else { $strContext }
+        $strRegion = $strSource
+        $intOffset = 0
+        if ($hashtableCase.Block.Length -ne 0) {
+            $objAst = [System.Management.Automation.Language.Parser]::ParseInput($strSource, [ref]$null, [ref]$null)
+            $arrAssignments = @($objAst.FindAll({
+                param ($Node)
+                $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+                $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+                ($Node.Left.VariablePath.UserPath -replace '^script:', '') -ceq $hashtableCase.Block
+            }, $true))
+            if ($arrAssignments.Count -ne 1) { throw 'static-adaptation-block' }
+            $strRegion = $arrAssignments[0].Extent.Text
+            $intOffset = $arrAssignments[0].Extent.StartOffset
+        }
+        if ([regex]::Matches($strRegion, [regex]::Escape($hashtableCase.Marker)).Count -ne 1) { throw ('static-adaptation-anchor-' + $intIndex) }
+        $strRegionMutant = $strRegion.Replace($hashtableCase.Marker, $hashtableCase.Replacement)
+        if ($strRegionMutant -ceq $strRegion) { throw 'static-adaptation-unchanged' }
+        $strMutant = $strSource.Substring(0, $intOffset) + $strRegionMutant + $strSource.Substring($intOffset + $strRegion.Length)
+        $strPath = [System.IO.Path]::Combine($RunRoot, ('static-adaptation-' + $intIndex + '.ps1'))
+        try {
+            [System.IO.File]::WriteAllText($strPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+            $arrErrors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($strPath, [ref]$null, [ref]$arrErrors)
+            if ($arrErrors.Count -ne 0) { throw 'static-adaptation-mutant-parser' }
+            $strHelperClaim = if ($hashtableCase.Role -ceq 'helper') { $strPath } else { $HelperLiteralPath }
+            $strContextClaim = if ($hashtableCase.Role -ceq 'context') { $strPath } else { $ContextLiteralPath }
+            $objFailure = $null
+            try {
+                if ($hashtableCase.Check -ceq 'taxonomy') {
+                    & $script:scriptBlockAssertProductionTaxonomyClosed -Catalog $Catalog -LiteralPath @($strHelperClaim, $strContextClaim)
+                } elseif ($hashtableCase.Check -ceq 'journal') {
+                    & $script:scriptBlockAssertRound63JournalPlanWired -LiteralPath $strHelperClaim
+                } elseif ($hashtableCase.Check -ceq 'version') {
+                    & $script:scriptBlockAssertVersionMarkersConsistent -LiteralPath $strContextClaim -ExpectedVersion $script:strCandidateExpectedContextVersion -ExpectedFunctionCount 3 -OwnVersionVariableName 'versionCandidateContext' -VersionConstantMap @{'versionCandidateContext' = $script:strCandidateExpectedContextVersion}
+                } else {
+                    & $script:scriptBlockAssertProductionValidateSetsClosed -Catalog $Catalog -HelperLiteralPath $strHelperClaim -ContextLiteralPath $strContextClaim
+                }
+            } catch { $objFailure = $_ }
+            $strExpectedCode = if ($hashtableCase.Check -ceq 'version') { 'script-identity-invalid' } else { 'catalog-invalid' }
+            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne $strExpectedCode -or
+                $objFailure.Exception.Message -cnotmatch ('\APSStyleGuide\.CandidateHarness\.v1\|code=' + $strExpectedCode + '\|detail=' + $hashtableCase.Detail + '\z')) { throw ('static-adaptation-refusal-' + $intIndex) }
+        } finally { [System.IO.File]::Delete($strPath) }
+    }
+    if ($intIndex -ne 24) { throw 'static-adaptation-count' }
+}
+
+$script:scriptBlockAssertCandidateFallbackDestinationControls = {
+    param ([object]$Catalog, [string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertProductionTaxonomyClosed -Catalog $Catalog -LiteralPath @($HelperLiteralPath, $ContextLiteralPath)
+    $strSource = [System.IO.File]::ReadAllText($HelperLiteralPath)
+    $strAnchor = '$strPhase = ''parameter'''
+    if ([regex]::Matches($strSource, [regex]::Escape($strAnchor)).Count -ne 1) { throw 'fallback-destination-anchor' }
+    foreach ($strLiteral in @('candidate-record', 'not-declared')) {
+        $strMutant = $strSource.Replace($strAnchor, ('$strPhase = ''' + $strLiteral + ''''))
+        $strPath = [System.IO.Path]::Combine($RunRoot, ('fallback-destination-' + $strLiteral + '.ps1'))
+        try {
+            [System.IO.File]::WriteAllText($strPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+            $objFailure = $null
+            try { & $script:scriptBlockAssertProductionTaxonomyClosed -Catalog $Catalog -LiteralPath @($strPath, $ContextLiteralPath) }
+            catch { $objFailure = $_ }
+            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+                $objFailure.Exception.Message -cnotmatch '\APSStyleGuide\.CandidateHarness\.v1\|code=catalog-invalid\|detail=production-passthrough-literal-[0-9]+\z') { throw 'fallback-destination-mutant' }
+        } finally { [System.IO.File]::Delete($strPath) }
+    }
+}
+
+$script:scriptBlockAssertDiagnosticDomainMutants = {
+    param ([object]$Catalog, [string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertProductionValidateSetsClosed -Catalog $Catalog -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    foreach ($strMutation in @('widen-production', 'remove-utf8', 'remove-frozen', 'misclassify', 'unknown-observation')) {
+        $objMutant = $Catalog | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+        switch ($strMutation) {
+            'widen-production' { $objMutant.DiagnosticDomains.ProductionSubreason += 'index-record' }
+            'remove-utf8' { $objMutant.DiagnosticDomains.ProductionSubreason = @($objMutant.DiagnosticDomains.ProductionSubreason | Where-Object { $_ -cne 'utf8' }) }
+            'remove-frozen' { $objMutant.DiagnosticDomains.ProductionSubreason = @($objMutant.DiagnosticDomains.ProductionSubreason | Where-Object { $_ -cne 'sha256' }) }
+            'misclassify' { $objMutant.DiagnosticDomains.ObservationOnlySubreason += 'utf8' }
+            'unknown-observation' { $objMutant.ClosedSets.Subreason += 'unallocated-observation' }
+        }
+        $objFailure = $null
+        try {
+            & $script:scriptBlockAssertProductionValidateSetsClosed -Catalog $objMutant -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+        } catch { $objFailure = $_ }
+        $strDetail = if ($strMutation -ceq 'unknown-observation') { 'diagnostic-domains-observation' } else { 'diagnostic-domains-membership' }
+        if ($null -eq $objFailure -or
+            $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strDetail)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-domain-mutant-not-rejected'
+        }
+    }
+
+    foreach ($strField in @('Phase', 'DiagnosticCode')) {
+        $strOnly = if ($strField -ceq 'Phase') { 'catalog' } else { 'catalog-invalid' }
+        foreach ($strMode in @('missing', 'extra', 'misclassified', 'unknown')) {
+            $objMutant = $Catalog | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+            $strProduction = 'Production' + $strField
+            $strObservation = 'ObservationOnly' + $strField
+            switch ($strMode) {
+                'missing' { $objMutant.DiagnosticDomains.PSObject.Properties[$strProduction].Value = @($objMutant.DiagnosticDomains.PSObject.Properties[$strProduction].Value | Where-Object { $_ -cne 'none' }) }
+                'extra' { $objMutant.DiagnosticDomains.PSObject.Properties[$strProduction].Value += $strOnly }
+                'misclassified' { $objMutant.DiagnosticDomains.PSObject.Properties[$strObservation].Value += 'none' }
+                'unknown' { $objMutant.ClosedSets.PSObject.Properties[$strField].Value += 'unallocated-observation' }
+            }
+            $objFailure = $null
+            try { & $script:scriptBlockAssertDiagnosticDomains -Catalog $objMutant } catch { $objFailure = $_ }
+            $strDetail = if ($strMode -ceq 'unknown') { 'diagnostic-domains-observation' } else { 'diagnostic-domains-membership' }
+            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+                $objFailure.Exception.Message -cne ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strDetail)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-domain-mutant-not-rejected'
+            }
+        }
+        $strParameter = if ($strField -ceq 'Phase') { 'Phase' } else { 'Code' }
+        $strOriginal = [System.IO.File]::ReadAllText($HelperLiteralPath)
+        $strPattern = '(?s)\[ValidateSet\((?:(?!\)\]).)*?\)\]\s*\[string\]\$' + $strParameter + '\b'
+        $arrMatch = [regex]::Matches($strOriginal, $strPattern)
+        if ($arrMatch.Count -ne 1) { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-production-anchor' }
+        $strAnchor = $arrMatch[0].Value
+        foreach ($strMode in @('missing', 'extra')) {
+            $strReplacement = if ($strMode -ceq 'missing') { $strAnchor.Replace("'none',", '') }
+            else { $strAnchor.Replace('[ValidateSet(', ("[ValidateSet('" + $strOnly + "',")) }
+            $strMutant = $strOriginal.Replace($strAnchor, $strReplacement)
+            if ($strMutant -ceq $strOriginal) { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-production-unchanged' }
+            $strPath = [System.IO.Path]::Combine($RunRoot, ('diagnostic-' + $strField + '-' + $strMode + '.ps1'))
+            [System.IO.File]::WriteAllText($strPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+            $objFailure = $null
+            try { & $script:scriptBlockAssertProductionValidateSetsClosed -Catalog $Catalog -HelperLiteralPath $strPath -ContextLiteralPath $ContextLiteralPath }
+            catch { $objFailure = $_ }
+            finally { [System.IO.File]::Delete($strPath) }
+            $strValue = if ($strMode -ceq 'missing') { 'none' } else { $strOnly }
+            $strDetail = 'validateset-' + $strMode + '-scriptBlockNewCandidateHelperException-' + $strParameter + '-' + $strValue
+            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+                $objFailure.Exception.Message -cne ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strDetail)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-domain-mutant-not-rejected'
+            }
+        }
+    }
+
+    $strSource = [System.IO.File]::ReadAllText($HelperLiteralPath)
+    $strAnchor = "'utf8', 'zip-open'"
+    if ([regex]::Matches($strSource, [regex]::Escape($strAnchor)).Count -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-production-anchor'
+    }
+    foreach ($strMutation in @('widen', 'narrow')) {
+        $strReplacement = if ($strMutation -ceq 'widen') { "'index-record', 'utf8', 'zip-open'" } else { "'zip-open'" }
+        $strMutant = $strSource.Replace($strAnchor, $strReplacement)
+        if ($strMutant -ceq $strSource) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-production-unchanged'
+        }
+        $strPath = [System.IO.Path]::Combine($RunRoot, ('diagnostic-domain-' + $strMutation + '.ps1'))
+        [System.IO.File]::WriteAllText($strPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+        $objFailure = $null
+        try {
+            & $script:scriptBlockAssertProductionValidateSetsClosed -Catalog $Catalog -HelperLiteralPath $strPath -ContextLiteralPath $ContextLiteralPath
+        } catch { $objFailure = $_ }
+        finally { [System.IO.File]::Delete($strPath) }
+        $strDetail = if ($strMutation -ceq 'widen') {
+            'validateset-extra-scriptBlockNewCandidateHelperException-Subreason-index-record'
+        } else {
+            'validateset-missing-scriptBlockNewCandidateHelperException-Subreason-utf8'
+        }
+        if ($null -eq $objFailure -or
+            $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strDetail)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'diagnostic-production-mutant-not-rejected'
+        }
+    }
+}
+
+$script:scriptBlockGetInitialStateAdmission = {
+    param ([object]$Catalog)
+
+    & $script:scriptBlockAssertSourceCatalogSeals -Catalog $Catalog
+    $objAdmitted = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    $listTuples = New-Object 'System.Collections.Generic.List[object]'
+    foreach ($objCase in $Catalog.Cases) {
+        if ($objCase.FixtureRecipe -cnotin @('source-raw-boundary', 'source-native-identity')) { continue }
+        if ($objCase.SemanticVariant -isnot [string]) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'initial-admission-mapping'
+        }
+        $strSourceId = $objCase.SemanticVariant.ToUpperInvariant()
+        $arrSource = @($Catalog.SourceProvenance.TerraformCatalog.Cases | Where-Object { $_.Id -ceq $strSourceId })
+        $arrMapping = @($Catalog.SourceProvenance.SourceMappings | Where-Object { $_.SourceCase -ceq $strSourceId })
+        if ($arrSource.Count -ne 1 -or $arrMapping.Count -ne 1 -or $arrMapping[0].TargetCases.Count -ne 1 -or
+            $arrMapping[0].TargetCases[0] -cne $objCase.CaseId -or -not $objAdmitted.Add($objCase.CaseId)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'initial-admission-mapping'
+        }
+        $listTuples.Add([pscustomobject][ordered]@{
+            CaseId = $objCase.CaseId; SourceCase = $strSourceId; Recipe = $objCase.FixtureRecipe
+            SemanticCase = $objCase.SemanticCase; InitialState = $objCase.InitialState
+        })
+    }
+    $strCanonical = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $listTuples.ToArray()
+    $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes (New-Object System.Text.UTF8Encoding($false)).GetBytes($strCanonical)
+    if ($objAdmitted.Count -ne 100 -or $strHash -cne '81c549bcbc4570bb864d1039f36a6822af28f3a9b9381522dd052de7a8629085') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'initial-admission-identity'
+    }
+    return ,$objAdmitted
+}
+
+$script:scriptBlockConvertToOrderedCatalogFixtureJson = {
+    param ([object]$Value)
+
+    # ConvertTo-Json escapes control characters inside strings. Only generated
+    # formatting CRLF is replaced; JSON property order and escaped values stay exact.
+    $strJson = ($Value | ConvertTo-Json -Depth 100).Replace("`r`n", "`n")
+    if ($strJson.IndexOf([char]13) -ge 0 -or $strJson.StartsWith([string][char]0xFEFF, [System.StringComparison]::Ordinal)) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'catalog-fixture-format'
+    }
+    return $strJson
+}
+
+$script:scriptBlockAssertInitialStateAdmissionMutants = {
+    param ([string]$CatalogLiteralPath, [string]$RunRoot)
+
+    $objControl = & $script:scriptBlockReadCandidateCatalog -LiteralPath $CatalogLiteralPath
+    $strControlPath = [System.IO.Path]::Combine($RunRoot, ('canonical-control-' + [System.Guid]::NewGuid().ToString('N') + '.json'))
+    $strControlJson = & $script:scriptBlockConvertToOrderedCatalogFixtureJson -Value $objControl
+    try {
+        [System.IO.File]::WriteAllText($strControlPath, $strControlJson, (New-Object System.Text.UTF8Encoding($false)))
+        $objRoundTrip = & $script:scriptBlockReadCandidateCatalog -LiteralPath $strControlPath
+        if ((& $script:scriptBlockConvertToOrderedCatalogFixtureJson -Value $objRoundTrip) -cne $strControlJson -or
+            (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objRoundTrip) -cne
+                (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objControl)) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'catalog-canonical-roundtrip'
+        }
+    } finally { [System.IO.File]::Delete($strControlPath) }
+    foreach ($strMode in @('raw-state', 'native-state', 'swapped-recipe', 'swapped-mapping', 'unknown-id', 'ordinary-state')) {
+        $objMutant = $objControl | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+        $objRaw = @($objMutant.Cases | Where-Object FixtureRecipe -CEQ 'source-raw-boundary')[0]
+        $objNative = @($objMutant.Cases | Where-Object FixtureRecipe -CEQ 'source-native-identity')[0]
+        $strExpected = 'initial-admission-identity'
+        switch ($strMode) {
+            'raw-state' { $objRaw.InitialState = 'Active' }
+            'native-state' { $objNative.InitialState = 'Active' }
+            'swapped-recipe' { $objRaw.FixtureRecipe = 'source-native-identity' }
+            'swapped-mapping' {
+                $objMap = @($objMutant.SourceProvenance.SourceMappings | Where-Object { $_.SourceCase -ceq $objRaw.SemanticVariant.ToUpperInvariant() })[0]
+                $objMap.TargetCases = @($objNative.CaseId)
+                $strExpected = 'initial-admission-mapping'
+            }
+            'unknown-id' { $objRaw.CaseId = 'PS-P1A-ZZ-99'; $strExpected = 'initial-admission-mapping' }
+            'ordinary-state' { $objMutant.Cases[0].InitialState = 'NotCreated'; $strExpected = 'case-initial-state' }
+        }
+        $strPath = [System.IO.Path]::Combine($RunRoot, ('initial-admission-' + $strMode + '.json'))
+        [System.IO.File]::WriteAllText($strPath, (& $script:scriptBlockConvertToOrderedCatalogFixtureJson -Value $objMutant), (New-Object System.Text.UTF8Encoding($false)))
+        $objFailure = $null
+        try { [void](& $script:scriptBlockReadCandidateCatalog -LiteralPath $strPath) }
+        catch { $objFailure = $_ }
+        finally { [System.IO.File]::Delete($strPath) }
+        if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strExpected)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'initial-admission-mutant-not-rejected'
+        }
+    }
+}
+
+$script:scriptBlockGetSourceLinkProfile = {
+    param ([object]$Case)
+
+    $strPrimitive = 'directory'
+    $strTargetState = 'ordinary-directory'
+    $strRepository = 'PSStyleGuide'
+    $strSourceCase = $Case.CaseId
+    switch -Exact ($Case.CaseId) {
+        'PS-P1A-E-07' { }
+        'PS-P1A-E-08' { }
+        'PS-P1A-L-03' { }
+        'PS-P1A-L-04' { $strTargetState = 'absent-directory' }
+        'PS-P1A-K-02' { $strPrimitive = 'file'; $strTargetState = 'ordinary-file' }
+        'PS-P1A-C-04' { }
+        'PS-P1A-W-04' { }
+        'PS-P1A-S-08' { $strPrimitive = 'file'; $strTargetState = 'ordinary-file' }
+        'PS-P1A-S-09' { $strPrimitive = 'file'; $strTargetState = 'ordinary-file' }
+        'PS-P1A-SP-09' { $strRepository = 'TerraformStyleGuide'; $strSourceCase = 'T1A-E-10' }
+        'PS-P1A-SP-20' { $strRepository = 'TerraformStyleGuide'; $strSourceCase = 'T1A-E-26' }
+        'PS-P1A-LF-05' { $strRepository = 'TerraformStyleGuide'; $strSourceCase = 'T1A-K-07' }
+        'PS-P1A-LF-06' { $strRepository = 'TerraformStyleGuide'; $strSourceCase = 'T1A-K-08'; $strTargetState = 'absent-directory' }
+        default { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-link-admission' }
+    }
+    return [pscustomobject][ordered]@{
+        SourceRepository = $strRepository; SourceCase = $strSourceCase
+        Primitive = $strPrimitive; TargetState = $strTargetState
+    }
+}
+
+$script:scriptBlockGetSourceLinkAdmission = {
+    param ([object]$Catalog)
+
+    & $script:scriptBlockAssertSourceCatalogSeals -Catalog $Catalog
+    $listTuples = New-Object 'System.Collections.Generic.List[object]'
+    $objIds = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    foreach ($objCase in $Catalog.Cases) {
+        if ($objCase.CaseId -cnotin @('PS-P1A-E-07', 'PS-P1A-E-08', 'PS-P1A-L-03', 'PS-P1A-L-04',
+                'PS-P1A-K-02', 'PS-P1A-C-04', 'PS-P1A-W-04', 'PS-P1A-S-08', 'PS-P1A-S-09',
+                'PS-P1A-SP-09', 'PS-P1A-SP-20', 'PS-P1A-LF-05', 'PS-P1A-LF-06')) { continue }
+        $objProfile = & $script:scriptBlockGetSourceLinkProfile -Case $objCase
+        if ($objProfile.SourceRepository -ceq 'PSStyleGuide') {
+            $arrSource = @($Catalog.SourceProvenance.PSCatalog.Cases | Where-Object { $_.CaseId -ceq $objCase.CaseId })
+            if ($arrSource.Count -ne 1 -or
+                (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $arrSource[0]) -cne
+                    (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objCase)) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-link-admission'
+            }
+        } else {
+            $arrSource = @($Catalog.SourceProvenance.TerraformCatalog.Cases | Where-Object { $_.Id -ceq $objProfile.SourceCase })
+            $arrMapping = @($Catalog.SourceProvenance.SourceMappings | Where-Object { $_.SourceCase -ceq $objProfile.SourceCase })
+            if ($arrSource.Count -ne 1 -or $arrSource[0].SemanticCase -cne $objCase.SemanticCase -or
+                $arrMapping.Count -ne 1 -or @($arrMapping[0].TargetCases).Count -ne 1 -or
+                $arrMapping[0].TargetCases[0] -cne $objCase.CaseId) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-link-admission'
+            }
+        }
+        if (-not $objIds.Add($objCase.CaseId)) { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-link-admission' }
+        $listTuples.Add([ordered]@{
+            CaseId = $objCase.CaseId; SemanticCase = $objCase.SemanticCase; SemanticVariant = $objCase.SemanticVariant
+            FixtureRecipe = $objCase.FixtureRecipe; PrimitiveProbeRule = $objCase.PrimitiveProbeRule
+            SourceRepository = $objProfile.SourceRepository; SourceCase = $objProfile.SourceCase
+            Primitive = $objProfile.Primitive; TargetState = $objProfile.TargetState
+        })
+    }
+    $strCanonical = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $listTuples.ToArray()
+    $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false)).GetBytes($strCanonical))
+    if ($objIds.Count -ne 13 -or $strHash -cne '6b74535fb678bfbb970c55973dd3e843beff92f15f5b913dfdbbc4c3e9873720') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-link-admission'
+    }
+    return ,$objIds
+}
+
+$script:scriptBlockTestSourceLinkPrimitive = {
+    param ([object]$Case, [string]$RunRoot)
+
+    if (-not $script:objCandidateSourceLinkAdmission.Contains($Case.CaseId)) { return $null }
+    $objProfile = & $script:scriptBlockGetSourceLinkProfile -Case $Case
+    $strRoot = [System.IO.Path]::Combine($RunRoot, 'link-probe-' + [System.Guid]::NewGuid().ToString('N'))
+    [void][System.IO.Directory]::CreateDirectory($strRoot)
+    $strTarget = [System.IO.Path]::Combine($strRoot, 'target')
+    $strLink = [System.IO.Path]::Combine($strRoot, 'link')
+    $strSentinel = [System.IO.Path]::Combine($strRoot, 'sentinel.bin')
+    $arrSentinel = [byte[]](0x50, 0x31, 0x41, 0x0A)
+    try {
+        [System.IO.File]::WriteAllBytes($strSentinel, $arrSentinel)
+        if ($objProfile.TargetState -ceq 'ordinary-directory') { [void][System.IO.Directory]::CreateDirectory($strTarget) }
+        elseif ($objProfile.TargetState -ceq 'ordinary-file') { [System.IO.File]::WriteAllBytes($strTarget, $arrSentinel) }
+        $boolCreated = $false
+        foreach ($strStage in @('before', 'after')) {
+            & $script:scriptBlockAssertOrdinaryDirectoryEnvelope -LiteralPath $strRoot
+            if ([System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strSentinel)) -cne 'UDFBCg==') { throw 'link-probe-sentinel-changed' }
+            if ($objProfile.TargetState -ceq 'ordinary-directory') {
+                & $script:scriptBlockAssertOrdinaryDirectoryEnvelope -LiteralPath $strTarget
+                if ([System.IO.Directory]::GetFileSystemEntries($strTarget).Count -ne 0) { throw 'link-probe-target-changed' }
+            } elseif ($objProfile.TargetState -ceq 'ordinary-file') {
+                $objAttributes = [System.IO.File]::GetAttributes($strTarget)
+                if (($objAttributes -band ([System.IO.FileAttributes]::Directory -bor [System.IO.FileAttributes]::ReparsePoint)) -ne 0 -or
+                    [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strTarget)) -cne 'UDFBCg==') { throw 'link-probe-target-changed' }
+            } else {
+                if (@([System.IO.Directory]::EnumerateFileSystemEntries($strRoot) | Where-Object {
+                            [System.IO.Path]::GetFileName($_) -ceq 'target'
+                        }).Count -ne 0) { throw 'link-probe-target-changed' }
+            }
+            if ($strStage -ceq 'before') {
+                $boolCreated = & $script:scriptBlockNewSymbolicLink -LinkPath $strLink -TargetPath $strTarget -Directory ($objProfile.Primitive -ceq 'directory')
+            }
+        }
+        $strReason = if ($boolCreated) { 'target-state-control-passed-link-created-and-reparse-verified' }
+        else { 'target-state-control-passed-link-create-or-reparse-verification-failed' }
+        $script:listCandidatePrimitiveEvidence.Add([pscustomobject][ordered]@{
+            CaseReference = $Case.CaseId; SourceCase = $objProfile.SourceCase
+            Primitive = $objProfile.Primitive; ProbeAttempted = $true; TargetControlPassed = $true
+            ProbeSucceeded = [bool]$boolCreated; Reason = $strReason
+            SourceRepository = $objProfile.SourceRepository; TargetState = $objProfile.TargetState
+        })
+        if ($boolCreated) { return $null }
+        $objObservation = & $script:scriptBlockNewObservation
+        $objObservation.AuthorizedSkip = $true
+        $objObservation.SkipCode = 'skip-link-primitive-unavailable'
+        return $objObservation
+    } finally { & $script:scriptBlockRemoveTestTree -LiteralPath $strRoot -ApprovedParent $RunRoot }
+}
+
+$script:scriptBlockInvokeRequiredLinkFixture = {
+    param ([object]$Case, [string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$GitPath)
+
+    if (-not $script:objCandidateSourceLinkAdmission.Contains($Case.CaseId)) { throw 'link-fixture-not-admitted' }
+    if ($Case.FixtureRecipe -ceq 'source-lifecycle') { return (& $script:scriptBlockInvokeSourceLifecycleFixture -Case $Case -RunRoot $RunRoot -HelperLiteralPath $HelperLiteralPath) }
+    switch -Exact ($Case.CaseId) {
+        'PS-P1A-S-08' { return (& $script:scriptBlockInvokeScriptIdentityFixture -Case $Case -RunRoot $RunRoot -GitPath $GitPath -HelperSourcePath $HelperLiteralPath -ContextSourcePath $ContextLiteralPath) }
+        'PS-P1A-S-09' { return (& $script:scriptBlockInvokeScriptIdentityFixture -Case $Case -RunRoot $RunRoot -GitPath $GitPath -HelperSourcePath $HelperLiteralPath -ContextSourcePath $ContextLiteralPath) }
+        'PS-P1A-C-04' { return (& $script:scriptBlockInvokeContextCleanupFixture -Case $Case -RunRoot $RunRoot -HelperLiteralPath $HelperLiteralPath) }
+        'PS-P1A-K-02' { return (& $script:scriptBlockInvokeHelperCleanupFixture -Case $Case -RunRoot $RunRoot -HelperLiteralPath $HelperLiteralPath) }
+        default { return (& $script:scriptBlockInvokeExpansionFixture -Case $Case -RunRoot $RunRoot -HelperLiteralPath $HelperLiteralPath) }
+    }
+}
+
+$script:scriptBlockAssertRequiredLinkLateFailures = {
+    param ([object]$Catalog, [string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath,
+        [string]$GitPath, [switch]$EmitObservations)
+
+    $strControlRoot = [System.IO.Path]::Combine($RunRoot, 'late-link-' + [guid]::NewGuid().ToString('N'))
+    [void][System.IO.Directory]::CreateDirectory($strControlRoot)
+    $scriptBlockOriginalLink = $script:scriptBlockNewSymbolicLink
+    $scriptBlockOriginalRemove = $script:scriptBlockRemoveTestTree
+    $scriptBlockSnapshot = $script:scriptBlockGetTerraformFixtureSnapshot
+    $scriptBlockCompare = $script:scriptBlockTestFixtureSnapshotEqual
+    $objOriginalEvidence = $script:listCandidatePrimitiveEvidence
+    $script:listCandidatePrimitiveEvidence = New-Object 'System.Collections.Generic.List[object]'
+    try {
+        foreach ($objCase in $Catalog.Cases) {
+            if (-not $script:objCandidateSourceLinkAdmission.Contains($objCase.CaseId)) { continue }
+            $objProfile = & $script:scriptBlockGetSourceLinkProfile -Case $objCase
+            $hashtableArguments = @{
+                Case = $objCase; RunRoot = $strControlRoot; HelperLiteralPath = $HelperLiteralPath
+                ContextLiteralPath = $ContextLiteralPath; GitPath = $GitPath
+            }
+            $objPositive = & $script:scriptBlockTestSourceLinkPrimitive -Case $objCase -RunRoot $strControlRoot
+            if ($null -ne $objPositive) {
+                if ($EmitObservations) { [pscustomobject]@{ CaseId = $objCase.CaseId; PositiveVerdict = 'skip'; NegativeExecuted = $false; PrimitiveEvidence = $script:listCandidatePrimitiveEvidence[$script:listCandidatePrimitiveEvidence.Count - 1] } }
+                continue
+            }
+            $objPositive = & $script:scriptBlockInvokeRequiredLinkFixture @hashtableArguments
+            $strPlatform = if ($script:boolCandidateIsWindows) { 'Windows' } else { 'Linux' }
+            $objPositiveResult = & $script:scriptBlockNewCaseResult -Case $objCase -Observation $objPositive -OperatingSystem $strPlatform -PowerShellEdition $PSVersionTable.PSEdition -PowerShellVersion $PSVersionTable.PSVersion
+            if ($objPositiveResult.HarnessVerdict -cne 'pass') { throw ('late-link-positive-oracle-' + $objCase.CaseId) }
+            if ([System.IO.Directory]::GetFileSystemEntries($strControlRoot).Count -ne 0) { throw 'late-link-positive-teardown' }
+            $hashtableControl = @{ Calls = 0; ProbeSucceeded = $false; Target = $null; SnapshotPath = $null; Before = $null; TargetChecked = $false }
+            $script:scriptBlockNewSymbolicLink = {
+                param ([string]$LinkPath, [string]$TargetPath, [bool]$Directory)
+                $hashtableControl.Calls++
+                if ($hashtableControl.Calls -eq 1) {
+                    $hashtableControl.ProbeSucceeded = & $scriptBlockOriginalLink -LinkPath $LinkPath -TargetPath $TargetPath -Directory $Directory
+                    return $hashtableControl.ProbeSucceeded
+                }
+                if ($hashtableControl.Calls -ne 2 -or -not $hashtableControl.ProbeSucceeded) { throw 'late-link-injection-order' }
+                $hashtableControl.Target = $TargetPath
+                $hashtableControl.SnapshotPath = if ($objProfile.TargetState -ceq 'absent-directory') { [System.IO.Path]::GetDirectoryName($TargetPath) } else { $TargetPath }
+                $hashtableControl.Before = & $scriptBlockSnapshot -LiteralPath $hashtableControl.SnapshotPath
+                return $false
+            }.GetNewClosure()
+            $script:scriptBlockRemoveTestTree = {
+                param ([string]$LiteralPath, [string]$ApprovedParent)
+                if ($null -ne $hashtableControl.Target -and -not $hashtableControl.TargetChecked) {
+                    $objAfter = & $scriptBlockSnapshot -LiteralPath $hashtableControl.SnapshotPath
+                    if (-not (& $scriptBlockCompare -Left $hashtableControl.Before -Right $objAfter)) { throw 'late-link-target-changed' }
+                    $hashtableControl.TargetChecked = $true
+                }
+                & $scriptBlockOriginalRemove -LiteralPath $LiteralPath -ApprovedParent $ApprovedParent
+            }.GetNewClosure()
+            $objFailure = $null
+            $arrReturned = @()
+            try {
+                $objSkip = & $script:scriptBlockTestSourceLinkPrimitive -Case $objCase -RunRoot $strControlRoot
+                if ($null -ne $objSkip) { throw 'late-link-repeat-preprobe-unavailable' }
+                $arrReturned = @(& $script:scriptBlockInvokeRequiredLinkFixture @hashtableArguments)
+            } catch { $objFailure = $_ }
+            finally {
+                $script:scriptBlockNewSymbolicLink = $scriptBlockOriginalLink
+                $script:scriptBlockRemoveTestTree = $scriptBlockOriginalRemove
+            }
+            if ($null -eq $objFailure -or $arrReturned.Count -ne 0 -or
+                $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'fixture-failed' -or
+                $objFailure.Exception.Message -cne 'PSStyleGuide.CandidateHarness.v1|code=fixture-failed|detail=available-link-creation-failed' -or
+                $hashtableControl.Calls -ne 2 -or -not $hashtableControl.ProbeSucceeded -or
+                -not $hashtableControl.TargetChecked) { throw ('late-link-failure-contract-' + $objCase.CaseId) }
+            if ([System.IO.Directory]::GetFileSystemEntries($strControlRoot).Count -ne 0) { throw 'late-link-negative-teardown' }
+            if ($EmitObservations) {
+                [pscustomobject]@{ CaseId = $objCase.CaseId; PositiveVerdict = 'pass'; NegativeExecuted = $true; LateFailureCode = 'fixture-failed'; LinkCalls = $hashtableControl.Calls; RealPreflightSucceeded = $hashtableControl.ProbeSucceeded; TargetUnchanged = $hashtableControl.TargetChecked; TeardownEmpty = $true }
+            }
+        }
+    } finally {
+        $script:scriptBlockNewSymbolicLink = $scriptBlockOriginalLink
+        $script:scriptBlockRemoveTestTree = $scriptBlockOriginalRemove
+        $script:listCandidatePrimitiveEvidence = $objOriginalEvidence
+        & $scriptBlockOriginalRemove -LiteralPath $strControlRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockAssertSourceLinkControls = {
+    param (
+        [object]$Catalog, [string]$CatalogLiteralPath, [string]$RunRoot, [string]$HarnessLiteralPath,
+        [AllowEmptyCollection()][System.Collections.Generic.HashSet[string]]$ExecutedLinkCategories
+    )
+
+    [void](& $script:scriptBlockReadCandidateCatalog -LiteralPath $CatalogLiteralPath)
+    foreach ($strMode in @('wrong-mapping', 'wrong-recipe', 'nonlink-probe')) {
+        $objMutant = $Catalog | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+        $objLinkCase = @($objMutant.Cases | Where-Object CaseId -CEQ 'PS-P1A-SP-09')[0]
+        $strExpected = 'source-link-admission'
+        switch ($strMode) {
+            'wrong-mapping' { @($objMutant.SourceProvenance.SourceMappings | Where-Object SourceCase -CEQ 'T1A-E-10')[0].TargetCases = @('PS-P1A-SP-10') }
+            'wrong-recipe' { $objLinkCase.FixtureRecipe = 'source-helper-raw' }
+            'nonlink-probe' { @($objMutant.Cases | Where-Object CaseId -CEQ 'PS-P1A-SP-10')[0].PrimitiveProbeRule = 'required-link'; $strExpected = 'case-probe-rule' }
+        }
+        $strPath = [System.IO.Path]::Combine($RunRoot, ('link-admission-' + $strMode + '.json'))
+        [System.IO.File]::WriteAllText($strPath, (& $script:scriptBlockConvertToOrderedCatalogFixtureJson -Value $objMutant), (New-Object System.Text.UTF8Encoding($false)))
+        $objFailure = $null
+        try { [void](& $script:scriptBlockReadCandidateCatalog -LiteralPath $strPath) } catch { $objFailure = $_ }
+        finally { [System.IO.File]::Delete($strPath) }
+        if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strExpected)) { throw 'source-link-admission-mutant' }
+    }
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($HarnessLiteralPath, [ref]$null, [ref]$objErrors)
+    $arrMain = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+        $_.Name -ceq 'Invoke-StyleGuideCandidateHarness'
+    })
+    if (@($objErrors).Count -ne 0 -or $arrMain.Count -ne 1) { throw 'source-link-wiring-parse' }
+    $strMain = $arrMain[0].Extent.Text
+    $strProbe = '$objObservation = & $script:scriptBlockTestSourceLinkPrimitive -Case $objCase -RunRoot $strRunRoot'
+    $strSkip = 'if ($null -ne $objObservation) {'
+    $strDispatch = '$objObservation = & $script:scriptBlockInvokeRequiredLinkFixture'
+    foreach ($strAnchor in @($strProbe, $strSkip, $strDispatch)) {
+        if ([regex]::Matches($strMain, [regex]::Escape($strAnchor)).Count -ne 1) { throw 'source-link-wiring-cardinality' }
+    }
+    if ($strMain.IndexOf($strProbe, [System.StringComparison]::Ordinal) -ge $strMain.IndexOf($strSkip, [System.StringComparison]::Ordinal) -or
+        $strMain.IndexOf($strSkip, [System.StringComparison]::Ordinal) -ge $strMain.IndexOf($strDispatch, [System.StringComparison]::Ordinal)) { throw 'source-link-wiring-order' }
+    foreach ($strFixtureName in @('scriptBlockInvokeExpansionFixture', 'scriptBlockInvokeContextCleanupFixture', 'scriptBlockInvokeHelperCleanupFixture', 'scriptBlockInvokeScriptIdentityFixture')) {
+        $arrFixture = @($objAst.EndBlock.Statements | Where-Object {
+            $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $_.Left.Extent.Text -ceq ('$script:' + $strFixtureName)
+        })
+        if ($arrFixture.Count -ne 1 -or $arrFixture[0].Extent.Text.Contains('AuthorizedSkip = $true')) { throw 'source-link-late-skip-branch' }
+    }
+    if ([regex]::Matches($strMain, [regex]::Escape('-PrimitiveEvidence $script:listCandidatePrimitiveEvidence.ToArray()')).Count -ne 1) { throw 'source-link-result-evidence-binding' }
+    $objSavedEvidence = $script:listCandidatePrimitiveEvidence
+    $intSavedEvidenceCount = $objSavedEvidence.Count
+    $arrSavedCoverage = [string[]]@($ExecutedLinkCategories)
+    $script:listCandidatePrimitiveEvidence = New-Object 'System.Collections.Generic.List[object]'
+    $scriptBlockSavedLink = $script:scriptBlockNewSymbolicLink
+    $intExpectedEvidenceCount = 2 * $script:objCandidateSourceLinkAdmission.Count
+    try {
+        foreach ($objCase in $Catalog.Cases) {
+            if (-not $script:objCandidateSourceLinkAdmission.Contains($objCase.CaseId)) { continue }
+            # This constructor controls only the proof's isolated evidence list.
+            # Real OS availability is observed later by each functional case.
+            $script:scriptBlockNewSymbolicLink = { param ($LinkPath, $TargetPath, $Directory) $null = $LinkPath; $null = $TargetPath; $null = $Directory; return $true }
+            $objAvailable = & $script:scriptBlockTestSourceLinkPrimitive -Case $objCase -RunRoot $RunRoot
+            if ($null -ne $objAvailable) { throw 'source-link-simulated-available-control' }
+            $script:scriptBlockNewSymbolicLink = { param ($LinkPath, $TargetPath, $Directory) $null = $LinkPath; $null = $TargetPath; $null = $Directory; return $false }
+            try {
+                $objUnavailable = & $script:scriptBlockTestSourceLinkPrimitive -Case $objCase -RunRoot $RunRoot
+                if ($null -eq $objUnavailable -or -not $objUnavailable.AuthorizedSkip -or
+                    $objUnavailable.SkipCode -cne 'skip-link-primitive-unavailable' -or $objUnavailable.FilesystemCallCount -ne 0) { throw 'source-link-unavailable-control' }
+            } finally { $script:scriptBlockNewSymbolicLink = $scriptBlockSavedLink }
+        }
+        if ($script:listCandidatePrimitiveEvidence.Count -ne $intExpectedEvidenceCount) { throw 'source-link-probe-evidence-count' }
+        for ($intIndex = 0; $intIndex -lt $intExpectedEvidenceCount; $intIndex++) {
+            $objEvidence = $script:listCandidatePrimitiveEvidence[$intIndex]
+            if (-not $objEvidence.ProbeAttempted -or -not $objEvidence.TargetControlPassed -or
+                $objEvidence.ProbeSucceeded -ne ($intIndex % 2 -eq 0)) { throw 'source-link-probe-evidence-value' }
+        }
+    } finally {
+        $script:scriptBlockNewSymbolicLink = $scriptBlockSavedLink
+        $script:listCandidatePrimitiveEvidence = $objSavedEvidence
+    }
+    if (-not [object]::ReferenceEquals($script:listCandidatePrimitiveEvidence, $objSavedEvidence) -or
+        $script:listCandidatePrimitiveEvidence.Count -ne $intSavedEvidenceCount -or
+        -not $ExecutedLinkCategories.SetEquals($arrSavedCoverage) -or
+        -not [object]::ReferenceEquals($script:scriptBlockNewSymbolicLink, $scriptBlockSavedLink)) { throw 'source-link-simulation-leaked' }
+
+    # Exercise the same four-category gate used after the actual case loop.
+    # Simulated availability never supplies entries to that set.
+    $strCoverageCall = '& $script:scriptBlockAssertRequiredLinkCoverage -Categories $objExecutedLinkCategories'
+    $arrCoverageCalls = @($objAst.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.CommandAst] -and $Node.Extent.Text -ceq $strCoverageCall
+    }, $true))
+    if ($arrCoverageCalls.Count -ne 1) { throw 'source-link-coverage-binding' }
+    foreach ($strMissing in @('none', 'root', 'below-root', 'candidate', 'context')) {
+        $objCoverageControl = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+        foreach ($strCategory in @('root', 'below-root', 'candidate', 'context')) {
+            if ($strCategory -cne $strMissing) { [void]$objCoverageControl.Add($strCategory) }
+        }
+        $objFailure = $null
+        try { & $script:scriptBlockAssertRequiredLinkCoverage -Categories $objCoverageControl } catch { $objFailure = $_ }
+        if ($strMissing -ceq 'none') {
+            if ($null -ne $objFailure) { throw 'source-link-coverage-positive' }
+        } elseif ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'orchestration-failed' -or
+            $objFailure.Exception.Message -cne 'PSStyleGuide.CandidateHarness.v1|code=orchestration-failed|detail=required-link-coverage') { throw 'source-link-coverage-missing' }
+    }
+}
+
+$script:scriptBlockAssertRequiredLinkCoverage = {
+    param ([AllowEmptyCollection()][System.Collections.Generic.HashSet[string]]$Categories)
+
+    foreach ($strRequiredLinkCategory in @('root', 'below-root', 'candidate', 'context')) {
+        if (-not $Categories.Contains($strRequiredLinkCategory)) {
+            & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'required-link-coverage'
+        }
+    }
+}
+
+$script:scriptBlockGetCatalogCaseAdmission = {
+    param ([object]$Catalog)
+
+    & $script:scriptBlockAssertSourceCatalogSeals -Catalog $Catalog
+    $listTuples = New-Object 'System.Collections.Generic.List[object]'
+    $objIds = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    foreach ($objCase in $Catalog.Cases) {
+        if ($objCase.FixtureRecipe -cne 'source-catalog-integrity') { continue }
+        $arrSource = @($Catalog.SourceProvenance.TerraformCatalog.Cases | Where-Object { $_.Id -ceq $objCase.SemanticVariant.ToUpperInvariant() })
+        $arrMapping = @($Catalog.SourceProvenance.SourceMappings | Where-Object { $_.SourceCase -ceq $objCase.SemanticVariant.ToUpperInvariant() })
+        if ($arrSource.Count -ne 1 -or $arrSource[0].Fixture.Invocation -cne 'catalog' -or
+            $arrSource[0].SemanticCase -cne $objCase.SemanticCase -or $arrMapping.Count -ne 1 -or
+            @($arrMapping[0].TargetCases).Count -ne 1 -or $arrMapping[0].TargetCases[0] -cne $objCase.CaseId -or
+            -not $objIds.Add($objCase.CaseId)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'catalog-case-admission'
+        }
+        $listTuples.Add([ordered]@{
+            CaseId = $objCase.CaseId; SemanticCase = $objCase.SemanticCase; SemanticVariant = $objCase.SemanticVariant
+            FixtureRecipe = $objCase.FixtureRecipe; InitialState = $objCase.InitialState
+            ExpectedPhase = $objCase.ExpectedPhase; ExpectedDiagnosticCode = $objCase.ExpectedDiagnosticCode
+        })
+    }
+    $strCanonical = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $listTuples.ToArray()
+    $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false)).GetBytes($strCanonical))
+    if ($objIds.Count -ne 8 -or $strHash -cne '90ae4d16effe7c4d01cf08351a6f113952c76fdb5e962a7c838843960bf9ae4f') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'catalog-case-admission'
+    }
+    return ,$objIds
+}
+
+$script:scriptBlockAssertCatalogCaseAdmissionMutants = {
+    param ([object]$Catalog, [string]$CatalogLiteralPath, [string]$RunRoot)
+
+    [void](& $script:scriptBlockReadCandidateCatalog -LiteralPath $CatalogLiteralPath)
+    foreach ($strMode in @('wrong-id', 'wrong-semantic', 'wrong-recipe', 'wrong-source', 'wrong-mapping',
+        'null-source', 'typed-source', 'missing-source', 'ordinary-phase', 'ordinary-code')) {
+        $objMutant = $Catalog | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+        $objCase = @($objMutant.Cases | Where-Object CaseId -CEQ 'PS-P1A-IC-01')[0]
+        $strExpected = 'catalog-case-admission'
+        switch ($strMode) {
+            'wrong-id' { $objCase.CaseId = 'PS-P1A-IC-99' }
+            'wrong-semantic' { $objCase.SemanticCase = 'catalog.changed' }
+            'wrong-recipe' { $objCase.FixtureRecipe = 'archive.valid.exact' }
+            'wrong-source' { $objCase.SemanticVariant = 't1a-i-02' }
+            'wrong-mapping' { @($objMutant.SourceProvenance.SourceMappings | Where-Object SourceCase -CEQ 'T1A-I-01')[0].TargetCases = @('PS-P1A-IC-02') }
+            'null-source' { $objCase.SemanticVariant = $null; $strExpected = 'case-string' }
+            'typed-source' { $objCase.SemanticVariant = 7; $strExpected = 'case-string' }
+            'missing-source' { $objCase.PSObject.Properties.Remove('SemanticVariant'); $strExpected = 'case-string' }
+            'ordinary-phase' { $objMutant.Cases[0].ExpectedPhase = 'catalog' }
+            'ordinary-code' { $objMutant.Cases[0].ExpectedDiagnosticCode = 'catalog-invalid' }
+        }
+        $strPath = [System.IO.Path]::Combine($RunRoot, ('catalog-admission-' + $strMode + '.json'))
+        [System.IO.File]::WriteAllText($strPath, (& $script:scriptBlockConvertToOrderedCatalogFixtureJson -Value $objMutant), (New-Object System.Text.UTF8Encoding($false)))
+        $objFailure = $null
+        try { [void](& $script:scriptBlockReadCandidateCatalog -LiteralPath $strPath) } catch { $objFailure = $_ }
+        finally { [System.IO.File]::Delete($strPath) }
+        if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strExpected)) { throw 'catalog-case-admission-mutant' }
+    }
+    $objEscaped = [pscustomobject][ordered]@{ z = "left`r`nright"; a = [pscustomobject][ordered]@{ second = '\r\n'; first = 7 } }
+    $strEscaped = & $script:scriptBlockConvertToOrderedCatalogFixtureJson -Value $objEscaped
+    $objRoundTrip = $strEscaped | ConvertFrom-Json
+    if ((& $script:scriptBlockConvertToOrderedCatalogFixtureJson -Value $objRoundTrip) -cne $strEscaped -or
+        (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objRoundTrip) -cne
+            (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objEscaped)) { throw 'catalog-escaped-value-control' }
+}
+
+$script:scriptBlockAssertOriginalOracleProfiles = {
+    param ([object]$Catalog)
+
+    # The two active terminal-repeat profiles replace only the old extra probe
+    # count. The complete original catalog remains immutable source provenance.
+    & $script:scriptBlockAssertSourceCatalogSeals -Catalog $Catalog
+    foreach ($objOriginal in $Catalog.SourceProvenance.PSCatalog.Cases) {
+        $arrCurrent = @($Catalog.Cases | Where-Object { $_.CaseId -ceq $objOriginal.CaseId })
+        if ($arrCurrent.Count -ne 1) { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'original-oracle-profile' }
+        $objExpected = $objOriginal | ConvertTo-Json -Depth 10 | ConvertFrom-Json
+        if ($objOriginal.CaseId -cin @('PS-P1A-K-03', 'PS-P1A-K-04')) {
+            $objExpected.OracleProfile = 'oracle.' + $objOriginal.CaseId.ToLowerInvariant() + '.v2'
+            $objExpected.ExpectedFilesystemCallCount = 0
+        }
+        if ((& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objExpected) -cne
+            (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $arrCurrent[0])) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'original-oracle-profile'
+        }
+    }
+    foreach ($objCase in $Catalog.Cases) {
+        if ($objCase.OracleProfile -cmatch '\.v2$' -and
+            ($objCase.CaseId -cnotin @('PS-P1A-K-03', 'PS-P1A-K-04') -or
+                $objCase.OracleProfile -cne ('oracle.' + $objCase.CaseId.ToLowerInvariant() + '.v2'))) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'original-oracle-profile'
+        }
+    }
+}
+
+$script:scriptBlockAssertOriginalOracleProfileControls = {
+    param ([object]$Catalog)
+
+    & $script:scriptBlockAssertOriginalOracleProfiles -Catalog $Catalog
+    foreach ($strMode in @('k03-old-count', 'k04-old-count', 'k03-old-profile', 'k04-old-profile',
+        'k03-other-field', 'k04-other-field', 'other-original-profile', 'appended-profile')) {
+        $objMutant = $Catalog | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+        $strId = if ($strMode.StartsWith('k04', [System.StringComparison]::Ordinal)) { 'PS-P1A-K-04' } else { 'PS-P1A-K-03' }
+        $objCase = @($objMutant.Cases | Where-Object { $_.CaseId -ceq $strId })[0]
+        switch -Exact ($strMode) {
+            { $_ -cin @('k03-old-count', 'k04-old-count') } { $objCase.ExpectedFilesystemCallCount = 1 }
+            { $_ -cin @('k03-old-profile', 'k04-old-profile') } { $objCase.OracleProfile = 'oracle.' + $strId.ToLowerInvariant() + '.v1' }
+            { $_ -cin @('k03-other-field', 'k04-other-field') } { $objCase.ExpectedSubreason = 'altered' }
+            'other-original-profile' { $objMutant.Cases[0].OracleProfile = 'oracle.ps-p1a-k-03.v2' }
+            'appended-profile' { $objMutant.Cases[-1].OracleProfile = 'oracle.ps-p1a-k-04.v2' }
+        }
+        $objFailure = $null
+        try { & $script:scriptBlockAssertOriginalOracleProfiles -Catalog $objMutant } catch { $objFailure = $_ }
+        if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne 'PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=original-oracle-profile') {
+            throw ('original-oracle-profile-mutant-' + $strMode)
+        }
+    }
+}
+
+$script:scriptBlockAssertActiveCatalogSeals = {
+    param ([object]$Catalog)
+
+    foreach ($objMapping in $Catalog.SourceProvenance.SourceMappings) {
+        if ($null -eq $objMapping.PSObject.Properties['ScenarioClass'] -or
+            $objMapping.ScenarioClass -cnotin @('shared-security-case', 'context-lifecycle-adaptation',
+                'owned-path-api-adaptation', 'label-contract-adaptation', 'catalog-integrity-adaptation')) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-mapping-classification'
+        }
+        if ($objMapping.ScenarioClass -ceq 'label-contract-adaptation' -and
+            ($null -eq $objMapping.PSObject.Properties['Rationale'] -or
+                $objMapping.Rationale -isnot [string] -or [string]::IsNullOrWhiteSpace($objMapping.Rationale))) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-mapping-rationale'
+        }
+    }
+    foreach ($strField in @('Cases', 'SourceMappings')) {
+        if ($strField -ceq 'Cases') { $objValue = $Catalog.Cases; $strExpected = 'cddf6be4cdc7eb82820bd20d5ed4ef15b28a6e178e00d9c175b73346d67a29d4'; $strDetail = 'oracle-content' }
+        else { $objValue = $Catalog.SourceProvenance.SourceMappings; $strExpected = '4811e3701fb191bd7026b3fb912b90b6d8005b45fefa5a83c966a557f129fbf7'; $strDetail = 'source-mapping-identity' }
+        $strCanonical = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $objValue
+        $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false)).GetBytes($strCanonical))
+        if ($strHash -cne $strExpected) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail $strDetail
+        }
+    }
+}
+
+$script:scriptBlockGetCandidateProofManifest = {
+    param ([object]$Catalog)
+
+    & $script:scriptBlockAssertExactPropertyNames -Value $Catalog.HarnessProofs -Names @('ManifestVersion', 'ProofCount', 'ExpectedResultCount', 'Rows', 'SourceMappings') -Detail 'proof-manifest'
+    foreach ($strName in @('ProofCount', 'ExpectedResultCount')) {
+        $objCount = $Catalog.HarnessProofs.PSObject.Properties[$strName].Value
+        if ($objCount -isnot [int] -and $objCount -isnot [long]) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'proof-manifest-type'
+        }
+    }
+    if ($Catalog.HarnessProofs.Rows -isnot [System.Array] -or $Catalog.HarnessProofs.SourceMappings -isnot [System.Array]) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'proof-manifest-type'
+    }
+    foreach ($objRow in $Catalog.HarnessProofs.Rows) {
+        if ($objRow.ExpectedStatus -isnot [int] -and $objRow.ExpectedStatus -isnot [long]) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'proof-manifest-type'
+        }
+    }
+    $strCanonical = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $Catalog.HarnessProofs
+    if ((& $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($strCanonical))) -cne
+        '32ed086b0a35e8b91e36c5062e55b6cbea75cb7c9d2d45f1114113eeb204a6d7') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'proof-manifest-identity'
+    }
+    # The frozen source manifest remains in SourceProvenance. This is a separate
+    # PS profile. The two declared substitutions preserve its public diagnostics
+    # and combined cleanup lifecycle; no functional case is part of this set.
+    return $Catalog.HarnessProofs
+}
+
+$script:scriptBlockAssertCandidateProofManifestMutants = {
+    param ([object]$Catalog)
+
+    [void](& $script:scriptBlockGetCandidateProofManifest -Catalog $Catalog)
+    foreach ($strMode in @('missing-row', 'duplicate-id', 'unknown-id', 'wrong-source', 'phase', 'context-state', 'extra-field', 'count-type', 'status-type')) {
+        $objMutant = $Catalog | ConvertTo-Json -Depth 100 -Compress | ConvertFrom-Json
+        $strDetail = 'proof-manifest-identity'
+        switch -Exact ($strMode) {
+            'missing-row' { $objMutant.HarnessProofs.Rows = @($objMutant.HarnessProofs.Rows[0]) }
+            'duplicate-id' { $objMutant.HarnessProofs.Rows[1].Id = $objMutant.HarnessProofs.Rows[0].Id }
+            'unknown-id' { $objMutant.HarnessProofs.Rows[0].Id = 'T1A-H-99' }
+            'wrong-source' { $objMutant.HarnessProofs.SourceMappings[0].SourceProofId = 'T1A-H-99' }
+            'phase' { $objMutant.HarnessProofs.Rows[1].ExpectedPostcondition.PerturbationPhase = 'complete' }
+            'context-state' { $objMutant.HarnessProofs.Rows[1].ExpectedPostcondition.ContextState = 'Disposed' }
+            'extra-field' { Add-Member -InputObject $objMutant.HarnessProofs.Rows[0] -NotePropertyName Unexpected -NotePropertyValue $true }
+            'count-type' { $objMutant.HarnessProofs.ProofCount = [double]2; $strDetail = 'proof-manifest-type' }
+            'status-type' { $objMutant.HarnessProofs.Rows[0].ExpectedStatus = [double]0; $strDetail = 'proof-manifest-type' }
+        }
+        $boolRefused = $false
+        try { [void](& $script:scriptBlockGetCandidateProofManifest -Catalog $objMutant) }
+        catch {
+            $boolRefused = $_.Exception.Data['PSStyleGuideHarnessCode'] -ceq 'catalog-invalid' -and
+                $_.Exception.Message -ceq ('PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $strDetail)
+        }
+        if (-not $boolRefused) { & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'proof-manifest-mutant-not-refused' }
+    }
+}
+
 $script:scriptBlockReadCandidateCatalog = {
     param (
         [Parameter(Mandatory = $true)]
@@ -7988,7 +12283,10 @@ $script:scriptBlockReadCandidateCatalog = {
         'SemanticCasePattern',
         'OracleProfilePattern',
         'ClosedSets',
-        'Cases'
+        'Cases',
+        'SourceProvenance',
+        'DiagnosticDomains',
+        'HarnessProofs'
     ) -Detail 'catalog'
     if ($null -eq $objCatalog.SchemaVersion -or
         $objCatalog.SchemaVersion.GetType() -notin @([System.Int32], [System.Int64]) -or
@@ -8007,7 +12305,7 @@ $script:scriptBlockReadCandidateCatalog = {
         $objCatalog.SemanticCasePattern -cne '^[a-z0-9]+(?:[.-][a-z0-9]+)*$' -or
         $null -eq $objCatalog.OracleProfilePattern -or
         $objCatalog.OracleProfilePattern.GetType() -ne [System.String] -or
-        $objCatalog.OracleProfilePattern -cne '^oracle\.ps-p1a-[a-z]+-[0-9]{2}\.v1$' -or
+        $objCatalog.OracleProfilePattern -cne '^(?:oracle\.ps-p1a-[a-z]+-[0-9]{2}\.v1|oracle\.ps-p1a-k-0[34]\.v2)$' -or
         $null -eq $objCatalog.Cases -or
         $objCatalog.Cases.GetType() -ne [System.Object[]] -or
         $objCatalog.Cases.Count -ne $script:intCandidateCaseCount) {
@@ -8053,6 +12351,41 @@ $script:scriptBlockReadCandidateCatalog = {
         }
     }
 
+    # Establish the fields read by source admission before invoking any member.
+    foreach ($objCase in $objCatalog.Cases) {
+        foreach ($strField in @('CaseId', 'SemanticCase', 'FixtureRecipe', 'InitialState', 'ExpectedPhase', 'ExpectedDiagnosticCode')) {
+            $objProperty = $objCase.PSObject.Properties[$strField]
+            if ($null -eq $objProperty -or $objProperty.Value -isnot [string]) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'case-string'
+            }
+        }
+        $objVariant = $objCase.PSObject.Properties['SemanticVariant']
+        if ($null -eq $objVariant -or ($null -ne $objVariant.Value -and $objVariant.Value -isnot [string]) -or
+            ($objCase.FixtureRecipe.StartsWith('source-', [System.StringComparison]::Ordinal) -and $null -eq $objVariant.Value)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'case-string'
+        }
+    }
+    foreach ($objMapping in $objCatalog.SourceProvenance.SourceMappings) {
+        $objClass = $objMapping.PSObject.Properties['ScenarioClass']
+        if ($null -eq $objClass -or $objClass.Value -isnot [string]) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-mapping-classification'
+        }
+        $objSource = $objMapping.PSObject.Properties['SourceCase']
+        $objTargets = $objMapping.PSObject.Properties['TargetCases']
+        if ($null -eq $objSource -or $objSource.Value -isnot [string] -or
+            $null -eq $objTargets -or $objTargets.Value -isnot [System.Array]) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-mapping-identity'
+        }
+        foreach ($objTarget in $objTargets.Value) {
+            if ($objTarget -isnot [string]) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'source-mapping-identity'
+            }
+        }
+    }
+    $objSourceLinkAdmission = & $script:scriptBlockGetSourceLinkAdmission -Catalog $objCatalog
+    $objCatalogCaseAdmission = & $script:scriptBlockGetCatalogCaseAdmission -Catalog $objCatalog
+    $objInitialStateAdmission = & $script:scriptBlockGetInitialStateAdmission -Catalog $objCatalog
+    $objManagerPathAdmission = & $script:scriptBlockGetManagerPathAdmission -Catalog $objCatalog
     $objCaseIds = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
     $objSemantics = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
     $objProfiles = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
@@ -8160,11 +12493,16 @@ $script:scriptBlockReadCandidateCatalog = {
         }
         $boolLinkSemanticCase = & $script:scriptBlockTestLinkSemanticCase `
             -SemanticCase $objCase.SemanticCase
+        $boolLinkSemanticCase = $boolLinkSemanticCase -or $objSourceLinkAdmission.Contains($objCase.CaseId)
         if (($boolLinkSemanticCase -and $objCase.PrimitiveProbeRule -cne 'required-link') -or
             (-not $boolLinkSemanticCase -and $objCase.PrimitiveProbeRule -cne 'none')) {
             & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'case-probe-rule'
         }
-        $boolNotCreatedCase = $objCase.SemanticCase.StartsWith(
+        if (($objCase.ExpectedPhase -ceq 'catalog' -or $objCase.ExpectedDiagnosticCode -ceq 'catalog-invalid') -and
+            -not $objCatalogCaseAdmission.Contains($objCase.CaseId)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'catalog-case-admission'
+        }
+        $boolNotCreatedCase = $objManagerPathAdmission.Contains($objCase.CaseId) -or $objCatalogCaseAdmission.Contains($objCase.CaseId) -or $objInitialStateAdmission.Contains($objCase.CaseId) -or $objCase.SemanticCase.StartsWith(
             'script.',
             [System.StringComparison]::Ordinal
         ) -or $objCase.SemanticCase -in @(
@@ -8202,7 +12540,81 @@ $script:scriptBlockReadCandidateCatalog = {
     if ($strAllocationSha256 -cne $script:strCandidateAllocationSha256) {
         & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'allocation-identity'
     }
+    & $script:scriptBlockAssertSourceCatalogSeals -Catalog $objCatalog
+    & $script:scriptBlockAssertDiagnosticDomains -Catalog $objCatalog
+    & $script:scriptBlockAssertActiveCatalogSeals -Catalog $objCatalog
+    & $script:scriptBlockAssertOriginalOracleProfiles -Catalog $objCatalog
+    [void](& $script:scriptBlockGetCandidateProofManifest -Catalog $objCatalog)
     return $objCatalog
+}
+
+$script:scriptBlockInvokeSourceCatalogIntegrityFixture = {
+    param ([object]$Case, [string]$RunRoot, [string]$CatalogLiteralPath)
+
+    # The accepted reader authenticates the source allocation and the exact oracle.
+    $objControl = & $script:scriptBlockReadCandidateCatalog -LiteralPath $CatalogLiteralPath
+    $strControlPath = [System.IO.Path]::Combine($RunRoot, ('canonical-control-' + [System.Guid]::NewGuid().ToString('N') + '.json'))
+    $strControlJson = & $script:scriptBlockConvertToOrderedCatalogFixtureJson -Value $objControl
+    try {
+        [System.IO.File]::WriteAllText($strControlPath, $strControlJson, (New-Object System.Text.UTF8Encoding($false)))
+        $objRoundTrip = & $script:scriptBlockReadCandidateCatalog -LiteralPath $strControlPath
+        if ((& $script:scriptBlockConvertToOrderedCatalogFixtureJson -Value $objRoundTrip) -cne $strControlJson -or
+            (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objRoundTrip) -cne
+                (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objControl)) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'catalog-canonical-roundtrip'
+        }
+    } finally { [System.IO.File]::Delete($strControlPath) }
+    $objAdmission = & $script:scriptBlockGetCatalogCaseAdmission -Catalog $objControl
+    if (-not $objAdmission.Contains($Case.CaseId)) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'catalog-case-admission'
+    }
+    $objMutant = $objControl | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+    switch -Exact ($Case.SemanticVariant) {
+        't1a-i-01' { $objMutant.Cases[1].CaseId = $objMutant.Cases[0].CaseId }
+        't1a-i-02' { $objMutant.Cases = [object[]]@($objMutant.Cases | Select-Object -Skip 1) }
+        't1a-i-03' { $objMutant.Cases[1].SemanticCase = $objMutant.Cases[0].SemanticCase }
+        't1a-i-04' { $objMutant.Cases[0].SemanticCase = $null }
+        't1a-i-05' { $objMutant.Cases[0].SemanticCase = 'archive.valid.changed' }
+        't1a-i-06' { $objMutant.Cases[0].ExpectedFilesystemCallCount++ }
+        't1a-i-07' { $objMutant.SourceProvenance.SourceMappings[0].PSObject.Properties.Remove('ScenarioClass') }
+        't1a-i-08' {
+            $objMapping = @($objMutant.SourceProvenance.SourceMappings | Where-Object ScenarioClass -CEQ 'label-contract-adaptation')[0]
+            $objMapping.Rationale = ''
+        }
+        default { & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'catalog-case-recipe' }
+    }
+    $strPath = [System.IO.Path]::Combine($RunRoot, ($Case.CaseId + '-catalog.json'))
+    $objSourceBefore = & $script:scriptBlockGetFileEvidence -LiteralPath $CatalogLiteralPath
+    $strSentinel = [System.IO.Path]::Combine($RunRoot, ($Case.CaseId + '-sentinel'))
+    [System.IO.File]::WriteAllBytes($strSentinel, [byte[]]@(115, 97, 102, 101))
+    $objSentinelBefore = & $script:scriptBlockGetFileEvidence -LiteralPath $strSentinel
+    try {
+        [System.IO.File]::WriteAllText($strPath, (& $script:scriptBlockConvertToOrderedCatalogFixtureJson -Value $objMutant), (New-Object System.Text.UTF8Encoding($false)))
+        $objFailure = $null
+        try { [void](& $script:scriptBlockReadCandidateCatalog -LiteralPath $strPath) }
+        catch { $objFailure = $_ }
+        $strExpected = 'PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=' + $Case.ExpectedSubreason
+        if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne $strExpected) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'catalog-case-refusal'
+        }
+        $objSourceAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $CatalogLiteralPath
+        $objSentinelAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $strSentinel
+        $objObservation = & $script:scriptBlockNewObservation
+        $objObservation.Phase = 'catalog'
+        $objObservation.DiagnosticCode = 'catalog-invalid'
+        $objObservation.Subreason = $Case.ExpectedSubreason
+        if ($objSourceBefore.Sha256 -cne $objSourceAfter.Sha256 -or $objSourceBefore.Length -ne $objSourceAfter.Length) {
+            $objObservation.SourceState = 'changed'
+        }
+        if ($objSentinelBefore.Sha256 -cne $objSentinelAfter.Sha256 -or $objSentinelBefore.Length -ne $objSentinelAfter.Length) {
+            $objObservation.SentinelState = 'changed'
+        }
+        return $objObservation
+    } finally {
+        [System.IO.File]::Delete($strPath)
+        [System.IO.File]::Delete($strSentinel)
+    }
 }
 
 $script:scriptBlockAssertCatalogMutationsRejected = {
@@ -8488,7 +12900,7 @@ $script:scriptBlockNewEntrySpecification = {
 }
 
 $script:scriptBlockGetDefaultEntrySpecifications = {
-    $listEntries = New-Object 'System.Collections.Generic.List[object]'
+    $listEntries = New-Object 'System.Collections.Generic.List[PSCustomObject]'
     $bytValue = [byte]0x41
     foreach ($strName in $script:arrCandidateExpectedName) {
         $arrPrefix = [System.Text.Encoding]::UTF8.GetBytes("# $strName`n")
@@ -8500,7 +12912,7 @@ $script:scriptBlockGetDefaultEntrySpecifications = {
             -Compression 'Optimal'))
         $bytValue = [byte]($bytValue + 1)
     }
-    return [object[]]$listEntries.ToArray()
+    return [object[]]@($listEntries.ToArray())
 }
 
 $script:scriptBlockNormalizeZipFixtureHeaders = {
@@ -9003,6 +13415,91 @@ $script:scriptBlockNewZipFixture = {
             $arrSpecifications[0].Length = [uint64]3
             $arrSpecifications[0].Prefix = [byte[]](0x78, 0x0D, 0x0A)
         }
+        'output.bytes.utf8-invalid-leading' {
+            $arrSpecifications[0].Length = [uint64]2
+            $arrSpecifications[0].Prefix = [byte[]](0xFF, 0x0A)
+        }
+        'output.bytes.utf8-invalid-continuation' {
+            $arrSpecifications[0].Length = [uint64]3
+            $arrSpecifications[0].Prefix = [byte[]](0xC2, 0x20, 0x0A)
+        }
+        'output.bytes.utf8-overlong' {
+            $arrSpecifications[0].Length = [uint64]3
+            $arrSpecifications[0].Prefix = [byte[]](0xC0, 0xAF, 0x0A)
+        }
+        'output.bytes.utf8-surrogate' {
+            $arrSpecifications[0].Length = [uint64]4
+            $arrSpecifications[0].Prefix = [byte[]](0xED, 0xA0, 0x80, 0x0A)
+        }
+        'output.bytes.utf8-out-of-range' {
+            $arrSpecifications[0].Length = [uint64]5
+            $arrSpecifications[0].Prefix = [byte[]](0xF4, 0x90, 0x80, 0x80, 0x0A)
+        }
+        'output.bytes.utf8-truncated-final' {
+            $arrSpecifications[0].Length = [uint64]3
+            $arrSpecifications[0].Prefix = [byte[]](0x78, 0xE2, 0x82)
+        }
+        'output.bytes.utf8-valid-two-byte' {
+            $arrSpecifications[0].Length = [uint64]3
+            $arrSpecifications[0].Prefix = [byte[]](0xC2, 0xA2, 0x0A)
+        }
+        'output.bytes.utf8-valid-three-byte' {
+            $arrSpecifications[0].Length = [uint64]4
+            $arrSpecifications[0].Prefix = [byte[]](0xE2, 0x82, 0xAC, 0x0A)
+        }
+        'output.bytes.utf8-valid-four-byte' {
+            $arrSpecifications[0].Length = [uint64]5
+            $arrSpecifications[0].Prefix = [byte[]](0xF0, 0x9F, 0x98, 0x80, 0x0A)
+        }
+        'output.bytes.utf8-valid-boundary' {
+            $arrBoundary = New-Object byte[] 131073
+            for ($intBoundary = 0; $intBoundary -lt 65533; $intBoundary++) {
+                $arrBoundary[$intBoundary] = [byte]0x61
+            }
+            $arrBoundary[65533] = [byte]0xF0
+            $arrBoundary[65534] = [byte]0x9F
+            $arrBoundary[65535] = [byte]0x98
+            $arrBoundary[65536] = [byte]0x80
+            for ($intBoundary = 65537; $intBoundary -lt 131072; $intBoundary++) {
+                $arrBoundary[$intBoundary] = [byte]0x61
+            }
+            $arrBoundary[131072] = [byte]0x0A
+            $arrSpecifications[0].Length = [uint64]$arrBoundary.Length
+            $arrSpecifications[0].Prefix = $arrBoundary
+        }
+        'output.bytes.utf8-empty' {
+            $arrSpecifications[0].Length = [uint64]0
+            $arrSpecifications[0].Prefix = $null
+        }
+        'output.bytes.utf8-later-file-invalid-continuation' {
+            $arrSpecifications[0].Length = [uint64]4
+            $arrSpecifications[0].Prefix = [byte[]](0xE2, 0x82, 0xAC, 0x0A)
+            $arrSpecifications[1].Length = [uint64]2
+            $arrSpecifications[1].Prefix = [byte[]](0x80, 0x0A)
+        }
+        'output.bytes.utf8-valid-two-byte-boundary' {
+            $arrBoundary = New-Object byte[] 65538
+            for ($intBoundary = 0; $intBoundary -lt 65535; $intBoundary++) {
+                $arrBoundary[$intBoundary] = [byte]0x61
+            }
+            $arrBoundary[65535] = [byte]0xC2
+            $arrBoundary[65536] = [byte]0xA2
+            $arrBoundary[65537] = [byte]0x0A
+            $arrSpecifications[0].Length = [uint64]$arrBoundary.Length
+            $arrSpecifications[0].Prefix = $arrBoundary
+        }
+        'output.bytes.utf8-valid-three-byte-boundary' {
+            $arrBoundary = New-Object byte[] 65538
+            for ($intBoundary = 0; $intBoundary -lt 65534; $intBoundary++) {
+                $arrBoundary[$intBoundary] = [byte]0x61
+            }
+            $arrBoundary[65534] = [byte]0xE2
+            $arrBoundary[65535] = [byte]0x82
+            $arrBoundary[65536] = [byte]0xAC
+            $arrBoundary[65537] = [byte]0x0A
+            $arrSpecifications[0].Length = [uint64]$arrBoundary.Length
+            $arrSpecifications[0].Prefix = $arrBoundary
+        }
         'resource.entry.below' {
             $arrSpecifications = & $script:scriptBlockSetResourceLengths -Specifications $arrSpecifications `
                 -Lengths ([uint64[]]@((8MB - 1), 0, 0, 0)) -Compression 'Optimal'
@@ -9141,6 +13638,7 @@ $script:scriptBlockTestLinkSemanticCase = {
     )
 }
 
+$script:objCandidateNativeSymbolicLinkMethod = $null
 $script:scriptBlockNewSymbolicLink = {
     param (
         [Parameter(Mandatory = $true)]
@@ -9166,8 +13664,38 @@ $script:scriptBlockNewSymbolicLink = {
             } else {
                 'SymbolicLink'
             }
-            $null = New-Item -ItemType $strItemType -Path $LinkPath -Target $TargetPath `
-                -ErrorAction Stop
+            if ($strItemType -ceq 'SymbolicLink' -and $PSVersionTable.PSEdition -ceq 'Desktop') {
+                # Desktop New-Item requires elevation for file links and rejects
+                # absent targets. The standard API uses the existing host policy;
+                # it changes no privilege or setting. Unsupported flags fail closed.
+                if ($null -eq $script:objCandidateNativeSymbolicLinkMethod) {
+                    $arrNativeTypes = @(Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+namespace PSStyleGuide.CandidateHarness {
+    public static class NativeSymbolicLink {
+        [DllImport("kernel32.dll", EntryPoint = "CreateSymbolicLinkW", CharSet = CharSet.Unicode, ExactSpelling = true, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.I1)]
+        public static extern bool Create(string link, string target, uint flags);
+    }
+}
+'@ -PassThru -ErrorAction Stop)
+                    if ($arrNativeTypes.Count -ne 1 -or
+                        $arrNativeTypes[0].FullName -cne 'PSStyleGuide.CandidateHarness.NativeSymbolicLink') {
+                        throw 'link-native-type'
+                    }
+                    $script:objCandidateNativeSymbolicLinkMethod = $arrNativeTypes[0].GetMethod('Create')
+                    if ($null -eq $script:objCandidateNativeSymbolicLinkMethod) { throw 'link-native-method' }
+                }
+                $uintFlags = if ($Directory) { [uint32]3 } else { [uint32]2 }
+                if (-not [bool]$script:objCandidateNativeSymbolicLinkMethod.Invoke(
+                        $null, [object[]]@($LinkPath, $TargetPath, $uintFlags))) {
+                    throw 'link-native-create'
+                }
+            } else {
+                $null = New-Item -ItemType $strItemType -Path $LinkPath -Target $TargetPath `
+                    -ErrorAction Stop
+            }
         } else {
             # A bare command name resolves alias, then function, then cmdlet,
             # then application, so a defined ln in the invoking scope binds
@@ -9304,6 +13832,71 @@ $script:scriptBlockNewObservation = {
     }
 }
 
+$script:scriptBlockTestSourceLinkSkipEvidence = {
+    param ([object]$Case, [AllowEmptyCollection()][object[]]$Evidence)
+
+    try {
+        $objProfile = & $script:scriptBlockGetSourceLinkProfile -Case $Case
+        $arrRows = @($Evidence | Where-Object { $null -ne $_ -and $null -ne $_.PSObject.Properties['CaseReference'] -and $_.CaseReference -ceq $Case.CaseId })
+        if ($arrRows.Count -ne 1) { return $false }
+        $objRow = $arrRows[0]
+        & $script:scriptBlockAssertExactPropertyNames -Value $objRow -Names @('CaseReference', 'SourceCase', 'Primitive', 'ProbeAttempted', 'TargetControlPassed', 'ProbeSucceeded', 'Reason', 'SourceRepository', 'TargetState') -Detail 'link-skip-evidence'
+        foreach ($strField in @('ProbeAttempted', 'TargetControlPassed', 'ProbeSucceeded')) {
+            if ($objRow.PSObject.Properties[$strField].Value -isnot [bool]) { return $false }
+        }
+        foreach ($strField in @('CaseReference', 'SourceCase', 'Primitive', 'Reason', 'SourceRepository', 'TargetState')) {
+            if ($objRow.PSObject.Properties[$strField].Value -isnot [string]) { return $false }
+        }
+        return $objRow.SourceCase -ceq $objProfile.SourceCase -and
+            $objRow.SourceRepository -ceq $objProfile.SourceRepository -and
+            $objRow.Primitive -ceq $objProfile.Primitive -and $objRow.TargetState -ceq $objProfile.TargetState -and
+            $objRow.ProbeAttempted -and $objRow.TargetControlPassed -and -not $objRow.ProbeSucceeded -and
+            $objRow.Reason -ceq 'target-state-control-passed-link-create-or-reparse-verification-failed'
+    } catch { return $false }
+}
+
+$script:scriptBlockAssertSourceLinkSkipEvidence = {
+    param ([object]$Catalog)
+
+    foreach ($objCase in $Catalog.Cases) {
+        if (-not $script:objCandidateSourceLinkAdmission.Contains($objCase.CaseId)) { continue }
+        $objProfile = & $script:scriptBlockGetSourceLinkProfile -Case $objCase
+        $objControl = [pscustomobject][ordered]@{
+            CaseReference = $objCase.CaseId; SourceCase = $objProfile.SourceCase; Primitive = $objProfile.Primitive
+            ProbeAttempted = $true; TargetControlPassed = $true; ProbeSucceeded = $false
+            Reason = 'target-state-control-passed-link-create-or-reparse-verification-failed'
+            SourceRepository = $objProfile.SourceRepository; TargetState = $objProfile.TargetState
+        }
+        $objObservation = & $script:scriptBlockNewObservation
+        $objObservation.AuthorizedSkip = $true
+        $objObservation.SkipCode = 'skip-link-primitive-unavailable'
+        $hashtableArguments = @{
+            Case = $objCase; Observation = $objObservation; OperatingSystem = 'Windows'
+            PowerShellEdition = $PSVersionTable.PSEdition; PowerShellVersion = $PSVersionTable.PSVersion
+        }
+        $objResult = & $script:scriptBlockNewCaseResult @hashtableArguments -PrimitiveEvidence @($objControl)
+        if ($objResult.HarnessVerdict -cne 'skip') { throw 'link-skip-evidence-control' }
+        foreach ($strMode in @('CaseReference', 'SourceCase', 'Primitive', 'ProbeAttempted', 'TargetControlPassed', 'ProbeSucceeded', 'Reason', 'SourceRepository', 'TargetState', 'missing', 'extra', 'duplicate', 'none', 'string-boolean')) {
+            $objMutant = $objControl | ConvertTo-Json -Compress | ConvertFrom-Json
+            $arrEvidence = @($objMutant)
+            switch -Exact ($strMode) {
+                'missing' { $objMutant.PSObject.Properties.Remove('TargetState') }
+                'extra' { Add-Member -InputObject $objMutant -MemberType NoteProperty -Name Extra -Value $true }
+                'duplicate' { $arrEvidence = @($objMutant, $objMutant) }
+                'none' { $arrEvidence = @() }
+                'string-boolean' { $objMutant.ProbeSucceeded = 'false' }
+                default {
+                    $objProperty = $objMutant.PSObject.Properties[$strMode]
+                    if ($objProperty.Value -is [bool]) { $objProperty.Value = -not $objProperty.Value }
+                    else { $objProperty.Value = 'wrong' }
+                }
+            }
+            $objResult = & $script:scriptBlockNewCaseResult @hashtableArguments -PrimitiveEvidence $arrEvidence
+            if ($objResult.HarnessVerdict -cne 'fail' -or $objResult.HarnessDiagnosticCode -cne 'orchestration-failed') { throw ('link-skip-evidence-mutant-' + $strMode) }
+        }
+    }
+}
+
 $script:scriptBlockNewCaseResult = {
     param (
         [Parameter(Mandatory = $true)]
@@ -9319,7 +13912,9 @@ $script:scriptBlockNewCaseResult = {
         [string]$PowerShellEdition,
 
         [Parameter(Mandatory = $true)]
-        [System.Version]$PowerShellVersion
+        [System.Version]$PowerShellVersion,
+
+        [AllowEmptyCollection()][object[]]$PrimitiveEvidence = @()
     )
 
     $boolMatched = $Case.ExpectedResult -ceq $Observation.Result -and
@@ -9347,7 +13942,8 @@ $script:scriptBlockNewCaseResult = {
         $Case.Applicability -cne 'All' -and
         $Case.Applicability -cne $OperatingSystem
     $boolPrimitiveSkip = $Observation.SkipCode -ceq 'skip-link-primitive-unavailable' -and
-        $Case.PrimitiveProbeRule -ceq 'required-link'
+        $Case.PrimitiveProbeRule -ceq 'required-link' -and
+        (& $script:scriptBlockTestSourceLinkSkipEvidence -Case $Case -Evidence $PrimitiveEvidence)
     $boolSkipAuthorized = $Observation.AuthorizedSkip -and
         ($boolOppositePlatformSkip -or $boolPrimitiveSkip)
     $strVerdict = if ($Observation.AuthorizedSkip -and -not $boolSkipAuthorized) {
@@ -9406,6 +14002,55 @@ $script:scriptBlockNewCaseResult = {
     return $objResult
 }
 
+$script:scriptBlockAssertOmittedResultFieldsCompared = {
+    param ([object]$Catalog, [string]$OperatingSystem, [string]$PowerShellEdition,
+        [System.Version]$PowerShellVersion, [string]$HarnessLiteralPath)
+
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        $HarnessLiteralPath, [ref]$null, [ref]$objErrors)
+    $arrProduction = @($objAst.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and
+        $Node.Name -ceq 'Invoke-StyleGuideCandidateHarness'
+    }, $true))
+    if (@($objErrors).Count -ne 0 -or $arrProduction.Count -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'result-comparator-source'
+    }
+    $arrCalls = @($arrProduction[0].Body.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.CommandAst] -and
+        $Node.CommandElements[0].Extent.Text -ceq '$script:scriptBlockNewCaseResult'
+    }, $true))
+    if ($arrCalls.Count -ne 1 -or $arrCalls[0].Extent.Text -cnotmatch
+        '-Case \$objCase\s+`?\s*-Observation \$objObservation') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'result-comparator-production-call'
+    }
+    $objCase = @($Catalog.Cases | Where-Object SemanticCase -CEQ 'archive.valid.exact')[0]
+    $objControl = & $script:scriptBlockNewObservation
+    foreach ($strField in [string[]]@('Result', 'Status', 'Phase', 'Subreason', 'DiagnosticCode',
+        'PreCleanupState', 'CleanupSequence', 'CandidateFinalState', 'ContextFinalState',
+        'FilesystemCallCount', 'SentinelState', 'SourceState')) {
+        $objControl[$strField] = $objCase.PSObject.Properties['Expected' + $strField].Value
+    }
+    $objControl.FixtureLength = [uint64]$objCase.FixtureLength
+    $objControl.FixtureSha256 = [string]$objCase.FixtureSha256
+    $hashtableArguments = @{ Case = $objCase; OperatingSystem = $OperatingSystem
+        PowerShellEdition = $PowerShellEdition; PowerShellVersion = $PowerShellVersion }
+    $objControlResult = & $script:scriptBlockNewCaseResult @hashtableArguments -Observation $objControl
+    if ($objControlResult.HarnessVerdict -cne 'pass') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'result-comparator-control'
+    }
+    foreach ($strField in [string[]]@('Subreason', 'SentinelState', 'SourceState')) {
+        $objMutant = [ordered]@{}
+        foreach ($strKey in $objControl.Keys) { $objMutant[$strKey] = $objControl[$strKey] }
+        $objMutant[$strField] = 'changed'
+        $objResult = & $script:scriptBlockNewCaseResult @hashtableArguments -Observation $objMutant
+        if ($objResult.HarnessVerdict -cne 'fail' -or
+            $objResult.HarnessDiagnosticCode -cne 'orchestration-failed') {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail ('result-comparator-mutant-' + $strField)
+        }
+    }
+}
+
 $script:scriptBlockAssertUnauthorizedSkipsRejected = {
     param (
         [Parameter(Mandatory = $true)]
@@ -9442,6 +14087,257 @@ $script:scriptBlockAssertUnauthorizedSkipsRejected = {
                 -Code 'orchestration-failed' `
                 -Detail 'unauthorized-skip-accepted'
         }
+    }
+}
+
+$script:scriptBlockWriteCandidateJsonLine = {
+    param ([AllowNull()][object]$Json)
+
+    if ($Json -isnot [string]) { throw 'json-line-type' }
+    $strJson = [string]$Json
+    if ($strJson.Length -eq 0 -or $strJson.IndexOf([char]13) -ge 0 -or $strJson.IndexOf([char]10) -ge 0) {
+        throw 'json-line-text'
+    }
+    # Encoding completes before stdout is opened. A malformed UTF-16 string
+    # cannot emit a partial record, and host success-stream formatting cannot
+    # replace the required LF or apply a console code page to this byte array.
+    $objEncoding = New-Object System.Text.UTF8Encoding($false, $true)
+    $arrBytes = $objEncoding.GetBytes($strJson + "`n")
+    $objOutput = [System.Console]::OpenStandardOutput()
+    try {
+        $objOutput.Write($arrBytes, 0, $arrBytes.Length)
+        $objOutput.Flush()
+    } finally { $objOutput.Dispose() }
+}
+
+$script:scriptBlockAssertCandidateJsonWriterWired = {
+    param ([string]$LiteralPath)
+
+    $arrErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($LiteralPath, [ref]$null, [ref]$arrErrors)
+    if ($arrErrors.Count -ne 0) { throw 'json-writer-source-parser' }
+    $arrWriter = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        $_.Left.VariablePath.UserPath -ceq 'script:scriptBlockWriteCandidateJsonLine'
+    })
+    $arrWrites = @($objAst.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        ($Node.Left.VariablePath.UserPath -replace '^(script|local|private|global):', '') -ieq 'scriptBlockWriteCandidateJsonLine'
+    }, $true))
+    if ($arrWriter.Count -ne 1 -or $arrWrites.Count -ne 1) { throw 'json-writer-source-definition' }
+    $strWriterSha = & $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($arrWriter[0].Extent.Text))
+    if ($strWriterSha -cne 'b6b973a380231918cf3b9cf90c52729846e95779e7d38de8faa9145f371cda21') { throw 'json-writer-source-content' }
+    $arrMain = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $_.Name -ceq 'Invoke-StyleGuideCandidateHarness'
+    })
+    if ($arrMain.Count -ne 1) { throw 'json-writer-source-main' }
+    $arrCalls = @($arrMain[0].Body.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.CommandAst] -and
+        $Node.CommandElements[0].Extent.Text -ceq '$script:scriptBlockWriteCandidateJsonLine'
+    }, $true))
+    $arrLegacy = @($arrMain[0].Body.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.CommandAst] -and $Node.GetCommandName() -ieq 'Write-Output'
+    }, $true))
+    if ($arrCalls.Count -ne 4 -or $arrLegacy.Count -ne 0) { throw 'json-writer-source-call-count' }
+    $arrExpected = [string[]]@(
+        'e7fe096bbc08f0b324d17d4f9eba597f7265dbf8a94fa5ae5e9af536bbb9340e',
+        'eff49ed83f1d113d1d1a2e2d8cb9860564f7727cfb73cc831687b2c3bf845078',
+        '3948f8221b119c6ee516d1f07c760440f8c89c9a978b2edf2381c4cb546bc3a0',
+        'f805507b8d2cc47541875ae6caeb88aacd58b5405bf7f266b988e2af3935f2d8'
+    )
+    for ($intIndex = 0; $intIndex -lt $arrExpected.Length; $intIndex++) {
+        $strActual = & $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($arrCalls[$intIndex].Extent.Text))
+        if ($strActual -cne $arrExpected[$intIndex]) { throw 'json-writer-source-call-content' }
+    }
+    return $strWriterSha
+}
+
+$script:scriptBlockAssertCandidateJsonWriterMutants = {
+    param ([string]$HarnessLiteralPath, [string]$RunRoot)
+
+    [void](& $script:scriptBlockAssertCandidateJsonWriterWired -LiteralPath $HarnessLiteralPath)
+    $strText = [System.IO.File]::ReadAllText($HarnessLiteralPath)
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($HarnessLiteralPath, [ref]$null, [ref]$null)
+    $objMain = @($objAst.EndBlock.Statements | Where-Object { $_ -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $_.Name -ceq 'Invoke-StyleGuideCandidateHarness' })[0]
+    $arrCalls = @($objMain.Body.FindAll({ param ($Node)
+        $Node -is [System.Management.Automation.Language.CommandAst] -and
+        $Node.CommandElements[0].Extent.Text -ceq '$script:scriptBlockWriteCandidateJsonLine'
+    }, $true))
+    $listMutants = New-Object 'System.Collections.Generic.List[object]'
+    foreach ($objCall in $arrCalls) {
+        $strMutant = $strText.Substring(0, $objCall.Extent.StartOffset) +
+            $objCall.Extent.Text.Replace('& $script:scriptBlockWriteCandidateJsonLine -Json ', 'Write-Output ') +
+            $strText.Substring($objCall.Extent.EndOffset)
+        $listMutants.Add([pscustomobject]@{ Text = $strMutant; Detail = 'json-writer-source-call-count' })
+    }
+    $objWriter = @($objAst.EndBlock.Statements | Where-Object { $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and $_.Left.Extent.Text -ceq '$script:scriptBlockWriteCandidateJsonLine' })[0]
+    $strMutantWriter = $objWriter.Extent.Text.Replace('UTF8Encoding($false, $true)', 'UTF8Encoding($true, $true)')
+    if ($strMutantWriter -ceq $objWriter.Extent.Text) { throw 'json-writer-mutant-anchor' }
+    $listMutants.Add([pscustomobject]@{ Text = $strText.Substring(0, $objWriter.Extent.StartOffset) + $strMutantWriter + $strText.Substring($objWriter.Extent.EndOffset); Detail = 'json-writer-source-content' })
+    $listMutants.Add([pscustomobject]@{ Text = $strText + "`n" + '$SCRIPT:SCRIPTBLOCKWRITECANDIDATEJSONLINE = { }'; Detail = 'json-writer-source-definition' })
+    $strRoot = [System.IO.Path]::Combine($RunRoot, 'json-writer-mutants')
+    [void][System.IO.Directory]::CreateDirectory($strRoot)
+    try {
+        $intIndex = 0
+        foreach ($objMutant in $listMutants) {
+            $intIndex++
+            $strPath = [System.IO.Path]::Combine($strRoot, ('mutant-' + $intIndex + '.ps1'))
+            [System.IO.File]::WriteAllText($strPath, $objMutant.Text, (New-Object System.Text.UTF8Encoding($false)))
+            $strFailure = $null
+            try { [void](& $script:scriptBlockAssertCandidateJsonWriterWired -LiteralPath $strPath) } catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne $objMutant.Detail) { throw ('json-writer-mutant-not-refused-' + $intIndex) }
+        }
+    } finally { & $script:scriptBlockRemoveTestTree -LiteralPath $strRoot -ApprovedParent $RunRoot }
+}
+
+$script:scriptBlockCandidateJsonWireWorker = {
+    param ([string]$HarnessPath, [string]$Mode, [string]$ResultPath)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    $arrErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($HarnessPath, [ref]$null, [ref]$arrErrors)
+    if ($arrErrors.Count -ne 0) { throw 'wire-worker-parser' }
+    $arrWriter = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+        $_.Left.VariablePath.UserPath -ceq 'script:scriptBlockWriteCandidateJsonLine'
+    })
+    if ($arrWriter.Count -ne 1) { throw 'wire-worker-definition' }
+    $strSource = $arrWriter[0].Extent.Text
+    $strDerived = $strSource
+    $strNeedle = '$objOutput = [System.Console]::OpenStandardOutput()'
+    if ($Mode -cin @('closed-stream', 'write-failure', 'flush-failure')) {
+        if ($strSource.Split([string[]]@($strNeedle), [System.StringSplitOptions]::None).Count -ne 2) { throw 'wire-worker-transform' }
+        if ($Mode -ceq 'closed-stream') {
+            $strDerived = $strSource.Replace($strNeedle, '$objOutput = New-Object System.IO.MemoryStream; $objOutput.Dispose()')
+        } else {
+            Add-Type -TypeDefinition @'
+using System;
+using System.IO;
+public sealed class PSStyleGuideWireWriteFailure : MemoryStream {
+    public override void Write(byte[] buffer, int offset, int count) { throw new IOException("wire-test-write"); }
+}
+public sealed class PSStyleGuideWireFlushFailure : MemoryStream {
+    public override void Flush() { throw new IOException("wire-test-flush"); }
+}
+'@
+            $strType = if ($Mode -ceq 'write-failure') { 'PSStyleGuideWireWriteFailure' } else { 'PSStyleGuideWireFlushFailure' }
+            $strDerived = $strSource.Replace($strNeedle, '$objOutput = New-Object ' + $strType)
+        }
+    }
+    . ([scriptblock]::Create($strDerived))
+    $objOriginalOut = [System.Console]::Out
+    $strOriginalNewLine = $objOriginalOut.NewLine
+    $intOriginalCodePage = [System.Console]::OutputEncoding.CodePage
+    $objCounter = [pscustomobject]@{ Calls = 0 }
+    $strAscii = '{"kind":"ascii","text":"plain"}'
+    $strUnicode = '{"kind":"unicode","text":"caf' + [char]0xE9 + ' ' + [char]::ConvertFromUtf32(0x1F600) + '"}'
+    $objInput = $strAscii
+    switch -Exact ($Mode) {
+        'positive' { }
+        'raw-type' {
+            $objInput = [pscustomobject]@{ Value = 'not-a-string' }
+            Add-Member -InputObject $objInput -MemberType ScriptMethod -Name ToString -Force -Value { $objCounter.Calls++; return '{}' }.GetNewClosure()
+            [void]$objInput.ToString()
+            if ($objCounter.Calls -ne 1) { throw 'wire-worker-callback-control' }
+            $objCounter.Calls = 0
+        }
+        'empty' { $objInput = '' }
+        'cr' { $objInput = "{`r}" }
+        'lf' { $objInput = "{`n}" }
+        'surrogate' { $objInput = '{"text":"' + [char]0xD800 + '"}' }
+        'closed-stream' { }
+        'write-failure' { }
+        'flush-failure' { }
+        default { throw 'wire-worker-mode' }
+    }
+    $objFailure = $null
+    $arrReturned = @()
+    try {
+        $arrReturned = @(& $script:scriptBlockWriteCandidateJsonLine -Json $objInput)
+        if ($Mode -ceq 'positive') { $arrReturned += @(& $script:scriptBlockWriteCandidateJsonLine -Json $strUnicode) }
+    } catch { $objFailure = $_ }
+    if ($Mode -ceq 'positive') {
+        if ($null -ne $objFailure) { throw $objFailure }
+    } else {
+        if ($null -eq $objFailure) { throw 'wire-worker-failure-not-propagated' }
+        $boolExpected = if ($Mode -ceq 'raw-type') { $objFailure.Exception.Message -ceq 'json-line-type' }
+            elseif ($Mode -cin @('empty', 'cr', 'lf')) { $objFailure.Exception.Message -ceq 'json-line-text' }
+            else { $false }
+        $objException = $objFailure.Exception
+        for ($intDepth = 0; $intDepth -lt 5 -and $null -ne $objException; $intDepth++) {
+            if (($Mode -ceq 'surrogate' -and $objException -is [System.Text.EncoderFallbackException]) -or
+                ($Mode -ceq 'closed-stream' -and $objException -is [System.ObjectDisposedException]) -or
+                ($Mode -cin @('write-failure', 'flush-failure') -and $objException -is [System.IO.IOException])) { $boolExpected = $true }
+            $objException = $objException.InnerException
+        }
+        if (-not $boolExpected) { throw 'wire-worker-wrong-failure' }
+    }
+    if ($arrReturned.Count -ne 0 -or $objCounter.Calls -ne 0 -or
+        -not [object]::ReferenceEquals($objOriginalOut, [System.Console]::Out) -or
+        $strOriginalNewLine -cne [System.Console]::Out.NewLine -or
+        $intOriginalCodePage -ne [System.Console]::OutputEncoding.CodePage) { throw 'wire-worker-caller-state' }
+    $objSha = [System.Security.Cryptography.SHA256]::Create()
+    try {
+        $strSourceSha = ([System.BitConverter]::ToString($objSha.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($strSource))) -replace '-', '').ToLowerInvariant()
+        $strDerivedSha = ([System.BitConverter]::ToString($objSha.ComputeHash([System.Text.Encoding]::UTF8.GetBytes($strDerived))) -replace '-', '').ToLowerInvariant()
+    } finally { $objSha.Dispose() }
+    $objResult = [pscustomobject][ordered]@{
+        Mode = $Mode; ProcessId = $PID; SourceWriterSha256 = $strSourceSha; DerivedWriterSha256 = $strDerivedSha
+        FailureObserved = $null -ne $objFailure; SuccessStreamValues = $arrReturned.Count; CallerCallbackCalls = $objCounter.Calls
+        ConsoleOutSame = [object]::ReferenceEquals($objOriginalOut, [System.Console]::Out)
+        ConsoleNewLineBefore = $strOriginalNewLine; ConsoleNewLineAfter = [System.Console]::Out.NewLine
+        ConsoleCodePageBefore = $intOriginalCodePage; ConsoleCodePageAfter = [System.Console]::OutputEncoding.CodePage
+    }
+    [System.IO.File]::WriteAllText($ResultPath, ($objResult | ConvertTo-Json -Compress), (New-Object System.Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockAssertCandidateJsonWire = {
+    param ([string]$HarnessLiteralPath, [string]$RunRoot, [switch]$EmitObservations)
+
+    $strWriterSha = & $script:scriptBlockAssertCandidateJsonWriterWired -LiteralPath $HarnessLiteralPath
+    $strRoot = [System.IO.Path]::Combine($RunRoot, 'json-wire-controls')
+    [void][System.IO.Directory]::CreateDirectory($strRoot)
+    $strWorkerPath = [System.IO.Path]::Combine($strRoot, 'worker.ps1')
+    [System.IO.File]::WriteAllText($strWorkerPath, $script:scriptBlockCandidateJsonWireWorker.ToString(), (New-Object System.Text.UTF8Encoding($false)))
+    $strAscii = '{"kind":"ascii","text":"plain"}'
+    $strUnicode = '{"kind":"unicode","text":"caf' + [char]0xE9 + ' ' + [char]::ConvertFromUtf32(0x1F600) + '"}'
+    $arrExpected = (New-Object System.Text.UTF8Encoding($false, $true)).GetBytes($strAscii + "`n" + $strUnicode + "`n")
+    $hashtableWorker = $null
+    try {
+        foreach ($strMode in @('positive', 'raw-type', 'empty', 'cr', 'lf', 'surrogate', 'closed-stream', 'write-failure', 'flush-failure')) {
+            $strResultPath = [System.IO.Path]::Combine($strRoot, $strMode + '.json')
+            $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath -WorkingDirectory $strRoot `
+                -Arguments @('-HarnessPath', $HarnessLiteralPath, '-Mode', $strMode, '-ResultPath', $strResultPath)
+            while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [System.Threading.Thread]::Sleep(10) }
+            if ($hashtableWorker.Process.ExitCode -ne 0 -or $hashtableWorker.Counts[1] -ne 0) { throw ('wire-worker-failed-' + $strMode) }
+            $arrActual = $hashtableWorker.Captured[0].ToArray()
+            if ($strMode -ceq 'positive') {
+                if ([System.Convert]::ToBase64String($arrActual) -cne [System.Convert]::ToBase64String($arrExpected)) { throw 'wire-native-bytes' }
+            } elseif ($arrActual.Length -ne 0) { throw 'wire-invalid-input-emitted' }
+            $objObserved = & $script:scriptBlockReadTerraformProofResult -LiteralPath $strResultPath
+            & $script:scriptBlockAssertExactPropertyNames -Value $objObserved -Names @('Mode', 'ProcessId', 'SourceWriterSha256', 'DerivedWriterSha256', 'FailureObserved', 'SuccessStreamValues', 'CallerCallbackCalls', 'ConsoleOutSame', 'ConsoleNewLineBefore', 'ConsoleNewLineAfter', 'ConsoleCodePageBefore', 'ConsoleCodePageAfter') -Detail 'wire-result'
+            if ($objObserved.Mode -cne $strMode -or $objObserved.ProcessId -ne $hashtableWorker.Process.Id -or
+                $objObserved.SourceWriterSha256 -cne $strWriterSha -or $objObserved.DerivedWriterSha256 -cnotmatch '^[0-9a-f]{64}$' -or
+                $objObserved.FailureObserved -isnot [bool] -or $objObserved.FailureObserved -ne ($strMode -cne 'positive') -or
+                $objObserved.SuccessStreamValues -ne 0 -or $objObserved.CallerCallbackCalls -ne 0 -or
+                $objObserved.ConsoleOutSame -isnot [bool] -or -not $objObserved.ConsoleOutSame -or
+                $objObserved.ConsoleNewLineBefore -cne $objObserved.ConsoleNewLineAfter -or
+                $objObserved.ConsoleCodePageBefore -ne $objObserved.ConsoleCodePageAfter) { throw 'wire-result-observation' }
+            if (($strMode -cin @('closed-stream', 'write-failure', 'flush-failure')) -eq
+                ($objObserved.SourceWriterSha256 -ceq $objObserved.DerivedWriterSha256)) { throw 'wire-source-transformation' }
+            if ($EmitObservations) {
+                [pscustomobject]@{ Observation = $objObserved; NativeExit = $hashtableWorker.Process.ExitCode; StandardErrorBytes = $hashtableWorker.Counts[1]; StandardOutputBase64 = [System.Convert]::ToBase64String($arrActual) }
+            }
+            & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker
+            $hashtableWorker = $null
+        }
+    } finally {
+        & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker
+        & $script:scriptBlockRemoveTestTree -LiteralPath $strRoot -ApprovedParent $RunRoot
     }
 }
 
@@ -9494,6 +14390,184 @@ $script:scriptBlockConvertToCanonicalCaseJson = {
 # The .NET version is recorded because without it the classification says only
 # "on some runtime the decoy was refused", which is not evidence of anything.
 # It is part of the observation, not an addition to it.
+$script:scriptBlockGetTerraformRunIdentity = {
+    param (
+        [string]$RepositoryRoot, [string]$GitPath, [string]$HelperLiteralPath,
+        [string]$ContextLiteralPath, [string]$CatalogPath, [string]$HarnessPath
+    )
+
+    $hashtableIdentity = [ordered]@{}
+    foreach ($strRole in @('Helper', 'Context', 'Catalog', 'Harness')) {
+        $strPath = switch -Exact ($strRole) {
+            'Helper' { $HelperLiteralPath }
+            'Context' { $ContextLiteralPath }
+            'Catalog' { $CatalogPath }
+            'Harness' { $HarnessPath }
+        }
+        $strRelative = switch -Exact ($strRole) {
+            'Helper' { $script:strCandidateHelperRelativePath }
+            'Context' { $script:strCandidateContextRelativePath }
+            'Catalog' { $script:strCandidateCatalogRelativePath }
+            'Harness' { '.github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1' }
+        }
+        & $script:scriptBlockAssertOrdinaryInputFileType -LiteralPath $strPath
+        $hashtableArguments = @{ RepositoryRoot = $RepositoryRoot; GitPath = $GitPath; LiteralPath = $strPath; RelativePath = $strRelative }
+        $strObjectId = if ($strRole -ceq 'Helper') {
+            & $script:scriptBlockAssertTrackedScriptIdentity @hashtableArguments -ExpectedVersion $script:strCandidateExpectedHelperVersion -ExpectedFunctionCount ([uint32]1)
+        } elseif ($strRole -ceq 'Context') {
+            & $script:scriptBlockAssertTrackedScriptIdentity @hashtableArguments -ExpectedVersion $script:strCandidateExpectedContextVersion -ExpectedFunctionCount ([uint32]3)
+        } else { & $script:scriptBlockAssertTrackedBlobIdentity @hashtableArguments }
+        $objEvidence = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath
+        $hashtableIdentity[$strRole + 'Blob'] = $strObjectId
+        $hashtableIdentity[$strRole + 'Sha256'] = $objEvidence.Sha256
+        $hashtableIdentity[$strRole + 'Length'] = $objEvidence.Length
+    }
+    foreach ($strKind in @('Commit', 'Tree')) {
+        $strRevision = if ($strKind -ceq 'Commit') { 'HEAD^{commit}' } else { 'HEAD^{tree}' }
+        $objNative = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $RepositoryRoot -ArgumentList @('rev-parse', '--verify', $strRevision)
+        if ($objNative.ExitCode -ne 0) { & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'run-head-status' }
+        $strValue = & $script:scriptBlockGetTrimmedAsciiLine -Bytes $objNative.StandardOutput
+        if ($strValue -cnotmatch '^(?:[0-9a-f]{40}|[0-9a-f]{64})$') { & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'run-head-shape' }
+        $hashtableIdentity['Source' + $strKind] = $strValue
+    }
+    return $hashtableIdentity
+}
+
+$script:scriptBlockAssertRunIdentityEqual = {
+    param ([object]$Before, [object]$After)
+
+    $arrNames = [string[]]@('HelperBlob', 'HelperSha256', 'HelperLength', 'ContextBlob', 'ContextSha256', 'ContextLength',
+        'CatalogBlob', 'CatalogSha256', 'CatalogLength', 'HarnessBlob', 'HarnessSha256', 'HarnessLength', 'SourceCommit', 'SourceTree')
+    foreach ($objIdentity in @($Before, $After)) {
+        if ($objIdentity -isnot [System.Collections.IDictionary] -or $objIdentity.Count -ne 14) { throw 'run-identity-shape' }
+        $arrKeys = @($objIdentity.Keys)
+        for ($intIndex = 0; $intIndex -lt $arrNames.Length; $intIndex++) {
+            $strName = $arrNames[$intIndex]
+            if ($arrKeys[$intIndex] -isnot [string] -or $arrKeys[$intIndex] -cne $strName) { throw 'run-identity-shape' }
+            $objValue = $objIdentity[$strName]
+            if ($strName.EndsWith('Length', [StringComparison]::Ordinal)) {
+                if ($objValue -isnot [uint64] -or $objValue -eq 0) { throw 'run-identity-shape' }
+            } elseif ($strName.EndsWith('Sha256', [StringComparison]::Ordinal)) {
+                if ($objValue -isnot [string] -or $objValue -cnotmatch '\A[0-9a-f]{64}\z') { throw 'run-identity-shape' }
+            } elseif ($objValue -isnot [string] -or $objValue -cnotmatch '\A(?:[0-9a-f]{40}|[0-9a-f]{64})\z') { throw 'run-identity-shape' }
+        }
+        foreach ($strName in @('HelperBlob', 'ContextBlob', 'CatalogBlob', 'HarnessBlob', 'SourceTree')) {
+            if ($objIdentity[$strName].Length -ne $objIdentity.SourceCommit.Length) { throw 'run-identity-shape' }
+        }
+    }
+    foreach ($strName in $arrNames) {
+        if ($Before[$strName] -cne $After[$strName]) { throw 'run-identity-changed' }
+    }
+}
+
+$script:scriptBlockAssertRunIdentityControls = {
+    param ([System.Collections.IDictionary]$Identity)
+
+    & $script:scriptBlockAssertRunIdentityEqual -Before $Identity -After $Identity
+    foreach ($strName in $Identity.Keys) {
+        foreach ($strMode in @('missing', 'type', 'changed')) {
+            $objChanged = [ordered]@{}
+            foreach ($strKey in $Identity.Keys) { $objChanged[$strKey] = $Identity[$strKey] }
+            switch -Exact ($strMode) {
+                'missing' { $objChanged.Remove($strName) }
+                'type' { $objChanged[$strName] = if ($Identity[$strName] -is [string]) { 42 } else { [string]$Identity[$strName] } }
+                'changed' {
+                    if ($Identity[$strName] -is [uint64]) { $objChanged[$strName] = [uint64]($Identity[$strName] + 1) }
+                    else { $objChanged[$strName] = $(if ($Identity[$strName][0] -ceq '0') { '1' } else { '0' }) + $Identity[$strName].Substring(1) }
+                }
+            }
+            $strExpected = if ($strMode -ceq 'changed') { 'run-identity-changed' } else { 'run-identity-shape' }
+            $strObserved = ''
+            try { & $script:scriptBlockAssertRunIdentityEqual -Before $Identity -After $objChanged }
+            catch { $strObserved = $_.Exception.Message }
+            if ($strObserved -cne $strExpected) { throw 'run-identity-control-refusal' }
+        }
+    }
+    foreach ($strMode in @('extra', 'wrong-case', 'wrong-order', 'null')) {
+        $objChanged = [ordered]@{}
+        foreach ($strKey in $Identity.Keys) { $objChanged[$strKey] = $Identity[$strKey] }
+        switch -Exact ($strMode) {
+            'extra' { $objChanged.Extra = 'extra' }
+            'wrong-case' { $objChanged = [ordered]@{}; foreach ($strKey in $Identity.Keys) { $objChanged[$strKey.ToLowerInvariant()] = $Identity[$strKey] } }
+            'wrong-order' { $objChanged = [ordered]@{}; $arrKeys = @($Identity.Keys); [array]::Reverse($arrKeys); foreach ($strKey in $arrKeys) { $objChanged[$strKey] = $Identity[$strKey] } }
+            'null' { $objChanged = $null }
+        }
+        $strObserved = ''
+        try { & $script:scriptBlockAssertRunIdentityEqual -Before $Identity -After $objChanged } catch { $strObserved = $_.Exception.Message }
+        if ($strObserved -cne 'run-identity-shape') { throw 'run-identity-control-shape' }
+    }
+}
+
+$script:scriptBlockAssertRunIdentityWiring = {
+    param ([string]$HarnessLiteralPath)
+
+    $arrErrors = $null
+    $objAst = [Management.Automation.Language.Parser]::ParseFile($HarnessLiteralPath, [ref]$null, [ref]$arrErrors)
+    if ($arrErrors.Count -ne 0) { throw 'run-identity-wiring' }
+    $arrMain = @($objAst.FindAll({ param ($Node) $Node -is [Management.Automation.Language.FunctionDefinitionAst] -and $Node.Name -ceq 'Invoke-StyleGuideCandidateHarness' }, $true))
+    if ($arrMain.Count -ne 1) { throw 'run-identity-wiring' }
+    $strMain = $arrMain[0].Body.Extent.Text
+    $arrRequired = [string[]]@(
+        '$hashtableRunIdentityBefore = & $script:scriptBlockGetTerraformRunIdentity -RepositoryRoot $strRepositoryRoot -GitPath $strGitPath -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -CatalogPath $strCatalogPath -HarnessPath $PSCommandPath',
+        '$objCatalog = & $script:scriptBlockReadCandidateCatalog -LiteralPath $strCatalogPath',
+        '$hashtableRunIdentityAfter = & $script:scriptBlockGetTerraformRunIdentity -RepositoryRoot $strRepositoryRoot -GitPath $strGitPath -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -CatalogPath $strCatalogPath -HarnessPath $PSCommandPath',
+        '& $script:scriptBlockAssertRunIdentityEqual -Before $hashtableRunIdentityBefore -After $hashtableRunIdentityAfter',
+        '& $script:scriptBlockWriteCandidateJsonLine -Json (& $script:scriptBlockConvertToCanonicalEnvelopeJson'
+    )
+    $intPrevious = -1
+    foreach ($strRequired in $arrRequired) {
+        if ([regex]::Matches($strMain, [regex]::Escape($strRequired)).Count -ne 1) { throw 'run-identity-wiring' }
+        $intOffset = $strMain.IndexOf($strRequired, [StringComparison]::Ordinal)
+        if ($intOffset -le $intPrevious) { throw 'run-identity-wiring' }
+        $intPrevious = $intOffset
+    }
+    foreach ($strVariable in @('hashtableRunIdentityBefore', 'hashtableRunIdentityAfter')) {
+        $arrWrites = @($arrMain[0].Body.FindAll({
+            param ($Node)
+            $Node -is [Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [Management.Automation.Language.VariableExpressionAst] -and
+            ($Node.Left.VariablePath.UserPath -replace '^(?i:script|local|private|global):', '') -ieq $strVariable
+        }, $true))
+        if ($arrWrites.Count -ne 1 -or $arrWrites[0].Left.VariablePath.UserPath -cne $strVariable) { throw 'run-identity-wiring' }
+    }
+}
+
+$script:scriptBlockAssertRunIdentityWiringMutants = {
+    param ([string]$HarnessLiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertRunIdentityWiring -HarnessLiteralPath $HarnessLiteralPath
+    $strSource = [IO.File]::ReadAllText($HarnessLiteralPath)
+    $arrErrors = $null
+    $objAst = [Management.Automation.Language.Parser]::ParseInput($strSource, [ref]$null, [ref]$arrErrors)
+    $objMain = @($objAst.FindAll({ param ($Node) $Node -is [Management.Automation.Language.FunctionDefinitionAst] -and $Node.Name -ceq 'Invoke-StyleGuideCandidateHarness' }, $true))[0]
+    $strMain = $objMain.Body.Extent.Text
+    $strBefore = '$hashtableRunIdentityBefore = & $script:scriptBlockGetTerraformRunIdentity -RepositoryRoot $strRepositoryRoot -GitPath $strGitPath -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -CatalogPath $strCatalogPath -HarnessPath $PSCommandPath'
+    $strAfter = $strBefore.Replace('hashtableRunIdentityBefore', 'hashtableRunIdentityAfter')
+    $strCompare = '& $script:scriptBlockAssertRunIdentityEqual -Before $hashtableRunIdentityBefore -After $hashtableRunIdentityAfter'
+    foreach ($objMutation in @(
+        @{ Marker = $strBefore; Replacement = '$hashtableRunIdentityBefore = @{}' },
+        @{ Marker = $strAfter; Replacement = $strAfter.Replace('-HarnessPath $PSCommandPath', '-HarnessPath $strHelperLiteralPath') },
+        @{ Marker = $strCompare; Replacement = '$null = $hashtableRunIdentityAfter' },
+        @{ Marker = $strCompare; Replacement = $strCompare.Replace('-After $hashtableRunIdentityAfter', '-After $hashtableRunIdentityBefore') },
+        @{ Marker = $strBefore; Replacement = $strBefore + "`n" + '$script:HASHTABLERUNIDENTITYBEFORE = @{}' },
+        @{ Marker = $strAfter; Replacement = $strAfter + "`n" + $strAfter }
+    )) {
+        if ([regex]::Matches($strMain, [regex]::Escape($objMutation.Marker)).Count -ne 1) { throw 'run-identity-mutant-anchor' }
+        $strChanged = $strMain.Replace($objMutation.Marker, $objMutation.Replacement)
+        $strChanged = $strSource.Substring(0, $objMain.Body.Extent.StartOffset) + $strChanged + $strSource.Substring($objMain.Body.Extent.EndOffset)
+        $arrErrors = $null
+        $null = [Management.Automation.Language.Parser]::ParseInput($strChanged, [ref]$null, [ref]$arrErrors)
+        if ($arrErrors.Count -ne 0) { throw 'run-identity-mutant-parse' }
+        $strPath = [IO.Path]::Combine($RunRoot, 'run-identity-mutant-' + [guid]::NewGuid().ToString('N') + '.ps1')
+        [IO.File]::WriteAllText($strPath, $strChanged, (New-Object Text.UTF8Encoding($false)))
+        $strObserved = ''
+        try { & $script:scriptBlockAssertRunIdentityWiring -HarnessLiteralPath $strPath }
+        catch { $strObserved = $_.Exception.Message }
+        finally { [IO.File]::Delete($strPath) }
+        if ($strObserved -cne 'run-identity-wiring') { throw 'run-identity-mutant-not-refused' }
+    }
+}
+
 $script:scriptBlockConvertToCanonicalEnvelopeJson = {
     param (
         [Parameter(Mandatory = $true)]
@@ -9521,7 +14595,7 @@ $script:scriptBlockConvertToCanonicalEnvelopeJson = {
         ContextSha256 = [string]$ContextEvidence.Sha256
         CatalogSha256 = [string]$CatalogEvidence.Sha256
         RuntimeVersion = [System.Environment]::Version.ToString()
-        AdversarialFixtureClassification = @($script:arrCandidateFixtureClassification)
+        AdversarialFixtureClassification = [object[]]@($script:listCandidateFixtureClassification.ToArray())
     }
     return ($hashtableEnvelope | ConvertTo-Json -Depth 4 -Compress)
 }
@@ -9621,6 +14695,385 @@ $script:scriptBlockAddTestDownloadRecord = {
     $Context.NextSequence = [uint32]($Context.NextSequence + 1)
 }
 
+$script:scriptBlockNewTerraformRawValue = {
+    param ([pscustomobject]$Specification, [string]$FixtureRoot)
+
+    $objValue = $null
+    $objCounters = [pscustomobject]@{ GetType = 0; ToString = 0 }
+    switch -Exact ($Specification.Class) {
+        'null' { $objValue = $null }
+        'integer' { $objValue = [int]1 }
+        'boolean' { $objValue = $true }
+        'one-element-array' { $objValue = [object[]]@('1') }
+        'two-element-array' { $objValue = [object[]]@('1', '2') }
+        'empty-array' { $objValue = [object[]]@() }
+        'hashtable' { $objValue = @{ Value = '1' } }
+        'pscustomobject' {
+            $objValue = [pscustomobject]@{ Value = '1' }
+            Add-Member -InputObject $objValue -MemberType ScriptMethod -Name ToString -Force -Value {
+                $script:intTerraformAttackerToStringCalls++
+                throw 'attacker-tostring-called'
+            }
+        }
+        { $_ -cin @('shadow-actual-type', 'shadow-string-type') } {
+            $objValue = [pscustomobject]@{ Value = '1' }
+            $objClaimedType = if ($Specification.Class -ceq 'shadow-string-type') { [string] } else { [System.Management.Automation.PSCustomObject] }
+            $scriptBlockType = {
+                $objCounters.GetType++
+                return $objClaimedType
+            }.GetNewClosure()
+            $scriptBlockText = {
+                $objCounters.ToString++
+                return '1'
+            }.GetNewClosure()
+            Add-Member -InputObject $objValue -MemberType ScriptMethod -Name GetType -Force -Value $scriptBlockType
+            Add-Member -InputObject $objValue -MemberType ScriptMethod -Name ToString -Force -Value $scriptBlockText
+            $null = $objValue.GetType()
+            $null = $objValue.ToString()
+            if ($objCounters.GetType -ne 1 -or $objCounters.ToString -ne 1) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'raw-counter-positive-control'
+            }
+            $objCounters.GetType = 0
+            $objCounters.ToString = 0
+        }
+        'string-builder' { $objValue = New-Object System.Text.StringBuilder('1') }
+        'empty' { $objValue = '' }
+        'whitespace' { $objValue = [string][char]8195 }
+        'control' { $objValue = [string][char]1 }
+        'zero' { $objValue = '0' }
+        'leading-zero' { $objValue = '01' }
+        'sign' { $objValue = '+1' }
+        'non-ascii-digit' { $objValue = [string][char]1633 }
+        'overlength' { $objValue = '1' * 21 }
+        'length-63' { $objValue = '0' * 63 }
+        'length-65' { $objValue = '0' * 65 }
+        'nonhex' { $objValue = 'g' * 64 }
+        'length-129' { $objValue = 'x' * 129 }
+        'digest-prefixed' { $objValue = 'sha256:' + ('0' * 64) }
+        'path-relative' { $objValue = 'relative-path' }
+        'path-nonfilesystem' { $objValue = 'Registry::' + [System.IO.Path]::Combine($FixtureRoot, 'unused') }
+        'path-wildcard' { $objValue = [System.IO.Path]::Combine($FixtureRoot, '*') }
+        'path-bracket' { $objValue = [System.IO.Path]::Combine($FixtureRoot, 'literal[1]') }
+        'path-bracket-parent' { $objValue = [System.IO.Path]::Combine($FixtureRoot, 'parent[1]', 'artifact.zip') }
+        'path-bracket-star' { $objValue = [System.IO.Path]::Combine($FixtureRoot, 'build[1]*.zip') }
+        'path-bracket-question' { $objValue = [System.IO.Path]::Combine($FixtureRoot, 'build[1]?.zip') }
+        'path-multiple-wildcard' { $objValue = [System.IO.Path]::Combine($FixtureRoot, 'match-*') }
+        'oversized-whitespace' { $objValue = ' ' * $Specification.ValueSpecification.Length }
+        'oversized-control' { $objValue = ('a' * $Specification.ValueSpecification.PrefixLength) + [char]1 }
+        default { & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'raw-class-unknown' }
+    }
+    # The envelope preserves null and empty/nested array identity across the
+    # PowerShell success pipeline; no raw value is stringified or enumerated.
+    return [pscustomobject]@{ Value = $objValue; Counters = $objCounters }
+}
+
+$script:scriptBlockAssertSourceOmittedLabelBinding = {
+    param ([object]$Parameters, [hashtable]$BoundLabels)
+
+    $strOmitted = [string]$Parameters.Raw.Parameter
+    $arrOther = @($Parameters.OtherLabels.PSObject.Properties)
+    if ($Parameters.Raw.Class -cne 'omitted' -or $arrOther.Count -ne 2 -or
+        $BoundLabels.Count -ne 2 -or $BoundLabels.ContainsKey($strOmitted)) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'omitted-label-bound-shape'
+    }
+    foreach ($strName in [string[]]@('ArtifactId', 'RunId', 'RunAttempt')) {
+        if ($strName -ceq $strOmitted) { continue }
+        $arrSourceValue = @($arrOther | Where-Object { $_.Name -ceq $strName })
+        if ($arrSourceValue.Count -ne 1 -or -not $BoundLabels.ContainsKey($strName) -or
+            $BoundLabels[$strName] -isnot [string] -or
+            $BoundLabels[$strName] -cne $arrSourceValue[0].Value) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'omitted-label-bound-value'
+        }
+    }
+}
+
+$script:scriptBlockNewTerraformRawZip = {
+    param ([string]$LiteralPath, [string]$CaseId)
+
+    $hashtableRawBytes = @{
+        'T1A-R-11' = 'UEsDBC0AAAAAAAAAAAAfCOpGAgAAAP////8XAAwAY29waWxvdC1pbnN0cnVjdGlvbnMubWQBAAgA//////////94ClBLAwQUAAAAAAAAAAAAHwjqRgIAAAACAAAAGgAAAHBvd2Vyc2hlbGwuaW5zdHJ1Y3Rpb25zLm1keApQSwMEFAAAAAAAAAAAAB8I6kYCAAAAAgAAABMAAABTVFlMRV9HVUlERV9DSEFULm1keApQSwMEFAAAAAAAAAAAAB8I6kYCAAAAAgAAABMAAABTVFlMRV9HVUlERV9GVUxMLm1keApQSwECLQAtAAAAAAAAAAAAHwjqRgIAAAD/////FwAMAAAAAAAAAAAAAAAAAAAAY29waWxvdC1pbnN0cnVjdGlvbnMubWQBAAgA//////////9QSwECLQAUAAAAAAAAAAAAHwjqRgIAAAACAAAAGgAAAAAAAAAAAAAAAABDAAAAcG93ZXJzaGVsbC5pbnN0cnVjdGlvbnMubWRQSwECLQAUAAAAAAAAAAAAHwjqRgIAAAACAAAAEwAAAAAAAAAAAAAAAAB9AAAAU1RZTEVfR1VJREVfQ0hBVC5tZFBLAQItABQAAAAAAAAAAAAfCOpGAgAAAAIAAAATAAAAAAAAAAAAAAAAALAAAABTVFlMRV9HVUlERV9GVUxMLm1kUEsFBgAAAAAEAAQAGwEAAOMAAAAAAA=='
+        'T1A-R-14' = 'UEsDBC0AAAAAAAAAAAAfCOpGAgAAAAMAAAAXAAAAY29waWxvdC1pbnN0cnVjdGlvbnMubWR4ClBLAwQUAAAAAAAAAAAAHwjqRgIAAAACAAAAGgAAAHBvd2Vyc2hlbGwuaW5zdHJ1Y3Rpb25zLm1keApQSwMEFAAAAAAAAAAAAB8I6kYCAAAAAgAAABMAAABTVFlMRV9HVUlERV9DSEFULm1keApQSwMEFAAAAAAAAAAAAB8I6kYCAAAAAgAAABMAAABTVFlMRV9HVUlERV9GVUxMLm1keApQSwECLQAtAAAAAAAAAAAAHwjqRgIAAAADAAAAFwAAAAAAAAAAAAAAAAAAAAAAY29waWxvdC1pbnN0cnVjdGlvbnMubWRQSwECLQAUAAAAAAAAAAAAHwjqRgIAAAACAAAAGgAAAAAAAAAAAAAAAAA3AAAAcG93ZXJzaGVsbC5pbnN0cnVjdGlvbnMubWRQSwECLQAUAAAAAAAAAAAAHwjqRgIAAAACAAAAEwAAAAAAAAAAAAAAAABxAAAAU1RZTEVfR1VJREVfQ0hBVC5tZFBLAQItABQAAAAAAAAAAAAfCOpGAgAAAAIAAAATAAAAAAAAAAAAAAAAAKQAAABTVFlMRV9HVUlERV9GVUxMLm1kUEsFBgAAAAAEAAQADwEAANcAAAAAAA=='
+        'T1A-R-04' = 'UEsDBC0AAAAAAAAAAAAfCOpGAgAAAAEAAAAXAAAAY29waWxvdC1pbnN0cnVjdGlvbnMubWR4ClBLAwQUAAAAAAAAAAAAHwjqRgIAAAACAAAAGgAAAHBvd2Vyc2hlbGwuaW5zdHJ1Y3Rpb25zLm1keApQSwMEFAAAAAAAAAAAAB8I6kYCAAAAAgAAABMAAABTVFlMRV9HVUlERV9DSEFULm1keApQSwMEFAAAAAAAAAAAAB8I6kYCAAAAAgAAABMAAABTVFlMRV9HVUlERV9GVUxMLm1keApQSwECLQAtAAAAAAAAAAAAHwjqRgIAAAABAAAAFwAAAAAAAAAAAAAAAAAAAAAAY29waWxvdC1pbnN0cnVjdGlvbnMubWRQSwECLQAUAAAAAAAAAAAAHwjqRgIAAAACAAAAGgAAAAAAAAAAAAAAAAA3AAAAcG93ZXJzaGVsbC5pbnN0cnVjdGlvbnMubWRQSwECLQAUAAAAAAAAAAAAHwjqRgIAAAACAAAAEwAAAAAAAAAAAAAAAABxAAAAU1RZTEVfR1VJREVfQ0hBVC5tZFBLAQItABQAAAAAAAAAAAAfCOpGAgAAAAIAAAATAAAAAAAAAAAAAAAAAKQAAABTVFlMRV9HVUlERV9GVUxMLm1kUEsFBgAAAAAEAAQADwEAANcAAAAAAA=='
+    }
+    if ($hashtableRawBytes.ContainsKey($CaseId)) {
+        [System.IO.File]::WriteAllBytes($LiteralPath, [System.Convert]::FromBase64String($hashtableRawBytes[$CaseId]))
+    } elseif ($CaseId -ceq 'T1A-R-08') {
+        # Three compressed 8 MiB entries and a final stored 8 MiB+1 entry.
+        # The last declared size is reduced by one in both actual ZIP headers.
+        # Stored data ensures ZipArchive exposes the extra byte to the prepass.
+        $objStream = [System.IO.File]::Open($LiteralPath, [System.IO.FileMode]::CreateNew,
+            [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+        try {
+            $objZip = New-Object System.IO.Compression.ZipArchive($objStream,
+                [System.IO.Compression.ZipArchiveMode]::Create, $true)
+            try {
+                $arrChunk = New-Object byte[] 65536
+                for ($intByte = 0; $intByte -lt $arrChunk.Length; $intByte++) { $arrChunk[$intByte] = 97 }
+                for ($intEntry = 0; $intEntry -lt 4; $intEntry++) {
+                    $objLevel = if ($intEntry -eq 3) { [System.IO.Compression.CompressionLevel]::NoCompression }
+                        else { [System.IO.Compression.CompressionLevel]::Optimal }
+                    $objEntry = $objZip.CreateEntry($script:arrCandidateExpectedName[$intEntry], $objLevel)
+                    $objOutput = $objEntry.Open()
+                    try {
+                        for ($intChunk = 0; $intChunk -lt 128; $intChunk++) { $objOutput.Write($arrChunk, 0, $arrChunk.Length) }
+                        if ($intEntry -eq 3) { $objOutput.WriteByte(97) }
+                    } finally { $objOutput.Dispose() }
+                }
+            } finally { $objZip.Dispose() }
+        } finally { $objStream.Dispose() }
+        $arrBytes = [System.IO.File]::ReadAllBytes($LiteralPath)
+        $intEnd = $arrBytes.Length - 22
+        if ([System.BitConverter]::ToUInt32($arrBytes, $intEnd) -ne 0x06054B50) { throw 'raw-zip-end' }
+        $intCentral = [int][System.BitConverter]::ToUInt32($arrBytes, $intEnd + 16)
+        # Framework NoCompression still uses deflate. Canonicalize only the final
+        # entry as stored while retaining the first three compressed records.
+        if (-not [System.BitConverter]::IsLittleEndian -or $intEnd -lt 22 -or
+            [System.BitConverter]::ToUInt16($arrBytes, $intEnd + 4) -ne 0 -or
+            [System.BitConverter]::ToUInt16($arrBytes, $intEnd + 6) -ne 0 -or
+            [System.BitConverter]::ToUInt16($arrBytes, $intEnd + 8) -ne 4 -or
+            [System.BitConverter]::ToUInt16($arrBytes, $intEnd + 10) -ne 4 -or
+            [System.BitConverter]::ToUInt16($arrBytes, $intEnd + 20) -ne 0 -or
+            $intCentral -lt 0 -or $intCentral -gt ($intEnd - 184) -or
+            [System.BitConverter]::ToUInt32($arrBytes, $intEnd + 12) -ne ($intEnd - $intCentral)) {
+            throw 'raw-zip-layout'
+        }
+        $intOriginalCentral = $intCentral
+        $intExpectedLocal = 0
+        $intFinalLocal = 0
+        $intFinalCentral = 0
+        $intFinalData = 0
+        for ($intEntry = 0; $intEntry -lt 4; $intEntry++) {
+            if ($intCentral -gt ($intEnd - 46) -or
+                [System.BitConverter]::ToUInt32($arrBytes, $intCentral) -ne 0x02014B50) {
+                throw 'raw-zip-source-central'
+            }
+            $intNameLength = [int][System.BitConverter]::ToUInt16($arrBytes, $intCentral + 28)
+            $intLocal = [int][System.BitConverter]::ToUInt32($arrBytes, $intCentral + 42)
+            $intCompressed = [int][System.BitConverter]::ToUInt32($arrBytes, $intCentral + 20)
+            $intLength = if ($intEntry -eq 3) { 8388609 } else { 8388608 }
+            $intMethod = [int][System.BitConverter]::ToUInt16($arrBytes, $intCentral + 10)
+            $intFlags = [int][System.BitConverter]::ToUInt16($arrBytes, $intCentral + 8)
+            if ($intNameLength -ne $script:arrCandidateExpectedName[$intEntry].Length -or
+                ($intCentral + 46 + $intNameLength) -gt $intEnd -or
+                [System.BitConverter]::ToUInt16($arrBytes, $intCentral + 30) -ne 0 -or
+                [System.BitConverter]::ToUInt16($arrBytes, $intCentral + 32) -ne 0 -or
+                [System.BitConverter]::ToUInt16($arrBytes, $intCentral + 34) -ne 0 -or
+                $intLocal -ne $intExpectedLocal -or $intLocal -gt ($intOriginalCentral - 30 - $intNameLength) -or
+                $intCompressed -lt 1 -or $intCompressed -gt ($intOriginalCentral - $intLocal - 30 - $intNameLength) -or
+                $intFlags -notin @(0, 2048) -or $intMethod -notin @(0, 8) -or
+                ($intEntry -lt 3 -and $intMethod -ne 8) -or
+                [System.BitConverter]::ToUInt32($arrBytes, $intCentral + 24) -ne $intLength -or
+                [System.BitConverter]::ToUInt32($arrBytes, $intLocal) -ne 0x04034B50 -or
+                [System.BitConverter]::ToUInt16($arrBytes, $intLocal + 6) -ne $intFlags -or
+                [System.BitConverter]::ToUInt16($arrBytes, $intLocal + 8) -ne $intMethod -or
+                [System.BitConverter]::ToUInt32($arrBytes, $intLocal + 14) -ne
+                    [System.BitConverter]::ToUInt32($arrBytes, $intCentral + 16) -or
+                [System.BitConverter]::ToUInt32($arrBytes, $intLocal + 18) -ne $intCompressed -or
+                [System.BitConverter]::ToUInt32($arrBytes, $intLocal + 22) -ne $intLength -or
+                [System.BitConverter]::ToUInt16($arrBytes, $intLocal + 26) -ne $intNameLength -or
+                [System.BitConverter]::ToUInt16($arrBytes, $intLocal + 28) -ne 0 -or
+                [System.Text.Encoding]::UTF8.GetString($arrBytes, $intCentral + 46, $intNameLength) -cne
+                    $script:arrCandidateExpectedName[$intEntry] -or
+                [System.Text.Encoding]::UTF8.GetString($arrBytes, $intLocal + 30, $intNameLength) -cne
+                    $script:arrCandidateExpectedName[$intEntry]) { throw 'raw-zip-source-entry' }
+            if ($intEntry -eq 3) {
+                $intFinalLocal = $intLocal
+                $intFinalCentral = $intCentral
+                $intFinalData = $intLocal + 30 + $intNameLength
+            }
+            $intExpectedLocal = $intLocal + 30 + $intNameLength + $intCompressed
+            $intCentral += 46 + $intNameLength
+        }
+        if ($intCentral -ne $intEnd -or $intExpectedLocal -ne $intOriginalCentral) { throw 'raw-zip-source-boundary' }
+        $intStoredCentral = $intFinalData + 8388609
+        $intCentralShift = $intStoredCentral - $intOriginalCentral
+        $arrStoredBytes = New-Object byte[] ($arrBytes.Length + $intCentralShift)
+        [System.Array]::Copy($arrBytes, 0, $arrStoredBytes, 0, $intFinalData)
+        for ($intChunk = 0; $intChunk -lt 128; $intChunk++) {
+            [System.Array]::Copy($arrChunk, 0, $arrStoredBytes, $intFinalData + ($intChunk * 65536), 65536)
+        }
+        $arrStoredBytes[$intFinalData + 8388608] = 97
+        [System.Array]::Copy($arrBytes, $intOriginalCentral, $arrStoredBytes, $intStoredCentral, $arrBytes.Length - $intOriginalCentral)
+        [System.Array]::Copy([System.BitConverter]::GetBytes([uint16]0), 0, $arrStoredBytes, $intFinalLocal + 8, 2)
+        [System.Array]::Copy([System.BitConverter]::GetBytes([uint32]8388609), 0, $arrStoredBytes, $intFinalLocal + 18, 4)
+        [System.Array]::Copy([System.BitConverter]::GetBytes([uint16]0), 0, $arrStoredBytes, $intFinalCentral + $intCentralShift + 10, 2)
+        [System.Array]::Copy([System.BitConverter]::GetBytes([uint32]8388609), 0, $arrStoredBytes, $intFinalCentral + $intCentralShift + 20, 4)
+        [System.Array]::Copy([System.BitConverter]::GetBytes([uint32]$intStoredCentral), 0, $arrStoredBytes, $intEnd + $intCentralShift + 16, 4)
+        $objPreservationHash = [System.Security.Cryptography.SHA256]::Create()
+        try {
+            if ([System.Convert]::ToBase64String($objPreservationHash.ComputeHash($arrBytes, 0, $intFinalLocal)) -cne
+                    [System.Convert]::ToBase64String($objPreservationHash.ComputeHash($arrStoredBytes, 0, $intFinalLocal)) -or
+                [System.Convert]::ToBase64String($objPreservationHash.ComputeHash($arrBytes, $intOriginalCentral, $intFinalCentral - $intOriginalCentral)) -cne
+                    [System.Convert]::ToBase64String($objPreservationHash.ComputeHash($arrStoredBytes, $intStoredCentral, $intFinalCentral - $intOriginalCentral))) {
+                throw 'raw-zip-preserved-entries'
+            }
+        } finally { $objPreservationHash.Dispose() }
+        $arrBytes = $arrStoredBytes
+        $intCentral = $intStoredCentral
+        for ($intEntry = 0; $intEntry -lt 4; $intEntry++) {
+            if ([System.BitConverter]::ToUInt32($arrBytes, $intCentral) -ne 0x02014B50) { throw 'raw-zip-central' }
+            if ($intEntry -eq 3) {
+                $intLocal = [int][System.BitConverter]::ToUInt32($arrBytes, $intCentral + 42)
+                if ([System.BitConverter]::ToUInt32($arrBytes, $intCentral + 24) -ne 8388609 -or
+                    [System.BitConverter]::ToUInt16($arrBytes, $intCentral + 10) -ne 0 -or
+                    [System.BitConverter]::ToUInt32($arrBytes, $intLocal) -ne 0x04034B50) { throw 'raw-zip-stored-control' }
+                [System.Array]::Copy([System.BitConverter]::GetBytes([uint32]8388608), 0, $arrBytes, $intCentral + 24, 4)
+                [System.Array]::Copy([System.BitConverter]::GetBytes([uint32]8388608), 0, $arrBytes, $intLocal + 22, 4)
+            }
+            $intCentral += 46 + [System.BitConverter]::ToUInt16($arrBytes, $intCentral + 28) +
+                [System.BitConverter]::ToUInt16($arrBytes, $intCentral + 30) + [System.BitConverter]::ToUInt16($arrBytes, $intCentral + 32)
+        }
+        [System.IO.File]::WriteAllBytes($LiteralPath, $arrBytes)
+        # Prove the malformed declaration still exposes the extra byte on this runtime.
+        $objReadZip = [System.IO.Compression.ZipFile]::OpenRead($LiteralPath)
+        try {
+            if ($objReadZip.Entries.Count -ne 4) { throw 'raw-zip-read-count' }
+            for ($intEntry = 0; $intEntry -lt 4; $intEntry++) {
+                $objReadEntry = $objReadZip.Entries[$intEntry]
+                if ($objReadEntry.FullName -cne $script:arrCandidateExpectedName[$intEntry] -or
+                    $objReadEntry.Length -ne 8388608) { throw 'raw-zip-read-declaration' }
+                $objReadStream = $objReadEntry.Open()
+                [long]$longActual = 0
+                try {
+                    $arrReadBuffer = New-Object byte[] 65536
+                    while (($intRead = $objReadStream.Read($arrReadBuffer, 0, $arrReadBuffer.Length)) -gt 0) {
+                        $longActual += $intRead
+                        if ($longActual -gt 8388609) { throw 'raw-zip-read-bound' }
+                    }
+                } finally { $objReadStream.Dispose() }
+                $intExpectedActual = if ($intEntry -eq 3) { 8388609 } else { 8388608 }
+                if ($longActual -ne $intExpectedActual) { throw 'raw-zip-read-length' }
+            }
+        } finally { $objReadZip.Dispose() }
+    } else { throw 'raw-zip-case' }
+    return & $script:scriptBlockGetFileEvidence -LiteralPath $LiteralPath
+}
+
+$script:scriptBlockPrepareTerraformEnvironmentCase = {
+    param (
+        [string]$CaseId, [System.Collections.IDictionary]$Layout, [object]$Context,
+        [System.Collections.IDictionary]$Arguments, [string]$ArchivePath
+    )
+
+    $objLock = $null
+    $strLinkPath = $null
+    $strLinkTarget = $null
+    $boolLinkDirectory = $true
+    switch -Exact ($CaseId) {
+        'T1A-P-01' {
+            $strParent = $Layout.Checkout + '-sibling'
+            [void][System.IO.Directory]::CreateDirectory($strParent)
+            $Arguments.CandidateDirectory = [System.IO.Path]::Combine($strParent, 'candidate')
+        }
+        'T1A-E-01' {
+            $Arguments.DownloadDirectory = [System.IO.Path]::Combine($Layout.CaseRoot, 'outside-download')
+            [void][System.IO.Directory]::CreateDirectory($Arguments.DownloadDirectory)
+        }
+        'T1A-AF-03' { $Arguments.CheckoutRoot = $Layout.Trusted.ToUpperInvariant() }
+        'T1A-AF-06' { [System.IO.File]::WriteAllBytes($Context.CandidatePath.ToUpperInvariant(), [byte[]]@(112, 114, 101)) }
+        'T1A-E-02' { $Arguments.CheckoutRoot = $Layout.Trusted }
+        'T1A-E-03' { $Arguments.CheckoutRoot = $Layout.CaseRoot }
+        'T1A-E-04' { $Arguments.CheckoutRoot = $Context.DownloadDirectoryPath }
+        'T1A-E-08' {
+            $strSibling = [System.IO.Path]::Combine($Layout.CaseRoot, 'TRUSTED')
+            $Arguments.DownloadDirectory = [System.IO.Path]::Combine($strSibling, 'download')
+            [void][System.IO.Directory]::CreateDirectory($Arguments.DownloadDirectory)
+        }
+        'T1A-E-09' {
+            $strLinkPath = [System.IO.Path]::Combine($Layout.CaseRoot, 'checkout-link')
+            $strLinkTarget = $Layout.Checkout
+            $Arguments.CheckoutRoot = $strLinkPath
+        }
+        'T1A-E-10' {
+            $strLinkPath = [System.IO.Path]::Combine($Layout.Trusted, 'download-link')
+            $strLinkTarget = $Context.DownloadDirectoryPath
+            $Arguments.DownloadDirectory = $strLinkPath
+        }
+        'T1A-E-11' {
+            $strExtra = [System.IO.Path]::Combine($Context.DownloadDirectoryPath, '.hidden-extra')
+            [System.IO.File]::WriteAllBytes($strExtra, [byte[]]@(120))
+            if ($script:boolCandidateIsWindows) { [System.IO.File]::SetAttributes($strExtra, [System.IO.FileAttributes]::Hidden) }
+            if (([System.IO.File]::GetAttributes($strExtra) -band [System.IO.FileAttributes]::Hidden) -eq 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'hidden-attribute-not-observed'
+            }
+        }
+        'T1A-E-14' { $Arguments.CheckoutRoot = [System.IO.Path]::Combine($Layout.CaseRoot, 'missing-checkout') }
+        'T1A-E-15' { $Arguments.CheckoutRoot = $Layout.SentinelFile }
+        'T1A-E-16' { $Arguments.TrustedTemporaryRoot = [System.IO.Path]::Combine($Layout.CaseRoot, 'missing-trusted') }
+        'T1A-E-17' { $Arguments.TrustedTemporaryRoot = $Layout.SentinelFile }
+        'T1A-E-18' { $Arguments.DownloadDirectory = [System.IO.Path]::Combine($Layout.Trusted, 'missing-download') }
+        'T1A-E-19' {
+            $strFile = [System.IO.Path]::Combine($Layout.Trusted, 'ordinary-parent-file')
+            [System.IO.File]::WriteAllBytes($strFile, [byte[]]@(112, 114, 101))
+            $Arguments.DownloadDirectory = $strFile
+        }
+        'T1A-E-21' {
+            [System.IO.File]::Delete($ArchivePath)
+            [void][System.IO.Directory]::CreateDirectory($ArchivePath)
+        }
+        'T1A-E-22' { $Arguments.CandidateDirectory = [System.IO.Path]::Combine($Layout.Trusted, 'missing-parent', 'candidate') }
+        'T1A-E-23' {
+            $strFile = [System.IO.Path]::Combine($Layout.Trusted, 'ordinary-parent-file')
+            [System.IO.File]::WriteAllBytes($strFile, [byte[]]@(112, 114, 101))
+            $Arguments.CandidateDirectory = [System.IO.Path]::Combine($strFile, 'candidate')
+        }
+        'T1A-E-24' {
+            $strParent = [System.IO.Path]::Combine($Layout.CaseRoot, 'outside-parent')
+            [void][System.IO.Directory]::CreateDirectory($strParent)
+            $Arguments.CandidateDirectory = [System.IO.Path]::Combine($strParent, 'candidate')
+        }
+        'T1A-E-26' {
+            [void][System.IO.Directory]::CreateDirectory([System.IO.Path]::Combine($Layout.Checkout, 'child'))
+            $strLinkPath = [System.IO.Path]::Combine($Layout.CaseRoot, 'ancestor-link')
+            $strLinkTarget = $Layout.Checkout
+            $Arguments.CheckoutRoot = [System.IO.Path]::Combine($strLinkPath, 'child')
+        }
+        'T1A-E-27' {
+            $strExtra = [System.IO.Path]::Combine($Context.DownloadDirectoryPath, 'system-extra')
+            [System.IO.File]::WriteAllBytes($strExtra, [byte[]]@(120))
+            [System.IO.File]::SetAttributes($strExtra, [System.IO.FileAttributes]::System)
+            if (([System.IO.File]::GetAttributes($strExtra) -band [System.IO.FileAttributes]::System) -eq 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'system-attribute-not-observed'
+            }
+        }
+        'T1A-W-01' { }
+        'T1A-W-02' { [System.IO.File]::WriteAllBytes([System.IO.Path]::Combine($Context.DownloadDirectoryPath, 'extra'), [byte[]]@(120)) }
+        'T1A-W-03' {
+            [System.IO.File]::Delete($ArchivePath)
+            [void][System.IO.Directory]::CreateDirectory($ArchivePath)
+        }
+        'T1A-W-04' {
+            [System.IO.File]::Delete($ArchivePath)
+            $strLinkPath = $ArchivePath
+            $strLinkTarget = $Layout.SentinelFile
+            $boolLinkDirectory = $false
+        }
+        'T1A-W-05' {
+            $objLock = New-Object System.IO.FileStream($ArchivePath, [System.IO.FileMode]::Open,
+                [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+        }
+        'T1A-W-06' {
+            if ($script:boolCandidateIsWindows) { throw 'fifo-inapplicable' }
+            $strMkfifo = [string](& $script:scriptBlockResolveHarnessNativePath -CandidatePath ([string[]]@('/usr/bin/mkfifo', '/bin/mkfifo')))
+            if ($strMkfifo.Length -eq 0 -or
+                ([System.IO.File]::GetAttributes($strMkfifo) -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'mkfifo-unavailable' }
+            [System.IO.File]::Delete($ArchivePath)
+            $arrOutput = @(& $strMkfifo '--' $ArchivePath 2>$null)
+            if ($LASTEXITCODE -ne 0 -or $arrOutput.Count -ne 0) { throw 'mkfifo-failed' }
+        }
+        'T1A-L-01' { [System.IO.File]::WriteAllBytes($Context.CandidatePath, [byte[]]@(112, 114, 101)) }
+        'T1A-L-02' { [void][System.IO.Directory]::CreateDirectory($Context.CandidatePath) }
+        'T1A-L-03' { $strLinkPath = $Context.CandidatePath; $strLinkTarget = $Layout.SentinelDirectory }
+        'T1A-L-04' { $strLinkPath = $Context.CandidatePath; $strLinkTarget = [System.IO.Path]::Combine($Layout.CaseRoot, 'absent-link-target') }
+        default { & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'environment-recipe-unimplemented' }
+    }
+    if ($null -ne $strLinkPath -and
+        -not (& $script:scriptBlockNewSymbolicLink -LinkPath $strLinkPath -TargetPath $strLinkTarget -Directory $boolLinkDirectory)) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
+    }
+    return [pscustomobject]@{ Lock = $objLock; LinkPath = $strLinkPath; LinkTarget = $strLinkTarget }
+}
+
 $script:scriptBlockInvokeExpansionFixture = {
     param (
         [Parameter(Mandatory = $true)]
@@ -9640,6 +15093,34 @@ $script:scriptBlockInvokeExpansionFixture = {
     $boolFixtureLinkCreated = $true
     try {
         $strSemantic = [string]$Case.SemanticCase
+        $objSourceRawCase = $null
+        $objRawEnvelope = $null
+        $objSourcePathCase = $null
+        if ($Case.FixtureRecipe -ceq 'source-helper-path') {
+            $arrSourcePathCase = @($script:objCandidateSourceCatalog.Cases | Where-Object {
+                $_.Id.ToLowerInvariant() -ceq $Case.SemanticVariant
+            })
+            if ($arrSourcePathCase.Count -ne 1) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'path-source-case'
+            }
+            $objSourcePathCase = $arrSourcePathCase[0]
+            $strSemantic = switch -Exact ($objSourcePathCase.Id) {
+                'T1A-E-20' { 'download.entries.empty' }
+                'T1A-E-21' { 'download.entry.directory' }
+                'T1A-Z-01' { 'archive.invalid.header' }
+                default { 'archive.valid.exact' }
+            }
+        }
+        if ($Case.FixtureRecipe -ceq 'source-helper-raw') {
+            $arrSourceCase = @($script:objCandidateSourceCatalog.Cases | Where-Object {
+                $_.Id.ToLowerInvariant() -ceq $Case.SemanticVariant
+            })
+            if ($arrSourceCase.Count -ne 1) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'raw-source-case'
+            }
+            $objSourceRawCase = $arrSourceCase[0]
+            $strSemantic = 'archive.valid.exact'
+        }
 
         if ($strSemantic -ceq 'environment.trusted.nonfilesystem-provider') {
             try {
@@ -9712,9 +15193,7 @@ $script:scriptBlockInvokeExpansionFixture = {
             $boolFixtureLinkCreated = & $script:scriptBlockNewSymbolicLink `
                 -LinkPath $strLink -TargetPath $strTarget -Directory $true
             if (-not $boolFixtureLinkCreated) {
-                $objObservation.AuthorizedSkip = $true
-                $objObservation.SkipCode = 'skip-link-primitive-unavailable'
-                return $objObservation
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
             }
             try {
                 [void](New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strLink)
@@ -9759,13 +15238,29 @@ $script:scriptBlockInvokeExpansionFixture = {
             [void][System.IO.Directory]::CreateDirectory($hashtableLayout.Trusted)
         }
 
+        $strCreationParent = $hashtableLayout.Trusted
+        if ($null -ne $objSourcePathCase -and $objSourcePathCase.Id -ceq 'T1A-DN-05') {
+            $strCreationParent += [System.IO.Path]::DirectorySeparatorChar
+        }
         $objContext = New-StyleGuideCandidateInvocationContext `
-            -TrustedTemporaryRoot $hashtableLayout.Trusted
+            -TrustedTemporaryRoot $strCreationParent
         $objObservation.InvocationId = $objContext.InvocationId
         $objObservation.PreCleanupState = 'Active'
         $objObservation.CandidateFinalState = 'Absent'
         $objObservation.ContextFinalState = 'Active'
 
+        if ($null -ne $objSourcePathCase -and $objSourcePathCase.Id -ceq 'T1A-DN-05') {
+            $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            $objObservation.Result = if ($objCleanup.Success) { 'success' } else { 'rejection' }
+            $objObservation.Status = if ($objCleanup.Success) { 'succeeded' } else { 'failed' }
+            $objObservation.Phase = 'none'
+            $objObservation.Subreason = 'none'
+            $objObservation.DiagnosticCode = 'none'
+            $objObservation.CleanupSequence = 'context'
+            $objObservation.ContextFinalState = [string]$objContext.LifecycleState
+            $objObservation.FilesystemCallCount = [uint32]$objCleanup.FilesystemCallCount
+            return $objObservation
+        }
         if ($strSemantic -ceq 'path.containment.sibling-prefix') {
             $strSibling = $hashtableLayout.Trusted + '-sibling'
             if (& $script:scriptBlockTestCandidateHelperPathContained `
@@ -9786,6 +15281,10 @@ $script:scriptBlockInvokeExpansionFixture = {
             $objContext.DownloadDirectoryPath,
             'candidate-artifact.bin'
         )
+        if ($null -ne $objSourcePathCase -and $objSourcePathCase.Id -cin @('T1A-FB-01', 'T1A-FB-02')) {
+            $strArchivePath = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath,
+                [string]$objSourcePathCase.Fixture.Parameters.ArchiveLeaf)
+        }
         $boolCreateDefaultArchive = $strSemantic -cnotin @(
             'download.entries.empty',
             'download.entries.two-files',
@@ -9866,9 +15365,7 @@ $script:scriptBlockInvokeExpansionFixture = {
                 -TargetPath $hashtableLayout.SentinelDirectory `
                 -Directory $true
             if (-not $boolFixtureLinkCreated) {
-                $objObservation.AuthorizedSkip = $true
-                $objObservation.SkipCode = 'skip-link-primitive-unavailable'
-                return $objObservation
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
             }
         } elseif ($boolCreateDefaultArchive) {
             $hashtableFixtureEvidence = & $script:scriptBlockNewZipFixture `
@@ -9980,9 +15477,7 @@ $script:scriptBlockInvokeExpansionFixture = {
             $boolFixtureLinkCreated = & $script:scriptBlockNewSymbolicLink `
                 -LinkPath $strCheckoutLink -TargetPath $strCheckoutTarget -Directory $true
             if (-not $boolFixtureLinkCreated) {
-                $objObservation.AuthorizedSkip = $true
-                $objObservation.SkipCode = 'skip-link-primitive-unavailable'
-                return $objObservation
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
             }
             $hashtableLayout.Checkout = $strCheckoutLink
         } elseif ($strSemantic -ceq 'environment.roots.equal') {
@@ -10018,11 +15513,21 @@ $script:scriptBlockInvokeExpansionFixture = {
         }
         if ((& $script:scriptBlockTestLinkSemanticCase -SemanticCase $strSemantic) -and
             -not $boolFixtureLinkCreated) {
-            $objObservation.AuthorizedSkip = $true
-            $objObservation.SkipCode = 'skip-link-primitive-unavailable'
-            return $objObservation
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
         }
 
+        if ($Case.FixtureRecipe -ceq 'source-raw-zip') {
+            [System.IO.File]::Delete($strArchivePath)
+            $objRawZipEvidence = & $script:scriptBlockNewTerraformRawZip -LiteralPath $strArchivePath -CaseId $Case.SemanticVariant.ToUpperInvariant()
+            $objObservation.FixtureLength = [uint64]$objRawZipEvidence.Length
+            $objObservation.FixtureSha256 = [string]$objRawZipEvidence.Sha256
+        }
+        if ($strSemantic -ceq 'archive.invalid.header') {
+            [System.IO.File]::WriteAllBytes($strArchivePath, (New-Object byte[] 32))
+            $objInvalidEvidence = & $script:scriptBlockGetFileEvidence -LiteralPath $strArchivePath
+            $objObservation.FixtureLength = [uint64]$objInvalidEvidence.Length
+            $objObservation.FixtureSha256 = [string]$objInvalidEvidence.Sha256
+        }
         $objCheckoutClaim = [object]$hashtableLayout.Checkout
         $objTrustedClaim = [object]$hashtableLayout.Trusted
         $objDownloadClaim = [object]$objContext.DownloadDirectoryPath
@@ -10070,6 +15575,82 @@ $script:scriptBlockInvokeExpansionFixture = {
             default {}
         }
 
+        if ($null -ne $objSourcePathCase) {
+            $hashtablePathArguments = @{
+                CheckoutRoot = $objCheckoutClaim; TrustedTemporaryRoot = $objTrustedClaim
+                DownloadDirectory = $objDownloadClaim; CandidateDirectory = $objCandidateClaim
+            }
+            if ($objSourcePathCase.Id -cin @('T1A-DN-01', 'T1A-DN-02', 'T1A-DN-03', 'T1A-DN-04')) {
+                $hashtablePathArguments[$objSourcePathCase.Fixture.Parameters.Parameter] += [System.IO.Path]::DirectorySeparatorChar
+            } elseif ($objSourcePathCase.Id -ceq 'T1A-E-07') {
+                foreach ($strPathKey in @($hashtablePathArguments.Keys)) {
+                    $hashtablePathArguments[$strPathKey] = $hashtablePathArguments[$strPathKey].ToUpperInvariant()
+                }
+            } elseif ($objSourcePathCase.Id -cin @('T1A-E-01', 'T1A-E-08', 'T1A-E-10', 'T1A-E-15',
+                'T1A-E-16', 'T1A-E-17', 'T1A-E-18', 'T1A-E-19', 'T1A-E-22', 'T1A-E-23',
+                'T1A-E-24', 'T1A-E-26', 'T1A-E-27', 'T1A-P-01')) {
+                $null = & $script:scriptBlockPrepareTerraformEnvironmentCase -CaseId $objSourcePathCase.Id `
+                    -Layout $hashtableLayout -Context $objContext -Arguments $hashtablePathArguments -ArchivePath $strArchivePath
+            } elseif ($objSourcePathCase.Id -ceq 'T1A-X-07') {
+                $objExpectedDigest = '0' * 64
+                $hashtableOptional.ArtifactId = '146'
+                $hashtableOptional.RunId = '9001'
+                $hashtableOptional.RunAttempt = '2'
+            }
+            $objCheckoutClaim = $hashtablePathArguments.CheckoutRoot
+            $objTrustedClaim = $hashtablePathArguments.TrustedTemporaryRoot
+            $objDownloadClaim = $hashtablePathArguments.DownloadDirectory
+            $objCandidateClaim = $hashtablePathArguments.CandidateDirectory
+        }
+
+        if ($null -ne $objSourceRawCase) {
+            $script:intTerraformAttackerToStringCalls = 0
+            $objRawSpecification = $objSourceRawCase.Fixture.Parameters.Raw
+            if ($objRawSpecification.Class -ceq 'omitted') {
+                foreach ($objOtherLabel in $objSourceRawCase.Fixture.Parameters.OtherLabels.PSObject.Properties) {
+                    $hashtableOptional.Add([string]$objOtherLabel.Name, $objOtherLabel.Value)
+                }
+                & $script:scriptBlockAssertSourceOmittedLabelBinding `
+                    -Parameters $objSourceRawCase.Fixture.Parameters -BoundLabels $hashtableOptional
+                foreach ($strSuppliedLabel in @($hashtableOptional.Keys)) {
+                    $hashtableMutant = $hashtableOptional.Clone()
+                    $hashtableMutant.Remove($strSuppliedLabel)
+                    $boolRejected = $false
+                    try {
+                        & $script:scriptBlockAssertSourceOmittedLabelBinding `
+                            -Parameters $objSourceRawCase.Fixture.Parameters -BoundLabels $hashtableMutant
+                    } catch {
+                        $boolRejected = $_.Exception.Message -ceq
+                            'PSStyleGuide.CandidateHarness.v1|code=fixture-failed|detail=omitted-label-bound-shape'
+                    }
+                    if (-not $boolRejected) {
+                        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'omitted-label-mutant-accepted'
+                    }
+                }
+            } else {
+                $objRawEnvelope = & $script:scriptBlockNewTerraformRawValue `
+                    -Specification $objRawSpecification -FixtureRoot $hashtableLayout.CaseRoot
+                switch -Exact ($objRawSpecification.Parameter) {
+                    'CheckoutRoot' { $objCheckoutClaim = $objRawEnvelope.Value }
+                    'TrustedTemporaryRoot' { $objTrustedClaim = $objRawEnvelope.Value }
+                    'DownloadDirectory' { $objDownloadClaim = $objRawEnvelope.Value }
+                    'CandidateDirectory' { $objCandidateClaim = $objRawEnvelope.Value }
+                    'ExpectedDigest' { $objExpectedDigest = $objRawEnvelope.Value }
+                    { $_ -cin @('ArtifactId', 'RunId', 'RunAttempt') } {
+                        $hashtableOptional[$objRawSpecification.Parameter] = $objRawEnvelope.Value
+                    }
+                    default {
+                        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'raw-parameter'
+                    }
+                }
+            }
+        }
+
+        $objRawSnapshotBefore = $null
+        if ($null -ne $objSourceRawCase -and
+            $objSourceRawCase.Fixture.Parameters.Raw.Class -cin @('shadow-actual-type', 'shadow-string-type')) {
+            $objRawSnapshotBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+        }
         $objExpansionError = $null
         $objReturnedContext = $null
         try {
@@ -10088,6 +15669,23 @@ $script:scriptBlockInvokeExpansionFixture = {
                 $objHeldStream.Dispose()
                 $objHeldStream = $null
             }
+        }
+
+        if ($null -ne $objRawSnapshotBefore) {
+            $objRawSnapshotAfter = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+            $hashtableRawEvidence = [ordered]@{
+                ShadowGetTypeCalls = $objRawEnvelope.Counters.GetType
+                ShadowToStringCalls = $objRawEnvelope.Counters.ToString
+                FilesystemSnapshotUnchanged = (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objRawSnapshotBefore -Right $objRawSnapshotAfter)
+            }
+            & $script:scriptBlockAssertCandidateRawEvidence -Evidence $hashtableRawEvidence
+            & $script:scriptBlockAssertTerraformRawEvidenceMutants -Evidence $hashtableRawEvidence
+        }
+        if ($null -ne $objSourceRawCase -and
+            ($script:intTerraformAttackerToStringCalls -ne 0 -or
+                ($null -ne $objRawEnvelope -and
+                    ($objRawEnvelope.Counters.GetType -ne 0 -or $objRawEnvelope.Counters.ToString -ne 0)))) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'raw-attacker-method-called'
         }
 
         if ($null -eq $objExpansionError) {
@@ -10236,6 +15834,696 @@ $script:scriptBlockSetCleanupObservation = {
         }
     } else {
         'Absent'
+    }
+}
+
+$script:scriptBlockInstallTerraformFixtureCount = {
+    param ([object]$Target, [scriptblock]$Getter)
+
+    $objOriginalTarget = $Target
+    $objTypeNames = $Target.PSObject.TypeNames
+    $arrOriginalNames = [string[]]@($objTypeNames)
+    $arrSibling = [object[]]@(7, 8)
+    $arrSiblingNames = [string[]]@($arrSibling.PSObject.TypeNames)
+    $objTypeNames.Clear()
+    try {
+        Add-Member -InputObject $Target -MemberType ScriptProperty -Name Count -Force -Value $Getter
+    } finally {
+        foreach ($strTypeName in $arrOriginalNames) { $objTypeNames.Add($strTypeName) }
+    }
+    if (-not [object]::ReferenceEquals($objOriginalTarget, $Target) -or
+        -not [object]::ReferenceEquals($objTypeNames, $Target.PSObject.TypeNames) -or
+        $objTypeNames.Count -ne $arrOriginalNames.Length -or
+        $arrSibling.PSObject.TypeNames.Count -ne $arrSiblingNames.Length -or $arrSibling.Count -ne 2) {
+        throw 'fixture-count-instance-restoration'
+    }
+    for ($intIndex = 0; $intIndex -lt $arrOriginalNames.Length; $intIndex++) {
+        if ($objTypeNames[$intIndex] -cne $arrOriginalNames[$intIndex]) { throw 'fixture-count-type-name-order' }
+    }
+    for ($intIndex = 0; $intIndex -lt $arrSiblingNames.Length; $intIndex++) {
+        if ($arrSibling.PSObject.TypeNames[$intIndex] -cne $arrSiblingNames[$intIndex]) { throw 'fixture-count-sibling-type-name-order' }
+    }
+}
+
+$script:scriptBlockTerraformPublicLifecycleWorker = {
+    param ([string]$Roles, [string]$FixtureRoot)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    . ([IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))
+    $strHelper = [IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1')
+    . $strHelper
+    $scriptBlockCleanup = (Microsoft.PowerShell.Core\Get-Command -Name Remove-StyleGuideCandidateInvocationState -CommandType Function).ScriptBlock
+    $scriptBlockManagerCleanup = (Microsoft.PowerShell.Core\Get-Command -Name Remove-StyleGuideCandidateInvocationContext -CommandType Function).ScriptBlock
+    $listResults = New-Object 'System.Collections.Generic.List[pscustomobject]'
+    foreach ($strMode in @('clone-candidate', 'clone-context', 'forged-candidate-terminal', 'forged-context-terminal',
+        'lying-success-active', 'lying-retained-active', 'lying-success-disposed', 'lying-retained-disposed')) {
+        $strRoot = [IO.Path]::Combine($FixtureRoot, $strMode)
+        $strCheckout = [IO.Path]::Combine($strRoot, 'checkout')
+        $strTrusted = [IO.Path]::Combine($strRoot, 'trusted')
+        [void][IO.Directory]::CreateDirectory($strCheckout)
+        [void][IO.Directory]::CreateDirectory($strTrusted)
+        $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrusted
+        $objOriginalContext = $objContext
+        $strArchive = [IO.Path]::Combine($objContext.DownloadDirectoryPath, 'artifact.zip')
+        $objZip = [IO.Compression.ZipFile]::Open($strArchive, [IO.Compression.ZipArchiveMode]::Create)
+        try {
+            foreach ($strName in @('copilot-instructions.md', 'powershell.instructions.md', 'STYLE_GUIDE_CHAT.md', 'STYLE_GUIDE_FULL.md')) {
+                $objStream = $objZip.CreateEntry($strName).Open()
+                try { $arrBytes = [Text.Encoding]::UTF8.GetBytes("fixture`n"); $objStream.Write($arrBytes, 0, $arrBytes.Length) }
+                finally { $objStream.Dispose() }
+            }
+        } finally { $objZip.Dispose() }
+        $strDigest = (Microsoft.PowerShell.Utility\Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash
+        $objExpanded = & $strHelper -Context $objContext -CheckoutRoot $strCheckout -TrustedTemporaryRoot $strTrusted `
+            -DownloadDirectory $objContext.DownloadDirectoryPath -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $strDigest
+        $objJournal = $objContext.OwnershipJournal
+        $arrFiles = @($objJournal | Where-Object { $_.Kind -ceq 'CandidateFile' -and $_.EntryState -ceq 'Created' })
+        if (-not [object]::ReferenceEquals($objExpanded, $objContext) -or $objContext.LifecycleState -cne 'Active' -or
+            $objJournal.Count -ne 8 -or $arrFiles.Count -ne 4) { throw 'public-lifecycle-control-expansion' }
+        $hashtableBytes = @{}
+        foreach ($objFile in $arrFiles) { $hashtableBytes[$objFile.Path] = [Convert]::ToBase64String([IO.File]::ReadAllBytes($objFile.Path)) }
+        $hashtableSignal = @{ Calls = 0 }
+        $strObservedReason = 'none'
+        $objObserved = $null
+        if ($strMode.StartsWith('lying-', [StringComparison]::Ordinal)) {
+            $boolDisposed = $strMode.EndsWith('-disposed', [StringComparison]::Ordinal)
+            if ($boolDisposed) {
+                $objInitial = & $scriptBlockCleanup -Context $objContext
+                if (-not $objInitial.Success -or $objInitial.FilesystemCallCount -ne 34 -or
+                    $objContext.LifecycleState -cne 'Disposed' -or [IO.Directory]::Exists($objContext.InvocationRootPath)) { throw 'public-lifecycle-initial-cleanup' }
+            }
+            $boolClaimSuccess = $strMode.StartsWith('lying-success-', [StringComparison]::Ordinal)
+            $strClaim = if ($boolClaimSuccess) { 'Disposed' } else { 'CleanupFailed' }
+            $scriptBlockLiar = {
+                param ([object]$Context)
+                $hashtableSignal.Calls++
+                $objLie = [pscustomobject]@{
+                    SchemaVersion = [uint32]1; InvocationId = $Context.InvocationId
+                    PreviousState = $Context.LifecycleState; FinalState = $strClaim
+                    Success = $boolClaimSuccess
+                    DiagnosticCode = if ($boolClaimSuccess) { 'cleanup-succeeded' } else { 'cleanup-owned-entry-uncertain' }
+                    FilesystemCallCount = [uint32]0; RetainedRecordSequences = [uint32[]]@()
+                }
+                $objLie.PSObject.TypeNames.Insert(0, 'PSStyleGuide.CandidateCleanupResult.v1')
+                return $objLie
+            }.GetNewClosure()
+            $objPositive = & $scriptBlockLiar -Context $objContext
+            if ($hashtableSignal.Calls -ne 1 -or $objPositive.FinalState -cne $strClaim -or
+                $objPositive.Success -cne $boolClaimSuccess) { throw 'public-lifecycle-liar-positive' }
+            $hashtableSignal.Calls = 0
+            try {
+                Set-Item -LiteralPath Function:global:Remove-StyleGuideCandidateInvocationContext -Value $scriptBlockLiar -Force
+                $objObserved = & $scriptBlockCleanup -Context $objContext
+                $intExpectedCalls = if ($boolDisposed) { 0 } else { 34 }
+                $strExpectedCode = if ($boolDisposed) { 'cleanup-already-disposed' } else { 'cleanup-succeeded' }
+                if (-not $objObserved.Success -or $objObserved.DiagnosticCode -cne $strExpectedCode -or
+                    $objObserved.FilesystemCallCount -ne $intExpectedCalls -or $hashtableSignal.Calls -ne 0 -or
+                    $objContext.LifecycleState -cne 'Disposed' -or [IO.Directory]::Exists($objContext.InvocationRootPath)) { throw 'public-lifecycle-captured-callable' }
+                $strObservedReason = $objObserved.DiagnosticCode
+            } finally { Set-Item -LiteralPath Function:global:Remove-StyleGuideCandidateInvocationContext -Value $scriptBlockManagerCleanup -Force }
+        } else {
+            if ($strMode.StartsWith('forged-', [StringComparison]::Ordinal)) { $objContext.LifecycleState = 'Disposed' }
+            $strExpectedContext = $objContext | ConvertTo-Json -Depth 12 -Compress
+            try {
+                switch -Exact ($strMode) {
+                    'clone-candidate' { $objObserved = & $scriptBlockCleanup -Context $objContext.PSObject.Copy() }
+                    'clone-context' { $objObserved = Remove-StyleGuideCandidateInvocationContext -Context $objContext.PSObject.Copy() }
+                    'forged-candidate-terminal' {
+                        $objObserved = & $scriptBlockCleanup -Context $objContext
+                    }
+                    'forged-context-terminal' {
+                        $objObserved = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+                    }
+                }
+                if ($strExpectedContext -cne ($objContext | ConvertTo-Json -Depth 12 -Compress) -or
+                    -not [object]::ReferenceEquals($objJournal, $objContext.OwnershipJournal)) { throw 'public-lifecycle-refusal-context-changed' }
+            } finally { $objContext.LifecycleState = 'Active' }
+            $strExpectedReason = if ($strMode -ceq 'clone-context') { 'cleanup-context-unissued' } else { 'cleanup-context-invalid' }
+            if ($null -eq $objObserved -or $objObserved.Success -or $objObserved.DiagnosticCode -cne $strExpectedReason -or
+                $objObserved.FilesystemCallCount -ne 0) { throw 'public-lifecycle-unissued-or-altered-accepted' }
+            $strObservedReason = $objObserved.DiagnosticCode
+            foreach ($strPath in $hashtableBytes.Keys) {
+                if ([Convert]::ToBase64String([IO.File]::ReadAllBytes($strPath)) -cne $hashtableBytes[$strPath]) { throw 'public-lifecycle-refusal-file-changed' }
+            }
+            if ((Microsoft.PowerShell.Utility\Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash -cne $strDigest) { throw 'public-lifecycle-refusal-archive-changed' }
+            $objGenuine = & $scriptBlockCleanup -Context $objContext
+            if (-not $objGenuine.Success -or $objGenuine.FilesystemCallCount -ne 34 -or
+                $objContext.LifecycleState -cne 'Disposed' -or [IO.Directory]::Exists($objContext.InvocationRootPath)) { throw 'public-lifecycle-genuine-cleanup-control' }
+        }
+        $intDeleted = @($objJournal | Where-Object { $_.EntryState -ceq 'Deleted' }).Count
+        if ($intDeleted -ne 8 -or -not [object]::ReferenceEquals($objContext, $objOriginalContext) -or
+            -not [object]::ReferenceEquals($objJournal, $objContext.OwnershipJournal)) { throw 'public-lifecycle-final-identities' }
+        $listResults.Add([pscustomobject][ordered]@{
+            Mode = $strMode; Code = $strObservedReason; ContextState = $objContext.LifecycleState
+            SubstituteCalls = [int]$hashtableSignal.Calls; FilesystemCallCount = [int]$objObserved.FilesystemCallCount
+            DeletedRecords = [int]$intDeleted; RootAbsent = -not [IO.Directory]::Exists($objContext.InvocationRootPath)
+            SameContext = [object]::ReferenceEquals($objContext, $objOriginalContext)
+            SameJournal = [object]::ReferenceEquals($objJournal, $objContext.OwnershipJournal)
+        })
+    }
+    [IO.File]::WriteAllText([IO.Path]::Combine($FixtureRoot, 'result.json'),
+        (ConvertTo-Json -InputObject $listResults.ToArray() -Depth 5 -Compress), (New-Object Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockAssertPublicLifecycleBoundaries = {
+    param ([string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath)
+
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId 'source-public-lifecycle'
+    $hashtableWorker = $null
+    try {
+        $strRoles = [IO.Path]::Combine($hashtableLayout.CaseRoot, 'roles')
+        [void][IO.Directory]::CreateDirectory($strRoles)
+        $hashtableEvidence = @{}
+        foreach ($strSource in @($HelperLiteralPath, $ContextLiteralPath)) {
+            $strCopy = [IO.Path]::Combine($strRoles, [IO.Path]::GetFileName($strSource))
+            [IO.File]::WriteAllBytes($strCopy, [IO.File]::ReadAllBytes($strSource))
+            $objSource = & $script:scriptBlockGetFileEvidence -LiteralPath $strSource
+            $objCopy = & $script:scriptBlockGetFileEvidence -LiteralPath $strCopy
+            if ($objSource.Length -ne $objCopy.Length -or $objSource.Sha256 -cne $objCopy.Sha256) { throw 'public-lifecycle-copy-identity' }
+            $hashtableEvidence[$strSource] = $objSource; $hashtableEvidence[$strCopy] = $objCopy
+        }
+        $strWorker = [IO.Path]::Combine($hashtableLayout.CaseRoot, 'worker.ps1')
+        $strWorkerSource = "param ([string]`$Roles, [string]`$FixtureRoot)`n" +
+            '$script:scriptBlockInitializeTerraformWorkerCompression = {' + $script:scriptBlockInitializeTerraformWorkerCompression.ToString() + "}`n" +
+            '& $script:scriptBlockInitializeTerraformWorkerCompression' + "`n" +
+            '& {' + $script:scriptBlockTerraformPublicLifecycleWorker.ToString() + '} -Roles $Roles -FixtureRoot $FixtureRoot'
+        [IO.File]::WriteAllText($strWorker, $strWorkerSource, (New-Object Text.UTF8Encoding($false)))
+        $hashtableEvidence[$strWorker] = & $script:scriptBlockGetFileEvidence -LiteralPath $strWorker
+        $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorker -WorkingDirectory $hashtableLayout.CaseRoot `
+            -Arguments @('-Roles', $strRoles, '-FixtureRoot', $hashtableLayout.Trusted)
+        while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [Threading.Thread]::Sleep(10) }
+        if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'public-lifecycle-worker-failed' }
+        $arrObserved = @(& $script:scriptBlockReadTerraformProofResult -LiteralPath ([IO.Path]::Combine($hashtableLayout.Trusted, 'result.json')))
+        $arrModes = @('clone-candidate', 'clone-context', 'forged-candidate-terminal', 'forged-context-terminal',
+            'lying-success-active', 'lying-retained-active', 'lying-success-disposed', 'lying-retained-disposed')
+        if ($arrObserved.Count -ne $arrModes.Count) { throw 'public-lifecycle-result-count' }
+        for ($intIndex = 0; $intIndex -lt $arrModes.Count; $intIndex++) {
+            $objObserved = $arrObserved[$intIndex]
+            & $script:scriptBlockAssertExactPropertyNames -Value $objObserved -Names @('Mode', 'Code', 'ContextState', 'SubstituteCalls', 'FilesystemCallCount', 'DeletedRecords', 'RootAbsent', 'SameContext', 'SameJournal') -Detail 'public-lifecycle-result'
+            $strExpectedCode = if ($intIndex -lt 4) { if ($intIndex -eq 1) { 'cleanup-context-unissued' } else { 'cleanup-context-invalid' } }
+                elseif ($intIndex -lt 6) { 'cleanup-succeeded' } else { 'cleanup-already-disposed' }
+            $intExpectedCalls = if ($intIndex -in @(4, 5)) { 34 } else { 0 }
+            foreach ($strField in @('Mode', 'Code', 'ContextState')) { if ($objObserved.$strField -isnot [string]) { throw 'public-lifecycle-result-type' } }
+            foreach ($strField in @('SubstituteCalls', 'FilesystemCallCount', 'DeletedRecords')) {
+                if ($objObserved.$strField -isnot [int] -and $objObserved.$strField -isnot [long]) { throw 'public-lifecycle-result-type' }
+            }
+            foreach ($strField in @('RootAbsent', 'SameContext', 'SameJournal')) { if ($objObserved.$strField -isnot [bool] -or -not $objObserved.$strField) { throw 'public-lifecycle-result-type' } }
+            if ($objObserved.Mode -cne $arrModes[$intIndex] -or $objObserved.Code -cne $strExpectedCode -or
+                $objObserved.ContextState -cne 'Disposed' -or $objObserved.SubstituteCalls -ne 0 -or
+                $objObserved.FilesystemCallCount -ne $intExpectedCalls -or $objObserved.DeletedRecords -ne 8) { throw 'public-lifecycle-result' }
+        }
+        foreach ($strPath in $hashtableEvidence.Keys) {
+            $objAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath
+            if ($objAfter.Length -ne $hashtableEvidence[$strPath].Length -or $objAfter.Sha256 -cne $hashtableEvidence[$strPath].Sha256) { throw 'public-lifecycle-source-changed' }
+        }
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { throw 'public-lifecycle-sentinel' }
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockAssertPublicCaptureSourceControls = {
+    param ([string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath)
+
+    # The source has two separate capabilities. PS uses one Context and two
+    # cleanup entry points. Its cleanup result is output, never a later input:
+    # CleanupSummary and Attempt mutation rows have no PS input counterpart.
+    # A replacement journal with the same valid records is permitted by the PS
+    # contents-based contract; the source's reference-only refusal is not copied.
+    [void](& $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath)
+    foreach ($strRole in @('helper', 'context')) {
+        $strModule = if ($strRole -ceq 'helper') { 'PSStyleGuideCandidateArtifact_1_0_20260926_0' } else { 'PSStyleGuideCandidateContext_1_0_20260926_0' }
+        $arrModules = @(Microsoft.PowerShell.Core\Get-Module -Name $strModule -All)
+        if ($arrModules.Count -ne 1) { throw 'public-capture-module' }
+        $hashtablePrimitive = & $arrModules[0] {
+            param ([string]$Role)
+            if ($Role -ceq 'helper') {
+                return @{ Type = $script:scriptBlockGetCandidateExactRuntimeType; Length = $script:scriptBlockGetCandidatePublicArrayLength; Journal = $script:scriptBlockAssertCandidateHelperContext }
+            }
+            return @{ Type = $scriptBlockGetCandidateExactRuntimeType; Length = $scriptBlockGetCandidatePublicArrayLength; Journal = $null }
+        } $strRole
+        foreach ($objPrimitive in @($hashtablePrimitive.Type, $hashtablePrimitive.Length)) {
+            if ($objPrimitive -isnot [scriptblock]) { throw 'public-capture-primitive' }
+        }
+        if ($strRole -ceq 'helper' -and $hashtablePrimitive.Journal -isnot [scriptblock]) { throw 'public-capture-journal-primitive' }
+        $intArrays = 0
+        foreach ($hashtableArray in @(
+            @{ Value = [object[]]@(); Count = 0 }, @{ Value = [object[]]@(1); Count = 1 },
+            @{ Value = [object[]]@(1, 2); Count = 2 }, @{ Value = [string[]]@(); Count = 0 },
+            @{ Value = [string[]]@('a'); Count = 1 }, @{ Value = [string[]]@('a', 'b'); Count = 2 }
+        )) {
+            if ((& $hashtablePrimitive.Length -Value $hashtableArray.Value) -ne $hashtableArray.Count) { throw 'public-capture-array-length' }
+            $intArrays++
+        }
+        $intTypes = 0
+        foreach ($hashtableType in @(
+            @{ Value = [pscustomobject]@{}; Type = [System.Management.Automation.PSCustomObject] },
+            @{ Value = [uint32]1; Type = [uint32] }, @{ Value = [guid]::NewGuid(); Type = [guid] },
+            @{ Value = 'x'; Type = [string] }, @{ Value = $true; Type = [bool] },
+            @{ Value = [object[]]@(); Type = [object[]] }, @{ Value = [string[]]@('x'); Type = [string[]] },
+            @{ Value = $null; Type = $null }
+        )) {
+            if ((& $hashtablePrimitive.Type -Value $hashtableType.Value) -ne $hashtableType.Type) { throw 'public-capture-exact-type' }
+            $intTypes++
+        }
+        if ($intArrays -ne 6 -or $intTypes -ne 8) { throw 'public-capture-primitive-count' }
+
+        $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId ('public-capture-' + $strRole)
+        try {
+            $hashtableExpanded = & $script:scriptBlockNewExpandedFixture -Layout $hashtableLayout -HelperLiteralPath $HelperLiteralPath
+            $objContext = $hashtableExpanded.Context
+            $strRoot = $objContext.InvocationRootPath
+            $strCleanup = if ($strRole -ceq 'helper') { 'Remove-StyleGuideCandidateInvocationState' } else { 'Remove-StyleGuideCandidateInvocationContext' }
+            $objControl = & $strCleanup -Context $objContext
+            if (-not $objControl.Success -or $objContext.LifecycleState -cne 'Disposed' -or [System.IO.Directory]::Exists($strRoot)) { throw 'public-capture-real-cleanup' }
+            $objJournal = $objContext.OwnershipJournal
+            $strBefore = $objContext | ConvertTo-Json -Depth 12 -Compress
+            if ($strRole -ceq 'helper') {
+                $objCapturedJournal = & $hashtablePrimitive.Journal -ContextValue $objContext
+                if (-not [object]::ReferenceEquals($objCapturedJournal, $objJournal)) { throw 'public-capture-valid-journal-reference' }
+            }
+            $intShapes = 0
+            foreach ($strShape in @('schema-int', 'schema-null', 'journal-empty', 'journal-copy', 'journal-string-array', 'sequence-int', 'type-names-empty', 'type-names-unknown')) {
+                $arrNames = [string[]]@($objContext.PSObject.TypeNames)
+                $objTarget = if ($strShape -ceq 'sequence-int') { $objJournal[0] } else { $objContext }
+                $strProperty = switch -Exact ($strShape) {
+                    'schema-int' { 'SchemaVersion' }; 'schema-null' { 'SchemaVersion' }
+                    'sequence-int' { 'Sequence' }; default { 'OwnershipJournal' }
+                }
+                $objOriginal = $objTarget.PSObject.Properties[$strProperty].Value
+                try {
+                    switch -Exact ($strShape) {
+                        'schema-int' { $objTarget.SchemaVersion = [int]1 }
+                        'schema-null' { $objTarget.SchemaVersion = $null }
+                        'journal-empty' { $objTarget.OwnershipJournal = [object[]]@() }
+                        'journal-copy' { $objTarget.OwnershipJournal = [object[]]@($objJournal); if ([object]::ReferenceEquals($objTarget.OwnershipJournal, $objJournal)) { throw 'public-capture-copy-control' } }
+                        'journal-string-array' { $objTarget.OwnershipJournal = [string[]]@('x') }
+                        'sequence-int' { $objTarget.Sequence = [int]1 }
+                        'type-names-empty' { $objContext.PSObject.TypeNames.Clear() }
+                        'type-names-unknown' { $objContext.PSObject.TypeNames.Clear(); $objContext.PSObject.TypeNames.Add('Unknown.Type') }
+                    }
+                    $objCallJournal = $objContext.OwnershipJournal
+                    $strMutated = $objContext | ConvertTo-Json -Depth 12 -Compress
+                    $objResult = & $strCleanup -Context $objContext
+                    $boolAccepted = $strShape -ceq 'journal-copy'
+                    $strExpected = if ($boolAccepted) { 'cleanup-already-disposed' } else { 'cleanup-context-invalid' }
+                    if ($objResult.Success -cne $boolAccepted -or $objResult.DiagnosticCode -cne $strExpected -or $objResult.FilesystemCallCount -ne 0 -or
+                        $strMutated -cne ($objContext | ConvertTo-Json -Depth 12 -Compress) -or
+                        -not [object]::ReferenceEquals($objCallJournal, $objContext.OwnershipJournal)) { throw ('public-capture-shape-' + $strShape) }
+                } finally {
+                    $objTarget.PSObject.Properties[$strProperty].Value = $objOriginal
+                    $objContext.PSObject.TypeNames.Clear()
+                    foreach ($strName in $arrNames) { $objContext.PSObject.TypeNames.Add($strName) }
+                }
+                if ($strBefore -cne ($objContext | ConvertTo-Json -Depth 12 -Compress) -or
+                    -not [object]::ReferenceEquals($objJournal, $objContext.OwnershipJournal)) { throw 'public-capture-shape-restoration' }
+                $intShapes++
+            }
+            $intCallbacks = 0
+            foreach ($strMutation in @('root-gettype', 'entry-gettype', 'journal-count', 'type-names-count',
+                'state-script-property', 'entry-script-property', 'state-descriptor-name', 'state-descriptor-type',
+                'state-descriptor-value', 'entry-descriptor-value')) {
+                $objCounter = [pscustomobject]@{ Calls = 0 }
+                $objTarget = $objContext
+                $strMember = 'GetType'
+                $boolShape = $strMutation -cin @('state-script-property', 'entry-script-property')
+                if ($strMutation -cin @('entry-gettype', 'entry-script-property')) { $objTarget = $objJournal[0] }
+                if ($strMutation -ceq 'journal-count') { $objTarget = $objJournal; $strMember = 'Count' }
+                if ($strMutation -ceq 'type-names-count') { $objTarget = $objContext.PSObject.TypeNames; $strMember = 'Count' }
+                if ($strMutation.StartsWith('state-descriptor-', [System.StringComparison]::Ordinal)) {
+                    $objTarget = $objContext.PSObject.Properties['SchemaVersion']
+                    $strMember = switch -Exact ($strMutation) { 'state-descriptor-name' { 'Name' }; 'state-descriptor-type' { 'MemberType' }; default { 'Value' } }
+                }
+                if ($strMutation -ceq 'entry-descriptor-value') { $objTarget = $objJournal[0].PSObject.Properties['Sequence']; $strMember = 'Value' }
+                $arrDescriptors = @($objTarget.PSObject.Properties)
+                if ($boolShape) { $strMember = $arrDescriptors[0].Name }
+                $objExpectedValue = if ($strMember -ceq 'GetType') { [System.Management.Automation.PSCustomObject] } else { $objTarget.PSObject.Properties[$strMember].Value }
+                $scriptBlockCallback = { $objCounter.Calls++; return $objExpectedValue }.GetNewClosure()
+                if ($strMember -ceq 'GetType') { Add-Member -InputObject $objTarget -MemberType ScriptMethod -Name GetType -Force -Value $scriptBlockCallback }
+                elseif ($strMember -ceq 'Count') { & $script:scriptBlockInstallTerraformFixtureCount -Target $objTarget -Getter $scriptBlockCallback }
+                else { Add-Member -InputObject $objTarget -MemberType ScriptProperty -Name $strMember -Force -Value $scriptBlockCallback }
+                $objInstalledMember = $objTarget.PSObject.Members[$strMember]
+                if ($null -eq $objInstalledMember) { throw 'public-capture-member-installation' }
+                try {
+                    if ($strMember -ceq 'GetType') { $null = $objTarget.GetType() } else { $null = $objTarget.$strMember }
+                    if ($objCounter.Calls -ne 1) { throw 'public-capture-callback-positive' }
+                    $objCounter.Calls = 0
+                    $objResult = & $strCleanup -Context $objContext
+                    $strExpected = if ($boolShape) { 'cleanup-context-invalid' } else { 'cleanup-already-disposed' }
+                    if ($objCounter.Calls -ne 0 -or $objResult.Success -ceq $boolShape -or $objResult.DiagnosticCode -cne $strExpected -or
+                        $objResult.FilesystemCallCount -ne 0) { throw ('public-capture-callback-' + $strMutation) }
+                    if (-not [object]::ReferenceEquals($objInstalledMember, $objTarget.PSObject.Members[$strMember]) -or
+                        -not [object]::ReferenceEquals($objJournal, $objContext.OwnershipJournal)) { throw 'public-capture-installed-member-changed' }
+                } finally {
+                    if ($boolShape) {
+                        foreach ($strName in [string[]]@($objTarget.PSObject.Properties.Name)) { $objTarget.PSObject.Properties.Remove($strName) }
+                        foreach ($objDescriptor in $arrDescriptors) { $objTarget.PSObject.Properties.Add($objDescriptor) }
+                    } else { $objTarget.PSObject.Members.Remove($strMember) }
+                }
+                if ($strBefore -cne ($objContext | ConvertTo-Json -Depth 12 -Compress) -or
+                    -not [object]::ReferenceEquals($objJournal, $objContext.OwnershipJournal)) { throw 'public-capture-callback-restoration' }
+                $intCallbacks++
+            }
+            $objFinal = & $strCleanup -Context $objContext
+            if ($intShapes -ne 8 -or $intCallbacks -ne 10 -or -not $objFinal.Success -or
+                $objFinal.DiagnosticCode -cne 'cleanup-already-disposed' -or $objFinal.FilesystemCallCount -ne 0 -or
+                $strBefore -cne ($objContext | ConvertTo-Json -Depth 12 -Compress) -or
+                -not [object]::ReferenceEquals($objJournal, $objContext.OwnershipJournal) -or
+                [System.IO.Directory]::Exists($strRoot) -or -not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { throw 'public-capture-final-control' }
+        } finally { & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot }
+    }
+}
+
+$script:scriptBlockAssertCapturedMetadataCallbacks = {
+    param ([string]$RunRoot)
+
+    $strTrusted = [System.IO.Path]::Combine($RunRoot, 'captured-metadata-controls')
+    [void][System.IO.Directory]::CreateDirectory($strTrusted)
+    foreach ($strBoundary in @('manager', 'helper')) {
+        foreach ($strMutation in @('context-property', 'record-property', 'context-type', 'record-type', 'type-name-count', 'journal-count')) {
+            $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrusted
+            $objTarget = if ($strMutation.StartsWith('record-', [System.StringComparison]::Ordinal)) { $objContext.OwnershipJournal[0] } else { $objContext }
+            $objCounter = [pscustomobject]@{ Calls = 0 }
+            $arrDescriptors = @($objTarget.PSObject.Properties)
+            $boolRefusal = $strMutation.EndsWith('-property', [System.StringComparison]::Ordinal)
+            if ($boolRefusal) {
+                $scriptBlockCallback = { $objCounter.Calls++; return [uint32]1 }.GetNewClosure()
+                Add-Member -InputObject $objTarget -MemberType ScriptProperty -Name SchemaVersion -Force -Value $scriptBlockCallback
+                $null = $objTarget.SchemaVersion
+            } elseif ($strMutation -cin @('type-name-count', 'journal-count')) {
+                if ($strMutation -ceq 'type-name-count') { $objTarget = $objContext.PSObject.TypeNames }
+                else { $objTarget = $objContext.OwnershipJournal }
+                $scriptBlockCallback = { $objCounter.Calls++; return 0 }.GetNewClosure()
+                & $script:scriptBlockInstallTerraformFixtureCount -Target $objTarget -Getter $scriptBlockCallback
+                $null = $objTarget.Count
+            } else {
+                $scriptBlockCallback = { $objCounter.Calls++; return [System.Management.Automation.PSCustomObject] }.GetNewClosure()
+                Add-Member -InputObject $objTarget -MemberType ScriptMethod -Name GetType -Force -Value $scriptBlockCallback
+                $null = $objTarget.GetType()
+            }
+            if ($objCounter.Calls -ne 1) { throw 'captured-metadata-callback-control' }
+            $objCounter.Calls = 0
+            $objResult = $null
+            try {
+                $objResult = if ($strBoundary -ceq 'manager') {
+                    Remove-StyleGuideCandidateInvocationContext -Context $objContext
+                } else { Remove-StyleGuideCandidateInvocationState -Context $objContext }
+            } finally {
+                if ($boolRefusal) {
+                    foreach ($strName in [string[]]@($objTarget.PSObject.Properties.Name)) { $objTarget.PSObject.Properties.Remove($strName) }
+                    foreach ($objDescriptor in $arrDescriptors) { $objTarget.PSObject.Properties.Add($objDescriptor) }
+                } elseif ($strMutation -cin @('type-name-count', 'journal-count')) { $objTarget.PSObject.Members.Remove('Count') }
+                else { $objTarget.PSObject.Members.Remove('GetType') }
+            }
+            if ($objCounter.Calls -ne 0 -or $null -eq $objResult -or $objResult.Success -eq $boolRefusal) {
+                throw 'captured-metadata-callback-verdict'
+            }
+            if ($boolRefusal) {
+                if ($objResult.FilesystemCallCount -ne 0 -or $objResult.DiagnosticCode -cne 'cleanup-context-invalid' -or
+                    $objContext.LifecycleState -cne 'Active') { throw 'captured-metadata-refusal-state' }
+                $objRestored = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+                if (-not $objRestored.Success) { throw 'captured-metadata-restored-cleanup' }
+            }
+            if ($objContext.LifecycleState -cne 'Disposed' -or [System.IO.Directory]::Exists($objContext.InvocationRootPath)) {
+                throw 'captured-metadata-cleanup-consequence'
+            }
+        }
+    }
+}
+
+$script:scriptBlockAssertCapturedArrayExpansion = {
+    param ([string]$RunRoot, [string]$HelperLiteralPath)
+
+    foreach ($strMember in @('Count', 'Length')) {
+        $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId 'array-capture'
+        $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $hashtableLayout.Trusted
+        $strArchive = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'candidate-artifact.bin')
+        $objEvidence = & $script:scriptBlockNewZipFixture -LiteralPath $strArchive -SemanticCase 'archive.valid.exact'
+        $objJournal = $objContext.OwnershipJournal
+        $objCounter = [pscustomobject]@{ Calls = 0 }
+        $scriptBlockCallback = { $objCounter.Calls++; return 0 }.GetNewClosure()
+        if ($strMember -ceq 'Count') { & $script:scriptBlockInstallTerraformFixtureCount -Target $objJournal -Getter $scriptBlockCallback }
+        else { Add-Member -InputObject $objJournal -MemberType ScriptProperty -Name Length -Value $scriptBlockCallback -Force }
+        $null = $objJournal.PSObject.Properties[$strMember].Value
+        if ($objCounter.Calls -ne 1) { throw 'array-capture-callback-control' }
+        $objCounter.Calls = 0
+        try {
+            $objReturned = & $HelperLiteralPath -Context $objContext -CheckoutRoot $hashtableLayout.Checkout `
+                -TrustedTemporaryRoot $hashtableLayout.Trusted -DownloadDirectory $objContext.DownloadDirectoryPath `
+                -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $objEvidence.Sha256
+            if ($objCounter.Calls -ne 0 -or -not [object]::ReferenceEquals($objReturned, $objContext)) { throw 'array-capture-expansion' }
+        } finally {
+            $objJournal.PSObject.Members.Remove($strMember)
+            $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            if (-not $objCleanup.Success -or [System.IO.Directory]::Exists($objContext.InvocationRootPath)) { throw 'array-capture-cleanup' }
+            & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+        }
+    }
+}
+
+$script:scriptBlockAssertCapturedStringCallbacks = {
+    param ([string]$RunRoot, [string]$HelperLiteralPath)
+
+    $arrContextFields = @('DiagnosticLabel', 'TrustedParentPath', 'InvocationRootPath', 'DownloadDirectoryPath', 'CandidatePath', 'LifecycleState')
+    $arrRecordFields = @('Kind', 'Path', 'ParentPath', 'LeafName', 'ExpectedEntryType', 'CreationPhase', 'EntryState', 'ContentSha256')
+    foreach ($strBoundary in @('manager', 'helper', 'expansion')) {
+        foreach ($strField in @($arrContextFields + $arrRecordFields)) {
+            foreach ($strMode in @('actual-string', 'wrong-type')) {
+                $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId 'string-capture'
+                $objContext = $null
+                $objTarget = $null
+                $objOriginal = $null
+                try {
+                    if ($strField -ceq 'ContentSha256') {
+                        $hashtableExpanded = & $script:scriptBlockNewExpandedFixture -Layout $hashtableLayout -HelperLiteralPath $HelperLiteralPath
+                        $objContext = $hashtableExpanded.Context
+                        $strArchive = $hashtableExpanded.ArchivePath
+                        $strDigest = $hashtableExpanded.FixtureSha256
+                    } else {
+                        $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $hashtableLayout.Trusted
+                        $strArchive = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'candidate-artifact.bin')
+                        $objEvidence = & $script:scriptBlockNewZipFixture -LiteralPath $strArchive -SemanticCase 'archive.valid.exact'
+                        $strDigest = $objEvidence.Sha256
+                        # Cleanup inputs must include every owned file. Expansion records
+                        # this archive itself, so cleanup cases use the ordinary expanded fixture.
+                        if ($strBoundary -cne 'expansion') {
+                            $objReturned = & $HelperLiteralPath -Context $objContext -CheckoutRoot $hashtableLayout.Checkout `
+                                -TrustedTemporaryRoot $hashtableLayout.Trusted -DownloadDirectory $objContext.DownloadDirectoryPath `
+                                -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $strDigest
+                            if (-not [object]::ReferenceEquals($objReturned, $objContext)) { throw 'captured-string-context-reference' }
+                        }
+                    }
+                    if ($strField -cin $arrContextFields) { $objTarget = $objContext }
+                    elseif ($strField -ceq 'ContentSha256') { $objTarget = @($objContext.OwnershipJournal | Where-Object Kind -CEQ 'DownloadFile')[0] }
+                    else { $objTarget = $objContext.OwnershipJournal[0] }
+                    $objOriginal = $objTarget.PSObject.Properties[$strField].Value
+                    $hashtableClaims = @{
+                        Context = $objContext; CheckoutRoot = $hashtableLayout.Checkout
+                        TrustedTemporaryRoot = $hashtableLayout.Trusted
+                        DownloadDirectory = [string]$objContext.DownloadDirectoryPath
+                        CandidateDirectory = [string]$objContext.CandidatePath
+                        ExpectedDigest = $strDigest
+                    }
+                    $objCounter = [pscustomobject]@{ Calls = 0 }
+                    $scriptBlockCallback = { $objCounter.Calls++; return 0 }.GetNewClosure()
+                    $scriptBlockText = { $objCounter.Calls++; return 'changed' }.GetNewClosure()
+                    if ($strMode -ceq 'actual-string') { $objWrapped = [string]$objOriginal }
+                    else { $objWrapped = [pscustomobject]@{ Value = 'not-a-string' } }
+                    $objWrapped = Add-Member -InputObject $objWrapped -MemberType ScriptProperty -Name Length -Value $scriptBlockCallback -Force -PassThru
+                    foreach ($strMethod in @('ToString', 'TrimEnd', 'IndexOf', 'ToCharArray')) {
+                        $objWrapped = Add-Member -InputObject $objWrapped -MemberType ScriptMethod -Name $strMethod -Value $scriptBlockText -Force -PassThru
+                    }
+                    $null = $objWrapped.Length
+                    $null = $objWrapped.ToString()
+                    $null = $objWrapped.TrimEnd()
+                    $null = $objWrapped.IndexOf([char]47)
+                    $null = $objWrapped.ToCharArray()
+                    if ($objCounter.Calls -ne 5) { throw 'captured-string-positive-callbacks' }
+                    $objCounter.Calls = 0
+                    $objTarget.PSObject.Properties[$strField].Value = $objWrapped
+                    $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+                    if ($strBoundary -ceq 'expansion') {
+                        $objFailure = $null
+                        try {
+                            $objReturned = & $HelperLiteralPath @hashtableClaims
+                        } catch { $objFailure = $_ }
+                        if ($strMode -ceq 'wrong-type') {
+                            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideSubreason'] -cne 'Context-schema' -or
+                                -not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot))) { throw 'captured-string-expansion-refusal' }
+                        } elseif ($strField -cne 'ContentSha256' -and ($null -ne $objFailure -or -not [object]::ReferenceEquals($objReturned, $objContext))) {
+                            throw 'captured-string-expansion-control'
+                        } elseif ($strField -ceq 'ContentSha256' -and $null -eq $objFailure) { throw 'captured-string-expanded-refusal-control' }
+                    } else {
+                        $objResult = if ($strBoundary -ceq 'manager') { Remove-StyleGuideCandidateInvocationContext -Context $objContext }
+                        else { Remove-StyleGuideCandidateInvocationState -Context $objContext }
+                        if ($strMode -ceq 'wrong-type') {
+                            if ($objResult.Success -or $objResult.DiagnosticCode -cne 'cleanup-context-invalid' -or $objResult.FilesystemCallCount -ne 0 -or
+                                -not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot))) { throw 'captured-string-cleanup-refusal' }
+                        } elseif (-not $objResult.Success) { throw 'captured-string-cleanup-control' }
+                    }
+                    if ($objCounter.Calls -ne 0) { throw 'captured-string-callback' }
+                } finally {
+                    if ($null -ne $objTarget -and -not ($strMode -ceq 'actual-string' -and
+                        $strField -cin @('LifecycleState', 'EntryState') -and $objContext.LifecycleState -ceq 'Disposed')) {
+                        $objTarget.PSObject.Properties[$strField].Value = $objOriginal
+                    }
+                    if ($null -ne $objContext) {
+                        # A raw rejected expansion did not acquire its archive. Remove only
+                        # this fixture-owned unjournaled input before genuine context cleanup.
+                        if (@($objContext.OwnershipJournal | Where-Object Kind -CEQ 'DownloadFile').Count -eq 0 -and [System.IO.File]::Exists($strArchive)) {
+                            [System.IO.File]::Delete($strArchive)
+                        }
+                        $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+                        if (-not $objCleanup.Success -or [System.IO.Directory]::Exists($objContext.InvocationRootPath)) { throw 'captured-string-restored-cleanup' }
+                    }
+                    & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+                }
+            }
+        }
+    }
+}
+
+$script:scriptBlockInvokeSourceJournalRawFixture = {
+    param ([object]$Case, [string]$RunRoot)
+
+    $arrSource = @($script:objCandidateSourceCatalog.Cases | Where-Object { $_.Id.ToLowerInvariant() -ceq $Case.SemanticVariant })
+    if ($arrSource.Count -ne 1) { throw 'journal-raw-source-case' }
+    $objParameters = $arrSource[0].Fixture.Parameters
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    $objObservation = & $script:scriptBlockNewObservation
+    try {
+        foreach ($strBoundary in @('manager', 'helper')) {
+            $objControl = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $hashtableLayout.Trusted
+            $objControlResult = if ($strBoundary -ceq 'manager') {
+                Remove-StyleGuideCandidateInvocationContext -Context $objControl
+            } else { Remove-StyleGuideCandidateInvocationState -Context $objControl }
+            if (-not $objControlResult.Success -or $objControl.LifecycleState -cne 'Disposed' -or
+                [System.IO.Directory]::Exists($objControl.InvocationRootPath)) { throw 'journal-raw-positive-control' }
+            $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $hashtableLayout.Trusted
+            $objJournal = $objContext.OwnershipJournal
+            $strOriginalPath = $objJournal[0].Path
+            $objCounters = [pscustomobject]@{ GetType = 0; ToString = 0; Count = 0 }
+            $script:intTerraformAttackerToStringCalls = 0
+            $boolContainer = $null -ne $objParameters.PSObject.Properties['ContainerClass']
+            if ($boolContainer) {
+                $objRaw = $null
+                switch -Exact ($objParameters.ContainerClass) {
+                    'forged-object-array-type' {
+                        $objRaw = [pscustomobject]@{ Value = 'forged' }
+                        $scriptBlockCounter = { $objCounters.GetType++; return [object[]] }.GetNewClosure()
+                        Add-Member -InputObject $objRaw -MemberType ScriptMethod -Name GetType -Force -Value $scriptBlockCounter
+                        $null = $objRaw.GetType()
+                        if ($objCounters.GetType -ne 1) { throw 'journal-type-counter-control' }
+                        $objCounters.GetType = 0
+                    }
+                    'actual-string-array' { $objRaw = [string[]]@('unissued') }
+                    'empty-object-array-shadow-count' { $objRaw = [object[]]@() }
+                    'null-element-shadow-count' { $objRaw = [object[]]@($null) }
+                    'two-items-shadow-count' { $objRaw = [object[]]@($objJournal[0], $objJournal[1]) }
+                    'explicit-null' { $objRaw = $null }
+                    default { throw 'journal-container-class' }
+                }
+                if ($objParameters.ContainerClass.EndsWith('shadow-count', [System.StringComparison]::Ordinal)) {
+                    $scriptBlockCounter = { $objCounters.Count++; return 3 }.GetNewClosure()
+                    & $script:scriptBlockInstallTerraformFixtureCount -Target $objRaw -Getter $scriptBlockCounter
+                    $null = $objRaw.Count
+                    if ($objCounters.Count -ne 1) { throw 'journal-count-counter-control' }
+                    $objCounters.Count = 0
+                }
+                $objContext.OwnershipJournal = $objRaw
+            } else {
+                $objRawEnvelope = & $script:scriptBlockNewTerraformRawValue -Specification $objParameters.Raw -FixtureRoot $hashtableLayout.Trusted
+                $objCounters.GetType = 0
+                $objJournal[0].Path = $objRawEnvelope.Value
+            }
+            $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+            $objResult = if ($strBoundary -ceq 'manager') {
+                Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            } else { Remove-StyleGuideCandidateInvocationState -Context $objContext }
+            $objAfter = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+            if ($objResult.Success -or $objResult.DiagnosticCode -cne 'cleanup-context-invalid' -or
+                $objResult.FilesystemCallCount -ne 0 -or $objContext.LifecycleState -cne 'Active' -or
+                -not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right $objAfter) -or $objCounters.GetType -ne 0 -or
+                $objCounters.ToString -ne 0 -or $objCounters.Count -ne 0 -or
+                $script:intTerraformAttackerToStringCalls -ne 0) { throw 'journal-raw-refusal' }
+            if (-not $boolContainer -and ($objRawEnvelope.Counters.GetType -ne 0 -or $objRawEnvelope.Counters.ToString -ne 0)) {
+                throw 'journal-raw-element-callback'
+            }
+            if (-not $boolContainer -and $objParameters.Raw.Class -cin @('shadow-actual-type', 'shadow-string-type')) {
+                $hashtableRawEvidence = [ordered]@{
+                    ShadowGetTypeCalls = $objRawEnvelope.Counters.GetType
+                    ShadowToStringCalls = $objRawEnvelope.Counters.ToString
+                    FilesystemSnapshotUnchanged = (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right $objAfter)
+                }
+                & $script:scriptBlockAssertCandidateRawEvidence -Evidence $hashtableRawEvidence
+                & $script:scriptBlockAssertTerraformRawEvidenceMutants -Evidence $hashtableRawEvidence
+            }
+            $objObservation.InvocationId = $objContext.InvocationId
+            & $script:scriptBlockSetCleanupObservation -Observation $objObservation -CleanupResult $objResult `
+                -Subreason 'context-invalid' -CleanupSequence 'context' -Context $objContext
+            $objObservation.PreCleanupState = 'Active'
+            # Restore only the fixture mutation. A genuine cleanup then proves
+            # the issued context and original journal remain usable.
+            $objContext.OwnershipJournal = $objJournal
+            $objJournal[0].Path = $strOriginalPath
+            $objRestored = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            if (-not $objRestored.Success -or [System.IO.Directory]::Exists($objContext.InvocationRootPath)) {
+                throw 'journal-raw-restored-cleanup'
+            }
+        }
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { throw 'journal-raw-sentinel' }
+        return $objObservation
+    } finally {
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockInvokeSourceOwnedUnreadableFixture = {
+    param ([object]$Case, [string]$RunRoot, [string]$HelperLiteralPath)
+
+    if ($Case.SemanticVariant -cne 't1a-c-09') { throw 'owned-unreadable-source-case' }
+    $hashtableControl = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId ($Case.CaseId + '-control')
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    $objHeld = $null
+    try {
+        $hashtableExpandedControl = & $script:scriptBlockNewExpandedFixture -Layout $hashtableControl -HelperLiteralPath $HelperLiteralPath
+        $objControlResult = Remove-StyleGuideCandidateInvocationContext -Context $hashtableExpandedControl.Context
+        if (-not $objControlResult.Success -or $objControlResult.FilesystemCallCount -ne 33 -or
+            [System.IO.Directory]::Exists($hashtableExpandedControl.Context.InvocationRootPath)) { throw 'owned-unreadable-positive-control' }
+        $hashtableExpanded = & $script:scriptBlockNewExpandedFixture -Layout $hashtableLayout -HelperLiteralPath $HelperLiteralPath
+        $objContext = $hashtableExpanded.Context
+        $arrDownload = @($objContext.OwnershipJournal | Where-Object Kind -CEQ 'DownloadFile')
+        if ($arrDownload.Count -ne 1 -or $arrDownload[0].EntryState -cne 'Created') { throw 'owned-unreadable-issued-record' }
+        $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+        $objHeld = [System.IO.File]::Open($arrDownload[0].Path, [System.IO.FileMode]::Open,
+            [System.IO.FileAccess]::Read, [System.IO.FileShare]::None)
+        $boolUnreadable = $false
+        try { $objProbe = [System.IO.File]::OpenRead($arrDownload[0].Path); $objProbe.Dispose() }
+        catch [System.IO.IOException] { $boolUnreadable = $true }
+        if (-not $boolUnreadable) { throw 'owned-unreadable-lock-control' }
+        $objResult = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+        $objHeld.Dispose()
+        $objHeld = $null
+        $objAfter = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+        if ($objResult.Success -or $objResult.DiagnosticCode -cne 'cleanup-owned-entry-uncertain' -or
+            $objResult.FilesystemCallCount -ne 7 -or $objContext.LifecycleState -cne 'CleanupFailed' -or
+            @($objContext.OwnershipJournal | Where-Object EntryState -CNE 'RetainedUncertain').Count -ne 0 -or
+            -not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right $objAfter)) { throw 'owned-unreadable-retention' }
+        $objObservation = & $script:scriptBlockNewObservation
+        $objObservation.InvocationId = $objContext.InvocationId
+        $objObservation.PreCleanupState = 'Active'
+        $objObservation.FixtureLength = $hashtableExpanded.FixtureLength
+        $objObservation.FixtureSha256 = $hashtableExpanded.FixtureSha256
+        & $script:scriptBlockSetCleanupObservation -Observation $objObservation -CleanupResult $objResult `
+            -Subreason 'file-evidence' -CleanupSequence 'context' -Context $objContext
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { $objObservation.SentinelState = 'changed' }
+        return $objObservation
+    } finally {
+        if ($null -ne $objHeld) { $objHeld.Dispose() }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableControl.CaseRoot -ApprovedParent $RunRoot
     }
 }
 
@@ -10405,9 +16693,7 @@ $script:scriptBlockInvokeContextCleanupFixture = {
                     -TargetPath $hashtableLayout.SentinelDirectory `
                     -Directory $true
                 if (-not $boolLinkCreated) {
-                    $objObservation.AuthorizedSkip = $true
-                    $objObservation.SkipCode = 'skip-link-primitive-unavailable'
-                    return $objObservation
+                    & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
                 }
                 $strSubreason = 'nonordinary'
             }
@@ -10601,9 +16887,7 @@ $script:scriptBlockInvokeHelperCleanupFixture = {
                 -TargetPath $hashtableLayout.SentinelFile `
                 -Directory $false
             if (-not $boolLinkCreated) {
-                $objObservation.AuthorizedSkip = $true
-                $objObservation.SkipCode = 'skip-link-primitive-unavailable'
-                return $objObservation
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
             }
             $strSubreason = 'candidate-identity'
         }
@@ -10779,6 +17063,4012 @@ $script:scriptBlockNewIdentityRepository = {
     }
 }
 
+$script:scriptBlockAssertTerraformExpandedFiles = {
+    param ([object]$Result, [string]$CandidatePath, [string]$ArchivePath)
+
+    if ($Result.LifecycleState -cne 'Active' -or
+        @($Result.OwnershipJournal | Where-Object { $_.Kind -ceq 'CandidateFile' -and $_.EntryState -ceq 'Created' }).Count -ne 4) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'expansion-return-contract'
+    }
+    $arrEntries = [System.IO.Directory]::GetFileSystemEntries($CandidatePath)
+    if ($arrEntries.Count -ne 4) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'expansion-count'
+    }
+    $objArchive = [System.IO.Compression.ZipFile]::OpenRead($ArchivePath)
+    try {
+        foreach ($strName in $script:arrCandidateExpectedName) {
+            $strExpectedPath = [System.IO.Path]::Combine($CandidatePath, $strName)
+            $boolReturnedPath = $false
+            foreach ($strReturnedPath in @($Result.OwnershipJournal | Where-Object { $_.Kind -ceq 'CandidateFile' -and $_.EntryState -ceq 'Created' } | ForEach-Object { $_.Path })) {
+                if ([string]::Equals($strExpectedPath, $strReturnedPath, $script:objCandidatePathComparison)) {
+                    $boolReturnedPath = $true
+                }
+            }
+            if (-not $boolReturnedPath) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'expansion-path'
+            }
+            $objAttributes = [System.IO.File]::GetAttributes($strExpectedPath)
+            if (($objAttributes -band ([System.IO.FileAttributes]::Directory -bor
+                        [System.IO.FileAttributes]::ReparsePoint)) -ne 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'expansion-file-type'
+            }
+            $objEntry = $objArchive.GetEntry($strName)
+            $objStream = $objEntry.Open()
+            $objHasher = [System.Security.Cryptography.SHA256]::Create()
+            try {
+                $strArchiveHash = [System.BitConverter]::ToString($objHasher.ComputeHash($objStream)).Replace('-', '').ToLowerInvariant()
+            } finally { $objHasher.Dispose(); $objStream.Dispose() }
+            $objEvidence = & $script:scriptBlockGetFileEvidence -LiteralPath $strExpectedPath
+            if ($objEvidence.Length -ne [uint64]$objEntry.Length -or $objEvidence.Sha256 -cne $strArchiveHash) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'expansion-content'
+            }
+        }
+    } finally { $objArchive.Dispose() }
+}
+
+
+$script:scriptBlockGetAcceptedExecutionSource = {
+    param ([object]$Case)
+
+    $hashtableSource = @{
+        'PS-P1A-AS-01' = 'T1A-AF-15'; 'PS-P1A-AS-02' = 'T1A-AF-16'; 'PS-P1A-AS-03' = 'T1A-S-11'
+        'PS-P1A-SL-01' = 'T1A-AF-31'; 'PS-P1A-SL-02' = 'T1A-AF-32'
+    }
+    if (-not $hashtableSource.ContainsKey($Case.CaseId)) { throw 'accepted-execution-case' }
+    $arrSealed = @($script:objCandidateActiveCatalog.Cases | Where-Object { $hashtableSource.ContainsKey($_.CaseId) })
+    $strJson = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $arrSealed
+    if ((& $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($strJson))) -cne 'e63af4385bcc136bc515ccae5d61fb1e3f1fa65b6a5378ca6b68de56a933eed8') { throw 'accepted-execution-allocation' }
+    $arrControl = @($arrSealed | Where-Object { $_.CaseId -ceq $Case.CaseId })
+    if ($arrControl.Count -ne 1 -or
+        (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $Case) -cne
+        (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $arrControl[0])) { throw 'accepted-execution-case' }
+    $strSourceId = $hashtableSource[$Case.CaseId]
+    $arrSource = @($script:objCandidateSourceCatalog.Cases | Where-Object { $_.Id -ceq $strSourceId })
+    $arrMapping = @($script:objCandidateActiveCatalog.SourceProvenance.SourceMappings | Where-Object { $_.SourceCase -ceq $strSourceId })
+    if ($arrSource.Count -ne 1 -or $arrMapping.Count -ne 1 -or $arrMapping[0].TargetCases.Count -ne 1 -or
+        $arrMapping[0].TargetCases[0] -cne $Case.CaseId -or $Case.SemanticVariant -cne $strSourceId.ToLowerInvariant()) { throw 'accepted-execution-source' }
+    return $arrSource[0]
+}
+
+$script:scriptBlockAssertAcceptedLabelArguments = {
+    param ([object]$SourceCase, [System.Collections.IDictionary]$Arguments)
+
+    $strName = switch -Exact ($SourceCase.Id) {
+        'T1A-AF-31' { 'RunId' }
+        'T1A-AF-32' { 'RunAttempt' }
+        default { throw 'accepted-label-source' }
+    }
+    $strExpected = if ($strName -ceq 'RunId') { '9001' } else { '2' }
+    $arrProperties = @($SourceCase.Fixture.Parameters.Labels.PSObject.Properties)
+    $arrKeys = @($Arguments.Keys)
+    if ($arrProperties.Count -ne 1 -or $arrProperties[0].Name -cne $strName -or
+        $arrProperties[0].Value -isnot [string] -or $arrProperties[0].Value -cne $strExpected -or
+        $Arguments.Count -ne 1 -or $arrKeys.Count -ne 1 -or $arrKeys[0] -isnot [string] -or
+        $arrKeys[0] -cne $strName -or -not $Arguments.Contains($strName) -or
+        $Arguments[$strName] -isnot [string] -or $Arguments[$strName] -cne $strExpected) { throw 'accepted-label-bound-shape' }
+}
+
+$script:scriptBlockAssertAcceptedRoleRefusals = {
+    param ([System.Collections.IDictionary]$Identity, [string]$OtherRolePath, [string]$RoleName)
+
+    [void](& $script:scriptBlockAssertTrackedScriptIdentity @Identity)
+    $arrBytes = [System.IO.File]::ReadAllBytes($Identity.LiteralPath)
+    foreach ($strMode in @('wrong-role', 'missing', 'counterfeit')) {
+        $strExpected = switch -Exact ($strMode) {
+            'wrong-role' { $RoleName + '-fixed-path' }
+            'missing' { 'working-file-type' }
+            'counterfeit' { 'working-object' }
+        }
+        $strMessage = $null
+        try {
+            if ($strMode -ceq 'wrong-role') {
+                [void](& $script:scriptBlockResolveFixedScriptClaim -Value ('FileSystem::' + $OtherRolePath) -Name $RoleName -ExpectedPath $Identity.LiteralPath)
+            } else {
+                if ($strMode -ceq 'missing') { [System.IO.File]::Delete($Identity.LiteralPath) }
+                else { [System.IO.File]::WriteAllBytes($Identity.LiteralPath, [byte[]](0x23, 0x0A)) }
+                [void](& $script:scriptBlockAssertTrackedScriptIdentity @Identity)
+            }
+        } catch { $strMessage = $_.Exception.Message }
+        finally { [System.IO.File]::WriteAllBytes($Identity.LiteralPath, $arrBytes) }
+        if ($strMessage -cne ('PSStyleGuide.CandidateHarness.v1|code=script-identity-invalid|detail=' + $strExpected)) { throw 'accepted-role-mutant' }
+        [void](& $script:scriptBlockAssertTrackedScriptIdentity @Identity)
+    }
+}
+
+$script:scriptBlockGetSourceLifecycleCase = {
+    param ([object]$Case)
+
+    $hashtableSource = @{
+        'PS-P1A-LF-01' = 'T1A-K-03'; 'PS-P1A-LF-02' = 'T1A-K-04'
+        'PS-P1A-LF-03' = 'T1A-K-05'; 'PS-P1A-LF-04' = 'T1A-K-06'
+        'PS-P1A-LF-05' = 'T1A-K-07'; 'PS-P1A-LF-06' = 'T1A-K-08'
+        'PS-P1A-LF-07' = 'T1A-K-09'; 'PS-P1A-LF-08' = 'T1A-K-10'
+        'PS-P1A-LF-09' = 'T1A-K-11'; 'PS-P1A-LF-10' = 'T1A-K-12'
+        'PS-P1A-LF-11' = 'T1A-K-13'; 'PS-P1A-LF-12' = 'T1A-K-14'
+        'PS-P1A-LF-13' = 'T1A-K-16'; 'PS-P1A-LF-14' = 'T1A-K-17'
+        'PS-P1A-LF-15' = 'T1A-AF-09'
+    }
+    if ($Case.CaseId -isnot [string] -or -not $hashtableSource.ContainsKey($Case.CaseId)) { throw 'source-lifecycle-case' }
+    $strSource = $hashtableSource[$Case.CaseId]
+    $arrSource = @($script:objCandidateActiveCatalog.SourceProvenance.TerraformCatalog.Cases | Where-Object { $_.Id -ceq $strSource })
+    $arrMapping = @($script:objCandidateActiveCatalog.SourceProvenance.SourceMappings | Where-Object { $_.SourceCase -ceq $strSource })
+    if ($arrSource.Count -ne 1 -or $arrMapping.Count -ne 1 -or @($arrMapping[0].TargetCases).Count -ne 1 -or
+        $arrMapping[0].TargetCases[0] -cne $Case.CaseId -or $Case.SemanticCase -cne $arrSource[0].SemanticCase -or
+        $Case.SemanticVariant -cne $strSource.ToLowerInvariant() -or $Case.FixtureRecipe -cne 'source-lifecycle' -or
+        $Case.InitialState -cne 'Active' -or $Case.OracleProfile -cne ('oracle.' + $Case.CaseId.ToLowerInvariant() + '.v1')) {
+        throw 'source-lifecycle-case'
+    }
+    if ($Case.CaseId -ceq 'PS-P1A-LF-15') {
+        $arrCandidateSource = @($script:objCandidateActiveCatalog.SourceProvenance.TerraformCatalog.Cases | Where-Object { $_.Id -ceq 'T1A-K-15' })
+        $arrCandidateMapping = @($script:objCandidateActiveCatalog.SourceProvenance.SourceMappings | Where-Object { $_.SourceCase -ceq 'T1A-K-15' })
+        if ($arrCandidateSource.Count -ne 1 -or $arrCandidateSource[0].SemanticCase -cne 'cleanup.candidate.disposed-owned-rejected' -or
+            $arrCandidateSource[0].Fixture.Invocation -cne 'candidate-cleanup' -or $arrCandidateMapping.Count -ne 1 -or
+            @($arrCandidateMapping[0].TargetCases).Count -ne 1 -or $arrCandidateMapping[0].TargetCases[0] -cne $Case.CaseId) { throw 'source-lifecycle-dual-entrypoint' }
+    }
+    return $arrSource[0]
+}
+
+$script:scriptBlockAssertTerminalCapabilityClosure = {
+    param ([string]$Source, [ValidateSet('helper', 'context')][string]$Role)
+
+    # A finite reviewed closure: exact public dispatch, captured validation
+    # dependencies, CLR bindings, and the manager prefix through both terminal
+    # returns and the nonmutating busy check. These hashes preserve exact LF
+    # bytes; they do not classify arbitrary Path operations as memory-only.
+    # The helper's active-only absence proof remains inside its pinned body.
+    $hashtablePins = @{
+        helper = @{
+            'script:objCandidateArrayLengthGetter' = '379a1042219e3fbe4f36950792b913e5b56a341d00ee1c2b9d6f89bf48e7ebac'
+            'script:objCandidateExactTypeMethod' = '3c5c5699ccec298e9c7b92c81a8f3c00fb377a73b124e618e68a45df896bcc62'
+            'script:objCandidateNoteKindGetter' = '3d20300df4b757c302458a45d15a904eb3724804119341e1912891efdc297eec'
+            'script:objCandidateNoteNameGetter' = 'a8c163200bae360f24d35af9023a157dae6c5fd0e01377cfe72f37e4f6039dce'
+            'script:objCandidatePropertiesGetter' = 'da3317ab46ea928b97fb067dbf27e5ac44fddd613500b397458e3897486077ef'
+            'script:objCandidateTypeNameCountGetter' = '501cd449a5ec11aa0eac427cf253522cda49a54cc6f75e052f90d5221105ce59'
+            'script:objCandidateTypeNameItemGetter' = '58daa4d5035173dfec03f571f531bb43079303dfd8450f1e5db7b8460367fb6c'
+            'script:objCandidateTypeNamesGetter' = '093f7f57766d67886001ccf6ff2a074b3fa470a409bfca5a9eb33daaaaed8a47'
+            'script:scriptBlockAssertCandidateHelperCanonicalStoredPath' = '651fd00c4acf127f40a4bdaf34530c91f0e8b7ee388cc4513af503f771bbfda9'
+            'script:scriptBlockAssertCandidateHelperContext' = 'f318af5753a0d944a6d14b2b95283d2de9ca3f8eadfca77112046b4efa5fcb17'
+            'script:scriptBlockAssertCandidateHelperExactProperty' = '6a151692c184e9cbe129adbff054df557b933a3911717170ecb2d7b40ecf70d3'
+            'script:scriptBlockAssertContextBinding' = 'b941380c980fdac9b398ba592f95dc431da68145e913095c9aaac0a9b9580bc5'
+            'script:scriptBlockGetCandidateExactRuntimeType' = '2382d7fa7d3207d69439aa505789754f4cbf672b2dbb1af021e5a33f99471cef'
+            'script:scriptBlockGetCandidateHelperFailureField' = '36a520154a80b10e704a1ee777fc01a99755fa01ae77fcfe28d1c924da6c9653'
+            'script:scriptBlockGetCandidateHelperRetainedSequence' = 'fcd7f18c4f996ea3aa4c4488c82858495bbfe411d861e6ac85476c3491310908'
+            'script:scriptBlockGetCandidatePropertyMetadata' = '89092540fb823759abf96f7889e675e87d45a37fd8d0478a5b6ea0b9e7b55cbf'
+            'script:scriptBlockGetCandidatePublicArrayLength' = '137c70466c6c2e9b34ae6a38436b2149e64645845bc15388b6e22be6b0bc0d94'
+            'script:scriptBlockNewCandidateHelperCleanupResult' = '33feef4ccc2291fe2516156839736b8611d4a87b14a716db9ea6fa9a0dde12fb'
+            'script:scriptBlockTestCandidatePublicTypeName' = '184b981d75cf61a5c2eea41be9c81bc9c2ecc12308e57d892c96dab825af67d7'
+            'PublicFunction' = '7cc16304e35709f97d3144b1d1ceb175165471a0a8f2951390a5986ac8cf2775'
+        }
+        context = @{
+            'objCandidateArrayLengthGetter' = '6706e2ad619d14940388ce87373d050f963419e79b8e263a19997c5cf01ed436'
+            'objCandidateExactTypeMethod' = 'ce3ea19e08ea488c7884ac612d53ef3592ea5c87c89d662e60963430d43550d6'
+            'objCandidateNoteKindGetter' = 'ea6f50b63494627f115228d483ac3a9cf4adb6aa43e51d97dd52f9f7d3956093'
+            'objCandidateNoteNameGetter' = 'ca34c890d2be4d0bfdff213bbdbf792767a85bc11d8a7e31b423a582b3c9cf2d'
+            'objCandidatePropertiesGetter' = 'd34767936db9440ba2af7976e2e346a1d702d282b4ab7108f21744ca19df0f9c'
+            'objCandidateTypeNameCountGetter' = '894a1024572027088049c5e57884201aeae9c1c52b7aa385fa5427e85c9607c0'
+            'objCandidateTypeNameItemGetter' = '23f3e493325d9e57fb8d96bdb2a1c8266f42ebfbd0b4aa82168d51487b89cb5f'
+            'objCandidateTypeNamesGetter' = 'b284b88ab76271fb3c565911a9102212c14fd8ec9d7d3e30dfcbb4b30c0f197e'
+            'scriptBlockAssertCandidateCanonicalStoredPath' = '5ac5ecee4f243a56ba303dc50e3f57a694ddf537a900917bff212bb57d5e5b70'
+            'scriptBlockAssertCandidateExactPropertySchema' = '54935140ec6ea85798ee450aa10913a4045aef6b5d6ef0246887042c76836396'
+            'scriptBlockAssertCandidateInMemoryContext' = '98e4579d2561aaf4da0532093e515b1b5ded3a57a455ac9ac4767d278d08a27f'
+            'scriptBlockCandidateContextIssuedIndex' = '28de4ac1b173ebfd268e3f63ea1342e3c2a9a0ac16e19a071b0a15dbee5349a8'
+            'scriptBlockGetCandidateExactRuntimeType' = '3a1a437e1f07aa92ee790c20bdc81f77fc083ea8a0c0e1943c14799c16698f61'
+            'scriptBlockGetCandidatePropertyMetadata' = 'c4a8c35f4cf1c525bff625c45b3612a751fbf27841013b1640a18419d172a3e4'
+            'scriptBlockGetCandidatePublicArrayLength' = '01d26119749c115b78e11c8a5d78cbf1ad034e15a54a5305c25392d8c79b4897'
+            'scriptBlockGetCandidateRetainedSequence' = '8c7c5d05adb386dbfc9ff303c718462583a642942d410b03e32491ea2b76d186'
+            'scriptBlockNewCandidateCleanupResult' = 'e11803475e41b2cf8b3fabcfbd04a7963fb73b34024519e5163f9db0c8794820'
+            'scriptBlockNewCandidateIssuanceSnapshot' = '4c579875a00e1b14e1aa99f3a30e8ffaee5ff6b326eb922272119d56341b5919'
+            'scriptBlockRemoveContextFunction' = (& $script:scriptBlockGetContextForwardingPins)['Remove-StyleGuideCandidateInvocationContext'].BindingSha256
+            'scriptBlockSourceTestContext' = 'c1860bc80d45f09bd1c80e39c151ddd520d6f59ee971d29c836f4725a1ccdd24'
+            'scriptBlockTestCandidatePublicTypeName' = '0b9bed9cfc94eac3e30876346d4170cda88d168655f482286011ac746fd65a94'
+            'scriptBlockTestContextFunction' = (& $script:scriptBlockGetContextForwardingPins)['Test-StyleGuideCandidateInvocationContextIssued'].BindingSha256
+            'PublicFunction' = (& $script:scriptBlockGetContextForwardingPins)['Remove-StyleGuideCandidateInvocationContext'].FunctionSha256
+            'TerminalPrefix' = 'cb9e45313d5ba062a8a69db9971a666aee65039ab1e6382f67a029a6f08467bb'
+        }
+    }
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseInput($Source, [ref]$null, [ref]$objErrors)
+    if (@($objErrors).Count -ne 0) { throw 'terminal-closure-parse' }
+    $strModuleName = if ($Role -ceq 'helper') { 'scriptBlockCandidateModuleDefinition' } else { 'scriptBlockContextModuleDefinition' }
+    $arrModule = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and $_.Left.Extent.Text -ceq ('$' + $strModuleName)
+    })
+    if ($arrModule.Count -ne 1) { throw 'terminal-closure-module' }
+    $objModuleLiteral = $arrModule[0].Right.Find({ param ($Node) $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst] }, $false)
+    if ($null -eq $objModuleLiteral) { throw 'terminal-closure-module' }
+    $strFunction = if ($Role -ceq 'helper') { 'Remove-StyleGuideCandidateInvocationState' } else { 'Remove-StyleGuideCandidateInvocationContext' }
+    $arrFunctions = @($objAst.FindAll({ param ($Node) $Node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $Node.Name -ieq $strFunction }, $true))
+    if ($arrFunctions.Count -ne 1 -or -not [object]::ReferenceEquals($arrFunctions[0].Parent, $objModuleLiteral.ScriptBlock.EndBlock)) { throw 'terminal-closure-binding' }
+    $hashtableParts = @{ PublicFunction = $arrFunctions[0].Extent.Text }
+    foreach ($strName in $hashtablePins[$Role].Keys) {
+        if ($strName -cin @('PublicFunction', 'TerminalPrefix')) { continue }
+        $strPlain = $strName -ireplace '^(script|local|private|global):', ''
+        $arrAssignments = @($objAst.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+            ($Node.Left.VariablePath.UserPath -ireplace '^(script|local|private|global):', '') -ieq $strPlain
+        }, $true))
+        foreach ($objAssignment in $arrAssignments) {
+            if ($objAssignment.Left.VariablePath.UserPath -cne $strName -or
+                -not [object]::ReferenceEquals($objAssignment.Parent, $objModuleLiteral.ScriptBlock.EndBlock)) { throw 'terminal-closure-binding' }
+        }
+        $hashtableParts[$strName] = ($arrAssignments | ForEach-Object { $_.Extent.Text }) -join "`n"
+    }
+    if ($Role -ceq 'context') {
+        $arrRemove = @($objAst.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+            ($Node.Left.VariablePath.UserPath -ireplace '^(script|local|private|global):', '') -ieq 'scriptBlockSourceRemoveContext'
+        }, $true))
+        if ($arrRemove.Count -ne 1 -or -not [object]::ReferenceEquals($arrRemove[0].Parent, $objModuleLiteral.ScriptBlock.EndBlock)) { throw 'terminal-closure-binding' }
+        $strText = $arrRemove[0].Extent.Text
+        $strMarker = '        [void]$arrCandidateActiveCleanup.Add($Context)'
+        if ([regex]::Matches($strText, [regex]::Escape($strMarker)).Count -ne 1) { throw 'terminal-closure-prefix' }
+        $hashtableParts.TerminalPrefix = $strText.Substring(0, $strText.IndexOf($strMarker, [System.StringComparison]::Ordinal))
+    }
+    foreach ($strName in $hashtablePins[$Role].Keys) {
+        $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false, $true)).GetBytes($hashtableParts[$strName]))
+        if ($strHash -cne $hashtablePins[$Role][$strName]) { throw 'terminal-closure-content' }
+    }
+}
+
+$script:scriptBlockAssertTerminalCapabilityClosureMutations = {
+    param ([string]$Source, [ValidateSet('helper', 'context')][string]$Role)
+
+    & $script:scriptBlockAssertTerminalCapabilityClosure -Source $Source -Role $Role
+    $objAst = [System.Management.Automation.Language.Parser]::ParseInput($Source, [ref]$null, [ref]$null)
+    $strFunction = if ($Role -ceq 'helper') { 'Remove-StyleGuideCandidateInvocationState' } else { 'Remove-StyleGuideCandidateInvocationContext' }
+    $objFunction = @($objAst.FindAll({ param ($Node) $Node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $Node.Name -ceq $strFunction }, $true))[0]
+    $strTypeName = if ($Role -ceq 'helper') { 'script:scriptBlockGetCandidateExactRuntimeType' } else { 'scriptBlockGetCandidateExactRuntimeType' }
+    $objType = @($objAst.FindAll({ param ($Node) $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and $Node.Left.Extent.Text -ceq ('$' + $strTypeName) -and $Node.Right.Extent.Text.StartsWith('{', [System.StringComparison]::Ordinal) }, $true))[0]
+    $strBindingName = if ($Role -ceq 'helper') { 'script:objCandidateExactTypeMethod' } else { 'objCandidateExactTypeMethod' }
+    $objBinding = @($objAst.FindAll({ param ($Node) $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and $Node.Left.Extent.Text -ceq ('$' + $strBindingName) }, $true))[0]
+    $listMutants = New-Object 'System.Collections.Generic.List[string]'
+    $listMutants.Add($Source.Insert($objFunction.Body.EndBlock.Statements[0].Extent.StartOffset, "[void][System.IO.File]::Exists('terminal-direct-control')`n"))
+    $strType = $objType.Extent.Text.Replace('if ($null -eq $Value)', "[void][System.IO.Directory]::Exists('terminal-indirect-control')`n        if (`$null -eq `$Value)")
+    if ($strType -ceq $objType.Extent.Text) { throw 'terminal-mutant-anchor' }
+    $listMutants.Add($Source.Remove($objType.Extent.StartOffset, $objType.Extent.EndOffset - $objType.Extent.StartOffset).Insert($objType.Extent.StartOffset, $strType))
+    $listMutants.Add($Source.Remove($objBinding.Extent.StartOffset, $objBinding.Extent.EndOffset - $objBinding.Extent.StartOffset).Insert($objBinding.Extent.StartOffset, ('if ($false) { ' + $objBinding.Extent.Text + ' }')))
+    $listMutants.Add($Source.Insert($objBinding.Extent.EndOffset, "`n" + $objBinding.Extent.Text))
+    $listMutants.Add($Source.Remove($objBinding.Extent.StartOffset, $objBinding.Extent.EndOffset - $objBinding.Extent.StartOffset).Insert($objBinding.Extent.StartOffset, $objBinding.Extent.Text.Replace("'GetType'", "'ToString'")))
+    $listMutants.Add($Source.Insert($objFunction.Body.EndBlock.Statements[0].Extent.StartOffset, "[void][System.IO.Path]::GetFullPath('terminal-path-control')`n"))
+    foreach ($strScope in @('script', 'local', 'private', 'global')) {
+        $listMutants.Add($Source.Insert($objBinding.Extent.EndOffset, "`n`$" + $strScope + ':OBJCANDIDATEEXACTTYPEMETHOD = $null'))
+    }
+    $arrShapes = [string[]]@('begin', 'process', 'dynamicparam', 'explicit-end-only')
+    if ($null -ne $objFunction.Body.PSObject.Properties['CleanBlock']) { $arrShapes += 'clean' }
+    foreach ($strShape in $arrShapes) {
+        $strOther = if ($strShape -ceq 'explicit-end-only') { '' } else { $strShape + " { [void][System.IO.File]::Exists('static-only-never-run') }" }
+        $strBody = "{`n" + $objFunction.Body.ParamBlock.Extent.Text + "`n" + $strOther + "`nend {`n" +
+            (($objFunction.Body.EndBlock.Statements | ForEach-Object { $_.Extent.Text }) -join "`n") + "`n}`n}"
+        $strMutant = $Source.Remove($objFunction.Body.Extent.StartOffset, $objFunction.Body.Extent.EndOffset - $objFunction.Body.Extent.StartOffset).Insert($objFunction.Body.Extent.StartOffset, $strBody)
+        $arrErrors = $null
+        [void][System.Management.Automation.Language.Parser]::ParseInput($strMutant, [ref]$null, [ref]$arrErrors)
+        if (@($arrErrors).Count -ne 0) { throw 'terminal-shape-mutant-parse' }
+        $listMutants.Add($strMutant)
+    }
+    foreach ($strMutant in $listMutants) {
+        $objFailure = $null
+        try { & $script:scriptBlockAssertTerminalCapabilityClosure -Source $strMutant -Role $Role } catch { $objFailure = $_ }
+        if ($null -eq $objFailure -or $objFailure.Exception.Message -cnotin @('terminal-closure-binding', 'terminal-closure-content')) { throw 'terminal-closure-mutant-accepted' }
+    }
+}
+
+$script:scriptBlockInvokeTerminalContextProbe = {
+    param ([object]$Context, [ValidateSet('helper', 'context')][string]$EntryPoint, [bool]$ExpectIssued = $true)
+
+    $arrHelper = @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateArtifact_1_0_20260926_0 -All)
+    $arrManager = @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateContext_1_0_20260926_0 -All)
+    if ($arrHelper.Count -ne 1 -or $arrManager.Count -ne 1) { throw 'terminal-probe-module-count' }
+    $objRemove = & $arrManager[0] { return $scriptBlockRemoveContextFunction }
+    if ($objRemove -isnot [scriptblock] -or $null -eq $objRemove.Module) { throw 'terminal-probe-remove-closure' }
+    $arrBoundaries = @(
+        @{ Module = $arrHelper[0]; Name = 'scriptBlockConvertToCandidateHelperNormalizedPath'; Category = 'Provider' },
+        @{ Module = $arrHelper[0]; Name = 'scriptBlockAssertCandidateHelperDirectoryEnvelope'; Category = 'Filesystem' },
+        @{ Module = $arrHelper[0]; Name = 'scriptBlockAssertCandidateHelperEntryAbsent'; Category = 'Filesystem' },
+        @{ Module = $arrHelper[0]; Name = 'scriptBlockResolveCandidateHelperNativePath'; Category = 'Native' },
+        @{ Module = $objRemove.Module; Name = 'scriptBlockResolveCandidateExistingDirectory'; Category = 'Path' },
+        @{ Module = $objRemove.Module; Name = 'scriptBlockAssertCandidateOrdinaryDirectoryEnvelope'; Category = 'Filesystem' },
+        @{ Module = $objRemove.Module; Name = 'scriptBlockGetCandidateImmediateEntry'; Category = 'Filesystem' },
+        @{ Module = $objRemove.Module; Name = 'scriptBlockGetCandidateFileEvidence'; Category = 'Filesystem' },
+        @{ Module = $objRemove.Module; Name = 'scriptBlockResolveCandidateNativePath'; Category = 'Native' }
+    )
+    $hashtableCounts = [ordered]@{ Provider = 0; Path = 0; Filesystem = 0; Native = 0 }
+    $listSaved = New-Object 'System.Collections.Generic.List[object]'
+    try {
+        foreach ($objBoundary in $arrBoundaries) {
+            $strCategory = $objBoundary.Category
+            $hashtableCounts[$strCategory] = 0
+            $objOriginal = & $objBoundary.Module { param ($Name) (Microsoft.PowerShell.Utility\Get-Variable -Name $Name -Scope Script -ErrorAction Stop).Value } $objBoundary.Name
+            if ($objOriginal -isnot [scriptblock]) { throw 'terminal-probe-boundary-type' }
+            $listSaved.Add(@{ Module = $objBoundary.Module; Name = $objBoundary.Name; Value = $objOriginal })
+            $scriptBlockSpy = {
+                $hashtableCounts[$strCategory]++
+                throw 'terminal-boundary-spy-called'
+            }.GetNewClosure()
+            & $objBoundary.Module { param ($Name, $Value) Microsoft.PowerShell.Utility\Set-Variable -Name $Name -Scope Script -Value $Value } $objBoundary.Name $scriptBlockSpy
+            try {
+                & $objBoundary.Module {
+                    param ($Name)
+                    & (Microsoft.PowerShell.Utility\Get-Variable -Name $Name -Scope Script -ErrorAction Stop).Value
+                } $objBoundary.Name
+            } catch { if ($_.Exception.Message -cne 'terminal-boundary-spy-called') { throw } }
+            if ($hashtableCounts[$strCategory] -ne 1) { throw 'terminal-probe-control' }
+            $hashtableCounts[$strCategory] = 0
+        }
+        $objJournal = $Context.OwnershipJournal
+        $strBefore = $Context | ConvertTo-Json -Depth 12 -Compress
+        if ($EntryPoint -ceq 'helper') { $objResult = Remove-StyleGuideCandidateInvocationState -Context $Context }
+        else { $objResult = Remove-StyleGuideCandidateInvocationContext -Context $Context }
+        if (-not [object]::ReferenceEquals($objJournal, $Context.OwnershipJournal) -or
+            $strBefore -cne ($Context | ConvertTo-Json -Depth 12 -Compress) -or
+            ([bool](Test-StyleGuideCandidateInvocationContextIssued -Context $Context)) -ne $ExpectIssued) { throw 'terminal-probe-context-mutated' }
+        foreach ($strCategory in $hashtableCounts.Keys) {
+            if ($hashtableCounts[$strCategory] -ne 0) { throw ('terminal-probe-boundary-' + $strCategory) }
+        }
+        if ($objResult.FilesystemCallCount -ne 0) { throw 'terminal-probe-filesystem-count' }
+        return [pscustomobject]@{ Result = $objResult; Counts = [pscustomobject][ordered]@{ Provider = $hashtableCounts.Provider; Path = $hashtableCounts.Path; Filesystem = $hashtableCounts.Filesystem; Native = $hashtableCounts.Native }; SameJournal = $true; ContextUnchanged = $true }
+    } finally {
+        foreach ($objSaved in $listSaved) {
+            & $objSaved.Module { param ($Name, $Value) Microsoft.PowerShell.Utility\Set-Variable -Name $Name -Scope Script -Value $Value } $objSaved.Name $objSaved.Value
+        }
+    }
+}
+
+$script:scriptBlockAssertMemoryOnlyModuleInitialization = {
+    param ([string]$Source, [ValidateSet('helper', 'context')][string]$Role)
+
+    # Only definition literals are excluded: creating those values does not
+    # execute their bodies. Every executable module initialization statement is
+    # included, with exact bytes and order, including private closure captures.
+    $hashtablePins = @{ helper = '7b6febd56cca71482201821f6eb0b6dcdcfe1673af7dad9c49ba094745246599'; context = '46b49061300229c4ed833a04618776ae36f4e447832ddd97a4a7eddfa4ba87fa' }
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseInput($Source, [ref]$null, [ref]$objErrors)
+    if (@($objErrors).Count -ne 0) { throw 'module-initialization-parse' }
+    $strName = if ($Role -ceq 'helper') { 'scriptBlockCandidateModuleDefinition' } else { 'scriptBlockContextModuleDefinition' }
+    $arrModules = @($objAst.EndBlock.Statements | Where-Object { $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and $_.Left.Extent.Text -ceq ('$' + $strName) })
+    if ($arrModules.Count -ne 1) { throw 'module-initialization-binding' }
+    $objLiteral = $arrModules[0].Right.Find({ param ($Node) $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst] }, $false)
+    if ($null -eq $objLiteral -or $null -ne $objLiteral.ScriptBlock.BeginBlock -or $null -ne $objLiteral.ScriptBlock.ProcessBlock -or
+        $null -ne $objLiteral.ScriptBlock.DynamicParamBlock -or -not $objLiteral.ScriptBlock.EndBlock.Unnamed -or
+        ($null -ne $objLiteral.ScriptBlock.PSObject.Properties['CleanBlock'] -and $null -ne $objLiteral.ScriptBlock.CleanBlock)) { throw 'module-initialization-shape' }
+    $arrStatements = @($objLiteral.ScriptBlock.EndBlock.Statements | Where-Object {
+        if ($_ -is [System.Management.Automation.Language.FunctionDefinitionAst]) { return $false }
+        if ($_ -is [System.Management.Automation.Language.AssignmentStatementAst]) {
+            $objDefinition = $_.Right.Find({ param ($Node) $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst] }, $false)
+            if ($null -ne $objDefinition -and $_.Right.Extent.Text -ceq $objDefinition.Extent.Text) { return $false }
+        }
+        return $true
+    })
+    $strText = ($arrStatements | ForEach-Object { $_.Extent.Text }) -join "`n"
+    if ((& $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false, $true)).GetBytes($strText))) -cne $hashtablePins[$Role]) { throw 'module-initialization-content' }
+    if ($Role -ceq 'helper') {
+        $arrExpansion = @($objAst.FindAll({ param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left.Extent.Text -ceq '$script:scriptBlockInvokeCandidateArtifactExpansion'
+        }, $true))
+        if ($arrExpansion.Count -ne 1) { throw 'module-raw-order-binding' }
+        $strExpansion = $arrExpansion[0].Extent.Text
+        $strMarker = '            $strCheckoutPath = & $script:scriptBlockConvertToCandidateHelperNormalizedPath'
+        if ([regex]::Matches($strExpansion, [regex]::Escape($strMarker)).Count -ne 1) { throw 'module-raw-order-marker' }
+        $strPrefix = $strExpansion.Substring(0, $strExpansion.IndexOf($strMarker, [System.StringComparison]::Ordinal))
+        if ((& $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false, $true)).GetBytes($strPrefix))) -cne 'ea811bd7fa1ec562cf75fc45729b97625f94523cb13de737585c6d299e081061') { throw 'module-raw-order-content' }
+    }
+}
+
+$script:scriptBlockAssertMemoryOnlyModuleInitializationControls = {
+    param ([string]$HelperLiteralPath, [string]$ContextLiteralPath)
+
+    foreach ($strRole in @('helper', 'context')) {
+        $strPath = if ($strRole -ceq 'helper') { $HelperLiteralPath } else { $ContextLiteralPath }
+        $strSource = [System.IO.File]::ReadAllText($strPath)
+        & $script:scriptBlockAssertMemoryOnlyModuleInitialization -Source $strSource -Role $strRole
+        $strExport = '    Microsoft.PowerShell.Core\Export-ModuleMember -Function '
+        if ([regex]::Matches($strSource, [regex]::Escape($strExport)).Count -ne 1) { throw 'module-initialization-control-anchor' }
+        foreach ($strInjection in @("[void][System.IO.File]::Exists('initialization-file-control')", "[void][System.IO.Path]::GetFullPath('initialization-path-control')", "Get-Item -LiteralPath 'initialization-provider-control'")) {
+            $strMutant = $strSource.Replace($strExport, ($strInjection + "`n" + $strExport))
+            $strFailure = ''
+            try { & $script:scriptBlockAssertMemoryOnlyModuleInitialization -Source $strMutant -Role $strRole } catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne 'module-initialization-content') { throw 'module-initialization-mutant' }
+        }
+        if ($strRole -ceq 'helper') {
+            $strMarker = '        $objArchiveStream = $null' + [char]10 + '        $objArchiveBuffer = $null'
+            if ([regex]::Matches($strSource, [regex]::Escape($strMarker)).Count -ne 1) { throw 'module-raw-order-control-anchor' }
+            foreach ($strInjection in @('& $script:scriptBlockAssertContextBinding', "[void][System.IO.File]::Exists('raw-order-control')")) {
+                $strReplacement = '        ' + $strInjection + [char]10 + $strMarker
+                $strMutant = $strSource.Replace($strMarker, $strReplacement)
+                if ($strMutant -ceq $strSource -or $strMutant.Replace($strReplacement, $strMarker) -cne $strSource) { throw 'module-raw-order-control-reversal' }
+                $strFailure = ''
+                try { & $script:scriptBlockAssertMemoryOnlyModuleInitialization -Source $strMutant -Role helper } catch { $strFailure = $_.Exception.Message }
+                if ($strFailure -cne 'module-raw-order-content') { throw 'module-raw-order-mutant' }
+            }
+        }
+    }
+}
+
+$script:scriptBlockContextBindingWorker = {
+    param ([string]$Roles, [string]$FixtureRoot, [string]$Mode)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    $strManagerPath = [System.IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1')
+    $strHelperPath = [System.IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1')
+    if ($Mode -ceq 'helper-first') {
+        if (@(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateContext_1_0_20260926_0 -All).Count -ne 0) { throw 'binding-helper-first-precondition' }
+        . $strHelperPath
+        if (@(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateContext_1_0_20260926_0 -All).Count -ne 0 -or
+            @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateArtifact_1_0_20260926_0 -All).Count -ne 1) { throw 'binding-helper-first-load' }
+    }
+    . $strManagerPath
+    $objOriginal = @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateContext_1_0_20260926_0 -All)[0]
+    $objOriginalCleanup = $objOriginal.ExportedFunctions['Remove-StyleGuideCandidateInvocationContext'].ScriptBlock
+    $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $FixtureRoot
+    $strInvocationRoot = $objContext.InvocationRootPath
+    $objInitial = & $objOriginalCleanup -Context $objContext
+    if (-not $objInitial.Success -or $objInitial.FinalState -cne 'Disposed' -or $objInitial.FilesystemCallCount -ne 9) { throw 'binding-initial-cleanup' }
+    . $strHelperPath
+    $objHelper = @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateArtifact_1_0_20260926_0 -All)[0]
+    $objHelperCleanup = $objHelper.ExportedFunctions['Remove-StyleGuideCandidateInvocationState'].ScriptBlock
+    $objReplacement = $null
+    $hashtableCallbacks = @{ Count = 0 }
+    try {
+        if ($Mode -ceq 'cached-replacement') {
+            $objControl = & $objHelperCleanup -Context $objContext
+            if (-not $objControl.Success -or $objControl.FilesystemCallCount -ne 0) { throw 'binding-cache-control' }
+        }
+        switch ($Mode) {
+            'control' { }
+            'helper-first' { }
+            'missing' { Microsoft.PowerShell.Core\Remove-Module -ModuleInfo $objOriginal -Force }
+            'wrong-definition' {
+                Microsoft.PowerShell.Core\Remove-Module -ModuleInfo $objOriginal -Force
+                $objReplacement = Microsoft.PowerShell.Core\New-Module -Name $objOriginal.Name -ScriptBlock { $null = 'wrong-definition' }
+                Microsoft.PowerShell.Core\Import-Module -ModuleInfo $objReplacement -Global -Force
+            }
+            'ambiguous' {
+                $objReplacement = Microsoft.PowerShell.Core\New-Module -Name $objOriginal.Name -ScriptBlock $scriptBlockContextModuleDefinition
+                Microsoft.PowerShell.Core\Import-Module -ModuleInfo $objReplacement -Global
+                if (@(Microsoft.PowerShell.Core\Get-Module -Name $objOriginal.Name -All).Count -ne 2) { throw 'binding-ambiguous-control' }
+            }
+            { $_ -cin @('fresh-nonissuing', 'cached-replacement') } {
+                Microsoft.PowerShell.Core\Remove-Module -ModuleInfo $objOriginal -Force
+                $objReplacement = Microsoft.PowerShell.Core\New-Module -Name $objOriginal.Name -ScriptBlock $scriptBlockContextModuleDefinition
+                Microsoft.PowerShell.Core\Import-Module -ModuleInfo $objReplacement -Global -Force
+                if ([object]::ReferenceEquals($objReplacement, $objOriginal) -or $objReplacement.Definition -cne $objOriginal.Definition) { throw 'binding-fresh-control' }
+            }
+            'public-rebound' {
+                $objFalseCleanup = { param ($Context) [void]$Context; $hashtableCallbacks.Count++; throw 'public-cleanup-was-called' }.GetNewClosure()
+                $objFalseIssued = { param ($Context, $ExpectedState, $ExpectedValues) [void]$Context; [void]$ExpectedState; [void]$ExpectedValues; $hashtableCallbacks.Count++; return $false }.GetNewClosure()
+                Set-Item -LiteralPath Function:global:Remove-StyleGuideCandidateInvocationContext -Value $objFalseCleanup
+                Set-Item -LiteralPath Function:global:Test-StyleGuideCandidateInvocationContextIssued -Value $objFalseIssued
+            }
+            'raw-order' {
+                $objBinder = & $objHelper { return $script:scriptBlockAssertContextBinding }
+                $objSpy = { $hashtableCallbacks.Count++; throw 'binding-order-spy' }.GetNewClosure()
+                & $objHelper { param ($Value) $script:scriptBlockAssertContextBinding = $Value } $objSpy
+                try {
+                    foreach ($strKind in @('missing', 'label', 'digest', 'context')) {
+                        $hashtableArguments = @{
+                            Context = $null; CheckoutRoot = $FixtureRoot; TrustedTemporaryRoot = $FixtureRoot
+                            DownloadDirectory = $FixtureRoot; CandidateDirectory = $FixtureRoot; ExpectedDigest = ('0' * 64)
+                        }
+                        $strExpected = 'Context-schema'
+                        if ($strKind -ceq 'missing') { $hashtableArguments.Remove('Context'); $strExpected = 'Context-missing' }
+                        if ($strKind -ceq 'label') { $hashtableArguments.RunId = [object]::new(); $strExpected = 'RunId-type' }
+                        if ($strKind -ceq 'digest') { $hashtableArguments.ExpectedDigest = 'invalid'; $strExpected = 'ExpectedDigest-grammar' }
+                        $objFailure = $null
+                        try { & $strHelperPath @hashtableArguments } catch { $objFailure = $_ }
+                        if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideDiagnosticCode'] -cne 'parameter' -or
+                            $objFailure.Exception.Data['PSStyleGuideSubreason'] -cne $strExpected -or $hashtableCallbacks.Count -ne 0) { throw 'binding-raw-order' }
+                    }
+                    $objInvalid = & $objHelperCleanup -Context $null
+                    if ($objInvalid.Success -or $objInvalid.DiagnosticCode -cne 'cleanup-context-invalid' -or
+                        $objInvalid.FilesystemCallCount -ne 0 -or $hashtableCallbacks.Count -ne 0) { throw 'binding-context-order' }
+                } finally { & $objHelper { param ($Value) $script:scriptBlockAssertContextBinding = $Value } $objBinder }
+            }
+            default { throw 'binding-mode' }
+        }
+        $strBefore = $objContext | ConvertTo-Json -Depth 12 -Compress
+        $objResult = & $objHelperCleanup -Context $objContext
+        $boolExpected = $Mode -cin @('control', 'helper-first', 'public-rebound', 'raw-order')
+        $strExpectedCode = if ($boolExpected) { 'cleanup-already-disposed' } else { 'cleanup-context-invalid' }
+        if ($objResult.Success -cne $boolExpected -or $objResult.DiagnosticCode -cne $strExpectedCode -or
+            $objResult.FilesystemCallCount -ne 0 -or $hashtableCallbacks.Count -ne 0 -or
+            ($objContext | ConvertTo-Json -Depth 12 -Compress) -cne $strBefore) { throw 'binding-result' }
+        $objResultRecord = [pscustomobject][ordered]@{
+            Mode = $Mode; Success = $objResult.Success; Code = $objResult.DiagnosticCode
+            FilesystemCallCount = $objResult.FilesystemCallCount; Callbacks = $hashtableCallbacks.Count
+            ContextUnchanged = $true; RootAbsent = -not [System.IO.Directory]::Exists($strInvocationRoot)
+        }
+        [System.IO.File]::WriteAllText([System.IO.Path]::Combine($FixtureRoot, 'result.json'),
+            ($objResultRecord | ConvertTo-Json -Compress), (New-Object System.Text.UTF8Encoding($false)))
+    } finally {
+        if ($null -ne $objReplacement) { Microsoft.PowerShell.Core\Remove-Module -ModuleInfo $objReplacement -Force }
+        Microsoft.PowerShell.Core\Import-Module -ModuleInfo $objOriginal -Global -Force
+        $objFinal = & $objOriginalCleanup -Context $objContext
+        if (-not $objFinal.Success -or $objFinal.FilesystemCallCount -ne 0 -or [System.IO.Directory]::Exists($strInvocationRoot)) { throw 'binding-restoration' }
+    }
+}
+
+$script:scriptBlockAssertContextBindingControls = {
+    param ([string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath)
+
+    $strRoot = [System.IO.Path]::Combine($RunRoot, 'context-binding-controls')
+    [void][System.IO.Directory]::CreateDirectory($strRoot)
+    $strRoles = [System.IO.Path]::Combine($strRoot, 'roles')
+    [void][System.IO.Directory]::CreateDirectory($strRoles)
+    $hashtableWorker = $null
+    try {
+        $hashtableEvidence = @{}
+        foreach ($strSource in @($HelperLiteralPath, $ContextLiteralPath)) {
+            $strCopy = [System.IO.Path]::Combine($strRoles, [System.IO.Path]::GetFileName($strSource))
+            [System.IO.File]::WriteAllBytes($strCopy, [System.IO.File]::ReadAllBytes($strSource))
+            $objSource = & $script:scriptBlockGetFileEvidence -LiteralPath $strSource
+            $objCopy = & $script:scriptBlockGetFileEvidence -LiteralPath $strCopy
+            if ($objSource.Length -ne $objCopy.Length -or $objSource.Sha256 -cne $objCopy.Sha256) { throw 'binding-copy-identity' }
+            $hashtableEvidence[$strSource] = $objSource; $hashtableEvidence[$strCopy] = $objCopy
+        }
+        $strWorker = [System.IO.Path]::Combine($strRoot, 'worker.ps1')
+        [System.IO.File]::WriteAllText($strWorker, $script:scriptBlockContextBindingWorker.ToString(), (New-Object System.Text.UTF8Encoding($false)))
+        $hashtableEvidence[$strWorker] = & $script:scriptBlockGetFileEvidence -LiteralPath $strWorker
+        foreach ($strMode in @('control', 'helper-first', 'missing', 'wrong-definition', 'ambiguous', 'fresh-nonissuing', 'cached-replacement', 'public-rebound', 'raw-order')) {
+            $strFixture = [System.IO.Path]::Combine($strRoot, $strMode)
+            [void][System.IO.Directory]::CreateDirectory($strFixture)
+            $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorker -WorkingDirectory $strFixture -Arguments @('-Roles', $strRoles, '-FixtureRoot', $strFixture, '-Mode', $strMode)
+            while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [System.Threading.Thread]::Sleep(10) }
+            if ($hashtableWorker.Process.ExitCode -ne 0) { throw ('binding-worker-' + $strMode) }
+            $objResult = & $script:scriptBlockReadTerraformProofResult -LiteralPath ([System.IO.Path]::Combine($strFixture, 'result.json'))
+            & $script:scriptBlockAssertExactPropertyNames -Value $objResult -Names @('Mode', 'Success', 'Code', 'FilesystemCallCount', 'Callbacks', 'ContextUnchanged', 'RootAbsent') -Detail 'binding-worker'
+            $boolExpected = $strMode -cin @('control', 'helper-first', 'public-rebound', 'raw-order')
+            $strExpectedCode = if ($boolExpected) { 'cleanup-already-disposed' } else { 'cleanup-context-invalid' }
+            if ($objResult.Mode -isnot [string] -or $objResult.Mode -cne $strMode -or $objResult.Success -isnot [bool] -or $objResult.Success -cne $boolExpected -or
+                $objResult.Code -isnot [string] -or $objResult.Code -cne $strExpectedCode -or
+                $objResult.ContextUnchanged -isnot [bool] -or -not $objResult.ContextUnchanged -or
+                $objResult.RootAbsent -isnot [bool] -or -not $objResult.RootAbsent) { throw 'binding-worker-values' }
+            foreach ($strField in @('FilesystemCallCount', 'Callbacks')) {
+                if ($objResult.$strField -isnot [int] -and $objResult.$strField -isnot [long]) { throw 'binding-worker-number-type' }
+                if ($objResult.$strField -ne 0) { throw 'binding-worker-number-value' }
+            }
+            & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker
+            $hashtableWorker = $null
+        }
+        foreach ($strPath in $hashtableEvidence.Keys) {
+            $objAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath
+            if ($objAfter.Length -ne $hashtableEvidence[$strPath].Length -or $objAfter.Sha256 -cne $hashtableEvidence[$strPath].Sha256) { throw 'binding-input-changed' }
+        }
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $strRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockSetDerivedContextDefinitionPin = {
+    param ([string]$HelperSource, [string]$ContextSource)
+
+    $objErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseInput($ContextSource, [ref]$null, [ref]$objErrors)
+    $arrDefinition = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and $_.Left.Extent.Text -ceq '$scriptBlockContextModuleDefinition'
+    })
+    if (@($objErrors).Count -ne 0 -or $arrDefinition.Count -ne 1) { throw 'derived-manager-definition' }
+    $objLiteral = $arrDefinition[0].Right.Find({ param ($Node) $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst] }, $false)
+    if ($null -eq $objLiteral) { throw 'derived-manager-literal' }
+    $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false, $true)).GetBytes($objLiteral.ScriptBlock.Extent.Text))
+    $arrPins = @([regex]::Matches($HelperSource, '\$script:strExpectedContextDefinitionSha256 = ''([0-9a-f]{64})'''))
+    if ($arrPins.Count -ne 1) { throw 'derived-manager-pin-cardinality' }
+    return $HelperSource.Replace($arrPins[0].Value, ('$script:strExpectedContextDefinitionSha256 = ''' + $strHash + ''''))
+}
+
+$script:scriptBlockSourceReentrantCleanupWorker = {
+    param ([string]$Roles, [string]$FixtureRoot, [string]$ArchivePath, [string]$Digest)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    & $script:scriptBlockInitializeTerraformWorkerCompression
+    . ([System.IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))
+    . ([System.IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1'))
+    $hashtableState = & $script:scriptBlockGetTerraformDerivedFixtureState -Roles $Roles -Role context
+    $hashtableState.Hook = $null
+    $hashtableState.Current = $null
+    $listResults = New-Object 'System.Collections.Generic.List[object]'
+    foreach ($strMode in @('control', 'helper-no-abort', 'context-no-abort', 'helper-abort', 'context-abort')) {
+        $strTrusted = [System.IO.Path]::Combine($FixtureRoot, $strMode)
+        $strCheckout = [System.IO.Path]::Combine($FixtureRoot, ($strMode + '-checkout'))
+        [void][System.IO.Directory]::CreateDirectory($strTrusted)
+        [void][System.IO.Directory]::CreateDirectory($strCheckout)
+        $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrusted
+        $strArchive = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'artifact.zip')
+        [System.IO.File]::Copy($ArchivePath, $strArchive)
+        $objReturned = & ([System.IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1')) -Context $objContext `
+            -CheckoutRoot $strCheckout -TrustedTemporaryRoot $strTrusted -DownloadDirectory $objContext.DownloadDirectoryPath `
+            -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $Digest
+        if (-not [object]::ReferenceEquals($objContext, $objReturned) -or $objContext.OwnershipJournal.Count -ne 8) { throw 'reentry-expansion-control' }
+        $hashtableBytes = @{}
+        foreach ($strFile in [System.IO.Directory]::GetFiles($objContext.CandidatePath)) { $hashtableBytes[$strFile] = [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strFile)) }
+        if ($hashtableBytes.Count -ne 4) { throw 'reentry-four-file-control' }
+        $objArchive = [System.IO.Compression.ZipFile]::OpenRead($strArchive)
+        try {
+            foreach ($strName in @('copilot-instructions.md', 'powershell.instructions.md', 'STYLE_GUIDE_CHAT.md', 'STYLE_GUIDE_FULL.md')) {
+                $strPath = [System.IO.Path]::Combine($objContext.CandidatePath, $strName)
+                if (-not $hashtableBytes.ContainsKey($strPath)) { throw 'reentry-expanded-name' }
+                $objEntry = $objArchive.GetEntry($strName)
+                $objStream = $objEntry.Open()
+                $objBuffer = New-Object System.IO.MemoryStream
+                try {
+                    $objStream.CopyTo($objBuffer)
+                    if ([System.Convert]::ToBase64String($objBuffer.ToArray()) -cne $hashtableBytes[$strPath]) { throw 'reentry-expanded-bytes' }
+                } finally { $objBuffer.Dispose(); $objStream.Dispose() }
+            }
+        } finally { $objArchive.Dispose() }
+        $hashtableState.Current = $objContext
+        $hashtableState.Observed = $null
+        $hashtableState.AbortRequested = $false
+        $scriptBlockTerminalProbe = $script:scriptBlockInvokeTerminalContextProbe
+        $hashtableState.Hook = {
+            param ([object]$Current)
+            if (-not [object]::ReferenceEquals($Current, $hashtableState.Current)) { return }
+            if ($Current.LifecycleState -cne 'Active') { throw 'reentry-public-state' }
+            if ($strMode -ceq 'control') { return }
+            $strEntry = if ($strMode.StartsWith('helper', [System.StringComparison]::Ordinal)) { 'helper' } else { 'context' }
+            $objNested = & $scriptBlockTerminalProbe -Context $Current -EntryPoint $strEntry
+            if ($objNested.Result.Success -or $objNested.Result.DiagnosticCode -cne 'cleanup-owned-entry-uncertain' -or
+                $objNested.Result.PreviousState -cne 'Active' -or $objNested.Result.FinalState -cne 'Active' -or
+                $objNested.Result.RetainedRecordSequences.Count -ne 0) { throw 'reentry-nested-result' }
+            # A second context must remain usable while this one is busy.
+            $objOther = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrusted
+            $objOtherResult = Remove-StyleGuideCandidateInvocationContext -Context $objOther
+            if (-not $objOtherResult.Success -or $objOtherResult.FilesystemCallCount -ne 9 -or [System.IO.Directory]::Exists($objOther.InvocationRootPath)) { throw 'reentry-independent-context' }
+            $hashtableState.Observed = [pscustomobject]@{
+                EntryPoint = $strEntry; Code = $objNested.Result.DiagnosticCode; PreviousState = $objNested.Result.PreviousState
+                FinalState = $objNested.Result.FinalState; FilesystemCallCount = $objNested.Result.FilesystemCallCount
+                Counts = $objNested.Counts; SameJournal = $objNested.SameJournal; ContextUnchanged = $objNested.ContextUnchanged
+                IndependentContextSucceeded = $true
+            }
+            if ($strMode.EndsWith('-abort', [System.StringComparison]::Ordinal) -and -not $strMode.EndsWith('-no-abort', [System.StringComparison]::Ordinal)) {
+                $hashtableState.AbortRequested = $true
+                throw 'reentry-controlled-abort-before-deletion'
+            }
+        }.GetNewClosure()
+        $objResult = Remove-StyleGuideCandidateInvocationState -Context $objContext
+        $hashtableState.Hook = $null
+        $boolAbort = $strMode -cin @('helper-abort', 'context-abort')
+        if ($hashtableState.AbortRequested -ne $boolAbort) { throw 'reentry-abort-control' }
+        if ($boolAbort) {
+            if ($objResult.Success -or $objResult.DiagnosticCode -cne 'cleanup-owned-entry-uncertain' -or
+                $objResult.FilesystemCallCount -ne 0 -or $objContext.LifecycleState -cne 'CleanupFailed' -or
+                @($objContext.OwnershipJournal | Where-Object EntryState -CEQ 'RetainedUncertain').Count -ne 8) { throw 'reentry-abort-retention' }
+            foreach ($strFile in $hashtableBytes.Keys) {
+                if ([System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strFile)) -cne $hashtableBytes[$strFile]) { throw 'reentry-retained-bytes' }
+            }
+            foreach ($strEntry in @('helper', 'context')) {
+                $objRepeat = & $script:scriptBlockInvokeTerminalContextProbe -Context $objContext -EntryPoint $strEntry
+                if ($objRepeat.Result.Success -or $objRepeat.Result.DiagnosticCode -cne 'cleanup-terminal-failure') { throw 'reentry-terminal-repeat' }
+            }
+        } elseif (-not $objResult.Success -or $objResult.FilesystemCallCount -ne 34 -or
+            $objContext.LifecycleState -cne 'Disposed' -or [System.IO.Directory]::Exists($objContext.InvocationRootPath)) { throw 'reentry-no-abort-result' }
+        if ($strMode -cne 'control' -and $null -eq $hashtableState.Observed) { throw 'reentry-hook-not-reached' }
+        $objManager = @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateContext_1_0_20260926_0 -All)[0]
+        $intBusy = & $objManager {
+            $objRemove = $scriptBlockRemoveContextFunction
+            & $objRemove.Module { return $arrCandidateActiveCleanup.Count }
+        }
+        if ($intBusy -ne 0) { throw 'reentry-marker-not-released' }
+        $listResults.Add([pscustomobject][ordered]@{
+            Mode = $strMode; Success = $objResult.Success; DiagnosticCode = $objResult.DiagnosticCode
+            FilesystemCallCount = $objResult.FilesystemCallCount; FinalState = $objContext.LifecycleState
+            MarkerCountAfter = $intBusy; Nested = $hashtableState.Observed; InvocationId = $objContext.InvocationId.ToString('D')
+        })
+    }
+    [System.IO.File]::WriteAllText([System.IO.Path]::Combine($FixtureRoot, 'result.json'),
+        (ConvertTo-Json -InputObject $listResults.ToArray() -Depth 12 -Compress), (New-Object System.Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockAssertReentrantCleanupEvidence = {
+    param ([object[]]$Rows)
+
+    $scriptBlockShape = {
+        param ([object]$Value, [string[]]$Names, [string]$Detail)
+        if ($null -eq $Value) { throw $Detail }
+        $arrProperties = @($Value.PSObject.Properties)
+        if ($arrProperties.Count -ne $Names.Count) { throw $Detail }
+        for ($intProperty = 0; $intProperty -lt $Names.Count; $intProperty++) {
+            if ($arrProperties[$intProperty].Name -cne $Names[$intProperty] -or
+                $arrProperties[$intProperty].MemberType -ne [System.Management.Automation.PSMemberTypes]::NoteProperty) { throw $Detail }
+        }
+    }
+    $scriptBlockNumber = {
+        param ([object]$Value, [int]$Expected, [string]$Detail)
+        if (($Value -isnot [int] -and $Value -isnot [long] -and $Value -isnot [uint32]) -or $Value -ne $Expected) { throw $Detail }
+    }
+    if ($Rows.Count -ne 5) { throw 'reentry-evidence-count' }
+    $arrModes = @('control', 'helper-no-abort', 'context-no-abort', 'helper-abort', 'context-abort')
+    $objIds = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    for ($intIndex = 0; $intIndex -lt 5; $intIndex++) {
+        $objRow = $Rows[$intIndex]
+        & $scriptBlockShape -Value $objRow -Names @('Mode', 'Success', 'DiagnosticCode', 'FilesystemCallCount', 'FinalState', 'MarkerCountAfter', 'Nested', 'InvocationId') -Detail 'reentry-evidence-shape'
+        $boolAbort = $intIndex -gt 2
+        $strCode = if ($boolAbort) { 'cleanup-owned-entry-uncertain' } else { 'cleanup-succeeded' }
+        $strState = if ($boolAbort) { 'CleanupFailed' } else { 'Disposed' }
+        if ($objRow.Mode -isnot [string] -or $objRow.Mode -cne $arrModes[$intIndex]) { throw 'reentry-evidence-Mode' }
+        if ($objRow.Success -isnot [bool] -or $objRow.Success -eq $boolAbort) { throw 'reentry-evidence-Success' }
+        if ($objRow.DiagnosticCode -isnot [string] -or $objRow.DiagnosticCode -cne $strCode) { throw 'reentry-evidence-DiagnosticCode' }
+        if ($objRow.FinalState -isnot [string] -or $objRow.FinalState -cne $strState) { throw 'reentry-evidence-FinalState' }
+        $intCalls = if ($boolAbort) { 0 } else { 34 }
+        & $scriptBlockNumber -Value $objRow.FilesystemCallCount -Expected $intCalls -Detail 'reentry-evidence-FilesystemCallCount'
+        & $scriptBlockNumber -Value $objRow.MarkerCountAfter -Expected 0 -Detail 'reentry-evidence-MarkerCountAfter'
+        if ($objRow.InvocationId -isnot [string] -or $objRow.InvocationId -cnotmatch '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' -or
+            $objRow.InvocationId -ceq '00000000-0000-0000-0000-000000000000' -or -not $objIds.Add($objRow.InvocationId)) { throw 'reentry-evidence-InvocationId' }
+        if ($intIndex -eq 0) {
+            if ($null -ne $objRow.Nested) { throw 'reentry-evidence-Nested' }
+            continue
+        }
+        $objNested = $objRow.Nested
+        & $scriptBlockShape -Value $objNested -Names @('EntryPoint', 'Code', 'PreviousState', 'FinalState', 'FilesystemCallCount', 'Counts', 'SameJournal', 'ContextUnchanged', 'IndependentContextSucceeded') -Detail 'reentry-evidence-nested-shape'
+        $strEntry = if ($intIndex -in @(1, 3)) { 'helper' } else { 'context' }
+        $hashtableExpected = @{ EntryPoint = $strEntry; Code = 'cleanup-owned-entry-uncertain'; PreviousState = 'Active'; FinalState = 'Active' }
+        foreach ($strName in $hashtableExpected.Keys) {
+            if ($objNested.$strName -isnot [string] -or $objNested.$strName -cne $hashtableExpected[$strName]) { throw ('reentry-evidence-nested-' + $strName) }
+        }
+        & $scriptBlockNumber -Value $objNested.FilesystemCallCount -Expected 0 -Detail 'reentry-evidence-nested-FilesystemCallCount'
+        foreach ($strName in @('SameJournal', 'ContextUnchanged', 'IndependentContextSucceeded')) {
+            if ($objNested.$strName -isnot [bool] -or -not $objNested.$strName) { throw ('reentry-evidence-nested-' + $strName) }
+        }
+        & $scriptBlockShape -Value $objNested.Counts -Names @('Provider', 'Path', 'Filesystem', 'Native') -Detail 'reentry-evidence-counts-shape'
+        foreach ($strName in @('Provider', 'Path', 'Filesystem', 'Native')) {
+            & $scriptBlockNumber -Value $objNested.Counts.$strName -Expected 0 -Detail ('reentry-evidence-counts-' + $strName)
+        }
+    }
+}
+
+$script:scriptBlockAssertReentrantCleanupEvidenceMutants = {
+    param ([object[]]$Rows)
+
+    & $script:scriptBlockAssertReentrantCleanupEvidence -Rows $Rows
+    foreach ($intIndex in @(0, 1, 2, 3, 4)) {
+        foreach ($strField in @('Mode', 'Success', 'DiagnosticCode', 'FilesystemCallCount', 'FinalState', 'MarkerCountAfter', 'InvocationId')) {
+            foreach ($strMode in @('missing', 'wrong-type', 'wrong-value')) {
+                [object[]]$arrMutant = & $script:scriptBlockCopyTerraformResultRows -Results $Rows
+                $strExpected = 'reentry-evidence-' + $strField
+                if ($strMode -ceq 'missing') { $arrMutant[$intIndex].PSObject.Properties.Remove($strField); $strExpected = 'reentry-evidence-shape' }
+                elseif ($strMode -ceq 'wrong-type') { $arrMutant[$intIndex].$strField = @($arrMutant[$intIndex].$strField) }
+                elseif ($arrMutant[$intIndex].$strField -is [bool]) { $arrMutant[$intIndex].$strField = -not $arrMutant[$intIndex].$strField }
+                elseif ($arrMutant[$intIndex].$strField -is [string]) { $arrMutant[$intIndex].$strField = 'wrong' }
+                else { $arrMutant[$intIndex].$strField++ }
+                $strFailure = $null
+                try { & $script:scriptBlockAssertReentrantCleanupEvidence -Rows $arrMutant } catch { $strFailure = $_.Exception.Message }
+                if ($strFailure -cne $strExpected) { throw 'reentry-evidence-row-mutant' }
+            }
+        }
+    }
+    foreach ($strField in @('EntryPoint', 'Code', 'PreviousState', 'FinalState', 'FilesystemCallCount', 'SameJournal', 'ContextUnchanged', 'IndependentContextSucceeded')) {
+        foreach ($strMode in @('missing', 'wrong-type', 'wrong-value')) {
+            [object[]]$arrMutant = & $script:scriptBlockCopyTerraformResultRows -Results $Rows
+            $objNested = $arrMutant[3].Nested
+            $strExpected = 'reentry-evidence-nested-' + $strField
+            if ($strMode -ceq 'missing') { $objNested.PSObject.Properties.Remove($strField); $strExpected = 'reentry-evidence-nested-shape' }
+            elseif ($strMode -ceq 'wrong-type') { $objNested.$strField = @($objNested.$strField) }
+            elseif ($objNested.$strField -is [bool]) { $objNested.$strField = $false }
+            elseif ($objNested.$strField -is [string]) { $objNested.$strField = 'wrong' }
+            else { $objNested.$strField++ }
+            $strFailure = $null
+            try { & $script:scriptBlockAssertReentrantCleanupEvidence -Rows $arrMutant } catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne $strExpected) { throw 'reentry-evidence-nested-mutant' }
+        }
+    }
+    foreach ($strCategory in @('Provider', 'Path', 'Filesystem', 'Native')) {
+        foreach ($strMode in @('missing', 'wrong-type', 'called')) {
+            [object[]]$arrMutant = & $script:scriptBlockCopyTerraformResultRows -Results $Rows
+            $strExpected = 'reentry-evidence-counts-' + $strCategory
+            if ($strMode -ceq 'missing') { $arrMutant[3].Nested.Counts.PSObject.Properties.Remove($strCategory); $strExpected = 'reentry-evidence-counts-shape' }
+            elseif ($strMode -ceq 'wrong-type') { $arrMutant[3].Nested.Counts.$strCategory = '0' }
+            else { $arrMutant[3].Nested.Counts.$strCategory = 1 }
+            $strFailure = $null
+            try { & $script:scriptBlockAssertReentrantCleanupEvidence -Rows $arrMutant } catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne $strExpected) { throw 'reentry-evidence-counts-mutant' }
+        }
+    }
+}
+
+$script:scriptBlockInvokeSourceReentrantCleanupFixture = {
+    param ([object]$Case, [string]$RunRoot, [string]$HelperLiteralPath)
+
+    if ($Case.CaseId -cne 'PS-P1A-LF-10' -or $Case.SemanticVariant -cne 't1a-k-12') { throw 'reentry-case' }
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    $hashtableWorker = $null
+    try {
+        $strManagerPath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($HelperLiteralPath), 'Manage-StyleGuideCandidateInvocationContext.ps1')
+        & $script:scriptBlockAssertContextDefinitionPin -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $strManagerPath
+        $strManager = [System.IO.File]::ReadAllText($strManagerPath)
+        $strHelper = [System.IO.File]::ReadAllText($HelperLiteralPath)
+        $strMarker = '        [void]$arrCandidateActiveCleanup.Add($Context)' + "`n" + '        try {'
+        if ([regex]::Matches($strManager, [regex]::Escape($strMarker)).Count -ne 1) { throw 'reentry-hook-cardinality' }
+        $strHook = "`n" + '            if ($null -ne $hashtableTask184FixtureState.Hook) { & $hashtableTask184FixtureState.Hook $Context }'
+        $strDerived = & $script:scriptBlockAddTerraformDerivedFixtureState -Source $strManager -Role context
+        $strDerived = $strDerived.Replace($strMarker, ($strMarker + $strHook))
+        $strStateInitializer = "`n" + '    $hashtableTask184FixtureState = @{}'
+        if ([regex]::Matches($strDerived, [regex]::Escape($strHook)).Count -ne 1 -or
+            [regex]::Matches($strDerived, [regex]::Escape($strStateInitializer)).Count -ne 1 -or
+            $strDerived.Replace($strHook, '').Replace($strStateInitializer, '') -cne $strManager) { throw 'reentry-manager-transform' }
+        $strDerivedHelper = & $script:scriptBlockSetDerivedContextDefinitionPin -HelperSource $strHelper -ContextSource $strDerived
+        if ((& $script:scriptBlockSetDerivedContextDefinitionPin -HelperSource $strDerivedHelper -ContextSource $strManager) -cne $strHelper -or
+            $strDerivedHelper -ceq $strHelper) { throw 'reentry-helper-transform' }
+        $strRoles = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'roles')
+        [void][System.IO.Directory]::CreateDirectory($strRoles)
+        $strDerivedManagerPath = [System.IO.Path]::Combine($strRoles, 'Manage-StyleGuideCandidateInvocationContext.ps1')
+        $strDerivedHelperPath = [System.IO.Path]::Combine($strRoles, 'Expand-StyleGuideCandidateArtifact.ps1')
+        [System.IO.File]::WriteAllText($strDerivedManagerPath, $strDerived, (New-Object System.Text.UTF8Encoding($false)))
+        [System.IO.File]::WriteAllText($strDerivedHelperPath, $strDerivedHelper, (New-Object System.Text.UTF8Encoding($false)))
+        & $script:scriptBlockAssertContextDefinitionPin -HelperLiteralPath $strDerivedHelperPath -ContextLiteralPath $strDerivedManagerPath
+        $strArchive = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'seed.zip')
+        $objArchive = & $script:scriptBlockNewZipFixture -LiteralPath $strArchive -SemanticCase 'archive.valid.exact'
+        $strWorkerPath = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'worker.ps1')
+        $strWorker = "param ([string]`$Roles, [string]`$FixtureRoot, [string]`$ArchivePath, [string]`$Digest)`n"
+        foreach ($strName in @('scriptBlockInitializeTerraformWorkerCompression', 'scriptBlockGetTerraformDerivedFixtureState', 'scriptBlockInvokeTerminalContextProbe')) {
+            $objBlock = (Get-Variable -Name $strName -Scope Script -ErrorAction Stop).Value
+            $strWorker += '$script:' + $strName + ' = {' + $objBlock.ToString() + "}`n"
+        }
+        $strWorker += '& {' + $script:scriptBlockSourceReentrantCleanupWorker.ToString() + '} -Roles $Roles -FixtureRoot $FixtureRoot -ArchivePath $ArchivePath -Digest $Digest'
+        [System.IO.File]::WriteAllText($strWorkerPath, $strWorker, (New-Object System.Text.UTF8Encoding($false)))
+        $hashtableInputEvidence = @{}
+        foreach ($strInputPath in @($HelperLiteralPath, $strManagerPath, $strDerivedHelperPath, $strDerivedManagerPath, $strWorkerPath, $strArchive)) {
+            $hashtableInputEvidence[$strInputPath] = & $script:scriptBlockGetFileEvidence -LiteralPath $strInputPath
+        }
+        $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath -WorkingDirectory $hashtableLayout.CaseRoot `
+            -Arguments @('-Roles', $strRoles, '-FixtureRoot', $hashtableLayout.Trusted, '-ArchivePath', $strArchive, '-Digest', $objArchive.Sha256)
+        while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [System.Threading.Thread]::Sleep(10) }
+        if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'reentry-worker-failed' }
+        foreach ($strInputPath in $hashtableInputEvidence.Keys) {
+            $objAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $strInputPath
+            if ($objAfter.Length -ne $hashtableInputEvidence[$strInputPath].Length -or
+                $objAfter.Sha256 -cne $hashtableInputEvidence[$strInputPath].Sha256) { throw 'reentry-input-changed' }
+        }
+        $arrResults = @(& $script:scriptBlockReadTerraformProofResult -LiteralPath ([System.IO.Path]::Combine($hashtableLayout.Trusted, 'result.json')))
+        & $script:scriptBlockAssertReentrantCleanupEvidence -Rows $arrResults
+        & $script:scriptBlockAssertReentrantCleanupEvidenceMutants -Rows $arrResults
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { throw 'reentry-sentinel' }
+        $objObservation = & $script:scriptBlockNewObservation
+        $objObservation.Result = 'rejection'; $objObservation.Status = 'failed'; $objObservation.Phase = 'cleanup'
+        $objObservation.Subreason = 'in-progress-refused'; $objObservation.DiagnosticCode = $arrResults[4].Nested.Code
+        $objObservation.InvocationId = [guid]$arrResults[4].InvocationId
+        $objObservation.PreCleanupState = 'Active'; $objObservation.CleanupSequence = 'helper-context'
+        $objObservation.CandidateFinalState = 'RetainedUncertain'; $objObservation.ContextFinalState = $arrResults[4].FinalState
+        $objObservation.FilesystemCallCount = [uint32]$arrResults[4].Nested.FilesystemCallCount
+        $objObservation.FixtureLength = [uint64]$objArchive.Length; $objObservation.FixtureSha256 = [string]$objArchive.Sha256
+        return $objObservation
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockPartialWriteWorker = {
+    param ([string]$Roles, [string]$FixtureRoot, [string]$ArchivePath, [string]$Digest, [string]$Mode)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    & $script:scriptBlockInitializeTerraformWorkerCompression
+    . ([System.IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))
+    . ([System.IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1'))
+    $strCheckout = [System.IO.Path]::Combine($FixtureRoot, 'checkout')
+    $strTrusted = [System.IO.Path]::Combine($FixtureRoot, 'trusted')
+    [void][System.IO.Directory]::CreateDirectory($strCheckout)
+    [void][System.IO.Directory]::CreateDirectory($strTrusted)
+    $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrusted
+    $strArchive = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'artifact.zip')
+    [System.IO.File]::Copy($ArchivePath, $strArchive)
+    $objReturned = $null
+    $objFailure = $null
+    try {
+        $objReturned = & ([System.IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1')) -Context $objContext -CheckoutRoot $strCheckout -TrustedTemporaryRoot $strTrusted -DownloadDirectory $objContext.DownloadDirectoryPath -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $Digest
+    } catch { $objFailure = $_ }
+    if ($Mode -ceq 'control') {
+        if ($null -ne $objFailure -or -not [object]::ReferenceEquals($objReturned, $objContext) -or
+            $objContext.LifecycleState -cne 'Active' -or $objContext.OwnershipJournal.Count -ne 8 -or
+            [System.IO.Directory]::GetFiles($objContext.CandidatePath).Count -ne 4) { throw 'partial-write-no-hook-control' }
+        $objCleanup = Remove-StyleGuideCandidateInvocationState -Context $objContext
+        if (-not $objCleanup.Success -or $objCleanup.FilesystemCallCount -ne 34 -or
+            $objContext.LifecycleState -cne 'Disposed' -or [System.IO.Directory]::Exists($objContext.InvocationRootPath)) { throw 'partial-write-control-cleanup' }
+        $objResult = [pscustomobject][ordered]@{ Mode = 'control'; Succeeded = $true; ContextState = 'Disposed'; FilesystemCallCount = $objCleanup.FilesystemCallCount }
+    } else {
+        if ($Mode -cne 'partial-write' -or $null -eq $objFailure -or $null -ne $objReturned) { throw 'partial-write-production-failure-missing' }
+        $objModule = @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateArtifact_1_0_20260926_0 -All)[0]
+        $objHook = & $objModule { return $script:hashtableTask193PartialWriteEvidence }
+        if (-not $objHook.Reached -or $objHook.JournalCount -ne 5 -or
+            -not [object]::ReferenceEquals($objHook.Record, $objContext.OwnershipJournal[4]) -or
+            $objContext.LifecycleState -cne 'CleanupFailed' -or
+            $objContext.OwnershipJournal.Count -ne 5 -or
+            @($objContext.OwnershipJournal | Where-Object EntryState -CEQ 'RetainedUncertain').Count -ne 5) { throw 'partial-write-retained-journal' }
+        $objRecord = $objContext.OwnershipJournal[4]
+        if ($objRecord.Sequence -ne 4 -or $objRecord.Kind -cne 'CandidateFile' -or
+            $objRecord.ContentLength -ne $objHook.ExpectedLength -or $objRecord.ContentSha256 -cne $objHook.ExpectedSha256) { throw 'partial-write-acquisition-evidence-changed' }
+        for ($intIndex = 0; $intIndex -lt 5; $intIndex++) {
+            if ($objContext.OwnershipJournal[$intIndex].Sequence -ne $intIndex) { throw 'partial-write-retained-sequence' }
+        }
+        $objActual = & $script:scriptBlockGetFileEvidence -LiteralPath $objRecord.Path
+        if ($objActual.Length -ne $objHook.WrittenLength -or $objActual.Length -eq 0 -or
+            $objActual.Length -ge $objRecord.ContentLength -or $objActual.Sha256 -ceq $objRecord.ContentSha256) { throw 'partial-write-actual-bytes' }
+        $arrActual = [System.IO.File]::ReadAllBytes($objRecord.Path)
+        foreach ($bytValue in $arrActual) { if ($bytValue -ne 120) { throw 'partial-write-content' } }
+        if ((& $script:scriptBlockGetFileEvidence -LiteralPath $strArchive).Sha256 -cne $Digest -or
+            [System.IO.Directory]::GetFiles($objContext.CandidatePath).Count -ne 1) { throw 'partial-write-retained-files' }
+        $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $objContext.InvocationRootPath
+        foreach ($strEntry in @('helper', 'context')) {
+            $objRepeat = & $script:scriptBlockInvokeTerminalContextProbe -Context $objContext -EntryPoint $strEntry
+            if ($objRepeat.Result.Success -or $objRepeat.Result.DiagnosticCode -cne 'cleanup-terminal-failure') { throw 'partial-write-terminal-repeat' }
+        }
+        if (-not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $objContext.InvocationRootPath))) { throw 'partial-write-retained-bytes-changed' }
+        $objResult = [pscustomobject][ordered]@{
+            Mode = 'partial-write'; PrimaryCode = $objFailure.Exception.Data['PSStyleGuideDiagnosticCode']
+            PrimaryPhase = $objFailure.Exception.Data['PSStyleGuidePhase']; PrimarySubreason = $objFailure.Exception.Data['PSStyleGuideSubreason']
+            CleanupCode = $objFailure.Exception.Data['PSStyleGuideCleanupCode']; ContextState = $objContext.LifecycleState
+            ExpectedLength = $objRecord.ContentLength; ExpectedSha256 = $objRecord.ContentSha256
+            ActualLength = $objActual.Length; ActualSha256 = $objActual.Sha256
+            JournalCount = 5; RetainedRecords = 5; AcquisitionEvidenceUnchanged = $true
+            RetainedBytesUnchanged = $true; TerminalFilesystemCallCount = $objRepeat.Result.FilesystemCallCount
+        }
+        & $script:scriptBlockAssertPartialWriteEvidence -Value $objResult
+    }
+    if ([System.IO.Directory]::GetFileSystemEntries($strCheckout).Count -ne 0) { throw 'partial-write-checkout-changed' }
+    [System.IO.File]::WriteAllText([System.IO.Path]::Combine($FixtureRoot, 'result.json'),
+        (ConvertTo-Json -InputObject $objResult -Depth 6 -Compress), (New-Object System.Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockAssertPartialWriteEvidence = {
+    param ([object]$Value)
+
+    & $script:scriptBlockAssertExactPropertyNames -Value $Value -Names @('Mode', 'PrimaryCode', 'PrimaryPhase', 'PrimarySubreason',
+        'CleanupCode', 'ContextState', 'ExpectedLength', 'ExpectedSha256', 'ActualLength', 'ActualSha256',
+        'JournalCount', 'RetainedRecords', 'AcquisitionEvidenceUnchanged', 'RetainedBytesUnchanged', 'TerminalFilesystemCallCount') -Detail 'partial-write'
+    $hashtableStrings = @{
+        Mode = 'partial-write'; PrimaryCode = 'extraction-invalid'; PrimaryPhase = 'extraction'
+        PrimarySubreason = 'actual-declared-mismatch'; CleanupCode = 'cleanup-owned-entry-uncertain'; ContextState = 'CleanupFailed'
+    }
+    foreach ($strName in $hashtableStrings.Keys) {
+        if ($Value.$strName -isnot [string] -or $Value.$strName -cne $hashtableStrings[$strName]) { throw ('partial-write-evidence-' + $strName) }
+    }
+    foreach ($strName in @('ExpectedLength', 'ActualLength', 'JournalCount', 'RetainedRecords', 'TerminalFilesystemCallCount')) {
+        if ($Value.$strName -isnot [int] -and $Value.$strName -isnot [long] -and $Value.$strName -isnot [uint32] -and $Value.$strName -isnot [uint64]) { throw ('partial-write-evidence-' + $strName) }
+    }
+    if ($Value.ExpectedLength -ne 131072 -or $Value.ActualLength -le 0 -or $Value.ActualLength -ge 131072 -or
+        $Value.JournalCount -ne 5 -or $Value.RetainedRecords -ne 5 -or $Value.TerminalFilesystemCallCount -ne 0) { throw 'partial-write-evidence-count' }
+    foreach ($strName in @('ExpectedSha256', 'ActualSha256')) {
+        if ($Value.$strName -isnot [string] -or $Value.$strName -cnotmatch '\A[0-9a-f]{64}\z') { throw ('partial-write-evidence-' + $strName) }
+    }
+    $arrExpected = [System.Text.Encoding]::ASCII.GetBytes(('x' * 131072))
+    $arrActual = [System.Text.Encoding]::ASCII.GetBytes(('x' * [int]$Value.ActualLength))
+    if ($Value.ExpectedSha256 -cne (& $script:scriptBlockGetByteArraySha256 -Bytes $arrExpected) -or
+        $Value.ActualSha256 -cne (& $script:scriptBlockGetByteArraySha256 -Bytes $arrActual)) { throw 'partial-write-evidence-hash' }
+    foreach ($strName in @('AcquisitionEvidenceUnchanged', 'RetainedBytesUnchanged')) {
+        if ($Value.$strName -isnot [bool] -or -not $Value.$strName) { throw ('partial-write-evidence-' + $strName) }
+    }
+}
+
+$script:scriptBlockAssertPartialWriteRetention = {
+    param ([string]$RunRoot, [string]$HelperLiteralPath)
+
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId 'partial-write'
+    $hashtableWorker = $null
+    try {
+        $strManagerPath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($HelperLiteralPath), 'Manage-StyleGuideCandidateInvocationContext.ps1')
+        $arrHelper = [System.IO.File]::ReadAllBytes($HelperLiteralPath)
+        $arrManager = [System.IO.File]::ReadAllBytes($strManagerPath)
+        $strHelper = (New-Object System.Text.UTF8Encoding($false, $true)).GetString($arrHelper)
+        $strMarker = '                        $uintActualTotal = $hashtableNewActualLength.TotalLength'
+        if ([regex]::Matches($strHelper, [regex]::Escape($strMarker)).Count -ne 1) { throw 'partial-write-hook-cardinality' }
+        $strHook = @'
+
+                        if ($uintEntryActual -eq 0 -or $uintEntryActual -ge [uint64]$objEntry.Length -or
+                            $objAuthenticatedJournal.Count -ne 5) { throw 'partial-write-hook-boundary' }
+                        $script:hashtableTask193PartialWriteEvidence = @{
+                            Reached = $true; Record = $objFileRecord; JournalCount = $objAuthenticatedJournal.Count
+                            ExpectedLength = $objFileRecord.ContentLength; ExpectedSha256 = $objFileRecord.ContentSha256
+                            WrittenLength = $uintEntryActual
+                        }
+                        & $script:scriptBlockStopCandidateHelperOperation -Code 'extraction-invalid' -Phase 'extraction' -Subreason 'actual-declared-mismatch'
+'@
+        $strDerived = $strHelper.Replace($strMarker, ($strMarker + $strHook))
+        if ($strDerived -ceq $strHelper -or $strDerived.Replace(($strMarker + $strHook), $strMarker) -cne $strHelper) { throw 'partial-write-hook-reverse-proof' }
+        $strArchive = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'seed.zip')
+        $objZip = [System.IO.Compression.ZipFile]::Open($strArchive, [System.IO.Compression.ZipArchiveMode]::Create)
+        try {
+            foreach ($strName in @('copilot-instructions.md', 'powershell.instructions.md', 'STYLE_GUIDE_CHAT.md', 'STYLE_GUIDE_FULL.md')) {
+                $arrBytes = [System.Text.Encoding]::ASCII.GetBytes($(if ($strName -ceq 'copilot-instructions.md') { 'x' * 131072 } else { '# ' + $strName }))
+                $objEntry = $objZip.CreateEntry($strName)
+                $objStream = $objEntry.Open()
+                try { $objStream.Write($arrBytes, 0, $arrBytes.Length) } finally { $objStream.Dispose() }
+            }
+        } finally { $objZip.Dispose() }
+        $objArchive = & $script:scriptBlockGetFileEvidence -LiteralPath $strArchive
+        $objObserved = $null
+        foreach ($strMode in @('control', 'partial-write')) {
+            $strRoot = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, $strMode)
+            $strRoles = [System.IO.Path]::Combine($strRoot, 'roles')
+            $strFixture = [System.IO.Path]::Combine($strRoot, 'fixture')
+            [void][System.IO.Directory]::CreateDirectory($strRoles); [void][System.IO.Directory]::CreateDirectory($strFixture)
+            $strHelperCopy = [System.IO.Path]::Combine($strRoles, 'Expand-StyleGuideCandidateArtifact.ps1')
+            $strManagerCopy = [System.IO.Path]::Combine($strRoles, 'Manage-StyleGuideCandidateInvocationContext.ps1')
+            if ($strMode -ceq 'control') { [System.IO.File]::WriteAllBytes($strHelperCopy, $arrHelper) }
+            else { [System.IO.File]::WriteAllText($strHelperCopy, $strDerived, (New-Object System.Text.UTF8Encoding($false))) }
+            [System.IO.File]::WriteAllBytes($strManagerCopy, $arrManager)
+            & $script:scriptBlockAssertContextDefinitionPin -HelperLiteralPath $strHelperCopy -ContextLiteralPath $strManagerCopy
+            $objHelperBefore = & $script:scriptBlockGetFileEvidence -LiteralPath $strHelperCopy
+            $objManagerBefore = & $script:scriptBlockGetFileEvidence -LiteralPath $strManagerCopy
+            $strWorkerPath = [System.IO.Path]::Combine($strRoot, 'worker.ps1')
+            $strWorker = "param ([string]`$Roles, [string]`$FixtureRoot, [string]`$ArchivePath, [string]`$Digest, [string]`$Mode)`n"
+            foreach ($strName in @('scriptBlockInitializeTerraformWorkerCompression', 'scriptBlockInvokeTerminalContextProbe', 'scriptBlockAssertPartialWriteEvidence',
+                'scriptBlockGetFileEvidence', 'scriptBlockGetTerraformFixtureSnapshot', 'scriptBlockTestFixtureSnapshotEqual',
+                'scriptBlockAssertExactPropertyNames', 'scriptBlockStopHarness', 'scriptBlockNewHarnessException', 'scriptBlockGetByteArraySha256')) {
+                $objBlock = (Get-Variable -Name $strName -Scope Script -ErrorAction Stop).Value
+                $strWorker += '$script:' + $strName + ' = {' + $objBlock.ToString() + "}`n"
+            }
+            $strWorker += '& {' + $script:scriptBlockPartialWriteWorker.ToString() + '} -Roles $Roles -FixtureRoot $FixtureRoot -ArchivePath $ArchivePath -Digest $Digest -Mode $Mode'
+            [System.IO.File]::WriteAllText($strWorkerPath, $strWorker, (New-Object System.Text.UTF8Encoding($false)))
+            $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath -WorkingDirectory $strRoot `
+                -Arguments @('-Roles', $strRoles, '-FixtureRoot', $strFixture, '-ArchivePath', $strArchive, '-Digest', $objArchive.Sha256, '-Mode', $strMode)
+            while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [System.Threading.Thread]::Sleep(10) }
+            if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'partial-write-worker-failed' }
+            $objObserved = & $script:scriptBlockReadTerraformProofResult -LiteralPath ([System.IO.Path]::Combine($strFixture, 'result.json'))
+            if ((& $script:scriptBlockGetFileEvidence -LiteralPath $strHelperCopy).Sha256 -cne $objHelperBefore.Sha256 -or
+                (& $script:scriptBlockGetFileEvidence -LiteralPath $strManagerCopy).Sha256 -cne $objManagerBefore.Sha256) { throw 'partial-write-source-copy-changed' }
+            if ($strMode -ceq 'control') {
+                & $script:scriptBlockAssertExactPropertyNames -Value $objObserved -Names @('Mode', 'Succeeded', 'ContextState', 'FilesystemCallCount') -Detail 'partial-write-control'
+                if ($objObserved.Mode -cne 'control' -or $objObserved.Succeeded -isnot [bool] -or -not $objObserved.Succeeded -or
+                    $objObserved.ContextState -cne 'Disposed' -or $objObserved.FilesystemCallCount -ne 34) { throw 'partial-write-control-evidence' }
+            } else { & $script:scriptBlockAssertPartialWriteEvidence -Value $objObserved }
+            & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker
+            $hashtableWorker = $null
+        }
+        foreach ($strField in @('PrimaryCode', 'PrimaryPhase', 'PrimarySubreason', 'CleanupCode')) {
+            foreach ($strMode in @('wrong', 'type', 'swapped')) {
+                $objMutant = $objObserved | ConvertTo-Json -Depth 10 | ConvertFrom-Json
+                $strExpected = 'partial-write-evidence-' + $strField
+                if ($strMode -ceq 'type') { $objMutant.$strField = @($objMutant.$strField) }
+                elseif ($strMode -ceq 'swapped') { $objMutant.$strField = if ($strField -ceq 'CleanupCode') { $objObserved.PrimaryCode } else { $objObserved.CleanupCode } }
+                else { $objMutant.$strField = 'wrong' }
+                $strFailure = $null
+                try { & $script:scriptBlockAssertPartialWriteEvidence -Value $objMutant } catch { $strFailure = $_.Exception.Message }
+                if ($strFailure -cne $strExpected) { throw 'partial-write-diagnostic-mutant' }
+            }
+        }
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout) -or
+            [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($HelperLiteralPath)) -cne [System.Convert]::ToBase64String($arrHelper) -or
+            [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strManagerPath)) -cne [System.Convert]::ToBase64String($arrManager)) { throw 'partial-write-source-or-sentinel' }
+
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockGeneratedPathWorker = {
+    param ([string]$ManagerPath, [string]$TrustedRoot, [string]$OutputPath, [string]$Mode)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    Set-Variable -Name 'intTask193GeneratedRegistrations' -Scope Global -Value ([int]0)
+    . $ManagerPath
+    $strSentinel = [System.IO.Path]::Combine($TrustedRoot, 'sentinel')
+    [System.IO.File]::WriteAllBytes($strSentinel, [byte[]]@(115, 97, 102, 101))
+    $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $TrustedRoot
+    $objContext = $null
+    $objFailure = $null
+    try { $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $TrustedRoot }
+    catch { $objFailure = $_ }
+    $boolCleanup = $false
+    if ($null -ne $objContext) {
+        $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+        $boolCleanup = $objCleanup.Success -and $objContext.LifecycleState -ceq 'Disposed' -and
+            -not [System.IO.Directory]::Exists($objContext.InvocationRootPath)
+    }
+    $strCode = 'none'
+    if ($null -ne $objFailure) {
+        $strCode = $objFailure.Exception.Data['PSStyleGuideDiagnosticCode']
+        if ($strCode -isnot [string]) { throw 'generated-path-unclassified-failure' }
+    }
+    $objResult = [pscustomobject][ordered]@{
+        Mode = $Mode; Returned = ($null -ne $objContext); Code = $strCode
+        Registrations = (Get-Variable -Name 'intTask193GeneratedRegistrations' -Scope Global -ValueOnly); CleanupSucceeded = $boolCleanup
+        ParentUnchanged = (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $TrustedRoot))
+        SentinelUnchanged = ([System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strSentinel)) -ceq 'c2FmZQ==')
+    }
+    [System.IO.File]::WriteAllText($OutputPath, (ConvertTo-Json -InputObject $objResult -Compress), (New-Object System.Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockAssertGeneratedPathEvidence = {
+    param ([object]$Value, [string]$Mode)
+
+    & $script:scriptBlockAssertExactPropertyNames -Value $Value -Names @('Mode', 'Returned', 'Code', 'Registrations', 'CleanupSucceeded', 'ParentUnchanged', 'SentinelUnchanged') -Detail 'generated-path'
+    if ($Value.Mode -isnot [string] -or $Value.Mode -cne $Mode -or $Value.Code -isnot [string] -or
+        ($Value.Registrations -isnot [int] -and $Value.Registrations -isnot [long]) -or
+        $Value.Registrations -lt 0 -or $Value.Registrations -gt [int]::MaxValue) { throw 'generated-path-evidence-type' }
+    foreach ($strName in @('Returned', 'CleanupSucceeded', 'ParentUnchanged', 'SentinelUnchanged')) {
+        if ($Value.$strName -isnot [bool]) { throw 'generated-path-evidence-type' }
+    }
+    if (-not $Value.SentinelUnchanged) { throw 'generated-path-evidence-sentinel' }
+    if ($Mode -ceq 'control') {
+        if (-not $Value.Returned -or $Value.Code -cne 'none' -or $Value.Registrations -ne 1 -or
+            -not $Value.CleanupSucceeded -or -not $Value.ParentUnchanged) { throw 'generated-path-evidence-control' }
+    } elseif ($Mode -ceq 'limited') {
+        if ($Value.Returned -or $Value.Code -cne 'context-create-failed' -or $Value.Registrations -ne 0 -or
+            $Value.CleanupSucceeded -or -not $Value.ParentUnchanged) { throw 'generated-path-evidence-refusal' }
+    } else { throw 'generated-path-evidence-mode' }
+}
+
+$script:scriptBlockAssertGeneratedPathsBeforeAcquisition = {
+    param ([string]$ContextLiteralPath, [string]$RunRoot)
+
+    # JSON integer values are Int32 on Desktop when they fit and Int64 on Core.
+    # Preserve the original Int32 value domain without coercing other JSON types.
+    foreach ($strEvidenceMode in @('control', 'limited')) {
+        $boolReturned = $strEvidenceMode -ceq 'control'
+        $strExpectedCode = if ($boolReturned) { 'none' } else { 'context-create-failed' }
+        $intExpectedRegistrations = if ($boolReturned) { 1 } else { 0 }
+        $strCountFailure = if ($boolReturned) { 'generated-path-evidence-control' } else { 'generated-path-evidence-refusal' }
+        $objControl = [pscustomobject][ordered]@{
+            Mode = $strEvidenceMode; Returned = $boolReturned; Code = $strExpectedCode
+            Registrations = [int]$intExpectedRegistrations; CleanupSucceeded = $boolReturned
+            ParentUnchanged = $true; SentinelUnchanged = $true
+        }
+        foreach ($strIntegerType in @('Int32', 'Int64')) {
+            if ($strIntegerType -ceq 'Int32') { $objControl.Registrations = [int]$intExpectedRegistrations }
+            else { $objControl.Registrations = [long]$intExpectedRegistrations }
+            & $script:scriptBlockAssertGeneratedPathEvidence -Value $objControl -Mode $strEvidenceMode
+            $objRoundTrip = ConvertFrom-Json -InputObject (ConvertTo-Json -InputObject $objControl -Compress)
+            & $script:scriptBlockAssertGeneratedPathEvidence -Value $objRoundTrip -Mode $strEvidenceMode
+        }
+        $objOriginalRegistrations = $objControl.Registrations
+        foreach ($hashtableMutation in @(
+            @{ Value = '1'; Failure = 'generated-path-evidence-type' },
+            @{ Value = $true; Failure = 'generated-path-evidence-type' },
+            @{ Value = [double]1; Failure = 'generated-path-evidence-type' },
+            @{ Value = [decimal]1; Failure = 'generated-path-evidence-type' },
+            @{ Value = $null; Failure = 'generated-path-evidence-type' },
+            @{ Value = [object[]]@(1); Failure = 'generated-path-evidence-type' },
+            @{ Value = [pscustomobject]@{ Count = 1 }; Failure = 'generated-path-evidence-type' },
+            @{ Value = [int]-1; Failure = 'generated-path-evidence-type' },
+            @{ Value = [long]-1; Failure = 'generated-path-evidence-type' },
+            @{ Value = ([long][int]::MaxValue + 1); Failure = 'generated-path-evidence-type' },
+            @{ Value = [long]::MaxValue; Failure = 'generated-path-evidence-type' },
+            @{ Value = [int](1 - $intExpectedRegistrations); Failure = $strCountFailure },
+            @{ Value = [long](1 - $intExpectedRegistrations); Failure = $strCountFailure },
+            @{ Value = [int]2; Failure = $strCountFailure },
+            @{ Value = [long][int]::MaxValue; Failure = $strCountFailure }
+        )) {
+            $strFailure = $null
+            try {
+                $objControl.Registrations = $hashtableMutation.Value
+                try { & $script:scriptBlockAssertGeneratedPathEvidence -Value $objControl -Mode $strEvidenceMode }
+                catch { $strFailure = $_.Exception.Message }
+            } finally { $objControl.Registrations = $objOriginalRegistrations }
+            if ($strFailure -cne $hashtableMutation.Failure) { throw 'generated-path-counter-mutant' }
+        }
+        & $script:scriptBlockAssertGeneratedPathEvidence -Value $objControl -Mode $strEvidenceMode
+    }
+
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId 'generated-paths'
+    $hashtableWorker = $null
+    try {
+        $arrSource = [System.IO.File]::ReadAllBytes($ContextLiteralPath)
+        $strSource = (New-Object System.Text.UTF8Encoding($false, $true)).GetString($arrSource)
+        $strLimit = '$intCandidateMaximumPathLength = 32767'
+        $strRegister = '[void]$arrCandidateIssuedContext.Add($objContext)'
+        $strRegisterProbe = '$global:intTask193GeneratedRegistrations++' + [char]10 + '        ' + $strRegister
+        $strLoop = @'
+                # Validate every generated stored name before registration or
+                # directory creation. In particular, adding a leaf must not exceed
+                # the source's stored-path limit and strand an acquired directory.
+                foreach ($strGeneratedPath in @($strInvocationRoot, $strDownloadDirectory, $strCandidatePath)) {
+                    [void](& $scriptBlockAssertCandidateCanonicalStoredPath -Value $strGeneratedPath)
+                }
+'@
+        foreach ($strMarker in @($strLimit, $strRegister, $strLoop)) {
+            if ([regex]::Matches($strSource, [regex]::Escape($strMarker)).Count -ne 1) { throw 'generated-path-source-anchor' }
+        }
+        foreach ($strMode in @('control', 'limited', 'no-loop')) {
+            $strRoot = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, $strMode)
+            $strTrusted = [System.IO.Path]::Combine($strRoot, 'trusted')
+            [void][System.IO.Directory]::CreateDirectory($strTrusted)
+            $strManager = [System.IO.Path]::Combine($strRoot, 'Manage-StyleGuideCandidateInvocationContext.ps1')
+            $strWorkerPath = [System.IO.Path]::Combine($strRoot, 'worker.ps1')
+            $strOutput = [System.IO.Path]::Combine($strRoot, 'result.json')
+            $strDerived = $strSource.Replace($strRegister, $strRegisterProbe)
+            $strReplacementLimit = '$intCandidateMaximumPathLength = ' + ($strTrusted.Length + 12)
+            if ($strMode -cne 'control') { $strDerived = $strDerived.Replace($strLimit, $strReplacementLimit) }
+            if ($strMode -ceq 'no-loop') { $strDerived = $strDerived.Replace($strLoop, '# task193-generated-path-loop-removed') }
+            $strReversed = $strDerived.Replace($strRegisterProbe, $strRegister)
+            if ($strMode -cne 'control') { $strReversed = $strReversed.Replace($strReplacementLimit, $strLimit) }
+            if ($strMode -ceq 'no-loop') { $strReversed = $strReversed.Replace('# task193-generated-path-loop-removed', $strLoop) }
+            if ($strReversed -cne $strSource -or $strDerived -ceq $strSource) { throw 'generated-path-reverse-proof' }
+            [System.IO.File]::WriteAllText($strManager, $strDerived, (New-Object System.Text.UTF8Encoding($false)))
+            $objBefore = & $script:scriptBlockGetFileEvidence -LiteralPath $strManager
+            $strWorker = 'param ([string]$ManagerPath, [string]$TrustedRoot, [string]$OutputPath, [string]$Mode)' + [char]10
+            foreach ($strName in @('scriptBlockGetFileEvidence', 'scriptBlockGetTerraformFixtureSnapshot', 'scriptBlockTestFixtureSnapshotEqual')) {
+                $objBlock = (Get-Variable -Name $strName -Scope Script -ErrorAction Stop).Value
+                $strWorker += '$script:' + $strName + ' = {' + $objBlock.ToString() + '}' + [char]10
+            }
+            $strWorker += '& {' + $script:scriptBlockGeneratedPathWorker.ToString() + '} -ManagerPath $ManagerPath -TrustedRoot $TrustedRoot -OutputPath $OutputPath -Mode $Mode'
+            [System.IO.File]::WriteAllText($strWorkerPath, $strWorker, (New-Object System.Text.UTF8Encoding($false)))
+            $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath -WorkingDirectory $strRoot -Arguments @('-ManagerPath', $strManager, '-TrustedRoot', $strTrusted, '-OutputPath', $strOutput, '-Mode', $strMode)
+            while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [System.Threading.Thread]::Sleep(10) }
+            if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'generated-path-worker-failed' }
+            $objObserved = & $script:scriptBlockReadTerraformProofResult -LiteralPath $strOutput
+            if ((& $script:scriptBlockGetFileEvidence -LiteralPath $strManager).Sha256 -cne $objBefore.Sha256) { throw 'generated-path-copy-changed' }
+            if ($strMode -ceq 'no-loop') {
+                # The same refusal assertion must detect removal of the real loop.
+                $objObserved.Mode = 'limited'
+                $strFailure = $null
+                try { & $script:scriptBlockAssertGeneratedPathEvidence -Value $objObserved -Mode 'limited' } catch { $strFailure = $_.Exception.Message }
+                if ($strFailure -cne 'generated-path-evidence-refusal' -or $objObserved.Registrations -ne 1 -or -not $objObserved.SentinelUnchanged) { throw 'generated-path-mutation-undetected' }
+            } else { & $script:scriptBlockAssertGeneratedPathEvidence -Value $objObserved -Mode $strMode }
+            & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker
+            $hashtableWorker = $null
+        }
+        if ([System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($ContextLiteralPath)) -cne [System.Convert]::ToBase64String($arrSource) -or
+            -not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { throw 'generated-path-original-or-sentinel-changed' }
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockSourceCompositeWorker = {
+    param ([string]$Roles, [string]$FixtureRoot, [string]$ArchivePath, [string]$Digest, [string]$Mode)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    & $script:scriptBlockInitializeTerraformWorkerCompression
+    . ([System.IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))
+    . ([System.IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1'))
+    $strCheckout = [System.IO.Path]::Combine($FixtureRoot, 'checkout')
+    $strTrusted = [System.IO.Path]::Combine($FixtureRoot, 'trusted')
+    [void][System.IO.Directory]::CreateDirectory($strCheckout)
+    [void][System.IO.Directory]::CreateDirectory($strTrusted)
+    $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrusted
+    $strArchive = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'artifact.zip')
+    [System.IO.File]::Copy($ArchivePath, $strArchive)
+    $objReturned = $null
+    $objFailure = $null
+    try {
+        $objReturned = & ([System.IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1')) -Context $objContext `
+            -CheckoutRoot $strCheckout -TrustedTemporaryRoot $strTrusted -DownloadDirectory $objContext.DownloadDirectoryPath `
+            -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $Digest
+    } catch { $objFailure = $_ }
+    if ($Mode -ceq 'control') {
+        if ($null -ne $objFailure -or -not [object]::ReferenceEquals($objReturned, $objContext) -or
+            $objContext.LifecycleState -cne 'Active' -or $objContext.OwnershipJournal.Count -ne 8 -or
+            [System.IO.Directory]::GetFiles($objContext.CandidatePath).Count -ne 4) { throw 'composite-no-hook-control' }
+        $objCleanup = Remove-StyleGuideCandidateInvocationState -Context $objContext
+        if (-not $objCleanup.Success -or $objCleanup.FilesystemCallCount -ne 34 -or
+            $objContext.LifecycleState -cne 'Disposed' -or [System.IO.Directory]::Exists($objContext.InvocationRootPath)) { throw 'composite-control-cleanup' }
+        $objResult = [pscustomobject][ordered]@{ Mode = 'control'; Succeeded = $true; ContextState = 'Disposed'; FilesystemCallCount = $objCleanup.FilesystemCallCount }
+    } else {
+        if ($Mode -cne 'foreign-entry' -or $null -eq $objFailure -or $null -ne $objReturned) { throw 'composite-production-failure-missing' }
+        $objModule = @(Microsoft.PowerShell.Core\Get-Module -Name PSStyleGuideCandidateArtifact_1_0_20260926_0 -All)[0]
+        $objHook = & $objModule { return $script:hashtableTask193CompositeEvidence }
+        if (-not $objHook.Reached -or $objHook.CreatedFiles -ne 4 -or $objHook.JournalCount -ne 8 -or
+            -not [object]::ReferenceEquals($objHook.Journal, $objContext.OwnershipJournal) -or
+            $objContext.LifecycleState -cne 'CleanupFailed' -or
+            @($objContext.OwnershipJournal | Where-Object EntryState -CEQ 'RetainedUncertain').Count -ne 8) { throw 'composite-retained-journal' }
+        foreach ($strFile in $objHook.FileBytes.Keys) {
+            if ([System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strFile)) -cne $objHook.FileBytes[$strFile]) { throw 'composite-owned-bytes-changed' }
+        }
+        if ([System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($objHook.ForeignPath)) -cne 'Zm9yZWlnbg==') { throw 'composite-foreign-bytes-changed' }
+        foreach ($strEntry in @('helper', 'context')) {
+            $objRepeat = & $script:scriptBlockInvokeTerminalContextProbe -Context $objContext -EntryPoint $strEntry
+            if ($objRepeat.Result.Success -or $objRepeat.Result.DiagnosticCode -cne 'cleanup-terminal-failure') { throw 'composite-terminal-repeat' }
+        }
+        $objResult = [pscustomobject][ordered]@{
+            Mode = 'foreign-entry'; PrimaryCode = $objFailure.Exception.Data['PSStyleGuideDiagnosticCode']
+            PrimaryPhase = $objFailure.Exception.Data['PSStyleGuidePhase']; PrimarySubreason = $objFailure.Exception.Data['PSStyleGuideSubreason']
+            CleanupCode = $objFailure.Exception.Data['PSStyleGuideCleanupCode']; ContextState = $objContext.LifecycleState
+            HookReached = $objHook.Reached; CreatedFiles = $objHook.CreatedFiles; JournalCount = $objHook.JournalCount
+            RetainedRecords = @($objContext.OwnershipJournal | Where-Object EntryState -CEQ 'RetainedUncertain').Count
+            OwnedBytesUnchanged = $true; ForeignBytesUnchanged = $true; SameJournal = $true
+            TerminalCode = $objRepeat.Result.DiagnosticCode; TerminalFilesystemCallCount = $objRepeat.Result.FilesystemCallCount
+            InvocationId = $objContext.InvocationId.ToString('D')
+        }
+        & $script:scriptBlockAssertSourceCompositeEvidence -Value $objResult
+    }
+    if ([System.IO.Directory]::GetFileSystemEntries($strCheckout).Count -ne 0) { throw 'composite-checkout-changed' }
+    [System.IO.File]::WriteAllText([System.IO.Path]::Combine($FixtureRoot, 'result.json'),
+        (ConvertTo-Json -InputObject $objResult -Depth 6 -Compress), (New-Object System.Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockAssertSourceCompositeEvidence = {
+    param ([object]$Value)
+
+    $arrNames = @('Mode', 'PrimaryCode', 'PrimaryPhase', 'PrimarySubreason', 'CleanupCode', 'ContextState',
+        'HookReached', 'CreatedFiles', 'JournalCount', 'RetainedRecords', 'OwnedBytesUnchanged', 'ForeignBytesUnchanged',
+        'SameJournal', 'TerminalCode', 'TerminalFilesystemCallCount', 'InvocationId')
+    $arrProperties = @($Value.PSObject.Properties)
+    if ($arrProperties.Count -ne $arrNames.Count) { throw 'composite-evidence-shape' }
+    for ($intIndex = 0; $intIndex -lt $arrNames.Count; $intIndex++) {
+        if ($arrProperties[$intIndex].Name -cne $arrNames[$intIndex] -or $arrProperties[$intIndex].MemberType -ne [System.Management.Automation.PSMemberTypes]::NoteProperty) { throw 'composite-evidence-shape' }
+    }
+    $hashtableStrings = @{
+        Mode = 'foreign-entry'; PrimaryCode = 'post-extraction-invalid'; PrimaryPhase = 'post-extraction'
+        PrimarySubreason = 'entry-count'; CleanupCode = 'cleanup-owned-entry-uncertain'
+        ContextState = 'CleanupFailed'; TerminalCode = 'cleanup-terminal-failure'
+    }
+    foreach ($strName in $hashtableStrings.Keys) {
+        if ($Value.$strName -isnot [string] -or $Value.$strName -cne $hashtableStrings[$strName]) { throw ('composite-evidence-' + $strName) }
+    }
+    foreach ($strName in @('HookReached', 'OwnedBytesUnchanged', 'ForeignBytesUnchanged', 'SameJournal')) {
+        if ($Value.$strName -isnot [bool] -or -not $Value.$strName) { throw ('composite-evidence-' + $strName) }
+    }
+    $hashtableNumbers = @{ CreatedFiles = 4; JournalCount = 8; RetainedRecords = 8; TerminalFilesystemCallCount = 0 }
+    foreach ($strName in $hashtableNumbers.Keys) {
+        if ($Value.$strName -isnot [int] -and $Value.$strName -isnot [long] -and $Value.$strName -isnot [uint32]) { throw ('composite-evidence-' + $strName) }
+        if ($Value.$strName -ne $hashtableNumbers[$strName]) { throw ('composite-evidence-' + $strName) }
+    }
+    if ($Value.InvocationId -isnot [string] -or $Value.InvocationId -cnotmatch '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$') { throw 'composite-evidence-InvocationId' }
+}
+
+$script:scriptBlockInvokeSourceCompositeFixture = {
+    param ([object]$Case, [string]$RunRoot, [string]$HelperLiteralPath)
+
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    $hashtableWorker = $null
+    try {
+        $strManagerPath = [System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($HelperLiteralPath), 'Manage-StyleGuideCandidateInvocationContext.ps1')
+        $arrHelper = [System.IO.File]::ReadAllBytes($HelperLiteralPath)
+        $arrManager = [System.IO.File]::ReadAllBytes($strManagerPath)
+        $strHelper = (New-Object System.Text.UTF8Encoding($false, $true)).GetString($arrHelper)
+        $strMarker = "            `$strPhase = 'post-extraction'"
+        if ([regex]::Matches($strHelper, [regex]::Escape($strMarker)).Count -ne 1) { throw 'composite-hook-cardinality' }
+        $strHook = @'
+
+            $script:hashtableTask193CompositeEvidence = @{
+                Reached = $true; Journal = $objAuthenticatedJournal; JournalCount = $objAuthenticatedJournal.Count
+                CreatedFiles = @($objAuthenticatedJournal | Where-Object { $_.Kind -ceq 'CandidateFile' -and $_.EntryState -ceq 'Created' }).Count
+                FileBytes = @{}; ForeignPath = [System.IO.Path]::Combine($strCandidatePath, 'foreign')
+            }
+            if ($script:hashtableTask193CompositeEvidence.CreatedFiles -ne 4 -or $script:hashtableTask193CompositeEvidence.JournalCount -ne 8 -or
+                [System.IO.Directory]::GetFiles($strCandidatePath).Count -ne 4) { throw 'composite-hook-boundary' }
+            foreach ($strFile in [System.IO.Directory]::GetFiles($strCandidatePath)) {
+                $script:hashtableTask193CompositeEvidence.FileBytes[$strFile] = [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strFile))
+            }
+            [System.IO.File]::WriteAllBytes($script:hashtableTask193CompositeEvidence.ForeignPath, [byte[]]@(102, 111, 114, 101, 105, 103, 110))
+'@
+        $strDerived = $strHelper.Replace($strMarker, ($strMarker + $strHook))
+        if ($strDerived -ceq $strHelper -or $strDerived.Replace(($strMarker + $strHook), $strMarker) -cne $strHelper) { throw 'composite-hook-reverse-proof' }
+        $strArchive = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'seed.zip')
+        $objArchive = & $script:scriptBlockNewZipFixture -LiteralPath $strArchive -SemanticCase 'archive.valid.exact'
+        $objObserved = $null
+        foreach ($strMode in @('control', 'foreign-entry')) {
+            $strRoot = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, $strMode)
+            $strRoles = [System.IO.Path]::Combine($strRoot, 'roles')
+            $strFixture = [System.IO.Path]::Combine($strRoot, 'fixture')
+            [void][System.IO.Directory]::CreateDirectory($strRoles); [void][System.IO.Directory]::CreateDirectory($strFixture)
+            $strHelperCopy = [System.IO.Path]::Combine($strRoles, 'Expand-StyleGuideCandidateArtifact.ps1')
+            $strManagerCopy = [System.IO.Path]::Combine($strRoles, 'Manage-StyleGuideCandidateInvocationContext.ps1')
+            if ($strMode -ceq 'control') { [System.IO.File]::WriteAllBytes($strHelperCopy, $arrHelper) }
+            else { [System.IO.File]::WriteAllText($strHelperCopy, $strDerived, (New-Object System.Text.UTF8Encoding($false))) }
+            [System.IO.File]::WriteAllBytes($strManagerCopy, $arrManager)
+            & $script:scriptBlockAssertContextDefinitionPin -HelperLiteralPath $strHelperCopy -ContextLiteralPath $strManagerCopy
+            $objHelperBefore = & $script:scriptBlockGetFileEvidence -LiteralPath $strHelperCopy
+            $objManagerBefore = & $script:scriptBlockGetFileEvidence -LiteralPath $strManagerCopy
+            $strWorkerPath = [System.IO.Path]::Combine($strRoot, 'worker.ps1')
+            $strWorker = "param ([string]`$Roles, [string]`$FixtureRoot, [string]`$ArchivePath, [string]`$Digest, [string]`$Mode)`n"
+            foreach ($strName in @('scriptBlockInitializeTerraformWorkerCompression', 'scriptBlockInvokeTerminalContextProbe', 'scriptBlockAssertSourceCompositeEvidence')) {
+                $objBlock = (Get-Variable -Name $strName -Scope Script -ErrorAction Stop).Value
+                $strWorker += '$script:' + $strName + ' = {' + $objBlock.ToString() + "}`n"
+            }
+            $strWorker += '& {' + $script:scriptBlockSourceCompositeWorker.ToString() + '} -Roles $Roles -FixtureRoot $FixtureRoot -ArchivePath $ArchivePath -Digest $Digest -Mode $Mode'
+            [System.IO.File]::WriteAllText($strWorkerPath, $strWorker, (New-Object System.Text.UTF8Encoding($false)))
+            $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath -WorkingDirectory $strRoot `
+                -Arguments @('-Roles', $strRoles, '-FixtureRoot', $strFixture, '-ArchivePath', $strArchive, '-Digest', $objArchive.Sha256, '-Mode', $strMode)
+            while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [System.Threading.Thread]::Sleep(10) }
+            if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'composite-worker-failed' }
+            $objObserved = & $script:scriptBlockReadTerraformProofResult -LiteralPath ([System.IO.Path]::Combine($strFixture, 'result.json'))
+            if ((& $script:scriptBlockGetFileEvidence -LiteralPath $strHelperCopy).Sha256 -cne $objHelperBefore.Sha256 -or
+                (& $script:scriptBlockGetFileEvidence -LiteralPath $strManagerCopy).Sha256 -cne $objManagerBefore.Sha256) { throw 'composite-source-copy-changed' }
+            if ($strMode -ceq 'control') {
+                & $script:scriptBlockAssertExactPropertyNames -Value $objObserved -Names @('Mode', 'Succeeded', 'ContextState', 'FilesystemCallCount') -Detail 'composite-control'
+                if ($objObserved.Mode -cne 'control' -or $objObserved.Succeeded -isnot [bool] -or -not $objObserved.Succeeded -or
+                    $objObserved.ContextState -cne 'Disposed' -or $objObserved.FilesystemCallCount -ne 34) { throw 'composite-control-evidence' }
+            } else { & $script:scriptBlockAssertSourceCompositeEvidence -Value $objObserved }
+            & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker
+            $hashtableWorker = $null
+        }
+        foreach ($strField in @('PrimaryCode', 'PrimaryPhase', 'PrimarySubreason', 'CleanupCode')) {
+            foreach ($strMode in @('missing', 'wrong', 'type', 'swapped')) {
+                $objMutant = $objObserved | ConvertTo-Json -Depth 10 | ConvertFrom-Json
+                $strExpected = 'composite-evidence-' + $strField
+                if ($strMode -ceq 'missing') { $objMutant.PSObject.Properties.Remove($strField); $strExpected = 'composite-evidence-shape' }
+                elseif ($strMode -ceq 'type') { $objMutant.$strField = @($objMutant.$strField) }
+                elseif ($strMode -ceq 'swapped') { $objMutant.$strField = if ($strField -ceq 'CleanupCode') { $objObserved.PrimaryCode } else { $objObserved.CleanupCode } }
+                else { $objMutant.$strField = 'wrong' }
+                $strFailure = $null
+                try { & $script:scriptBlockAssertSourceCompositeEvidence -Value $objMutant } catch { $strFailure = $_.Exception.Message }
+                if ($strFailure -cne $strExpected) { throw 'composite-diagnostic-mutant' }
+            }
+        }
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout) -or
+            [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($HelperLiteralPath)) -cne [System.Convert]::ToBase64String($arrHelper) -or
+            [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strManagerPath)) -cne [System.Convert]::ToBase64String($arrManager)) { throw 'composite-source-or-sentinel' }
+        $objObservation = & $script:scriptBlockNewObservation
+        $objObservation.Result = 'rejection'; $objObservation.Status = 'failed'; $objObservation.Phase = $objObserved.PrimaryPhase
+        $objObservation.Subreason = 'primary-and-cleanup'; $objObservation.DiagnosticCode = $objObserved.PrimaryCode
+        $objObservation.PreCleanupState = 'Active'; $objObservation.CleanupSequence = 'helper-context'
+        $objObservation.ContextFinalState = $objObserved.ContextState; $objObservation.CandidateFinalState = 'RetainedUncertain'
+        $objObservation.FilesystemCallCount = [uint32]$objObserved.TerminalFilesystemCallCount; $objObservation.InvocationId = [guid]$objObserved.InvocationId
+        $objObservation.FixtureLength = [uint64]$objArchive.Length; $objObservation.FixtureSha256 = [string]$objArchive.Sha256
+        return $objObservation
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockInvokeSourceLifecycleAdditionalFixture = {
+    param ([object]$Case, [string]$RunRoot, [string]$HelperLiteralPath)
+
+    $objSource = & $script:scriptBlockGetSourceLifecycleCase -Case $Case
+    if ($objSource.Id -ceq 'T1A-K-04') { return (& $script:scriptBlockInvokeSourceCompositeFixture -Case $Case -RunRoot $RunRoot -HelperLiteralPath $HelperLiteralPath) }
+    if ($objSource.Id -ceq 'T1A-K-12') {
+        return (& $script:scriptBlockInvokeSourceReentrantCleanupFixture -Case $Case -RunRoot $RunRoot -HelperLiteralPath $HelperLiteralPath)
+    }
+    if ($objSource.Id -cnotin @('T1A-K-10', 'T1A-K-11', 'T1A-K-13', 'T1A-K-14', 'T1A-K-16', 'T1A-K-17', 'T1A-AF-09')) { throw 'source-lifecycle-additional-case' }
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    try {
+        $objObservation = & $script:scriptBlockNewObservation
+        $objSourceBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.Checkout
+        $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $hashtableLayout.Trusted
+        $objObservation.InvocationId = $objContext.InvocationId
+        $objObservation.PreCleanupState = 'Active'
+        $boolExpanded = $objSource.Id -cnotin @('T1A-K-10', 'T1A-K-11', 'T1A-AF-09')
+        if ($boolExpanded) {
+            $strArchive = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'artifact.zip')
+            $objArchive = & $script:scriptBlockNewZipFixture -LiteralPath $strArchive -SemanticCase 'archive.valid.exact'
+            $objObservation.FixtureLength = [uint64]$objArchive.Length
+            $objObservation.FixtureSha256 = [string]$objArchive.Sha256
+            $objReturned = & $HelperLiteralPath -Context $objContext -CheckoutRoot $hashtableLayout.Checkout -TrustedTemporaryRoot $hashtableLayout.Trusted `
+                -DownloadDirectory $objContext.DownloadDirectoryPath -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $objArchive.Sha256
+            if (-not [object]::ReferenceEquals($objReturned, $objContext)) { throw 'lifecycle-expansion-reference' }
+            & $script:scriptBlockAssertTerraformExpandedFiles -Result $objReturned -CandidatePath $objContext.CandidatePath -ArchivePath $strArchive
+        }
+        $strOwnedRoot = $objContext.InvocationRootPath
+        $strCandidate = $objContext.CandidatePath
+        $objCleanup = $null
+        $strSubreason = 'context-invalid'
+        $strCandidateFinal = 'RetainedUncertain'
+        if ($objSource.Id -cin @('T1A-K-10', 'T1A-K-11')) {
+            if ($objContext.OwnershipJournal[2].EntryState -cne 'ExpectedAbsent' -or $objContext.OwnershipJournal.Count -ne 3) { throw 'not-created-control' }
+            if ($objSource.Id -ceq 'T1A-K-11') { [System.IO.File]::WriteAllBytes($strCandidate, [byte[]]@(110, 111, 116, 45, 111, 119, 110, 101, 100)) }
+            $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $strOwnedRoot
+            $objCleanup = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            if ($objSource.Id -ceq 'T1A-K-10') {
+                if (-not $objCleanup.Success -or $objCleanup.DiagnosticCode -cne 'cleanup-succeeded' -or
+                    $objContext.LifecycleState -cne 'Disposed' -or [System.IO.Directory]::Exists($strOwnedRoot)) { throw 'not-created-absent-result' }
+                $strSubreason = 'succeeded'; $strCandidateFinal = 'Absent'
+            } else {
+                if ($objCleanup.Success -or $objCleanup.DiagnosticCode -cne 'cleanup-owned-entry-uncertain' -or
+                    $objContext.LifecycleState -cne 'CleanupFailed' -or
+                    -not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $strOwnedRoot))) { throw 'not-created-occupied-result' }
+                $strSubreason = 'root-cardinality'
+                foreach ($strEntry in @('helper', 'context')) {
+                    $objRepeat = & $script:scriptBlockInvokeTerminalContextProbe -Context $objContext -EntryPoint $strEntry
+                    if ($objRepeat.Result.Success -or $objRepeat.Result.DiagnosticCode -cne 'cleanup-terminal-failure') { throw 'not-created-retained-repeat' }
+                }
+            }
+        } elseif ($objSource.Id -ceq 'T1A-K-13') {
+            [System.IO.File]::WriteAllBytes([System.IO.Path]::Combine($strCandidate, 'foreign'), [byte[]]@(102, 111, 114, 101, 105, 103, 110))
+            $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $strOwnedRoot
+            $objFirst = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            if ($objFirst.Success -or $objFirst.DiagnosticCode -cne 'cleanup-owned-entry-uncertain' -or
+                $objContext.LifecycleState -cne 'CleanupFailed' -or $objFirst.RetainedRecordSequences.Count -eq 0) { throw 'lifecycle-retention-control' }
+            $objCleanup = $objFirst
+            $strSubreason = 'primary-and-cleanup'
+            foreach ($strEntry in @('helper', 'context')) {
+                $objRepeat = & $script:scriptBlockInvokeTerminalContextProbe -Context $objContext -EntryPoint $strEntry
+                if ($objRepeat.Result.Success -or $objRepeat.Result.DiagnosticCode -cne 'cleanup-terminal-failure' -or
+                    $objRepeat.Result.PreviousState -cne 'CleanupFailed' -or $objRepeat.Result.FinalState -cne 'CleanupFailed' -or
+                    $objRepeat.Result.RetainedRecordSequences.Count -eq 0) { throw 'lifecycle-retained-repeat' }
+            }
+            if ($objSource.Id -ceq 'T1A-K-13') {
+                $objCleanup = $objRepeat.Result; $strSubreason = 'terminal-failure'; $objObservation.PreCleanupState = 'CleanupFailed'
+            }
+            if (-not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $strOwnedRoot))) { throw 'lifecycle-retained-files-changed' }
+        } else {
+            $objSupplied = $objContext
+            $objSaved = $null
+            if ($objSource.Id -ceq 'T1A-AF-09') {
+                $objInitial = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+                if (-not $objInitial.Success -or $objContext.LifecycleState -cne 'Disposed' -or [System.IO.Directory]::Exists($strOwnedRoot)) { throw 'disposed-journal-control' }
+                $objSaved = $objContext.OwnershipJournal[0].EntryState
+                if ($objSaved -cne 'Deleted') { throw 'disposed-journal-original-state' }
+                $objContext.OwnershipJournal[0].EntryState = 'Created'
+                $objObservation.PreCleanupState = 'Disposed'
+                $strCandidateFinal = 'Absent'
+            } elseif ($objSource.Id -ceq 'T1A-K-14') {
+                $hashtableClone = [ordered]@{}
+                foreach ($objProperty in $objContext.PSObject.Properties) { $hashtableClone[$objProperty.Name] = $objProperty.Value }
+                $objSupplied = [pscustomobject]$hashtableClone
+                $objSupplied.PSObject.TypeNames.Insert(0, $objContext.PSObject.TypeNames[0])
+                if ([object]::ReferenceEquals($objSupplied, $objContext)) { throw 'loose-context-control' }
+            } elseif ($objSource.Id -ceq 'T1A-K-16') { $objSaved = $objContext.InvocationId; $objContext.InvocationId = [guid]::NewGuid() }
+            elseif ($objSource.Id -ceq 'T1A-K-17') { $objSaved = $objContext.TrustedParentPath; $objContext.TrustedParentPath = $hashtableLayout.SentinelDirectory }
+            $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+            try {
+                foreach ($strEntry in @('helper', 'context')) {
+                    $boolExpectedIssued = $objSource.Id -ceq 'T1A-AF-09'
+                    $objRepeat = & $script:scriptBlockInvokeTerminalContextProbe -Context $objSupplied -EntryPoint $strEntry -ExpectIssued $boolExpectedIssued
+                    $strExpectedCode = 'cleanup-context-invalid'
+                    if ($strEntry -ceq 'context' -and $objSource.Id -ceq 'T1A-K-14') { $strExpectedCode = 'cleanup-context-unissued' }
+                    if ($strEntry -ceq 'context' -and $objSource.Id -ceq 'T1A-K-16') { $strExpectedCode = 'cleanup-context-altered' }
+                    if ($objRepeat.Result.Success -or $objRepeat.Result.DiagnosticCode -cne $strExpectedCode) { throw 'lifecycle-invalid-context-refusal' }
+                    if ($strEntry -ceq 'helper' -or $objSource.Id -ceq 'T1A-AF-09') { $objCleanup = $objRepeat.Result }
+                }
+                if (-not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot))) { throw 'lifecycle-invalid-context-files-changed' }
+            } finally {
+                if ($objSource.Id -ceq 'T1A-AF-09') { $objContext.OwnershipJournal[0].EntryState = $objSaved }
+                elseif ($objSource.Id -ceq 'T1A-K-16') { $objContext.InvocationId = $objSaved }
+                elseif ($objSource.Id -ceq 'T1A-K-17') { $objContext.TrustedParentPath = $objSaved }
+            }
+            if ($objSource.Id -ceq 'T1A-AF-09') {
+                foreach ($strEntry in @('helper', 'context')) {
+                    $objRestored = & $script:scriptBlockInvokeTerminalContextProbe -Context $objContext -EntryPoint $strEntry
+                    if (-not $objRestored.Result.Success -or $objRestored.Result.DiagnosticCode -cne 'cleanup-already-disposed') { throw 'disposed-journal-restored-control' }
+                }
+            }
+        }
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout) -or
+            -not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objSourceBefore -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.Checkout))) { throw 'lifecycle-source-or-sentinel' }
+        $objObservation.Result = if ($objCleanup.Success) { 'success' } else { 'rejection' }
+        $objObservation.Status = if ($objCleanup.Success) { 'succeeded' } else { 'failed' }
+        $objObservation.Phase = 'cleanup'; $objObservation.Subreason = $strSubreason
+        $objObservation.DiagnosticCode = $objCleanup.DiagnosticCode; $objObservation.CleanupSequence = 'helper-context'
+        $objObservation.FilesystemCallCount = [uint32]$objCleanup.FilesystemCallCount
+        $objObservation.ContextFinalState = [string]$objContext.LifecycleState
+        $objObservation.CandidateFinalState = $strCandidateFinal
+        if ($objSource.Id -cin @('T1A-K-14', 'T1A-K-16', 'T1A-K-17')) {
+            $objRestored = Remove-StyleGuideCandidateInvocationState -Context $objContext
+            if (-not $objRestored.Success -or [System.IO.Directory]::Exists($strOwnedRoot)) { throw 'lifecycle-genuine-restored-cleanup' }
+        }
+        return $objObservation
+    } finally { & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot }
+}
+
+$script:scriptBlockInvokeSourceLifecycleFixture = {
+    param ([object]$Case, [string]$RunRoot, [string]$HelperLiteralPath)
+
+    $objSource = & $script:scriptBlockGetSourceLifecycleCase -Case $Case
+    if ($objSource.Id -cnotin @('T1A-K-03', 'T1A-K-05', 'T1A-K-06', 'T1A-K-07', 'T1A-K-08', 'T1A-K-09')) {
+        return (& $script:scriptBlockInvokeSourceLifecycleAdditionalFixture -Case $Case -RunRoot $RunRoot -HelperLiteralPath $HelperLiteralPath)
+    }
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    $objLock = $null
+    $strLinkPath = $null
+    try {
+        $objObservation = & $script:scriptBlockNewObservation
+        $objSourceBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.Checkout
+        $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $hashtableLayout.Trusted
+        $objObservation.InvocationId = $objContext.InvocationId
+        $strArchive = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'artifact.zip')
+        $objArchive = & $script:scriptBlockNewZipFixture -LiteralPath $strArchive -SemanticCase 'archive.valid.exact'
+        $objObservation.FixtureLength = [uint64]$objArchive.Length
+        $objObservation.FixtureSha256 = [string]$objArchive.Sha256
+        $objReturned = & $HelperLiteralPath -Context $objContext -CheckoutRoot $hashtableLayout.Checkout -TrustedTemporaryRoot $hashtableLayout.Trusted `
+            -DownloadDirectory $objContext.DownloadDirectoryPath -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $objArchive.Sha256
+        if (-not [object]::ReferenceEquals($objReturned, $objContext)) { throw 'terminal-expansion-reference' }
+        & $script:scriptBlockAssertTerraformExpandedFiles -Result $objReturned -CandidatePath $objContext.CandidatePath -ArchivePath $strArchive
+        $objInitial = Remove-StyleGuideCandidateInvocationState -Context $objContext
+        if (-not $objInitial.Success -or $objInitial.DiagnosticCode -cne 'cleanup-succeeded' -or
+            $objInitial.FilesystemCallCount -ne 34 -or $objContext.LifecycleState -cne 'Disposed' -or
+            [System.IO.Directory]::Exists($objContext.InvocationRootPath)) { throw 'terminal-initial-cleanup' }
+        $strPath = $objContext.CandidatePath
+        if ($objSource.Id -cne 'T1A-K-03') { [void][System.IO.Directory]::CreateDirectory($objContext.InvocationRootPath) }
+        switch -Exact ($objSource.Id) {
+            'T1A-K-05' { [System.IO.File]::WriteAllBytes($strPath, [byte[]]@(102, 111, 114, 101, 105, 103, 110)) }
+            'T1A-K-06' { [void][System.IO.Directory]::CreateDirectory($strPath) }
+            { $_ -cin @('T1A-K-07', 'T1A-K-08') } {
+                $strTarget = if ($objSource.Id -ceq 'T1A-K-07') { $hashtableLayout.SentinelDirectory }
+                    else { [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'absent-link-target') }
+                if ($objSource.Id -ceq 'T1A-K-08' -and ([System.IO.File]::Exists($strTarget) -or [System.IO.Directory]::Exists($strTarget))) { throw 'terminal-dangling-target-present' }
+                if (-not (& $script:scriptBlockNewSymbolicLink -LinkPath $strPath -TargetPath $strTarget -Directory $true)) {
+                    & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
+                }
+                $strLinkPath = $strPath
+            }
+            'T1A-K-09' { [System.IO.File]::WriteAllBytes($strPath, [byte[]]@(117, 110, 114, 101, 97, 100, 97, 98, 108, 101)) }
+        }
+        $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+        $strLinkBefore = if ($null -ne $strLinkPath) { @((Microsoft.PowerShell.Management\Get-Item -LiteralPath $strLinkPath -Force).Target) -join '|' } else { $null }
+        if ($objSource.Id -ceq 'T1A-K-09') {
+            $objLock = [System.IO.File]::Open($strPath, [System.IO.FileMode]::Open, [System.IO.FileAccess]::ReadWrite, [System.IO.FileShare]::None)
+            $boolRefused = $false
+            try { $objUnexpected = [System.IO.File]::OpenRead($strPath); $objUnexpected.Dispose() } catch { $boolRefused = $true }
+            if (-not $boolRefused) { throw 'terminal-unreadable-control' }
+        }
+        foreach ($strEntryPoint in @('helper', 'context')) {
+            $objRepeat = & $script:scriptBlockInvokeTerminalContextProbe -Context $objContext -EntryPoint $strEntryPoint
+            if (-not $objRepeat.Result.Success -or $objRepeat.Result.DiagnosticCode -cne 'cleanup-already-disposed' -or
+                $objRepeat.Result.PreviousState -cne 'Disposed' -or $objRepeat.Result.FinalState -cne 'Disposed') { throw 'terminal-repeat-result' }
+        }
+        if ($null -ne $objLock) { $objLock.Dispose(); $objLock = $null }
+        $objAfter = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+        $strLinkAfter = if ($null -ne $strLinkPath) { @((Microsoft.PowerShell.Management\Get-Item -LiteralPath $strLinkPath -Force).Target) -join '|' } else { $null }
+        if (-not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right $objAfter) -or $strLinkBefore -cne $strLinkAfter) { throw 'terminal-released-name-changed' }
+        if (-not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objSourceBefore -Right (& $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.Checkout)) -or
+            -not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { throw 'terminal-source-or-sentinel' }
+        $objObservation.Result = 'success'; $objObservation.Status = 'succeeded'
+        $objObservation.Phase = 'cleanup'; $objObservation.Subreason = 'already-disposed'; $objObservation.DiagnosticCode = $objRepeat.Result.DiagnosticCode
+        $objObservation.PreCleanupState = 'Disposed'; $objObservation.CleanupSequence = 'helper-context'
+        $objObservation.CandidateFinalState = 'Absent'; $objObservation.ContextFinalState = $objContext.LifecycleState
+        $objObservation.FilesystemCallCount = [uint32]$objRepeat.Result.FilesystemCallCount
+        return $objObservation
+    } finally {
+        if ($null -ne $objLock) { $objLock.Dispose() }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockInvokeAcceptedExecutionFixture = {
+    param ([object]$Case, [string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath, [string]$GitPath)
+
+    $objSourceCase = & $script:scriptBlockGetAcceptedExecutionSource -Case $Case
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    $objObservation = & $script:scriptBlockNewObservation
+    try {
+        $objSourceBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.Checkout
+        $hashtableRepository = & $script:scriptBlockNewIdentityRepository -Layout $hashtableLayout -GitPath $GitPath `
+            -HelperSourcePath $HelperLiteralPath -ContextSourcePath $ContextLiteralPath
+        $boolHelperQualified = $objSourceCase.Id -cin @('T1A-AF-15', 'T1A-S-11')
+        $boolContextQualified = $objSourceCase.Id -cin @('T1A-AF-16', 'T1A-S-11')
+        $strHelperClaim = if ($boolHelperQualified) { 'FileSystem::' + $hashtableRepository.HelperPath } else { $hashtableRepository.HelperPath }
+        $strContextClaim = if ($boolContextQualified) { 'FileSystem::' + $hashtableRepository.ContextPath } else { $hashtableRepository.ContextPath }
+        $strHelper = & $script:scriptBlockResolveFixedScriptClaim -Value $strHelperClaim -Name HelperPath -ExpectedPath $hashtableRepository.HelperPath
+        $strContext = & $script:scriptBlockResolveFixedScriptClaim -Value $strContextClaim -Name ContextManagerPath -ExpectedPath $hashtableRepository.ContextPath
+        & $script:scriptBlockAssertOrdinaryInputFileType -LiteralPath $strHelper
+        & $script:scriptBlockAssertOrdinaryInputFileType -LiteralPath $strContext
+        $objHelperBefore = & $script:scriptBlockGetFileEvidence -LiteralPath $strHelper
+        $objContextBefore = & $script:scriptBlockGetFileEvidence -LiteralPath $strContext
+        $hashtableHelper = @{
+            RepositoryRoot = $hashtableRepository.RepositoryRoot; GitPath = $GitPath; LiteralPath = $strHelper
+            RelativePath = $script:strCandidateHelperRelativePath; ExpectedVersion = $script:strCandidateExpectedHelperVersion; ExpectedFunctionCount = [uint32]1
+        }
+        $hashtableContext = @{
+            RepositoryRoot = $hashtableRepository.RepositoryRoot; GitPath = $GitPath; LiteralPath = $strContext
+            RelativePath = $script:strCandidateContextRelativePath; ExpectedVersion = $script:strCandidateExpectedContextVersion; ExpectedFunctionCount = [uint32]3
+        }
+        $strHelperObject = & $script:scriptBlockAssertTrackedScriptIdentity @hashtableHelper
+        $strContextObject = & $script:scriptBlockAssertTrackedScriptIdentity @hashtableContext
+        $hashtableProof = [ordered]@{
+            BothRoleIdentityBeforeLoad = $true
+            HelperProviderQualified = $strHelperClaim.StartsWith('FileSystem::', [System.StringComparison]::Ordinal)
+            ContextProviderQualified = $strContextClaim.StartsWith('FileSystem::', [System.StringComparison]::Ordinal)
+            HelperControlObjectId = $strHelperObject
+            ContextControlObjectId = $strContextObject
+        }
+        if ($Case.FixtureRecipe -ceq 'source-accepted-script') {
+            & $script:scriptBlockAssertAcceptedRoleRefusals -Identity $hashtableHelper -OtherRolePath $strContext -RoleName HelperPath
+            & $script:scriptBlockAssertAcceptedRoleRefusals -Identity $hashtableContext -OtherRolePath $strHelper -RoleName ContextManagerPath
+        }
+        # Both fixed roles are authenticated before either script is loaded.
+        . $strContext
+        $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $hashtableLayout.Trusted
+        $objObservation.InvocationId = $objContext.InvocationId
+        $objObservation.PreCleanupState = [string]$objContext.LifecycleState
+        $strArchive = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'artifact.zip')
+        $objArchive = & $script:scriptBlockNewZipFixture -LiteralPath $strArchive -SemanticCase 'archive.valid.exact'
+        $objObservation.FixtureLength = [uint64]$objArchive.Length
+        $objObservation.FixtureSha256 = [string]$objArchive.Sha256
+        $hashtableLabels = @{}
+        if ($Case.FixtureRecipe -ceq 'source-single-label') {
+            foreach ($objLabel in $objSourceCase.Fixture.Parameters.Labels.PSObject.Properties) { $hashtableLabels.Add($objLabel.Name, $objLabel.Value) }
+            & $script:scriptBlockAssertAcceptedLabelArguments -SourceCase $objSourceCase -Arguments $hashtableLabels
+        }
+        if ((& $script:scriptBlockAssertTrackedScriptIdentity @hashtableHelper) -cne $strHelperObject -or
+            (& $script:scriptBlockAssertTrackedScriptIdentity @hashtableContext) -cne $strContextObject) { throw 'accepted-script-before-invocation-identity' }
+        $objResult = & $strHelper -Context $objContext -CheckoutRoot $hashtableLayout.Checkout -TrustedTemporaryRoot $hashtableLayout.Trusted `
+            -DownloadDirectory $objContext.DownloadDirectoryPath -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $objArchive.Sha256 @hashtableLabels
+        $hashtableProof.PublicArchiveInvocation = $true
+        if (-not [object]::ReferenceEquals($objContext, $objResult)) { throw 'accepted-script-context-reference' }
+        & $script:scriptBlockAssertTerraformExpandedFiles -Result $objResult -CandidatePath $objContext.CandidatePath -ArchivePath $strArchive
+        $hashtableProof.FourFileContentProof = $true
+        $objCleanup = Remove-StyleGuideCandidateInvocationState -Context $objContext
+        if (-not $objCleanup.Success -or $objContext.LifecycleState -cne 'Disposed' -or
+            [System.IO.Directory]::Exists($objContext.InvocationRootPath) -or [System.IO.File]::Exists($objContext.InvocationRootPath)) { throw 'accepted-script-cleanup' }
+        $objHelperAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $strHelper
+        $objContextAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $strContext
+        if ($objHelperAfter.Sha256 -cne $objHelperBefore.Sha256 -or $objContextAfter.Sha256 -cne $objContextBefore.Sha256 -or
+            (& $script:scriptBlockAssertTrackedScriptIdentity @hashtableHelper) -cne $strHelperObject -or
+            (& $script:scriptBlockAssertTrackedScriptIdentity @hashtableContext) -cne $strContextObject) { throw 'accepted-script-after-identity' }
+        $hashtableProof.FixtureRoleBytesUnchanged = $true
+        & $script:scriptBlockAssertAcceptedExecutionEvidence -SourceCase $objSourceCase -Evidence $hashtableProof -HelperObjectId $strHelperObject -ContextObjectId $strContextObject
+        & $script:scriptBlockAssertAcceptedExecutionEvidenceMutants -SourceCase $objSourceCase -Evidence $hashtableProof -HelperObjectId $strHelperObject -ContextObjectId $strContextObject
+        $objSourceAfter = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.Checkout
+        if (-not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objSourceBefore -Right $objSourceAfter)) { throw 'accepted-script-source-changed' }
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { throw 'accepted-script-sentinel' }
+        $objObservation.Result = 'success'; $objObservation.Status = 'succeeded'
+        $objObservation.Phase = 'none'; $objObservation.Subreason = 'none'; $objObservation.DiagnosticCode = 'none'
+        $objObservation.CleanupSequence = 'helper-context'; $objObservation.CandidateFinalState = 'Absent'
+        $objObservation.ContextFinalState = [string]$objContext.LifecycleState
+        $objObservation.FilesystemCallCount = [uint32]$objCleanup.FilesystemCallCount
+        return $objObservation
+    } finally {
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockAssertAcceptedExecutionEvidence = {
+    param ([object]$SourceCase, [System.Collections.IDictionary]$Evidence, [string]$HelperObjectId, [string]$ContextObjectId)
+
+    if ($Evidence.Count -ne 8) { throw 'accepted-execution-evidence-shape' }
+    foreach ($strName in @('FourFileContentProof', 'BothRoleIdentityBeforeLoad', 'FixtureRoleBytesUnchanged', 'PublicArchiveInvocation')) {
+        if (-not $Evidence.Contains($strName) -or $Evidence[$strName] -isnot [bool] -or -not $Evidence[$strName]) { throw ('accepted-execution-evidence-' + $strName) }
+    }
+    foreach ($strRole in @('Helper', 'Context')) {
+        $strFlag = $strRole + 'ProviderQualified'
+        $boolExpected = if ($strRole -ceq 'Helper') { $SourceCase.Id -cin @('T1A-AF-15', 'T1A-S-11') }
+            else { $SourceCase.Id -cin @('T1A-AF-16', 'T1A-S-11') }
+        if (-not $Evidence.Contains($strFlag) -or $Evidence[$strFlag] -isnot [bool] -or $Evidence[$strFlag] -ne $boolExpected) { throw ('accepted-execution-evidence-' + $strFlag) }
+        $strObjectName = $strRole + 'ControlObjectId'
+        $strExpectedObject = if ($strRole -ceq 'Helper') { $HelperObjectId } else { $ContextObjectId }
+        if (-not $Evidence.Contains($strObjectName) -or $Evidence[$strObjectName] -isnot [string] -or
+            $Evidence[$strObjectName] -cnotmatch '^(?:[0-9a-f]{40}|[0-9a-f]{64})$' -or
+            $Evidence[$strObjectName] -cne $strExpectedObject) { throw ('accepted-execution-evidence-' + $strObjectName) }
+    }
+}
+
+$script:scriptBlockAssertAcceptedExecutionEvidenceMutants = {
+    param ([object]$SourceCase, [System.Collections.IDictionary]$Evidence, [string]$HelperObjectId, [string]$ContextObjectId)
+
+    & $script:scriptBlockAssertAcceptedExecutionEvidence -SourceCase $SourceCase -Evidence $Evidence -HelperObjectId $HelperObjectId -ContextObjectId $ContextObjectId
+    foreach ($strName in @($Evidence.Keys)) {
+        foreach ($strMode in @('missing', 'wrong', 'type')) {
+            $hashtableMutant = [ordered]@{}
+            foreach ($strKey in $Evidence.Keys) { if ($strKey -cne $strName) { $hashtableMutant[$strKey] = $Evidence[$strKey] } }
+            $strExpected = 'accepted-execution-evidence-shape'
+            if ($strMode -cne 'missing') {
+                if ($strMode -ceq 'type') { $hashtableMutant[$strName] = [object[]]@($Evidence[$strName]) }
+                elseif ($Evidence[$strName] -is [bool]) { $hashtableMutant[$strName] = -not $Evidence[$strName] }
+                else { $hashtableMutant[$strName] = '0' * $Evidence[$strName].Length }
+                $strExpected = 'accepted-execution-evidence-' + $strName
+            }
+            $strFailure = $null
+            try { & $script:scriptBlockAssertAcceptedExecutionEvidence -SourceCase $SourceCase -Evidence $hashtableMutant -HelperObjectId $HelperObjectId -ContextObjectId $ContextObjectId }
+            catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne $strExpected) { throw 'accepted-execution-evidence-mutant' }
+        }
+    }
+}
+
+$script:scriptBlockAssertAcceptedExecutionControls = {
+    foreach ($objCase in @($script:objCandidateActiveCatalog.Cases | Where-Object { $_.FixtureRecipe -cin @('source-accepted-script', 'source-single-label') })) {
+        $objSource = & $script:scriptBlockGetAcceptedExecutionSource -Case $objCase
+        foreach ($strField in @('CaseId', 'SemanticCase', 'SemanticVariant', 'FixtureRecipe', 'InitialState')) {
+            $objMutant = $objCase | ConvertTo-Json -Depth 20 | ConvertFrom-Json
+            $objMutant.$strField = 'invalid'
+            $strFailure = $null
+            try { [void](& $script:scriptBlockGetAcceptedExecutionSource -Case $objMutant) } catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne 'accepted-execution-case') { throw 'accepted-execution-mutant' }
+        }
+        if ($objCase.FixtureRecipe -cne 'source-single-label') { continue }
+        $hashtableLabels = @{}
+        foreach ($objLabel in $objSource.Fixture.Parameters.Labels.PSObject.Properties) { $hashtableLabels.Add($objLabel.Name, $objLabel.Value) }
+        & $script:scriptBlockAssertAcceptedLabelArguments -SourceCase $objSource -Arguments $hashtableLabels
+        foreach ($strMode in @('missing', 'wrong-value', 'wrong-type', 'wrong-key-case', 'ArtifactId', 'RunId', 'RunAttempt')) {
+            $hashtableMutant = $hashtableLabels.Clone()
+            $strName = [string]@($hashtableLabels.Keys)[0]
+            switch -Exact ($strMode) {
+                'missing' { $hashtableMutant.Clear() }
+                'wrong-value' { $hashtableMutant[$strName] = 'wrong' }
+                'wrong-type' { $hashtableMutant[$strName] = [object[]]@($hashtableLabels[$strName]) }
+                'wrong-key-case' { $hashtableMutant.Clear(); $hashtableMutant[$strName.ToLowerInvariant()] = $hashtableLabels[$strName] }
+                default { if ($strMode -ceq $strName) { continue }; $hashtableMutant[$strMode] = 'extra' }
+            }
+            if ($strMode -ceq $strName) { continue }
+            $strFailure = $null
+            try { & $script:scriptBlockAssertAcceptedLabelArguments -SourceCase $objSource -Arguments $hashtableMutant } catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne 'accepted-label-bound-shape') { throw 'accepted-label-mutant' }
+        }
+    }
+}
+
+$script:scriptBlockAssertAcceptedExecutionWiring = {
+    param ([string]$LiteralPath)
+
+    $arrErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($LiteralPath, [ref]$null, [ref]$arrErrors)
+    if ($arrErrors.Count -ne 0) { throw 'accepted-execution-wiring-parser' }
+    $hashtablePins = @{
+        'scriptBlockAssertTerraformExpandedFiles' = '1c4e8bc1536fa53528759cdb411c9a91d8cd0089ad2a798f3249b69f92f2f0ff'
+        'scriptBlockGetAcceptedExecutionSource' = '96c8c090a0b9a9361b7abd74fcc851cb67347495822c1e3d4fecbe7d8891d7c8'
+        'scriptBlockAssertAcceptedLabelArguments' = '5252f99e9ec86261863b2b0fc03956e528aef3035b1416b884f5802b93437152'
+        'scriptBlockAssertAcceptedRoleRefusals' = '4684226136d3e2c858812ff91e980ad00f4a00422a4158b055cfc2cfe9d048bf'
+        'scriptBlockInvokeAcceptedExecutionFixture' = 'a14f827860cbae8da2db04552c1eafb64c8559321c5a862c007c203abdeae38a'
+        'scriptBlockAssertAcceptedExecutionEvidence' = 'd66a345fcf1d4dad01177d51210bc5ff3e52a9898cd198ad449305a5aca59d3c'
+    }
+    foreach ($strName in $hashtablePins.Keys) {
+        $arrAssignments = @($objAst.FindAll({
+            param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+            ($Node.Left.VariablePath.UserPath -replace '^(script|local|private|global):', '') -ieq $strName
+        }, $true))
+        if ($arrAssignments.Count -ne 1 -or $arrAssignments[0].Parent -ne $objAst.EndBlock -or
+            $arrAssignments[0].Left.Extent.Text -cne ('$script:' + $strName)) { throw 'accepted-execution-wiring-binding' }
+        if ((& $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($arrAssignments[0].Extent.Text))) -cne $hashtablePins[$strName]) { throw 'accepted-execution-wiring-content' }
+    }
+    $arrCalls = @($objAst.FindAll({
+        param ($Node)
+        $Node -is [System.Management.Automation.Language.CommandAst] -and
+        $Node.CommandElements.Count -gt 0 -and $Node.CommandElements[0].Extent.Text -ceq '$script:scriptBlockInvokeAcceptedExecutionFixture'
+    }, $true))
+    if ($arrCalls.Count -ne 1 -or $arrCalls[0].Extent.Text -cne
+        '& $script:scriptBlockInvokeAcceptedExecutionFixture -Case $objCase -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -GitPath $strGitPath') { throw 'accepted-execution-wiring-dispatch' }
+}
+
+$script:scriptBlockAssertAcceptedExecutionWiringMutants = {
+    param ([string]$LiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertAcceptedExecutionWiring -LiteralPath $LiteralPath
+    $strSource = [System.IO.File]::ReadAllText($LiteralPath)
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($LiteralPath, [ref]$null, [ref]$null)
+    $objFixture = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left.Extent.Text -ceq '$script:scriptBlockInvokeAcceptedExecutionFixture'
+    })[0]
+    $strRoot = [System.IO.Path]::Combine($RunRoot, 'accepted-execution-static')
+    [void][System.IO.Directory]::CreateDirectory($strRoot)
+    try {
+        $intIndex = 0
+        foreach ($strAnchor in @(
+            '& $script:scriptBlockAssertTerraformExpandedFiles -Result $objResult -CandidatePath $objContext.CandidatePath -ArchivePath $strArchive',
+            '& $script:scriptBlockAssertAcceptedExecutionEvidence -SourceCase $objSourceCase -Evidence $hashtableProof -HelperObjectId $strHelperObject -ContextObjectId $strContextObject',
+            "`$strHelperObject = & `$script:scriptBlockAssertTrackedScriptIdentity @hashtableHelper",
+            '$objResult = & $strHelper -Context $objContext -CheckoutRoot $hashtableLayout.Checkout -TrustedTemporaryRoot $hashtableLayout.Trusted'
+        )) {
+            if ([regex]::Matches($objFixture.Extent.Text, [regex]::Escape($strAnchor)).Count -ne 1) { throw 'accepted-execution-wiring-anchor' }
+            $intIndex++
+            $strFixture = $objFixture.Extent.Text.Replace($strAnchor, $strAnchor.Replace('$script:', '$global:').Replace('$strHelper -Context', '$strContext -Context'))
+            if ($strFixture -ceq $objFixture.Extent.Text) { throw 'accepted-execution-wiring-mutant-unchanged' }
+            $strCopy = $strSource.Substring(0, $objFixture.Extent.StartOffset) + $strFixture + $strSource.Substring($objFixture.Extent.EndOffset)
+            $strPath = [System.IO.Path]::Combine($strRoot, ('mutant-' + $intIndex + '.ps1'))
+            [System.IO.File]::WriteAllText($strPath, $strCopy, (New-Object System.Text.UTF8Encoding($false)))
+            $strFailure = $null
+            try { & $script:scriptBlockAssertAcceptedExecutionWiring -LiteralPath $strPath } catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne 'accepted-execution-wiring-content') { throw 'accepted-execution-wiring-mutant' }
+        }
+    } finally { & $script:scriptBlockRemoveTestTree -LiteralPath $strRoot -ApprovedParent $RunRoot }
+}
+
+$script:scriptBlockTestFixtureSnapshotEqual = {
+    param ([object]$Left, [object]$Right)
+
+    foreach ($objSnapshot in @($Left, $Right)) {
+        if ($null -eq $objSnapshot -or $objSnapshot -isnot [System.Management.Automation.PSCustomObject] -or
+            @($objSnapshot.PSObject.Properties).Count -ne 2 -or
+            $null -eq $objSnapshot.PSObject.Properties['Count'] -or $null -eq $objSnapshot.PSObject.Properties['Entries'] -or
+            $objSnapshot.Count -isnot [int] -or $objSnapshot.Count -lt 0 -or $objSnapshot.Entries -isnot [string[]]) { return $false }
+    }
+    if ($Left.Count -ne $Right.Count -or $Left.Entries.Length -ne $Right.Entries.Length) { return $false }
+    for ($intIndex = 0; $intIndex -lt $Left.Entries.Length; $intIndex++) {
+        if ($null -eq $Left.Entries[$intIndex] -or $null -eq $Right.Entries[$intIndex] -or
+            -not [string]::Equals($Left.Entries[$intIndex], $Right.Entries[$intIndex], [System.StringComparison]::Ordinal)) { return $false }
+    }
+    return $true
+}
+
+$script:scriptBlockAssertFixtureSnapshotComparison = {
+    param ([string]$RunRoot)
+
+    $strRoot = [System.IO.Path]::Combine($RunRoot, ('snapshot-control-' + [System.Guid]::NewGuid().ToString('N')))
+    [void][System.IO.Directory]::CreateDirectory($strRoot)
+    try {
+        [System.IO.File]::WriteAllBytes([System.IO.Path]::Combine($strRoot, 'file'), [byte[]]@(120))
+        $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $strRoot
+        $objAfter = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $strRoot
+        if (-not (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right $objAfter) -or
+            $objBefore.Count -ne 2 -or $objBefore.Entries.Length -ne 3) { throw 'snapshot-comparator-positive' }
+    } finally { & $script:scriptBlockRemoveTestTree -LiteralPath $strRoot -ApprovedParent $RunRoot }
+    $objControl = [pscustomobject]@{ Entries = [string[]]@('root|16', 'root/file|32', ('root/file|1|' + ('a' * 64))); Count = [int]2 }
+    foreach ($strMode in @('count', 'path', 'attribute', 'hash', 'entry-count', 'order', 'case', 'count-type', 'entries-type')) {
+        $objMutant = [pscustomobject]@{ Entries = [string[]]$objControl.Entries.Clone(); Count = [int]$objControl.Count }
+        switch ($strMode) {
+            'count' { $objMutant.Count++ }
+            'path' { $objMutant.Entries[1] = 'root/other|32' }
+            'attribute' { $objMutant.Entries[1] = 'root/file|16' }
+            'hash' { $objMutant.Entries[2] = 'root/file|1|' + ('b' * 64) }
+            'entry-count' { $objMutant.Entries = [string[]]@($objMutant.Entries[0], $objMutant.Entries[1]) }
+            'order' { $objMutant.Entries = [string[]]@($objMutant.Entries[1], $objMutant.Entries[0], $objMutant.Entries[2]) }
+            'case' { $objMutant.Entries[1] = 'ROOT/file|32' }
+            'count-type' { $objMutant.Count = [string]'2' }
+            'entries-type' { $objMutant.Entries = [object[]]@($objMutant.Entries) }
+        }
+        if (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objControl -Right $objMutant) { throw 'snapshot-comparator-mutant' }
+    }
+    $objLeft = [pscustomobject]@{ Entries = [string[]]@("a`nb", 'c'); Count = [int]2 }
+    $objRight = [pscustomobject]@{ Entries = [string[]]@('a', "b`nc"); Count = [int]2 }
+    if (($objLeft.Entries -join "`n") -cne ($objRight.Entries -join "`n") -or
+        (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objLeft -Right $objRight)) { throw 'snapshot-comparator-boundary' }
+}
+
+$script:scriptBlockGetTerraformFixtureSnapshot = {
+    param ([string]$LiteralPath)
+
+    $listPending = New-Object 'System.Collections.Generic.List[string]'
+    $listRecords = New-Object 'System.Collections.Generic.List[string]'
+    $listPending.Add($LiteralPath)
+    for ($intIndex = 0; $intIndex -lt $listPending.Count; $intIndex++) {
+        if ($listPending.Count -gt 64) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'raw-observation-entry-bound'
+        }
+        $strPath = $listPending[$intIndex]
+        $objAttributes = [System.IO.File]::GetAttributes($strPath)
+        $listRecords.Add($strPath + '|' + [int]$objAttributes)
+        if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { continue }
+        if (($objAttributes -band [System.IO.FileAttributes]::Directory) -ne 0) {
+            $objEnumerator = [System.IO.Directory]::EnumerateFileSystemEntries($strPath).GetEnumerator()
+            try {
+                while ($objEnumerator.MoveNext()) {
+                    if ($listPending.Count -ge 64) {
+                        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'raw-observation-entry-bound'
+                    }
+                    $listPending.Add([string]$objEnumerator.Current)
+                }
+            } finally { $objEnumerator.Dispose() }
+        } else {
+            $objEvidence = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath
+            $listRecords.Add($strPath + '|' + $objEvidence.Length + '|' + $objEvidence.Sha256)
+        }
+    }
+    $arrRecords = $listRecords.ToArray()
+    [System.Array]::Sort($arrRecords, [System.StringComparer]::Ordinal)
+    return [pscustomobject]@{ Entries = $arrRecords; Count = $listPending.Count }
+}
+
+$script:scriptBlockTerraformSourceExpansionWorker = {
+    param ([string]$Roles, [string]$FixtureRoot, [string]$ArchivePath)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    . ([IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))
+    . ([IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1'))
+    $strCheckout = [IO.Path]::Combine($FixtureRoot, 'checkout')
+    $strTrusted = [IO.Path]::Combine($FixtureRoot, 'trusted')
+    [void][IO.Directory]::CreateDirectory($strCheckout)
+    [void][IO.Directory]::CreateDirectory($strTrusted)
+    $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrusted
+    $strArchive = [IO.Path]::Combine($objContext.DownloadDirectoryPath, 'artifact.zip')
+    [IO.File]::WriteAllBytes($strArchive, [IO.File]::ReadAllBytes($ArchivePath))
+    $strDigest = (Microsoft.PowerShell.Utility\Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash
+    $objOutcome = [pscustomobject]@{ Accepted = $false; Code = 'none'; Phase = 'none'; Subreason = 'none'; CandidateState = 'none'; ContextState = 'none'; CandidateExists = $true }
+    try {
+        $objExpanded = & ([IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1')) `
+            -Context $objContext -CheckoutRoot $strCheckout -TrustedTemporaryRoot $strTrusted -DownloadDirectory $objContext.DownloadDirectoryPath `
+            -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $strDigest
+        if (-not [object]::ReferenceEquals($objExpanded, $objContext) -or $objContext.LifecycleState -cne 'Active' -or
+            @($objContext.OwnershipJournal | Where-Object Kind -CEQ 'CandidateFile').Count -ne 4) { throw 'source-expansion-success-shape' }
+        $objOutcome.Accepted = $true
+    } catch {
+        $objFailure = $_
+        foreach ($strField in @('Code', 'Phase', 'Subreason')) {
+            $strKey = if ($strField -ceq 'Code') { 'PSStyleGuideDiagnosticCode' } else { 'PSStyleGuide' + $strField }
+            $objValue = $objFailure.Exception.Data[$strKey]
+            if ($objValue -isnot [string] -or $objValue -cnotmatch '^[a-z][a-z0-9-]*$') { throw 'source-expansion-unclassified-failure' }
+            $objOutcome.$strField = $objValue
+        }
+    }
+    $objCleanup = Remove-StyleGuideCandidateInvocationState -Context $objContext
+    $objOutcome.CandidateState = $objContext.OwnershipJournal[2].EntryState
+    $objOutcome.ContextState = $objContext.LifecycleState
+    $objOutcome.CandidateExists = [IO.Directory]::Exists($objContext.CandidatePath)
+    if ($objOutcome.Accepted -and ($objOutcome.CandidateState -cne 'Deleted' -or
+        $objOutcome.ContextState -cne 'Disposed' -or -not $objCleanup.Success -or $objOutcome.CandidateExists)) { throw 'source-expansion-control-cleanup' }
+    [IO.File]::WriteAllText([IO.Path]::Combine($FixtureRoot, 'result.json'), (ConvertTo-Json -InputObject $objOutcome -Compress), [Text.UTF8Encoding]::new($false))
+}
+
+$script:scriptBlockInvokeTerraformSourceExpansion = {
+    param ([string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath, [byte[]]$ArchiveBytes)
+
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId 'source-expansion'
+    $hashtableWorker = $null
+    try {
+        $strRoles = [IO.Path]::Combine($hashtableLayout.CaseRoot, 'roles')
+        [void][IO.Directory]::CreateDirectory($strRoles)
+        foreach ($hashtableRole in @(
+            @{ Input = $HelperLiteralPath; Name = 'Expand-StyleGuideCandidateArtifact.ps1' },
+            @{ Input = $ContextLiteralPath; Name = 'Manage-StyleGuideCandidateInvocationContext.ps1' }
+        )) {
+            $arrBytes = [IO.File]::ReadAllBytes($hashtableRole.Input)
+            $arrErrors = $null
+            $null = [Management.Automation.Language.Parser]::ParseInput([Text.UTF8Encoding]::new($false, $true).GetString($arrBytes), [ref]$null, [ref]$arrErrors)
+            if ($arrErrors.Count -ne 0) { throw 'source-expansion-role-parse' }
+            [IO.File]::WriteAllBytes([IO.Path]::Combine($strRoles, $hashtableRole.Name), $arrBytes)
+        }
+        $strArchive = [IO.Path]::Combine($hashtableLayout.CaseRoot, 'fixture.zip')
+        [IO.File]::WriteAllBytes($strArchive, $ArchiveBytes)
+        $strWorker = [IO.Path]::Combine($hashtableLayout.CaseRoot, 'worker.ps1')
+        [IO.File]::WriteAllText($strWorker, $script:scriptBlockTerraformSourceExpansionWorker.ToString(), [Text.UTF8Encoding]::new($false))
+        $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorker -WorkingDirectory $hashtableLayout.CaseRoot `
+            -Arguments @('-Roles', $strRoles, '-FixtureRoot', $hashtableLayout.Trusted, '-ArchivePath', $strArchive)
+        while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [Threading.Thread]::Sleep(10) }
+        if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'source-expansion-worker-failed' }
+        $objOutcome = & $script:scriptBlockReadTerraformProofResult -LiteralPath ([IO.Path]::Combine($hashtableLayout.Trusted, 'result.json'))
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) { throw 'source-expansion-sentinel' }
+        return $objOutcome
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockAssertTerraformNegativeZip64Fallback = {
+    param ([string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath, [switch]$EmitObservations)
+
+    $strRoot = [IO.Path]::Combine($RunRoot, 'negative-zip64-controls')
+    [void][IO.Directory]::CreateDirectory($strRoot)
+    try {
+        $hashtableBindings = & $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+        $strArchive = [IO.Path]::Combine($strRoot, 'negative.zip')
+        $null = & $script:scriptBlockNewTerraformRawZip -LiteralPath $strArchive -CaseId 'T1A-R-11'
+        $arrOriginal = [IO.File]::ReadAllBytes($strArchive)
+        $intEnd = $arrOriginal.Length - 22
+        $intCentral = [int][BitConverter]::ToUInt32($arrOriginal, $intEnd + 16)
+        $intExtra = $intCentral + 46 + [BitConverter]::ToUInt16($arrOriginal, $intCentral + 28)
+        $intSecond = $intExtra + 12
+        if ($arrOriginal[$intCentral + 46] -ne 99) { throw 'negative-zip64-original-name-byte' }
+        $listControls = New-Object 'System.Collections.Generic.List[object]'
+        $listControls.Add(@{ Id = 'negative'; Bytes = $arrOriginal; Expected = $true })
+        foreach ($strVariant in @('high-bit', 'nonnegative', 'missing-marker', 'wrong-id', 'short-field', 'oversized-field',
+            'compressed-field-missing', 'offset-field-missing', 'disk-field-missing', 'later-broken-record', 'bad-name', 'non-ascii-name', 'case-changed-name', 'fifth-count')) {
+            $arrMutant = [byte[]]$arrOriginal.Clone()
+            switch -Exact ($strVariant) {
+                'high-bit' { for ($intByte = 0; $intByte -lt 7; $intByte++) { $arrMutant[$intExtra + 4 + $intByte] = 0 }; $arrMutant[$intExtra + 11] = 128 }
+                'nonnegative' { $arrMutant[$intExtra + 11] = 127 }
+                'missing-marker' { [Array]::Copy([BitConverter]::GetBytes([uint32]2), 0, $arrMutant, $intCentral + 24, 4) }
+                'wrong-id' { $arrMutant[$intExtra] = 2 }
+                'short-field' { $arrMutant[$intExtra + 2] = 7 }
+                'oversized-field' { $arrMutant[$intExtra + 2] = 13 }
+                'compressed-field-missing' { for ($intByte = 20; $intByte -le 23; $intByte++) { $arrMutant[$intCentral + $intByte] = 255 } }
+                'offset-field-missing' { for ($intByte = 42; $intByte -le 45; $intByte++) { $arrMutant[$intCentral + $intByte] = 255 } }
+                'disk-field-missing' { $arrMutant[$intCentral + 34] = 255; $arrMutant[$intCentral + 35] = 255 }
+                'later-broken-record' { $arrMutant[$intSecond] = 0 }
+                'bad-name' { $arrMutant[$intCentral + 46] = 120 }
+                'non-ascii-name' { $arrMutant[$intCentral + 46] = 128 }
+                'case-changed-name' { $arrMutant[$intCentral + 46] = 67 }
+                'fifth-count' { $arrMutant[$intEnd + 8] = 5; $arrMutant[$intEnd + 10] = 5 }
+            }
+            $listControls.Add(@{ Id = $strVariant; Bytes = $arrMutant; Expected = ($strVariant -ceq 'high-bit') })
+        }
+        $arrDuplicate = New-Object byte[] ($arrOriginal.Length + 12)
+        [Array]::Copy($arrOriginal, 0, $arrDuplicate, 0, $intSecond)
+        [Array]::Copy($arrOriginal, $intExtra, $arrDuplicate, $intSecond, 12)
+        [Array]::Copy($arrOriginal, $intSecond, $arrDuplicate, $intSecond + 12, $arrOriginal.Length - $intSecond)
+        $arrDuplicate[$intCentral + 30] = 24
+        [Array]::Copy([BitConverter]::GetBytes([uint32]([BitConverter]::ToUInt32($arrOriginal, $intEnd + 12) + 12)), 0, $arrDuplicate, $intEnd + 24, 4)
+        $listControls.Add(@{ Id = 'duplicate-zip64'; Bytes = $arrDuplicate; Expected = $false })
+        foreach ($hashtableControl in $listControls) {
+            $objActual = & $hashtableBindings.HelperNegativeZip64Length -ArchiveByte $hashtableControl.Bytes
+            if ($objActual -isnot [bool] -or $objActual -ne $hashtableControl.Expected) { throw ('negative-zip64-classifier-' + $hashtableControl.Id) }
+            if ($EmitObservations) { [pscustomobject]@{ Scope = 'negative-zip64-classifier'; Id = $hashtableControl.Id; Actual = $objActual; Expected = $hashtableControl.Expected } }
+        }
+        $objReader = [IO.Compression.ZipFile]::OpenRead($strArchive)
+        $boolReaderRefused = $false
+        try { $null = $objReader.get_Entries() } catch { $boolReaderRefused = $true } finally { $objReader.Dispose() }
+        $arrHonest = & $script:scriptBlockNewArchiveByte -EntryName ([string[]]@($script:arrCandidateExpectedName))
+        $objPositive = & $script:scriptBlockInvokeTerraformSourceExpansion -RunRoot $strRoot -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath -ArchiveBytes $arrHonest
+        if (-not $objPositive.Accepted -or $objPositive.ContextState -cne 'Disposed' -or
+            $objPositive.CandidateState -cne 'Deleted' -or $objPositive.CandidateExists) { throw 'negative-zip64-public-control' }
+        $strSource = [IO.File]::ReadAllText($HelperLiteralPath)
+        $strNeedle = '$objMaterializedEntries = $objZipArchive.get_Entries()'
+        if ($strSource.Split([string[]]@($strNeedle), [StringSplitOptions]::None).Count -ne 2) { throw 'negative-zip64-getter-site' }
+        $strInvalidData = [IO.Path]::Combine($strRoot, 'helper-invalid-data.ps1')
+        $strOtherError = [IO.Path]::Combine($strRoot, 'helper-other-error.ps1')
+        [IO.File]::WriteAllText($strInvalidData, $strSource.Replace($strNeedle, "throw [IO.InvalidDataException]::new('negative-zip64-reader-control')"), [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText($strOtherError, $strSource.Replace($strNeedle, "throw [IO.InvalidOperationException]::new('negative-zip64-reader-control')"), [Text.UTF8Encoding]::new($false))
+        foreach ($hashtableControl in @(
+            @{ Id = 'public-negative'; Bytes = $arrOriginal; Helper = $HelperLiteralPath; Expected = 'declared-length' },
+            @{ Id = 'count-before-negative'; Bytes = @($listControls | Where-Object { $_.Id -ceq 'fifth-count' })[0].Bytes; Helper = $HelperLiteralPath; Expected = 'entry-count' },
+            @{ Id = 'name-before-length'; Bytes = @($listControls | Where-Object { $_.Id -ceq 'bad-name' })[0].Bytes; Helper = $HelperLiteralPath; Expected = $(if ($boolReaderRefused) { 'entry-count' } else { 'entry-name' }) },
+            @{ Id = 'invalid-data-without-negative'; Bytes = $arrHonest; Helper = $strInvalidData; Expected = 'entry-count' },
+            @{ Id = 'other-error-with-negative'; Bytes = $arrOriginal; Helper = $strOtherError; Expected = 'entry-count' }
+        )) {
+            $objResult = & $script:scriptBlockInvokeTerraformSourceExpansion -RunRoot $strRoot -HelperLiteralPath $hashtableControl.Helper -ContextLiteralPath $ContextLiteralPath -ArchiveBytes $hashtableControl.Bytes
+            if ($objResult.Accepted -or $objResult.Code -cne 'manifest-invalid' -or $objResult.Phase -cne 'manifest' -or
+                $objResult.Subreason -cne $hashtableControl.Expected -or $objResult.ContextState -cne 'Disposed' -or
+                $objResult.CandidateState -cne 'ExpectedAbsent' -or $objResult.CandidateExists) { throw ('negative-zip64-public-' + $hashtableControl.Id) }
+            if ($EmitObservations) { [pscustomobject]@{ Scope = 'negative-zip64-public'; Id = $hashtableControl.Id; Subreason = $objResult.Subreason; ContextState = $objResult.ContextState; CandidateState = $objResult.CandidateState; ReaderRefused = $boolReaderRefused } }
+        }
+    } finally { & $script:scriptBlockRemoveTestTree -LiteralPath $strRoot -ApprovedParent $RunRoot }
+}
+
+$script:scriptBlockAssertTerraformFixtureClassification = {
+    param ([object[]]$Classification)
+
+    if ($null -eq $Classification -or $Classification.Length -ne 2) {
+        throw 'fixture-classification-count'
+    }
+    $objSeen = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    foreach ($objClassification in $Classification) {
+        if ($objClassification -isnot [System.Collections.Specialized.OrderedDictionary] -or
+            $objClassification.Count -ne 3 -or
+            @($objClassification.Keys | Where-Object { $_ -cnotin @('Fixture', 'ReaderRefused', 'ReaderEntryCount') }).Count -ne 0 -or
+            $objClassification.Fixture -isnot [string] -or
+            $objClassification.Fixture -cnotin @('archive.trailer.decoy', 'archive.trailer.zip64-gate') -or
+            -not $objSeen.Add($objClassification.Fixture) -or
+            $objClassification.ReaderRefused -isnot [bool]) {
+            throw 'fixture-classification-shape'
+        }
+        if ($objClassification.ReaderRefused) {
+            if ($null -ne $objClassification.ReaderEntryCount) { throw 'fixture-classification-refusal' }
+        } elseif ($objClassification.ReaderEntryCount -isnot [uint32] -or $objClassification.ReaderEntryCount -le 4) {
+            throw 'fixture-classification-count-type'
+        }
+    }
+}
+
+$script:scriptBlockTerraformH01Worker = {
+    param ([string]$Roles, [string]$FixtureRoot)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    Add-Type -TypeDefinition @'
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+public static class PSCandidateH01Trace {
+    public static int Advances;
+    public static int Disposals;
+    public static IEnumerable<string> Enumerate(string path) { return new Source(path); }
+    private sealed class Source : IEnumerable<string> {
+        private readonly string path;
+        public Source(string value) { path = value; }
+        public IEnumerator<string> GetEnumerator() {
+            return new Iterator(Directory.EnumerateFileSystemEntries(path).GetEnumerator());
+        }
+        IEnumerator IEnumerable.GetEnumerator() { return GetEnumerator(); }
+    }
+    private sealed class Iterator : IEnumerator<string> {
+        private readonly IEnumerator<string> inner;
+        public Iterator(IEnumerator<string> value) { inner = value; }
+        public string Current { get { return inner.Current; } }
+        object IEnumerator.Current { get { return Current; } }
+        public bool MoveNext() { Advances++; return inner.MoveNext(); }
+        public void Reset() { throw new NotSupportedException(); }
+        public void Dispose() { Disposals++; inner.Dispose(); }
+    }
+}
+'@
+    foreach ($strName in @('Expand-StyleGuideCandidateArtifact.ps1', 'Manage-StyleGuideCandidateInvocationContext.ps1')) {
+        $arrErrors = $null
+        [void][System.Management.Automation.Language.Parser]::ParseFile(
+            [System.IO.Path]::Combine($Roles, $strName), [ref]$null, [ref]$arrErrors)
+        if ($arrErrors.Count -ne 0) { throw 'h01-derived-parse' }
+    }
+    . ([System.IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))
+    . ([System.IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1'))
+    $hashtableEnumerators = @{}
+    foreach ($strRole in @('helper', 'manager')) {
+        $strName = if ($strRole -ceq 'helper') { 'Expand-StyleGuideCandidateArtifact.ps1' } else { 'Manage-StyleGuideCandidateInvocationContext.ps1' }
+        $strDefinitionVariable = if ($strRole -ceq 'helper') { 'scriptBlockCandidateModuleDefinition' } else { 'scriptBlockContextModuleDefinition' }
+        $objAst = [System.Management.Automation.Language.Parser]::ParseFile(
+            [System.IO.Path]::Combine($Roles, $strName), [ref]$null, [ref]$null)
+        $arrDefinitions = @($objAst.FindAll({
+            param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+            $Node.Left.VariablePath.UserPath -ceq $strDefinitionVariable
+        }, $true))
+        if ($arrDefinitions.Count -ne 1) { throw 'h01-module-definition-cardinality' }
+        $arrDefinitionBlocks = @($arrDefinitions[0].Right.FindAll({ param ($Node) $Node -is [System.Management.Automation.Language.ScriptBlockExpressionAst] }, $false))
+        if ($arrDefinitionBlocks.Count -ne 1) { throw 'h01-module-definition-shape' }
+        $strModulePattern = if ($strRole -ceq 'helper') { 'PSStyleGuideCandidateArtifact_*' } else { 'PSStyleGuideCandidateContext_*' }
+        $arrModules = @(Microsoft.PowerShell.Core\Get-Module -Name $strModulePattern -All)
+        if ($arrModules.Count -ne 1 -or $arrModules[0].Definition -cne $arrDefinitionBlocks[0].ScriptBlock.Extent.Text) { throw 'h01-module-definition-mismatch' }
+        $objEnumerator = if ($strRole -ceq 'helper') {
+            & $arrModules[0] { return $script:scriptBlockGetCandidateHelperEntry }
+        } else {
+            & $arrModules[0] { return $scriptBlockGetCandidateImmediateEntry }
+        }
+        if ($objEnumerator -isnot [scriptblock]) { throw 'h01-module-enumerator-type' }
+        $hashtableEnumerators[$strRole] = $objEnumerator
+    }
+    $listRecords = New-Object 'System.Collections.Generic.List[pscustomobject]'
+    foreach ($strRole in @('helper', 'manager')) {
+        foreach ($intActual in @(0, 3, 12)) {
+            foreach ($intExpected in @(0, 1, 4)) {
+                $strDirectory = [System.IO.Path]::Combine($FixtureRoot, 'entries-' + $intActual)
+                [PSCandidateH01Trace]::Advances = 0
+                [PSCandidateH01Trace]::Disposals = 0
+                $intMaximum = $intExpected + 1
+                $arrObserved = @(if ($strRole -ceq 'helper') {
+                    @(& $hashtableEnumerators[$strRole] -LiteralPath $strDirectory -Phase download -MaximumEntry $intMaximum)
+                } else {
+                    @(& $hashtableEnumerators[$strRole] -LiteralPath $strDirectory -FailureCode enumeration -FailurePhase cleanup -MaximumEntry $intMaximum)
+                })
+                if ([PSCandidateH01Trace]::Advances -gt $intMaximum -or
+                    [PSCandidateH01Trace]::Disposals -ne 1 -or
+                    $arrObserved.Count -ne [Math]::Min($intActual, $intMaximum)) { throw 'h01-traced-bound' }
+                $listRecords.Add([pscustomobject][ordered]@{
+                    Role = $strRole; Existing = $intActual; Expected = $intExpected; Maximum = $intMaximum
+                    Advances = [PSCandidateH01Trace]::Advances
+                    Disposals = [PSCandidateH01Trace]::Disposals; Returned = $arrObserved.Count
+                })
+            }
+        }
+    }
+    $strJson = [pscustomobject][ordered]@{
+        Runtime = $PSVersionTable.PSVersion.ToString(); ParserErrors = 0; ProcessId = $PID; Records = $listRecords.ToArray()
+    } | ConvertTo-Json -Depth 6 -Compress
+    [System.IO.File]::WriteAllText([System.IO.Path]::Combine($FixtureRoot, 'result.json'), $strJson, (New-Object System.Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockInvokeTerraformH01Proof = {
+    param (
+        [string]$RunRoot,
+        [string]$HelperLiteralPath,
+        [string]$ContextLiteralPath,
+        [System.Collections.IDictionary]$SourceIdentity
+    )
+
+    & $script:scriptBlockAssertEnumerationPrimitiveExclusive -HelperLiteralPath $HelperLiteralPath -ContextLiteralPath $ContextLiteralPath
+    $strRoot = [System.IO.Path]::Combine($RunRoot, 'T1A-H-01')
+    if ([System.IO.Directory]::Exists($strRoot) -or [System.IO.File]::Exists($strRoot)) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h01-root-occupied'
+    }
+    $strRoles = [System.IO.Path]::Combine($strRoot, 'roles')
+    [void][System.IO.Directory]::CreateDirectory($strRoles)
+    $listIdentities = New-Object 'System.Collections.Generic.List[pscustomobject]'
+    $hashtableWorker = $null
+    $objResult = $null
+    try {
+        foreach ($strRole in @('helper', 'context')) {
+            $strSourcePath = if ($strRole -ceq 'helper') { $HelperLiteralPath } else { $ContextLiteralPath }
+            $strName = [System.IO.Path]::GetFileName($strSourcePath)
+            $strText = [System.IO.File]::ReadAllText($strSourcePath)
+            $strNewLine = if ($strText.Contains("`r`n")) { "`r`n" } else { "`n" }
+            $strNeedle = '[System.IO.Directory]::EnumerateFileSystemEntries(' + $strNewLine + '                $LiteralPath).GetEnumerator()'
+            if ([regex]::Matches($strText, [regex]::Escape($strNeedle)).Count -ne 1) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h01-transform-cardinality'
+            }
+            $strDerived = $strText.Replace($strNeedle, '[PSCandidateH01Trace]::Enumerate($LiteralPath).GetEnumerator()')
+            $strDerivedPath = [System.IO.Path]::Combine($strRoles, $strName)
+            [System.IO.File]::WriteAllText($strDerivedPath, $strDerived, (New-Object System.Text.UTF8Encoding($false)))
+            $strMutantPath = [System.IO.Path]::Combine($strRoot, $strName)
+            $strMutant = $strText.Replace($strNeedle,
+                '([string[]]@([System.IO.Directory]::EnumerateFileSystemEntries($LiteralPath))).GetEnumerator()')
+            [System.IO.File]::WriteAllText($strMutantPath, $strMutant, (New-Object System.Text.UTF8Encoding($false)))
+            $strObservedReason = ''
+            try {
+                $hashtablePaths = @{ HelperLiteralPath = $HelperLiteralPath; ContextLiteralPath = $ContextLiteralPath }
+                if ($strRole -ceq 'helper') { $hashtablePaths.HelperLiteralPath = $strMutantPath }
+                else { $hashtablePaths.ContextLiteralPath = $strMutantPath }
+                & $script:scriptBlockAssertEnumerationPrimitiveExclusive @hashtablePaths
+            } catch {
+                if ($_.Exception.Data['PSStyleGuideHarnessCode'] -ceq 'catalog-invalid' -and
+                    $_.Exception.Message -ceq 'PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=enumeration-unfiltered-source-shape') {
+                    $strObservedReason = 'enumeration-unfiltered-source-shape'
+                }
+            }
+            if ($strObservedReason -cne 'enumeration-unfiltered-source-shape') {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h01-eager-mutant-not-rejected'
+            }
+            $listIdentities.Add([pscustomobject][ordered]@{
+                Role = $strRole
+                SourceSha256 = (& $script:scriptBlockGetFileEvidence -LiteralPath $strSourcePath).Sha256
+                DerivedSha256 = (& $script:scriptBlockGetFileEvidence -LiteralPath $strDerivedPath).Sha256
+                MutantSha256 = (& $script:scriptBlockGetFileEvidence -LiteralPath $strMutantPath).Sha256
+                Transformation = 'one-unfiltered-enumerator-call-to-real-delegating-counter-v1'
+                EagerMutantExecuted = $false; EagerMutantReason = $strObservedReason
+            })
+        }
+        foreach ($intCount in @(0, 3, 12)) {
+            $strDirectory = [System.IO.Path]::Combine($strRoot, 'entries-' + $intCount)
+            [void][System.IO.Directory]::CreateDirectory($strDirectory)
+            for ($intIndex = 0; $intIndex -lt $intCount; $intIndex++) {
+                [System.IO.File]::WriteAllBytes([System.IO.Path]::Combine($strDirectory, 'entry-' + $intIndex), [byte[]]@(120))
+            }
+        }
+        $strWorkerPath = [System.IO.Path]::Combine($strRoot, 'worker.ps1')
+        [System.IO.File]::WriteAllText($strWorkerPath, $script:scriptBlockTerraformH01Worker.ToString(), (New-Object System.Text.UTF8Encoding($false)))
+        $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath `
+            -WorkingDirectory $strRoot -Arguments @('-Roles', $strRoles, '-FixtureRoot', $strRoot)
+        while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) {
+            [System.Threading.Thread]::Sleep(10)
+        }
+        if ($hashtableWorker.Process.ExitCode -ne 0) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h01-worker-failed'
+        }
+        $objTrace = & $script:scriptBlockReadTerraformProofResult -LiteralPath ([System.IO.Path]::Combine($strRoot, 'result.json'))
+        if ($objTrace.ParserErrors -ne 0 -or $objTrace.Records.Count -ne 18) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h01-result-shape'
+        }
+        $objResult = [pscustomobject][ordered]@{
+            Id = 'T1A-H-01'; SemanticCase = 'harness.resource.bounded-cardinality-enumeration'
+            ActualStatus = 0; ActualPhase = 'harness-proof'; SourceIdentity = $SourceIdentity
+            SourceCopies = $listIdentities.ToArray(); Trace = $objTrace
+            ProcessExit = $hashtableWorker.Process.ExitCode; ProcessId = $hashtableWorker.Process.Id
+            CandidateState = 'not-applicable'; ContextState = 'not-created'
+        }
+    } finally {
+        & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker
+        & $script:scriptBlockRemoveTestTree -LiteralPath $strRoot -ApprovedParent $RunRoot
+    }
+    return $objResult
+}
+
+$script:scriptBlockTerraformH02Worker = {
+    param ([string]$Roles, [string]$FixtureRoot)
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    $strHelper = [System.IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1')
+    $strManager = [System.IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1')
+    foreach ($strPath in @($strHelper,$strManager)) {
+        $arrErrors=$null
+        [void][System.Management.Automation.Language.Parser]::ParseFile($strPath,[ref]$null,[ref]$arrErrors)
+        if ($arrErrors.Count -ne 0) { throw 'h02-copy-parse' }
+    }
+    $strCheckout=[System.IO.Path]::Combine($FixtureRoot,'checkout')
+    $strTrusted=[System.IO.Path]::Combine($FixtureRoot,'trusted')
+    [void][System.IO.Directory]::CreateDirectory($strCheckout)
+    [void][System.IO.Directory]::CreateDirectory($strTrusted)
+    . $strManager
+    . $strHelper
+    $objContext=New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrusted
+    $strArchive=[System.IO.Path]::Combine($objContext.DownloadDirectoryPath,'artifact.zip')
+    $objArchive=[System.IO.Compression.ZipFile]::Open($strArchive,[System.IO.Compression.ZipArchiveMode]::Create)
+    try {
+        foreach ($strName in @('copilot-instructions.md','powershell.instructions.md','STYLE_GUIDE_CHAT.md','STYLE_GUIDE_FULL.md')) {
+            $objStream=$objArchive.CreateEntry($strName).Open()
+            try { $arrBytes=[System.Text.Encoding]::UTF8.GetBytes("fixture`n");$objStream.Write($arrBytes,0,$arrBytes.Length) } finally { $objStream.Dispose() }
+        }
+    } finally { $objArchive.Dispose() }
+    $strSetup=[pscustomobject]@{Candidate=$objContext.CandidatePath;ProcessId=$PID}|ConvertTo-Json -Compress
+    [System.IO.File]::WriteAllText([System.IO.Path]::Combine($FixtureRoot,'setup.json'),$strSetup,(New-Object System.Text.UTF8Encoding($false)))
+    $strDigest=(Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash
+    $strPhase='complete';$strReason='none';$strCode='none';$boolSameObject=$false
+    try {
+        $objResult=& $strHelper -Context $objContext -CheckoutRoot $strCheckout -TrustedTemporaryRoot $strTrusted -DownloadDirectory $objContext.DownloadDirectoryPath -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $strDigest
+        $boolSameObject=[object]::ReferenceEquals($objResult,$objContext)
+    } catch {
+        $strPhase=[string]$_.Exception.Data['PSStyleGuidePhase']
+        $strReason=[string]$_.Exception.Data['PSStyleGuideSubreason']
+        $strCode=[string]$_.Exception.Data['PSStyleGuideDiagnosticCode']
+        if ($strPhase.Length -eq 0) { throw }
+    }
+    $strBeforeCleanup=$objContext.LifecycleState
+    $arrBefore=@($objContext.OwnershipJournal | Select-Object Sequence,Path,Kind,EntryState)
+    $objCleanup=Remove-StyleGuideCandidateInvocationState -Context $objContext
+    $objCleanupEvidence=[pscustomobject][ordered]@{
+        SchemaVersion=$objCleanup.SchemaVersion;ContextScriptVersion=$objCleanup.ContextScriptVersion.ToString()
+        InvocationId=$objCleanup.InvocationId.ToString('D');PreviousState=$objCleanup.PreviousState
+        FinalState=$objCleanup.FinalState;Success=$objCleanup.Success;DiagnosticCode=$objCleanup.DiagnosticCode
+        FilesystemCallCount=$objCleanup.FilesystemCallCount;RetainedRecordSequences=$objCleanup.RetainedRecordSequences
+    }
+    $arrAfter=@(foreach ($objRecord in $objContext.OwnershipJournal) {
+        $boolExists=if ($objRecord.Kind -ceq 'DownloadFile' -or $objRecord.Kind -ceq 'CandidateFile') {
+            [System.IO.File]::Exists($objRecord.Path)
+        } else { [System.IO.Directory]::Exists($objRecord.Path) }
+        $strHash=if ($boolExists -and $objRecord.Kind -ceq 'DownloadFile') {
+            (Microsoft.PowerShell.Utility\Get-FileHash -LiteralPath $objRecord.Path -Algorithm SHA256).Hash.ToLowerInvariant()
+        } else { $null }
+        [pscustomobject][ordered]@{Sequence=$objRecord.Sequence;Path=$objRecord.Path;Kind=$objRecord.Kind;EntryState=$objRecord.EntryState;Exists=$boolExists;Sha256=$strHash}
+    })
+    $strSentinel=[System.IO.Path]::Combine($objContext.CandidatePath,'competing-sentinel')
+    $strSentinelBytes=if ([System.IO.File]::Exists($strSentinel)) { [System.Convert]::ToBase64String([System.IO.File]::ReadAllBytes($strSentinel)) } else { $null }
+    $objObservation=[pscustomobject][ordered]@{
+        Phase=$strPhase;Subreason=$strReason;DiagnosticCode=$strCode;SameObjectReturned=$boolSameObject
+        StateBeforeExplicitCleanup=$strBeforeCleanup;ContextState=$objContext.LifecycleState;Cleanup=$objCleanupEvidence
+        SentinelBytes=$strSentinelBytes;JournalBeforeExplicitCleanup=$arrBefore
+        JournalAfter=$arrAfter;DownloadSha256=$strDigest.ToLowerInvariant()
+        RootExists=[System.IO.Directory]::Exists($objContext.InvocationRootPath);CandidateExists=[System.IO.Directory]::Exists($objContext.CandidatePath)
+        WorkerProcessId=$PID;CandidatePath=$objContext.CandidatePath;ParserErrors=0
+    }
+    [System.IO.File]::WriteAllText([System.IO.Path]::Combine($FixtureRoot,'result.json'),($objObservation|ConvertTo-Json -Depth 8 -Compress),(New-Object System.Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockInvokeTerraformH02Proof = {
+    param (
+        [string]$RunRoot,
+        [string]$HelperLiteralPath,
+        [string]$ContextLiteralPath,
+        [System.Collections.IDictionary]$SourceIdentity
+    )
+
+    $strRoot = [System.IO.Path]::Combine($RunRoot, 'T1A-H-02')
+    if ([System.IO.Directory]::Exists($strRoot) -or [System.IO.File]::Exists($strRoot)) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h02-root-occupied'
+    }
+    $strRoles = [System.IO.Path]::Combine($strRoot, 'roles')
+    [void][System.IO.Directory]::CreateDirectory($strRoles)
+    $strReady = [System.IO.Path]::Combine($strRoot, 'ready')
+    $strRelease = [System.IO.Path]::Combine($strRoot, 'release')
+    $hashtableWorker = $null
+    $objResult = $null
+    try {
+        $strSource = [System.IO.File]::ReadAllText($HelperLiteralPath)
+        $strMarker = '        $null = [System.IO.Directory]::CreateDirectory($strCandidatePath)'
+        if ([regex]::Matches($strSource, [regex]::Escape($strMarker)).Count -ne 1) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h02-transform-cardinality'
+        }
+        $strBridge = @'
+
+        [System.IO.File]::WriteAllText(__READY__, 'ready')
+        $objTerraformH02Watch = [System.Diagnostics.Stopwatch]::StartNew()
+        while (-not [System.IO.File]::Exists(__RELEASE__)) {
+            if ($objTerraformH02Watch.Elapsed.TotalSeconds -gt 60) { throw 'h02-release-timeout' }
+            [System.Threading.Thread]::Sleep(10)
+        }
+'@
+        $strBridge = $strBridge.Replace('__READY__', "'" + $strReady.Replace("'", "''") + "'").Replace(
+            '__RELEASE__', "'" + $strRelease.Replace("'", "''") + "'")
+        $strDerived = $strSource.Replace($strMarker, $strMarker + $strBridge)
+        $strDerivedPath = [System.IO.Path]::Combine($strRoles, 'Expand-StyleGuideCandidateArtifact.ps1')
+        $strManagerPath = [System.IO.Path]::Combine($strRoles, 'Manage-StyleGuideCandidateInvocationContext.ps1')
+        [System.IO.File]::WriteAllText($strDerivedPath, $strDerived, (New-Object System.Text.UTF8Encoding($false)))
+        [System.IO.File]::WriteAllBytes($strManagerPath, [System.IO.File]::ReadAllBytes($ContextLiteralPath))
+        $strWorkerPath = [System.IO.Path]::Combine($strRoot, 'worker.ps1')
+        $strWorkerSource = "param ([string]`$Roles, [string]`$FixtureRoot)`n" +
+            '$script:scriptBlockInitializeTerraformWorkerCompression = {' + $script:scriptBlockInitializeTerraformWorkerCompression.ToString() + "}`n" +
+            '& $script:scriptBlockInitializeTerraformWorkerCompression' + "`n" +
+            '& {' + $script:scriptBlockTerraformH02Worker.ToString() + '} -Roles $Roles -FixtureRoot $FixtureRoot'
+        [System.IO.File]::WriteAllText($strWorkerPath, $strWorkerSource, (New-Object System.Text.UTF8Encoding($false)))
+        $arrSentinel = [System.Text.Encoding]::UTF8.GetBytes("h02-competing-sentinel`n")
+        $listRecords = New-Object 'System.Collections.Generic.List[pscustomobject]'
+        foreach ($strCase in @('control', 'perturbation')) {
+            $strCaseRoot = [System.IO.Path]::Combine($strRoot, $strCase)
+            [void][System.IO.Directory]::CreateDirectory($strCaseRoot)
+            [System.IO.File]::Delete($strReady)
+            [System.IO.File]::Delete($strRelease)
+            $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath `
+                -WorkingDirectory $strCaseRoot -Arguments @('-Roles', $strRoles, '-FixtureRoot', $strCaseRoot)
+            while (-not [System.IO.File]::Exists($strReady)) {
+                if (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker) {
+                    & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h02-worker-before-ready'
+                }
+                [System.Threading.Thread]::Sleep(10)
+            }
+            $objSetup = & $script:scriptBlockReadTerraformProofResult -LiteralPath ([System.IO.Path]::Combine($strCaseRoot, 'setup.json'))
+            $strCandidate = [System.IO.Path]::GetFullPath([string]$objSetup.Candidate)
+            if (-not $strCandidate.StartsWith($strCaseRoot + [System.IO.Path]::DirectorySeparatorChar, $script:objCandidatePathComparison) -or
+                [System.IO.Path]::GetFileName($strCandidate) -cne 'candidate' -or
+                $objSetup.ProcessId -ne $hashtableWorker.Process.Id -or $objSetup.ProcessId -eq $PID) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h02-worker-setup'
+            }
+            $objAttributes = [System.IO.File]::GetAttributes($strCandidate)
+            if (($objAttributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0 -or
+                ($objAttributes -band [System.IO.FileAttributes]::Directory) -eq 0 -or
+                [System.IO.Directory]::GetFileSystemEntries($strCandidate).Count -ne 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h02-not-empty-at-ready'
+            }
+            if ($strCase -ceq 'perturbation') {
+                $objStream = New-Object System.IO.FileStream(
+                    [System.IO.Path]::Combine($strCandidate, 'competing-sentinel'),
+                    [System.IO.FileMode]::CreateNew, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+                try { $objStream.Write($arrSentinel, 0, $arrSentinel.Length) }
+                finally { $objStream.Dispose() }
+            }
+            [System.IO.File]::WriteAllText($strRelease, 'release')
+            while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) {
+                [System.Threading.Thread]::Sleep(10)
+            }
+            if ($hashtableWorker.Process.ExitCode -ne 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h02-worker-failed'
+            }
+            $objObserved = & $script:scriptBlockReadTerraformProofResult -LiteralPath ([System.IO.Path]::Combine($strCaseRoot, 'result.json'))
+            if ($objObserved.ParserErrors -ne 0 -or $objObserved.WorkerProcessId -ne $hashtableWorker.Process.Id) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'h02-result-identity'
+            }
+            $listRecords.Add([pscustomobject][ordered]@{
+                Case = $strCase; ReadyObserved = $true; ReleasedAfterWrite = $strCase -ceq 'perturbation'
+                WriterProcessId = $PID; WorkerProcessId = $hashtableWorker.Process.Id; WorkerExit = $hashtableWorker.Process.ExitCode
+                Observation = $objObserved
+            })
+            & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker
+            $hashtableWorker = $null
+        }
+        $objResult = [pscustomobject][ordered]@{
+            Id = 'T1A-H-02'; SemanticCase = 'harness.race.pre-journal-population-retained'
+            ActualStatus = 0; ActualPhase = 'harness-proof'; SourceIdentity = $SourceIdentity
+            HelperSourceSha256 = (& $script:scriptBlockGetFileEvidence -LiteralPath $HelperLiteralPath).Sha256
+            ContextSourceSha256 = (& $script:scriptBlockGetFileEvidence -LiteralPath $ContextLiteralPath).Sha256
+            DerivedHelperSha256 = (& $script:scriptBlockGetFileEvidence -LiteralPath $strDerivedPath).Sha256
+            DerivedContextSha256 = (& $script:scriptBlockGetFileEvidence -LiteralPath $strManagerPath).Sha256
+            Transformation = 'one-candidate-create-anchor-append-ready-release-before-next-statement-v1'
+            Records = $listRecords.ToArray()
+        }
+    } finally {
+        & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker
+        & $script:scriptBlockRemoveTestTree -LiteralPath $strRoot -ApprovedParent $RunRoot
+    }
+    return $objResult
+}
+
+$script:scriptBlockAssertTerraformResultPairs = {
+    param ([object[]]$Expected, [object[]]$Results, [string]$RuntimeId, [switch]$Proof)
+
+    if (-not $Proof) { throw 'result-pair-proof-required' }
+    $objExpected = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    foreach ($objRow in $Expected) {
+        if (-not $objExpected.Add($objRow.Id)) { throw 'result-pair-expected-duplicate' }
+    }
+    $objSeen = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    foreach ($objResult in $Results) {
+        if ($null -eq $objResult -or $null -eq $objResult.PSObject.Properties['Id'] -or
+            $null -eq $objResult.PSObject.Properties['Runtime'] -or
+            $objResult.Runtime.Id -cne $RuntimeId -or -not $objExpected.Contains($objResult.Id)) { throw 'result-pair-unknown-or-orphan' }
+        if (-not $objSeen.Add($objResult.Id)) { throw 'result-pair-duplicate' }
+        if ($null -eq $objResult.PSObject.Properties['HarnessVerdict'] -or $objResult.HarnessVerdict -cnotin @('pass', 'fail', 'skip')) { throw 'result-pair-verdict' }
+        if ($objResult.HarnessVerdict -ceq 'skip') {
+            if ($Proof) { throw 'result-pair-proof-skip' }
+            throw 'result-pair-functional-results-not-supported'
+        }
+    }
+    if ($objSeen.Count -ne $objExpected.Count) { throw 'result-pair-missing' }
+}
+
+$script:scriptBlockCopyTerraformResultRows = {
+    param ([object[]]$Results)
+
+    # A named property retains the array shape on both Desktop and Core.
+    $objEnvelope = [pscustomobject]@{ Rows = [object[]]$Results } |
+        ConvertTo-Json -Depth 100 -Compress | ConvertFrom-Json
+    return ,([object[]]@($objEnvelope.Rows))
+}
+
+$script:scriptBlockAssertTerraformResultRowCloning = {
+    param ([object[]]$FullResults, [switch]$EmitObservations)
+
+    $objControl = [pscustomobject]@{
+        Id = 'T1A-CLONE-CONTROL'
+        Runtime = [pscustomobject]@{ Id = 'diagnostic-validator-input' }
+        Text = 'literal-text'; Flag = $true; EmptyValue = $null
+        Integer = [long]7
+        Nested = [object[]]@([object[]]@(1, 2), [object[]]@(), [object[]]@(9))
+    }
+    foreach ($hashtableControl in @(
+        @{ Id = 'empty'; Rows = [object[]]@() },
+        @{ Id = 'singleton'; Rows = [object[]]@($objControl) },
+        @{ Id = 'two'; Rows = [object[]]@($objControl, $objControl) },
+        @{ Id = 'full'; Rows = $FullResults }
+    )) {
+        $arrOriginal = [object[]]$hashtableControl.Rows
+        $strOriginal = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $arrOriginal
+        [object[]]$arrClone = & $script:scriptBlockCopyTerraformResultRows -Results $arrOriginal
+        if ($arrClone.Length -ne $arrOriginal.Length -or
+            (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $arrClone) -cne $strOriginal) { throw 'result-clone-values' }
+        if ($arrClone.Length -gt 0) {
+            if ([object]::ReferenceEquals($arrOriginal[0], $arrClone[0]) -or
+                [object]::ReferenceEquals($arrOriginal[0].Runtime, $arrClone[0].Runtime)) { throw 'result-clone-alias' }
+            if ($hashtableControl.Id -cne 'full') {
+                if ($arrClone[0].Text -isnot [string] -or $arrClone[0].Flag -isnot [bool] -or
+                    $null -ne $arrClone[0].EmptyValue -or
+                    ($arrClone[0].Integer -isnot [int] -and $arrClone[0].Integer -isnot [long]) -or
+                    $arrClone[0].Nested -isnot [Array] -or $arrClone[0].Nested.Length -ne 3 -or
+                    $arrClone[0].Nested[0] -isnot [Array] -or $arrClone[0].Nested[0].Length -ne 2 -or
+                    $arrClone[0].Nested[1] -isnot [Array] -or $arrClone[0].Nested[1].Length -ne 0 -or
+                    $arrClone[0].Nested[2] -isnot [Array] -or $arrClone[0].Nested[2].Length -ne 1) { throw 'result-clone-json-shape' }
+                $arrClone[0].Nested[0][0] = 99
+            }
+            $arrClone[0].Id = 'T1A-CLONE-MUTATED'
+            $arrClone[0].Runtime.Id = 'mutated-validator-input'
+            if ((& $script:scriptBlockConvertToCanonicalCatalogJson -Value $arrOriginal) -cne $strOriginal) { throw 'result-clone-input-mutated' }
+        }
+        if ($EmitObservations) { [pscustomobject]@{ Scope = 'result-row-clone'; Id = $hashtableControl.Id; Rows = $arrOriginal.Length; DeepValuesPreserved = $true; IndependentMutation = $true } }
+    }
+}
+
+$script:scriptBlockAssertTerraformResultPairMutants = {
+    param ([object[]]$Expected, [object[]]$Results, [string]$RuntimeId, [switch]$Proof, [switch]$EmitObservations)
+
+    & $script:scriptBlockAssertTerraformResultPairs -Expected $Expected -Results $Results -RuntimeId $RuntimeId -Proof:$Proof
+    foreach ($strMode in @('missing', 'duplicate', 'unknown', 'multiple', 'orphan', 'skip')) {
+        [object[]]$arrChanged = & $script:scriptBlockCopyTerraformResultRows -Results $Results
+        $strReason = switch -Exact ($strMode) {
+            'missing' { $arrChanged = @($arrChanged | Select-Object -Skip 1); 'result-pair-missing' }
+            'duplicate' { $arrChanged += $arrChanged[0]; 'result-pair-duplicate' }
+            'multiple' { $arrChanged += @($arrChanged[0], $arrChanged[0]); 'result-pair-duplicate' }
+            'unknown' { $arrChanged[0].Id = 'T1A-UNKNOWN-99'; 'result-pair-unknown-or-orphan' }
+            'orphan' { $arrChanged[0].Runtime.Id = 'UnknownRuntime'; 'result-pair-unknown-or-orphan' }
+            'skip' { $arrChanged[0].HarnessVerdict = 'skip'; if ($Proof) { 'result-pair-proof-skip' } else { 'result-pair-functional-skip' } }
+        }
+        $strObserved = ''
+        try { & $script:scriptBlockAssertTerraformResultPairs -Expected $Expected -Results $arrChanged -RuntimeId $RuntimeId -Proof:$Proof }
+        catch { $strObserved = $_.Exception.Message }
+        if ($strObserved -cne $strReason) { throw 'result-pair-mutant-not-refused' }
+        if ($EmitObservations) { [pscustomobject]@{ Scope = 'result-pair-mutation'; Mode = $strMode; Proof = [bool]$Proof; Expected = $strReason; Actual = $strObserved; InputRows = $Results.Length } }
+    }
+}
+
+$script:scriptBlockAssertTerraformProofEvidence = {
+    param ([object]$Observation, [string]$Id, [System.Collections.IDictionary]$SourceIdentity)
+
+    try {
+        $scriptBlockInteger = {
+            param ([object]$Value, [long]$Minimum, [long]$Maximum)
+            if (($Value -isnot [int] -and $Value -isnot [long] -and $Value -isnot [uint32]) -or
+                $Value -lt $Minimum -or $Value -gt $Maximum) { throw 'proof-integer-type-or-bound' }
+        }
+        & $scriptBlockInteger -Value $Observation.ActualStatus -Minimum 0 -Maximum 0
+        if ($Observation.Id -cne $Id -or $Observation.ActualStatus -cne 0 -or
+            $Observation.ActualPhase -cne 'harness-proof' -or
+            (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $Observation.SourceIdentity) -cne
+                (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $SourceIdentity)) { throw 'header' }
+        if ($Id -ceq 'T1A-H-01') {
+            & $script:scriptBlockAssertExactPropertyNames -Value $Observation -Names @('Id', 'SemanticCase', 'ActualStatus', 'ActualPhase', 'SourceIdentity', 'SourceCopies', 'Trace', 'ProcessExit', 'ProcessId', 'CandidateState', 'ContextState') -Detail 'h01-observation'
+            if ($Observation.SemanticCase -cne 'harness.resource.bounded-cardinality-enumeration' -or
+                $Observation.ProcessExit -cne 0 -or $Observation.ProcessId -le 0 -or
+                $Observation.CandidateState -cne 'not-applicable' -or $Observation.ContextState -cne 'not-created' -or
+                $Observation.SourceCopies -isnot [System.Array] -or $Observation.SourceCopies.Count -ne 2) { throw 'h01-header' }
+            $objRoles = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+            & $scriptBlockInteger -Value $Observation.ProcessExit -Minimum 0 -Maximum 0
+            & $scriptBlockInteger -Value $Observation.ProcessId -Minimum 1 -Maximum ([int]::MaxValue)
+            foreach ($objCopy in $Observation.SourceCopies) {
+                & $script:scriptBlockAssertExactPropertyNames -Value $objCopy -Names @('Role', 'SourceSha256', 'DerivedSha256', 'MutantSha256', 'Transformation', 'EagerMutantExecuted', 'EagerMutantReason') -Detail 'h01-source-copy'
+                foreach ($strName in @('Role', 'SourceSha256', 'DerivedSha256', 'MutantSha256', 'Transformation', 'EagerMutantReason')) {
+                    if ($objCopy.PSObject.Properties[$strName].Value -isnot [string]) { throw 'h01-copy-string' }
+                }
+                if ($objCopy.Role -cnotin @('helper', 'context') -or -not $objRoles.Add($objCopy.Role) -or
+                    $objCopy.SourceSha256 -cne $SourceIdentity[$objCopy.Role + 'Sha256'] -or
+                    $objCopy.DerivedSha256 -cnotmatch '^[0-9a-f]{64}$' -or $objCopy.MutantSha256 -cnotmatch '^[0-9a-f]{64}$' -or
+                    $objCopy.Transformation -cne 'one-unfiltered-enumerator-call-to-real-delegating-counter-v1' -or
+                    $objCopy.EagerMutantExecuted -isnot [bool] -or $objCopy.EagerMutantExecuted -or
+                    $objCopy.EagerMutantReason -cne 'enumeration-unfiltered-source-shape') { throw 'h01-copy' }
+            }
+            $objTrace = $Observation.Trace
+            & $script:scriptBlockAssertExactPropertyNames -Value $objTrace -Names @('Runtime', 'ParserErrors', 'ProcessId', 'Records') -Detail 'h01-trace'
+            & $scriptBlockInteger -Value $objTrace.ParserErrors -Minimum 0 -Maximum 0
+            & $scriptBlockInteger -Value $objTrace.ProcessId -Minimum 1 -Maximum ([int]::MaxValue)
+            if ($objTrace.Runtime -cne $PSVersionTable.PSVersion.ToString() -or $objTrace.ParserErrors -cne 0 -or
+                $objTrace.ProcessId -ne $Observation.ProcessId -or $objTrace.Records -isnot [System.Array] -or $objTrace.Records.Count -ne 18) { throw 'h01-trace-header' }
+            $objKeys = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+            foreach ($objRecord in $objTrace.Records) {
+                & $script:scriptBlockAssertExactPropertyNames -Value $objRecord -Names @('Role', 'Existing', 'Expected', 'Maximum', 'Advances', 'Disposals', 'Returned') -Detail 'h01-trace-record'
+                foreach ($strName in @('Existing', 'Expected', 'Maximum', 'Advances', 'Disposals', 'Returned')) {
+                    $objValue = $objRecord.PSObject.Properties[$strName].Value
+                    if (($objValue -isnot [int] -and $objValue -isnot [long]) -or $objValue -lt 0 -or $objValue -gt 64) { throw 'h01-counter-type' }
+                }
+                if ($objRecord.Role -cnotin @('helper', 'manager') -or $objRecord.Existing -notin @(0, 3, 12) -or
+                    $objRecord.Expected -notin @(0, 1, 4) -or $objRecord.Maximum -ne ($objRecord.Expected + 1) -or
+                    $objRecord.Advances -gt $objRecord.Maximum -or $objRecord.Disposals -ne 1 -or
+                    $objRecord.Returned -ne [Math]::Min($objRecord.Existing, $objRecord.Maximum) -or
+                    -not $objKeys.Add($objRecord.Role + ':' + $objRecord.Existing + ':' + $objRecord.Expected)) { throw 'h01-bound' }
+            }
+        } elseif ($Id -ceq 'T1A-H-02') {
+            & $script:scriptBlockAssertExactPropertyNames -Value $Observation -Names @('Id', 'SemanticCase', 'ActualStatus', 'ActualPhase', 'SourceIdentity', 'HelperSourceSha256', 'ContextSourceSha256', 'DerivedHelperSha256', 'DerivedContextSha256', 'Transformation', 'Records') -Detail 'h02-observation'
+            foreach ($strName in @('HelperSourceSha256', 'ContextSourceSha256', 'DerivedHelperSha256', 'DerivedContextSha256', 'Transformation')) {
+                if ($Observation.PSObject.Properties[$strName].Value -isnot [string]) { throw 'h02-source-string' }
+            }
+            if ($Observation.SemanticCase -cne 'harness.race.pre-journal-population-retained' -or
+                $Observation.HelperSourceSha256 -cne $SourceIdentity.HelperSha256 -or $Observation.ContextSourceSha256 -cne $SourceIdentity.ContextSha256 -or
+                $Observation.DerivedHelperSha256 -cnotmatch '^[0-9a-f]{64}$' -or
+                $Observation.DerivedContextSha256 -cne $Observation.ContextSourceSha256 -or
+                $Observation.Transformation -cne 'one-candidate-create-anchor-append-ready-release-before-next-statement-v1' -or
+                $Observation.Records -isnot [System.Array] -or $Observation.Records.Count -ne 2) { throw 'h02-header' }
+            $objCases = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+            foreach ($objRecord in $Observation.Records) {
+                & $script:scriptBlockAssertExactPropertyNames -Value $objRecord -Names @('Case', 'ReadyObserved', 'ReleasedAfterWrite', 'WriterProcessId', 'WorkerProcessId', 'WorkerExit', 'Observation') -Detail 'h02-record'
+                & $scriptBlockInteger -Value $objRecord.WorkerExit -Minimum 0 -Maximum 0
+                & $scriptBlockInteger -Value $objRecord.WriterProcessId -Minimum 1 -Maximum ([int]::MaxValue)
+                & $scriptBlockInteger -Value $objRecord.WorkerProcessId -Minimum 1 -Maximum ([int]::MaxValue)
+                if ($objRecord.Case -cnotin @('control', 'perturbation') -or -not $objCases.Add($objRecord.Case) -or
+                    $objRecord.ReadyObserved -isnot [bool] -or -not $objRecord.ReadyObserved -or
+                    $objRecord.ReleasedAfterWrite -isnot [bool] -or $objRecord.ReleasedAfterWrite -ne ($objRecord.Case -ceq 'perturbation') -or
+                    $objRecord.WriterProcessId -eq $objRecord.WorkerProcessId) { throw 'h02-synchronization' }
+                $objValue = $objRecord.Observation
+                & $script:scriptBlockAssertExactPropertyNames -Value $objValue -Names @('Phase', 'Subreason', 'DiagnosticCode', 'SameObjectReturned', 'StateBeforeExplicitCleanup', 'ContextState', 'Cleanup', 'SentinelBytes', 'JournalBeforeExplicitCleanup', 'JournalAfter', 'DownloadSha256', 'RootExists', 'CandidateExists', 'WorkerProcessId', 'CandidatePath', 'ParserErrors') -Detail 'h02-worker'
+                & $scriptBlockInteger -Value $objValue.WorkerProcessId -Minimum 1 -Maximum ([int]::MaxValue)
+                & $scriptBlockInteger -Value $objValue.ParserErrors -Minimum 0 -Maximum 0
+                foreach ($strName in @('Phase', 'Subreason', 'DiagnosticCode', 'StateBeforeExplicitCleanup', 'ContextState', 'DownloadSha256', 'CandidatePath')) {
+                    if ($objValue.PSObject.Properties[$strName].Value -isnot [string]) { throw 'h02-worker-string' }
+                }
+                foreach ($strName in @('SameObjectReturned', 'RootExists', 'CandidateExists')) {
+                    if ($objValue.PSObject.Properties[$strName].Value -isnot [bool]) { throw 'h02-worker-boolean' }
+                }
+                if ($objValue.WorkerProcessId -ne $objRecord.WorkerProcessId -or $objValue.CandidatePath.Length -eq 0 -or
+                    $objValue.DownloadSha256 -cnotmatch '^[0-9a-f]{64}$') { throw 'h02-worker' }
+                $boolControl = $objRecord.Case -ceq 'control'
+                $intRows = if ($boolControl) { 8 } else { 4 }
+                if ($objValue.JournalBeforeExplicitCleanup -isnot [System.Array] -or $objValue.JournalBeforeExplicitCleanup.Count -ne $intRows -or
+                    $objValue.JournalAfter -isnot [System.Array] -or $objValue.JournalAfter.Count -ne $intRows) { throw 'h02-journal-count' }
+                $arrKinds = [string[]]@('InvocationRootDirectory', 'DownloadDirectory', 'CandidateDirectory', 'DownloadFile', 'CandidateFile', 'CandidateFile', 'CandidateFile', 'CandidateFile')
+                $objPaths = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+                for ($intIndex = 0; $intIndex -lt $intRows; $intIndex++) {
+                    $objBefore = $objValue.JournalBeforeExplicitCleanup[$intIndex]
+                    $objAfter = $objValue.JournalAfter[$intIndex]
+                    & $script:scriptBlockAssertExactPropertyNames -Value $objBefore -Names @('Sequence', 'Path', 'Kind', 'EntryState') -Detail 'h02-journal-before'
+                    & $script:scriptBlockAssertExactPropertyNames -Value $objAfter -Names @('Sequence', 'Path', 'Kind', 'EntryState', 'Exists', 'Sha256') -Detail 'h02-journal-after'
+                    & $scriptBlockInteger -Value $objBefore.Sequence -Minimum $intIndex -Maximum $intIndex
+                    & $scriptBlockInteger -Value $objAfter.Sequence -Minimum $intIndex -Maximum $intIndex
+                    foreach ($objEntry in @($objBefore, $objAfter)) {
+                        foreach ($strName in @('Path', 'Kind', 'EntryState')) {
+                            if ($objEntry.PSObject.Properties[$strName].Value -isnot [string]) { throw 'h02-journal-string' }
+                        }
+                    }
+                    if ($objBefore.Path.Length -eq 0 -or -not $objPaths.Add($objBefore.Path) -or
+                        $objAfter.Path -cne $objBefore.Path -or $objBefore.Kind -cne $arrKinds[$intIndex] -or $objAfter.Kind -cne $objBefore.Kind -or
+                        $objAfter.Exists -isnot [bool] -or $objAfter.Exists -eq $boolControl) { throw 'h02-journal-identity-or-existence' }
+                    if ($intIndex -eq 2 -and $objBefore.Path -cne $objValue.CandidatePath) { throw 'h02-candidate-journal-path' }
+                    if ($boolControl) {
+                        if ($objBefore.EntryState -cne 'Created' -or $objAfter.EntryState -cne 'Deleted' -or $null -ne $objAfter.Sha256) { throw 'h02-control-journal' }
+                    } else {
+                        if ($objBefore.EntryState -cne 'RetainedUncertain' -or $objAfter.EntryState -cne 'RetainedUncertain') { throw 'h02-retained-journal' }
+                        if ($intIndex -eq 3) {
+                            if ($objAfter.Sha256 -isnot [string] -or $objAfter.Sha256 -cne $objValue.DownloadSha256) { throw 'h02-retained-download' }
+                        } elseif ($null -ne $objAfter.Sha256) { throw 'h02-directory-hash' }
+                    }
+                }
+                $objCleanup = $objValue.Cleanup
+                & $script:scriptBlockAssertExactPropertyNames -Value $objCleanup -Names @('SchemaVersion', 'ContextScriptVersion', 'InvocationId', 'PreviousState', 'FinalState', 'Success', 'DiagnosticCode', 'FilesystemCallCount', 'RetainedRecordSequences') -Detail 'h02-combined-cleanup'
+                & $scriptBlockInteger -Value $objCleanup.SchemaVersion -Minimum 1 -Maximum 1
+                & $scriptBlockInteger -Value $objCleanup.FilesystemCallCount -Minimum 0 -Maximum ([int]::MaxValue)
+                foreach ($strName in @('ContextScriptVersion', 'InvocationId', 'PreviousState', 'FinalState', 'DiagnosticCode')) {
+                    if ($objCleanup.PSObject.Properties[$strName].Value -isnot [string]) { throw 'h02-cleanup-string' }
+                }
+                if ($objCleanup.ContextScriptVersion -cne $script:strCandidateExpectedContextVersion -or
+                    $objCleanup.InvocationId -cnotmatch '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' -or
+                    $objCleanup.Success -isnot [bool] -or $objCleanup.RetainedRecordSequences -isnot [System.Array]) { throw 'h02-cleanup-shape' }
+                if ($boolControl) {
+                    if ($objValue.Phase -cne 'complete' -or $objValue.Subreason -cne 'none' -or $objValue.DiagnosticCode -cne 'none' -or
+                        -not $objValue.SameObjectReturned -or $objValue.StateBeforeExplicitCleanup -cne 'Active' -or $objValue.ContextState -cne 'Disposed' -or
+                        $null -ne $objValue.SentinelBytes -or $objValue.RootExists -or $objValue.CandidateExists -or
+                        $objCleanup.PreviousState -cne 'Active' -or $objCleanup.FinalState -cne 'Disposed' -or -not $objCleanup.Success -or
+                        $objCleanup.DiagnosticCode -cne 'cleanup-succeeded' -or $objCleanup.FilesystemCallCount -le 0 -or
+                        $objCleanup.RetainedRecordSequences.Count -ne 0) { throw 'h02-control' }
+                } else {
+                    $strSentinel = [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes("h02-competing-sentinel`n"))
+                    if ($objValue.Phase -cne 'destination' -or $objValue.Subreason -cne 'entry-count' -or $objValue.DiagnosticCode -cne 'destination-invalid' -or
+                        $objValue.SameObjectReturned -or $objValue.StateBeforeExplicitCleanup -cne 'CleanupFailed' -or $objValue.ContextState -cne 'CleanupFailed' -or
+                        $objValue.SentinelBytes -isnot [string] -or $objValue.SentinelBytes -cne $strSentinel -or -not $objValue.RootExists -or -not $objValue.CandidateExists -or
+                        $objCleanup.PreviousState -cne 'CleanupFailed' -or $objCleanup.FinalState -cne 'CleanupFailed' -or $objCleanup.Success -or
+                        $objCleanup.DiagnosticCode -cne 'cleanup-terminal-failure' -or $objCleanup.FilesystemCallCount -ne 0 -or
+                        $objCleanup.RetainedRecordSequences.Count -ne 4) { throw 'h02-perturbation' }
+                    for ($intIndex = 0; $intIndex -lt 4; $intIndex++) {
+                        & $scriptBlockInteger -Value $objCleanup.RetainedRecordSequences[$intIndex] -Minimum $intIndex -Maximum $intIndex
+                    }
+                }
+            }
+        } else { throw 'proof-id' }
+    } catch { throw 'proof-evidence-invalid' }
+}
+
+$script:scriptBlockAssertTerraformProofEvidenceMutants = {
+    param ([object]$Observation, [string]$Id, [System.Collections.IDictionary]$SourceIdentity)
+
+    & $script:scriptBlockAssertTerraformProofEvidence -Observation $Observation -Id $Id -SourceIdentity $SourceIdentity
+    $arrModes = if ($Id -ceq 'T1A-H-01') {
+        @('missing-copies', 'copy-hash', 'executed-mutant', 'missing-counter', 'exceeded-bound', 'duplicate-trace', 'parser-error', 'source-identity', 'status-string', 'parser-string', 'pid-string')
+    } elseif ($Id -ceq 'T1A-H-02') {
+        @('missing-record', 'missing-sync', 'same-process', 'missing-state', 'sentinel-changed', 'sentinel-deleted', 'parser-error', 'source-identity', 'status-string', 'parser-string', 'pid-string', 'context-copy-changed', 'removed-path-type',
+            'same-object', 'control-state', 'control-rows', 'control-root', 'retained-state', 'retained-existence', 'download-hash', 'cleanup-state', 'cleanup-diagnostic', 'cleanup-fs', 'retained-sequence', 'boolean-string', 'extra-observation')
+    } else { throw 'proof-id' }
+    $intRefused = 0
+    foreach ($strMode in $arrModes) {
+        $objChanged = $Observation | ConvertTo-Json -Depth 30 -Compress | ConvertFrom-Json
+        switch -Exact ($strMode) {
+            'missing-copies' { $objChanged.PSObject.Properties.Remove('SourceCopies') }
+            'copy-hash' { $objChanged.SourceCopies[0].SourceSha256 = '0' * 64 }
+            'executed-mutant' { $objChanged.SourceCopies[0].EagerMutantExecuted = $true }
+            'missing-counter' { $objChanged.Trace.Records[0].PSObject.Properties.Remove('Advances') }
+            'exceeded-bound' { $objChanged.Trace.Records[0].Advances = 64 }
+            'duplicate-trace' { $objChanged.Trace.Records[1] = $objChanged.Trace.Records[0] }
+            'parser-error' { if ($Id -ceq 'T1A-H-01') { $objChanged.Trace.ParserErrors = 1 } else { $objChanged.Records[1].Observation.ParserErrors = 1 } }
+            'missing-record' { $objChanged.Records = @($objChanged.Records[0]) }
+            'missing-sync' { $objChanged.Records[1].PSObject.Properties.Remove('ReadyObserved') }
+            'same-process' { $objChanged.Records[1].WriterProcessId = $objChanged.Records[1].WorkerProcessId }
+            'missing-state' { $objChanged.Records[1].Observation.PSObject.Properties.Remove('ContextState') }
+            'sentinel-changed' { $objChanged.Records[1].Observation.SentinelBytes = 'YQ==' }
+            'sentinel-deleted' { $objChanged.Records[1].Observation.SentinelBytes = $null }
+            'context-copy-changed' { $objChanged.DerivedContextSha256 = '0' * 64 }
+            'removed-path-type' { $objChanged.Records[0].Observation.JournalAfter[0].Path = 42 }
+            'same-object' { $objChanged.Records[0].Observation.SameObjectReturned = $false }
+            'control-state' { $objChanged.Records[0].Observation.StateBeforeExplicitCleanup = 'Disposed' }
+            'control-rows' { $objChanged.Records[0].Observation.JournalBeforeExplicitCleanup = @($objChanged.Records[0].Observation.JournalBeforeExplicitCleanup | Select-Object -Skip 1) }
+            'control-root' { $objChanged.Records[0].Observation.RootExists = $true }
+            'retained-state' { $objChanged.Records[1].Observation.JournalAfter[2].EntryState = 'Deleted' }
+            'retained-existence' { $objChanged.Records[1].Observation.JournalAfter[3].Exists = $false }
+            'download-hash' { $objChanged.Records[1].Observation.JournalAfter[3].Sha256 = '0' * 64 }
+            'cleanup-state' { $objChanged.Records[1].Observation.Cleanup.FinalState = 'Disposed' }
+            'cleanup-diagnostic' { $objChanged.Records[1].Observation.Cleanup.DiagnosticCode = 'cleanup-succeeded' }
+            'cleanup-fs' { $objChanged.Records[1].Observation.Cleanup.FilesystemCallCount = 1 }
+            'retained-sequence' { $objChanged.Records[1].Observation.Cleanup.RetainedRecordSequences[3] = 2 }
+            'boolean-string' { $objChanged.Records[1].Observation.CandidateExists = 'True' }
+            'extra-observation' { Add-Member -InputObject $objChanged.Records[1].Observation -NotePropertyName Unexpected -NotePropertyValue $true }
+            'source-identity' { $objChanged.SourceIdentity.HelperSha256 = '0' * 64 }
+            'status-string' { $objChanged.ActualStatus = '0' }
+            'parser-string' { if ($Id -ceq 'T1A-H-01') { $objChanged.Trace.ParserErrors = '0' } else { $objChanged.Records[1].Observation.ParserErrors = '0' } }
+            'pid-string' { if ($Id -ceq 'T1A-H-01') { $objChanged.ProcessId = [string]$objChanged.ProcessId } else { $objChanged.Records[1].WorkerProcessId = [string]$objChanged.Records[1].WorkerProcessId } }
+        }
+        $strObserved = ''
+        try { & $script:scriptBlockAssertTerraformProofEvidence -Observation $objChanged -Id $Id -SourceIdentity $SourceIdentity }
+        catch { $strObserved = $_.Exception.Message }
+        if ($strObserved -cne 'proof-evidence-invalid') { throw 'proof-evidence-mutant-not-refused' }
+        $intRefused++
+    }
+    return [pscustomobject]@{ ProofId = $Id; PositiveControlPassed = $true; MutantsRefused = $intRefused }
+}
+
+$script:scriptBlockNewTerraformProofResult = {
+    param ([object]$Row, [object]$Observation, [System.Collections.IDictionary]$Runtime, [System.Collections.IDictionary]$SourceIdentity)
+
+    & $script:scriptBlockAssertTerraformProofEvidence -Observation $Observation -Id $Row.Id -SourceIdentity $SourceIdentity
+    if ($Observation.Id -cne $Row.Id -or $Observation.SemanticCase -cne $Row.SemanticCase -or
+        $Observation.ActualStatus -ne 0 -or $Observation.ActualPhase -cne 'harness-proof') { throw 'proof-result-observation' }
+    $hashtableResult = [ordered]@{}
+    foreach ($strField in @('Id', 'SemanticCase', 'Applicability', 'ProductionBoundary', 'Control', 'Perturbation', 'ExpectedStatus', 'ExpectedPhase', 'ExpectedPostcondition')) {
+        $hashtableResult[$strField] = $Row.PSObject.Properties[$strField].Value
+    }
+    $hashtableResult.Runtime = [pscustomobject]$Runtime
+    $hashtableResult.ActualStatus = $Observation.ActualStatus
+    $hashtableResult.ActualPhase = $Observation.ActualPhase
+    $hashtableResult.SourceIdentity = [pscustomobject]$Observation.SourceIdentity
+    if ($Row.Id -ceq 'T1A-H-01') {
+        $hashtableResult.SourceCopies = $Observation.SourceCopies
+        $hashtableResult.Trace = $Observation.Trace
+        $hashtableResult.ProcessExit = $Observation.ProcessExit
+        $hashtableResult.ProcessId = $Observation.ProcessId
+        $hashtableResult.ActualCandidateState = $Observation.CandidateState
+        $hashtableResult.ActualContextState = $Observation.ContextState
+    } elseif ($Row.Id -ceq 'T1A-H-02') {
+        foreach ($strField in @('HelperSourceSha256', 'ContextSourceSha256', 'DerivedHelperSha256', 'DerivedContextSha256', 'Transformation')) {
+            $hashtableResult[$strField] = $Observation.PSObject.Properties[$strField].Value
+        }
+        $hashtableResult.Records = $Observation.Records
+    } else { throw 'proof-id' }
+    $hashtableResult.HarnessVerdict = 'pass'
+    return [pscustomobject]$hashtableResult
+}
+
+$script:scriptBlockStartTerraformProofProcess = {
+    param ([string]$ScriptPath, [string]$WorkingDirectory, [string[]]$Arguments)
+
+    $strExecutableName = if ($PSVersionTable.PSEdition -ceq 'Desktop') { 'powershell.exe' }
+        elseif ($script:boolCandidateIsWindows) { 'pwsh.exe' } else { 'pwsh' }
+    $strExecutable = [System.IO.Path]::Combine($PSHOME, $strExecutableName)
+    $objAttributes = [System.IO.File]::GetAttributes($strExecutable)
+    if (($objAttributes -band ([System.IO.FileAttributes]::Directory -bor
+                [System.IO.FileAttributes]::ReparsePoint)) -ne 0) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'proof-runtime-type'
+    }
+    $objStart = New-Object System.Diagnostics.ProcessStartInfo
+    $objStart.FileName = $strExecutable
+    $objStart.WorkingDirectory = $WorkingDirectory
+    $objStart.UseShellExecute = $false
+    $objStart.CreateNoWindow = $true
+    $objStart.RedirectStandardInput = $true
+    $objStart.RedirectStandardOutput = $true
+    $objStart.RedirectStandardError = $true
+    $arrArguments = [string[]]@('-NoProfile', '-NonInteractive', '-File', $ScriptPath) + $Arguments
+    if ($null -ne $objStart.PSObject.Properties['ArgumentList']) {
+        foreach ($strArgument in $arrArguments) { [void]$objStart.ArgumentList.Add($strArgument) }
+    } else {
+        $objStart.Arguments = & $script:scriptBlockConvertToNativeArgumentString -ArgumentList $arrArguments
+    }
+    $objProcess = New-Object System.Diagnostics.Process
+    $objProcess.StartInfo = $objStart
+    if (-not $objProcess.Start()) {
+        $objProcess.Dispose()
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'proof-process-start'
+    }
+    $objProcess.StandardInput.Close()
+    $arrBuffers = [object[]]@((New-Object byte[] 4096), (New-Object byte[] 4096))
+    $arrStreams = [object[]]@($objProcess.StandardOutput.BaseStream, $objProcess.StandardError.BaseStream)
+    $arrTasks = [object[]]@(
+        $arrStreams[0].ReadAsync($arrBuffers[0], 0, 4096),
+        $arrStreams[1].ReadAsync($arrBuffers[1], 0, 4096)
+    )
+    return @{
+        Process = $objProcess; Buffers = $arrBuffers; Streams = $arrStreams; Tasks = $arrTasks
+        Counts = [int[]]@(0, 0); Complete = [bool[]]@($false, $false)
+        Captured = [object[]]@((New-Object System.IO.MemoryStream), (New-Object System.IO.MemoryStream))
+        Watch = [System.Diagnostics.Stopwatch]::StartNew()
+    }
+}
+
+$script:scriptBlockReceiveTerraformProofProcess = {
+    param ([System.Collections.IDictionary]$Worker)
+
+    if ($Worker.Watch.Elapsed.TotalSeconds -gt 90) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'proof-process-timeout'
+    }
+    for ($intIndex = 0; $intIndex -lt 2; $intIndex++) {
+        if ($Worker.Complete[$intIndex] -or -not $Worker.Tasks[$intIndex].IsCompleted) { continue }
+        $intRead = $Worker.Tasks[$intIndex].GetAwaiter().GetResult()
+        if ($intRead -eq 0) { $Worker.Complete[$intIndex] = $true; continue }
+        if ($intRead -gt 65536 - $Worker.Counts[$intIndex]) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'proof-process-output-bound'
+        }
+        $Worker.Counts[$intIndex] += $intRead
+        $Worker.Captured[$intIndex].Write($Worker.Buffers[$intIndex], 0, $intRead)
+        $Worker.Tasks[$intIndex] = $Worker.Streams[$intIndex].ReadAsync($Worker.Buffers[$intIndex], 0, 4096)
+    }
+    return $Worker.Process.HasExited -and $Worker.Complete[0] -and $Worker.Complete[1]
+}
+
+$script:scriptBlockStopTerraformProofProcess = {
+    param ([System.Collections.IDictionary]$Worker)
+
+    if ($null -eq $Worker) { return }
+    try {
+        if (-not $Worker.Process.HasExited) { $Worker.Process.Kill() }
+        if (-not $Worker.Process.WaitForExit(10000)) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'proof-process-did-not-exit'
+        }
+    } finally {
+        foreach ($objStream in $Worker.Captured) { $objStream.Dispose() }
+        $Worker.Process.Dispose()
+    }
+}
+
+$script:scriptBlockReadTerraformProofResult = {
+    param ([string]$LiteralPath)
+
+    $objEvidence = & $script:scriptBlockGetFileEvidence -LiteralPath $LiteralPath
+    if ($objEvidence.Length -gt 65536) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'proof-result-bound'
+    }
+    $strJson = [System.IO.File]::ReadAllText($LiteralPath)
+    # Desktop emits the root array as one object; Core normally enumerates it.
+    # Capture the original root shape, then emit exactly one level ourselves.
+    $objRoot = if ($PSVersionTable.PSVersion.Major -ge 7) {
+        ConvertFrom-Json -InputObject $strJson -NoEnumerate -ErrorAction Stop
+    } else {
+        ConvertFrom-Json -InputObject $strJson -ErrorAction Stop
+    }
+    if ($objRoot -is [array]) {
+        foreach ($objItem in $objRoot) {
+            , $objItem
+        }
+    } elseif ($null -ne $objRoot) {
+        $objRoot
+    }
+}
+
+$script:scriptBlockAddTerraformDerivedFixtureState = {
+    param ([string]$Source, [ValidateSet('helper', 'context')][string]$Role)
+
+    # Only disposable derived test copies receive this private state. Its
+    # creation precedes manager GetNewClosure captures, so all hooks and the
+    # worker share one explicit reference without a global variable.
+    $strNewline = if ($Source.Contains("`r`n")) { "`r`n" } else { "`n" }
+    $strMarker = if ($Role -ceq 'helper') { '$scriptBlockCandidateModuleDefinition = {' }
+        else { '$scriptBlockContextModuleDefinition = {' }
+    if ($Source.Contains('$script:hashtableTask184FixtureState = @{}') -or
+        $Source.Contains('$hashtableTask184FixtureState = @{}') -or
+        $Source.Split([string[]]@($strMarker), [StringSplitOptions]::None).Count -ne 2) { throw 'fixture-state-transform-cardinality' }
+    $strAssignment = if ($Role -ceq 'helper') { '    $script:hashtableTask184FixtureState = @{}' }
+        else { '    $hashtableTask184FixtureState = @{}' }
+    return $Source.Replace($strMarker, $strMarker + $strNewline + $strAssignment)
+}
+
+$script:scriptBlockGetTerraformDerivedFixtureState = {
+    param ([string]$Roles, [ValidateSet('helper', 'context')][string]$Role)
+
+    $strFile = if ($Role -ceq 'helper') { 'Expand-StyleGuideCandidateArtifact.ps1' } else { 'Manage-StyleGuideCandidateInvocationContext.ps1' }
+    $strName = if ($Role -ceq 'helper') { 'PSStyleGuideCandidateArtifact_1_0_20260926_0' } else { 'PSStyleGuideCandidateContext_1_0_20260926_0' }
+    $strVariable = if ($Role -ceq 'helper') { 'scriptBlockCandidateModuleDefinition' } else { 'scriptBlockContextModuleDefinition' }
+    $arrErrors = $null
+    $objAst = [Management.Automation.Language.Parser]::ParseFile([IO.Path]::Combine($Roles, $strFile), [ref]$null, [ref]$arrErrors)
+    if ($arrErrors.Count -ne 0) { throw 'fixture-state-source-parse' }
+    $arrDefinitions = @($objAst.FindAll({ param ($Node)
+        $Node -is [Management.Automation.Language.AssignmentStatementAst] -and
+        $Node.Left -is [Management.Automation.Language.VariableExpressionAst] -and
+        $Node.Left.VariablePath.UserPath -ceq $strVariable
+    }, $true))
+    if ($arrDefinitions.Count -ne 1) { throw 'fixture-state-definition' }
+    $arrLiterals = @($arrDefinitions[0].Right.FindAll({ param ($Node)
+        $Node -is [Management.Automation.Language.ScriptBlockExpressionAst]
+    }, $false))
+    $arrModules = @(Microsoft.PowerShell.Core\Get-Module -Name $strName -All)
+    if ($arrLiterals.Count -ne 1 -or $arrModules.Count -ne 1 -or
+        $arrModules[0].Definition -cne $arrLiterals[0].ScriptBlock.Extent.Text) { throw 'fixture-state-module-identity' }
+    $objState = & $arrModules[0] { $hashtableTask184FixtureState }
+    if ($objState -isnot [hashtable]) { throw 'fixture-state-reference' }
+    return $objState
+}
+
+$script:scriptBlockTerraformPartialContextWorker = {
+    param ([string]$Roles, [string]$FixtureRoot)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    . ([System.IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))
+    $hashtableTask184FixtureState = & $script:scriptBlockGetTerraformDerivedFixtureState -Roles $Roles -Role context
+    $hashtableTask184FixtureState.Fail = $false
+    $objControl = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $FixtureRoot
+    $objControlCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objControl
+    if ($objControl.LifecycleState -cne 'Disposed' -or -not $objControlCleanup.Success -or $objControlCleanup.FilesystemCallCount -ne 9) { throw 'partial-context-public-control' }
+    $hashtableTask184FixtureState.Observed = @{}
+    $hashtableTask184FixtureState.Fail = $true
+    $objPublic = $null
+    $objCreationError = $null
+    try { $objPublic = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $FixtureRoot }
+    catch { $objCreationError = $_ }
+    $hashtableObserved = $hashtableTask184FixtureState.Observed
+    if ($null -ne $objPublic -or $null -eq $objCreationError -or
+        $objCreationError.Exception.Data['PSStyleGuideDiagnosticCode'] -cne 'context-create-composite-failure' -or
+        -not $hashtableObserved.CleanupSuccess -or $hashtableObserved.PreviousState -cne 'Active' -or
+        $hashtableObserved.FinalState -cne 'Disposed' -or $hashtableObserved.DiagnosticCode -cne 'cleanup-succeeded' -or
+        $hashtableObserved.RootRecordAfter -cne 'Deleted' -or $hashtableObserved.DownloadRecordAfter -cne 'ExpectedAbsent' -or
+        -not $hashtableObserved.Deregistered -or [System.IO.Directory]::Exists($hashtableObserved.RootPath) -or
+        [System.IO.File]::Exists($hashtableObserved.CandidatePath) -or [System.IO.Directory]::Exists($hashtableObserved.CandidatePath) -or
+        [System.IO.File]::Exists($hashtableObserved.DownloadPath) -or [System.IO.Directory]::Exists($hashtableObserved.DownloadPath)) { throw 'partial-context-rollback-outcome' }
+    $objResult = [pscustomobject]@{
+        ActualInitialState = $hashtableObserved.InitialState
+        ActualContextState = $hashtableObserved.FinalState
+        SourceCleanupCode = $hashtableObserved.DiagnosticCode
+        CleanupSuccess = $hashtableObserved.CleanupSuccess
+        PublicContextIssued = $null -ne $objPublic
+        OuterCreationRejected = $null -ne $objCreationError
+        Deregistered = $hashtableObserved.Deregistered
+        JournalCount = $hashtableObserved.JournalCount
+        CreatedRecordCount = $hashtableObserved.CreatedRecordCount
+        FilesystemCallCount = $hashtableObserved.FilesystemCallCount
+        RemovedCount = [int]($hashtableObserved.RootRecordAfter -ceq 'Deleted')
+        ReservedEntriesAbsent = $true
+        NoContentionControlPassed = $objControl.LifecycleState -ceq 'Disposed'
+    }
+    [System.IO.File]::WriteAllText([System.IO.Path]::Combine($FixtureRoot, 'result.json'),
+        (ConvertTo-Json -InputObject $objResult -Depth 5 -Compress), (New-Object System.Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockInvokeTerraformPartialContextCase = {
+    param ([object]$Case, [string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath)
+
+    if ($Case.SemanticVariant -cne 't1a-c-07') { throw 'partial-context-case-id' }
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    $hashtableWorker = $null
+    try {
+        $arrSource = [System.IO.File]::ReadAllBytes($ContextLiteralPath)
+        $objHasher = [System.Security.Cryptography.SHA256]::Create()
+        try { $strSourceHash = [System.BitConverter]::ToString($objHasher.ComputeHash($arrSource)).Replace('-', '').ToLowerInvariant() }
+        finally { $objHasher.Dispose() }
+        $strSource = (New-Object System.Text.UTF8Encoding($false, $true)).GetString($arrSource)
+        $strCreate = '$null = [System.IO.Directory]::CreateDirectory($strDownloadDirectory)'
+        $strRemove = '$objCleanupResult = & $scriptBlockRemoveContextFunction -Context $objContext'
+        $strDeregister = '& $scriptBlockDeregisterCandidateContext -Context $objContext'
+        foreach ($strMarker in @($strCreate, $strRemove)) {
+            if ([regex]::Matches($strSource, [regex]::Escape($strMarker)).Count -ne 1) { throw 'partial-context-transform-cardinality' }
+        }
+        # Two deregistration sites exist. Only the first, following genuine
+        # filesystem rollback, is the bounded target of this observation.
+        $intDeregister = $strSource.IndexOf($strDeregister, $strSource.IndexOf($strRemove), [System.StringComparison]::Ordinal)
+        if ($intDeregister -lt 0) { throw 'partial-context-deregister-anchor' }
+        $strAfterDeregister = @'
+
+if ($hashtableTask184FixtureState.Fail) {
+    $hashtableTask184FixtureState.Observed.Deregistered = (& $scriptBlockCandidateContextIssuedIndex -Context $objContext) -eq -1
+}
+'@
+        $strDerived = $strSource.Insert($intDeregister + $strDeregister.Length, $strAfterDeregister)
+        $strBeforeCreate = @'
+if ($hashtableTask184FixtureState.Fail) {
+    if ($objContext.LifecycleState -cne 'Active' -or $objContext.OwnershipJournal.Count -ne 3 -or
+        $objContext.OwnershipJournal[0].EntryState -cne 'Created' -or
+        $objContext.OwnershipJournal[1].EntryState -cne 'ExpectedAbsent' -or
+        $objContext.OwnershipJournal[2].EntryState -cne 'ExpectedAbsent' -or
+        $arrClaimEntries.Count -ne 0) { throw 'partial-context-genuine-journal' }
+    $hashtableTask184FixtureState.Observed.InitialState = $objContext.LifecycleState
+    $hashtableTask184FixtureState.Observed.RootPath = $objContext.InvocationRootPath
+    $hashtableTask184FixtureState.Observed.DownloadPath = $objContext.DownloadDirectoryPath
+    $hashtableTask184FixtureState.Observed.CandidatePath = $objContext.CandidatePath
+    $hashtableTask184FixtureState.Observed.JournalCount = $objContext.OwnershipJournal.Count
+    $hashtableTask184FixtureState.Observed.CreatedRecordCount = @($objContext.OwnershipJournal | Where-Object EntryState -CEQ 'Created').Count
+    throw 'partial-context-controlled-before-download-create'
+}
+'@
+        $strDerived = $strDerived.Replace($strCreate, $strBeforeCreate + "`n" + $strCreate)
+        $strAfterRemove = @'
+
+if ($hashtableTask184FixtureState.Fail) {
+    $hashtableTask184FixtureState.Observed.FilesystemCallCount = $objCleanupResult.FilesystemCallCount
+    $hashtableTask184FixtureState.Observed.CleanupSuccess = $objCleanupResult.Success
+    $hashtableTask184FixtureState.Observed.PreviousState = $objCleanupResult.PreviousState
+    $hashtableTask184FixtureState.Observed.FinalState = $objCleanupResult.FinalState
+    $hashtableTask184FixtureState.Observed.DiagnosticCode = $objCleanupResult.DiagnosticCode
+    $hashtableTask184FixtureState.Observed.RootRecordAfter = $objContext.OwnershipJournal[0].EntryState
+    $hashtableTask184FixtureState.Observed.DownloadRecordAfter = $objContext.OwnershipJournal[1].EntryState
+}
+'@
+        $strDerived = $strDerived.Replace($strRemove, $strRemove + $strAfterRemove)
+        $strDerived = & $script:scriptBlockAddTerraformDerivedFixtureState -Source $strDerived -Role context
+        $arrParseErrors = $null
+        [void][System.Management.Automation.Language.Parser]::ParseInput($strDerived, [ref]$null, [ref]$arrParseErrors)
+        if ($arrParseErrors.Count -ne 0) { throw 'partial-context-derived-parse' }
+        $arrDerived = (New-Object System.Text.UTF8Encoding($false, $true)).GetBytes($strDerived)
+        $objHasher = [System.Security.Cryptography.SHA256]::Create()
+        try { $strDerivedHash = [System.BitConverter]::ToString($objHasher.ComputeHash($arrDerived)).Replace('-', '').ToLowerInvariant() }
+        finally { $objHasher.Dispose() }
+        if ($strDerivedHash -ceq $strSourceHash) { throw 'partial-context-source-unchanged' }
+        $strRoles = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'roles')
+        [void][System.IO.Directory]::CreateDirectory($strRoles)
+        [System.IO.File]::WriteAllBytes([System.IO.Path]::Combine($strRoles, 'Manage-StyleGuideCandidateInvocationContext.ps1'), $arrDerived)
+        [System.IO.File]::WriteAllBytes([System.IO.Path]::Combine($strRoles, 'Expand-StyleGuideCandidateArtifact.ps1'), [System.IO.File]::ReadAllBytes($HelperLiteralPath))
+        $strWorkerPath = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'worker.ps1')
+        $strWorkerSource = "param ([string]`$Roles, [string]`$FixtureRoot)`n" +
+            '$script:scriptBlockGetTerraformDerivedFixtureState = {' + $script:scriptBlockGetTerraformDerivedFixtureState.ToString() + "}`n" +
+            '& {' + $script:scriptBlockTerraformPartialContextWorker.ToString() + '} -Roles $Roles -FixtureRoot $FixtureRoot'
+        [System.IO.File]::WriteAllText($strWorkerPath, $strWorkerSource, (New-Object System.Text.UTF8Encoding($false)))
+        $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath -WorkingDirectory $hashtableLayout.CaseRoot `
+            -Arguments @('-Roles', $strRoles, '-FixtureRoot', $hashtableLayout.Trusted)
+        while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [System.Threading.Thread]::Sleep(10) }
+        if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'partial-context-worker-failed' }
+        $objObserved = & $script:scriptBlockReadTerraformProofResult -LiteralPath ([System.IO.Path]::Combine($hashtableLayout.Trusted, 'result.json'))
+        if (-not $objObserved.CleanupSuccess -or $objObserved.PublicContextIssued -or -not $objObserved.OuterCreationRejected -or
+            -not $objObserved.Deregistered -or $objObserved.CreatedRecordCount -ne 1 -or $objObserved.RemovedCount -ne 1 -or
+            $objObserved.ActualContextState -cne 'Disposed' -or -not $objObserved.ReservedEntriesAbsent -or -not $objObserved.NoContentionControlPassed) { throw 'partial-context-observation' }
+        $objObservation = & $script:scriptBlockNewObservation
+        $objObservation.Result = 'success'
+        $objObservation.Status = 'succeeded'
+        $objObservation.Phase = 'cleanup'
+        $objObservation.Subreason = 'partial-creation-rollback'
+        $objObservation.DiagnosticCode = [string]$objObserved.SourceCleanupCode
+        $objObservation.PreCleanupState = [string]$objObserved.ActualInitialState
+        $objObservation.CandidateFinalState = 'Absent'
+        $objObservation.ContextFinalState = [string]$objObserved.ActualContextState
+        $objObservation.CleanupSequence = 'context'
+        $objObservation.FilesystemCallCount = [uint32]$objObserved.FilesystemCallCount
+        return $objObservation
+
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockInitializeTerraformWorkerCompression = {
+    foreach ($strCompressionAssembly in @(
+        'System.IO.Compression',
+        'System.IO.Compression.FileSystem'
+    )) {
+        try {
+            Add-Type -AssemblyName $strCompressionAssembly -ErrorAction Stop
+        } catch {
+            # A loader refusal is tolerated only when every required type resolves.
+            $null = $_
+        }
+    }
+    foreach ($strCompressionType in @(
+        'System.IO.Compression.ZipFile',
+        'System.IO.Compression.ZipArchive',
+        'System.IO.Compression.ZipArchiveMode'
+    )) {
+        if ($null -eq ($strCompressionType -as [type])) {
+            throw 'compression-type-unavailable'
+        }
+    }
+}
+
+$script:scriptBlockTerraformMissingArchiveWorker = {
+    param ([string]$Roles, [string]$FixtureRoot, [ValidateSet('control', 'missing')][string]$Mode)
+
+    Set-StrictMode -Version Latest
+    $ErrorActionPreference = 'Stop'
+    . ([System.IO.Path]::Combine($Roles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))
+    $strHelper = [System.IO.Path]::Combine($Roles, 'Expand-StyleGuideCandidateArtifact.ps1')
+    $listResults = New-Object 'System.Collections.Generic.List[pscustomobject]'
+    foreach ($boolMissing in @($Mode -ceq 'missing')) {
+        $strRoot = [System.IO.Path]::Combine($FixtureRoot, [string]$boolMissing)
+        $strCheckout = [System.IO.Path]::Combine($strRoot, 'checkout')
+        $strTrusted = [System.IO.Path]::Combine($strRoot, 'trusted')
+        [void][System.IO.Directory]::CreateDirectory($strCheckout)
+        [void][System.IO.Directory]::CreateDirectory($strTrusted)
+        $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strTrusted
+        $strArchive = [System.IO.Path]::Combine($objContext.DownloadDirectoryPath, 'artifact.zip')
+        $objZip = [System.IO.Compression.ZipFile]::Open($strArchive, [System.IO.Compression.ZipArchiveMode]::Create)
+        try {
+            foreach ($strName in @('copilot-instructions.md', 'powershell.instructions.md', 'STYLE_GUIDE_CHAT.md', 'STYLE_GUIDE_FULL.md')) {
+                $objStream = $objZip.CreateEntry($strName).Open()
+                try {
+                    $arrBytes = [System.Text.Encoding]::UTF8.GetBytes("fixture`n")
+                    $objStream.Write($arrBytes, 0, $arrBytes.Length)
+                } finally { $objStream.Dispose() }
+            }
+        } finally { $objZip.Dispose() }
+        $strDigest = (Microsoft.PowerShell.Utility\Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash
+        $strHelper = [System.IO.Path]::Combine($Roles, $(if ($boolMissing) { 'Expand-StyleGuideCandidateArtifact.ps1' } else { 'control.ps1' }))
+        $objFailure = $null
+        $objResult = $null
+        try {
+            $objResult = & $strHelper -Context $objContext -CheckoutRoot $strCheckout -TrustedTemporaryRoot $strTrusted `
+                -DownloadDirectory $objContext.DownloadDirectoryPath -CandidateDirectory $objContext.CandidatePath -ExpectedDigest $strDigest
+        } catch { $objFailure = $_ }
+        $strCapture = [System.IO.Path]::Combine($Roles, 'retained-archive-proof.txt')
+        if ($boolMissing) {
+            if ($null -eq $objFailure -or -not [System.IO.File]::Exists($strCapture) -or
+                [System.IO.File]::ReadAllText($strCapture) -cne $strArchive -or
+                $objFailure.Exception.Data['PSStyleGuidePhase'] -cne 'download' -or
+                $objFailure.Exception.Data['PSStyleGuideSubreason'] -cne 'file-metadata' -or
+                $objFailure.Exception.Data['PSStyleGuideDiagnosticCode'] -cne 'download-invalid' -or
+                $objFailure.Exception.Data['PSStyleGuideCleanupCode'] -cne 'cleanup-succeeded' -or
+                $objContext.LifecycleState -cne 'Disposed' -or
+                @($objContext.OwnershipJournal | Where-Object Kind -CEQ 'CandidateFile').Count -ne 0 -or
+                @($objContext.OwnershipJournal | Where-Object Kind -CEQ 'DownloadFile').Count -ne 0) {
+                throw 'missing-archive-refusal-or-ownership'
+            }
+        } else {
+            if ($null -ne $objFailure -or -not [object]::ReferenceEquals($objResult, $objContext) -or
+                [System.IO.File]::Exists($strCapture) -or
+                @([System.IO.Directory]::EnumerateFiles($objContext.CandidatePath)).Count -ne 4) {
+                throw 'missing-archive-valid-control'
+            }
+            $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            if (-not $objCleanup.Success) { throw 'missing-archive-control-cleanup' }
+        }
+        if ($objContext.LifecycleState -cne 'Disposed' -or
+            [System.IO.Directory]::Exists($objContext.InvocationRootPath) -or
+            [System.IO.File]::Exists($strArchive)) { throw 'missing-archive-cleanup' }
+        $listResults.Add([pscustomobject]@{
+            Missing = $boolMissing
+            ContextState = $objContext.LifecycleState
+            Phase = if ($null -eq $objFailure) { 'none' } else { [string]$objFailure.Exception.Data['PSStyleGuidePhase'] }
+            Subreason = if ($null -eq $objFailure) { 'none' } else { [string]$objFailure.Exception.Data['PSStyleGuideSubreason'] }
+            Code = if ($null -eq $objFailure) { 'none' } else { [string]$objFailure.Exception.Data['PSStyleGuideDiagnosticCode'] }
+            RetainedArchiveCaptured = [System.IO.File]::Exists($strCapture)
+        })
+    }
+    [System.IO.File]::WriteAllText([System.IO.Path]::Combine($FixtureRoot, 'result.json'),
+        (ConvertTo-Json -InputObject $listResults.ToArray() -Depth 6 -Compress), (New-Object System.Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockInvokeTerraformMissingArchiveCase = {
+    param ([object]$Case, [string]$RunRoot, [string]$HelperLiteralPath, [string]$ContextLiteralPath)
+
+    if ($Case.SemanticVariant -cne 't1a-e-20') { throw 'missing-archive-case-id' }
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    $hashtableWorker = $null
+    try {
+        $arrSource = [System.IO.File]::ReadAllBytes($HelperLiteralPath)
+        $objHasher = [System.Security.Cryptography.SHA256]::Create()
+        try { $strSourceHash = [System.BitConverter]::ToString($objHasher.ComputeHash($arrSource)).Replace('-', '').ToLowerInvariant() }
+        finally { $objHasher.Dispose() }
+        $strSource = (New-Object System.Text.UTF8Encoding($false, $true)).GetString($arrSource)
+        $strMarker = '$uintArchiveMetadataLength = & $script:scriptBlockAssertCandidateHelperOrdinaryFileMetadata `'
+        if ([regex]::Matches($strSource, [regex]::Escape($strMarker)).Count -ne 1) { throw 'missing-archive-transform-cardinality' }
+        $strRoles = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'roles')
+        $strCaptureLiteral = "'" + [System.IO.Path]::Combine($strRoles, 'retained-archive-proof.txt').Replace("'", "''") + "'"
+        $strHook = @(
+            'if ($arrDownloadEntries.Count -ne 1 -or $strArchivePath -cne $arrDownloadEntries[0]) { throw ''missing-archive-retained-capture'' }'
+            ('[System.IO.File]::WriteAllText(' + $strCaptureLiteral + ', $strArchivePath, (New-Object System.Text.UTF8Encoding($false)))')
+            '[System.IO.File]::Delete($strArchivePath)'
+        ) -join "`n"
+        $strDerived = $strSource.Replace($strMarker, $strHook + "`n" + $strMarker)
+        if ([regex]::Matches($strDerived, [regex]::Escape($strHook)).Count -ne 1 -or
+            $strDerived.Replace($strHook + "`n", '') -cne $strSource) { throw 'missing-archive-reverse-transform' }
+        $arrParseErrors = $null
+        [void][System.Management.Automation.Language.Parser]::ParseInput($strDerived, [ref]$null, [ref]$arrParseErrors)
+        if ($arrParseErrors.Count -ne 0) { throw 'missing-archive-derived-parse' }
+        $arrDerived = (New-Object System.Text.UTF8Encoding($false, $true)).GetBytes($strDerived)
+        $objHasher = [System.Security.Cryptography.SHA256]::Create()
+        try { $strDerivedHash = [System.BitConverter]::ToString($objHasher.ComputeHash($arrDerived)).Replace('-', '').ToLowerInvariant() }
+        finally { $objHasher.Dispose() }
+        [void][System.IO.Directory]::CreateDirectory($strRoles)
+        [System.IO.File]::WriteAllBytes([System.IO.Path]::Combine($strRoles, 'Expand-StyleGuideCandidateArtifact.ps1'), $arrDerived)
+        [System.IO.File]::WriteAllBytes([System.IO.Path]::Combine($strRoles, 'control.ps1'), $arrSource)
+        [System.IO.File]::WriteAllBytes([System.IO.Path]::Combine($strRoles, 'Manage-StyleGuideCandidateInvocationContext.ps1'), [System.IO.File]::ReadAllBytes($ContextLiteralPath))
+        $strWorkerPath = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'worker.ps1')
+        $strWorkerSource = "param ([string]`$Roles, [string]`$FixtureRoot, [string]`$Mode)`n" +
+            '$script:scriptBlockInitializeTerraformWorkerCompression = {' + $script:scriptBlockInitializeTerraformWorkerCompression.ToString() + "}`n" +
+            '& $script:scriptBlockInitializeTerraformWorkerCompression' + "`n" +
+            '& {' + $script:scriptBlockTerraformMissingArchiveWorker.ToString() + '} -Roles $Roles -FixtureRoot $FixtureRoot -Mode $Mode'
+        [System.IO.File]::WriteAllText($strWorkerPath, $strWorkerSource, (New-Object System.Text.UTF8Encoding($false)))
+        $hashtableInputs = @{}
+        foreach ($strPath in @($HelperLiteralPath, $ContextLiteralPath, $strWorkerPath,
+            [System.IO.Path]::Combine($strRoles, 'Expand-StyleGuideCandidateArtifact.ps1'),
+            [System.IO.Path]::Combine($strRoles, 'control.ps1'),
+            [System.IO.Path]::Combine($strRoles, 'Manage-StyleGuideCandidateInvocationContext.ps1'))) {
+            $hashtableInputs[$strPath] = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath
+        }
+        $listObserved = New-Object 'System.Collections.Generic.List[object]'
+        foreach ($strMode in @('control', 'missing')) {
+            $strWorkerRoot = [System.IO.Path]::Combine($hashtableLayout.Trusted, $strMode)
+            [void][System.IO.Directory]::CreateDirectory($strWorkerRoot)
+            $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath -WorkingDirectory $hashtableLayout.CaseRoot `
+                -Arguments @('-Roles', $strRoles, '-FixtureRoot', $strWorkerRoot, '-Mode', $strMode)
+            while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [System.Threading.Thread]::Sleep(10) }
+            if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'missing-archive-worker-failed' }
+            $arrWorkerObserved = @(& $script:scriptBlockReadTerraformProofResult -LiteralPath ([System.IO.Path]::Combine($strWorkerRoot, 'result.json')))
+            if ($arrWorkerObserved.Count -ne 1) { throw 'missing-archive-worker-count' }
+            $listObserved.Add($arrWorkerObserved[0])
+            & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker
+            $hashtableWorker = $null
+        }
+        foreach ($strPath in $hashtableInputs.Keys) {
+            $objAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $strPath
+            if ($objAfter.Length -ne $hashtableInputs[$strPath].Length -or $objAfter.Sha256 -cne $hashtableInputs[$strPath].Sha256) { throw 'missing-archive-input-changed' }
+        }
+        $arrObserved = $listObserved.ToArray()
+        if ($arrObserved.Count -ne 2 -or $arrObserved[0].Missing -or $arrObserved[0].Phase -cne 'none' -or
+            $arrObserved[0].ContextState -cne 'Disposed' -or $arrObserved[0].RetainedArchiveCaptured -or
+            -not $arrObserved[1].Missing -or -not $arrObserved[1].RetainedArchiveCaptured -or
+            $arrObserved[1].ContextState -cne 'Disposed') { throw 'missing-archive-observation' }
+        $objObserved = $arrObserved[1]
+        $objObservation = & $script:scriptBlockNewObservation
+        $objObservation.Phase = [string]$objObserved.Phase
+        $objObservation.Subreason = [string]$objObserved.Subreason
+        $objObservation.DiagnosticCode = [string]$objObserved.Code
+        $objObservation.PreCleanupState = 'Active'
+        $objObservation.CandidateFinalState = 'Absent'
+        $objObservation.ContextFinalState = [string]$objObserved.ContextState
+        $objObservation.CleanupSequence = 'helper-context'
+        $objObservation.SentinelState = if (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout) { 'intact' } else { 'changed' }
+        if ($strSourceHash -ceq $strDerivedHash) { throw 'missing-archive-unchanged-source' }
+        return $objObservation
+
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockManagerPathWorker = {
+    param ([string]$ManagerPath, [string]$TrustedRoot, [string]$Mode, [string]$OutputPath)
+
+    $ErrorActionPreference = 'Stop'
+    Set-StrictMode -Version Latest
+    $arrSourceBefore = [System.IO.File]::ReadAllBytes($ManagerPath)
+    . $ManagerPath
+    foreach ($strPrefix in @('', 'FileSystem::', 'Microsoft.PowerShell.Core\FileSystem::')) {
+        $objControl = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot ($strPrefix + $TrustedRoot)
+        $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objControl
+        if (-not $objCleanup.Success -or [System.IO.Directory]::Exists($objControl.InvocationRootPath)) { throw 'manager-path-positive-cleanup' }
+    }
+    if ([System.IO.Directory]::GetFileSystemEntries($TrustedRoot).Length -ne 0) { throw 'manager-path-positive-side-effect' }
+    $strClaim = $null
+    $strCode = 'parameter'
+    $boolAlias = $false
+    $strDriveName = $TrustedRoot.Substring(0, 1)
+    switch ($Mode) {
+        'f193-18-relative' {
+            Set-Location -LiteralPath ([System.IO.Path]::GetDirectoryName($TrustedRoot))
+            $strClaim = [System.IO.Path]::GetFileName($TrustedRoot)
+        }
+        'f193-18-root-relative' { $strClaim = $TrustedRoot.Substring(2) }
+        'f193-18-qualified-drive-relative' { $strClaim = 'FileSystem::' + $strDriveName + ':trusted' }
+        'f193-18-native-drive-alias' {
+            Set-Location Env:
+            Remove-PSDrive -Name $strDriveName -Force
+            New-PSDrive -Name $strDriveName -PSProvider FileSystem -Root $TrustedRoot -Scope Script | Out-Null
+            $boolAlias = $true
+            $strClaim = $TrustedRoot
+            $strCode = 'root-invalid'
+        }
+        default { throw 'manager-path-mode' }
+    }
+    $objFailure = $null
+    $objContext = $null
+    try {
+        try { $objContext = New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $strClaim } catch { $objFailure = $_ }
+        if ($null -ne $objContext) {
+            $objCleanup = Remove-StyleGuideCandidateInvocationContext -Context $objContext
+            if (-not $objCleanup.Success) { throw 'manager-path-unexpected-context-cleanup' }
+            throw 'manager-path-accepted'
+        }
+        if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideDiagnosticCode'] -cne $strCode -or
+            $objFailure.Exception.Message -cne ('PSStyleGuide.ContextCreate.v1|category=' + $strCode + '|cleanup=not-required')) { throw 'manager-path-diagnostic' }
+    } finally {
+        if ($boolAlias) { Remove-PSDrive -Name $strDriveName -Force }
+    }
+    if ([System.IO.Directory]::GetFileSystemEntries($TrustedRoot).Length -ne 0) { throw 'manager-path-refusal-side-effect' }
+    $arrSourceAfter = [System.IO.File]::ReadAllBytes($ManagerPath)
+    if ($arrSourceBefore.Length -ne $arrSourceAfter.Length) { throw 'manager-path-source-length' }
+    for ($intIndex = 0; $intIndex -lt $arrSourceBefore.Length; $intIndex++) {
+        if ($arrSourceBefore[$intIndex] -ne $arrSourceAfter[$intIndex]) { throw 'manager-path-source-byte' }
+    }
+    $objResult = [pscustomobject][ordered]@{
+        Mode = $Mode; Code = $strCode; NoContext = $true; PositiveControls = 3
+        TrustedEntriesBefore = 0; TrustedEntriesAfter = 0; SourceUnchanged = $true
+    }
+    [System.IO.File]::WriteAllText($OutputPath, (ConvertTo-Json -InputObject $objResult -Compress), (New-Object System.Text.UTF8Encoding($false)))
+}
+
+$script:scriptBlockInvokeManagerPathFixture = {
+    param ([object]$Case, [string]$RunRoot, [string]$ContextLiteralPath)
+
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    $hashtableWorker = $null
+    try {
+        $strWorkerPath = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'manager-path-worker.ps1')
+        $strOutputPath = [System.IO.Path]::Combine($hashtableLayout.CaseRoot, 'manager-path-result.json')
+        $strWorker = 'param ([string]$ManagerPath, [string]$TrustedRoot, [string]$Mode, [string]$OutputPath)' + "`n" +
+            '& {' + $script:scriptBlockManagerPathWorker.ToString() + '} -ManagerPath $ManagerPath -TrustedRoot $TrustedRoot -Mode $Mode -OutputPath $OutputPath'
+        [System.IO.File]::WriteAllText($strWorkerPath, $strWorker, (New-Object System.Text.UTF8Encoding($false)))
+        $hashtableWorker = & $script:scriptBlockStartTerraformProofProcess -ScriptPath $strWorkerPath -WorkingDirectory $hashtableLayout.CaseRoot `
+            -Arguments @('-ManagerPath', $ContextLiteralPath, '-TrustedRoot', $hashtableLayout.Trusted, '-Mode', $Case.SemanticVariant, '-OutputPath', $strOutputPath)
+        while (-not (& $script:scriptBlockReceiveTerraformProofProcess -Worker $hashtableWorker)) { [System.Threading.Thread]::Sleep(10) }
+        if ($hashtableWorker.Process.ExitCode -ne 0) { throw 'manager-path-worker-failed' }
+        $objResult = & $script:scriptBlockReadTerraformProofResult -LiteralPath $strOutputPath
+        if ($objResult.Mode -cne $Case.SemanticVariant -or -not $objResult.NoContext -or $objResult.PositiveControls -ne 3 -or
+            $objResult.TrustedEntriesBefore -ne 0 -or $objResult.TrustedEntriesAfter -ne 0 -or -not $objResult.SourceUnchanged) { throw 'manager-path-worker-result' }
+        $objObservation = & $script:scriptBlockNewObservation
+        $objObservation.DiagnosticCode = [string]$objResult.Code
+        $objObservation.Phase = if ($objResult.Code -ceq 'parameter') { 'parameter' } else { 'root' }
+        $objObservation.Subreason = if ($objResult.Code -ceq 'parameter') { 'context-create-parameter-refusal' } else { 'provider' }
+        $objObservation.SentinelState = if (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout) { 'intact' } else { 'changed' }
+        return $objObservation
+    } finally {
+        if ($null -ne $hashtableWorker) { & $script:scriptBlockStopTerraformProofProcess -Worker $hashtableWorker }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockGetManagerPathAdmission = {
+    param ([object]$Catalog)
+
+    $listTuples = New-Object 'System.Collections.Generic.List[object]'
+    $objIds = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::Ordinal)
+    foreach ($objCase in $Catalog.Cases) {
+        if ($objCase.FixtureRecipe -cne 'manager-path-boundary') { continue }
+        foreach ($strField in @('CaseId', 'SemanticCase', 'SemanticVariant', 'OracleProfile', 'FixtureRecipe', 'InitialState', 'Applicability')) {
+            $objProperty = $objCase.PSObject.Properties[$strField]
+            if ($null -eq $objProperty -or $objProperty.Value -isnot [string]) {
+                & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'manager-path-admission'
+            }
+        }
+        if (-not $objIds.Add($objCase.CaseId)) {
+            & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'manager-path-admission'
+        }
+        $listTuples.Add([ordered]@{
+            CaseId = $objCase.CaseId; SemanticCase = $objCase.SemanticCase; SemanticVariant = $objCase.SemanticVariant
+            OracleProfile = $objCase.OracleProfile; FixtureRecipe = $objCase.FixtureRecipe; InitialState = $objCase.InitialState
+            Applicability = $objCase.Applicability
+        })
+    }
+    $strCanonical = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $listTuples.ToArray()
+    $strHash = & $script:scriptBlockGetByteArraySha256 -Bytes ((New-Object System.Text.UTF8Encoding($false)).GetBytes($strCanonical))
+    if ($objIds.Count -ne 4 -or $strHash -cne '27c871ffa6fbc808f637a197761b31add60be9d1d9a533aa7c8f95b83cb79c0d') {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'manager-path-admission'
+    }
+    return ,$objIds
+}
+
+$script:scriptBlockAssertManagerPathAdmission = {
+    param ([object]$Catalog)
+
+    $objAdmitted = & $script:scriptBlockGetManagerPathAdmission -Catalog $Catalog
+    if ($objAdmitted.Count -ne 4) { throw 'manager-path-admission-positive' }
+    foreach ($strField in @('CaseId', 'SemanticCase', 'SemanticVariant', 'OracleProfile', 'FixtureRecipe', 'InitialState', 'Applicability')) {
+        $objMutant = $Catalog | ConvertTo-Json -Depth 100 | ConvertFrom-Json
+        $objCase = @($objMutant.Cases | Where-Object CaseId -CEQ 'PS-P1A-MP-01')[0]
+        $objCase.PSObject.Properties[$strField].Value = 'changed'
+        $objFailure = $null
+        try { [void](& $script:scriptBlockGetManagerPathAdmission -Catalog $objMutant) } catch { $objFailure = $_ }
+        if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'catalog-invalid' -or
+            $objFailure.Exception.Message -cne 'PSStyleGuide.CandidateHarness.v1|code=catalog-invalid|detail=manager-path-admission') { throw 'manager-path-admission-mutant' }
+    }
+}
+
+$script:scriptBlockAssertQualifiedScriptClaims = {
+    param ([string]$ExpectedPath)
+
+    foreach ($strPrefix in @('', 'FileSystem::', 'Microsoft.PowerShell.Core\FileSystem::')) {
+        $strObserved = & $script:scriptBlockResolveFixedScriptClaim -Value ($strPrefix + $ExpectedPath) -Name 'HelperPath' -ExpectedPath $ExpectedPath
+        if ($strObserved -cne $ExpectedPath) { throw 'qualified-claim-positive-control' }
+    }
+    $listCases = New-Object 'System.Collections.Generic.List[object]'
+    $listCases.Add(@{ Claim = 'Unknown::' + $ExpectedPath; Detail = 'HelperPath-provider'; Mutation = 'provider' })
+    $listCases.Add(@{ Claim = 'FileSystem::FileSystem::' + $ExpectedPath; Detail = 'HelperPath-provider'; Mutation = $null })
+    $listCases.Add(@{ Claim = 'relative.ps1'; Detail = 'HelperPath-relative'; Mutation = $null })
+    $strDriveName = $null
+    if ($script:boolCandidateIsWindows) {
+        $listCases.Add(@{ Claim = $ExpectedPath.Substring(2); Detail = 'HelperPath-relative'; Mutation = 'qualification' })
+        $listCases.Add(@{ Claim = $ExpectedPath.Substring(0, 2) + 'relative.ps1'; Detail = 'HelperPath-relative'; Mutation = $null })
+        foreach ($chrDrive in [char[]]'ZYXWVUTSRQPONMLKJIHGFED') {
+            if ($null -eq (Get-PSDrive -Name ([string]$chrDrive) -ErrorAction SilentlyContinue)) { $strDriveName = [string]$chrDrive; break }
+        }
+        if ($null -eq $strDriveName) { throw 'qualified-claim-no-fixture-drive' }
+        New-PSDrive -Name $strDriveName -PSProvider FileSystem -Root ([System.IO.Path]::GetDirectoryName($ExpectedPath)) -Scope Script | Out-Null
+        $listCases.Add(@{ Claim = $strDriveName + ':\' + [System.IO.Path]::GetFileName($ExpectedPath); Detail = 'HelperPath-provider'; Mutation = 'native-root' })
+    }
+    try {
+        $strSource = $script:scriptBlockResolveFixedScriptClaim.ToString()
+        $hashtableAnchors = @{
+            qualification = 'if ($boolDriveRelative -or -not $boolFullyQualified) {'
+            provider = 'if ($strProviderName -cnotin @(''FileSystem'', ''Microsoft.PowerShell.Core\FileSystem'')) {'
+            'native-root' = @'
+if ($null -eq $objDrive -or -not [string]::Equals(
+                    $objDrive.Root, $strNativeRoot, [StringComparison]::OrdinalIgnoreCase)) {
+'@
+        }
+        foreach ($objCase in $listCases) {
+            $objFailure = $null
+            try { [void](& $script:scriptBlockResolveFixedScriptClaim -Value $objCase.Claim -Name 'HelperPath' -ExpectedPath $ExpectedPath) } catch { $objFailure = $_ }
+            if ($null -eq $objFailure -or $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'parameter' -or
+                $objFailure.Exception.Message -cne ('PSStyleGuide.CandidateHarness.v1|code=parameter|detail=' + $objCase.Detail)) { throw 'qualified-claim-refusal-control' }
+            if ($null -eq $objCase.Mutation) { continue }
+            $strAnchor = $hashtableAnchors[$objCase.Mutation]
+            if ([regex]::Matches($strSource, [regex]::Escape($strAnchor)).Count -ne 1) { throw 'qualified-claim-mutant-cardinality' }
+            $strMutant = $strSource.Replace($strAnchor, 'if ($false) {')
+            if ($strMutant -ceq $strSource) { throw 'qualified-claim-mutant-unchanged' }
+            $scriptBlockMutant = [scriptblock]::Create($strMutant)
+            $strObserved = & $scriptBlockMutant -Value $objCase.Claim -Name 'HelperPath' -ExpectedPath $ExpectedPath
+            if ($strObserved -cne $ExpectedPath) { throw 'qualified-claim-mutant-not-reached' }
+        }
+    } finally {
+        if ($null -ne $strDriveName) { Remove-PSDrive -Name $strDriveName -Force }
+    }
+}
+
+
+$script:scriptBlockAssertNativeStartClassified = {
+    param ([string]$GitPath, [string]$WorkingDirectory)
+
+    $objControl = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath -WorkingDirectory $WorkingDirectory -ArgumentList @('--version')
+    if ($objControl.ExitCode -ne 0 -or $objControl.StandardErrorLength -ne 0 -or
+        -not [System.Text.Encoding]::ASCII.GetString($objControl.StandardOutput).StartsWith('git version ', [System.StringComparison]::Ordinal)) { throw 'native-start-positive-control' }
+    $strMissing = [System.IO.Path]::Combine($WorkingDirectory, ('missing-native-' + [guid]::NewGuid().ToString('N')))
+    if ([System.IO.File]::Exists($strMissing) -or [System.IO.Directory]::Exists($strMissing)) { throw 'native-start-fixture-collision' }
+    $strSource = $script:scriptBlockInvokeNativeRaw.ToString()
+    $strAnchor = @'
+        try { $boolStarted = $objProcess.Start() }
+        catch { & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'native-start' }
+'@
+    if ([regex]::Matches($strSource, [regex]::Escape($strAnchor)).Count -ne 1) { throw 'native-start-mutant-cardinality' }
+    $strMutant = $strSource.Replace($strAnchor, '        $boolStarted = $objProcess.Start()')
+    if ($strMutant -ceq $strSource) { throw 'native-start-mutant-unchanged' }
+    $scriptBlockMutant = [scriptblock]::Create($strMutant)
+    foreach ($boolMutant in @($false, $true)) {
+        $objFailure = $null
+        try {
+            if ($boolMutant) { [void](& $scriptBlockMutant -FilePath $strMissing -WorkingDirectory $WorkingDirectory -ArgumentList @('--version')) }
+            else { [void](& $script:scriptBlockInvokeNativeRaw -FilePath $strMissing -WorkingDirectory $WorkingDirectory -ArgumentList @('--version')) }
+        } catch { $objFailure = $_ }
+        if ($null -eq $objFailure) { throw 'native-start-missing-executable-accepted' }
+        $boolClassified = $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -ceq 'script-identity-invalid' -and
+            $objFailure.Exception.Message -ceq 'PSStyleGuide.CandidateHarness.v1|code=script-identity-invalid|detail=native-start'
+        if ($boolClassified -eq $boolMutant) { throw 'native-start-classification-control' }
+    }
+}
+
+
+$script:scriptBlockAssertCandidateRawEvidenceWiring = {
+    param ([string]$LiteralPath)
+
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($LiteralPath, [ref]$null, [ref]$null)
+    $hashtablePins = @{
+        'scriptBlockInvokeSourceRawBoundaryFixture' = '50d124d9504b65334248af8cdef5346097e49d1ac7f0d1e3a881a5d31bec3828'
+        'scriptBlockInvokeExpansionFixture' = 'b04e550bc2c3c11798d2f185494924040c0da7a5ca4bbe4efe87ab57fda44678'
+        'scriptBlockInvokeSourceJournalRawFixture' = 'b8e3ff57f2e813f5e4bc26e4c78738b1bbc9c1544b92aecb92699934b53557ba'
+        'scriptBlockAssertCandidateRawEvidence' = 'b407791a830cbe746d1294add291e1f932e47eca02d509b1082331270879d8de'
+    }
+    foreach ($strName in $hashtablePins.Keys) {
+        $arrAssignments = @($objAst.FindAll({
+            param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+            ($Node.Left.VariablePath.UserPath -replace '^(script|local|private|global):', '') -ieq $strName
+        }, $true))
+        if ($arrAssignments.Count -ne 1 -or $arrAssignments[0].Parent -ne $objAst.EndBlock -or
+            $arrAssignments[0].Left.Extent.Text -cne ('$script:' + $strName)) { throw 'raw-evidence-wiring-binding' }
+        if ((& $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($arrAssignments[0].Extent.Text))) -cne $hashtablePins[$strName]) { throw 'raw-evidence-wiring-content' }
+    }
+}
+
+$script:scriptBlockAssertCandidateRawEvidence = {
+    param ([System.Collections.IDictionary]$Evidence)
+
+    foreach ($strName in @('ShadowGetTypeCalls', 'ShadowToStringCalls')) {
+        if (-not $Evidence.Contains($strName) -or $Evidence[$strName] -isnot [int] -or $Evidence[$strName] -ne 0) {
+            throw ('missing-or-nonzero-raw-shadow-' + $strName)
+        }
+    }
+    if (-not $Evidence.Contains('FilesystemSnapshotUnchanged') -or
+        $Evidence.FilesystemSnapshotUnchanged -isnot [bool] -or -not $Evidence.FilesystemSnapshotUnchanged) {
+        throw 'missing-or-changed-raw-filesystem-snapshot'
+    }
+}
+
+$script:scriptBlockAssertTerraformRawEvidenceMutants = {
+    param ([System.Collections.IDictionary]$Evidence)
+
+    # The PS closed case projection omits these fields. The actual boundary
+    # calls this same private comparator before it can return an observation.
+    & $script:scriptBlockAssertCandidateRawEvidence -Evidence $Evidence
+    foreach ($strField in @('ShadowGetTypeCalls', 'ShadowToStringCalls', 'FilesystemSnapshotUnchanged')) {
+        foreach ($strMode in @('missing', 'wrong', 'type')) {
+            $hashtableClone = [ordered]@{}
+            foreach ($strKey in $Evidence.Keys) {
+                if ($strKey -cne $strField) { $hashtableClone[$strKey] = $Evidence[$strKey] }
+            }
+            if ($strMode -ceq 'wrong') {
+                if ($strField -ceq 'FilesystemSnapshotUnchanged') { $hashtableClone[$strField] = $false }
+                else { $hashtableClone[$strField] = [int]1 }
+            } elseif ($strMode -ceq 'type') { $hashtableClone[$strField] = [object[]]@($Evidence[$strField]) }
+            $strFailure = $null
+            try { & $script:scriptBlockAssertCandidateRawEvidence -Evidence $hashtableClone }
+            catch { $strFailure = $_.Exception.Message }
+            $strReason = if ($strField -ceq 'FilesystemSnapshotUnchanged') { 'missing-or-changed-raw-filesystem-snapshot' }
+                else { 'missing-or-nonzero-raw-shadow-' + $strField }
+            if ($strFailure -cne $strReason) { throw 'raw-evidence-mutant-not-refused' }
+        }
+    }
+}
+
+
+$script:scriptBlockInvokeSourceRawBoundaryFixture = {
+    param (
+        [object]$Case,
+        [string]$RunRoot,
+        [string]$HelperSourcePath,
+        [string]$ContextSourcePath
+    )
+
+    $arrSourceCase = @($script:objCandidateSourceCatalog.Cases | Where-Object {
+        $_.Id.ToLowerInvariant() -ceq $Case.SemanticVariant
+    })
+    if ($arrSourceCase.Count -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'raw-source-case'
+    }
+    $objRaw = $arrSourceCase[0].Fixture.Parameters.Raw
+    $objObservation = & $script:scriptBlockNewObservation
+    $hashtableLayout = & $script:scriptBlockNewCaseFixtureLayout -RunRoot $RunRoot -CaseId $Case.CaseId
+    try {
+        $script:intTerraformAttackerToStringCalls = 0
+        $objEnvelope = & $script:scriptBlockNewTerraformRawValue -Specification $objRaw -FixtureRoot $hashtableLayout.CaseRoot
+        $objBefore = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+        $objFailure = $null
+        try {
+            if ($objRaw.Boundary -ceq 'harness') {
+                $strExpected = if ($objRaw.Parameter -ceq 'HelperPath') { $HelperSourcePath } else { $ContextSourcePath }
+                [void](& $script:scriptBlockResolveFixedScriptClaim -Value $objEnvelope.Value -Name $objRaw.Parameter -ExpectedPath $strExpected)
+            } elseif ($objRaw.Boundary -ceq 'context-create') {
+                [void](New-StyleGuideCandidateInvocationContext -TrustedTemporaryRoot $objEnvelope.Value)
+            } else {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'raw-boundary'
+            }
+        } catch { $objFailure = $_ }
+        $objAfter = & $script:scriptBlockGetTerraformFixtureSnapshot -LiteralPath $hashtableLayout.CaseRoot
+        $hashtableRawEvidence = [ordered]@{
+            ShadowGetTypeCalls = $objEnvelope.Counters.GetType
+            ShadowToStringCalls = $objEnvelope.Counters.ToString
+            FilesystemSnapshotUnchanged = (& $script:scriptBlockTestFixtureSnapshotEqual -Left $objBefore -Right $objAfter)
+        }
+        & $script:scriptBlockAssertCandidateRawEvidence -Evidence $hashtableRawEvidence
+        if ($objRaw.Class -cin @('shadow-actual-type', 'shadow-string-type')) {
+            & $script:scriptBlockAssertTerraformRawEvidenceMutants -Evidence $hashtableRawEvidence
+        }
+        if ($script:intTerraformAttackerToStringCalls -ne 0) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'raw-boundary-side-effect'
+        }
+        if ($null -eq $objFailure) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'raw-boundary-accepted'
+        }
+        if ($objRaw.Boundary -ceq 'harness') {
+            $strCode = [string]$objFailure.Exception.Data['PSStyleGuideHarnessCode']
+            $strPrefix = 'PSStyleGuide.CandidateHarness.v1|code=' + $strCode + '|detail='
+            if (-not $objFailure.Exception.Message.StartsWith($strPrefix, [System.StringComparison]::Ordinal)) {
+                throw $objFailure
+            }
+            $objObservation.Phase = 'identity'
+            $objObservation.Subreason = $objFailure.Exception.Message.Substring($strPrefix.Length)
+            $objObservation.DiagnosticCode = $strCode
+        } else {
+            $strCode = [string]$objFailure.Exception.Data['PSStyleGuideDiagnosticCode']
+            if ($objFailure.Exception.Message -cne ('PSStyleGuide.ContextCreate.v1|category=' + $strCode + '|cleanup=not-required')) {
+                throw $objFailure
+            }
+            $objObservation.Phase = 'parameter'
+            $objObservation.Subreason = 'context-create-' + $strCode + '-refusal'
+            $objObservation.DiagnosticCode = $strCode
+        }
+        return $objObservation
+    } finally {
+        if (-not (& $script:scriptBlockTestSentinelIntact -Layout $hashtableLayout)) {
+            $objObservation.SentinelState = 'changed'
+        }
+        & $script:scriptBlockRemoveTestTree -LiteralPath $hashtableLayout.CaseRoot -ApprovedParent $RunRoot
+    }
+}
+
+$script:scriptBlockInvokeSourceNativeIdentityFixture = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [pscustomobject]$Case,
+
+        [Parameter(Mandatory = $true)]
+        [string]$RunRoot,
+
+        [Parameter(Mandatory = $true)]
+        [string]$GitPath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$HelperSourcePath,
+
+        [Parameter(Mandatory = $true)]
+        [string]$ContextSourcePath
+    )
+
+    $arrSourceCase = @($script:objCandidateSourceCatalog.Cases | Where-Object {
+        $_.Id.ToLowerInvariant() -ceq $Case.SemanticVariant
+    })
+    if ($arrSourceCase.Count -ne 1) {
+        & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'native-source-case'
+    }
+    $objParameters = $arrSourceCase[0].Fixture.Parameters
+    if ($objParameters.Boundary -cnotin @('repository', 'metadata-guard', 'native-record', 'native-status', 'native-start') -or
+        $objParameters.Role -cnotin @('helper', 'context')) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'identity-boundary'
+    }
+    $strCaseRoot = [System.IO.Path]::Combine($RunRoot, $Case.CaseId)
+    if ([System.IO.Directory]::Exists($strCaseRoot) -or [System.IO.File]::Exists($strCaseRoot)) {
+        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'identity-root-occupied'
+    }
+    [void][System.IO.Directory]::CreateDirectory($strCaseRoot)
+    $strSentinel = [System.IO.Path]::Combine($strCaseRoot, 'outside-sentinel')
+    [System.IO.File]::WriteAllBytes($strSentinel, [byte[]]@(111, 117, 116, 115, 105, 100, 101))
+    $scriptBlockOriginalNative = $script:scriptBlockInvokeNativeRaw
+    $objFailure = $null
+    $objObservation = $null
+    $strLinkTarget = $null
+    $objLinkTargetBefore = $null
+    try {
+        $hashtableRepository = & $script:scriptBlockNewIdentityRepository `
+            -Layout @{ CaseRoot = $strCaseRoot } -GitPath $GitPath `
+            -HelperSourcePath $HelperSourcePath -ContextSourcePath $ContextSourcePath
+        $strRelative = if ($objParameters.Role -ceq 'helper') {
+            $script:strCandidateHelperRelativePath
+        } else { $script:strCandidateContextRelativePath }
+        $strLiteral = if ($objParameters.Role -ceq 'helper') {
+            $hashtableRepository.HelperPath
+        } else { $hashtableRepository.ContextPath }
+        $uintFunctions = if ($objParameters.Role -ceq 'helper') { [uint32]1 } else { [uint32]3 }
+        $hashtableIdentityArguments = @{
+            RepositoryRoot = $hashtableRepository.RepositoryRoot
+            GitPath = $GitPath
+            LiteralPath = $strLiteral
+            RelativePath = $strRelative
+            ExpectedVersion = if ($objParameters.Role -ceq 'helper') {
+                $script:strCandidateExpectedHelperVersion
+            } else { $script:strCandidateExpectedContextVersion }
+            ExpectedFunctionCount = $uintFunctions
+        }
+        # A real Git control authenticates the ordinary supplied bytes before
+        # one protocol response is perturbed. No mutated script is loaded.
+        $strControlOid = & $script:scriptBlockAssertTrackedScriptIdentity @hashtableIdentityArguments
+        if ($strControlOid -cnotmatch '^[0-9a-f]{40}$|^[0-9a-f]{64}$') {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'identity-control-oid'
+        }
+        $intRepositoryMutations = 0
+        if ($objParameters.Boundary -ceq 'repository') {
+            $hashtableGitArguments = @{
+                GitPath = $GitPath
+                RepositoryRoot = $hashtableRepository.RepositoryRoot
+            }
+            switch -Exact ($objParameters.Operation) {
+                'working-fifo' {
+                    if ($script:boolCandidateIsWindows) { throw 'fifo-inapplicable' }
+                    $strEmpty = [System.IO.Path]::Combine($strCaseRoot, 'empty-control.ps1')
+                    [System.IO.File]::WriteAllBytes($strEmpty, [byte[]]@())
+                    & $script:scriptBlockAssertOrdinaryInputFileType -LiteralPath $strEmpty
+                    if ((& $script:scriptBlockGetFileEvidence -LiteralPath $strEmpty).Length -ne 0) { throw 'empty-control-length' }
+                    $strMkfifo = [string](& $script:scriptBlockResolveHarnessNativePath -CandidatePath ([string[]]@('/usr/bin/mkfifo', '/bin/mkfifo')))
+                    if ($strMkfifo.Length -eq 0 -or
+                        ([System.IO.File]::GetAttributes($strMkfifo) -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) { throw 'mkfifo-unavailable' }
+                    [System.IO.File]::Delete($strLiteral)
+                    $arrNativeOutput = @(& $strMkfifo '--' $strLiteral 2>$null)
+                    if ($LASTEXITCODE -ne 0 -or $arrNativeOutput.Count -ne 0) { throw 'mkfifo-failed' }
+                }
+                'working-directory' {
+                    [System.IO.File]::Delete($strLiteral)
+                    [void][System.IO.Directory]::CreateDirectory($strLiteral)
+                    [System.IO.File]::WriteAllBytes([System.IO.Path]::Combine($strLiteral, 'child'), [byte[]]@(120))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments -ArgumentList @('add', '-A', '--', $strRelative))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments -ArgumentList @('commit', '-q', '-m', 'directory identity fixture'))
+                }
+                'outside-repository' {
+                    $strOutside = [System.IO.Path]::Combine($strCaseRoot, 'outside-repository')
+                    [void][System.IO.Directory]::CreateDirectory($strOutside)
+                    $hashtableIdentityArguments.RepositoryRoot = $strOutside
+                }
+                'working-missing' {
+                    [System.IO.File]::Delete($strLiteral)
+                }
+                'working-reparse' {
+                    $strTarget = [System.IO.Path]::Combine($strCaseRoot, 'ordinary-link-target.ps1')
+                    [System.IO.File]::Move($strLiteral, $strTarget)
+                    $strLinkTarget = $strTarget
+                    $objLinkTargetBefore = & $script:scriptBlockGetFileEvidence -LiteralPath $strTarget
+                    if (-not (& $script:scriptBlockNewSymbolicLink -LinkPath $strLiteral -TargetPath $strTarget -Directory $false)) {
+                        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
+                    }
+                }
+                'untracked' {
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('rm', '--cached', '--', $strRelative))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('commit', '-q', '-m', 'untracked fixed role fixture'))
+                }
+                'head-absent' {
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('rm', '--cached', '--', $strRelative))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('commit', '-q', '-m', 'head absence fixture'))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('add', '--', $strRelative))
+                }
+                'index-absent' {
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('rm', '--cached', '--', $strRelative))
+                }
+                'staged-replacement' {
+                    [System.IO.File]::AppendAllText($strLiteral, "`n# staged identity fixture`n")
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('add', '--', $strRelative))
+                }
+                'unstaged-replacement' {
+                    [System.IO.File]::AppendAllText($strLiteral, "`n# unstaged identity fixture`n")
+                }
+                'wrong-mode' {
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('update-index', '--chmod=+x', '--', $strRelative))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('commit', '-q', '-m', 'wrong mode fixture'))
+                }
+                'nonblob-head-ordinary-working-file' {
+                    $objHead = & $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('rev-parse', '--verify', 'HEAD^{commit}')
+                    $strHead = & $script:scriptBlockGetTrimmedAsciiLine -Bytes $objHead.StandardOutput
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('update-index', '--cacheinfo', ('160000,' + $strHead + ',' + $strRelative)))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('commit', '-q', '-m', 'gitlink identity fixture'))
+                    # Git's index and HEAD now contain a commit object; the
+                    # existing ordinary working file is deliberately untouched.
+                    $objAttributes = [System.IO.File]::GetAttributes($strLiteral)
+                    if (($objAttributes -band ([System.IO.FileAttributes]::Directory -bor
+                                [System.IO.FileAttributes]::ReparsePoint)) -ne 0) {
+                        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'gitlink-working-type'
+                    }
+                }
+                'conflict-stage' {
+                    $arrOriginalBytes = [System.IO.File]::ReadAllBytes($strLiteral)
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('checkout', '-q', '-b', 'identity-side'))
+                    [System.IO.File]::WriteAllBytes($strLiteral, [byte[]]@(115, 10))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('add', '--', $strRelative))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('commit', '-q', '-m', 'side conflict fixture'))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('checkout', '-q', $hashtableRepository.InitialBranch))
+                    [System.IO.File]::WriteAllBytes($strLiteral, [byte[]]@(109, 10))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('add', '--', $strRelative))
+                    [void](& $script:scriptBlockInvokeRequiredIdentityGit @hashtableGitArguments `
+                        -ArgumentList @('commit', '-q', '-m', 'main conflict fixture'))
+                    $objMerge = & $script:scriptBlockInvokeNativeRaw -FilePath $GitPath `
+                        -WorkingDirectory $hashtableRepository.RepositoryRoot `
+                        -ArgumentList @('merge', '--no-edit', 'identity-side')
+                    if ($objMerge.ExitCode -ne 1) {
+                        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'conflict-not-created'
+                    }
+                    # Preserve a syntactically valid working script while the
+                    # real index retains all conflict stages from Git merge.
+                    [System.IO.File]::WriteAllBytes($strLiteral, $arrOriginalBytes)
+                }
+                default { & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'repository-mutation-unknown' }
+            }
+            $intRepositoryMutations = 1
+        }
+        $script:scriptBlockTerraformNativeControl = $scriptBlockOriginalNative
+        $script:objTerraformNativeParameters = $objParameters
+        $script:strTerraformNativeRelative = $strRelative
+        $script:strTerraformNativeAbsentExecutable = [System.IO.Path]::Combine($strCaseRoot, 'absent-native-tool')
+        $script:intTerraformNativePerturbationCount = 0
+        if ($objParameters.Boundary -cnotin @('repository', 'metadata-guard')) {
+            $script:scriptBlockInvokeNativeRaw = {
+            param ([string]$FilePath, [string]$WorkingDirectory, [string[]]$ArgumentList)
+
+            $boolTargetCommand = $ArgumentList[0] -ceq $script:objTerraformNativeParameters.Command
+            if ($script:objTerraformNativeParameters.Boundary -ceq 'native-start' -and $boolTargetCommand) {
+                $script:intTerraformNativePerturbationCount++
+                return & $script:scriptBlockTerraformNativeControl `
+                    -FilePath $script:strTerraformNativeAbsentExecutable `
+                    -WorkingDirectory $WorkingDirectory -ArgumentList $ArgumentList
+            }
+            $objResult = & $script:scriptBlockTerraformNativeControl `
+                -FilePath $FilePath -WorkingDirectory $WorkingDirectory -ArgumentList $ArgumentList
+            if (-not $boolTargetCommand) { return $objResult }
+            $script:intTerraformNativePerturbationCount++
+            if ($script:objTerraformNativeParameters.Boundary -ceq 'native-status') {
+                return [ordered]@{ ExitCode = [int]2; StandardOutput = [byte[]]@(); StandardErrorLength = [uint32]0 }
+            }
+            if ($objResult.ExitCode -ne 0) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'native-control-status'
+            }
+            $strRecord = [System.Text.Encoding]::UTF8.GetString($objResult.StandardOutput)
+            $intTab = $strRecord.IndexOf([char]9)
+            if ($intTab -lt 1 -or -not $strRecord.EndsWith([string][char]0, [System.StringComparison]::Ordinal)) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'native-control-record'
+            }
+            switch -Exact ($script:objTerraformNativeParameters.Mutation) {
+                'duplicate-record' { $strRecord += $strRecord }
+                'truncated-record' { $strRecord = $strRecord.Substring(0, $strRecord.Length - 1) }
+                'missing-tab' { $strRecord = $strRecord.Replace([string][char]9, ' ') }
+                'extra-tab' { $strRecord = $strRecord.Insert($intTab, [string][char]9) }
+                'metadata-control-byte' { $strRecord = $strRecord.Insert(0, [string][char]1) }
+                'path-mismatch' { $strRecord = $strRecord.Substring(0, $intTab + 1) + 'different-fixed-role.ps1' + [char]0 }
+                'abbreviated-oid' {
+                    $strRecord = [System.Text.RegularExpressions.Regex]::Replace($strRecord, '[0-9a-f]{40}', ('0' * 12))
+                }
+                'wrong-format-oid' {
+                    $strRecord = [System.Text.RegularExpressions.Regex]::Replace($strRecord, '[0-9a-f]{40}', ('0' * 64))
+                }
+                default { & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'native-mutation-unknown' }
+            }
+            return [ordered]@{
+                ExitCode = [int]0
+                StandardOutput = [System.Text.Encoding]::UTF8.GetBytes($strRecord)
+                StandardErrorLength = [uint32]0
+            }
+            }
+        }
+        try {
+            if ($objParameters.Boundary -ceq 'metadata-guard') {
+                switch -Exact ($arrSourceCase[0].Id) {
+                    'T1A-AF-23' {
+                        if ((& $script:scriptBlockGetCandidateTreeObjectId -Metadata ('100644 blob ' + ('0' * 40)) -ObjectIdLength 40) -cne ('0' * 40)) { throw 'tree-control' }
+                        [void](& $script:scriptBlockGetCandidateTreeObjectId -Metadata ('100755 blob ' + ('0' * 40)) -ObjectIdLength 40)
+                    }
+                    'T1A-AF-24' {
+                        [void](& $script:scriptBlockGetCandidateIndexObjectId -Metadata ('100644 ' + ('0' * 40) + ' 0') -ObjectIdLength 40 -ExpectedObjectId ('0' * 40))
+                        [void](& $script:scriptBlockGetCandidateIndexObjectId -Metadata ('100644 ' + ('0' * 40) + ' 1') -ObjectIdLength 40 -ExpectedObjectId ('0' * 40))
+                    }
+                    { $_ -cin @('T1A-AF-25', 'T1A-AF-26') } {
+                        [void](& $script:scriptBlockAssertCandidateWorkingObjectId -ObjectId ('0' * 40) -ObjectIdLength 40 -ExpectedObjectId ('0' * 40))
+                        $intLength = if ($arrSourceCase[0].Id -ceq 'T1A-AF-25') { 12 } else { 64 }
+                        [void](& $script:scriptBlockAssertCandidateWorkingObjectId -ObjectId ('0' * $intLength) -ObjectIdLength 40 -ExpectedObjectId ('0' * 40))
+                    }
+                    'T1A-AF-28' {
+                        $arrExpected = [System.Text.Encoding]::ASCII.GetBytes($strRelative)
+                        $strPrefix = '100644 blob ' + ('0' * 40) + "`t"
+                        [void](& $script:scriptBlockSplitOneNulGitRecord -Bytes ([System.Text.Encoding]::ASCII.GetBytes($strPrefix + $strRelative + "`0")) -ExpectedPathBytes $arrExpected)
+                        [void](& $script:scriptBlockSplitOneNulGitRecord -Bytes ([System.Text.Encoding]::ASCII.GetBytes($strPrefix + "hostile.ps1`0")) -ExpectedPathBytes $arrExpected)
+                    }
+                    default { throw 'metadata-guard-case' }
+                }
+            } else { [void](& $script:scriptBlockAssertTrackedScriptIdentity @hashtableIdentityArguments) }
+        }
+        catch { $objFailure = $_ }
+        finally { $script:scriptBlockInvokeNativeRaw = $scriptBlockOriginalNative }
+        if (($objParameters.Boundary -cin @('repository', 'metadata-guard') -and
+                $script:intTerraformNativePerturbationCount -ne 0) -or
+            ($objParameters.Boundary -cnotin @('repository', 'metadata-guard') -and
+                $script:intTerraformNativePerturbationCount -ne 1)) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'native-mutation-not-reached'
+        }
+        if (($objParameters.Boundary -ceq 'repository' -and $intRepositoryMutations -ne 1) -or
+            ($objParameters.Boundary -cne 'repository' -and $intRepositoryMutations -ne 0)) {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'identity-repository-mutation-count'
+        }
+        $boolSentinelIntact = & $script:scriptBlockTestByteSequenceEqual `
+            -Left ([System.IO.File]::ReadAllBytes($strSentinel)) -Right ([byte[]]@(111, 117, 116, 115, 105, 100, 101))
+        $boolLinkTargetUnchanged = $true
+        if ($null -ne $strLinkTarget) {
+            $objLinkTargetAfter = & $script:scriptBlockGetFileEvidence -LiteralPath $strLinkTarget
+            $boolLinkTargetUnchanged = $objLinkTargetAfter.Sha256 -ceq $objLinkTargetBefore.Sha256 -and
+                $objLinkTargetAfter.Length -eq $objLinkTargetBefore.Length
+            if (-not $boolLinkTargetUnchanged) {
+                & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'identity-link-target-changed'
+            }
+        }
+        if ($null -eq $objFailure -or
+            $objFailure.Exception.Data['PSStyleGuideHarnessCode'] -cne 'script-identity-invalid') {
+            & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'native-expected-refusal'
+        }
+        $strMessage = [string]$objFailure.Exception.Message
+        $strPrefix = 'PSStyleGuide.CandidateHarness.v1|code=script-identity-invalid|detail='
+        if (-not $strMessage.StartsWith($strPrefix, [System.StringComparison]::Ordinal)) {
+            throw $objFailure
+        }
+        $objObservation = & $script:scriptBlockNewObservation
+        $objObservation.Phase = 'identity'
+        $objObservation.Subreason = $strMessage.Substring($strPrefix.Length)
+        $objObservation.DiagnosticCode = 'script-identity-invalid'
+        $objObservation.SentinelState = if ($boolSentinelIntact) { 'intact' } else { 'changed' }
+
+    } finally {
+        $script:scriptBlockInvokeNativeRaw = $scriptBlockOriginalNative
+        & $script:scriptBlockRemoveTestTree -LiteralPath $strCaseRoot -ApprovedParent $RunRoot
+    }
+    return $objObservation
+}
+
 $script:scriptBlockInvokeScriptIdentityFixture = {
     param (
         [Parameter(Mandatory = $true)]
@@ -10894,9 +21184,7 @@ $script:scriptBlockInvokeScriptIdentityFixture = {
                     $boolLinkCreated = & $script:scriptBlockNewSymbolicLink `
                         -LinkPath $strLinkPath -TargetPath $strLiteralPath -Directory $false
                     if (-not $boolLinkCreated) {
-                        $objObservation.AuthorizedSkip = $true
-                        $objObservation.SkipCode = 'skip-link-primitive-unavailable'
-                        return $objObservation
+                        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
                     }
                     $strLiteralPath = $strLinkPath
                 }
@@ -10908,9 +21196,7 @@ $script:scriptBlockInvokeScriptIdentityFixture = {
                     $boolLinkCreated = & $script:scriptBlockNewSymbolicLink `
                         -LinkPath $strLinkPath -TargetPath $strLiteralPath -Directory $false
                     if (-not $boolLinkCreated) {
-                        $objObservation.AuthorizedSkip = $true
-                        $objObservation.SkipCode = 'skip-link-primitive-unavailable'
-                        return $objObservation
+                        & $script:scriptBlockStopHarness -Code 'fixture-failed' -Detail 'available-link-creation-failed'
                     }
                     $strLiteralPath = $strLinkPath
                 }
@@ -11124,9 +21410,286 @@ $script:scriptBlockInvokeScriptIdentityFixture = {
     }
 }
 
+$script:scriptBlockConvertCandidateMainFailure = {
+    param ([System.Management.Automation.ErrorRecord]$Failure)
+
+    # PS146 keeps its original exception message and Code-only Data contract.
+    # Adapt only that complete bounded message; the shared projector still
+    # admits each token through its fixed code, phase, and reason allowlists.
+    $objCode = $Failure.Exception.Data['PSStyleGuideHarnessCode']
+    if ($objCode -isnot [string] -or
+        $null -ne $Failure.Exception.Data['PSStyleGuidePhase'] -or
+        $null -ne $Failure.Exception.Data['PSStyleGuideSubreason']) { return $Failure }
+    $strCode = [string]$objCode
+    $strMessage = [string]$Failure.Exception.Message
+    if ($strMessage.Length -gt 256) { return $Failure }
+    $objMatch = [regex]::Match($strMessage,
+        '\APSStyleGuide\.CandidateHarness\.v1\|code=(?<Code>[A-Za-z0-9-]{1,48})\|detail=(?<Detail>[A-Za-z0-9-]{1,96})\z',
+        [System.Text.RegularExpressions.RegexOptions]::CultureInvariant)
+    if (-not $objMatch.Success -or $objMatch.Groups['Code'].Value -cne $strCode) { return $Failure }
+    $strPhase = switch -Exact ($strCode) {
+        'catalog-invalid' { 'catalog' }
+        'parameter' { 'parameter' }
+        'harness-input' { 'harness-input' }
+        default { 'identity' }
+    }
+    $objException = New-Object System.InvalidOperationException('bounded-main-failure')
+    $objException.Data['PSStyleGuideHarnessCode'] = $strCode
+    $objException.Data['PSStyleGuidePhase'] = $strPhase
+    $objException.Data['PSStyleGuideSubreason'] = $objMatch.Groups['Detail'].Value
+    return (New-Object System.Management.Automation.ErrorRecord(
+            $objException, 'bounded-main-failure', [System.Management.Automation.ErrorCategory]::InvalidData, $null))
+}
+
+$script:scriptBlockAssertCandidateMainFailureAdapter = {
+    $objKnown = & $script:scriptBlockNewHarnessException -Code 'parameter' -Detail 'HelperPath-type'
+    $objRecord = New-Object System.Management.Automation.ErrorRecord($objKnown, 'known', [System.Management.Automation.ErrorCategory]::InvalidData, $null)
+    $objPositive = & $script:scriptBlockGetTerraformMainFailure -Failure $objRecord
+    if ($objPositive.Code -cne 'parameter' -or $objPositive.Phase -cne 'parameter' -or
+        $objPositive.Subreason -cne 'HelperPath-type' -or $objPositive.Status -ne 1) { throw 'main-adapter-positive' }
+    foreach ($strMode in @('wrong-code-type', 'mismatched-code', 'extra-content', 'empty-detail', 'unknown-detail', 'oversize-detail', 'line-break', 'trailing-line-break')) {
+        $strMessage = $objKnown.Message
+        $objCode = 'parameter'
+        switch -Exact ($strMode) {
+            'wrong-code-type' { $objCode = [object[]]@('parameter') }
+            'mismatched-code' { $objCode = 'catalog-invalid' }
+            'extra-content' { $strMessage += '|private-content' }
+            'empty-detail' { $strMessage = $strMessage.Replace('HelperPath-type', '') }
+            'unknown-detail' { $strMessage = $strMessage.Replace('HelperPath-type', 'DO-NOT-EMIT-PRIVATE-CONTENT') }
+            'oversize-detail' { $strMessage = $strMessage.Replace('HelperPath-type', ('x' * 300)) }
+            'line-break' { $strMessage = $strMessage.Replace('HelperPath-type', "private`ncontent") }
+            'trailing-line-break' { $strMessage += "`n" }
+        }
+        $objException = New-Object System.InvalidOperationException($strMessage)
+        $objException.Data['PSStyleGuideHarnessCode'] = $objCode
+        $objError = New-Object System.Management.Automation.ErrorRecord($objException, 'private-id', [System.Management.Automation.ErrorCategory]::InvalidData, 'private-target')
+        $objActual = & $script:scriptBlockGetTerraformMainFailure -Failure $objError
+        $strExpectedCode = if ($strMode -ceq 'unknown-detail') { 'parameter' } else { 'unexpected-error' }
+        $strExpectedReason = if ($strMode -ceq 'unknown-detail') { 'validation-failed' } else { 'unexpected-error' }
+        if ($objActual.Code -cne $strExpectedCode -or $objActual.Subreason -cne $strExpectedReason -or $objActual.Status -ne 1) { throw ('main-adapter-mutant-' + $strMode) }
+        $strOutput = & $script:scriptBlockConvertToCanonicalCatalogJson -Value $objActual
+        if ($strOutput.Length -gt 512 -or $strOutput.Contains('private') -or $strOutput.Contains('DO-NOT-EMIT')) { throw 'main-adapter-output-bound' }
+    }
+}
+
+$script:scriptBlockGetTerraformMainFailure = {
+    param (
+        [Parameter(Mandatory = $true)]
+        [System.Management.Automation.ErrorRecord]$Failure,
+
+        [string]$Stage = 'startup'
+    )
+
+    $Failure = & $script:scriptBlockConvertCandidateMainFailure -Failure $Failure
+    $strCode = 'unexpected-error'
+    $strPhase = 'harness'
+    $strReason = 'unexpected-error'
+    $objCode = $Failure.Exception.Data['PSStyleGuideHarnessCode']
+    if ($null -eq $objCode) {
+        $objCode = $Failure.Exception.Data['PSStyleGuideDiagnosticCode']
+    }
+    $objPhase = $Failure.Exception.Data['PSStyleGuidePhase']
+    $objReason = $Failure.Exception.Data['PSStyleGuideSubreason']
+    $arrCodes = [string[]]@(
+        'catalog-invalid', 'fixture-failed', 'git-tool-failure', 'harness-input',
+        'invalid-version', 'orchestration-failed', 'parameter',
+        'script-identity-invalid', 'unexpected-version'
+    )
+    $arrPhases = [string[]]@('catalog', 'harness-input', 'parameter', 'identity')
+    $arrReasons = [string[]]@(
+        'HelperPath-type', 'HelperPath-empty', 'HelperPath-control', 'HelperPath-wildcard', 'HelperPath-relative', 'HelperPath-provider',
+        'ContextManagerPath-type', 'ContextManagerPath-empty', 'ContextManagerPath-control', 'ContextManagerPath-wildcard', 'ContextManagerPath-relative', 'ContextManagerPath-provider',
+        'path-null', 'path-type', 'path-empty', 'path-whitespace', 'path-malformed',
+        'path-wildcard', 'path-not-fully-qualified', 'path-provider',
+        'HelperPath-length', 'ContextManagerPath-length',
+        'HelperPath-normalization', 'ContextManagerPath-normalization',
+        'HelperPath-fixed-path', 'ContextManagerPath-fixed-path',
+        'script-missing', 'script-reparse', 'working-file-type',
+        'directory-identity', 'directory-attribute', 'directory-component',
+        'directory-mount', 'metadata-byte', 'record-termination',
+        'record-cardinality', 'record-tab', 'literal-path', 'native-line',
+        'tree-record', 'index-record', 'index-stage', 'index-status',
+        'head-status', 'native-start', 'native-timeout', 'native-output-bound',
+        'native-exit', 'git-missing', 'working-oid', 'index-oid', 'head-oid',
+        'object-format', 'repository-root', 'repository-prefix',
+        'run-head-status', 'run-head-shape', 'context-load-output',
+        'helper-load-output', 'source-state-changed', 'unsupported-runtime',
+        'temporary-inside-repository', 'observation-cardinality',
+        'required-link-coverage', 'run-context-not-disposed', 'case-failure',
+        'header', 'schema', 'duplicate-id', 'duplicate-semantic', 'canonical',
+        'catalog-byte-sha256', 'catalog-canonical-sha256', 'allocation',
+        'function', 'marker-count', 'marker-grammar', 'component', 'date',
+        'binding', 'proof-evidence-invalid', 'proof-result-bound',
+        'h01-worker-failed', 'h02-worker-failed', 'h02-control', 'h02-perturbation',
+        'authoritative-catalog-mutated', 'canonical-value-type', 'catalog',
+        'catalog-byte-identity', 'catalog-mutation-case-unknown',
+        'counterpart-classification-missing', 'counterpart-set', 'counterpart-source',
+        'counterpart-target', 'counterpart-target-missing', 'duplicate-local-id',
+        'duplicate-semantic-key', 'equal-key-oracle-differs', 'file-type',
+        'fixed-catalog-field-changed', 'function-count', 'head-object',
+        'id-key-mapping-changed', 'intentional-difference-rationale-missing',
+        'json', 'missing-local-id', 'missing-semantic-key', 'mutation-path-occupied',
+        'object-format-status', 'oracle-profile-missing', 'oracle-profile-set',
+        'parser', 'proof-allocation', 'proof-manifest', 'proof-row', 'proof-row-value',
+        'repository-output', 'repository-status', 'script-untracked',
+        'source-provenance', 'source-provenance-identity', 'target-only-classification',
+        'target-only-row', 'terraform-catalog', 'terraform-cleanup-operation',
+        'terraform-header', 'terraform-profile', 'terraform-result-status',
+        'terraform-row', 'terraform-row-enum', 'tree-status', 'working-object',
+        'working-status'
+    )
+    if ($objCode -is [string] -and $arrCodes -ccontains $objCode -and
+        $objPhase -is [string] -and $arrPhases -ccontains $objPhase) {
+        $strCode = $objCode
+        $strPhase = $objPhase
+        $strReason = 'validation-failed'
+        if ($objReason -is [string] -and $arrReasons -ccontains $objReason) {
+            $strReason = $objReason
+        }
+    }
+    $strStage = if ($Stage -cin @('startup', 'source-assertions', 'functional-cases',
+            'harness-proofs', 'download-leaf-assertion', 'result-sealing')) {
+        $Stage
+    } else {
+        'unknown-stage'
+    }
+    return [pscustomobject][ordered]@{
+        Schema = 'PSStyleGuide.CandidateHarnessFailure.v1'
+        Stage = $strStage
+        Code = $strCode
+        Phase = $strPhase
+        Subreason = $strReason
+        Status = 1
+    }
+}
+
+$script:scriptBlockAssertTerraformMainFailureProjection = {
+    $objKnown = & $script:scriptBlockNewHarnessException -Code 'harness-input' -Detail 'script-missing'
+    $objKnown.Data['PSStyleGuidePhase'] = 'harness-input'
+    $objKnown.Data['PSStyleGuideSubreason'] = 'script-missing'
+    $objKnownRecord = New-Object System.Management.Automation.ErrorRecord(
+        $objKnown, 'known', [System.Management.Automation.ErrorCategory]::InvalidData, $null)
+    $objKnownResult = & $script:scriptBlockGetTerraformMainFailure -Failure $objKnownRecord
+    if ($objKnownResult.Code -cne 'harness-input' -or $objKnownResult.Phase -cne 'harness-input' -or
+        $objKnownResult.Subreason -cne 'script-missing' -or $objKnownResult.Status -ne 1) {
+        throw 'main-failure-known-control'
+    }
+    $strHostile = 'DO-NOT-EMIT-PRIVATE-PATH-CONTENT-OR-STDERR'
+    $objHostile = New-Object System.InvalidOperationException($strHostile)
+    $objHostile.Data['PSStyleGuideHarnessCode'] = $strHostile
+    $objHostile.Data['PSStyleGuidePhase'] = $strHostile
+    $objHostile.Data['PSStyleGuideSubreason'] = $strHostile
+    $objHostileRecord = New-Object System.Management.Automation.ErrorRecord(
+        $objHostile, $strHostile, [System.Management.Automation.ErrorCategory]::InvalidData, $strHostile)
+    $objHostileResult = & $script:scriptBlockGetTerraformMainFailure -Failure $objHostileRecord
+    if ($objHostileResult.Code -cne 'unexpected-error' -or $objHostileResult.Phase -cne 'harness' -or
+        $objHostileResult.Subreason -cne 'unexpected-error') {
+        throw 'main-failure-unknown-control'
+    }
+    $objKnown.Data['PSStyleGuideSubreason'] = $strHostile
+    $objDetailResult = & $script:scriptBlockGetTerraformMainFailure -Failure $objKnownRecord
+    if ($objDetailResult.Code -cne 'harness-input' -or $objDetailResult.Phase -cne 'harness-input' -or
+        $objDetailResult.Subreason -cne 'validation-failed') {
+        throw 'main-failure-detail-control'
+    }
+    $objKnown.Data['PSStyleGuideSubreason'] = [object[]]@('script-missing')
+    $objTypeResult = & $script:scriptBlockGetTerraformMainFailure -Failure $objKnownRecord
+    if ($objTypeResult.Subreason -cne 'validation-failed') {
+        throw 'main-failure-type-control'
+    }
+    $objStageResult = & $script:scriptBlockGetTerraformMainFailure -Failure $objKnownRecord -Stage $strHostile
+    if ($objStageResult.Stage -cne 'unknown-stage') {
+        throw 'main-failure-stage-control'
+    }
+}
+
+$script:scriptBlockAssertCandidateMainFailureWiring = {
+    param ([string]$LiteralPath)
+
+    $arrErrors = $null
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($LiteralPath, [ref]$null, [ref]$arrErrors)
+    if ($arrErrors.Count -ne 0) { throw 'main-failure-wiring-parser' }
+    $objLast = $objAst.EndBlock.Statements[$objAst.EndBlock.Statements.Count - 1]
+    if ($objLast -isnot [System.Management.Automation.Language.TryStatementAst]) { throw 'main-failure-wiring-catch' }
+    $strSha = & $script:scriptBlockGetByteArraySha256 -Bytes ([System.Text.Encoding]::UTF8.GetBytes($objLast.Extent.Text))
+    if ($strSha -cne '3443b1ef8c10d8b683a50868380794cd45a33d0d82e5c3270eff337621708316') { throw 'main-failure-wiring-content' }
+    foreach ($strName in @('scriptBlockGetTerraformMainFailure', 'scriptBlockConvertCandidateMainFailure')) {
+        $arrBindings = @($objAst.FindAll({
+            param ($Node)
+            $Node -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+            $Node.Left -is [System.Management.Automation.Language.VariableExpressionAst] -and
+            ($Node.Left.VariablePath.UserPath -replace '^(script|local|private|global):', '') -ieq $strName
+        }, $true))
+        if ($arrBindings.Count -ne 1 -or $arrBindings[0].Parent -ne $objAst.EndBlock -or
+            $arrBindings[0].Left.Extent.Text -cne ('$script:' + $strName)) { throw 'main-failure-wiring-binding' }
+    }
+    $arrProjection = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left.Extent.Text -ceq '$script:scriptBlockGetTerraformMainFailure'
+    })
+    if ($arrProjection.Count -ne 1) { throw 'main-failure-wiring-projection' }
+    $strCall = '$Failure = & $script:scriptBlockConvertCandidateMainFailure -Failure $Failure'
+    if ([regex]::Matches($arrProjection[0].Extent.Text, [regex]::Escape($strCall)).Count -ne 1) { throw 'main-failure-wiring-adapter' }
+}
+
+$script:scriptBlockAssertCandidateMainFailureWiringMutants = {
+    param ([string]$HarnessLiteralPath, [string]$RunRoot)
+
+    & $script:scriptBlockAssertCandidateMainFailureWiring -LiteralPath $HarnessLiteralPath
+    $strSource = [System.IO.File]::ReadAllText($HarnessLiteralPath)
+    $objAst = [System.Management.Automation.Language.Parser]::ParseFile($HarnessLiteralPath, [ref]$null, [ref]$null)
+    $objLast = $objAst.EndBlock.Statements[$objAst.EndBlock.Statements.Count - 1]
+    $listMutants = New-Object 'System.Collections.Generic.List[object]'
+    foreach ($strMode in @('raw-error', 'stdout', 'zero-exit', 'raw-message')) {
+        $strMutant = switch -Exact ($strMode) {
+            'raw-error' { $objLast.Extent.Text.Replace('exit 1', 'Write-Error -ErrorRecord $_; exit 1') }
+            'stdout' { $objLast.Extent.Text.Replace('[System.Console]::Error.WriteLine(', '[System.Console]::Out.WriteLine(') }
+            'zero-exit' { $objLast.Extent.Text.Replace('exit 1', 'exit 0') }
+            'raw-message' { $objLast.Extent.Text.Replace('(& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objFailureProjection)', '$_.Exception.Message') }
+        }
+        if ($strMutant -ceq $objLast.Extent.Text) { throw 'main-failure-mutant-anchor' }
+        $listMutants.Add([pscustomobject]@{
+            Source = $strSource.Substring(0, $objLast.Extent.StartOffset) + $strMutant + $strSource.Substring($objLast.Extent.EndOffset)
+            Detail = 'main-failure-wiring-content'
+        })
+    }
+    $arrProjection = @($objAst.EndBlock.Statements | Where-Object {
+        $_ -is [System.Management.Automation.Language.AssignmentStatementAst] -and
+        $_.Left.Extent.Text -ceq '$script:scriptBlockGetTerraformMainFailure'
+    })
+    $strProjection = $arrProjection[0].Extent.Text.Replace('$Failure = & $script:scriptBlockConvertCandidateMainFailure -Failure $Failure', '$null = $Failure')
+    if ($strProjection -ceq $arrProjection[0].Extent.Text) { throw 'main-failure-mutant-anchor' }
+    $listMutants.Add([pscustomobject]@{
+        Source = $strSource.Substring(0, $arrProjection[0].Extent.StartOffset) + $strProjection + $strSource.Substring($arrProjection[0].Extent.EndOffset)
+        Detail = 'main-failure-wiring-adapter'
+    })
+    foreach ($strName in @('scriptBlockGetTerraformMainFailure', 'scriptBlockConvertCandidateMainFailure')) {
+        foreach ($strScope in @('', 'script:', 'local:', 'private:', 'global:')) {
+            $strWrite = '$' + $strScope + $strName.ToUpperInvariant() + ' = { return $null }' + [char]10
+            $listMutants.Add([pscustomobject]@{
+                Source = $strSource.Insert($objLast.Extent.StartOffset, $strWrite)
+                Detail = 'main-failure-wiring-binding'
+            })
+        }
+    }
+    $strRoot = [System.IO.Path]::Combine($RunRoot, 'main-failure-static-mutants')
+    [void][System.IO.Directory]::CreateDirectory($strRoot)
+    try {
+        $intIndex = 0
+        foreach ($objMutant in $listMutants) {
+            $intIndex++
+            $strPath = [System.IO.Path]::Combine($strRoot, ('mutant-' + $intIndex + '.ps1'))
+            [System.IO.File]::WriteAllText($strPath, $objMutant.Source, (New-Object System.Text.UTF8Encoding($false)))
+            $strFailure = $null
+            try { & $script:scriptBlockAssertCandidateMainFailureWiring -LiteralPath $strPath } catch { $strFailure = $_.Exception.Message }
+            if ($strFailure -cne $objMutant.Detail) { throw ('main-failure-wiring-mutant-' + $intIndex) }
+        }
+    } finally { & $script:scriptBlockRemoveTestTree -LiteralPath $strRoot -ApprovedParent $RunRoot }
+}
+
 function Invoke-StyleGuideCandidateHarness {
     # .SYNOPSIS
-    # Executes the fixed 115-case style-guide candidate harness.
+    # Executes the fixed 450-case style-guide candidate harness.
     #
     # .DESCRIPTION
     # Authenticates the fixed production scripts, loads their public functions,
@@ -11137,26 +21700,23 @@ function Invoke-StyleGuideCandidateHarness {
     # .EXAMPLE
     # Invoke-StyleGuideCandidateHarness
     #
-    # # Emits exactly one canonical JSON object for every catalog row.
-    #
-    # .EXAMPLE
-    # $arrCaseJson = @(Invoke-StyleGuideCandidateHarness)
-    #
-    # # Captures the complete canonical JSONL projection for further validation.
+    # # Writes case, proof, primitive, and envelope JSONL directly to native stdout.
+    # # A native process caller must capture stdout bytes for further validation.
     #
     # .INPUTS
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # [string] One canonical JSON object per style-guide candidate case.
+    # None. The success stream is empty. Native stdout receives strict BOM-less
+    # UTF-8 JSONL with one LF terminator per record.
     #
     # .NOTES
     # This function consumes only the fixed script parameters and repository
     # paths established by the enclosing trusted harness.
     #
-    # Version: 1.0.20260811.0
+    # Version: 1.0.20260927.0
     [CmdletBinding(PositionalBinding = $false)]
-    [OutputType([string])]
+    [OutputType([void])]
     param ()
 
     Set-StrictMode -Version Latest
@@ -11257,40 +21817,15 @@ function Invoke-StyleGuideCandidateHarness {
     if ($strGitPath.Length -eq 0) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'git-missing'
     }
-    $hashtableHelperEvidenceBefore = & $script:scriptBlockGetFileEvidence `
-        -LiteralPath $strHelperLiteralPath
-    $hashtableContextEvidenceBefore = & $script:scriptBlockGetFileEvidence `
-        -LiteralPath $strContextLiteralPath
-    $hashtableCatalogEvidenceBefore = & $script:scriptBlockGetFileEvidence `
-        -LiteralPath $strCatalogPath
-
-    [void](& $script:scriptBlockAssertTrackedScriptIdentity `
-        -RepositoryRoot $strRepositoryRoot `
-        -GitPath $strGitPath `
-        -LiteralPath $strHelperLiteralPath `
-        -RelativePath $script:strCandidateHelperRelativePath `
-        -ExpectedVersion $script:strCandidateExpectedHelperVersion `
-        -ExpectedFunctionCount ([uint32]1))
-    [void](& $script:scriptBlockAssertTrackedScriptIdentity `
-        -RepositoryRoot $strRepositoryRoot `
-        -GitPath $strGitPath `
-        -LiteralPath $strContextLiteralPath `
-        -RelativePath $script:strCandidateContextRelativePath `
-        -ExpectedVersion $script:strCandidateExpectedContextVersion `
-        -ExpectedFunctionCount ([uint32]3))
-
-    # The catalog is the oracle. Authenticate it against HEAD, the index, and the
-    # no-filter working object before consuming a single expectation, exactly as
-    # the two production scripts are authenticated. The allocation hash binds only
-    # case IDs, semantic names, and profile names, so without this a staged or
-    # unstaged catalog edit could rewrite expected diagnostics, states, counts, or
-    # closed sets and still be accepted as the oracle.
-    [void](& $script:scriptBlockAssertTrackedBlobIdentity `
-        -RepositoryRoot $strRepositoryRoot `
-        -GitPath $strGitPath `
-        -LiteralPath $strCatalogPath `
-        -RelativePath $script:strCandidateCatalogRelativePath)
+    $hashtableRunIdentityBefore = & $script:scriptBlockGetTerraformRunIdentity -RepositoryRoot $strRepositoryRoot -GitPath $strGitPath -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -CatalogPath $strCatalogPath -HarnessPath $PSCommandPath
+    & $script:scriptBlockAssertRunIdentityControls -Identity $hashtableRunIdentityBefore
+    $hashtableHelperEvidenceBefore = [ordered]@{ Length = $hashtableRunIdentityBefore.HelperLength; Sha256 = $hashtableRunIdentityBefore.HelperSha256 }
+    $hashtableContextEvidenceBefore = [ordered]@{ Length = $hashtableRunIdentityBefore.ContextLength; Sha256 = $hashtableRunIdentityBefore.ContextSha256 }
+    $hashtableCatalogEvidenceBefore = [ordered]@{ Length = $hashtableRunIdentityBefore.CatalogLength; Sha256 = $hashtableRunIdentityBefore.CatalogSha256 }
+    & $script:scriptBlockAssertTerraformCanonicalNumericTypes
     $objCatalog = & $script:scriptBlockReadCandidateCatalog -LiteralPath $strCatalogPath
+    $script:objCandidateSourceCatalog = $objCatalog.SourceProvenance.TerraformCatalog
+    $script:objCandidateActiveCatalog = $objCatalog
     [void](& $script:scriptBlockAssertProductionTaxonomyClosed `
         -Catalog $objCatalog `
         -LiteralPath ([string[]]@($strHelperLiteralPath, $strContextLiteralPath)))
@@ -11318,7 +21853,9 @@ function Invoke-StyleGuideCandidateHarness {
             'versionCandidateContext' =
                 $script:strCandidateExpectedContextVersion
         })
+    [void](& $script:scriptBlockAssertUtf8DecoderWired -LiteralPath $strHelperLiteralPath)
     [void](& $script:scriptBlockAssertResourceGuardsWired -LiteralPath $strHelperLiteralPath)
+    & $script:scriptBlockAssertMemoryOnlyModuleInitializationControls -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
     [void](& $script:scriptBlockAssertContextReadsAreCaptured `
         -LiteralPath $strHelperLiteralPath)
     $arrContextLoadOutput = @(. $strContextLiteralPath)
@@ -11329,6 +21866,23 @@ function Invoke-StyleGuideCandidateHarness {
     if ($arrHelperLoadOutput.Count -ne 0) {
         & $script:scriptBlockStopHarness -Code 'script-identity-invalid' -Detail 'helper-load-output'
     }
+    $hashtableCandidatePrivate = & $script:scriptBlockGetTerraformPrivatePredicates -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+    $script:scriptBlockGetCandidateHelperEntry = $hashtableCandidatePrivate.HelperEntry
+    $script:scriptBlockAssertCandidateHelperOrdinaryRegularFile = $hashtableCandidatePrivate.HelperRegular
+    $script:scriptBlockNewCandidateHelperRecord = $hashtableCandidatePrivate.HelperNewRecord
+    $script:scriptBlockAssertCandidateHelperContext = $hashtableCandidatePrivate.HelperAssertContext
+    $script:scriptBlockAddCandidateHelperRecord = $hashtableCandidatePrivate.HelperAddRecord
+    $script:scriptBlockAssertCandidateHelperJournalCurrent = $hashtableCandidatePrivate.HelperJournalCurrent
+    $script:scriptBlockAssertCandidateHelperRecordUnchanged = $hashtableCandidatePrivate.HelperRecordUnchanged
+    $script:scriptBlockAssertCandidateHelperArchiveEntryCount = $hashtableCandidatePrivate.HelperArchiveEntryCount
+    $script:scriptBlockTestCandidateHelperNegativeZip64Length = $hashtableCandidatePrivate.HelperNegativeZip64Length
+    $script:scriptBlockReadCandidateHelperValidatedFile = $hashtableCandidatePrivate.HelperReadValidated
+    $script:scriptBlockAddCandidateHelperActualLength = $hashtableCandidatePrivate.HelperActualLength
+    $script:scriptBlockAddCandidateHelperDeclaredLength = $hashtableCandidatePrivate.HelperDeclaredLength
+    $script:scriptBlockTestCandidateHelperPathContained = $hashtableCandidatePrivate.HelperContained
+    $script:scriptBlockGetCandidateImmediateEntry = $hashtableCandidatePrivate.ContextEntry
+    $script:scriptBlockAssertCandidateOrdinaryRegularFile = $hashtableCandidatePrivate.ContextRegular
+    $script:scriptBlockSetCandidateIssuedState = $hashtableCandidatePrivate.SourceSetState
     foreach ($strFunctionName in @(
         'New-StyleGuideCandidateInvocationContext',
         'Remove-StyleGuideCandidateInvocationContext',
@@ -11382,6 +21936,8 @@ function Invoke-StyleGuideCandidateHarness {
     }
     [void][System.IO.Directory]::CreateDirectory($strRunRoot)
 
+    $script:objCandidateSourceLinkAdmission = & $script:scriptBlockGetSourceLinkAdmission -Catalog $objCatalog
+    $script:listCandidatePrimitiveEvidence = New-Object 'System.Collections.Generic.List[object]'
     $uintPassCount = [uint32]0
     $uintFailCount = [uint32]0
     $uintSkipCount = [uint32]0
@@ -11392,6 +21948,49 @@ function Invoke-StyleGuideCandidateHarness {
         [System.StringComparer]::Ordinal
     )
     try {
+        & $script:scriptBlockAssertRegisterRemovalControls -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertDiagnosticDomainMutants -Catalog $objCatalog -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertDiagnosticSplatControls -Catalog $objCatalog -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertCandidateFallbackDestinationControls -Catalog $objCatalog -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertContextDefinitionPinControls -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertContextBindingControls -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertTerminalCapabilityClosureMutations -Source ([System.IO.File]::ReadAllText($strHelperLiteralPath)) -Role helper
+        & $script:scriptBlockAssertTerminalCapabilityClosureMutations -Source ([System.IO.File]::ReadAllText($strContextLiteralPath)) -Role context
+        & $script:scriptBlockAssertOriginalOracleProfileControls -Catalog $objCatalog
+        & $script:scriptBlockAssertCandidateSubreasonFamilyControls -Catalog $objCatalog -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertCandidateStaticAdaptationControls -Catalog $objCatalog -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertManagerQualifiedPathAllowanceMutants -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertManagerPathAdmission -Catalog $objCatalog
+        & $script:scriptBlockAssertQualifiedScriptClaims -ExpectedPath $strHelperLiteralPath
+        & $script:scriptBlockAssertNativeStartClassified -GitPath $strGitPath -WorkingDirectory $strRunRoot
+        & $script:scriptBlockAssertRunIdentityWiringMutants -HarnessLiteralPath $PSCommandPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertFixtureSnapshotComparison -RunRoot $strRunRoot
+        & $script:scriptBlockAssertCapturedMetadataCallbacks -RunRoot $strRunRoot
+        & $script:scriptBlockAssertPublicCaptureSourceControls -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertPublicLifecycleBoundaries -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertCapturedStringCallbacks -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath
+        & $script:scriptBlockAssertCapturedArrayExpansion -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath
+        & $script:scriptBlockAssertCapturedMetadataMutants -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertEqualsReceiverAliasBounded -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertTerraformZipGetterMutants -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertTerraformArchiveHashMutants -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertUtf8DecoderMutants -LiteralPath $strHelperLiteralPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertUtf8DecoderStateIsolated -RunRoot $strRunRoot
+        & $script:scriptBlockAssertCandidateVersionProgressionControls
+        & $script:scriptBlockAssertOmittedResultFieldsCompared -Catalog $objCatalog `
+            -OperatingSystem $strOperatingSystem -PowerShellEdition $strPowerShellEdition `
+            -PowerShellVersion $versionPowerShell -HarnessLiteralPath $PSCommandPath
+        & $script:scriptBlockAssertInitialStateAdmissionMutants -CatalogLiteralPath $strCatalogPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertCatalogCaseAdmissionMutants -Catalog $objCatalog -CatalogLiteralPath $strCatalogPath -RunRoot $strRunRoot
+        $script:strTerraformHarnessStage = 'source-assertions'
+        & $script:scriptBlockAssertCandidateMainFailureWiringMutants -HarnessLiteralPath $PSCommandPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertTerraformVersionLayoutControls -HelperSource ([System.IO.File]::ReadAllText($strHelperLiteralPath)) -ContextSource ([System.IO.File]::ReadAllText($strContextLiteralPath))
+        & $script:scriptBlockAssertCandidateRawEvidenceWiring -LiteralPath $PSCommandPath
+        & $script:scriptBlockAssertAcceptedExecutionControls
+        & $script:scriptBlockAssertAcceptedExecutionWiringMutants -LiteralPath $PSCommandPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertSourceLinkControls -Catalog $objCatalog -CatalogLiteralPath $strCatalogPath -RunRoot $strRunRoot -HarnessLiteralPath $PSCommandPath -ExecutedLinkCategories $objExecutedLinkCategories
+        & $script:scriptBlockAssertSourceLinkSkipEvidence -Catalog $objCatalog
+        & $script:scriptBlockAssertRequiredLinkLateFailures -Catalog $objCatalog -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -GitPath $strGitPath
         & $script:scriptBlockAssertCatalogMutationsRejected `
             -Catalog $objCatalog `
             -RunRoot $strRunRoot
@@ -11401,6 +22000,8 @@ function Invoke-StyleGuideCandidateHarness {
         & $script:scriptBlockAssertEnumerationPrimitiveExclusive `
             -HelperLiteralPath $strHelperLiteralPath `
             -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertCaptureMutantsRefused -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertModuleBridgeMutantsRefused -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertArchiveLengthReadOnce `
             -HelperLiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertStaticMembersResolve `
@@ -11408,31 +22009,37 @@ function Invoke-StyleGuideCandidateHarness {
             -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertDownloadPathProvenance `
             -HelperLiteralPath $strHelperLiteralPath
+        & $script:scriptBlockAssertRegularFileProofSourceMutants -LiteralPath $PSCommandPath -RunRoot $strRunRoot
         & $script:scriptBlockAssertRegularFileProofExecutes `
             -RunRoot $strRunRoot `
             -HelperLiteralPath $strHelperLiteralPath `
             -ContextLiteralPath $strContextLiteralPath
-        & $script:scriptBlockAssertJournalSwapRefused -RunRoot $strRunRoot
+        & $script:scriptBlockAssertJournalSwapRefused -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertRetainedSequenceFromCapture -RunRoot $strRunRoot
+        & $script:scriptBlockAssertRetainedCaptureProduction -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertOrdinaryFileProofWired `
             -LiteralPath $strHelperLiteralPath
         & $script:scriptBlockAssertRound63JournalPlanWired `
             -LiteralPath $strHelperLiteralPath
-        & $script:scriptBlockAssertCandidateRecordUnchangedRefused
-        & $script:scriptBlockAssertPreexistingRecordReproofRefused -RunRoot $strRunRoot
+        & $script:scriptBlockAssertCandidateRecordUnchangedRefused -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertPreexistingRecordReproofRefused -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertPartialWriteRetention -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath
+        & $script:scriptBlockAssertGeneratedPathsBeforeAcquisition -RunRoot $strRunRoot -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertDownloadLeafGuardExecutes `
             -HelperLiteralPath $strHelperLiteralPath `
             -RunRoot $strRunRoot
         & $script:scriptBlockAssertLifecycleRecordStatesRejected -RunRoot $strRunRoot `
-            -HelperLiteralPath $strHelperLiteralPath
+            -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertRound73RegisterLeakDeregistered -RunRoot $strRunRoot `
-            -ContextLiteralPath $strContextLiteralPath
-        & $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow -RunRoot $strRunRoot
+            -ContextLiteralPath $strContextLiteralPath -HelperLiteralPath $strHelperLiteralPath
+        & $script:scriptBlockAssertRound73RefusedWriteToleranceNarrow -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
         & $script:scriptBlockAssertResourceGuardsReached `
             -LiteralPath $strHelperLiteralPath `
+            -ContextLiteralPath $strContextLiteralPath `
             -RunRoot $strRunRoot
         & $script:scriptBlockAssertArchiveTrailerAgreementEnforced `
             -LiteralPath $strHelperLiteralPath `
+            -ContextLiteralPath $strContextLiteralPath `
             -RunRoot $strRunRoot
         & $script:scriptBlockAssertDirectoryReadsBounded `
             -LiteralPath $strHelperLiteralPath `
@@ -11443,6 +22050,7 @@ function Invoke-StyleGuideCandidateHarness {
             -OperatingSystem $strOperatingSystem `
             -PowerShellEdition $strPowerShellEdition `
             -PowerShellVersion $versionPowerShell
+        $script:strTerraformHarnessStage = 'functional-cases'
         foreach ($objCase in $objCatalog.Cases) {
             if (-not $objExecutedCaseIds.Add([string]$objCase.CaseId)) {
                 & $script:scriptBlockStopHarness -Code 'catalog-invalid' -Detail 'duplicate-execution'
@@ -11477,7 +22085,43 @@ function Invoke-StyleGuideCandidateHarness {
                 $objObservation.SkipCode = 'skip-opposite-platform'
             } else {
                 try {
-                    if ($objCase.SemanticCase.StartsWith(
+                    $objObservation = & $script:scriptBlockTestSourceLinkPrimitive -Case $objCase -RunRoot $strRunRoot
+                    if ($null -ne $objObservation) {
+                        # A failed, completed primitive probe is the only link skip.
+                    } elseif ($objCase.PrimitiveProbeRule -ceq 'required-link') {
+                        $objObservation = & $script:scriptBlockInvokeRequiredLinkFixture -Case $objCase -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -GitPath $strGitPath
+                    } elseif ($objCase.FixtureRecipe -ceq 'source-lifecycle') {
+                        $objObservation = & $script:scriptBlockInvokeSourceLifecycleFixture -Case $objCase -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath
+                    } elseif ($objCase.FixtureRecipe -cin @('source-accepted-script', 'source-single-label')) {
+                        $objObservation = & $script:scriptBlockInvokeAcceptedExecutionFixture -Case $objCase -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -GitPath $strGitPath
+                    } elseif ($objCase.FixtureRecipe -ceq 'manager-path-boundary') {
+                        $objObservation = & $script:scriptBlockInvokeManagerPathFixture -Case $objCase -RunRoot $strRunRoot -ContextLiteralPath $strContextLiteralPath
+                    } elseif ($objCase.FixtureRecipe -ceq 'source-catalog-integrity') {
+                        $objObservation = & $script:scriptBlockInvokeSourceCatalogIntegrityFixture -Case $objCase -RunRoot $strRunRoot -CatalogLiteralPath $strCatalogPath
+                    } elseif ($objCase.FixtureRecipe -ceq 'source-missing-archive') {
+                        $objObservation = & $script:scriptBlockInvokeTerraformMissingArchiveCase `
+                            -Case $objCase -RunRoot $strRunRoot `
+                            -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+                    } elseif ($objCase.FixtureRecipe -ceq 'source-owned-unreadable') {
+                        $objObservation = & $script:scriptBlockInvokeSourceOwnedUnreadableFixture -Case $objCase -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath
+                    } elseif ($objCase.FixtureRecipe -ceq 'source-journal-raw') {
+                        $objObservation = & $script:scriptBlockInvokeSourceJournalRawFixture -Case $objCase -RunRoot $strRunRoot
+                    } elseif ($objCase.FixtureRecipe -ceq 'source-partial-context') {
+                        $objObservation = & $script:scriptBlockInvokeTerraformPartialContextCase `
+                            -Case $objCase -RunRoot $strRunRoot `
+                            -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+                    } elseif ($objCase.FixtureRecipe -ceq 'source-raw-boundary') {
+                        $objObservation = & $script:scriptBlockInvokeSourceRawBoundaryFixture `
+                            -Case $objCase -RunRoot $strRunRoot `
+                            -HelperSourcePath $strHelperLiteralPath -ContextSourcePath $strContextLiteralPath
+                    } elseif ($objCase.FixtureRecipe -ceq 'source-native-identity') {
+                        $objObservation = & $script:scriptBlockInvokeSourceNativeIdentityFixture `
+                            -Case $objCase `
+                            -RunRoot $strRunRoot `
+                            -GitPath $strGitPath `
+                            -HelperSourcePath $strHelperLiteralPath `
+                            -ContextSourcePath $strContextLiteralPath
+                    } elseif ($objCase.SemanticCase.StartsWith(
                         'script.',
                         [System.StringComparison]::Ordinal
                     )) {
@@ -11534,7 +22178,8 @@ function Invoke-StyleGuideCandidateHarness {
                 -Observation $objObservation `
                 -OperatingSystem $strOperatingSystem `
                 -PowerShellEdition $strPowerShellEdition `
-                -PowerShellVersion $versionPowerShell
+                -PowerShellVersion $versionPowerShell `
+                -PrimitiveEvidence $script:listCandidatePrimitiveEvidence.ToArray()
             switch -Exact ($objResult.HarnessVerdict) {
                 'pass' { $uintPassCount++ }
                 'fail' { $uintFailCount++ }
@@ -11545,7 +22190,7 @@ function Invoke-StyleGuideCandidateHarness {
                         -Detail 'result-verdict'
                 }
             }
-            Write-Output (& $script:scriptBlockConvertToCanonicalCaseJson -Result $objResult)
+            & $script:scriptBlockWriteCandidateJsonLine -Json (& $script:scriptBlockConvertToCanonicalCaseJson -Result $objResult)
         }
 
         if ($objExecutedCaseIds.Count -ne $script:intCandidateCaseCount -or
@@ -11553,47 +22198,61 @@ function Invoke-StyleGuideCandidateHarness {
                 [uint32]$script:intCandidateCaseCount) {
             & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'result-total'
         }
-        foreach ($strRequiredLinkCategory in @('root', 'below-root', 'candidate', 'context')) {
-            if (-not $objExecutedLinkCategories.Contains($strRequiredLinkCategory)) {
-                & $script:scriptBlockStopHarness `
-                    -Code 'orchestration-failed' `
-                    -Detail 'required-link-coverage'
-            }
-        }
+        $script:strTerraformHarnessStage = 'harness-proofs'
+        & $script:scriptBlockAssertCandidateJsonWriterMutants -HarnessLiteralPath $PSCommandPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertCandidateJsonWire -HarnessLiteralPath $PSCommandPath -RunRoot $strRunRoot
+        & $script:scriptBlockAssertTerraformNegativeZip64Fallback -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath
+        & $script:scriptBlockAssertTerraformFixtureClassification -Classification $script:listCandidateFixtureClassification.ToArray()
 
-        [void](& $script:scriptBlockAssertTrackedScriptIdentity `
-            -RepositoryRoot $strRepositoryRoot `
-            -GitPath $strGitPath `
-            -LiteralPath $strHelperLiteralPath `
-            -RelativePath $script:strCandidateHelperRelativePath `
-            -ExpectedVersion $script:strCandidateExpectedHelperVersion `
-            -ExpectedFunctionCount ([uint32]1))
-        [void](& $script:scriptBlockAssertTrackedScriptIdentity `
-            -RepositoryRoot $strRepositoryRoot `
-            -GitPath $strGitPath `
-            -LiteralPath $strContextLiteralPath `
-            -RelativePath $script:strCandidateContextRelativePath `
-            -ExpectedVersion $script:strCandidateExpectedContextVersion `
-            -ExpectedFunctionCount ([uint32]3))
-        $hashtableHelperEvidenceAfter = & $script:scriptBlockGetFileEvidence `
-            -LiteralPath $strHelperLiteralPath
-        $hashtableContextEvidenceAfter = & $script:scriptBlockGetFileEvidence `
-            -LiteralPath $strContextLiteralPath
-        $hashtableCatalogEvidenceAfter = & $script:scriptBlockGetFileEvidence `
-            -LiteralPath $strCatalogPath
-        foreach ($strEvidenceName in @('Length', 'Sha256')) {
-            if ($hashtableHelperEvidenceBefore[$strEvidenceName] -cne
-                    $hashtableHelperEvidenceAfter[$strEvidenceName] -or
-                $hashtableContextEvidenceBefore[$strEvidenceName] -cne
-                    $hashtableContextEvidenceAfter[$strEvidenceName] -or
-                $hashtableCatalogEvidenceBefore[$strEvidenceName] -cne
-                    $hashtableCatalogEvidenceAfter[$strEvidenceName]) {
-                & $script:scriptBlockStopHarness `
-                    -Code 'orchestration-failed' `
-                    -Detail 'source-state-changed'
-            }
+        $hashtableProofSourceIdentity = [ordered]@{
+            HelperSha256 = $hashtableHelperEvidenceBefore.Sha256
+            ContextSha256 = $hashtableContextEvidenceBefore.Sha256
+            HarnessSha256 = $hashtableRunIdentityBefore.HarnessSha256
+            CatalogSha256 = $hashtableCatalogEvidenceBefore.Sha256
         }
-        Write-Output (& $script:scriptBlockConvertToCanonicalEnvelopeJson `
+        $hashtableProofRuntime = [ordered]@{
+            Id = $strRequiredRuntime; Platform = $strOperatingSystem
+            Edition = $strPowerShellEdition; Version = $versionPowerShell.ToString()
+        }
+        $objProofManifest = & $script:scriptBlockGetCandidateProofManifest -Catalog $objCatalog
+        & $script:scriptBlockAssertCandidateProofManifestMutants -Catalog $objCatalog
+        $listProofResults = New-Object 'System.Collections.Generic.List[pscustomobject]'
+        foreach ($objProof in $objProofManifest.Rows) {
+            $objProofObservation = if ($objProof.Id -ceq 'T1A-H-01') {
+                & $script:scriptBlockInvokeTerraformH01Proof -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -SourceIdentity $hashtableProofSourceIdentity
+            } else {
+                & $script:scriptBlockInvokeTerraformH02Proof -RunRoot $strRunRoot -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -SourceIdentity $hashtableProofSourceIdentity
+            }
+            [void](& $script:scriptBlockAssertTerraformProofEvidenceMutants -Observation $objProofObservation -Id $objProof.Id -SourceIdentity $hashtableProofSourceIdentity)
+            $listProofResults.Add((& $script:scriptBlockNewTerraformProofResult -Row $objProof -Observation $objProofObservation -Runtime $hashtableProofRuntime -SourceIdentity $hashtableProofSourceIdentity))
+        }
+        & $script:scriptBlockAssertTerraformResultRowCloning -FullResults $listProofResults.ToArray()
+        & $script:scriptBlockAssertTerraformResultPairMutants -Expected $objProofManifest.Rows -Results $listProofResults.ToArray() -RuntimeId $strRequiredRuntime -Proof
+        if ((& $script:scriptBlockGetFileEvidence -LiteralPath $PSCommandPath).Sha256 -cne $hashtableProofSourceIdentity.HarnessSha256) {
+            & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'source-state-changed'
+        }
+        foreach ($objProofResult in $listProofResults) { & $script:scriptBlockWriteCandidateJsonLine -Json ($objProofResult | ConvertTo-Json -Depth 30 -Compress) }
+
+        $script:strTerraformHarnessStage = 'result-sealing'
+        foreach ($objPrimitiveEvidence in $script:listCandidatePrimitiveEvidence) {
+            & $script:scriptBlockWriteCandidateJsonLine -Json (([ordered]@{
+                Schema = 'PSStyleGuide.CandidatePrimitiveEvidence.v1'; SchemaVersion = [uint32]1
+                OperatingSystem = $strOperatingSystem; PowerShellEdition = $strPowerShellEdition
+                PowerShellVersion = $versionPowerShell.ToString(); Evidence = $objPrimitiveEvidence
+            }) | ConvertTo-Json -Depth 4 -Compress)
+        }
+        & $script:scriptBlockAssertRequiredLinkCoverage -Categories $objExecutedLinkCategories
+
+        $hashtableRunIdentityAfter = & $script:scriptBlockGetTerraformRunIdentity -RepositoryRoot $strRepositoryRoot -GitPath $strGitPath -HelperLiteralPath $strHelperLiteralPath -ContextLiteralPath $strContextLiteralPath -CatalogPath $strCatalogPath -HarnessPath $PSCommandPath
+        try {
+            & $script:scriptBlockAssertRunIdentityEqual -Before $hashtableRunIdentityBefore -After $hashtableRunIdentityAfter
+        } catch {
+            & $script:scriptBlockStopHarness -Code 'orchestration-failed' -Detail 'source-state-changed'
+        }
+        $hashtableHelperEvidenceAfter = [ordered]@{ Length = $hashtableRunIdentityAfter.HelperLength; Sha256 = $hashtableRunIdentityAfter.HelperSha256 }
+        $hashtableContextEvidenceAfter = [ordered]@{ Length = $hashtableRunIdentityAfter.ContextLength; Sha256 = $hashtableRunIdentityAfter.ContextSha256 }
+        $hashtableCatalogEvidenceAfter = [ordered]@{ Length = $hashtableRunIdentityAfter.CatalogLength; Sha256 = $hashtableRunIdentityAfter.CatalogSha256 }
+        & $script:scriptBlockWriteCandidateJsonLine -Json (& $script:scriptBlockConvertToCanonicalEnvelopeJson `
                 -HelperEvidence $hashtableHelperEvidenceAfter `
                 -ContextEvidence $hashtableContextEvidenceAfter `
                 -CatalogEvidence $hashtableCatalogEvidenceAfter)
@@ -11608,9 +22267,14 @@ function Invoke-StyleGuideCandidateHarness {
     }
 }
 
+$script:strTerraformHarnessStage = 'startup'
 try {
+    & $script:scriptBlockAssertTerraformMainFailureProjection
+    & $script:scriptBlockAssertCandidateMainFailureAdapter
     Invoke-StyleGuideCandidateHarness
 } catch {
-    Write-Error -ErrorRecord $_
+    $objFailureProjection = & $script:scriptBlockGetTerraformMainFailure -Failure $_ -Stage $script:strTerraformHarnessStage
+    [System.Console]::Error.WriteLine(
+        (& $script:scriptBlockConvertToCanonicalCatalogJson -Value $objFailureProjection))
     exit 1
 }
