@@ -30,7 +30,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.4.20260919.0
+# Version: 1.5.20260927.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -52,7 +52,7 @@ if ($arrDeclaredOutputTypes.Count -ne 1 -or
 }
 $script:strMaximumMetadataUtcDate = $MaximumMetadataUtcDate
 
-$strHelperVersionPattern = '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-58]))|1\.2026091[45]|2\.20260917|(?:1|3)\.20260919)\.0\.$'
+$strHelperVersionPattern = '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-58]))|1\.2026091[45]|2\.20260917|(?:1|3)\.20260919|(?:0|2)\.20260927)\.0\.$'
 $strHelpValidatorSource = [IO.File]::ReadAllText(
     (Join-Path $PSScriptRoot 'Test-AgentInstructions.ps1'))
 if ([regex]::Matches($strHelpValidatorSource,
@@ -65,7 +65,7 @@ $arrExpectedHelperVersions = @(
     '1.0.20260912.0', '1.0.20260913.0',
     '1.0.20260914.0', '1.0.20260915.0', '1.0.20260918.0',
     '1.1.20260914.0', '1.1.20260915.0', '1.2.20260917.0',
-    '1.1.20260919.0', '1.3.20260919.0'
+    '1.1.20260919.0', '1.3.20260919.0', '1.0.20260927.0', '1.2.20260927.0'
 )
 $intHelperVersionCases = 0
 $intAcceptedHelperVersions = 0
@@ -90,7 +90,7 @@ foreach ($intMinorVersion in 0..3) {
         }
     }
 }
-if ($intHelperVersionCases -ne 792 -or $intAcceptedHelperVersions -ne 14) {
+if ($intHelperVersionCases -ne 792 -or $intAcceptedHelperVersions -ne 16) {
     throw 'The helper-version fixture census is incomplete.'
 }
 

@@ -3,7 +3,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.14.20260919.0
+# Version: 1.15.20260927.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -92,6 +92,7 @@ $script:arrTrustRootPaths = @(
     '.github/workflows/trust-root-authorization.json',
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
+    '.github/workflows/copilot-setup-steps.yml',
     '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
     '.github/workflows/pull-request-body-identity-cases.json',
     '.github/workflows/pull-request-body-identity.yml',
@@ -139,6 +140,7 @@ $script:arrPushGovernedExactPaths = @(
     '.github/workflows/markdownlint.yml',
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
+    '.github/workflows/copilot-setup-steps.yml',
     '.gitignore',
     '.npmrc',
     'docs/ISSUE_EVALUATION_PROMPT.md',
@@ -8027,7 +8029,7 @@ if ($SelfTest) {
                 }
                 if ([regex]::Matches(
                         $strFunctionNotes,
-                        '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-58]))|1\.2026091[45]|2\.20260917|(?:1|3)\.20260919)\.0\.$'
+                        '(?m)^Version: 1\.(?:0\.(?:2026083[01]|202609(?:0[23]|1[2-58]))|1\.2026091[45]|2\.20260917|(?:1|3)\.20260919|(?:0|2)\.20260927)\.0\.$'
                     ).Count -ne 1) {
                     $listMissingHelp.Add('landing or repair helper Version')
                 }
@@ -8067,7 +8069,7 @@ if ($SelfTest) {
             [pscustomobject]@{
                 Source = $strTrustRootAuthorizationSource
                 Path = $strTrustRootAuthorizationPath
-                ExpectedFunctionCount = 14
+                ExpectedFunctionCount = 15
             },
             [pscustomobject]@{
                 Source = $strExtractedSelfTestSource
@@ -8089,7 +8091,7 @@ if ($SelfTest) {
                 Name = 'trust-root authorization helper'
                 Source = $strTrustRootAuthorizationSource
                 Path = $strTrustRootAuthorizationPath
-                ExpectedFunctionCount = 14
+                ExpectedFunctionCount = 15
                 FunctionName = 'Invoke-BoundedProcessByte'
             },
             [pscustomobject]@{
@@ -8139,9 +8141,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.14\.20260919\.0$'
+            '(?m)^# Version: 1\.15\.20260927\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.14.20260919.0.'
+        throw 'The validator script version is not 1.15.20260927.0.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -9002,9 +9004,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strTrustRootAuthorizationSource,
-            '(?m)^# Version: 1\.7\.20260919\.0$'
+            '(?m)^# Version: 1\.8\.20260927\.0$'
         ).Count -ne 1) {
-        throw 'The trust-root authorization script lacks version 1.7.20260919.0.'
+        throw 'The trust-root authorization script lacks version 1.8.20260927.0.'
     }
     & (Join-Path $strRepositoryRootPath $strTrustRootAuthorizationPath) `
         -RepositoryRootPath $strRepositoryRootPath `
@@ -9014,6 +9016,7 @@ if ($SelfTest) {
         -SelfTest
     foreach ($strProtectedValidationPath in @(
             '.github/actionlint.yaml',
+            '.github/workflows/copilot-setup-steps.yml',
             '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
             '.github/workflows/pull-request-body-identity-cases.json',
             '.github/workflows/pull-request-body-identity.yml',
@@ -9035,6 +9038,7 @@ if ($SelfTest) {
     }
     foreach ($strIdentityTrustRootPath in @(
             '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
+            '.github/workflows/copilot-setup-steps.yml',
             '.github/workflows/pull-request-body-identity-cases.json',
             '.github/workflows/pull-request-body-identity.yml',
             '.github/workflows/workflow-policy-cases.json',
@@ -9083,9 +9087,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.4\.20260919\.0$'
+            '(?m)^# Version: 1\.5\.20260927\.0$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.4.20260919.0.'
+        throw 'The extracted self-test lacks version 1.5.20260927.0.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)
@@ -10737,10 +10741,10 @@ if ($SelfTest) {
                 'PUSH_COMMIT_EVIDENCE: ${{ toJson(github.event.commits) }}',
                 'git ls-remote --sort=refname --refs --heads --tags origin',
                 'Initial remote ref snapshot output bounding failed.',
-                'Initial authenticated remote ref query failed.',
+                ('Initial ' + $(if ($Content.Contains('id: acquire')) { 'anonymous' } else { 'authenticated' }) + ' remote ref query failed.'),
                 'Final remote ref snapshot output bounding failed.',
                 'Final remote ref evidence exceeded 1048576 bytes.',
-                'Final authenticated remote ref query failed.',
+                ('Final ' + $(if ($Content.Contains('id: acquire')) { 'anonymous' } else { 'authenticated' }) + ' remote ref query failed.'),
                 'Remote ref evidence changed during authentication.',
                 'const evidence = process.env.PUSH_COMMIT_EVIDENCE;',
                 'Buffer.byteLength(evidence, "utf8") > 1048576',
@@ -11774,6 +11778,15 @@ if ($SelfTest) {
     )
     $strBadFinalStatusWorkflow =
         $strFinalStatusWorkflowPrefix + $strBadFinalStatusWorkflowBody
+    $strRemoteQueryKind = if ($strAgentWorkflowContent.Contains('id: acquire')) {
+        'anonymous'
+    } else {
+        'authenticated'
+    }
+    $strInitialRemoteQueryDiagnostic =
+        'Initial ' + $strRemoteQueryKind + ' remote ref query failed.'
+    $strFinalRemoteQueryDiagnostic =
+        'Final ' + $strRemoteQueryKind + ' remote ref query failed.'
     $arrWorkflowMutations = @(
         [pscustomobject]@{
             Name = 'missing initial snapshot output-bound diagnostic'
@@ -11786,14 +11799,14 @@ if ($SelfTest) {
                 'Initial remote ref snapshot output bounding failed.'
         },
         [pscustomobject]@{
-            Name = 'missing initial authenticated-query diagnostic'
+            Name = 'missing initial remote-query diagnostic'
             Content = $strAgentWorkflowContent.Replace(
-                'Initial authenticated remote ref query failed.',
+                $strInitialRemoteQueryDiagnostic,
                 'Initial remote ref query failed.'
             )
             Expected =
                 'Workflow contract literal is missing: ' +
-                'Initial authenticated remote ref query failed.'
+                $strInitialRemoteQueryDiagnostic
         },
         [pscustomobject]@{
             Name = 'missing final snapshot output-bound diagnostic'
@@ -11816,14 +11829,14 @@ if ($SelfTest) {
                 'Final remote ref evidence exceeded 1048576 bytes.'
         },
         [pscustomobject]@{
-            Name = 'missing final authenticated-query diagnostic'
+            Name = 'missing final remote-query diagnostic'
             Content = $strAgentWorkflowContent.Replace(
-                'Final authenticated remote ref query failed.',
+                $strFinalRemoteQueryDiagnostic,
                 'Final remote ref query failed.'
             )
             Expected =
                 'Workflow contract literal is missing: ' +
-                'Final authenticated remote ref query failed.'
+                $strFinalRemoteQueryDiagnostic
         },
         [pscustomobject]@{
             Name = 'missing remote snapshot-change diagnostic'

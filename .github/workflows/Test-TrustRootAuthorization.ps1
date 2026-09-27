@@ -51,7 +51,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.7.20260919.0
+# Version: 1.8.20260927.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -72,7 +72,7 @@ $ErrorActionPreference = 'Stop'
 $script:boolValidateOrdinaryCaseCatalog = [bool]$ValidateOrdinaryCaseCatalog
 $script:strIsolationMarkerPattern = '(?m)^const WORKFLOW_ISOLATION_POLICY_VERSION = 1;$'
 $intManifestMaximumBytes = 65536
-$intCandidateMaximumPaths = 19
+$intCandidateMaximumPaths = 20
 $intInactiveManifestMaximumPaths = 16
 $intCandidateMaximumBlobBytes = 573440
 $intCandidateMaximumCommits = 64
@@ -94,6 +94,7 @@ $arrTrustRootPaths = @(
     '.github/workflows/trust-root-authorization.json',
     '.github/workflows/agent-instruction-current-base.yml',
     '.github/workflows/agent-instructions.yml',
+    '.github/workflows/copilot-setup-steps.yml',
     '.github/workflows/Sync-PullRequestBodyIdentity.mjs',
     '.github/workflows/pull-request-body-identity-cases.json',
     '.github/workflows/pull-request-body-identity.yml',
@@ -126,9 +127,11 @@ $script:arrSpecialSemanticInvariant = @(
     'workflow-policy-identity-cases-are-exact',
     'workflow-policy-preflight-authenticates-deferred-yaml-import',
     'workflow-created-push-history-fetch-is-bounded',
-    'current-base-status-helper-is-fail-closed'
+    'current-base-status-helper-is-fail-closed',
+    'copilot-setup-is-action-free'
 )
 $script:hashtableSemanticInvariantPath = @{
+    'copilot-setup-is-action-free' = '.github/workflows/copilot-setup-steps.yml'
     'actionlint-queue-schema-exceptions-are-exact' =
         '.github/actionlint.yaml'
     'agent-instruction-heading-status-and-bootstrap-order-is-exact' =
@@ -208,7 +211,7 @@ $script:hashtableSemanticInvariantPattern = @{
     'extracted-self-test-is-invoked' =
         '& \(Join-Path \$strRepositoryRootPath \$strExtractedSelfTestPath\)'
     'extracted-self-test-version-and-topology' =
-        '(?s)# Version: 1\.4\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext'
+        '(?s)# Version: 1\.5\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext'
     'new-ref-boundary-cap-is-64' =
         '\$intMetadataMaximumBoundaries = 64'
     'pr-merge-bases-use-all-and-cap' =
@@ -3501,6 +3504,165 @@ function Assert-WorkflowPolicyTransitionTuple {
     }
 }
 
+function Assert-AgentWorkflowIsolation {
+    # .SYNOPSIS
+    # Validates the closed ordinary agent or Copilot isolation role.
+    #
+    # .DESCRIPTION
+    # Parses inert YAML with the trusted parser and checks the ordinary job.
+    # The exact previously installed workflow remains a compatibility input.
+    # All other inputs must satisfy action-free, credential-free acquisition.
+    #
+    # .PARAMETER Text
+    # The complete candidate workflow text.
+    #
+    # .PARAMETER Path
+    # One of the two fixed workflow paths.
+    #
+    # .EXAMPLE
+    # Assert-AgentWorkflowIsolation -Text $strText -Path $strPath
+    #
+    # # Returns only when the fixed role has a supported security boundary.
+    #
+    # .INPUTS
+    # None. This helper does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # None. Invalid content throws a terminating error.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20260927.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param(
+        [Parameter(Mandatory)][string] $Text,
+        [Parameter(Mandatory)][string] $Path
+    )
+
+    $hashtableLegacyIdentity = @{
+        '.github/workflows/agent-instructions.yml' =
+            '2d9731e0aad332dc5c182dbe9c97b9fb0af7b5e407513672e82a617347c43d2a'
+        '.github/workflows/copilot-setup-steps.yml' =
+            'e0ab3e8a4fcf85d354266ed5f47e3c942ea73f6c4c3934be94423010a623a660'
+    }
+    if (-not $hashtableLegacyIdentity.ContainsKey($Path)) {
+        throw 'The agent isolation path is outside the two fixed roles.'
+    }
+    $strDigest = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData(
+            [Text.UTF8Encoding]::new($false).GetBytes($Text))).ToLowerInvariant()
+    if ($strDigest -ceq $hashtableLegacyIdentity[$Path]) { return }
+    $strNodeSource = @'
+const { parseAllDocuments, isAlias, isMap, isScalar, isSeq } = require(process.argv[2]);
+const fs = require('fs');
+const crypto = require('crypto');
+const input = fs.readFileSync(0, 'utf8');
+const path = process.argv[1];
+const fail = message => { throw new Error(`agent-isolation: ${message}`); };
+const record = value => value && typeof value === 'object' && !Array.isArray(value);
+// Use the established workflow-policy parse boundary. Candidate bytes are data.
+if (/^(?:%|---\s*$|\.\.\.\s*$)/mu.test(input)) fail('yaml-document');
+const documents = parseAllDocuments(input, { schema: 'core', merge: false, strict: true,
+  uniqueKeys: true, maxAliasCount: 0, prettyErrors: false });
+if (documents.length !== 1) fail('yaml-document');
+const parsed = documents[0];
+if (parsed.errors.length || parsed.warnings.length || parsed.contents === null) fail('yaml-parse');
+let nodes = 0;
+function inspect(node, depth) {
+  if (depth > 64 || ++nodes > 32768) fail('yaml-limit');
+  if (isAlias(node) || node?.anchor !== undefined || node?.tag !== undefined) fail('yaml-feature');
+  if (isMap(node)) {
+    for (const pair of node.items) {
+      if (!isScalar(pair.key) || typeof pair.key.value !== 'string' ||
+          ['<<', '__proto__', 'constructor', 'prototype'].includes(pair.key.value)) fail('yaml-key');
+      inspect(pair.key, depth + 1); inspect(pair.value, depth + 1);
+    }
+  } else if (isSeq(node)) {
+    for (const item of node.items) inspect(item, depth + 1);
+  } else if (!isScalar(node)) fail('yaml-shape');
+  else if (node.value !== null && !['string', 'boolean'].includes(typeof node.value) &&
+      (typeof node.value !== 'number' || !Number.isFinite(node.value))) fail('yaml-value');
+}
+inspect(parsed.contents, 0);
+const document = parsed.toJS({ mapAsMap: false, maxAliasCount: 0 });
+if (!record(document) || !record(document.jobs)) fail('workflow shape');
+const copilot = path.endsWith('/copilot-setup-steps.yml');
+const name = copilot ? 'copilot-setup-steps' : 'validate-agent-instructions';
+const names = Object.keys(document.jobs).sort();
+const expected = copilot ? [name] : ['mark-current-base-pending', 'publish-current-base-status', name].sort();
+if (JSON.stringify(names) !== JSON.stringify(expected)) fail('closed job set');
+const job = document.jobs[name];
+if (!record(job) || !record(job.permissions) || Object.keys(job.permissions).length) fail('empty job permissions');
+if (job['runs-on'] !== 'ubuntu-24.04' || job['timeout-minutes'] !== (copilot ? 15 : 20)) fail('host/timeout');
+if (['container', 'services', 'uses', 'secrets', 'environment'].some(key => key in job)) fail('extra authority surface');
+if (!Array.isArray(job.steps) || job.steps.length < 5) fail('steps');
+for (const step of job.steps) {
+  if (!record(step) || typeof step.run !== 'string' || 'uses' in step || 'with' in step) fail('action or non-run step');
+  if (!['bash', 'pwsh'].includes(step.shell)) fail('explicit supported shell');
+  if (JSON.stringify(step).includes('github.token') || JSON.stringify(step).includes('secrets.') ||
+      /Authorization: Basic|GIT_CONFIG_VALUE_\d/.test(step.run)) fail('credential projection');
+  if (step.env && Object.keys(step.env).some(key => /TOKEN|PASSWORD|SECRET/.test(key))) fail('credential environment');
+}
+const acquire = job.steps.find(step => step.id === 'acquire');
+if (!acquire || job.steps[0] !== acquire || acquire.shell !== 'pwsh') fail('first acquisition step');
+for (const literal of ["$strSha = $env:GITHUB_SHA", "'https://github.com'", "'franklesniak/PSStyleGuide'",
+  "'^[0-9a-f]{40}$'", '$strHead -cne $strSha', 'EnumerateFileSystemEntries($PWD.Path)',
+  'credential.helper=', 'http.extraheader=', 'core.hooksPath=/dev/null', 'origin $strSha',
+  "$env:GIT_CONFIG_GLOBAL = '/dev/null'", "$env:GIT_CONFIG_NOSYSTEM = '1'", 'ACTIONS_RUNTIME_TOKEN']) {
+  if (!acquire.run.includes(literal)) fail(`acquisition invariant ${literal}`);
+}
+const requiredGitEnvironment = { GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null', GIT_TERMINAL_PROMPT: '0' };
+for (const environment of [document.env, job.env, ...job.steps.map(step => step.env)]) {
+  if (environment === undefined) continue;
+  if (!record(environment)) fail('environment shape');
+  if (Object.keys(environment).some(key => /TOKEN|PASSWORD|SECRET/.test(key) ||
+      /^GIT_CONFIG(?:$|_COUNT$|_PARAMETERS$|_KEY_|_VALUE_)/.test(key))) fail('credential environment');
+}
+if (!copilot && (!record(job.env) || Object.entries(requiredGitEnvironment)
+    .some(([key, value]) => job.env[key] !== value))) fail('child Git configuration exclusion');
+for (const step of job.steps) {
+  // Copilot supports step env, but does not promise job/workflow env inheritance.
+  const effective = copilot ? step.env : { ...document.env, ...job.env, ...step.env };
+  if (!record(effective) || Object.entries(requiredGitEnvironment)
+      .some(([key, value]) => effective[key] !== value)) fail('child Git configuration exclusion');
+}
+if (copilot && !acquire.run.includes('fetch --depth 1')) fail('Copilot shallow acquisition');
+const cleanup = job.steps.find(step => step.id === 'verify-checkout-credentials');
+if (!cleanup || job.steps.indexOf(cleanup) !== 1 || !cleanup.run.includes('config --show-scope --name-only --list')) fail('credential cleanup');
+const runtime = job.steps.find(step => step.name === (copilot ? 'Set up verified official Node.js runtime' : 'Set up locked Node.js runtime'));
+if (!runtime) fail('verified runtime');
+for (const literal of ['55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742',
+  "'24.18.0'", 'https://nodejs.org/dist/v$strVersion/', 'Get-FileHash -LiteralPath $strArchive -Algorithm SHA256',
+  '.Hash -cne $strReviewedSha256', '$strObservedVersion -cne "v$strVersion"', 'GITHUB_PATH']) {
+  if (!runtime.run.includes(literal)) fail(`runtime invariant ${literal}`);
+}
+if (copilot) {
+  if (!record(document.permissions) || Object.keys(document.permissions).length) fail('empty workflow permissions');
+  const joined = job.steps.map(step => step.run).join('\n');
+  for (const literal of ['npm-shrinkwrap.json', '.npmrc', 'root_manifest_state', 'root_lock_state',
+    'layout=modern', 'layout=legacy', 'npm ls --all', 'git diff --exit-code',
+    'DF770B2A6F130ED8627C9782C988FDA9669FA23898329A61A871E32F965E007D']) {
+    if (!joined.includes(literal)) fail(`layout invariant ${literal}`);
+  }
+} else {
+  for (const [name, digest] of [
+    ['mark-current-base-pending', '2ff45613614e81ad022ef77c15753a047b2179f8a079343b4f27b0ac334e63ee'],
+    ['publish-current-base-status', '73af6e9e2d6774f16978fafafc4e3c1a20d39d439f19a2e4b1b778a5a65ee5c4']]) {
+    const block = input.match(new RegExp(`^  ${name}:\\n[\\s\\S]*?(?=^  [a-z]|$(?![\\s\\S]))`, 'm'));
+    if (!block || crypto.createHash('sha256').update(block[0]).digest('hex') !== digest) fail('metadata region changed');
+  }
+}
+'@
+    $objValidation = Invoke-BoundedProcessByte -FileName 'node' -ArgumentList @(
+        '-e', $strNodeSource, $Path, (Join-Path $PSScriptRoot 'node_modules/yaml')
+    ) -InputBytes ([Text.UTF8Encoding]::new($false).GetBytes($Text)) -MaximumBytes 65536
+    if ($objValidation.ExitCode -ne 0) {
+        throw "The fixed agent isolation contract failed: $($objValidation.Error)"
+    }
+}
+
 function Assert-SemanticInvariant {
     # .SYNOPSIS
     # Validates one named trust-root semantic invariant.
@@ -3534,7 +3696,7 @@ function Assert-SemanticInvariant {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.1.20260914.0.
+    # Version: 1.2.20260927.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -3542,6 +3704,15 @@ function Assert-SemanticInvariant {
         [Parameter(Mandatory)][AllowEmptyString()][string] $Text,
         [Parameter(Mandatory)][string] $Path
     )
+
+    if ($Invariant -cin @('workflow-checkout-is-trusted-sha', 'copilot-setup-is-action-free')) {
+        $strExpectedPath = if ($Invariant -ceq 'copilot-setup-is-action-free') {
+            '.github/workflows/copilot-setup-steps.yml'
+        } else { '.github/workflows/agent-instructions.yml' }
+        if ($Path -cne $strExpectedPath) { throw 'The isolation invariant has the wrong path.' }
+        Assert-AgentWorkflowIsolation -Text $Text -Path $Path
+        return
+    }
 
     if ($script:hashtableSemanticInvariantPath.ContainsKey($Invariant) -and
         -not [StringComparer]::Ordinal.Equals(
@@ -4876,10 +5047,10 @@ function Assert-SemanticInvariant {
             'git cat-file -e "${push_commit_id}^{commit}"',
             'git ls-remote --sort=refname --refs --heads --tags origin',
             'Initial remote ref snapshot output bounding failed.',
-            'Initial authenticated remote ref query failed.',
+            ('Initial ' + $(if ($Text.Contains('id: acquire')) { 'anonymous' } else { 'authenticated' }) + ' remote ref query failed.'),
             'Final remote ref snapshot output bounding failed.',
             'Final remote ref evidence exceeded 1048576 bytes.',
-            'Final authenticated remote ref query failed.',
+            ('Final ' + $(if ($Text.Contains('id: acquire')) { 'anonymous' } else { 'authenticated' }) + ' remote ref query failed.'),
             'cmp --silent "${raw_refs}" "${raw_refs_after}"',
             'Remote ref evidence changed during authentication.'
         )
@@ -5136,6 +5307,57 @@ function Assert-SemanticInvariant {
 }
 
 if ($SelfTest) {
+    # Exercise actual production isolation checks; each mutation must fail for
+    # the removed boundary, not for an unrelated parser or fixture error.
+    foreach ($strIsolationPath in @(
+            '.github/workflows/agent-instructions.yml',
+            '.github/workflows/copilot-setup-steps.yml'
+        )) {
+        $strIsolationText = [IO.File]::ReadAllText((Join-Path $RepositoryRootPath $strIsolationPath))
+        Assert-AgentWorkflowIsolation -Text $strIsolationText -Path $strIsolationPath
+        if ($strIsolationText.Contains('id: acquire', [StringComparison]::Ordinal)) {
+            $arrIsolationMutation = @(
+                @('    permissions: {}', '    permissions: {contents: write}', 'empty job permissions'),
+                @('        id: acquire', '        id: acquire-disabled', 'first acquisition step'),
+                @('id: verify-checkout-credentials', 'id: removed-cleanup', 'credential cleanup'),
+                @('$strSha = $env:GITHUB_SHA', '$strSha = $env:GITHUB_REF', 'acquisition invariant'),
+                @('$strHead -cne $strSha', '$strHead -ceq $strSha', 'acquisition invariant'),
+                @('55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742',
+                    '65AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742', 'runtime invariant'),
+                @('GIT_CONFIG_GLOBAL: /dev/null', 'GIT_CONFIG_GLOBAL: /tmp/untrusted', 'child Git configuration exclusion'),
+                @('        id: acquire', "        id: acquire`n        uses: actions/checkout@untrusted", 'action or non-run step'),
+                @('    runs-on: ubuntu-24.04', '    runs-on: &runner ubuntu-24.04', 'yaml-feature'),
+                @('    runs-on: ubuntu-24.04', '    runs-on: !!str ubuntu-24.04', 'yaml-feature'),
+                @('    runs-on: ubuntu-24.04', "    runs-on: ubuntu-24.04`n    runs-on: ubuntu-24.04", 'yaml-parse'),
+                @('jobs:', "---`njobs:", 'yaml-document'),
+                @('    runs-on: ubuntu-24.04', "    runs-on: *missing", 'yaml-feature')
+            )
+            if ($strIsolationPath -ceq '.github/workflows/agent-instructions.yml') {
+                $arrIsolationMutation += @(
+                    @('          TRUSTED_REVISION: ${{ github.sha }}',
+                        ("          GIT_CONFIG_GLOBAL: /tmp/untrusted`n" +
+                            '          TRUSTED_REVISION: ${{ github.sha }}'),
+                        'child Git configuration exclusion'),
+                    @(("`n      GIT_CONFIG_NOSYSTEM: " + '"1"'),
+                        ("`n      GH_TOKEN: forbidden`n" + '      GIT_CONFIG_NOSYSTEM: ' + '"1"'),
+                        'credential environment')
+                )
+            }
+            foreach ($arrMutation in $arrIsolationMutation) {
+                $strMutated = $strIsolationText.Replace($arrMutation[0], $arrMutation[1], [StringComparison]::Ordinal)
+                if ($strMutated -ceq $strIsolationText) { throw 'The isolation mutation target is absent.' }
+                $boolRejected = $false
+                try { Assert-AgentWorkflowIsolation -Text $strMutated -Path $strIsolationPath } catch {
+                    if (-not $_.Exception.Message.Contains($arrMutation[2], [StringComparison]::Ordinal)) {
+                        throw "Isolation mutation $strIsolationPath / $($arrMutation[0]) expected $($arrMutation[2]): $($_.Exception.Message)"
+                    }
+                    $boolRejected = $true
+                }
+                if (-not $boolRejected) { throw "An isolation mutation passed: $($arrMutation[2])" }
+            }
+        }
+    }
+
     $scriptblockTestBoundedProcessInput = {
         param([Parameter(Mandatory)][string] $Root)
         $strEcho = 'const fs=require("node:fs");process.stdout.write(fs.readFileSync(0));'
@@ -6122,6 +6344,11 @@ if ($SelfTest) {
                 )
             },
             [pscustomobject]@{
+                Path = '.github/workflows/copilot-setup-steps.yml'
+                Syntax = 'yaml'
+                Invariants = @('copilot-setup-is-action-free')
+            },
+            [pscustomobject]@{
                 Path = '.github/workflows/agent-instructions.yml'
                 Syntax = 'yaml'
                 Invariants = @(
@@ -6295,7 +6522,7 @@ if ($SelfTest) {
             ConvertTo-Json -InputObject $objSchemaManifest -Depth 8
         )
         $objOverLimitManifest.authorization_id = 'self-test-path-limit-overflow'
-        $objOverLimitManifest.limits.maximum_paths = 20
+        $objOverLimitManifest.limits.maximum_paths = 21
         [IO.File]::WriteAllText(
             $strSchemaManifestPath,
             ((ConvertTo-Json -InputObject $objOverLimitManifest -Depth 8) `
@@ -6346,8 +6573,59 @@ if ($SelfTest) {
             throw 'Could not restore the trusted schema fixture after path-limit testing.'
         }
 
+        # The new fixed consumer cannot be omitted, duplicated, or renamed.
+        foreach ($strConsumerMutation in @('missing', 'duplicate', 'unknown')) {
+            & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
+            if ($LASTEXITCODE -ne 0) { throw 'Could not restore the consumer fixture.' }
+            $objConsumerManifest = ConvertFrom-Json -InputObject (
+                ConvertTo-Json -InputObject $objSchemaManifest -Depth 8
+            )
+            $objConsumerPath = @($objConsumerManifest.allowed_paths | Where-Object {
+                    $_.path -ceq '.github/workflows/copilot-setup-steps.yml'
+                })[0]
+            $strConsumerExpected = 'missing or duplicate semantic invariants'
+            switch ($strConsumerMutation) {
+                'missing' { $objConsumerPath.semantic_invariants = @() }
+                'duplicate' {
+                    $objConsumerPath.semantic_invariants = @(
+                        'copilot-setup-is-action-free', 'copilot-setup-is-action-free'
+                    )
+                }
+                'unknown' {
+                    $objConsumerPath.semantic_invariants = @('copilot-setup-unknown')
+                    $strConsumerExpected = 'does not satisfy semantic invariant'
+                }
+            }
+            [IO.File]::WriteAllText($strSchemaManifestPath,
+                ((ConvertTo-Json -InputObject $objConsumerManifest -Depth 8) -replace "`r`n", "`n") + "`n",
+                [Text.UTF8Encoding]::new($false))
+            & git -C $strSchemaFixtureRoot add -- $strAuthorizationPath
+            & git -C $strSchemaFixtureRoot -c 'user.name=Trust root schema self-test' `
+                -c 'user.email=trust-root-schema@example.invalid' -c 'commit.gpgSign=false' `
+                -c 'core.hooksPath=NUL' commit --quiet --no-gpg-sign -m "consumer $strConsumerMutation trusted"
+            if ($LASTEXITCODE -ne 0) { throw 'Could not commit a consumer trusted fixture.' }
+            $strConsumerTrusted = ([string](& git -C $strSchemaFixtureRoot rev-parse HEAD)).Trim()
+            foreach ($objSchemaPath in $arrSchemaPathSpec) {
+                [IO.File]::Copy((Join-Path $RepositoryRootPath $objSchemaPath.Path),
+                    (Join-Path $strSchemaFixtureRoot $objSchemaPath.Path), $true)
+            }
+            & git -C $strSchemaFixtureRoot add -- .
+            & git -C $strSchemaFixtureRoot -c 'user.name=Trust root schema self-test' `
+                -c 'user.email=trust-root-schema@example.invalid' -c 'commit.gpgSign=false' `
+                -c 'core.hooksPath=NUL' commit --quiet --no-gpg-sign -m "consumer $strConsumerMutation candidate"
+            if ($LASTEXITCODE -ne 0) { throw 'Could not commit a consumer candidate fixture.' }
+            $strConsumerHead = ([string](& git -C $strSchemaFixtureRoot rev-parse HEAD)).Trim()
+            & git -C $strSchemaFixtureRoot switch --quiet --detach $strConsumerTrusted
+            if ($LASTEXITCODE -ne 0) { throw 'Could not select a consumer trusted fixture.' }
+            & $scriptblockExpectSchemaRejection -Trusted $strConsumerTrusted `
+                -Base $strConsumerTrusted -Head $strConsumerHead -ExpectedMessage $strConsumerExpected
+        }
+        & git -C $strSchemaFixtureRoot switch --quiet --detach $strSchemaTrusted
+        if ($LASTEXITCODE -ne 0) { throw 'Could not restore the schema fixture after consumer tests.' }
+
         foreach ($strStandaloneProtectedPath in @(
                 '.github/actionlint.yaml',
+                '.github/workflows/copilot-setup-steps.yml',
                 '.pre-commit-config.yaml'
             )) {
             & git -C $strSchemaFixtureRoot switch --quiet --detach `
@@ -6606,7 +6884,7 @@ if ($SelfTest) {
                     parent_commits = @($strTransitionBase)
                 }
                 limits = [ordered]@{
-                    maximum_paths = 19
+                    maximum_paths = 20
                     maximum_blob_bytes = $intCandidateMaximumBlobBytes
                     maximum_manifest_bytes = 65536
                 }
@@ -6704,7 +6982,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-same-base-deactivation'
             limits = [ordered]@{
-                maximum_paths = 19
+                maximum_paths = 20
                 maximum_blob_bytes = $intCandidateMaximumBlobBytes
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
@@ -6846,7 +7124,7 @@ if ($SelfTest) {
             schema_version = 2
             authorization_id = 'self-test-noncanonical-deactivation-target'
             limits = [ordered]@{
-                maximum_paths = 19
+                maximum_paths = 20
                 maximum_blob_bytes = $intCandidateMaximumBlobBytes
                 maximum_manifest_bytes = 65536
                 maximum_commits = 64
