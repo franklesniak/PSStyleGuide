@@ -304,13 +304,6 @@ jobs:
           }
           $strVersion = '24.18.0'
           $strReviewedSha256 = '55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742'
-          if ($env:TOOLCHAIN_LAYOUT -ceq 'legacy') {
-              $strVersion = '20.20.2'
-              $strReviewedSha256 = 'DF770B2A6F130ED8627C9782C988FDA9669FA23898329A61A871E32F965E007D'
-          } elseif (-not [string]::IsNullOrEmpty($env:TOOLCHAIN_LAYOUT) -and
-              $env:TOOLCHAIN_LAYOUT -cne 'modern') {
-              throw 'toolchain: unsupported validation-tool layout'
-          }
           $strNodeRoot = [IO.Path]::Combine($env:RUNNER_TEMP, 'agent-validation-node')
           $strArchive = [IO.Path]::Combine($env:RUNNER_TEMP, 'agent-validation-node.tar.xz')
           if ([IO.Path]::Exists($strNodeRoot) -or [IO.Path]::Exists($strArchive)) {
