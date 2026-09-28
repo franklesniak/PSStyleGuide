@@ -250,8 +250,8 @@ jobs:
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
           [[ "${PUSH_BASE_SHA}" =~ ^[0-9a-f]{40}$ ]]
           [[ ! "${PUSH_BASE_SHA}" =~ ^0{40}$ ]]
-            git fetch --no-tags --no-recurse-submodules origin \
-              "${PUSH_BASE_SHA}:refs/remotes/event/push-base"
+          git fetch --no-tags --no-recurse-submodules origin \
+            "${PUSH_BASE_SHA}:refs/remotes/event/push-base"
           fetched_base="$(git rev-parse --verify \
             'refs/remotes/event/push-base^{commit}')"
           test "${fetched_base}" = "${PUSH_BASE_SHA}"
@@ -372,8 +372,8 @@ jobs:
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
           [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
           # An unexpected non-fast-forward local ref must fail closed.
-            git fetch --no-tags --no-recurse-submodules origin \
-              "${PR_HEAD_SHA}:refs/remotes/event/pr-head"
+          git fetch --no-tags --no-recurse-submodules origin \
+            "${PR_HEAD_SHA}:refs/remotes/event/pr-head"
           fetched_head="$(git rev-parse --verify \
             'refs/remotes/event/pr-head^{commit}')"
           test "${fetched_head}" = "${PR_HEAD_SHA}"
@@ -466,7 +466,7 @@ jobs:
           test "${fetch_depth}" -le 2048
           comparison_ref_fetch_depth=2048
           set +e
-            timeout 30s git ls-remote --sort=refname --refs --heads --tags origin |
+          timeout 30s git ls-remote --sort=refname --refs --heads --tags origin |
             head -c 1048577 >"${raw_refs}"
           pipeline_status=("${PIPESTATUS[@]}")
           set -e
@@ -557,9 +557,9 @@ jobs:
             echo 'The created destination evidence ref already exists.' >&2
             exit 1
           fi
-            timeout 60s git fetch --depth="${fetch_depth}" --no-tags \
-              --no-write-fetch-head --no-recurse-submodules origin \
-              "${PUSH_REF}:${destination_local_ref}"
+          timeout 60s git fetch --depth="${fetch_depth}" --no-tags \
+            --no-write-fetch-head --no-recurse-submodules origin \
+            "${PUSH_REF}:${destination_local_ref}"
           fetched_destination="$(git rev-parse --verify \
             "${destination_local_ref}^{commit}")"
           test "${fetched_destination}" = "${PUSH_AFTER_SHA}"
@@ -569,12 +569,12 @@ jobs:
 
           if test "${#fetch_arguments[@]}" -gt 0; then
             fetch_depth="${comparison_ref_fetch_depth}"
-              timeout 60s git fetch --depth="${fetch_depth}" --no-tags \
-                --no-write-fetch-head \
-                --no-recurse-submodules origin "${fetch_arguments[@]}"
+            timeout 60s git fetch --depth="${fetch_depth}" --no-tags \
+              --no-write-fetch-head \
+              --no-recurse-submodules origin "${fetch_arguments[@]}"
           fi
           set +e
-            timeout 30s git ls-remote --sort=refname --refs --heads --tags origin |
+          timeout 30s git ls-remote --sort=refname --refs --heads --tags origin |
             head -c 1048577 >"${raw_refs_after}"
           pipeline_status=("${PIPESTATUS[@]}")
           set -e
@@ -591,7 +591,8 @@ jobs:
             exit 1
           fi
           if ! cmp --silent "${raw_refs}" "${raw_refs_after}"; then
-            echo 'Remote ref evidence changed during authentication.' >&2
+            echo 'Remote ref evidence changed during anonymous fetch.' >&2
+            echo 'Legacy diagnostic: Remote ref evidence changed during authentication.' >&2
             exit 1
           fi
 
