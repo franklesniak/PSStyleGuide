@@ -205,9 +205,9 @@
     {
       "path": ".github/workflows/agent-instructions.yml",
       "mode": "100644",
-      "blob": "d7fbac7f01fe635165cc30d544c44acf6ef67aec",
-      "bytes": 43428,
-      "sha256": "e1ca3c237b1f571a20247e3c0fb46009b14c5d3eb2a1f487002a4c3f4fb54fc4",
+      "blob": "8d7b8061aed855d212c965cc15182320131ec194",
+      "bytes": 43025,
+      "sha256": "71db61cb871ad2367106473ec058f3d4221139812ed87d7cb1ad5f2603a7e530",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "yaml",
       "semantic_invariants": [
