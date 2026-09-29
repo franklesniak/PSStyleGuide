@@ -30,7 +30,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.5.20260927.0
+# Version: 1.5.20260929.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -138,6 +138,335 @@ if ([regex]::Matches($strCapacityAuthorizer,
         [regex]::Escape('$intCandidateMaximumBlobBytes = 573440')).Count -ne 1) {
     throw 'The trusted authorizer disagrees on the finite candidate capacity.'
 }
+
+
+# Bind the landed U1 supply contracts to both actual workflow roles. These are
+# inert content tests; native execution fixtures are run separately on each host.
+$scriptblockGetAgentSupplyFailure = {
+    param(
+        [Parameter(Mandatory)][string] $WorkflowContent,
+        [Parameter(Mandatory)][bool] $PullRequestRole
+    )
+
+    $hashtableExpectedNativeIdentityBlocks = @{
+        checkout = @'
+          $arrHeadOutput = @(& $strGitPath rev-parse HEAD)
+          $intHeadExitCode = $LASTEXITCODE
+          if ($intHeadExitCode -ne 0) {
+              throw "acquire: git rev-parse exited $intHeadExitCode"
+          }
+          if ($arrHeadOutput.Count -ne 1) {
+              throw 'acquire: git rev-parse must return exactly one line'
+          }
+          $strHead = $arrHeadOutput[0].Trim()
+          if ($strHead -cne $strSha) {
+              throw 'acquire: the checked out revision is not the triggering revision'
+          }
+'@.TrimEnd()
+        runtime = @'
+          $arrVersionOutput = @(& $strNodePath --version)
+          $intVersionExitCode = $LASTEXITCODE
+          if ($intVersionExitCode -ne 0) {
+              throw "toolchain: runtime version command exited $intVersionExitCode"
+          }
+          if ($arrVersionOutput.Count -ne 1) {
+              throw 'toolchain: runtime version command must return exactly one line'
+          }
+          $strObservedVersion = $arrVersionOutput[0].Trim()
+          if ($strObservedVersion -cne "v$strVersion") {
+              throw 'toolchain: verified runtime executable identity is wrong'
+          }
+'@.TrimEnd()
+    }
+    foreach ($objNativeIdentityBlock in $hashtableExpectedNativeIdentityBlocks.GetEnumerator()) {
+        if ([regex]::Matches(
+                $WorkflowContent, [regex]::Escape($objNativeIdentityBlock.Value)
+            ).Count -ne 1) {
+            Write-Output (
+                'Agent workflow must preserve native ' + $objNativeIdentityBlock.Key +
+                ' status and single-line identity.'
+            )
+        }
+    }
+
+    $strExpectedNpmConfiguration = @'
+          export npm_config_userconfig=/dev/null
+          export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
+            -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
+            echo '::error::Unexpected package-manager configuration source.'
+            exit 1
+          fi
+          printf '%s\n' 'npm_config_userconfig=/dev/null' \
+            'npm_config_globalconfig=/etc/npmrc-absent-by-policy' >> "${GITHUB_ENV}"
+'@.TrimEnd()
+    $arrNpmConfigurationBlocks = @([regex]::Matches(
+            $WorkflowContent, [regex]::Escape($strExpectedNpmConfiguration)
+        ))
+    $objFirstNpmInvocation = [regex]::Match(
+        $WorkflowContent, '(?m)^ {10,}(?:npm[ \t]|.*\$\([ \t]*npm[ \t])'
+    )
+    if ($arrNpmConfigurationBlocks.Count -ne 1 -or
+        -not $objFirstNpmInvocation.Success -or
+        $arrNpmConfigurationBlocks[0].Index -ge $objFirstNpmInvocation.Index) {
+        Write-Output 'Agent workflow must isolate npm file configuration before its first npm invocation.'
+    }
+
+    $strExpectedNodeDownload = '          & $strCurlPath --silent --show-error --fail --location --proto ''=https'' --proto-redir ''=https'' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl'
+    if ([regex]::Matches($WorkflowContent,
+            [regex]::Escape($strExpectedNodeDownload)).Count -ne 1) {
+        Write-Output 'Agent workflow must use the bounded anonymous Node download.'
+    }
+    if (-not $PullRequestRole) { return }
+
+    $strExpectedInvocationGuard = @'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or
+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {
+              throw 'credential-policy: unexpected credential or Git configuration channel'
+          }
+          ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest `
+'@.TrimEnd()
+    if ([regex]::Matches($WorkflowContent,
+            [regex]::Escape($strExpectedInvocationGuard)).Count -ne 1) {
+        Write-Output 'The ordinary validator must reject all five credential/config channels immediately before invocation.'
+    }
+
+    $strPullRequestHeadFetch = @'
+      - name: Fetch pull request head as data
+        if: github.event_name == 'pull_request_target'
+        shell: bash
+        env:
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          [[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]
+          # An unexpected non-fast-forward local ref must fail closed.
+          git fetch --no-tags --no-recurse-submodules origin \
+              "refs/pull/${PR_NUMBER}/head:refs/remotes/pull/${PR_NUMBER}/head"
+          fetched_head="$(git rev-parse --verify \
+            "refs/remotes/pull/${PR_NUMBER}/head^{commit}")"
+          test "${fetched_head}" = "${PR_HEAD_SHA}"
+          git diff --quiet --no-ext-diff
+          git diff --cached --quiet --no-ext-diff
+'@.TrimEnd()
+    if ([regex]::Matches($WorkflowContent,
+            [regex]::Escape($strPullRequestHeadFetch)).Count -ne 1) {
+        Write-Output 'The pull-request head must use the exact numbered-ref and event-SHA contract.'
+    }
+
+    $strPullRequestBaseFetch = @'
+      - name: Fetch pull request base as data
+        if: github.event_name == 'pull_request_target'
+        shell: bash
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          if [[ ! "${PR_BASE_SHA:-}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo '::error::Pull request base must be a full lowercase commit hash.'
+            exit 1
+          fi
+          if [[ "${PR_BASE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
+            echo '::error::Pull request base must not be the zero commit hash.'
+            exit 1
+          fi
+          if ! git cat-file -e "${PR_BASE_SHA}^{commit}" 2>/dev/null; then
+            if ! git fetch --no-tags --no-recurse-submodules origin "${PR_BASE_SHA}"; then
+              echo '::error::Could not fetch the exact pull request base.'
+              exit 1
+            fi
+          fi
+          if ! fetched_base="$(git rev-parse --verify "${PR_BASE_SHA}^{commit}")"; then
+            echo '::error::Could not resolve the exact pull request base commit.'
+            exit 1
+          fi
+          if [[ "${fetched_base}" != "${PR_BASE_SHA}" ]]; then
+            echo '::error::Resolved pull request base does not match the exact event identity.'
+            exit 1
+          fi
+          if ! git diff --quiet --no-ext-diff; then
+            echo '::error::Could not confirm a clean worktree after pull request base acquisition.'
+            exit 1
+          fi
+          if ! git diff --cached --quiet --no-ext-diff; then
+            echo '::error::Could not confirm a clean index after pull request base acquisition.'
+            exit 1
+          fi
+'@.TrimEnd()
+    if ([regex]::Matches(
+            $WorkflowContent,
+            [regex]::Escape($strPullRequestBaseFetch)
+        ).Count -ne 1) {
+        Write-Output 'The exact pull-request base data-fetch contract is not exact.'
+    }
+
+    $intBaseFetch = $WorkflowContent.IndexOf($strPullRequestBaseFetch,
+        [StringComparison]::Ordinal)
+    $intAuthorization = $WorkflowContent.IndexOf(
+        '      - name: Validate exact trust-root maintenance as inert data',
+        [StringComparison]::Ordinal)
+    $intPublishedValidation = $WorkflowContent.IndexOf(
+        '      - name: Validate instruction capacity and capabilities',
+        [StringComparison]::Ordinal)
+    if ($intBaseFetch -lt 0 -or $intAuthorization -le $intBaseFetch -or
+        $intPublishedValidation -le $intBaseFetch) {
+        Write-Output 'PR base data must be available before authorization and published validation.'
+    }
+}
+
+$arrSupplyMutations = @(
+    @('checkout exit capture', '$intHeadExitCode = $LASTEXITCODE', '$intHeadExitCode = 0'),
+    @('checkout failure guard', 'if ($intHeadExitCode -ne 0)', 'if ($false)'),
+    @('checkout cardinality', 'if ($arrHeadOutput.Count -ne 1)', 'if ($false)'),
+    @('checkout identity', 'if ($strHead -cne $strSha)', 'if ($false)'),
+    @('runtime exit capture', '$intVersionExitCode = $LASTEXITCODE', '$intVersionExitCode = 0'),
+    @('runtime failure guard', 'if ($intVersionExitCode -ne 0)', 'if ($false)'),
+    @('runtime cardinality', 'if ($arrVersionOutput.Count -ne 1)', 'if ($false)'),
+    @('runtime identity', 'if ($strObservedVersion -cne "v$strVersion")', 'if ($false)'),
+    @('retry count', '--retry 3 ', ''),
+    @('retry errors', '--retry-all-errors ', ''),
+    @('connection bound', '--connect-timeout 20 ', ''),
+    @('transfer bound', '--max-time 120 ', ''),
+    @('retry bound', '--retry-max-time 300 ', ''),
+    @('user configuration', 'export npm_config_userconfig=/dev/null', 'export npm_config_userconfig=/tmp/npmrc'),
+    @('global configuration', 'export npm_config_globalconfig=/etc/npmrc-absent-by-policy', 'export npm_config_globalconfig=/tmp/npmrc'),
+    @('user configuration export', 'export npm_config_userconfig=', 'npm_config_userconfig='),
+    @('global configuration export', 'export npm_config_globalconfig=', 'npm_config_globalconfig='),
+    @('character device guard', '! -c "${npm_config_userconfig}"', '! -e "${npm_config_userconfig}"'),
+    @('empty device guard', ' || -s "${npm_config_userconfig}"', ''),
+    @('absent global guard', '-e "${npm_config_globalconfig}"', '-s "${npm_config_globalconfig}"'),
+    @('global symlink guard', ' || -L "${npm_config_globalconfig}"', ''),
+    @('configuration persistence', '>> "${GITHUB_ENV}"', '> /dev/null')
+)
+$intSupplyMutationCount = 0
+foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-steps.yml')) {
+    $strSupplyWorkflowPath = $ExecutionContext.SessionState.Path.
+        GetUnresolvedProviderPathFromPSPath((Join-Path $PSScriptRoot $strSupplyWorkflowName))
+    $strSupplyWorkflowContent = [IO.File]::ReadAllText($strSupplyWorkflowPath)
+    $boolPullRequestRole = $strSupplyWorkflowName -ceq 'agent-instructions.yml'
+    $arrSupplyFailures = @(& $scriptblockGetAgentSupplyFailure `
+            -WorkflowContent $strSupplyWorkflowContent -PullRequestRole $boolPullRequestRole)
+    if ($arrSupplyFailures.Count -ne 0) {
+        throw "$strSupplyWorkflowName failed U1 supply validation: $($arrSupplyFailures -join '; ')"
+    }
+    foreach ($arrSupplyMutation in $arrSupplyMutations) {
+        $strSupplyMutant = $strSupplyWorkflowContent.Replace(
+            $arrSupplyMutation[1], $arrSupplyMutation[2])
+        if ($strSupplyMutant -ceq $strSupplyWorkflowContent -or
+            @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
+                    -PullRequestRole $boolPullRequestRole).Count -eq 0) {
+            throw "$strSupplyWorkflowName did not reject $($arrSupplyMutation[0])."
+        }
+        $intSupplyMutationCount++
+    }
+    $objProducer = [regex]::Match($strSupplyWorkflowContent,
+        '(?ms)^          export npm_config_userconfig=/dev/null\n.*?^            ''npm_config_globalconfig=/etc/npmrc-absent-by-policy'' >> "\$\{GITHUB_ENV\}"\n')
+    if (-not $objProducer.Success) { throw 'The npm producer fixture is unavailable.' }
+    foreach ($strProducerMutation in @('missing', 'late', 'duplicate')) {
+        $strSupplyMutant = switch ($strProducerMutation) {
+            'missing' { $strSupplyWorkflowContent.Replace($objProducer.Value, '') }
+            'late' { $strSupplyWorkflowContent.Replace($objProducer.Value, '') + $objProducer.Value }
+            'duplicate' { $strSupplyWorkflowContent + $objProducer.Value }
+        }
+        if (@(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
+                    -PullRequestRole $boolPullRequestRole).Count -eq 0) {
+            throw "$strSupplyWorkflowName accepted a $strProducerMutation npm producer."
+        }
+        $intSupplyMutationCount++
+    }
+    if ($boolPullRequestRole) {
+        foreach ($strGuardChannel in @('GITHUB_TOKEN', 'GH_TOKEN',
+                'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS')) {
+            $strSupplyMutant = $strSupplyWorkflowContent.Replace(
+                '$env:' + $strGuardChannel + ')', '$env:UNRELATED_CHANNEL)')
+            if ($strSupplyMutant -ceq $strSupplyWorkflowContent -or
+                @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
+                        -PullRequestRole $true).Count -eq 0) {
+                throw "The ordinary invocation accepted a missing $strGuardChannel guard."
+            }
+            $intSupplyMutationCount++
+        }
+        foreach ($arrGuardMutation in @(
+                @('terminating errors', "          `$ErrorActionPreference = 'Stop'", "          `$ErrorActionPreference = 'Continue'"),
+                @('guard ordering', '          ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest `', '          # validator moved before its guard'),
+                @('literal run', "        run: |`n          `$ErrorActionPreference = 'Stop'", "        run: >-`n          `$ErrorActionPreference = 'Stop'")
+            )) {
+            $strSupplyMutant = $strSupplyWorkflowContent.Replace($arrGuardMutation[1], $arrGuardMutation[2])
+            if ($strSupplyMutant -ceq $strSupplyWorkflowContent -or
+                @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
+                        -PullRequestRole $true).Count -eq 0) {
+                throw "The ordinary invocation accepted $($arrGuardMutation[0]) mutation."
+            }
+            $intSupplyMutationCount++
+        }
+        foreach ($arrHeadMutation in @(
+                @('head event', 'PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}', 'PR_HEAD_SHA: ${{ github.sha }}'),
+                @('head number source', 'PR_NUMBER: ${{ github.event.pull_request.number }}', 'PR_NUMBER: 1'),
+                @('head number guard', '[[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]', 'true'),
+                @('head numbered ref', '"refs/pull/${PR_NUMBER}/head:refs/remotes/pull/${PR_NUMBER}/head"', '"${PR_HEAD_SHA}:refs/remotes/event/pr-head"'),
+                @('head event equality', 'test "${fetched_head}" = "${PR_HEAD_SHA}"', 'true'),
+                @('head tracked cleanliness', 'git diff --cached --quiet --no-ext-diff', 'true')
+            )) {
+            $strSupplyMutant = $strSupplyWorkflowContent.Replace($arrHeadMutation[1], $arrHeadMutation[2])
+            if ($strSupplyMutant -ceq $strSupplyWorkflowContent -or
+                @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
+                        -PullRequestRole $true).Count -eq 0) {
+                throw "The ordinary workflow did not reject $($arrHeadMutation[0])."
+            }
+            $intSupplyMutationCount++
+        }
+        foreach ($arrBaseMutation in @(
+                @('base event', 'PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}', 'PR_BASE_SHA: ${{ github.sha }}'),
+                @('base syntax', '^[0-9a-f]{40}$', '^[0-9a-f]+$'),
+                @('base zero', '== "0000000000000000000000000000000000000000"', '== "unused"'),
+                @('base missing', 'if ! git cat-file -e', 'if git cat-file -e'),
+                @('base exact fetch', 'origin "${PR_BASE_SHA}"', 'origin main'),
+                @('base resolution', 'if ! fetched_base=', 'if fetched_base='),
+                @('base identity', '"${fetched_base}" != "${PR_BASE_SHA}"', '"${fetched_base}" == "${PR_BASE_SHA}"'),
+                @('base worktree', 'if ! git diff --quiet --no-ext-diff;', 'if false;'),
+                @('base index', 'if ! git diff --cached --quiet --no-ext-diff;', 'if false;')
+            )) {
+            $strSupplyMutant = $strSupplyWorkflowContent.Replace($arrBaseMutation[1], $arrBaseMutation[2])
+            if ($strSupplyMutant -ceq $strSupplyWorkflowContent -or
+                @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
+                        -PullRequestRole $true).Count -eq 0) {
+                throw "The ordinary workflow did not reject $($arrBaseMutation[0])."
+            }
+            $intSupplyMutationCount++
+        }
+        $objBaseStep = [regex]::Match($strSupplyWorkflowContent,
+            '(?ms)^      - name: Fetch pull request base as data\n.*?(?=^      - name: |\z)')
+        if (-not $objBaseStep.Success) { throw 'The PR-base step fixture is unavailable.' }
+        $strSupplyMutant = $strSupplyWorkflowContent.Replace($objBaseStep.Value, '') + $objBaseStep.Value
+        if (@(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
+                    -PullRequestRole $true).Count -eq 0) {
+            throw 'A PR-base acquisition after its consumers was accepted.'
+        }
+        $intSupplyMutationCount++
+    }
+}
+if ($intSupplyMutationCount -ne 74) { throw 'The U1 supply mutation census is incomplete.' }
 
 # These input-reader fixtures need no candidate code or parent-scope mutation.
 Assert-RepositoryInputMetadataMutationRejected `

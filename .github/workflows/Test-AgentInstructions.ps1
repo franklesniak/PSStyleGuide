@@ -3,7 +3,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.15.20260927.0
+# Version: 1.15.20260929.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -8141,9 +8141,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.15\.20260927\.0$'
+            '(?m)^# Version: 1\.15\.20260929\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.15.20260927.0.'
+        throw 'The validator script version is not 1.15.20260929.0.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -9087,9 +9087,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.5\.20260927\.0$'
+            '(?m)^# Version: 1\.5\.20260929\.0$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.5.20260927.0.'
+        throw 'The extracted self-test lacks version 1.5.20260929.0.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)
@@ -10736,7 +10736,7 @@ if ($SelfTest) {
                 'PUSH_CREATED: ${{ github.event.created }}',
                 'PUSH_DELETED: ${{ github.event.deleted }}',
                 'refs/remotes/event/push-base',
-                'refs/remotes/event/pr-head',
+                'refs/remotes/pull/${PR_NUMBER}/head',
                 'id: created-push-boundary',
                 'PUSH_COMMIT_EVIDENCE: ${{ toJson(github.event.commits) }}',
                 'git ls-remote --sort=refname --refs --heads --tags origin',
@@ -11900,8 +11900,8 @@ if ($SelfTest) {
         [pscustomobject]@{
             Name = 'forcing pull request head fetch'
             Content = $strAgentWorkflowContent.Replace(
-                '"${PR_HEAD_SHA}:refs/remotes/event/pr-head"',
-                '"+${PR_HEAD_SHA}:refs/remotes/event/pr-head"'
+                '"refs/pull/${PR_NUMBER}/head:refs/remotes/pull/${PR_NUMBER}/head"',
+                '"+refs/pull/${PR_NUMBER}/head:refs/remotes/pull/${PR_NUMBER}/head"'
             )
             Expected = 'Event-data fetches must not force a destination ref.'
         },

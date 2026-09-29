@@ -168,8 +168,16 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "acquire: git fetch exited $LASTEXITCODE" }
           & $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD
           if ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }
-          $strHead = (& $strGitPath rev-parse HEAD).Trim()
-          if ($LASTEXITCODE -ne 0 -or $strHead -cne $strSha) {
+          $arrHeadOutput = @(& $strGitPath rev-parse HEAD)
+          $intHeadExitCode = $LASTEXITCODE
+          if ($intHeadExitCode -ne 0) {
+              throw "acquire: git rev-parse exited $intHeadExitCode"
+          }
+          if ($arrHeadOutput.Count -ne 1) {
+              throw 'acquire: git rev-parse must return exactly one line'
+          }
+          $strHead = $arrHeadOutput[0].Trim()
+          if ($strHead -cne $strSha) {
               throw 'acquire: the checked out revision is not the triggering revision'
           }
           Write-Information "acquire: anonymous exact checkout of $strSha" -InformationAction Continue
@@ -317,7 +325,7 @@ jobs:
               throw 'toolchain: fixed download/extraction tools are unavailable'
           }
           $strUrl = "https://nodejs.org/dist/v$strVersion/node-v$strVersion-linux-x64.tar.xz"
-          & $strCurlPath --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --output $strArchive $strUrl
+          & $strCurlPath --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl
           if ($LASTEXITCODE -ne 0) { throw "toolchain: download exited $LASTEXITCODE" }
           if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash -cne $strReviewedSha256) {
               throw 'toolchain: official Node archive does not match the reviewed digest'
@@ -330,8 +338,16 @@ jobs:
           if (-not [IO.File]::Exists($strNodePath) -or -not [IO.File]::Exists($strNpmPath)) {
               throw 'toolchain: verified runtime executables are missing'
           }
-          $strObservedVersion = (& $strNodePath --version).Trim()
-          if ($LASTEXITCODE -ne 0 -or $strObservedVersion -cne "v$strVersion") {
+          $arrVersionOutput = @(& $strNodePath --version)
+          $intVersionExitCode = $LASTEXITCODE
+          if ($intVersionExitCode -ne 0) {
+              throw "toolchain: runtime version command exited $intVersionExitCode"
+          }
+          if ($arrVersionOutput.Count -ne 1) {
+              throw 'toolchain: runtime version command must return exactly one line'
+          }
+          $strObservedVersion = $arrVersionOutput[0].Trim()
+          if ($strObservedVersion -cne "v$strVersion") {
               throw 'toolchain: verified runtime executable identity is wrong'
           }
           [IO.File]::AppendAllText($env:GITHUB_PATH,
@@ -351,16 +367,71 @@ jobs:
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          export npm_config_userconfig=/dev/null
+          export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
+            -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
+            echo '::error::Unexpected package-manager configuration source.'
+            exit 1
+          fi
+          printf '%s\n' 'npm_config_userconfig=/dev/null' \
+            'npm_config_globalconfig=/etc/npmrc-absent-by-policy' >> "${GITHUB_ENV}"
           expected_node="$(node -p 'require("./package.json").engines.node')"
           expected_npm="$(node -p 'require("./package.json").engines.npm')"
           test "$(node --version)" = "v${expected_node}"
           test "$(npm --version)" = "${expected_npm}"
+
+      - name: Fetch pull request base as data
+        if: github.event_name == 'pull_request_target'
+        shell: bash
+        env:
+          PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          set -euo pipefail
+          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
+            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
+            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
+            echo '::error::Unexpected credential or Git configuration channel.'
+            exit 1
+          fi
+          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          if [[ ! "${PR_BASE_SHA:-}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo '::error::Pull request base must be a full lowercase commit hash.'
+            exit 1
+          fi
+          if [[ "${PR_BASE_SHA}" == "0000000000000000000000000000000000000000" ]]; then
+            echo '::error::Pull request base must not be the zero commit hash.'
+            exit 1
+          fi
+          if ! git cat-file -e "${PR_BASE_SHA}^{commit}" 2>/dev/null; then
+            if ! git fetch --no-tags --no-recurse-submodules origin "${PR_BASE_SHA}"; then
+              echo '::error::Could not fetch the exact pull request base.'
+              exit 1
+            fi
+          fi
+          if ! fetched_base="$(git rev-parse --verify "${PR_BASE_SHA}^{commit}")"; then
+            echo '::error::Could not resolve the exact pull request base commit.'
+            exit 1
+          fi
+          if [[ "${fetched_base}" != "${PR_BASE_SHA}" ]]; then
+            echo '::error::Resolved pull request base does not match the exact event identity.'
+            exit 1
+          fi
+          if ! git diff --quiet --no-ext-diff; then
+            echo '::error::Could not confirm a clean worktree after pull request base acquisition.'
+            exit 1
+          fi
+          if ! git diff --cached --quiet --no-ext-diff; then
+            echo '::error::Could not confirm a clean index after pull request base acquisition.'
+            exit 1
+          fi
 
       - name: Fetch pull request head as data
         if: github.event_name == 'pull_request_target'
         shell: bash
         env:
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
           if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
@@ -371,11 +442,12 @@ jobs:
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
           [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
+          [[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]
           # An unexpected non-fast-forward local ref must fail closed.
           git fetch --no-tags --no-recurse-submodules origin \
-            "${PR_HEAD_SHA}:refs/remotes/event/pr-head"
+              "refs/pull/${PR_NUMBER}/head:refs/remotes/pull/${PR_NUMBER}/head"
           fetched_head="$(git rev-parse --verify \
-            'refs/remotes/event/pr-head^{commit}')"
+            "refs/remotes/pull/${PR_NUMBER}/head^{commit}")"
           test "${fetched_head}" = "${PR_HEAD_SHA}"
           git diff --quiet --no-ext-diff
           git diff --cached --quiet --no-ext-diff
@@ -659,11 +731,7 @@ jobs:
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          node .github/workflows/Test-AgentInstructionParserManifest.mjs \
-            --repository-root . \
-            --trusted-revision "${TRUSTED_REVISION}" \
-            --input-revision "${INPUT_REVISION}" \
-            --self-test
+          node .github/workflows/Test-AgentInstructionParserManifest.mjs --repository-root . --trusted-revision "${TRUSTED_REVISION}" --input-revision "${INPUT_REVISION}" --self-test
 
       - name: Install locked validation dependencies
         if: >-
@@ -680,8 +748,7 @@ jobs:
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
           node .github/workflows/Validate-WorkflowPolicy.mjs --preflight
-          npm ci --ignore-scripts --no-audit --fund=false \
-            --include=dev --package-lock=true
+          npm ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true
           npm --prefix .github/workflows ci --ignore-scripts --no-audit \
             --fund=false --include=dev --package-lock=true
 
@@ -814,28 +881,36 @@ jobs:
               toJson(github.event.commits) || '' }}
           AGENT_INSTRUCTION_OTHER_REF_EVIDENCE: >-
             ${{ steps.created-push-boundary.outputs.other_ref_evidence || '' }}
-        run: >-
-          ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
-          -AuthorizationBaseRevision $env:AGENT_INSTRUCTION_AUTHORIZATION_BASE
-          -AuthorizationHeadRevision $env:AGENT_INSTRUCTION_AUTHORIZATION_HEAD
-          -TrustedMaintenanceAuthorizationValidated:([bool]::Parse(
-          $env:AGENT_INSTRUCTION_TRUST_MAINTENANCE_AUTHORIZED))
-          -InputRevision $env:AGENT_INSTRUCTION_INPUT_REVISION
-          -PublishedBaselineRevision $env:AGENT_INSTRUCTION_PUBLISHED_BASELINE
-          -PublishedFinalRevision $env:AGENT_INSTRUCTION_PUBLISHED_FINAL
-          -PublishedBaselineAbsent:([bool]::Parse(
-          $env:AGENT_INSTRUCTION_PUBLISHED_BASELINE_ABSENT))
-          -PublishedFinalDeleted:([bool]::Parse(
-          $env:AGENT_INSTRUCTION_PUBLISHED_FINAL_DELETED))
-          -TrustedEventTimestamp $env:AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP
-          -EventName $env:AGENT_INSTRUCTION_EVENT_NAME
-          -PullRequestAction $env:AGENT_INSTRUCTION_PULL_REQUEST_ACTION
-          -PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED
-          -DestinationRef $env:AGENT_INSTRUCTION_DESTINATION_REF
-          -EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION
-          -EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT
+        run: |
+          $ErrorActionPreference = 'Stop'
+          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN) -or
+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or
+              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {
+              throw 'credential-policy: unexpected credential or Git configuration channel'
+          }
+          ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest `
+          -AuthorizationBaseRevision $env:AGENT_INSTRUCTION_AUTHORIZATION_BASE `
+          -AuthorizationHeadRevision $env:AGENT_INSTRUCTION_AUTHORIZATION_HEAD `
+          -TrustedMaintenanceAuthorizationValidated:([bool]::Parse( `
+          $env:AGENT_INSTRUCTION_TRUST_MAINTENANCE_AUTHORIZED)) `
+          -InputRevision $env:AGENT_INSTRUCTION_INPUT_REVISION `
+          -PublishedBaselineRevision $env:AGENT_INSTRUCTION_PUBLISHED_BASELINE `
+          -PublishedFinalRevision $env:AGENT_INSTRUCTION_PUBLISHED_FINAL `
+          -PublishedBaselineAbsent:([bool]::Parse( `
+          $env:AGENT_INSTRUCTION_PUBLISHED_BASELINE_ABSENT)) `
+          -PublishedFinalDeleted:([bool]::Parse( `
+          $env:AGENT_INSTRUCTION_PUBLISHED_FINAL_DELETED)) `
+          -TrustedEventTimestamp $env:AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP `
+          -EventName $env:AGENT_INSTRUCTION_EVENT_NAME `
+          -PullRequestAction $env:AGENT_INSTRUCTION_PULL_REQUEST_ACTION `
+          -PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED `
+          -DestinationRef $env:AGENT_INSTRUCTION_DESTINATION_REF `
+          -EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION `
+          -EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT `
           -PushCommitEvidenceJson `
-          $env:AGENT_INSTRUCTION_PUSH_COMMIT_EVIDENCE
+          $env:AGENT_INSTRUCTION_PUSH_COMMIT_EVIDENCE `
           -OtherRefEvidenceJson `
           $env:AGENT_INSTRUCTION_OTHER_REF_EVIDENCE
 

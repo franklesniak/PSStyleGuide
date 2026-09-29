@@ -120,8 +120,16 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "acquire: git fetch exited $LASTEXITCODE" }
           & $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD
           if ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }
-          $strHead = (& $strGitPath rev-parse HEAD).Trim()
-          if ($LASTEXITCODE -ne 0 -or $strHead -cne $strSha) {
+          $arrHeadOutput = @(& $strGitPath rev-parse HEAD)
+          $intHeadExitCode = $LASTEXITCODE
+          if ($intHeadExitCode -ne 0) {
+              throw "acquire: git rev-parse exited $intHeadExitCode"
+          }
+          if ($arrHeadOutput.Count -ne 1) {
+              throw 'acquire: git rev-parse must return exactly one line'
+          }
+          $strHead = $arrHeadOutput[0].Trim()
+          if ($strHead -cne $strSha) {
               throw 'acquire: the checked out revision is not the triggering revision'
           }
           Write-Information "acquire: anonymous exact checkout of $strSha" -InformationAction Continue
@@ -312,7 +320,7 @@ jobs:
               throw 'toolchain: fixed download/extraction tools are unavailable'
           }
           $strUrl = "https://nodejs.org/dist/v$strVersion/node-v$strVersion-linux-x64.tar.xz"
-          & $strCurlPath --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --output $strArchive $strUrl
+          & $strCurlPath --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl
           if ($LASTEXITCODE -ne 0) { throw "toolchain: download exited $LASTEXITCODE" }
           if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash -cne $strReviewedSha256) {
               throw 'toolchain: official Node archive does not match the reviewed digest'
@@ -325,8 +333,16 @@ jobs:
           if (-not [IO.File]::Exists($strNodePath) -or -not [IO.File]::Exists($strNpmPath)) {
               throw 'toolchain: verified runtime executables are missing'
           }
-          $strObservedVersion = (& $strNodePath --version).Trim()
-          if ($LASTEXITCODE -ne 0 -or $strObservedVersion -cne "v$strVersion") {
+          $arrVersionOutput = @(& $strNodePath --version)
+          $intVersionExitCode = $LASTEXITCODE
+          if ($intVersionExitCode -ne 0) {
+              throw "toolchain: runtime version command exited $intVersionExitCode"
+          }
+          if ($arrVersionOutput.Count -ne 1) {
+              throw 'toolchain: runtime version command must return exactly one line'
+          }
+          $strObservedVersion = $arrVersionOutput[0].Trim()
+          if ($strObservedVersion -cne "v$strVersion") {
               throw 'toolchain: verified runtime executable identity is wrong'
           }
           [IO.File]::AppendAllText($env:GITHUB_PATH,
@@ -348,11 +364,18 @@ jobs:
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          export npm_config_userconfig=/dev/null
+          export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
+            -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
+            echo '::error::Unexpected package-manager configuration source.'
+            exit 1
+          fi
+          printf '%s\n' 'npm_config_userconfig=/dev/null' \
+            'npm_config_globalconfig=/etc/npmrc-absent-by-policy' >> "${GITHUB_ENV}"
           if [[ "${TOOLCHAIN_LAYOUT}" == modern ]]; then
-            expected_node="$(node -p \
-              'require("./package.json").engines.node')"
-            expected_npm="$(node -p \
-              'require("./package.json").engines.npm')"
+            expected_node="$(node -p 'require("./package.json").engines.node')"
+            expected_npm="$(node -p 'require("./package.json").engines.npm')"
             test "$(node --version)" = "v${expected_node}"
             test "$(npm --version)" = "${expected_npm}"
           elif [[ "${TOOLCHAIN_LAYOUT}" == legacy ]]; then
