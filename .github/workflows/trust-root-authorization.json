@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "authorization_id": "issue-211-u1-review-corrections",
+  "authorization_id": "issue-211-u1-validator-compatibility-prerequisite",
   "limits": {
     "maximum_paths": 20,
     "maximum_blob_bytes": 573440,
@@ -60,9 +60,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
       "mode": "100644",
-      "blob": "19693d793ae9edb7c34e14b791016a3bf708dad7",
-      "bytes": 86490,
-      "sha256": "a0cbae62096a6cd19457a7c0401f1976f3a669a24fffa84e74fbbcb9b317e0a7",
+      "blob": "663c7c9e67e233375524940cb55f75c45b8b2c61",
+      "bytes": 56775,
+      "sha256": "b3e8c41f8a436c52f5434cc785bde17de6b97814254b9edeb2681c74d851f016",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -72,9 +72,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "da87e9fe6266bfba02b33a55598fe0b9a7affce3",
-      "bytes": 570098,
-      "sha256": "c0c581745c42f37c3bc3e7879fefbc6a92f7607ffa50f42af6fffc76579d2e00",
+      "blob": "f1cdb25a2454b2bceb6f6a511af19135f19ae782",
+      "bytes": 570045,
+      "sha256": "723001a56f283c53c1402542a17257f6d702c9fa14072668614585dfa8eb9d90",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -96,9 +96,9 @@
     {
       "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
       "mode": "100644",
-      "blob": "954eb46a965f74467538d1885b98bc6b7f3b9200",
-      "bytes": 443693,
-      "sha256": "cc69ac989bb94a30bd4205a1ec03b4caf917177153e7556f8de30852464a9f9f",
+      "blob": "5ca9ba1b26ec87ad65b5f91b1258e82753d07a39",
+      "bytes": 446475,
+      "sha256": "2c4f15b71bfd467a9c4fbf104536862af28f6ac58b3e2c00ad7b90e3bb98147e",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -193,9 +193,9 @@
     {
       "path": ".github/workflows/copilot-setup-steps.yml",
       "mode": "100644",
-      "blob": "346ef744b3b3f0b097fdfeee374a381d97574bfa",
-      "bytes": 21795,
-      "sha256": "37eb5162899deef6d154192c038960a8e51b8a43e96b5699b59bddee3a0da010",
+      "blob": "ca12c64e85be77a9a3df25ca4f22c5276ff91e68",
+      "bytes": 20523,
+      "sha256": "a02072070a31ec84ebd10ac583a189632594feeb2eee161362a743d920322b3b",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "yaml",
       "semantic_invariants": [
@@ -205,9 +205,9 @@
     {
       "path": ".github/workflows/agent-instructions.yml",
       "mode": "100644",
-      "blob": "09a389439702ab44ee21d08438c479418eb6fd90",
-      "bytes": 47823,
-      "sha256": "2bcd9a632b96dcf5f281270a8abe0cdde06266fd22f0ab9c0b1f60c5d58185f6",
+      "blob": "a7496529872c89f506879f1e2d15784561bebdb2",
+      "bytes": 43095,
+      "sha256": "c94f13309619724ccf5ba00fd179ee9ce77adad04bca5338ecc0ecf14ae5b937",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "yaml",
       "semantic_invariants": [
