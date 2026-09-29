@@ -441,16 +441,33 @@ jobs:
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
-          [[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]
+          if ! [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo '::error::Pull request head must be a full lowercase commit hash.'
+            exit 1
+          fi
+          if ! [[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]; then
+            echo '::error::Pull request number must be a positive decimal integer.'
+            exit 1
+          fi
           # An unexpected non-fast-forward local ref must fail closed.
           git fetch --no-tags --no-recurse-submodules origin \
               "refs/pull/${PR_NUMBER}/head:refs/remotes/pull/${PR_NUMBER}/head"
           fetched_head="$(git rev-parse --verify \
             "refs/remotes/pull/${PR_NUMBER}/head^{commit}")"
-          test "${fetched_head}" = "${PR_HEAD_SHA}"
-          git diff --quiet --no-ext-diff
-          git diff --cached --quiet --no-ext-diff
+          if ! test "${fetched_head}" = "${PR_HEAD_SHA}"; then
+            echo '::error::Fetched pull request head does not match the exact event identity.'
+            exit 1
+          fi
+          git diff --quiet --no-ext-diff || {
+            diff_status=$?
+            echo '::error::Could not confirm a clean worktree after pull request head acquisition.'
+            exit "${diff_status}"
+          }
+          git diff --cached --quiet --no-ext-diff || {
+            diff_status=$?
+            echo '::error::Could not confirm a clean index after pull request head acquisition.'
+            exit "${diff_status}"
+          }
 
       - name: Authenticate created push boundary refs as data
         id: created-push-boundary

@@ -3,7 +3,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.15.20260929.0
+# Version: 1.16.20260929.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -8141,9 +8141,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strValidatorSource,
-            '(?m)^# Version: 1\.15\.20260929\.0$'
+            '(?m)^# Version: 1\.16\.20260929\.0$'
         ).Count -ne 1) {
-        throw 'The validator script version is not 1.15.20260929.0.'
+        throw 'The validator script version is not 1.16.20260929.0.'
     }
     $strBoundedEvidenceDiagnostic =
         'A created-push boundary lacks authenticated other-ref provenance ' +
@@ -9087,9 +9087,9 @@ if ($SelfTest) {
     }
     if ([regex]::Matches(
             $strExtractedSelfTestSource,
-            '(?m)^# Version: 1\.5\.20260929\.0$'
+            '(?m)^# Version: 1\.5\.20260929\.1$'
         ).Count -ne 1) {
-        throw 'The extracted self-test lacks version 1.5.20260929.0.'
+        throw 'The extracted self-test lacks version 1.5.20260929.1.'
     }
     $strExtractedSelfTestRevision = if (
         [string]::IsNullOrEmpty($strValidatedInputRevision)

@@ -30,7 +30,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.5.20260929.0
+# Version: 1.5.20260929.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -142,6 +142,89 @@ if ([regex]::Matches($strCapacityAuthorizer,
 
 # Bind the landed U1 supply contracts to both actual workflow roles. These are
 # inert content tests; native execution fixtures are run separately on each host.
+# This finite lexical detector recognizes literal command words, shell lists,
+# pipelines and $(...) in the reviewed literal Bash run bodies. It does not
+# resolve functions, aliases, variables, eval, here-documents or arbitrary Bash.
+$scriptblockFindLiteralNpmCommand = {
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Text)
+    if ($Text.Length -gt 131072) { throw 'The literal Bash fixture exceeds its bound.' }
+    $strWord = ''
+    $intWordStart = -1
+    $strQuote = ''
+    $boolCommand = $true
+    $stackSubstitution = [Collections.Generic.Stack[object]]::new()
+    for ($intCharacter = 0; $intCharacter -le $Text.Length; $intCharacter++) {
+        $strCharacter = if ($intCharacter -lt $Text.Length) {
+            [string] $Text[$intCharacter]
+        } else { "`n" }
+        $strNext = if ($intCharacter + 1 -lt $Text.Length) {
+            [string] $Text[$intCharacter + 1]
+        } else { '' }
+        if ($strQuote -ceq "'") {
+            if ($strCharacter -ceq "'") { $strQuote = '' } else { $strWord += $strCharacter }
+            continue
+        }
+        if ($strCharacter -ceq '\' -and $intCharacter -lt $Text.Length) {
+            if ($strNext -cne "`n") {
+                if ($intWordStart -lt 0) { $intWordStart = $intCharacter }
+                $strWord += $strNext
+            }
+            $intCharacter++
+            continue
+        }
+        if ($strCharacter -ceq '$' -and $strNext -ceq '(') {
+            if ($stackSubstitution.Count -ge 16) { throw 'The command-substitution fixture exceeds its bound.' }
+            $stackSubstitution.Push(@($strQuote, $strWord, $intWordStart, $boolCommand))
+            $strQuote = ''
+            $strWord = ''
+            $intWordStart = -1
+            $boolCommand = $true
+            $intCharacter++
+            continue
+        }
+        if ($strQuote -ceq '"') {
+            if ($strCharacter -ceq '"') { $strQuote = '' } else { $strWord += $strCharacter }
+            continue
+        }
+        if ($strCharacter -cin @("'", '"')) {
+            if ($intWordStart -lt 0) { $intWordStart = $intCharacter }
+            $strQuote = $strCharacter
+            continue
+        }
+        if ($strCharacter -ceq '#' -and $intWordStart -lt 0) {
+            while ($intCharacter -lt $Text.Length -and $Text[$intCharacter] -cne "`n") {
+                $intCharacter++
+            }
+            $strCharacter = "`n"
+        }
+        $boolBoundary = $strCharacter -cmatch '^[\s;|&()]$'
+        if (-not $boolBoundary) {
+            if ($intWordStart -lt 0) { $intWordStart = $intCharacter }
+            $strWord += $strCharacter
+            continue
+        }
+        if ($intWordStart -ge 0) {
+            if ($boolCommand -and $strWord -ceq 'npm') { return $intWordStart }
+            if ($boolCommand) {
+                $boolCommand = $strWord -cin @('if', 'then', 'elif', 'else', 'do', '!', 'command') -or
+                    $strWord -cmatch '^[A-Za-z_][A-Za-z0-9_]*='
+            }
+            $strWord = ''
+            $intWordStart = -1
+        }
+        if ($strCharacter -ceq ')' -and $stackSubstitution.Count -gt 0) {
+            $arrPrevious = $stackSubstitution.Pop()
+            $strQuote = $arrPrevious[0]
+            $strWord = $arrPrevious[1] + '<command-substitution>'
+            $intWordStart = [int] $arrPrevious[2]
+            $boolCommand = [bool] $arrPrevious[3]
+        } elseif ($strCharacter -cmatch '^[\r\n;|&()]$') {
+            $boolCommand = $true
+        }
+    }
+    return -1
+}
+
 $scriptblockGetAgentSupplyFailure = {
     param(
         [Parameter(Mandatory)][string] $WorkflowContent,
@@ -203,12 +286,24 @@ $scriptblockGetAgentSupplyFailure = {
     $arrNpmConfigurationBlocks = @([regex]::Matches(
             $WorkflowContent, [regex]::Escape($strExpectedNpmConfiguration)
         ))
-    $objFirstNpmInvocation = [regex]::Match(
-        $WorkflowContent, '(?m)^ {10,}(?:npm[ \t]|.*\$\([ \t]*npm[ \t])'
-    )
+    $intFirstNpmInvocation = -1
+    $arrLiteralSteps = @([regex]::Matches($WorkflowContent,
+            '(?ms)^      - name: [^\n]+\n.*?(?=^      - name: |\z)'))
+    if ($arrLiteralSteps.Count -gt 64) { throw 'The literal step fixture exceeds its bound.' }
+    foreach ($objLiteralStep in $arrLiteralSteps) {
+        if ($objLiteralStep.Value -cnotmatch '(?m)^        shell: bash$') { continue }
+        $objLiteralRun = [regex]::Match($objLiteralStep.Value,
+            '(?m)^        run: \|\n(?<Body>(?:^          [^\n]*\n|^\n)*)')
+        if (-not $objLiteralRun.Success) { throw 'The Bash fixture must use a literal run body.' }
+        $intNpmInRun = & $scriptblockFindLiteralNpmCommand -Text $objLiteralRun.Groups['Body'].Value
+        if ($intNpmInRun -ge 0) {
+            $intFirstNpmInvocation = $objLiteralStep.Index + $objLiteralRun.Groups['Body'].Index + $intNpmInRun
+            break
+        }
+    }
     if ($arrNpmConfigurationBlocks.Count -ne 1 -or
-        -not $objFirstNpmInvocation.Success -or
-        $arrNpmConfigurationBlocks[0].Index -ge $objFirstNpmInvocation.Index) {
+        $intFirstNpmInvocation -lt 0 -or
+        $arrNpmConfigurationBlocks[0].Index -ge $intFirstNpmInvocation) {
         Write-Output 'Agent workflow must isolate npm file configuration before its first npm invocation.'
     }
 
@@ -252,16 +347,33 @@ $scriptblockGetAgentSupplyFailure = {
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
-          [[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]
+          if ! [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]; then
+            echo '::error::Pull request head must be a full lowercase commit hash.'
+            exit 1
+          fi
+          if ! [[ "${PR_NUMBER}" =~ ^[1-9][0-9]*$ ]]; then
+            echo '::error::Pull request number must be a positive decimal integer.'
+            exit 1
+          fi
           # An unexpected non-fast-forward local ref must fail closed.
           git fetch --no-tags --no-recurse-submodules origin \
               "refs/pull/${PR_NUMBER}/head:refs/remotes/pull/${PR_NUMBER}/head"
           fetched_head="$(git rev-parse --verify \
             "refs/remotes/pull/${PR_NUMBER}/head^{commit}")"
-          test "${fetched_head}" = "${PR_HEAD_SHA}"
-          git diff --quiet --no-ext-diff
-          git diff --cached --quiet --no-ext-diff
+          if ! test "${fetched_head}" = "${PR_HEAD_SHA}"; then
+            echo '::error::Fetched pull request head does not match the exact event identity.'
+            exit 1
+          fi
+          git diff --quiet --no-ext-diff || {
+            diff_status=$?
+            echo '::error::Could not confirm a clean worktree after pull request head acquisition.'
+            exit "${diff_status}"
+          }
+          git diff --cached --quiet --no-ext-diff || {
+            diff_status=$?
+            echo '::error::Could not confirm a clean index after pull request head acquisition.'
+            exit "${diff_status}"
+          }
 '@.TrimEnd()
     if ([regex]::Matches($WorkflowContent,
             [regex]::Escape($strPullRequestHeadFetch)).Count -ne 1) {
@@ -335,6 +447,38 @@ $scriptblockGetAgentSupplyFailure = {
     }
 }
 
+# These are lexical controls, not execution of candidate shell text.
+$arrBadNpmSyntax = @('npm --version', 'true && npm --version', 'printf x | npm --version',
+    'true || npm --version', 'true; npm --version', 'test "$(npm --version)" = 1',
+    'value=$(npm --version)', 'if npm --version; then true; fi', 'command npm --version',
+    'true && "npm" --version', 'true && n"p"m --version', 'VAR=value npm --version',
+    "true &&\`nnpm --version", 'echo "$(true && npm --version)"')
+$arrBenignNpmSyntax = @('# npm --version', '# $(npm --version)', 'echo "npm --version"',
+    'echo ''$(npm --version)''', 'echo npm --version', 'export npm_config_userconfig=/dev/null',
+    'printf ''npm --version''', 'echo "true && npm --version"', 'npm_config_value=npm',
+    'test "$(node -p ''npm'')" = npm', 'echo "$(echo npm --version)"', 'echo "\$(npm --version)"')
+
+foreach ($strNpmSyntax in $arrBadNpmSyntax + $arrBenignNpmSyntax) {
+    $intNpmSyntaxIndex = & $scriptblockFindLiteralNpmCommand -Text $strNpmSyntax
+    if (($intNpmSyntaxIndex -ge 0) -ne ($arrBadNpmSyntax -ccontains $strNpmSyntax)) {
+        throw 'The bounded literal npm detector misclassified a syntax control.'
+    }
+}
+
+$scriptblockSetSupplyStepMutation = {
+    param([string] $WorkflowContent, [string] $StepName, [string] $OldText, [string] $NewText)
+    $strStepPattern = '(?ms)^      - name: ' + [regex]::Escape($StepName) +
+        '\n.*?(?=^      - name: |^  [a-z]|\z)'
+    $arrSteps = @([regex]::Matches($WorkflowContent, $strStepPattern))
+    if ($arrSteps.Count -ne 1 -or
+        [regex]::Matches($arrSteps[0].Value, [regex]::Escape($OldText)).Count -ne 1) {
+        throw 'A scoped supply mutation must have exactly one step and target.'
+    }
+    $objStep = $arrSteps[0]
+    return $WorkflowContent.Remove($objStep.Index, $objStep.Length).Insert(
+        $objStep.Index, $objStep.Value.Replace($OldText, $NewText))
+}
+
 $arrSupplyMutations = @(
     @('checkout exit capture', '$intHeadExitCode = $LASTEXITCODE', '$intHeadExitCode = 0'),
     @('checkout failure guard', 'if ($intHeadExitCode -ne 0)', 'if ($false)'),
@@ -395,27 +539,56 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
         }
         $intSupplyMutationCount++
     }
+    foreach ($strNpmSyntax in $arrBadNpmSyntax + $arrBenignNpmSyntax) {
+        $strNpmLine = '          ' + $strNpmSyntax.Replace("`n", "`n          ") + "`n"
+        $strSupplyMutant = $strSupplyWorkflowContent.Insert($objProducer.Index, $strNpmLine)
+        $arrNpmSyntaxFailures = @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant -PullRequestRole $boolPullRequestRole)
+        $boolNpmOrderingRejected = $arrNpmSyntaxFailures -ccontains
+            'Agent workflow must isolate npm file configuration before its first npm invocation.'
+        if ($boolNpmOrderingRejected -ne ($arrBadNpmSyntax -ccontains $strNpmSyntax)) {
+            throw "$strSupplyWorkflowName misclassified a pre-producer literal npm command."
+        }
+        if ($arrBenignNpmSyntax -ccontains $strNpmSyntax -and $arrNpmSyntaxFailures.Count -ne 0) {
+            throw "$strSupplyWorkflowName rejected benign pre-producer shell text."
+        }
+        $intSupplyMutationCount++
+    }
     if ($boolPullRequestRole) {
+        $strInvocationStep = 'Validate instruction capacity and capabilities'
+        $strInvocationFailure = 'The ordinary validator must reject all five credential/config channels immediately before invocation.'
+        $strHeadFailure = 'The pull-request head must use the exact numbered-ref and event-SHA contract.'
+        $strBaseFailure = 'The exact pull-request base data-fetch contract is not exact.'
         foreach ($strGuardChannel in @('GITHUB_TOKEN', 'GH_TOKEN',
                 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS')) {
-            $strSupplyMutant = $strSupplyWorkflowContent.Replace(
-                '$env:' + $strGuardChannel + ')', '$env:UNRELATED_CHANNEL)')
+            $hashtableMutation = @{
+                WorkflowContent = $strSupplyWorkflowContent
+                StepName = $strInvocationStep
+                OldText = '$env:' + $strGuardChannel + ')'
+                NewText = '$env:UNRELATED_CHANNEL)'
+            }
+            $strSupplyMutant = & $scriptblockSetSupplyStepMutation @hashtableMutation
             if ($strSupplyMutant -ceq $strSupplyWorkflowContent -or
                 @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
-                        -PullRequestRole $true).Count -eq 0) {
+                        -PullRequestRole $true) -cnotcontains $strInvocationFailure) {
                 throw "The ordinary invocation accepted a missing $strGuardChannel guard."
             }
             $intSupplyMutationCount++
         }
         foreach ($arrGuardMutation in @(
                 @('terminating errors', "          `$ErrorActionPreference = 'Stop'", "          `$ErrorActionPreference = 'Continue'"),
-                @('guard ordering', '          ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest `', '          # validator moved before its guard'),
+                @('missing invocation', '          ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest `', '          # validator invocation removed'),
                 @('literal run', "        run: |`n          `$ErrorActionPreference = 'Stop'", "        run: >-`n          `$ErrorActionPreference = 'Stop'")
             )) {
-            $strSupplyMutant = $strSupplyWorkflowContent.Replace($arrGuardMutation[1], $arrGuardMutation[2])
+            $hashtableMutation = @{
+                WorkflowContent = $strSupplyWorkflowContent
+                StepName = $strInvocationStep
+                OldText = $arrGuardMutation[1]
+                NewText = $arrGuardMutation[2]
+            }
+            $strSupplyMutant = & $scriptblockSetSupplyStepMutation @hashtableMutation
             if ($strSupplyMutant -ceq $strSupplyWorkflowContent -or
                 @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
-                        -PullRequestRole $true).Count -eq 0) {
+                        -PullRequestRole $true) -cnotcontains $strInvocationFailure) {
                 throw "The ordinary invocation accepted $($arrGuardMutation[0]) mutation."
             }
             $intSupplyMutationCount++
@@ -428,10 +601,16 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
                 @('head event equality', 'test "${fetched_head}" = "${PR_HEAD_SHA}"', 'true'),
                 @('head tracked cleanliness', 'git diff --cached --quiet --no-ext-diff', 'true')
             )) {
-            $strSupplyMutant = $strSupplyWorkflowContent.Replace($arrHeadMutation[1], $arrHeadMutation[2])
+            $hashtableMutation = @{
+                WorkflowContent = $strSupplyWorkflowContent
+                StepName = 'Fetch pull request head as data'
+                OldText = $arrHeadMutation[1]
+                NewText = $arrHeadMutation[2]
+            }
+            $strSupplyMutant = & $scriptblockSetSupplyStepMutation @hashtableMutation
             if ($strSupplyMutant -ceq $strSupplyWorkflowContent -or
                 @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
-                        -PullRequestRole $true).Count -eq 0) {
+                        -PullRequestRole $true) -cnotcontains $strHeadFailure) {
                 throw "The ordinary workflow did not reject $($arrHeadMutation[0])."
             }
             $intSupplyMutationCount++
@@ -447,14 +626,48 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
                 @('base worktree', 'if ! git diff --quiet --no-ext-diff;', 'if false;'),
                 @('base index', 'if ! git diff --cached --quiet --no-ext-diff;', 'if false;')
             )) {
-            $strSupplyMutant = $strSupplyWorkflowContent.Replace($arrBaseMutation[1], $arrBaseMutation[2])
+            $hashtableMutation = @{
+                WorkflowContent = $strSupplyWorkflowContent
+                StepName = 'Fetch pull request base as data'
+                OldText = $arrBaseMutation[1]
+                NewText = $arrBaseMutation[2]
+            }
+            $strSupplyMutant = & $scriptblockSetSupplyStepMutation @hashtableMutation
             if ($strSupplyMutant -ceq $strSupplyWorkflowContent -or
                 @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
-                        -PullRequestRole $true).Count -eq 0) {
+                        -PullRequestRole $true) -cnotcontains $strBaseFailure) {
                 throw "The ordinary workflow did not reject $($arrBaseMutation[0])."
             }
             $intSupplyMutationCount++
         }
+        foreach ($strDiffCommand in @('git diff --quiet --no-ext-diff',
+                'git diff --cached --quiet --no-ext-diff')) {
+            $hashtableMutation = @{
+                WorkflowContent = $strSupplyWorkflowContent
+                StepName = 'Fetch pull request head as data'
+                OldText = $strDiffCommand + ' || {' + "`n" + '            diff_status=$?'
+                NewText = $strDiffCommand + ' || {' + "`n" + '            diff_status=0'
+            }
+            $strSupplyMutant = & $scriptblockSetSupplyStepMutation @hashtableMutation
+            if (@(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant -PullRequestRole $true) -cnotcontains $strHeadFailure) {
+                throw 'A head cleanliness mutation lost native failure status without rejection.'
+            }
+            $intSupplyMutationCount++
+        }
+        $arrInvocationSteps = @([regex]::Matches($strSupplyWorkflowContent,
+                '(?ms)^      - name: Validate instruction capacity and capabilities\n.*?(?=^      - name: |^  [a-z]|\z)'))
+        if ($arrInvocationSteps.Count -ne 1) { throw 'The invocation step is not unique.' }
+        $strInvocationStepText = $arrInvocationSteps[0].Value
+        $intInvocationStart = $strInvocationStepText.IndexOf('          ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest ')
+        $intGuardStart = $strInvocationStepText.IndexOf('          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN)')
+        if ($intInvocationStart -le $intGuardStart -or $intGuardStart -lt 0) { throw 'The invocation ordering fixture is invalid.' }
+        $strInvocationText = $strInvocationStepText.Substring($intInvocationStart)
+        $strReorderedStep = $strInvocationStepText.Remove($intInvocationStart).Insert($intGuardStart, $strInvocationText)
+        $strSupplyMutant = $strSupplyWorkflowContent.Replace($strInvocationStepText, $strReorderedStep)
+        if (@(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant -PullRequestRole $true) -cnotcontains $strInvocationFailure) {
+            throw 'The ordinary validator accepted invocation before its guard.'
+        }
+        $intSupplyMutationCount++
         $objBaseStep = [regex]::Match($strSupplyWorkflowContent,
             '(?ms)^      - name: Fetch pull request base as data\n.*?(?=^      - name: |\z)')
         if (-not $objBaseStep.Success) { throw 'The PR-base step fixture is unavailable.' }
@@ -466,7 +679,7 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
         $intSupplyMutationCount++
     }
 }
-if ($intSupplyMutationCount -ne 74) { throw 'The U1 supply mutation census is incomplete.' }
+if ($intSupplyMutationCount -ne 129) { throw 'The U1 supply mutation census is incomplete.' }
 
 # These input-reader fixtures need no candidate code or parent-scope mutation.
 Assert-RepositoryInputMetadataMutationRejected `
