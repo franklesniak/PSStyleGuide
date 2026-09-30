@@ -60,7 +60,7 @@ $strUrl = "https://nodejs.org/dist/v$($objPackage.engines.node)/node-v$($objPack
     --retry 2 --output $strArchive $strUrl
 if ($LASTEXITCODE -ne 0) { throw "Runtime download failed: $LASTEXITCODE" }
 if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash.ToLowerInvariant() -cne
-    $objPin.linuxX64Sha256) { throw 'The runtime archive digest is incorrect.' }
+    $objPin.linuxX64Sha256) { throw "The runtime archive digest is incorrect for $strUrl. Check package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256. Verify the official release checksum before changing the declaration." }
 [void][IO.Directory]::CreateDirectory($strNodeRoot)
 & /usr/bin/tar -xJf $strArchive -C $strNodeRoot --strip-components=1
 if ($LASTEXITCODE -ne 0) { throw "Runtime extraction failed: $LASTEXITCODE" }

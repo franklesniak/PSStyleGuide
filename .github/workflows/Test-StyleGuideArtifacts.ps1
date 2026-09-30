@@ -542,14 +542,23 @@ for ($intArtifactIndex = 0; $intArtifactIndex -lt $arrExpectedArtifactRecords.Co
     }
 }
 
+# Include this child in the final integrity checks, but defer its generic
+# clean-state result until after the specific artifact drift diagnostic.
+$strVerifierCommand = '& ''./.github/workflows/Test-ExactGitPathSet.ps1'' -RepositoryRoot $env:GITHUB_WORKSPACE -GitExecutablePath ''/usr/bin/git'' -ExpectedPath @() -Mode Both -RequireCleanWorkingAgainstIndex'
+$strEncodedVerifierCommand = [System.Convert]::ToBase64String(
+    [System.Text.Encoding]::Unicode.GetBytes($strVerifierCommand)
+)
+$arrPathSetResult = @(& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -EncodedCommand $strEncodedVerifierCommand)
+$intPathSetExit = $LASTEXITCODE
+
 if ((Get-GitControlSurfaceDigest) -cne $strControlSurfaceBefore) {
-    throw 'git-state: the generator changed repository Git configuration or hooks'
+    throw 'git-state: the generator or verifier changed repository Git configuration or hooks'
 }
 
 foreach ($strChannel in $arrChannelPaths) {
     if ([string]::IsNullOrEmpty($strChannel)) { throw 'runner-state: a step communication file path is unset' }
     if ([System.IO.FileInfo]::new($strChannel).Length -ne 0) {
-        throw 'runner-state: the generator wrote to a runner step communication file'
+        throw 'runner-state: the generator or verifier wrote to a runner step communication file'
     }
 }
 
@@ -569,18 +578,12 @@ foreach ($strPath in $objWorktreeAfter.Keys) {
 if ($listChanged.Count -ne 0) {
     $arrOutside = @($listChanged | Where-Object { $arrArtifacts -cnotcontains $_ } | Sort-Object -CaseSensitive)
     if ($arrOutside.Count -ne 0) {
-        throw "git-state: the generator changed $($arrOutside.Count) path(s) outside the four generated artifacts"
+        throw "git-state: the generator or verifier changed $($arrOutside.Count) path(s) outside the four generated artifacts"
     }
     throw 'generated-artifacts: committed artifacts do not match generator output. Run ./.github/workflows/Generate-StyleGuideArtifacts.ps1 and commit the four regenerated files.'
 }
 
-# Preserve the v2 exact-path verifier as an additional independent check.
-$strVerifierCommand = '& ''./.github/workflows/Test-ExactGitPathSet.ps1'' -RepositoryRoot $env:GITHUB_WORKSPACE -GitExecutablePath ''/usr/bin/git'' -ExpectedPath @() -Mode Both -RequireCleanWorkingAgainstIndex'
-$strEncodedVerifierCommand = [System.Convert]::ToBase64String(
-    [System.Text.Encoding]::Unicode.GetBytes($strVerifierCommand)
-)
-$arrPathSetResult = @(& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -EncodedCommand $strEncodedVerifierCommand)
-$intPathSetExit = $LASTEXITCODE
+# Check the saved verifier result after the specific integrity diagnostics.
 if ($arrPathSetResult.Count -ne 1) { throw 'Exact-path verification returned an invalid shape.' }
 try { $objPathSetResult = $arrPathSetResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }
 catch { throw 'Exact-path verification returned invalid JSON.' }

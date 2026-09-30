@@ -292,6 +292,7 @@ jobs:
               -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
               throw 'credential-policy: a token was projected into a code job'
           }
+          $strDigestSource = 'copilot-setup-steps.yml retained runtime digest'
           if ($env:TOOLCHAIN_LAYOUT -ceq 'legacy') {
               $strVersion = '20.20.2'
               $strReviewedSha256 = 'DF770B2A6F130ED8627C9782C988FDA9669FA23898329A61A871E32F965E007D'
@@ -301,6 +302,7 @@ jobs:
                   $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop
                   $strVersion = $objPackage.engines.node
                   $strReviewedSha256 = $objRuntimePin.linuxX64Sha256.ToUpperInvariant()
+                  $strDigestSource = 'package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256'
               } else {
                   # Preserve service setup for published branches from before the shared declaration.
                   $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop
@@ -331,7 +333,7 @@ jobs:
           & $strCurlPath --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --output $strArchive $strUrl
           if ($LASTEXITCODE -ne 0) { throw "toolchain: download exited $LASTEXITCODE" }
           if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash -cne $strReviewedSha256) {
-              throw 'toolchain: official Node archive does not match the reviewed digest'
+              throw "toolchain: official Node archive does not match the reviewed digest for $strUrl. Check $strDigestSource. Verify the official release checksum before changing the declaration."
           }
           [void][IO.Directory]::CreateDirectory($strNodeRoot)
           & $strTarPath -xJf $strArchive -C $strNodeRoot --strip-components=1
