@@ -118,8 +118,13 @@ jobs:
           # Fetching the commit itself, not a ref that names it. No credential
           # is supplied and none is configured, so nothing is persisted for the
           # next step to have to clean up.
-          & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strSha
-          if ($LASTEXITCODE -ne 0) { throw "acquire: git fetch exited $LASTEXITCODE" }
+          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
+              & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strSha
+              $intFetchExitCode = $LASTEXITCODE
+              if ($intFetchExitCode -eq 0) { break }
+              if ($intAttempt -lt 3) { Start-Sleep -Seconds 2 }
+          }
+          if ($intFetchExitCode -ne 0) { throw "acquire: git fetch exited $intFetchExitCode after three attempts" }
           & $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD
           if ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }
           $arrHeadOutput = @(& $strGitPath rev-parse HEAD)
@@ -382,12 +387,23 @@ jobs:
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          # Each step is a fresh process; remove inherited npm override aliases.
-          while IFS= read -r variable; do
-            if [[ "${variable,,}" == npm_config_* ]]; then unset "${variable}"; fi
-          done < <(compgen -e)
+          # env includes inherited names that are not valid Bash identifiers.
+          npm_environment=(/usr/bin/env)
+          while IFS= read -r -d '' entry; do
+            variable=${entry%%=*}
+            if [[ "${variable,,}" == npm_config_* ]]; then
+              npm_environment+=(-u "${variable}")
+            fi
+          done < <(/usr/bin/env -0)
+          # Wait for this process substitution before running any other child.
+          if ! wait "$!"; then
+            echo '::error::Unable to read the package-manager environment.'
+            exit 1
+          fi
           export npm_config_userconfig=/dev/null
           export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          npm_environment+=(-- "npm_config_userconfig=${npm_config_userconfig}"
+            "npm_config_globalconfig=${npm_config_globalconfig}")
           if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
             -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
             echo '::error::Unexpected package-manager configuration source.'
@@ -399,7 +415,7 @@ jobs:
             expected_node="$(node -p 'require("./package.json").engines.node')"
             expected_npm="$(node -p 'require("./package.json").engines.npm')"
             test "$(node --version)" = "v${expected_node}"
-            test "$(npm --version)" = "${expected_npm}"
+            test "$("${npm_environment[@]}" npm --version)" = "${expected_npm}"
           elif [[ "${TOOLCHAIN_LAYOUT}" == legacy ]]; then
             test "$(node -p 'process.versions.node.split(".")[0]')" = '20'
           else
@@ -423,24 +439,35 @@ jobs:
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          # Each step is a fresh process; remove inherited npm override aliases.
-          while IFS= read -r variable; do
-            if [[ "${variable,,}" == npm_config_* ]]; then unset "${variable}"; fi
-          done < <(compgen -e)
+          # env includes inherited names that are not valid Bash identifiers.
+          npm_environment=(/usr/bin/env)
+          while IFS= read -r -d '' entry; do
+            variable=${entry%%=*}
+            if [[ "${variable,,}" == npm_config_* ]]; then
+              npm_environment+=(-u "${variable}")
+            fi
+          done < <(/usr/bin/env -0)
+          # Wait for this process substitution before running any other child.
+          if ! wait "$!"; then
+            echo '::error::Unable to read the package-manager environment.'
+            exit 1
+          fi
           export npm_config_userconfig=/dev/null
           export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          npm_environment+=(-- "npm_config_userconfig=${npm_config_userconfig}"
+            "npm_config_globalconfig=${npm_config_globalconfig}")
           if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
             -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
             echo '::error::Unexpected package-manager configuration source.'
             exit 1
           fi
           if [[ "${TOOLCHAIN_LAYOUT}" == modern ]]; then
-            npm ci --ignore-scripts --no-audit --fund=false --include=dev
+            "${npm_environment[@]}" npm ci --ignore-scripts --no-audit --fund=false --include=dev
           elif [[ "${TOOLCHAIN_LAYOUT}" != legacy ]]; then
             echo '::error::The validation-tool layout is unsupported.'
             exit 1
           fi
-          npm ci --ignore-scripts --no-audit --fund=false --include=dev \
+          "${npm_environment[@]}" npm ci --ignore-scripts --no-audit --fund=false --include=dev \
             --prefix .github/workflows
 
       - name: Verify locked dependency trees and immutable manifests
@@ -459,19 +486,30 @@ jobs:
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          # Each step is a fresh process; remove inherited npm override aliases.
-          while IFS= read -r variable; do
-            if [[ "${variable,,}" == npm_config_* ]]; then unset "${variable}"; fi
-          done < <(compgen -e)
+          # env includes inherited names that are not valid Bash identifiers.
+          npm_environment=(/usr/bin/env)
+          while IFS= read -r -d '' entry; do
+            variable=${entry%%=*}
+            if [[ "${variable,,}" == npm_config_* ]]; then
+              npm_environment+=(-u "${variable}")
+            fi
+          done < <(/usr/bin/env -0)
+          # Wait for this process substitution before running any other child.
+          if ! wait "$!"; then
+            echo '::error::Unable to read the package-manager environment.'
+            exit 1
+          fi
           export npm_config_userconfig=/dev/null
           export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          npm_environment+=(-- "npm_config_userconfig=${npm_config_userconfig}"
+            "npm_config_globalconfig=${npm_config_globalconfig}")
           if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
             -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
             echo '::error::Unexpected package-manager configuration source.'
             exit 1
           fi
           if [[ "${TOOLCHAIN_LAYOUT}" == modern ]]; then
-            npm ls --all
+            "${npm_environment[@]}" npm ls --all
             immutable_inputs=(
               package.json
               package-lock.json
@@ -487,5 +525,5 @@ jobs:
             echo '::error::The validation-tool layout is unsupported.'
             exit 1
           fi
-          npm --prefix .github/workflows ls --all
+          "${npm_environment[@]}" npm --prefix .github/workflows ls --all
           git diff --exit-code -- "${immutable_inputs[@]}"
