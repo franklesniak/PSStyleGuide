@@ -30,7 +30,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.5.20260929.1
+# Version: 1.6.20260929.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -143,8 +143,12 @@ if ([regex]::Matches($strCapacityAuthorizer,
 # Bind the landed U1 supply contracts to both actual workflow roles. These are
 # inert content tests; native execution fixtures are run separately on each host.
 # This finite lexical detector recognizes literal command words, shell lists,
-# pipelines and $(...) in the reviewed literal Bash run bodies. It does not
-# resolve functions, aliases, variables, eval, here-documents or arbitrary Bash.
+# pipelines, unquoted command prefixes and $(...) in the reviewed literal Bash
+# run bodies. In $((...)) and command-position ((...)), arithmetic identifiers
+# are not commands; nested $(...) still is.
+# The quote flag distinguishes reserved syntax from literal command names.
+# It does not resolve functions, aliases, variables, eval, here-documents or
+# arbitrary Bash.
 $scriptblockFindLiteralNpmCommand = {
     param([Parameter(Mandatory)][AllowEmptyString()][string] $Text)
     if ($Text.Length -gt 131072) { throw 'The literal Bash fixture exceeds its bound.' }
@@ -152,6 +156,10 @@ $scriptblockFindLiteralNpmCommand = {
     $intWordStart = -1
     $strQuote = ''
     $boolCommand = $true
+    $boolWordQuoted = $false
+    $boolAssignmentPrefix = $false
+    $intArithmeticDepth = 0
+    $intGroupingDepth = 0
     $stackSubstitution = [Collections.Generic.Stack[object]]::new()
     for ($intCharacter = 0; $intCharacter -le $Text.Length; $intCharacter++) {
         $strCharacter = if ($intCharacter -lt $Text.Length) {
@@ -167,19 +175,61 @@ $scriptblockFindLiteralNpmCommand = {
         if ($strCharacter -ceq '\' -and $intCharacter -lt $Text.Length) {
             if ($strNext -cne "`n") {
                 if ($intWordStart -lt 0) { $intWordStart = $intCharacter }
+                if ($strQuote -ceq '"' -and $strNext -cnotin @('$', '`', '"', '\')) {
+                    $strWord += '\'
+                }
                 $strWord += $strNext
+                $boolWordQuoted = $true
             }
             $intCharacter++
             continue
         }
         if ($strCharacter -ceq '$' -and $strNext -ceq '(') {
             if ($stackSubstitution.Count -ge 16) { throw 'The command-substitution fixture exceeds its bound.' }
-            $stackSubstitution.Push(@($strQuote, $strWord, $intWordStart, $boolCommand))
+            if ($intWordStart -lt 0) { $intWordStart = $intCharacter }
+            $stackSubstitution.Push(@($strQuote, $strWord, $intWordStart,
+                    $boolCommand, $boolWordQuoted, $intArithmeticDepth,
+                    $boolAssignmentPrefix, $intGroupingDepth))
             $strQuote = ''
             $strWord = ''
             $intWordStart = -1
             $boolCommand = $true
+            $boolWordQuoted = $false
+            $boolAssignmentPrefix = $false
+            $intArithmeticDepth = 0
+            $intGroupingDepth = 0
             $intCharacter++
+            if ($intCharacter + 1 -lt $Text.Length -and $Text[$intCharacter + 1] -ceq '(') {
+                $intArithmeticDepth = 2
+                $intCharacter++
+            }
+            continue
+        }
+        if ($intArithmeticDepth -eq 0 -and $strQuote -ceq '' -and
+            $boolCommand -and $intWordStart -lt 0 -and
+            $strCharacter -ceq '(' -and $strNext -ceq '(') {
+            if ($stackSubstitution.Count -ge 16) { throw 'The command-substitution fixture exceeds its bound.' }
+            $stackSubstitution.Push(@('', '', $intCharacter, $false, $false, 0,
+                    $false, $intGroupingDepth))
+            $intArithmeticDepth = 2
+            $intGroupingDepth = 0
+            $intCharacter++
+            continue
+        }
+        if ($intArithmeticDepth -gt 0) {
+            if ($strCharacter -ceq '(') { $intArithmeticDepth++ }
+            if ($strCharacter -ceq ')') { $intArithmeticDepth-- }
+            if ($intArithmeticDepth -eq 0) {
+                $arrPrevious = $stackSubstitution.Pop()
+                $strQuote = $arrPrevious[0]
+                $strWord = $arrPrevious[1] + '<arithmetic-expansion>'
+                $intWordStart = [int] $arrPrevious[2]
+                $boolCommand = [bool] $arrPrevious[3]
+                $boolWordQuoted = [bool] $arrPrevious[4]
+                $intArithmeticDepth = [int] $arrPrevious[5]
+                $boolAssignmentPrefix = [bool] $arrPrevious[6]
+                $intGroupingDepth = [int] $arrPrevious[7]
+            }
             continue
         }
         if ($strQuote -ceq '"') {
@@ -189,6 +239,7 @@ $scriptblockFindLiteralNpmCommand = {
         if ($strCharacter -cin @("'", '"')) {
             if ($intWordStart -lt 0) { $intWordStart = $intCharacter }
             $strQuote = $strCharacter
+            $boolWordQuoted = $true
             continue
         }
         if ($strCharacter -ceq '#' -and $intWordStart -lt 0) {
@@ -200,24 +251,44 @@ $scriptblockFindLiteralNpmCommand = {
         $boolBoundary = $strCharacter -cmatch '^[\s;|&()]$'
         if (-not $boolBoundary) {
             if ($intWordStart -lt 0) { $intWordStart = $intCharacter }
+            if ($strCharacter -ceq '=' -and -not $boolWordQuoted -and
+                $strWord -cmatch '^[A-Za-z_][A-Za-z0-9_]*$') {
+                $boolAssignmentPrefix = $true
+            }
             $strWord += $strCharacter
             continue
         }
         if ($intWordStart -ge 0) {
             if ($boolCommand -and $strWord -ceq 'npm') { return $intWordStart }
             if ($boolCommand) {
-                $boolCommand = $strWord -cin @('if', 'then', 'elif', 'else', 'do', '!', 'command') -or
-                    $strWord -cmatch '^[A-Za-z_][A-Za-z0-9_]*='
+                $boolCommand = (-not $boolWordQuoted -and
+                    $strWord -cin @('if', 'then', 'elif', 'else', 'do', '!',
+                        'while', 'until', '{', 'time', 'coproc')) -or
+                    $strWord -ceq 'command' -or
+                    $boolAssignmentPrefix
             }
             $strWord = ''
             $intWordStart = -1
+            $boolWordQuoted = $false
+            $boolAssignmentPrefix = $false
         }
-        if ($strCharacter -ceq ')' -and $stackSubstitution.Count -gt 0) {
+        if ($strCharacter -ceq '(') {
+            if ($intGroupingDepth -ge 16) { throw 'The grouping fixture exceeds its bound.' }
+            $intGroupingDepth++
+            $boolCommand = $true
+        } elseif ($strCharacter -ceq ')' -and $intGroupingDepth -gt 0) {
+            $intGroupingDepth--
+            $boolCommand = $false
+        } elseif ($strCharacter -ceq ')' -and $stackSubstitution.Count -gt 0) {
             $arrPrevious = $stackSubstitution.Pop()
             $strQuote = $arrPrevious[0]
             $strWord = $arrPrevious[1] + '<command-substitution>'
             $intWordStart = [int] $arrPrevious[2]
             $boolCommand = [bool] $arrPrevious[3]
+            $boolWordQuoted = [bool] $arrPrevious[4]
+            $intArithmeticDepth = [int] $arrPrevious[5]
+            $boolAssignmentPrefix = [bool] $arrPrevious[6]
+            $intGroupingDepth = [int] $arrPrevious[7]
         } elseif ($strCharacter -cmatch '^[\r\n;|&()]$') {
             $boolCommand = $true
         }
@@ -452,17 +523,93 @@ $arrBadNpmSyntax = @('npm --version', 'true && npm --version', 'printf x | npm -
     'true || npm --version', 'true; npm --version', 'test "$(npm --version)" = 1',
     'value=$(npm --version)', 'if npm --version; then true; fi', 'command npm --version',
     'true && "npm" --version', 'true && n"p"m --version', 'VAR=value npm --version',
-    "true &&\`nnpm --version", 'echo "$(true && npm --version)"')
+    "true &&\`nnpm --version", 'echo "$(true && npm --version)"',
+    'while npm --version; do break; done', 'until npm --version; do break; done',
+    '{ npm --version; }', 'time npm --version', 'coproc npm --version',
+    'echo "$(( $(npm --version) + 1 ))"', 'echo "$(( 1 + ( $(npm --version) ) ))"',
+    'echo "$(echo "$(( $(npm --version) + 1 ))")"',
+    'echo "$(( $(( $(npm --version) + 1 )) + 1 ))"',
+    'n\pm --version', '''npm'' --version', '"command" "npm" --version',
+    'echo "$((npm + 1))"; npm --version',
+    '(( $(npm --version) + 1 ))', '(( 1 + ( $(npm --version) ) ))',
+    'VAR="x" npm --version', 'VAR=''x'' npm --version', 'VAR=x\ y npm --version',
+    'VAR="" npm --version', 'VAR="$(echo x)" npm --version', 'VAR="$((1))" npm --version')
 $arrBenignNpmSyntax = @('# npm --version', '# $(npm --version)', 'echo "npm --version"',
     'echo ''$(npm --version)''', 'echo npm --version', 'export npm_config_userconfig=/dev/null',
     'printf ''npm --version''', 'echo "true && npm --version"', 'npm_config_value=npm',
-    'test "$(node -p ''npm'')" = npm', 'echo "$(echo npm --version)"', 'echo "\$(npm --version)"')
+    'test "$(node -p ''npm'')" = npm', 'echo "$(echo npm --version)"', 'echo "\$(npm --version)"',
+    'echo "$((npm + 1))"', 'echo "$(((npm + 1) * 2))"',
+    'echo "$(( $((npm + 1)) + 1 ))"', 'echo "$(( $(echo npm) + 1 ))"',
+    'echo "$(echo "$((npm + 1))")"',
+    '"if" npm --version', '''if'' npm --version', '\if npm --version',
+    '"while" npm --version', '\while npm --version',
+    '"until" npm --version', '\until npm --version',
+    '"{" npm --version', '\{ npm --version',
+    '"time" npm --version', '\time npm --version',
+    '"coproc" npm --version', '\coproc npm --version',
+    '# while npm --version', 'printf ''while npm --version''',
+    '(( npm + 1 ))', '(( (npm + 1) * 2 ))', '(( $(echo npm) + 1 ))',
+    '"n\pm" --version', '"np\m" --version', '"n\\pm" --version',
+    '"VAR=x" npm --version', 'V\AR=x npm --version', 'VAR\=x npm --version',
+    'VA"R"=x npm --version')
+
+# A completed expansion word must not hide the next command or promote an
+# argument. Local grouping must close before its outer substitution closes.
+$arrBadNpmSyntax += @(
+    foreach ($strCommandPrefix in @('(( 1 ))', 'echo $((1))', 'echo $(true)')) {
+        foreach ($strCommandSeparator in @('; ', "`n", ' && ', ' | ')) {
+            $strCommandPrefix + $strCommandSeparator + 'npm --version'
+        }
+    }
+    foreach ($strCommandPrefix in @('(( 0 ))', 'false $((1))', 'false $(true)')) {
+        $strCommandPrefix + ' || npm --version'
+    }
+    'echo $(( $(true) + 1 )); npm --version'
+    'echo $(echo $((1))); npm --version'
+    '(( $((1)) )); npm --version'
+    'echo "$( (true); npm --version )"'
+    'echo $( (true); npm --version )'
+    'echo "$( ( (true) ); npm --version )"'
+    'echo "$( (echo $(true)); npm --version )"'
+    'echo "$(true | (npm --version))"'
+    'echo "$( printf '')''; npm --version )"'
+)
+$arrBenignNpmSyntax += @(
+    'echo $((1)) npm --version'
+    'echo $(true) npm --version'
+    'echo $(echo $((1))) npm --version'
+    'echo $(( $(true) + 1 )) npm --version'
+    '(( 1 )); echo npm --version'
+    'echo "$( (true); echo npm --version )"'
+    'echo $( (true); echo npm --version )'
+    'echo "$( ( (true) ); echo npm --version )"'
+    'echo "$( (echo $(true)); echo npm --version )"'
+    'echo "$(true | (echo npm --version))"'
+    'echo "$( printf '')''; echo npm --version )"'
+)
 
 foreach ($strNpmSyntax in $arrBadNpmSyntax + $arrBenignNpmSyntax) {
     $intNpmSyntaxIndex = & $scriptblockFindLiteralNpmCommand -Text $strNpmSyntax
     if (($intNpmSyntaxIndex -ge 0) -ne ($arrBadNpmSyntax -ccontains $strNpmSyntax)) {
         throw 'The bounded literal npm detector misclassified a syntax control.'
     }
+}
+$strGroupingBoundaryFixture = ('( ' * 16) + 'npm --version' + (' )' * 16)
+if ((& $scriptblockFindLiteralNpmCommand -Text $strGroupingBoundaryFixture) -lt 0) {
+    throw 'The grouping-depth boundary lost a literal npm command.'
+}
+$boolGroupingOverflowRejected = $false
+try {
+    $strGroupingOverflowFixture = ('( ' * 17) + 'true' + (' )' * 17)
+    $null = & $scriptblockFindLiteralNpmCommand -Text $strGroupingOverflowFixture
+} catch {
+    if ($_.Exception.Message -cne 'The grouping fixture exceeds its bound.') {
+        throw
+    }
+    $boolGroupingOverflowRejected = $true
+}
+if (-not $boolGroupingOverflowRejected) {
+    throw 'The grouping-depth overflow did not fail closed.'
 }
 
 $scriptblockSetSupplyStepMutation = {
@@ -679,7 +826,7 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
         $intSupplyMutationCount++
     }
 }
-if ($intSupplyMutationCount -ne 129) { throw 'The U1 supply mutation census is incomplete.' }
+if ($intSupplyMutationCount -ne 301) { throw 'The U1 supply mutation census is incomplete.' }
 
 # These input-reader fixtures need no candidate code or parent-scope mutation.
 Assert-RepositoryInputMetadataMutationRejected `

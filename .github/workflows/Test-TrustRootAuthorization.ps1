@@ -51,7 +51,7 @@
 # [System.Boolean] True for a bounded content-valid candidate, not merge approval.
 #
 # .NOTES
-# Version: 1.8.20260927.0
+# Version: 1.9.20260929.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([bool])]
@@ -211,7 +211,10 @@ $script:hashtableSemanticInvariantPattern = @{
     'extracted-self-test-is-invoked' =
         '& \(Join-Path \$strRepositoryRootPath \$strExtractedSelfTestPath\)'
     'extracted-self-test-version-and-topology' =
-        '(?s)# Version: 1\.5\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext'
+        '(?s)(?:# Version: 1\.5\.\d{8}\.\d+.*Get-CreatedRefBoundaryContext|' +
+        '\A(?:(?!# (?:Version:|\.NOTES))(?:#[^\r\n]*|[ \t]*)\r?\n)*' +
+        '# \.NOTES\r?\n# Version: 1\.6\.\d{8}\.\d+\r?\n' +
+        '.*Get-CreatedRefBoundaryContext)'
     'new-ref-boundary-cap-is-64' =
         '\$intMetadataMaximumBoundaries = 64'
     'pr-merge-bases-use-all-and-cap' =
@@ -5307,6 +5310,54 @@ function Assert-SemanticInvariant {
 }
 
 if ($SelfTest) {
+    # Keep legacy matching intact; bind the new minor family to a script header.
+    $strExtractedInvariant = 'extracted-self-test-version-and-topology'
+    $strExtractedFixturePath = '.github/workflows/Test-AgentInstructions.SelfTest.ps1'
+    $strExactExtractedFixture = "# .SYNOPSIS`n# Fixture`n#`n# .NOTES`n" +
+        "# Version: 1.6.20260929.0`n`nGet-CreatedRefBoundaryContext`n"
+    foreach ($strExtractedPositive in @(
+            $strExactExtractedFixture,
+            $strExactExtractedFixture.Replace("`n", "`r`n"),
+            $strExactExtractedFixture.Replace('1.6.20260929.0', '1.6.20260930.0'),
+            $strExactExtractedFixture.Replace('1.6.20260929.0', '1.6.20260929.1'),
+            $strExactExtractedFixture.Replace('1.6.20260929.0', '1.6.20260929.01'),
+            "# Version: 1.5.20260927.0`nGet-CreatedRefBoundaryContext",
+            "# Version: 1.5.20260929.1`nGet-CreatedRefBoundaryContext",
+            "legacy # Version: 1.5.12345678.01 suffix`nGet-CreatedRefBoundaryContext"
+        )) {
+        Assert-SemanticInvariant -Invariant $strExtractedInvariant `
+            -Text $strExtractedPositive -Path $strExtractedFixturePath
+    }
+    $arrExtractedNegative = @(
+        foreach ($strInvalidExtractedVersion in @(
+                '1.6.20260929.0 suffix', '1.6.2026092.0', '1.6.202609290.0',
+                '1.6.20260929.', '1.7.20260929.0', '2.6.20260929.0',
+                '01.6.20260929.0', '1.06.20260929.0'
+            )) {
+            $strExactExtractedFixture.Replace('1.6.20260929.0', $strInvalidExtractedVersion)
+        }
+        $strExactExtractedFixture.Replace('Get-CreatedRefBoundaryContext', 'MissingTopology')
+        $strExactExtractedFixture.Replace("# .NOTES`n", '')
+        "param()`n" + $strExactExtractedFixture
+        $strExactExtractedFixture.Replace('# Version:', ' # Version:')
+        $strExactExtractedFixture.Replace("# .NOTES`n", "# .NOTES`n# Version: 1.7.20260929.0`n")
+    )
+    foreach ($strExtractedNegative in $arrExtractedNegative) {
+        $boolExtractedRejected = $false
+        try {
+            Assert-SemanticInvariant -Invariant $strExtractedInvariant `
+                -Text $strExtractedNegative -Path $strExtractedFixturePath
+        } catch {
+            if ($_.Exception.Message -cne
+                "$strExtractedFixturePath does not satisfy semantic invariant $strExtractedInvariant.") {
+                throw
+            }
+            $boolExtractedRejected = $true
+        }
+        if (-not $boolExtractedRejected) {
+            throw 'An unauthorized extracted self-test version or header passed.'
+        }
+    }
     # Exercise actual production isolation checks; each mutation must fail for
     # the removed boundary, not for an unrelated parser or fixture error.
     foreach ($strIsolationPath in @(
