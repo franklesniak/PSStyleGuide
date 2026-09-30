@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "authorization_id": "issue-211-u1-final-product-syncback",
+  "authorization_id": "issue-211-u1-p3-review-finding-repair",
   "limits": {
     "maximum_paths": 20,
     "maximum_blob_bytes": 573440,
@@ -60,9 +60,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
       "mode": "100644",
-      "blob": "baa86d9a527edbce526e109db2160fb265ed5a65",
-      "bytes": 93456,
-      "sha256": "d8fa402e6493327d29e99e1eecfc48da2711a8b37841fabb4b1a77d10f6b327b",
+      "blob": "8de9da9476ffcede36c588ea7f098cb08d88abd0",
+      "bytes": 108086,
+      "sha256": "ceabeee327721d83318f75960c0cc541103c682b90f001660316a70dc90a9eae",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
