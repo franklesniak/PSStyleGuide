@@ -142,13 +142,18 @@ if ([regex]::Matches($strCapacityAuthorizer,
 
 # Bind the landed U1 supply contracts to both actual workflow roles. These are
 # inert content tests; native execution fixtures are run separately on each host.
-# This finite lexical detector recognizes literal command words, shell lists,
-# pipelines, unquoted command prefixes and $(...) in the reviewed literal Bash
-# run bodies. In $((...)) and command-position ((...)), arithmetic identifiers
-# are not commands; nested $(...) still is.
-# The quote flag distinguishes reserved syntax from literal command names.
-# It does not resolve functions, aliases, variables, eval, here-documents or
-# arbitrary Bash.
+# This finite detector finds bare literal npm commands in the reviewed Bash run
+# bodies. It tracks lists, pipelines, reserved prefixes, bounded command/time
+# options, and scalar or bracketed assignment prefixes with their raw syntax.
+# It scans $(...) and preserves quote/escape context. In $((...)) and
+# command-position ((...)), arithmetic identifiers are data; nested $(...) is
+# still scanned. Assignment indices and values are not evaluated. This can
+# conservatively flag substitutions in array prefixes that Bash ignores.
+# Before the first literal npm, active legacy backtick substitutions fail closed;
+# comments, single-quoted data and escaped literal backticks remain data.
+# It does not model redirection grammar, wrapper options, other languages,
+# path-qualified executables, aliases/functions, variable values, ANSI-C quoting,
+# eval, here-documents, ambiguous arithmetic fallback, or arbitrary Bash.
 $scriptblockFindLiteralNpmCommand = {
     param([Parameter(Mandatory)][AllowEmptyString()][string] $Text)
     if ($Text.Length -gt 131072) { throw 'The literal Bash fixture exceeds its bound.' }
@@ -156,8 +161,11 @@ $scriptblockFindLiteralNpmCommand = {
     $intWordStart = -1
     $strQuote = ''
     $boolCommand = $true
+    $strCommandPrefix = ''
     $boolWordQuoted = $false
     $boolAssignmentPrefix = $false
+    $strAssignmentState = 'name'
+    $intAssignmentDepth = 0
     $intArithmeticDepth = 0
     $intGroupingDepth = 0
     $stackSubstitution = [Collections.Generic.Stack[object]]::new()
@@ -180,22 +188,35 @@ $scriptblockFindLiteralNpmCommand = {
                 }
                 $strWord += $strNext
                 $boolWordQuoted = $true
+                if ($strAssignmentState -cnotin @('subscript', 'value')) {
+                    $strAssignmentState = 'invalid'
+                }
             }
             $intCharacter++
             continue
         }
+        if ($strCharacter -ceq '`') {
+            throw 'Legacy command substitution is unsupported; use $(...) in the literal Bash fixture.'
+        }
         if ($strCharacter -ceq '$' -and $strNext -ceq '(') {
             if ($stackSubstitution.Count -ge 16) { throw 'The command-substitution fixture exceeds its bound.' }
             if ($intWordStart -lt 0) { $intWordStart = $intCharacter }
+            if ($strAssignmentState -cnotin @('subscript', 'value')) {
+                $strAssignmentState = 'invalid'
+            }
             $stackSubstitution.Push(@($strQuote, $strWord, $intWordStart,
                     $boolCommand, $boolWordQuoted, $intArithmeticDepth,
-                    $boolAssignmentPrefix, $intGroupingDepth))
+                    $boolAssignmentPrefix, $intGroupingDepth, $strCommandPrefix,
+                    $strAssignmentState, $intAssignmentDepth))
             $strQuote = ''
             $strWord = ''
             $intWordStart = -1
             $boolCommand = $true
+            $strCommandPrefix = ''
             $boolWordQuoted = $false
             $boolAssignmentPrefix = $false
+            $strAssignmentState = 'name'
+            $intAssignmentDepth = 0
             $intArithmeticDepth = 0
             $intGroupingDepth = 0
             $intCharacter++
@@ -210,7 +231,7 @@ $scriptblockFindLiteralNpmCommand = {
             $strCharacter -ceq '(' -and $strNext -ceq '(') {
             if ($stackSubstitution.Count -ge 16) { throw 'The command-substitution fixture exceeds its bound.' }
             $stackSubstitution.Push(@('', '', $intCharacter, $false, $false, 0,
-                    $false, $intGroupingDepth))
+                    $false, $intGroupingDepth, '', 'invalid', 0))
             $intArithmeticDepth = 2
             $intGroupingDepth = 0
             $intCharacter++
@@ -229,6 +250,9 @@ $scriptblockFindLiteralNpmCommand = {
                 $intArithmeticDepth = [int] $arrPrevious[5]
                 $boolAssignmentPrefix = [bool] $arrPrevious[6]
                 $intGroupingDepth = [int] $arrPrevious[7]
+                $strCommandPrefix = [string] $arrPrevious[8]
+                $strAssignmentState = [string] $arrPrevious[9]
+                $intAssignmentDepth = [int] $arrPrevious[10]
             }
             continue
         }
@@ -240,6 +264,9 @@ $scriptblockFindLiteralNpmCommand = {
             if ($intWordStart -lt 0) { $intWordStart = $intCharacter }
             $strQuote = $strCharacter
             $boolWordQuoted = $true
+            if ($strAssignmentState -cnotin @('subscript', 'value')) {
+                $strAssignmentState = 'invalid'
+            }
             continue
         }
         if ($strCharacter -ceq '#' -and $intWordStart -lt 0) {
@@ -248,36 +275,126 @@ $scriptblockFindLiteralNpmCommand = {
             }
             $strCharacter = "`n"
         }
-        $boolBoundary = $strCharacter -cmatch '^[\s;|&()]$'
+        $boolBoundary = $strCharacter -cmatch '^[\s;|&()]$' -and
+            $strAssignmentState -cne 'subscript'
         if (-not $boolBoundary) {
             if ($intWordStart -lt 0) { $intWordStart = $intCharacter }
-            if ($strCharacter -ceq '=' -and -not $boolWordQuoted -and
-                $strWord -cmatch '^[A-Za-z_][A-Za-z0-9_]*$') {
-                $boolAssignmentPrefix = $true
+            # Preserve the original name/operator syntax. Quotes and escapes
+            # inside a bracketed index or assigned value do not quote the name.
+            switch -CaseSensitive ($strAssignmentState) {
+                'name' {
+                    if (-not $boolCommand -or
+                        $strCommandPrefix -cin @('command-options', 'command-word')) {
+                        $strAssignmentState = 'invalid'
+                    } elseif ($strCharacter -ceq '=' -and
+                        $strWord -cmatch '^[A-Za-z_][A-Za-z0-9_]*$') {
+                        $boolAssignmentPrefix = $true
+                        $strAssignmentState = 'value'
+                    } elseif ($strCharacter -ceq '[' -and
+                        $strWord -cmatch '^[A-Za-z_][A-Za-z0-9_]*$') {
+                        $strAssignmentState = 'subscript'
+                        $intAssignmentDepth = 1
+                    } elseif ($strCharacter -ceq '+' -and
+                        $strWord -cmatch '^[A-Za-z_][A-Za-z0-9_]*$') {
+                        $strAssignmentState = 'append'
+                    } elseif ($strCharacter -cnotmatch '^[A-Za-z0-9_]$') {
+                        $strAssignmentState = 'invalid'
+                    }
+                }
+                'subscript' {
+                    if ($strCharacter -ceq '[') { $intAssignmentDepth++ }
+                    if ($strCharacter -ceq ']') { $intAssignmentDepth-- }
+                    if ($intAssignmentDepth -eq 0) { $strAssignmentState = 'after-subscript' }
+                }
+                'after-subscript' {
+                    if ($strCharacter -ceq '=') {
+                        $boolAssignmentPrefix = $true
+                        $strAssignmentState = 'value'
+                    } elseif ($strCharacter -ceq '+') {
+                        $strAssignmentState = 'append'
+                    } else { $strAssignmentState = 'invalid' }
+                }
+                'append' {
+                    if ($strCharacter -ceq '=') {
+                        $boolAssignmentPrefix = $true
+                        $strAssignmentState = 'value'
+                    } else { $strAssignmentState = 'invalid' }
+                }
             }
             $strWord += $strCharacter
             continue
         }
         if ($intWordStart -ge 0) {
-            if ($boolCommand -and $strWord -ceq 'npm') { return $intWordStart }
             if ($boolCommand) {
-                $boolCommand = (-not $boolWordQuoted -and
-                    $strWord -cin @('if', 'then', 'elif', 'else', 'do', '!',
-                        'while', 'until', '{', 'time', 'coproc')) -or
-                    $strWord -ceq 'command' -or
-                    $boolAssignmentPrefix
+                $boolPrefixOption = $false
+                $boolShellPrefixAllowed = $true
+                switch -CaseSensitive ($strCommandPrefix) {
+                    'command-options' {
+                        $boolShellPrefixAllowed = $false
+                        if ($strWord -ceq '--') {
+                            $strCommandPrefix = 'command-word'
+                            $boolPrefixOption = $true
+                        } elseif ($strWord -cmatch '^-.+') {
+                            $boolPrefixOption = $true
+                            if ($strWord -cnotmatch '^-[pVv]+$' -or
+                                $strWord -cmatch '[Vv]') {
+                                $boolCommand = $false
+                                $strCommandPrefix = ''
+                            }
+                        } else { $strCommandPrefix = '' }
+                    }
+                    'command-word' {
+                        $boolShellPrefixAllowed = $false
+                        $strCommandPrefix = ''
+                    }
+                    'time-options' {
+                        if (-not $boolWordQuoted -and $strWord -ceq '-p') {
+                            $strCommandPrefix = 'time-after-p'
+                            $boolPrefixOption = $true
+                        } elseif (-not $boolWordQuoted -and $strWord -ceq '--') {
+                            $strCommandPrefix = 'time-word'
+                            $boolPrefixOption = $true
+                        } else { $strCommandPrefix = '' }
+                    }
+                    'time-after-p' {
+                        if (-not $boolWordQuoted -and $strWord -ceq '--') {
+                            $strCommandPrefix = 'time-word'
+                            $boolPrefixOption = $true
+                        } else { $strCommandPrefix = '' }
+                    }
+                    'time-word' { $strCommandPrefix = '' }
+                }
+                if (-not $boolPrefixOption) {
+                    if ($strWord -ceq 'npm') { return $intWordStart }
+                    if ($strWord -ceq 'command') {
+                        $strCommandPrefix = 'command-options'
+                    } elseif ($boolShellPrefixAllowed -and -not $boolWordQuoted -and
+                        $strWord -ceq 'time') {
+                        $strCommandPrefix = 'time-options'
+                    } else {
+                        $boolCommand = $boolShellPrefixAllowed -and (
+                            (-not $boolWordQuoted -and
+                                $strWord -cin @('if', 'then', 'elif', 'else', 'do', '!',
+                                    'while', 'until', '{', 'coproc')) -or
+                            $boolAssignmentPrefix)
+                    }
+                }
             }
             $strWord = ''
             $intWordStart = -1
             $boolWordQuoted = $false
             $boolAssignmentPrefix = $false
+            $strAssignmentState = 'name'
+            $intAssignmentDepth = 0
         }
         if ($strCharacter -ceq '(') {
             if ($intGroupingDepth -ge 16) { throw 'The grouping fixture exceeds its bound.' }
             $intGroupingDepth++
+            $strCommandPrefix = ''
             $boolCommand = $true
         } elseif ($strCharacter -ceq ')' -and $intGroupingDepth -gt 0) {
             $intGroupingDepth--
+            $strCommandPrefix = ''
             $boolCommand = $false
         } elseif ($strCharacter -ceq ')' -and $stackSubstitution.Count -gt 0) {
             $arrPrevious = $stackSubstitution.Pop()
@@ -289,7 +406,11 @@ $scriptblockFindLiteralNpmCommand = {
             $intArithmeticDepth = [int] $arrPrevious[5]
             $boolAssignmentPrefix = [bool] $arrPrevious[6]
             $intGroupingDepth = [int] $arrPrevious[7]
+            $strCommandPrefix = [string] $arrPrevious[8]
+            $strAssignmentState = [string] $arrPrevious[9]
+            $intAssignmentDepth = [int] $arrPrevious[10]
         } elseif ($strCharacter -cmatch '^[\r\n;|&()]$') {
+            $strCommandPrefix = ''
             $boolCommand = $true
         }
     }
@@ -556,6 +677,59 @@ $arrBenignNpmSyntax = @('# npm --version', '# $(npm --version)', 'echo "npm --ve
 # A completed expansion word must not hide the next command or promote an
 # argument. Local grouping must close before its outer substitution closes.
 $arrBadNpmSyntax += @(
+    'npm --version; echo `printf x`'
+    'npm --version; echo "`printf x`"'
+    'echo arr[; npm --version'
+    'echo arr[ && npm --version'
+    'printf %s arr[; npm --version'
+    'echo arr[0; npm --version'
+    'echo arr[; npm --version; echo ]=x'
+    'echo arr[0; npm --version; echo ]'
+    'command nonexistent_assignment_probe[ || npm --version'
+    'command -p nonexistent_assignment_probe[ || npm --version'
+    'command -- nonexistent_assignment_probe[ || npm --version'
+    'command -p -- nonexistent_assignment_probe[ || npm --version'
+    'echo "$(echo arr[; npm --version)"'
+    'echo "$(command -p nonexistent_assignment_probe[ || npm --version)"'
+    'VAR+=x npm --version'
+    'VAR+="x" npm --version'
+    'VAR+=x MORE=y npm --version'
+    'arr[0]=x npm --version'
+    'arr[0]+=x npm --version'
+    'arr[name]=x npm --version'
+    'arr[1+1]=x npm --version'
+    'arr[1 + 1]=x npm --version'
+    'arr["0"]=x npm --version'
+    'arr[''0'']=x npm --version'
+    'arr[0]="x" npm --version'
+    'arr[a[0]]=x npm --version'
+    'arr[$(printf 0)]=x npm --version'
+    'arr[$(npm --version)]=x'
+    'arr[0]="$(npm --version)"'
+    'echo "$(arr[0]=x npm --version)"'
+    'arr[0]=x printf ok; npm --version'
+    'VAR+=$(printf x) npm --version'
+    'command -v "$(printf npm)" npm; npm --version'
+    'time -p npm --version'
+    'time -- npm --version'
+    'time -p -- npm --version'
+    'command -p npm --version'
+    'command -- npm --version'
+    'command -p -- npm --version'
+    'command -pp npm --version'
+    '"command" "-p" npm --version'
+    'command -p -p npm --version'
+    'command -- command -p npm --version'
+    'time -p command -p npm --version'
+    'time time -p npm --version'
+    'command -v node; npm --version'
+    'command -V printf && npm --version'
+    'command -pv node | npm --version'
+    'echo "$(command -p npm --version)"'
+    'command -v "$(npm --version)"'
+    'time -p echo "$(npm --version)"'
+    'echo "$(command -v node)"; command -p npm --version'
+    'command -p npm --version # query options after command are arguments'
     foreach ($strCommandPrefix in @('(( 1 ))', 'echo $((1))', 'echo $(true)')) {
         foreach ($strCommandSeparator in @('; ', "`n", ' && ', ' | ')) {
             $strCommandPrefix + $strCommandSeparator + 'npm --version'
@@ -575,6 +749,64 @@ $arrBadNpmSyntax += @(
     'echo "$( printf '')''; npm --version )"'
 )
 $arrBenignNpmSyntax += @(
+    '# `npm --version`'
+    'echo ''`npm --version`'''
+    'echo \`npm --version\`'
+    'echo "\`npm --version\`"'
+    'printf ''%s'' ''`'''
+    'echo "$(printf ''`npm --version`'')"'
+    'echo "$(printf \`npm --version\`)"'
+    'echo literal # `npm --version`'
+    'echo arr[; printf npm'
+    'echo arr[ && printf npm'
+    'printf %s arr[; printf npm'
+    'echo arr[0; printf npm'
+    'echo arr[; printf npm; echo ]=x'
+    'echo arr[0; printf npm; echo ]'
+    'command nonexistent_assignment_probe[ || printf npm'
+    'command -p nonexistent_assignment_probe[ || printf npm'
+    'command -- nonexistent_assignment_probe[ || printf npm'
+    'command -p -- nonexistent_assignment_probe[ || printf npm'
+    'echo "$(echo arr[; printf npm)"'
+    'echo "$(command -p nonexistent_assignment_probe[ || printf npm)"'
+    '"VAR+=x" npm --version'
+    'VAR\+=x npm --version'
+    'VAR+\=x npm --version'
+    '"arr[0]=x" npm --version'
+    'arr\[0\]=x npm --version'
+    '"arr"[0]=x npm --version'
+    'arr[0]\=x npm --version'
+    'arr[0]"="x npm --version'
+    'arr[0]x=x npm --version'
+    'arr[0]++=x npm --version'
+    'arr[0]=x printf npm'
+    'arr[0]="$(printf npm)" printf npm'
+    'arr[$(printf npm)]=x printf npm'
+    'VAR+="$(printf npm)" printf npm'
+    'echo "arr[0]=x npm --version"'
+    '# arr[0]=x npm --version'
+    'command -v "$(printf npm)" npm'
+    'time -p -p npm --version'
+    'time -x npm --version'
+    'time "-p" npm --version'
+    'command -v npm --version'
+    'command -V npm --version'
+    'command -pv npm --version'
+    'command -Vp npm --version'
+    'command -p -v npm --version'
+    'command -v -- npm --version'
+    'command -x npm --version'
+    'command -- -p npm --version'
+    'command -p printf npm'
+    'command if npm --version'
+    'command VAR=x npm --version'
+    'echo "$(command -pv npm --version)"'
+    'command -v node; printf npm'
+    'time -p printf npm'
+    'time -p -- printf npm'
+    'echo "$(command -v node)"; printf npm'
+    'echo "time -p npm --version"'
+    '# command -p npm --version'
     'echo $((1)) npm --version'
     'echo $(true) npm --version'
     'echo $(echo $((1))) npm --version'
@@ -588,11 +820,56 @@ $arrBenignNpmSyntax += @(
     'echo "$( printf '')''; echo npm --version )"'
 )
 
+$arrUnsupportedBashSyntax = @(
+    'echo `npm --version`', 'echo "`npm --version`"', 'echo `printf x`',
+    'VAR=`printf x`', 'echo "$(echo `printf x`)"', 'printf x; echo `printf x`',
+    '(( `printf 1` + 1 ))', 'echo "$(( `printf 1` + 1 ))"',
+    'echo \`literal\`; echo `printf x`', '`npm --version`'
+)
+foreach ($strUnsupportedBashSyntax in $arrUnsupportedBashSyntax) {
+    $boolLegacySubstitutionRejected = $false
+    try {
+        $null = & $scriptblockFindLiteralNpmCommand -Text $strUnsupportedBashSyntax
+    } catch {
+        if ($_.Exception.Message -cne
+            'Legacy command substitution is unsupported; use $(...) in the literal Bash fixture.') {
+            throw
+        }
+        $boolLegacySubstitutionRejected = $true
+    }
+    if (-not $boolLegacySubstitutionRejected) {
+        throw 'The legacy substitution syntax did not fail closed.'
+    }
+}
 foreach ($strNpmSyntax in $arrBadNpmSyntax + $arrBenignNpmSyntax) {
     $intNpmSyntaxIndex = & $scriptblockFindLiteralNpmCommand -Text $strNpmSyntax
     if (($intNpmSyntaxIndex -ge 0) -ne ($arrBadNpmSyntax -ccontains $strNpmSyntax)) {
         throw 'The bounded literal npm detector misclassified a syntax control.'
     }
+}
+$intSupplyBoundaryCount = 0
+$arrLiteralBoundaryFixtures = @(
+    @('length', ((' ' * (131072 - 'npm --version'.Length)) + 'npm --version'),
+        (' ' * 131073), 'The literal Bash fixture exceeds its bound.'),
+    @('substitution', (('$(' * 16) + 'npm --version' + (')' * 16)),
+        (('$(' * 17) + 'true' + (')' * 17)),
+        'The command-substitution fixture exceeds its bound.')
+)
+foreach ($arrLiteralBoundaryFixture in $arrLiteralBoundaryFixtures) {
+    if ((& $scriptblockFindLiteralNpmCommand -Text $arrLiteralBoundaryFixture[1]) -lt 0) {
+        throw "The $($arrLiteralBoundaryFixture[0]) boundary lost a literal npm command."
+    }
+    $boolLiteralOverflowRejected = $false
+    try {
+        $null = & $scriptblockFindLiteralNpmCommand -Text $arrLiteralBoundaryFixture[2]
+    } catch {
+        if ($_.Exception.Message -cne $arrLiteralBoundaryFixture[3]) { throw }
+        $boolLiteralOverflowRejected = $true
+    }
+    if (-not $boolLiteralOverflowRejected) {
+        throw "The $($arrLiteralBoundaryFixture[0]) overflow did not fail closed."
+    }
+    $intSupplyBoundaryCount += 2
 }
 $strGroupingBoundaryFixture = ('( ' * 16) + 'npm --version' + (' )' * 16)
 if ((& $scriptblockFindLiteralNpmCommand -Text $strGroupingBoundaryFixture) -lt 0) {
@@ -611,6 +888,7 @@ try {
 if (-not $boolGroupingOverflowRejected) {
     throw 'The grouping-depth overflow did not fail closed.'
 }
+$intSupplyBoundaryCount += 2
 
 $scriptblockSetSupplyStepMutation = {
     param([string] $WorkflowContent, [string] $StepName, [string] $OldText, [string] $NewText)
@@ -661,6 +939,28 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
     if ($arrSupplyFailures.Count -ne 0) {
         throw "$strSupplyWorkflowName failed U1 supply validation: $($arrSupplyFailures -join '; ')"
     }
+    $intLiteralStepCount = [regex]::Matches($strSupplyWorkflowContent,
+        '(?ms)^      - name: [^\n]+\n.*?(?=^      - name: |\z)').Count
+    $strBoundaryStep = "      - name: Bound fixture`n        shell: bash`n" +
+        "        run: |`n          true`n"
+    $strStepBoundaryFixture = $strSupplyWorkflowContent + "`n" +
+        ($strBoundaryStep * (64 - $intLiteralStepCount))
+    $arrStepBoundaryFailures = @(& $scriptblockGetAgentSupplyFailure `
+            -WorkflowContent $strStepBoundaryFixture -PullRequestRole $boolPullRequestRole)
+    if ($arrStepBoundaryFailures.Count -ne 0) {
+        throw 'The 64-step boundary did not preserve the valid workflow contract.'
+    }
+    $boolStepOverflowRejected = $false
+    try {
+        $null = & $scriptblockGetAgentSupplyFailure `
+            -WorkflowContent ($strStepBoundaryFixture + $strBoundaryStep) `
+            -PullRequestRole $boolPullRequestRole
+    } catch {
+        if ($_.Exception.Message -cne 'The literal step fixture exceeds its bound.') { throw }
+        $boolStepOverflowRejected = $true
+    }
+    if (-not $boolStepOverflowRejected) { throw 'The 65-step overflow did not fail closed.' }
+    $intSupplyBoundaryCount += 2
     foreach ($arrSupplyMutation in $arrSupplyMutations) {
         $strSupplyMutant = $strSupplyWorkflowContent.Replace(
             $arrSupplyMutation[1], $arrSupplyMutation[2])
@@ -697,6 +997,25 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
         }
         if ($arrBenignNpmSyntax -ccontains $strNpmSyntax -and $arrNpmSyntaxFailures.Count -ne 0) {
             throw "$strSupplyWorkflowName rejected benign pre-producer shell text."
+        }
+        $intSupplyMutationCount++
+    }
+    foreach ($strUnsupportedBashSyntax in $arrUnsupportedBashSyntax) {
+        $strUnsupportedLine = '          ' + $strUnsupportedBashSyntax + "`n"
+        $strSupplyMutant = $strSupplyWorkflowContent.Insert($objProducer.Index, $strUnsupportedLine)
+        $boolLegacySubstitutionRejected = $false
+        try {
+            $null = & $scriptblockGetAgentSupplyFailure `
+                -WorkflowContent $strSupplyMutant -PullRequestRole $boolPullRequestRole
+        } catch {
+            if ($_.Exception.Message -cne
+                'Legacy command substitution is unsupported; use $(...) in the literal Bash fixture.') {
+                throw
+            }
+            $boolLegacySubstitutionRejected = $true
+        }
+        if (-not $boolLegacySubstitutionRejected) {
+            throw "$strSupplyWorkflowName accepted unsupported legacy substitution."
         }
         $intSupplyMutationCount++
     }
@@ -826,7 +1145,8 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
         $intSupplyMutationCount++
     }
 }
-if ($intSupplyMutationCount -ne 301) { throw 'The U1 supply mutation census is incomplete.' }
+if ($intSupplyMutationCount -ne 543) { throw 'The U1 supply mutation census is incomplete.' }
+if ($intSupplyBoundaryCount -ne 10) { throw 'The U1 boundary-control census is incomplete.' }
 
 # These input-reader fixtures need no candidate code or parent-scope mutation.
 Assert-RepositoryInputMetadataMutationRejected `
