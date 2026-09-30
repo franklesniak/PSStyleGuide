@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "authorization_id": "issue-211-u1-p3-review-finding-repair",
+  "authorization_id": "issue-211-u1-p4-review-assertion-repair",
   "limits": {
     "maximum_paths": 20,
     "maximum_blob_bytes": 573440,
@@ -60,9 +60,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
       "mode": "100644",
-      "blob": "8de9da9476ffcede36c588ea7f098cb08d88abd0",
-      "bytes": 108086,
-      "sha256": "ceabeee327721d83318f75960c0cc541103c682b90f001660316a70dc90a9eae",
+      "blob": "cd421ee21ecf71abadefbc09b2486e1d4206ab85",
+      "bytes": 111868,
+      "sha256": "e4af5e10a930b99ae42e8a0c53241ce8533455221281d553c3e5bfde09f8d607",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
@@ -72,9 +72,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "1808a12e3dbaf563568ece4764b662a712b19026",
+      "blob": "91da3a44c09cfc2c76918ea84fffa27eba370c6b",
       "bytes": 570098,
-      "sha256": "1fe93ed8c374aa40fce69c46efab08f22f25ba712b6f4bbeb207169df0600eb8",
+      "sha256": "fe206b0cd1ff9e9caa7710cda7bfeabed5b010cf9a1be051b38349f5370eb73b",
       "encoding": "utf-8-no-bom-lf",
       "syntax": "powershell",
       "semantic_invariants": [
