@@ -5,15 +5,17 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-09-22
+- **Last Updated:** 2026-09-30
 - **Scope:** Manual, read-only supply observation and separate historical provenance verification for issue 158. This method does not change the P1 schema or integrate a workflow gate.
-- **Related:** [Issue 158](https://github.com/franklesniak/PSStyleGuide/issues/158), [policy contract](../.github/workflows/workflow-policy-contract.json), [recorder](../.github/workflows/Get-SupplyFreezeDigest.mjs), [focused tests](../.github/workflows/Get-SupplyFreezeDigest.test.mjs), [baseline decision](decisions/0002-accept-unverifiable-baseline-provenance.md)
+- **Related:** [Issue 158](https://github.com/franklesniak/PSStyleGuide/issues/158), [historical profile](../.github/workflows/historical-supply-profile.json), [recorder](../.github/workflows/Get-SupplyFreezeDigest.mjs), [focused tests](../.github/workflows/Get-SupplyFreezeDigest.test.mjs), [baseline decision](decisions/0002-accept-unverifiable-baseline-provenance.md)
 
 ## Meaning of a successful run
 
+This recorder is an optional manual diagnostic. It is not a routine CI, dependency-update or merge requirement. Its unchanged historical assertions now reside in `historical-supply-profile.json`, copied from accepted commit `91fd587f53de228792cd65c46bbd2c4e871a580d`. The active workflow policy does not use this file. Strict mode compares with the named historical profile. A current dependency change does not require a new historical profile. Use current locked-install and parser-integrity checks for routine validation. Run the deep diagnostic only when an installed-byte or historical-provenance question needs it.
+
 The recorder copies the existing `supplyFreeze` object without changing its `P1-SUPPLY-FREEZE-v1` schema, field names, values, or types. It emits new measurements under `currentObservation`. The historical producer is Windows/x64; the current recorder supports Linux/x64. These are different events. A current Linux installation cannot reconstruct the historical Windows installation.
 
-`currentObservation.complete: true` means that the current measurement passed the recorder's toolchain, manifest, installed-tree, configuration, live-audit, and consistency guards. It does **not** verify every historical assertion, approve an advisory, extend an expiry, or replace a policy decision. The output states that policy authorization was not evaluated. A consumer must separately verify the historical evidence it needs and obtain an applicable advisory disposition. The existing owner, issue 149 reopener, and `2026-10-29T23:59:59.000Z` expiry remain unchanged.
+`currentObservation.complete: true` means that the current measurement passed the recorder's toolchain, manifest, installed-tree, configuration, live-audit, and consistency guards. It does **not** verify every historical assertion, approve an advisory, extend an expiry, or replace a policy decision. The output states that policy authorization was not evaluated. A consumer must separately verify the historical evidence it needs and obtain an applicable advisory disposition. The recorded owner, issue 149 reopener, and `2026-10-29T23:59:59.000Z` expiry remain historical assertions. This diagnostic does not renew them or make them current update gates.
 
 `--no-audit` and `--any-toolchain` produce explicitly incomplete observations. Neither bypasses the cache boundary, authenticated npm-installation digest and census, installed/npm-tree safety refusals, or during-run consistency checks. `--any-toolchain` relaxes only the listed runtime/version/configuration/manifest/tree comparison guards; it never authorizes executing different npm bytes. Unsupported hosts refuse; there is no Windows emulation claim or BSD claim. The Windows refusal test proves that boundary, not a Windows supply measurement.
 
@@ -31,7 +33,7 @@ The source is [TerraformStyleGuide PR 27](https://github.com/franklesniak/Terraf
 
 The installed-byte fold, npm-distribution authentication, configuration checks, JSON duplicate-key checks, advisory normalization, and quiescence checks derive from the upstream implementation. The port changes four current-manifest constants, adds the unchanged P1 assertion envelope and contract snapshot, requires external npm housekeeping authority, emits explicit null/empty fields for an intentionally skipped audit, preserves structured stderr diagnostic summaries without publishing child text, binds the checked audit registry in one canonical child-environment setting without putting it in argv, identifies npm wrapper failures only by fixed operation labels, withholds every unsupported argv token and filesystem path/name from public diagnostics, translates descriptor I/O failures through each caller's documented refusal, takes its first self snapshot through a nonblocking verified descriptor, admits the repository-internal input directory chain before reading project inputs, restricts audit failures to the documented native outcome, maps bounded child-response overflow to the owning response phase, exact-decodes every semantic npm stdout response, emits fixed JSON-response and npm-tree-check refusal categories without source content, rejects lossy UTF-8 JSON decoding, validates every present non-null advisory URL as a string, requires non-owner write bits to be clear on controlled inputs, makes installed-tree link containment and reviewed npm-installation identity unconditional, applies the same component-by-component resolver to links inside the npm installation, and publishes only fixed numeric audit-package summaries while keeping complete normalized response strings as inputs to the published normalized digest. These are explicit differences, not a claim of whole-recorder byte identity. Historical upstream review comments in the source describe T1; this method governs the P1 port.
 
-The P1 assertion object is pinned by SHA-256 of recursive sorted-key JSON, without insignificant whitespace: `83c5138131de742734d22a818e21feb63d5ac11f8877adf52299809f04217362`. Changing an assertion requires a reviewed recorder change. Other contract fields can change without changing that assertion tuple; the complete raw contract identity is still reported and checked for changes during the run.
+The P1 assertion object is pinned by SHA-256 of recursive sorted-key JSON, without insignificant whitespace: `83c5138131de742734d22a818e21feb63d5ac11f8877adf52299809f04217362`. Changing an assertion requires a reviewed recorder change. Other historical-profile fields can change without changing that assertion tuple; the complete raw profile identity is still reported and checked for changes during the run. The existing output fields named `contractSha256` and `contractBlob` now identify this historical input. They do not identify the active workflow policy.
 
 ## Field provenance and output types
 
@@ -192,7 +194,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-const freeze = JSON.parse(readFileSync('.github/workflows/workflow-policy-contract.json')).supplyFreeze;
+const freeze = JSON.parse(readFileSync('.github/workflows/historical-supply-profile.json')).supplyFreeze;
 assert.equal(freeze.reviewedCommit, '4346310e7deebffb4159c75e30d9546263dfd649');
 assert.equal(typeof process.env.PATH, 'string');
 const gitEnvironment = {
@@ -245,7 +247,7 @@ import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
-const freeze = JSON.parse(readFileSync('.github/workflows/workflow-policy-contract.json')).supplyFreeze;
+const freeze = JSON.parse(readFileSync('.github/workflows/historical-supply-profile.json')).supplyFreeze;
 assert.equal(freeze.reviewedCommit, '4346310e7deebffb4159c75e30d9546263dfd649');
 assert.equal(typeof process.env.PATH, 'string');
 const gitEnvironment = {

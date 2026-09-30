@@ -1,0 +1,119 @@
+{
+  "sourceCommit": "91fd587f53de228792cd65c46bbd2c4e871a580d",
+  "sourcePath": ".github/workflows/workflow-policy-contract.json",
+  "supplyFreeze": {
+    "schema": "P1-SUPPLY-FREEZE-v1",
+    "reviewedCommit": "4346310e7deebffb4159c75e30d9546263dfd649",
+    "baseline": {
+      "packageJson": {
+        "blob": "923106fc4ee5508b7a03930b3d8b774db9fcd009",
+        "length": 987,
+        "sha256": "05da30054a296c0b2a409a527958abcae149bec72b6c8f50ce30b2bf45b77260"
+      },
+      "packageLockJson": {
+        "blob": "7e96fd1fd41765ba31488762f60c2f74ba17d3a8",
+        "length": 64608,
+        "sha256": "25ffbe3c4e5b26615318235dffe2908dbddcf2788a40f7c7bdb620ec0314415d"
+      }
+    },
+    "reviewedWorkingBytes": {
+      "packageJson": {
+        "length": 1021,
+        "sha256": "59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9"
+      },
+      "packageLockJson": {
+        "length": 65107,
+        "sha256": "5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2"
+      }
+    },
+    "producer": {
+      "nodeVersion": "24.18.1",
+      "npmVersion": "11.16.0",
+      "platform": "win32-x64",
+      "nodeArchive": "https://nodejs.org/dist/v24.18.1/node-v24.18.1-win-x64.zip",
+      "nodeArchiveLength": 37177316,
+      "nodeArchiveSha256": "ec56b84a7551893ab2324ebdfdc4ab974a63b4781162600b68a1293cc3e53765",
+      "signedChecksums": "https://nodejs.org/dist/v24.18.1/SHASUMS256.txt",
+      "signatureFingerprint": "DD792F5973C6DE52C432CBDAC77ABFA00DDBF2B7",
+      "argv": [
+        "npm",
+        "install",
+        "--package-lock-only",
+        "--ignore-scripts",
+        "--no-audit",
+        "--no-fund"
+      ]
+    },
+    "yaml": {
+      "version": "2.9.0",
+      "tarball": "https://registry.npmjs.org/yaml/-/yaml-2.9.0.tgz",
+      "tarballLength": 112086,
+      "tarballSha256": "008fa204cb1ba700e0272ba045abbf09a6ffe63456e8146ba97cac6c2ad1ef91",
+      "integrity": "sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==",
+      "enginesNode": ">= 14.6"
+    },
+    "installedTree": {
+      "packageCount": 126,
+      "canonicalInstalledTreeLength": 22560,
+      "canonicalInstalledTreeSha256": "251f8d2185cc292422c77482ebbd37c037a96ea923a13aa63c46f0e339808b18",
+      "canonicalLockTreeSha256": "7a2ce7163bbda446ec63e62bc590e9c9ebd2e0b9ba141fdece41e392df717b77"
+    },
+    "advisoryDecision": {
+      "decisionOwner": "PSStyleGuide repository owner/administrator",
+      "recordedAtUtc": "2026-08-31T18:59:40.600Z",
+      "expiresAtUtc": "2026-10-29T23:59:59.000Z",
+      "expiresEarlierOn": "Completion of issue 149",
+      "policy": "Temporarily retain the currently accepted npm findings during the approved remediation window; issue 149 owns remediation.",
+      "reason": "Permit 60 more calendar days for remediation while all existing compensating controls remain mandatory.",
+      "compensatingControls": [
+        "Every P1 workflow is read-only.",
+        "npm lifecycle scripts are disabled.",
+        "Pull-request Markdown is processed by the retained graph; exposure is bounded to a read-only job whose token is read-only and is not persisted.",
+        "Dependency changes other than exact yaml@2.9.0 are prohibited."
+      ],
+      "gateAudit": {
+        "observedAtUtc": "2026-08-31T19:14:13.491Z",
+        "command": "npm audit --json",
+        "nodeVersion": "26.8.1",
+        "npmVersion": "11.7.0",
+        "nativeExit": 1,
+        "stdoutLength": 11515,
+        "stdoutSha256": "da7b0b093a6cd84633728c0c131ec5cf919b19d6097d2212966658524d5d0fda",
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 2,
+          "high": 5,
+          "critical": 0,
+          "total": 7
+        }
+      },
+      "producerAudit": {
+        "observedAtUtc": "2026-07-31T12:21:03.679Z",
+        "command": "npm audit --json",
+        "nodeVersion": "24.18.1",
+        "npmVersion": "11.16.0",
+        "nativeExit": 1,
+        "stdoutLength": 10339,
+        "stdoutSha256": "28a9fd687c1dff1ab2f909371dce530e5c73540edad448f333cfc026605fc3ae",
+        "findingKeys": [
+          "brace-expansion",
+          "js-yaml",
+          "linkify-it",
+          "markdown-it",
+          "markdownlint-cli2",
+          "minimatch",
+          "picomatch"
+        ],
+        "vulnerabilities": {
+          "info": 0,
+          "low": 0,
+          "moderate": 2,
+          "high": 5,
+          "critical": 0,
+          "total": 7
+        }
+      }
+    }
+  }
+}

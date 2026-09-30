@@ -1,10 +1,12 @@
 name: Agent instruction validation
-
 on:
   workflow_dispatch:
   push:
     branches:
-      - "**"
+      - main
+  pull_request:
+    branches:
+      - main
   pull_request_target:
     branches:
       - main
@@ -13,881 +15,159 @@ on:
       - reopened
       - synchronize
       - edited
-
-permissions:
-  contents: read
-
+permissions: {}
 jobs:
-  mark-current-base-pending:
-    name: Mark current-base validation pending
-    if: >-
-      github.event_name == 'pull_request_target' &&
-      (github.event.action != 'edited' ||
-      github.event.changes.base.ref.from != '')
-    concurrency:
-      group: agent-instruction-current-base-status
-      queue: max
-      cancel-in-progress: false
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions:
-      contents: read
-      pull-requests: read
-      statuses: write
-    steps:
-      - name: Check out trusted current-base helper
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ github.repository }}
-          ref: ${{ github.sha }}
-          token: ${{ github.token }}
-          persist-credentials: false
-          clean: true
-          fetch-depth: 1
-          fetch-tags: false
-          show-progress: true
-          lfs: false
-          submodules: false
-          set-safe-directory: true
-          allow-unsafe-pr-checkout: false
-
-      - name: Authenticate live base and head before marking pending
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          GITHUB_SERVER_URL: ${{ github.server_url }}
-          EXPECTED_REPOSITORY: ${{ github.repository }}
-          EXPECTED_PULL_NUMBER: ${{ github.event.pull_request.number }}
-          EXPECTED_BASE_REF: ${{ github.event.pull_request.base.ref }}
-          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          STATUS_TARGET_URL: >-
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
-              github.run_id }}
-        run: >-
-          node .github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs
-          start
-
-  validate-agent-instructions:
-    name: Validate agent instructions
-    needs:
-      - mark-current-base-pending
-    if: >-
-      always() &&
-      (github.event_name != 'pull_request_target' ||
-      ((github.event.action != 'edited' ||
-      github.event.changes.base.ref.from != '') &&
-      needs.mark-current-base-pending.result == 'success'))
+  accepted-policy:
+    name: Classify maintenance and validate ordinary instructions
+    if: github.event_name == 'pull_request_target'
     runs-on: ubuntu-24.04
     timeout-minutes: 20
     permissions: {}
-    env:
-      GIT_CONFIG_NOSYSTEM: "1"
-      GIT_CONFIG_GLOBAL: /dev/null
-      GIT_TERMINAL_PROMPT: "0"
     steps:
-      - name: Acquire triggering revision without an action
+      - name: Acquire accepted policy without credentials
         id: acquire
         env:
-          ACQUISITION_EVENT: ${{ github.event_name }}
-          ACQUISITION_CREATED: ${{ github.event.created }}
+          EXPECTED_BASE: ${{ github.event.pull_request.base.sha }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-
-          # Do not load user/system Git credentials or hooks during anonymous acquisition.
-          if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or
-              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {
-              throw 'credential-policy: external Git command configuration is not allowed'
+          $PSNativeCommandUseErrorActionPreference = $false
+          if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or
+              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {
+              throw 'Unexpected acquisition repository.'
+          }
+          if ($env:GITHUB_TOKEN -or $env:GH_TOKEN -or $env:ACTIONS_RUNTIME_TOKEN -or
+              $env:GIT_CONFIG_COUNT -or $env:GIT_CONFIG_PARAMETERS) {
+              throw 'Unexpected credentials or external Git configuration.'
           }
           $env:GIT_CONFIG_NOSYSTEM = '1'
           $env:GIT_CONFIG_GLOBAL = '/dev/null'
           $env:GIT_TERMINAL_PROMPT = '0'
-          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
-              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
-              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
-              throw 'credential-policy: a token was projected into a code job'
+          $env:GIT_NO_REPLACE_OBJECTS = '1'
+          $strRevision = if ($env:EXPECTED_BASE) { $env:EXPECTED_BASE } else { $env:GITHUB_SHA }
+          if ($strRevision -cnotmatch '^[0-9a-f]{40}$') { throw 'A full commit hash is required.' }
+          if (@([IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
+              throw 'The acquisition workspace must be empty.'
           }
-          # git reports absent state with a non-zero status in places this step
-          # accepts, so native-command error mapping is disabled the same way
-          # the other governed steps disable it and each status is classified
-          # explicitly instead.
-          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
-              $PSNativeCommandUseErrorActionPreference = $false
+          & /usr/bin/git -c core.hooksPath=/dev/null init --quiet .
+          if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }
+          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'
+          if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }
+          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
+              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision
+              if ($LASTEXITCODE -eq 0) { break }
+              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }
+              Start-Sleep -Seconds 2
           }
-
-          # Every value below is set by the runner before any repository code
-          # executes, and is read from the environment rather than expanded as
-          # a workflow expression, because no governed script step in this
-          # repository contains an expression at all.
-          $strServerUrl = $env:GITHUB_SERVER_URL
-          $strRepository = $env:GITHUB_REPOSITORY
-          $strSha = $env:GITHUB_SHA
-          if ($strServerUrl -cne 'https://github.com') {
-              throw 'acquire: the runner named an unexpected server'
-          }
-          if ($strRepository -cne 'franklesniak/PSStyleGuide') {
-              throw 'acquire: the triggering repository is not the expected repository'
-          }
-          # A full 40-hex commit is required rather than a ref. A ref would let
-          # the fetch resolve to whatever the ref points at when the fetch runs,
-          # which for a push to a busy branch is not necessarily the revision
-          # that triggered this run.
-          if ($strSha -cnotmatch '^[0-9a-f]{40}$') {
-              throw 'acquire: the triggering revision is not a full commit hash'
-          }
-
-          # The workspace is proven empty rather than cleaned. Cleaning would
-          # decide what to delete from state that is already present, while an
-          # emptiness assertion has no such input.
-          if (@([System.IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
-              throw 'acquire: the workspace is not empty'
-          }
-
-          # Resolved from a fixed candidate list rather than by name. Nothing has
-          # executed in this step yet, so name resolution is not attacker-
-          # influenced here -- but PowerShell aliases curl and wget to
-          # Invoke-WebRequest on the Desktop edition, this repository already
-          # pins the Git executable this way in the verify step, and relying on
-          # an alias being absent is a property of the host rather than
-          # something this file asserts. Constant, so nothing later can rebind
-          # it.
-          $strResolvedGit = @('/usr/bin/git', '/bin/git') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
-          if ([string]::IsNullOrEmpty($strResolvedGit)) { throw 'acquire: Git was not resolved as an application' }
-          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant
-
-          & $strGitPath -c core.hooksPath=/dev/null init --quiet .
-          if ($LASTEXITCODE -ne 0) { throw "acquire: git init exited $LASTEXITCODE" }
-          & $strGitPath remote add origin "$strServerUrl/$strRepository"
-          if ($LASTEXITCODE -ne 0) { throw "acquire: git remote add exited $LASTEXITCODE" }
-          # Fetching the commit itself, not a ref that names it. No credential
-          # is supplied and none is configured, so nothing is persisted for the
-          # next step to have to clean up.
-          $arrDepthArguments = if ($env:ACQUISITION_EVENT -ceq 'push' -and
-              $env:ACQUISITION_CREATED -ceq 'true') { @('--depth', '1') } else { @() }
-          & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch @arrDepthArguments --no-tags --no-recurse-submodules origin $strSha
-          if ($LASTEXITCODE -ne 0) { throw "acquire: git fetch exited $LASTEXITCODE" }
-          & $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD
-          if ($LASTEXITCODE -ne 0) { throw "acquire: git checkout exited $LASTEXITCODE" }
-          $strHead = (& $strGitPath rev-parse HEAD).Trim()
-          if ($LASTEXITCODE -ne 0 -or $strHead -cne $strSha) {
-              throw 'acquire: the checked out revision is not the triggering revision'
-          }
-          Write-Information "acquire: anonymous exact checkout of $strSha" -InformationAction Continue
-      - name: Verify checkout credential cleanup
+          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'
+          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }
+          & /usr/bin/git -c core.hooksPath=/dev/null checkout --quiet --detach $strRevision
+          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }
+          $strHead = & /usr/bin/git rev-parse --verify 'HEAD^{commit}'
+          if ($LASTEXITCODE -ne 0 -or $strHead -cne $strRevision) { throw 'Checked-out commit mismatch.' }
+      - name: Verify checkout credentials
         id: verify-checkout-credentials
         shell: pwsh
         run: |
+          ./.github/workflows/Test-CheckoutCredentials.ps1
+      - name: Install accepted parser dependencies
+        id: initialize-toolchain
+        shell: pwsh
+        run: |
+          ./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies -InstructionDependencies
+      - name: Classify exact PR input and validate ordinary content
+        id: validate
+        env:
+          EXPECTED_BASE: ${{ github.event.pull_request.base.sha }}
+          EXPECTED_HEAD: ${{ github.event.pull_request.head.sha }}
+        shell: pwsh
+        run: |
           $ErrorActionPreference = 'Stop'
-
-          # Do not load user/system Git credentials or hooks during anonymous acquisition.
-          if (-not [string]::IsNullOrEmpty($env:GIT_CONFIG_COUNT) -or
-              -not [string]::IsNullOrEmpty($env:GIT_CONFIG_PARAMETERS)) {
-              throw 'credential-policy: external Git command configuration is not allowed'
+          $PSNativeCommandUseErrorActionPreference = $false
+          if ($env:EXPECTED_HEAD -cnotmatch '^[0-9a-f]{40}$' -or
+              $env:EXPECTED_BASE -cnotmatch '^[0-9a-f]{40}$') { throw 'Invalid PR endpoints.' }
+          & ./.github/workflows/Test-CheckoutCredentials.ps1
+          $env:GIT_NO_REPLACE_OBJECTS = '1'
+          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
+              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $env:EXPECTED_HEAD
+              if ($LASTEXITCODE -eq 0) { break }
+              if ($intAttempt -eq 3) { throw 'PR data fetch failed after three attempts.' }
+              Start-Sleep -Seconds 2
+          }
+          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'
+          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $env:EXPECTED_HEAD) { throw 'PR data commit mismatch.' }
+          $strResult = & node .github/workflows/Classify-InstructionMaintenance.mjs $PWD.Path $env:EXPECTED_BASE $env:EXPECTED_HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'Maintenance classification failed.' }
+          $objResult = $strResult | ConvertFrom-Json -ErrorAction Stop
+          [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, "Accepted-policy classification (not merge authority):`n`n$strResult`n")
+          if ($objResult.classification -ceq 'ordinary') {
+              & ./.github/workflows/Test-AgentInstructions.ps1 -InputRevision $env:EXPECTED_HEAD -PublishedBaselineRevision $env:EXPECTED_BASE
+              & node .github/workflows/Validate-WorkflowPolicy.mjs --input-revision $env:EXPECTED_HEAD .github/workflows/build.yml .github/workflows/markdownlint.yml
+              if ($LASTEXITCODE -ne 0) { throw 'Accepted workflow policy rejected ordinary input.' }
+          } elseif ($objResult.classification -ceq 'maintenance_required') {
+              Write-Output 'MAINTENANCE_REQUIRED: candidate tests, scoped owner authority and fresh independent review are required before merge. This is not ordinary policy admission.'
+          } else { throw 'Unknown maintenance classification.' }
+  candidate-tests:
+    name: Test proposed instruction and workflow behavior
+    if: github.event_name != 'pull_request_target'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions: {}
+    steps:
+      - name: Acquire the exact revision without credentials
+        id: acquire
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
+          if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or
+              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {
+              throw 'Unexpected acquisition repository.'
+          }
+          if ($env:GITHUB_TOKEN -or $env:GH_TOKEN -or $env:ACTIONS_RUNTIME_TOKEN -or
+              $env:GIT_CONFIG_COUNT -or $env:GIT_CONFIG_PARAMETERS) {
+              throw 'Unexpected credentials or external Git configuration.'
           }
           $env:GIT_CONFIG_NOSYSTEM = '1'
           $env:GIT_CONFIG_GLOBAL = '/dev/null'
           $env:GIT_TERMINAL_PROMPT = '0'
-          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
-              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
-              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
-              throw 'credential-policy: a token was projected into a code job'
+          $env:GIT_NO_REPLACE_OBJECTS = '1'
+          $strRevision = $env:GITHUB_SHA
+          if ($strRevision -cnotmatch '^[0-9a-f]{40}$') { throw 'A full commit hash is required.' }
+          if (@([IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {
+              throw 'The acquisition workspace must be empty.'
           }
-          # git config exits 1 when a queried key is absent, which is the secure
-          # expected state this step asserts. If the runner enables native-command
-          # error mapping, that accepted status would terminate the step before the
-          # explicit capture below runs, so it is disabled the same way
-          # markdownlint.yml disables it.
-          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
-              $PSNativeCommandUseErrorActionPreference = $false
+          & /usr/bin/git -c core.hooksPath=/dev/null init --quiet .
+          if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }
+          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'
+          if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }
+          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
+              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision
+              if ($LASTEXITCODE -eq 0) { break }
+              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }
+              Start-Sleep -Seconds 2
           }
-          # Resolved here too. Constants do not cross step boundaries, and this
-          # step asserts a credential property, so the executable it asks must
-          # not be chosen by name resolution either.
-          $strResolvedGit = @('/usr/bin/git', '/bin/git') | Where-Object { [System.IO.File]::Exists($_) } | Select-Object -First 1
-          if ([string]::IsNullOrEmpty($strResolvedGit)) { throw 'credential-policy: Git was not resolved as an application' }
-          New-Variable -Name strGitPath -Value $strResolvedGit -Option Constant
-          $arrRemoteUrls = @(& $strGitPath remote get-url --all origin)
-          if ($LASTEXITCODE -ne 0 -or $arrRemoteUrls.Count -ne 1) {
-              throw 'credential-policy: unable to resolve exactly one origin URL'
-          }
-          if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {
-              throw 'credential-policy: origin is not a credential-free GitHub HTTPS URL'
-          }
-          $arrHelpers = @(& $strGitPath config --local --get-all credential.helper)
-          $intHelperExit = $LASTEXITCODE
-          $global:LASTEXITCODE = 0
-          if (($intHelperExit -ne 0 -and $intHelperExit -ne 1) -or $arrHelpers.Count -ne 0) {
-              throw 'credential-policy: a local credential helper is configured'
-          }
-          $arrAuthorizationKeys = @(& $strGitPath config --local --name-only --get-regexp '^http\..*\.extraheader$')
-          $intAuthorizationExit = $LASTEXITCODE
-          $global:LASTEXITCODE = 0
-          if (($intAuthorizationExit -ne 0 -and $intAuthorizationExit -ne 1) -or $arrAuthorizationKeys.Count -ne 0) {
-              throw 'credential-policy: persisted HTTP authorization is configured'
-          }
-
-          $arrEffectiveConfig = @(& $strGitPath config --show-scope --name-only --list)
-          $intEffectiveConfigExit = $LASTEXITCODE
-          if ($intEffectiveConfigExit -ne 0 -or @($arrEffectiveConfig | Where-Object { $_ -cmatch '^(system|global)\s' }).Count -ne 0) {
-              throw 'credential-policy: external Git configuration was not excluded'
-          }
-
-      - name: Fetch existing push base as data
-        if: >-
-          github.event_name == 'push' && !github.event.created &&
-          !github.event.deleted
-        shell: bash
-        env:
-          PUSH_BASE_SHA: ${{ github.event.before }}
-        run: |
-          set -euo pipefail
-          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
-            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
-            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
-            echo '::error::Unexpected credential or Git configuration channel.'
-            exit 1
-          fi
-          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          [[ "${PUSH_BASE_SHA}" =~ ^[0-9a-f]{40}$ ]]
-          [[ ! "${PUSH_BASE_SHA}" =~ ^0{40}$ ]]
-          git fetch --no-tags --no-recurse-submodules origin \
-            "${PUSH_BASE_SHA}:refs/remotes/event/push-base"
-          fetched_base="$(git rev-parse --verify \
-            'refs/remotes/event/push-base^{commit}')"
-          test "${fetched_base}" = "${PUSH_BASE_SHA}"
-          git diff --quiet --no-ext-diff
-          git diff --cached --quiet --no-ext-diff
-
-      - name: Determine exact push applicability
-        id: push-applicability
-        if: github.event_name == 'push'
-        shell: pwsh
-        env:
-          PUSH_BEFORE_SHA: ${{ github.event.before }}
-          PUSH_AFTER_SHA: ${{ github.event.after }}
-          PUSH_CREATED: ${{ github.event.created }}
-          PUSH_DELETED: ${{ github.event.deleted }}
-        run: |
-          $arrDecision = @(
-              & ./.github/workflows/Test-AgentInstructions.ps1 `
-                  -PushApplicabilityOnly `
-                  -PublishedBaselineRevision $env:PUSH_BEFORE_SHA `
-                  -PublishedFinalRevision $env:PUSH_AFTER_SHA `
-                  -PublishedBaselineAbsent:([bool]::Parse($env:PUSH_CREATED)) `
-                  -PublishedFinalDeleted:([bool]::Parse($env:PUSH_DELETED)) `
-                  -EventName 'push'
-          )
-          if ($arrDecision.Count -ne 1 -or
-              $arrDecision[0] -cnotin @('true', 'false')) {
-              throw 'Push applicability did not return one exact decision.'
-          }
-          [System.IO.File]::AppendAllText(
-              $env:GITHUB_OUTPUT,
-              "required=$($arrDecision[0])`n",
-              [System.Text.UTF8Encoding]::new($false)
-          )
-
-      - name: Set up locked Node.js runtime
-        if: >-
-          github.event_name != 'push' ||
-          steps.push-applicability.outputs.required == 'true'
+          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'
+          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }
+          & /usr/bin/git -c core.hooksPath=/dev/null checkout --quiet --detach $strRevision
+          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }
+          $strHead = & /usr/bin/git rev-parse --verify 'HEAD^{commit}'
+          if ($LASTEXITCODE -ne 0 -or $strHead -cne $strRevision) { throw 'Checked-out commit mismatch.' }
+      - name: Verify checkout credentials
+        id: verify-checkout-credentials
         shell: pwsh
         run: |
-          $ErrorActionPreference = 'Stop'
-          if (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {
-              $PSNativeCommandUseErrorActionPreference = $false
-          }
-          if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
-              -not [string]::IsNullOrEmpty($env:GH_TOKEN) -or
-              -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
-              throw 'credential-policy: a token was projected into a code job'
-          }
-          $strVersion = '24.18.0'
-          $strReviewedSha256 = '55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742'
-          $strNodeRoot = [IO.Path]::Combine($env:RUNNER_TEMP, 'agent-validation-node')
-          $strArchive = [IO.Path]::Combine($env:RUNNER_TEMP, 'agent-validation-node.tar.xz')
-          if ([IO.Path]::Exists($strNodeRoot) -or [IO.Path]::Exists($strArchive)) {
-              throw 'toolchain: runtime staging destination already exists'
-          }
-          $strCurlPath = @('/usr/bin/curl', '/bin/curl') |
-              Where-Object { [IO.File]::Exists($_) } | Select-Object -First 1
-          $strTarPath = @('/usr/bin/tar', '/bin/tar') |
-              Where-Object { [IO.File]::Exists($_) } | Select-Object -First 1
-          if ([string]::IsNullOrEmpty($strCurlPath) -or [string]::IsNullOrEmpty($strTarPath)) {
-              throw 'toolchain: fixed download/extraction tools are unavailable'
-          }
-          $strUrl = "https://nodejs.org/dist/v$strVersion/node-v$strVersion-linux-x64.tar.xz"
-          & $strCurlPath --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --output $strArchive $strUrl
-          if ($LASTEXITCODE -ne 0) { throw "toolchain: download exited $LASTEXITCODE" }
-          if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash -cne $strReviewedSha256) {
-              throw 'toolchain: official Node archive does not match the reviewed digest'
-          }
-          [void][IO.Directory]::CreateDirectory($strNodeRoot)
-          & $strTarPath -xJf $strArchive -C $strNodeRoot --strip-components=1
-          if ($LASTEXITCODE -ne 0) { throw "toolchain: extraction exited $LASTEXITCODE" }
-          $strNodePath = [IO.Path]::Combine($strNodeRoot, 'bin', 'node')
-          $strNpmPath = [IO.Path]::Combine($strNodeRoot, 'bin', 'npm')
-          if (-not [IO.File]::Exists($strNodePath) -or -not [IO.File]::Exists($strNpmPath)) {
-              throw 'toolchain: verified runtime executables are missing'
-          }
-          $strObservedVersion = (& $strNodePath --version).Trim()
-          if ($LASTEXITCODE -ne 0 -or $strObservedVersion -cne "v$strVersion") {
-              throw 'toolchain: verified runtime executable identity is wrong'
-          }
-          [IO.File]::AppendAllText($env:GITHUB_PATH,
-              [IO.Path]::Combine($strNodeRoot, 'bin') + "`n", [Text.UTF8Encoding]::new($false))
-
-      - name: Verify locked Node.js runtime
-        if: >-
-          github.event_name != 'push' ||
-          steps.push-applicability.outputs.required == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
-            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
-            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
-            echo '::error::Unexpected credential or Git configuration channel.'
-            exit 1
-          fi
-          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          expected_node="$(node -p 'require("./package.json").engines.node')"
-          expected_npm="$(node -p 'require("./package.json").engines.npm')"
-          test "$(node --version)" = "v${expected_node}"
-          test "$(npm --version)" = "${expected_npm}"
-
-      - name: Fetch pull request head as data
-        if: github.event_name == 'pull_request_target'
-        shell: bash
-        env:
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          set -euo pipefail
-          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
-            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
-            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
-            echo '::error::Unexpected credential or Git configuration channel.'
-            exit 1
-          fi
-          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          [[ "${PR_HEAD_SHA}" =~ ^[0-9a-f]{40}$ ]]
-          # An unexpected non-fast-forward local ref must fail closed.
-          git fetch --no-tags --no-recurse-submodules origin \
-            "${PR_HEAD_SHA}:refs/remotes/event/pr-head"
-          fetched_head="$(git rev-parse --verify \
-            'refs/remotes/event/pr-head^{commit}')"
-          test "${fetched_head}" = "${PR_HEAD_SHA}"
-          git diff --quiet --no-ext-diff
-          git diff --cached --quiet --no-ext-diff
-
-      - name: Authenticate created push boundary refs as data
-        id: created-push-boundary
-        if: >-
-          github.event_name == 'push' && github.event.created &&
-          !github.event.deleted &&
-          steps.push-applicability.outputs.required == 'true'
-        shell: bash
-        env:
-          PUSH_REF: ${{ github.ref }}
-          PUSH_AFTER_SHA: ${{ github.event.after }}
-          PUSH_COMMIT_EVIDENCE: ${{ toJson(github.event.commits) }}
-        run: |
-          set -euo pipefail
-          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
-            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
-            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
-            echo '::error::Unexpected credential or Git configuration channel.'
-            exit 1
-          fi
-          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          export LC_ALL=C
-          [[ "${PUSH_REF}" =~ ^refs/heads/.+ ]]
-          [[ "${PUSH_AFTER_SHA}" =~ ^[0-9a-f]{40}$ ]]
-          git check-ref-format "${PUSH_REF}"
-          if git show-ref --verify --quiet "${PUSH_REF}"; then
-            echo 'The created destination ref was present before discovery.' >&2
-            exit 1
-          fi
-
-          raw_refs="$(mktemp)"
-          raw_refs_after="$(mktemp)"
-          sorted_refs="$(mktemp)"
-          evidence_rows="$(mktemp)"
-          push_commit_ids_file="$(mktemp)"
-          push_commit_count_file="$(mktemp)"
-          trap 'rm -f "${raw_refs}" "${raw_refs_after}" \
-            "${sorted_refs}" "${evidence_rows}" \
-            "${push_commit_ids_file}" "${push_commit_count_file}"' EXIT
-          if ! node -e '
-            const fs = require("fs");
-            const evidence = process.env.PUSH_COMMIT_EVIDENCE;
-            if (typeof evidence !== "string" ||
-                Buffer.byteLength(evidence, "utf8") > 1048576) {
-              throw new Error("Push commit evidence is missing or oversized.");
-            }
-            let commits;
-            try {
-              commits = JSON.parse(evidence);
-            } catch {
-              throw new Error("Push commit evidence is malformed JSON.");
-            }
-            if (!Array.isArray(commits) || commits.length >= 2048) {
-              throw new Error("Push commit evidence is not a bounded array.");
-            }
-            const seenCommitIds = new Set();
-            const ids = commits.map((entry) => {
-              if (entry === null || typeof entry !== "object" ||
-                  Array.isArray(entry) ||
-                  typeof entry.id !== "string" ||
-                  !/^[0-9a-f]{40}$/.test(entry.id) ||
-                  seenCommitIds.has(entry.id)) {
-                throw new Error("Push commit evidence has an invalid or duplicate ID.");
-              }
-              seenCommitIds.add(entry.id);
-              return entry.id;
-            });
-            if (ids.length > 0 &&
-                ids[ids.length - 1] !== process.env.PUSH_AFTER_SHA) {
-              throw new Error("Push commit evidence does not end at the event head.");
-            }
-            fs.writeFileSync(process.argv[1], ids.join("\n") +
-              (ids.length > 0 ? "\n" : ""), "utf8");
-            fs.writeFileSync(process.argv[2], String(ids.length) + "\n", "utf8");
-          ' "${push_commit_ids_file}" "${push_commit_count_file}"; then
-            echo 'Push commit evidence parsing failed.' >&2
-            exit 1
-          fi
-          mapfile -t push_commit_ids <"${push_commit_ids_file}"
-          IFS= read -r push_commit_count <"${push_commit_count_file}"
-          [[ "${push_commit_count}" =~ ^[0-9]+$ ]]
-          test "${push_commit_count}" -eq "${#push_commit_ids[@]}"
-          fetch_depth=$((push_commit_count + 1))
-          test "${fetch_depth}" -ge 1
-          test "${fetch_depth}" -le 2048
-          comparison_ref_fetch_depth=2048
-          set +e
-          timeout 30s git ls-remote --sort=refname --refs --heads --tags origin |
-            head -c 1048577 >"${raw_refs}"
-          pipeline_status=("${PIPESTATUS[@]}")
-          set -e
-          if test "${pipeline_status[1]}" -ne 0; then
-            echo 'Initial remote ref snapshot output bounding failed.' >&2
-            exit 1
-          fi
-          if test "$(wc -c <"${raw_refs}")" -gt 1048576; then
-            echo 'Remote ref evidence exceeded 1048576 bytes.' >&2
-            exit 1
-          fi
-          if test "${pipeline_status[0]}" -ne 0; then
-            echo 'Initial anonymous remote ref query failed.' >&2
-            exit 1
-          fi
-
-          if ! node -e '
-            const fs = require("fs");
-            const { TextDecoder } = require("util");
-            const decoder = new TextDecoder("utf-8", { fatal: true });
-            const text = decoder.decode(fs.readFileSync(process.argv[1]));
-            if (text.includes("\r") ||
-                (text.length > 0 && !text.endsWith("\n"))) {
-              throw new Error("Remote ref evidence has invalid line endings.");
-            }
-            const rows = text.length === 0 ? [] :
-              text.slice(0, -1).split("\n");
-            const seenRefs = new Set();
-            const parsed = rows.map((row) => {
-              const fields = row.split("\t");
-              if (fields.length !== 2 ||
-                  !/^[0-9a-f]{40}$/.test(fields[0]) ||
-                  !/^refs\/(heads|tags)\/.+/.test(fields[1]) ||
-                  seenRefs.has(fields[1])) {
-                throw new Error("Remote ref evidence is malformed or duplicate.");
-              }
-              seenRefs.add(fields[1]);
-              return { object: fields[0], ref: fields[1], row };
-            });
-            const compareOrdinal = (left, right) =>
-              left < right ? -1 : left > right ? 1 : 0;
-            parsed.sort((left, right) =>
-              compareOrdinal(left.ref, right.ref));
-            fs.writeFileSync(process.argv[2],
-              parsed.map((entry) => entry.row).join("\n") +
-              (parsed.length > 0 ? "\n" : ""), "utf8");
-          ' "${raw_refs}" "${sorted_refs}"; then
-            echo 'Remote ref evidence parsing or ordinal sorting failed.' >&2
-            exit 1
-          fi
-          mapfile -t remote_rows <"${sorted_refs}"
-          if test "${#remote_rows[@]}" -gt 257; then
-            echo 'Remote ref evidence exceeded 256 other refs.' >&2
-            exit 1
-          fi
-          destination_count=0
-          fetch_arguments=()
-          remote_names=()
-          remote_objects=()
-          for row in "${remote_rows[@]}"; do
-            object="${row%%$'\t'*}"
-            ref="${row#*$'\t'}"
-            [[ "${object}" =~ ^[0-9a-f]{40}$ ]]
-            [[ "${ref}" =~ ^refs/(heads|tags)/.+ ]]
-            test "${object}"$'\t'"${ref}" = "${row}"
-            git check-ref-format "${ref}"
-            if test "${ref}" = "${PUSH_REF}"; then
-              destination_count=$((destination_count + 1))
-              test "${object}" = "${PUSH_AFTER_SHA}"
-              continue
-            fi
-            remote_names+=("${ref}")
-            remote_objects+=("${object}")
-            raw_index=$((${#remote_names[@]} - 1))
-            printf -v raw_local_ref \
-              'refs/remotes/event/created-enumerated-%04d' "${raw_index}"
-            if git show-ref --verify --quiet "${raw_local_ref}"; then
-              echo 'A created-ref evidence destination already exists.' >&2
-              exit 1
-            fi
-            fetch_arguments+=("${ref}:${raw_local_ref}")
-          done
-          test "${destination_count}" -eq 1
-          test "${#remote_names[@]}" -le 256
-
-          destination_local_ref='refs/remotes/event/created-destination'
-          if git show-ref --verify --quiet "${destination_local_ref}"; then
-            echo 'The created destination evidence ref already exists.' >&2
-            exit 1
-          fi
-          timeout 60s git fetch --depth="${fetch_depth}" --no-tags \
-            --no-write-fetch-head --no-recurse-submodules origin \
-            "${PUSH_REF}:${destination_local_ref}"
-          fetched_destination="$(git rev-parse --verify \
-            "${destination_local_ref}^{commit}")"
-          test "${fetched_destination}" = "${PUSH_AFTER_SHA}"
-          for push_commit_id in "${push_commit_ids[@]}"; do
-            git cat-file -e "${push_commit_id}^{commit}"
-          done
-
-          if test "${#fetch_arguments[@]}" -gt 0; then
-            fetch_depth="${comparison_ref_fetch_depth}"
-            timeout 60s git fetch --depth="${fetch_depth}" --no-tags \
-              --no-write-fetch-head \
-              --no-recurse-submodules origin "${fetch_arguments[@]}"
-          fi
-          set +e
-          timeout 30s git ls-remote --sort=refname --refs --heads --tags origin |
-            head -c 1048577 >"${raw_refs_after}"
-          pipeline_status=("${PIPESTATUS[@]}")
-          set -e
-          if test "${pipeline_status[1]}" -ne 0; then
-            echo 'Final remote ref snapshot output bounding failed.' >&2
-            exit 1
-          fi
-          if test "$(wc -c <"${raw_refs_after}")" -gt 1048576; then
-            echo 'Final remote ref evidence exceeded 1048576 bytes.' >&2
-            exit 1
-          fi
-          if test "${pipeline_status[0]}" -ne 0; then
-            echo 'Final anonymous remote ref query failed.' >&2
-            exit 1
-          fi
-          if ! cmp --silent "${raw_refs}" "${raw_refs_after}"; then
-            echo 'Remote ref evidence changed during anonymous fetch.' >&2
-            echo 'Legacy diagnostic: Remote ref evidence changed during authentication.' >&2
-            exit 1
-          fi
-
-          evidence_index=0
-          for raw_index in "${!remote_names[@]}"; do
-            printf -v raw_local_ref \
-              'refs/remotes/event/created-enumerated-%04d' "${raw_index}"
-            resolved_object="$(git rev-parse --verify \
-              "${raw_local_ref}^{object}")"
-            test "${resolved_object}" = "${remote_objects[raw_index]}"
-            if ! resolved_commit="$(git rev-parse --verify \
-              "${raw_local_ref}^{commit}" 2>/dev/null)"; then
-              continue
-            fi
-            printf -v evidence_local_ref \
-              'refs/remotes/event/created-other-%04d' "${evidence_index}"
-            if git show-ref --verify --quiet "${evidence_local_ref}"; then
-              echo 'A normalized created-ref evidence destination exists.' >&2
-              exit 1
-            fi
-            git update-ref "${evidence_local_ref}" "${resolved_object}" ''
-            printf '%s\t%s\t%s\t%s\n' \
-              "${remote_names[raw_index]}" "${resolved_object}" \
-              "${resolved_commit}" "${evidence_local_ref}" >>"${evidence_rows}"
-            evidence_index=$((evidence_index + 1))
-          done
-          test "${evidence_index}" -le 256
-
-          other_ref_evidence="$(node -e '
-            const fs = require("fs");
-            const rows = fs.readFileSync(process.argv[1], "utf8")
-              .split("\n").filter(Boolean).map((row) => {
-                const fields = row.split("\t");
-                if (fields.length !== 4 ||
-                    fields.some((field) => field.length === 0)) {
-                  throw new Error("Created-ref evidence row is malformed.");
-                }
-                const [ref, object, commit, local_ref] = fields;
-                return { ref, object, commit, local_ref };
-              });
-            process.stdout.write(JSON.stringify(rows));
-          ' "${evidence_rows}")"
-          test "$(printf '%s' "${other_ref_evidence}" | wc -c)" -le 131072
-          printf 'other_ref_evidence=%s\n' "${other_ref_evidence}" >>"${GITHUB_OUTPUT}"
-          git diff --quiet --no-ext-diff
-          git diff --cached --quiet --no-ext-diff
-
-      - name: Validate parser manifests as inert data
-        if: >-
-          github.event_name != 'push' ||
-          steps.push-applicability.outputs.required == 'true'
-        shell: bash
-        env:
-          TRUSTED_REVISION: ${{ github.sha }}
-          INPUT_REVISION: >-
-            ${{ github.event_name == 'pull_request_target' &&
-              github.event.pull_request.head.sha || github.sha }}
-        run: |
-          set -euo pipefail
-          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
-            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
-            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
-            echo '::error::Unexpected credential or Git configuration channel.'
-            exit 1
-          fi
-          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          node .github/workflows/Test-AgentInstructionParserManifest.mjs \
-            --repository-root . \
-            --trusted-revision "${TRUSTED_REVISION}" \
-            --input-revision "${INPUT_REVISION}" \
-            --self-test
-
-      - name: Install locked validation dependencies
-        if: >-
-          github.event_name != 'push' ||
-          steps.push-applicability.outputs.required == 'true'
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [[ -n "${GITHUB_TOKEN:-}" || -n "${GH_TOKEN:-}" ||
-            -n "${ACTIONS_RUNTIME_TOKEN:-}" || -n "${GIT_CONFIG_COUNT:-}" ||
-            -n "${GIT_CONFIG_PARAMETERS:-}" ]]; then
-            echo '::error::Unexpected credential or Git configuration channel.'
-            exit 1
-          fi
-          export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
-          node .github/workflows/Validate-WorkflowPolicy.mjs --preflight
-          npm ci --ignore-scripts --no-audit --fund=false \
-            --include=dev --package-lock=true
-          npm --prefix .github/workflows ci --ignore-scripts --no-audit \
-            --fund=false --include=dev --package-lock=true
-
-      - name: Validate exact trust-root maintenance as inert data
-        id: trust-root-authorization
-        if: github.event_name == 'pull_request_target'
+          ./.github/workflows/Test-CheckoutCredentials.ps1
+      - name: Install locked test dependencies
+        id: initialize-toolchain
         shell: pwsh
-        env:
-          TRUSTED_REVISION: ${{ github.sha }}
-          CANDIDATE_BASE_REVISION: ${{ github.event.pull_request.base.sha }}
-          CANDIDATE_HEAD_REVISION: ${{ github.event.pull_request.head.sha }}
         run: |
-          $arrApplicability = @(
-              & ./.github/workflows/Test-TrustRootAuthorization.ps1 `
-                  -RepositoryRootPath $PWD `
-                  -TrustedRevision $env:TRUSTED_REVISION `
-                  -BaseRevision $env:CANDIDATE_BASE_REVISION `
-                  -HeadRevision $env:CANDIDATE_HEAD_REVISION `
-                  -AuthorizationApplicabilityOnly
-          )
-          if ($arrApplicability.Count -ne 1 -or
-              $arrApplicability[0] -isnot [bool]) {
-              throw 'Trust-root applicability did not return one exact Boolean.'
-          }
-          $boolAuthorized = $false
-          $boolOrdinaryContent = $false
-          if ($arrApplicability[0]) {
-              $arrAuthorization = @(
-                  & ./.github/workflows/Test-TrustRootAuthorization.ps1 `
-                      -RepositoryRootPath $PWD `
-                      -TrustedRevision $env:TRUSTED_REVISION `
-                      -BaseRevision $env:CANDIDATE_BASE_REVISION `
-                      -HeadRevision $env:CANDIDATE_HEAD_REVISION
-              )
-              if ($arrAuthorization.Count -ne 1 -or
-                  $arrAuthorization[0] -isnot [bool] -or
-                  -not $arrAuthorization[0]) {
-                  throw 'Trust-root authorization did not return one exact true result.'
-              }
-              $boolAuthorized = $true
-              $strManifestDigest = (Get-FileHash -LiteralPath `
-                      './.github/workflows/trust-root-authorization.json' `
-                      -Algorithm SHA256).Hash.ToLowerInvariant()
-              $boolOrdinaryContent = $strManifestDigest -ceq
-                  'd30601d4b8c40672ac9e91414b88a88efcb50a32e168c473a128549fdf2d65f4'
-          }
-          [System.IO.File]::AppendAllText(
-              $env:GITHUB_OUTPUT,
-              ("authorized=$($boolAuthorized.ToString().ToLowerInvariant())`n" +
-                  "ordinary=$($boolOrdinaryContent.ToString().ToLowerInvariant())`n"),
-              [System.Text.UTF8Encoding]::new($false)
-          )
-
-      - name: Validate ordinary candidate cases with trusted rules
-        if: steps.trust-root-authorization.outputs.ordinary == 'true'
+          ./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies -InstructionDependencies
+      - name: Test proposed behavior without publication authority
+        id: test
         shell: pwsh
-        env:
-          TRUSTED_REVISION: ${{ github.sha }}
-          CANDIDATE_BASE_REVISION: ${{ github.event.pull_request.base.sha }}
-          CANDIDATE_HEAD_REVISION: ${{ github.event.pull_request.head.sha }}
         run: |
-          # The trusted authorizer checks the supported caller transition and
-          # prepared category mutations as inert data. It retains the original
-          # trusted-validator outcome gate for other ordinary candidate data.
-          node .github/workflows/Validate-WorkflowPolicy.mjs --preflight
-          if ($LASTEXITCODE -ne 0) { throw 'Trusted policy preflight failed.' }
-          & ./.github/workflows/Test-TrustRootAuthorization.ps1 `
-              -RepositoryRootPath $PWD `
-              -TrustedRevision $env:TRUSTED_REVISION `
-              -BaseRevision $env:CANDIDATE_BASE_REVISION `
-              -HeadRevision $env:CANDIDATE_HEAD_REVISION `
-              -ValidateOrdinaryCaseCatalog
-
-      - name: Validate instruction capacity and capabilities
-        if: >-
-          github.event_name != 'push' ||
-          steps.push-applicability.outputs.required == 'true'
-        shell: pwsh
-        env:
-          AGENT_INSTRUCTION_AUTHORIZATION_BASE: >-
-            ${{ github.event_name == 'pull_request_target' &&
-              github.event.pull_request.base.sha || '' }}
-          AGENT_INSTRUCTION_AUTHORIZATION_HEAD: >-
-            ${{ github.event_name == 'pull_request_target' &&
-              github.event.pull_request.head.sha || '' }}
-          AGENT_INSTRUCTION_TRUST_MAINTENANCE_AUTHORIZED: >-
-            ${{ steps.trust-root-authorization.outputs.authorized || 'false' }}
-          AGENT_INSTRUCTION_INPUT_REVISION: >-
-            ${{ github.event_name == 'pull_request_target' &&
-              github.event.pull_request.head.sha ||
-              github.event_name == 'push' && github.event.after || '' }}
-          AGENT_INSTRUCTION_PUBLISHED_BASELINE: >-
-            ${{ github.event_name == 'pull_request_target' &&
-              github.event.pull_request.base.sha ||
-              github.event_name == 'push' && github.event.before || '' }}
-          AGENT_INSTRUCTION_PUBLISHED_FINAL: >-
-            ${{ github.event_name == 'pull_request_target' &&
-              github.event.pull_request.head.sha ||
-              github.event_name == 'push' && github.event.after || '' }}
-          AGENT_INSTRUCTION_PUBLISHED_BASELINE_ABSENT: >-
-            ${{ github.event_name == 'push' && github.event.created || false }}
-          AGENT_INSTRUCTION_PUBLISHED_FINAL_DELETED: >-
-            ${{ github.event_name == 'push' && github.event.deleted || false }}
-          AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP: >-
-            ${{ github.event_name == 'push' &&
-              github.event.repository.pushed_at ||
-              github.event_name == 'pull_request_target' &&
-              github.event.pull_request.updated_at || '' }}
-          AGENT_INSTRUCTION_EVENT_NAME: >-
-            ${{ (github.event_name == 'pull_request_target' ||
-              github.event_name == 'push') && github.event_name || '' }}
-          AGENT_INSTRUCTION_PULL_REQUEST_ACTION: >-
-            ${{ github.event_name == 'pull_request_target' &&
-              github.event.action || '' }}
-          AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED: >-
-            ${{ github.event_name == 'pull_request_target' &&
-              github.event.action == 'edited' &&
-              github.event.changes.base.ref.from != '' && 'true' || '' }}
-          AGENT_INSTRUCTION_DESTINATION_REF: >-
-            ${{ github.event_name == 'push' && github.event.created &&
-              github.ref || '' }}
-          AGENT_INSTRUCTION_EVENT_HEAD_REVISION: >-
-            ${{ github.event_name == 'push' && github.event.created &&
-              github.event.head_commit.id || '' }}
-          AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT: >-
-            ${{ github.event_name == 'push' && github.event.created &&
-              toJson(github.event.head_commit.distinct) || '' }}
-          AGENT_INSTRUCTION_PUSH_COMMIT_EVIDENCE: >-
-            ${{ github.event_name == 'push' && github.event.created &&
-              toJson(github.event.commits) || '' }}
-          AGENT_INSTRUCTION_OTHER_REF_EVIDENCE: >-
-            ${{ steps.created-push-boundary.outputs.other_ref_evidence || '' }}
-        run: >-
           ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
-          -AuthorizationBaseRevision $env:AGENT_INSTRUCTION_AUTHORIZATION_BASE
-          -AuthorizationHeadRevision $env:AGENT_INSTRUCTION_AUTHORIZATION_HEAD
-          -TrustedMaintenanceAuthorizationValidated:([bool]::Parse(
-          $env:AGENT_INSTRUCTION_TRUST_MAINTENANCE_AUTHORIZED))
-          -InputRevision $env:AGENT_INSTRUCTION_INPUT_REVISION
-          -PublishedBaselineRevision $env:AGENT_INSTRUCTION_PUBLISHED_BASELINE
-          -PublishedFinalRevision $env:AGENT_INSTRUCTION_PUBLISHED_FINAL
-          -PublishedBaselineAbsent:([bool]::Parse(
-          $env:AGENT_INSTRUCTION_PUBLISHED_BASELINE_ABSENT))
-          -PublishedFinalDeleted:([bool]::Parse(
-          $env:AGENT_INSTRUCTION_PUBLISHED_FINAL_DELETED))
-          -TrustedEventTimestamp $env:AGENT_INSTRUCTION_TRUSTED_EVENT_TIMESTAMP
-          -EventName $env:AGENT_INSTRUCTION_EVENT_NAME
-          -PullRequestAction $env:AGENT_INSTRUCTION_PULL_REQUEST_ACTION
-          -PullRequestBaseChanged $env:AGENT_INSTRUCTION_PULL_REQUEST_BASE_CHANGED
-          -DestinationRef $env:AGENT_INSTRUCTION_DESTINATION_REF
-          -EventHeadRevision $env:AGENT_INSTRUCTION_EVENT_HEAD_REVISION
-          -EventHeadDistinct $env:AGENT_INSTRUCTION_EVENT_HEAD_DISTINCT
-          -PushCommitEvidenceJson `
-          $env:AGENT_INSTRUCTION_PUSH_COMMIT_EVIDENCE
-          -OtherRefEvidenceJson `
-          $env:AGENT_INSTRUCTION_OTHER_REF_EVIDENCE
-
-  publish-current-base-status:
-    name: Publish current-base status
-    needs:
-      - mark-current-base-pending
-      - validate-agent-instructions
-    if: >-
-      always() && github.event_name == 'pull_request_target' &&
-      (github.event.action != 'edited' ||
-      github.event.changes.base.ref.from != '')
-    concurrency:
-      group: agent-instruction-current-base-status
-      queue: max
-      cancel-in-progress: false
-    runs-on: ubuntu-24.04
-    timeout-minutes: 5
-    permissions:
-      contents: read
-      pull-requests: read
-      statuses: write
-    steps:
-      - name: Check out trusted current-base helper
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          repository: ${{ github.repository }}
-          ref: ${{ github.sha }}
-          token: ${{ github.token }}
-          persist-credentials: false
-          clean: true
-          fetch-depth: 1
-          fetch-tags: false
-          show-progress: true
-          lfs: false
-          submodules: false
-          set-safe-directory: true
-          allow-unsafe-pr-checkout: false
-
-      - name: Publish status after live base and head verification
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-          GITHUB_SERVER_URL: ${{ github.server_url }}
-          EXPECTED_REPOSITORY: ${{ github.repository }}
-          EXPECTED_PULL_NUMBER: ${{ github.event.pull_request.number }}
-          EXPECTED_BASE_REF: ${{ github.event.pull_request.base.ref }}
-          EXPECTED_BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          EXPECTED_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          VALIDATION_RESULT: ${{ needs.validate-agent-instructions.result }}
-          STATUS_TARGET_URL: >-
-            ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{
-              github.run_id }}
-        run: >-
-          node .github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs
-          finalize
+          & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs
+          if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }
