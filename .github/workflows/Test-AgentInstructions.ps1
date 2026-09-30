@@ -52,7 +52,6 @@ $script:arrPushGovernedExactPaths = @(
     $script:arrCheckoutAttributePaths
     $script:arrOperationalLintGuidePaths
     '.codex/config.toml',
-    '.github/workflows/Test-AgentInstructionParserManifest.mjs',
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/workflow-policy-cases.json',

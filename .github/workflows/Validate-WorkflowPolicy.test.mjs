@@ -57,6 +57,7 @@ test('labels, comments, CRLF, whitespace and literal call quoting are harmless',
 
 const cases = JSON.parse(fs.readFileSync(path.join(directory, 'workflow-policy-cases.json'), 'utf8'));
 assert.equal(cases.schema, 'PSStyleGuide.WorkflowPolicyCases.v2');
+assert.ok(Array.isArray(cases.cases) && cases.cases.length > 0, 'Workflow mutation catalog must contain cases.');
 for (const item of cases.cases) {
   test(item.name, () => {
     const value = clone(fixtures[item.workflow]);

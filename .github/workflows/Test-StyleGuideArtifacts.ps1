@@ -542,23 +542,6 @@ for ($intArtifactIndex = 0; $intArtifactIndex -lt $arrExpectedArtifactRecords.Co
     }
 }
 
-# Preserve the v2 exact-path verifier as an additional independent check.
-$strVerifierCommand = '& ''./.github/workflows/Test-ExactGitPathSet.ps1'' -RepositoryRoot $env:GITHUB_WORKSPACE -GitExecutablePath ''/usr/bin/git'' -ExpectedPath @() -Mode Both -RequireCleanWorkingAgainstIndex'
-$strEncodedVerifierCommand = [System.Convert]::ToBase64String(
-    [System.Text.Encoding]::Unicode.GetBytes($strVerifierCommand)
-)
-$arrPathSetResult = @(& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -EncodedCommand $strEncodedVerifierCommand)
-$intPathSetExit = $LASTEXITCODE
-if ($arrPathSetResult.Count -ne 1) { throw 'Exact-path verification returned an invalid shape.' }
-try { $objPathSetResult = $arrPathSetResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }
-catch { throw 'Exact-path verification returned invalid JSON.' }
-if ($null -eq $objPathSetResult -or $objPathSetResult.GetType() -ne [System.Management.Automation.PSCustomObject] -or
-    $intPathSetExit -isnot [int] -or $intPathSetExit -ne 0 -or
-    $objPathSetResult.Schema -isnot [string] -or $objPathSetResult.Schema -cne 'PSStyleGuide.ExactGitPathSetResult.v2' -or
-    $objPathSetResult.Success -isnot [bool] -or -not $objPathSetResult.Success) {
-    throw 'Exact-path verification did not confirm a clean worktree and index.'
-}
-
 if ((Get-GitControlSurfaceDigest) -cne $strControlSurfaceBefore) {
     throw 'git-state: the generator changed repository Git configuration or hooks'
 }
@@ -589,6 +572,23 @@ if ($listChanged.Count -ne 0) {
         throw "git-state: the generator changed $($arrOutside.Count) path(s) outside the four generated artifacts"
     }
     throw 'generated-artifacts: committed artifacts do not match generator output. Run ./.github/workflows/Generate-StyleGuideArtifacts.ps1 and commit the four regenerated files.'
+}
+
+# Preserve the v2 exact-path verifier as an additional independent check.
+$strVerifierCommand = '& ''./.github/workflows/Test-ExactGitPathSet.ps1'' -RepositoryRoot $env:GITHUB_WORKSPACE -GitExecutablePath ''/usr/bin/git'' -ExpectedPath @() -Mode Both -RequireCleanWorkingAgainstIndex'
+$strEncodedVerifierCommand = [System.Convert]::ToBase64String(
+    [System.Text.Encoding]::Unicode.GetBytes($strVerifierCommand)
+)
+$arrPathSetResult = @(& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -EncodedCommand $strEncodedVerifierCommand)
+$intPathSetExit = $LASTEXITCODE
+if ($arrPathSetResult.Count -ne 1) { throw 'Exact-path verification returned an invalid shape.' }
+try { $objPathSetResult = $arrPathSetResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop }
+catch { throw 'Exact-path verification returned invalid JSON.' }
+if ($null -eq $objPathSetResult -or $objPathSetResult.GetType() -ne [System.Management.Automation.PSCustomObject] -or
+    $intPathSetExit -isnot [int] -or $intPathSetExit -ne 0 -or
+    $objPathSetResult.Schema -isnot [string] -or $objPathSetResult.Schema -cne 'PSStyleGuide.ExactGitPathSetResult.v2' -or
+    $objPathSetResult.Success -isnot [bool] -or -not $objPathSetResult.Success) {
+    throw 'Exact-path verification did not confirm a clean worktree and index.'
 }
 
 $objWorking = Invoke-GitRaw @('diff', '--no-ext-diff', '--no-textconv', '--no-renames', '--name-only', '-z', '--')

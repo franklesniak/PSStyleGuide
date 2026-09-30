@@ -12,7 +12,6 @@ const selectorPaths = new Set([
     '.gitattributes', '.npmrc', 'npm-shrinkwrap.json', 'package.json', 'package-lock.json',
     'Classify-InstructionMaintenance.mjs', 'Classify-InstructionMaintenance.test.mjs',
     'Test-AgentInstructions.ps1', 'Test-AgentInstructions.SelfTest.ps1',
-    'Test-AgentInstructionParserManifest.mjs',
     'Validate-WorkflowPolicy.mjs',
     'workflow-policy-contract.json', 'workflow-policy-cases.json',
     'agent-instructions.yml',

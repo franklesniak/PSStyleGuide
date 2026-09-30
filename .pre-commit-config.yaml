@@ -12,8 +12,7 @@ repos:
         files: >-
           (?x)^(
             package(-lock)?\.json|
-            \.github/workflows/package(-lock)?\.json|
-            \.github/workflows/(style-guide-candidate-cases|workflow-policy-cases|workflow-policy-contract)\.json
+            \.github/workflows/[^/]+\.json
           )$
       - id: check-yaml
         files: >-

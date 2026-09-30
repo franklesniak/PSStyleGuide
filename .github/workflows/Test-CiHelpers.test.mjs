@@ -44,7 +44,7 @@ if (args.includes('config') && (args.includes('--get-all') || args.includes('--g
   function run(source, env = {}) {
     const script = path.join(root, 'case.ps1');
     // Only the fixed Git executable changes; all argument and status handling stays.
-    fs.writeFileSync(script, source.replaceAll('/usr/bin/git', git).replaceAll("'/bin/git'", quote(git)));
+    fs.writeFileSync(script, "$ErrorActionPreference = 'Stop'\n" + source.replaceAll('/usr/bin/git', git).replaceAll("'/bin/git'", quote(git)));
     const environment = { ...process.env, GITHUB_SERVER_URL: 'https://github.com',
       GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head,
       TEST_REVISION: head, TEST_LOG: log, TEST_MODE: '', RUNNER_TEMP: root,
@@ -126,7 +126,8 @@ test('acquisition rejects credentials, wrong repository, refs and occupied works
   assert.equal(fs.readFileSync(path.join(f.work, 'keep.txt'), 'utf8'), 'do not remove');
 });
 
-for (const mode of ['native-download-failure', 'wrong-download-bytes', 'unsafe-npm-config']) {
+for (const mode of ['native-download-failure', 'wrong-download-bytes', 'unsafe-npm-config',
+  'invalid-node', 'invalid-npm', 'invalid-digest', 'existing-staging', 'dangling-staging-link']) {
   test(`runtime setup rejects ${mode} before dependency code`, { skip: !linux }, t => {
     const f = fixture(t), workflows = path.join(f.work, '.github/workflows');
     fs.mkdirSync(workflows, { recursive: true });
@@ -140,19 +141,47 @@ fs.writeFileSync(args[args.indexOf('--output')+1], 'incorrect archive bytes');
     fs.writeFileSync(path.join(workflows, 'Test-CheckoutCredentials.ps1'),
       read('Test-CheckoutCredentials.ps1').replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
     fs.copyFileSync(path.join(directory, 'ci-toolchain.json'), path.join(workflows, 'ci-toolchain.json'));
+    const manifest = JSON.parse(fs.readFileSync(path.resolve(directory, '../../package.json')));
+    if (mode === 'invalid-node') manifest.engines.node = '^24';
+    if (mode === 'invalid-npm') manifest.engines.npm = 'latest';
+    fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify(manifest));
+    if (mode === 'invalid-digest') fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), '{"linuxX64Sha256":"bad"}');
+    if (mode === 'existing-staging') fs.mkdirSync(path.join(f.root, 'styleguide-node'));
+    if (mode === 'dangling-staging-link') fs.symlinkSync(path.join(f.root, 'missing-target'), path.join(f.root, 'styleguide-node'));
     const source = read('Initialize-CiToolchain.ps1').replaceAll('/usr/bin/curl', curl);
     fs.writeFileSync(path.join(workflows, 'Initialize-CiToolchain.ps1'), source);
     if (mode === 'unsafe-npm-config') fs.writeFileSync(path.join(f.work, '.npmrc'), 'script-shell=hostile\n');
     const result = f.run(`& ${quote(path.join(workflows, 'Initialize-CiToolchain.ps1'))} -WorkflowDependencies`, { TEST_MODE: mode });
     assert.notEqual(result.status, 0);
     assert.match(result.stderr, mode === 'unsafe-npm-config' ? /npm configuration selector/ :
+      mode.startsWith('invalid-') ? /runtime declaration is invalid/ :
+      mode.includes('staging') ? /staging destination already exists/ :
       mode === 'native-download-failure' ? /Runtime download failed/ : /archive digest is incorrect/);
-    assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), false);
-    if (mode === 'unsafe-npm-config') assert.ok(f.calls().every(row => !row.includes('curl')));
+    assert.equal(fs.existsSync(path.join(f.root, 'styleguide-node')), mode === 'existing-staging');
+    if (mode === 'unsafe-npm-config' || mode.startsWith('invalid-') || mode.includes('staging')) {
+      assert.ok(f.calls().every(row => !row.includes('curl')));
+    }
+    if (mode === 'dangling-staging-link') assert.equal(fs.lstatSync(path.join(f.root, 'styleguide-node')).isSymbolicLink(), true);
   });
 }
 
-test('runtime setup neutralizes npm before version and suppresses install scripts', { skip: !linux }, t => {
+for (const [file, variables] of [
+  ['Initialize-CiToolchain.ps1', ['RUNNER_TEMP', 'GITHUB_PATH', 'GITHUB_ENV']],
+  ['Invoke-MarkdownLint.ps1', ['RUNNER_TEMP']],
+]) {
+  for (const variable of variables) test(`${file}: missing ${variable} fails before external work`, { skip: !linux }, t => {
+    const f = fixture(t);
+    const helper = path.join(f.root, file);
+    fs.writeFileSync(helper, read(file));
+    const result = f.run(`& ${quote(helper)}`, { [variable]: '' });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, new RegExp('requires the runner environment variable ' + variable));
+    assert.equal(f.calls().length, 0);
+  });
+}
+
+for (const mode of ['current', 'updated-engines', 'wrong-node', 'wrong-npm']) {
+test(`runtime setup uses root engines and safe npm inputs: ${mode}`, { skip: !linux }, t => {
   const f = fixture(t), workflows = path.join(f.work, '.github/workflows');
   fs.mkdirSync(workflows, { recursive: true });
   fs.writeFileSync(path.join(workflows, 'Test-CheckoutCredentials.ps1'),
@@ -161,6 +190,9 @@ test('runtime setup neutralizes npm before version and suppresses install script
     fs.writeFileSync(path.join(directory, 'package.json'), '{}\n');
     fs.writeFileSync(path.join(directory, 'package-lock.json'), '{}\n');
   }
+  const selectedNode = mode === 'updated-engines' ? '24.19.0' : '24.18.1';
+  const selectedNpm = mode === 'updated-engines' ? '11.17.0' : '11.16.0';
+  fs.writeFileSync(path.join(f.work, 'package.json'), JSON.stringify({ engines: { node: selectedNode, npm: selectedNpm } }));
   const archiveRoot = path.join(f.root, 'archive');
   const bin = path.join(archiveRoot, 'runtime/bin'); fs.mkdirSync(bin, { recursive: true });
   for (const executable of ['node', 'npm']) {
@@ -174,28 +206,38 @@ if ('${executable}' === 'npm') {
       process.env.npm_config_ignore_scripts !== 'true') process.exit(97);
   if (args.includes('ci') && !args.includes('--ignore-scripts')) process.exit(98);
 }
-if (args.includes('--version')) console.log('${executable === 'node' ? 'v24.18.1' : '11.16.0'}');
+if (args.includes('--version')) console.log('${executable === 'node' ? (mode === 'wrong-node' ? 'v0.0.0' : 'v' + selectedNode) : (mode === 'wrong-npm' ? '0.0.0' : selectedNpm)}');
 `, { mode: 0o700 });
   }
   const archive = path.join(f.root, 'fixture.tar.xz');
   const tar = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', archiveRoot, 'runtime'], { encoding: 'utf8' });
   assert.equal(tar.status, 0, tar.stderr);
-  fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify({ node: '24.18.1', npm: '11.16.0',
+  fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify({
     linuxX64Sha256: createHash('sha256').update(fs.readFileSync(archive)).digest('hex') }));
   const curl = path.join(f.root, 'curl');
   fs.writeFileSync(curl, `#!${process.execPath}
 const fs = require('node:fs'), args = process.argv.slice(2);
+fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['curl', ...args])+'\\n');
 fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output')+1]);
 `, { mode: 0o700 });
   fs.writeFileSync(path.join(workflows, 'Initialize-CiToolchain.ps1'),
     read('Initialize-CiToolchain.ps1').replaceAll('/usr/bin/curl', curl));
   const result = f.run(`& ${quote(path.join(workflows, 'Initialize-CiToolchain.ps1'))} -WorkflowDependencies -InstructionDependencies`,
     { NPM_CONFIG_SCRIPT_SHELL: 'hostile', npm_config_ignore_scripts: 'false', npm_config_userconfig: '/hostile' });
+  if (mode.startsWith('wrong-')) {
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /installed (Node|npm) version is incorrect/);
+    assert.ok(f.calls().every(row => !row.includes('ci')));
+    return;
+  }
   assert.equal(result.status, 0, result.stderr);
+  assert.equal(f.calls().find(row => row[0] === 'curl').at(-1),
+    `https://nodejs.org/dist/v${selectedNode}/node-v${selectedNode}-linux-x64.tar.xz`);
   const calls = f.calls().filter(row => ['node', 'npm'].includes(row[0]));
   assert.deepEqual(calls.map(row => row.includes('ci') ? 'ci' : row.at(-1)),
     ['--version', '--version', '--preflight', 'ci', 'ci']);
 });
+}
 
 test('accepted PR-data loader rejects failed fetch and wrong or missing objects before classification', { skip: !linux }, t => {
   const source = parse(read('agent-instructions.yml')).jobs['accepted-policy'].steps.find(step => step.id === 'validate').run;

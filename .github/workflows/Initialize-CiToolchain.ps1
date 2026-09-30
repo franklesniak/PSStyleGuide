@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+#Requires -Version 7.3
 # .SYNOPSIS
 # Installs the reviewed Linux runtime and the requested locked dependency trees.
 # .DESCRIPTION
@@ -14,6 +14,11 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
 if (-not $IsLinux) { throw 'The CI runtime installer requires Linux.' }
+foreach ($strRequiredVariable in @('RUNNER_TEMP', 'GITHUB_PATH', 'GITHUB_ENV')) {
+    if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($strRequiredVariable))) {
+        throw "CI setup requires the runner environment variable $strRequiredVariable."
+    }
+}
 & "$PSScriptRoot/Test-CheckoutCredentials.ps1"
 $strRepositoryRoot = [IO.Path]::GetFullPath("$PSScriptRoot/../..")
 foreach ($strRelativePath in @('.npmrc', '.github/.npmrc', '.github/workflows/.npmrc',
@@ -36,8 +41,11 @@ if (Test-Path -LiteralPath $env:npm_config_globalconfig) {
 }
 $objPin = Get-Content -Raw -LiteralPath "$PSScriptRoot/ci-toolchain.json" |
     ConvertFrom-Json -ErrorAction Stop
-if ($objPin.node -cnotmatch '^24\.[0-9]+\.[0-9]+$' -or
-    $objPin.npm -cnotmatch '^[0-9]+\.[0-9]+\.[0-9]+$' -or
+# Package engines are the single version source; the CI file supplies archive identity.
+$objPackage = Get-Content -Raw -LiteralPath "$strRepositoryRoot/package.json" |
+    ConvertFrom-Json -ErrorAction Stop
+if ($objPackage.engines.node -cnotmatch '^24\.[0-9]+\.[0-9]+$' -or
+    $objPackage.engines.npm -cnotmatch '^[0-9]+\.[0-9]+\.[0-9]+$' -or
     $objPin.linuxX64Sha256 -cnotmatch '^[a-f0-9]{64}$') {
     throw 'The reviewed runtime declaration is invalid.'
 }
@@ -46,7 +54,7 @@ $strArchive = Join-Path $env:RUNNER_TEMP 'styleguide-node.tar.xz'
 if ([IO.Path]::Exists($strNodeRoot) -or [IO.Path]::Exists($strArchive)) {
     throw 'The runtime staging destination already exists.'
 }
-$strUrl = "https://nodejs.org/dist/v$($objPin.node)/node-v$($objPin.node)-linux-x64.tar.xz"
+$strUrl = "https://nodejs.org/dist/v$($objPackage.engines.node)/node-v$($objPackage.engines.node)-linux-x64.tar.xz"
 & /usr/bin/curl --silent --show-error --fail --location --proto '=https' `
     --proto-redir '=https' --tlsv1.2 --connect-timeout 20 --max-time 180 `
     --retry 2 --output $strArchive $strUrl
@@ -60,11 +68,11 @@ $strNode = Join-Path $strNodeRoot 'bin/node'
 $strNpm = Join-Path $strNodeRoot 'bin/npm'
 $env:PATH = (Join-Path $strNodeRoot 'bin') + ':' + $env:PATH
 $strNodeVersion = & $strNode --version
-if ($LASTEXITCODE -ne 0 -or $strNodeVersion -cne "v$($objPin.node)") {
+if ($LASTEXITCODE -ne 0 -or $strNodeVersion -cne "v$($objPackage.engines.node)") {
     throw 'The installed Node version is incorrect.'
 }
 $strNpmVersion = & $strNpm --version
-if ($LASTEXITCODE -ne 0 -or $strNpmVersion -cne $objPin.npm) {
+if ($LASTEXITCODE -ne 0 -or $strNpmVersion -cne $objPackage.engines.npm) {
     throw 'The installed npm version is incorrect.'
 }
 & $strNode "$PSScriptRoot/Validate-WorkflowPolicy.mjs" --preflight

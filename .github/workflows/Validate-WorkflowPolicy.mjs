@@ -514,6 +514,7 @@ async function main(args = process.argv.slice(2)) {
     validateWorkflowObject(file, parseStrictYaml(bytes, LIMITS).value, contract);
     workflowSha256[file] = sha256(bytes);
   }
+  // This CLI validates inputs; the separate Node test suite executes mutation cases.
   return { schema: RESULT_SCHEMA, ...common, casesPassed: 0, workflowSha256 };
 }
 
