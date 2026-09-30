@@ -1,13 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # Agent Instructions for Claude Code
 
-**Version:** 1.9.20260907.0
+**Version:** 1.10.20260930.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-09-07
+- **Last Updated:** 2026-09-30
 - **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
 <!-- template-sync: begin markdown-reference-only -->
 - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
@@ -171,6 +171,8 @@ This section is retained Claude platform protocol. Thin-entry-point pruning must
 
 When a code review comment is received from GitHub Copilot, Codex, a human reviewer, or any other code reviewer on a pull request, follow this process for **each** comment. Comments from every reviewer are processed **identically**; no reviewer's comments receive a lighter process than another's.
 
+Apply the full decision process once per distinct confirmed finding, using affected stakeholders. Link duplicate reports to that decision after checking its evidence. Do not repeat a rubric for its mechanical implementation. Keep one complete record. Reuse scoped owner grants until revoked or exceeded. A new commit requires current review, not new permission. During an authorized outage, use the approved substitute. Keep failed-service and substitute results distinct. Preserve pending-request checks, retry limits, finding resolution and final independent quality review.
+
 Review feedback has two co-equal surfaces. Inspect both in every review round and whole-PR audit:
 
 1. **Inline review comments and threads.** Enumerate the complete GraphQL `reviewThreads` connection. Its resolved-plus-unresolved set is the head-independent inline inventory. Use `isResolved == false` only to select open work. Do **not** inventory by filtering REST comments on `commit_id == <round-head>`. GitHub can re-anchor the mutable `commit_id` when the commented line still maps, so that filter can omit a still-open thread. Retain `originalCommit` or `original_commit_id` only as provenance.
@@ -253,7 +255,7 @@ These terms are the operative protected-file authorization contract for the revi
 
     **Rubric-construction discipline.** Build the rubric **once** with a fixed set of criteria, then apply it **once**. Do not re-score with revised criteria mid-deliberation unless a **new external information source arrives**, such as a reviewer follow-up, CI failure, or newly discovered repository constraint. If, after rubric application, the agent wants to add or remove criteria in order to produce a different winner, treat that as analysis paralysis: commit to the rubric output and proceed unless one of the escalation conditions above applies.
 
-6. **Post the evaluation.** For an inline finding, reply to its thread. For a review-body-only finding, post a PR-level comment that cites its synthetic key, source review, reviewed commit, and location when available. Include the options, weighted rubric, scoring table, selected option, references and local testing required by the framework, and either a note that implementation follows or the implementing commit SHA.
+6. **Post the evaluation.** For an inline finding, reply to its thread. For a review-body-only finding, post a PR-level comment that cites its synthetic key, source review, reviewed commit, and location when available. Include or link to the complete options, weighted rubric, scoring table, selected option, references and local testing required by the framework, and either a note that implementation follows or the implementing commit SHA.
 
 7. **Implement the fix.** Run **Stage 6** of the **Structured Decision Framework**: apply the selected option, verify that any check, test, or guard the fix adds or modifies is non-vacuous, then commit and push. Report the verification result in the thread alongside the fix.
 
@@ -320,7 +322,7 @@ This section is retained Claude platform protocol. Thin-entry-point pruning must
 
 When a pull request is created or when the owner posts a PR comment containing `@claude start review loop`, initiate the following automated review cycle.
 
-**Reviewer set.** The loop runs **two co-equal automated reviewers: GitHub Copilot and remote Codex (`chatgpt-codex-connector[bot]`).** Every rule in this section applies to each reviewer independently, and findings from either receive the same **Handling Code Review Comments** and **Structured Decision Framework** process. Request Codex every round by posting a PR comment whose body is exactly `@codex review`; do not rely on auto-review. A round is not complete until both reviewers have been requested, awaited, and processed. If a reviewer cannot be requested or detected, **PAUSE** and identify that reviewer and the failure rather than continuing silently.
+**Reviewer set.** The loop runs **two co-equal automated reviewers: GitHub Copilot and remote Codex (`chatgpt-codex-connector[bot]`).** Every rule in this section applies to each reviewer independently, and findings from either receive the same **Handling Code Review Comments** and **Structured Decision Framework** process. Request Codex by posting a PR comment whose body is exactly `@codex review`; do not rely on auto-review. Preserve the active request schedule, pending-request suppression, and attempt cap. If a reviewer is unavailable, record the failure and use a substitute only within an explicit owner grant. Keep identities and results separate. When no authorized fallback applies, pause with the concrete missing decision. A round is complete only when each applicable review requirement and all other gates are satisfied.
 
 ### Pause discipline
 
@@ -334,7 +336,7 @@ The loop pauses only for a pause that this protocol explicitly defines. Those de
 
 ### Loop procedure
 
-1. **Request reviews from both reviewers.** First, pass a review-readiness gate. Confirm that every intended fix commit is reachable from the PR head. Synchronize the PR body with the exact current head and tree, file versions, relevant identities, validation commands, and results that it claims. Read the body and head back through an authenticated API and compare them with the committed files. Do not request review while the body is stale or identity evidence is incomplete.
+1. **Request reviews from both reviewers.** First, pass a review-readiness gate. Confirm that every intended fix commit is reachable from the PR head. Keep the PR body's scope, behavior, risks, commands, and results accurate. Read current head and base identities from authenticated GitHub and Git data. Do not require a generated identity block or copy file release labels into the body. Recheck any identity the body does claim. Do not request review while a material description or technical result is stale.
 
     Then record the detection baselines and the request-time PR head SHA (these **MUST** be recorded before requesting the reviews), **for each reviewer separately**:
     - Use `get_reviews` (or equivalent) to record the `submitted_at` timestamp of the most recent review authored by that reviewer's bot account — `copilot-pull-request-reviewer[bot]` for Copilot, and the configured Codex reviewer account for Codex (or note that no such review exists yet). This is that reviewer's `get_reviews` baseline for step 2.

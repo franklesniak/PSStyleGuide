@@ -710,7 +710,7 @@ test('RECURSIVE-COMPARISON-REFUSAL: contract and strict config boundaries transl
   };
   const objDeep = nested(10000, 'TASK131_F2_PRIVATE_RECURSIVE_VALUE');
   const objContract = JSON.parse(
-    readFileSync(join(workflow, 'workflow-policy-contract.json'), 'utf8'));
+    readFileSync(join(workflow, 'historical-supply-profile.json'), 'utf8'));
   let strDiagnostic = '';
   const objProcess = {
     stderr: { write(strValue) { strDiagnostic += strValue; } },
@@ -1615,7 +1615,7 @@ test('HISTORICAL-ACQUISITION: exact authored shell gates verification on native 
       'file:///task148-synthetic-source/');
       const strPack = join(temporary, 'complete.pack');
       writeFileSync(strPack, bufComplete);
-      const objContract = JSON.parse(readFileSync(join(workflow, 'workflow-policy-contract.json')));
+      const objContract = JSON.parse(readFileSync(join(workflow, 'historical-supply-profile.json')));
       const run = (strName, strInitial, intFetchStatus, strShell, boolBadHash = false,
         strEffectiveUrl = strCanonicalRemote, intPreflightStatus = 0) => {
         const strRepository = join(temporary, strName);
@@ -1635,7 +1635,7 @@ test('HISTORICAL-ACQUISITION: exact authored shell gates verification on native 
         mkdirSync(strContractDirectory, { recursive: true });
         const objCandidate = structuredClone(objContract);
         if (boolBadHash) objCandidate.supplyFreeze.baseline.packageLockJson.sha256 = '0'.repeat(64);
-        writeFileSync(join(strContractDirectory, 'workflow-policy-contract.json'), JSON.stringify(objCandidate));
+        writeFileSync(join(strContractDirectory, 'historical-supply-profile.json'), JSON.stringify(objCandidate));
         // A transport fixture supplies real pinned objects without network. Every
         // verifier Git child still executes the real Git binary with its closed env.
         const strShim = join(strBin, 'git');
@@ -1776,8 +1776,8 @@ test('HISTORICAL-VERIFICATION: authored JavaScript block reports success only af
     });
     assert.equal(objHistoricalObject.status, 0, objHistoricalObject.stderr);
     const strContractDirectory = join(strFixtureRepository, '.github', 'workflows');
-    const strContractPath = join(strContractDirectory, 'workflow-policy-contract.json');
-    const objContract = JSON.parse(readFileSync(join(workflow, 'workflow-policy-contract.json')));
+    const strContractPath = join(strContractDirectory, 'historical-supply-profile.json');
+    const objContract = JSON.parse(readFileSync(join(workflow, 'historical-supply-profile.json')));
     mkdirSync(strContractDirectory, { recursive: true });
     const invokeVerifier = (objCandidate, objExtraEnv = {}, arrDeletedEnvironment = []) => {
       writeFileSync(strContractPath, JSON.stringify(objCandidate));
@@ -2233,12 +2233,12 @@ test('LINUX: strict success, entire ignored tree preservation, and refusal prope
     const checkout = join(temporary, 'TASK131_F31_PRIVATE_PATH');
     const fixture = join(checkout, '.github', 'workflows');
     mkdirSync(fixture, { recursive: true });
-    for (const name of ['Get-SupplyFreezeDigest.mjs', 'package.json', 'package-lock.json', 'workflow-policy-contract.json']) {
+    for (const name of ['Get-SupplyFreezeDigest.mjs', 'package.json', 'package-lock.json', 'historical-supply-profile.json']) {
       cpSync(join(workflow, name), join(fixture, name));
       chmodSync(join(fixture, name), 0o644);
     }
     cpSync(join(workflow, 'node_modules'), join(fixture, 'node_modules'), { recursive: true, verbatimSymlinks: true });
-    const contract = JSON.parse(readFileSync(join(fixture, 'workflow-policy-contract.json')));
+    const contract = JSON.parse(readFileSync(join(fixture, 'historical-supply-profile.json')));
     const invokeFrom = (strFixture, flags = [], env = {}, objBaseEnvironment = process.env,
       intTimeout = undefined) => {
       const cache = mkdtempSync(join(temporary, 'cache-'));
@@ -2547,7 +2547,7 @@ const realpathSync = (strPath, ...arrArguments) => {
       refuse(invoke(['--no-audit', '--any-toolchain']), 15);
       chmodSync(packagePath, 0o644);
 
-      const contractPath = join(fixture, 'workflow-policy-contract.json');
+      const contractPath = join(fixture, 'historical-supply-profile.json');
       const contractBytes = readFileSync(contractPath);
       for (const arrFlags of [['--no-audit'], ['--no-audit', '--any-toolchain']]) {
         writeFileSync(contractPath, 'null');
@@ -2724,7 +2724,7 @@ const realpathSync = (strPath, ...arrArguments) => {
         `--cache-directory=${cache}`], { encoding: 'utf8', maxBuffer: 16 * 1024 * 1024 });
       refuse(aliasRun(physicalCache), 16);
       assert.deepEqual(readdirSync(physicalCache), []);
-      for (const name of ['package.json', 'package-lock.json', 'workflow-policy-contract.json', 'node_modules']) {
+      for (const name of ['package.json', 'package-lock.json', 'historical-supply-profile.json', 'node_modules']) {
         cpSync(join(fixture, name), join(aliasWorkflow, name), { recursive: true, verbatimSymlinks: true });
       }
       const validAlias = aliasRun(mkdtempSync(join(temporary, 'alias-cache-')));

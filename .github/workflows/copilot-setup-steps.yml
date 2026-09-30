@@ -6,6 +6,7 @@ on:
     branches:
       - "**"
     paths:
+      - .github/workflows/ci-toolchain.json
       - .github/workflows/.npmrc
       - .github/workflows/copilot-setup-steps.yml
       - .github/workflows/npm-shrinkwrap.json
@@ -18,6 +19,7 @@ on:
       - package-lock.json
   pull_request:
     paths:
+      - .github/workflows/ci-toolchain.json
       - .github/workflows/.npmrc
       - .github/workflows/copilot-setup-steps.yml
       - .github/workflows/npm-shrinkwrap.json
@@ -290,13 +292,26 @@ jobs:
               -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
               throw 'credential-policy: a token was projected into a code job'
           }
-          $strVersion = '24.18.0'
-          $strReviewedSha256 = '55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742'
           if ($env:TOOLCHAIN_LAYOUT -ceq 'legacy') {
               $strVersion = '20.20.2'
               $strReviewedSha256 = 'DF770B2A6F130ED8627C9782C988FDA9669FA23898329A61A871E32F965E007D'
-          } elseif (-not [string]::IsNullOrEmpty($env:TOOLCHAIN_LAYOUT) -and
-              $env:TOOLCHAIN_LAYOUT -cne 'modern') {
+          } elseif ($env:TOOLCHAIN_LAYOUT -ceq 'modern') {
+              if (Test-Path -LiteralPath '.github/workflows/ci-toolchain.json') {
+                  $objRuntimePin = Get-Content -Raw -LiteralPath '.github/workflows/ci-toolchain.json' | ConvertFrom-Json -ErrorAction Stop
+                  $strVersion = $objRuntimePin.node
+                  $strReviewedSha256 = $objRuntimePin.linuxX64Sha256.ToUpperInvariant()
+              } else {
+                  # Preserve service setup for published branches from before the shared declaration.
+                  $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop
+                  if ($objPackage.engines.node -cne '24.18.0') { throw 'toolchain: a current runtime declaration is required' }
+                  $strVersion = '24.18.0'
+                  $strReviewedSha256 = '55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742'
+              }
+              if ($strVersion -cnotmatch '^24\.[0-9]+\.[0-9]+$' -or
+                  $strReviewedSha256 -cnotmatch '^[A-F0-9]{64}$') {
+                  throw 'toolchain: the reviewed runtime declaration is invalid'
+              }
+          } else {
               throw 'toolchain: unsupported validation-tool layout'
           }
           $strNodeRoot = [IO.Path]::Combine($env:RUNNER_TEMP, 'agent-validation-node')

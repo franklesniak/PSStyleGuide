@@ -5,7 +5,7 @@
 
 - **Status:** Accepted
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-09-21
+- **Last Updated:** 2026-09-30
 - **Scope:** Records the accepted limitation on automatic offline verification of supply-freeze baseline provenance, the separate manual verification method, and reconsideration conditions. Does not redefine enforcement of current reviewed bytes.
 
 ## Date
@@ -17,7 +17,11 @@ Accepted by Frank Lesniak, PSStyleGuide repository owner.
 This records a deliberate acceptance so the question is settled rather than rediscovered.
 If the review triggers in the last section fire, reopen it.
 
-## Context
+## Current application
+
+The September 30 cleanup moves the unchanged `supplyFreeze` assertions to [the historical profile](../../.github/workflows/historical-supply-profile.json). The [manual procedure](../P1-SUPPLY-FREEZE-v1.md#verify-historical-git-provenance-separately) reads that file. Historical equality is no longer an active workflow or ordinary dependency-update requirement. The current installer uses reviewed lockfiles and authenticates its runtime and parser before execution. The following implementation descriptions record the earlier freeze design; they do not restore those removed gates. The decision to keep historical Git verification separate remains applicable.
+
+## Historical context
 
 `workflow-policy-contract.json` contains a `supplyFreeze.baseline` object recording what
 `package.json` and `package-lock.json` looked like on `main` before the dependency change,
@@ -77,7 +81,7 @@ with `fetch-depth: 1`, where the historical object need not be present at all.
 
 An incorrect value can now be detected by that explicit manual procedure. It remains outside the offline validator and CI. A recorder observation alone does not establish historical provenance.
 
-## Consequences
+## Historical consequences
 
 | Question | Answer |
 | --- | --- |

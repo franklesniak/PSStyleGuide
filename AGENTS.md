@@ -1,13 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # Agent Instructions for OpenAI Codex CLI
 
-**Version:** 1.6.20260907.0
+**Version:** 1.7.20260930.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-09-07
+- **Last Updated:** 2026-09-30
 - **Scope:** Agent-specific entry point for OpenAI Codex CLI and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
 <!-- template-sync: begin markdown-reference-only -->
 - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
@@ -111,6 +111,8 @@ This workflow adapts the Claude-targeted process documented in `CLAUDE.md` for C
 
 For each finding received from GitHub Copilot (`copilot-pull-request-reviewer[bot]`), remote Codex (`chatgpt-codex-connector[bot]`), a human reviewer, or any other reviewer, follow these steps. Process every reviewer identically and address findings one at a time.
 
+Apply the full decision process once per distinct confirmed finding, using affected stakeholders. Link duplicate reports to that decision after checking its evidence. Do not repeat a rubric for its mechanical implementation. Keep one complete record. Reuse scoped owner grants until revoked or exceeded. A new commit requires current review, not new permission. During an authorized outage, use the approved substitute. Keep failed-service and substitute results distinct. Preserve pending-request checks, retry limits, finding resolution and final independent quality review.
+
 Review feedback has two co-equal surfaces. Inspect both in every round and whole-PR audit:
 
 1. **Inline threads.** Enumerate the complete resolved-plus-unresolved GraphQL `reviewThreads` connection. Use `isResolved == false` only for open work. Do not inventory by REST `commit_id == <round-head>` because GitHub can re-anchor mutable `commit_id`; retain original commit fields only as provenance.
@@ -150,7 +152,7 @@ These terms are the operative protected-file authorization contract for the revi
 
     **PAUSE** processing of this comment until the owner responds. Continue processing other independent review comments in the meantime.
 
-6. **Post the evaluation.** Reply to an inline thread. For a body-only finding, post a PR comment with its synthetic key, review, commit, and location. Include options, weighted rubric, scores, ASD-STE100 selection, references, tests, and implementation status or SHA. Before posting, verify that all required artifacts are present. End public adjudication with `Generated with Codex`. Prefer the plugin; use `gh` only for a missing capability.
+6. **Post the evaluation.** Reply to an inline thread. For a body-only finding, post a PR comment with its synthetic key, review, commit, and location. Include or link to the complete options, weighted rubric, scores, ASD-STE100 selection, references, tests, and implementation status or SHA. Before posting, verify that all required artifacts are present. End public adjudication with `Generated with Codex`. Prefer the plugin; use `gh` only for a missing capability.
 
 7. **Implement the fix.** Apply the selected option locally, commit, and push to the agent's working branch using local `git`.
 
@@ -214,7 +216,7 @@ References: [GitHub Copilot code-review effort levels](https://docs.github.com/e
 
 When the owner asks for multiple rounds, use Copilot and remote Codex as co-equal reviewers while the local session stays active; never present the loop as autonomous.
 
-1. **Gate readiness.** Verify fix commits on the PR head; synchronize the PR body with current head, tree, versions, identities, commands, and results; read head and body back through an authenticated API.
+1. **Gate readiness.** Verify fix commits on the PR head. Keep the PR body's scope, behavior, risks, commands, and results accurate. Read current head and base identities from authenticated GitHub and Git data. Do not require a generated identity block or copy file release labels into the body. Recheck any identity the body does claim.
 2. **Baseline and request.** Per bot, record newest review, inline-comment, and PR-comment IDs and times plus head SHA. Request Copilot through the plugin or fallback. Post exact `@codex review`, read it back, and record its ID; do not rely on auto-review.
 3. **Poll.** At intervals of at least 60 seconds, paginate authenticated review bodies, `reviewThreads`, and PR comments. Arrival requires a post-baseline event anchored to the recorded head. Stale, failed, or indeterminate observations do not count.
 4. **Inventory.** Reconcile all declared counts, "generated N comment(s)", native thread IDs, and synthetic keys across both surfaces; `isResolved == false` selects only open work.
