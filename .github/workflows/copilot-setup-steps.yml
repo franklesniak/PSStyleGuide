@@ -6,6 +6,7 @@ on:
     branches:
       - "**"
     paths:
+      - .github/workflows/ci-toolchain.json
       - .github/workflows/.npmrc
       - .github/workflows/copilot-setup-steps.yml
       - .github/workflows/npm-shrinkwrap.json
@@ -18,6 +19,7 @@ on:
       - package-lock.json
   pull_request:
     paths:
+      - .github/workflows/ci-toolchain.json
       - .github/workflows/.npmrc
       - .github/workflows/copilot-setup-steps.yml
       - .github/workflows/npm-shrinkwrap.json
@@ -298,13 +300,29 @@ jobs:
               -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
               throw 'credential-policy: a token was projected into a code job'
           }
-          $strVersion = '24.18.0'
-          $strReviewedSha256 = '55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742'
+          $strDigestSource = 'copilot-setup-steps.yml retained runtime digest'
           if ($env:TOOLCHAIN_LAYOUT -ceq 'legacy') {
               $strVersion = '20.20.2'
               $strReviewedSha256 = 'DF770B2A6F130ED8627C9782C988FDA9669FA23898329A61A871E32F965E007D'
-          } elseif (-not [string]::IsNullOrEmpty($env:TOOLCHAIN_LAYOUT) -and
-              $env:TOOLCHAIN_LAYOUT -cne 'modern') {
+          } elseif ($env:TOOLCHAIN_LAYOUT -ceq 'modern') {
+              if (Test-Path -LiteralPath '.github/workflows/ci-toolchain.json') {
+                  $objRuntimePin = Get-Content -Raw -LiteralPath '.github/workflows/ci-toolchain.json' | ConvertFrom-Json -ErrorAction Stop
+                  $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop
+                  $strVersion = $objPackage.engines.node
+                  $strReviewedSha256 = $objRuntimePin.linuxX64Sha256.ToUpperInvariant()
+                  $strDigestSource = 'package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256'
+              } else {
+                  # Preserve service setup for published branches from before the shared declaration.
+                  $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop
+                  if ($objPackage.engines.node -cne '24.18.0') { throw 'toolchain: a current runtime declaration is required' }
+                  $strVersion = '24.18.0'
+                  $strReviewedSha256 = '55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742'
+              }
+              if ($strVersion -cnotmatch '^24\.[0-9]+\.[0-9]+$' -or
+                  $strReviewedSha256 -cnotmatch '^[A-F0-9]{64}$') {
+                  throw 'toolchain: the reviewed runtime declaration is invalid'
+              }
+          } else {
               throw 'toolchain: unsupported validation-tool layout'
           }
           $strNodeRoot = [IO.Path]::Combine($env:RUNNER_TEMP, 'agent-validation-node')
@@ -323,7 +341,7 @@ jobs:
           & $strCurlPath --silent --show-error --fail --location --proto '=https' --proto-redir '=https' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl
           if ($LASTEXITCODE -ne 0) { throw "toolchain: download exited $LASTEXITCODE" }
           if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash -cne $strReviewedSha256) {
-              throw 'toolchain: official Node archive does not match the reviewed digest'
+              throw "toolchain: official Node archive does not match the reviewed digest for $strUrl. Check $strDigestSource. Verify the official release checksum before changing the declaration."
           }
           [void][IO.Directory]::CreateDirectory($strNodeRoot)
           & $strTarPath -xJf $strArchive -C $strNodeRoot --strip-components=1
@@ -364,6 +382,10 @@ jobs:
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          # Each step is a fresh process; remove inherited npm override aliases.
+          while IFS= read -r variable; do
+            if [[ "${variable,,}" == npm_config_* ]]; then unset "${variable}"; fi
+          done < <(compgen -e)
           export npm_config_userconfig=/dev/null
           export npm_config_globalconfig=/etc/npmrc-absent-by-policy
           if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
@@ -401,6 +423,17 @@ jobs:
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          # Each step is a fresh process; remove inherited npm override aliases.
+          while IFS= read -r variable; do
+            if [[ "${variable,,}" == npm_config_* ]]; then unset "${variable}"; fi
+          done < <(compgen -e)
+          export npm_config_userconfig=/dev/null
+          export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
+            -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
+            echo '::error::Unexpected package-manager configuration source.'
+            exit 1
+          fi
           if [[ "${TOOLCHAIN_LAYOUT}" == modern ]]; then
             npm ci --ignore-scripts --no-audit --fund=false --include=dev
           elif [[ "${TOOLCHAIN_LAYOUT}" != legacy ]]; then
@@ -426,6 +459,17 @@ jobs:
             exit 1
           fi
           export GIT_CONFIG_NOSYSTEM=1 GIT_CONFIG_GLOBAL=/dev/null GIT_TERMINAL_PROMPT=0
+          # Each step is a fresh process; remove inherited npm override aliases.
+          while IFS= read -r variable; do
+            if [[ "${variable,,}" == npm_config_* ]]; then unset "${variable}"; fi
+          done < <(compgen -e)
+          export npm_config_userconfig=/dev/null
+          export npm_config_globalconfig=/etc/npmrc-absent-by-policy
+          if [[ ! -c "${npm_config_userconfig}" || -s "${npm_config_userconfig}" ||
+            -e "${npm_config_globalconfig}" || -L "${npm_config_globalconfig}" ]]; then
+            echo '::error::Unexpected package-manager configuration source.'
+            exit 1
+          fi
           if [[ "${TOOLCHAIN_LAYOUT}" == modern ]]; then
             npm ls --all
             immutable_inputs=(

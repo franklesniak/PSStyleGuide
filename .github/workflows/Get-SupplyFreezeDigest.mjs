@@ -4396,7 +4396,7 @@ const objPackageBefore = snapshotOrRefuse(strPackagePath);
 const objLockBefore = snapshotOrRefuse(strLockPath);
 const strPackageJsonBefore = decodeUtf8ExactlyOrRefuse(
   objPackageBefore, 'package manifest', 4);
-const strContractPath = join(strWorkflowDirectory, 'workflow-policy-contract.json');
+const strContractPath = join(strWorkflowDirectory, 'historical-supply-profile.json');
 const objContractBefore = snapshotContractOrRefuse(strContractPath);
 function contractIdentityOrRefuse() {
   try { return lstatSync(strContractPath, { bigint: true }); } catch {
