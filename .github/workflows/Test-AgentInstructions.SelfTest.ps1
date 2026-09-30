@@ -30,7 +30,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.6.20260929.0
+# Version: 1.6.20260930.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -151,9 +151,12 @@ if ([regex]::Matches($strCapacityAuthorizer,
 # conservatively flag substitutions in array prefixes that Bash ignores.
 # Before the first literal npm, active legacy backtick substitutions fail closed;
 # comments, single-quoted data and escaped literal backticks remain data.
-# It does not model redirection grammar, wrapper options, other languages,
-# path-qualified executables, aliases/functions, variable values, ANSI-C quoting,
-# eval, here-documents, ambiguous arithmetic fallback, or arbitrary Bash.
+# It does not resolve external wrapper commands (including quoted or escaped
+# external time, env and timeout) or their options. It does not model array-literal
+# or case-pattern grammar; bracketed assignment prefixes do not imply array data
+# parsing. Other non-goals are redirections, other languages, path-qualified
+# executables, aliases/functions, variable values, ANSI-C quoting, eval,
+# here-documents, ambiguous arithmetic fallback, and arbitrary Bash.
 $scriptblockFindLiteralNpmCommand = {
     param([Parameter(Mandatory)][AllowEmptyString()][string] $Text)
     if ($Text.Length -gt 131072) { throw 'The literal Bash fixture exceeds its bound.' }
@@ -637,9 +640,18 @@ $scriptblockGetAgentSupplyFailure = {
         $intPublishedValidation -le $intBaseFetch) {
         Write-Output 'PR base data must be available before authorization and published validation.'
     }
+    $intHeadFetch = $WorkflowContent.IndexOf($strPullRequestHeadFetch,
+        [StringComparison]::Ordinal)
+    $intParserManifest = $WorkflowContent.IndexOf(
+        '      - name: Validate parser manifests as inert data',
+        [StringComparison]::Ordinal)
+    if ($intHeadFetch -lt 0 -or $intParserManifest -le $intHeadFetch) {
+        Write-Output 'PR head data must be available before parser-manifest validation.'
+    }
 }
 
-# These are lexical controls, not execution of candidate shell text.
+# These are lexical controls, not execution of candidate shell text. A benign
+# control means no match in the declared finite scope, not proof of no execution.
 $arrBadNpmSyntax = @('npm --version', 'true && npm --version', 'printf x | npm --version',
     'true || npm --version', 'true; npm --version', 'test "$(npm --version)" = 1',
     'value=$(npm --version)', 'if npm --version; then true; fi', 'command npm --version',
@@ -905,28 +917,28 @@ $scriptblockSetSupplyStepMutation = {
 }
 
 $arrSupplyMutations = @(
-    @('checkout exit capture', '$intHeadExitCode = $LASTEXITCODE', '$intHeadExitCode = 0'),
-    @('checkout failure guard', 'if ($intHeadExitCode -ne 0)', 'if ($false)'),
-    @('checkout cardinality', 'if ($arrHeadOutput.Count -ne 1)', 'if ($false)'),
-    @('checkout identity', 'if ($strHead -cne $strSha)', 'if ($false)'),
-    @('runtime exit capture', '$intVersionExitCode = $LASTEXITCODE', '$intVersionExitCode = 0'),
-    @('runtime failure guard', 'if ($intVersionExitCode -ne 0)', 'if ($false)'),
-    @('runtime cardinality', 'if ($arrVersionOutput.Count -ne 1)', 'if ($false)'),
-    @('runtime identity', 'if ($strObservedVersion -cne "v$strVersion")', 'if ($false)'),
-    @('retry count', '--retry 3 ', ''),
-    @('retry errors', '--retry-all-errors ', ''),
-    @('connection bound', '--connect-timeout 20 ', ''),
-    @('transfer bound', '--max-time 120 ', ''),
-    @('retry bound', '--retry-max-time 300 ', ''),
-    @('user configuration', 'export npm_config_userconfig=/dev/null', 'export npm_config_userconfig=/tmp/npmrc'),
-    @('global configuration', 'export npm_config_globalconfig=/etc/npmrc-absent-by-policy', 'export npm_config_globalconfig=/tmp/npmrc'),
-    @('user configuration export', 'export npm_config_userconfig=', 'npm_config_userconfig='),
-    @('global configuration export', 'export npm_config_globalconfig=', 'npm_config_globalconfig='),
-    @('character device guard', '! -c "${npm_config_userconfig}"', '! -e "${npm_config_userconfig}"'),
-    @('empty device guard', ' || -s "${npm_config_userconfig}"', ''),
-    @('absent global guard', '-e "${npm_config_globalconfig}"', '-s "${npm_config_globalconfig}"'),
-    @('global symlink guard', ' || -L "${npm_config_globalconfig}"', ''),
-    @('configuration persistence', '>> "${GITHUB_ENV}"', '> /dev/null')
+    @('checkout exit capture', '$intHeadExitCode = $LASTEXITCODE', '$intHeadExitCode = 0', 'Agent workflow must preserve native checkout status and single-line identity.'),
+    @('checkout failure guard', 'if ($intHeadExitCode -ne 0)', 'if ($false)', 'Agent workflow must preserve native checkout status and single-line identity.'),
+    @('checkout cardinality', 'if ($arrHeadOutput.Count -ne 1)', 'if ($false)', 'Agent workflow must preserve native checkout status and single-line identity.'),
+    @('checkout identity', 'if ($strHead -cne $strSha)', 'if ($false)', 'Agent workflow must preserve native checkout status and single-line identity.'),
+    @('runtime exit capture', '$intVersionExitCode = $LASTEXITCODE', '$intVersionExitCode = 0', 'Agent workflow must preserve native runtime status and single-line identity.'),
+    @('runtime failure guard', 'if ($intVersionExitCode -ne 0)', 'if ($false)', 'Agent workflow must preserve native runtime status and single-line identity.'),
+    @('runtime cardinality', 'if ($arrVersionOutput.Count -ne 1)', 'if ($false)', 'Agent workflow must preserve native runtime status and single-line identity.'),
+    @('runtime identity', 'if ($strObservedVersion -cne "v$strVersion")', 'if ($false)', 'Agent workflow must preserve native runtime status and single-line identity.'),
+    @('retry count', '--retry 3 ', '', 'Agent workflow must use the bounded anonymous Node download.'),
+    @('retry errors', '--retry-all-errors ', '', 'Agent workflow must use the bounded anonymous Node download.'),
+    @('connection bound', '--connect-timeout 20 ', '', 'Agent workflow must use the bounded anonymous Node download.'),
+    @('transfer bound', '--max-time 120 ', '', 'Agent workflow must use the bounded anonymous Node download.'),
+    @('retry bound', '--retry-max-time 300 ', '', 'Agent workflow must use the bounded anonymous Node download.'),
+    @('user configuration', 'export npm_config_userconfig=/dev/null', 'export npm_config_userconfig=/tmp/npmrc', 'Agent workflow must isolate npm file configuration before its first npm invocation.'),
+    @('global configuration', 'export npm_config_globalconfig=/etc/npmrc-absent-by-policy', 'export npm_config_globalconfig=/tmp/npmrc', 'Agent workflow must isolate npm file configuration before its first npm invocation.'),
+    @('user configuration export', 'export npm_config_userconfig=', 'npm_config_userconfig=', 'Agent workflow must isolate npm file configuration before its first npm invocation.'),
+    @('global configuration export', 'export npm_config_globalconfig=', 'npm_config_globalconfig=', 'Agent workflow must isolate npm file configuration before its first npm invocation.'),
+    @('character device guard', '! -c "${npm_config_userconfig}"', '! -e "${npm_config_userconfig}"', 'Agent workflow must isolate npm file configuration before its first npm invocation.'),
+    @('empty device guard', ' || -s "${npm_config_userconfig}"', '', 'Agent workflow must isolate npm file configuration before its first npm invocation.'),
+    @('absent global guard', '-e "${npm_config_globalconfig}"', '-s "${npm_config_globalconfig}"', 'Agent workflow must isolate npm file configuration before its first npm invocation.'),
+    @('global symlink guard', ' || -L "${npm_config_globalconfig}"', '', 'Agent workflow must isolate npm file configuration before its first npm invocation.'),
+    @('configuration persistence', '>> "${GITHUB_ENV}"', '> /dev/null', 'Agent workflow must isolate npm file configuration before its first npm invocation.')
 )
 $intSupplyMutationCount = 0
 foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-steps.yml')) {
@@ -966,7 +978,7 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
             $arrSupplyMutation[1], $arrSupplyMutation[2])
         if ($strSupplyMutant -ceq $strSupplyWorkflowContent -or
             @(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
-                    -PullRequestRole $boolPullRequestRole).Count -eq 0) {
+                    -PullRequestRole $boolPullRequestRole) -cnotcontains $arrSupplyMutation[3]) {
             throw "$strSupplyWorkflowName did not reject $($arrSupplyMutation[0])."
         }
         $intSupplyMutationCount++
@@ -981,7 +993,8 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
             'duplicate' { $strSupplyWorkflowContent + $objProducer.Value }
         }
         if (@(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
-                    -PullRequestRole $boolPullRequestRole).Count -eq 0) {
+                    -PullRequestRole $boolPullRequestRole) -cnotcontains
+            'Agent workflow must isolate npm file configuration before its first npm invocation.') {
             throw "$strSupplyWorkflowName accepted a $strProducerMutation npm producer."
         }
         $intSupplyMutationCount++
@@ -1139,13 +1152,30 @@ foreach ($strSupplyWorkflowName in @('agent-instructions.yml', 'copilot-setup-st
         if (-not $objBaseStep.Success) { throw 'The PR-base step fixture is unavailable.' }
         $strSupplyMutant = $strSupplyWorkflowContent.Replace($objBaseStep.Value, '') + $objBaseStep.Value
         if (@(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
-                    -PullRequestRole $true).Count -eq 0) {
+                    -PullRequestRole $true) -cnotcontains
+            'PR base data must be available before authorization and published validation.') {
             throw 'A PR-base acquisition after its consumers was accepted.'
+        }
+        $intSupplyMutationCount++
+        $objHeadStep = [regex]::Match($strSupplyWorkflowContent,
+            '(?ms)^      - name: Fetch pull request head as data\n.*?(?=^      - name: |^  [a-z]|\z)')
+        if (-not $objHeadStep.Success) { throw 'The PR-head step fixture is unavailable.' }
+        $strSupplyMutant = $strSupplyWorkflowContent.Remove(
+            $objHeadStep.Index, $objHeadStep.Length)
+        $intAfterParser = $strSupplyMutant.IndexOf(
+            '      - name: Install locked validation dependencies',
+            [StringComparison]::Ordinal)
+        if ($intAfterParser -lt 0) { throw 'The parser-consumer successor is unavailable.' }
+        $strSupplyMutant = $strSupplyMutant.Insert($intAfterParser, $objHeadStep.Value)
+        if (@(& $scriptblockGetAgentSupplyFailure -WorkflowContent $strSupplyMutant `
+                    -PullRequestRole $true) -cnotcontains
+            'PR head data must be available before parser-manifest validation.') {
+            throw 'A PR-head acquisition after its first consumer was accepted.'
         }
         $intSupplyMutationCount++
     }
 }
-if ($intSupplyMutationCount -ne 543) { throw 'The U1 supply mutation census is incomplete.' }
+if ($intSupplyMutationCount -ne 544) { throw 'The U1 supply mutation census is incomplete.' }
 if ($intSupplyBoundaryCount -ne 10) { throw 'The U1 boundary-control census is incomplete.' }
 
 # These input-reader fixtures need no candidate code or parent-scope mutation.
