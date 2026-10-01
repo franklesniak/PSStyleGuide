@@ -345,7 +345,7 @@
       "category": "helper-call"
     },
     {
-      "name": "rejects instruction dependency overhead in lint job",
+      "name": "rejects omitted workflow dependencies in the lint and audit job",
       "workflow": "markdownlint.yml",
       "path": [
         "jobs",
@@ -413,6 +413,155 @@
       "operation": "set",
       "value": "false",
       "category": "code-step-shape"
+    },
+    {
+      "name": "rejects missing audit failure propagation",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "markdownlint",
+        "steps",
+        4,
+        "run"
+      ],
+      "operation": "set",
+      "value": "& node ./.github/workflows/Check-NpmAudit.mjs",
+      "category": "helper-call"
+    },
+    {
+      "name": "rejects audit that ignores native findings",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "markdownlint",
+        "steps",
+        4,
+        "run"
+      ],
+      "operation": "set",
+      "value": "& node ./.github/workflows/Check-NpmAudit.mjs --ci\nWrite-Output 'ok'",
+      "category": "native-failure-check"
+    },
+    {
+      "name": "rejects missing weekly audit schedule",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "on",
+        "schedule"
+      ],
+      "operation": "delete",
+      "category": "workflow-events"
+    },
+    {
+      "name": "rejects duplicate weekly audit schedules",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "on",
+        "schedule"
+      ],
+      "operation": "set",
+      "category": "workflow-events",
+      "value": [
+        {
+          "cron": "17 6 * * 1"
+        },
+        {
+          "cron": "30 8 * * 2"
+        }
+      ]
+    },
+    {
+      "name": "rejects build schedule",
+      "workflow": "build.yml",
+      "path": [
+        "on",
+        "schedule"
+      ],
+      "operation": "set",
+      "category": "workflow-events",
+      "value": [
+        {
+          "cron": "17 6 * * 1"
+        }
+      ]
+    },
+    {
+      "name": "rejects audit schedule field count",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "on",
+        "schedule",
+        0,
+        "cron"
+      ],
+      "operation": "set",
+      "value": "17 6 * * 1 0",
+      "category": "workflow-events"
+    },
+    {
+      "name": "rejects audit schedule minute range",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "on",
+        "schedule",
+        0,
+        "cron"
+      ],
+      "operation": "set",
+      "value": "60 6 * * 1",
+      "category": "workflow-events"
+    },
+    {
+      "name": "rejects audit schedule hour range",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "on",
+        "schedule",
+        0,
+        "cron"
+      ],
+      "operation": "set",
+      "value": "17 24 * * 1",
+      "category": "workflow-events"
+    },
+    {
+      "name": "rejects audit schedule weekday range",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "on",
+        "schedule",
+        0,
+        "cron"
+      ],
+      "operation": "set",
+      "value": "17 6 * * 7",
+      "category": "workflow-events"
+    },
+    {
+      "name": "rejects audit schedule daily cadence",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "on",
+        "schedule",
+        0,
+        "cron"
+      ],
+      "operation": "set",
+      "value": "17 6 * * *",
+      "category": "workflow-events"
+    },
+    {
+      "name": "rejects audit schedule monthly day",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "on",
+        "schedule",
+        0,
+        "cron"
+      ],
+      "operation": "set",
+      "value": "17 6 3 * 1",
+      "category": "workflow-events"
     }
   ]
 }

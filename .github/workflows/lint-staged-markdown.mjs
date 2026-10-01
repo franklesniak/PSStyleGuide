@@ -2,11 +2,11 @@ import { spawnSync } from 'node:child_process';
 import { dirname, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const requiredNodeMajor = 20;
+const requiredNodeMajor = 22;
 const currentNodeMajor = Number(process.versions.node.split('.')[0]);
 
 if (!Number.isInteger(currentNodeMajor) || currentNodeMajor < requiredNodeMajor) {
-  console.error('pre-commit: Node.js 20 or newer is required to lint staged Markdown.');
+  console.error('pre-commit: Node.js 22 or newer is required to lint staged Markdown.');
   console.error(`Current version: ${process.version || 'unknown'}`);
   console.error('If you use a Node version manager with a GUI Git client, add its initialization to');
   console.error('~/.config/husky/init.sh, which Husky sources before running hooks.');
@@ -90,7 +90,7 @@ try {
 } catch (error) {
   console.error(error);
   console.error('pre-commit: Markdown lint tooling failed to run.');
-  console.error('Try reinstalling dev dependencies: npm --prefix .github/workflows ci');
+  console.error('Rebuild the locked tools: node .github/workflows/NpmTools.mjs install');
   process.exit(2);
 }
 

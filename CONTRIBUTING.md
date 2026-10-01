@@ -62,6 +62,8 @@ Consumer-facing style guide files must not cross-reference other files in this r
 
 ## Proposing changes
 
+Use the [dependency setup and checks](docs/dependency-maintenance.md) to install the locked tools and local Markdown hook before validation.
+
 When proposing a change:
 
 1. Determine whether your content is normative (belongs in `STYLE_GUIDE.md`) or explanatory (belongs in `STYLE_GUIDE_RATIONALE.md`).

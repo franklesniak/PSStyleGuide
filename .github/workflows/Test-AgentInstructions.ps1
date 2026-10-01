@@ -3402,7 +3402,7 @@ function Get-MarkdownParserBootstrapFailure {
     if (-not (Test-Path -LiteralPath $strMarkdownParserPath -PathType Leaf)) {
         Write-Output (
             'Locked Node.js dependencies are missing. Run ' +
-            '`npm run bootstrap:agent-instructions` before pre-commit validation.'
+            '`node .github/workflows/NpmTools.mjs install` before pre-commit validation.'
         )
     }
 }
@@ -6192,7 +6192,7 @@ if ($SelfTest) {
             -RepositoryRootPath $strMissingBootstrapFixture)
     if ($arrMissingBootstrapFailures.Count -ne 1 -or
         -not $arrMissingBootstrapFailures[0].Contains(
-            'npm run bootstrap:agent-instructions',
+            'node .github/workflows/NpmTools.mjs install',
             [StringComparison]::Ordinal
         )) {
         throw 'The node_modules-absent bootstrap fixture did not fail actionably.'
