@@ -12,7 +12,7 @@ The complete style guide is available in [STYLE_GUIDE.md](STYLE_GUIDE.md). Exten
 
 ### Generated Versions
 
-For convenience, this repository automatically generates four additional versions of the style guide:
+For convenience, this repository provides four generated versions of the style guide:
 
 - **[copilot-instructions.md](copilot-instructions.md)** - For GitHub Copilot custom instructions in repositories that contain exclusively PowerShell code. Copy this file to your repository's `.github` folder as `.github/copilot-instructions.md` to enable Copilot to follow these conventions when generating code across your entire PowerShell project.
 
@@ -24,7 +24,7 @@ For convenience, this repository automatically generates four additional version
 
 These files are generated from [STYLE_GUIDE.md](STYLE_GUIDE.md) and [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md). When you change either source, [regenerate the artifacts and commit them in the same pull request](CONTRIBUTING.md#regenerate-and-publish-the-style-guide-artifacts). The [build workflow](.github/workflows/build.yml) rejects generated files that do not match their sources. After that check passes, a separate read-only job uploads the four committed files from the triggering revision without running the generator. CI does not commit changes to the repository.
 
-Pull-request artifacts are previews, not proof of completed review. Artifacts from a push to `main` contain that run's landed committed files; use the run's repository, event, and commit identity together with the applicable pull-request review and merge record to identify accepted output. Upload success alone does not prove review or merge acceptance.
+Pull-request artifacts are previews from the pull request's merge revision, not proof of completed review. Artifacts from a push to `main` contain that run's landed committed files; use the run's repository, event, and commit identity together with the applicable pull-request review and merge record to identify accepted output. Upload success alone does not prove review or merge acceptance.
 
 ### Table of Contents
 
