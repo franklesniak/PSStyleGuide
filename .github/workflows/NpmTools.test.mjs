@@ -87,3 +87,68 @@ test('real bundled npm version runs with isolated configuration and temporary fi
     assert.throws(() => withNpmEnvironment(() => { throw new Error('test callback failure'); }, { root }), /test callback failure/u);
   } finally { removeFixture(root); }
 });
+
+test('runtime errors distinguish invalid declarations and required versus observed versions', () => {
+  const root = inputFixture();
+  const manifest = path.join(root, 'package.json');
+  try {
+    fs.writeFileSync(manifest, '{}');
+    assert.throws(() => withNpmEnvironment(() => {}, { root }), /must declare exact Node and npm/u);
+    fs.writeFileSync(manifest, JSON.stringify({ engines: { node: '0.0.0', npm: '11.16.0' } }));
+    assert.throws(() => withNpmEnvironment(() => {}, { root }), error =>
+      error.message === `Node 0.0.0 is required; observed ${process.versions.node}.`);
+    fs.writeFileSync(manifest, JSON.stringify({ engines: { node: process.versions.node, npm: '0.0.0' } }));
+    assert.throws(() => withNpmEnvironment(() => {}, { root }), /Bundled npm 0\.0\.0 is required; observed "11\.16\.0"/u);
+  } finally { removeFixture(root); }
+});
+
+function emptyInstallFixture() {
+  const root = inputFixture();
+  for (const directory of [root, path.join(root, '.github/workflows')]) {
+    const manifest = { name: 'setup-diagnostic-fixture', version: '1.0.0',
+      engines: { node: process.versions.node, npm: '11.16.0' } };
+    fs.writeFileSync(path.join(directory, 'package.json'), JSON.stringify(manifest));
+    fs.writeFileSync(path.join(directory, 'package-lock.json'), JSON.stringify({ ...manifest,
+      lockfileVersion: 3, requires: true, packages: { '': manifest } }));
+  }
+  return root;
+}
+
+function runBootstrap(root) {
+  const source = `import { bootstrap } from ${JSON.stringify(new URL('./NpmTools.mjs', import.meta.url).href)};
+    try { bootstrap({ root: ${JSON.stringify(root)} }); }
+    catch (error) { console.error(error.message); process.exitCode = 2; }`;
+  return runBounded(process.execPath, ['--input-type=module', '-e', source], { cwd: root });
+}
+
+test('actual stale-lock installation exposes npm cause and does not claim setup success', () => {
+  const root = emptyInstallFixture();
+  try {
+    const file = path.join(root, 'package.json');
+    const manifest = JSON.parse(fs.readFileSync(file, 'utf8'));
+    manifest.dependencies = { 'local-diagnostic-fixture': 'file:./local-package' };
+    fs.mkdirSync(path.join(root, 'local-package'));
+    fs.writeFileSync(path.join(root, 'local-package/package.json'), JSON.stringify({ name: 'local-diagnostic-fixture', version: '1.0.0' }));
+    fs.writeFileSync(file, JSON.stringify(manifest));
+    const result = runBootstrap(root);
+    assert.equal(result.status, 2);
+    const stderr = result.stderr.toString();
+    assert.match(stderr, /EUSAGE/u);
+    assert.match(stderr, /Missing: local-diagnostic-fixture/u);
+    assert.match(stderr, /Correct the reported cause/u);
+    assert.doesNotMatch(result.stdout.toString(), /Locked tools installed/u);
+  } finally { removeFixture(root); }
+});
+
+test('actual hook child failure exposes stderr and cannot claim setup success', () => {
+  const root = emptyInstallFixture();
+  try {
+    // Both empty locked installs succeed; the deliberately absent hook entry fails in Node.
+    const result = runBootstrap(root);
+    assert.equal(result.status, 2);
+    assert.match(result.stderr.toString(), /MODULE_NOT_FOUND/u);
+    assert.match(result.stderr.toString(), /install-husky\.mjs/u);
+    assert.match(result.stderr.toString(), /Hook installation failed/u);
+    assert.doesNotMatch(result.stdout.toString(), /Locked tools installed/u);
+  } finally { removeFixture(root); }
+});

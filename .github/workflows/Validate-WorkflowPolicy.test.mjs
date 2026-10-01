@@ -56,6 +56,14 @@ test('labels, comments, CRLF, whitespace and literal call quoting are harmless',
   validateWorkflowObject('markdownlint.yml', value, contract);
 });
 
+test('weekly audit can move to another valid time without a policy edit', () => {
+  const value = clone(fixtures['markdownlint.yml']);
+  for (const cron of ['0 0 * * 0', '59 23 * * 6', '35  12 * * 4']) {
+    value.on.schedule = [{ cron }];
+    validateWorkflowObject('markdownlint.yml', value, contract);
+  }
+});
+
 const cases = JSON.parse(fs.readFileSync(path.join(directory, 'workflow-policy-cases.json'), 'utf8'));
 assert.equal(cases.schema, 'PSStyleGuide.WorkflowPolicyCases.v2');
 assert.ok(Array.isArray(cases.cases) && cases.cases.length > 0, 'Workflow mutation catalog must contain cases.');

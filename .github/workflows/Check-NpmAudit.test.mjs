@@ -35,7 +35,8 @@ test('CI skips only a complete ordinary-document change, including modes and bot
     '.github/workflows/npm-risk-exceptions.json', '.github/workflows/Check-NpmAudit.mjs', '.github/workflows/markdownlint.yml',
     '.github/workflows/ci-toolchain.json', '.npmrc', '.markdownlint.json', '.pre-commit-config.yaml', '.husky/pre-commit',
     'AGENTS.md', 'tools/AGENTS.override.md', 'AGENTS.override.md', 'docs/GEMINI.md', 'GEMINI.md',
-    'docs/CLAUDE.md', 'CLAUDE.local.md', 'docs/SKILL.md', '.github/notes.md', 'docs/.hidden/note.md', 'tool.js']) {
+    'docs/CLAUDE.md', 'CLAUDE.local.md', 'docs/SKILL.md', 'copilot-instructions.md', 'powershell.instructions.md',
+    'docs/terraform.instructions.md', '.github/notes.md', 'docs/.hidden/note.md', 'tool.js']) {
     assert.equal(documentationOnlyDiff(Buffer.from(docs + raw(name))), false, name);
   }
   for (const mode of ['100755', '120000', '160000']) {

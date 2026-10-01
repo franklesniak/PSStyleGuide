@@ -61,8 +61,12 @@ export function checkInstallInputs(root) {
 export function withNpmEnvironment(callback, { root = repositoryRoot, environment = process.env } = {}) {
   const inputs = checkInstallInputs(root);
   const engines = JSON.parse(inputs.get('package.json')).engines;
-  if (!engines || !/^\d+\.\d+\.\d+$/u.test(engines.node) || !/^\d+\.\d+\.\d+$/u.test(engines.npm) ||
-      process.versions.node !== engines.node) throw new Error('Use the Node version declared in root package.json.');
+  if (!engines || !/^\d+\.\d+\.\d+$/u.test(engines.node) || !/^\d+\.\d+\.\d+$/u.test(engines.npm)) {
+    throw new Error('Root package.json must declare exact Node and npm versions in engines.');
+  }
+  if (process.versions.node !== engines.node) {
+    throw new Error(`Node ${engines.node} is required; observed ${process.versions.node}.`);
+  }
   const executableDirectory = path.dirname(process.execPath);
   const npm = path.resolve(executableDirectory, process.platform === 'win32'
     ? 'node_modules/npm/bin/npm-cli.js' : '../lib/node_modules/npm/bin/npm-cli.js');
@@ -76,8 +80,14 @@ export function withNpmEnvironment(callback, { root = repositoryRoot, environmen
       cwd: directory, env, timeout: args[0] === 'ci' ? 600000 : processLimits.timeout,
     });
     const version = runNpm(['--version']);
-    if (version.status !== 0 || version.stdout.toString('utf8').trim() !== engines.npm) {
-      throw new Error('Use the bundled npm version declared in root package.json.');
+    if (version.status !== 0) {
+      if (version.stdout.length) process.stdout.write(version.stdout);
+      if (version.stderr.length) process.stderr.write(version.stderr);
+      throw new Error(`Could not read the bundled npm version (exit ${version.status}); npm ${engines.npm} is required.`);
+    }
+    const observed = version.stdout.toString('utf8').trim();
+    if (observed !== engines.npm) {
+      throw new Error(`Bundled npm ${engines.npm} is required; observed ${JSON.stringify(observed)}.`);
     }
     const value = callback({ runNpm, env, root });
     for (const [name, before] of inputs) {
@@ -98,13 +108,18 @@ export function bootstrap(options) {
     for (const directory of [root, path.join(root, '.github/workflows')]) {
       try {
         const result = runNpm(['ci', '--ignore-scripts', '--no-audit', '--fund=false', '--include=dev', '--package-lock=true'], directory);
-        if (result.status !== 0) throw new Error(`Locked installation failed (exit ${result.status}).`);
+        if (result.status !== 0) {
+          if (result.stdout.length) process.stdout.write(result.stdout);
+          if (result.stderr.length) process.stderr.write(result.stderr);
+          throw new Error(`Locked installation failed (exit ${result.status}).`);
+        }
       } catch (error) {
-        throw new Error(`${path.relative(root, directory) || 'root'}: ${error.message} Setup is incomplete. Run the bootstrap again to rebuild the locked installed trees.`);
+        throw new Error(`${path.relative(root, directory) || 'root'}: ${error.message} Setup is incomplete. Correct the reported cause, then run the bootstrap again to rebuild the locked installed trees.`);
       }
     }
     const hook = runBounded(process.execPath, [path.join(root, '.github/workflows/install-husky.mjs')], { cwd: root, env });
     if (hook.stdout.length) process.stdout.write(hook.stdout);
+    if (hook.stderr.length) process.stderr.write(hook.stderr);
     if (hook.status !== 0) throw new Error(`Hook installation failed (exit ${hook.status}).`);
     console.log('Locked tools installed. The Husky installer completed or reported an applicable skip.');
   }, options);

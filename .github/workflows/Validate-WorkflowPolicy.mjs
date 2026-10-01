@@ -458,7 +458,8 @@ function validateWorkflowObject(fileName, workflow, contract) {
     const schedule = workflow.on?.schedule;
     if (!Array.isArray(schedule) || schedule.length !== 1) fail('workflow-events');
     expectExactKeys(schedule[0], ['cron'], 'workflow-events');
-    if (typeof schedule[0].cron !== 'string' || !/^[0-9*,/\- ]{9,128}$/u.test(schedule[0].cron)) fail('workflow-events');
+    const weekly = typeof schedule[0].cron === 'string' && /^(\d{1,2}) +(\d{1,2}) +\* +\* +([0-6])$/u.exec(schedule[0].cron);
+    if (!weekly || Number(weekly[1]) > 59 || Number(weekly[2]) > 23) fail('workflow-events');
     events.schedule = schedule;
   }
   expectDeepEqual(workflow.on, events, 'workflow-events');

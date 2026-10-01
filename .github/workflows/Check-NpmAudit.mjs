@@ -264,7 +264,8 @@ export function documentationOnlyDiff(bytes) {
     const parts = name.toLowerCase().split('/');
     documents &&= [entry[1], entry[2]].every(mode => ['000000', '100644'].includes(mode)) &&
       parts.every(part => !part.startsWith('.')) && parts.at(-1).endsWith('.md') &&
-      !['agents.md', 'agents.override.md', 'claude.md', 'claude.local.md', 'gemini.md', 'skill.md'].includes(parts.at(-1));
+      !parts.at(-1).endsWith('.instructions.md') &&
+      !['agents.md', 'agents.override.md', 'claude.md', 'claude.local.md', 'gemini.md', 'skill.md', 'copilot-instructions.md'].includes(parts.at(-1));
   }
   return documents;
 }
