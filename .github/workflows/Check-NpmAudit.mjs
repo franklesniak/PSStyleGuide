@@ -26,7 +26,10 @@ function readInput(file, limit) {
 export function parseJson(bytes, limit = 2 * 1024 * 1024) {
   let visit;
   try { ({ visit } = require('jsonc-parser')); }
-  catch { fail('Cannot load the audit parser. Run node .github/workflows/NpmTools.mjs install, then retry the audit.'); }
+  catch (error) {
+    const cause = `${error.code || error.name || 'Load error'}: ${error.message}`.slice(0, 1024);
+    fail(`Cannot load the audit parser (${cause}). Correct the reported cause, then run node .github/workflows/NpmTools.mjs install and retry the audit.`);
+  }
   if (bytes.length > limit) fail('JSON output exceeds the size limit.');
   const source = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
   if (source.charCodeAt(0) === 0xfeff) fail('JSON BOM is not supported.');
@@ -113,15 +116,23 @@ export function interpretAudit(result, root, lock) {
     if (value.metadata.vulnerabilities[severity] !== actualCounts[severity]) fail('Audit severity totals disagree with package summaries.');
   }
   if (value.metadata.vulnerabilities.total !== entries.length || result.status !== (entries.length ? 1 : 0)) fail('Audit native exit or total disagrees with its report.');
-  const scopes = new Map();
-  function advisoryScope(name, visiting = new Set()) {
-    if (!facts.has(name)) fail('Audit contains a dangling package reference.');
-    if (visiting.has(name)) fail('Audit contains a cyclic package reference.');
-    if (visiting.size >= 32) fail('Audit package references exceed the depth limit.');
-    if (scopes.has(name)) return scopes.get(name);
-    const next = new Set(visiting).add(name), item = facts.get(name);
-    const scope = new Set([...item.directAdvisories.map(a => a.id), ...item.viaPackages.flatMap(v => [...advisoryScope(v, next)])]);
-    scopes.set(name, scope);
+  function advisoryScope(name) {
+    const scope = new Set(), seen = new Set([name]), queue = [[name, 0]];
+    // npm package references can form cycles. Never cache a partly visited scope.
+    for (let index = 0; index < queue.length; index++) {
+      const [current, distance] = queue[index];
+      if (distance >= 32) fail('Audit package references exceed the depth limit.');
+      const item = facts.get(current);
+      for (const advisory of item.directAdvisories) scope.add(advisory.id);
+      for (const reference of item.viaPackages) {
+        if (!facts.has(reference)) fail('Audit contains a dangling package reference.');
+        if (!seen.has(reference)) {
+          seen.add(reference);
+          queue.push([reference, distance + 1]);
+        }
+      }
+    }
+    if (scope.size === 0) fail('Audit package has no reachable direct advisory.');
     return scope;
   }
   return [...facts.values()].map(item => ({ ...item, advisories: [...advisoryScope(item.package)].sort() }))
@@ -149,7 +160,7 @@ export function validateGraph(result, manifest, scope = '.') {
   if (result.error || result.signal) fail(`${context} command failed. ${stderr}`);
   let graph;
   try { graph = parseJson(result.stdout); }
-  catch (error) { fail(`${context} report is invalid: ${error.message} ${stderr}`); }
+  catch (error) { fail(`${context} report is invalid (exit ${result.status}): ${error.message} ${stderr}`); }
   const problems = Array.isArray(graph?.problems)
     ? graph.problems.filter(item => typeof item === 'string').slice(0, 5).map(item => item.slice(0, 4096)).join('; ') : '';
   const details = [problems, stderr].filter(Boolean).join('; ');

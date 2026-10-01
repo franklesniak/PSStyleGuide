@@ -24,6 +24,13 @@ test('bounded children preserve native nonzero status but reject launch, timeout
   assert.equal(runBounded(process.execPath, ['-e', 'process.exit(7)']).status, 7);
   assert.throws(() => runBounded(path.resolve('absent-node-command'), []), /Process failed/u);
   assert.throws(() => runBounded(process.execPath, ['-e', 'setInterval(()=>{},1000)'], { timeout: 100 }), /timed out after 0.1 seconds/u);
+  assert.throws(() => runBounded(process.execPath, ['-e', "const fs=require('fs');fs.writeSync(2,'native timeout cause');fs.writeSync(1,'x'.repeat(10000));setInterval(()=>{},1000)"], { timeout: 1000 }), error => {
+    assert.match(error.message, /timed out after 1 seconds/u);
+    assert.match(error.message, /native timeout cause/u);
+    assert.ok(error.message.length < 8300);
+    assert.doesNotMatch(error.message, /x{4097}/u);
+    return true;
+  });
   assert.throws(() => runBounded(process.execPath, ['-e', "process.stdout.write('x'.repeat(50000))"], { maxBuffer: 1024 }), /Process failed/u);
 });
 

@@ -7,7 +7,7 @@
 - **Last Updated:** 2026-10-01
 - **Scope:** Locked npm tools, the local Markdown hook, and current dependency-risk checks in PSStyleGuide.
 
-Use the Node and bundled npm versions declared in the root [package.json](../package.json). From the repository root, run:
+Setup and audit require the exact Node and bundled npm versions declared in the root [package.json](../package.json). If either version differs, install or select that Node distribution before retrying. Check `node --version` and `npm --version`. From the repository root, run:
 
 ```text
 node .github/workflows/NpmTools.mjs install

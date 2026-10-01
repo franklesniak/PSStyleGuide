@@ -153,7 +153,41 @@ test('package references preserve aggregate scope without inventing direct advis
   value.vulnerabilities.parent.via = ['missing'];
   assert.throws(() => interpretAudit(result(value), '.', lock), /dangling/u);
   value.vulnerabilities.parent.via = ['example']; value.vulnerabilities.example.via = ['parent'];
-  assert.throws(() => interpretAudit(result(value), '.', lock), /cyclic/u);
+  assert.throws(() => interpretAudit(result(value), '.', lock), /no reachable direct advisory/u);
+});
+
+test('native npm cycle shape preserves every reachable advisory and excludes unrelated scope', () => {
+  const yamlId = 'GHSA-r3ph-w7gj-g6xm', markdownId = 'GHSA-253c-mchw-3w2r';
+  const direct = (name, advisory) => ({ source: 1, name, severity: 'high', range: '<2.0.0',
+    url: `https://github.com/advisories/${advisory}` });
+  // The actual npm CLI/formatter cycle; irrelevant report fields are omitted.
+  const references = {
+    'js-yaml': [direct('js-yaml', yamlId)],
+    'markdown-it': [direct('markdown-it', markdownId)],
+    'markdownlint-cli2': ['markdownlint-cli2-formatter-default', 'js-yaml', 'markdown-it'],
+    'markdownlint-cli2-formatter-default': ['markdownlint-cli2'],
+    unrelated: [direct('unrelated', id)],
+  };
+  const graphLock = { packages: {} }, vulnerabilities = {};
+  for (const [name, via] of Object.entries(references)) {
+    graphLock.packages[`node_modules/${name}`] = { version: '1.0.0' };
+    vulnerabilities[name] = { name, severity: 'high', via, nodes: [`node_modules/${name}`] };
+  }
+  const value = { auditReportVersion: 2, vulnerabilities,
+    metadata: { vulnerabilities: { info: 0, low: 0, moderate: 0, high: 5, critical: 0, total: 5 } } };
+  for (const entries of [Object.entries(vulnerabilities), Object.entries(vulnerabilities).reverse()]) {
+    value.vulnerabilities = Object.fromEntries(entries);
+    const interpreted = interpretAudit(result(value), '.', graphLock);
+    for (const name of ['markdownlint-cli2', 'markdownlint-cli2-formatter-default']) {
+      const finding = interpreted.find(item => item.package === name);
+      assert.deepEqual(finding.advisories, [markdownId, yamlId]);
+      assert.deepEqual(finding.directAdvisories, []);
+      const exception = { ...grant, package: name, advisories: [markdownId, yamlId], nodes: finding.nodes };
+      assert.equal(evaluateFindings([finding], [exception], now).status, 'ACCEPTED_RISK');
+      assert.equal(evaluateFindings([finding], [{ ...exception, advisories: [yamlId] }], now).status, 'FINDINGS');
+    }
+    assert.deepEqual(interpreted.find(item => item.package === 'unrelated').advisories, [id]);
+  }
 });
 
 test('valid exception structure is canonical; malformed or duplicate scopes fail', () => {
@@ -236,13 +270,17 @@ test('graph failures name the root and retain short native causes without dumpin
     assert.doesNotMatch(error.message, /5:xxxx/u);
     return true;
   });
-  assert.throws(() => validateGraph({ status: 1, stdout: Buffer.from('truncated'), stderr: Buffer.from('native failure') }, manifest, '.'), /native failure/u);
+  assert.throws(() => validateGraph({ status: 17, stdout: Buffer.from('truncated'), stderr: Buffer.from('native failure') }, manifest, '.'), error => {
+    assert.match(error.message, /exit 17/u);
+    assert.match(error.message, /native failure/u);
+    return true;
+  });
 });
 
-test('actual CLI reports missing installed parser as ERROR with the bootstrap command', () => {
+test('actual CLI reports missing or malformed parser as ERROR with its cause and bootstrap command', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'npm-audit-missing-parser-'));
   const directory = path.join(root, '.github/workflows');
-  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^GIT_/iu.test(key)));
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:GIT_|NODE_PATH$)/iu.test(key)));
   Object.assign(env, { GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null' });
   delete env.GITHUB_ACTIONS;
   const git = (...args) => execFileSync('git', args, { cwd: root, env, encoding: 'utf8', windowsHide: true, timeout: 10000 }).trim();
@@ -255,6 +293,10 @@ test('actual CLI reports missing installed parser as ERROR with the bootstrap co
     git('add', '--all');
     git('-c', 'core.hooksPath=/dev/null', '-c', 'user.name=Audit fixture', '-c', 'user.email=audit@example.invalid', 'commit', '--quiet', '-m', 'Fixture');
     git('update-ref', 'refs/remotes/origin/main', git('rev-parse', 'HEAD'));
+    const parser = path.join(directory, 'node_modules/jsonc-parser');
+    fs.mkdirSync(parser, { recursive: true });
+    // A local broken entry prevents an unrelated ancestor package satisfying this fixture.
+    fs.writeFileSync(path.join(parser, 'package.json'), JSON.stringify({ main: 'index.cjs' }));
     const result = spawnSync(process.execPath, [path.join(directory, 'Check-NpmAudit.mjs')], {
       cwd: root, env, encoding: 'utf8', windowsHide: true, timeout: 15000,
     });
@@ -263,8 +305,18 @@ test('actual CLI reports missing installed parser as ERROR with the bootstrap co
     const failure = JSON.parse(result.stderr);
     assert.equal(failure.status, 'ERROR');
     assert.match(failure.message, /Cannot load the audit parser/u);
+    assert.match(failure.message, /MODULE_NOT_FOUND/u);
     assert.match(failure.message, /node \.github\/workflows\/NpmTools\.mjs install/u);
     assert.equal(result.stdout, '');
+    fs.writeFileSync(path.join(parser, 'index.cjs'), 'module.exports = ;');
+    const malformed = spawnSync(process.execPath, [path.join(directory, 'Check-NpmAudit.mjs')], {
+      cwd: root, env, encoding: 'utf8', windowsHide: true, timeout: 15000,
+    });
+    assert.equal(malformed.status, 2);
+    const malformedFailure = JSON.parse(malformed.stderr);
+    assert.equal(malformedFailure.status, 'ERROR');
+    assert.match(malformedFailure.message, /SyntaxError/u);
+    assert.match(malformedFailure.message, /Correct the reported cause/u);
   } finally {
     assert.equal(path.dirname(root), fs.realpathSync(os.tmpdir()));
     assert.ok(path.basename(root).startsWith('npm-audit-missing-parser-'));

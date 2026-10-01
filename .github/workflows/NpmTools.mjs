@@ -12,11 +12,13 @@ export function runBounded(executable, args, options = {}) {
     cwd: repositoryRoot, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
     ...processLimits, killSignal: 'SIGKILL', ...options,
   });
-  if (result.error?.code === 'ETIMEDOUT') {
-    throw new Error(`Process timed out after ${(options.timeout ?? processLimits.timeout) / 1000} seconds.`);
-  }
   if (result.error || result.signal || !Number.isInteger(result.status)) {
-    throw new Error(`Process failed (${result.error?.code || result.signal || 'missing status'}).`);
+    const cause = result.error?.code === 'ETIMEDOUT'
+      ? `Process timed out after ${(options.timeout ?? processLimits.timeout) / 1000} seconds.`
+      : `Process failed (${result.error?.code || result.signal || 'missing status'}).`;
+    const details = [result.stderr, result.stdout]
+      .map(output => output?.toString('utf8').slice(0, 4096).trim()).filter(Boolean).join('\n');
+    throw new Error(`${cause}${details ? `\n${details}` : ''}`);
   }
   return result;
 }
