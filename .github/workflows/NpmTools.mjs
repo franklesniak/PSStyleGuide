@@ -12,6 +12,9 @@ export function runBounded(executable, args, options = {}) {
     cwd: repositoryRoot, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
     ...processLimits, killSignal: 'SIGKILL', ...options,
   });
+  if (result.error?.code === 'ETIMEDOUT') {
+    throw new Error(`Process timed out after ${(options.timeout ?? processLimits.timeout) / 1000} seconds.`);
+  }
   if (result.error || result.signal || !Number.isInteger(result.status)) {
     throw new Error(`Process failed (${result.error?.code || result.signal || 'missing status'}).`);
   }
@@ -69,7 +72,9 @@ export function withNpmEnvironment(callback, { root = repositoryRoot, environmen
   try {
     for (const name of ['user.npmrc', 'global.npmrc']) fs.writeFileSync(path.join(temporary, name), '', { flag: 'wx', mode: 0o600 });
     const env = safeNpmEnvironment(environment, temporary);
-    const runNpm = (args, directory = root) => runBounded(process.execPath, [npm, ...args], { cwd: directory, env });
+    const runNpm = (args, directory = root) => runBounded(process.execPath, [npm, ...args], {
+      cwd: directory, env, timeout: args[0] === 'ci' ? 600000 : processLimits.timeout,
+    });
     const version = runNpm(['--version']);
     if (version.status !== 0 || version.stdout.toString('utf8').trim() !== engines.npm) {
       throw new Error('Use the bundled npm version declared in root package.json.');
@@ -91,12 +96,17 @@ export function withNpmEnvironment(callback, { root = repositoryRoot, environmen
 export function bootstrap(options) {
   return withNpmEnvironment(({ runNpm, env, root }) => {
     for (const directory of [root, path.join(root, '.github/workflows')]) {
-      const result = runNpm(['ci', '--ignore-scripts', '--no-audit', '--fund=false', '--include=dev', '--package-lock=true'], directory);
-      if (result.status !== 0) throw new Error(`Locked installation failed in ${path.relative(root, directory) || 'root'} (exit ${result.status}).`);
+      try {
+        const result = runNpm(['ci', '--ignore-scripts', '--no-audit', '--fund=false', '--include=dev', '--package-lock=true'], directory);
+        if (result.status !== 0) throw new Error(`Locked installation failed (exit ${result.status}).`);
+      } catch (error) {
+        throw new Error(`${path.relative(root, directory) || 'root'}: ${error.message} Setup is incomplete. Run the bootstrap again to rebuild the locked installed trees.`);
+      }
     }
     const hook = runBounded(process.execPath, [path.join(root, '.github/workflows/install-husky.mjs')], { cwd: root, env });
+    if (hook.stdout.length) process.stdout.write(hook.stdout);
     if (hook.status !== 0) throw new Error(`Hook installation failed (exit ${hook.status}).`);
-    console.log('Locked tools installed. The deliberate Husky installer completed; CI/HUSKY=0/production suppression remains effective.');
+    console.log('Locked tools installed. The Husky installer completed or reported an applicable skip.');
   }, options);
 }
 

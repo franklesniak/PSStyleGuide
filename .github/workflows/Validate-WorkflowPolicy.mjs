@@ -440,7 +440,7 @@ function validateRunStep(step, id, expected) {
   }
   if (id === 'audit') {
     if (lines.length !== 2) fail('helper-call');
-    expectDeepEqual(helperCall(lines[0].replace(/;$/u, '')), ['node', './.github/workflows/Check-NpmAudit.mjs'], 'helper-call');
+    expectDeepEqual(helperCall(lines[0].replace(/;$/u, '')), ['node', './.github/workflows/Check-NpmAudit.mjs', '--ci'], 'helper-call');
     if (!/^if\s*\(\s*\$LASTEXITCODE\s+-ne\s+0\s*\)\s*\{\s*throw\s+(['"])[A-Za-z0-9 .:-]+\1\s*;?\s*\}$/u.test(lines[1])) fail('native-failure-check');
     return;
   }
@@ -473,8 +473,7 @@ function validateWorkflowObject(fileName, workflow, contract) {
     const roles = [
       ['acquire', null],
       ['verify-checkout-credentials', ['./.github/workflows/Test-CheckoutCredentials.ps1']],
-      ...(build ? [] : [['initialize-toolchain', ['./.github/workflows/Initialize-CiToolchain.ps1', '-WorkflowDependencies',
-        ...(id === 'markdownlint' ? ['-InstructionDependencies'] : [])]]]),
+      ...(build ? [] : [['initialize-toolchain', ['./.github/workflows/Initialize-CiToolchain.ps1', '-WorkflowDependencies']]]),
       build ? ['generate_style_guide_artifacts', ['./.github/workflows/Test-StyleGuideArtifacts.ps1']]
         : id === 'policy' ? ['validate', null] : ['lint', ['./.github/workflows/Invoke-MarkdownLint.ps1']],
       ...(id === 'markdownlint' ? [['audit', null]] : []),

@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { acceptedBase, evaluateFindings, evaluateProposal, hostedAuthorityReference, interpretAudit, parseExceptions, parseJson, validateGraph } from './Check-NpmAudit.mjs';
+import { acceptedBase, ciScope, documentationOnlyDiff, evaluateFindings, evaluateProposal, hostedAuthorityReference, interpretAudit, parseExceptions, parseJson, readCandidateExceptions, runAuditCommand, validateGraph } from './Check-NpmAudit.mjs';
 
 const id = 'GHSA-abcd-2345-cdef';
 const bytes = value => Buffer.from(JSON.stringify(value));
@@ -23,6 +23,68 @@ const findings = interpretAudit(result(report('high')), '.', lock);
 const grant = { root: '.', package: 'example', advisories: [id], nodes: [{ path: 'node_modules/example', version: '1.0.0' }],
   owner: 'maintainer', reason: 'Temporary fixture', controls: ['Bound input'], expires: '2030-01-01T00:00:00Z' };
 const now = Date.parse('2026-10-01T00:00:00Z');
+
+test('CI skips only a complete ordinary-document change, including modes and both rename endpoints', () => {
+  const raw = (name, before = '100644', after = '100644', kind = 'M') =>
+    `:${before} ${after} ${'a'.repeat(40)} ${'b'.repeat(40)} ${kind}\0${name}\0`;
+  const docs = raw('README.md') + raw('docs/new.md', '000000', '100644', 'A') + raw('docs/old.md', '100644', '000000', 'D');
+  assert.equal(documentationOnlyDiff(Buffer.from(docs)), true);
+  assert.equal(documentationOnlyDiff(Buffer.alloc(0)), true);
+  assert.equal(documentationOnlyDiff(Buffer.from(Array.from({ length: 400 }, (_, i) => raw(`docs/${i}.md`)).join(''))), true);
+  for (const name of ['package.json', 'package-lock.json', '.github/workflows/package-lock.json',
+    '.github/workflows/npm-risk-exceptions.json', '.github/workflows/Check-NpmAudit.mjs', '.github/workflows/markdownlint.yml',
+    '.github/workflows/ci-toolchain.json', '.npmrc', '.markdownlint.json', '.pre-commit-config.yaml', '.husky/pre-commit',
+    'AGENTS.md', 'tools/AGENTS.override.md', 'AGENTS.override.md', 'docs/GEMINI.md', 'GEMINI.md',
+    'docs/CLAUDE.md', 'CLAUDE.local.md', 'docs/SKILL.md', '.github/notes.md', 'docs/.hidden/note.md', 'tool.js']) {
+    assert.equal(documentationOnlyDiff(Buffer.from(docs + raw(name))), false, name);
+  }
+  for (const mode of ['100755', '120000', '160000']) {
+    assert.equal(documentationOnlyDiff(Buffer.from(raw('docs/changed.md', mode))), false);
+    assert.equal(documentationOnlyDiff(Buffer.from(raw('docs/changed.md', '100644', mode))), false);
+  }
+  assert.equal(documentationOnlyDiff(Buffer.from(raw('tool.js', '100644', '000000', 'D') + raw('docs/tool.md', '000000', '100644', 'A'))), false);
+  for (const invalid of [docs.slice(0, -1), docs + 'partial\0', raw('../escape.md'), raw('docs/line\nbreak.md'),
+    raw('docs/name.md', '100644', '100644', 'R100')]) assert.throws(() => documentationOnlyDiff(Buffer.from(invalid)));
+  assert.throws(() => documentationOnlyDiff(Buffer.alloc(2 * 1024 * 1024 + 1)), /size/u);
+  assert.throws(() => documentationOnlyDiff(Buffer.from([0xff])));
+});
+
+test('CI scope uses real complete Git endpoints; mismatches and unavailable objects cannot skip', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'npm-audit-scope-'));
+  const git = (...args) => execFileSync('git', ['-c', 'core.hooksPath=/dev/null', ...args], {
+    cwd: root, encoding: 'utf8', windowsHide: true, timeout: 10000,
+    env: { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null' },
+  }).trim();
+  try {
+    git('init', '--quiet');
+    const commit = message => {
+      git('add', '--all');
+      git('-c', 'user.name=Audit fixture', '-c', 'user.email=audit@example.invalid', 'commit', '--quiet', '-m', message);
+      return git('rev-parse', 'HEAD');
+    };
+    fs.writeFileSync(path.join(root, 'README.md'), '# Before\n');
+    fs.writeFileSync(path.join(root, 'tool.js'), 'export const value = 1;\n');
+    const base = commit('base');
+    fs.writeFileSync(path.join(root, 'README.md'), '# After\n');
+    const docs = commit('docs');
+    const environment = { GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'pull_request', GITHUB_SHA: docs };
+    const scope = () => ciScope({ root, environment, authority: { sha: base } });
+    assert.equal(scope().applicable, false);
+    assert.throws(() => ciScope({ root, environment: { ...environment, GITHUB_SHA: base }, authority: { sha: base } }), /checkout mismatch/u);
+    assert.throws(() => ciScope({ root, environment, authority: { sha: 'f'.repeat(40) } }), /complete Git change/u);
+    git('mv', 'tool.js', 'tool.md');
+    environment.GITHUB_SHA = commit('rename executable source to prose');
+    assert.equal(scope().applicable, true);
+    for (const event of ['push', 'schedule', 'workflow_dispatch']) {
+      assert.equal(ciScope({ root, environment: { ...environment, GITHUB_EVENT_NAME: event }, authority: { sha: base } }).applicable, true);
+    }
+    assert.throws(() => ciScope({ root, environment: {}, authority: { sha: base } }), /hosted event/u);
+  } finally {
+    assert.equal(path.dirname(root), fs.realpathSync(os.tmpdir()));
+    assert.ok(path.basename(root).startsWith('npm-audit-scope-'));
+    fs.rmSync(root, { recursive: true });
+  }
+});
 
 test('clean and every severity have the actual info-threshold exit semantics', () => {
   assert.deepEqual(interpretAudit(result(report()), '.', lock), []);
@@ -48,8 +110,33 @@ test('strict bounded JSON rejects truncation, comments, trailing commas, bad UTF
   for (const source of ['{"exceptions":[]', '{"exceptions":[],"exceptions":[]}', '{"exceptions":[],}',
     '{/*comment*/"exceptions":[]}', '{"__proto__":{}}']) assert.throws(() => parseJson(Buffer.from(source)));
   assert.throws(() => parseJson(Buffer.from([0xff])));
+  assert.throws(() => parseJson(Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), bytes(report())])), /BOM/u);
+  assert.throws(() => parseExceptions(Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), bytes({ exceptions: [] })])), /BOM/u);
   assert.throws(() => parseJson(Buffer.alloc(65537), 65536), /size/u);
   assert.throws(() => parseJson(Buffer.from('['.repeat(33) + '0' + ']'.repeat(33))), /nesting/u);
+});
+
+test('only a recognized transient audit POST failure gets one bounded retry', () => {
+  const temporary = { statusCode: 503, method: 'POST', uri: 'https://registry.npmjs.org/-/npm/v1/security/advisories/bulk', error: {} };
+  const transport = value => ({ status: 1, stdout: bytes(value) });
+  let calls = 0, waits = 0;
+  const recovered = runAuditCommand(() => ++calls === 1 ? transport(temporary) : result(report()), '.', () => waits++);
+  assert.deepEqual(interpretAudit(recovered, '.', lock), []);
+  assert.equal(calls, 2); assert.equal(waits, 1);
+  calls = 0;
+  const failed = runAuditCommand(() => { calls++; return transport(temporary); }, '.', () => {});
+  assert.equal(calls, 2);
+  assert.throws(() => interpretAudit(failed, '.', lock), /Unsupported/u);
+  for (const native of [result(report()), result(report('high')), transport({ ...temporary, statusCode: 401 }),
+    transport({ ...temporary, uri: 'https://unexpected.example/' }), transport({ ...temporary, method: 'GET' }),
+    transport({ ...temporary, auditReportVersion: 2 }), transport({ ...temporary, statusCode: undefined }),
+    { status: 2, stdout: bytes(temporary) }, { status: null, signal: 'SIGTERM', stdout: bytes(temporary) }]) {
+    calls = 0;
+    assert.equal(runAuditCommand(() => { calls++; return native; }, '.', () => assert.fail('Unexpected wait')), native);
+    assert.equal(calls, 1);
+  }
+  assert.throws(() => runAuditCommand(() => ({ status: 1, stdout: Buffer.from('{') }), '.', () => assert.fail('Unexpected wait')), /JSON/u);
+  assert.throws(() => runAuditCommand(() => { throw new Error('launch failed'); }, '.', () => assert.fail('Unexpected wait')), /launch failed/u);
 });
 
 test('package references preserve aggregate scope without inventing direct advisory-to-node pairs', () => {
@@ -159,6 +246,19 @@ test('a missing accepted record is empty authority; a failed Git read is an erro
     assert.equal(authority.sha, commit);
     assert.deepEqual(authority.exceptions, []);
     assert.match(authority.limitation, /Offline/u);
+    // An available exact main commit needs no remote or extra network fetch.
+    const hosted = acceptedBase({ root, environment: { GITHUB_ACTIONS: 'true', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide',
+      GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/main', GITHUB_SHA: commit } });
+    assert.equal(hosted.sha, commit);
+    assert.deepEqual(hosted.exceptions, []);
+    const candidateFile = path.join(root, '.github/workflows/npm-risk-exceptions.json');
+    fs.unlinkSync(candidateFile);
+    assert.deepEqual(readCandidateExceptions(root), []);
+    assert.equal(evaluateProposal([], [grant], readCandidateExceptions(root), now).status, 'PROPOSAL');
+    fs.writeFileSync(candidateFile, '{');
+    assert.throws(() => readCandidateExceptions(root), /JSON/u);
+    fs.unlinkSync(candidateFile); fs.mkdirSync(candidateFile);
+    assert.throws(() => readCandidateExceptions(root), /regular JSON input/u);
     // The file in the candidate worktree above cannot supply authority.
     git(['update-ref', '-d', 'refs/remotes/origin/main']);
     assert.throws(() => acceptedBase({ root, environment: {} }), /unavailable/u);

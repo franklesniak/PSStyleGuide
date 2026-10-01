@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { checkInstallInputs, runBounded, safeNpmEnvironment, withNpmEnvironment } from './NpmTools.mjs';
 
 test('every npm configuration spelling is removed before the first npm child', () => {
@@ -22,7 +23,7 @@ test('every npm configuration spelling is removed before the first npm child', (
 test('bounded children preserve native nonzero status but reject launch, timeout and output failures', () => {
   assert.equal(runBounded(process.execPath, ['-e', 'process.exit(7)']).status, 7);
   assert.throws(() => runBounded(path.resolve('absent-node-command'), []), /Process failed/u);
-  assert.throws(() => runBounded(process.execPath, ['-e', 'setInterval(()=>{},1000)'], { timeout: 100 }), /Process failed/u);
+  assert.throws(() => runBounded(process.execPath, ['-e', 'setInterval(()=>{},1000)'], { timeout: 100 }), /timed out after 0.1 seconds/u);
   assert.throws(() => runBounded(process.execPath, ['-e', "process.stdout.write('x'.repeat(50000))"], { maxBuffer: 1024 }), /Process failed/u);
 });
 
@@ -40,6 +41,20 @@ function removeFixture(root) {
   assert.ok(path.basename(root).startsWith('npm-input-test-'));
   fs.rmSync(root, { recursive: true });
 }
+
+test('actual archive installer reports that no Git hook was installed', () => {
+  const root = inputFixture();
+  try {
+    const script = path.join(root, '.github/workflows/install-husky.mjs');
+    fs.copyFileSync(fileURLToPath(new URL('./install-husky.mjs', import.meta.url)), script);
+    const env = { ...process.env }; delete env.CI; delete env.HUSKY; delete env.NODE_ENV;
+    const result = runBounded(process.execPath, [script], { cwd: root, env });
+    assert.equal(result.status, 0);
+    assert.match(result.stdout.toString(), /no Git hook was installed/u);
+    assert.equal(fs.existsSync(path.join(root, '.git')), false);
+    assert.equal(fs.existsSync(path.join(root, '.husky')), false);
+  } finally { removeFixture(root); }
+});
 
 test('configuration and alternate lock selectors are rejected before npm', () => {
   const root = inputFixture();

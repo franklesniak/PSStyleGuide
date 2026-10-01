@@ -20,9 +20,8 @@ const codeJob = final => ({
   'runs-on': 'ubuntu-24.04', 'timeout-minutes': 30, permissions: {},
   steps: [step('acquire', "Write-Output 'bootstrap fixture'"),
     step('verify-checkout-credentials', './.github/workflows/Test-CheckoutCredentials.ps1'),
-    ...(final.id === 'generate_style_guide_artifacts' ? [] : [step('initialize-toolchain', './.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies' +
-      (final.id === 'lint' ? ' -InstructionDependencies' : ''))]), final,
-    ...(final.id === 'lint' ? [step('audit', "& node ./.github/workflows/Check-NpmAudit.mjs\nif ($LASTEXITCODE -ne 0) { throw 'Dependency audit did not pass.' }")] : [])],
+    ...(final.id === 'generate_style_guide_artifacts' ? [] : [step('initialize-toolchain', './.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies')]), final,
+    ...(final.id === 'lint' ? [step('audit', "& node ./.github/workflows/Check-NpmAudit.mjs --ci\nif ($LASTEXITCODE -ne 0) { throw 'Dependency audit did not pass.' }")] : [])],
 });
 const common = { name: 'Fixture', on: { push: { branches: ['main'] }, pull_request: { branches: ['main'] } }, permissions: {} };
 const fixtures = {

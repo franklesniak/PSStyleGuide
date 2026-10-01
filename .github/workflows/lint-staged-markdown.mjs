@@ -90,7 +90,7 @@ try {
 } catch (error) {
   console.error(error);
   console.error('pre-commit: Markdown lint tooling failed to run.');
-  console.error('Try reinstalling dev dependencies: npm --prefix .github/workflows ci');
+  console.error('Rebuild the locked tools: node .github/workflows/NpmTools.mjs install');
   process.exit(2);
 }
 

@@ -24,7 +24,7 @@ function readInput(file, limit) {
 
 export function parseJson(bytes, limit = 2 * 1024 * 1024) {
   if (bytes.length > limit) fail('JSON output exceeds the size limit.');
-  const source = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  const source = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
   if (source.charCodeAt(0) === 0xfeff) fail('JSON BOM is not supported.');
   const stack = [];
   let depth = 0;
@@ -182,9 +182,12 @@ export function acceptedBase({ environment = process.env, root = repositoryRoot 
     const event = environment.GITHUB_EVENT_NAME === 'pull_request'
       ? parseJson(readInput(environment.GITHUB_EVENT_PATH, 2 * 1024 * 1024)) : undefined;
     reference = hostedAuthorityReference(environment, event);
-    const fetched = git(['fetch', '--quiet', '--depth=1', '--no-tags', '--no-recurse-submodules',
-      'https://github.com/franklesniak/PSStyleGuide', reference], env, root);
-    if (fetched.status !== 0) fail('Cannot acquire the event authority commit.');
+    const available = git(['cat-file', '-e', `${reference}^{commit}`], env, root);
+    if (available.status !== 0) {
+      const fetched = git(['fetch', '--quiet', '--depth=1', '--no-tags', '--no-recurse-submodules',
+        'https://github.com/franklesniak/PSStyleGuide', reference], env, root);
+      if (fetched.status !== 0) fail('Cannot acquire the event authority commit.');
+    }
   }
   const resolved = git(['rev-parse', '--verify', `${reference}^{commit}`], env, root);
   const sha = resolved.stdout.toString('utf8').trim();
@@ -204,18 +207,39 @@ export function acceptedBase({ environment = process.env, root = repositoryRoot 
       'Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.' };
 }
 
-export function audit({ root = repositoryRoot, authority = acceptedBase({ root }) } = {}) {
-  const candidate = parseExceptions(readInput(path.join(root, exceptionPath), 65536));
+export function readCandidateExceptions(root) {
+  try { return parseExceptions(readInput(path.join(root, exceptionPath), 65536)); }
+  catch (error) { if (error.code === 'ENOENT') return []; throw error; }
+}
+
+export function runAuditCommand(runNpm, directory, wait = () => Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 2000)) {
+  const args = ['audit', '--json', '--audit-level=info', '--include=dev', '--package-lock=true'];
+  let result = runNpm(args, directory);
+  if (result.status === 1 && !result.error && !result.signal) {
+    const value = parseJson(result.stdout);
+    if (object(value.error) && !('auditReportVersion' in value) && !('vulnerabilities' in value) &&
+        value.method === 'POST' && value.uri === 'https://registry.npmjs.org/-/npm/v1/security/advisories/bulk' &&
+        [408, 429, 500, 502, 503, 504].includes(value.statusCode)) {
+      console.error(`npm audit returned HTTP ${value.statusCode}; retrying once.`);
+      wait();
+      result = runNpm(args, directory);
+    }
+  }
+  return result;
+}
+
+export function audit({ root = repositoryRoot, authority = acceptedBase({ root }), installedRoots = roots } = {}) {
+  const candidate = readCandidateExceptions(root);
   const findings = withNpmEnvironment(({ runNpm }) => roots.flatMap(scope => {
     const directory = path.resolve(root, scope);
     const lock = parseJson(readInput(path.join(directory, 'package-lock.json'), 2 * 1024 * 1024));
     const manifest = parseJson(readInput(path.join(directory, 'package.json'), 65536));
-    validateGraph(runNpm(['ls', '--all', '--json', '--include=dev'], directory), manifest);
-    const result = runNpm(['audit', '--json', '--audit-level=info', '--include=dev', '--package-lock=true'], directory);
+    if (installedRoots.includes(scope)) validateGraph(runNpm(['ls', '--all', '--json', '--include=dev'], directory), manifest);
+    const result = runAuditCommand(runNpm, directory);
     return interpretAudit(result, scope, lock);
   }), { root });
   return { ...evaluateProposal(findings, authority.exceptions, candidate), authority: authority.sha,
-    limitation: authority.limitation, findings };
+    limitation: authority.limitation, installedGraphRoots: installedRoots, findings };
 }
 
 export function evaluateProposal(findings, accepted, candidate, now = Date.now()) {
@@ -224,12 +248,55 @@ export function evaluateProposal(findings, accepted, candidate, now = Date.now()
   return { ...result, status: proposal ? 'PROPOSAL' : result.status, proposedState: proposal };
 }
 
+export function documentationOnlyDiff(bytes) {
+  if (bytes.length > 2 * 1024 * 1024) fail('Git change exceeds the size limit.');
+  const source = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
+  if (source === '') return true;
+  if (!source.endsWith('\0')) fail('Incomplete Git change.');
+  const fields = source.slice(0, -1).split('\0');
+  if (fields.length % 2 || fields.length > 20000) fail('Invalid or oversized Git change.');
+  let documents = true;
+  for (let index = 0; index < fields.length; index += 2) {
+    const entry = /^:([0-7]{6}) ([0-7]{6}) [a-f0-9]{40} [a-f0-9]{40} ([AMDT])$/u.exec(fields[index]);
+    const name = fields[index + 1];
+    if (!entry || !text(name) || name.includes('\\') || name.startsWith('/') ||
+        name.split('/').some(part => !part || part === '.' || part === '..')) fail('Invalid Git change entry.');
+    const parts = name.toLowerCase().split('/');
+    documents &&= [entry[1], entry[2]].every(mode => ['000000', '100644'].includes(mode)) &&
+      parts.every(part => !part.startsWith('.')) && parts.at(-1).endsWith('.md') &&
+      !['agents.md', 'agents.override.md', 'claude.md', 'claude.local.md', 'gemini.md', 'skill.md'].includes(parts.at(-1));
+  }
+  return documents;
+}
+
+export function ciScope({ root = repositoryRoot, environment = process.env, authority } = {}) {
+  if (environment.GITHUB_ACTIONS !== 'true') fail('CI audit mode requires a hosted event.');
+  if (environment.GITHUB_EVENT_NAME !== 'pull_request') return { applicable: true };
+  const env = gitEnvironment(), head = environment.GITHUB_SHA;
+  if (!/^[a-f0-9]{40}$/u.test(head ?? '') || !/^[a-f0-9]{40}$/u.test(authority?.sha ?? '')) fail('Invalid CI audit endpoints.');
+  const current = git(['rev-parse', '--verify', 'HEAD^{commit}'], env, root);
+  if (current.status !== 0 || current.stdout.toString('utf8').trim() !== head) fail('CI audit checkout mismatch.');
+  const changed = git(['diff', '--raw', '--no-abbrev', '--no-renames', '--no-ext-diff', '--no-textconv',
+    '-z', authority.sha, head, '--'], env, root);
+  if (changed.status !== 0) fail('Cannot read the complete Git change.');
+  return { applicable: !documentationOnlyDiff(changed.stdout), base: authority.sha, head };
+}
+
+export function ciAudit({ root = repositoryRoot, environment = process.env } = {}) {
+  const authority = acceptedBase({ root, environment });
+  const scope = ciScope({ root, environment, authority });
+  return scope.applicable ? audit({ root, authority, installedRoots: ['.github/workflows'] }) : {
+    status: 'NOT_APPLICABLE', ...scope,
+    reason: 'Only ordinary Markdown changed; no live audit ran. Main and scheduled audits remain applicable.',
+  };
+}
+
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   try {
-    if (process.argv.length !== 2) fail('Usage: node .github/workflows/Check-NpmAudit.mjs');
-    const result = audit();
+    if (process.argv.length > 3 || (process.argv.length === 3 && process.argv[2] !== '--ci')) fail('Usage: node .github/workflows/Check-NpmAudit.mjs [--ci]');
+    const result = process.argv[2] === '--ci' ? ciAudit() : audit();
     console.log(JSON.stringify(result, null, 2));
-    process.exitCode = { CLEAN: 0, ACCEPTED_RISK: 0, FINDINGS: 1, PROPOSAL: 3 }[result.status];
+    process.exitCode = { CLEAN: 0, ACCEPTED_RISK: 0, NOT_APPLICABLE: 0, FINDINGS: 1, PROPOSAL: 3 }[result.status];
   } catch (error) {
     console.error(JSON.stringify({ status: 'ERROR', message: error.message }));
     process.exitCode = 2;

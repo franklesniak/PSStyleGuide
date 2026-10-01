@@ -123,7 +123,7 @@ jobs:
         id: initialize-toolchain
         shell: pwsh
         run: |
-          ./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies -InstructionDependencies
+          ./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies
       - name: Lint both Markdown surfaces
         id: lint
         shell: pwsh
@@ -133,5 +133,5 @@ jobs:
         id: audit
         shell: pwsh
         run: |
-          & node ./.github/workflows/Check-NpmAudit.mjs
+          & node ./.github/workflows/Check-NpmAudit.mjs --ci
           if ($LASTEXITCODE -ne 0) { throw 'Dependency audit did not pass.' }
