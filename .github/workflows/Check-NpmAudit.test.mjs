@@ -106,6 +106,35 @@ test('tool, transport, schema and inconsistent-count failures cannot become find
   const inconsistent = report('high'); inconsistent.metadata.vulnerabilities.total = 0;
   assert.throws(() => interpretAudit(result(inconsistent), '.', lock), /total/u);
   assert.throws(() => interpretAudit(result(report('high')), '.', { packages: {} }), /node/u);
+  for (const native of [
+    { status: 1, stdout: bytes({ error: { code: 'ENOTFOUND' } }), stderr: Buffer.from('Registry DNS failure') },
+    { status: 1, stdout: bytes({ error: { code: 'E403' }, statusCode: 403 }), stderr: Buffer.from('Access denied') },
+    { status: 2, stdout: Buffer.alloc(0), stderr: Buffer.from('Native audit failure') },
+    { status: 1, stdout: Buffer.from('{'), stderr: Buffer.from('Connection reset') },
+    { status: 0, stdout: Buffer.from('{'), stderr: Buffer.from('Invalid output') },
+  ]) {
+    let calls = 0;
+    assert.throws(() => interpretAudit(runAuditCommand(() => { calls++; return native; }, '.github/workflows',
+      () => assert.fail('Unexpected retry')), '.github/workflows', lock), error => {
+      assert.ok(error.message.includes('.github/workflows'));
+      assert.ok(error.message.includes(`exit ${native.status}`));
+      assert.ok(error.message.includes(native.stderr.toString()));
+      if (native.stdout.includes('ENOTFOUND')) assert.match(error.message, /ENOTFOUND/u);
+      if (native.stdout.includes('E403')) assert.match(error.message, /E403; HTTP 403/u);
+      return true;
+    });
+    assert.equal(calls, 1);
+  }
+  assert.throws(() => interpretAudit({ status: 1,
+    stdout: bytes({ error: { code: 'E'.repeat(1000) }, statusCode: 503 }),
+    stderr: Buffer.from('x'.repeat(10000)) }, '.', lock), error => {
+    assert.ok(error.message.length < 4400);
+    assert.ok(error.message.includes('E'.repeat(128)));
+    assert.ok(!error.message.includes('E'.repeat(129)));
+    assert.ok(error.message.includes('x'.repeat(4096)));
+    assert.ok(!error.message.includes('x'.repeat(4097)));
+    return true;
+  });
 });
 
 test('strict bounded JSON rejects truncation, comments, trailing commas, bad UTF8 and duplicate authority keys', () => {

@@ -80,11 +80,21 @@ export function parseExceptions(bytes) {
     .sort((a, b) => `${a.root}:${a.package}`.localeCompare(`${b.root}:${b.package}`));
 }
 
+function auditFailure(message, result, root, value) {
+  const code = typeof value?.error?.code === 'string' ? value.error.code.slice(0, 128) : '';
+  const http = Number.isInteger(value?.statusCode) ? `HTTP ${value.statusCode}` : '';
+  const context = [root, `exit ${result.status ?? 'unavailable'}`, code, http].filter(Boolean).join('; ');
+  const stderr = result.stderr?.toString('utf8').slice(0, 4096).trim();
+  fail(`${message} [${context}]${stderr ? `\n${stderr}` : ''}`);
+}
+
 export function interpretAudit(result, root, lock) {
-  if (!Number.isInteger(result.status) || result.error || result.signal || ![0, 1].includes(result.status)) fail('Audit process did not complete normally.');
-  const value = parseJson(result.stdout);
+  if (!Number.isInteger(result.status) || result.error || result.signal || ![0, 1].includes(result.status)) auditFailure('Audit process did not complete normally.', result, root);
+  let value;
+  try { value = parseJson(result.stdout); }
+  catch (error) { auditFailure(error.message, result, root); }
   if (!object(value) || value.auditReportVersion !== 2 || 'error' in value || !object(value.vulnerabilities) ||
-      !object(value.metadata?.vulnerabilities) || !object(lock.packages)) fail('Unsupported audit report.');
+      !object(value.metadata?.vulnerabilities) || !object(lock.packages)) auditFailure('Unsupported audit report.', result, root, value);
   const entries = Object.entries(value.vulnerabilities);
   if (entries.length > 1000) fail('Too many affected package summaries.');
   const actualCounts = Object.fromEntries(severities.map(name => [name, 0]));
@@ -239,7 +249,9 @@ export function runAuditCommand(runNpm, directory, wait = () => Atomics.wait(new
   const args = ['audit', '--json', '--audit-level=info', '--include=dev', '--package-lock=true'];
   let result = runNpm(args, directory);
   if (result.status === 1 && !result.error && !result.signal) {
-    const value = parseJson(result.stdout);
+    let value;
+    try { value = parseJson(result.stdout); }
+    catch (error) { auditFailure(error.message, result, directory); }
     if (object(value.error) && !('auditReportVersion' in value) && !('vulnerabilities' in value) &&
         value.method === 'POST' && value.uri === 'https://registry.npmjs.org/-/npm/v1/security/advisories/bulk' &&
         [408, 429, 500, 502, 503, 504].includes(value.statusCode)) {
