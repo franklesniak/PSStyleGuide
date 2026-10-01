@@ -7,7 +7,7 @@ import { execFileSync, spawnSync } from 'node:child_process';
 import test from 'node:test';
 import {
   LIMITS, readContract, validatePackagePair, foldParserTree, assertReviewedParserTree,
-  loadYamlBindings, parseStrictYaml, validateWorkflowObject, main,
+  loadYamlBindings, parseStrictYaml, validateWorkflowObject, readJsonBytes, main,
 } from './Validate-WorkflowPolicy.mjs';
 
 const directory = path.dirname(fileURLToPath(import.meta.url));
@@ -97,6 +97,31 @@ test('bounded YAML rejects excessive size and depth', () => {
   assert.throws(() => parseStrictYaml(Buffer.from('['.repeat(40) + '0' + ']'.repeat(40)), LIMITS), error => error.category === 'yaml-limit');
 });
 
+test('bounded JSON rejects duplicate decoded member names without folding case or scopes', () => {
+  for (const text of [
+    String.raw`{"":1,"":2}`,
+    String.raw`{"name":1,"na\u006de":2}`,
+    String.raw`{"\"":1,"\u0022":2}`,
+    String.raw`{"\\":1,"\u005c":2}`,
+    String.raw`{"outer":{"id":1,"id":2}}`,
+    String.raw`{"items":[{"id":1,"id":2}]}`,
+  ]) {
+    assert.throws(() => readJsonBytes(Buffer.from(text), 'fixture-json'), error => {
+      assert.equal(error.category, 'fixture-json');
+      assert.equal(error.message, 'fixture-json');
+      return true;
+    });
+  }
+
+  const text = String.raw`{"left":{"id":1},"right":{"id":2},"Name":3,"name":4,"items":[{"id":5},{"id":6}],"text":"\\\"id\\\":\\\\value"}`;
+  const value = readJsonBytes(Buffer.from(text), 'fixture-json');
+  assert.equal(value.Name, 3);
+  assert.equal(value.name, 4);
+  assert.deepEqual(value.left, { id: 1 });
+  assert.deepEqual(value.right, { id: 2 });
+  assert.throws(() => readJsonBytes(Buffer.from('{"broken":'), 'fixture-json'), error => error.category === 'fixture-json');
+});
+
 const manifest = JSON.parse(fs.readFileSync(path.join(directory, 'package.json')));
 const lock = JSON.parse(fs.readFileSync(path.join(directory, 'package-lock.json')));
 test('reviewed locked dependency updates do not need historical hashes or waiver fields', () => {
@@ -148,6 +173,23 @@ test('built-in preflight works before parser installation; full validation fails
   const fixture = makeRepository(t);
   assert.equal(fixture.run('--preflight').result.success, true);
   assert.equal(fixture.run(...args).status, 1);
+});
+for (const item of [
+  { file: 'workflow-policy-contract.json', key: 'schema', category: 'contract-json' },
+  { file: 'package.json', key: 'name', category: 'package-json', root: true },
+  { file: 'package-lock.json', key: 'version', category: 'lock-json', root: true },
+  { file: 'package.json', key: 'name', category: 'package-json' },
+  { file: 'package-lock.json', key: 'version', category: 'lock-json' },
+]) test(`built-in preflight rejects duplicate ${item.key} in ${item.root ? 'root ' : ''}${item.file}`, t => {
+  const fixture = makeRepository(t);
+  const directory = item.root ? fixture.temporary : fixture.destination;
+  const file = path.join(directory, item.file);
+  const source = fs.readFileSync(file, 'utf8').trimStart();
+  assert.equal(source[0], '{');
+  fs.writeFileSync(file, `{"${item.key}":"ambiguous",${source.slice(1)}`);
+  const result = fixture.run('--preflight');
+  assert.equal(result.status, 1);
+  assert.equal(result.result.category, item.category);
 });
 test('tampered installed parser never executes', t => {
   const fixture = makeRepository(t, true);

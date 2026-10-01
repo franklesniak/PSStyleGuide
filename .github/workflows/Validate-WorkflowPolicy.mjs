@@ -317,11 +317,43 @@ function strictUtf8Text(bytes, category) {
 function readJsonBytes(bytes, category) {
   if (bytes.length > LIMITS.maximumJsonBytes) fail(category);
   try {
-    return JSON.parse(strictUtf8Text(bytes, category), (key, value) => {
+    const text = strictUtf8Text(bytes, category);
+    const value = JSON.parse(text, (key, item) => {
       if (FORBIDDEN_OBJECT_KEYS.has(key)) fail(category);
-      return value;
+      return item;
     });
+    if (hasDuplicateJsonMember(text)) fail(category);
+    return value;
   } catch (error) { if (error instanceof PolicyError) throw error; fail(category); }
+}
+
+// JSON.parse validates the document but discards earlier occurrences of a key.
+// Scan only accepted JSON text, comparing decoded names within each object.
+function hasDuplicateJsonMember(text) {
+  const scopes = [];
+  let index = 0;
+  while (index < text.length) {
+    const character = text[index];
+    if (character === '{') { scopes.push(new Set()); index += 1; continue; }
+    if (character === '[') { scopes.push(null); index += 1; continue; }
+    if (character === '}' || character === ']') { scopes.pop(); index += 1; continue; }
+    if (character !== '"') { index += 1; continue; }
+    let end = index + 1;
+    while (end < text.length && text[end] !== '"') {
+      end += text[end] === '\\' ? 2 : 1;
+    }
+    const literal = text.slice(index, end + 1);
+    index = end + 1;
+    let probe = index;
+    while (probe < text.length && ' \t\n\r'.includes(text[probe])) probe += 1;
+    if (text[probe] !== ':') continue;
+    const keys = scopes.at(-1);
+    if (!(keys instanceof Set)) continue;
+    const key = JSON.parse(literal);
+    if (keys.has(key)) return true;
+    keys.add(key);
+  }
+  return false;
 }
 
 function readContract() {

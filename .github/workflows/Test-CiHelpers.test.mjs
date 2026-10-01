@@ -17,10 +17,10 @@ const head = 'a'.repeat(40), base = 'b'.repeat(40);
 const read = name => fs.readFileSync(path.join(directory, name), 'utf8');
 const quote = value => `'${value.replaceAll("'", "''")}'`;
 
-function fixture(t) {
+function fixture(t, workDirectoryName = 'work') {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-ci-test-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-  const work = path.join(root, 'work'); fs.mkdirSync(work);
+  const work = path.join(root, workDirectoryName); fs.mkdirSync(work);
   const log = path.join(root, 'calls');
   const git = path.join(root, 'git');
   fs.writeFileSync(git, `#!${process.execPath}
@@ -245,6 +245,73 @@ fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output')+1]);
     ['--version', '--version', '--preflight', 'ci', 'ci']);
 });
 }
+
+test('runtime preflight uses one read grant for a spaced repository and denies writes and child processes', { skip: !linux }, t => {
+  const f = fixture(t, 'repository with spaces'), workflows = path.join(f.work, '.github/workflows');
+  fs.mkdirSync(workflows, { recursive: true });
+  const repository = path.resolve(directory, '../..');
+  const rootManifest = JSON.parse(fs.readFileSync(path.join(repository, 'package.json')));
+  assert.equal(process.version, `v${rootManifest.engines.node}`);
+  for (const name of ['package.json', 'package-lock.json']) {
+    fs.copyFileSync(path.join(repository, name), path.join(f.work, name));
+    fs.copyFileSync(path.join(directory, name), path.join(workflows, name));
+  }
+  for (const name of ['workflow-policy-contract.json', 'Validate-WorkflowPolicy.mjs']) {
+    fs.copyFileSync(path.join(directory, name), path.join(workflows, name));
+  }
+  fs.writeFileSync(path.join(workflows, 'Test-CheckoutCredentials.ps1'),
+    read('Test-CheckoutCredentials.ps1').replaceAll('/usr/bin/git', f.git).replaceAll("'/bin/git'", quote(f.git)));
+
+  const archiveRoot = path.join(f.root, 'archive'), bin = path.join(archiveRoot, 'runtime/bin');
+  fs.mkdirSync(bin, { recursive: true });
+  fs.symlinkSync(process.execPath, path.join(bin, 'node'));
+  fs.writeFileSync(path.join(bin, 'npm'), `#!${process.execPath}
+const fs = require('node:fs'), args = process.argv.slice(2);
+fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['npm', ...args])+'\\n');
+if (args.includes('--version')) console.log('${rootManifest.engines.npm}');
+`, { mode: 0o700 });
+  const archive = path.join(f.root, 'runtime.tar.xz');
+  const tar = spawnSync('/usr/bin/tar', ['-cJf', archive, '-C', archiveRoot, 'runtime'], { encoding: 'utf8' });
+  assert.equal(tar.status, 0, tar.stderr);
+  fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify({
+    linuxX64Sha256: createHash('sha256').update(fs.readFileSync(archive)).digest('hex') }));
+  const curl = path.join(f.root, 'curl');
+  fs.writeFileSync(curl, `#!${process.execPath}
+const fs = require('node:fs'), args = process.argv.slice(2);
+fs.appendFileSync(process.env.TEST_LOG, JSON.stringify(['curl'])+'\\n');
+fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output')+1]);
+`, { mode: 0o700 });
+  const initializer = path.join(workflows, 'Initialize-CiToolchain.ps1');
+  fs.writeFileSync(initializer, read('Initialize-CiToolchain.ps1').replaceAll('/usr/bin/curl', curl));
+
+  const positive = f.run(`& ${quote(initializer)} -WorkflowDependencies -InstructionDependencies`);
+  assert.equal(positive.status, 0, positive.stderr);
+  assert.deepEqual(f.calls().filter(row => row[0] === 'npm').map(row => row.includes('ci') ? 'ci' : row.at(-1)),
+    ['--version', 'ci', 'ci']);
+
+  fs.rmSync(path.join(f.root, 'styleguide-node'), { recursive: true });
+  fs.rmSync(path.join(f.root, 'styleguide-node.tar.xz'), { force: true });
+  const validatorPath = path.join(workflows, 'Validate-WorkflowPolicy.mjs');
+  const validator = fs.readFileSync(validatorPath, 'utf8');
+  const marker = path.join(f.root, 'preflight-write');
+  const probe = `import fsProbe from 'node:fs';
+import { execFileSync as execFileSyncProbe } from 'node:child_process';
+if (globalThis.process.argv.includes('--preflight')) {
+    try { fsProbe.writeFileSync(${JSON.stringify(marker)}, 'unexpected'); process.stderr.write('WRITE_ALLOWED\\n'); }
+    catch (error) { process.stderr.write('WRITE_' + error.code + '\\n'); }
+    try { execFileSyncProbe('/bin/true'); process.stderr.write('CHILD_ALLOWED\\n'); }
+    catch (error) { process.stderr.write('CHILD_' + error.code + '\\n'); }
+    throw new Error('permission denial probes completed');
+}
+`;
+  fs.writeFileSync(validatorPath, probe + validator);
+  const denied = f.run(`& ${quote(initializer)} -WorkflowDependencies -InstructionDependencies`);
+  assert.notEqual(denied.status, 0);
+  assert.match(denied.stderr, /WRITE_ERR_ACCESS_DENIED/);
+  assert.match(denied.stderr, /CHILD_ERR_ACCESS_DENIED/);
+  assert.equal(fs.existsSync(marker), false);
+  assert.equal(f.calls().filter(row => row[0] === 'npm' && row.includes('ci')).length, 2);
+});
 
 test('accepted PR-data loader rejects failed fetch and wrong or missing objects before classification', { skip: !linux }, t => {
   const source = parse(read('agent-instructions.yml')).jobs['accepted-policy'].steps.find(step => step.id === 'validate').run;

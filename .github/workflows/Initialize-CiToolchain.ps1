@@ -75,7 +75,7 @@ $strNpmVersion = & $strNpm --version
 if ($LASTEXITCODE -ne 0 -or $strNpmVersion -cne $objPackage.engines.npm) {
     throw 'The installed npm version is incorrect.'
 }
-& $strNode "$PSScriptRoot/Validate-WorkflowPolicy.mjs" --preflight
+& $strNode --permission "--allow-fs-read=$strRepositoryRoot" "$PSScriptRoot/Validate-WorkflowPolicy.mjs" --preflight
 if ($LASTEXITCODE -ne 0) { throw 'Package and workflow preflight failed before installation.' }
 $arrInstallRoots = @()
 if ($InstructionDependencies) { $arrInstallRoots += $strRepositoryRoot }
