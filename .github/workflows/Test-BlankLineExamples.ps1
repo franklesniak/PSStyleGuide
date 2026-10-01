@@ -1,4 +1,4 @@
-﻿#Requires -Version 7.0
+#Requires -Version 7.0
 
 # .SYNOPSIS
 # Checks that the blank-line examples communicate distinct, copy-safe behavior.
@@ -8,49 +8,55 @@
 # warning. Focused mutations prove duplicate examples, whitespace-only lines,
 # and unsafe marker guidance are rejected while harmless wording is accepted.
 #
+# .OUTPUTS
+# System.String. Writes one success message when all semantic checks pass.
+#
 # .NOTES
 # Version: 1.0.20261001.0
 
 [CmdletBinding(PositionalBinding = $false)]
-[OutputType([void])]
+[OutputType([string])]
 param()
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+$strVisibleSpaceMarker = [string][char]0x2420
 
 function Get-BlankLineExampleContract {
-    <#
-    .SYNOPSIS
-    Reads the semantic contract from the paired blank-line examples.
-
-    .DESCRIPTION
-    Locates the non-compliant example by its unique visible-space warning,
-    then reads the nearest preceding compliant example. Headings and caption
-    wording are not part of the extraction contract.
-
-    .PARAMETER Content
-    Complete UTF-8 source text of the normative style guide.
-
-    .EXAMPLE
-    $objExamples = Get-BlankLineExampleContract -Content $strGuide
+    # .SYNOPSIS
+    # Reads the semantic contract from the paired blank-line examples.
     #
-    # # Returns the paired example text and source spans.
-
-    .INPUTS
-    None. This function does not accept pipeline input.
-
-    .OUTPUTS
-    System.Management.Automation.PSCustomObject. The two example bodies,
-    warning text, and their source spans.
-
-    .NOTES
-    PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    surface. Parameters and behavior may change without notice.
+    # .DESCRIPTION
+    # Locates the non-compliant example by its unique visible-space warning,
+    # then reads the nearest preceding compliant example. Headings and caption
+    # wording are not part of the extraction contract.
+    #
+    # .PARAMETER Content
+    # Complete UTF-8 source text of the normative style guide.
+    #
+    # .EXAMPLE
+    # $objExamples = Get-BlankLineExampleContract -Content $strGuide
+    # # Returns both example bodies, the warning, and source spans.
+    #
+    # .EXAMPLE
+    # (Get-BlankLineExampleContract -Content $strGuide).NonCompliantCode
+    # # Returns the non-compliant code body as one string.
+    #
+    # .INPUTS
+    # None. This function does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # System.Management.Automation.PSCustomObject. The two example bodies,
+    # warning text, and their source spans.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
     #
     # Version: 1.0.20261001.0
     #
     # Positional parameters are not supported.
-    #>
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([System.Management.Automation.PSCustomObject])]
     param(
@@ -61,7 +67,7 @@ function Get-BlankLineExampleContract {
 
     $strLabelPattern = '(?im)^\*\*(?<kind>Compliant|Non-Compliant)\b[^\r\n]*'
     $strFencePattern = '(?ms)^```powershell[ \t]*\r?\n(?<code>.*?)^```[ \t]*$'
-    $arrCandidatePairs = [System.Collections.Generic.List[object]]::new()
+    $listCandidatePairs = [System.Collections.Generic.List[System.Management.Automation.PSObject]]::new()
     foreach ($objNonCompliantLabel in [regex]::Matches($Content, $strLabelPattern)) {
         if ($objNonCompliantLabel.Groups['kind'].Value -cne 'Non-Compliant') {
             continue
@@ -70,17 +76,25 @@ function Get-BlankLineExampleContract {
             $objNonCompliantLabel.Index + $objNonCompliantLabel.Length
         )
         $objNonCompliantFence = [regex]::Match($strAfterNonCompliantLabel, $strFencePattern)
-        if (-not $objNonCompliantFence.Success) { continue }
+        if (-not $objNonCompliantFence.Success) {
+            continue
+        }
         $strWarning = $strAfterNonCompliantLabel.Substring(0, $objNonCompliantFence.Index)
-        if (-not $strWarning.Contains('␠')) { continue }
+        if (-not $strWarning.Contains($strVisibleSpaceMarker)) {
+            continue
+        }
 
         $arrEarlierCompliantLabels = @(
             [regex]::Matches(
                 $Content.Substring(0, $objNonCompliantLabel.Index),
                 $strLabelPattern
-            ) | Where-Object { $_.Groups['kind'].Value -ceq 'Compliant' }
+            ) | Where-Object {
+                $_.Groups['kind'].Value -ceq 'Compliant'
+            }
         )
-        if ($arrEarlierCompliantLabels.Count -eq 0) { continue }
+        if ($arrEarlierCompliantLabels.Count -eq 0) {
+            continue
+        }
         $objCompliantLabel = $arrEarlierCompliantLabels[-1]
         $intCompliantTailStart = $objCompliantLabel.Index + $objCompliantLabel.Length
         $strCompliantTail = $Content.Substring(
@@ -88,7 +102,9 @@ function Get-BlankLineExampleContract {
             $objNonCompliantLabel.Index - $intCompliantTailStart
         )
         $objCompliantFence = [regex]::Match($strCompliantTail, $strFencePattern)
-        if (-not $objCompliantFence.Success) { continue }
+        if (-not $objCompliantFence.Success) {
+            continue
+        }
 
         $arrEarlierHeadings = @(
             [regex]::Matches(
@@ -96,12 +112,14 @@ function Get-BlankLineExampleContract {
                 '(?im)^#{1,6}[ \t]+[^\r\n]+'
             )
         )
-        if ($arrEarlierHeadings.Count -eq 0) { continue }
+        if ($arrEarlierHeadings.Count -eq 0) {
+            continue
+        }
         $objHeading = $arrEarlierHeadings[-1]
 
         $strCompliantCode = $objCompliantFence.Groups['code'].Value -replace '\r\n?', "`n"
         $strNonCompliantCode = $objNonCompliantFence.Groups['code'].Value -replace '\r\n?', "`n"
-        $arrCandidatePairs.Add([pscustomobject]@{
+        $listCandidatePairs.Add([pscustomobject]@{
             HeadingIndex = $objHeading.Index
             HeadingLength = $objHeading.Length
             CompliantLabelIndex = $objCompliantLabel.Index
@@ -120,23 +138,26 @@ function Get-BlankLineExampleContract {
             WarningLength = $objNonCompliantFence.Index
         })
     }
-    if ($arrCandidatePairs.Count -ne 1) {
+    if ($listCandidatePairs.Count -ne 1) {
         throw 'blank-line examples: the visible-marker example pair is missing or ambiguous.'
     }
 
-    $objPair = $arrCandidatePairs[0]
+    $objPair = $listCandidatePairs[0]
     if ([string]::Equals($objPair.CompliantCode, $objPair.NonCompliantCode, [StringComparison]::Ordinal)) {
         throw 'blank-line examples: the compliant and non-compliant examples are identical.'
     }
-    if ($objPair.Warning -notmatch '(?is)␠.{0,200}(?:marker|illustrat).{0,200}(?:not|is not|isn''t)\s+(?:PowerShell\s+)?syntax' -or
+    if ($objPair.Warning -notmatch '(?is)\u2420.{0,200}(?:marker|illustrat).{0,200}(?:not|is not|isn''t)\s+(?:PowerShell\s+)?syntax' -or
         $objPair.Warning -notmatch '(?i)do not copy|must not copy|not copyable|should not be copied') {
         throw 'blank-line warning: explain that the marker is illustrative, is not PowerShell syntax, and must not be copied.'
     }
 
     $arrCompliantLines = @($objPair.CompliantCode -split "`n")
-    if (@($arrCompliantLines | Where-Object {
-        $_.Length -gt 0 -and [string]::IsNullOrWhiteSpace($_)
-    }).Count -ne 0) {
+    $arrWhitespaceOnlyCompliantLines = @(
+        $arrCompliantLines | Where-Object {
+            $_.Length -gt 0 -and [string]::IsNullOrWhiteSpace($_)
+        }
+    )
+    if ($arrWhitespaceOnlyCompliantLines.Count -ne 0) {
         throw 'blank-line examples: the compliant example contains a whitespace-only line.'
     }
     $boolHasTrulyEmptyLine = $false
@@ -153,14 +174,17 @@ function Get-BlankLineExampleContract {
     }
 
     $arrNonCompliantLines = @($objPair.NonCompliantCode -split "`n")
-    if (@($arrNonCompliantLines | Where-Object {
-        $_.Length -gt 0 -and [string]::IsNullOrWhiteSpace($_)
-    }).Count -ne 0) {
+    $arrWhitespaceOnlyNonCompliantLines = @(
+        $arrNonCompliantLines | Where-Object {
+            $_.Length -gt 0 -and [string]::IsNullOrWhiteSpace($_)
+        }
+    )
+    if ($arrWhitespaceOnlyNonCompliantLines.Count -ne 0) {
         throw 'blank-line examples: the non-compliant example must use a visible marker, not literal whitespace-only lines.'
     }
     $boolHasVisibleMarker = $false
     for ($intIndex = 1; $intIndex -lt ($arrNonCompliantLines.Count - 1); $intIndex++) {
-        if ($arrNonCompliantLines[$intIndex] -match '^␠+$' -and
+        if ($arrNonCompliantLines[$intIndex] -match '^\u2420+$' -and
             -not [string]::IsNullOrWhiteSpace($arrNonCompliantLines[$intIndex - 1]) -and
             -not [string]::IsNullOrWhiteSpace($arrNonCompliantLines[$intIndex + 1])) {
             $boolHasVisibleMarker = $true
@@ -175,42 +199,44 @@ function Get-BlankLineExampleContract {
 }
 
 function Assert-MutationRejected {
-    <#
-    .SYNOPSIS
-    Confirms a focused semantic mutation is rejected.
-
-    .DESCRIPTION
-    Verifies the mutation changed its input and then requires the example
-    contract to reject it with the expected semantic failure.
-
-    .PARAMETER OriginalContent
-    Unmodified style-guide source text.
-
-    .PARAMETER MutatedContent
-    Source text after the focused in-memory mutation.
-
-    .PARAMETER ExpectedFailure
-    Stable diagnostic fragment identifying the violated semantic rule.
-
-    .EXAMPLE
-    Assert-MutationRejected -OriginalContent $strGuide -MutatedContent $strMutant -ExpectedFailure 'identical'
+    # .SYNOPSIS
+    # Confirms a focused semantic mutation is rejected.
     #
-    # # Fails if the mutation is accepted or was a no-op.
-
-    .INPUTS
-    None. This function does not accept pipeline input.
-
-    .OUTPUTS
-    System.Void. Throws when the mutation is a no-op or is accepted.
-
-    .NOTES
-    PRIVATE/INTERNAL HELPER - This function is not part of the public API
-    surface. Parameters and behavior may change without notice.
+    # .DESCRIPTION
+    # Verifies the mutation changed its input and then requires the example
+    # contract to reject it with the expected semantic failure.
+    #
+    # .PARAMETER OriginalContent
+    # Unmodified style-guide source text.
+    #
+    # .PARAMETER MutatedContent
+    # Source text after the focused in-memory mutation.
+    #
+    # .PARAMETER ExpectedFailure
+    # Stable diagnostic fragment identifying the violated semantic rule.
+    #
+    # .EXAMPLE
+    # Assert-MutationRejected -OriginalContent $strGuide -MutatedContent $strMutant -ExpectedFailure 'identical'
+    # # Completes without output when the duplicate examples are rejected.
+    #
+    # .EXAMPLE
+    # Assert-MutationRejected -OriginalContent $strGuide -MutatedContent $strBadWarning -ExpectedFailure 'blank-line warning'
+    # # Completes without output when unsafe marker guidance is rejected.
+    #
+    # .INPUTS
+    # None. This function does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # System.Void. Throws when the mutation is a no-op or is accepted.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API
+    # surface. Parameters, return shape, and positional contract may change
+    # without notice.
     #
     # Version: 1.0.20261001.0
     #
     # Positional parameters are not supported.
-    #>
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -225,7 +251,9 @@ function Assert-MutationRejected {
     try {
         $null = Get-BlankLineExampleContract -Content $MutatedContent
     } catch {
-        if ($_.Exception.Message -like ('*{0}*' -f $ExpectedFailure)) { return }
+        if ($_.Exception.Message -like ('*{0}*' -f $ExpectedFailure)) {
+            return
+        }
         throw
     }
     throw "blank-line mutation: a mutation expected to fail was accepted ($ExpectedFailure)."
@@ -277,7 +305,7 @@ $strNonBreakingSpaceMutation = $strGuideContent.Remove(
 Assert-MutationRejected -OriginalContent $strGuideContent `
     -MutatedContent $strNonBreakingSpaceMutation -ExpectedFailure 'whitespace-only line'
 
-$strUnclearWarning = 'The `␠` marker is shown below.'
+$strUnclearWarning = 'The `{0}` marker is shown below.' -f $strVisibleSpaceMarker
 $strUnclearWarningMutation = $strGuideContent.Remove(
     $objExamples.WarningIndex,
     $objExamples.WarningLength
@@ -288,7 +316,7 @@ $strUnclearWarningMutation = $strGuideContent.Remove(
 Assert-MutationRejected -OriginalContent $strGuideContent `
     -MutatedContent $strUnclearWarningMutation -ExpectedFailure 'blank-line warning'
 
-$strUnsafeWarning = 'The `␠` glyph is an illustration marker and is not PowerShell syntax. Copy the marker.'
+$strUnsafeWarning = 'The `{0}` glyph is an illustration marker and is not PowerShell syntax. Copy the marker.' -f $strVisibleSpaceMarker
 $strUnsafeWarningMutation = $strGuideContent.Remove(
     $objExamples.WarningIndex,
     $objExamples.WarningLength
@@ -299,9 +327,10 @@ $strUnsafeWarningMutation = $strGuideContent.Remove(
 Assert-MutationRejected -OriginalContent $strGuideContent `
     -MutatedContent $strUnsafeWarningMutation -ExpectedFailure 'blank-line warning'
 
-$strHarmlessWarning = 'The `␠` glyph is an illustration marker and is not PowerShell syntax. It is not copyable.'
+$strHarmlessWarning = 'The `{0}` glyph is an illustration marker and is not PowerShell syntax. It is not copyable.' -f $strVisibleSpaceMarker
 $strHarmlessCaption = '**Compliant example:**'
-$strDoubleMarkerCode = $objExamples.NonCompliantCode.Replace('␠', '␠␠')
+$strDoubleMarker = '{0}{0}' -f $strVisibleSpaceMarker
+$strDoubleMarkerCode = $objExamples.NonCompliantCode.Replace($strVisibleSpaceMarker, $strDoubleMarker)
 $strDoubleMarkerMutation = $strGuideContent.Remove(
     $objExamples.NonCompliantCodeIndex,
     $objExamples.NonCompliantCodeLength
