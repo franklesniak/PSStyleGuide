@@ -76,9 +76,17 @@ export function withNpmEnvironment(callback, { root = repositoryRoot, environmen
   try {
     for (const name of ['user.npmrc', 'global.npmrc']) fs.writeFileSync(path.join(temporary, name), '', { flag: 'wx', mode: 0o600 });
     const env = safeNpmEnvironment(environment, temporary);
-    const runNpm = (args, directory = root) => runBounded(process.execPath, [npm, ...args], {
-      cwd: directory, env, timeout: args[0] === 'ci' ? 600000 : processLimits.timeout,
-    });
+    const runNpm = (args, directory = root) => {
+      const childEnv = { ...env };
+      if (args[0] === 'ci') {
+        // Allow npm's normal download retries within the bounded install deadline.
+        delete childEnv.npm_config_fetch_retries;
+        delete childEnv.npm_config_fetch_timeout;
+      }
+      return runBounded(process.execPath, [npm, ...args], {
+        cwd: directory, env: childEnv, timeout: args[0] === 'ci' ? 600000 : processLimits.timeout,
+      });
+    };
     const version = runNpm(['--version']);
     if (version.status !== 0) {
       if (version.stdout.length) process.stdout.write(version.stdout);

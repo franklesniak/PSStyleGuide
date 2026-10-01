@@ -121,6 +121,28 @@ function runBootstrap(root) {
   return runBounded(process.execPath, ['--input-type=module', '-e', source], { cwd: root });
 }
 
+test('actual install child uses npm download defaults while other children retain audit limits', () => {
+  const root = emptyInstallFixture();
+  try {
+    // Observe only the two task-owned settings in actual child processes.
+    const probe = path.join(root, 'network-environment.cjs');
+    fs.writeFileSync(probe, `if (process.argv[2] !== '--version') console.log('NETWORK_ENV=' + JSON.stringify({
+      timeout: process.env.npm_config_fetch_timeout ?? null,
+      retries: process.env.npm_config_fetch_retries ?? null
+    }));`);
+    withNpmEnvironment(({ runNpm }) => {
+      const inspect = args => {
+        const result = runNpm(args);
+        assert.equal(result.status, 0, result.stderr.toString());
+        const line = result.stdout.toString().split(/\r?\n/u).find(value => value.startsWith('NETWORK_ENV='));
+        return JSON.parse(line.slice('NETWORK_ENV='.length));
+      };
+      assert.deepEqual(inspect(['ci', '--dry-run']), { timeout: null, retries: null });
+      assert.deepEqual(inspect(['config', 'get', 'fetch-timeout']), { timeout: '30000', retries: '1' });
+    }, { root, environment: { ...process.env, NODE_OPTIONS: `--require ${JSON.stringify(probe)}` } });
+  } finally { removeFixture(root); }
+});
+
 test('actual stale-lock installation exposes npm cause and does not claim setup success', () => {
   const root = emptyInstallFixture();
   try {

@@ -1,10 +1,11 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { visit } from 'jsonc-parser';
+import { createRequire } from 'node:module';
 import { repositoryRoot, runBounded, withNpmEnvironment } from './NpmTools.mjs';
 
 const exceptionPath = '.github/workflows/npm-risk-exceptions.json';
+const require = createRequire(import.meta.url);
 const severities = ['info', 'low', 'moderate', 'high', 'critical'];
 const roots = ['.', '.github/workflows'];
 const advisoryPattern = /^GHSA-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4}$/u;
@@ -23,6 +24,9 @@ function readInput(file, limit) {
 }
 
 export function parseJson(bytes, limit = 2 * 1024 * 1024) {
+  let visit;
+  try { ({ visit } = require('jsonc-parser')); }
+  catch { fail('Cannot load the audit parser. Run node .github/workflows/NpmTools.mjs install, then retry the audit.'); }
   if (bytes.length > limit) fail('JSON output exceeds the size limit.');
   const source = new TextDecoder('utf-8', { fatal: true, ignoreBOM: true }).decode(bytes);
   if (source.charCodeAt(0) === 0xfeff) fail('JSON BOM is not supported.');
@@ -139,12 +143,20 @@ export function evaluateFindings(findings, exceptions, now = Date.now()) {
     unusedExceptions: exceptions.filter((_, index) => !used.has(index)).map(item => `${item.root}:${item.package}`) };
 }
 
-export function validateGraph(result, manifest) {
-  if (result.status !== 0 || result.error || result.signal) fail('Installed graph command failed.');
-  const graph = parseJson(result.stdout);
+export function validateGraph(result, manifest, scope = '.') {
+  const stderr = result.stderr?.toString('utf8').slice(0, 4096).trim() || '';
+  const context = `${scope}: Installed graph`;
+  if (result.error || result.signal) fail(`${context} command failed. ${stderr}`);
+  let graph;
+  try { graph = parseJson(result.stdout); }
+  catch (error) { fail(`${context} report is invalid: ${error.message} ${stderr}`); }
+  const problems = Array.isArray(graph?.problems)
+    ? graph.problems.filter(item => typeof item === 'string').slice(0, 5).map(item => item.slice(0, 4096)).join('; ') : '';
+  const details = [problems, stderr].filter(Boolean).join('; ');
+  if (result.status !== 0) fail(`${context} command failed (exit ${result.status}). ${details} Run the locked bootstrap.`);
   if (!object(graph) || graph.name !== manifest.name || graph.version !== manifest.version || 'error' in graph ||
       ('problems' in graph && (!Array.isArray(graph.problems) || graph.problems.length !== 0))) {
-    fail('Installed graph has problems or an unexpected root; run the locked bootstrap.');
+    fail(`${context} has problems or an unexpected root. ${details} Run the locked bootstrap.`);
   }
   return graph;
 }
@@ -234,7 +246,7 @@ export function audit({ root = repositoryRoot, authority = acceptedBase({ root }
     const directory = path.resolve(root, scope);
     const lock = parseJson(readInput(path.join(directory, 'package-lock.json'), 2 * 1024 * 1024));
     const manifest = parseJson(readInput(path.join(directory, 'package.json'), 65536));
-    if (installedRoots.includes(scope)) validateGraph(runNpm(['ls', '--all', '--json', '--include=dev'], directory), manifest);
+    if (installedRoots.includes(scope)) validateGraph(runNpm(['ls', '--all', '--json', '--include=dev'], directory), manifest, scope);
     const result = runAuditCommand(runNpm, directory);
     return interpretAudit(result, scope, lock);
   }), { root });
@@ -297,7 +309,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
     if (process.argv.length > 3 || (process.argv.length === 3 && process.argv[2] !== '--ci')) fail('Usage: node .github/workflows/Check-NpmAudit.mjs [--ci]');
     const result = process.argv[2] === '--ci' ? ciAudit() : audit();
     console.log(JSON.stringify(result, null, 2));
-    process.exitCode = { CLEAN: 0, ACCEPTED_RISK: 0, NOT_APPLICABLE: 0, FINDINGS: 1, PROPOSAL: 3 }[result.status];
+    process.exitCode = { CLEAN: 0, ACCEPTED_RISK: 0, NOT_APPLICABLE: 0, FINDINGS: 1, PROPOSAL: 3 }[result.status] ?? 2;
   } catch (error) {
     console.error(JSON.stringify({ status: 'ERROR', message: error.message }));
     process.exitCode = 2;

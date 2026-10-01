@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
+import { fileURLToPath } from 'node:url';
 import { acceptedBase, ciScope, documentationOnlyDiff, evaluateFindings, evaluateProposal, hostedAuthorityReference, interpretAudit, parseExceptions, parseJson, readCandidateExceptions, runAuditCommand, validateGraph } from './Check-NpmAudit.mjs';
 
 const id = 'GHSA-abcd-2345-cdef';
@@ -215,6 +216,60 @@ test('graph problems cannot pass merely because npm returned zero', () => {
     assert.throws(() => validateGraph({ status: 0, stdout: bytes(changed) }, manifest), /graph/u);
   }
   assert.throws(() => validateGraph({ status: 1, stdout: bytes(graph) }, manifest), /command failed/u);
+});
+
+test('graph failures name the root and retain short native causes without dumping the graph', () => {
+  const manifest = { name: 'fixture', version: '1.0.0' };
+  const graph = { ...manifest, problems: ['missing: useful-tool@1.0.0', 'extraneous: old-tool@0.1.0'] };
+  for (const status of [0, 1]) {
+    assert.throws(() => validateGraph({ status, stdout: bytes(graph), stderr: Buffer.from('native graph diagnostic') }, manifest, '.github/workflows'), error => {
+      assert.match(error.message, /^\.github\/workflows: Installed graph/u);
+      assert.match(error.message, /missing: useful-tool@1\.0\.0/u);
+      assert.match(error.message, /extraneous: old-tool@0\.1\.0/u);
+      assert.match(error.message, /native graph diagnostic/u);
+      return true;
+    });
+  }
+  graph.problems = Array.from({ length: 20 }, (_, index) => `${index}:` + 'x'.repeat(5000));
+  assert.throws(() => validateGraph({ status: 1, stdout: bytes(graph), stderr: Buffer.from('y'.repeat(10000)) }, manifest), error => {
+    assert.ok(error.message.length < 25000);
+    assert.doesNotMatch(error.message, /5:xxxx/u);
+    return true;
+  });
+  assert.throws(() => validateGraph({ status: 1, stdout: Buffer.from('truncated'), stderr: Buffer.from('native failure') }, manifest, '.'), /native failure/u);
+});
+
+test('actual CLI reports missing installed parser as ERROR with the bootstrap command', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'npm-audit-missing-parser-'));
+  const directory = path.join(root, '.github/workflows');
+  const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^GIT_/iu.test(key)));
+  Object.assign(env, { GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null' });
+  delete env.GITHUB_ACTIONS;
+  const git = (...args) => execFileSync('git', args, { cwd: root, env, encoding: 'utf8', windowsHide: true, timeout: 10000 }).trim();
+  try {
+    fs.mkdirSync(directory, { recursive: true });
+    for (const name of ['Check-NpmAudit.mjs', 'NpmTools.mjs']) {
+      fs.copyFileSync(fileURLToPath(new URL(name, import.meta.url)), path.join(directory, name));
+    }
+    git('init', '--quiet');
+    git('add', '--all');
+    git('-c', 'core.hooksPath=/dev/null', '-c', 'user.name=Audit fixture', '-c', 'user.email=audit@example.invalid', 'commit', '--quiet', '-m', 'Fixture');
+    git('update-ref', 'refs/remotes/origin/main', git('rev-parse', 'HEAD'));
+    const result = spawnSync(process.execPath, [path.join(directory, 'Check-NpmAudit.mjs')], {
+      cwd: root, env, encoding: 'utf8', windowsHide: true, timeout: 15000,
+    });
+    assert.equal(result.error, undefined);
+    assert.equal(result.status, 2);
+    const failure = JSON.parse(result.stderr);
+    assert.equal(failure.status, 'ERROR');
+    assert.match(failure.message, /Cannot load the audit parser/u);
+    assert.match(failure.message, /node \.github\/workflows\/NpmTools\.mjs install/u);
+    assert.equal(result.stdout, '');
+  } finally {
+    assert.equal(path.dirname(root), fs.realpathSync(os.tmpdir()));
+    assert.ok(path.basename(root).startsWith('npm-audit-missing-parser-'));
+    fs.rmSync(root, { recursive: true });
+  }
 });
 
 test('hosted authority is the native event base, not candidate or merge identity', () => {
