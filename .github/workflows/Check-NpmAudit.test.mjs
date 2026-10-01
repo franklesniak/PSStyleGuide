@@ -365,6 +365,8 @@ test('hosted authority is the native event base, not candidate or merge identity
   invalid.pull_request.base.sha = base; invalid.pull_request.base.ref = 'topic';
   assert.throws(() => hostedAuthorityReference(environment, invalid), /Unexpected PR authority/u);
   assert.equal(hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/main' }), merge);
+  assert.throws(() => hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/main', GITHUB_REPOSITORY: 'franklesniak/Other' }), /Unexpected audit repository/u);
+  assert.throws(() => hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/copilot/proposal' }), /must be the main branch/u);
   assert.throws(() => hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'pull_request_target' }), /Unsupported/u);
 });
 
