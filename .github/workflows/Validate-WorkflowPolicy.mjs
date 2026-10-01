@@ -438,6 +438,12 @@ function validateRunStep(step, id, expected) {
     if (!/^if\s*\(\s*\$LASTEXITCODE\s+-ne\s+0\s*\)\s*\{\s*throw\s+(['"])Workflow policy validation failed\.\1\s*;?\s*\}$/u.test(lines[1])) fail('native-failure-check');
     return;
   }
+  if (id === 'audit') {
+    if (lines.length !== 2) fail('helper-call');
+    expectDeepEqual(helperCall(lines[0].replace(/;$/u, '')), ['node', './.github/workflows/Check-NpmAudit.mjs'], 'helper-call');
+    if (!/^if\s*\(\s*\$LASTEXITCODE\s+-ne\s+0\s*\)\s*\{\s*throw\s+(['"])[A-Za-z0-9 .:-]+\1\s*;?\s*\}$/u.test(lines[1])) fail('native-failure-check');
+    return;
+  }
   if (lines.length !== 1) fail('helper-call');
   expectDeepEqual(helperCall(lines[0]), expected, 'helper-call');
 }
@@ -446,9 +452,17 @@ function validateWorkflowObject(fileName, workflow, contract) {
   if (!WORKFLOWS.includes(fileName)) fail('workflow-name');
   expectExactKeys(workflow, ['name', 'on', 'permissions', 'jobs'], 'workflow-shape');
   if (typeof workflow.name !== 'string' || !workflow.name.trim()) fail('workflow-name');
-  expectDeepEqual(workflow.on, { push: { branches: ['main'] }, pull_request: { branches: ['main'] } }, 'workflow-events');
-  expectDeepEqual(workflow.permissions, {}, 'workflow-permissions');
   const build = fileName === 'build.yml';
+  const events = { push: { branches: ['main'] }, pull_request: { branches: ['main'] } };
+  if (!build) {
+    const schedule = workflow.on?.schedule;
+    if (!Array.isArray(schedule) || schedule.length !== 1) fail('workflow-events');
+    expectExactKeys(schedule[0], ['cron'], 'workflow-events');
+    if (typeof schedule[0].cron !== 'string' || !/^[0-9*,/\- ]{9,128}$/u.test(schedule[0].cron)) fail('workflow-events');
+    events.schedule = schedule;
+  }
+  expectDeepEqual(workflow.on, events, 'workflow-events');
+  expectDeepEqual(workflow.permissions, {}, 'workflow-permissions');
   const codeJobs = build ? ['verify_generated_artifacts'] : ['policy', 'markdownlint'];
   expectExactKeys(workflow.jobs, build ? [...codeJobs, 'publish_committed_artifacts'] : codeJobs, 'isolation-jobs');
   for (const id of codeJobs) {
@@ -459,9 +473,11 @@ function validateWorkflowObject(fileName, workflow, contract) {
     const roles = [
       ['acquire', null],
       ['verify-checkout-credentials', ['./.github/workflows/Test-CheckoutCredentials.ps1']],
-      ...(build ? [] : [['initialize-toolchain', ['./.github/workflows/Initialize-CiToolchain.ps1', '-WorkflowDependencies']]]),
+      ...(build ? [] : [['initialize-toolchain', ['./.github/workflows/Initialize-CiToolchain.ps1', '-WorkflowDependencies',
+        ...(id === 'markdownlint' ? ['-InstructionDependencies'] : [])]]]),
       build ? ['generate_style_guide_artifacts', ['./.github/workflows/Test-StyleGuideArtifacts.ps1']]
         : id === 'policy' ? ['validate', null] : ['lint', ['./.github/workflows/Invoke-MarkdownLint.ps1']],
+      ...(id === 'markdownlint' ? [['audit', null]] : []),
     ];
     if (!Array.isArray(job.steps) || job.steps.length !== roles.length) fail('code-step-cardinality');
     roles.forEach(([role, call], index) => validateRunStep(job.steps[index], role, call));

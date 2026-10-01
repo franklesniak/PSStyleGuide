@@ -20,7 +20,9 @@ const codeJob = final => ({
   'runs-on': 'ubuntu-24.04', 'timeout-minutes': 30, permissions: {},
   steps: [step('acquire', "Write-Output 'bootstrap fixture'"),
     step('verify-checkout-credentials', './.github/workflows/Test-CheckoutCredentials.ps1'),
-    ...(final.id === 'generate_style_guide_artifacts' ? [] : [step('initialize-toolchain', './.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies')]), final],
+    ...(final.id === 'generate_style_guide_artifacts' ? [] : [step('initialize-toolchain', './.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies' +
+      (final.id === 'lint' ? ' -InstructionDependencies' : ''))]), final,
+    ...(final.id === 'lint' ? [step('audit', "& node ./.github/workflows/Check-NpmAudit.mjs\nif ($LASTEXITCODE -ne 0) { throw 'Dependency audit did not pass.' }")] : [])],
 });
 const common = { name: 'Fixture', on: { push: { branches: ['main'] }, pull_request: { branches: ['main'] } }, permissions: {} };
 const fixtures = {
@@ -34,7 +36,7 @@ const fixtures = {
       })),
     },
   } },
-  'markdownlint.yml': { ...clone(common), jobs: {
+  'markdownlint.yml': { ...clone(common), on: { ...clone(common.on), schedule: [{ cron: '17 6 * * 1' }] }, jobs: {
     policy: codeJob(step('validate', "& node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml\nif ($LASTEXITCODE -ne 0) { throw 'Workflow policy validation failed.' }")),
     markdownlint: codeJob(step('lint', './.github/workflows/Invoke-MarkdownLint.ps1')),
   } },

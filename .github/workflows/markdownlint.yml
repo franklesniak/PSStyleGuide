@@ -6,6 +6,8 @@ on:
   pull_request:
     branches:
       - main
+  schedule:
+    - cron: '17 6 * * 1'
 permissions: {}
 jobs:
   policy:
@@ -121,9 +123,15 @@ jobs:
         id: initialize-toolchain
         shell: pwsh
         run: |
-          ./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies
+          ./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies -InstructionDependencies
       - name: Lint both Markdown surfaces
         id: lint
         shell: pwsh
         run: |
           ./.github/workflows/Invoke-MarkdownLint.ps1
+      - name: Audit current locked dependencies
+        id: audit
+        shell: pwsh
+        run: |
+          & node ./.github/workflows/Check-NpmAudit.mjs
+          if ($LASTEXITCODE -ne 0) { throw 'Dependency audit did not pass.' }

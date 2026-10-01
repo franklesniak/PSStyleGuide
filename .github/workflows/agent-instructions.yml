@@ -169,5 +169,5 @@ jobs:
         shell: pwsh
         run: |
           ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
-          & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs
+          & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs
           if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }

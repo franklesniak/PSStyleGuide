@@ -24,11 +24,17 @@
   },
   "homepage": "https://github.com/franklesniak/PSStyleGuide#readme",
   "devDependencies": {
-    "glob": "^10.3.10",
+    "glob": "13.0.6",
     "husky": "^9.1.7",
-    "markdown-it": "^14.0.0",
-    "markdownlint": "^0.40.0",
-    "markdownlint-cli2": "^0.20.0",
+    "jsonc-parser": "3.3.1",
+    "markdown-it": "14.3.2",
+    "markdownlint": "0.41.1",
+    "markdownlint-cli2": "0.23.3",
     "yaml": "2.9.0"
+  },
+  "overrides": {
+    "markdownlint-cli2@0.23.3": {
+      "markdown-it": "15.0.2"
+    }
   }
 }

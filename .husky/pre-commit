@@ -8,13 +8,4 @@ if ! command -v node >/dev/null 2>&1; then
   exit 1
 fi
 
-if ! node -e "process.exit(Number(process.versions.node.split('.')[0]) >= 20 ? 0 : 1)" >/dev/null 2>&1; then
-  echo "pre-commit: Node.js 20 or newer is required to lint staged Markdown." >&2
-  echo "Current version: $(node -v 2>/dev/null || echo unknown)" >&2
-  echo "If you use a Node version manager with a GUI Git client, add its initialization to" >&2
-  echo "~/.config/husky/init.sh, which Husky sources before running hooks." >&2
-  echo "To bypass this one commit only, use: git commit --no-verify" >&2
-  exit 1
-fi
-
 node .github/workflows/lint-staged-markdown.mjs

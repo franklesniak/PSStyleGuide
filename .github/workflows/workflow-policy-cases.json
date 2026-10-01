@@ -345,7 +345,7 @@
       "category": "helper-call"
     },
     {
-      "name": "rejects instruction dependency overhead in lint job",
+      "name": "rejects omitted workflow dependencies in the lint and audit job",
       "workflow": "markdownlint.yml",
       "path": [
         "jobs",
@@ -413,6 +413,34 @@
       "operation": "set",
       "value": "false",
       "category": "code-step-shape"
+    },
+    {
+      "name": "rejects missing audit failure propagation",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "markdownlint",
+        "steps",
+        4,
+        "run"
+      ],
+      "operation": "set",
+      "value": "& node ./.github/workflows/Check-NpmAudit.mjs",
+      "category": "helper-call"
+    },
+    {
+      "name": "rejects audit that ignores native findings",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "markdownlint",
+        "steps",
+        4,
+        "run"
+      ],
+      "operation": "set",
+      "value": "& node ./.github/workflows/Check-NpmAudit.mjs\nWrite-Output 'ok'",
+      "category": "native-failure-check"
     }
   ]
 }
