@@ -291,7 +291,8 @@ exit 98
   });
 }
 
-for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 'verifier-worktree', 'verifier-failure']) {
+for (const mode of ['clean', 'stale', 'semantic-failure', 'semantic-side-effect',
+  'verifier-channel', 'verifier-config', 'verifier-worktree', 'verifier-failure']) {
   test(`artifact gate includes verifier child effects: ${mode}`, { skip: !linux }, t => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-artifact-child-'));
     t.after(() => fs.rmSync(root, { recursive: true, force: true }));
@@ -301,6 +302,17 @@ for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 've
       ['chat', 'STYLE_GUIDE_CHAT.md'], ['full', 'STYLE_GUIDE_FULL.md']];
     for (const [, name] of records) fs.writeFileSync(path.join(work, name), 'committed fixture\n');
     fs.writeFileSync(path.join(scripts, 'Test-StyleGuideArtifacts.ps1'), read('Test-StyleGuideArtifacts.ps1'));
+    fs.writeFileSync(path.join(work, 'STYLE_GUIDE.md'), [
+      '# PowerShell Writing Style', '',
+      '### Examples', '',
+      '**Compliant example:**', '',
+      '```powershell', '{', '    Invoke-First', '', '    Invoke-Second', '}', '```', '',
+      '**Non-Compliant example:**', '',
+      'The `␠` glyph is an illustration marker and is not PowerShell syntax. Do not copy it.', '',
+      '```powershell', '{', '    Invoke-First', '␠', '    Invoke-Second', '}', '```', '',
+    ].join('\n'));
+    fs.copyFileSync(path.join(directory, 'Test-BlankLineExamples.ps1'),
+      path.join(scripts, 'Test-BlankLineExamples.ps1'));
     const generation = { Schema: 'PSStyleGuide.GeneratorResult.v2', Overall: 'NoChange', Phase: 'complete',
       Category: 'none', NativeOutcome: 'Success', ExitCode: 0,
       Artifacts: records.map(([ArtifactId, Path]) => ({ ArtifactId, Path, Status: 'NoChange' })) };
@@ -312,6 +324,15 @@ for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 've
       'verifier-config': "[IO.File]::AppendAllText((Join-Path $env:GITHUB_WORKSPACE '.git/config'), \"`n# changed by verifier`n\")",
       'verifier-worktree': "[IO.File]::WriteAllText('unexpected.txt', 'changed by verifier')",
     }[mode] ?? '';
+    if (mode === 'semantic-side-effect') {
+      fs.writeFileSync(path.join(scripts, 'Test-BlankLineExamples.ps1'),
+        "[IO.File]::WriteAllText('unexpected.txt', 'changed by semantic verifier')\n" +
+        "Write-Output 'Blank-line example semantics passed, including focused mutation checks.'\nexit 0\n");
+    }
+    if (mode === 'semantic-failure') {
+      fs.writeFileSync(path.join(work, 'STYLE_GUIDE.md'),
+        fs.readFileSync(path.join(work, 'STYLE_GUIDE.md'), 'utf8').replace('\n␠\n', '\n\n'));
+    }
     const verifierFails = ['stale', 'verifier-failure'].includes(mode);
     fs.writeFileSync(path.join(scripts, 'Test-ExactGitPathSet.ps1'), mutation + '\n' +
       quote(JSON.stringify({ Schema: 'PSStyleGuide.ExactGitPathSetResult.v2', Success: !verifierFails })) +
@@ -331,9 +352,14 @@ for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 've
       path.join(scripts, 'Test-StyleGuideArtifacts.ps1')], { cwd: work, env, encoding: 'utf8', timeout: 30000 });
     assert.equal(result.status, mode === 'clean' ? 0 : 1, result.stdout + result.stderr);
     const expected = { clean: /committed bytes match generator output/, stale: /Generate-StyleGuideArtifacts\.ps1/,
+      'semantic-failure': /blank-line semantic check failed/i,
+      'semantic-side-effect': /outside the four[\s\S]{0,100}generated artifacts/,
       'verifier-channel': /runner-state/, 'verifier-config': /configuration or hooks/,
       'verifier-worktree': /outside the four/, 'verifier-failure': /Exact-path verification did not confirm/ }[mode];
-    assert.match(result.stdout + result.stderr, expected);
+    const diagnostic = result.stdout + result.stderr;
+    assert.match(mode === 'semantic-side-effect'
+      ? diagnostic.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '')
+      : diagnostic, expected);
   });
 }
 

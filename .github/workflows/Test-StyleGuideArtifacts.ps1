@@ -460,6 +460,32 @@ function Get-WorktreeFileDigestMap {
 }
 $objWorktreeBefore = Get-WorktreeFileDigestMap
 
+# The semantic check runs in its own process after the integrity snapshot.
+# Its exit status is authoritative; any worktree side effect is detected by
+# the existing comparison after generation completes.
+try {
+    $strSemanticPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
+} catch {
+    $strSemanticPowerShellPath = $null
+}
+if ([string]::IsNullOrEmpty($strSemanticPowerShellPath) -or
+    -not [System.IO.File]::Exists($strSemanticPowerShellPath)) {
+    throw 'The current PowerShell executable could not be resolved for semantic validation.'
+}
+$arrSemanticResult = @(& $strSemanticPowerShellPath `
+    -NoLogo `
+    -NoProfile `
+    -NonInteractive `
+    -File './.github/workflows/Test-BlankLineExamples.ps1')
+$intSemanticExit = $LASTEXITCODE
+if ($intSemanticExit -isnot [int] -or $intSemanticExit -ne 0) {
+    throw 'The blank-line semantic check failed.'
+}
+if ($arrSemanticResult.Count -ne 1 -or
+    $arrSemanticResult[0] -cne 'Blank-line example semantics passed, including focused mutation checks.') {
+    throw 'The blank-line semantic check returned an unexpected result.'
+}
+
 # The generator runs in its own process, not in this session. In-session
 # it could shadow a cmdlet with a function, reassign a variable in this
 # scope, or prepend a directory to PATH, and every check below would

@@ -5,13 +5,13 @@
 
 # PowerShell Writing Style
 
-**Version:** 2.23.20260726.0
+**Version:** 2.23.20261001.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-07-26
+- **Last Updated:** 2026-10-01
 - **Scope:** PowerShell coding standards for all `.ps1` files in this repository — style, formatting, naming, error handling, documentation, and compatibility patterns for both legacy (v1.0) and modern (v2.0+) codebases.
 
 ## Applicability and Portability
@@ -249,7 +249,7 @@ When a method call (like `.Add()`) is wrapped (e.g., in a `[void]` cast) and its
 
 Blank lines **SHOULD** be used sparingly but effectively: two **SHOULD** surround function definitions for visual separation, and single blanks **SHOULD** group related logic within functions (e.g., before a block comment or between setup and main logic). Files **MUST** end with a single blank line. Regions (#region ... #endregion) **SHOULD** logically group elements like licenses or helper sections, improving navigability in larger scripts.
 
-**Important:** Blank lines **MUST** be completely empty—they **MUST NOT** contain any whitespace characters (spaces or tabs). This ensures consistency and prevents issues with some editors and linters.
+Blank lines **MUST** be completely empty—they **MUST NOT** contain any whitespace characters (spaces or tabs).
 
 **Compliant (blank line is truly empty):**
 
@@ -263,15 +263,15 @@ Blank lines **SHOULD** be used sparingly but effectively: two **SHOULD** surroun
 
 **Non-Compliant (blank line contains spaces):**
 
+The `␠` marker below illustrates a space on an otherwise blank line; it is not PowerShell syntax. Do not copy the marker.
+
 ```powershell
 {
     Invoke-SomeCmdlet
-
+␠
     Invoke-AnotherCmdlet
 }
 ```
-
-In the non-compliant example, the blank line (line 3) contains spaces, which is not allowed.
 
 ### Trailing Whitespace
 

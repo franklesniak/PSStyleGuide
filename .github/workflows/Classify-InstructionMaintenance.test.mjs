@@ -30,6 +30,7 @@ test('new platform-discovered workflows require maintenance; sample YAML and not
 
 test('checker, helper, workflow and dependency-only changes require maintenance', () => {
   for (const name of ['.github/workflows/Test-AgentInstructions.ps1',
+    '.github/workflows/Test-BlankLineExamples.ps1',
     '.github/workflows/Classify-InstructionMaintenance.mjs', '.github/workflows/agent-instructions.yml',
     '.github/workflows/package-lock.json', '.github/workflows/.npmrc',
     '.github/workflows/Test-CheckoutCredentials.ps1',
