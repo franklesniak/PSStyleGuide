@@ -18,7 +18,7 @@ const selectorPaths = new Set([
     'copilot-setup-steps.yml',
     'build.yml', 'markdownlint.yml', '.markdownlint.jsonc', 'lint-nested-markdown.js',
     'Generate-StyleGuideArtifacts.ps1', 'Test-ExactGitPathSet.ps1',
-    'Test-StyleGuideArtifacts.ps1',
+    'Test-BlankLineExamples.ps1', 'Test-StyleGuideArtifacts.ps1',
     'Test-CheckoutCredentials.ps1', 'Initialize-CiToolchain.ps1',
     'Invoke-MarkdownLint.ps1', 'ci-toolchain.json',
     'NpmTools.mjs', 'NpmTools.test.mjs', 'Check-NpmAudit.mjs', 'Check-NpmAudit.test.mjs',

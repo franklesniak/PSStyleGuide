@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainer (@franklesniak)
-- **Last Updated:** 2026-08-30
+- **Last Updated:** 2026-10-01
 - **Scope:** Explains the rationale, design philosophy, and historical context behind the normative rules in `STYLE_GUIDE.md`. It does not define normative rules.
 - **Related:** [PowerShell Writing Style](STYLE_GUIDE.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 
@@ -1014,6 +1014,13 @@ function ExampleFunction {
     return 0
 }
 ```
+
+The compliant and non-compliant examples must make a spaces-only line visibly
+different from a truly empty line. Spaces can disappear from rendered Markdown,
+editor views, or copied text, so the non-compliant example uses `␠` as an
+illustration marker. The marker is not PowerShell syntax and is not a copyable
+replacement for the spaces it represents. This keeps the distinction clear
+without relying on trailing spaces in the Markdown source.
 
 ### Trailing Whitespace
 
