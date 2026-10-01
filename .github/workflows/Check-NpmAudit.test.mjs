@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { acceptedBase, ciScope, documentationOnlyDiff, evaluateFindings, evaluateProposal, hostedAuthorityReference, interpretAudit, parseExceptions, parseJson, readCandidateExceptions, runAuditCommand, validateGraph } from './Check-NpmAudit.mjs';
+import { acceptedBase, ciAudit, ciScope, documentationOnlyDiff, evaluateFindings, evaluateProposal, hostedAuthorityReference, interpretAudit, parseExceptions, parseJson, readCandidateExceptions, runAuditCommand, validateGraph } from './Check-NpmAudit.mjs';
 
 const id = 'GHSA-abcd-2345-cdef';
 const bytes = value => Buffer.from(JSON.stringify(value));
@@ -306,12 +306,13 @@ test('graph failures name the root and retain short native causes without dumpin
   });
 });
 
-test('actual CLI reports missing or malformed parser as ERROR with its cause and bootstrap command', () => {
+test('ordinary CLI keeps local authority under agent variables and reports parser failures', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'npm-audit-missing-parser-'));
   const directory = path.join(root, '.github/workflows');
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:GIT_|NODE_PATH$)/iu.test(key)));
   Object.assign(env, { GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null' });
-  delete env.GITHUB_ACTIONS;
+  Object.assign(env, { GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'dynamic',
+    GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_REF: 'refs/heads/copilot/proposal', GITHUB_SHA: 'a'.repeat(40) });
   const git = (...args) => execFileSync('git', args, { cwd: root, env, encoding: 'utf8', windowsHide: true, timeout: 10000 }).trim();
   try {
     fs.mkdirSync(directory, { recursive: true });
@@ -364,6 +365,8 @@ test('hosted authority is the native event base, not candidate or merge identity
   invalid.pull_request.base.sha = base; invalid.pull_request.base.ref = 'topic';
   assert.throws(() => hostedAuthorityReference(environment, invalid), /Unexpected PR authority/u);
   assert.equal(hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/main' }), merge);
+  assert.throws(() => hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/main', GITHUB_REPOSITORY: 'franklesniak/Other' }), /Unexpected audit repository/u);
+  assert.throws(() => hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/copilot/proposal' }), /must be the main branch/u);
   assert.throws(() => hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'pull_request_target' }), /Unsupported/u);
 });
 
@@ -383,8 +386,16 @@ test('a missing accepted record is empty authority; a failed Git read is an erro
     assert.equal(authority.sha, commit);
     assert.deepEqual(authority.exceptions, []);
     assert.match(authority.limitation, /Offline/u);
+    const agentEnvironment = { GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'dynamic',
+      GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_REF: 'refs/heads/copilot/proposal', GITHUB_SHA: 'a'.repeat(40) };
+    const agentAuthority = acceptedBase({ root, environment: agentEnvironment });
+    assert.equal(agentAuthority.sha, commit);
+    assert.deepEqual(agentAuthority.exceptions, []);
+    assert.match(agentAuthority.limitation, /Offline/u);
+    assert.throws(() => ciAudit({ root, environment: agentEnvironment }), /Unsupported hosted audit event/u);
+    assert.throws(() => ciAudit({ root, environment: {} }), /requires a hosted event/u);
     // An available exact main commit needs no remote or extra network fetch.
-    const hosted = acceptedBase({ root, environment: { GITHUB_ACTIONS: 'true', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide',
+    const hosted = acceptedBase({ root, hosted: true, environment: { GITHUB_ACTIONS: 'true', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide',
       GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/main', GITHUB_SHA: commit } });
     assert.equal(hosted.sha, commit);
     assert.deepEqual(hosted.exceptions, []);
@@ -399,6 +410,7 @@ test('a missing accepted record is empty authority; a failed Git read is an erro
     // The file in the candidate worktree above cannot supply authority.
     git(['update-ref', '-d', 'refs/remotes/origin/main']);
     assert.throws(() => acceptedBase({ root, environment: {} }), /unavailable/u);
+    assert.throws(() => acceptedBase({ root, environment: agentEnvironment }), /unavailable/u);
   } finally {
     assert.equal(path.dirname(root), fs.realpathSync(os.tmpdir()));
     assert.ok(path.basename(root).startsWith('npm-authority-test-'));

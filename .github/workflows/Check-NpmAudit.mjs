@@ -207,11 +207,11 @@ export function hostedAuthorityReference(environment, event) {
   return reference;
 }
 
-export function acceptedBase({ environment = process.env, root = repositoryRoot } = {}) {
+export function acceptedBase({ environment = process.env, root = repositoryRoot, hosted = false } = {}) {
   const env = gitEnvironment();
   let reference = 'refs/remotes/origin/main';
-  const hosted = environment.GITHUB_ACTIONS === 'true';
   if (hosted) {
+    if (environment.GITHUB_ACTIONS !== 'true') fail('CI audit authority requires a hosted event.');
     const event = environment.GITHUB_EVENT_NAME === 'pull_request'
       ? parseJson(readInput(environment.GITHUB_EVENT_PATH, 2 * 1024 * 1024)) : undefined;
     reference = hostedAuthorityReference(environment, event);
@@ -319,7 +319,7 @@ export function ciScope({ root = repositoryRoot, environment = process.env, auth
 }
 
 export function ciAudit({ root = repositoryRoot, environment = process.env } = {}) {
-  const authority = acceptedBase({ root, environment });
+  const authority = acceptedBase({ root, environment, hosted: true });
   const scope = ciScope({ root, environment, authority });
   return scope.applicable ? audit({ root, authority, installedRoots: ['.github/workflows'] }) : {
     status: 'NOT_APPLICABLE', ...scope,
