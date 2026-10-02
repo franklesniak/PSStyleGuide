@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # A02 D17 frozen checkpoint
 
-Product source remains HEAD `fe3d6738d5b331f88e21bf6b9815883b3bb353b8`, index `8bebd544abaaf3d11cea1feffe18c498e63dc981`. Worker retains sole writer ownership with bytes frozen. No protected, native, commit or push action occurred.
+At the initial frozen checkpoint, product source remained HEAD `fe3d6738d5b331f88e21bf6b9815883b3bb353b8`, index `8bebd544abaaf3d11cea1feffe18c498e63dc981`. Worker retained sole writer ownership with bytes frozen. The terminal update below supersedes that ownership and publication state.
 
 Selected D17 changes only the private F2 fixture in `Test-AgentInstructions.SelfTest.ps1`: a resolved existing Node application, bounded native lstat identity before/after the existing reader, and durable inquiry/identity negative tests. All prior hash, raw/path/type/source, intended Git mode and date/caller controls remain. The retained guard is static refusal under no competing writer; the inquiry timeout does not bound a later substituted .NET open or establish atomic handle identity.
 
@@ -14,3 +14,13 @@ The combined Linux control invocation exited1 after its successful inquiry/ident
 `D17-complete-candidate-inventory.json` proves all71 raw lengths/SHA256/blobs/modes, source HEAD/index, exactly11 native differences, fixture's own `.git`, no unstaged/untracked product changes, and detached native B `48f4d8a36c8faceee12afac78aaecea0d176125d` with staged tree `6c6108352ba2aa6217fe0d31b5c7d0ae093beaf2`. Fixture is `D14-native-validation`; the name preserves original failed evidence while new receipts use D17 names.
 
 `D17-validation-command-preimages.json` pins normal `py -3.12 -m pre_commit run --all-files`, two passes, unchanged ordinary D14 dependency setup, complete Node24.18.1/npm11.16.0 runtime, active Husky shim, null HUSKY/SKIP and all six tool/config input hashes. Runner `run-D17-precommit-pass.py` SHA256 is `4f585bee1127b65c8c0243aa5bed566bb118e0012819558ac6e5198b81575cae`. The coordinator subsequently verified the complete gate at 12:52 UTC and released both normal sequential aggregates; pass1 is running. No aggregate pass is claimed. All earlier failed receipts retain their original names.
+
+## Terminal validation and actual candidate
+
+Both sequential normal full passes exited0 with all ten hooks passing and complete before/after identity guards unchanged. Pass1 ran 12:53:54.180Z–13:14:55.979Z; pass2 ran13:15:50.810Z–13:35:15.208Z. Both log SHA256 values are `8a08f43aa8f330c8f47ebdaff5ab88a771be2476eb2d143fb9f5ba5323b171b4`. Parent independently verified both receipts, all71 raw/blob/mode identities, the fixture B/T, source HEAD/index and command/setup inputs. These successful final runs do not change the disposition of earlier failures.
+
+The worker returned both worktrees to the coordinator. Normal Husky commit `d9b9e1c4597f91b9f5d2de0cc376c28305207654` has parent `fe3d6738d5b331f88e21bf6b9815883b3bb353b8` and exact validated tree `6c6108352ba2aa6217fe0d31b5c7d0ae093beaf2`; its worktree is clean. The normal staged Markdown hook passed.
+
+From detached native B, the final proposed checker ran both commands with `-InputRevision d9b9e1c4597f91b9f5d2de0cc376c28305207654 -PublishedBaselineRevision 48f4d8a36c8faceee12afac78aaecea0d176125d`: `-FinalizeMetadataNow` exited0 and reported UTC date2026-10-02; `-MetadataClassificationOnly` separately exited0. Log SHA256 values are `449bb57adfc94de404b9238df39289e9bfe0173c38d82b043092bbe1264dbaa0` and `5aefb5a51162c65f31d9b6955f91207ac3a84686ebbfdf9b717d5b0bcc586ab8`. All71 source/fixture bytes, blobs and modes remained unchanged. The native base does not contain these new modes: this proves proposed code against actual native inputs, not installed enforcement.
+
+Fresh native main/topic preimages and the complete one-commit/five-path outgoing range were verified before the normal nonforce push. Current-input reviews, Linux candidate CI, independent final quality, normal merge/landed behavior and peer convergence remain pending. Protected proposals remain unauthorized. A02 is not complete; round1 history, original deadline and transfers0/12 are retained.
