@@ -1,0 +1,751 @@
+{
+  "checkedUtc": "2026-10-02T07:54:06.333606+00:00",
+  "sourceChecks": [
+    {
+      "repository": "PS",
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/NpmTools.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/agent-instructions.yml",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/build.yml",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/ci-toolchain.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/historical-supply-profile.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/markdownlint.yml",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/package-lock.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/package.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/scripts-README.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": "docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": "docs/dependency-maintenance.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": "package-lock.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": "package.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/NpmTools.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/agent-instructions.yml",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/build.yml",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/ci-toolchain.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/historical-supply-profile.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/markdownlint.yml",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/package-lock.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/package.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/scripts-README.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": "docs/dependency-maintenance.md",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": "package-lock.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": "package.json",
+      "rawHashAndMode": true
+    },
+    {
+      "repository": "TF",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "rawHashAndMode": true
+    }
+  ],
+  "scoreArithmetic": [
+    {
+      "decision": "D1",
+      "option": "A",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        1,
+        4,
+        1,
+        2,
+        5
+      ],
+      "total": 44.0
+    },
+    {
+      "decision": "D1",
+      "option": "B",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        1,
+        2,
+        4,
+        2,
+        3
+      ],
+      "total": 42.0
+    },
+    {
+      "decision": "D1",
+      "option": "C",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        5,
+        5,
+        4,
+        4,
+        3
+      ],
+      "total": 92.0
+    },
+    {
+      "decision": "D1",
+      "option": "D",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        2,
+        1,
+        5,
+        5,
+        5
+      ],
+      "total": 55.0
+    },
+    {
+      "decision": "D1",
+      "option": "E",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        4,
+        3,
+        2,
+        1,
+        1
+      ],
+      "total": 57.0
+    },
+    {
+      "decision": "D2",
+      "option": "A",
+      "weights": [
+        40,
+        25,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        1,
+        5,
+        1,
+        4,
+        5
+      ],
+      "total": 50.0
+    },
+    {
+      "decision": "D2",
+      "option": "B",
+      "weights": [
+        40,
+        25,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        5,
+        5,
+        5,
+        5,
+        4
+      ],
+      "total": 99.0
+    },
+    {
+      "decision": "D2",
+      "option": "C",
+      "weights": [
+        40,
+        25,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        3,
+        1,
+        3,
+        4,
+        3
+      ],
+      "total": 52.0
+    },
+    {
+      "decision": "D2",
+      "option": "D",
+      "weights": [
+        40,
+        25,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        2,
+        1,
+        4,
+        2,
+        2
+      ],
+      "total": 43.0
+    },
+    {
+      "decision": "D2",
+      "option": "E",
+      "weights": [
+        40,
+        25,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        2,
+        4,
+        1,
+        1,
+        1
+      ],
+      "total": 43.0
+    },
+    {
+      "decision": "D3",
+      "option": "A",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        5,
+        4,
+        3,
+        3,
+        5
+      ],
+      "total": 82.0
+    },
+    {
+      "decision": "D3",
+      "option": "B",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        5,
+        5,
+        5,
+        4,
+        3
+      ],
+      "total": 96.0
+    },
+    {
+      "decision": "D3",
+      "option": "C",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        3,
+        1,
+        2,
+        2,
+        2
+      ],
+      "total": 41.0
+    },
+    {
+      "decision": "D3",
+      "option": "D",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        0,
+        3,
+        2,
+        4,
+        4
+      ],
+      "total": 38.0
+    },
+    {
+      "decision": "D3",
+      "option": "E",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        3,
+        2,
+        2,
+        1,
+        1
+      ],
+      "total": 44.0
+    },
+    {
+      "decision": "D3",
+      "option": "F",
+      "weights": [
+        35,
+        30,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        5,
+        5,
+        4,
+        5,
+        5
+      ],
+      "total": 96.0
+    }
+  ],
+  "guardProbes": {
+    "node": "v24.18.1",
+    "records": [
+      {
+        "repository": "PS",
+        "guardLines": [
+          5456,
+          5467
+        ],
+        "guardSha256": "a78e666d1d2129588d21ed7316e546603062eaab4c13f0be5e603db25a1fcecd",
+        "method": "Exact production expression and guard in Node vm; process.exit sentinel; no whole-script/npm/cloud execution",
+        "results": [
+          {
+            "case": "current-strict",
+            "status": 4,
+            "matches": false,
+            "diagnostic": false,
+            "stderr": "supply-freeze: refusing to record digests for an unreviewed manifest.\n  package.json       observed a01509018203f9d0d092549b5a220447818d6af8fc58f6ad7d93681a37b63a98\n                     reviewed 59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9\n  package-lock.json  observed ec2139965d08fd8ed42eca2da44759537e1ecdde06845b72af3d5ce6efc22195\n                     reviewed 5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2\n  package.json       blob     753a464d066c0832e8b360d21a541b176ed61456\n                     reviewed 84bd0421fcf17984220a408e42c5e0523ef65be6\n  a changed manifest needs a new reviewed freeze, not a digest against this one.\n",
+            "stdoutBytes": 0,
+            "packageSha256": "a01509018203f9d0d092549b5a220447818d6af8fc58f6ad7d93681a37b63a98",
+            "lockSha256": "ec2139965d08fd8ed42eca2da44759537e1ecdde06845b72af3d5ce6efc22195"
+          },
+          {
+            "case": "historical-strict",
+            "status": 0,
+            "matches": true,
+            "diagnostic": false,
+            "stderr": "",
+            "stdoutBytes": 0,
+            "packageSha256": "59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9",
+            "lockSha256": "5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2"
+          },
+          {
+            "case": "current-diagnostic",
+            "status": 0,
+            "matches": false,
+            "diagnostic": true,
+            "stderr": "",
+            "stdoutBytes": 0,
+            "packageSha256": "a01509018203f9d0d092549b5a220447818d6af8fc58f6ad7d93681a37b63a98",
+            "lockSha256": "ec2139965d08fd8ed42eca2da44759537e1ecdde06845b72af3d5ce6efc22195"
+          }
+        ]
+      },
+      {
+        "repository": "TF",
+        "guardLines": [
+          5456,
+          5467
+        ],
+        "guardSha256": "a78e666d1d2129588d21ed7316e546603062eaab4c13f0be5e603db25a1fcecd",
+        "method": "Exact production expression and guard in Node vm; process.exit sentinel; no whole-script/npm/cloud execution",
+        "results": [
+          {
+            "case": "current-strict",
+            "status": 4,
+            "matches": false,
+            "diagnostic": false,
+            "stderr": "supply-freeze: refusing to record digests for an unreviewed manifest.\n  package.json       observed 761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f\n                     reviewed c6db6befda88e58aa5568f52f44ca934af5751e545dba0644297b9fb15577e0d\n  package-lock.json  observed ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a\n                     reviewed 84cbe61e33e4c66b653efd2bfbe3f80b0061368a64ad80ef0de4898da28d887d\n  package.json       blob     65aebbba501747454aede48fe32ce406a2ce43ff\n                     reviewed 103075d0d14f61b49d29cf2ed8dc8a7804fe092e\n  a changed manifest needs a new reviewed freeze, not a digest against this one.\n",
+            "stdoutBytes": 0,
+            "packageSha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f",
+            "lockSha256": "ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a"
+          },
+          {
+            "case": "historical-strict",
+            "status": 0,
+            "matches": true,
+            "diagnostic": false,
+            "stderr": "",
+            "stdoutBytes": 0,
+            "packageSha256": "c6db6befda88e58aa5568f52f44ca934af5751e545dba0644297b9fb15577e0d",
+            "lockSha256": "84cbe61e33e4c66b653efd2bfbe3f80b0061368a64ad80ef0de4898da28d887d"
+          },
+          {
+            "case": "current-diagnostic",
+            "status": 0,
+            "matches": false,
+            "diagnostic": true,
+            "stderr": "",
+            "stdoutBytes": 0,
+            "packageSha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f",
+            "lockSha256": "ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "This is a source-bound guard execution, not a Linux whole-recorder pass.",
+      "Diagnostic bypass of this one guard does not establish complete observation or policy acceptance.",
+      "No dependency installation or real credentials."
+    ]
+  },
+  "selectedCurrentTests": {
+    "node": "24.18.1",
+    "host": "Windows",
+    "results": [
+      {
+        "repository": "PS",
+        "nativeExit": 0,
+        "selection": "--test-name-pattern=JSON-ROOT-GUARDS|RECURSIVE-COMPARISON-REFUSAL|HISTORICAL-RECIPE-IDENTITY|HOST:",
+        "summary": [
+          "\u2139 tests 4",
+          "\u2139 pass 4",
+          "\u2139 fail 0",
+          "\u2139 skipped 0",
+          "\u2139 duration_ms 174.8986"
+        ],
+        "logSha256": "755ab2d0b4564f3d461621484a358790a373fb154355aa717c4700df451908b7"
+      },
+      {
+        "repository": "TF",
+        "nativeExit": 0,
+        "selection": "--test-name-pattern=JSON-ROOT-GUARDS|RECURSIVE-COMPARISON-REFUSAL|HISTORICAL-RECIPE-IDENTITY|HOST:",
+        "summary": [
+          "\u2139 tests 4",
+          "\u2139 pass 4",
+          "\u2139 fail 0",
+          "\u2139 skipped 0",
+          "\u2139 duration_ms 185.9435"
+        ],
+        "logSha256": "d7939030ccd4eb1a8929fc2312e18a6821c8333d62d84c595b3e30f42ea6b8e3"
+      }
+    ],
+    "limit": "Only four selected test names per repository; name-filter exclusions are not passes. No Linux full recorder or live audit run."
+  },
+  "originalCoverage": {
+    "count": 29,
+    "historicalVerifiedPreserved": 7,
+    "retainPreserved": 22,
+    "newCredits": 0,
+    "ownerArraysExactlyMatchA00": true
+  },
+  "finalRefs": {
+    "PS": {
+      "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc"
+    },
+    "TF": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "limits": [
+    "No whole current Linux recorder execution",
+    "Old exact passes have changed current dependency inputs; no current full-suite pass claimed",
+    "No current candidate implementation/acceptance",
+    "A03/A07 implementation acceptance pending",
+    "No real secrets/cloud/state or Windows execution-policy change",
+    "Source inspection was bounded, not a full new audit of every unchanged source line"
+  ],
+  "decisionRevision": {
+    "D3": "Added distinct narrow-existing-hunk option F under unchanged weights and A-E scores. B=96,F=96; select F on lower mutation/initialization burden.",
+    "selected": "F",
+    "noCentralizedDescriptorSelected": true
+  }
+}

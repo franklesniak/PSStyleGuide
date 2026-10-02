@@ -1,0 +1,1367 @@
+{
+  "capturedUtc": "2026-10-02T07:28:39.958457+00:00",
+  "repositories": {
+    "PS": {
+      "name": "franklesniak/PSStyleGuide",
+      "main": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc",
+      "sources": [
+        {
+          "path": ".github/workflows/Check-NpmAudit.mjs",
+          "blob": "3babe4848f5d97ffd5757255983463231d4163f7",
+          "mode": "100644",
+          "sha256": "0110c31f21d9037991cb87ca0a2f00b3360995ba7ca815defaafd4a08d19c90d",
+          "bytes": 20485,
+          "lines": 340
+        },
+        {
+          "path": ".github/workflows/Check-NpmAudit.test.mjs",
+          "blob": "3a98a55e7d01a1dfd95f2112e8fa656f79df6df2",
+          "mode": "100644",
+          "sha256": "42fb09ef61f7d67d40a33a0b8b71c8ffd952876d8bac9140300975cf1db86b08",
+          "bytes": 27466,
+          "lines": 419
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "blob": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+          "mode": "100644",
+          "sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1",
+          "bytes": 376988,
+          "lines": 6556
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "blob": "19240ed44a8811d0a98bb0c67e4a732b5a749f58",
+          "mode": "100644",
+          "sha256": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae",
+          "bytes": 150171,
+          "lines": 2743
+        },
+        {
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+          "mode": "100644",
+          "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+          "bytes": 5844,
+          "lines": 104
+        },
+        {
+          "path": ".github/workflows/NpmTools.mjs",
+          "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+          "mode": "100644",
+          "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587",
+          "bytes": 7375,
+          "lines": 146
+        },
+        {
+          "path": ".github/workflows/NpmTools.test.mjs",
+          "blob": "77a1313b9044bb934159a165e07219a3c1c9306b",
+          "mode": "100644",
+          "sha256": "0b328c28f566e3d337831026eb0c7055b8158c8895c0552c77d9dbb8e3808c42",
+          "bytes": 9686,
+          "lines": 183
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          "blob": "41a955fc4ef68f47b3391417babbcb91824a2726",
+          "mode": "100644",
+          "sha256": "becb1877caa33c3cbdb949ce710676674ad8475384252072aef8e63496710bba",
+          "bytes": 19602,
+          "lines": 491
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "blob": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+          "mode": "100644",
+          "sha256": "5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5",
+          "bytes": 378451,
+          "lines": 9449
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "blob": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+          "mode": "100644",
+          "sha256": "a8f12abf35f250c7f2d0a0ab753a18a42fca7516a36aae9e3dd90eac76805160",
+          "bytes": 25672,
+          "lines": 577
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "blob": "3f0abda0049fdeacb85c8493937b768ddc999c4a",
+          "mode": "100644",
+          "sha256": "09c32c6e780a325bfac5a2d6d2505f747fd3cdfff297edb7b74107fc79bbcaca",
+          "bytes": 15077,
+          "lines": 251
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "blob": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+          "mode": "100644",
+          "sha256": "1c9457868eb262fc7ed8583d1cfff2903288286f11c103a46f91703b04bef67d",
+          "bytes": 9504,
+          "lines": 173
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+          "mode": "100644",
+          "sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0",
+          "bytes": 4361,
+          "lines": 103
+        },
+        {
+          "path": ".github/workflows/ci-toolchain.json",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "mode": "100644",
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+          "bytes": 91,
+          "lines": 3
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+          "mode": "100644",
+          "sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa",
+          "bytes": 26612,
+          "lines": 529
+        },
+        {
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "blob": "dde42437f9f5d579abee2e944321488a2ba4f793",
+          "mode": "100644",
+          "sha256": "0deabaded368671ae8759f4c4fc02445e2e3c0c930cfe3a3a20df728a1e988de",
+          "bytes": 3863,
+          "lines": 108
+        },
+        {
+          "path": ".github/workflows/historical-supply-profile.json",
+          "blob": "224f6fba1aa90174dad8eec57dc6012697d8be33",
+          "mode": "100644",
+          "sha256": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4",
+          "bytes": 4461,
+          "lines": 119
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "blob": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+          "mode": "100644",
+          "sha256": "73b1eb08b07254ffcb9d437e260bee8a38cce2e8cc65af1c921a3a9c4ed47bfa",
+          "bytes": 6604,
+          "lines": 137
+        },
+        {
+          "path": ".github/workflows/package-lock.json",
+          "blob": "0f2ba8fde17782391a0589fb8e02045c8322d956",
+          "mode": "100644",
+          "sha256": "ec2139965d08fd8ed42eca2da44759537e1ecdde06845b72af3d5ce6efc22195",
+          "bytes": 55584,
+          "lines": 1586
+        },
+        {
+          "path": ".github/workflows/package.json",
+          "blob": "753a464d066c0832e8b360d21a541b176ed61456",
+          "mode": "100644",
+          "sha256": "a01509018203f9d0d092549b5a220447818d6af8fc58f6ad7d93681a37b63a98",
+          "bytes": 1137,
+          "lines": 40
+        },
+        {
+          "path": ".github/workflows/scripts-README.md",
+          "blob": "0350d4979fd5ba109ba4dbb910e1593debd0138d",
+          "mode": "100644",
+          "sha256": "b6af48d2e2d29449c7ab302dcde88cdafa30c6573b89065fcd31ab5adf25b8f2",
+          "bytes": 3038,
+          "lines": 77
+        },
+        {
+          "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+          "mode": "100644",
+          "sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+          "bytes": 57610,
+          "lines": 355
+        },
+        {
+          "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+          "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+          "mode": "100644",
+          "sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+          "bytes": 12177,
+          "lines": 215
+        },
+        {
+          "path": "docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+          "blob": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+          "mode": "100644",
+          "sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+          "bytes": 8744,
+          "lines": 130
+        },
+        {
+          "path": "docs/dependency-maintenance.md",
+          "blob": "34c9dec3cd9f640fd3a8346583fe8b1569056fb8",
+          "mode": "100644",
+          "sha256": "6371e711abad12c5d0a153e12ba519870034aa39c6455c11608d0969c185822a",
+          "bytes": 6243,
+          "lines": 40
+        },
+        {
+          "path": "package-lock.json",
+          "blob": "5a8244af74fde546f0bfa55af366ce3ca13cea51",
+          "mode": "100644",
+          "sha256": "63e3455bc1e4d04c4390dea1ddddb340bf89c48206ee6deeb851241e1177b6fe",
+          "bytes": 51357,
+          "lines": 1459
+        },
+        {
+          "path": "package.json",
+          "blob": "f700e931201cac80accde177a11b1a0bb5c75bb2",
+          "mode": "100644",
+          "sha256": "50f91f5901669fc74d624ce0ca8d90e50cf335c0eb437fdfdd6f4723d7226a3a",
+          "bytes": 1025,
+          "lines": 31
+        },
+        {
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "blob": "d44a87f46f60e0cc80a3293aa90d7ed6e1c5d161",
+          "mode": "100644",
+          "sha256": "0414d5e9a498b0bf7f9f5ce258a733679bc1ad6963af5bbdb3e6f2ecb30901ee",
+          "bytes": 1448,
+          "lines": 41
+        }
+      ]
+    },
+    "TF": {
+      "name": "franklesniak/TerraformStyleGuide",
+      "main": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "sources": [
+        {
+          "path": ".github/workflows/Check-NpmAudit.mjs",
+          "blob": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+          "mode": "100644",
+          "sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb",
+          "bytes": 20499,
+          "lines": 340
+        },
+        {
+          "path": ".github/workflows/Check-NpmAudit.test.mjs",
+          "blob": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+          "mode": "100644",
+          "sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3",
+          "bytes": 27494,
+          "lines": 419
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+          "mode": "100644",
+          "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f",
+          "bytes": 377161,
+          "lines": 6556
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+          "mode": "100644",
+          "sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57",
+          "bytes": 154151,
+          "lines": 2808
+        },
+        {
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "mode": "100644",
+          "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+          "bytes": 5706,
+          "lines": 103
+        },
+        {
+          "path": ".github/workflows/NpmTools.mjs",
+          "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+          "mode": "100644",
+          "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587",
+          "bytes": 7375,
+          "lines": 146
+        },
+        {
+          "path": ".github/workflows/NpmTools.test.mjs",
+          "blob": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+          "mode": "100644",
+          "sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b",
+          "bytes": 11402,
+          "lines": 209
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+          "mode": "100644",
+          "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875",
+          "bytes": 460163,
+          "lines": 11379
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "mode": "100644",
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7",
+          "bytes": 25568,
+          "lines": 577
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+          "mode": "100644",
+          "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327",
+          "bytes": 14948,
+          "lines": 251
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "mode": "100644",
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c",
+          "bytes": 9558,
+          "lines": 169
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "mode": "100644",
+          "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd",
+          "bytes": 4222,
+          "lines": 103
+        },
+        {
+          "path": ".github/workflows/ci-toolchain.json",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "mode": "100644",
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+          "bytes": 91,
+          "lines": 3
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+          "mode": "100644",
+          "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae",
+          "bytes": 33862,
+          "lines": 674
+        },
+        {
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+          "mode": "100644",
+          "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62",
+          "bytes": 7645,
+          "lines": 191
+        },
+        {
+          "path": ".github/workflows/historical-supply-profile.json",
+          "blob": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+          "mode": "100644",
+          "sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d",
+          "bytes": 2783,
+          "lines": 78
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+          "mode": "100644",
+          "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad",
+          "bytes": 6632,
+          "lines": 137
+        },
+        {
+          "path": ".github/workflows/package-lock.json",
+          "blob": "8836c53a7d86ea9eeab8d0ba10b4026cb848b3ae",
+          "mode": "100644",
+          "sha256": "ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a",
+          "bytes": 55624,
+          "lines": 1586
+        },
+        {
+          "path": ".github/workflows/package.json",
+          "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+          "mode": "100644",
+          "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f",
+          "bytes": 1105,
+          "lines": 40
+        },
+        {
+          "path": ".github/workflows/scripts-README.md",
+          "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+          "mode": "100644",
+          "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6",
+          "bytes": 5421,
+          "lines": 39
+        },
+        {
+          "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+          "mode": "100644",
+          "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2",
+          "bytes": 65689,
+          "lines": 451
+        },
+        {
+          "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+          "blob": "9e04225a355997850e4817f9163868089a773332",
+          "mode": "100644",
+          "sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93",
+          "bytes": 127363,
+          "lines": 1631
+        },
+        {
+          "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+          "blob": "b1065e9a330dc2a37e6f56eedc38f720558e6528",
+          "mode": "100644",
+          "sha256": "d2b20a47d918b31e6443d17bb8a305a83a1d3102cc5ad3b9362c0594440d570f",
+          "bytes": 16511,
+          "lines": 286
+        },
+        {
+          "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+          "blob": "970afd6f1df559f3085bd39cff2f7b961cc96a15",
+          "mode": "100644",
+          "sha256": "88f628441c80c9aa7ec99e94e8f67e87dedade21f9275547147508950fd15d87",
+          "bytes": 21626,
+          "lines": 359
+        },
+        {
+          "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+          "blob": "277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba",
+          "mode": "100644",
+          "sha256": "c8994c132bf13fae0500e0cd429999cd36c9ccf4fa26bdcffe7f97a6cd9cf5cc",
+          "bytes": 11644,
+          "lines": 213
+        },
+        {
+          "path": "docs/dependency-maintenance.md",
+          "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+          "mode": "100644",
+          "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6",
+          "bytes": 6448,
+          "lines": 40
+        },
+        {
+          "path": "package-lock.json",
+          "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+          "mode": "100644",
+          "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57",
+          "bytes": 3566,
+          "lines": 112
+        },
+        {
+          "path": "package.json",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "mode": "100644",
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+          "bytes": 837,
+          "lines": 25
+        },
+        {
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "mode": "100644",
+          "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222",
+          "bytes": 1407,
+          "lines": 41
+        }
+      ]
+    }
+  },
+  "historicalProof": [
+    {
+      "repository": "PS",
+      "pr": 205,
+      "url": "https://github.com/franklesniak/PSStyleGuide/pull/205",
+      "merged": true,
+      "mergedAt": "2026-09-22T08:40:45Z",
+      "merge": "97f126c172221bb383a3d340d26338006ed1609d",
+      "head": "5f4bd1de2db17139e0240b0b6decdcb8fe2ba462",
+      "comment": {
+        "id": 5773736175,
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/205#issuecomment-5773736175",
+        "author": "franklesniak",
+        "updatedAt": "2026-09-22T08:52:48Z",
+        "sha256": "f9a10868d4b942ffe67e086938fd888ee6991cb98dfde1eaf6f0bec4a4a11826"
+      },
+      "fileComparisons": [
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "oldBlob": "58ce7b0470a91589e6a6d99f26b30dc43cf21ce9",
+          "currentBlob": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+          "rawEqual": false,
+          "onlyChangedBytesAreProfileFilename": true,
+          "oldFilenameOccurrences": 1
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "oldBlob": "7b8c6c4d131a25387068fdb2bd9a26233773c23d",
+          "currentBlob": "19240ed44a8811d0a98bb0c67e4a732b5a749f58",
+          "rawEqual": false,
+          "onlyChangedBytesAreProfileFilename": true,
+          "oldFilenameOccurrences": 9
+        }
+      ],
+      "supplyFreezeObjectEqualToAcceptedOldContract": true,
+      "historicalRuntimeOnly": {
+        "Windows": {
+          "total": 34,
+          "pass": 27,
+          "linuxOnlySkip": 7,
+          "fail": 0
+        },
+        "Linux": {
+          "total": 34,
+          "pass": 33,
+          "windowsOnlySkip": 1,
+          "fail": 0
+        },
+        "toolchain": "Node24.18.1/npm11.16.0",
+        "currentLimit": "Exact historical suite result is not current whole-suite acceptance: profile path and manifest inputs changed."
+      }
+    },
+    {
+      "repository": "TF",
+      "pr": 55,
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/55",
+      "merged": true,
+      "mergedAt": "2026-09-22T17:17:42Z",
+      "merge": "ee7f99cc7e40e8d09f08cead7ff646b47b046e3a",
+      "head": "b1f3601211f3d29137e3d51a71513f1499265e5c",
+      "comment": {
+        "id": 5781088578,
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/55#issuecomment-5781088578",
+        "author": "franklesniak",
+        "updatedAt": "2026-09-22T17:35:55Z",
+        "sha256": "d6a6a9541a215ab2d759636fd0ec0ddadc98b922dbeab4d6ab2fd92bc3e7dce1"
+      },
+      "fileComparisons": [
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "oldBlob": "7846ca99acfbb3d8d361bc544e60c62a521cfa72",
+          "currentBlob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+          "rawEqual": false,
+          "onlyChangedBytesAreProfileFilename": true,
+          "oldFilenameOccurrences": 1
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "oldBlob": "f3d8442b60c4abc99e55bbec85b9a3eee38a100c",
+          "currentBlob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+          "rawEqual": false,
+          "onlyChangedBytesAreProfileFilename": true,
+          "oldFilenameOccurrences": 9
+        }
+      ],
+      "supplyFreezeObjectEqualToAcceptedOldContract": true,
+      "historicalRuntimeOnly": {
+        "Windows": {
+          "total": 34,
+          "pass": 27,
+          "linuxOnlySkip": 7,
+          "fail": 0
+        },
+        "Linux": {
+          "total": 34,
+          "pass": 33,
+          "windowsOnlySkip": 1,
+          "fail": 0
+        },
+        "toolchain": "Node24.18.1/npm11.16.0",
+        "currentLimit": "Exact historical suite result is not current whole-suite acceptance: profile path and manifest inputs changed."
+      }
+    }
+  ],
+  "differences": [
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "changedIntervals": [
+        {
+          "PS": [
+            1,
+            1
+          ],
+          "TF": [
+            1,
+            1
+          ],
+          "psSha256": "699c439d360ef7b9b79bdd418355045830937706ff33a9d1899c90cb91d40567",
+          "tfSha256": "98d6a29831817103b606fc6654e2dec1f05cfc6e72f086a93ce1a676a10afcff"
+        },
+        {
+          "PS": [
+            4,
+            4
+          ],
+          "TF": [
+            4,
+            4
+          ],
+          "psSha256": "0d947e4ce568004b23178342db5c3a1acd004c83ffebd98d063e0c9481ebc850",
+          "tfSha256": "56c3059e86e47a283dc8f204510f7fd38a313c18e647fd1a3ae1396859db7bec"
+        },
+        {
+          "PS": [
+            6,
+            8
+          ],
+          "TF": [
+            6,
+            8
+          ],
+          "psSha256": "9dc124ece02174d56f91dc871778b4f0dd66b9f1313ed8c3f5d619ec60845ea3",
+          "tfSha256": "3ab47fc5e2cd465996e34f1340c283ccdc0c668d427f3b3d8e92a54bc2dc1228"
+        },
+        {
+          "PS": [
+            265,
+            266
+          ],
+          "TF": [
+            265,
+            266
+          ],
+          "psSha256": "8b82a627abe06857a35dadbea19a29bc052d16aa65e834dd9858c1720a740190",
+          "tfSha256": "a6c38ee5a93e5c1be8bf124289abfa319663d74ff0694e698fb92d86c6ee6183"
+        },
+        {
+          "PS": [
+            278,
+            279
+          ],
+          "TF": [
+            278,
+            279
+          ],
+          "psSha256": "50bfaf48b39e7e1b85e7ed3436e0c222066041197c3d3d9d17d54daef8d72903",
+          "tfSha256": "f29ebdebedb8514a9ad89981962f1b050c8958789da554789793c30bd7aa689a"
+        },
+        {
+          "PS": [
+            1341,
+            1341
+          ],
+          "TF": [
+            1341,
+            1341
+          ],
+          "psSha256": "e5b5b45ca0d5d2815ad09fea3c9e52ec40b4b2586a389981240525f2d367ea5e",
+          "tfSha256": "679e4f3eb9713615f71ad1479bbef80844064216dc66548cb98d004982514620"
+        },
+        {
+          "PS": [
+            2420,
+            2420
+          ],
+          "TF": [
+            2420,
+            2420
+          ],
+          "psSha256": "081314b753aad2629b9311fa39b49b67b79bb36714c83ac25e5b1b03102480e4",
+          "tfSha256": "c1909b417a182ceeb9290409d678d1e544b3e27d999b42b20e864e8443eaab6a"
+        },
+        {
+          "PS": [
+            4358,
+            4359
+          ],
+          "TF": [
+            4358,
+            4359
+          ],
+          "psSha256": "6b8bc64bb2df66bf52258f9c3a89e0aa63ac432abb4a560b94b5f96f2c5dadd5",
+          "tfSha256": "1591829c93088a6aeb6a2a32188180f79419617458d0e5a1f6da57c5769114dc"
+        },
+        {
+          "PS": [
+            4361,
+            4361
+          ],
+          "TF": [
+            4361,
+            4361
+          ],
+          "psSha256": "cb67ddb3e0d9c73ce3c838f590fe3c4d43337b8187be5d737c3a41b2df9ca01f",
+          "tfSha256": "11751ef8281181c85578305d2e8e79e4cc0214c54904a9786b4d4b75595ec8ad"
+        },
+        {
+          "PS": [
+            4366,
+            4366
+          ],
+          "TF": [
+            4366,
+            4366
+          ],
+          "psSha256": "e0d31abdbed3beb7f3367a15f3c097becf6d0e1dbe9680b4ce40983b79ae011a",
+          "tfSha256": "df4977364ada98ea006e719379e6e2eb79a9b9c743adae1150299862a5439ea3"
+        },
+        {
+          "PS": [
+            4378,
+            4378
+          ],
+          "TF": [
+            4378,
+            4378
+          ],
+          "psSha256": "6c0661545b10ab4235363305ab07769997031e905ea465bee20fd44db153bdbe",
+          "tfSha256": "6b495cf9a694a3236291386831f7090466368ae649beb94e81321ee44420736e"
+        },
+        {
+          "PS": [
+            4381,
+            4381
+          ],
+          "TF": [
+            4381,
+            4381
+          ],
+          "psSha256": "cbff59438afa1952475f3377586e28604152f6098e748537046e79496a9a8365",
+          "tfSha256": "a587a31e78c33489b767095fcf2d4d595c2282eba0eaf880228f71e707244ca1"
+        },
+        {
+          "PS": [
+            4403,
+            4403
+          ],
+          "TF": [
+            4403,
+            4403
+          ],
+          "psSha256": "1701a51f779db8a6b1fa614e45850fa625d00a2caf560b0e3a05b05a1b09fedd",
+          "tfSha256": "12ed6e0590525ac87b967a6c06c2687a4ed2ee32af585dc60f446b34c27c17a2"
+        },
+        {
+          "PS": [
+            4409,
+            4409
+          ],
+          "TF": [
+            4409,
+            4409
+          ],
+          "psSha256": "cf89833935074fcbef2aeaeb58c6296e5dbf9139d16421a6c598e0ca283b0d95",
+          "tfSha256": "9cf58f2a9422a2ce302a9dd0b5e07333ebcc4886530d399003580db0d24a3670"
+        },
+        {
+          "PS": [
+            4417,
+            4417
+          ],
+          "TF": [
+            4417,
+            4417
+          ],
+          "psSha256": "485da9016c7f19d2541bc993650d8f5267bc45044d3825e1318e60d930dc3b1e",
+          "tfSha256": "9f0fb977497e604d0501446feb78c07e8bc9e04a861fc9d2c4d65f9ccb57b29a"
+        },
+        {
+          "PS": [
+            4420,
+            4420
+          ],
+          "TF": [
+            4420,
+            4420
+          ],
+          "psSha256": "c2880911f77f98e2cfc8df72e5c473089cdc616d1a5c8059b5862f521be32822",
+          "tfSha256": "3334b3bd4a5ce694b691d494edc4b7bff5cdf91ef1d51335a657eb5879582531"
+        },
+        {
+          "PS": [
+            4427,
+            4428
+          ],
+          "TF": [
+            4427,
+            4428
+          ],
+          "psSha256": "539dc43d1f2a1aa787e74c94ac4562a61e693c26e67f82502714f3c694f26213",
+          "tfSha256": "2f382459c5e54977e7b522af252bed225ef1f63b1e829278c1de47bd5f3d2a6d"
+        },
+        {
+          "PS": [
+            4878,
+            4878
+          ],
+          "TF": [
+            4878,
+            4878
+          ],
+          "psSha256": "e1c456b93224f7c085718a6be363f6bf9929b999ec6827f9cfa7340af3cf54cb",
+          "tfSha256": "543b7041652e4f7c9ea740900c234e0cf78f8500d59db2d4f52be758ca304d2a"
+        },
+        {
+          "PS": [
+            6507,
+            6507
+          ],
+          "TF": [
+            6507,
+            6507
+          ],
+          "psSha256": "3be6c2b3721a94db26c3a1ab8b2b545393e0bd1d5208506f6f97d7f09407b8c0",
+          "tfSha256": "d62e1366a23fe8000cbf558645b9dba6152581ecd6d16a44a19e2fdc22e4cec1"
+        },
+        {
+          "PS": [
+            6515,
+            6517
+          ],
+          "TF": [
+            6515,
+            6517
+          ],
+          "psSha256": "53615aaa29292700ed50114c8aa8a12794e284a955843163fe35cfb98e6a4005",
+          "tfSha256": "ff6d38445fb0d2cc44178131cea3931708cc518270e37d46f78b5d806f87ee5e"
+        },
+        {
+          "PS": [
+            6519,
+            6521
+          ],
+          "TF": [
+            6519,
+            6521
+          ],
+          "psSha256": "ca7af8d0175248be1e2c1058820fd4359a9a7c4cd08e0fd348734a5dcffa1a47",
+          "tfSha256": "78843483fbb1093c3a9415070c6f1169cc1680557cf95c0479b8124bf1b3ebfe"
+        },
+        {
+          "PS": [
+            6526,
+            6526
+          ],
+          "TF": [
+            6526,
+            6526
+          ],
+          "psSha256": "2f6731ed2f6de0a9af038305d3634a766fc0a841b20ea8450b61c5834507bb0e",
+          "tfSha256": "a60f81e0152220892a8b3462246ce0bd27f0a69c6e9f95c7af9422355c9ce09c"
+        },
+        {
+          "PS": [
+            6534,
+            6535
+          ],
+          "TF": [
+            6534,
+            6535
+          ],
+          "psSha256": "d9e2fc2c2c4932504327b094add7a303f92d0a59a44410abc1cdf27895b00d17",
+          "tfSha256": "8b7d33939cd24308ca78ec28702e523eebf0f0899c45e6c980f8be1e6ee8f19b"
+        }
+      ],
+      "equalRawLines": 6522,
+      "PSChangedLines": 34,
+      "TFChangedLines": 34
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "changedIntervals": [
+        {
+          "PS": [
+            659,
+            659
+          ],
+          "TF": [
+            659,
+            659
+          ],
+          "psSha256": "28ae21287f3b99a1f86ab9ce18fb1cf074c3650a02434d981a57b7d1ac6a2c6e",
+          "tfSha256": "eb2e8afa37b578087f538fd3484eeee9cd4b45d886c64eafe9d7f8d7d7458002"
+        },
+        {
+          "PS": [
+            730,
+            730
+          ],
+          "TF": [
+            730,
+            730
+          ],
+          "psSha256": "39e5cb561f319468a203cf62e09463f216bda792ac9bb0e748b3c5eda105a7d0",
+          "tfSha256": "b5af1de2bbe427243b92f55bec8d0ad87cd7770060dfe3f1a593fb4bbe4efc8d"
+        },
+        {
+          "PS": [
+            742,
+            742
+          ],
+          "TF": [
+            742,
+            742
+          ],
+          "psSha256": "df35f8ed2807e899e7cd39e3922f38fbb797f4d48eb5896bb6b76e658cf5c604",
+          "tfSha256": "7d39e4a152a682fdc77affd2a944e82651884ad8f1f65e1d5d5c98ed6887adbd"
+        },
+        {
+          "PS": [
+            749,
+            749
+          ],
+          "TF": [
+            749,
+            749
+          ],
+          "psSha256": "df35f8ed2807e899e7cd39e3922f38fbb797f4d48eb5896bb6b76e658cf5c604",
+          "tfSha256": "7d39e4a152a682fdc77affd2a944e82651884ad8f1f65e1d5d5c98ed6887adbd"
+        },
+        {
+          "PS": [
+            846,
+            846
+          ],
+          "TF": [
+            846,
+            846
+          ],
+          "psSha256": "39c2359eb562006989a71cdd4e9e3a89d6184314996ba865d7ff60a611843877",
+          "tfSha256": "ef60c55380210af324972be54b9d440d06cb717ff3eb46eadf4a9887c7324982"
+        },
+        {
+          "PS": [
+            849,
+            849
+          ],
+          "TF": [
+            849,
+            849
+          ],
+          "psSha256": "cc29622ee1b606fd71e0dc1058bce4813d54ff374b342b7b02f5a2500b380d9f",
+          "tfSha256": "ad5f922990c4ac50f5bf7aa76002051c834a9d26c830c2c5c7a6bb396ab43554"
+        },
+        {
+          "PS": [
+            1551,
+            1551
+          ],
+          "TF": [
+            1551,
+            1551
+          ],
+          "psSha256": "10f19428c8a4ccae06f59928563e7b2c4b7955025b73e5993b2221bb3655eaf1",
+          "tfSha256": "369201ad3d86e6e03b4b390c0bfbc0e3ac9867905c61d3aa356a86f97ce43ab6"
+        },
+        {
+          "PS": [
+            1575,
+            1577
+          ],
+          "TF": [
+            1575,
+            1582
+          ],
+          "psSha256": "c9f0ace130f66b52b0d1136bf3e94c97f1827d3539c215db6da538b568e74675",
+          "tfSha256": "b98849ce1942a0e8090ef731387d9009464c1fde64e5e486667100ad3c659d62"
+        },
+        {
+          "PS": [
+            1579,
+            1579
+          ],
+          "TF": [
+            1584,
+            1584
+          ],
+          "psSha256": "6144d9aec7c4c43d5b5d4e1b816377699db4d162dec163171cf3881e58f9a7c4",
+          "tfSha256": "84fc2cf71b760720589ed20117a7d4554d1eb5ec16494403beac84b1b28444a5"
+        },
+        {
+          "PS": [
+            1594,
+            1594
+          ],
+          "TF": [
+            1599,
+            1599
+          ],
+          "psSha256": "8bcb53de3314f1ee95e3b8f680c1d8e89bf1ef4d064ee9d2263ab99a528b9272",
+          "tfSha256": "7e93cdb08aaa392c033beacb1b8f986c35d4dd16143bd31fc88e0256b149a8f1"
+        },
+        {
+          "PS": [
+            1604,
+            1604
+          ],
+          "TF": [
+            1609,
+            1609
+          ],
+          "psSha256": "926c8ba5a1e3321223429ba0d90496e452069a4471f9645902fcd0fdaeea4722",
+          "tfSha256": "fa91b9d43c350ff801c8069d5b8e030fcd881f95074a09d1b440db36f6b3f3e7"
+        },
+        {
+          "PS": [
+            1606,
+            1606
+          ],
+          "TF": [
+            1611,
+            1611
+          ],
+          "psSha256": "3631d6bb357e5e20b41170792952b86a87ba5b999d0142efb74aa43fa47fc311",
+          "tfSha256": "0bf97e58c24a64f703b3245d7161299582b6e746141e42c7376d85360e608017"
+        },
+        {
+          "PS": [
+            1608,
+            1607
+          ],
+          "TF": [
+            1613,
+            1623
+          ],
+          "psSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tfSha256": "000c3d2690736900bd15d1aa6bf7c14d64def4d89a6b5a48d5b1c428453680bb"
+        },
+        {
+          "PS": [
+            1612,
+            1612
+          ],
+          "TF": [
+            1628,
+            1628
+          ],
+          "psSha256": "e457ff9d14b866334b18b637500e3f989dda39bf0f4cf56fbff25ac3201b41d1",
+          "tfSha256": "16528a8bedac5b880c550cadf7bed180213e08bfdc498733f69fff4616061b61"
+        },
+        {
+          "PS": [
+            1615,
+            1615
+          ],
+          "TF": [
+            1631,
+            1631
+          ],
+          "psSha256": "e8ece7733dce76fbd5816768368eb6cbf1c823921efbd442e89de1980f22be56",
+          "tfSha256": "c6206aff793068cc7a7027eea73816ad8b19369ce5ce27ac11b46f8e39d9d884"
+        },
+        {
+          "PS": [
+            1628,
+            1630
+          ],
+          "TF": [
+            1644,
+            1648
+          ],
+          "psSha256": "abfd2fd167bd9d13e56d3c889412c226d8061f19134b3fdf4d7611be8057fffd",
+          "tfSha256": "85fe0e57546e1b6665797ce869e1b871d2adb0bd5e093c1fde01c17c99472d5b"
+        },
+        {
+          "PS": [
+            1632,
+            1632
+          ],
+          "TF": [
+            1650,
+            1652
+          ],
+          "psSha256": "79a66e63579722532b9f18e704d9abb60cf5aab564191a1ea5170da59057c538",
+          "tfSha256": "8024511f27372c2b073525ec11cb39756127dcf039292fe97433620820de612a"
+        },
+        {
+          "PS": [
+            1655,
+            1655
+          ],
+          "TF": [
+            1675,
+            1675
+          ],
+          "psSha256": "cda878e8285365fbda3b5bc79e761ccc46e131f98a559ccac0e1ab3a74f440f5",
+          "tfSha256": "a0f74cecd1959b6c01a1065605bf7a68bd75985f1f9db00fc53021085115839e"
+        },
+        {
+          "PS": [
+            1679,
+            1680
+          ],
+          "TF": [
+            1699,
+            1700
+          ],
+          "psSha256": "6aa7c95c42feb96c0407849262be2cf41f264475657ade57aa09015b890e2492",
+          "tfSha256": "f5e6752dacfc462b54e758842c91e986ae2300246df71e9a935dff87721fc448"
+        },
+        {
+          "PS": [
+            1685,
+            1685
+          ],
+          "TF": [
+            1705,
+            1705
+          ],
+          "psSha256": "3bdd2b1e7b5ee1b218d1e0bb9425f760a29c0e58cd55bf1d960d9b61abe48c50",
+          "tfSha256": "7daaeaa2214015b24123bfa5c6b8e26f7c33147603fa3c10a0a48a40c5377c68"
+        },
+        {
+          "PS": [
+            1695,
+            1695
+          ],
+          "TF": [
+            1715,
+            1715
+          ],
+          "psSha256": "a5b9df55491f3d5581f3f9c477c4c8428f28a0dd2dee2c70d33d7c4fac8469cb",
+          "tfSha256": "ddd47da08cd08f7ecf9b9e36ef23a32f764e0d40ad17f5cbcbe2f3ee9b909e2b"
+        },
+        {
+          "PS": [
+            1711,
+            1711
+          ],
+          "TF": [
+            1731,
+            1731
+          ],
+          "psSha256": "643ff9e10c85c8a047af7a5aa560d601fca0bf138266931054bd63130871c81e",
+          "tfSha256": "283fa1e6e075388b299e31ce492c06c495dc7d9ba882ed7e42c2e60ee532443e"
+        },
+        {
+          "PS": [
+            1713,
+            1713
+          ],
+          "TF": [
+            1733,
+            1733
+          ],
+          "psSha256": "e754f8b80b177451b06491fd135e2dfdf1185ad6985d6eb6534a1e5b042a9437",
+          "tfSha256": "c393b844ece4ea4ebfcd5e2f92fda4fe0f75c7753cc103b202e8d9cecad42f62"
+        },
+        {
+          "PS": [
+            1720,
+            1720
+          ],
+          "TF": [
+            1740,
+            1740
+          ],
+          "psSha256": "517563cee2b03784eb121bb5a31b349469b3a1e2ad88baf7ef8f29c56f7f498b",
+          "tfSha256": "9d2eceb8e01a150490f55b7ed75d86439ba076e5be66e9997768e5c9e80a3764"
+        },
+        {
+          "PS": [
+            1732,
+            1732
+          ],
+          "TF": [
+            1752,
+            1752
+          ],
+          "psSha256": "74d2208d99a273c6fa37dee967314d64213316c2a29307c3b9aea2761399eff3",
+          "tfSha256": "0d7a7475e1f06b8f1e2058b720c94380269c31127165445f90160083db5f89af"
+        },
+        {
+          "PS": [
+            1742,
+            1742
+          ],
+          "TF": [
+            1762,
+            1762
+          ],
+          "psSha256": "a0c670564e8b987f2413f40a6a2e6a0f599d2165d7ce7e6d24d737426e10bfbc",
+          "tfSha256": "59c4ae0533b35eff5dfb8d3f33e4deb3fc544b4f1b917b1919e1a8718d0065bc"
+        },
+        {
+          "PS": [
+            1746,
+            1746
+          ],
+          "TF": [
+            1766,
+            1766
+          ],
+          "psSha256": "f42ce1c8a737047683147a694284367c5688d5b3703619cfe67cc52cd51f3dbb",
+          "tfSha256": "656f42b8a03c08e607f8b9183f2f8ff74bccb7f98d57218eb64d0b4509660f9c"
+        },
+        {
+          "PS": [
+            1764,
+            1764
+          ],
+          "TF": [
+            1784,
+            1787
+          ],
+          "psSha256": "7fde18c4678b7ef93b09b4d647c193e81cc1c62a6505e26e2b7c0e29264745c7",
+          "tfSha256": "2dc5111b1738f3587eb278996379d31b5f7a258883133d477c72eeef8da94d78"
+        },
+        {
+          "PS": [
+            1774,
+            1774
+          ],
+          "TF": [
+            1797,
+            1797
+          ],
+          "psSha256": "6febc02c82b34c9e2c6d9627dbd1ad9b9e05dcb8d0945e603952e5a544d81b84",
+          "tfSha256": "ffbdbf633b5a17b2f635d06054ce508ab5097df92a65690f0a60d050ec819d26"
+        },
+        {
+          "PS": [
+            1782,
+            1782
+          ],
+          "TF": [
+            1805,
+            1806
+          ],
+          "psSha256": "68855e9d6e33cea2e64ccd1644ae1a0afa7a9932ae28fa4ab4ae6fc9fdbddd73",
+          "tfSha256": "dee7ee8c046132c59c627f7f75a53194d800bd3152118df824fbe130b6b52917"
+        },
+        {
+          "PS": [
+            1798,
+            1798
+          ],
+          "TF": [
+            1822,
+            1822
+          ],
+          "psSha256": "0f6319821879761c8b2e2e70853671d4fbf738d40ad63c9c3f46c43ece8dfcb0",
+          "tfSha256": "ebf4ec7a332ebf32dd4a470e789e849d8e99b69684ae9bd5a9b698c84928c419"
+        },
+        {
+          "PS": [
+            1856,
+            1860
+          ],
+          "TF": [
+            1880,
+            1910
+          ],
+          "psSha256": "db864ce514afc88503a2e4f720e9c8269805153712b96085f826e5fe85a7524c",
+          "tfSha256": "1f94ea9a0d7c73ac3e5fc5de38f93f1559f0cb0e21b3722df02fdf3dc3946ea8"
+        },
+        {
+          "PS": [
+            1874,
+            1874
+          ],
+          "TF": [
+            1924,
+            1924
+          ],
+          "psSha256": "a3dfe834aea52c389acb2ecc1971b27725b95badd2b22b51e35aa48ccbe2a376",
+          "tfSha256": "f4664f713f350c8bf3371db67dd031bfd4bc877a6294eb9bd2f43eb9f320bd4a"
+        },
+        {
+          "PS": [
+            1888,
+            1888
+          ],
+          "TF": [
+            1938,
+            1938
+          ],
+          "psSha256": "870d5dcc59da2bf014438591d1caae9585b60dd2d9c8fddc5a469e256f4c109d",
+          "tfSha256": "d14e53c9ee235d2a36dc044c2da045a07199c15688ce72d01a2387da82b20fdd"
+        },
+        {
+          "PS": [
+            1890,
+            1889
+          ],
+          "TF": [
+            1940,
+            1950
+          ],
+          "psSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "tfSha256": "35d103aea166513d7e5e78e802ca1d14dbe94a3946d4d3bc13e57f64cd641001"
+        },
+        {
+          "PS": [
+            1892,
+            1893
+          ],
+          "TF": [
+            1953,
+            1954
+          ],
+          "psSha256": "11dd1774d86288a1cdbd2b01b3ef10a151513c108bd1a65c2eef7abffff17732",
+          "tfSha256": "4f4b6aa4fe172b0bcacef362da01e5df521783220fa4e89fe128988b68b8d403"
+        },
+        {
+          "PS": [
+            2280,
+            2280
+          ],
+          "TF": [
+            2341,
+            2345
+          ],
+          "psSha256": "5ac9041dd2e8fb0f7081a9202d39a82f894de7b2dbf6e84aad55e59dc8a68d75",
+          "tfSha256": "4fa338aa326d706a670064e130432cb16b74016123111cdc6687ef0302dd2781"
+        },
+        {
+          "PS": [
+            2558,
+            2558
+          ],
+          "TF": [
+            2623,
+            2623
+          ],
+          "psSha256": "46cf2c2e8cf8dead4532edd3cb1df726e4c83c36f1cd0394bca11deb3d5558cd",
+          "tfSha256": "ef898c9908f53c47dee1e0dc6d5f3c7665c89eb4b237acd0e3cd4053a79b3e4a"
+        },
+        {
+          "PS": [
+            2575,
+            2575
+          ],
+          "TF": [
+            2640,
+            2640
+          ],
+          "psSha256": "a4b3b02e73ef7026358b9d966420694f1d1666fa1ff092cfeadbcbce8181aaa9",
+          "tfSha256": "7076e8fe9b97f271ffc1afcc446ed822fe1753695047975793347134844c187a"
+        }
+      ],
+      "equalRawLines": 2696,
+      "PSChangedLines": 47,
+      "TFChangedLines": 112
+    }
+  ],
+  "callerInventory": {
+    "PS": [
+      ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "docs/P1-SUPPLY-FREEZE-v1.md",
+      "docs/decisions/0002-accept-unverifiable-baseline-provenance.md"
+    ],
+    "TF": [
+      ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      ".github/workflows/scripts-README.md",
+      "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+      "docs/T1-SUPPLY-FREEZE-v1.md"
+    ]
+  },
+  "finalRefs": {
+    "PS": {
+      "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc"
+    },
+    "TF": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "finalRefsCheckedUtc": "2026-10-02T07:54:06.333606+00:00"
+}
