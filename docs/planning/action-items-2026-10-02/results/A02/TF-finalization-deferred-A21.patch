@@ -1,0 +1,36 @@
+diff --git a/CONTRIBUTING.md b/CONTRIBUTING.md
+--- a/CONTRIBUTING.md
++++ b/CONTRIBUTING.md
+@@ -81,3 +81,32 @@
+ - Extended explanation, history, tradeoffs, and rationale still belong in `STYLE_GUIDE_RATIONALE.md` or other contributor-facing files.
+ - Consumer-facing guide files still **MUST NOT** cross-reference other repository files (see the no-cross-referencing norm above).
+ - Do **not** add a `Related` field or any other cross-reference-oriented metadata to consumer-facing guide files.
++
++## Finalize governed document metadata
++
++Set the metadata date and applicable version for your last author-controlled update, commit the final candidate, and validate that exact candidate at finalization. Once the accepted base contains `-FinalizeMetadataNow`, use its checker in an accepted-base worktree. Run this example from the candidate repository after refreshing the destination by the normal fetch procedure:
++
++```powershell
++$strFinalHead = (git rev-parse --verify 'HEAD^{commit}').Trim()
++if ($LASTEXITCODE -ne 0) { throw 'Candidate head is unavailable.' }
++$strPolicyBase = (git rev-parse --verify 'origin/main^{commit}').Trim()
++if ($LASTEXITCODE -ne 0) { throw 'Accepted base is unavailable.' }
++$strPolicyPath = Join-Path (Split-Path (Get-Location).Path -Parent) 'TerraformStyleGuide-finalization-policy'
++# Use an absent path; reuse a suitable accepted-base worktree when available.
++git worktree add --detach $strPolicyPath $strPolicyBase
++if ($LASTEXITCODE -ne 0) { throw 'Policy worktree creation failed.' }
++Push-Location $strPolicyPath
++try {
++    # Install this accepted worktree's locked prerequisites from docs/dependency-maintenance.md first.
++    pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -InputRevision $strFinalHead -PublishedBaselineRevision $strPolicyBase -FinalizeMetadataNow
++    if ($LASTEXITCODE -ne 0) { throw 'Author finalization validation failed.' }
++} finally {
++    Pop-Location
++}
++```
++
++Use the actual accepted PR/destination base if it differs from `origin/main`; resolve and fetch that exact commit before creating the policy worktree. The worktree shares the candidate repository's Git objects, so the checker reads the committed candidate without running candidate code. Follow the [dependency setup and checks](docs/dependency-maintenance.md) in that accepted worktree; creating a worktree does not install its dependencies. An older accepted checker without this mode cannot run the command. Initial installation requires separate proposed-code validation and independent review; it is not an installed accepted-base pass.
++
++Keep the successful output's exact base, head and UTC date in the normal final-validation evidence. Correct failures, commit the correction and validate the new exact head. Another author-controlled update requires its applicable finalization check. Automatic target movement and delayed CI reruns follow the existing documentation policy; rerunning checks on identical finalized input does not create a new author finalization.
++
++For later verification of identical base/head, run the same accepted checker with the same endpoints and omit `-FinalizeMetadataNow`. It retains structural, calendar, baseline and version checks and explicitly reports that this invocation did not verify finalization date. Reuse the original successful finalization output for unchanged inputs. Missing original evidence supplies no historical finalization-date proof; CI event time, run time and candidate metadata are not substitutes. This capability does not create an automatic remote freshness gate or grant maintenance, owner or merge authority.

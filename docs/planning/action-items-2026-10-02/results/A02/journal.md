@@ -152,3 +152,9 @@ Fix and targeted reproduction are pending; no production behavior change or CI r
 [Native failure](https://github.com/franklesniak/PSStyleGuide/actions/runs/37014384227).
 
 The CI diagnostic-wrap fixture finding is tracked in the [five-line note](ci-fixture-note.md). One local final-byte pre-commit pass is running on treece2999638; published round2 remains clean on d9b9e1c, with no round3 request yet.
+
+## D07 execution checkpoint, 2026-10-02
+
+The fixture-only Linux diagnostic repair committed normally as f81f769 after one full10-hook pass and actual B/H finalization/classification. Native Linux candidate CI37023858676 passed. Round3 used the documented CLI fallback because the available GitHub browser session was signed out with disabled effort controls; Copilot acceptance event32344190549/run37025180589 preceded the single Codex trigger5955386254. Results and independent final quality remain pending; round3/80, original deadline and transfers0/12 retained.
+
+Round3 finished on f81f769: Copilot5393527247 observed Balanced with no findings; Codex5393521315/comment4167109675 reported P2 optional-header coverage. Independent quality confirmed the same F5 and found no additional concrete blocker. The worker owns only the validator and SelfTest repair; A07 stays frozen. Four-path TF peer preparation and separate draft patches were inspected; no transfer or peer implementation occurred.

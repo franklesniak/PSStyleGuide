@@ -1,0 +1,31 @@
+<!-- markdownlint-disable MD013 -->
+# D07 A02 peer preparation
+
+Read-only counterpart preparation. Transfers0/12. PS proposed d9b9e1c4597f91b9f5d2de0cc376c28305207654 (all four inputs independently confirmed unchanged at f81f769); TF main06ad4f7c9b6847028cafdacf1ae55128d0f2d56c. No product, planning, native or Git-index changes; only this scratch directory changed. Source merge and refreshed actual inputs are required before any TF implementation.
+
+## Four-path result
+
+| Path | Raw result / useful delta | Disposition |
+| --- | --- | --- |
+| .gitignore | Both100644, blob76b672659bef2bda7a97f7fa8e7878e1cacafdc9, 249bytes. Recursive personal-memory pattern already equal. | No patch or transfer for this path. Effective-ignore validator belongs A21. |
+| CONTRIBUTING.md | Shared roles/generation/publication/metadata paragraphs match. PS has root-vs-repository Copilot clarification and F2 finalization section. | TF-peer-mechanical.patch adds the exact clarification. Full finalization section is separated in TF-finalization-deferred-A21.patch; absent TF mode is a real dependency, not an exception or installed pass. |
+| README.md | Common layout, generation and publication text match. ACK pointer can match without inventing TF source provenance. Seven stale TF TOC links confirmed. | Mechanical patch aligns only the pointer. peer-readme-navigation-decision.md and separate unselected patch cover navigation. Common Readability/Quality wording is a provisional separate patch: D07 favors common harmless wording, while old D05 retained language-specific goals; coordinator must disposition that precise wording before claiming convergence. |
+| docs/ISSUE_EVALUATION_PROMPT.md | Prompt body is already equal. Owner/Scope/Related/date differ. | Mechanical patch copies PS's truthful generic header, making the whole file byte equal. Touched date is synchronized to2026-10-02, not retained as historical exemption. Refresh finalization date at actual transfer; if later, synchronize both touched files through normal lifecycle. |
+
+## Necessary differences and unresolved boundary
+
+CONTRIBUTING title and three scoped-output references use the real product and language filename (PS3/TF3, PS20/TF20, PS41/TF41, PS61/TF61). Finalization worktree label is PSStyleGuide-finalization-policy versus TerraformStyleGuide-finalization-policy. D07 identity/filename classes apply; no common command/API is permanently exempt. TF exact validator source has no FinalizeMetadataNow mode. A21 owns installation; do not land a promise of currently executable TF finalization before that accepted capability. The draft section already says an older accepted checker cannot run it, but readiness remains withheld until the actual prerequisite/caller is verified.
+
+README differing title/intro/About and generated-language guidance are linesPS1–7/TF1–7 andPS17–19/TF17–19. Preserve Terraform configurations/infrastructure context, all six TF source globs and actual scoped filename; preserve PS scripts/ps1 guidance. TF instruction frontmatter proves all six globs. The language-guide TOC is PS33–40/TF33–46, derived from different normative guides; it must link actual targets, not merely retain old words. This is the D07 normative-derivative/filename boundary, not a whole-README exception.
+
+README Consistency uses the actual language atPS44/TF50. Readability and Quality atPS45–46/TF51–52 could use PS's generic wording without changing normative rules; TF retains its secure/modular/well-documented instruction description and TOC. The provisional patch offers that factoring. No claim of a necessary algorithm or metadata exception is made for these harmless sentences.
+
+README source provenance atPS55 has a real Microsoft/community claim supported by PS ACKNOWLEDGMENTS; TF ACKNOWLEDGMENTS says own maintainer experience/community best practices and no third-party sources requiring attribution. Do not fabricate a Microsoft/official-source contribution in TF. Existing D06 selected factual-provenance preservation supplies the narrow factual exception for this PS-only sentence; the following ACK pointer converges in the mechanical patch. README authorship PS63/TF69 matches each exact MIT copyright holder list, a D07 identity exception. No license/history rewrite is proposed. CONTRIBUTING/README have no Version/Last Updated metadata to synchronize; no new metadata is added. Prompt metadata synchronizes because both shared files are touched.
+
+## Artifacts and checks
+
+peer-inputs.json records all eight raw Git modes/blobs/lengths/SHA256; PS/ and TF/ hold exact snapshots. Four clause-level .diff files retain actual differences. proposal-artifacts.json hashes the four separate proposal patches. patch-application-check.json records eight native exit0 checks/applications in disposable scratch; .gitignore and prompt match exact PS bytes after application. No peer repository validation, rendered GitHub click test, PR/review, transfer, integration or paired acceptance is claimed. The initial two-link inspection was expanded to the complete fourteen-target TF navigation audit; readme-heading-evidence.json is the final seven-failure evidence. All eight PS targets match. Target generation follows [GitHub's documented heading rules](https://docs.github.com/en/get-started/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax#section-links).
+
+Source handoff excluded validator/SelfTest/manifest/classifier(A21), protected files(A20), lint/toolchain(A07), workflows(A03). Earlier all-surface A02 transfer proposals are superseded for ownership, not reused as a new implementation plan. Parent owns all repository writes. Recheck the merged PS source and actual TF main, disposition provisional README goals/navigation, and verify the A21 installed caller before a directional implementation. Nothing here resets transfer/review limits or permits implementation before source merge.
+
+Coordinator check: all eight input bytes, modes, blob IDs and SHA256 matched native Git objects; all handoff artifacts matched worker hashes; all six navigation score totals recomputed. Raw execution artifacts remain in A02 scratch `D07-peer-preparation`; source acceptance/current-input refresh still precede any transfer.

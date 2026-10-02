@@ -1,0 +1,14 @@
+diff --git a/README.md b/README.md
+--- a/README.md
++++ b/README.md
+@@ -48,8 +48,8 @@
+ ## Goals
+ 
+ - **Consistency**: Establish uniform coding patterns across all Terraform projects
+-- **Readability**: Make infrastructure code easier to understand and maintain
+-- **Quality**: Promote best practices for security, modularity, and documentation
++- **Readability**: Make code easier to understand and maintain
++- **Quality**: Promote best practices and professional standards
+ - **Accessibility**: Useful for both humans and AI/LLM code generation
+ 
+ ## Contributing

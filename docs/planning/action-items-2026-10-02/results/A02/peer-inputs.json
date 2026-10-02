@@ -1,0 +1,78 @@
+[
+  {
+    "path": ".gitignore",
+    "PS": {
+      "commit": "d9b9e1c4597f91b9f5d2de0cc376c28305207654",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+      "bytes": 249,
+      "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+    },
+    "TF": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+      "bytes": 249,
+      "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+    }
+  },
+  {
+    "path": "CONTRIBUTING.md",
+    "PS": {
+      "commit": "d9b9e1c4597f91b9f5d2de0cc376c28305207654",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "1d9bee771e20859433d0b99300dc97302a54fac0",
+      "bytes": 9036,
+      "sha256": "e6269a6addf416b7870203d4f4418d3975410cb27c4ebec3e8d1fffd9e173524"
+    },
+    "TF": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "94beedee85478c14d284ca830e94d4a5f4ece202",
+      "bytes": 5813,
+      "sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda"
+    }
+  },
+  {
+    "path": "README.md",
+    "PS": {
+      "commit": "d9b9e1c4597f91b9f5d2de0cc376c28305207654",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "0dbd77c1fe581bc1b32aa97e4dfb6c5119192560",
+      "bytes": 4720,
+      "sha256": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d"
+    },
+    "TF": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "f04368718d580fe61d9a22f4c92cdfdf8287b28d",
+      "bytes": 5063,
+      "sha256": "affbdcdced05773f20895a397d1e062d716fb9e2b2215d0a4f412d7ed8b7a200"
+    }
+  },
+  {
+    "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+    "PS": {
+      "commit": "d9b9e1c4597f91b9f5d2de0cc376c28305207654",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "ca0b7837554c896389e2750170ff43f4ff28d69e",
+      "bytes": 2179,
+      "sha256": "efa416634e0944322f352387aae491bfa39ca4d77951822d4402b8a38e4928f3"
+    },
+    "TF": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "f43b5168ce508a9a054dc85ba7231e27d8c70809",
+      "bytes": 2146,
+      "sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1"
+    }
+  }
+]
