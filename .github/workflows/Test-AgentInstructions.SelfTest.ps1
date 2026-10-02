@@ -1417,6 +1417,33 @@ function Assert-AuthorFinalizationGitFixture {
         & $scriptblockCheck $strNestedMetadataExampleHead $false $false $true 'content contract passed'
         Write-Verbose 'Later peer Metadata current/prior rejection and nested example caller controls passed.'
 
+        # Conflicting reserved fields and raw Unicode paths reach real B/H checks.
+        $strBeforeFieldBaseline = $strBaseline
+        $strReadmePath = [IO.Path]::Combine($strFixtureRoot, 'README.md')
+        $strConflictingMetadata = $strMetadataDocument.Replace('DATE', $strCurrentDate).
+            Replace('## Procedure', "- **last updated:** 2026-99-99`n`n## Procedure")
+        [IO.File]::WriteAllText($strReadmePath, $strConflictingMetadata, [Text.UTF8Encoding]::new($false))
+        $strConflictingHead = & $scriptblockCommit
+        & $scriptblockCheck $strConflictingHead $false $false $false 'one exact top-level Last Updated list item'
+        [IO.File]::WriteAllText($strReadmePath, $strConflictingMetadata, [Text.UTF8Encoding]::new($false))
+        $strBaseline = & $scriptblockCommit
+        [IO.File]::WriteAllText($strReadmePath,
+            $strMetadataDocument.Replace('DATE', $strCurrentDate), [Text.UTF8Encoding]::new($false))
+        $strValidAfterConflictHead = & $scriptblockCommit
+        & $scriptblockCheck $strValidAfterConflictHead $false $false $false '(?s)parent of README[.]md.*Last Updated list item'
+        $strBaseline = $strBeforeFieldBaseline
+        & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Conflicting-field baseline restoration failed.' }
+        $strUnicodePath = [IO.Path]::Combine($strFixtureRoot, 'docs', ('caf' + [char]0x00e9 + '.md'))
+        [IO.File]::WriteAllText($strUnicodePath,
+            $strMetadataDocument.Replace('DATE', $strCurrentDate), [Text.UTF8Encoding]::new($false))
+        $strValidUnicodeHead = & $scriptblockCommit
+        & $scriptblockCheck $strValidUnicodeHead $true $false $true 'content contract passed'
+        [IO.File]::WriteAllText($strUnicodePath, '# Procedure without metadata', [Text.UTF8Encoding]::new($false))
+        $strInvalidUnicodeHead = & $scriptblockCommit
+        & $scriptblockCheck $strInvalidUnicodeHead $false $false $false 'must place one document-level metadata list'
+        Write-Verbose 'Reserved field current/prior and Unicode current-document caller controls passed.'
+
         # Promotion must remain valid on a later no-context rerun.
         $strManifestPath = [IO.Path]::Combine($strFixtureRoot, '.github', 'document-metadata-classification.json')
         $objManifest = [IO.File]::ReadAllText($strManifestPath) | ConvertFrom-Json
@@ -1833,8 +1860,196 @@ function Assert-OptionalMetadataSelfTest {
                 -BaseContent $strInvalidPriorVersion -TrustedEventUtcDate '') -match 'parent of .*Version')) {
         throw 'A noncanonical prior Version-like header was erased.'
     }
+    foreach ($strFieldName in @('Status', 'Owner', 'Last Updated', 'Scope')) {
+        foreach ($strLabel in @($strFieldName.ToLowerInvariant(), $strFieldName.ToUpperInvariant(),
+                ($strFieldName + ' '), $strFieldName.Replace(' ', '  '))) {
+            foreach ($boolRequiresVersion in @($false, $true)) {
+                $strBase = if ($boolRequiresVersion) { $strVersioned } else { $strDirect }
+                $arrMalformed = @($strBase.Replace('## Content', "- **${strLabel}:** conflicting value`n`n## Content"))
+                if ($strLabel -cne $strFieldName) {
+                    $arrMalformed += $strBase.Replace("**${strFieldName}:**", "**${strLabel}:**")
+                }
+                foreach ($strMalformed in $arrMalformed) {
+                    $strFailure = (Get-DocumentMetadataContext -Content $strMalformed -RequiresVersion $boolRequiresVersion).Failure
+                    if ($strFailure -notmatch ('one exact top-level ' + [regex]::Escape($strFieldName) + ' list item')) {
+                        throw "A reserved field variant escaped exact validation: $strLabel"
+                    }
+                }
+            }
+        }
+    }
+    foreach ($strExample in @(
+            "~~~~text`n- **status:** Broken`n~~~~`n",
+            "> - **status:** Broken`n",
+            "- Example:`n  - **status:** Broken`n",
+            '- `status: Broken`',
+            '- **Related:** Useful reference.',
+            '- StatusCode: ordinary extra field.')) {
+        if ((Get-DocumentMetadataContext -Content $strDirect.Replace('## Content', "$strExample`n`n## Content") -RequiresVersion $false).Failure) {
+            throw 'An excluded example or unrelated metadata label was promoted.'
+        }
+    }
+    if ((Get-DocumentMetadataContext -Content ($strDirect + "`n- **status:** Broken`n") -RequiresVersion $false).Failure) {
+        throw 'A later-section field example was promoted.'
+    }
+    $strInvalidPriorField = $strDirect.Replace('## Content', "- **last updated:** 2026-99-99`n`n## Content")
+    if (-not (@(Get-PublishedEndpointLastUpdatedFailure -Name 'optional.md' -CurrentContent $strDirect `
+                -BaseContent $strInvalidPriorField -TrustedEventUtcDate '') -match 'parent of .*Last Updated')) {
+        throw 'A conflicting noncanonical prior field was erased.'
+    }
 }
 
+function Assert-GitRevisionTextSelfTest {
+    # .SYNOPSIS
+    # Checks exact raw Git entry framing and bounded revision content reads.
+    #
+    # .DESCRIPTION
+    # Uses disposable native Git objects and controlled child-process output.
+    # Retains exact path, mode, object type, UTF-8 and transport failure checks.
+    #
+    # .EXAMPLE
+    # Assert-GitRevisionTextSelfTest
+    #
+    # # Throws when a revision reader control fails.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None. Failed controls throw.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param()
+
+    $strTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strFixtureRoot = [IO.Path]::Combine($strTempRoot, 'agent-git-entry-' + [Guid]::NewGuid().ToString('N'))
+    [void][IO.Directory]::CreateDirectory([IO.Path]::Combine($strFixtureRoot, 'docs'))
+    $strEmptyHooks = [IO.Path]::Combine($strFixtureRoot, 'empty-hooks')
+    [void][IO.Directory]::CreateDirectory($strEmptyHooks)
+    $arrNames = @('docs/caf' + [char]0x00e9 + '.md') + @('docs/space name.md', 'docs/[literal].md', 'docs/UPPER.md')
+    try {
+        & git -C $strFixtureRoot -c "init.templateDir=$strEmptyHooks" init --quiet
+        if ($LASTEXITCODE -ne 0) { throw 'Git entry fixture initialization failed.' }
+        foreach ($strName in $arrNames) {
+            [IO.File]::WriteAllText([IO.Path]::Combine($strFixtureRoot, $strName), "content:$strName", [Text.UTF8Encoding]::new($false))
+        }
+        [IO.File]::WriteAllBytes([IO.Path]::Combine($strFixtureRoot, 'docs/invalid.md'), [byte[]]@(255))
+        [IO.File]::WriteAllText([IO.Path]::Combine($strFixtureRoot, 'docs/executable.md'), 'executable', [Text.UTF8Encoding]::new($false))
+        & git -C $strFixtureRoot -c core.autocrlf=false add --all
+        if ($LASTEXITCODE -ne 0) { throw 'Git entry fixture indexing failed.' }
+        & git -C $strFixtureRoot update-index --chmod=+x -- docs/executable.md
+        if ($LASTEXITCODE -ne 0) { throw 'Git entry fixture mode setup failed.' }
+        & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+            -c commit.gpgsign=false -c "core.hooksPath=$strEmptyHooks" commit --quiet --no-gpg-sign --message=fixture
+        if ($LASTEXITCODE -ne 0) { throw 'Git entry fixture commit failed.' }
+        $strRevision = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
+        $strBlob = ([string](& git -C $strFixtureRoot rev-parse "${strRevision}:docs/UPPER.md")).Trim()
+        & git -C $strFixtureRoot update-index --add --cacheinfo "120000,$strBlob,docs/link.md"
+        if ($LASTEXITCODE -ne 0) { throw 'Git entry symlink-mode setup failed.' }
+        & git -C $strFixtureRoot update-index --add --cacheinfo "160000,$strRevision,docs/submodule"
+        if ($LASTEXITCODE -ne 0) { throw 'Git entry gitlink-mode setup failed.' }
+        & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+            -c commit.gpgsign=false -c "core.hooksPath=$strEmptyHooks" commit --quiet --no-gpg-sign --message=modes
+        if ($LASTEXITCODE -ne 0) { throw 'Git entry mode fixture commit failed.' }
+        $strRevision = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
+        foreach ($strName in $arrNames) {
+            $strRead = Read-GitRevisionText -RepositoryRootPath $strFixtureRoot -Revision $strRevision `
+                -RepositoryRelativePath $strName -MaximumBytes 4096 -RequireRegularFile
+            if ($strRead -cne "content:$strName") { throw "Git entry exact content failed: $strName" }
+        }
+        foreach ($objCase in @(
+                @{ Path = 'docs/missing.md'; Limit = 4096; Revision = $strRevision; Failure = 'not one regular 100644 blob' },
+                @{ Path = 'docs/upper.md'; Limit = 4096; Revision = $strRevision; Failure = 'not one regular 100644 blob' },
+                @{ Path = 'docs/executable.md'; Limit = 4096; Revision = $strRevision; Failure = 'not one regular 100644 blob' },
+                @{ Path = 'docs/link.md'; Limit = 4096; Revision = $strRevision; Failure = 'not one regular 100644 blob' },
+                @{ Path = 'docs/submodule'; Limit = 4096; Revision = $strRevision; Failure = 'not one regular 100644 blob' },
+                @{ Path = 'docs'; Limit = 4096; Revision = $strRevision; Failure = 'not one regular 100644 blob' },
+                @{ Path = 'docs/invalid.md'; Limit = 4096; Revision = $strRevision; Failure = 'UTF-8' },
+                @{ Path = 'docs/UPPER.md'; Limit = 1; Revision = $strRevision; Failure = 'must not exceed 1 byte' },
+                @{ Path = 'docs/UPPER.md'; Limit = 4096; Revision = ('0' * 40); Failure = 'Could not inspect' }
+            )) {
+            $boolRejected = $false
+            try {
+                $null = Read-GitRevisionText -RepositoryRootPath $strFixtureRoot -Revision $objCase.Revision `
+                    -RepositoryRelativePath $objCase.Path -MaximumBytes $objCase.Limit -RequireRegularFile
+            } catch {
+                if ($_.Exception.Message -notmatch $objCase.Failure) { throw }
+                $boolRejected = $true
+            }
+            if (-not $boolRejected) { throw "Git entry negative control was accepted: $($objCase.Path)" }
+        }
+        $scriptBlockActualProcessReader = ${function:Read-BoundedProcessData}
+        $strProbePath = 'docs/probe.md'
+        $strRecord = '100644 blob ' + ('a' * 40) + "`t$strProbePath" + [char]0
+        $arrRecordCases = @(
+            @{ Name = 'exact 40'; Data = $strRecord; Failure = '' },
+            @{ Name = 'exact 64'; Data = $strRecord.Replace(('a' * 40), ('a' * 64)); Failure = '' },
+            @{ Name = 'empty'; Data = ''; Failure = 'not one regular 100644 blob' },
+            @{ Name = 'no NUL'; Data = $strRecord.TrimEnd([char]0); Failure = 'not one regular 100644 blob' },
+            @{ Name = 'extra record'; Data = $strRecord + [char]0; Failure = 'not one regular 100644 blob' },
+            @{ Name = 'wrong case'; Data = $strRecord.Replace('probe.md', 'PROBE.md'); Failure = 'not one regular 100644 blob' },
+            @{ Name = 'wrong mode'; Data = $strRecord.Replace('100644', '100755'); Failure = 'not one regular 100644 blob' },
+            @{ Name = 'wrong type'; Data = $strRecord.Replace('blob', 'tree'); Failure = 'not one regular 100644 blob' },
+            @{ Name = 'bad object'; Data = $strRecord.Replace(('a' * 40), ('g' * 40)); Failure = 'not one regular 100644 blob' },
+            @{ Name = 'invalid UTF8'; Data = ''; Bytes = [byte[]]@(255); Failure = 'UTF-8' },
+            @{ Name = 'native failure'; Data = $strRecord; Program = 'exit 42'; Failure = 'Could not inspect' },
+            @{ Name = 'overflow'; Data = ('x' * 256); Failure = 'must not exceed|exceeded' },
+            @{ Name = 'timeout'; Data = ''; Program = 'Start-Sleep -Seconds 30'; Failure = 'timed out|canceled' }
+        )
+        foreach ($objRecordCase in $arrRecordCases) {
+            & {
+                function Read-BoundedProcessData {
+                    param($Process, $MaximumBytes, $TimeoutMilliseconds, $DisplayName)
+                    $arrArguments = @($Process.StartInfo.ArgumentList)
+                    $boolTree = $arrArguments -ccontains 'ls-tree'
+                    if ($boolTree -and ($arrArguments[0] -cne '--literal-pathspecs' -or
+                            $arrArguments -cnotcontains '-z' -or $arrArguments -cnotcontains '--full-tree' -or
+                            $arrArguments[-1] -cne $strProbePath -or $MaximumBytes -ne 91 -or $TimeoutMilliseconds -ne 10000)) {
+                        throw 'Git entry bounded invocation contract changed.'
+                    }
+                    if (-not $boolTree -and ($arrArguments[-1] -cnotmatch '^a{40}(?:a{24})?$')) {
+                        throw 'Git content was not bound to the inspected object.'
+                    }
+                    $arrData = [byte[]]@(if (-not $boolTree) { [Text.Encoding]::UTF8.GetBytes('content') } elseif ($objRecordCase.ContainsKey('Bytes')) {
+                        $objRecordCase.Bytes
+                    } else { [Text.Encoding]::UTF8.GetBytes($objRecordCase.Data) })
+                    $strProgram = if ($boolTree -and $objRecordCase.ContainsKey('Program')) { $objRecordCase.Program } else {
+                        '$b=[Convert]::FromBase64String(''' + [Convert]::ToBase64String($arrData) + ''');[Console]::OpenStandardOutput().Write($b,0,$b.Length)'
+                    }
+                    $Process.StartInfo.FileName = (Get-Process -Id $PID).Path
+                    $Process.StartInfo.ArgumentList.Clear()
+                    foreach ($strArgument in @('-NoProfile', '-NonInteractive', '-Command', $strProgram)) {
+                        $Process.StartInfo.ArgumentList.Add($strArgument)
+                    }
+                    & $scriptBlockActualProcessReader -Process $Process -MaximumBytes $MaximumBytes `
+                        -TimeoutMilliseconds $TimeoutMilliseconds -DisplayName $DisplayName
+                }
+                $strFailure = ''
+                try {
+                    $strRead = Read-GitRevisionText -RepositoryRootPath $strFixtureRoot -Revision $strRevision `
+                        -RepositoryRelativePath $strProbePath -MaximumBytes 4096 -RequireRegularFile
+                    if ($strRead -cne 'content') { throw 'Controlled Git content changed.' }
+                } catch { $strFailure = $_.Exception.Message }
+                if (($objRecordCase.Failure -ceq '' -and $strFailure -cne '') -or
+                    ($objRecordCase.Failure -cne '' -and $strFailure -notmatch $objRecordCase.Failure)) {
+                    throw "Git entry transport control failed ($($objRecordCase.Name)): $strFailure"
+                }
+            }
+        }
+    } finally {
+        $strResolvedFixtureRoot = [IO.Path]::GetFullPath($strFixtureRoot)
+        if ($strResolvedFixtureRoot.StartsWith($strTempRoot, [StringComparison]::OrdinalIgnoreCase) -and
+            $strResolvedFixtureRoot -cne $strTempRoot -and [IO.Directory]::Exists($strResolvedFixtureRoot)) {
+            Remove-Item -LiteralPath $strResolvedFixtureRoot -Recurse -Force
+        }
+    }
+}
+
+Assert-GitRevisionTextSelfTest
 Assert-DocumentMetadataClassificationSelfTest -MaximumMetadataUtcDate $MaximumMetadataUtcDate
 Assert-OptionalMetadataSelfTest -MaximumMetadataUtcDate $MaximumMetadataUtcDate
 Assert-DocumentMetadataPlacementSelfTest -RepositoryRootPath $RepositoryRootPath -MaximumMetadataUtcDate $MaximumMetadataUtcDate

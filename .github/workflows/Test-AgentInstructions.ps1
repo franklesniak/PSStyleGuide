@@ -1317,7 +1317,8 @@ function Read-GitRevisionText {
     # Reads one bounded UTF-8 file from a Git revision.
     #
     # .DESCRIPTION
-    # Reads one file from an exact Git revision as strict UTF-8.
+    # Reads one file from an exact Git revision as strict UTF-8. Required regular
+    # files use a bounded NUL-delimited tree record and exact ordinal path.
     #
     # .PARAMETER RepositoryRootPath
     # The absolute path of the trusted Git repository.
@@ -1349,7 +1350,7 @@ function Read-GitRevisionText {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.1.20261002.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -1370,19 +1371,40 @@ function Read-GitRevisionText {
         [switch] $RequireRegularFile
     )
 
+    $strBlobObject = "${Revision}:$RepositoryRelativePath"
     if ($RequireRegularFile) {
-        $arrTreeEntries = @(& git -C $RepositoryRootPath ls-tree `
-                $Revision -- $RepositoryRelativePath 2>&1)
-        if ($LASTEXITCODE -ne 0) {
+        $longTreeMaximumBytes = [long][Text.Encoding]::UTF8.GetByteCount($RepositoryRelativePath) + 78
+        if ($longTreeMaximumBytes -gt 2147483646) {
+            throw 'Git revision entry exceeds the supported bounded output size.'
+        }
+        $objTreeStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
+        $objTreeStartInfo.UseShellExecute = $false
+        $objTreeStartInfo.CreateNoWindow = $true
+        $objTreeStartInfo.RedirectStandardOutput = $true
+        $objTreeStartInfo.RedirectStandardError = $true
+        foreach ($strArgument in @('--literal-pathspecs', '-C', $RepositoryRootPath,
+                'ls-tree', '-z', '--full-tree', $Revision, '--', $RepositoryRelativePath)) {
+            $objTreeStartInfo.ArgumentList.Add($strArgument)
+        }
+        $objTreeProcess = [Diagnostics.Process]::new()
+        $objTreeProcess.StartInfo = $objTreeStartInfo
+        $objTreeResult = Read-BoundedProcessData -Process $objTreeProcess `
+            -MaximumBytes ([int]$longTreeMaximumBytes) -TimeoutMilliseconds 10000 `
+            -DisplayName "Git revision entry $Revision`:$RepositoryRelativePath"
+        if ($objTreeResult.ExitCode -ne 0) {
             throw "Could not inspect $Revision`:$RepositoryRelativePath in Git."
         }
-        $strExpectedEntryPattern =
-            '^100644 blob (?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})\t' +
-            [regex]::Escape($RepositoryRelativePath) + '$'
-        if ($arrTreeEntries.Count -ne 1 -or
-            [string]$arrTreeEntries[0] -notmatch $strExpectedEntryPattern) {
+        $strTreeRecord = if ($objTreeResult.Bytes.Length -eq 0) { '' } else {
+            ConvertFrom-StrictUtf8Data -Bytes $objTreeResult.Bytes -DisplayName 'Git revision entry'
+        }
+        $objTreeMatch = [regex]::Match($strTreeRecord,
+            '\A100644 blob (?<ObjectId>[0-9a-fA-F]{40}|[0-9a-fA-F]{64})\t(?<Path>[^\x00]+)\x00\z')
+        if (-not $objTreeMatch.Success -or
+            -not [string]::Equals($objTreeMatch.Groups['Path'].Value,
+                $RepositoryRelativePath, [StringComparison]::Ordinal)) {
             throw "Git revision input is not one regular 100644 blob: $Revision`:$RepositoryRelativePath"
         }
+        $strBlobObject = $objTreeMatch.Groups['ObjectId'].Value
     }
 
     $objStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
@@ -1396,7 +1418,7 @@ function Read-GitRevisionText {
             $RepositoryRootPath,
             'cat-file',
             'blob',
-            "${Revision}:$RepositoryRelativePath"
+            $strBlobObject
         )) {
         $objStartInfo.ArgumentList.Add($strArgument)
     }
@@ -5497,16 +5519,17 @@ function Get-DocumentMetadataContext {
     $hashtableFieldMatches = @{}
     $hashtableFieldLineIndices = @{}
     foreach ($objField in $arrRequiredFields) {
+        $strFieldLabelPattern = '^' +
+            (($objField.Name.Split(' ') | ForEach-Object { [regex]::Escape($_) }) -join '\s+') + '\s*:'
         $arrFieldRecords = @(
             $arrTopLevelListItems |
                 Where-Object {
                     $_.Start -ge $objMetadataList.Start -and
                     $_.Start -lt $intHeaderRegionEnd -and
                     $_.Text -is [string] -and
-                    $_.Text.StartsWith(
-                        "$($objField.Name):",
-                        [StringComparison]::Ordinal
-                    )
+                    [regex]::IsMatch($_.Text, $strFieldLabelPattern,
+                        ([Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+                            [Text.RegularExpressions.RegexOptions]::CultureInvariant))
                 }
         )
         $strFieldFailure = "must contain one exact top-level $($objField.Name) " +
