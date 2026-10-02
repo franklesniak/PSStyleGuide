@@ -1,0 +1,74 @@
+{
+  "repository": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-shared-governance\\PSStyleGuide",
+  "branch": "codex/shared-governance",
+  "head": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+  "protected_diff_empty": true,
+  "paths": [
+    {
+      "path": ".github/document-metadata-classification.json",
+      "bytes": 388,
+      "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+      "index_entry": "100644 e69de29bb2d1d6434b8b29ae775ad8c2e48c5391 0\t.github/document-metadata-classification.json"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "bytes": 5613,
+      "sha256": "a17bfe6ab678793fde20248d32cd35cbbb5668c4fe430f59679e05157b60acff",
+      "index_entry": "100644 d6f0628d492f6d2f76fe1ab65b3e0b316b52c729 0\t.github/workflows/Classify-InstructionMaintenance.mjs"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "bytes": 6739,
+      "sha256": "8255b514c8d9a724c2a12a269783b19b408d4c51f413ae48a39ed486c0b2c839",
+      "index_entry": "100644 1e7a60a42a8e9b28811c64de3d1b7e4c1bbec76a 0\t.github/workflows/Classify-InstructionMaintenance.test.mjs"
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "bytes": 2453,
+      "sha256": "48cd39e17bce054a2b391d27983f5c2a9bdaede8cde070a9b601e3e9bb233432",
+      "index_entry": "100644 bed8c585a495c3cab2875cac036a5717acd82bb6 0\t.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "bytes": 41614,
+      "sha256": "93c193d607687f1c2b2b9fce2f11f066b010bfb53cc53a679561ea13f95801b9",
+      "index_entry": "100644 41a955fc4ef68f47b3391417babbcb91824a2726 0\t.github/workflows/Test-AgentInstructions.SelfTest.ps1"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "bytes": 410026,
+      "sha256": "bb65599fde7cf98ecd868a608d43c85559282705df694f8a3f116c185bed2492",
+      "index_entry": "100644 bf2b013289afc7d5bc1f760de49e7abcc7cfdda2 0\t.github/workflows/Test-AgentInstructions.ps1"
+    },
+    {
+      "path": ".gitignore",
+      "bytes": 249,
+      "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87",
+      "index_entry": "100644 7429fc67b0c38c8ad6b57211c88797b5e8f13140 0\t.gitignore"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "bytes": 5909,
+      "sha256": "fb4e2cb22a678a0b506b790dd370b8673c00eac52b11b0ba8e102c8edcb87c59",
+      "index_entry": "100644 798aec2eacbdee846266299d2725069514fe6d58 0\tCONTRIBUTING.md"
+    },
+    {
+      "path": "README.md",
+      "bytes": 4720,
+      "sha256": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d",
+      "index_entry": "100644 90646a6ec020a2708d79412110d2acc2896382c4 0\tREADME.md"
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "bytes": 2179,
+      "sha256": "efa416634e0944322f352387aae491bfa39ca4d77951822d4402b8a38e4928f3",
+      "index_entry": "100644 6835e35d318e3f8af8f48ba0d7d773f10475918b 0\tdocs/ISSUE_EVALUATION_PROMPT.md"
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "bytes": 6256,
+      "sha256": "17c6ff1fabc939d33f9bbb424ac586d25f0f22a888d4eaf5bfc479bf382d7329",
+      "index_entry": "100644 34c9dec3cd9f640fd3a8346583fe8b1569056fb8 0\tdocs/dependency-maintenance.md"
+    }
+  ]
+}

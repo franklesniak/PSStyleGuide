@@ -1,0 +1,583 @@
+[
+  {
+    "path": ".codex/config.toml",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "89eb76dba2ac64bf811cf4272b033a30de241d80"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "89eb76dba2ac64bf811cf4272b033a30de241d80"
+    },
+    "status": "equal",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 205,
+        "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+      },
+      "TF": {
+        "bytes": 205,
+        "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+      }
+    },
+    "diff_file": "diffs/.codex/config.toml.diff"
+  },
+  {
+    "path": ".gitattributes",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "6313b56c57848efce05faa7aa7e901ccfc2886ea"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "6313b56c57848efce05faa7aa7e901ccfc2886ea"
+    },
+    "status": "equal",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 19,
+        "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+      },
+      "TF": {
+        "bytes": 19,
+        "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+      }
+    },
+    "diff_file": "diffs/.gitattributes.diff"
+  },
+  {
+    "path": ".github/copilot-instructions.md",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "62ff9fcfb1fb56dea8fd894d4d622cd3c598f875"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "d4ad431a6c629203aa6cd88b9cea6f9caa4c293b"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 1634,
+        "sha256": "e8c5d01dc227dc109e412f364c2d036ad17d59d5c56be942b87b0e5a16b2be34"
+      },
+      "TF": {
+        "bytes": 2231,
+        "sha256": "81fbe1615dd96fe99afca2738ff5888a6f7b7390068c1087d3d817fad73ff614"
+      }
+    },
+    "diff_file": "diffs/.github/copilot-instructions.md.diff"
+  },
+  {
+    "path": ".github/document-metadata-classification.json",
+    "PS": null,
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "79b79ebef9da1175a18a42748c1f69b6df58af35"
+    },
+    "status": "TF-only",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "TF": {
+        "bytes": 387,
+        "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+      }
+    },
+    "diff_file": "diffs/.github/document-metadata-classification.json.diff"
+  },
+  {
+    "path": ".github/instructions/docs.instructions.md",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "4a8f2addc02af857928205199b66cf3918ae9a82"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 46230,
+        "sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b"
+      },
+      "TF": {
+        "bytes": 46254,
+        "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+      }
+    },
+    "diff_file": "diffs/.github/instructions/docs.instructions.md.diff"
+  },
+  {
+    "path": ".github/instructions/yaml.instructions.md",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "edef19560d3403985d1417af4772d74bbf9eacf4"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "924d12c833d07def47d05137b532e622db622fa4"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 54645,
+        "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3"
+      },
+      "TF": {
+        "bytes": 54645,
+        "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+      }
+    },
+    "diff_file": "diffs/.github/instructions/yaml.instructions.md.diff"
+  },
+  {
+    "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "92743273da44ad7f6d46113a763089b9e1675f82"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 1509,
+        "sha256": "43c629f08ddb78a423187887db2ee7e53705bf2681ca0f1b49a169e1887e3452"
+      },
+      "TF": {
+        "bytes": 1510,
+        "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      }
+    },
+    "diff_file": "diffs/.github/workflows/Invoke-MarkdownLint.ps1.diff"
+  },
+  {
+    "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "bed8c585a495c3cab2875cac036a5717acd82bb6"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "5622bb03dd0af81ed44d4709a7eda8c644ce9530"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 8689,
+        "sha256": "a708e153c12b4576bc65fb5df50b322353d1f6d050c28df8d6575be7ce4a7955"
+      },
+      "TF": {
+        "bytes": 2603,
+        "sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a"
+      }
+    },
+    "diff_file": "diffs/.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md.diff"
+  },
+  {
+    "path": ".github/workflows/ci-toolchain.json",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "740a7749945acbf53e9981241ea553dc1431d3c8"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "740a7749945acbf53e9981241ea553dc1431d3c8"
+    },
+    "status": "equal",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 91,
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+      },
+      "TF": {
+        "bytes": 91,
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+      }
+    },
+    "diff_file": "diffs/.github/workflows/ci-toolchain.json.diff"
+  },
+  {
+    "path": ".github/workflows/npm-risk-exceptions.json",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0"
+    },
+    "status": "equal",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 23,
+        "sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+      },
+      "TF": {
+        "bytes": 23,
+        "sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+      }
+    },
+    "diff_file": "diffs/.github/workflows/npm-risk-exceptions.json.diff"
+  },
+  {
+    "path": ".gitignore",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "7429fc67b0c38c8ad6b57211c88797b5e8f13140"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 250,
+        "sha256": "a75dc3cbfa65dd2cba13326062c5039e04b7a15f6cb9a4c6c4983c2262c00bad"
+      },
+      "TF": {
+        "bytes": 249,
+        "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+      }
+    },
+    "diff_file": "diffs/.gitignore.diff"
+  },
+  {
+    "path": ".vscode/settings.json",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "bbccb6f224a56a77909ddd133b79adaea68564e1"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 39,
+        "sha256": "a15459993da7abc895615079e283122c110694db963a538bdf7f43d563fce24c"
+      },
+      "TF": {
+        "bytes": 46,
+        "sha256": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da"
+      }
+    },
+    "diff_file": "diffs/.vscode/settings.json.diff"
+  },
+  {
+    "path": "ACKNOWLEDGMENTS.md",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "f10ae23380e94de3feb20d88274635c4fe2ed308"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "f1ae2dd938628424412d9edd6787e99a9246f5ff"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 2543,
+        "sha256": "2eb74a8475145e01f55895df7299b8c35aa81386bd981d5343b8511ef77d1d20"
+      },
+      "TF": {
+        "bytes": 674,
+        "sha256": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42"
+      }
+    },
+    "diff_file": "diffs/ACKNOWLEDGMENTS.md.diff"
+  },
+  {
+    "path": "AGENTS.md",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "f7543d786156f0efc39c3fe2927ffcd186b29f39"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "aa643a442d6a0c59c05d2aff8737564981147fc6"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 32680,
+        "sha256": "ce1860e518783cdd75d78124a1ab078257233807f689839eb7cb3e3749f8847b"
+      },
+      "TF": {
+        "bytes": 33422,
+        "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266"
+      }
+    },
+    "diff_file": "diffs/AGENTS.md.diff"
+  },
+  {
+    "path": "CLAUDE.md",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "3bb0afcae09e05b6a8022d339b12721e8a1473d2"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "3cc21fc793944033be430ad08722081db4e7b9dd"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 82478,
+        "sha256": "527069c020934a6e73774dadef98359911bee71754ac6d67ab60796ac757c591"
+      },
+      "TF": {
+        "bytes": 80980,
+        "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2"
+      }
+    },
+    "diff_file": "diffs/CLAUDE.md.diff"
+  },
+  {
+    "path": "CONTRIBUTING.md",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "798aec2eacbdee846266299d2725069514fe6d58"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "94beedee85478c14d284ca830e94d4a5f4ece202"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 6210,
+        "sha256": "01091a192353fc5c571d6cdc37c451c5c5c33c115c55280fb1c71053bf78c5cc"
+      },
+      "TF": {
+        "bytes": 5813,
+        "sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda"
+      }
+    },
+    "diff_file": "diffs/CONTRIBUTING.md.diff"
+  },
+  {
+    "path": "LICENSE",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "fc77effb1732726e1d7445c687023889fe7180f0"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "98ca721ce2a880acbcbce1d9690cab0100b8bb7a"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 1070,
+        "sha256": "92f60fd7d9711fb9c898af1b4781d2314e364bde7104090f3fbdd363f74199b9"
+      },
+      "TF": {
+        "bytes": 1101,
+        "sha256": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb"
+      }
+    },
+    "diff_file": "diffs/LICENSE.diff"
+  },
+  {
+    "path": "README.md",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "90646a6ec020a2708d79412110d2acc2896382c4"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "f04368718d580fe61d9a22f4c92cdfdf8287b28d"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 4742,
+        "sha256": "e2e32feb1415250b4913e57de0bebbdf937195095fc18fc14037cf1cb6fdbe76"
+      },
+      "TF": {
+        "bytes": 5063,
+        "sha256": "affbdcdced05773f20895a397d1e062d716fb9e2b2215d0a4f412d7ed8b7a200"
+      }
+    },
+    "diff_file": "diffs/README.md.diff"
+  },
+  {
+    "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+    "PS": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "6835e35d318e3f8af8f48ba0d7d773f10475918b"
+    },
+    "TF": {
+      "mode": "100644",
+      "type": "blob",
+      "oid": "f43b5168ce508a9a054dc85ba7231e27d8c70809"
+    },
+    "status": "different",
+    "owner": "A02",
+    "exception_status": "none approved",
+    "commits": {
+      "PS": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "raw": {
+      "PS": {
+        "bytes": 2214,
+        "sha256": "13cf6d01fe951c4f8197e6a1b27740e5554b68f2f0b8add7a675322833ef4594"
+      },
+      "TF": {
+        "bytes": 2146,
+        "sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1"
+      }
+    },
+    "diff_file": "diffs/docs/ISSUE_EVALUATION_PROMPT.md.diff"
+  }
+]

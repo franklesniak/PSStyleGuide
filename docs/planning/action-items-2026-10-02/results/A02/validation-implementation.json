@@ -1,0 +1,113 @@
+{
+  "state": "nonprotected-ready",
+  "repository": "C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide",
+  "branch": "codex/shared-governance",
+  "head": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+  "protectedDiffEmpty": true,
+  "publicMutations": 0,
+  "transfers": 0,
+  "transferCap": 12,
+  "tools": {
+    "node": "24.18.1",
+    "npm": "11.16.0",
+    "runtime": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64",
+    "python": "3.12.10",
+    "powershell": "7.6.5",
+    "psscriptanalyzer": "1.24.0",
+    "preCommit": "4.6.2",
+    "markdownlintCli2": "0.23.3",
+    "markdownlint": "0.41.1"
+  },
+  "checks": [
+    {
+      "command": "node --test .github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "exit": 0,
+      "passed": 8
+    },
+    {
+      "command": "node --test Validate-WorkflowPolicy.test.mjs",
+      "cwd": ".github/workflows",
+      "exit": 0,
+      "passed": 72
+    },
+    {
+      "command": "node Validate-WorkflowPolicy.mjs build.yml markdownlint.yml",
+      "cwd": ".github/workflows",
+      "exit": 0
+    },
+    {
+      "command": "npm run lint:md",
+      "exit": 0,
+      "files": 24
+    },
+    {
+      "command": "npm run lint:md:nested",
+      "exit": 0,
+      "blocks": 23
+    },
+    {
+      "command": "Invoke-ScriptAnalyzer changed validator and SelfTest -Severity Warning,Error",
+      "exit": 0,
+      "findings": 0
+    },
+    {
+      "command": "focused-metadata-test.ps1",
+      "exit": 0,
+      "scope": "actual helper definitions; only PSScriptRoot substituted for scratch location; metadata/exemption/discovery/bootstrap, typed JSON/timestamps and Git-ignore fixtures"
+    },
+    {
+      "command": "pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -SelfTest",
+      "exit": 0,
+      "scope": "actual product content and complete mutation suite"
+    },
+    {
+      "command": "git diff --check",
+      "exit": 0
+    },
+    {
+      "command": "git diff --quiet -- AGENTS.md CLAUDE.md .github/copilot-instructions.md .github/instructions",
+      "exit": 0
+    },
+    {
+      "command": "py -3.12 -m pre_commit run --all-files",
+      "pass": 1,
+      "state": "passed",
+      "exit": 0,
+      "log": "precommit-final-pass1.log"
+    },
+    {
+      "command": "py -3.12 -m pre_commit run --all-files",
+      "pass": 2,
+      "state": "passed",
+      "exit": 0,
+      "log": "precommit-final-pass2.log"
+    }
+  ],
+  "unmeasured": [
+    "older PowerShell host runtime behavior",
+    "npm audit or installed dependency graph safety",
+    "absent parser-manifest suite owned by A06",
+    "protected proposal product behavior before authority",
+    "TF product validation and paired lifecycle",
+    "PR reviewer or main/main acceptance"
+  ],
+  "record_scope": "Worker pre-commit validation snapshot, preserved separately from native publication and ongoing review state",
+  "coordinator_verification": {
+    "native_sources": 37,
+    "decision_score_rows": 45,
+    "published_head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+    "pr": "https://github.com/franklesniak/PSStyleGuide/pull/224",
+    "full_precommit_logs": [
+      {
+        "name": "precommit-final-pass1.log",
+        "sha256": "5c49b73e1bba45543d26a4d875206625437f0ecd810ad385697d27ba9d328ec2",
+        "native_exit": 0
+      },
+      {
+        "name": "precommit-final-pass2.log",
+        "sha256": "827f87b3313bd34047bd317c6761c60bfa484d2e0f81e0ff1508f3af299a8a45",
+        "native_exit": 0
+      }
+    ]
+  }
+}

@@ -1,0 +1,597 @@
+{
+  "capturedUtc": "2026-10-02T07:12:07.414648+00:00",
+  "repositories": {
+    "TF": {
+      "name": "franklesniak/TerraformStyleGuide",
+      "main": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "sources": [
+        {
+          "path": "STYLE_GUIDE.md",
+          "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+          "mode": "100644",
+          "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+          "bytes": 152868,
+          "sameAsTf64": true,
+          "tf64Blob": "f872e52ee5b7ded737157dcf745cb93013005a2b"
+        },
+        {
+          "path": "STYLE_GUIDE_RATIONALE.md",
+          "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+          "mode": "100644",
+          "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74",
+          "bytes": 73953,
+          "sameAsTf64": true,
+          "tf64Blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c"
+        },
+        {
+          "path": "STYLE_GUIDE_CHAT.md",
+          "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+          "mode": "100644",
+          "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+          "bytes": 152962,
+          "sameAsTf64": true,
+          "tf64Blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8"
+        },
+        {
+          "path": "STYLE_GUIDE_FULL.md",
+          "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+          "mode": "100644",
+          "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+          "bytes": 222292,
+          "sameAsTf64": true,
+          "tf64Blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00"
+        },
+        {
+          "path": "copilot-instructions.md",
+          "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+          "mode": "100644",
+          "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+          "bytes": 152868,
+          "sameAsTf64": true,
+          "tf64Blob": "f872e52ee5b7ded737157dcf745cb93013005a2b"
+        },
+        {
+          "path": "terraform.instructions.md",
+          "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+          "mode": "100644",
+          "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+          "bytes": 153067,
+          "sameAsTf64": true,
+          "tf64Blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98"
+        },
+        {
+          "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+          "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+          "mode": "100644",
+          "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca",
+          "bytes": 22102,
+          "sameAsTf64": true,
+          "tf64Blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad"
+        },
+        {
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+          "mode": "100644",
+          "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4",
+          "bytes": 31949,
+          "sameAsTf64": true,
+          "tf64Blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e"
+        },
+        {
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+          "mode": "100644",
+          "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab",
+          "bytes": 33662,
+          "sameAsTf64": false,
+          "tf64Blob": "46e0bbdaf3301833b26e086d29c82c4057eef420"
+        },
+        {
+          "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+          "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+          "mode": "100644",
+          "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c",
+          "bytes": 95329,
+          "sameAsTf64": true,
+          "tf64Blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82"
+        },
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+          "mode": "100644",
+          "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528",
+          "bytes": 5632,
+          "sameAsTf64": true,
+          "tf64Blob": "00c5857b701c9c85668f9fe66e33838f82d313e8"
+        },
+        {
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "mode": "100644",
+          "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+          "bytes": 5706,
+          "sameAsTf64": false,
+          "tf64Blob": "802740aadd7293d4304222350dca798aad6532ce"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "mode": "100644",
+          "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd",
+          "bytes": 4222,
+          "sameAsTf64": true,
+          "tf64Blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "mode": "100644",
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c",
+          "bytes": 9558,
+          "sameAsTf64": true,
+          "tf64Blob": "7bf29f43ea081e9861ad53ecf0951831bf878075"
+        },
+        {
+          "path": "package.json",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "mode": "100644",
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+          "bytes": 837,
+          "sameAsTf64": true,
+          "tf64Blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832"
+        }
+      ]
+    },
+    "PS": {
+      "name": "franklesniak/PSStyleGuide",
+      "main": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc",
+      "sources": [
+        {
+          "path": "terraform.instructions.md",
+          "absent": true
+        },
+        {
+          "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+          "absent": true
+        },
+        {
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+          "mode": "100644",
+          "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996",
+          "bytes": 32648
+        },
+        {
+          "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+          "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+          "mode": "100644",
+          "sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48",
+          "bytes": 86655
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+          "mode": "100644",
+          "sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0",
+          "bytes": 4361
+        }
+      ]
+    }
+  },
+  "acceptedTf64": {
+    "pr": {
+      "number": 64,
+      "html_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/64",
+      "state": "closed",
+      "merged": true,
+      "merged_at": "2026-10-01T22:15:29Z",
+      "merge_commit_sha": "6e9f4ced62cf02cf99bc087e20a670aaa2f49bbf",
+      "reviewedHead": "975012ed84374aa2fe9f80bb489c69bc8b9bca63",
+      "base": "ff483324ccb62139b6956795f9adcba360f9401b"
+    },
+    "mergeTree": "bed6cbdfba2371eef4cff487057412b3712b1122",
+    "reviewedTree": "bed6cbdfba2371eef4cff487057412b3712b1122",
+    "comments": [
+      {
+        "id": 5941723473,
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/64#issuecomment-5941723473",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T22:14:50Z",
+        "updatedAt": "2026-10-01T22:14:50Z",
+        "bodySha256": "cc56b3c60bd3ca75aec617fe6543fc51c803fc6fc35acc3eda9ae7232bdf1569",
+        "body": "## Final review closure and independent pre-merge quality\n\nTask288 / issue23, current reviewed input:\n- Head: 975012ed84374aa2fe9f80bb489c69bc8b9bca63\n- Tree: bed6cbdfba2371eef4cff487057412b3712b1122\n- Accepted base/policy: ff483324ccb62139b6956795f9adcba360f9401b\n- Input key: d5d58009d968e75d6b1cd509c112f34086a706afc1ef3f38ec369468a2687995\n\nFresh independent pre-merge quality: **PASS**. The independent audit re-read the actual issue, full eleven-path scope, source and generated blocks, caller/classifier dependencies, native reviews/findings/checks, maintenance authority and artifact bytes. It found no unresolved material defect. The previous a07554d audit remains **FAIL** history; its token defect is repaired on this input.\n\n### Findings and reviewer results\n\n- D87: the reproduced allexport token leak is fixed by disabling allexport inside the HCP subshell before input, retaining inherited-token removal. The new actual-block regression checks child environments and the caller's unchanged option; its negative run rejects the old source. [Full decision](https://github.com/franklesniak/TerraformStyleGuide/pull/64#issuecomment-5941190554).\n- D85: the real multiple-Node lookup failure is repaired and its precedence/no-fallback tests pass. The separate Node20 image allegation in comment4160438660 is refuted for the actual observed image and successful harness run; its thread remains resolved. [Full decision/evidence](https://github.com/franklesniak/TerraformStyleGuide/pull/64#issuecomment-5940497773).\n- D88: the original all-files local invocation failed its unmerged-topic metadata comparison. It remains failed. The unchanged accepted validator passed its contract and mutation self-tests against the explicit accepted base/current candidate, from a clean accepted checkout. Normal installed commit hooks passed; no check was disabled or metadata inflated. [Full decision](https://github.com/franklesniak/TerraformStyleGuide/pull/64#issuecomment-5941307449).\n- D89: current Copilot's one optional heading-case suggestion4160983380 is declined with the full decision process; its thread is resolved. This is not a claim of zero reviewer findings. [Full disposition](https://github.com/franklesniak/TerraformStyleGuide/pull/64#discussion_r4161006200).\n- D86: all three body assurance items (`review:5385531618:Needs a closer look:1`, `review:5385811580:Needs a closer look:1`, `review:5386149722:Needs a closer look:1`) are closed by actual local/hosted execution plus the fresh independent audit. The audit examined secret handling, targeting, publication and failure/cleanup behavior. It is not human review; no live cloud account was tested. The original reviewer execution limitation is preserved. [Selected assurance approach](https://github.com/franklesniak/TerraformStyleGuide/pull/64#issuecomment-5940644112).\n\nActual current reviewers remain distinct: [Copilot5386149722](https://github.com/franklesniak/TerraformStyleGuide/pull/64#pullrequestreview-5386149722), observed Balanced, and [Codex detail5941518875](https://github.com/franklesniak/TerraformStyleGuide/pull/64#issuecomment-5941518875), no major issues. Formal Codex request5941459729 at21:56:21Z followed confirmed Copilot readiness. Actual connector app1144995 summary5940348814 completed this head at22:00:53.427705Z. Both native threads are resolved; no review request remains pending.\n\n### Validation and exact preview\n\n- Local:112 actual-example cases and16 caller cases; committed artifact verifier with multiple Node installations and zero drift; normal installed hooks and applicable lint/policy checks; explicit accepted-baseline instruction contract and mutation self-tests.\n- Current [PR candidate job110601115819](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/36931367616/job/110601115819) and push job110601101248 each report193 tests,193 passes,0 failures,0 skips.\n- [Accepted-policy job110601117402](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/36931367697/job/110601117402) and local accepted-source classification identify maintenance_required on these exact endpoints. Scoped standing authority covers the coupled verifier/selector/tests; candidate tests do not grant authority.\n- [Build run36931367661](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/36931367661): actual verifier110601115796 and publisher110601311734 passed. Preview artifact11196430773 has digest76953709013747289f643c6e483a50ee0ddbdb74878282afa81b1ae63ff1d498 and exactly four regular files, independently checked byte-for-byte against this commit. All eight marked blocks match the normative source in each generated guide.\n- All eleven applicable native checks passed. Four separate jobs are intentionally inapplicable under the existing push/PR/PR-target conditions; none is a required-check substitute.\n\nThe audit found no missing requirement, illegitimate deferral or inaccurate description. The bounded PS comparison identified no corresponding state-recovery surface requiring a counterpart edit. Linux/tool/storage assumptions, basic rather than complete Terraform-state validation, and no hostile same-user/privileged filesystem guarantee remain explicit. Manual backup/destructive recovery/corruption guidance remains issue25.\n\nThis is final pre-merge evidence, not landed-service acceptance. Recheck live input, rules, findings, checks and mergeability; merge normally with head matching; then verify the landed tree and actual main-branch verifier/publication before closing issue23. No settings, force, administrator override or bypass is authorized.\n\nGenerated with Codex\n"
+      },
+      {
+        "id": 5941926849,
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/64#issuecomment-5941926849",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T22:27:29Z",
+        "updatedAt": "2026-10-01T22:27:29Z",
+        "bodySha256": "49cb6d104cae817b171369c70faf60dc82d7e2ae71323ef9719289e464a26758",
+        "body": "<!-- markdownlint-disable MD013 -->\n\n## Task288 landed acceptance: PASS\n\nPR64 merged normally at 2026-10-01T22:15:29Z as `6e9f4ced62cf02cf99bc087e20a670aaa2f49bbf`. Its tree `bed6cbdfba2371eef4cff487057412b3712b1122` exactly matches reviewed head `975012ed84374aa2fe9f80bb489c69bc8b9bca63`. The [final review and independent pre-merge quality record](https://github.com/franklesniak/TerraformStyleGuide/pull/64#issuecomment-5941723473) remains the review evidence. No settings or controls were bypassed.\n\nAll six applicable landed jobs and four workflow runs passed. The existing accepted-policy job was inapplicable on this push and was skipped; it is not counted as a pass. [Actual candidate job 110609668716](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/36933949311/job/110609668716) reports 193 tests, 193 passes, zero failures and zero skips.\n\nThe changed artifact service was tested on the landed commit. [Build run 36933948257](https://github.com/franklesniak/TerraformStyleGuide/actions/runs/36933948257) ran the actual published-example tests and committed-output comparison successfully in verify job110609665404, followed by separate successful publication job110609852583. Artifact11196329173 contains exactly four regular files, each byte-identical to that landed commit. Its downloaded SHA-256 `72bd07944277a71810ed31d057100480444e2a557aac9c1dc0f4e28ec70e7fc8` matches the native artifact digest. Upload success alone was not used as acceptance.\n\nA fresh independent affected-service audit returned PASS after checking those native results, archive contents and Git identities. Task288 and issue23's retained scope are complete. Earlier failed CI, metadata invocation and pre-merge token audit remain failed historical evidence; the repaired successor does not erase them.\n\nThe result covers the seven documented read-only discovery/exact-version recovery examples and their bounded runtime/storage contract. It does not prove live provider credentials/IAM behavior, universal filesystem confinement or full Terraform state-format compatibility. Manual backups, destructive state commands and corruption recovery remain in issue25. The bounded PS comparison found no corresponding content defect requiring a counterpart edit.\n\nGenerated with Codex"
+      }
+    ],
+    "runs": [
+      {
+        "id": 36933948257,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/36933948257",
+        "head_sha": "6e9f4ced62cf02cf99bc087e20a670aaa2f49bbf",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-01T22:15:32Z",
+        "updated_at": "2026-10-01T22:16:15Z",
+        "run_attempt": 1
+      },
+      {
+        "id": 36933949311,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/36933949311",
+        "head_sha": "6e9f4ced62cf02cf99bc087e20a670aaa2f49bbf",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-01T22:15:33Z",
+        "updated_at": "2026-10-01T22:20:51Z",
+        "run_attempt": 1
+      }
+    ],
+    "jobs": [
+      {
+        "id": 110609665404,
+        "run_id": 36933948257,
+        "head_sha": "6e9f4ced62cf02cf99bc087e20a670aaa2f49bbf",
+        "name": "verify",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-01T22:15:34Z",
+        "completed_at": "2026-10-01T22:16:05Z",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-01T22:15:35Z",
+            "completed_at": "2026-10-01T22:15:35Z"
+          },
+          {
+            "name": "Acquire the exact revision without credentials",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-01T22:15:35Z",
+            "completed_at": "2026-10-01T22:15:37Z"
+          },
+          {
+            "name": "Verify checkout credentials",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-01T22:15:37Z",
+            "completed_at": "2026-10-01T22:15:38Z"
+          },
+          {
+            "name": "Generate and verify committed artifacts",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-01T22:15:38Z",
+            "completed_at": "2026-10-01T22:16:04Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-01T22:16:04Z",
+            "completed_at": "2026-10-01T22:16:04Z"
+          }
+        ],
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "logSha256": "dfaa7dbc5453352d711a049ecb5e77d5b30681a3f1a41d2895973d61650cb5c0",
+        "selectedLogLines": [
+          "2026-10-01T22:15:35.4710596Z Ubuntu",
+          "2026-10-01T22:15:35.4719902Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md",
+          "2026-10-01T22:16:04.1333911Z state-recovery: published-example tests passed"
+        ]
+      },
+      {
+        "id": 110609852583,
+        "run_id": 36933948257,
+        "head_sha": "6e9f4ced62cf02cf99bc087e20a670aaa2f49bbf",
+        "name": "publish",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-01T22:16:08Z",
+        "completed_at": "2026-10-01T22:16:14Z",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-01T22:16:08Z",
+            "completed_at": "2026-10-01T22:16:09Z"
+          },
+          {
+            "name": "Checkout repository",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-01T22:16:09Z",
+            "completed_at": "2026-10-01T22:16:10Z"
+          },
+          {
+            "name": "Publish committed style guide artifacts",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-01T22:16:10Z",
+            "completed_at": "2026-10-01T22:16:12Z"
+          },
+          {
+            "name": "Post Checkout repository",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-01T22:16:12Z",
+            "completed_at": "2026-10-01T22:16:12Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-01T22:16:12Z",
+            "completed_at": "2026-10-01T22:16:12Z"
+          }
+        ],
+        "labels": [
+          "ubuntu-24.04"
+        ]
+      },
+      {
+        "id": 110609668716,
+        "run_id": 36933949311,
+        "head_sha": "6e9f4ced62cf02cf99bc087e20a670aaa2f49bbf",
+        "name": "Test proposed instruction and workflow behavior",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-01T22:15:35Z",
+        "completed_at": "2026-10-01T22:20:51Z",
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-01T22:15:36Z",
+            "completed_at": "2026-10-01T22:15:36Z"
+          },
+          {
+            "name": "Acquire the exact revision without credentials",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-01T22:15:36Z",
+            "completed_at": "2026-10-01T22:15:48Z"
+          },
+          {
+            "name": "Verify checkout credentials",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-01T22:15:48Z",
+            "completed_at": "2026-10-01T22:15:51Z"
+          },
+          {
+            "name": "Install locked test dependencies",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-01T22:15:51Z",
+            "completed_at": "2026-10-01T22:15:57Z"
+          },
+          {
+            "name": "Test proposed behavior without publication authority",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-01T22:15:57Z",
+            "completed_at": "2026-10-01T22:20:49Z"
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-01T22:20:49Z",
+            "completed_at": "2026-10-01T22:20:49Z"
+          }
+        ],
+        "labels": [
+          "ubuntu-24.04"
+        ],
+        "logSha256": "8179f292fb494e32a636414540a3ad11f69b77c6ef54935d98dbca5f2484a37b",
+        "selectedLogLines": [
+          "2026-10-01T22:15:36.1143659Z Ubuntu",
+          "2026-10-01T22:15:36.1151531Z Included Software: https://github.com/actions/runner-images/blob/ubuntu24/20260927.320/images/ubuntu/Ubuntu2404-Readme.md",
+          "2026-10-01T22:15:57.4253461Z Installed Node v24.18.1 and npm 11.16.0 from the reviewed runtime declaration.",
+          "2026-10-01T22:20:49.2573861Z \u2139 tests 193",
+          "2026-10-01T22:20:49.2574304Z \u2139 pass 193",
+          "2026-10-01T22:20:49.2574526Z \u2139 fail 0",
+          "2026-10-01T22:20:49.2574982Z \u2139 skipped 0"
+        ]
+      }
+    ],
+    "artifact": {
+      "id": 11196329173,
+      "name": "style-guide-artifacts",
+      "size_in_bytes": 681751,
+      "expired": false,
+      "digest": "sha256:72bd07944277a71810ed31d057100480444e2a557aac9c1dc0f4e28ec70e7fc8",
+      "created_at": "2026-10-01T22:16:12Z",
+      "expires_at": "2026-10-08T22:16:11Z",
+      "workflow_run": {
+        "id": 36933948257,
+        "repository_id": 1208373637,
+        "head_repository_id": 1208373637,
+        "head_branch": "main",
+        "head_sha": "6e9f4ced62cf02cf99bc087e20a670aaa2f49bbf"
+      }
+    },
+    "artifactCallerRegion": {
+      "currentPath": ".github/workflows/Test-CiHelpers.test.mjs",
+      "firstLine": 427,
+      "bytes": 6514,
+      "sha256": "6f36de8c3ea25471451a33dcbb624ae8f4b3ab9992be80249e20d76dccabbb82",
+      "identicalAtAcceptedMerge": true,
+      "cases": 16
+    }
+  },
+  "blocks": [
+    {
+      "id": "SR-SETUP",
+      "source": "STYLE_GUIDE.md",
+      "markerLine": 2389,
+      "bodySha256": "f1766ab2d50d9304be65295d9e35b4fe1451513175bed70056fc17f5f4778b26",
+      "bodyBytes": 6747,
+      "identicalAtTf64": true
+    },
+    {
+      "id": "SR-AWS-DISCOVERY",
+      "source": "STYLE_GUIDE.md",
+      "markerLine": 2552,
+      "bodySha256": "f9bf281a4b6f99aebec280b1eaf6d31e0266e70494f9bf1341fb69f0b543c679",
+      "bodyBytes": 734,
+      "identicalAtTf64": true
+    },
+    {
+      "id": "SR-AWS-RECOVERY",
+      "source": "STYLE_GUIDE.md",
+      "markerLine": 2572,
+      "bodySha256": "e3e37f3bc653d13a5a99ac0c8a62985b227c544454118fbd8e7bafbcd2ac1ac7",
+      "bodyBytes": 663,
+      "identicalAtTf64": true
+    },
+    {
+      "id": "SR-AZURE-DISCOVERY",
+      "source": "STYLE_GUIDE.md",
+      "markerLine": 2595,
+      "bodySha256": "655e8827ef4f3a3c9dd2e7b8aed5c4ac5493aba5ee36b373229cc179e9bc6739",
+      "bodyBytes": 785,
+      "identicalAtTf64": true
+    },
+    {
+      "id": "SR-AZURE-RECOVERY",
+      "source": "STYLE_GUIDE.md",
+      "markerLine": 2614,
+      "bodySha256": "216ebbfc9c1b94b3da7850b1eb129fdc03a77fcd14f487f5cfdbae98103bd6d6",
+      "bodyBytes": 754,
+      "identicalAtTf64": true
+    },
+    {
+      "id": "SR-GCS-DISCOVERY",
+      "source": "STYLE_GUIDE.md",
+      "markerLine": 2637,
+      "bodySha256": "167b40643e63337d4d89579e09850e77ddaaae90be6e6254a613d88882ce184c",
+      "bodyBytes": 733,
+      "identicalAtTf64": true
+    },
+    {
+      "id": "SR-GCS-RECOVERY",
+      "source": "STYLE_GUIDE.md",
+      "markerLine": 2657,
+      "bodySha256": "6442fd63ed598efe824ddc600d2dc6fa4b5014d5c18f9fee73d4db85fc0daaf2",
+      "bodyBytes": 829,
+      "identicalAtTf64": true
+    },
+    {
+      "id": "SR-HCP-DISCOVERY",
+      "source": "STYLE_GUIDE.md",
+      "markerLine": 2683,
+      "bodySha256": "301199f0b4b9a71f8a3d115ea5485e56970ed35c7d4a2507f93d1b33d1131510",
+      "bodyBytes": 1566,
+      "identicalAtTf64": true
+    }
+  ],
+  "issue23": {
+    "number": 23,
+    "html_url": "https://github.com/franklesniak/TerraformStyleGuide/issues/23",
+    "title": "Make state-version discovery and recovery examples safe to copy",
+    "state": "closed",
+    "state_reason": "completed",
+    "updated_at": "2026-10-01T22:28:18Z",
+    "closed_at": "2026-10-01T22:28:18Z",
+    "comments": 1,
+    "body": "<!-- markdownlint-disable MD013 -->\n\n# Make state-version discovery and recovery examples safe to copy\n\n## Current scope\n\nThis body applies the already selected post-PR212 F01\u2013F10/A01\u2013A05 amendment after its merge/service-acceptance and independent amendment-review boundary. It does not assert that implementation or acceptance has occurred.\n\nRepository: TerraformStyleGuide; native issue: #23. Own seven published Bash surfaces: `SR-AWS-DISCOVERY`, `SR-AWS-RECOVERY`, `SR-AZURE-DISCOVERY`, `SR-AZURE-RECOVERY`, `SR-GCS-DISCOVERY`, `SR-GCS-RECOVERY`, and `SR-HCP-DISCOVERY`. Preserve their identification so the harness executes the actual final published snippets. Separate discovery from deliberate exact-version retrieval. Never auto-select latest or mutate remote state. Check current primary provider documentation at implementation for identifier restrictions, supported bucket/account classes, permissions, version retention and retrieval behavior; document a limited supported subset rather than inventing incompatible restrictions.\n\nWrite sensitive outputs only to fresh protected destinations outside Git and inappropriate shared storage. Do not overwrite existing files or links. Do not log tokens, signed URLs or state. A typed no-competing-writer phrase is a stated precondition, not proof. Inspect what can actually be verified; bound race/ownership claims honestly. Use provider-native no-clobber support where available and safe publication/cleanup ownership. Before publication, a failure leaves no final file and cleans only proven owned temporary data. After publication or ownership uncertainty, retain the sensitive output privately and fail; never delete a successfully recovered file merely to satisfy an absence assertion. Preserve the primary error or signal; report cleanup-only failure distinctly.\n\nUse network-free provider stubs to execute the exact seven snippets and test deliberate identifier/version preservation, wrong version, unsupported input, existing file/link, partial failure, secret suppression and safe cleanup at each phase. Test documented runtime requirements on supported environments; do not assume wrapper tests prove copied snippets. Keep adjacent manual backups, destructive state commands, corruption recovery and older overlapping examples inventoried in the separate destructive-recovery follow-up. Generate derived guide outputs from sources and run applicable native content, lint, metadata and CI checks. Complete through the shared lifecycle; a PS counterpart change requires a demonstrated common need, not a mandatory cycle.\n\n## Provider behavior retained\n\n| Provider | Required behavior |\n| --- | --- |\n| AWS S3 | Discover versions for the exact key; retrieve only the deliberately supplied version. Explain Enabled/Suspended/null behavior, expiration/permanent deletion, general-purpose bucket scope, ListBucketVersions/GetObjectVersion permissions and applicable KMS decryption. Recheck current primary bucket-class and KMS documentation before implementation; do not change bucket versioning. |\n| Azure Blob | Discover the exact blob's versions and retrieve the chosen version with no-overwrite support. Explain authentication/read permissions, versioning prerequisites and documented unsupported account classes. |\n| GCS | Distinguish retained Object Versioning generations from soft-delete recovery; discover the exact object and retrieve the explicitly selected generation. Explain list/get permissions and supported no-clobber behavior; add no soft-delete restoration. |\n| HCP Terraform | Discover the selected workspace's state-version API data into a fresh protected response file with bounded paging and explicit host/workspace/page inputs. Protect bearer tokens, signed URLs and returned state metadata. Do not download or apply a state automatically. |\n\nDocument the supported identifier subset against current provider rules, preserve accepted location/version bytes, reject missing/unsafe inputs before provider or filesystem work, and prove those properties with the actual published snippets. Retain the scoped seven IDs, not a permanent source-hash or arbitrary grammar protocol.\n\n## Delivery and evidence\n\nFor implementation changes, use the plan's shared lifecycle: implementation and relevant behavior/security validation, authenticated independent review, separate fresh independent final-quality audit, normal head-matched merge, actual landed readback and changed-service acceptance. Preserve the full validate/options/unique weighted rubric/scores/selection process for each distinct confirmed finding. Reuse standing in-scope authority and authorized actual Claude substitution; failed Codex remains failed, pending requests and attempt caps remain binding. Candidate flags/tests do not grant maintenance authority. Required native checks must truthfully state what they prove. No settings, administrator override, force, credentials or bypass authority is created here.\n\nThe prior writer, release-prose, duplicated review and compulsory reverse-cycle requirements replaced below are superseded, not implemented. Historical issue discussions and implementation evidence remain history. Complete only the retained outcome and its real acceptance gates; do not manufacture a PR for a proved no-change applicability result.\n",
+    "commentPages": [
+      [
+        {
+          "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/comments/5941939104",
+          "html_url": "https://github.com/franklesniak/TerraformStyleGuide/issues/23#issuecomment-5941939104",
+          "issue_url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/23",
+          "id": 5941939104,
+          "node_id": "IC_kwDOSAZRhc8AAAABYirLoA",
+          "user": {
+            "login": "franklesniak",
+            "id": 11204406,
+            "node_id": "MDQ6VXNlcjExMjA0NDA2",
+            "avatar_url": "https://avatars.githubusercontent.com/u/11204406?v=4",
+            "gravatar_id": "",
+            "url": "https://api.github.com/users/franklesniak",
+            "html_url": "https://github.com/franklesniak",
+            "followers_url": "https://api.github.com/users/franklesniak/followers",
+            "following_url": "https://api.github.com/users/franklesniak/following{/other_user}",
+            "gists_url": "https://api.github.com/users/franklesniak/gists{/gist_id}",
+            "starred_url": "https://api.github.com/users/franklesniak/starred{/owner}{/repo}",
+            "subscriptions_url": "https://api.github.com/users/franklesniak/subscriptions",
+            "organizations_url": "https://api.github.com/users/franklesniak/orgs",
+            "repos_url": "https://api.github.com/users/franklesniak/repos",
+            "events_url": "https://api.github.com/users/franklesniak/events{/privacy}",
+            "received_events_url": "https://api.github.com/users/franklesniak/received_events",
+            "type": "User",
+            "user_view_type": "public",
+            "site_admin": false
+          },
+          "created_at": "2026-10-01T22:28:17Z",
+          "updated_at": "2026-10-01T22:28:17Z",
+          "body": "Completed and independently accepted on the actual landed commit. Final outcome, native tests, artifact proof and remaining scope limits: https://github.com/franklesniak/TerraformStyleGuide/pull/64#issuecomment-5941926849",
+          "author_association": "OWNER",
+          "pin": null,
+          "reactions": {
+            "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/issues/comments/5941939104/reactions",
+            "total_count": 0,
+            "+1": 0,
+            "-1": 0,
+            "laugh": 0,
+            "hooray": 0,
+            "confused": 0,
+            "heart": 0,
+            "rocket": 0,
+            "eyes": 0
+          },
+          "performed_via_github_app": null,
+          "minimized": null
+        }
+      ]
+    ]
+  },
+  "finalRefs": {
+    "verifiedUtc": "2026-10-02T07:20:16.800593+00:00",
+    "repositories": {
+      "TF": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+      },
+      "PS": {
+        "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+        "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc"
+      }
+    }
+  }
+}

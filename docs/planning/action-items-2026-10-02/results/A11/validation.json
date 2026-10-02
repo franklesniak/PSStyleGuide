@@ -1,0 +1,410 @@
+{
+  "checkedUtc": "2026-10-02T07:20:16.800593+00:00",
+  "checks": [
+    {
+      "check": "TF:STYLE_GUIDE.md",
+      "passed": true
+    },
+    {
+      "check": "TF:STYLE_GUIDE_RATIONALE.md",
+      "passed": true
+    },
+    {
+      "check": "TF:STYLE_GUIDE_CHAT.md",
+      "passed": true
+    },
+    {
+      "check": "TF:STYLE_GUIDE_FULL.md",
+      "passed": true
+    },
+    {
+      "check": "TF:copilot-instructions.md",
+      "passed": true
+    },
+    {
+      "check": "TF:terraform.instructions.md",
+      "passed": true
+    },
+    {
+      "check": "TF:.github/workflows/Test-StateRecoveryExamples.mjs",
+      "passed": true
+    },
+    {
+      "check": "TF:.github/workflows/Test-StyleGuideArtifacts.ps1",
+      "passed": true
+    },
+    {
+      "check": "TF:.github/workflows/Test-CiHelpers.test.mjs",
+      "passed": true
+    },
+    {
+      "check": "TF:.github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "passed": true
+    },
+    {
+      "check": "TF:.github/workflows/Classify-InstructionMaintenance.mjs",
+      "passed": true
+    },
+    {
+      "check": "TF:.github/workflows/Initialize-CiToolchain.ps1",
+      "passed": true
+    },
+    {
+      "check": "TF:.github/workflows/build.yml",
+      "passed": true
+    },
+    {
+      "check": "TF:.github/workflows/agent-instructions.yml",
+      "passed": true
+    },
+    {
+      "check": "TF:package.json",
+      "passed": true
+    },
+    {
+      "check": "PS:.github/workflows/Test-StyleGuideArtifacts.ps1",
+      "passed": true
+    },
+    {
+      "check": "PS:.github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "passed": true
+    },
+    {
+      "check": "PS:.github/workflows/build.yml",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_CHAT.md:SR-SETUP",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_CHAT.md:SR-AWS-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_CHAT.md:SR-AWS-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_CHAT.md:SR-AZURE-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_CHAT.md:SR-AZURE-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_CHAT.md:SR-GCS-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_CHAT.md:SR-GCS-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_CHAT.md:SR-HCP-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_FULL.md:SR-SETUP",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_FULL.md:SR-AWS-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_FULL.md:SR-AWS-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_FULL.md:SR-AZURE-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_FULL.md:SR-AZURE-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_FULL.md:SR-GCS-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_FULL.md:SR-GCS-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "STYLE_GUIDE_FULL.md:SR-HCP-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "copilot-instructions.md:SR-SETUP",
+      "passed": true
+    },
+    {
+      "check": "copilot-instructions.md:SR-AWS-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "copilot-instructions.md:SR-AWS-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "copilot-instructions.md:SR-AZURE-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "copilot-instructions.md:SR-AZURE-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "copilot-instructions.md:SR-GCS-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "copilot-instructions.md:SR-GCS-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "copilot-instructions.md:SR-HCP-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "terraform.instructions.md:SR-SETUP",
+      "passed": true
+    },
+    {
+      "check": "terraform.instructions.md:SR-AWS-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "terraform.instructions.md:SR-AWS-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "terraform.instructions.md:SR-AZURE-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "terraform.instructions.md:SR-AZURE-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "terraform.instructions.md:SR-GCS-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "terraform.instructions.md:SR-GCS-RECOVERY",
+      "passed": true
+    },
+    {
+      "check": "terraform.instructions.md:SR-HCP-DISCOVERY",
+      "passed": true
+    },
+    {
+      "check": "16 artifact caller cases unchanged from TF64",
+      "passed": true,
+      "bytes": 6514,
+      "sha256": "6f36de8c3ea25471451a33dcbb624ae8f4b3ab9992be80249e20d76dccabbb82"
+    },
+    {
+      "check": "all 18 original IDs retain historical audit state",
+      "passed": true
+    },
+    {
+      "check": "Node syntax only; not Linux harness execution",
+      "passed": true,
+      "runtime": "v24.18.1"
+    },
+    {
+      "check": "TF final native main unchanged",
+      "passed": true
+    },
+    {
+      "check": "PS final native main unchanged",
+      "passed": true
+    }
+  ],
+  "scoreArithmetic": [
+    {
+      "decision": "D1",
+      "option": "A",
+      "weights": [
+        35,
+        25,
+        15,
+        15,
+        10
+      ],
+      "scores": [
+        5,
+        5,
+        4,
+        5,
+        4
+      ],
+      "total": 95.0
+    },
+    {
+      "decision": "D1",
+      "option": "B",
+      "weights": [
+        35,
+        25,
+        15,
+        15,
+        10
+      ],
+      "scores": [
+        3,
+        3,
+        3,
+        2,
+        1
+      ],
+      "total": 53.0
+    },
+    {
+      "decision": "D1",
+      "option": "C",
+      "weights": [
+        35,
+        25,
+        15,
+        15,
+        10
+      ],
+      "scores": [
+        1,
+        1,
+        3,
+        4,
+        5
+      ],
+      "total": 43.0
+    },
+    {
+      "decision": "D1",
+      "option": "D",
+      "weights": [
+        35,
+        25,
+        15,
+        15,
+        10
+      ],
+      "scores": [
+        4,
+        2,
+        3,
+        3,
+        4
+      ],
+      "total": 64.0
+    },
+    {
+      "decision": "D2",
+      "option": "A",
+      "weights": [
+        40,
+        25,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        5,
+        5,
+        5,
+        4,
+        4
+      ],
+      "total": 97.0
+    },
+    {
+      "decision": "D2",
+      "option": "B",
+      "weights": [
+        40,
+        25,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        2,
+        2,
+        2,
+        4,
+        5
+      ],
+      "total": 47.0
+    },
+    {
+      "decision": "D2",
+      "option": "C",
+      "weights": [
+        40,
+        25,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        4,
+        4,
+        3,
+        1,
+        2
+      ],
+      "total": 68.0
+    },
+    {
+      "decision": "D2",
+      "option": "D",
+      "weights": [
+        40,
+        25,
+        20,
+        10,
+        5
+      ],
+      "scores": [
+        3,
+        3,
+        1,
+        3,
+        4
+      ],
+      "total": 53.0
+    }
+  ],
+  "scope": "Raw source and generated block identity, native readback, syntax only; no new Linux execution, real state, credentials or cloud recovery.",
+  "historicalAcceptedExecution": {
+    "linuxT2ActionCases": 112,
+    "artifactCallerCases": 16,
+    "candidateTests": 193,
+    "candidatePass": 193,
+    "candidateFail": 0,
+    "candidateSkip": 0,
+    "countSource": "TF64 final quality/acceptance; native candidate log independently confirms 193/193/0/0, artifact log confirms published-example gate pass, not individual 112 count."
+  },
+  "limitations": [
+    "A06/A07 acceptance pending",
+    "Windows host cannot establish GNU/Linux runtime acceptance",
+    "No Windows5.1 script launch or execution-policy bypass",
+    "No fresh artifact archive byte check; historical accepted digest and current metadata agree",
+    "No T4 Gate A/B acceptance",
+    "Requested model gpt-6-astra/high; effective runtime metadata unavailable"
+  ],
+  "finalRefs": {
+    "TF": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    },
+    "PS": {
+      "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc"
+    }
+  }
+}

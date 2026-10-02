@@ -1,0 +1,39 @@
+{
+  "id": 110746856635,
+  "run_id": 36978295346,
+  "head_sha": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+  "status": "completed",
+  "conclusion": "success",
+  "labels": [
+    "ubuntu-24.04"
+  ],
+  "started_at": "2026-10-02T07:23:25Z",
+  "completed_at": "2026-10-02T07:29:42Z",
+  "steps": [
+    {
+      "name": "Set up job",
+      "conclusion": "success"
+    },
+    {
+      "name": "Acquire the exact revision without credentials",
+      "conclusion": "success"
+    },
+    {
+      "name": "Verify checkout credentials",
+      "conclusion": "success"
+    },
+    {
+      "name": "Install locked test dependencies",
+      "conclusion": "success"
+    },
+    {
+      "name": "Test proposed behavior without publication authority",
+      "conclusion": "success"
+    },
+    {
+      "name": "Complete job",
+      "conclusion": "success"
+    }
+  ],
+  "log_sha256": "603f008d9ec5333b58d2c04dfc014da0ce38caef14bd69b7702bbd92e0960e2f"
+}

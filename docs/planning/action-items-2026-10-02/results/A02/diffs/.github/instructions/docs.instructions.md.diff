@@ -1,0 +1,54 @@
+--- PS/.github/instructions/docs.instructions.md
++++ TF/.github/instructions/docs.instructions.md
+@@ -7,13 +7,13 @@
+ 
+ # Documentation Writing Style
+ 
+-**Version:** 1.6.20260904.0
++**Version:** 1.6.20260911.0
+ 
+ ## Metadata
+ 
+ - **Status:** Active
+ - **Owner:** Repository Maintainers
+-- **Last Updated:** 2026-09-04
++- **Last Updated:** 2026-09-11
+ - **Scope:** Defines documentation standards for Markdown (`**/*.md`) and Cursor Markdown rule (`**/*.mdc`) files in this repository, including specs, design docs, runbooks, ADRs, instruction files, and developer documentation. Does not cover code comments or inline documentation in source files.
+ - **Related:** [Repository Copilot Instructions](../copilot-instructions.md)
+ 
+@@ -37,18 +37,18 @@
+ 
+ ## Documentation Taxonomy
+ 
+-- **Normative PowerShell style:** `STYLE_GUIDE.md` (required rules and examples)
+-- **PowerShell style rationale:** `STYLE_GUIDE_RATIONALE.md` (rationale and trade-offs)
++- **Normative Terraform style:** `STYLE_GUIDE.md` (required rules and examples)
++- **Terraform style rationale:** `STYLE_GUIDE_RATIONALE.md` (rationale and trade-offs)
+ - **Developer documentation:** `docs/` (how to build, test, extend, and operate)
+ - **Decision records:** `docs/decisions/` (durable repository decisions)
+ 
+ If you introduce a new **top-level documentation category** (a bucket that represents a distinct kind of document), it MUST be added to this taxonomy section. Purely **organizational subdirectories under an existing category** (for example, grouping related developer docs under `docs/<topic>/`) are a filing convention, MUST NOT be treated as new top-level categories, and MUST NOT trigger an update to this section. When in doubt, prefer treating a new directory as a subdirectory of an existing category unless it represents a fundamentally different kind of document.
+ 
+-This taxonomy is specific to PSStyleGuide and MUST be updated when the repository's documentation ownership or tracked structure changes.
++This taxonomy is specific to TerraformStyleGuide and MUST be updated when the repository's documentation ownership or tracked structure changes.
+ 
+ ## Canonical Source of Truth
+ 
+-`STYLE_GUIDE.md` is the authoritative source for normative PowerShell style requirements. `STYLE_GUIDE_RATIONALE.md` owns the rationale and trade-offs for those requirements and MUST remain aligned with the normative guide. Developer documentation under `docs/` and durable decisions under `docs/decisions/` MUST link to these sources rather than redefine conflicting PowerShell style requirements.
++`STYLE_GUIDE.md` is the authoritative source for normative Terraform style requirements. `STYLE_GUIDE_RATIONALE.md` owns the rationale and trade-offs for those requirements and MUST remain aligned with the normative guide. Developer documentation under `docs/` and durable decisions under `docs/decisions/` MUST link to these sources rather than redefine conflicting Terraform style requirements.
+ 
+ ## Metadata Header Block Policy (Tiered by Audience)
+ 
+@@ -269,10 +269,10 @@
+ 
+ #### Repository URL and placeholder safety
+ 
+-PSStyleGuide does not track request-template files or a placeholder-check workflow. Documentation MUST NOT attribute a live convention or enforcement guarantee to an absent repository source.
++TerraformStyleGuide does not track request-template files or a placeholder-check workflow. Documentation MUST NOT attribute a live convention or enforcement guarantee to an absent repository source.
+ 
+ - Tracked Markdown SHOULD use relative links for repository-internal targets.
+-- When a durable document requires an absolute PSStyleGuide link, the link MUST use `https://github.com/franklesniak/PSStyleGuide/` and MUST identify a real target.
++- When a durable document requires an absolute TerraformStyleGuide link, the link MUST use `https://github.com/franklesniak/TerraformStyleGuide/` and MUST identify a real target.
+ - The literal example `https://github.com/OWNER/REPO/...` MAY appear only as clearly labeled didactic text in an inline code span or fenced code block. It MUST NOT appear as a live unresolved link target.
+ - Placeholder text in copyable shell examples MUST remain literal and safe. The shell rules below prohibit command-substitution metacharacters in such placeholder text.
+ - `.github/instructions/docs.instructions.md` owns these documentation rules.

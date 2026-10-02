@@ -1,0 +1,132 @@
+--- PS/AGENTS.md
++++ TF/AGENTS.md
+@@ -8,16 +8,16 @@
+ - **Status:** Active
+ - **Owner:** Repository maintainer (@franklesniak)
+ - **Last Updated:** 2026-10-01
+-- **Scope:** Agent-specific entry point for OpenAI Codex CLI and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
++- **Scope:** Agent-specific entry point for OpenAI Codex CLI and compatible AI coding agents operating in TerraformStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
+ <!-- template-sync: begin markdown-reference-only -->
+ - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
+ <!-- template-sync: end markdown-reference-only -->
+ 
+-This file provides PSStyleGuide-specific instructions for OpenAI Codex CLI and compatible AI coding agents. These instructions apply the repository's PowerShell, documentation, safety, and review contracts.
++This file provides TerraformStyleGuide-specific instructions for OpenAI Codex CLI and compatible AI coding agents. These instructions apply the repository's Terraform, PowerShell, documentation, safety, and review contracts.
+ 
+ ## Canonical Instructions
+ 
+-The authoritative source of truth for PSStyleGuide documentation authoring is **`.github/copilot-instructions.md`**. Its normative-versus-rationale split and generated-artifact rules apply without exception. **Read that file before changing style-guide content.**
++The authoritative source of truth for TerraformStyleGuide documentation authoring is **`.github/copilot-instructions.md`**. Its normative-versus-rationale split and generated-artifact rules apply without exception. **Read that file before changing style-guide content.**
+ 
+ This file intentionally keeps only a minimal inline summary of the highest-priority shared rules so that agents receive critical guidance immediately. The full shared rule set remains in the canonical file above.
+ 
+@@ -41,12 +41,14 @@
+ ## Essential Repository Summary
+ 
+ - **Repository purpose and documentation contract**
+-  - PSStyleGuide defines actionable PowerShell rules for humans and coding agents.
++  - TerraformStyleGuide defines actionable Terraform rules for humans and coding agents.
+   - `STYLE_GUIDE.md` is the normative source. Put extended explanation and design rationale in `STYLE_GUIDE_RATIONALE.md`.
+-  - Do not hand-edit `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.
++  - Do not hand-edit `copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.
++  - Regenerate these files with `.github/workflows/Generate-StyleGuideArtifacts.ps1`. CI rejects generated-file drift.
+ 
+ - **PowerShell conformance**
+-  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in `STYLE_GUIDE.md`.
++  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in the [PSStyleGuide](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md).
++  - This rule applies to `.github/workflows/Generate-StyleGuideArtifacts.ps1` and inline `pwsh` steps in GitHub Actions workflows.
+   - Leave every modified PowerShell file with zero parser errors, zero applicable PSScriptAnalyzer warnings or errors, and zero uncovered `MUST` or `MUST NOT` violations.
+ 
+ - **Safety and security**
+@@ -55,19 +57,22 @@
+   - Respect allowlisted file access boundaries; reject path traversal and symlink escapes.
+ 
+ - **Pre-commit and validation**
+-  - Install Python 3.12 before validation. On Windows, use `py -3.12`; otherwise, expose `python3.12`, `python3`, or `python` on `PATH` as Python 3.12.
+-  - Run `node .github/workflows/NpmTools.mjs install` after a fresh clone or lockfile change. See [dependency maintenance](docs/dependency-maintenance.md) for script and hook behavior.
+-  - Run `pre-commit run --all-files` before every commit.
+-  - Include all auto-fixes in the same commit as the related change.
+-  - Do not push code when pre-commit or required validation checks are failing; fix issues and re-run until the checks pass.
++  - First install PowerShell 7's `pwsh` on `PATH` ([guide](https://learn.microsoft.com/powershell/scripting/install/install-powershell)); verify: `pwsh -NoProfile -Command 'if ($PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'`.
++  - Install Python 3.12 and the pinned runner: Windows, `py -3.12 -m pip install --requirement requirements-dev.txt`; elsewhere, `python3.12 -m pip install --requirement requirements-dev.txt`. A verified equivalent is allowed.
++  - On clone or lock changes, run `node .github/workflows/NpmTools.mjs install`. See [dependency maintenance](docs/dependency-maintenance.md) for script and hook behavior.
++  - Pre-commit: Windows, `py -3.12 -m pre_commit run --all-files`; elsewhere, `python3.12 -m pre_commit run --all-files`. Use the same equivalent.
++  - Retain Husky's staged-Markdown checks: `npm --prefix .github/workflows run lint:md` and `npm --prefix .github/workflows run lint:md:nested`.
++  - Commit auto-fixes with the related change.
++  - Do not push until pre-commit and required validation pass.
+   - Run the applicable repository commands:
+     - `npm run lint:md`
+     - `npm run lint:md:nested`
+     - `npm run test:agent-instructions`
+-  - The `pre-commit run --all-files` command exercises the active hooks configured in [`.pre-commit-config.yaml`](.pre-commit-config.yaml), the authoritative list of active hooks.
++  - These module commands use the active hooks in [`.pre-commit-config.yaml`](.pre-commit-config.yaml), the authoritative list.
+   - Retained JSON checks include strict JSON syntax (`check-json`).
+   - Retained YAML checks include YAML parsing (`check-yaml`) and style (`yamllint`).
+   - Retained GitHub Actions checks include GitHub Actions linting (`actionlint`).
++  - CI also runs `node .github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml` and the artifact generator's zero-drift check.
+ 
+ - **Modular instruction files**
+   - Read the relevant file under `.github/instructions/` before modifying matching files:
+@@ -82,6 +87,17 @@
+   - Invent behavior when requirements are ambiguous; use an explicit Open Question.
+   - Create separate formatting-only or lint-only commits.
+ 
++## Compact Execution and Evidence
++
++Use one active task record, one final validation record, and targeted remote readback. Reuse unchanged results. Do not create per-command approvals, duplicate evidence, a per-round ledger, or a separate placement receipt.
++
++- **R0:** Read-only work needs no approval record.
++- **R1:** The active task authorizes routine reversible work, commits, non-force topic pushes, PR or Issue updates, comments, and review requests.
++- **R2:** Explicit task scope, complete affected-boundary validation, and independent review govern trust roots, protected instructions, privileged workflows, and externally observable behavior.
++- **R3:** Current final readiness governs merges, force, deletion, settings, credentials, permissions, protections, and gate changes. Never infer authority for a force, deletion, settings, credential, permission, protection, override, or bypass action.
++
++The active task authorizes its R0 and R1 work and an R2 action that it expressly requires. A merge is on-plan only when the task names it, identities and scope match, current checks and review pass, no material finding remains, and no control is bypassed. Do not request another approval for an on-plan merge. Ask only for an off-plan merge, a scope expansion, a human-assigned decision, or another R3 action.
++
+ ## GitHub Plugin Usage
+ 
+ This section is retained Codex platform protocol. Thin-entry-point pruning must preserve it unless the repository owner explicitly waives Codex GitHub plugin protocol for the retained Codex entry point.
+@@ -126,12 +142,9 @@
+ 
+ These terms are the operative protected-file authorization contract for the review-comment workflow below:
+ 
+-- **Protected instruction file:** Any file covered by this document's protected instruction rules, including `.github/copilot-instructions.md`, the root agent entry points (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`), files under `.github/instructions/`, and files under `.cursor/rules/`.
+-- **Explicit protected-file authorization:** A direct maintainer or owner instruction in the current task authorizing the specific protected instruction-file change, either by naming the file or by clearly bounding the protected-file change set. The following are not sufficient on their own: a PR existing, a review comment existing, a generic "address the feedback" request, a reusable prompt, an automated review loop or active review workflow, or generic branch-placement authorization.
+-- **Already in the PR's scope:** The protected file appears in the PR's changed-files list or diff against its base branch before the review-driven edit under consideration. This is relevant context, not authorization.
+-- **Newly introduced protected file:** A protected file the PR did not modify before the review-driven edit. Introducing one exceeds any authorization scoped to the PR's existing changes and requires the narrow authorization question in step 7.
+-- **Within the already-authorized scope:** An edit that resolves the reviewer's comment without expanding the protected file's changes beyond the specific protected-file change the maintainer already explicitly authorized for this task. A larger or more structural change, or one that newly introduces a protected file, exceeds the already-authorized scope.
+-- **Secondary style-guide recommendation:** A step-8 recommendation to update a style guide to prevent similar issues in the future, distinct from the selected step-7 fix for the current review comment.
++- **Protected instruction file:** `.github/copilot-instructions.md`, a root agent entry point, or a file under `.github/instructions/` or `.cursor/rules/`.
++- **Explicit protected-file authorization:** A direct current-task instruction that names the file or bounds the protected change set. A PR, review, generic feedback request, reusable prompt, review loop, or branch-placement authority is not sufficient by itself.
++- Existing PR scope is context, not authorization. A new protected file or a broader protected edit exceeds narrow authority. Treat a secondary style-guide recommendation as a separate protected change.
+ 
+ 1. **Signal processing (conditional).** If the GitHub plugin (or a documented fallback) supports adding emoji reactions to review comments, add an `eyes` (👀) reaction when work begins on the comment and remove it when the comment is fully processed (after step 9, or after the early-exit path in step 2). The reaction's `content` value is the literal string `eyes` as used by the GitHub Reactions API, not the Markdown shortcode `:eyes:`. If reaction tooling is not available in the current runtime, skip this step silently.
+ 
+@@ -165,18 +178,13 @@
+     This checkpoint governs authorization to change protected-file content only. It does not restrict where an authorized fix lands. Use these placement rules:
+ 
+     - **Outside an active automated review loop:** Push to the working branch only. State whether a merge or cherry-pick is required to make the fix visible on the PR head.
+-    - **During an active automated review loop:** Push the fix directly to the PR head when all conditions below hold:
+-        1. The PR head is in the **same repository** as the working branch.
+-        2. The remote PR head is an ancestor of the fix, so the push is **non-destructive** and does not rewrite history.
+-        3. Branch protections, required checks, signing rules, and CI/CD policy remain satisfied.
+-        4. The fix remains on the agent's development branch as a per-round ledger.
+-        5. No higher-priority instruction or explicit owner direction forbids the push.
++    - **During an active automated review loop:** Push directly to the PR head only when it is in the **same repository**, the remote head is an ancestor of the fix, the push is **non-destructive**, all repository controls remain satisfied, and no higher-priority instruction forbids it.
+ 
+       **Standing placement authorization.** The documented active review loop supplies explicit authorization for direct PR-head placement when all conditions above hold. No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required. The agent MUST NOT ask the owner for that additional authorization.
+ 
+-      **Outgoing-range audit.** Before the push, audit the entire outgoing range from the fetched remote PR-head SHA through the fix. Match every commit SHA and every changed path to the pinned per-round ledger and allowed paths, and validate the exact tree. If a commit or path is unlisted, do not push it. Construct and validate a clean descendant of the fetched head that contains only authorized fix commits, or use the safe fallback.
+-
+-      Before the push, fetch the remote PR head and verify ancestry. Use an explicit non-force source-to-destination refspec; never use `--force` or a leading `+`. If a condition fails or GitHub rejects the update, use the documented safe fallback and do not bypass policy. After placement, read the head back through authenticated GitHub tooling, record the resulting PR-head commit SHA(s), and post the placement receipt.
++      **Outgoing-range audit.** Before the push, inspect the outgoing range from the fetched remote PR-head SHA through the fix once. Confirm that each commit and changed path belongs to the active task, and validate the exact tree. If the range contains unrelated work, construct a clean descendant of the fetched head that contains only authorized fixes, or use the safe fallback.
++
++      Before the push, fetch the remote PR head and verify ancestry. Use an explicit non-force source-to-destination refspec; never use `--force` or a leading `+`. If a condition fails or GitHub rejects the update, use the documented safe fallback and do not bypass policy. After placement, use one authenticated readback to confirm that the intended commit is the PR head. Put that result in the active task record; do not post a separate placement receipt.
+ 
+ 8. **Evaluate style guide impact.** Determine whether the relevant language instruction file(s) under `.github/instructions/` should be updated to prevent the same issue in the future. **Read the full applicable style guide(s) before answering** so the recommendation accounts for what the guide already covers and does not duplicate or contradict existing rules. The protected-file authorization checkpoint in step 7 governs selected fixes that would directly change any protected instruction file, including a style guide under `.github/instructions/`. This step governs secondary style-guide recommendations. If such a secondary update is warranted, write a prompt in a Markdown code fence (suitable for sending to GitHub Copilot's coding agent) that describes the style-guide change. For an inline finding, post the prompt as a reply in the same review thread. For a review-body-only finding, post the prompt as a standalone PR-level comment that cites its synthetic key, source review, reviewed commit, and location when available. In either secondary-recommendation case, do **not** modify the style guide directly; if the maintainer later authorizes that change, handle it through the step-7 protected-file authorization checkpoint.
+ 
+@@ -249,4 +257,4 @@
+ 
+ ---
+ 
+-> This file is the Codex entry point for PSStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.
++> This file is the Codex entry point for TerraformStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.

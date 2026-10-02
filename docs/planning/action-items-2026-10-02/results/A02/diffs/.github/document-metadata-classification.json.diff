@@ -1,0 +1,20 @@
+--- PS/.github/document-metadata-classification.json
++++ TF/.github/document-metadata-classification.json
+@@ -0,0 +1,17 @@
++{
++  "schemaVersion": 2,
++  "authorizedExemptionPaths": [],
++  "tier2Paths": [
++    "ACKNOWLEDGMENTS.md",
++    "CONTRIBUTING.md",
++    "README.md",
++    "samples/test-nested-markdown-linting.md",
++    "samples/test-recursive-nested-markdown.md"
++  ],
++  "generatedPaths": [
++    "STYLE_GUIDE_CHAT.md",
++    "STYLE_GUIDE_FULL.md",
++    "copilot-instructions.md",
++    "terraform.instructions.md"
++  ]
++}
