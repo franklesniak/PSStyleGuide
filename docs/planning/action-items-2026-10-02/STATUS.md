@@ -2,13 +2,13 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `af5298d619f7480e0345dbaa220189ae6b6f471f` (published F11/F12 decisions and conditional quality) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `676bb8b4cd33c094eae864de0600e287b2391752` (published F11/F12 final local evidence) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | [A00](tasks/A00.md) | Reconcile historical obligations and retirement decisions | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A00/RESULT.md) | Reuse the canonical native delivery ledger |
 | [A01](tasks/A01.md) | Refresh issue coverage and full-tree baseline | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A01/RESULT.md) | Reuse accepted inventory; refresh at next mutation |
-| [A02](tasks/A02.md) | Non-protected shared governance | active | coordinator native gates | PS codex/shared-governance | 25b17e8 / 48f4d8a | [224](https://github.com/franklesniak/PSStyleGuide/pull/224) | 7/80; 2026-10-10T07:26:08.214692Z | 0/12 | [Evidence](results/A02/RESULT.md) | Publish final evidence, reply/resolve F11/F12, then request round8 |
+| [A02](tasks/A02.md) | Non-protected shared governance | active | a00 repairs; coordinator native gates | PS codex/shared-governance | 25b17e8 / 48f4d8a | [224](https://github.com/franklesniak/PSStyleGuide/pull/224) | 8/80; 2026-10-10T07:26:08.214692Z | 0/12 | [Evidence](results/A02/RESULT.md) | Repair reproduced F13/F14/F15, then validate final candidate |
 | [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A03/RESULT.md) | Exact option L prepared; await owner choice |
 | [A04](tasks/A04.md) | Bound ordinary Node downloads and test retries | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A04/design.md) | Integrate after A03/A07 acceptance |
 | [A05](tasks/A05.md) | Require immutable event acquisition in the YAML guide | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A05/design.md) | Await exact two-guide authority |
@@ -32,10 +32,10 @@ Planning head: `af5298d619f7480e0345dbaa220189ae6b6f471f` (published F11/F12 dec
 ## Local configuration and in-flight native operations
 
 - Planning: `C:/Users/flesniak/GitHub/PSStyleGuide`; peer: `C:/Users/flesniak/GitHub/TerraformStyleGuide`.
-- PS product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`. HEAD25b17e8/tree4dba7b2, clean; ownership released to root. Full identities in A02 resume/RESULT.
+- PS product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`. Published HEAD25b17e8/tree4dba7b2; a00 owns F13–F15 repairs. Full identities in A02 resume/RESULT.
 - Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 uses suffix `A02-design-20261002` (resume `PR224-review-state.json`, validation `D14-native-validation`); D07 uses `plan-review-20261002`.
 - Node24.18.1/npm11.16.0: scratch prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 remains Restricted. No Docker container remains.
-- A02: F11/F12 normal commit25b17e8 published. Focused74098, all10 aggregate95367, exact B/H endpoints48783 and reconciled whole-PR local quality pass. Round7 terminal on oldb9; fresh pair/current CI pending. Nine of11 threads resolved; A07 frozen. No native write/request pending; resume holds IDs/clocks.
+- A02: round8 terminal on25b17e8: CI passed; Copilot Balanced/None; Codex F13–F15 reproduced. 14 threads/11 resolved. F13–F15 selected; scoped repairs and focused tests underway. A07 frozen; no native write/request pending. Resume holds IDs/clocks.
 - A07 is frozen at `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; staged treec68b5e1 passed all11 hooks; a00 resumes after PR224 before held-path integration. A15 scope/identity/D5 proposals prepared; exact amendments and platform proof pending. A21 whole-base census prepared; no base selected. A08 verified; A03 option L unselected. Preserve unrelated edits.
 - Await A03-D1: owner-label gate L, procedural boundary P, or another direction.
 - Await A20: six-file protected-v2 grant and separate two-CLAUDE protocol grant.
