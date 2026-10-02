@@ -1,0 +1,10 @@
+{
+  "ref": "refs/heads/main",
+  "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+  "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+  "object": {
+    "sha": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "type": "commit",
+    "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/48f4d8a36c8faceee12afac78aaecea0d176125d"
+  }
+}

@@ -1,0 +1,279 @@
+[
+  {
+    "id": "A00",
+    "title": "Reconcile historical obligations and retirement decisions",
+    "dependencies": [],
+    "repository": "both + planning",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A00.md"
+  },
+  {
+    "id": "A01",
+    "title": "Refresh issue coverage and full-tree baseline",
+    "dependencies": [],
+    "repository": "both",
+    "model": "gpt-6-luna",
+    "reasoning": "medium",
+    "transfer_cap": 8,
+    "file": "tasks/A01.md"
+  },
+  {
+    "id": "A02",
+    "title": "Converge shared governance, metadata and repository documentation",
+    "dependencies": [
+      "A00",
+      "A01"
+    ],
+    "repository": "PS first, then TF",
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "transfer_cap": 12,
+    "file": "tasks/A02.md"
+  },
+  {
+    "id": "A03",
+    "title": "Converge workflows and retain meaningful admission and freshness controls",
+    "dependencies": [
+      "A00",
+      "A01",
+      "A02"
+    ],
+    "repository": "PS first, then TF",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 12,
+    "file": "tasks/A03.md"
+  },
+  {
+    "id": "A04",
+    "title": "Bound ordinary Node downloads and test retries",
+    "dependencies": [
+      "A01",
+      "A03",
+      "A07"
+    ],
+    "repository": "PS first, then TF",
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A04.md"
+  },
+  {
+    "id": "A05",
+    "title": "Require immutable event acquisition in the YAML guide",
+    "dependencies": [
+      "A01",
+      "A02",
+      "A03"
+    ],
+    "repository": "PS first, then TF",
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A05.md"
+  },
+  {
+    "id": "A06",
+    "title": "Converge the generator and artifact verification",
+    "dependencies": [
+      "A00",
+      "A01",
+      "A02",
+      "A03"
+    ],
+    "repository": "PS first, then TF",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 12,
+    "file": "tasks/A06.md"
+  },
+  {
+    "id": "A07",
+    "title": "Converge dependency, lint and local toolchain behavior",
+    "dependencies": [
+      "A00",
+      "A01",
+      "A02"
+    ],
+    "repository": "PS first, then TF",
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "transfer_cap": 12,
+    "file": "tasks/A07.md"
+  },
+  {
+    "id": "A08",
+    "title": "Converge repository review instructions",
+    "dependencies": [
+      "A00",
+      "A01",
+      "A02"
+    ],
+    "repository": "PS first, then TF",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "transfer_cap": 8,
+    "file": "tasks/A08.md"
+  },
+  {
+    "id": "A09",
+    "title": "Converge current supply checks and preserve truthful history",
+    "dependencies": [
+      "A00",
+      "A01",
+      "A03",
+      "A07"
+    ],
+    "repository": "PS first, then TF",
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A09.md"
+  },
+  {
+    "id": "A10",
+    "title": "Revalidate PowerShell examples and bounded preflight outcomes",
+    "dependencies": [
+      "A00",
+      "A01",
+      "A06",
+      "A07"
+    ],
+    "repository": "PS first; assess TF applicability",
+    "model": "gpt-6.1-sol",
+    "reasoning": "medium",
+    "transfer_cap": 8,
+    "file": "tasks/A10.md"
+  },
+  {
+    "id": "A11",
+    "title": "Revalidate Terraform state-version discovery and retrieval",
+    "dependencies": [
+      "A00",
+      "A01",
+      "A06",
+      "A07"
+    ],
+    "repository": "TF first; assess PS applicability",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A11.md"
+  },
+  {
+    "id": "A12",
+    "title": "Assess useful main protection",
+    "dependencies": [
+      "A00",
+      "A01"
+    ],
+    "repository": "PS #152; compare TF settings",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A12.md"
+  },
+  {
+    "id": "A13",
+    "title": "Apply an authorized protection delta, if selected",
+    "dependencies": [
+      "A12"
+    ],
+    "repository": "explicitly authorized repository only",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A13.md"
+  },
+  {
+    "id": "A14",
+    "title": "Assess and address live filesystem residuals",
+    "dependencies": [
+      "A00",
+      "A01"
+    ],
+    "repository": "PS #155; assess TF counterpart",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A14.md"
+  },
+  {
+    "id": "A15",
+    "title": "Reconcile Terraform manual recovery scope against current callers",
+    "dependencies": [
+      "A00",
+      "A01"
+    ],
+    "repository": "TF #25",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A15.md"
+  },
+  {
+    "id": "A16",
+    "title": "Deliver Terraform Gate A nonmutating foundation",
+    "dependencies": [
+      "A15",
+      "A06",
+      "A07",
+      "A11"
+    ],
+    "repository": "TF first; port only shared primitives",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 12,
+    "file": "tasks/A16.md"
+  },
+  {
+    "id": "A17",
+    "title": "Deliver Terraform Gate B destructive-procedure guidance",
+    "dependencies": [
+      "A16"
+    ],
+    "repository": "TF first; port only shared primitives",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 16,
+    "file": "tasks/A17.md"
+  },
+  {
+    "id": "A18",
+    "title": "Close remaining byte differences and verify convergence",
+    "dependencies": [
+      "A02",
+      "A03",
+      "A04",
+      "A05",
+      "A06",
+      "A07",
+      "A08",
+      "A09",
+      "A10",
+      "A11",
+      "A13",
+      "A14",
+      "A17"
+    ],
+    "repository": "both; original research source read-only where required",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 12,
+    "file": "tasks/A18.md"
+  },
+  {
+    "id": "A19",
+    "title": "Reconcile issues and publish final acceptance",
+    "dependencies": [
+      "A18"
+    ],
+    "repository": "both + planning tracker",
+    "model": "gpt-6.1-sol",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A19.md"
+  }
+]

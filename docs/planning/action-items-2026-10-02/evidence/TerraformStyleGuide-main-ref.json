@@ -1,0 +1,10 @@
+{
+  "ref": "refs/heads/main",
+  "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+  "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+  "object": {
+    "sha": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "type": "commit",
+    "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+  }
+}

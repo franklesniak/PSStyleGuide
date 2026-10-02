@@ -1,243 +1,42 @@
 <!-- markdownlint-disable MD013 -->
-
-# Parent orchestration loop for the cross-repository action plan
-
-Run this prompt from `C:\Users\flesniak\GitHub\PSStyleGuide` while the PSStyleGuide checkout is on `planning-CRT-PR-852`.
-
-Execute active outcomes in the explicit execution order in `docs/planning/action-items-2026-08-30.md`; stable historical IDs do not require numeric execution order. Preserve completed and superseded history. Continue until the active outcomes are complete or the next action genuinely requires a human. Do not stop for routine approval, evidence, routing, or identity paperwork.
-
-Use the user-selected `model-routing-advisor` for a coding task when it is available. The parent owns sequence, scope, state, validation, publication, and completion decisions.
-
-## Repository map
-
-- PSStyleGuide: `C:\Users\flesniak\GitHub\PSStyleGuide`
-- TerraformStyleGuide: `C:\Users\flesniak\GitHub\TerraformStyleGuide`
-- research-misc: `C:\Users\flesniak\GitHub\research-misc`
-
-The plan, this prompt, and orchestration state belong only to the PSStyleGuide planning branch. Do not add them to an implementation branch or PR. When a task runs in another repository, pass the task objective, scope, risk tier, and completion conditions to its executor.
-
-Preserve user work and unrelated dirty files. Use an isolated worktree when the current checkout is not a safe implementation surface. Do not expose credentials, tokens, cookies, or private state.
-
-Do not use a Git command that discards work, including `git reset --hard`, `git clean`, or an overwriting checkout or restore. Use inspection, an isolated worktree, or another non-destructive method. Permit destructive Git recovery only when the current task expressly requires it as R3 work; identify and verify the exact repository and target, preserve unrelated work, and run the final R3 readiness check before the command.
-
-## Standing authority
-
-The operator's instruction to execute the numbered plan authorizes in-scope R0 and R1 work. It also authorizes an R2 action when the current numbered task expressly requires that action and all R2 controls pass. This authority includes local edits, append-only commits, non-force pushes, PR creation and updates, issue or review comments, review requests, and other reversible publication steps that the current task requires.
-
-Do not request approval for a new commit SHA, tree, parent, content hash, branch name, or routine command when the work remains in scope. Record exact identities as execution checks and results, not as permission receipts.
-
-The instruction to execute the numbered plan is also standing authority for an on-plan merge. A merge is on-plan only when the current numbered task expressly names it; the repository, PR, target branch, head commit, tree, and scope match that task; required review and checks pass for the same immutable head; no material change or unresolved feedback remains; the PR is mergeable; and the selected repository-permitted method does not bypass a control. Do not request separate operator approval for that merge.
-
-Ask the operator when a merge is not on-plan, the task assigns a material decision to a human, or the work expands scope. Never infer permission for a force push, deletion, settings change, credential or permission change, protection change, administrator override, or gate bypass. These exceptional R3 actions require separate explicit authority even when a task names them.
-
-Notify the operator as soon as a future exceptional action and its readiness conditions are known. The notification is not a stop condition. While authority is pending, continue every safe in-scope action that does not cross that boundary, including implementation, local validation, non-force topic publication, PR correction, CI diagnosis, review requests, finding repair, and final readiness work. Enter `waiting_human` only when the next concrete action requires the operator and no independent safe in-scope work remains. If the exceptional action is itself necessary to clear one final gate, complete every independent gate, identify the exact residual gate and cause, and do not weaken or bypass it.
-
-When the operator explicitly authorizes a bounded maintenance outcome, apply that grant to its necessary coupled callers, tests, metadata, and task-scope corrections within the stated limits. Do not narrow the grant to an earlier estimated file list or request another approval for an in-scope correction. Reuse of an independently reviewed maintenance procedure within its established semantic domains can proceed under an explicit standing grant for that reuse. Neither the procedure nor a candidate's data grants authority to add a trust domain, change the procedure's security rules, or admit arbitrary replacement validation code. Preserve all applicable risk controls and exclusions.
-
-Before substantial work on protected validation code, inspect the admission and installation path, trusted authority source, coupled consumers, finite input limits, and required publication order. Distinguish an unsupported product candidate from failed validation of the maintenance installation itself. Use the existing mechanism where feasible; any temporary bridge needs a decision-supported purpose and a removal condition. Keep this information in the existing task record, not a new permission ledger. Prefer PR installation; use a direct non-force default-branch bootstrap only when the operator explicitly permits it, the normal PR route cannot install the prerequisite, exact-input independent review and applicable pre-publication tests pass, and native readback plus applicable landed CI verify the installation before dependent product publication.
-
-An expressly authorized prerequisite has its own delivery boundary. Do not apply a numbered task's local-only product restriction to that separately authorized prerequisite, and do not use prerequisite authority to publish the product early. Keep one implementation owner, independent review, the applicable installation tests and landed-CI gate. A spent one-use installation grant cannot authorize a second update. Record this distinction in the existing task scope and state; do not create another approval ledger or restart completed tasks.
-
-## Risk tiers
-
-Use the highest tier that applies to any action in the task.
-
-| Tier | Scope | Required control |
-| --- | --- | --- |
-| R0 | Read-only inspection, planning, or local analysis | Targeted reads and a truthful result |
-| R1 | Reversible routine work, commits, non-force topic pushes, PR or issue updates, comments, and review requests | Relevant validation, exact precondition, native result, and targeted readback |
-| R2 | Trust roots, workflows, security policy, required checks, default-branch non-force bootstrap updates, or sensitive cross-repository convergence | Full applicable validation, exact identities, clean state, independent review when reviewable bytes change, and targeted readback |
-| R3 | Merge, force, deletion, settings, credentials, permissions, branch protection, or gate changes | Standing plan authority for an on-plan merge; separate explicit authority for other R3 actions; all R2 controls, current green gates, required review, and an explicit final readiness check |
-
-Risk controls are cumulative. Churn and implementation effort do not justify a weaker tier. A task can move to a higher tier if its action changes. It cannot move to a lower tier only to avoid a failed gate.
-
-## Compact state machine
-
-Use these states:
-
-```text
-pending -> active -> validating -> ready -> complete
-                         |           |
-                         |           +-> waiting_external -> ready
-                         +-> active
-no-safe-work human boundary -> waiting_human
-any nonterminal state -> blocked
-```
-
-- `pending`: A predecessor is not complete or the task has not started.
-- `active`: Analysis or implementation is in progress.
-- `validating`: The final applicable gate set is running.
-- `ready`: Validation passed and the next planned mutation can run.
-- `waiting_external`: A CI, review, or other external result is pending.
-- `waiting_human`: The next concrete action needs one exact human decision or exceptional authority, and no independent safe in-scope work remains.
-- `complete`: The task's `Complete when` condition is true.
-- `blocked`: The same genuine blocker has persisted after the required retry or decision process, and no safe work remains.
-
-A validation failure returns the task to `active` for diagnosis and repair. A new review finding also returns the task to `active`. Do not call these states blocked while useful work remains.
-
-## Compact state record
-
-Use one untracked `TEMP-coding-agent-loop-state.json` file. It is a resume aid, not an evidence archive. Keep only:
-
-```json
-{
-  "schema": 2,
-  "plan": "docs/planning/action-items-2026-08-30.md",
-  "current_task": {
-    "number": 4,
-    "state": "active",
-    "risk": "R2",
-    "repository": "franklesniak/PSStyleGuide",
-    "branch": "agent/example",
-    "base": null,
-    "head": null,
-    "last_gate": "<short-result-or-null>",
-    "next_action": "<one-action>",
-    "blocker": null
-  },
-  "predecessor_outputs": {},
-  "completed": [1, 2, 3],
-  "updated_utc": "2026-09-04T10:00:00Z"
-}
-```
-
-The root file and `current_task` object are closed records. Keep immutable predecessor values that a later task still needs in `predecessor_outputs`. Key each value first by its producing task number and then by its exact output name. Store the value and `last_consumer_task`. Delete the value when that consumer completes. Do not retain full task results. Reject duplicate JSON member names before parsing the state file. Before JSON parsing can change a number, reject a non-finite token, a token whose exact decimal value differs after Number conversion, negative zero, or a token whose absolute value exceeds 9007199254740991; store a larger exact identifier as a string. Require every in-memory predecessor string value and object key to pass the same decoded transport rule before pruning returns it. During ingestion, require every output producer to be a completed task and reject an output whose final consumer has already completed. Version 2 stores a sorted, unique list of actual completed task IDs. The current task is in that list if and only if its state is complete. A final consumer can have a lower historical number than its producer, but cannot be the producer itself. Pass the actual completed-ID array to `prunePredecessorOutputs`; do not pass the largest completed ID. Keep an output until its named final consumer actually completes. Keep version 1 records readable with their original contiguous-prefix and later-numbered-consumer rules; do not silently reinterpret them. The nested review-state version stays 1. Preserve the last completed outcome's review history and standing grants before moving to another outcome. Superseded task IDs belong in the plan's coverage table, not the completed list. When review state exists, require `current_task.head` to equal the review-input head and require every request for the current reviewed-input key to name that reviewed head. Also reject a reversed reconciliation interval, a terminal no-effect interval shorter than 120 seconds, a supersession that names a non-immediate retained successor or is recorded after the first later different-input request, and a Codex request without one eligible same-input Copilot predecessor whose `readyAt` time is not later than the Codex request time.
-
-When the current task uses the review loop, add only one `review` member under `current_task`; its closed shape contains the reviewed input, mutation class, ordered channel-attempt records, typed superseded-input dispositions, separate reviewer results, public-mutation reconciliation attempts, an optional scoped standing review grant, separate Claude result, retained historical reviewer-exhaustion authority, metrics, and comment publications. The actual resume file must validate against `docs/planning/review-loop-policy.json`. Do not place review-loop fields beside the six root fields.
-
-Write the state at task start, after a meaningful implementation or validation boundary, after a remote mutation readback, before a real wait, and at task completion. Do not write it for unchanged status probes.
-
-Do not create activation, capability, routing, bypass, manifest, prompt-change, continuation, retry, validation-tier, or per-mutation receipt catalogs. Do not hash the prompt or reconcile state because prompt text changed. If the active task text changes materially, re-read that task, retain valid product work, and repeat only the affected analysis or validation.
-
-Git commits, GitHub objects, CI runs, review state, and the one final task validation record are the primary evidence. Historical `TEMP-*` receipts can remain as incident evidence, but they are not prerequisites for continuation.
-
-## Task loop
-
-For each active task in the plan's explicit execution order:
-
-1. Read the exact task and its active dependencies. Do not load all completed task bodies.
-2. Confirm each predecessor's actual completion condition. Use live state only when the condition is mutable.
-3. Locate and obey the applicable `AGENTS.md`. If no `AGENTS.md` applies, read the repository root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor.
-4. Classify the task as R0, R1, R2, or R3. Record the tier in compact state.
-5. Inspect only the repositories, refs, issues, PRs, checks, reviews, settings, and paths that can affect this task. For protected validation changes, perform the early admission and installation feasibility check before substantial implementation.
-6. Select the executor. Use `model-routing-advisor` once for a new coding task or a genuine capability-driven reroute. Do not create an activation receipt.
-7. Give one executor the task objective, repository, branch, base, allowed scope, risk tier, known findings, required validation, and completion test.
-8. Keep analysis and implementation in that executor while it remains healthy. Reuse it after an ordinary recoverable failure.
-9. For each distinct confirmed finding, validate the feedback, list reasonable options, create a finding-specific weighted rubric, score the options in a table, state the selected option in ASD-STE100 language, and then implement. Keep one complete decision record and link duplicate reports to it. Classify invalid reports with evidence. Do not publish duplicate full decisions or completion-only addenda.
-10. Inspect the diff and run applicable validation. Run cheap deterministic checks first and the full gate set once on the final unchanged bytes.
-11. Perform authorized publication in the order required by the task. Check the exact preimage immediately before each write and read back only the affected object after it.
-12. Verify the task's `Complete when` condition. Record one final validation result and mark the task complete.
-13. Advance immediately to the next satisfied task.
-
-Do not split one useful action into separate issue, commencement, branch, commit, push, and PR paperwork tasks when the active plan permits them in one task. Do not invent work when the plan is complete.
-
-## Routing
-
-Use the advisor recommendation unless an explicit task requirement overrides it. Record the selected model and reasoning effort only in compact state or the final task result. The runtime's accepted route is enough; do not create proof of selector activation, model catalog availability, service tier, or effective override unless the task is specifically about routing behavior.
-
-If the numbered task specifies an exact model or reasoning effort, request that exact route and do not substitute another model or effort. If the runtime rejects the request and no already-permitted interface can request the same route, use `waiting_human` and state the exact limitation. If the runtime accepts the request but does not expose the effective setting, continue and record that limitation only in compact state or the final task result.
-
-Run active outcomes in the plan's explicit execution order, not historical numeric order. Use one executor at a time. The task executor must not create descendants. A descendant is permitted only when the user or current numbered task explicitly requests subagents and the parent defines independent scope and ownership before dispatch; this serial plan does not activate that exception. For a `Coding agent executable` task, the assigned executor performs the substantive implementation. The parent can maintain compact state, inspect the work, run independent validation, reconcile remote state, and make completion or retry decisions. Do not reroute merely because a test failed. Reroute only when the task changes materially or concrete evidence shows that the selected executor cannot perform it.
-
-## Validation
-
-Use risk-proportionate validation:
-
-- R0: validate the queried identity and the claimed result.
-- R1: run tests and linters affected by the diff, inspect the complete diff, and run repository-required gates once on final bytes.
-- R2: run the complete applicable local gate set, inspect identities and scope, test security failure paths, and obtain required independent review for reviewable changes.
-- R3: satisfy R2, refresh all required checks and reviews on the exact final head and tree, and perform a final readiness check immediately before action.
-
-Do not rerun an expensive passing gate when its code, inputs, dependencies, and environment are unchanged. A later change invalidates only affected results. Do not duplicate a successful executor gate solely to create parent evidence; the parent may validate high-risk or uncertain predicates that need an independent check.
-
-Preserve native exit codes and useful bounded output. Failed, skipped, neutral, canceled, missing, pending, stale, timed-out, expired, and ambiguous results are not success. Do not weaken a gate to make it pass.
-
-## Remote operations
-
-Before a remote write:
-
-1. Confirm repository, target, operation class, local identity, clean state, expected remote preimage, force mode, and required gates.
-2. Stop that write on drift or failed validation. Continue unrelated safe work.
-3. Execute once. Do not retry an ambiguous non-idempotent operation.
-4. Validate the native response.
-5. Perform one targeted authenticated readback of the changed ref or object.
-6. Record the exact postimage in compact state or the final task result.
-
-Paginate only the connection whose completeness is required for the current decision. Do not capture unrelated repository-wide snapshots before a routine write. Respect service rate limits without creating timing receipts.
-
-## CI, review, and merge
-
-Check CI before merge. Do not merge when any required check is red, skipped, canceled, missing, pending, stale, timed out, or expired.
-
-Use repository-required review for R1. Use an independent review for R2 when reviewable bytes change. R3 merge requires the exact reviewed head and tree, resolved material findings, a truthful PR body, current green required checks, and a mergeable state. A code or material risk-description change invalidates review of the old bytes. A status record or comment does not.
-
-For a planned dual-review task, generate and semantically verify the reviewer-facing body before the first request. Freeze its scope, behavior, and risk meaning. Keep task state, polling state, reviewer requests, review IDs, review results, quality results, metrics, audit records, and terminal results in compact state or separate comments. Never append them to the frozen reviewer-facing body.
-
-Classify a later change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. The first two classes invalidate review. The other classes do not. Raw PR-body byte inequality is not the classifier. Reject a same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. Before a pair starts for a new reviewed-input key, require every earlier pair for every different key to contain both channels and be terminal. If authenticated readback proves reviewed-input drift that makes an unrequested old-input channel impossible, including drift on an unchanged head, record one typed `SUPERSEDED` disposition with the old input, successor head, time, and reason only after every recorded old-input request is terminal. Cross-validate the disposition against request existence, an incomplete channel set, one matching head, the immediate successor head in retained chronological head order, and a time that is not earlier than every described request terminal-result or terminal-disposition boundary and is not later than the first later different-input request. Preserve a zero-request intermediate head and permit a same-head successor only when the successor input retains that head. Require that disposition before a different-input successor request. If that superseded key later becomes current again, validate and retain its disposition as history, ignore it only for current-input gating, and resume the original incomplete pair without creating a duplicate request identity. Do not synthesize the missing request or attribute successor-input evidence to the old input. Then capture fresh baselines. Before persisting metrics, require each same-head re-request reason record to contain only a nonempty `reason` string and Boolean `material` value.
-
-Persist Copilot results separately from Codex results. Preserve both Codex result channels. Require a submitted review's commit to match the reviewed head. Pass the complete persisted request collection to Codex result collection. Accept a headless `chatgpt-codex-connector` PR-conversation result only when the authenticated author, request time, exclusion of every supplied identity from the baseline, mutually consistent valid timestamp aliases, required matching normalized head evidence when terminal, reviewed-input key, and one eligible same-input Copilot predecessor whose `readyAt` time is not later than the Codex request time attribute it to the request. Reject an orphan, premature, or reverse-ordered Codex request during compact-state ingestion and every request decision. Normalize empty, singleton, and multiple API collections with the tested policy helper; an empty collection is not a match. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-
-Generate a GitHub Copilot REST request only from the typed policy specification. The exact reviewer login is `copilot-pull-request-reviewer[bot]`; do not send the display name `Copilot`. Capture the native status and response body. Confirm an accepted mutation only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run; later local serialization failure cannot repeat it. If an accepted request has no matching readback, record `RECONCILING` and continue other safe work. Wait at least 120 seconds, then require complete negative readback from new request events, current requested reviewers, matching submitted reviews, and matching Copilot review runs before recording `NO_EFFECT`. Permit only one public-mutation no-effect retry for the same reviewed input and channel. A second proved no-effect delivery attempt is `EXHAUSTED`. Keep this delivery budget separate from the downstream reviewer terminal-failure budget. Do not send the serialized Codex trigger until the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology.
-
-For current cleanup and PR #212 review administration, apply the standing-authority and availability rules here over older copied transport mechanics. Do not amend future task objectives, native issue requirements, or completion predicates before PR #212 merge and service acceptance.
-
-Keep one optional `standingReviewGrant` in existing review state. Record its authenticated owner-source reference, repository, PR, bounded scope, exclusions, authorization time, and allowed reviewer accommodations. The executor must read the actual source, verify its scope and exclusions, and check for known revocation before use. Record `executorVerified`, `scopeMatches`, and the verification reference truthfully. These fields are executor assertions, not native authentication or a new permission service. The same scoped grant can cover ordinary repairs; do not request another grant for a new hash or because a later review finishes. Never fabricate a verification record. A revoked or mismatched grant cannot release a gate.
-
-When a confirmed Copilot request returns an authenticated submitted review declaring that no files were reviewed, keep one closed `terminalNonfunctionalOutcome`. Retain the raw response, native result identities, actor, head, request and result times, and baseline exclusions. Reference the standing grant through `authority.grantRef` with truthful executor verification and scope assertions, or retain an already recorded legacy authority. Inspect the complete body and inline findings. Response footers, byte lengths, and complete-body hashes are not admission rules; a retained historical hash is optional evidence only. An ordinary actionable review cannot be classified as unavailable merely to skip its findings. Unknown output stays unresolved. Report `AUTHORIZED_NONFUNCTIONAL` with `clean: false`; do not retry that channel. Keep the earlier unconfirmed `terminalDisposition` path compatible and non-clean.
-
-Record `COPILOT_PROMPT_BUDGET_EXCEEDED` only when the authenticated Copilot service-error result is correlated with a matching terminal failed workflow run, its failed job, and the observed prompt-budget failure cause. Preserve run/job identity, job-to-run relation, exact head, actor, baseline, time, and cause checks. Harmless response wording or footer changes do not require permission. An unproven cause remains unknown; do not diagnose a generic service error as prompt-budget exhaustion. A service failure or no-files declaration is never a clean review. Full finding inventory and every other gate still apply.
-
-For a confirmed downstream Codex request, keep an ordered `channelAttempt` history with at most three channel attempts: 1, 2, and 3. Only one exact attributable terminal non-success result for the immediately preceding attempt authorizes the next attempt. Require the exact reviewer identity, head, reviewed-input key, causal time, unique immutable failure-detail identity, matching terminal-summary observation, prior-result exclusion, and a fresh baseline that preserves every earlier baseline and includes the preceding failure and summary. Wait at least 60 seconds after the complete preceding failure boundary. Retry only the failed channel. Missing, ambiguous, pending, stale, unattributed, and nonterminal evidence does not authorize a retry. The statuses `failed`, `canceled`, `skipped`, `timed_out`, and `expired` are terminal failure states, not clean results. Only `completed` is a clean Codex result. Attempt 3 failure exhausts the channel. Never permit channel attempt 4.
-
-Use actual Claude as the independently authorized substitute while Codex is unavailable. Keep one optional `claudeReview` separate from `codexResults`: record its actual reviewer identity, invocation and result references, grant reference, current input key, head, applicable base, status, times, complete finding inventory and unresolved-finding count. The executor must verify the actual independent invocation and result and record that assertion and its source. Missing, pending, failed, stale, unverified or non-independent Claude results do not satisfy review. Keep an accepted native request pending until it actually terminates; substitution cannot erase it. Keep Codex failures and attempts unchanged. Do not issue a fourth P5 request, alter input merely to restart its budget, or schedule extra recovery requests outside the existing recovery monitor.
-
-An exhausted channel without an applicable authorized accommodation remains blocked. Retain historical `reviewerExhaustionAuthority` records and their `OPERATOR_AUTHORIZED_EXHAUSTED_NOT_CLEAN` authority and `EXHAUSTED_NOT_CLEAN` result classification; do not require a new input-specific exhaustion permission to use an existing scoped Claude grant. An effective Claude substitute is reported as `claude-substitute-codex-not-clean`. Neither substitution nor an availability exception marks Codex clean. Exact-head CI, resolved findings and threads, the separate fresh independent final-quality audit, final validation, accurate frozen input, mergeability and every other required gate remain mandatory. An authorized substitution does not by itself satisfy final quality. A genuine changed input needs fresh applicable results while the grant remains standing within scope.
-
-Normalize native check-run records for complete readback, but do not authenticate Copilot from a mutable check-run name plus the generic GitHub Actions App identity. Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt. Require a matching fresh authenticated request event, exact-head submitted review, or exact-head workflow-run bot actor.
-
-Persist the unique request-event, review-run, submitted-review, and node-ID-to-timestamp conversation-comment baselines with the in-flight attempt before or at the confirmed mutation. After each confirmed reviewer request and its targeted readback, persist its head, reviewed-input key, request time, `confirmed: true`, nonterminal state, and Copilot `readyAt` time in `current_task.review` before another public mutation. Use `confirmed` only for authenticated request readback. Mark the request terminal only after an attributable terminal result or an exact repository-authorized non-functional disposition. If the local state write fails, reconstruct the request from targeted remote readback and do not repeat a confirmed request.
-
-For each confirmed terminal request, persist exactly one closed outcome reference. Use one closed `terminalResultRef` only for a clean completed result. Use one closed `terminalFailureRef` for an exact downstream failure and keep its immutable detail identity, detail observation, mutable summary identity, summary observation, status, and exact attempt attribution. Use one closed `terminalNonfunctionalOutcome` only for an attributable authorized Copilot availability result described above. Keep the complete result in its separate channel result collection. During compact-state ingestion, cross-validate the reference against the correct channel, actor, every supplied request-baseline identity, losslessly ordered mutually consistent timestamp aliases, required matching normalized head evidence, the reviewed head, the next same-channel attempt boundary, and the next different-input request boundary. Deduplicate immutable results by result kind and every native identity across clean, failure, and authorized-nonfunctional modes. Reject a missing, duplicate, stale, baseline, wrong-actor, wrong-head, wrong-channel, wrong-attempt, wrong-time, or cross-mode reference. Do not add any outcome reference to an unconfirmed or nonterminal request.
-
-Keep every frozen reviewed head in chronological discovery order in `reviewerRequestsPerHead`, including a head that received zero requests. Persist each logical public mutation's bounded physical `attemptCount` as one or two and each downstream reviewer `channelAttempt` as one, two, or three. Default an absent legacy value to one, and sum physical public mutations in `reviewerRequestsPerHead`. During ingestion, require the current head and every request head to occur in that map, and require each count to equal the persisted request history. Pass that map into request-decision calls that evaluate retained supersessions. Revalidate its current head, request heads, exact counts, key syntax, and chronological property order there before using those ordered keys to bind each retained supersession to its immediate successor, including a zero-request head.
-
-The deterministic planning-only policy and scenarios are in `docs/planning/review-loop-policy.json`, `docs/planning/review-loop-policy.mjs`, and `docs/planning/review-loop-policy.test.mjs`. The module operates on the nested `current_task.review` value, and the schema validates the enclosing resume file. They validate decisions and transport. They do not perform GitHub writes.
-
-An anticipated approval boundary does not defer CI or review work that can run safely before that boundary. Request the approval early, continue toward a clean reviewed head, and stop only at the exact action that needs the approval. When that action is required before one final check can become green, finish all other checks and reviews and report that single dependency precisely.
-
-Immediately before an on-plan merge, repeat the final readiness check against the live PR and target ref. Use head-commit matching when the merge tool supports it. Stop for drift, new material feedback, an incomplete or failed required gate, an off-plan target or scope, a required human decision, or any need for an administrator override or bypass. Do not stop only to obtain another approval for a merge that still satisfies the on-plan definition.
-
-At that check, populate the existing review state's `maintenance` record from a fresh accepted-base classification and pass the live `currentBase` and accepted-source `currentPolicy` commit to `evaluateReviewMergeReadiness`. The authenticated executor may obtain classification locally from the accepted checker; neither repository needs the other's hosted workflow. Verify the actual loader and dependency source, repository, PR, head, base and reviewed input before asserting `executorVerified`. Candidate flags, candidate configuration and green candidate tests cannot supply that assertion or authorize maintenance. The record's references point to the existing task result or native evidence; they are not a new approval ledger. These executor assertions are consistency inputs, not cryptographic authentication or GitHub branch protection. Historical state remains readable, but a missing or unverified classification cannot support a new merge decision.
-
-For `maintenance_required`, reuse the authenticated scoped `standingReviewGrant` only when it explicitly permits policy maintenance with `allowPolicyMaintenance: true`. Check the existing scope, limits, exclusions and revocation before asserting `scopeMatches`; do not ask for another grant for a repair that still fits. Record successful candidate tests and the existing independent final-quality audit in that same maintenance record, with their final input, head, applicable base, accepted-policy commit and verified evidence references. The audit must cover the actual changed policy and executable dependencies, be independent, and account for every finding through the full finding decision process. An absent, failed, stale or unresolved result blocks merge. A missing final audit still permits progression to that audit after all earlier gates pass. An authenticated `ordinary` classification needs neither maintenance authority nor extra audit receipts beyond the existing review and quality gates. CI maintenance success proves only the stated validation; the owner or authorized executor consumes authority and performs the final merge check.
-
-Do not request duplicate AI reviews on an unchanged head without a material reason. Do not require two named AI reviewers and a separate fresh-agent pass for routine low-risk work unless repository policy or the task names that gate.
-
-## Failure, retry, and waiting
-
-Diagnose every failed gate. Apply the finding decision process before repairing a distinct confirmed finding. Preserve failed public evidence; do not rewrite it as success.
-
-Continue after ordinary code, test, tool, or infrastructure failures while a safe repair or alternative exists. A new commit identity is progress, not a human blocker.
-
-Use `waiting_external` only when an external result is genuinely pending and no independent work remains. Use `waiting_human` only when the next concrete action needs one exact human decision or exceptional authority and no independent safe in-scope work remains. Notify the operator early, state the minimum requested decision in plain English, and continue safe preparation until that exact boundary. Use `blocked` only after the same blocker has persisted through the applicable retry or decision process and no safe progress remains.
-
-Provide short user updates at meaningful boundaries. Do not create persistent 15-second or 60-second monitoring records. A quiet, live test is not stalled.
-
-## Resume and migration
-
-Resume from Git, GitHub, CI, review state, the compact state file, and the current task. Do not revalidate historical receipt graphs. Do not restart a completed task unless a live completion predicate changed.
-
-Preserve completed history, failed CI and reviewer evidence, validated decisions, standing grants and the current executor. After the post-PR212 amendment is accepted, use its historical-ID mapping and explicit execution order. Consolidated lifecycle gates remain required; superseded leaves do not become implemented. Do not restart an accepted task because its orchestration prose changed.
-
-## Completion
-
-The goal is complete when every active outcome satisfies its completion condition and every superseded or no-change historical ID has an honest disposition, with no real blocker hidden. The final audit checks current task status, final repository commits and trees, required CI and review state, open material findings, applicable counterpart outcomes, and any unresolved human decisions. It does not replay receipt catalogs or hash every historical control artifact.
-
-The final report includes:
-
-- completed, skipped, and blocked tasks;
-- final PSStyleGuide and TerraformStyleGuide commits and trees;
-- relevant issues and PRs;
-- final validation, CI, and review results;
-- material intentional differences and residual risks; and
-- any action that still requires a human.
+# Execute the paired repository plan
+
+Use this prompt when the owner instructs you to execute the plan. Preparing or reviewing it does not itself authorize product execution.
+
+> Execute the plan in `docs/planning/action-items-2026-10-02/README.md`. Work from PSStyleGuide branch `planning-CRT-PR-852` and keep planning progress there. Never merge that branch into main. Use separate product worktrees from each repository's current native main. The peer checkout is `C:/Users/flesniak/GitHub/TerraformStyleGuide`; the GitHub repositories are `franklesniak/PSStyleGuide` and `franklesniak/TerraformStyleGuide`.
+>
+> Read `docs/planning/action-items-2026-10-02/STATUS.md` first, including after every restart or context compaction. Then read the README, LOOP-POLICY, ROUTING-AND-PARALLELISM and the current task. Read only the original contracts and evidence needed by that task. Use disk progress and authenticated native state; do not infer completion from chat memory or old TEMP completed lists.
+>
+> Work every live issue and every applicable original requirement to a truthful outcome. Reuse verified historical implementations, reviews and merges. Do not replay administrative leaves or restore retired machinery solely because an old task names it. Use RETIREMENT-REVIEW to preserve useful controls and address actual losses. Keep retired, implemented, conditional, unverified and blocked results distinct.
+>
+> Apply the owner's complete finding-specific decision process before each material solution: validate the finding, identify all relevant stakeholders, list options, describe a new weighted rubric, show scores, state the selected action in controlled English, then implement and test it. Follow DECISION-PROCESS.md. Keep one complete decision and link duplicate reports.
+>
+> Use the installed model-routing-advisor skill and the current task's revisited model recommendation. Verify runtime availability and effort support. Delegate bounded independent scopes with explicit overrides where supported; verify effective settings when exposed and report unknown metadata honestly. Do not require model-attestation paperwork or rerun accepted product reviews merely because historical metadata is absent. Keep one writer per worktree and outcome. No routed worker spawns descendants. The coordinator owns integration, native mutations, STATUS and counters.
+>
+> Run independent research, non-overlapping tasks and immutable-input reviews in parallel where useful. Enforce the task dependency graph and path ownership; serialize shared workflow/lockfile/generated-output edits and product merges. Never implement both repositories' side of one convergence outcome simultaneously. During a review wait, continue other safe work.
+>
+> For each actual change, implement a focused source-repository PR, validate it, run the Copilot-and-Codex review loop, obtain independent final quality, merge through normal current gates, and verify landed behavior. Diff the accepted bytes against the other repository. If an applicable common difference remains, create a focused peer repair PR and repeat the lifecycle. Compare back after the peer merge; propagate useful review-driven changes until the outcome converges or reaches its cap.
+>
+> Each PR review stops at the first of: both reviewers clean on the same current input, 80 rounds, or 8 elapsed days from its first request. Each work item has a separate directional repository-transfer cap: 8 for narrow work, 12 for coupled work, 16 only for justified large scope. Initial source implementation is transfer0; first peer repair is1; reverse repair is2. Neither counter resets after a new head, worker, PR replacement or restart. Reserve the last two transfers for final repair/alignment. Follow the exact counter, pending-request, timeout and at-limit rules in LOOP-POLICY.md.
+>
+> Prefer Copilot Balanced through the supported GitHub Reviewers UI as AGENTS.md requires. Capture baselines, submit once, confirm the native request, and record the observed effort. Use the documented CLI/REST fallback if the UI cannot select Balanced; Lite is acceptable and does not justify a second request. Attribute both reviewers' results to exact inputs. Never duplicate a pending or ambiguously accepted request. Serialize request sets across changed inputs. Preserve genuine failed-service and substitute-review outcomes without relabeling them clean.
+>
+> On an exhausted limit, stop optional iteration. Merge final reviewed changes only when independent quality and required current gates permit it. If a material defect, required approval, failed check or unjustified byte difference remains, record the concrete blocker and next bounded decision. Never call that convergence. Do not create a replacement PR or new task solely to reset a budget.
+>
+> A merge is on-plan only when the task names the outcome, scope and actual candidate match, applicable checks and review pass, no material finding remains, and no control is bypassed. Do not request redundant permission for routine in-scope actions. Preserve actual protected-file, settings and Terraform Gate A/B authority boundaries; a generated plan cannot invent a missing grant. Prepare concrete readiness before requesting the exact missing decision. Continue independent work while waiting.
+>
+> Before a meaningful wait, worker handoff or restart, update STATUS with actual inputs, changed paths, evidence, pending native operations, PR round/deadline, transfer count and one next action. Reconcile a possibly accepted write before retrying it. After a relevant input changes, reopen affected completed conditional results and preserve old evidence and counters. Do not rerun unrelated checks.
+>
+> Complete A18 only after a full native-main tracked-tree union comparison plus original required-capability checks. Compare actual blob bytes and modes. Verify every necessary language/repository exception at exact paths/regions; do not excuse common algorithms or tests by repository name. Preserve truthful historical facts. Check both refs again so the accepted pair is current. Finish A19 with a fresh issue census and explicit original-requirement dispositions. Report unresolved conditional risks honestly; do not force-close them or claim all402 original implementations were delivered.
+
+## Current supporting documents
+
+- [Plan entry](action-items-2026-10-02/README.md)
+- [Progress and restart record](action-items-2026-10-02/STATUS.md)
+- [Two-loop policy](action-items-2026-10-02/LOOP-POLICY.md)
+- [Model routing and parallel ownership](action-items-2026-10-02/ROUTING-AND-PARALLELISM.md)
+- [Finding decision process](action-items-2026-10-02/DECISION-PROCESS.md)
+- [Historical completion reconciliation](action-items-2026-10-02/COMPLETION-REVIEW.md)
+- [Retirement merits](action-items-2026-10-02/RETIREMENT-REVIEW.md)
+
+The earlier numeric-state controller, condensed-plan prompts and old completion record are not active entry points for this plan. Do not feed A00–A19 state to the old controller/schema. Use this policy directly unless a later explicit controller migration is validated. Preserve pre-existing local edits and unrelated files. Never commit credentials, browser state or temporary research receipts.
