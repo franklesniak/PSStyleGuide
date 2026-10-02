@@ -2,11 +2,9 @@
 
 # Install and check repository dependencies
 
-## Metadata
-
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-10-02
+- **Last Updated:** 2026-10-01
 - **Scope:** Locked npm tools, the local Markdown hook, and current dependency-risk checks in PSStyleGuide.
 
 Setup and audit require the exact Node and bundled npm versions declared in the root [package.json](../package.json). If either version differs, install or select that Node distribution before retrying. Check `node --version` and `npm --version`. From the repository root, run:

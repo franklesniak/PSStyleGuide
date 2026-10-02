@@ -97,6 +97,8 @@ jobs:
           }
           $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'
           if ($LASTEXITCODE -ne 0 -or $strFetched -cne $env:EXPECTED_HEAD) { throw 'PR data commit mismatch.' }
+          & ./.github/workflows/Test-AgentInstructions.ps1 -MetadataClassificationOnly -InputRevision $env:EXPECTED_HEAD -PublishedBaselineRevision $env:EXPECTED_BASE
+          if ($LASTEXITCODE -ne 0) { throw 'Accepted metadata classification rejected PR data.' }
           $strResult = & node .github/workflows/Classify-InstructionMaintenance.mjs $PWD.Path $env:EXPECTED_BASE $env:EXPECTED_HEAD
           if ($LASTEXITCODE -ne 0) { throw 'Maintenance classification failed.' }
           $objResult = $strResult | ConvertFrom-Json -ErrorAction Stop
