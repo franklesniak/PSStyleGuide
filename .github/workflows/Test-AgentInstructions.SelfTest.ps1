@@ -1386,6 +1386,37 @@ function Assert-AuthorFinalizationGitFixture {
         & git -C $strFixtureRoot -c "core.hooksPath=$strEmptyHooks" checkout --quiet --detach $strBaseline
         if ($LASTEXITCODE -ne 0) { throw 'Suffix fixture baseline restoration failed.' }
         Write-Verbose 'Version-like header and uppercase Markdown actual caller controls passed.'
+        # A peer Metadata section remains operative when its placement is wrong.
+        $strBeforeLateMetadataBaseline = $strBaseline
+        $strLateMetadata = "`n`n## Metadata`n`n- **Status:** Broken`n- **Owner:** Fixture`n" +
+            "- **Last Updated:** 2026-99-99`n- **Scope:** Optional metadata.`n"
+        foreach ($strOptionalPath in @('README.md', '.github/copilot-instructions.md')) {
+            $strOptionalFullPath = [IO.Path]::Combine($strFixtureRoot, $strOptionalPath)
+            [IO.File]::WriteAllText($strOptionalFullPath,
+                [IO.File]::ReadAllText($strOptionalFullPath) + $strLateMetadata,
+                [Text.UTF8Encoding]::new($false))
+            $strLateMetadataHead = & $scriptblockCommit
+            & $scriptblockCheck $strLateMetadataHead $false $false $false 'must place one document-level metadata list'
+        }
+        $strReadmePath = [IO.Path]::Combine($strFixtureRoot, 'README.md')
+        [IO.File]::WriteAllText($strReadmePath,
+            "# Reader`n`n## Intro`n`nBody.`n" + $strLateMetadata,
+            [Text.UTF8Encoding]::new($false))
+        $strBaseline = & $scriptblockCommit
+        [IO.File]::WriteAllText($strReadmePath,
+            $strMetadataDocument.Replace('DATE', $strCurrentDate), [Text.UTF8Encoding]::new($false))
+        $strValidAfterLateMetadataHead = & $scriptblockCommit
+        & $scriptblockCheck $strValidAfterLateMetadataHead $false $false $false '(?s)parent of README[.]md.*metadata list'
+        $strBaseline = $strBeforeLateMetadataBaseline
+        & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Late metadata baseline restoration failed.' }
+        [IO.File]::WriteAllText($strReadmePath,
+            "# Reader`n`n## Examples`n`n### Metadata`n`n- **Status:** Broken`n",
+            [Text.UTF8Encoding]::new($false))
+        $strNestedMetadataExampleHead = & $scriptblockCommit
+        & $scriptblockCheck $strNestedMetadataExampleHead $false $false $true 'content contract passed'
+        Write-Verbose 'Later peer Metadata current/prior rejection and nested example caller controls passed.'
+
         # Promotion must remain valid on a later no-context rerun.
         $strManifestPath = [IO.Path]::Combine($strFixtureRoot, '.github', 'document-metadata-classification.json')
         $objManifest = [IO.File]::ReadAllText($strManifestPath) | ConvertFrom-Json
@@ -1718,6 +1749,21 @@ function Assert-OptionalMetadataSelfTest {
         @{ Name = 'plain Version paragraph'; Content = "# Reader`n`nVersion: malformed`n"; Expected = $true },
         @{ Name = 'Version paragraph before title'; Content = "$strVersion`n`n# Reader`n"; Expected = $true },
         @{ Name = 'Metadata example after ordinary section'; Content = "# Reader`n`n## Examples`n`n### Metadata`n`n$strFields"; Expected = $false },
+        @{ Name = 'later peer Metadata'; Content = "# Reader`n`n## Intro`n`nText.`n`n## Metadata`n`n$strFields"; Expected = $true },
+        @{ Name = 'later peer missing fields'; Content = "# Reader`n`n## Intro`n`n## Metadata`n"; Expected = $true },
+        @{ Name = 'later peer malformed fields'; Content = "# Reader`n`n## Intro`n`n## Metadata`n`n- **Status:** Broken`n- **Last Updated:** 2026-99-99`n"; Expected = $true },
+        @{ Name = 'later peer stale fields'; Content = "# Reader`n`n## Intro`n`n## Metadata`n`n" + $strFields.Replace($MaximumMetadataUtcDate, $strPriorDate); Expected = $true },
+        @{ Name = 'later peer after several sections'; Content = "# Reader`n`n## One`n`n### Detail`n`n## Two`n`n## Metadata`n`n$strFields"; Expected = $true },
+        @{ Name = 'later peer before early title'; Content = "## Intro`n`n## Metadata`n`n$strFields`n# Reader`n"; Expected = $true },
+        @{ Name = 'later peer fallback'; Content = "Overview.`n`n## Intro`n`n## Metadata`n`n$strFields"; Expected = $true },
+        @{ Name = 'later peer setext'; Content = "# Reader`n`n## Intro`n`nMetadata`n--------`n`n$strFields"; Expected = $true },
+        @{ Name = 'later noncanonical peer'; Content = "# Reader`n`n## Intro`n`n## metadata:`n`n$strFields"; Expected = $true },
+        @{ Name = 'later quoted peer'; Content = "# Reader`n`n## Examples`n`n> ## Metadata`n> - **Status:** Broken`n"; Expected = $false },
+        @{ Name = 'later fenced peer'; Content = "# Reader`n`n## Examples`n`n~~~~markdown`n## Metadata`n$strFields~~~~`n"; Expected = $false },
+        @{ Name = 'later list-nested peer'; Content = "# Reader`n`n## Examples`n`n- Example:`n`n  ## Metadata`n`n  - **Status:** Broken`n"; Expected = $false },
+        @{ Name = 'later HTML peer'; Content = "# Reader`n`n## Examples`n`n<div>`n## Metadata`n$strFields</div>`n"; Expected = $false },
+        @{ Name = 'frontmatter peer'; Content = "---`n## Metadata`n---`n# Reader`n`nNo header.`n"; Expected = $false },
+        @{ Name = 'later Metadata H1'; Content = "# Reader`n`n## Examples`n`n# Metadata`n"; Expected = $false },
         @{ Name = 'no H1 fallback'; Content = $strFields; Expected = $true },
         @{ Name = 'directive fallback'; Content = "<!-- markdownlint-disable MD013 -->`n`n$strFields"; Expected = $true },
         @{ Name = 'late H1 fallback'; Content = $strFields + ("`n" * 31) + '# Late title'; Expected = $true },

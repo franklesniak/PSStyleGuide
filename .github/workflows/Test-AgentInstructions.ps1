@@ -5178,7 +5178,8 @@ function Test-DocumentMetadataHeaderIntent {
     #
     # .DESCRIPTION
     # Uses parsed document-level header blocks, excluding leading front matter,
-    # quoted or fenced examples and later ordinary sections. Incomplete fields
+    # quoted or fenced examples and later ordinary sections. Peer H2 Metadata
+    # sections select validation even when misplaced. Incomplete fields
     # still select the strict metadata validator. Generated paths are excluded
     # by the caller, not inferred from their copied source contents.
     #
@@ -5228,6 +5229,12 @@ function Test-DocumentMetadataHeaderIntent {
     $objParseContext = Get-MarkdownParseContext `
         -Content ($arrParserLines -join "`n") -LineCount $arrLines.Count
     $arrBlocks = @($objParseContext.TopLevelBlocks)
+    # A later peer Metadata section is misplaced intent, not an ordinary
+    # subsection example. Leave deeper headings to the existing header window.
+    foreach ($objBlock in $arrBlocks) {
+        if ($objBlock.Type -ceq 'heading_open' -and $objBlock.Tag -ceq 'h2' -and
+            $objBlock.Text -imatch '^Metadata\s*:?$') { return $true }
+    }
     $intHeaderStart = $intBodyStart
     foreach ($objBlock in $arrBlocks) {
         if ($objBlock.Type -ceq 'heading_open' -and $objBlock.Tag -ceq 'h1' -and
