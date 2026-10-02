@@ -1168,6 +1168,54 @@ function Assert-AuthorFinalizationGitFixture {
             $strInvalidCandidate = & $scriptblockCommit
             & $scriptblockCheck $strInvalidCandidate $true $false $false 'later than trusted UTC|valid|calendar'
         }
+        # Optional coverage uses an explicit private installed-policy baseline.
+        # This setup is independent of whether future source docs opt in.
+        $strBeforeOptionalBaseline = $strBaseline
+        $strOptionalReadmePath = [IO.Path]::Combine($strFixtureRoot, 'README.md')
+        $strOptionalCatalogPath = [IO.Path]::Combine($strFixtureRoot, '.github', 'copilot-instructions.md')
+        $strNoHeaderFixture = "# Reader fixture`n`nNo optional metadata header.`n"
+        [IO.File]::WriteAllText($strOptionalReadmePath, $strNoHeaderFixture, [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText($strOptionalCatalogPath, $strNoHeaderFixture, [Text.UTF8Encoding]::new($false))
+        & git -C $strFixtureRoot -c core.autocrlf=false add --all
+        if ($LASTEXITCODE -ne 0) { throw 'Optional metadata baseline indexing failed.' }
+        & git -C $strFixtureRoot diff --cached --quiet
+        $intOptionalBaselineDifference = $LASTEXITCODE
+        if ($intOptionalBaselineDifference -eq 1) { $strBaseline = & $scriptblockCommit }
+        elseif ($intOptionalBaselineDifference -ne 0) { throw 'Optional metadata baseline comparison failed.' }
+        foreach ($strOptionalPath in @($strOptionalReadmePath, $strOptionalCatalogPath)) {
+            [IO.File]::WriteAllText($strOptionalPath,
+                $strMetadataDocument.Replace('DATE', $strPriorDate), [Text.UTF8Encoding]::new($false))
+            $strOptionalStaleCandidate = & $scriptblockCommit
+            & $scriptblockCheck $strOptionalStaleCandidate $true $false $false 'Last Updated must'
+            & $scriptblockCheck $strOptionalStaleCandidate $false $true $true 'Finalization date not verified by this invocation'
+            [IO.File]::WriteAllText($strOptionalPath,
+                $strMetadataDocument.Replace('DATE', $strCurrentDate).Replace('Status:** Active', 'Status:** Broken'),
+                [Text.UTF8Encoding]::new($false))
+            $strOptionalMalformedCandidate = & $scriptblockCommit
+            & $scriptblockCheck $strOptionalMalformedCandidate $false $false $false 'exact top-level Status'
+        }
+        $strOptionalVersionedDocument = $strMetadataDocument.Replace('DATE', $strCurrentDate).Replace(
+            "# Finalization fixture`n", "# Finalization fixture`n`n**Version:** 1.0.$($strCurrentDate.Replace('-', '')).0`n")
+        [IO.File]::WriteAllText($strOptionalReadmePath, $strOptionalVersionedDocument, [Text.UTF8Encoding]::new($false))
+        $strOptionalVersionCandidate = & $scriptblockCommit
+        & $scriptblockCheck $strOptionalVersionCandidate $true $false $true 'Author finalization UTC date checked'
+        # A malformed prior opt-in is data to reject, not new coverage to erase.
+        [IO.File]::WriteAllText($strOptionalReadmePath,
+            $strMetadataDocument.Replace('DATE', $strPriorDate).Replace('Status:** Active', 'Status:** Broken'),
+            [Text.UTF8Encoding]::new($false))
+        $strBaseline = & $scriptblockCommit
+        [IO.File]::WriteAllText($strOptionalReadmePath,
+            $strMetadataDocument.Replace('DATE', $strCurrentDate), [Text.UTF8Encoding]::new($false))
+        $strOptionalParentCandidate = & $scriptblockCommit
+        & $scriptblockCheck $strOptionalParentCandidate $false $false $false 'parent of README.md .*Status'
+        # Full optional-header removal is allowed; malformed remnants are not.
+        [IO.File]::WriteAllText($strOptionalReadmePath, $strNoHeaderFixture, [Text.UTF8Encoding]::new($false))
+        $strOptionalRemovalCandidate = & $scriptblockCommit
+        & $scriptblockCheck $strOptionalRemovalCandidate $true $false $true 'Author finalization UTC date checked'
+        $strBaseline = $strBeforeOptionalBaseline
+        & git -C $strFixtureRoot -c "core.hooksPath=$strEmptyHooks" checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Optional metadata fixture baseline restoration failed.' }
+        Write-Verbose 'Optional retained Tier2/catalog and invalid-prior caller controls passed.'
         # Promotion must remain valid on a later no-context rerun.
         $strManifestPath = [IO.Path]::Combine($strFixtureRoot, '.github', 'document-metadata-classification.json')
         $objManifest = [IO.File]::ReadAllText($strManifestPath) | ConvertFrom-Json
@@ -1441,7 +1489,109 @@ if ($arrDeclaredOutputTypes.Count -ne 1 -or
     throw 'The extracted self-test must declare one void output contract.'
 }
 $script:strMaximumMetadataUtcDate = $MaximumMetadataUtcDate
+function Assert-OptionalMetadataSelfTest {
+    # .SYNOPSIS
+    # Checks optional header intent and retained metadata transitions.
+    #
+    # .DESCRIPTION
+    # Uses the production parser and metadata helpers. Intent selects strict
+    # validation even when fields are malformed; examples remain non-operative.
+    #
+    # .PARAMETER MaximumMetadataUtcDate
+    # The captured latest UTC date used by the validator.
+    #
+    # .EXAMPLE
+    # Assert-OptionalMetadataSelfTest -MaximumMetadataUtcDate $strDate
+    #
+    # # Runs optional metadata positive and negative controls.
+    #
+    # .INPUTS
+    # None. This function does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # None. Failed controls throw.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param([Parameter(Mandatory)][string] $MaximumMetadataUtcDate)
+
+    $objDate = [DateTime]::ParseExact($MaximumMetadataUtcDate, 'yyyy-MM-dd',
+        [Globalization.CultureInfo]::InvariantCulture)
+    $strPriorDate = $objDate.AddDays(-1).ToString('yyyy-MM-dd')
+    $strFutureDate = $objDate.AddDays(1).ToString('yyyy-MM-dd')
+    $strFields = "- **Status:** Active`n- **Owner:** Fixture`n- **Last Updated:** $MaximumMetadataUtcDate`n- **Scope:** Optional metadata.`n"
+    $strDirect = "# Reader`n`n$strFields`n## Content`n`nCurrent text.`n"
+    $strVersion = '**Version:** 1.0.' + $MaximumMetadataUtcDate.Replace('-', '') + '.0'
+    $strVersioned = $strDirect.Replace("# Reader`n", "# Reader`n`n$strVersion`n")
+    $arrIntentCases = @(
+        @{ Name = 'direct'; Content = $strDirect; Expected = $true },
+        @{ Name = 'headed'; Content = $strDirect.Replace('- **Status:', "## Metadata`n`n- **Status:"); Expected = $true },
+        @{ Name = 'optional version'; Content = $strVersioned; Expected = $true },
+        @{ Name = 'missing fields'; Content = "# Reader`n`n## Metadata`n"; Expected = $true },
+        @{ Name = 'malformed status'; Content = $strDirect.Replace('Status:** Active', 'Status:** Broken'); Expected = $true },
+        @{ Name = 'malformed emphasis'; Content = "# Reader`n`n- **Owner** Fixture`n"; Expected = $true },
+        @{ Name = 'wrong placement'; Content = $strDirect.Replace("# Reader`n", "# Reader`n`nIntervening prose.`n"); Expected = $true },
+        @{ Name = 'direct before early title'; Content = $strFields + "`n# Reader`n`nBody.`n"; Expected = $true },
+        @{ Name = 'headed before early title'; Content = "## Metadata`n`n$strFields`n# Reader`n`nBody.`n"; Expected = $true },
+        @{ Name = 'malformed section before early title'; Content = "### Metadata`n`n# Reader`n`nBody.`n"; Expected = $true },
+        @{ Name = 'quoted before early title'; Content = "> - **Status:** Active`n`n# Reader`n`nBody.`n"; Expected = $false },
+        @{ Name = 'Metadata title without fields'; Content = "# Metadata`n`nReader overview.`n"; Expected = $false },
+        @{ Name = 'Metadata title with fields'; Content = $strDirect.Replace('# Reader', '# Metadata'); Expected = $true },
+        @{ Name = 'late Metadata title without fields'; Content = ("`n" * 31) + '# Metadata'; Expected = $false },
+        @{ Name = 'late Metadata title with fallback fields'; Content = $strFields + ("`n" * 31) + '# Metadata'; Expected = $true },
+        @{ Name = 'Version title without fields'; Content = "# Version`n`nReader overview.`n"; Expected = $false },
+        @{ Name = 'Version title with fields'; Content = $strDirect.Replace('# Reader', '# Version'); Expected = $true },
+        @{ Name = 'plain Version paragraph'; Content = "# Reader`n`nVersion: malformed`n"; Expected = $true },
+        @{ Name = 'Version paragraph before title'; Content = "$strVersion`n`n# Reader`n"; Expected = $true },
+        @{ Name = 'Metadata example after ordinary section'; Content = "# Reader`n`n## Examples`n`n### Metadata`n`n$strFields"; Expected = $false },
+        @{ Name = 'no H1 fallback'; Content = $strFields; Expected = $true },
+        @{ Name = 'directive fallback'; Content = "<!-- markdownlint-disable MD013 -->`n`n$strFields"; Expected = $true },
+        @{ Name = 'late H1 fallback'; Content = $strFields + ("`n" * 31) + '# Late title'; Expected = $true },
+        @{ Name = 'no header'; Content = "# Reader`n`nGetting started.`n"; Expected = $false },
+        @{ Name = 'generic labels'; Content = "# Reader`n`n- Owner: project team`n- Scope: user examples`n"; Expected = $false },
+        @{ Name = 'fenced'; Content = "# Reader`n`n~~~~markdown`n$strFields~~~~`n"; Expected = $false },
+        @{ Name = 'quoted'; Content = "# Reader`n`n" + (($strFields.TrimEnd() -split "`n" | ForEach-Object { '> ' + $_ }) -join "`n"); Expected = $false },
+        @{ Name = 'front matter'; Content = "---`n$strFields---`n# Reader`n`nNo header.`n"; Expected = $false },
+        @{ Name = 'unclosed marked front matter'; Content = "---`n$strFields"; Expected = $true },
+        @{ Name = 'example section'; Content = "# Reader`n`n## Example`n`n$strFields"; Expected = $false },
+        @{ Name = 'inline code'; Content = '# Reader' + "`n`n- ``**Status:** Active```n"; Expected = $false },
+        @{ Name = 'HTML example'; Content = "# Reader`n`n<div>`n$strFields</div>`n"; Expected = $false }
+    )
+    foreach ($objCase in $arrIntentCases) {
+        if ((Test-DocumentMetadataHeaderIntent -Content $objCase.Content) -ne $objCase.Expected) {
+            throw "Optional metadata intent failed: $($objCase.Name)"
+        }
+    }
+    foreach ($objCase in @(
+            @{ Name = 'initial'; Current = $strDirect; Base = $null; Strict = $true; Pattern = '' },
+            @{ Name = 'initial version'; Current = $strVersioned; Base = $null; Strict = $true; Pattern = '' },
+            @{ Name = 'initial nonzero revision'; Current = $strVersioned.Replace('.0' + "`n", '.2' + "`n"); Base = $null; Strict = $true; Pattern = 'revision must be exactly 0' },
+            @{ Name = 'stale finalization'; Current = $strDirect.Replace($MaximumMetadataUtcDate, $strPriorDate); Base = $null; Strict = $true; Pattern = 'Last Updated must be' },
+            @{ Name = 'delayed ordinary'; Current = $strDirect.Replace($MaximumMetadataUtcDate, $strPriorDate); Base = $null; Strict = $false; Pattern = '' },
+            @{ Name = 'future'; Current = $strDirect.Replace($MaximumMetadataUtcDate, $strFutureDate); Base = $null; Strict = $false; Pattern = 'later than trusted UTC' },
+            @{ Name = 'calendar'; Current = $strDirect.Replace($MaximumMetadataUtcDate, '2026-99-99'); Base = $null; Strict = $false; Pattern = 'real calendar date' },
+            @{ Name = 'invalid parent'; Current = $strDirect; Base = $strDirect.Replace('Status:** Active', 'Status:** Broken'); Strict = $false; Pattern = 'parent of .*Status' },
+            @{ Name = 'backward'; Current = $strDirect.Replace($MaximumMetadataUtcDate, $strPriorDate); Base = $strDirect; Strict = $false; Pattern = 'must not move backward' },
+            @{ Name = 'version introduction'; Current = $strVersioned; Base = $strDirect; Strict = $false; Pattern = '' },
+            @{ Name = 'version removal'; Current = $strDirect; Base = $strVersioned; Strict = $false; Pattern = '' },
+            @{ Name = 'invalid prior version removal'; Current = $strDirect; Base = $strVersioned.Replace($strVersion, $strVersion.Replace($MaximumMetadataUtcDate.Replace('-', ''), '20269999')); Strict = $false; Pattern = 'matching calendar date' }
+        )) {
+        $arrFailures = @(Get-PublishedEndpointLastUpdatedFailure -Name 'optional.md' `
+                -CurrentContent $objCase.Current -BaseContent $objCase.Base -TrustedEventUtcDate '' `
+                -RequireCurrentMaximumDateForRenderedChange $objCase.Strict)
+        if (($objCase.Pattern -ceq '' -and $arrFailures.Count -ne 0) -or
+            ($objCase.Pattern -cne '' -and -not ($arrFailures -match $objCase.Pattern))) {
+            throw "Optional metadata transition failed: $($objCase.Name): $($arrFailures -join '; ')"
+        }
+    }
+}
+
 Assert-DocumentMetadataClassificationSelfTest -MaximumMetadataUtcDate $MaximumMetadataUtcDate
+Assert-OptionalMetadataSelfTest -MaximumMetadataUtcDate $MaximumMetadataUtcDate
 Assert-DocumentMetadataPlacementSelfTest -RepositoryRootPath $RepositoryRootPath -MaximumMetadataUtcDate $MaximumMetadataUtcDate
 Assert-PublishedMetadataGitFixture -MaximumMetadataUtcDate $MaximumMetadataUtcDate
 Assert-ClassificationAdmissionGitFixture -RepositoryRootPath $RepositoryRootPath

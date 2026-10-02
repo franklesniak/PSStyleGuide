@@ -5140,6 +5140,113 @@ function Get-DiscoveredGovernedMarkdownDocumentPath {
     )
 }
 
+function Test-DocumentMetadataHeaderIntent {
+    # .SYNOPSIS
+    # Detects intentional optional metadata without accepting its structure.
+    #
+    # .DESCRIPTION
+    # Uses parsed document-level header blocks, excluding leading front matter,
+    # quoted or fenced examples and later ordinary sections. Incomplete fields
+    # still select the strict metadata validator. Generated paths are excluded
+    # by the caller, not inferred from their copied source contents.
+    #
+    # .PARAMETER Content
+    # The bounded document text supplied by the existing safe input reader.
+    #
+    # .EXAMPLE
+    # Test-DocumentMetadataHeaderIntent -Content $strDocument
+    #
+    # # Reports recognizable header intent, not valid metadata.
+    #
+    # .INPUTS
+    # None. This function does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # [bool] True when the document header contains metadata markers.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Content)
+
+    $arrLines = [regex]::Split($Content, '\r\n|\r|\n')
+    $arrParserLines = [string[]]$arrLines.Clone()
+    $intBodyStart = 0
+    if ($arrLines[0] -ceq '---') {
+        $intFrontMatterEnd = -1
+        for ($intLine = 1; $intLine -lt $arrLines.Count; $intLine++) {
+            if ($arrLines[$intLine] -ceq '---') {
+                $intFrontMatterEnd = $intLine
+                break
+            }
+        }
+        # A marked header behind an unclosed delimiter must not disappear as
+        # successful optional coverage. The strict parser reports that error.
+        if ($intFrontMatterEnd -lt 0) {
+            return $Content -imatch '(?m)^(?:#+\s+Metadata|[-+*]\s+\*\*(?:Status|Owner|Last Updated|Scope)|\*\*Version:)'
+        }
+        for ($intLine = 0; $intLine -le $intFrontMatterEnd; $intLine++) {
+            $arrParserLines[$intLine] = ''
+        }
+        $intBodyStart = $intFrontMatterEnd + 1
+    }
+    $objParseContext = Get-MarkdownParseContext `
+        -Content ($arrParserLines -join "`n") -LineCount $arrLines.Count
+    $arrBlocks = @($objParseContext.TopLevelBlocks)
+    $intHeaderStart = $intBodyStart
+    foreach ($objBlock in $arrBlocks) {
+        if ($objBlock.Type -ceq 'heading_open' -and $objBlock.Tag -ceq 'h1' -and
+            ($objBlock.Start - $intBodyStart) -lt 30) {
+            $intHeaderStart = $objBlock.End
+            break
+        }
+    }
+    # A recognizable header before an early title is misplaced, not absent.
+    # Stop this prefix at its first heading so later examples stay excluded.
+    $intPrefixEnd = $intHeaderStart
+    foreach ($objBlock in $arrBlocks) {
+        if ($objBlock.Start -ge $intBodyStart -and $objBlock.Start -lt $intHeaderStart -and
+            $objBlock.Type -ceq 'heading_open') {
+            if ($objBlock.Tag -cne 'h1' -and $objBlock.Text -imatch '^Metadata\s*:?$') { return $true }
+            $intPrefixEnd = $objBlock.Start
+            break
+        }
+    }
+    $intHeaderEnd = $arrLines.Count
+    foreach ($objBlock in $arrBlocks) {
+        if ($objBlock.Start -lt $intHeaderStart -or $objBlock.Type -cne 'heading_open') {
+            continue
+        }
+        if ($objBlock.Tag -cne 'h1' -and $objBlock.Text -imatch '^Metadata\s*:?$') { return $true }
+        $intHeaderEnd = $objBlock.Start
+        break
+    }
+    foreach ($objBlock in $arrBlocks) {
+        $boolInHeader = ($objBlock.Start -ge $intHeaderStart -and $objBlock.Start -lt $intHeaderEnd) -or
+            ($objBlock.Start -ge $intBodyStart -and $objBlock.Start -lt $intPrefixEnd)
+        if ($boolInHeader -and
+            $objBlock.Type -ceq 'paragraph_open' -and $objBlock.Text -imatch '^Version\s*:') {
+            return $true
+        }
+    }
+    foreach ($objItem in $objParseContext.TopLevelListItems) {
+        $boolInHeader = ($objItem.Start -ge $intHeaderStart -and $objItem.Start -lt $intHeaderEnd) -or
+            ($objItem.Start -ge $intBodyStart -and $objItem.Start -lt $intPrefixEnd)
+        if (-not $boolInHeader) { continue }
+        # Status/date labels are distinctive. Generic Owner/Scope prose alone
+        # is not an opt-in; explicitly emphasized reserved fields are markers.
+        if ($objItem.Text -imatch '^(?:Status|Last\s+Updated)\s*(?::|$)' -or
+            $arrLines[$objItem.Start] -imatch
+                '^\s*[-+*]\s+\*\*(?:Status|Owner|Last\s+Updated|Scope)(?::|\*\*)') {
+            return $true
+        }
+    }
+    return $false
+}
+
 function Get-DocumentMetadataContext {
     # .SYNOPSIS
     # Gets validated document-level metadata context.
@@ -6801,6 +6908,14 @@ foreach ($strDiscoveredGovernedMarkdownPath in $arrDiscoveredGovernedMarkdownPat
         RequiresVersion = $false
     }
 }
+foreach ($strOptionalMetadataPath in $objDocumentClassificationContext.Tier2Paths) {
+    $arrGovernedMetadataDocuments += [pscustomobject]@{
+        Path = $strOptionalMetadataPath
+        MaximumBytes = $intInstructionDocumentMaximumInputBytes
+        RequiresMetadata = $false
+        RequiresVersion = $false
+    }
+}
 
 if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
     $arrRequiredPaths = @($strCodexConfigPath)
@@ -6968,15 +7083,21 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
     }
     $boolInitialMetadataCoverage = $false
     $objMetadataParentContent = $objParentContext.ParentContent
-    if ($objDocumentSpec.RequiresMetadata -and -not $objDocumentSpec.RequiresVersion -and
+    $boolValidateMetadata = $objDocumentSpec.RequiresMetadata
+    if (-not $boolValidateMetadata -and
+        $null -ne $hashtableGovernedInstructionContent[$objDocumentSpec.Path]) {
+        $boolValidateMetadata = Test-DocumentMetadataHeaderIntent `
+            -Content $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
+    }
+    if ($boolValidateMetadata -and -not $objDocumentSpec.RequiresVersion -and
         $null -ne $objMetadataParentContent) {
-        $objPriorMetadataContext = Get-DocumentMetadataContext `
-            -Content $objMetadataParentContent -RequiresVersion $false
-        if ($null -ne $objPriorMetadataContext.Failure) {
-            $boolInitialMetadataCoverage = Test-InitialMetadataCoveragePath `
-                -HasTrustedBaselineManifest $boolHasTrustedBaselineClassificationManifest `
-                -TrustedBaselineExemptPath $arrTrustedBaselineClassificationExemptPaths `
-                -RepositoryRelativePath $objDocumentSpec.Path
+        $boolPriorMetadataIntent = Test-DocumentMetadataHeaderIntent -Content $objMetadataParentContent
+        if (-not $boolPriorMetadataIntent) {
+            $boolInitialMetadataCoverage = -not $objDocumentSpec.RequiresMetadata -or
+                (Test-InitialMetadataCoveragePath `
+                    -HasTrustedBaselineManifest $boolHasTrustedBaselineClassificationManifest `
+                    -TrustedBaselineExemptPath $arrTrustedBaselineClassificationExemptPaths `
+                    -RepositoryRelativePath $objDocumentSpec.Path)
             if ($boolInitialMetadataCoverage) { $objMetadataParentContent = $null }
         }
     }
@@ -6990,7 +7111,7 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
             ExpectedUtcDate = $objParentContext.ExpectedUtcDate
             IsWorktreeTransition = $objParentContext.IsWorktreeTransition
             RequireFinalizationDate = ($objParentContext.IsWorktreeTransition -or $FinalizeMetadataNow)
-            RequiresMetadata = $objDocumentSpec.RequiresMetadata
+            RequiresMetadata = $boolValidateMetadata
             RequiresVersion = $objDocumentSpec.RequiresVersion
             RequiredDocument = $arrDecisionRecordInventoryPaths -cnotcontains `
                 $objDocumentSpec.Path
@@ -7130,6 +7251,17 @@ if ($FinalizeMetadataNow) {
 
 if ($SelfTest) {
     #region Mutation self-tests
+
+    foreach ($strGeneratedMetadataPath in $objDocumentClassificationContext.GeneratedPaths) {
+        if (@($listGovernedDocumentContexts | Where-Object Path -CEQ $strGeneratedMetadataPath).Count -ne 0) {
+            throw 'Generated aggregate metadata was promoted into optional document validation.'
+        }
+    }
+    foreach ($strOptionalMetadataPath in $objDocumentClassificationContext.Tier2Paths) {
+        if (@($listGovernedDocumentContexts | Where-Object Path -CEQ $strOptionalMetadataPath).Count -ne 1) {
+            throw 'A retained Tier2 document is missing its optional metadata context.'
+        }
+    }
 
     $strExtractedSelfTestPath = '.github/workflows/Test-AgentInstructions.SelfTest.ps1'
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
