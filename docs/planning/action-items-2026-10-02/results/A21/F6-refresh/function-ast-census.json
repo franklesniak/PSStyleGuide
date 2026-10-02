@@ -1,0 +1,1673 @@
+[
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "ConvertFrom-ParserJsonContext",
+    "line": 216,
+    "endLine": 310,
+    "extentSha256": "fdc9ba99208a602458a30ef85394c593f7f85f462f4b2d841f480a788c427c8e",
+    "parameters": [
+      "Content",
+      "MaximumBytes"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][AllowEmptyString()][string] $Content",
+      "[Parameter(Mandatory)][ValidateRange(1, 16777216)][int] $MaximumBytes"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-InitialMetadataCoveragePath",
+    "line": 312,
+    "endLine": 367,
+    "extentSha256": "1b573bc860abd6042b7cb2a9834c5c61db8936f4141310675bd2a339dd7fa618",
+    "parameters": [
+      "HasTrustedBaselineManifest",
+      "TrustedBaselineExemptPath",
+      "RepositoryRelativePath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][bool] $HasTrustedBaselineManifest",
+      "[Parameter()][AllowEmptyCollection()][string[]] $TrustedBaselineExemptPath = @()",
+      "[Parameter(Mandatory)][string] $RepositoryRelativePath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "ConvertFrom-StrictUtf8Data",
+    "line": 369,
+    "endLine": 441,
+    "extentSha256": "576b37bdde7b76d44206fb546570b6dcd17641b431ba75b5675f6ef89c3e8826",
+    "parameters": [
+      "Bytes",
+      "DisplayName"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [byte[]] $Bytes",
+      "[Parameter(Mandatory)]\n        [string] $DisplayName"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-EncodingMutationRejected",
+    "line": 443,
+    "endLine": 492,
+    "extentSha256": "3a4a3726afb54530d7636361831b2973d4dd55ad64ef2e54c0679a4ad130a335",
+    "parameters": [
+      "Name",
+      "Bytes"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Name",
+      "[Parameter(Mandatory)]\n        [byte[]] $Bytes"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-RepositoryInputMetadataFailure",
+    "line": 494,
+    "endLine": 591,
+    "extentSha256": "d3d127525f51db7b103f468b4c0dc2116a128ec7ce24f50a261fec797490d214",
+    "parameters": [
+      "DisplayName",
+      "GitIndexEntryCount",
+      "GitMode",
+      "GitStage",
+      "IsFileInfo",
+      "Attributes",
+      "LinkType",
+      "UnixMode"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $DisplayName",
+      "[Parameter(Mandatory)]\n        [int] $GitIndexEntryCount",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $GitMode",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $GitStage",
+      "[Parameter(Mandatory)]\n        [bool] $IsFileInfo",
+      "[Parameter(Mandatory)]\n        [System.IO.FileAttributes] $Attributes",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $LinkType = ''",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $UnixMode = ''"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-RepositoryInputMetadataMutationRejected",
+    "line": 593,
+    "endLine": 693,
+    "extentSha256": "20f4a73f082725a5802a4d8cfe110c4da9a7841258160af43dd177a0f19aa0c3",
+    "parameters": [
+      "Name",
+      "GitIndexEntryCount",
+      "GitMode",
+      "GitStage",
+      "IsFileInfo",
+      "Attributes",
+      "LinkType",
+      "UnixMode",
+      "Failure"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Name",
+      "[Parameter()]\n        [int] $GitIndexEntryCount = 1",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $GitMode = '100644'",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $GitStage = '0'",
+      "[Parameter()]\n        [bool] $IsFileInfo = $true",
+      "[Parameter()]\n        [System.IO.FileAttributes] $Attributes = [System.IO.FileAttributes]::Normal",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $LinkType = ''",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $UnixMode = ''",
+      "[Parameter(Mandatory)]\n        [string] $Failure"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Read-BoundedStreamData",
+    "line": 695,
+    "endLine": 783,
+    "extentSha256": "281f63f62909d1c1469514adf7e7f9c8c704aaf57f5bd4be427ebae3a1da61fa",
+    "parameters": [
+      "Stream",
+      "MaximumBytes",
+      "DisplayName",
+      "CancellationToken"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [System.IO.Stream] $Stream",
+      "[Parameter(Mandatory)]\n        [ValidateRange(1, 2147483646)]\n        [int] $MaximumBytes",
+      "[Parameter(Mandatory)]\n        [string] $DisplayName",
+      "[Parameter()]\n        [Threading.CancellationToken] $CancellationToken =\n            [Threading.CancellationToken]::None"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Read-BoundedProcessData",
+    "line": 785,
+    "endLine": 879,
+    "extentSha256": "0384bf30d813b5082a930b20daf56769158cad0217889c6aaabd2e27fd493813",
+    "parameters": [
+      "Process",
+      "MaximumBytes",
+      "TimeoutMilliseconds",
+      "DisplayName"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][Diagnostics.Process] $Process",
+      "[Parameter(Mandatory)][ValidateRange(1, 2147483646)][int] $MaximumBytes",
+      "[Parameter(Mandatory)][ValidateRange(1, 60000)][int] $TimeoutMilliseconds",
+      "[Parameter(Mandatory)][string] $DisplayName"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "ConvertFrom-GitPathListData",
+    "line": 881,
+    "endLine": 964,
+    "extentSha256": "48ff3041e4793c484793087c373c12470b2924603413f4c32a85be3d613c4ad2",
+    "parameters": [
+      "Bytes",
+      "AllowDuplicatePath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [byte[]] $Bytes",
+      "[Parameter()]\n        [switch] $AllowDuplicatePath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Read-GitTrackedPath",
+    "line": 966,
+    "endLine": 1038,
+    "extentSha256": "b542dab680b6813893a7115c69aa346bd7aecb8a0878b3f0ea4e1f857fbbca45",
+    "parameters": [
+      "RepositoryRootPath",
+      "Revision",
+      "MaximumBytes"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRootPath",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $Revision = ''",
+      "[Parameter(Mandatory)]\n        [ValidateRange(1, 2147483646)]\n        [int] $MaximumBytes"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Read-GitPublishedEndpointChangedPath",
+    "line": 1040,
+    "endLine": 1111,
+    "extentSha256": "b73ebb2d09d2141e024c37d7f60a2d374f4b4e55088b8019722efb2609e29569",
+    "parameters": [
+      "RepositoryRootPath",
+      "BaselineRevision",
+      "FinalRevision",
+      "MaximumBytes"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $RepositoryRootPath",
+      "[Parameter(Mandatory)][AllowEmptyString()][string] $BaselineRevision",
+      "[Parameter(Mandatory)][string] $FinalRevision",
+      "[Parameter(Mandatory)][ValidateRange(1, 2147483646)][int] $MaximumBytes"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Read-RepositoryInputData",
+    "line": 1113,
+    "endLine": 1313,
+    "extentSha256": "7399dfc1cbf80f1cdf29166f0f1d5d09bbcce73c172a1d888b226b27673ef363",
+    "parameters": [
+      "Path",
+      "RepositoryRootPath",
+      "RepositoryRelativePath",
+      "DisplayName",
+      "MaximumBytes"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Path",
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRootPath",
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRelativePath",
+      "[Parameter(Mandatory)]\n        [string] $DisplayName",
+      "[Parameter(Mandatory)]\n        [ValidateRange(1, 2147483646)]\n        [int] $MaximumBytes"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Read-GitRevisionText",
+    "line": 1315,
+    "endLine": 1417,
+    "extentSha256": "3b909daf827352d1a1432791f7553963fcab5482b3501b15642db1e048cf6a31",
+    "parameters": [
+      "RepositoryRootPath",
+      "Revision",
+      "RepositoryRelativePath",
+      "MaximumBytes",
+      "RequireRegularFile"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRootPath",
+      "[Parameter(Mandatory)]\n        [string] $Revision",
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRelativePath",
+      "[Parameter(Mandatory)]\n        [ValidateRange(1, 2147483646)]\n        [int] $MaximumBytes",
+      "[Parameter()]\n        [switch] $RequireRegularFile"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-PublishedBaselineDocumentContext",
+    "line": 1419,
+    "endLine": 1497,
+    "extentSha256": "16aa0f74361e121185f7a1a354ce2e2195e550614b80d4d0ef6b8072e4adc9f8",
+    "parameters": [
+      "RepositoryRootPath",
+      "RepositoryRelativePath",
+      "MaximumBytes"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRootPath",
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRelativePath",
+      "[Parameter(Mandatory)]\n        [ValidateRange(1, 2147483646)]\n        [int] $MaximumBytes"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-OversizedStreamMutationRejected",
+    "line": 1499,
+    "endLine": 1622,
+    "extentSha256": "adca1a8796ed64215fbdff1b658a63247af6b09fa54d406fd10d106a9a6c7ed1",
+    "parameters": [],
+    "parameterDeclarations": []
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-MarkdownParserTransportCleanup",
+    "line": 1624,
+    "endLine": 1731,
+    "extentSha256": "880c7c4439900462c5cfd15f67aafbb06a72c72a229bbdbf2bd758c740f8e96b",
+    "parameters": [],
+    "parameterDeclarations": []
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-TomlParseContext",
+    "line": 1733,
+    "endLine": 2025,
+    "extentSha256": "58edc092b8636c89c2c89e25057a126d578d9cd2c5f37d196659374fe0e3dd15",
+    "parameters": [
+      "Content"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Content"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Invoke-MarkdownParserProcess",
+    "line": 2027,
+    "endLine": 2243,
+    "extentSha256": "7b2e6d3eddeb7681218384ac0a394c7e736b648a21e301ba9301ded6e27196cb",
+    "parameters": [
+      "StartInfo",
+      "Content"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [Diagnostics.ProcessStartInfo] $StartInfo",
+      "[Parameter(Mandatory)]\n        [AllowEmptyString()]\n        [string] $Content"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-MarkdownParseContext",
+    "line": 2245,
+    "endLine": 2748,
+    "extentSha256": "1c4ab3ce142944b1d01e6cbd6b752da2cf13101936477be270c0364ff0a833ed",
+    "parameters": [
+      "Content",
+      "LineCount"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [AllowEmptyString()]\n        [string] $Content",
+      "[Parameter(Mandatory)]\n        [ValidateRange(1, 2147483647)]\n        [int] $LineCount"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-MarkdownParserExactContext",
+    "line": 2750,
+    "endLine": 2947,
+    "extentSha256": "b96c1c3a3260bec5eaf65f3352b67508dd28de9542ae36b400c12dcab320e818",
+    "parameters": [],
+    "parameterDeclarations": []
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-OperativeMarkdownContext",
+    "line": 2949,
+    "endLine": 3018,
+    "extentSha256": "5424901850c2a12b690d7395dd78afe84f2ffe0da7a5c68a9acf5325357b789b",
+    "parameters": [
+      "Content"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Content"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "ConvertTo-OperativeMarkdownText",
+    "line": 3020,
+    "endLine": 3054,
+    "extentSha256": "070d0ba74a3d62ff49b5eaa7930b25e2deb4d1568dc2a4f9df77999a117e7b0f",
+    "parameters": [
+      "Content"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Content"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-ActiveClaudeImportReference",
+    "line": 3056,
+    "endLine": 3101,
+    "extentSha256": "94ef96bc2095492b352c8e8112fe3fc4571c2009ab5ac62c796bf6a4b3efe1cd",
+    "parameters": [
+      "MarkdownContext"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [pscustomobject] $MarkdownContext"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-ClaudeImportFailure",
+    "line": 3103,
+    "endLine": 3146,
+    "extentSha256": "f4eeda9ef7b770ee1768091dbe7f7c9fcf27415110cadadca33a403a2e4d1a90",
+    "parameters": [
+      "Name",
+      "MarkdownContext"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Name",
+      "[Parameter(Mandatory)]\n        [pscustomobject] $MarkdownContext"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-NestedClaudeImportFailure",
+    "line": 3148,
+    "endLine": 3192,
+    "extentSha256": "1431f03376e258899ca35210e27517704394fbe3e76314619471cfa7b2935b39",
+    "parameters": [
+      "DocumentContexts"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [object[]] $DocumentContexts"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-MarkdownLevelTwoSectionContext",
+    "line": 3194,
+    "endLine": 3289,
+    "extentSha256": "f4c5580b596428c52842730d7b58a528872aaf39afc4998ae6a5f9e0e49533b2",
+    "parameters": [
+      "MarkdownContext",
+      "Heading"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [pscustomobject] $MarkdownContext",
+      "[Parameter(Mandatory)]\n        [string] $Heading"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-MetadataCalendarDatePair",
+    "line": 3291,
+    "endLine": 3347,
+    "extentSha256": "ae9688a9305bd82d64627f219071b5fbecbf0264e465cd6b968fc0db42d9ed06",
+    "parameters": [
+      "VersionDate",
+      "UpdatedDate"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $VersionDate",
+      "[Parameter(Mandatory)]\n        [string] $UpdatedDate"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "ConvertTo-MetadataComparisonText",
+    "line": 3349,
+    "endLine": 3419,
+    "extentSha256": "9fd18abe52440758cfccc3ead8ba382eb7496d13a67810480d08de4159c93ff4",
+    "parameters": [
+      "Content",
+      "MetadataContext"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Content",
+      "[Parameter(Mandatory)]\n        [pscustomobject] $MetadataContext"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-PublishedEndpointLastUpdatedFailure",
+    "line": 3421,
+    "endLine": 3558,
+    "extentSha256": "bffdf409a0932f3fb225c0ffd8eabf21f8fe535ea16c8afff7977ea72e1bfb84",
+    "parameters": [
+      "Name",
+      "CurrentContent",
+      "BaseContent",
+      "TrustedEventUtcDate",
+      "RequireCurrentMaximumDateForRenderedChange"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $Name",
+      "[Parameter(Mandatory)][string] $CurrentContent",
+      "[Parameter()][AllowNull()][object] $BaseContent",
+      "[Parameter(Mandatory)][AllowEmptyString()][string] $TrustedEventUtcDate",
+      "[Parameter()][bool] $RequireCurrentMaximumDateForRenderedChange = $false"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-MarkdownParserBootstrapFailure",
+    "line": 3560,
+    "endLine": 3598,
+    "extentSha256": "fb1275d092d345202911b2d031061a73bf8208ad78817319e3e7d282db29500d",
+    "parameters": [
+      "RepositoryRootPath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $RepositoryRootPath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Invoke-SafeTemporaryDirectoryRemoval",
+    "line": 3600,
+    "endLine": 3695,
+    "extentSha256": "f3f39e0faf5ba6bb74bef59f3a6309c7b4c39429b8d57d76e0244d206b29bf15",
+    "parameters": [
+      "LiteralPath",
+      "SystemTemporaryRootPath",
+      "MaximumAttempts",
+      "InitialDelayMilliseconds"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [ValidateNotNullOrEmpty()]\n        [string] $LiteralPath",
+      "[Parameter(Mandatory)]\n        [ValidateNotNullOrEmpty()]\n        [string] $SystemTemporaryRootPath",
+      "[Parameter()]\n        [ValidateRange(1, 10)]\n        [int] $MaximumAttempts = 5",
+      "[Parameter()]\n        [ValidateRange(1, 1000)]\n        [int] $InitialDelayMilliseconds = 50"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-RecursivePersonalMemoryIgnoreContract",
+    "line": 3697,
+    "endLine": 3754,
+    "extentSha256": "52e07ce1e8680cfaba59064da1abeafb55fa96f33337567dac4b8beac4c0d80b",
+    "parameters": [
+      "GitIgnoreContent",
+      "TrackedPath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][AllowEmptyString()][string] $GitIgnoreContent",
+      "[Parameter(Mandatory)][AllowEmptyCollection()][string[]] $TrackedPath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-GitIgnorePathEffective",
+    "line": 3756,
+    "endLine": 3842,
+    "extentSha256": "040c9ada2d2a3de262687ca6f69d709cb39b983169506311fc7143897e3b9017",
+    "parameters": [
+      "GitIgnoreContent",
+      "RepositoryRelativePath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [AllowEmptyString()]\n        [string] $GitIgnoreContent",
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRelativePath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-ProhibitedClaudeLocalPath",
+    "line": 3844,
+    "endLine": 3875,
+    "extentSha256": "5ea99ae263c73aa937ab0d768647f19131ed578a3fe59419de789460c03e8631",
+    "parameters": [
+      "RepositoryRelativePath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $RepositoryRelativePath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-GovernedInstructionPath",
+    "line": 3877,
+    "endLine": 3944,
+    "extentSha256": "af0fdf461f879c2daacef929b5ede3f6e3b32f1c07803ee1d620aadf36c8a013",
+    "parameters": [
+      "RepositoryRelativePath",
+      "GovernedRootPaths"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRelativePath",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $GovernedRootPaths"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-GovernedInstructionPathCaseMismatch",
+    "line": 3946,
+    "endLine": 4006,
+    "extentSha256": "37cb2c1346fa0d186cb8390140823f58c8589cfba28ab66065c0be325ed8d7ed",
+    "parameters": [
+      "RepositoryRelativePath",
+      "GovernedRootPaths"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRelativePath",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $GovernedRootPaths"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-ExactPathCaseMismatch",
+    "line": 4008,
+    "endLine": 4052,
+    "extentSha256": "a1f4d1f5c75a2c386a9b39e840eb653d94888f373fb82ca7e66931b53d6bc93d",
+    "parameters": [
+      "RepositoryRelativePath",
+      "CanonicalPaths"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRelativePath",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $CanonicalPaths"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-GovernedInstructionInventoryPath",
+    "line": 4054,
+    "endLine": 4100,
+    "extentSha256": "d2150587fa9a5083c07388d17addab118fca4ed2f12b45df96756606c8be5fbf",
+    "parameters": [
+      "RepositoryRelativePath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRelativePath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-AgentInstructionWorkflowPath",
+    "line": 4102,
+    "endLine": 4150,
+    "extentSha256": "a90cd7309f50913a04a9e6c70d195a36f90875e99a7d54e2d0fc5dc92973e7b4",
+    "parameters": [
+      "RepositoryRelativePath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $RepositoryRelativePath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DecisionRecordPathFailure",
+    "line": 4152,
+    "endLine": 4186,
+    "extentSha256": "798860e3688426b9733d39a276e1481ca3e5ad8b2ece5a60f27026dd2b660b31",
+    "parameters": [
+      "RepositoryRelativePath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $RepositoryRelativePath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-GovernedInstructionInventoryFailure",
+    "line": 4188,
+    "endLine": 4280,
+    "extentSha256": "7b149cbadfe48de0a10636982d891c70cb272d88df1bc6cb4e5e39172a95d579",
+    "parameters": [
+      "CatalogPaths",
+      "TrackedPaths"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $CatalogPaths",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrackedPaths"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DocumentationClaimFailure",
+    "line": 4282,
+    "endLine": 4349,
+    "extentSha256": "2f21f9cbfe162047a6f5ae0c05f7a26ab85b9af161de3e66d0a47ed3f486289a",
+    "parameters": [
+      "Content",
+      "TrackedPaths"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Content",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrackedPaths"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DecisionLifecyclePolicyFailure",
+    "line": 4351,
+    "endLine": 4439,
+    "extentSha256": "3a7a18525bf5d025b909325108925c4bf9fbe15bffb3ae50a8c2fc27aa7d4feb",
+    "parameters": [
+      "Content"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Content"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-DecisionLifecycleStatusLabel",
+    "line": 4441,
+    "endLine": 4481,
+    "extentSha256": "38397f243e667db72279c1208f374638fa8add1ed3d5d96d6712c145fd059ac2",
+    "parameters": [
+      "Label"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [AllowEmptyString()]\n        [string] $Label"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DecisionRecordLifecycleFailure",
+    "line": 4483,
+    "endLine": 4611,
+    "extentSha256": "b48bd3ab7047478050f8fe25585c9131704d6ece334eec91a1d3a25afdeb502b",
+    "parameters": [
+      "Name",
+      "CurrentContent",
+      "BaselineContent"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $Name",
+      "[Parameter(Mandatory)][string] $CurrentContent",
+      "[Parameter()][AllowNull()][string] $BaselineContent"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DocumentMetadataClassificationContext",
+    "line": 4613,
+    "endLine": 4856,
+    "extentSha256": "39d4e6d2ff5f0f4408f9653a591c47bd33020b4b845e3763acc1451f98fbf9bd",
+    "parameters": [
+      "Content",
+      "TrackedPath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Content",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrackedPath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-InitialDocumentMetadataClassificationFailure",
+    "line": 4858,
+    "endLine": 4919,
+    "extentSha256": "1f035e3883d4febcd7ed27c3f340b873981ecb4eef6927da33f1895fa137876b",
+    "parameters": [
+      "BaselineRevision",
+      "TrustedBaselineValidatorSha256",
+      "CandidateContext"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][AllowEmptyString()][string] $BaselineRevision",
+      "[Parameter(Mandatory)][AllowEmptyString()][string] $TrustedBaselineValidatorSha256",
+      "[Parameter(Mandatory)][pscustomobject] $CandidateContext"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DocumentMetadataClassificationExpansionFailure",
+    "line": 4921,
+    "endLine": 5047,
+    "extentSha256": "8cf6a76c90377c808a9be0f7b02d57357824d1faf09e9df97fb5bdb954857f69",
+    "parameters": [
+      "HasTrustedBaselineManifest",
+      "TrustedBaselineExemptPath",
+      "TrustedBaselineAuthorizedExemptionPath",
+      "CandidateExemptPath",
+      "TrustedBaselineGeneratedPath",
+      "CandidateGeneratedPath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [bool] $HasTrustedBaselineManifest",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineExemptPath",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineAuthorizedExemptionPath",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $CandidateExemptPath",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineGeneratedPath",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $CandidateGeneratedPath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DiscoveredGovernedMarkdownDocumentPath",
+    "line": 5049,
+    "endLine": 5173,
+    "extentSha256": "874160f026e42e3b2705a72cbd71ba986b838f122603e6e7b7a5427ddb338522",
+    "parameters": [
+      "CandidatePath",
+      "KnownGovernedPath",
+      "ExemptPath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $CandidatePath",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $KnownGovernedPath",
+      "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $ExemptPath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-DocumentMetadataHeaderIntent",
+    "line": 5175,
+    "endLine": 5280,
+    "extentSha256": "9f1e3a258a2ec9b8d186a3fb24ee35fad985a1793714a251bff5aa421c2b4374",
+    "parameters": [
+      "Content"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][AllowEmptyString()][string] $Content"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DocumentMetadataContext",
+    "line": 5282,
+    "endLine": 5574,
+    "extentSha256": "03005b9511b556ce92289a7f34b4c80d2ef5ed3f8ef01b1387671cbf7305914b",
+    "parameters": [
+      "Content",
+      "RequiresVersion"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Content",
+      "[Parameter()]\n        [bool] $RequiresVersion = $true"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-PublishedEndpointMetadataFailure",
+    "line": 5576,
+    "endLine": 5823,
+    "extentSha256": "f9be223836ef9a08b93d630750f52ae396f336e487a1a537479b8bcb512ded76",
+    "parameters": [
+      "Name",
+      "CurrentContent",
+      "ParentContent",
+      "ExpectedUtcDate",
+      "IsNewDocumentTransition",
+      "RequireExpectedUtcDateForRenderedChange"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Name",
+      "[Parameter(Mandatory)]\n        [string] $CurrentContent",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $ParentContent",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $ExpectedUtcDate = ''",
+      "[Parameter(Mandatory)]\n        [bool] $IsNewDocumentTransition",
+      "[Parameter()]\n        [bool] $RequireExpectedUtcDateForRenderedChange = $true"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-TomlSemanticStatementContext",
+    "line": 5825,
+    "endLine": 5888,
+    "extentSha256": "d5b7cc75a441811ca18ccf15d212e25f1adfe0e7e10523feffcb73826a26bd13",
+    "parameters": [
+      "Content"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [AllowEmptyString()]\n        [string] $Content"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-GitHubPluginEnablementContext",
+    "line": 5890,
+    "endLine": 5954,
+    "extentSha256": "83d7b1420a54f359c9d5e108662111b6f5b4fa76ce6df0e2f6dd50b18e23e5f9",
+    "parameters": [
+      "Content"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Content"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "ConvertTo-DisabledGitHubPluginMutation",
+    "line": 5956,
+    "endLine": 6010,
+    "extentSha256": "b4cbc4783a90b47cde6e77db05ca168503fd5813c18840f503e8b0cd031ae07e",
+    "parameters": [
+      "Content"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $Content"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-AgentInstructionFailure",
+    "line": 6012,
+    "endLine": 6443,
+    "extentSha256": "3f9861c5cfe3b34063d827818d9a8eb3e5ed499f034c20c28150a59b37b483b8",
+    "parameters": [
+      "AgentsContent",
+      "ClaudeContent",
+      "CodexConfigContent",
+      "ParentAgentsContent",
+      "ParentClaudeContent",
+      "AgentsExpectedUtcDate",
+      "ClaudeExpectedUtcDate"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)]\n        [string] $AgentsContent",
+      "[Parameter(Mandatory)]\n        [string] $ClaudeContent",
+      "[Parameter(Mandatory)]\n        [string] $CodexConfigContent",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $ParentAgentsContent",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $ParentClaudeContent",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $AgentsExpectedUtcDate = ''",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $ClaudeExpectedUtcDate = ''"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-Failure",
+    "line": 6445,
+    "endLine": 6548,
+    "extentSha256": "c2ab0e25bf8ab00bdf9fe10bff477564de2ca0300d18111e72dc1c076d56235c",
+    "parameters": [
+      "Name",
+      "AgentsContent",
+      "ClaudeContent",
+      "CodexConfigContent",
+      "Failure",
+      "ParentAgentsContent",
+      "ParentClaudeContent",
+      "AgentsExpectedUtcDate",
+      "ClaudeExpectedUtcDate"
+    ],
+    "parameterDeclarations": [
+      "[Parameter()][string] $Name",
+      "[Parameter()]\n        [string] $AgentsContent = $script:strAgentsContent",
+      "[Parameter()]\n        [string] $ClaudeContent = $script:strClaudeContent",
+      "[Parameter()]\n        [string] $CodexConfigContent = $script:strCodexConfigContent",
+      "[Parameter(Mandatory)]\n        [string] $Failure",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $ParentAgentsContent",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $ParentClaudeContent",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $AgentsExpectedUtcDate = ''",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $ClaudeExpectedUtcDate = ''"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-FixtureAccepted",
+    "line": 6550,
+    "endLine": 6644,
+    "extentSha256": "a6f4c509eab1ec9aed3f492e2fde0fdb24a56472563a3a3a91194738e0338ca5",
+    "parameters": [
+      "Name",
+      "AgentsContent",
+      "ClaudeContent",
+      "CodexConfigContent",
+      "ParentAgentsContent",
+      "ParentClaudeContent",
+      "AgentsExpectedUtcDate",
+      "ClaudeExpectedUtcDate"
+    ],
+    "parameterDeclarations": [
+      "[Parameter()][string] $Name",
+      "[Parameter()]\n        [string] $AgentsContent = $script:strAgentsContent",
+      "[Parameter()]\n        [string] $ClaudeContent = $script:strClaudeContent",
+      "[Parameter()]\n        [string] $CodexConfigContent = $script:strCodexConfigContent",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $ParentAgentsContent",
+      "[Parameter()]\n        [AllowNull()]\n        [string] $ParentClaudeContent",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $AgentsExpectedUtcDate = ''",
+      "[Parameter()]\n        [AllowEmptyString()]\n        [string] $ClaudeExpectedUtcDate = ''"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.SelfTest.ps1",
+    "name": "Assert-DocumentMetadataClassificationSelfTest",
+    "line": 48,
+    "endLine": 454,
+    "extentSha256": "ac102377f37a2ab1285bb373f6b0e5484b717bb658efa4207f4670584a038f9c",
+    "parameters": [
+      "MaximumMetadataUtcDate"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $MaximumMetadataUtcDate"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.SelfTest.ps1",
+    "name": "Assert-PublishedMetadataGitFixture",
+    "line": 456,
+    "endLine": 605,
+    "extentSha256": "b29b7c9adcae1902a758e3960fa7e9c819cafd36eec7e101a7430d9fc6d753db",
+    "parameters": [
+      "MaximumMetadataUtcDate"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $MaximumMetadataUtcDate"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.SelfTest.ps1",
+    "name": "Assert-ClassificationAdmissionGitFixture",
+    "line": 607,
+    "endLine": 795,
+    "extentSha256": "28abaa0eae563a67c8a7cb32724513890aa3f5ff7f03af12c994fde9fd240428",
+    "parameters": [
+      "RepositoryRootPath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $RepositoryRootPath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.SelfTest.ps1",
+    "name": "Assert-AuthorFinalizationGitFixture",
+    "line": 797,
+    "endLine": 1422,
+    "extentSha256": "f695e3c3aa798194f735bf0e32bab5c7877dee95df00fc3b343c83dd5b922f20",
+    "parameters": [
+      "RepositoryRootPath"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $RepositoryRootPath"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.SelfTest.ps1",
+    "name": "Assert-DocumentMetadataPlacementSelfTest",
+    "line": 1424,
+    "endLine": 1587,
+    "extentSha256": "0227922a9771151f1fa5c45205cbb9197af43a04ac72a10809290ec8452cd6a1",
+    "parameters": [
+      "RepositoryRootPath",
+      "MaximumMetadataUtcDate"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $RepositoryRootPath",
+      "[Parameter(Mandatory)][string] $MaximumMetadataUtcDate"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.SelfTest.ps1",
+    "name": "Assert-OptionalMetadataSelfTest",
+    "line": 1595,
+    "endLine": 1694,
+    "extentSha256": "ac3e6135d0ec875e0bd1625d9ec2fe3b5f60cc299e4625ed3062ef48896a82fc",
+    "parameters": [
+      "MaximumMetadataUtcDate"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $MaximumMetadataUtcDate"
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.SelfTest.ps1",
+    "name": "ConvertTo-CreatedPushCommitEvidenceObject",
+    "line": 1856,
+    "endLine": 1915,
+    "extentSha256": "c04929f4c6d5ba9d808299ec1f8a1aab892d7dcfa28bc4bf79fcad7f9ebf5625",
+    "parameters": [
+      "Id",
+      "Distinct",
+      "Timestamp"
+    ],
+    "parameterDeclarations": [
+      "[Parameter(Mandatory)][string] $Id",
+      "[Parameter(Mandatory)][bool] $Distinct",
+      "[string] $Timestamp = ''"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "ConvertFrom-StrictUtf8Data",
+    "line": 210,
+    "endLine": 287,
+    "extentSha256": "f70897ae796b1002d65c2a7952df1a1a4bd9b1fc1c8eb8a4e19788e8930b679a",
+    "parameters": [
+      "Bytes",
+      "DisplayName"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-EncodingMutationRejected",
+    "line": 289,
+    "endLine": 341,
+    "extentSha256": "9445d65fa1c6468d89d5752bb306d1653397a1843fc381cc76d13c36c5102d4e",
+    "parameters": [
+      "Name",
+      "Bytes"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-RepositoryInputMetadataFailure",
+    "line": 343,
+    "endLine": 446,
+    "extentSha256": "c7446a4031bfc5816d8e18da76cffcbe4884c7a70ca5e72b182343ed142ea5fc",
+    "parameters": [
+      "DisplayName",
+      "GitIndexEntryCount",
+      "GitMode",
+      "GitStage",
+      "IsFileInfo",
+      "Attributes",
+      "LinkType",
+      "UnixMode"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-RepositoryInputMetadataMutationRejected",
+    "line": 448,
+    "endLine": 553,
+    "extentSha256": "7666f5527fa25914abad9b458e954aed61c3135720a36d675596d9b39667d47f",
+    "parameters": [
+      "Name",
+      "GitIndexEntryCount",
+      "GitMode",
+      "GitStage",
+      "IsFileInfo",
+      "Attributes",
+      "LinkType",
+      "UnixMode",
+      "ExpectedFailure"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-StagedInputMatchFailure",
+    "line": 555,
+    "endLine": 621,
+    "extentSha256": "ada3dc6c04d2ae33299cbcfbd988cf9f133b9885235fbf81676d45a2c02f4074",
+    "parameters": [
+      "DisplayName",
+      "RequireMatch",
+      "WorktreeContent",
+      "IndexContent"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Read-BoundedStreamData",
+    "line": 623,
+    "endLine": 699,
+    "extentSha256": "4df5693f2188907ecd57608a1a2d591a211659e756ad62b884395ec17117c25c",
+    "parameters": [
+      "Stream",
+      "MaximumBytes",
+      "DisplayName"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Read-RepositoryInputData",
+    "line": 701,
+    "endLine": 937,
+    "extentSha256": "c4d16c755aca75a7af7e49d83eedab017baee2465354720c257cb8404db607f8",
+    "parameters": [
+      "Path",
+      "RepositoryRootPath",
+      "RepositoryRelativePath",
+      "DisplayName",
+      "MaximumBytes",
+      "RequireIndexContentMatch"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Read-GitRevisionText",
+    "line": 939,
+    "endLine": 1065,
+    "extentSha256": "c9fd9206bc38b21fbdb3f50a31ce8339a08f27e77c43894be3f80ca933f0dfb2",
+    "parameters": [
+      "RepositoryRootPath",
+      "Revision",
+      "RepositoryRelativePath",
+      "MaximumBytes",
+      "RequireRegularFile"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Invoke-GitNulRecordQuery",
+    "line": 1067,
+    "endLine": 1179,
+    "extentSha256": "1f8c8d79862c30d57a1d4988b90f55d9714c2170fa1a6c7a4abe49f75f6bc613",
+    "parameters": [
+      "RepositoryRootPath",
+      "Argument",
+      "DisplayName",
+      "MaximumBytes"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-GitRevisionTreeEntryContext",
+    "line": 1181,
+    "endLine": 1263,
+    "extentSha256": "2dca0df0671977eac34d422c98fac8d38809971fe9a86c0e95a30ca01670d75f",
+    "parameters": [
+      "RepositoryRootPath",
+      "Revision",
+      "RepositoryRelativePath"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-GovernedDocumentParentContext",
+    "line": 1265,
+    "endLine": 1323,
+    "extentSha256": "afced2a375a6a7135b1243f4a23eb24d46c53434126ca7f5cef9e8bfca8676c0",
+    "parameters": [
+      "RepositoryRootPath",
+      "RepositoryRelativePath",
+      "MaximumBytes",
+      "Revision",
+      "LocalBaselineRevision",
+      "PublishedBaselineRevision"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-OversizedStreamMutationRejected",
+    "line": 1325,
+    "endLine": 1372,
+    "extentSha256": "fd7009483b9d43a3c0e42fa50783cca4ea1a1f0f40e452f55e6bdd9520746717",
+    "parameters": []
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-WorkflowCredentialProjection",
+    "line": 1374,
+    "endLine": 1429,
+    "extentSha256": "3a2c2167435148b7ce72d3f8827be8c9d8fa8edbbaa7fa88d43065889c9a7cc2",
+    "parameters": [
+      "WorkflowContent"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-HuskySetupContractFailure",
+    "line": 1432,
+    "endLine": 1736,
+    "extentSha256": "b6b6af557059af5c0cc052bfe883724a1418abc75565b6da3dfa7956912ad2c4",
+    "parameters": [
+      "RootPackageContent",
+      "WorkflowPackageContent",
+      "HookContent",
+      "CopilotSetupContent",
+      "PreCommitConfigContent"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-PreCommitBootstrapContractFailure",
+    "line": 1739,
+    "endLine": 1874,
+    "extentSha256": "02dc1e5d07b5cc6098cf890c412dc70e973be74f27283210ed270d54b6662371",
+    "parameters": [
+      "AgentsContent",
+      "ClaudeContent",
+      "ScriptIndexContent",
+      "RequirementsContent"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-Python312Application",
+    "line": 1876,
+    "endLine": 1961,
+    "extentSha256": "e4143fb2c56072f7e6b899bb603e3e6f59b5fd0a02743a41538440d7def610dd",
+    "parameters": [
+      "Path",
+      "PrefixArgument"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-Python312CommandContext",
+    "line": 1963,
+    "endLine": 2069,
+    "extentSha256": "26967ce36a3c75d2d14ba6c09fc015164a94098050f703fd3387a9107c582898",
+    "parameters": [
+      "WindowsPlatform",
+      "CommandResolver",
+      "VersionProbe"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-TomlParseContext",
+    "line": 2071,
+    "endLine": 2368,
+    "extentSha256": "36358382c2370541acf5613102b3260eca73444d0df31d301fd3fc7261b5ad35",
+    "parameters": [
+      "Content"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Invoke-NodeRuntimeProbe",
+    "line": 2370,
+    "endLine": 2448,
+    "extentSha256": "6e7d73e2241c0c7a40200f5f86733b34c814ad7e83122b943c19e50f5e01110b",
+    "parameters": [
+      "Path"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-NodeApplicationContext",
+    "line": 2450,
+    "endLine": 2615,
+    "extentSha256": "d141e97e8f59c22dc2d51a06960bf2f61434948efc07b7677398d80761ea6bf8",
+    "parameters": [
+      "CommandResolver",
+      "RuntimeProbe",
+      "ApplicationResolver"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-MarkdownParseContext",
+    "line": 2617,
+    "endLine": 2987,
+    "extentSha256": "8030ca081537a941cf859038026673aca8d63912f90389e9ab41c17c0714c2d4",
+    "parameters": [
+      "Content",
+      "LineCount"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-OperativeMarkdownContext",
+    "line": 2989,
+    "endLine": 3057,
+    "extentSha256": "9e0f506906739cd236953a644e93881f4cecae2e2d9cb55eea7ebfda1f71ec1a",
+    "parameters": [
+      "Content"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "ConvertTo-OperativeMarkdownText",
+    "line": 3059,
+    "endLine": 3095,
+    "extentSha256": "9fe396490dcbc9d59768067e05ec05739c5b15229a927eae895a9243acbf5cc4",
+    "parameters": [
+      "Content"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-MarkdownLevelTwoSectionContext",
+    "line": 3097,
+    "endLine": 3194,
+    "extentSha256": "f8b6ee824e52767a7d5aef8fcd553b78251552ab5341f48abf40b10b1f81e02e",
+    "parameters": [
+      "MarkdownContext",
+      "Heading"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-MetadataCalendarDate",
+    "line": 3196,
+    "endLine": 3242,
+    "extentSha256": "bf5adee766049acb800aeb6b2fbbf647359b2724d1d6aa5691050ad1d310e5b2",
+    "parameters": [
+      "Date"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-MetadataCalendarDatePair",
+    "line": 3244,
+    "endLine": 3292,
+    "extentSha256": "955eda27a2fbbe23c0f53bb6eb71a7094489870f2e087c6bb8f303bad45a3b32",
+    "parameters": [
+      "VersionDate",
+      "UpdatedDate"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "ConvertTo-MetadataComparisonText",
+    "line": 3294,
+    "endLine": 3368,
+    "extentSha256": "d2972a92aa5f4be3cba79ab00c020374c2974b5777f284309be29b101de34df2",
+    "parameters": [
+      "Content",
+      "MetadataContext"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-GovernedInstructionInventoryFailure",
+    "line": 3370,
+    "endLine": 3457,
+    "extentSha256": "a8a87872c85298b03b3fe078a94b322b8bc0a204c160df93dc99eae743fbd3d6",
+    "parameters": [
+      "CatalogPaths",
+      "TrackedPaths"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-GovernedDecisionDocumentPath",
+    "line": 3459,
+    "endLine": 3506,
+    "extentSha256": "a1f7675114af1eb76bdf6b87af03fe5ec685702e1a7c8f0f1bfe30a8279288a9",
+    "parameters": [
+      "CandidatePath"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DecisionRecordContractFailure",
+    "line": 3508,
+    "endLine": 3639,
+    "extentSha256": "d4417d18331fb59af5f72a04b0b92dba561e1b2a243c30da3f397c08531a7188",
+    "parameters": [
+      "Name",
+      "Content",
+      "MetadataContext"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DocumentMetadataClassificationContext",
+    "line": 3641,
+    "endLine": 3873,
+    "extentSha256": "68d8ff85fd63b22fcd7882f58cb0b844668e8202f13fdc201e7e8e14a6ce79a1",
+    "parameters": [
+      "Content",
+      "TrackedPath"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DocumentMetadataClassificationExpansionFailure",
+    "line": 3875,
+    "endLine": 3967,
+    "extentSha256": "567b788f5ce13b4e5861fe92e2c40fe671348ed1e88939a4a383e953fffa9cb9",
+    "parameters": [
+      "HasTrustedBaselineManifest",
+      "TrustedBaselineExemptPath",
+      "TrustedBaselineAuthorizedExemptionPath",
+      "CandidateExemptPath"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DiscoveredGovernedMarkdownDocumentPath",
+    "line": 3969,
+    "endLine": 4093,
+    "extentSha256": "874160f026e42e3b2705a72cbd71ba986b838f122603e6e7b7a5427ddb338522",
+    "parameters": [
+      "CandidatePath",
+      "KnownGovernedPath",
+      "ExemptPath"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-ProhibitedTrackedClaudeLocalFailure",
+    "line": 4095,
+    "endLine": 4141,
+    "extentSha256": "eadab76a1c712ffcfa12ec9e1f054a4ed22964418dc714c411c0b22bc70fd705",
+    "parameters": [
+      "TrackedPaths"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DocumentMetadataContext",
+    "line": 4143,
+    "endLine": 4439,
+    "extentSha256": "72798f41f3b069947b5b9c121e7a61e3844d0ffcb4b49ca5bf93e9d4bd84733a",
+    "parameters": [
+      "Content"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Test-DocumentMetadataHeaderIntent",
+    "line": 4441,
+    "endLine": 4524,
+    "extentSha256": "72512738fab3a2fcf4672340a32f60329b9165d0bc8737f018d2f2f968a5c935",
+    "parameters": [
+      "Content"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-DocumentMetadataTransitionFailure",
+    "line": 4526,
+    "endLine": 4859,
+    "extentSha256": "8c34708854326059c50b6657d9ef28d6e0a6e1c44c90e782764185362057e128",
+    "parameters": [
+      "Name",
+      "CurrentContent",
+      "ParentContent",
+      "ExpectedUtcDate",
+      "IsNewDocumentTransition",
+      "RequireExpectedUtcDateForRenderedChange",
+      "RequirePublishedRevisionConvention",
+      "MetadataRequired"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-TomlSemanticStatementContext",
+    "line": 4861,
+    "endLine": 4927,
+    "extentSha256": "db92fcbf043e93c897a27a452eceeeb443f76ae467bfcfc6cf1db44012938321",
+    "parameters": [
+      "Content"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-GitHubPluginEnablementContext",
+    "line": 4929,
+    "endLine": 4996,
+    "extentSha256": "9e6adc907695ed19b1320bfb4a381cb0c730f92dbcc8553970cb864d5c062b80",
+    "parameters": [
+      "Content"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "ConvertTo-DisabledGitHubPluginMutation",
+    "line": 4998,
+    "endLine": 5055,
+    "extentSha256": "b8606bbcc3f8f7d3a432baa956dafd6b8065b85277536168fc57bb3b92947631",
+    "parameters": [
+      "Content"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Get-AgentInstructionFailure",
+    "line": 5057,
+    "endLine": 5500,
+    "extentSha256": "1652c883fee36f6a6249dc7b4209bae6f44875a3e9ae1122c6daf4ed59302d99",
+    "parameters": [
+      "AgentsContent",
+      "ClaudeContent",
+      "CodexConfigContent",
+      "ParentAgentsContent",
+      "ParentClaudeContent",
+      "AgentsExpectedUtcDate",
+      "ClaudeExpectedUtcDate"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-MutationRejected",
+    "line": 5502,
+    "endLine": 5607,
+    "extentSha256": "9cca2937b134e59896d5cc74813dc78b40d8eb5f05cfe37b1abde6a5942a11eb",
+    "parameters": [
+      "Name",
+      "AgentsContent",
+      "ClaudeContent",
+      "CodexConfigContent",
+      "ExpectedFailure",
+      "ParentAgentsContent",
+      "ParentClaudeContent",
+      "AgentsExpectedUtcDate",
+      "ClaudeExpectedUtcDate"
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "name": "Assert-FixtureAccepted",
+    "line": 5609,
+    "endLine": 5704,
+    "extentSha256": "609d0a0fd35db195346e618c9e4a64bd4b5d0c805b5589b49e94a7d95c50ad7d",
+    "parameters": [
+      "Name",
+      "AgentsContent",
+      "ClaudeContent",
+      "CodexConfigContent",
+      "ParentAgentsContent",
+      "ParentClaudeContent",
+      "AgentsExpectedUtcDate",
+      "ClaudeExpectedUtcDate"
+    ]
+  }
+]

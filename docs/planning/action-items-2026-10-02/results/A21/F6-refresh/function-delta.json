@@ -1,0 +1,337 @@
+{
+  "summary": {
+    "proposedPSFunctions": 65,
+    "unchangedTFFunctions": 43,
+    "sharedNames": 26,
+    "identicalSharedExtentNames": [
+      "Get-DiscoveredGovernedMarkdownDocumentPath"
+    ],
+    "staticParserErrors": 0,
+    "executedProductTests": 0,
+    "TFRecordsReusedFromExactUnchangedBlob": true
+  },
+  "versusPriorF81Census": {
+    "added": [
+      {
+        "repository": "PS",
+        "file": "Test-AgentInstructions.SelfTest.ps1",
+        "name": "Assert-OptionalMetadataSelfTest",
+        "line": 1595,
+        "endLine": 1694,
+        "extentSha256": "ac3e6135d0ec875e0bd1625d9ec2fe3b5f60cc299e4625ed3062ef48896a82fc",
+        "parameters": [
+          "MaximumMetadataUtcDate"
+        ],
+        "parameterDeclarations": [
+          "[Parameter(Mandatory)][string] $MaximumMetadataUtcDate"
+        ]
+      },
+      {
+        "repository": "PS",
+        "file": "Test-AgentInstructions.ps1",
+        "name": "Test-DocumentMetadataHeaderIntent",
+        "line": 5175,
+        "endLine": 5280,
+        "extentSha256": "9f1e3a258a2ec9b8d186a3fb24ee35fad985a1793714a251bff5aa421c2b4374",
+        "parameters": [
+          "Content"
+        ],
+        "parameterDeclarations": [
+          "[Parameter(Mandatory)][AllowEmptyString()][string] $Content"
+        ]
+      }
+    ],
+    "removed": [],
+    "changed": [
+      {
+        "file": "Test-AgentInstructions.SelfTest.ps1",
+        "name": "Assert-AuthorFinalizationGitFixture",
+        "before": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-AuthorFinalizationGitFixture",
+          "line": 728,
+          "endLine": 1271,
+          "extentSha256": "27b6a61ffda91c48c94bbd98b6881775939fd364305d07f04e8a860aa602d95a",
+          "parameters": [
+            "RepositoryRootPath"
+          ]
+        },
+        "after": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-AuthorFinalizationGitFixture",
+          "line": 797,
+          "endLine": 1422,
+          "extentSha256": "f695e3c3aa798194f735bf0e32bab5c7877dee95df00fc3b343c83dd5b922f20",
+          "parameters": [
+            "RepositoryRootPath"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)][string] $RepositoryRootPath"
+          ]
+        },
+        "parameterNamesChanged": false
+      },
+      {
+        "file": "Test-AgentInstructions.SelfTest.ps1",
+        "name": "Assert-ClassificationAdmissionGitFixture",
+        "before": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-ClassificationAdmissionGitFixture",
+          "line": 561,
+          "endLine": 726,
+          "extentSha256": "93af66686c6cbd2a8637340cf02cb09c93061dca419c6f615dcd74967f92483b",
+          "parameters": [
+            "RepositoryRootPath"
+          ]
+        },
+        "after": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-ClassificationAdmissionGitFixture",
+          "line": 607,
+          "endLine": 795,
+          "extentSha256": "28abaa0eae563a67c8a7cb32724513890aa3f5ff7f03af12c994fde9fd240428",
+          "parameters": [
+            "RepositoryRootPath"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)][string] $RepositoryRootPath"
+          ]
+        },
+        "parameterNamesChanged": false
+      },
+      {
+        "file": "Test-AgentInstructions.SelfTest.ps1",
+        "name": "Assert-DocumentMetadataClassificationSelfTest",
+        "before": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-DocumentMetadataClassificationSelfTest",
+          "line": 48,
+          "endLine": 408,
+          "extentSha256": "23fddef43c57a0ef407a02e60d89eba14a95609c32810be7d77c3d5ea0aaa11d",
+          "parameters": [
+            "MaximumMetadataUtcDate"
+          ]
+        },
+        "after": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-DocumentMetadataClassificationSelfTest",
+          "line": 48,
+          "endLine": 454,
+          "extentSha256": "ac102377f37a2ab1285bb373f6b0e5484b717bb658efa4207f4670584a038f9c",
+          "parameters": [
+            "MaximumMetadataUtcDate"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)][string] $MaximumMetadataUtcDate"
+          ]
+        },
+        "parameterNamesChanged": false
+      },
+      {
+        "file": "Test-AgentInstructions.ps1",
+        "name": "Get-DocumentMetadataClassificationExpansionFailure",
+        "before": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.ps1",
+          "name": "Get-DocumentMetadataClassificationExpansionFailure",
+          "line": 4921,
+          "endLine": 5015,
+          "extentSha256": "2c510985ff3f5b1687fd4f181808adc3c9d16ba11ad1e43f7ea3a9a09361ff6f",
+          "parameters": [
+            "HasTrustedBaselineManifest",
+            "TrustedBaselineExemptPath",
+            "TrustedBaselineAuthorizedExemptionPath",
+            "CandidateExemptPath"
+          ]
+        },
+        "after": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.ps1",
+          "name": "Get-DocumentMetadataClassificationExpansionFailure",
+          "line": 4921,
+          "endLine": 5047,
+          "extentSha256": "8cf6a76c90377c808a9be0f7b02d57357824d1faf09e9df97fb5bdb954857f69",
+          "parameters": [
+            "HasTrustedBaselineManifest",
+            "TrustedBaselineExemptPath",
+            "TrustedBaselineAuthorizedExemptionPath",
+            "CandidateExemptPath",
+            "TrustedBaselineGeneratedPath",
+            "CandidateGeneratedPath"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)]\n        [bool] $HasTrustedBaselineManifest",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineExemptPath",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineAuthorizedExemptionPath",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $CandidateExemptPath",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineGeneratedPath",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $CandidateGeneratedPath"
+          ]
+        },
+        "parameterNamesChanged": true
+      }
+    ],
+    "unchangedExtentCount": 59
+  },
+  "versusParent519c420": {
+    "added": [],
+    "removed": [],
+    "changed": [
+      {
+        "file": "Test-AgentInstructions.SelfTest.ps1",
+        "name": "Assert-AuthorFinalizationGitFixture",
+        "before": {
+          "repository": "PS-parent",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-AuthorFinalizationGitFixture",
+          "line": 728,
+          "endLine": 1319,
+          "extentSha256": "1c461bc5019d779a8f9e8599854e5449e060999d20be6a838787e9d7ffe8763d",
+          "parameters": [
+            "RepositoryRootPath"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)][string] $RepositoryRootPath"
+          ]
+        },
+        "after": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-AuthorFinalizationGitFixture",
+          "line": 797,
+          "endLine": 1422,
+          "extentSha256": "f695e3c3aa798194f735bf0e32bab5c7877dee95df00fc3b343c83dd5b922f20",
+          "parameters": [
+            "RepositoryRootPath"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)][string] $RepositoryRootPath"
+          ]
+        },
+        "parameterNamesChanged": false
+      },
+      {
+        "file": "Test-AgentInstructions.SelfTest.ps1",
+        "name": "Assert-ClassificationAdmissionGitFixture",
+        "before": {
+          "repository": "PS-parent",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-ClassificationAdmissionGitFixture",
+          "line": 561,
+          "endLine": 726,
+          "extentSha256": "93af66686c6cbd2a8637340cf02cb09c93061dca419c6f615dcd74967f92483b",
+          "parameters": [
+            "RepositoryRootPath"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)][string] $RepositoryRootPath"
+          ]
+        },
+        "after": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-ClassificationAdmissionGitFixture",
+          "line": 607,
+          "endLine": 795,
+          "extentSha256": "28abaa0eae563a67c8a7cb32724513890aa3f5ff7f03af12c994fde9fd240428",
+          "parameters": [
+            "RepositoryRootPath"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)][string] $RepositoryRootPath"
+          ]
+        },
+        "parameterNamesChanged": false
+      },
+      {
+        "file": "Test-AgentInstructions.SelfTest.ps1",
+        "name": "Assert-DocumentMetadataClassificationSelfTest",
+        "before": {
+          "repository": "PS-parent",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-DocumentMetadataClassificationSelfTest",
+          "line": 48,
+          "endLine": 408,
+          "extentSha256": "23fddef43c57a0ef407a02e60d89eba14a95609c32810be7d77c3d5ea0aaa11d",
+          "parameters": [
+            "MaximumMetadataUtcDate"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)][string] $MaximumMetadataUtcDate"
+          ]
+        },
+        "after": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.SelfTest.ps1",
+          "name": "Assert-DocumentMetadataClassificationSelfTest",
+          "line": 48,
+          "endLine": 454,
+          "extentSha256": "ac102377f37a2ab1285bb373f6b0e5484b717bb658efa4207f4670584a038f9c",
+          "parameters": [
+            "MaximumMetadataUtcDate"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)][string] $MaximumMetadataUtcDate"
+          ]
+        },
+        "parameterNamesChanged": false
+      },
+      {
+        "file": "Test-AgentInstructions.ps1",
+        "name": "Get-DocumentMetadataClassificationExpansionFailure",
+        "before": {
+          "repository": "PS-parent",
+          "file": "Test-AgentInstructions.ps1",
+          "name": "Get-DocumentMetadataClassificationExpansionFailure",
+          "line": 4921,
+          "endLine": 5015,
+          "extentSha256": "2c510985ff3f5b1687fd4f181808adc3c9d16ba11ad1e43f7ea3a9a09361ff6f",
+          "parameters": [
+            "HasTrustedBaselineManifest",
+            "TrustedBaselineExemptPath",
+            "TrustedBaselineAuthorizedExemptionPath",
+            "CandidateExemptPath"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)]\n        [bool] $HasTrustedBaselineManifest",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineExemptPath",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineAuthorizedExemptionPath",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $CandidateExemptPath"
+          ]
+        },
+        "after": {
+          "repository": "PS",
+          "file": "Test-AgentInstructions.ps1",
+          "name": "Get-DocumentMetadataClassificationExpansionFailure",
+          "line": 4921,
+          "endLine": 5047,
+          "extentSha256": "8cf6a76c90377c808a9be0f7b02d57357824d1faf09e9df97fb5bdb954857f69",
+          "parameters": [
+            "HasTrustedBaselineManifest",
+            "TrustedBaselineExemptPath",
+            "TrustedBaselineAuthorizedExemptionPath",
+            "CandidateExemptPath",
+            "TrustedBaselineGeneratedPath",
+            "CandidateGeneratedPath"
+          ],
+          "parameterDeclarations": [
+            "[Parameter(Mandatory)]\n        [bool] $HasTrustedBaselineManifest",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineExemptPath",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineAuthorizedExemptionPath",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $CandidateExemptPath",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $TrustedBaselineGeneratedPath",
+            "[Parameter(Mandatory)]\n        [AllowEmptyCollection()]\n        [string[]] $CandidateGeneratedPath"
+          ]
+        },
+        "parameterNamesChanged": true
+      }
+    ],
+    "unchangedExtentCount": 61
+  }
+}

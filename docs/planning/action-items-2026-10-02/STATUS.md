@@ -2,13 +2,13 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `642932dc225ac536be2db069ec8228416a462a58` (published F5 and preparation checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `938367c472c675c1f05d3843ee52dd587e00b766` (published review and D5 checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | [A00](tasks/A00.md) | Reconcile historical obligations and retirement decisions | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A00/RESULT.md) | Reuse the canonical native delivery ledger |
 | [A01](tasks/A01.md) | Refresh issue coverage and full-tree baseline | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A01/RESULT.md) | Reuse accepted inventory; refresh at next mutation |
-| [A02](tasks/A02.md) | Non-protected shared governance | waiting_external | coordinator | PS codex/shared-governance | 519c420 / 48f4d8a | [224](https://github.com/franklesniak/PSStyleGuide/pull/224) | 4/80; 2026-10-10T07:26:08.214692Z | 0/12 | [Evidence](results/A02/RESULT.md) | Quality approved; await automatic ready-triggered Codex result |
+| [A02](tasks/A02.md) | Non-protected shared governance | active | a00 writer + d07 quality | PS codex/shared-governance | b8976a4 / 48f4d8a | [224](https://github.com/franklesniak/PSStyleGuide/pull/224) | 4/80; 2026-10-10T07:26:08.214692Z | 0/12 | [Evidence](results/A02/RESULT.md) | F6 published; update body and request round5 |
 | [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A03/RESULT.md) | Exact option L prepared; await owner choice |
 | [A04](tasks/A04.md) | Bound ordinary Node downloads and test retries | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A04/design.md) | Integrate after A03/A07 acceptance |
 | [A05](tasks/A05.md) | Require immutable event acquisition in the YAML guide | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A05/design.md) | Await exact two-guide authority |
@@ -25,22 +25,23 @@ Planning head: `642932dc225ac536be2db069ec8228416a462a58` (published F5 and prep
 | [A16](tasks/A16.md) | Deliver Terraform Gate A nonmutating foundation | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](tasks/A16.md) | Wait for A15/A06/A07 acceptance |
 | [A17](tasks/A17.md) | Deliver Terraform Gate B destructive-procedure guidance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/16 | [Evidence](tasks/A17.md) | Wait for accepted Gate A and owner approval |
 | [A18](tasks/A18.md) | Close remaining byte differences and verify convergence | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](tasks/A18.md) | Run final union and A10/A11 checklist after products |
-| [A19](tasks/A19.md) | Reconcile issues and publish final acceptance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](tasks/A19.md) | Read TF22/PR63 and reconcile final evidence |
+| [A19](tasks/A19.md) | Reconcile issues and publish final acceptance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](tasks/A19.md) | Refresh final issue census after A18 |
 | [A20](tasks/A20.md) | Protected instruction files | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A02/protected-v2-request.md) | Await PR224 merge and explicit protected authority |
-| [A21](tasks/A21.md) | Instruction validator, SelfTest, and classification manifest convergence | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A21/RESULT.md) | Refresh census after PR224; select one whole base |
+| [A21](tasks/A21.md) | Instruction validator, SelfTest, and classification manifest convergence | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A21/RESULT.md) | F6 census refreshed; await merge and select one base |
 
 ## Local configuration and in-flight native operations
 
 - Planning: `C:/Users/flesniak/GitHub/PSStyleGuide`; peer: `C:/Users/flesniak/GitHub/TerraformStyleGuide`.
-- PS product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`. Coordinator owns publication; published519c420/tree `c204d80a4bd0a8252ba05e34485d3018317dca66`; full10-hook and actual B/H checks passed.
+- PS product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`. Coordinator owns publication; publishedb8976a4/tree `5406a2e77ed9d8d8230e24fd978c0f5d1ef15488`; full10-hook and actual B/H checks passed.
 - Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 uses suffix `A02-design-20261002` (resume `PR224-review-state.json`, validation `D14-native-validation`); D07 uses `plan-review-20261002`.
 - Node24.18.1/npm11.16.0: scratch prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 remains Restricted. No Docker container remains.
-- A02: Round4 terminal on519c420. Copilot request32350164822 accepted via documented signed-out UI fallback; Codex trigger5956961276 verified. Prior F5 resolved with reply4167795971. Candidate CI37034733217 passed; Copilot5394420175 reports Balanced/no findings and Codex5957019264 is clean on519c420. Independent final quality approved. PR ready; automatic Codex519 review running since17:01:41Z, no manual duplicate. No ambiguous native operation. Clock/baselines in resume file.
-- A07 is frozen at `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; staged treec68b5e1 passed all11 hooks; a00 resumes after F5/PR224 before held-path integration. A15 scope/identity/D5 proposals prepared; exact amendments and platform proof pending. A21 whole-base census prepared; no base selected. A08 verified; A03 option L unselected. Preserve unrelated edits.
+- A02: round4 historical on519c420. F6 is published asb8976a4/tree5406a2e; focused/full10-hook and actual B/H checks passed; independent local quality approved. Update body/reply then request round5. Merge held. No ambiguous native operation; resume retains clocks/baselines.
+- A07 is frozen at `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; staged treec68b5e1 passed all11 hooks; a00 resumes after PR224 before held-path integration. A15 scope/identity/D5 proposals prepared; exact amendments and platform proof pending. A21 whole-base census prepared; no base selected. A08 verified; A03 option L unselected. Preserve unrelated edits.
 - Await A03-D1: owner-label gate L, procedural boundary P, or another direction.
 - Await A20: six-file protected-v2 grant and separate two-CLAUDE protocol grant.
 - Await A05: two YAML-guide immutable-acquisition patch grant.
 - Await A13: exact PS ruleset and bounded ordinary-PR validation/restoration grant.
+- Await A15: exact D1/D3/D4/D5 design amendments at planning938367c; owner question sent, no answer. Actual Gate approvals remain separate.
 - At PR224 deadline only: request one dated extension/accept-at-limit/close decision; none supplied.
 
 ## Final results

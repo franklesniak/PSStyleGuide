@@ -1,0 +1,31 @@
+{
+  "sourceAttribution": {
+    "PS": {
+      "proposedTree": "5406a2e77ed9d8d8230e24fd978c0f5d1ef15488",
+      "declaredParent": "519c420738f8f8c9c1b185dfa68138b89974343e",
+      "parentTree": "c204d80a4bd0a8252ba05e34485d3018317dca66",
+      "acceptedMain": false,
+      "changesFromParent": [
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-AgentInstructions.ps1"
+      ]
+    },
+    "TF": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "inputSummary": {
+    "present": 9,
+    "absent": 1,
+    "changedFromOldCensus": 2,
+    "unchangedFromOldCensus": 8
+  },
+  "a07": {
+    "frozenStagedTree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+    "fullIndexMatchesFrozenTree": true,
+    "fullIndexPaths": 72,
+    "reusedInterfaceCount": 8
+  },
+  "scope": "read-only raw object/index census; no base selection, product tests, implementation, merge acceptance, transfers or native writes"
+}
