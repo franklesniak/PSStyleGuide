@@ -1,7 +1,467 @@
 <!-- markdownlint-disable MD013 -->
 <!-- markdownlint-configure-file { "MD024": { "siblings_only": true } } -->
 
-# Chronological PSStyleGuide-first cross-repository convergence plan
+# Remaining original work — October 2, 2026
+
+This plan retains **376 of the original 402 tasks**. Only these independently verified completed task IDs are omitted: **83–85, 92–94, 101–103, 110–112, 120–121, 131–132, 140–141, 148–150, 159–160, 167–169**. All other original tasks remain, including conditional, partial, regressed and unverified work. The original plan is restored separately; this document does not start product execution.
+
+Evidence: [completion audit](plan-restoration-2026-10-02/completion-audit.md), [per-task ledger](plan-restoration-2026-10-02/completion-audit.json), [paired-byte audit](plan-restoration-2026-10-02/parity-audit.md), [restoration audit](plan-restoration-2026-10-02/baseline-audit.md), [execution reference corrections](plan-restoration-2026-10-02/execution-readiness-inputs.md), and [restart progress](plan-restoration-2026-10-02/PROGRESS.md). Historical action completion does not certify present product equality.
+
+Original source SHA-256: `03e755a9c1035712cc46a1231fdb22cb3a6b0512a5de145c696597a37c90a416`. Original task IDs stay fixed; there is no renumbering or omission based on supersession. The prepared [start state](plan-restoration-2026-10-02/successor-start-state.json) is not the live execution state.
+
+## Authority and scope
+
+The owner's latest instruction restores the original plan's requirements. The new dated plan omits only original tasks independently verified complete. An earlier decision to cancel, consolidate, supersede, defer or narrow work is not completion evidence. Retain every unresolved original obligation. Do not reuse the smaller amended plan's completed-task list or final-completion assertion to skip work.
+
+Keep the restored August 30 plan byte-identical to its verified pre-amendment source. The October 2 plan is the execution document. Original task IDs remain stable and can have gaps only for independently verified completed tasks. Links to omitted predecessors refer to their accepted evidence in the completion audit, not a nonexistent task body.
+
+The original task bodies remain unchanged. The startup rules, current evidence, and narrowly identified reference corrections in the new plan resolve stale execution context; they do not remove objectives, safety requirements, required outputs, or independent validation. Native issue bodies edited during consolidation cannot silently narrow the frozen original requirements. Use the saved original issue definitions with the original task text, and read live issues to establish current state.
+
+## Completion and cross-repository identity
+
+Completion requires the full original task predicate and applicable controls. For a shared delivered file, compare actual Git blob bytes at the named accepted commits. Same names, equal behavior, similar tests, matching counts, equal normalized text and shared absence are not byte identity. A completed historical merge or review proves only that immutable action; it does not certify a newer head or current repository convergence.
+
+Allow a divergence only with a specific compelling repository or language requirement. Show the exact differing lines and why identical bytes would fail a supported PowerShell or Terraform use. A repository name, old implementation, harmless wording preference or convenience alone is not enough. Use the owner's full finding-specific decision process for a substantive divergence decision. If it is not justified, retain or repair the task instead of declaring completion.
+
+Keep verified existing implementation and test evidence as reusable inputs. A retained task can be partly done. First examine its recorded gap; complete the missing work and rerun only validations invalidated by changes. Do not re-merge a closed PR or fabricate a fresh historical review. A changed or repaired input requires its own applicable review, validation and merge sequence.
+
+### New candidates after historical completion
+
+An omitted review, quality or merge task has completion credit only for the exact historical instance listed in the audit. A changed candidate requires fresh applicable gates. The immutable omission ledger records the original completed instances. The live schema-2 `completed` list records satisfied task instances for the active execution context. Keep these records separate. An old completed ID cannot authorize a new merge.
+
+1. Identify the full affected gate chain when a real candidate changes. Include all downstream review, quality, merge and handoff results invalidated by that change. Save the previous results as history. Do not reset progress merely to probe a reviewer service.
+2. Before ingesting the new candidate's outputs, remove each affected completed ID from the live `completed` list. Keep the immutable completion audit and omission list unchanged. Reopen the full affected chain, not only its first review task. For example, a new candidate after Task 82 must reopen historical Tasks 83, 84 and 85 before it enters those gates.
+3. Remove stale values from the live `predecessor_outputs` map when their producer is reopened or their value describes the old candidate. Preserve valid, still-needed inputs. Refresh actual producer/output identities. A producer must be complete before its new output enters the map, and that output's declared last consumer must still be incomplete. Do not carry an old result into a new dependency merely to satisfy the parser.
+4. Run each required gate as its own task under its original task number and original scope. For a historically omitted heading, read its complete procedure in the [restored August 30 plan](action-items-2026-08-30.md). Resolve its execution inputs from the new candidate's verified predecessor outputs, including any historical literal PR URL in its original task table. Keep the saved original body unchanged. Do not run a merge under a publication or handoff task.
+5. Bind every new result to its actual repository, PR, head and tree. Add the task ID back to the live completed list only after its new instance satisfies its full predicate. Proceed to the next gate in the original sequence. Use one active resume record; do not replace the historical omission audit with the new instance results.
+6. Preserve actual reviewer request history, pending suppression, input attribution, attempt caps, applicable authority and all other controls while updating task progress. Reopening a task does not reset the limit for the same reviewed input or authorize a duplicate request. Resume the retained handoff only after the new candidate has passed its own required gates.
+
+## Start and resume
+
+Read the new plan, the durable restoration progress file, the independent completion audit, the paired-byte audit, and the execution-readiness report. Verify the plan and audit hashes and current native repository identities before using the baseline. Do not infer completion for changed input from an old review.
+
+Initialize a fresh resume record only when execution is authorized. Set its plan path to the October 2 plan and its completed IDs only to the independently accepted set. Select the first remaining task whose actual predecessors are satisfied. The saved old state naming Task 402 complete applies to the superseded condensed scope and is not an execution frontier for this plan. Preserve that state as history.
+
+Follow original sequencing and conditional repair paths. Resolve completed predecessor outputs from the completion record and authenticated native objects. If a required predecessor value is unproved, obtain the evidence before a dependent mutation. Preserve every conditional task until its original condition and permitted no-repair result are proved. Do not interpret presence in the plan as unconditional permission for a destructive action.
+
+Use current repository instructions for tool transport, including the Copilot Balanced preference and documented fallback. Preserve actual reviewer identities, request caps and pending-request suppression. Standing grants remain valid only within their actual scope. Preparing this plan does not authorize new settings, credentials, force, deletion, administrator bypass or unconditional approval.
+
+This successor is the entry document: instruct the executor to read and execute this file, not an older condensed-plan entry point. Its original task contracts and the retained shared execution policy below supply the sequence and requirements. The current `coding-agent-loop.md`, its variants, and `prompt-action-items-update.md` contain instructions for the condensed plan. For this successor, these startup rules control task selection and completion. Reuse only their compatible execution/review machinery. Do not import the supersession map, risk-first reordered slate, optional-writer disposition or old completed state. The controller and its schema now accept this successor's exact filename while retaining the historical filename; all 164 controller tests passed. This path correction does not migrate live execution state or grant completion.
+
+## Preserved native requirements and narrow reference corrections
+
+Read the exact archived original native issue bodies under `plan-restoration-2026-10-02/evidence/native-preimages`, identified by `manifest.json`. They preserve PS issues 147, 148, 149, 151, 152, 155 and 156 and Terraform issues 22, 23 and 24. Original requirements in those bodies remain work even if the live issues were closed or rewritten under the smaller plan. Read live issue state before any native action, but do not substitute a narrower live body for its original requirements.
+
+For a closed issue with remaining original work, use its existing linked history and the task's authorized issue-setup step to establish an accurate owner for the remainder. Do not edit or re-merge an already merged PR. A new repair uses a new candidate and its applicable review, validation, quality, merge and acceptance steps. Retained historical merge leaves refer to their actual historical object when verifying past performance; never use them as permission to merge a new unreviewed input.
+
+Apply the following narrow corrections when interpreting the unchanged task bodies. The independent readiness report provides the original locators and reasons. These corrections preserve the original objectives and required gates.
+
+| Task IDs | Execution correction |
+| --- | --- |
+| 233, 324 | The issue-write destination is TerraformStyleGuide, for Terraform issues 22 and 24. PSStyleGuide is the pinned source. |
+| 269–276, 333–340, 360–367 | Bind one repair destination, issue and PR from the preceding comparison: Task 268, 332 or 359. For a confirmed gap in Terraform, that destination is Terraform despite copied PS target text. Preserve an explicitly evidenced PS sync-back branch when actually selected. |
+| 229 | Its changed writer candidate requires its own Task 228 independent quality result, not the unrelated historical Task 185. |
+| 230–232 | Any authorized settings activation needed for the writer merge must precede Task 231's merge. Task 232 is the later landed handoff. Preserve the separate actual settings authority. |
+| 321 | Refresh the PS dependency candidate through 307 implementation, 308 publication/validation, 309 review, 310 independent quality and applicable 312 approval. Recheck 321 readiness. The copied 265/267 references are unrelated whitespace work. |
+| 379–390 | A present residual trigger enters Task 380 assessment. Follow its actual conditional repair branch before Task 390 closure. Never jump from trigger detection directly to closure. |
+| 380 | Its residual repair recurrence is Tasks 380–390, not the copied Tasks 373–390 range from the prior capability. |
+| 391 | Keep the initial assessment read-only. Its task-required evidence publication is the bounded exception already stated in its original controls. Any selected implementation uses the later authorized lifecycle and its actual target. |
+| 311–320 | Report the historical August checkpoint truthfully. Do not backdate a new fallback to August 22. Task 312 must obtain an applicable actual owner decision and prospective date where its original decision requires one. Do not extend the stated October 29 expiry without the required new authority. Preserve all original fallback tasks and permitted skip branches. |
+
+Preserve original research-misc obligations where a task requires the original three-repository comparison. This request's additional PS/Terraform byte check does not delete the third-repository work. Keep every original named reviewer or executor requirement unless an actual applicable owner grant permits a specified alternate outcome. Record alternate identities and non-clean service failures honestly; header prose cannot create a missing grant.
+
+## Evidence limits
+
+The completion audit is a conservative omission decision. RETAIN can mean incomplete, partly complete, regressed, conditional, or not proved by the available evidence. It is not a claim that nobody performed the work. No retained task is omitted merely because completing it appears expensive or unnecessary.
+
+The original plan has concrete future owner decisions. Preserve those tasks and prepare their evidence before requesting any missing authority. Their presence does not prevent a plan from being ready to execute its earlier safe work.
+
+## Remaining-task entry index
+
+Use the per-task completion ledger for the exact original predicate, evidence and remaining action. RETAIN includes unverified work; it does not assert that no historical action occurred.
+
+| Original ID | Remaining original task |
+| ---: | --- |
+| 1 | create or update the PS metadata-policy corrective issue |
+| 2 | commence the PS metadata-policy correction |
+| 3 | establish clause-level metadata-policy provenance |
+| 4 | implement the PS metadata-policy and validator correction |
+| 5 | create or update the PS metadata-policy corrective PR and freeze its reviewer-facing body |
+| 6 | run the corrected Copilot-and-Codex review loop on the PS metadata-policy PR |
+| 7 | run the independent final quality check on the PS metadata-policy PR |
+| 8 | merge the PS metadata-policy corrective PR |
+| 9 | publish the PS metadata-policy landed handoff |
+| 10 | create or update the planning-branch review-loop corrective issue |
+| 11 | commence the planning-branch review-loop correction |
+| 12 | inventory every permanent review-loop mutation and request surface |
+| 13 | implement the corrected review-loop architecture on the planning branch |
+| 14 | create or update the review-loop corrective PR and freeze its reviewer-facing body |
+| 15 | run the corrected Copilot-and-Codex review loop on the review-loop PR |
+| 16 | run the independent final quality check on the review-loop PR |
+| 17 | merge the review-loop corrective PR into the planning branch |
+| 18 | publish the review-loop landed handoff |
+| 19 | publish the corrected landed PS PR #174 handoff |
+| 20 | compare the research source with landed PS and authorize the Terraform disposition |
+| 21 | create or update the focused Terraform issue for the PR #78 port |
+| 22 | commence the focused Terraform PR #78 port |
+| 23 | implement the focused Terraform PR #78 port candidate |
+| 24 | create or update the Terraform candidate PR for the PR #78 port |
+| 25 | run the Copilot-and-Codex review loop on the Terraform PR #78 port PR |
+| 26 | run the independent final quality check on the Terraform PR #78 port PR |
+| 27 | merge the reviewed Terraform PR #78 port PR |
+| 28 | publish the landed Terraform PR #78 port handoff |
+| 29 | perform the first three-repository PR #78 fixed-point comparison |
+| 30 | create or update one selected-target PR #78 fixed-point repair issue |
+| 31 | commence one selected-target PR #78 fixed-point repair |
+| 32 | implement one selected-target PR #78 fixed-point repair candidate |
+| 33 | create or update one selected-target PR #78 fixed-point repair PR |
+| 34 | run the Copilot-and-Codex review loop on one selected-target PR #78 fixed-point repair PR |
+| 35 | run the independent final quality check on one selected-target PR #78 repair PR |
+| 36 | merge one reviewed selected-target PR #78 fixed-point repair PR |
+| 37 | publish one landed selected-target PR #78 repair handoff |
+| 38 | recompare the three repositories and repeat the PR #78 repair loop when required |
+| 39 | publish the PR #78 three-repository fixed-point closure |
+| 40 | close the PR #78 convergence umbrella |
+| 41 | validate and update PS #168 for PR-body identity synchronization |
+| 42 | commence PS PR-body identity synchronization |
+| 43 | implement PS PR-body identity synchronization |
+| 44 | create or update the candidate PR for PS PR-body identity synchronization |
+| 45 | run the Copilot-and-Codex review loop on the PS #168 PR |
+| 46 | run the independent final quality check on the PS #168 PR |
+| 47 | merge the PS #168 PR |
+| 48 | publish the landed handoff for the PS #168 PR |
+| 49 | compare the PR-body identity synchronization cycle in Terraform — determine the next disposition |
+| 50 | create or update the focused repair issue for the PR-body identity synchronization cycle in Terraform |
+| 51 | commence the focused repair for the PR-body identity synchronization cycle in Terraform |
+| 52 | implement the focused repair for the PR-body identity synchronization cycle in Terraform |
+| 53 | create or update the focused repair PR for the PR-body identity synchronization cycle in Terraform |
+| 54 | run the Copilot-and-Codex review loop on the focused repair PR for the PR-body identity synchronization cycle in Terraform |
+| 55 | run the independent final quality check on the focused repair PR for the PR-body identity synchronization cycle in Terraform |
+| 56 | merge the focused repair PR for the PR-body identity synchronization cycle in Terraform |
+| 57 | publish the landed repair handoff for the PR-body identity synchronization cycle in Terraform |
+| 58 | reverse-compare the PR-body identity synchronization cycle in PS — determine the next disposition |
+| 59 | create or update the focused repair issue for the PR-body identity synchronization cycle in PS |
+| 60 | commence the focused repair for the PR-body identity synchronization cycle in PS |
+| 61 | implement the focused repair for the PR-body identity synchronization cycle in PS |
+| 62 | create or update the focused repair PR for the PR-body identity synchronization cycle in PS |
+| 63 | run the Copilot-and-Codex review loop on the focused repair PR for the PR-body identity synchronization cycle in PS |
+| 64 | run the independent final quality check on the focused repair PR for the PR-body identity synchronization cycle in PS |
+| 65 | merge the focused repair PR for the PR-body identity synchronization cycle in PS |
+| 66 | publish the landed repair handoff for the PR-body identity synchronization cycle in PS |
+| 67 | recheck the reciprocal result for the PR-body identity synchronization cycle in PS |
+| 68 | publish the fixed-point closure for the PR-body identity synchronization cycle in PS |
+| 69 | reverse-compare cycle 2 in PS — determine the next disposition |
+| 70 | validate and update PS #169 for BSD identity dispatch and candidate-publication binding |
+| 71 | commence the PS #169 generator identity repair |
+| 72 | implement the PS #169 generator identity repair |
+| 73 | create or update the PS #169 PR |
+| 74 | run the Copilot-and-Codex review loop on the PS #169 PR |
+| 75 | run the independent final quality check on the PS #169 PR |
+| 76 | merge the PS #169 PR |
+| 77 | publish the landed handoff for PS #169 |
+| 78 | compare landed PS #169 with Terraform and authorize PS #170 |
+| 79 | validate and update PS #170 for culture-invariant rationale anchors |
+| 80 | commence the PS #170 culture-invariant anchor repair |
+| 81 | implement the PS #170 culture-invariant anchor repair |
+| 82 | create or update the PS #170 PR |
+| 86 | publish the landed handoff for PS #170 |
+| 87 | compare landed PS #170 with Terraform and authorize PS #171 |
+| 88 | validate and update PS #171 for bounded field-specific generator diagnostics |
+| 89 | commence the PS #171 bounded diagnostic repair |
+| 90 | implement the PS #171 bounded diagnostic repair |
+| 91 | create or update the PS #171 PR |
+| 95 | publish the landed handoff for PS #171 |
+| 96 | perform the final reciprocal recheck for PS #169, #170, and #171 |
+| 97 | publish the fixed-point closure for PS #169, #170, and #171 |
+| 98 | commence PS workflow isolation and policy convergence |
+| 99 | implement PS workflow isolation and policy convergence |
+| 100 | create or update the candidate PR for PS workflow isolation and policy convergence |
+| 104 | publish the landed handoff for the PS #162 PR |
+| 105 | compare cycle 3 in Terraform — determine the next disposition |
+| 106 | create or update the focused repair issue for cycle 3 in Terraform |
+| 107 | commence the focused repair for cycle 3 in Terraform |
+| 108 | implement the focused repair for cycle 3 in Terraform |
+| 109 | create or update the focused repair PR for cycle 3 in Terraform |
+| 113 | publish the landed repair handoff for cycle 3 in Terraform |
+| 114 | reverse-compare cycle 3 in PS — determine the next disposition |
+| 115 | create or update the focused repair issue for cycle 3 in PS |
+| 116 | commence the focused repair for cycle 3 in PS |
+| 117 | implement the focused repair for cycle 3 in PS |
+| 118 | create or update the focused repair PR for cycle 3 in PS |
+| 119 | run the Copilot-and-Codex review loop on the focused repair PR for cycle 3 in PS |
+| 122 | publish the landed repair handoff for cycle 3 in PS |
+| 123 | recheck the reciprocal result for cycle 3 in PS |
+| 124 | publish the fixed-point closure for cycle 3 in PS |
+| 125 | post the initial three-cycle handoff |
+| 126 | update PS #158 with the landed workflow-policy starting point |
+| 127 | commence the PS read-only supply-freeze recorder |
+| 128 | implement the PS read-only supply-freeze recorder |
+| 129 | create or update the candidate PR for the PS read-only supply-freeze recorder |
+| 130 | run the Copilot-and-Codex review loop on the PS #158 PR |
+| 133 | publish the landed handoff for the PS #158 PR |
+| 134 | compare cycle 4 in Terraform — determine the next disposition |
+| 135 | create or update the focused repair issue for cycle 4 in Terraform |
+| 136 | commence the focused repair for cycle 4 in Terraform |
+| 137 | implement the focused repair for cycle 4 in Terraform |
+| 138 | create or update the focused repair PR for cycle 4 in Terraform |
+| 139 | run the Copilot-and-Codex review loop on the focused repair PR for cycle 4 in Terraform |
+| 142 | publish the landed repair handoff for cycle 4 in Terraform |
+| 143 | reverse-compare cycle 4 in PS — determine the next disposition |
+| 144 | create or update the focused repair issue for cycle 4 in PS |
+| 145 | commence the focused repair for cycle 4 in PS |
+| 146 | implement the focused repair for cycle 4 in PS |
+| 147 | create or update the focused repair PR for cycle 4 in PS |
+| 151 | publish the landed repair handoff for cycle 4 in PS |
+| 152 | recheck the reciprocal result for cycle 4 in PS |
+| 153 | publish the fixed-point closure for cycle 4 in PS |
+| 154 | close the PS foundation umbrella |
+| 155 | commence the PS Claude review-loop command |
+| 156 | implement the PS Claude review-loop command |
+| 157 | create or update the candidate PR for the PS Claude review-loop command |
+| 158 | run the Copilot-and-Codex review loop on the PS #163 PR |
+| 161 | publish the landed handoff for the PS #163 PR |
+| 162 | compare cycle 5 in Terraform — determine the next disposition |
+| 163 | create or update the focused repair issue for cycle 5 in Terraform |
+| 164 | commence the focused repair for cycle 5 in Terraform |
+| 165 | implement the focused repair for cycle 5 in Terraform |
+| 166 | create or update the focused repair PR for cycle 5 in Terraform |
+| 170 | publish the landed repair handoff for cycle 5 in Terraform |
+| 171 | reverse-compare cycle 5 in PS — determine the next disposition |
+| 172 | create or update the focused repair issue for cycle 5 in PS |
+| 173 | commence the focused repair for cycle 5 in PS |
+| 174 | implement the focused repair for cycle 5 in PS |
+| 175 | create or update the focused repair PR for cycle 5 in PS |
+| 176 | run the Copilot-and-Codex review loop on the focused repair PR for cycle 5 in PS |
+| 177 | run the independent final quality check on the focused repair PR for cycle 5 in PS |
+| 178 | merge the focused repair PR for cycle 5 in PS |
+| 179 | publish the landed repair handoff for cycle 5 in PS |
+| 180 | recheck the reciprocal result for cycle 5 in PS |
+| 181 | publish the fixed-point closure for cycle 5 in PS |
+| 182 | close the Terraform initial-convergence tracker |
+| 183 | commence Terraform #21 from the landed PS P1A source |
+| 184 | implement Terraform #21 from the landed PS P1A source |
+| 185 | create or update the candidate PR for Terraform #21 from the landed PS P1A source |
+| 186 | run the Copilot-and-Codex review loop on the Terraform #21 PR |
+| 187 | run the independent final quality check on the Terraform #21 PR |
+| 188 | merge the Terraform #21 PR |
+| 189 | publish the landed handoff for the Terraform #21 implementation |
+| 190 | reverse-compare Terraform #21 in PS — determine the next disposition |
+| 191 | create or update the focused repair issue for Terraform #21 in PS |
+| 192 | commence the focused repair for Terraform #21 in PS |
+| 193 | implement the focused repair for Terraform #21 in PS |
+| 194 | create or update the focused repair PR for Terraform #21 in PS |
+| 195 | run the Copilot-and-Codex review loop on the focused repair PR for Terraform #21 in PS |
+| 196 | run the independent final quality check on the focused repair PR for Terraform #21 in PS |
+| 197 | merge the focused repair PR for Terraform #21 in PS |
+| 198 | publish the landed repair handoff for Terraform #21 in PS |
+| 199 | perform the final Terraform recheck — determine the next disposition |
+| 200 | create or update the focused repair issue for the final Terraform recheck |
+| 201 | commence the focused repair for the final Terraform recheck |
+| 202 | implement the focused repair for the final Terraform recheck |
+| 203 | create or update the focused repair PR for the final Terraform recheck |
+| 204 | run the Copilot-and-Codex review loop on the focused repair PR for the final Terraform recheck |
+| 205 | run the independent final quality check on the focused repair PR for the final Terraform recheck |
+| 206 | merge the focused repair PR for the final Terraform recheck |
+| 207 | publish the landed repair handoff for the final Terraform recheck |
+| 208 | recheck the reciprocal result for the final Terraform recheck |
+| 209 | publish the fixed-point closure for the final Terraform recheck |
+| 210 | inventory all untracked cross-repository differences |
+| 211 | assess one untracked-blocker reciprocal cycle — determine the next disposition |
+| 212 | create or update the focused repair issue for one untracked-blocker reciprocal cycle |
+| 213 | commence the focused repair for one untracked-blocker reciprocal cycle |
+| 214 | implement the focused repair for one untracked-blocker reciprocal cycle |
+| 215 | create or update the focused repair PR for one untracked-blocker reciprocal cycle |
+| 216 | run the Copilot-and-Codex review loop on the focused repair PR for one untracked-blocker reciprocal cycle |
+| 217 | run the independent final quality check on the focused repair PR for one untracked-blocker reciprocal cycle |
+| 218 | merge the focused repair PR for one untracked-blocker reciprocal cycle |
+| 219 | publish the landed repair handoff for one untracked-blocker reciprocal cycle |
+| 220 | recheck the reciprocal result for one untracked-blocker reciprocal cycle |
+| 221 | publish the fixed-point closure for one untracked-blocker reciprocal cycle |
+| 222 | finalize the global consistency sweep |
+| 223 | commence the PS P1B writer candidate and decision evidence |
+| 224 | prepare the PS P1B writer candidate and decision evidence |
+| 225 | create or update the candidate PR for the PS P1B writer candidate and decision evidence |
+| 226 | prepare read-only PS #152 settings evidence |
+| 227 | run the Copilot-and-Codex review loop on the PS #147 PR |
+| 228 | run the independent final quality check on the PS #147 PR |
+| 229 | approve or reject the P1B authority decisions |
+| 230 | prove and activate the approved PS #152 settings |
+| 231 | merge PS P1B |
+| 232 | publish the landed handoff for PS P1B |
+| 233 | update Terraform #22 from the landed PS P1B handoff |
+| 234 | commence Terraform #22 |
+| 235 | implement Terraform #22 |
+| 236 | create or update the candidate PR for Terraform #22 |
+| 237 | run the Copilot-and-Codex review loop on the Terraform #22 PR |
+| 238 | run the independent final quality check on the Terraform #22 PR |
+| 239 | merge the Terraform #22 PR |
+| 240 | publish the landed handoff for the Terraform #22 PR |
+| 241 | reverse-compare T1B in PS — determine the next disposition |
+| 242 | create or update the focused repair issue for T1B in PS |
+| 243 | commence the focused repair for T1B in PS |
+| 244 | implement the focused repair for T1B in PS |
+| 245 | create or update the focused repair PR for T1B in PS |
+| 246 | run the Copilot-and-Codex review loop on the focused repair PR for T1B in PS |
+| 247 | run the independent final quality check on the focused repair PR for T1B in PS |
+| 248 | merge the focused repair PR for T1B in PS |
+| 249 | publish the landed repair handoff for T1B in PS |
+| 250 | perform the final Terraform T1B recheck — determine the next disposition |
+| 251 | create or update the focused repair issue for the final Terraform T1B recheck |
+| 252 | commence the focused repair for the final Terraform T1B recheck |
+| 253 | implement the focused repair for the final Terraform T1B recheck |
+| 254 | create or update the focused repair PR for the final Terraform T1B recheck |
+| 255 | run the Copilot-and-Codex review loop on the focused repair PR for the final Terraform T1B recheck |
+| 256 | run the independent final quality check on the focused repair PR for the final Terraform T1B recheck |
+| 257 | merge the focused repair PR for the final Terraform T1B recheck |
+| 258 | publish the landed repair handoff for the final Terraform T1B recheck |
+| 259 | recheck the reciprocal result for the final Terraform T1B recheck |
+| 260 | publish the fixed-point closure for the final Terraform T1B recheck |
+| 261 | commence PS #148 |
+| 262 | implement PS #148 |
+| 263 | create or update the candidate PR for PS #148 |
+| 264 | run the Copilot-and-Codex review loop on the PS #148 PR |
+| 265 | run the independent final quality check on the PS #148 PR |
+| 266 | merge the PS #148 PR |
+| 267 | publish the landed handoff for the PS #148 PR |
+| 268 | compare PS #148 in Terraform — determine the next disposition |
+| 269 | create or update the focused repair issue for PS #148 in Terraform |
+| 270 | commence the focused repair for PS #148 in Terraform |
+| 271 | implement the focused repair for PS #148 in Terraform |
+| 272 | create or update the focused repair PR for PS #148 in Terraform |
+| 273 | run the Copilot-and-Codex review loop on the focused repair PR for PS #148 in Terraform |
+| 274 | run the independent final quality check on the focused repair PR for PS #148 in Terraform |
+| 275 | merge the focused repair PR for PS #148 in Terraform |
+| 276 | publish the landed repair handoff for PS #148 in Terraform |
+| 277 | reverse-compare the PS #148 cycle — determine the next disposition |
+| 278 | create or update the focused repair issue for the PS #148 cycle |
+| 279 | commence the focused repair for the PS #148 cycle |
+| 280 | implement the focused repair for the PS #148 cycle |
+| 281 | create or update the focused repair PR for the PS #148 cycle |
+| 282 | run the Copilot-and-Codex review loop on the focused repair PR for the PS #148 cycle |
+| 283 | run the independent final quality check on the focused repair PR for the PS #148 cycle |
+| 284 | merge the focused repair PR for the PS #148 cycle |
+| 285 | publish the landed repair handoff for the PS #148 cycle |
+| 286 | recheck the reciprocal result for the PS #148 cycle |
+| 287 | publish the fixed-point closure for the PS #148 cycle |
+| 288 | commence Terraform #23 |
+| 289 | implement Terraform #23 |
+| 290 | create or update the candidate PR for Terraform #23 |
+| 291 | run the Copilot-and-Codex review loop on the Terraform #23 PR |
+| 292 | run the independent final quality check on the Terraform #23 PR |
+| 293 | merge the Terraform #23 PR |
+| 294 | publish the landed handoff for the Terraform #23 PR |
+| 295 | evaluate Terraform #23 applicability in PS — determine the next disposition |
+| 296 | create or update the focused repair issue for Terraform #23 applicability in PS |
+| 297 | commence the focused repair for Terraform #23 applicability in PS |
+| 298 | implement the focused repair for Terraform #23 applicability in PS |
+| 299 | create or update the focused repair PR for Terraform #23 applicability in PS |
+| 300 | run the Copilot-and-Codex review loop on the focused repair PR for Terraform #23 applicability in PS |
+| 301 | run the independent final quality check on the focused repair PR for Terraform #23 applicability in PS |
+| 302 | merge the focused repair PR for Terraform #23 applicability in PS |
+| 303 | publish the landed repair handoff for Terraform #23 applicability in PS |
+| 304 | recheck the reciprocal result for Terraform #23 applicability in PS |
+| 305 | publish the fixed-point closure for Terraform #23 applicability in PS |
+| 306 | commence the PS P3 candidate for merge |
+| 307 | prepare the PS P3 candidate for merge |
+| 308 | create or update the candidate PR for the PS P3 candidate for merge |
+| 309 | run the Copilot-and-Codex review loop on the PS #149 PR |
+| 310 | run the independent final quality check on the PS #149 PR |
+| 311 | check the PS #149 advisory-deadline state |
+| 312 | select and approve the PS #149 deadline path |
+| 313 | create or update the approved advisory-fallback issue |
+| 314 | commence an approved advisory fallback |
+| 315 | implement an approved advisory fallback |
+| 316 | create or update the candidate PR for an approved advisory fallback |
+| 317 | run the Copilot-and-Codex review loop on the fallback PR |
+| 318 | run the independent final quality check on the fallback PR |
+| 319 | merge the approved fallback PR |
+| 320 | publish the landed handoff for the approved fallback PR |
+| 321 | check whether the PS #149 candidate requires a post-fallback refresh |
+| 322 | merge the PS #149 PR |
+| 323 | publish the landed handoff for the PS #149 P3 implementation |
+| 324 | update Terraform #24 from the landed PS P3 handoff |
+| 325 | commence Terraform #24 |
+| 326 | implement Terraform #24 |
+| 327 | create or update the candidate PR for Terraform #24 |
+| 328 | run the Copilot-and-Codex review loop on the Terraform #24 PR |
+| 329 | run the independent final quality check on the Terraform #24 PR |
+| 330 | merge the Terraform #24 PR |
+| 331 | publish the landed handoff for the Terraform #24 PR |
+| 332 | reverse-compare T3 in PS — determine the next disposition |
+| 333 | create or update the focused repair issue for T3 in PS |
+| 334 | commence the focused repair for T3 in PS |
+| 335 | implement the focused repair for T3 in PS |
+| 336 | create or update the focused repair PR for T3 in PS |
+| 337 | run the Copilot-and-Codex review loop on the focused repair PR for T3 in PS |
+| 338 | run the independent final quality check on the focused repair PR for T3 in PS |
+| 339 | merge the focused repair PR for T3 in PS |
+| 340 | publish the landed repair handoff for T3 in PS |
+| 341 | perform the final Terraform T3 recheck — determine the next disposition |
+| 342 | create or update the focused repair issue for the final Terraform T3 recheck |
+| 343 | commence the focused repair for the final Terraform T3 recheck |
+| 344 | implement the focused repair for the final Terraform T3 recheck |
+| 345 | create or update the focused repair PR for the final Terraform T3 recheck |
+| 346 | run the Copilot-and-Codex review loop on the focused repair PR for the final Terraform T3 recheck |
+| 347 | run the independent final quality check on the focused repair PR for the final Terraform T3 recheck |
+| 348 | merge the focused repair PR for the final Terraform T3 recheck |
+| 349 | publish the landed repair handoff for the final Terraform T3 recheck |
+| 350 | recheck the reciprocal result for the final Terraform T3 recheck |
+| 351 | publish the fixed-point closure for the final Terraform T3 recheck |
+| 352 | commence PS #151 |
+| 353 | implement PS #151 |
+| 354 | create or update the candidate PR for PS #151 |
+| 355 | run the Copilot-and-Codex review loop on the PS #151 PR |
+| 356 | run the independent final quality check on the PS #151 PR |
+| 357 | merge the PS #151 PR |
+| 358 | publish the landed handoff for the PS #151 PR |
+| 359 | compare PS #151 in Terraform — determine the next disposition |
+| 360 | create or update the focused repair issue for PS #151 in Terraform |
+| 361 | commence the focused repair for PS #151 in Terraform |
+| 362 | implement the focused repair for PS #151 in Terraform |
+| 363 | create or update the focused repair PR for PS #151 in Terraform |
+| 364 | run the Copilot-and-Codex review loop on the focused repair PR for PS #151 in Terraform |
+| 365 | run the independent final quality check on the focused repair PR for PS #151 in Terraform |
+| 366 | merge the focused repair PR for PS #151 in Terraform |
+| 367 | publish the landed repair handoff for PS #151 in Terraform |
+| 368 | reverse-compare the PS #151 cycle — determine the next disposition |
+| 369 | create or update the focused repair issue for the PS #151 cycle |
+| 370 | commence the focused repair for the PS #151 cycle |
+| 371 | implement the focused repair for the PS #151 cycle |
+| 372 | create or update the focused repair PR for the PS #151 cycle |
+| 373 | run the Copilot-and-Codex review loop on the focused repair PR for the PS #151 cycle |
+| 374 | run the independent final quality check on the focused repair PR for the PS #151 cycle |
+| 375 | merge the focused repair PR for the PS #151 cycle |
+| 376 | publish the landed repair handoff for the PS #151 cycle |
+| 377 | recheck the reciprocal result for the PS #151 cycle |
+| 378 | publish the fixed-point closure for the PS #151 cycle |
+| 379 | check the independent residual triggers |
+| 380 | assess one triggered residual cycle — determine the next disposition |
+| 381 | create or update the focused repair issue for one triggered residual cycle |
+| 382 | commence the focused repair for one triggered residual cycle |
+| 383 | implement the focused repair for one triggered residual cycle |
+| 384 | create or update the focused repair PR for one triggered residual cycle |
+| 385 | run the Copilot-and-Codex review loop on the focused repair PR for one triggered residual cycle |
+| 386 | run the independent final quality check on the focused repair PR for one triggered residual cycle |
+| 387 | merge the focused repair PR for one triggered residual cycle |
+| 388 | publish the landed repair handoff for one triggered residual cycle |
+| 389 | recheck the reciprocal result for one triggered residual cycle |
+| 390 | publish the fixed-point closure for one triggered residual cycle |
+| 391 | assess one future PS-first paired capability cycle — determine the next disposition |
+| 392 | create or update the focused repair issue for one future PS-first paired capability cycle |
+| 393 | commence the focused repair for one future PS-first paired capability cycle |
+| 394 | implement the focused repair for one future PS-first paired capability cycle |
+| 395 | create or update the focused repair PR for one future PS-first paired capability cycle |
+| 396 | run the Copilot-and-Codex review loop on the focused repair PR for one future PS-first paired capability cycle |
+| 397 | run the independent final quality check on the focused repair PR for one future PS-first paired capability cycle |
+| 398 | merge the focused repair PR for one future PS-first paired capability cycle |
+| 399 | publish the landed repair handoff for one future PS-first paired capability cycle |
+| 400 | recheck the reciprocal result for one future PS-first paired capability cycle |
+| 401 | publish the fixed-point closure for one future PS-first paired capability cycle |
+| 402 | verify final completion |
+
+## Original shared execution contract
+
+The following original policy and context are retained. The successor startup rules above control stale routing, completion and date references. Original task objectives and acceptance requirements remain binding.
 
 ## Purpose
 
@@ -7874,251 +8334,6 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, for the current issue-ready branch.
 
-## Task 83 — run the Copilot-and-Codex review loop on the PS #170 PR
-
-> **Execution class: Coding agent executable.**
->
-> **Required executor: Codex subagent (`gpt-5.6-sol`, `xhigh`).**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 82 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/198` | Produced by Task 82; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 82 | `FS` | The focused repair PR is review-ready, and the current issue-ready branch is active. |
-
-### Objective
-
-Run only the Copilot-and-Codex review loop. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 82 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 82's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
-4. If reviewable repository bytes change, repeat Task 83 for the new head before Task 84. Do not merge.
-
-### Reviewer-input and mutation-materiality controls
-
-1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
-3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
-4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Generate the Copilot REST request from the typed policy specification with exact reviewer login `copilot-pull-request-reviewer[bot]`; the display name `Copilot` is invalid for this REST request. Capture the native status and response body and normalize every collection through the tested helper. Confirm an accepted mutation only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. An empty collection is not success. An accepted request without a match stays `RECONCILING` for at least 120 seconds while other safe work continues; complete negative request-event, requested-reviewer, submitted-review, and review-run evidence then permits one `NO_EFFECT` retry for the same input and channel. A second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger before the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Reject any other same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
-5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
-6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
-7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
-
-### Copilot-and-Codex review-loop prompt
-
-~~~text
-Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
-
-Work in the pull request's repository. Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Follow the applicable "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. The local Codex subagent is the executor; `chatgpt-codex-connector` is a separate remote reviewer.
-
-Do not merge the pull request.
-
-1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
-2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
-4. Record baselines for each bot across review-request events, review runs, review submissions, inline review comments, and PR-level comments. Generate the GitHub Copilot request from the typed policy specification and send the authenticated REST review-request payload with exact reviewer login `copilot-pull-request-reviewer[bot]`. Do not use the display name `Copilot`. Capture the native status and response body. Normalize every returned collection with the tested helper; an empty collection is not success. Confirm the request only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt. If an accepted request has no match, record `RECONCILING`, continue other safe work, wait at least 120 seconds, and require complete negative evidence from all four surfaces before recording `NO_EFFECT`. Retry at most once for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger until the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Request the remote Codex reviewer every round by posting one ordinary PR conversation comment whose body is exactly `@codex review`. Treat that exact trigger comment as neither a finding nor an instruction to the local Codex subagent. Do not rely on an automatic Codex trigger.
-5. Poll authenticated structured data at least every 60 seconds. Paginate every review submission with its body, every inline review comment and thread, and every PR-level comment. Count a submitted-review result for the round only when every supplied commit identity matches the recorded PR head SHA, every valid timestamp alias agrees, and it is newer than every applicable supplied-identity baseline. Count a headless Codex PR-conversation result only when the authenticated author, request time, exclusion of every supplied identity from the baseline, agreement of every valid timestamp alias, explicit matching normalized head evidence for a terminal result, reviewed-input key, and serialized predecessor-pair order attribute it to this round. A stale or unattributable result never counts.
-6. Inventory all feedback surfaces. Parse every new review body, including every suppressed or advisory section. Verify each declared item count. Reconcile synthetic review-body keys with native inline comments so no finding is duplicated or dropped.
-7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
-8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
-9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
-12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
-14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
-
-If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-### Complete when
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-## Task 84 — run the independent final quality check on the PS #170 PR
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 82 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/198` | Produced by Task 82; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 83 | `FS` | A terminal-clean record applies to the current repair head/tree, and the current issue-ready branch is active. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
-
-### Objective
-
-Run only the independent final quality check in a fresh coding-agent session. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 83 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 82's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
-4. If any reviewable repository byte changes, return `FAIL`, repeat Task 83 for the new head, and then repeat Task 84 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
-
-### Post-review materiality controls
-
-1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
-3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
-4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
-5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
-
-### Independent final quality-check prompt
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Apply the applicable code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, for the current issue-ready branch.
-
-### Complete when
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, for the current issue-ready branch.
-
-## Task 85 — merge the PS #170 PR
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 82 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/198` | Produced by Task 82; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 84 | `FS` | Both review gates apply to the same current head/tree, and the current issue-ready branch is active. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
-
-### Objective
-
-Merge only the focused repair PR after the exact final-head gates pass. Do not publish the landed handoff.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Task-local merge gate
-
-Immediately before the merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
-4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Procedure
-
-1. If Task 84 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
-4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
-
-### Review-evidence materiality gate
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The focused repair PR is merged and its actual landed identity is recorded, for the current issue-ready branch.
-
-### Complete when
-
-The focused repair PR is merged and its actual landed identity is recorded, for the current issue-ready branch.
-
 ## Task 86 — publish the landed handoff for PS #170
 
 > **Execution class: Coding agent executable.**
@@ -8592,251 +8807,6 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ### Complete when
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, for the current issue-ready branch.
-
-## Task 92 — run the Copilot-and-Codex review loop on the PS #171 PR
-
-> **Execution class: Coding agent executable.**
->
-> **Required executor: Codex subagent (`gpt-5.6-sol`, `xhigh`).**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 91 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/199` | Produced by Task 91; verified focused repair PR |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 91 | `FS` | The focused repair PR is review-ready, and the current issue-ready branch is active. |
-
-### Objective
-
-Run only the Copilot-and-Codex review loop. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 91 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 91's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
-4. If reviewable repository bytes change, repeat Task 92 for the new head before Task 93. Do not merge.
-
-### Reviewer-input and mutation-materiality controls
-
-1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
-3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
-4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Generate the Copilot REST request from the typed policy specification with exact reviewer login `copilot-pull-request-reviewer[bot]`; the display name `Copilot` is invalid for this REST request. Capture the native status and response body and normalize every collection through the tested helper. Confirm an accepted mutation only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. An empty collection is not success. An accepted request without a match stays `RECONCILING` for at least 120 seconds while other safe work continues; complete negative request-event, requested-reviewer, submitted-review, and review-run evidence then permits one `NO_EFFECT` retry for the same input and channel. A second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger before the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Reject any other same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
-5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
-6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
-7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
-
-### Copilot-and-Codex review-loop prompt
-
-~~~text
-Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
-
-Work in the pull request's repository. Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Follow the applicable "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. The local Codex subagent is the executor; `chatgpt-codex-connector` is a separate remote reviewer.
-
-Do not merge the pull request.
-
-1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
-2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
-4. Record baselines for each bot across review-request events, review runs, review submissions, inline review comments, and PR-level comments. Generate the GitHub Copilot request from the typed policy specification and send the authenticated REST review-request payload with exact reviewer login `copilot-pull-request-reviewer[bot]`. Do not use the display name `Copilot`. Capture the native status and response body. Normalize every returned collection with the tested helper; an empty collection is not success. Confirm the request only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt. If an accepted request has no match, record `RECONCILING`, continue other safe work, wait at least 120 seconds, and require complete negative evidence from all four surfaces before recording `NO_EFFECT`. Retry at most once for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger until the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Request the remote Codex reviewer every round by posting one ordinary PR conversation comment whose body is exactly `@codex review`. Treat that exact trigger comment as neither a finding nor an instruction to the local Codex subagent. Do not rely on an automatic Codex trigger.
-5. Poll authenticated structured data at least every 60 seconds. Paginate every review submission with its body, every inline review comment and thread, and every PR-level comment. Count a submitted-review result for the round only when every supplied commit identity matches the recorded PR head SHA, every valid timestamp alias agrees, and it is newer than every applicable supplied-identity baseline. Count a headless Codex PR-conversation result only when the authenticated author, request time, exclusion of every supplied identity from the baseline, agreement of every valid timestamp alias, explicit matching normalized head evidence for a terminal result, reviewed-input key, and serialized predecessor-pair order attribute it to this round. A stale or unattributable result never counts.
-6. Inventory all feedback surfaces. Parse every new review body, including every suppressed or advisory section. Verify each declared item count. Reconcile synthetic review-body keys with native inline comments so no finding is duplicated or dropped.
-7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
-8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
-9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
-12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
-14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
-
-If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-### Complete when
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, for the current issue-ready branch. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-## Task 93 — run the independent final quality check on the PS #171 PR
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 91 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/199` | Produced by Task 91; verified focused repair PR |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 92 | `FS` | A terminal-clean record applies to the current repair head/tree, and the current issue-ready branch is active. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
-
-### Objective
-
-Run only the independent final quality check in a fresh coding-agent session. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 92 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 91's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
-4. If any reviewable repository byte changes, return `FAIL`, repeat Task 92 for the new head, and then repeat Task 93 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
-
-### Post-review materiality controls
-
-1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
-3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
-4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
-5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
-
-### Independent final quality-check prompt
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Apply the applicable code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, for the current issue-ready branch.
-
-### Complete when
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, for the current issue-ready branch.
-
-## Task 94 — merge the PS #171 PR
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 91 PR URL | `https://github.com/franklesniak/PSStyleGuide/pull/199` | Produced by Task 91; verified focused repair PR |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 93 | `FS` | Both review gates apply to the same current head/tree, and the current issue-ready branch is active. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
-
-### Objective
-
-Merge only the focused repair PR after the exact final-head gates pass. Do not publish the landed handoff.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Task-local merge gate
-
-Immediately before the merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
-4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Procedure
-
-1. If Task 93 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
-4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
-
-### Review-evidence materiality gate
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The focused repair PR is merged and its actual landed identity is recorded, for the current issue-ready branch.
-
-### Complete when
-
-The focused repair PR is merged and its actual landed identity is recorded, for the current issue-ready branch.
 
 ## Task 95 — publish the landed handoff for PS #171
 
@@ -9512,244 +9482,6 @@ The PS #162 candidate PR exists with complete initial validation and an accurate
 
 The PS #162 candidate PR exists with complete initial validation and an accurate PR body.
 
-## Task 101 — run the Copilot-and-Codex review loop on the PS #162 PR
-
-> **Execution class: Coding agent executable.**
->
-> **Required executor: Codex subagent (`gpt-5.6-sol`, `xhigh`).**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| PS issue #162 URL | `https://github.com/franklesniak/PSStyleGuide/issues/162` | Verified existing GitHub issue |
-| Task 100 PR URL | `{{TASK_100_PR_URL}}` | Produced by Task 100; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 100 | `FS` | The PS #162 candidate PR exists and initial checks pass. |
-
-### Objective
-
-Complete only this leaf action: run the Copilot-and-Codex review loop on the PS #162 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-Run the task-local Copilot-and-Codex review-loop prompt below against the PS #162 PR. Do not merge. If the loop changes bytes, rerun the Task 100 validation and continue on the new head.
-
-### Reviewer-input and mutation-materiality controls
-
-1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
-3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
-4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Generate the Copilot REST request from the typed policy specification with exact reviewer login `copilot-pull-request-reviewer[bot]`; the display name `Copilot` is invalid for this REST request. Capture the native status and response body and normalize every collection through the tested helper. Confirm an accepted mutation only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. An empty collection is not success. An accepted request without a match stays `RECONCILING` for at least 120 seconds while other safe work continues; complete negative request-event, requested-reviewer, submitted-review, and review-run evidence then permits one `NO_EFFECT` retry for the same input and channel. A second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger before the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Reject any other same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
-5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
-6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
-7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
-
-### Copilot-and-Codex review-loop prompt
-
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`:
-
-~~~text
-Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
-
-Work in the pull request's repository. Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Follow the applicable "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. The local Codex subagent is the executor; `chatgpt-codex-connector` is a separate remote reviewer.
-
-Do not merge the pull request.
-
-1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
-2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
-4. Record baselines for each bot across review-request events, review runs, review submissions, inline review comments, and PR-level comments. Generate the GitHub Copilot request from the typed policy specification and send the authenticated REST review-request payload with exact reviewer login `copilot-pull-request-reviewer[bot]`. Do not use the display name `Copilot`. Capture the native status and response body. Normalize every returned collection with the tested helper; an empty collection is not success. Confirm the request only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt. If an accepted request has no match, record `RECONCILING`, continue other safe work, wait at least 120 seconds, and require complete negative evidence from all four surfaces before recording `NO_EFFECT`. Retry at most once for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger until the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Request the remote Codex reviewer every round by posting one ordinary PR conversation comment whose body is exactly `@codex review`. Treat that exact trigger comment as neither a finding nor an instruction to the local Codex subagent. Do not rely on an automatic Codex trigger.
-5. Poll authenticated structured data at least every 60 seconds. Paginate every review submission with its body, every inline review comment and thread, and every PR-level comment. Count a submitted-review result for the round only when every supplied commit identity matches the recorded PR head SHA, every valid timestamp alias agrees, and it is newer than every applicable supplied-identity baseline. Count a headless Codex PR-conversation result only when the authenticated author, request time, exclusion of every supplied identity from the baseline, agreement of every valid timestamp alias, explicit matching normalized head evidence for a terminal result, reviewed-input key, and serialized predecessor-pair order attribute it to this round. A stale or unattributable result never counts.
-6. Inventory all feedback surfaces. Parse every new review body, including every suppressed or advisory section. Verify each declared item count. Reconcile synthetic review-body keys with native inline comments so no finding is duplicated or dropped.
-7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
-8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
-9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
-12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
-14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
-
-If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
-~~~
-
-### Validation and evidence
-
-### Stop and escalation conditions
-
-### Exact output
-
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-### Complete when
-
-The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-## Task 102 — run the independent final quality check on the PS #162 PR
-
-> **Execution class: Coding agent executable.** Use a fresh coding-agent session.
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| PS issue #162 URL | `https://github.com/franklesniak/PSStyleGuide/issues/162` | Verified existing GitHub issue |
-| Task 100 PR URL | `{{TASK_100_PR_URL}}` | Produced by Task 100; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 101 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
-
-### Objective
-
-Complete only this leaf action: run the independent final quality check on the PS #162 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-Run the task-local independent final PR quality-check prompt below against the PS #162 PR. Require full issue-contract, workflow-topology, policy-case, comment, deferral, PR-body, validation, and mergeability coverage. Return to Task 101 after any head change.
-
-### Post-review materiality controls
-
-1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
-3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
-4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
-5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
-
-### Independent final PR quality-check prompt
-
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Apply the applicable code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-### Stop and escalation conditions
-
-### Exact output
-
-The fresh agent returns `PASS` for the same head SHA and tree as Task 101.
-
-### Complete when
-
-The fresh agent returns `PASS` for the same head SHA and tree as Task 101.
-
-## Task 103 — merge the PS #162 PR
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| PS issue #162 URL | `https://github.com/franklesniak/PSStyleGuide/issues/162` | Verified existing GitHub issue |
-| Task 100 PR URL | `{{TASK_100_PR_URL}}` | Produced by Task 100; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 102 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
-
-### Objective
-
-Merge only the current reviewed PR after both final gates apply to the same head and tree. Do not publish the permanent handoff.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Task-local merge gate
-
-Immediately before the merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
-4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Procedure
-
-1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
-3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
-4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
-
-### Review-evidence materiality gate
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The PR is merged and its actual landed identity is recorded, or the conditional fallback merge has the authorized skip record; permanent handoff publication remains for the next task when merge occurred.
-
-### Complete when
-
-The PR is merged and its actual landed identity is recorded, or the conditional fallback merge has the authorized skip record; permanent handoff publication remains for the next task when merge occurred.
-
 ## Task 104 — publish the landed handoff for the PS #162 PR
 
 > **Execution class: Coding agent executable.**
@@ -10241,251 +9973,6 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ### Complete when
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-## Task 110 — run the Copilot-and-Codex review loop on the focused repair PR for cycle 3 in Terraform
-
-> **Execution class: Coding agent executable.**
->
-> **Required executor: Codex subagent (`gpt-5.6-sol`, `xhigh`).**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 109 PR URL | `{{TASK_109_PR_URL}}` | Produced by Task 109; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 109 | `FS` | The focused repair PR is review-ready, or the branch is skipped. |
-
-### Objective
-
-Run only the Copilot-and-Codex review loop. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 109 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 109's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
-4. If reviewable repository bytes change, repeat Task 110 for the new head before Task 111. Do not merge.
-
-### Reviewer-input and mutation-materiality controls
-
-1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
-3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
-4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Generate the Copilot REST request from the typed policy specification with exact reviewer login `copilot-pull-request-reviewer[bot]`; the display name `Copilot` is invalid for this REST request. Capture the native status and response body and normalize every collection through the tested helper. Confirm an accepted mutation only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. An empty collection is not success. An accepted request without a match stays `RECONCILING` for at least 120 seconds while other safe work continues; complete negative request-event, requested-reviewer, submitted-review, and review-run evidence then permits one `NO_EFFECT` retry for the same input and channel. A second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger before the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Reject any other same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
-5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
-6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
-7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
-
-### Copilot-and-Codex review-loop prompt
-
-~~~text
-Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
-
-Work in the pull request's repository. Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Follow the applicable "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. The local Codex subagent is the executor; `chatgpt-codex-connector` is a separate remote reviewer.
-
-Do not merge the pull request.
-
-1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
-2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
-4. Record baselines for each bot across review-request events, review runs, review submissions, inline review comments, and PR-level comments. Generate the GitHub Copilot request from the typed policy specification and send the authenticated REST review-request payload with exact reviewer login `copilot-pull-request-reviewer[bot]`. Do not use the display name `Copilot`. Capture the native status and response body. Normalize every returned collection with the tested helper; an empty collection is not success. Confirm the request only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt. If an accepted request has no match, record `RECONCILING`, continue other safe work, wait at least 120 seconds, and require complete negative evidence from all four surfaces before recording `NO_EFFECT`. Retry at most once for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger until the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Request the remote Codex reviewer every round by posting one ordinary PR conversation comment whose body is exactly `@codex review`. Treat that exact trigger comment as neither a finding nor an instruction to the local Codex subagent. Do not rely on an automatic Codex trigger.
-5. Poll authenticated structured data at least every 60 seconds. Paginate every review submission with its body, every inline review comment and thread, and every PR-level comment. Count a submitted-review result for the round only when every supplied commit identity matches the recorded PR head SHA, every valid timestamp alias agrees, and it is newer than every applicable supplied-identity baseline. Count a headless Codex PR-conversation result only when the authenticated author, request time, exclusion of every supplied identity from the baseline, agreement of every valid timestamp alias, explicit matching normalized head evidence for a terminal result, reviewed-input key, and serialized predecessor-pair order attribute it to this round. A stale or unattributable result never counts.
-6. Inventory all feedback surfaces. Parse every new review body, including every suppressed or advisory section. Verify each declared item count. Reconcile synthetic review-body keys with native inline comments so no finding is duplicated or dropped.
-7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
-8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
-9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
-12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
-14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
-
-If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-### Complete when
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-## Task 111 — run the independent final quality check on the focused repair PR for cycle 3 in Terraform
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 109 PR URL | `{{TASK_109_PR_URL}}` | Produced by Task 109; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 110 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
-
-### Objective
-
-Run only the independent final quality check in a fresh coding-agent session. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 110 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 109's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
-4. If any reviewable repository byte changes, return `FAIL`, repeat Task 110 for the new head, and then repeat Task 111 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
-
-### Post-review materiality controls
-
-1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
-3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
-4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
-5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
-
-### Independent final quality-check prompt
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Apply the applicable code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-### Complete when
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-## Task 112 — merge the focused repair PR for cycle 3 in Terraform
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 109 PR URL | `{{TASK_109_PR_URL}}` | Produced by Task 109; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 111 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
-
-### Objective
-
-Merge only the focused repair PR after the exact final-head gates pass. Do not publish the landed handoff.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Task-local merge gate
-
-Immediately before the merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
-4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Procedure
-
-1. If Task 111 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
-4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
-
-### Review-evidence materiality gate
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The focused repair PR is merged and its actual landed identity is recorded, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-### Complete when
-
-The focused repair PR is merged and its actual landed identity is recorded, or the task is recorded `SKIPPED — NO_REPAIR`.
 
 ## Task 113 — publish the landed repair handoff for cycle 3 in Terraform
 
@@ -11067,160 +10554,6 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 ### Complete when
 
 The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-## Task 120 — run the independent final quality check on the focused repair PR for cycle 3 in PS
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 118 PR URL | `{{TASK_118_PR_URL}}` | Produced by Task 118; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 119 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
-
-### Objective
-
-Run only the independent final quality check in a fresh coding-agent session. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 119 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 118's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
-4. If any reviewable repository byte changes, return `FAIL`, repeat Task 119 for the new head, and then repeat Task 120 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
-
-### Post-review materiality controls
-
-1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
-3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
-4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
-5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
-
-### Independent final quality-check prompt
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Apply the applicable code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-### Complete when
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-## Task 121 — merge the focused repair PR for cycle 3 in PS
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 118 PR URL | `{{TASK_118_PR_URL}}` | Produced by Task 118; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 120 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
-
-### Objective
-
-Merge only the focused repair PR after the exact final-head gates pass. Do not publish the landed handoff.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Task-local merge gate
-
-Immediately before the merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
-4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Procedure
-
-1. If Task 120 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
-4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
-
-### Review-evidence materiality gate
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The focused repair PR is merged and its actual landed identity is recorded, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-### Complete when
-
-The focused repair PR is merged and its actual landed identity is recorded, or the task is recorded `SKIPPED — NO_REPAIR`.
 
 ## Task 122 — publish the landed repair handoff for cycle 3 in PS
 
@@ -11913,157 +11246,6 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a close
 
 The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
-## Task 131 — run the independent final quality check on the PS #158 PR
-
-> **Execution class: Coding agent executable.** Use a fresh coding-agent session.
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| PS issue #158 URL | `https://github.com/franklesniak/PSStyleGuide/issues/158` | Verified existing GitHub issue |
-| Task 129 PR URL | `{{TASK_129_PR_URL}}` | Produced by Task 129; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 130 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
-
-### Objective
-
-Complete only this leaf action: run the independent final quality check on the PS #158 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-Run the task-local independent final PR quality-check prompt below. Require PS #158 issue coverage, immutable-source verification, read-only and mutation-absence proof, comments, deferrals, PR-body accuracy, validation, and mergeability. Return to Task 130 after any head change.
-
-### Post-review materiality controls
-
-1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
-3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
-4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
-5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
-
-### Independent final PR quality-check prompt
-
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Apply the applicable code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-### Stop and escalation conditions
-
-### Exact output
-
-The fresh agent returns `PASS` for the same head SHA and tree as Task 130.
-
-### Complete when
-
-The fresh agent returns `PASS` for the same head SHA and tree as Task 130.
-
-## Task 132 — merge the PS #158 PR
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| PS issue #158 URL | `https://github.com/franklesniak/PSStyleGuide/issues/158` | Verified existing GitHub issue |
-| Task 129 PR URL | `{{TASK_129_PR_URL}}` | Produced by Task 129; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 131 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
-
-### Objective
-
-Merge only the current reviewed PR after both final gates apply to the same head and tree. Do not publish the permanent handoff.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Task-local merge gate
-
-Immediately before the merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
-4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Procedure
-
-1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
-3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
-4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
-
-### Review-evidence materiality gate
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The PR is merged and its actual landed identity is recorded, or the conditional fallback merge has the authorized skip record; permanent handoff publication remains for the next task when merge occurred.
-
-### Complete when
-
-The PR is merged and its actual landed identity is recorded, or the conditional fallback merge has the authorized skip record; permanent handoff publication remains for the next task when merge occurred.
-
 ## Task 133 — publish the landed handoff for the PS #158 PR
 
 > **Execution class: Coding agent executable.**
@@ -12647,160 +11829,6 @@ The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the 
 
 The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
-## Task 140 — run the independent final quality check on the focused repair PR for cycle 4 in Terraform
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 138 PR URL | `{{TASK_138_PR_URL}}` | Produced by Task 138; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 139 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
-
-### Objective
-
-Run only the independent final quality check in a fresh coding-agent session. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 139 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 138's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
-4. If any reviewable repository byte changes, return `FAIL`, repeat Task 139 for the new head, and then repeat Task 140 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
-
-### Post-review materiality controls
-
-1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
-3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
-4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
-5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
-
-### Independent final quality-check prompt
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Apply the applicable code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-### Complete when
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-## Task 141 — merge the focused repair PR for cycle 4 in Terraform
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 138 PR URL | `{{TASK_138_PR_URL}}` | Produced by Task 138; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 140 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
-
-### Objective
-
-Merge only the focused repair PR after the exact final-head gates pass. Do not publish the landed handoff.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Task-local merge gate
-
-Immediately before the merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
-4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Procedure
-
-1. If Task 140 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
-4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
-
-### Review-evidence materiality gate
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The focused repair PR is merged and its actual landed identity is recorded, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-### Complete when
-
-The focused repair PR is merged and its actual landed identity is recorded, or the task is recorded `SKIPPED — NO_REPAIR`.
-
 ## Task 142 — publish the landed repair handoff for cycle 4 in Terraform
 
 > **Execution class: Coding agent executable.**
@@ -13290,251 +12318,6 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ### Complete when
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-## Task 148 — run the Copilot-and-Codex review loop on the focused repair PR for cycle 4 in PS
-
-> **Execution class: Coding agent executable.**
->
-> **Required executor: Codex subagent (`gpt-5.6-sol`, `xhigh`).**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 147 PR URL | `{{TASK_147_PR_URL}}` | Produced by Task 147; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 147 | `FS` | The focused repair PR is review-ready, or the branch is skipped. |
-
-### Objective
-
-Run only the Copilot-and-Codex review loop. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 147 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 147's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
-4. If reviewable repository bytes change, repeat Task 148 for the new head before Task 149. Do not merge.
-
-### Reviewer-input and mutation-materiality controls
-
-1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
-3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
-4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Generate the Copilot REST request from the typed policy specification with exact reviewer login `copilot-pull-request-reviewer[bot]`; the display name `Copilot` is invalid for this REST request. Capture the native status and response body and normalize every collection through the tested helper. Confirm an accepted mutation only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. An empty collection is not success. An accepted request without a match stays `RECONCILING` for at least 120 seconds while other safe work continues; complete negative request-event, requested-reviewer, submitted-review, and review-run evidence then permits one `NO_EFFECT` retry for the same input and channel. A second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger before the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Reject any other same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
-5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
-6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
-7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
-
-### Copilot-and-Codex review-loop prompt
-
-~~~text
-Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
-
-Work in the pull request's repository. Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Follow the applicable "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. The local Codex subagent is the executor; `chatgpt-codex-connector` is a separate remote reviewer.
-
-Do not merge the pull request.
-
-1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
-2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
-4. Record baselines for each bot across review-request events, review runs, review submissions, inline review comments, and PR-level comments. Generate the GitHub Copilot request from the typed policy specification and send the authenticated REST review-request payload with exact reviewer login `copilot-pull-request-reviewer[bot]`. Do not use the display name `Copilot`. Capture the native status and response body. Normalize every returned collection with the tested helper; an empty collection is not success. Confirm the request only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt. If an accepted request has no match, record `RECONCILING`, continue other safe work, wait at least 120 seconds, and require complete negative evidence from all four surfaces before recording `NO_EFFECT`. Retry at most once for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger until the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Request the remote Codex reviewer every round by posting one ordinary PR conversation comment whose body is exactly `@codex review`. Treat that exact trigger comment as neither a finding nor an instruction to the local Codex subagent. Do not rely on an automatic Codex trigger.
-5. Poll authenticated structured data at least every 60 seconds. Paginate every review submission with its body, every inline review comment and thread, and every PR-level comment. Count a submitted-review result for the round only when every supplied commit identity matches the recorded PR head SHA, every valid timestamp alias agrees, and it is newer than every applicable supplied-identity baseline. Count a headless Codex PR-conversation result only when the authenticated author, request time, exclusion of every supplied identity from the baseline, agreement of every valid timestamp alias, explicit matching normalized head evidence for a terminal result, reviewed-input key, and serialized predecessor-pair order attribute it to this round. A stale or unattributable result never counts.
-6. Inventory all feedback surfaces. Parse every new review body, including every suppressed or advisory section. Verify each declared item count. Reconcile synthetic review-body keys with native inline comments so no finding is duplicated or dropped.
-7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
-8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
-9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
-12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
-14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
-
-If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-### Complete when
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-## Task 149 — run the independent final quality check on the focused repair PR for cycle 4 in PS
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 147 PR URL | `{{TASK_147_PR_URL}}` | Produced by Task 147; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 148 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
-
-### Objective
-
-Run only the independent final quality check in a fresh coding-agent session. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 148 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 147's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
-4. If any reviewable repository byte changes, return `FAIL`, repeat Task 148 for the new head, and then repeat Task 149 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
-
-### Post-review materiality controls
-
-1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
-3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
-4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
-5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
-
-### Independent final quality-check prompt
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Apply the applicable code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-### Complete when
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-## Task 150 — merge the focused repair PR for cycle 4 in PS
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 147 PR URL | `{{TASK_147_PR_URL}}` | Produced by Task 147; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 149 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
-
-### Objective
-
-Merge only the focused repair PR after the exact final-head gates pass. Do not publish the landed handoff.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Task-local merge gate
-
-Immediately before the merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
-4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Procedure
-
-1. If Task 149 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
-4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
-
-### Review-evidence materiality gate
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The focused repair PR is merged and its actual landed identity is recorded, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-### Complete when
-
-The focused repair PR is merged and its actual landed identity is recorded, or the task is recorded `SKIPPED — NO_REPAIR`.
 
 ## Task 151 — publish the landed repair handoff for cycle 4 in PS
 
@@ -14194,157 +12977,6 @@ The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a close
 
 The loop returns `TERMINALLY CLEAN` for a recorded head SHA and tree. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
 
-## Task 159 — run the independent final quality check on the PS #163 PR
-
-> **Execution class: Coding agent executable.** Use a fresh coding-agent session.
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| PS issue #163 URL | `https://github.com/franklesniak/PSStyleGuide/issues/163` | Verified existing GitHub issue |
-| Task 157 PR URL | `{{TASK_157_PR_URL}}` | Produced by Task 157; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 158 | `FS` | The Copilot-and-Codex review loop is terminally clean. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
-
-### Objective
-
-Complete only this leaf action: run the independent final quality check on the PS #163 PR. Produce the exact state and evidence in this task's `Complete when` condition; do not perform a successor lifecycle action.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-Run the task-local independent final PR quality-check prompt below. Require PS #163 issue coverage, protected-entry-point authorization, pinned-input comparison, absence of volatile protocol duplication, comments, deferrals, PR-body accuracy, validation, and mergeability. Return to Task 158 after any head change.
-
-### Post-review materiality controls
-
-1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
-3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
-4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
-5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
-
-### Independent final PR quality-check prompt
-
-Replace only `<PR_URL_OR_NUMBER>` with the verified pull-request URL or number. Copy the resulting prompt into a fresh coding-agent session after the Copilot-and-Codex review loop is terminally clean:
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Apply the applicable code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-### Stop and escalation conditions
-
-### Exact output
-
-The fresh agent returns `PASS` for the same head SHA and tree as Task 158.
-
-### Complete when
-
-The fresh agent returns `PASS` for the same head SHA and tree as Task 158.
-
-## Task 160 — merge the PS #163 PR
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/PSStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| PS issue #163 URL | `https://github.com/franklesniak/PSStyleGuide/issues/163` | Verified existing GitHub issue |
-| Task 157 PR URL | `{{TASK_157_PR_URL}}` | Produced by Task 157; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 159 | `FS` | The independent quality check passed for the current head and tree. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
-
-### Objective
-
-Merge only the current reviewed PR after both final gates apply to the same head and tree. Do not publish the permanent handoff.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Task-local merge gate
-
-Immediately before the merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
-4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Procedure
-
-1. Re-query the PR, all linked and closing issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-2. Verify the terminal-clean and independent `PASS` records identify the current head/tree, no newer feedback exists, all required checks pass, the PR body and dependencies are exact, and every plan-defined dependency and readiness gate is satisfied.
-3. Apply the task-local merge gate. Merge with an allowed method. Do not publish the permanent landed handoff in this task.
-4. Record the API-returned merge method, actual landed commit/tree, parents, immediate issue state, and post-merge checks.
-
-### Review-evidence materiality gate
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The PR is merged and its actual landed identity is recorded, or the conditional fallback merge has the authorized skip record; permanent handoff publication remains for the next task when merge occurred.
-
-### Complete when
-
-The PR is merged and its actual landed identity is recorded, or the conditional fallback merge has the authorized skip record; permanent handoff publication remains for the next task when merge occurred.
-
 ## Task 161 — publish the landed handoff for the PS #163 PR
 
 > **Execution class: Coding agent executable.**
@@ -14836,251 +13468,6 @@ The focused repair PR is review-ready with an accurate body, exact candidate ide
 ### Complete when
 
 The focused repair PR is review-ready with an accurate body, exact candidate identities, and successful initial checks, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-## Task 167 — run the Copilot-and-Codex review loop on the focused repair PR for cycle 5 in Terraform
-
-> **Execution class: Coding agent executable.**
->
-> **Required executor: Codex subagent (`gpt-5.6-sol`, `xhigh`).**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 166 PR URL | `{{TASK_166_PR_URL}}` | Produced by Task 166; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 166 | `FS` | The focused repair PR is review-ready, or the branch is skipped. |
-
-### Objective
-
-Run only the Copilot-and-Codex review loop. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 166 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 166's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh`.
-4. If reviewable repository bytes change, repeat Task 167 for the new head before Task 168. Do not merge.
-
-### Reviewer-input and mutation-materiality controls
-
-1. Before the first terminal reviewer request for each final code head, generate the reviewer-facing PR body from typed or deterministically recomputed data. Verify every represented commit, tree, blob, byte count, hash, check, parity row, issue relationship, scope, risk, and rollback statement. Verify Markdown transport and reject control characters. Freeze the reviewer-facing body.
-2. Keep compact task state, polling state, reviewer requests, review IDs, review results, quality results, audit records, and terminal results outside the frozen reviewer-facing body. Publish mutable results in compact state or a separate comment.
-3. Classify each change as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. A code or reviewed-diff change requires a new pair. A material scope, behavior, or risk-description change normally requires a new pair and must record the material reason. Raw body-byte inequality is not the classifier.
-4. Request at most one Codex and one GitHub Copilot review for each reviewed input by default. Generate the Copilot REST request from the typed policy specification with exact reviewer login `copilot-pull-request-reviewer[bot]`; the display name `Copilot` is invalid for this REST request. Capture the native status and response body and normalize every collection through the tested helper. Confirm an accepted mutation only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. An empty collection is not success. An accepted request without a match stays `RECONCILING` for at least 120 seconds while other safe work continues; complete negative request-event, requested-reviewer, submitted-review, and review-run evidence then permits one `NO_EFFECT` retry for the same input and channel. A second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger before the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Reject any other same-head request unless a recorded material scope, behavior, or risk reason changes the reviewed input. A non-material fact, result, task state, audit record, or comment-only publication does not request review.
-5. Treat a successful review-request or comment API response plus authenticated readback as the mutation boundary. If later local serialization fails, reconcile the confirmed public state and do not repeat the request.
-6. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode in construction, transport, and readback. Reject disallowed control characters.
-7. Preserve both submitted-review and attributable PR-conversation-comment ingestion for Codex. An exact `@codex review` trigger is neither a finding nor a local instruction.
-
-### Copilot-and-Codex review-loop prompt
-
-~~~text
-Use a fresh Codex subagent with model `gpt-5.6-sol` and reasoning effort `xhigh` to take pull request <PR_URL_OR_NUMBER> through the repository's complete automated review-loop process.
-
-Work in the pull request's repository. Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Follow the applicable "Handling code review comments," "Deferring work," "Automated review loop," protected-instruction, validation, and identity-gate requirements exactly. The local Codex subagent is the executor; `chatgpt-codex-connector` is a separate remote reviewer.
-
-Do not merge the pull request.
-
-1. Re-query the pull request. Record the base SHA, current head SHA and tree, draft state, merge state, required checks, linked issues, and existing review/comment baselines.
-2. Confirm that the candidate implementation and its initial local validation are complete. If the PR is still a draft, mark it ready for review only when the candidate is ready for the review loop.
-4. Record baselines for each bot across review-request events, review runs, review submissions, inline review comments, and PR-level comments. Generate the GitHub Copilot request from the typed policy specification and send the authenticated REST review-request payload with exact reviewer login `copilot-pull-request-reviewer[bot]`. Do not use the display name `Copilot`. Capture the native status and response body. Normalize every returned collection with the tested helper; an empty collection is not success. Confirm the request only through a matching fresh authenticated request event, exact-head submitted review, or exact-head Copilot workflow run. Treat current requested-reviewer membership as diagnostic only; it cannot confirm the current attempt. If an accepted request has no match, record `RECONCILING`, continue other safe work, wait at least 120 seconds, and require complete negative evidence from all four surfaces before recording `NO_EFFECT`. Retry at most once for the same reviewed input and channel; a second proved no-effect attempt is `EXHAUSTED`. Do not send the Codex trigger until the Copilot request is confirmed or is terminally proved non-functional through a persisted `terminalDisposition` whose state is `REPOSITORY_AUTHORIZED_NON_FUNCTIONAL`, whose authority and reason are nonempty, and whose recorded time is not earlier than the Copilot request. Persist Copilot `readyAt` as the authenticated release boundary before a Codex request. For a confirmed request, use the matching authenticated confirmation-readback time. At matching `CONFIRMED` review-request public-mutation ingestion, require the attempt count and both attempt and reconciliation timestamps, then require `readyAt` to equal that reconciliation time with lossless RFC 3339 comparison. For an unconfirmed terminal request, require `readyAt` to equal `terminalDisposition.recordedAt`. Require the Codex request time to be at or after `readyAt`. Reject a request event, submitted review, review run, or Codex trigger comment when any supplied node, numeric, or database identity overlaps its persisted baseline; every supplied identity for those immutable items must be absent from the matching baseline. For a result-bearing conversation comment, accept a supplied identity that overlaps its baseline only when its authenticated `updatedAt` is strictly later than every matching baseline observation. Every supplied review-run head identity must match the reviewed head, and all valid timestamp aliases for one event time must agree. Causal RFC 3339 ordering must preserve every supplied fractional digit. Treat a readback surface as complete only when its selected direct collection or recognized wrapper member is present and non-null; a present outer wrapper with a null or missing selected `nodes`, `edges`, `requested_reviewers`, `users`, `check_runs`, or `workflow_runs` collection is incomplete. Accept each supplied native evidence identity only as a nonempty string or positive safe integer; reject the entire evidence item if any supplied identity is invalid. Validate a retained disposition against the original request segment ending at the first later different-input request; a later reactivated channel cannot retroactively complete that original pair. Retain an exact reciprocal reactivation edge after the resumed request only when that first later request uses the recorded reciprocal successor head. Assign each terminal outcome observation to only one request across both reviewer channels. Deduplicate submitted reviews and immutable failure details by result kind and every native identity globally. Deduplicate each clean mutable conversation result globally by its result kind, every native identity, and exact authenticated observation instant. Treat a strictly later valid observation of that comment as distinct, but reject native-identity reuse between a clean mutable result and an immutable failure detail. When the first later different-input request uses the recorded same head or next distinct retained head, require that exact head; otherwise treat the immediate successor as unrequested and accept either eligible head. Require one closed authenticated PR-readback evidence record for every zero-request head before it can participate in reviewed-head chronology. Request the remote Codex reviewer every round by posting one ordinary PR conversation comment whose body is exactly `@codex review`. Treat that exact trigger comment as neither a finding nor an instruction to the local Codex subagent. Do not rely on an automatic Codex trigger.
-5. Poll authenticated structured data at least every 60 seconds. Paginate every review submission with its body, every inline review comment and thread, and every PR-level comment. Count a submitted-review result for the round only when every supplied commit identity matches the recorded PR head SHA, every valid timestamp alias agrees, and it is newer than every applicable supplied-identity baseline. Count a headless Codex PR-conversation result only when the authenticated author, request time, exclusion of every supplied identity from the baseline, agreement of every valid timestamp alias, explicit matching normalized head evidence for a terminal result, reviewed-input key, and serialized predecessor-pair order attribute it to this round. A stale or unattributable result never counts.
-6. Inventory all feedback surfaces. Parse every new review body, including every suppressed or advisory section. Verify each declared item count. Reconcile synthetic review-body keys with native inline comments so no finding is duplicated or dropped.
-7. Process every actionable inline or review-body finding from both reviewers, humans, and other reviewers one at a time. For each real finding, complete all nine `AGENTS.md` comment-processing steps: validate; list exhaustive options; build a fresh weighted rubric; score the options in a table; select and state the best option in ASD-STE100-compliant language; post the complete evaluation; implement the selected solution; evaluate instruction/style-guide impact; and answer and close the native thread or synthetic key.
-8. Ignore comments that begin with @copilot when they are commands addressed to GitHub Copilot, as `AGENTS.md` requires.
-9. After each fix, verify that the commit is reachable from the PR head. Run applicable local validation. Search for sibling defects by property and mutation-test new assertions before requesting the next review round.
-11. Run up to 80 rounds. Keep public-mutation `NO_EFFECT` recovery separate from a confirmed downstream reviewer terminal failure. For one unchanged reviewed-input key, permit at most three Codex channel attempts. Attempt 2 requires exact attributable terminal non-success evidence for attempt 1, a fresh cumulative baseline captured after that failure boundary, and at least 60 seconds. Attempt 3 requires the same evidence for attempt 2 and another fresh cumulative baseline. Preserve each request and failure. Count only `completed` as clean. Missing, pending, ambiguous, stale, unattributed, or nonterminal evidence does not permit a retry. Never permit attempt 4. After attempt 3 fails exactly, record exhausted-not-clean and block unless a closed exact typed operator authority permits independent quality and merge-readiness evaluation; that authority does not make the reviewer result clean and does not waive any other gate. Document the exact failure in a PR comment and continue only as `AGENTS.md` permits.
-12. Before declaring the loop clean, run the whole-PR deferred-work sweep across all resolved and unresolved review threads, reviews, inline comments, PR-level comments, and the PR body. Complete illegitimate worker-fact deferrals now. For each legitimate deferral, verify that a self-contained GitHub issue exists, is cited by the PR, and has correct native dependencies. Correct residual/deviation labels that are incorrectly called deferrals.
-13. Declare terminal clean only when Copilot and Codex each have a current-head clean result, except that Copilot can use an exact persisted repository-authorized non-functional disposition. A Codex attempt is clean only when its exact attributable terminal status is `completed`. After three exact attributable Codex terminal failures, return `EXHAUSTED_NOT_CLEAN` and block by default. A closed exact typed operator authority may permit independent quality and merge-readiness evaluation, but it does not make the Codex result clean and does not waive CI, exact-head, Copilot, actionable-finding, independent-quality, frozen-input, mergeability, or other required gates. Reconcile every declared review-body count; close every native thread and synthetic key with evidence; and leave no untracked or illegitimate deferral. A sentence that says no new comments is not clean when the same review body contains a suppressed or advisory finding.
-14. Post and return a terminal review-loop record. Include the PR URL, final head SHA and tree, round count, reviewer review IDs and commit IDs, all processed comment/thread IDs, local validation, deferred-work disposition, non-functional-reviewer evidence if applicable, and the explicit result TERMINALLY CLEAN or NOT CLEAN.
-
-If you reach a blocker, the 80-round cap, or a maintainer decision, stop without merging. State the exact blocker, current head SHA and tree, completed work, open thread IDs, and the next required action.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-### Complete when
-
-The repair PR has a `TERMINALLY CLEAN` record for its current head/tree, or the task is recorded `SKIPPED — NO_REPAIR`. If a closed exact typed operator authority validates after three exact attributable Codex terminal failures, the task instead returns or completes as `EXHAUSTED_NOT_CLEAN`; this state is not clean, any allowed successor is limited to independent quality or merge-readiness evaluation, and every other gate remains mandatory.
-
-## Task 168 — run the independent final quality check on the focused repair PR for cycle 5 in Terraform
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 166 PR URL | `{{TASK_166_PR_URL}}` | Produced by Task 166; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 167 | `FS` | A terminal-clean record applies to the current repair head/tree, or the branch is skipped. An exact closed typed operator authority may instead permit `EXHAUSTED_NOT_CLEAN` independent-quality or merge-readiness evaluation after three exact attributable Codex failures; this state is not clean and every other gate remains mandatory. |
-
-### Objective
-
-Run only the independent final quality check in a fresh coding-agent session. Do not merge.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Procedure
-
-1. If Task 167 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Obtain `<PR_URL_OR_NUMBER>` from Task 166's verified output. Replace only that placeholder in the prompt below.
-3. Run the prompt in a fresh coding-agent session with no reliance on the Copilot-and-Codex review-loop subagent.
-4. If any reviewable repository byte changes, return `FAIL`, repeat Task 167 for the new head, and then repeat Task 168 in another fresh session. If only metadata changes, re-query and repeat affected sections. Do not merge.
-
-### Post-review materiality controls
-
-1. Verify that the reviewed code head, tree, diff, frozen reviewer-facing body semantics, represented scope, and risk remain unchanged before adjudicating findings.
-2. Classify each discrepancy as `CODE_OR_DIFF`, `MATERIAL_SCOPE_BEHAVIOR_RISK`, `NON_MATERIAL_FACT`, `RESULT_OR_STATE`, or `COMMENT_ONLY`. Route the first two classes back to implementation or PR preparation, refreeze the corrected reviewer input, and require a new review and quality pair.
-3. Correct a verified non-material fact only through compact state or a tightly bounded factual field. Read it back, preserve the frozen reviewed input, do not request reviewers again, and rerun only this quality task. Raw body-byte inequality is not the classifier.
-4. Reject a same-head review request without a recorded material scope, behavior, or risk reason. Treat a successful API response plus authenticated readback as the mutation boundary; a later local serialization failure cannot repeat the public mutation.
-5. Normalize empty, singleton, and multiple reviewer, review, comment, and thread collections. Preserve Markdown backticks and Unicode and reject disallowed control characters.
-6. Preserve and independently reconcile both submitted-review objects and attributable Codex PR-conversation comments.
-
-### Independent final quality-check prompt
-
-~~~text
-Perform an independent final quality check of pull request <PR_URL_OR_NUMBER>. Use a fresh coding-agent session. Do not rely on the prior review-loop agent's summary, memory, or context. Re-query and verify all evidence yourself.
-
-Apply the repository-local root `AGENTS.md` that Codex loaded at launch, and use bounded discovery for any more-specific `AGENTS.md`. If the repository has no `AGENTS.md`, read its root `CLAUDE.md` as compatibility workflow instructions; the filename does not change the executor. Apply the applicable code-review-comment process and deferral rules exactly. Do not merge the pull request.
-
-1. Record the repository, PR URL, base SHA, current head SHA and tree, draft state, merge state, required checks, review decisions, and associated issues.
-2. Enumerate and paginate every review submission with its complete body, review thread, inline review comment, PR-level comment, commit, check, and PR-body revision available through authenticated structured tooling. Parse suppressed or advisory sections, verify declared counts, and reconcile synthetic review-body keys with native inline findings. Include resolved, unresolved, active, and outdated threads. Record counts and stable IDs so omissions are detectable.
-3. Verify that the terminal Copilot-and-Codex review-loop record applies to the current head SHA. Verify that both Copilot and Codex produced current-head clean results, except any reviewer proved non-functional under `AGENTS.md`. A stale result or a head change after the loop is a blocker.
-4. Review every code-review comment and thread. Confirm that each real finding was answered and resolved through all required `AGENTS.md` steps. If an unaddressed finding exists, process it one at a time through that complete process. Do not accept an "outdated" label as proof that the finding no longer applies.
-5. Sweep all review threads, reviews, PR-level comments, commit messages, and the PR body for unfinished-work or deferral language, including defer, follow-up, future, later, TODO, known gap, left open, being added, will be added, out of scope, context, budget, turns, and similar wording.
-6. Re-evaluate every possible deferral. A deferral caused by context-window exhaustion, token or turn limits, time pressure, task size, tedium, or another worker fact is illegitimate. Complete that work in this PR. A legitimate deferral must result from the full `AGENTS.md` decision process on the merits.
-7. For each legitimate deferral, verify that a self-contained GitHub issue exists before merge. Confirm that it states the problem, decision basis, trigger or reopen condition, affected scope, and originating PR/thread. Confirm that the PR cites it. Re-query GitHub and verify that its native blocking and blocked-by dependencies are complete and correct. Correct false, missing, reversed, or tracker-only dependency representations before passing the PR.
-8. Distinguish deferred work from accepted residuals and intentional deviations. Require accurate labels and bounded evidence. Do not let pending work hide under residual or deviation language.
-9. Identify every issue associated with the PR through closing references, development links, explicit PR-body links, and repository evidence. Build a requirement-to-evidence table for every issue requirement and acceptance criterion. Map each requirement to final code, documentation, tests, validation, or an authorized decision.
-10. If an issue requirement is incomplete, return FAIL and draft a copy-paste-ready completion prompt for a coding agent. The prompt must name the PR, issue, missing requirement, relevant paths, required validation, review-loop return condition, and prohibition on merge. Do not describe required work as deferred.
-12. Inspect the final diff independently for correctness, security, failure truth, unintended scope, debug artifacts, placeholders, secrets, TODO markers, disabled checks, unjustified suppressions, generated-file drift, stale version/digest/name pins, missing negative tests, and documentation inconsistency. Run or verify all applicable repository validation against the recorded head.
-13. Verify that all required checks passed on the current head, the PR is mergeable, the base and head identities are current, every fix commit is reachable from the PR head, and no newer comment or review arrived during this check.
-14. If you change any reviewable repository byte, commit the fix to the PR head, run applicable validation, return FAIL, and direct the operator to rerun the Copilot-and-Codex review loop followed by this independent check. If you change only issue/PR metadata, re-query it and repeat the affected quality-check sections.
-15. Return a final report with PASS or FAIL, the verified head SHA and tree, issue-requirement matrix, comment/thread audit, deferral audit, PR-description disposition, checks and tests, changes made, blocking completion prompts, and the exact next action.
-
-PASS means: no unfinished requirement; no unaddressed reviewer finding; no illegitimate or untracked deferral; accurate issue dependencies; accurate PR title/body; terminal review evidence for the same head; successful required checks; and no unresolved quality blocker. Anything else is FAIL.
-~~~
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-### Complete when
-
-A fresh independent `PASS` applies to the same current head/tree as the terminal-clean record, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-## Task 169 — merge the focused repair PR for cycle 5 in Terraform
-
-> **Execution class: Coding agent executable.**
-
-### Task variables
-
-Only values enclosed in double braces are variables. Each token has exactly one meaning throughout this document. Before execution, replace every unresolved input token globally, including its braces. Literal values need no replacement. A token produced by this task remains unresolved until the task returns its exact output.
-
-| Item | Value | Source or resolution rule |
-| --- | --- | --- |
-| Target repository | `franklesniak/TerraformStyleGuide` | Fixed by the task scope; disposition-dependent targets use a globally unique token |
-| Task 166 PR URL | `{{TASK_166_PR_URL}}` | Produced by Task 166; resolve globally before execution |
-
-### Record inputs
-
-Use predecessor results named in `Task variables` and `Dependencies` from compact state. Do not paste completion records into this plan.
-
-### Dependencies
-
-| Predecessor | Relationship | Requirement |
-| --- | --- | --- |
-| Task 168 | `FS` | Both review gates apply to the same current head/tree, or the branch is skipped. Before merge, require the predecessor review to be `TERMINALLY_CLEAN` or, only under a closed exact typed operator authority after three exact attributable Codex failures, `EXHAUSTED_NOT_CLEAN`. Exhaustion is not clean, and every other gate remains mandatory. |
-
-### Objective
-
-Merge only the focused repair PR after the exact final-head gates pass. Do not publish the landed handoff.
-
-### Execution controls
-
-Apply the shared compact execution policy. Use the highest applicable risk tier. The task-specific controls below define this task's scope.
-
-### Task-local merge gate
-
-Immediately before the merge:
-
-1. Re-query the PR, its linked issues, reviews, threads, and checks. Fetch both current `origin/main` refs.
-2. Verify that the Copilot-and-Codex terminal-clean record and independent `PASS` record identify the current head SHA and tree.
-3. Stop if the head changed, new material feedback arrived, a required check is incomplete or failed, the PR is not mergeable, a plan-defined dependency or readiness gate is unmet, or the merge is off-plan. Do not require separate operator approval for an on-plan merge.
-4. Use a repository-permitted, non-bypassing merge method that is consistent with the task. Record the merge method, landed commit and tree, closed issues, final path and blob identities, and post-merge checks.
-5. Post the permanent handoff only from the landed commit. Do not use a reviewed head or anticipated squash SHA as the landed identity.
-
-### Procedure
-
-1. If Task 168 recorded `SKIPPED — NO_REPAIR`, record the same skip result and stop.
-2. Re-query the PR, linked issues, every review submission/body, every review thread/comment, all commits and checks, and both current main refs. Paginate every connection.
-3. Verify that terminal-clean and independent `PASS` evidence identify the current head/tree; no new feedback exists; all checks pass; the PR body and dependencies are exact; and the PR is mergeable and the merge remains on-plan.
-4. Merge with an allowed method. Record the actual merge method, landed commit/tree, parents, immediate issue state, and post-merge checks. Do not publish the permanent handoff in this task.
-
-### Review-evidence materiality gate
-
-### Validation and evidence
-
-Apply the shared validation policy and the task-specific validation requirements.
-
-### Stop and escalation conditions
-
-Apply the shared stop policy and the task-specific stop conditions.
-
-### Exact output
-
-The focused repair PR is merged and its actual landed identity is recorded, or the task is recorded `SKIPPED — NO_REPAIR`.
-
-### Complete when
-
-The focused repair PR is merged and its actual landed identity is recorded, or the task is recorded `SKIPPED — NO_REPAIR`.
 
 ## Task 170 — publish the landed repair handoff for cycle 5 in Terraform
 
