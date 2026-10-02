@@ -1,0 +1,31 @@
+<!-- markdownlint-disable MD013 -->
+# PR224 whole-candidate quality after F10
+
+Independent reviewer: `/root/d07_ledger`.
+
+Whole-PR local-quality approval, conditional on remaining remote gates: no concrete blocker found in native base `48f4d8a36c8faceee12afac78aaecea0d176125d` to actual commit `b9c2d0ea4c04894a6ea3267e9daa662f27b5820b`. Read-only Git inspection confirms parent `8b6c1da46b568cb3b44e60fc511a03ac1fc4edf0`, the exact reviewed tree `ed2bd7cf9e28ffc363bfd0dd7ac95e6ee63cf770`, and a clean product worktree. This independent review uses immutable source/diffs and saved evidence only. No probes, tests, fixtures, aggregate polling, product/planning edits, or native mutations were performed. The earlier service-rejected review attempt is not credited.
+
+Exactly two files differ from the previously reviewed whole-PR candidate; both mode 100644:
+
+| Path under .github/workflows | Blob | Raw SHA256 |
+| --- | --- | --- |
+| Test-AgentInstructions.ps1 | b8ec6e9d8c088245cd9271a53c2572204f1cea72 | 6787d259a03a1a411b1eb260f7aad9c556ea94530cfde9bf88cf50365d145bc7 |
+| Test-AgentInstructions.SelfTest.ps1 | 9d99b2beabc448930f66b68ee0d37d7a49aadb2d | 6c33b01bd4ddcb5bf601c0e80516ae3e258c43642fbf1b242b4d644d3a8aadda |
+
+F10 adds recognition of parsed document-level H2 Metadata sections anywhere in the body, before the existing bounded header-window inference. Recognition selects strict validation; it does not make later placement or alternate spelling valid. The unchanged strict parser rejects misplaced sections. Current and actual prior content use this same helper, so a misplaced prior header no longer disappears through the no-header adoption branch. Generated aggregates remain excluded by classification at the caller.
+
+The added scan is restricted to top-level heading blocks tagged h2. It preserves later subordinate H3 Metadata examples, title-only H1 cases, and parsed quoted/fenced/list-nested/HTML/front-matter exclusions. Existing Version and field windows remain unchanged. The new test matrix covers later sections, missing/malformed/stale fields, multiple sections, pre-title/fallback and setext H2, noncanonical markers, and these negative contexts. The actual B/H fixture covers retained Tier2 README, optional catalog content, malformed real prior content followed by valid current metadata, and a legitimate nested H3 example. Its baseline-checkout behavior keeps these cases separate; failures require the intended placement or prior-header diagnostic rather than arbitrary failure.
+
+Saved `F10/focused.log` reports the optional-header suite and four actual current/prior/example caller controls passed. `focused.ps1` extracts the production helpers and the existing real-caller setup/new scenario block, with explicit boundary checks; it is targeted evidence, not an aggregate. `fixture-note.md` preserves the initial scratch argument omission that stopped before caller execution; that attempt is not accepted evidence. The canonical F10 decision matches the inspected implementation and its option totals are arithmetically consistent. No broader policy or owner grant is inferred.
+
+The complete base-to-tree diff remains the same eleven paths: classification manifest; maintenance classifier and test; agent-instructions workflow; validator and SelfTest; .gitignore; lint implementation guide; CONTRIBUTING; README; and issue-evaluation prompt. The other nine paths are byte-identical to the reviewed 8b6c1da candidate. The whole-PR assessment in [F7–F9 whole-PR quality](F7-F9-quality.md) is reused for those exact unchanged bytes and unchanged coupled callers. A fresh protected-path comparison remains empty for AGENTS, CLAUDE, canonical Copilot instructions, docs/YAML instructions, and both style-guide sources.
+
+Security and scope conclusions remain bounded: accepted B code reads H as data; unconditional classification admission precedes maintenance branching; complete endpoint/checkout checks, bounded regular Git reads, exact closed initializer, ordinal path/grant/category authority, and F6–F9 behavior are unchanged. Explicit author finalization remains distinct from delayed ordinary checks. No new dependency, credential, workflow privilege, executable candidate trust, manifest grant, or public interface is added. Proposed-code validation is not installed native enforcement, immutable-workflow proof, or first-install/owner/merge authority. The generic trust-boundary review caution remains addressed by source evidence rather than invented human attestation.
+
+Paired implications remain unchanged: A21 must reconcile a complete accepted validator base and supported contracts after source merge; the PS-specific native bootstrap pin cannot be transplanted as TF authority. A03 authority selection and A20 protected ownership are separate. This PR source review does not complete paired convergence or authorize those choices.
+
+Final local evidence reconciled: `F10/precommit.log` contains all ten normal hooks Passed; its independently verified SHA256 is `87bdf2eb787456abc5dbdb22262cf96537d7e1281c57aeb73fd176ded449ab73`. Parent reports worker aggregate15981 terminal exit 0 at 2026-10-02T21:01:38.8759123Z. The actual normal commit contains the exact reviewed tree, so no duplicate source review or execution was needed.
+
+`F10/finalization-b9c2d0e.log` reports the content contract passed and author-finalization UTC date 2026-10-02 for exact B `48f4d8a36c8faceee12afac78aaecea0d176125d` and H `b9c2d0ea4c04894a6ea3267e9daa662f27b5820b`. `classification-b9c2d0e.log` reports classification data validated for the same full endpoints. Parent reports root-owned session61184 terminal exit 0 and the guarded endpoint runner preserving fixture HEAD48f, staged treeed2bd7c and no unstaged changes after importing the actual commit and verifying frozen bytes. These proposed-code endpoint checks remain distinct from installed native enforcement, first-install permission, owner authority, and merge acceptance.
+
+Pending: fresh authenticated remote reviews for actual headb9c2d0e, current CI, and immediate native head/base/body/thread/settings gate reconciliation. Prior-head reviews do not satisfy these gates. Local whole-PR quality and final local evidence are approved; the PR merge gate remains open.
