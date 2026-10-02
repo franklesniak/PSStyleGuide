@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # PR224 whole-candidate quality after F11/F12
 
-Disposition: locally sound, conditional on remaining gates; no concrete blocker found. Reviewer: independent delegated Codex agent `/root/d07_ledger`, not the implementation writer. Review capability used here is read-only immutable Git/source inspection and saved-evidence analysis. No tests, probes, fixtures, aggregate polling, product/planning edits, or native mutations were performed. No model/effective-setting or human-attestation claim is made; the earlier service-rejected review attempt is not credited.
+Disposition: whole-PR local quality approved for actual commit `25b17e892f6429cf4df4f39489443d950f5902e8`, conditional on remaining remote gates; no concrete blocker found. Reviewer: independent delegated Codex agent `/root/d07_ledger`, not the implementation writer. Review capability used here is read-only immutable Git/source inspection and saved-evidence analysis. No tests, probes, fixtures, aggregate polling, product/planning edits, or native mutations were performed. No model/effective-setting or human-attestation claim is made; the earlier service-rejected review attempt is not credited.
 
 Input: native base `48f4d8a36c8faceee12afac78aaecea0d176125d` to frozen tree `4dba7b2766ba49233e7dd0871188255c0870ae7c`, parent `b9c2d0ea4c04894a6ea3267e9daa662f27b5820b`. Exactly two paths differ from the prior whole-PR quality input, both mode 100644. Independently read blob bytes match:
 
@@ -22,4 +22,14 @@ The base-to-tree diff remains eleven paths: manifest, classifier/test, instructi
 
 Unchanged F1–F10 contracts remain material: exact accepted-base checkout and endpoints; candidate read as data; closed PS initialization; ordinal grants/category provenance; generated exclusions; optional/current/prior intent and placement; author-finalization versus delayed verification; and workflow maintenance classification without owner authority. The reader change strengthens representation/identity handling without giving candidate code execution or changing credentials. Proposed-code fixtures are not installed enforcement or immutable-workflow proof. A03/A20 authority remains separate; A21 still requires accepted whole-base paired convergence, and PS bootstrap pins cannot establish TF authority.
 
-Pending: worker-owned normal aggregate95367 on these exact bytes, actual committed head/tree, exact B/H finalization/classification, fresh authenticated remote reviews, current CI and immediate native gate reconciliation. Prior-input passing aggregates and reviews do not satisfy those gates. This is conditional whole-PR local source quality, not merge acceptance.
+At frozen-tree review, aggregate95367, actual commit and endpoint validation were pending. They are reconciled below; prior-input results are not substituted for them.
+
+Final local reconciliation: read-only Git inspection confirms normal commit `25b17e892f6429cf4df4f39489443d950f5902e8`, parent `b9c2d0ea4c04894a6ea3267e9daa662f27b5820b`, exact reviewed tree `4dba7b2766ba49233e7dd0871188255c0870ae7c`, and a clean product worktree. No source identity changed, so this reconciliation did not repeat the source review or tests.
+
+Saved `F11-F12/precommit.log` contains all ten normal hooks Passed and independently matches SHA256 `87bdf2eb787456abc5dbdb22262cf96537d7e1281c57aeb73fd176ded449ab73`. Parent reports worker-owned95367 terminal exit 0 at 2026-10-02T22:30:33.3579863Z, followed by verified final readback/release.
+
+`finalization-25b17e8.log` reports content-contract success and author-finalization UTC date 2026-10-02 for exact B `48f4d8a36c8faceee12afac78aaecea0d176125d` and H `25b17e892f6429cf4df4f39489443d950f5902e8`. `classification-25b17e8.log` reports classification data validated for the same full endpoints. Parent reports root-owned48783 terminal exit 0, endpoint completions at 22:33:44/47Z, and the guarded runner preserving fixture HEAD48f, staged reviewed tree and no unstaged changes. These are proposed-code checks bound to actual endpoints, not proof of installed native enforcement or first-install/owner/maintenance/merge authority.
+
+Pending: remote publication, fresh authenticated reviews for actual head25b17e8, current CI, and immediate native head/base/body/thread/settings gate reconciliation. Prior-head reviews do not satisfy these gates. Local whole-PR quality and final local evidence are approved; merge acceptance remains open.
+
+Parent publication readback subsequently confirms native PR head25b17e8/base48f4d8a after the normal non-force push. The first PR readback lagged; the accepted push was not repeated. Current CI, fresh remote reviews and immediate native merge gates remain pending.
