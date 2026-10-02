@@ -8,3 +8,5 @@ Append-only history moved verbatim from STATUS by D07. This journal is optional 
 | [A07](tasks/A07.md) | Converge dependency, lint and local toolchain behavior | validating | coordinator | 0/12 | [Read-only result](results/A07/RESULT.md) reviewed; current audits clean and native Windows tests pass; A02 prerequisite and proposed-candidate/Linux validation pending |
 
 - A07 worker `/root/a07_tooling` finished read-only preparation, requested `gpt-6.1-sol/high`, effective settings unknown. Parent integrated [RESULT](results/A07/RESULT.md), verified38 source blob hashes and29 weighted totals, inspected Windows npm26/26 and27/27, staged nested-hook contrast, all11 TF cold-cache hooks and four zero-vulnerability audit reports. No proposed candidate or Linux acceptance. Scratch/runtime remain at `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002`. Next: implement sequentially after A02; port only coupled validator/tooling regions, preserving A02 metadata fixes.
+
+After D07 publication, worker a00 started A07 in its isolated PS worktree from48f4d8a, with PR224 paths and all A21 validator/classifier paths held. No PR/native write; transfers0/12.

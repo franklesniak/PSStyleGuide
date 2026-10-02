@@ -150,3 +150,5 @@ A02 D17 final candidate published: both normal full pre-commit passes exited0 wi
 Likely cause: formatted Linux exception output wraps the expected diagnostic; the private caller checks the rendered string.
 Fix and targeted reproduction are pending; no production behavior change or CI rerun is claimed.
 [Native failure](https://github.com/franklesniak/PSStyleGuide/actions/runs/37014384227).
+
+The CI diagnostic-wrap fixture finding is tracked in the [five-line note](ci-fixture-note.md). One local final-byte pre-commit pass is running on treece2999638; published round2 remains clean on d9b9e1c, with no round3 request yet.

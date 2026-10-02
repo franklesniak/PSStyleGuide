@@ -1,0 +1,32 @@
+{
+  "scope": "Scratch-only option L proposals; no product, label, settings or GitHub mutation",
+  "inputs": {
+    "PS": "d9b9e1c4597f91b9f5d2de0cc376c28305207654",
+    "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+  },
+  "node": "24.18.1",
+  "platform": "Windows",
+  "tests": [
+    "Assert-MaintenanceLabel.test.mjs",
+    "Classify-InstructionMaintenance.test.mjs",
+    "Validate-WorkflowPolicy.test.mjs"
+  ],
+  "PS": {
+    "passed": 118,
+    "failed": 0,
+    "skipped": 0
+  },
+  "TF": {
+    "passed": 119,
+    "failed": 0,
+    "skipped": 0
+  },
+  "patch_application_checks": "PASS for both product proposals and scratch planning proposal",
+  "limits": [
+    "No full pre-commit or native PR check/race test performed.",
+    "Persistent owner attribution is absent from retained label payloads.",
+    "Fresh owner-account label event is the concrete proposed variant; later maintenance events require reapplication.",
+    "No owner option or settings grant supplied. Existing A12 payload remains unchanged; option-L variant is separate.",
+    "Rebase against accepted PR224 and coordinate classifier edits with A21 before implementation."
+  ]
+}

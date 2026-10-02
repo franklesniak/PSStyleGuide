@@ -9,3 +9,5 @@ Append-only history moved verbatim from STATUS by D07. This journal is optional 
 
 - Worker `/root/a08_review_command`, requested `gpt-6.1-sol/medium`, completed A08/A10 preparation, A11/A09 independent evidence checks, and the complete-guide F1/F4, F2/F3, D14 and D15 impact audits. Latest [D15 guide audit](results/A02/A02-D15-guide-contract-audit.md) is prospective design evidence, not implementation/final quality. No new guide rule identified on those inspected inputs. No product/native/planning write or descendants. Effective settings unavailable.
 
+
+The narrowed wrapper scope is independently verified by d07 after a00 refreshed native inputs. [Final result](RESULT.md): seven exact exceptions,46 identical lines, no product change/PR, transfers0/8. Protected root work remains A20.

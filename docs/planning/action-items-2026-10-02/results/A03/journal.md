@@ -8,3 +8,5 @@ Append-only history moved verbatim from STATUS by D07. This journal is optional 
 | [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | waiting_human | coordinator | 0/12 | [Design](results/A03/design.md) and threat map reviewed; D1 residual/external-enforcement question pending; A02 implementation prerequisite pending |
 
 
+
+Step8 option L is prepared read-only in the [current result](RESULT.md): PS118/TF119 tests pass; fresh owner-label event attribution and persistent-label limitations are explicit. No checkbox supplies implementation/settings authority.
