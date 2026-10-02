@@ -1,0 +1,16 @@
+<!-- markdownlint-disable MD013 -->
+# A02 D17 frozen checkpoint
+
+Product source remains HEAD `fe3d6738d5b331f88e21bf6b9815883b3bb353b8`, index `8bebd544abaaf3d11cea1feffe18c498e63dc981`. Worker retains sole writer ownership with bytes frozen. No protected, native, commit or push action occurred.
+
+Selected D17 changes only the private F2 fixture in `Test-AgentInstructions.SelfTest.ps1`: a resolved existing Node application, bounded native lstat identity before/after the existing reader, and durable inquiry/identity negative tests. All prior hash, raw/path/type/source, intended Git mode and date/caller controls remain. The retained guard is static refusal under no competing writer; the inquiry timeout does not bound a later substituted .NET open or establish atomic handle identity.
+
+Final five hashes are in `D17-frozen-inventory.json`; validator `c8202d8591f247f1ed477e564b3890a519d0b93f66dd61812b7c4483ffc071d1`, SelfTest `92d08611feab539af35caaa8e1980ee8c76443d8727c97377b88baf06fe6da4b`. Other three are unchanged. `docs/dependency-maintenance.md` exactly matches native B; protected diff is zero.
+
+`D17-focused-results.json` pins exact harness/log hashes and source-extraction/before-after proofs. Windows inquiry, missing Node, AST/PSSA Warning+Error, real Linux FIFO and isolated socket, real71 snapshot, and affected full F2 all exited0. Full F2 source72 remained exactly unchanged. Process start to final log write was approximately9m08s. Actual71 snapshot took30.836s/142 inquiries; no comparative incremental-overhead measurement was made. Reuse unchanged D15 date/no-op/source-shape and D16 hash/mode/root-mutation evidence only within their unchanged properties.
+
+The combined Linux control invocation exited1 after its successful inquiry/identity/environment/timeout-cleanup/byte/mode prefix because its socket assertion incorrectly required the later native-inquiry diagnostic. The retained earlier UnixMode guard correctly refused that socket. Isolated socket correction exited0 and accepts only the two specific refusal diagnostics. The failed whole invocation is preserved, not called a pass. Original D16 FIFO exit143 is also preserved separately.
+
+`D17-complete-candidate-inventory.json` proves all71 raw lengths/SHA256/blobs/modes, source HEAD/index, exactly11 native differences, fixture's own `.git`, no unstaged/untracked product changes, and detached native B `48f4d8a36c8faceee12afac78aaecea0d176125d` with staged tree `6c6108352ba2aa6217fe0d31b5c7d0ae093beaf2`. Fixture is `D14-native-validation`; the name preserves original failed evidence while new receipts use D17 names.
+
+`D17-validation-command-preimages.json` pins normal `py -3.12 -m pre_commit run --all-files`, two passes, unchanged ordinary D14 dependency setup, complete Node24.18.1/npm11.16.0 runtime, active Husky shim, null HUSKY/SKIP and all six tool/config input hashes. Runner `run-D17-precommit-pass.py` SHA256 is `4f585bee1127b65c8c0243aa5bed566bb118e0012819558ac6e5198b81575cae`. The coordinator subsequently verified the complete gate at 12:52 UTC and released both normal sequential aggregates; pass1 is running. No aggregate pass is claimed. All earlier failed receipts retain their original names.
