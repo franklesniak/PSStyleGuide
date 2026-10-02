@@ -1,0 +1,66 @@
+[
+  {
+    "path": "requirements-dev.txt",
+    "tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+    "mode": "100644",
+    "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+    "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+    "bytes": 5920
+  },
+  {
+    "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+    "tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+    "mode": "100644",
+    "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+    "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+    "bytes": 3127
+  },
+  {
+    "path": ".pre-commit-config.yaml",
+    "tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+    "mode": "100644",
+    "blob": "0688b48f0065acf8a57181c0eb13816d6f363796",
+    "sha256": "a3c8998aabe4f78f1b29267ece80c727fa10f01bbce3d63cdb3d4f471c40180e",
+    "bytes": 5373
+  },
+  {
+    "path": ".husky/pre-commit",
+    "tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+    "mode": "100644",
+    "blob": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+    "sha256": "1888b6c6e29c1c06baebbdf2946cc7b465ce5adcc869c2977dfd774d68b96df0",
+    "bytes": 3544
+  },
+  {
+    "path": ".github/workflows/install-husky.mjs",
+    "tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+    "mode": "100644",
+    "blob": "6a12568776f6473472193bc98638f1856a7c9dec",
+    "sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7",
+    "bytes": 625
+  },
+  {
+    "path": ".github/workflows/lint-staged-markdown.mjs",
+    "tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+    "mode": "100644",
+    "blob": "c35575990d5854ea6da9d5f6d49d23287df43146",
+    "sha256": "0e8b0b5c725227b98a338e44e630f6b50a90f725e2f01b2f0262284ffdd6926b",
+    "bytes": 5971
+  },
+  {
+    "path": "docs/dependency-maintenance.md",
+    "tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+    "mode": "100644",
+    "blob": "8a5ff01571ff39df2b434279c10109c990e69d60",
+    "sha256": "cf9d44a5703f2a954aad619631581968a9439f5696f764b4863c827c97bde27d",
+    "bytes": 7575
+  },
+  {
+    "path": ".github/workflows/scripts-README.md",
+    "tree": "c68b5e1c6ae4a793df16c316c81c824164bc3be6",
+    "mode": "100644",
+    "blob": "5865668d0f7e282494c9524b8458f2d12f44185f",
+    "sha256": "b07e500c4be846f737a24f1d2e4c38fcd656ac6057fb46e3a6f1b12c957a838b",
+    "bytes": 3425
+  }
+]

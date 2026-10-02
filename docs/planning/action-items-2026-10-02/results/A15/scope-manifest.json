@@ -1,0 +1,382 @@
+{
+  "status": "Frozen design proposal only; no scope amendment or operational approval. Must refresh after foundation acceptance.",
+  "TFBase": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+  "TFBaseTree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+  "GateA": {
+    "owner": "A16",
+    "changedPaths": [
+      "STYLE_GUIDE.md",
+      "STYLE_GUIDE_RATIONALE.md",
+      "copilot-instructions.md",
+      "terraform.instructions.md",
+      "STYLE_GUIDE_CHAT.md",
+      "STYLE_GUIDE_FULL.md",
+      ".github/workflows/Test-StateRecoveryExamples.mjs",
+      ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+      ".github/workflows/Confirm-StateMutation.mjs",
+      ".github/workflows/Inspect-TerraformState.mjs",
+      ".github/workflows/Review-TerraformStateDifference.mjs",
+      ".github/workflows/Resolve-TerraformStateAddress.mjs",
+      ".github/workflows/StateRecoveryCaseCatalog.json"
+    ],
+    "count": 13,
+    "markersExecuted": [
+      "SM-BACKUP-PULL",
+      "SM-BACKUP-PULL-PS"
+    ],
+    "catalog": "All GateA/B definitions frozen; no GateB executable procedure/mutation stub/call in GateA."
+  },
+  "GateB": {
+    "owner": "A17",
+    "changedPaths": [
+      "STYLE_GUIDE.md",
+      "STYLE_GUIDE_RATIONALE.md",
+      "copilot-instructions.md",
+      "terraform.instructions.md",
+      "STYLE_GUIDE_CHAT.md",
+      "STYLE_GUIDE_FULL.md",
+      ".github/workflows/Test-StateRecoveryExamples.mjs",
+      ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+      ".github/workflows/Prepare-TerraformStateRecovery.mjs"
+    ],
+    "count": 9,
+    "markersExecuted": [
+      "SM-BACKUP-PULL",
+      "SM-BACKUP-PULL-PS",
+      "SM-LOCAL-CORRUPTION",
+      "SM-STATE-PUSH",
+      "SM-STATE-RM"
+    ],
+    "unchangedFoundationPaths": [
+      ".github/workflows/Confirm-StateMutation.mjs",
+      ".github/workflows/Inspect-TerraformState.mjs",
+      ".github/workflows/Review-TerraformStateDifference.mjs",
+      ".github/workflows/Resolve-TerraformStateAddress.mjs",
+      ".github/workflows/StateRecoveryCaseCatalog.json"
+    ],
+    "foundationRule": "Any change to approved GateAcode/role/schema/path/limit/confirmation/evidence returns toGateA. B-owned proposed source/harness edits are not exempt: compare actual approval bindings, preserve exact A block/helper/case identities, and obtain refreshed A approval whenever an approved input changes. Do not infer file-region equality overrides a whole-blob approval."
+  },
+  "foundationOwners": {
+    "A03": {
+      "requiredIntegrationPaths": [
+        ".github/workflows/build.yml",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/workflow-policy-cases.json",
+        ".github/workflows/Test-CiHelpers.test.mjs"
+      ],
+      "consumeWithoutAssumingEdit": [
+        ".github/workflows/markdownlint.yml",
+        ".github/workflows/workflow-policy-contract.json"
+      ],
+      "contract": "Same-revision Linux/T2 plus Windows5.1/7 gate before read-only publication; native build-graph recommendation awaits D2/topology authority. Do not change action allowlist/contract merely for a new job if unchanged. Alternative reusable topology requires same canonical D2 revision."
+    },
+    "A06": {
+      "requiredIntegrationPaths": [
+        ".github/workflows/Test-StyleGuideArtifacts.ps1"
+      ],
+      "consumeWithoutAssumingEdit": [
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-ExactGitPathSet.ps1"
+      ],
+      "contract": "Current300000ms recovery child is already inside whole-worktree, Git and runner-channel integrity snapshots. Consume that full closure; do not add redundant helper hash ledgers. Integrate exact gate/caller/platform admission and test new imported-input mutation refusal with A03. Adjust budget only on a measured selected finding."
+    },
+    "A07": {
+      "requiredIntegrationPaths": [
+        ".github/workflows/Initialize-CiToolchain.ps1",
+        ".github/workflows/ci-toolchain.json"
+      ],
+      "consumeWithoutAssumingEdit": [
+        "package.json",
+        "package-lock.json"
+      ],
+      "contract": "Checksum-reviewed exact locked Linux and Windows Node/npm acquisition usable by5.1/7 test hosts; native installer is Linux-only7.3. Same-version declaration24.18.1/npm11.16.0 is existing input, not approval of Windows CI installation."
+    },
+    "A21": {
+      "requiredIntegrationPaths": [
+        ".github/workflows/Classify-InstructionMaintenance.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs"
+      ],
+      "consumeWithoutAssumingEdit": [
+        ".github/workflows/Test-AgentInstructions.ps1",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/document-metadata-classification.json"
+      ],
+      "contract": "Select one complete validator base once afterPR224merge; extend exact executable/data loader maintenance closure with all7newT4paths and test independent additions/case aliases/mixed additions. Do not region-port or add manifest exemptions for JS/PS/JSON files."
+    }
+  },
+  "T4NewLoaderClosure": [
+    ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+    ".github/workflows/Confirm-StateMutation.mjs",
+    ".github/workflows/Inspect-TerraformState.mjs",
+    ".github/workflows/Review-TerraformStateDifference.mjs",
+    ".github/workflows/Resolve-TerraformStateAddress.mjs",
+    ".github/workflows/StateRecoveryCaseCatalog.json",
+    ".github/workflows/Prepare-TerraformStateRecovery.mjs"
+  ],
+  "manifestRules": [
+    "This is exact recovery-owned proposed changed scope; integration-owner batches remain separately scoped and serialized.",
+    "No arbitrary extras, absent.sh restoration, root agent/policy instructions, supply exceptions or hand-edited generated outputs.",
+    "Check actual staged path equality per batch against its selected manifest after final source generation.",
+    "A smaller actual patch or additional required integration path requires revising this same D1proposal before implementation, not silent count normalization."
+  ],
+  "nativePathIdentities": {
+    "STYLE_GUIDE.md": {
+      "path": "STYLE_GUIDE.md",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+      "bytes": 152868,
+      "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+    },
+    "STYLE_GUIDE_RATIONALE.md": {
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+      "bytes": 73953,
+      "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+    },
+    "copilot-instructions.md": {
+      "path": "copilot-instructions.md",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+      "bytes": 152868,
+      "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+    },
+    "terraform.instructions.md": {
+      "path": "terraform.instructions.md",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+      "bytes": 153067,
+      "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+    },
+    "STYLE_GUIDE_CHAT.md": {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+      "bytes": 152962,
+      "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72"
+    },
+    "STYLE_GUIDE_FULL.md": {
+      "path": "STYLE_GUIDE_FULL.md",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+      "bytes": 222292,
+      "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab"
+    },
+    ".github/workflows/Test-StateRecoveryExamples.mjs": {
+      "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+      "bytes": 22102,
+      "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+    },
+    ".github/workflows/Test-StateRecoveryPowerShell.ps1": {
+      "path": ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+      "exists": false
+    },
+    ".github/workflows/Confirm-StateMutation.mjs": {
+      "path": ".github/workflows/Confirm-StateMutation.mjs",
+      "exists": false
+    },
+    ".github/workflows/Inspect-TerraformState.mjs": {
+      "path": ".github/workflows/Inspect-TerraformState.mjs",
+      "exists": false
+    },
+    ".github/workflows/Review-TerraformStateDifference.mjs": {
+      "path": ".github/workflows/Review-TerraformStateDifference.mjs",
+      "exists": false
+    },
+    ".github/workflows/Prepare-TerraformStateRecovery.mjs": {
+      "path": ".github/workflows/Prepare-TerraformStateRecovery.mjs",
+      "exists": false
+    },
+    ".github/workflows/Resolve-TerraformStateAddress.mjs": {
+      "path": ".github/workflows/Resolve-TerraformStateAddress.mjs",
+      "exists": false
+    },
+    ".github/workflows/StateRecoveryCaseCatalog.json": {
+      "path": ".github/workflows/StateRecoveryCaseCatalog.json",
+      "exists": false
+    },
+    ".github/workflows/build.yml": {
+      "path": ".github/workflows/build.yml",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+      "bytes": 4222,
+      "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+    },
+    ".github/workflows/markdownlint.yml": {
+      "path": ".github/workflows/markdownlint.yml",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+      "bytes": 6632,
+      "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+    },
+    ".github/workflows/Validate-WorkflowPolicy.mjs": {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "995b72a7b48dea2636094d81226893a519950797",
+      "bytes": 25568,
+      "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+    },
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+      "bytes": 14948,
+      "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+    },
+    ".github/workflows/workflow-policy-contract.json": {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+      "bytes": 1407,
+      "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+    },
+    ".github/workflows/workflow-policy-cases.json": {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+      "bytes": 13047,
+      "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89"
+    },
+    ".github/workflows/Test-CiHelpers.test.mjs": {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+      "bytes": 33662,
+      "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+    },
+    ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+      "bytes": 31949,
+      "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+    },
+    ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+      "bytes": 95329,
+      "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+    },
+    ".github/workflows/Test-ExactGitPathSet.ps1": {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+      "bytes": 253918,
+      "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+    },
+    ".github/workflows/Initialize-CiToolchain.ps1": {
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "906460d818674199b32294185ed6525c143b48bb",
+      "bytes": 5706,
+      "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+    },
+    ".github/workflows/ci-toolchain.json": {
+      "path": ".github/workflows/ci-toolchain.json",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+      "bytes": 91,
+      "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+    },
+    ".github/workflows/Test-AgentInstructions.ps1": {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+      "bytes": 460163,
+      "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+    },
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "exists": false
+    },
+    ".github/workflows/Classify-InstructionMaintenance.mjs": {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+      "bytes": 5632,
+      "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+    },
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs": {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+      "bytes": 6799,
+      "sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+    },
+    ".github/document-metadata-classification.json": {
+      "path": ".github/document-metadata-classification.json",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+      "bytes": 387,
+      "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+    },
+    "package.json": {
+      "path": "package.json",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+      "bytes": 837,
+      "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+    },
+    "package-lock.json": {
+      "path": "package-lock.json",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+      "bytes": 3566,
+      "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+    }
+  }
+}

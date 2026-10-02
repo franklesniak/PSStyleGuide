@@ -1,0 +1,60 @@
+{
+  "historicalPR": "https://github.com/franklesniak/TerraformStyleGuide/pull/64",
+  "reviewedHead": "975012ed84374aa2fe9f80bb489c69bc8b9bca63",
+  "merge": "6e9f4ced62cf02cf99bc087e20a670aaa2f49bbf",
+  "reviewedAndLandedTree": "bed6cbdfba2371eef4cff487057412b3712b1122",
+  "currentMain": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+  "blocks": [
+    {
+      "marker": "SR-SETUP",
+      "sameRawBlock": true,
+      "bytes": 6747,
+      "sha256": "f1766ab2d50d9304be65295d9e35b4fe1451513175bed70056fc17f5f4778b26"
+    },
+    {
+      "marker": "SR-AWS-DISCOVERY",
+      "sameRawBlock": true,
+      "bytes": 734,
+      "sha256": "f9bf281a4b6f99aebec280b1eaf6d31e0266e70494f9bf1341fb69f0b543c679"
+    },
+    {
+      "marker": "SR-AWS-RECOVERY",
+      "sameRawBlock": true,
+      "bytes": 663,
+      "sha256": "e3e37f3bc653d13a5a99ac0c8a62985b227c544454118fbd8e7bafbcd2ac1ac7"
+    },
+    {
+      "marker": "SR-AZURE-DISCOVERY",
+      "sameRawBlock": true,
+      "bytes": 785,
+      "sha256": "655e8827ef4f3a3c9dd2e7b8aed5c4ac5493aba5ee36b373229cc179e9bc6739"
+    },
+    {
+      "marker": "SR-AZURE-RECOVERY",
+      "sameRawBlock": true,
+      "bytes": 754,
+      "sha256": "216ebbfc9c1b94b3da7850b1eb129fdc03a77fcd14f487f5cfdbae98103bd6d6"
+    },
+    {
+      "marker": "SR-GCS-DISCOVERY",
+      "sameRawBlock": true,
+      "bytes": 733,
+      "sha256": "167b40643e63337d4d89579e09850e77ddaaae90be6e6254a613d88882ce184c"
+    },
+    {
+      "marker": "SR-GCS-RECOVERY",
+      "sameRawBlock": true,
+      "bytes": 829,
+      "sha256": "6442fd63ed598efe824ddc600d2dc6fa4b5014d5c18f9fee73d4db85fc0daaf2"
+    },
+    {
+      "marker": "SR-HCP-DISCOVERY",
+      "sameRawBlock": true,
+      "bytes": 1566,
+      "sha256": "301199f0b4b9a71f8a3d115ea5485e56970ed35c7d4a2507f93d1b33d1131510"
+    }
+  ],
+  "harnessRawEqualsReviewed": true,
+  "harnessRawSha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca",
+  "execution": "None; exact raw historical/current Git inspection only."
+}
