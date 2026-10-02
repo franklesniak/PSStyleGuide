@@ -4760,7 +4760,7 @@ function Get-DocumentMetadataClassificationContext {
                     $strPath.Contains('\', [System.StringComparison]::Ordinal) -or
                     $strPath -match '(?:^|/)\.\.(?:/|$)' -or
                     $strPath -match '[\x00-\x1f\x7f]' -or
-                    $strPath -cnotmatch '\.(?:md|mdc)$') {
+                    $strPath -inotmatch '\.(?:md|mdc)$') {
                     return & $scriptBlockFailure -Message (
                         "The document classification contains an unsafe path: $strPath"
                     )
@@ -4809,7 +4809,7 @@ function Get-DocumentMetadataClassificationContext {
                 $strPath.Contains('\', [System.StringComparison]::Ordinal) -or
                 $strPath -match '(?:^|/)\.\.(?:/|$)' -or
                 $strPath -match '[\x00-\x1f\x7f]' -or
-                $strPath -cnotmatch '\.(?:md|mdc)$') {
+                $strPath -inotmatch '\.(?:md|mdc)$') {
                 return & $scriptBlockFailure -Message (
                     "The document classification contains an unsafe path: $strPath"
                 )
@@ -5084,7 +5084,7 @@ function Get-DiscoveredGovernedMarkdownDocumentPath {
     # contract may change without notice.
     #
     # This function does not support positional parameters.
-    # Version: 1.0.20260910.0
+    # Version: 1.1.20261002.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5112,7 +5112,7 @@ function Get-DiscoveredGovernedMarkdownDocumentPath {
             $Path.Contains('\', [System.StringComparison]::Ordinal) -or
             $Path -match '(?:^|/)\.\.(?:/|$)' -or
             $Path -match '[\x00-\x1f\x7f]' -or
-            $Path -cnotmatch '\.(?:md|mdc)$') {
+            $Path -inotmatch '\.(?:md|mdc)$') {
             throw "$InventoryName contains an unsafe Markdown path: $Path"
         }
     }
@@ -5121,7 +5121,7 @@ function Get-DiscoveredGovernedMarkdownDocumentPath {
         [System.StringComparer]::Ordinal
     )
     foreach ($strCandidatePath in $CandidatePath) {
-        if ($strCandidatePath -cnotmatch '\.(?:md|mdc)$') {
+        if ($strCandidatePath -inotmatch '\.(?:md|mdc)$') {
             continue
         }
         & $scriptBlockAssertSafeMarkdownPath `
@@ -5416,7 +5416,9 @@ function Get-DocumentMetadataContext {
             $objBlock.Start -lt $intHeaderRegionEnd -and
             $objBlock.Type -ceq 'paragraph_open' -and
             $objBlock.Text -is [string] -and
-            $objBlock.Text.StartsWith('Version:', [StringComparison]::Ordinal)) {
+            [regex]::IsMatch($objBlock.Text, '^Version\s*:',
+                ([Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+                    [Text.RegularExpressions.RegexOptions]::CultureInvariant))) {
             $listVersionRecords.Add([pscustomobject]@{ BlockIndex = $intIndex; Block = $objBlock })
         }
     }

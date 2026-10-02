@@ -87,10 +87,12 @@ The following constraints apply:
 Set the metadata date and applicable version for your last author-controlled update, commit the final candidate, and validate that exact candidate at finalization. Once the accepted base contains `-FinalizeMetadataNow`, use its checker in an accepted-base worktree. Run this example from the candidate repository after refreshing the destination by the normal fetch procedure:
 
 ```powershell
-$strFinalHead = (git rev-parse --verify 'HEAD^{commit}').Trim()
+$strFinalHead = [string](git rev-parse --verify 'HEAD^{commit}')
 if ($LASTEXITCODE -ne 0) { throw 'Candidate head is unavailable.' }
-$strPolicyBase = (git rev-parse --verify 'origin/main^{commit}').Trim()
+$strFinalHead = $strFinalHead.Trim()
+$strPolicyBase = [string](git rev-parse --verify 'origin/main^{commit}')
 if ($LASTEXITCODE -ne 0) { throw 'Accepted base is unavailable.' }
+$strPolicyBase = $strPolicyBase.Trim()
 $strPolicyPath = Join-Path (Split-Path (Get-Location).Path -Parent) 'PSStyleGuide-finalization-policy'
 # Use an absent path; reuse a suitable accepted-base worktree when available.
 git worktree add --detach $strPolicyPath $strPolicyBase

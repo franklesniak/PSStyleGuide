@@ -113,6 +113,46 @@ function Assert-DocumentMetadataClassificationSelfTest {
         $arrDiscoveredFixturePaths -cnotcontains 'docs/RUNBOOK.md') {
         throw 'New or hidden governed Markdown escaped classification discovery.'
     }
+    $arrSuffixPaths = @('docs/RUNBOOK.MD', 'docs/mixed.Md', 'docs/example.MdC',
+        '.cursor/rules/operations.MDC', 'docs/exact.md', 'docs/exact.MD')
+    $arrSuffixDiscovered = @(Get-DiscoveredGovernedMarkdownDocumentPath `
+            -CandidatePath ($arrSuffixPaths + @('notes.txt')) -KnownGovernedPath @() -ExemptPath @())
+    if ($arrSuffixDiscovered.Count -ne $arrSuffixPaths.Count) { throw 'Markdown suffix discovery lost exact paths.' }
+    foreach ($strSuffixPath in $arrSuffixPaths) {
+        if ($arrSuffixDiscovered -cnotcontains $strSuffixPath) { throw "Markdown suffix path changed: $strSuffixPath" }
+        foreach ($strCategory in @('tier2Paths', 'generatedPaths', 'authorizedExemptionPaths')) {
+            $hashtableManifest = @{ schemaVersion = 2; tier2Paths = @(); generatedPaths = @(); authorizedExemptionPaths = @() }
+            $hashtableManifest[$strCategory] = @($strSuffixPath)
+            $objSuffixContext = Get-DocumentMetadataClassificationContext `
+                -Content ($hashtableManifest | ConvertTo-Json -Compress) -TrackedPath $arrSuffixPaths
+            if ($objSuffixContext.Failure) { throw "Valid Markdown suffix classification failed: $strSuffixPath" }
+        }
+    }
+    foreach ($strCaseAlias in @('AGENTS.MD', '.cursor/rules/operations.MDC')) {
+        if (-not (Test-GovernedInstructionPathCaseMismatch -RepositoryRelativePath $strCaseAlias `
+                    -GovernedRootPaths @('AGENTS.md'))) {
+            throw "Existing governed-family casing rule was lost: $strCaseAlias"
+        }
+    }
+    $objUpperCandidate = Get-DocumentMetadataClassificationContext `
+        -Content '{"schemaVersion":2,"authorizedExemptionPaths":[],"tier2Paths":["docs/RUNBOOK.MD"],"generatedPaths":[]}' `
+        -TrackedPath $arrSuffixPaths
+    foreach ($strAuthorizedPath in @('docs/RUNBOOK.MD', 'docs/runbook.md')) {
+        $arrSuffixFailures = @(Get-DocumentMetadataClassificationExpansionFailure `
+                -HasTrustedBaselineManifest $true -TrustedBaselineExemptPath @() `
+                -TrustedBaselineAuthorizedExemptionPath @($strAuthorizedPath) `
+                -CandidateExemptPath $objUpperCandidate.ExemptPaths `
+                -TrustedBaselineGeneratedPath @() -CandidateGeneratedPath @())
+        if (($strAuthorizedPath -ceq 'docs/RUNBOOK.MD') -ne ($arrSuffixFailures.Count -eq 0)) {
+            throw 'Markdown suffix recognition changed exact authorization identity.'
+        }
+    }
+    if (@(Get-DocumentMetadataClassificationExpansionFailure `
+            -HasTrustedBaselineManifest $true -TrustedBaselineExemptPath $objUpperCandidate.ExemptPaths `
+            -TrustedBaselineAuthorizedExemptionPath @() -CandidateExemptPath $objUpperCandidate.ExemptPaths `
+            -TrustedBaselineGeneratedPath @() -CandidateGeneratedPath $objUpperCandidate.ExemptPaths).Count -eq 0) {
+        throw 'An uppercase Tier2 path gained unauthenticated generated status.'
+    }
     foreach ($strDiscoveredFixturePath in $arrDiscoveredFixturePaths) {
         $objMissingMetadataContext = Get-DocumentMetadataContext `
             -Content "# Operational procedure`n`nRun the reviewed procedure.`n" `
@@ -1319,6 +1359,33 @@ function Assert-AuthorFinalizationGitFixture {
         & git -C $strFixtureRoot -c "core.hooksPath=$strEmptyHooks" checkout --quiet --detach $strBaseline
         if ($LASTEXITCODE -ne 0) { throw 'Generated-to-Tier2 fixture baseline restoration failed.' }
         Write-Verbose 'Generated-to-Tier2 actual content and prior-header controls passed.'
+        # Version-like labels and mixed suffixes must reach the actual B/H checks.
+        $strBeforeCaseBaseline = $strBaseline
+        $strCaseReadmePath = [IO.Path]::Combine($strFixtureRoot, 'README.md')
+        $strCaseRunbookPath = [IO.Path]::Combine($strFixtureRoot, 'docs', 'RUNBOOK.MD')
+        $strCaseMetadata = $strMetadataDocument.Replace('DATE', $strCurrentDate)
+        $strInvalidCaseVersion = $strCaseMetadata.Replace('## Procedure',
+            "**version:** 1.0.20200101.7`n`n## Procedure")
+        [IO.File]::WriteAllText($strCaseReadmePath, $strInvalidCaseVersion, [Text.UTF8Encoding]::new($false))
+        $strInvalidCaseCandidate = & $scriptblockCommit
+        & $scriptblockCheck $strInvalidCaseCandidate $false $false $false 'exact document-level Version'
+        [IO.File]::WriteAllText($strCaseReadmePath, $strInvalidCaseVersion, [Text.UTF8Encoding]::new($false))
+        $strBaseline = & $scriptblockCommit
+        [IO.File]::WriteAllText($strCaseReadmePath, $strCaseMetadata, [Text.UTF8Encoding]::new($false))
+        $strPriorCaseCandidate = & $scriptblockCommit
+        & $scriptblockCheck $strPriorCaseCandidate $false $false $false '(?s)parent of README[.]md.*Version'
+        $strBaseline = $strBeforeCaseBaseline
+        & git -C $strFixtureRoot -c "core.hooksPath=$strEmptyHooks" checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Version-case fixture baseline restoration failed.' }
+        [IO.File]::WriteAllText($strCaseRunbookPath, '# Missing metadata', [Text.UTF8Encoding]::new($false))
+        $strUpperMissingCandidate = & $scriptblockCommit
+        & $scriptblockCheck $strUpperMissingCandidate $false $false $false '(?s)RUNBOOK[.]MD.*metadata'
+        [IO.File]::WriteAllText($strCaseRunbookPath, $strCaseMetadata, [Text.UTF8Encoding]::new($false))
+        $strUpperValidCandidate = & $scriptblockCommit
+        & $scriptblockCheck $strUpperValidCandidate $true $false $true 'Author finalization UTC date checked'
+        & git -C $strFixtureRoot -c "core.hooksPath=$strEmptyHooks" checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Suffix fixture baseline restoration failed.' }
+        Write-Verbose 'Version-like header and uppercase Markdown actual caller controls passed.'
         # Promotion must remain valid on a later no-context rerun.
         $strManifestPath = [IO.Path]::Combine($strFixtureRoot, '.github', 'document-metadata-classification.json')
         $objManifest = [IO.File]::ReadAllText($strManifestPath) | ConvertFrom-Json
@@ -1690,6 +1757,35 @@ function Assert-OptionalMetadataSelfTest {
             ($objCase.Pattern -cne '' -and -not ($arrFailures -match $objCase.Pattern))) {
             throw "Optional metadata transition failed: $($objCase.Name): $($arrFailures -join '; ')"
         }
+    }
+    foreach ($strLabel in @('version:', 'VERSION:', 'vErSiOn:', 'Version :', "Version`t:")) {
+        $strMalformedVersion = "**${strLabel}** 1.0.20200101.7"
+        foreach ($strContent in @(
+                $strDirect.Replace("# Reader`n", "# Reader`n`n$strMalformedVersion`n"),
+                $strDirect.Replace('## Content', "$strMalformedVersion`n`n## Content"),
+                $strVersioned.Replace('## Content', "$strMalformedVersion`n`n## Content"))) {
+            foreach ($boolRequiresVersion in @($false, $true)) {
+                $objMalformedContext = Get-DocumentMetadataContext -Content $strContent -RequiresVersion $boolRequiresVersion
+                if ($objMalformedContext.Failure -notmatch 'one exact document-level Version paragraph') {
+                    throw "A noncanonical Version-like header was ignored: $strLabel"
+                }
+            }
+        }
+    }
+    $strNoncanonicalVersion = '**version:** 1.0.20200101.7'
+    foreach ($strContent in @(
+            $strDirect.Replace('## Content', "~~~~text`n$strNoncanonicalVersion`n~~~~`n`n## Content"),
+            $strDirect.Replace('## Content', "> $strNoncanonicalVersion`n`n## Content"),
+            ($strDirect + "`n$strNoncanonicalVersion`n"),
+            "---`nversion: 1.0.20200101.7`n---`n$strDirect")) {
+        if ((Get-DocumentMetadataContext -Content $strContent -RequiresVersion $false).Failure) {
+            throw 'A Version-like example outside operative header paragraphs was promoted.'
+        }
+    }
+    $strInvalidPriorVersion = $strDirect.Replace('## Content', "$strNoncanonicalVersion`n`n## Content")
+    if (-not (@(Get-PublishedEndpointLastUpdatedFailure -Name 'optional.md' -CurrentContent $strDirect `
+                -BaseContent $strInvalidPriorVersion -TrustedEventUtcDate '') -match 'parent of .*Version')) {
+        throw 'A noncanonical prior Version-like header was erased.'
     }
 }
 
