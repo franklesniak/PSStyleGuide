@@ -1,0 +1,18 @@
+[
+  {
+    "repository": "PS",
+    "path": ".github/instructions/yaml.instructions.md",
+    "baseSha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+    "proposedSha256": "ed273f8e4b84afdcb433a39c5b6e7c56bb5ef2f0cb5b727713664d114bad3e75",
+    "patch": "proposed-PS.patch",
+    "patchSha256": "3646374828a8cd128645a734d2d1a347ab3495efb49f270898d9c556cde820e7"
+  },
+  {
+    "repository": "TF",
+    "path": ".github/instructions/yaml.instructions.md",
+    "baseSha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+    "proposedSha256": "ed273f8e4b84afdcb433a39c5b6e7c56bb5ef2f0cb5b727713664d114bad3e75",
+    "patch": "proposed-TF.patch",
+    "patchSha256": "2d4c357ff5cf6694365b27130e79de97758439f5a6aae903b823baff35e605c2"
+  }
+]

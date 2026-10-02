@@ -1,0 +1,84 @@
+--- a/.github/instructions/yaml.instructions.md
++++ b/.github/instructions/yaml.instructions.md
+@@ -7,13 +7,13 @@
+ 
+ # YAML Writing Style
+ 
+-**Version:** 1.6.20260911.0
++**Version:** 1.6.20261002.0
+ 
+ ## Metadata
+ 
+ - **Status:** Active
+ - **Owner:** Repository Maintainers
+-- **Last Updated:** 2026-09-11
++- **Last Updated:** 2026-10-02
+ - **Scope:** Defines authoring standards for all YAML files in this repository, including GitHub Actions workflows, Azure Pipelines YAML, pre-commit configuration, linter configuration, and any other human-authored YAML configuration. Does not cover JSON files (covered by the companion JSON guide, if present) or generated YAML artifacts that are owned by another tool's serializer.
+ - **Related:** [Repository Copilot Instructions](../copilot-instructions.md), [Repository Git Attributes](../../.gitattributes), [Pre-commit Configuration](../../.pre-commit-config.yaml)
+ 
+@@ -37,6 +37,7 @@
+ - **[All]** **SHOULD NOT** use anchors, aliases, merge keys, custom tags, or multi-document files unless required and supported by the consumer.
+ - **[All]** **MUST NOT** commit secrets in YAML.
+ - **[Actions]** **MUST** apply least-privilege `permissions:` on GitHub Actions workflows.
++- **[Actions]** A job that validates an event commit **MUST** acquire its full immutable commit ID and verify the acquired commit. Mutable-ref acquisition followed only by comparison is insufficient.
+ - **[Actions]** A privileged `pull_request_target` workflow **MUST** execute only trusted-revision bytes. Proposed files that select executable bytes **MUST** fail closed as trust-root changes or pass bounded inert-data validation by trusted code.
+ - **[Actions]** A privileged workflow that fetches a proposed pull-request revision into a persistent local ref **MUST NOT** force-update that ref. It **MUST** verify that the fetched commit equals the expected event commit.
+ - **[Actions]** A path-scoped `push` workflow **MUST** define branch and tag intent explicitly. GitHub does not evaluate `paths` or `paths-ignore` for tag pushes.
+@@ -127,6 +128,50 @@
+ When a workflow defines only `branches` or `branches-ignore`, GitHub does not run it for tag pushes. GitHub applies branch and path filters together, so both filters must accept a branch push before the workflow runs. See [GitHub's branch and tag filter syntax](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onpushbranchestagsbranches-ignoretags-ignore).
+ 
+ If a workflow must run for tags, define `tags` or `tags-ignore` deliberately and design the tag behavior as a separate event contract. A tag-enabled workflow **MUST NOT** rely on `paths` or `paths-ignore` to select tag events.
++
++## GitHub Actions Immutable Event Acquisition
++
++A job that claims to validate one event commit **MUST** use that event's full immutable commit ID as the fetch or checkout source. It **MUST NOT** acquire a mutable branch, tag, `github.ref`, or `github.head_ref` and rely only on a later expected-commit comparison. A ref can move while the job waits. The comparison detects the wrong commit but does not recover the intended event object.
++
++Select the immutable ID for the intended role. Use `github.sha` when the job validates the triggering commit defined for that event. Use `github.event.pull_request.head.sha` when the proposed head is the intended data input. For `pull_request_target`, these are different roles. An immutable ID does not make proposed code trusted. The privileged-workflow rules below still prohibit its execution.
++
++Keep least privilege, bounded acquisition, non-forcing fetches and exact post-acquisition commit verification. If the expected object cannot be acquired, stop with a failure. Do not substitute the current value of a mutable ref. For a checkout action, supply the immutable ID as its `ref` and verify the resulting `HEAD` before use.
++
++**Compliant immutable-source example:** This Linux Bash step assumes a least-privilege job, a fresh isolated Git repository and an already verified fixed `origin`. Its destination ref does not exist. The step deadline bounds acquisition; depth1 bounds history. Existing persistent refs remain subject to the no-force and unexpected-transition rules below.
++
++```yaml
++- name: Acquire the immutable event commit
++  shell: bash
++  timeout-minutes: 2
++  env:
++    EXPECTED_REVISION: ${{ github.sha }}
++  run: |
++    set -euo pipefail
++    [[ "${EXPECTED_REVISION}" =~ ^[0-9a-f]{40}$ ]]
++    git fetch --no-tags --no-recurse-submodules --depth=1 --refmap= origin \
++      "${EXPECTED_REVISION}:refs/remotes/event/target"
++    actual_revision="$(git rev-parse --verify 'refs/remotes/event/target^{commit}')"
++    test "${actual_revision}" = "${EXPECTED_REVISION}"
++```
++
++**Non-compliant mutable-source example:** The final comparison remains necessary, but it cannot prevent this acquisition race. This example has the same fresh-repository precondition.
++
++```yaml
++- name: Acquire a mutable event ref
++  shell: bash
++  timeout-minutes: 2
++  env:
++    EXPECTED_REF: ${{ github.ref }}
++    EXPECTED_REVISION: ${{ github.sha }}
++  run: |
++    set -euo pipefail
++    git fetch --no-tags --no-recurse-submodules --depth=1 --refmap= origin \
++      "${EXPECTED_REF}:refs/remotes/event/target"
++    actual_revision="$(git rev-parse --verify 'refs/remotes/event/target^{commit}')"
++    test "${actual_revision}" = "${EXPECTED_REVISION}"
++```
++
++See [GitHub's event reference](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows) for each event's commit roles and [Git's fetch reference](https://git-scm.com/docs/git-fetch) for refspec and destination behavior.
+ 
+ ## GitHub Actions Privileged-Workflow Trust Roots
+ 
+@@ -655,5 +700,6 @@
+ - Any schema or ecosystem validator wired into pre-commit or CI passes for the affected files (for example, `actionlint` for GitHub Actions workflow files, `check-jsonschema` for schema-backed YAML covered by an active hook). When no such validator is wired up for the file family being changed, authors **SHOULD** run the applicable validator locally before committing. For Azure Pipelines YAML, service-backed validation through Azure DevOps Services pipeline creation, queued runs, or Azure Repos branch-policy build validation should be recorded when it cannot be performed in the current task.
+ - Pre-commit hooks pass locally (`pre-commit run --all-files`) and in the repository's configured CI.
+ - No secrets are committed; GitHub Actions workflows declare least-privilege `permissions:`.
++- Each job that validates an event commit uses its full immutable commit ID as the acquisition source and verifies the acquired commit before use.
+ - Each privileged `pull_request_target` workflow has a complete executable trust-root inventory, covers every selector in its path filters, and has fail-closed mutation tests for proposed trust-root or inert-data changes.
+ - Each path-scoped `push` workflow defines branch and tag intent explicitly and does not rely on path filters to restrict tag events.

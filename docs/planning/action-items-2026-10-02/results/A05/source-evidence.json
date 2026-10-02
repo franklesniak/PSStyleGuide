@@ -1,0 +1,28 @@
+[
+  {
+    "repository": "PSStyleGuide",
+    "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "path": ".github/instructions/yaml.instructions.md",
+    "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+    "bytes": 54645,
+    "treeEntry": "100644 blob edef19560d3403985d1417af4772d74bbf9eacf4\t.github/instructions/yaml.instructions.md"
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/instructions/yaml.instructions.md",
+    "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+    "bytes": 54645,
+    "treeEntry": "100644 blob 924d12c833d07def47d05137b532e622db622fa4\t.github/instructions/yaml.instructions.md"
+  },
+  {
+    "repository": "PSStyleGuide",
+    "commit": "00d380586bb728544bad921f1ab809d49646a89b",
+    "tree": "9dbea0305812650d4143df6f8cba8f195881fc12",
+    "path": ".github/workflows/devcontainer-ci.yml",
+    "sha256": "d622508dfc9caead761bf4aebe84a1fff9ab8bfeb12f67763b7af7d4df6c0609",
+    "bytes": 2462,
+    "treeEntry": "100644 blob 86d1d785eaf0d3635cb79bfb5f67661821c9c3f6\t.github/workflows/devcontainer-ci.yml",
+    "claim": "historical source conformance only; no workflow execution"
+  }
+]

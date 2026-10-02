@@ -1,0 +1,10 @@
+{
+  "frontMatterAndExampleYamlParses": 6,
+  "patchApplyChecks": 2,
+  "weightedScoreRows": 5,
+  "identicalPairedGuidePreviews": true,
+  "localRefMoveProbe": "PASS",
+  "productLintAndInstructionAcceptance": false,
+  "requiredTwoPrecommitPasses": "pending actual authorized implementation",
+  "scratchMarkdownLint": "PASS exact locked CLI0.23.3, design and both guide previews"
+}

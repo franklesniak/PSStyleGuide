@@ -1,0 +1,382 @@
+{
+  "environment": {
+    "git": "git version 2.55.0.windows.5",
+    "host": "win32",
+    "transport": "local file URI; no network/service behavior proof",
+    "perProcessTimeoutSeconds": 15
+  },
+  "fixtureDirectory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi",
+  "eventCommit": "dff5cad1c406da513dac9606b484b9b485e95702",
+  "movedBranchCommit": "41583441c91b8f6fd56cb117631d90ed4fe6d007",
+  "results": [
+    {
+      "case": "immutable",
+      "actualRevision": "dff5cad1c406da513dac9606b484b9b485e95702",
+      "expectedEventRevision": "dff5cad1c406da513dac9606b484b9b485e95702",
+      "matchesEvent": true,
+      "value": "event A"
+    },
+    {
+      "case": "mutable",
+      "actualRevision": "41583441c91b8f6fd56cb117631d90ed4fe6d007",
+      "expectedEventRevision": "dff5cad1c406da513dac9606b484b9b485e95702",
+      "matchesEvent": false,
+      "value": "later B"
+    }
+  ],
+  "missingObjectNativeExit": 128,
+  "commands": [
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\seed",
+        "init",
+        "--quiet",
+        "--initial-branch=event"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.083,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\seed",
+        "config",
+        "user.name",
+        "Local acquisition fixture"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.063,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\seed",
+        "config",
+        "user.email",
+        "fixture@example.invalid"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.063,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\seed",
+        "add",
+        "--",
+        "value.txt"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.074,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\seed",
+        "-c",
+        "commit.gpgsign=false",
+        "commit",
+        "--quiet",
+        "-m",
+        "Event A"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.114,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\seed",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.076,
+      "stdout": "dff5cad1c406da513dac9606b484b9b485e95702",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\seed",
+        "add",
+        "--",
+        "value.txt"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.111,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\seed",
+        "-c",
+        "commit.gpgsign=false",
+        "commit",
+        "--quiet",
+        "-m",
+        "Move ref to B"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.132,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\seed",
+        "rev-parse",
+        "HEAD"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.061,
+      "stdout": "41583441c91b8f6fd56cb117631d90ed4fe6d007",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi",
+        "clone",
+        "--bare",
+        "--quiet",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\seed",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\remote.git"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.208,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\immutable",
+        "init",
+        "--quiet"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.086,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\immutable",
+        "remote",
+        "add",
+        "origin",
+        "file:///C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A05-design-20261002/ref-move-7_a5oufi/remote.git"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.062,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\immutable",
+        "fetch",
+        "--no-tags",
+        "--no-recurse-submodules",
+        "--depth=1",
+        "--refmap=",
+        "origin",
+        "dff5cad1c406da513dac9606b484b9b485e95702:refs/remotes/event/target"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.432,
+      "stdout": "",
+      "stderr": "From file:///C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A05-design-20261002/ref-move-7_a5oufi/remote\n * [new ref]         dff5cad1c406da513dac9606b484b9b485e95702 -> event/target"
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\immutable",
+        "rev-parse",
+        "--verify",
+        "refs/remotes/event/target^{commit}"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.061,
+      "stdout": "dff5cad1c406da513dac9606b484b9b485e95702",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\immutable",
+        "show",
+        "dff5cad1c406da513dac9606b484b9b485e95702:value.txt"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.063,
+      "stdout": "event A",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\mutable",
+        "init",
+        "--quiet"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.084,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\mutable",
+        "remote",
+        "add",
+        "origin",
+        "file:///C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A05-design-20261002/ref-move-7_a5oufi/remote.git"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.06,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\mutable",
+        "fetch",
+        "--no-tags",
+        "--no-recurse-submodules",
+        "--depth=1",
+        "--refmap=",
+        "origin",
+        "refs/heads/event:refs/remotes/event/target"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 1.82,
+      "stdout": "",
+      "stderr": "From file:///C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A05-design-20261002/ref-move-7_a5oufi/remote\n * [new branch]      event      -> event/target"
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\mutable",
+        "rev-parse",
+        "--verify",
+        "refs/remotes/event/target^{commit}"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.128,
+      "stdout": "41583441c91b8f6fd56cb117631d90ed4fe6d007",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\mutable",
+        "show",
+        "41583441c91b8f6fd56cb117631d90ed4fe6d007:value.txt"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.119,
+      "stdout": "later B",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\missing",
+        "init",
+        "--quiet"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.083,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\missing",
+        "remote",
+        "add",
+        "origin",
+        "file:///C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A05-design-20261002/ref-move-7_a5oufi/remote.git"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.062,
+      "stdout": "",
+      "stderr": ""
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi\\missing",
+        "fetch",
+        "--no-tags",
+        "--no-recurse-submodules",
+        "--depth=1",
+        "--refmap=",
+        "origin",
+        "1111111111111111111111111111111111111111:refs/remotes/event/target"
+      ],
+      "exit": 128,
+      "elapsedSeconds": 0.127,
+      "stdout": "",
+      "stderr": "fatal: git upload-pack: not our ref 1111111111111111111111111111111111111111\nfatal: remote error: upload-pack: not our ref 1111111111111111111111111111111111111111"
+    },
+    {
+      "args": [
+        "git",
+        "-C",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A05-design-20261002\\ref-move-7_a5oufi",
+        "--version"
+      ],
+      "exit": 0,
+      "elapsedSeconds": 0.063,
+      "stdout": "git version 2.55.0.windows.5",
+      "stderr": ""
+    }
+  ],
+  "productEdits": 0,
+  "status": "PASS local immutable/ref-move characterization; proposed shipped fixture not implemented"
+}
