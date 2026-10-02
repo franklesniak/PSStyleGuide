@@ -1,0 +1,9 @@
+{
+  "sourceHead": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+  "shallow": "true",
+  "historicalRevision": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+  "historicalObjectExit": 128,
+  "scope": "Exact depth1 Git object availability reproduction, not a CI execution or validator test",
+  "sourceReceiptSha256": "e700487980f53669addc30e9f240cc28f5f9942fa0a2490dc6d8e84bf11e9f1e",
+  "method": "git clone --no-local --depth 1 --no-checkout --branch codex/shared-governance from the trusted local product repository into a new disposable directory; rev-parse HEAD and is-shallow-repository; cat-file -e historicalRevision^{commit}"
+}

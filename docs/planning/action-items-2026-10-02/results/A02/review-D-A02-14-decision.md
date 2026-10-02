@@ -131,3 +131,7 @@ Product scope is the existing validator, dedicated SelfTest/required same-file p
 - Then run the required current-candidate repository validation and paired review lifecycle. Previous frozen pre-commit evidence predates this repair and cannot accept the new bytes.
 
 This author contributed to the design. Later independent quality must inspect the implementation and its negative controls with the parent's supplemental independent review. This decision supplies neither current-head acceptance nor transfer credit.
+
+## Final validation placement
+
+The [validation-placement addendum](review-D-A02-14-validation-addendum.md) preserves this product selection and defines the exact-native-B final-tree fixture needed for aggregate validation. It also repairs two test-input assumptions exposed by that context and the supported shallow CI checkout. No production baseline change or control waiver is selected.
