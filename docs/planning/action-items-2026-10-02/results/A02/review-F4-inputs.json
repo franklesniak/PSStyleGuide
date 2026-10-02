@@ -1,0 +1,7 @@
+{
+  "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+  "tracked_gitignore_paths": [
+    ".gitignore"
+  ],
+  "changed_input_trigger": "Any introduced nested/case-alias Git ignore file invalidates the root-only proof; reject until explicitly supported by a separately validated extension."
+}

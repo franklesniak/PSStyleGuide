@@ -1,0 +1,27 @@
+<!-- markdownlint-disable MD013 -->
+# D-A02-13: Prove recursive personal-memory exclusion
+
+**Finding:** Codex4163722062, review5389295737, exact headfe3d6738d5b331f88e21bf6b9815883b3bb353b8. No product edit preceded this decision. Public step6/release remains with the coordinator.
+
+**Validate.** The actual Git-backed helper returns true for root and literal nested probes under /CLAUDE.local.md plus /nested/CLAUDE.local.md, while tools/project/CLAUDE.local.md returns false. Existing tracked-path prohibition is recursive, so two samples cannot prove the intended root ignore-file contract. Exact reproduction log F4. Git documents basename patterns and leading **/ as recursive, with later matching rules overriding earlier ones. [Git ignore specification](https://git-scm.com/docs/gitignore) directly supports the proof; no invented wildcard evaluator is needed.
+
+**Stakeholders.** Claude operators and privacy/security owners need personal project memory excluded at every depth. Maintainers and new developers need actionable failure and Git semantics. Reviewers, auditors and DevOps need a proof stronger than samples. Project/cost owners need a bounded validator repair. Existing public instructions must remain visible; no new telemetry or external data results.
+
+**Options before scoring.** F keep the current two-sample behavior/no change. A add several fixed/random deeper probes. B require a canonical all-depth basename exclusion, or its native **/ equivalent, after every active negation; retain actual Git effectiveness/public-visibility probes. C implement general Git glob-language intersection and negation analysis. D remove the recursive requirement. E reject every .gitignore negation anywhere. A never proves arbitrary depth or path coverage. F leaves the reproduced deeper exposure and cannot support universal coverage. B permits earlier/unrelated negations but conservatively requires any later negation to precede a final canonical personal-memory exclusion. That finite proof is narrower than E; harmless later negations can be reordered without losing their other-path effect. B+native probes is selected, not a general parser rewrite.
+
+**New rubric:** privacy/recursive coverage45%; correct Git semantics30%; legitimate pattern compatibility15%; maintenance cost10%. Scores1-5; total=sum(weight*score)/5. Hard constraints: no sampling claimed as universal proof, no glob-parser rewrite, no hiding CLAUDE.md, no weakening tracked-memory prohibition.
+
+| Option | Coverage | Git semantics | Compatibility | Cost | Total /100 |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| A | 2 | 3 | 5 | 5 | 61 |
+| B | 5 | 5 | 4 | 4 | 95 |
+| C | 4 | 3 | 3 | 1 | 65 |
+| D | 1 | 1 | 5 | 5 | 40 |
+| E | 5 | 4 | 2 | 4 | 83 |
+| F | 1 | 3 | 5 | 5 | 52 |
+
+**Select B.** Native exact-head ls-tree inventory proves only root .gitignore is tracked (review-F4-inputs.json). Add one narrow helper that reads root .gitignore lines and the already bounded tracked-path array. Reject nested/case-alias ignore files because they invalidate this root-only proof; do not silently claim arbitrary lower-file coverage. This is a changed-input trigger, not a general glob engine. Recognize exact positive CLAUDE.local.md or **/CLAUDE.local.md patterns with native insignificant unescaped trailing whitespace; leading whitespace is not trimmed into a different Git pattern. A recognized recursive exclusion establishes proof. Any subsequent active ! rule clears that proof; a later canonical exclusion restores it. Escaped ! is a literal pattern, not negation. Root-anchored and enumerated-depth exclusions never establish recursive proof. Comments and positive rules do not undo it. Require the proof in production, retaining native Git root/nested/deep local probes and public CLAUDE.md visibility checks. Diagnostics ask for the final all-depth exclusion after negations. Do not modify product .gitignore: its current canonical rule already satisfies the selected proof.
+
+**Required tests.** Current canonical pattern passes root/nested/deep Git probes. Native **/ alias passes. Root+literal-nested-only rules fail proof even though old probes pass. Deep/path-specific negation after exclusion fails; moving canonical exclusion after it passes. Broad later negation fails; escaped ! and comments are inert. Leading-space pseudo-pattern is rejected; trailing native whitespace is accepted. Root/nested/deep CLAUDE.md remain visible. A candidate that introduces a nested .gitignore (including a personal-memory negation) must invalidate the root-only proof; current exact root-only inventory passes. Retain original native Git exact-path tests, including unrelated negation, rather than rewriting their true semantic results to match the proof helper.
+
+**Limits.** This proves the supplied root ignore-file rule at all depths, not user-local excludes or arbitrary lower-directory overrides. The bounded candidate tracked-path guard fails closed when a new lower-directory ignore file appears; expanding support needs a fresh exact-input coverage decision. Existing tracked-path prohibition remains the authoritative independent check for tracked personal-memory aliases. A06 owns general parser/exact-path work. Environment native Git/PS7.6.5/Node24.18.1; full checks pending public step6/release. The guide already states the personal-memory prohibition; step8 no-new-guide recommendation waits for full applicable guide audit and repair evidence.
