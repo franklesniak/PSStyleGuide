@@ -1,0 +1,240 @@
+{
+  "ps_accepted_main": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+  "ps_candidate_head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+  "tf_accepted_main": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+  "native_main_refs_refreshed": true,
+  "frozen_all_four_sha256_match": true,
+  "transfer_count": "0/12",
+  "paths": [
+    {
+      "path": ".github/document-metadata-classification.json",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+        "bytes": 388,
+        "frozen_repair": false,
+        "head_tree": "100644 blob 2e714fcc8ba113da7265eeec50ffe8094aa3a2a0\t.github/document-metadata-classification.json",
+        "equals_head_blob": true
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob 79b79ebef9da1175a18a42748c1f69b6df58af35\t.github/document-metadata-classification.json",
+        "absent": false,
+        "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+        "bytes": 387
+      },
+      "raw_equal": false
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "a17bfe6ab678793fde20248d32cd35cbbb5668c4fe430f59679e05157b60acff",
+        "bytes": 5613,
+        "frozen_repair": false,
+        "head_tree": "100644 blob 1e03c3fe9d1845fe73a8f05820e8acb09d04f918\t.github/workflows/Classify-InstructionMaintenance.mjs",
+        "equals_head_blob": true
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob 00c5857b701c9c85668f9fe66e33838f82d313e8\t.github/workflows/Classify-InstructionMaintenance.mjs",
+        "absent": false,
+        "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528",
+        "bytes": 5632
+      },
+      "raw_equal": false
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "8255b514c8d9a724c2a12a269783b19b408d4c51f413ae48a39ed486c0b2c839",
+        "bytes": 6739,
+        "frozen_repair": false,
+        "head_tree": "100644 blob 10501fb25bef1e57f51e8d147900f298a9dcb39b\t.github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "equals_head_blob": true
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob c24be2165520a02cb622f47dc03c4e4ad9ddd716\t.github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "absent": false,
+        "sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706",
+        "bytes": 6799
+      },
+      "raw_equal": false
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "48cd39e17bce054a2b391d27983f5c2a9bdaede8cde070a9b601e3e9bb233432",
+        "bytes": 2453,
+        "frozen_repair": false,
+        "head_tree": "100644 blob d128a7cd297f026584ee05e7825379503cacb7ab\t.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+        "equals_head_blob": true
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob 5622bb03dd0af81ed44d4709a7eda8c644ce9530\t.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+        "absent": false,
+        "sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a",
+        "bytes": 2603
+      },
+      "raw_equal": false
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "dd7a97bb0bfe7ea7e27276771104384c3c0db6716fea653b9171b7205640ef55",
+        "bytes": 85291,
+        "frozen_repair": true,
+        "head_tree": "100644 blob 47d3c60496d1b5872d3147e822fda1c59217b8d3\t.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "equals_head_blob": false
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": null,
+        "absent": true,
+        "sha256": null,
+        "bytes": null
+      },
+      "raw_equal": false
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "da64afc90f005280f218569fd37a7a8eeb6097db0ee9738e25162671f9699f73",
+        "bytes": 419697,
+        "frozen_repair": true,
+        "head_tree": "100644 blob 3e60de7ada8f9fa356e5a69f80a7081cc9444b94\t.github/workflows/Test-AgentInstructions.ps1",
+        "equals_head_blob": false
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob c84d9067c1b315e037850f2cd40e79c0704356b5\t.github/workflows/Test-AgentInstructions.ps1",
+        "absent": false,
+        "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875",
+        "bytes": 460163
+      },
+      "raw_equal": false
+    },
+    {
+      "path": ".gitignore",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87",
+        "bytes": 249,
+        "frozen_repair": false,
+        "head_tree": "100644 blob 76b672659bef2bda7a97f7fa8e7878e1cacafdc9\t.gitignore",
+        "equals_head_blob": true
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob 76b672659bef2bda7a97f7fa8e7878e1cacafdc9\t.gitignore",
+        "absent": false,
+        "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87",
+        "bytes": 249
+      },
+      "raw_equal": true
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "e6269a6addf416b7870203d4f4418d3975410cb27c4ebec3e8d1fffd9e173524",
+        "bytes": 9036,
+        "frozen_repair": true,
+        "head_tree": "100644 blob 601bba20e7b86c66ad51f634ce35f0f4e31d359a\tCONTRIBUTING.md",
+        "equals_head_blob": false
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob 94beedee85478c14d284ca830e94d4a5f4ece202\tCONTRIBUTING.md",
+        "absent": false,
+        "sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda",
+        "bytes": 5813
+      },
+      "raw_equal": false
+    },
+    {
+      "path": "README.md",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d",
+        "bytes": 4720,
+        "frozen_repair": false,
+        "head_tree": "100644 blob 0dbd77c1fe581bc1b32aa97e4dfb6c5119192560\tREADME.md",
+        "equals_head_blob": true
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob f04368718d580fe61d9a22f4c92cdfdf8287b28d\tREADME.md",
+        "absent": false,
+        "sha256": "affbdcdced05773f20895a397d1e062d716fb9e2b2215d0a4f412d7ed8b7a200",
+        "bytes": 5063
+      },
+      "raw_equal": false
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "efa416634e0944322f352387aae491bfa39ca4d77951822d4402b8a38e4928f3",
+        "bytes": 2179,
+        "frozen_repair": false,
+        "head_tree": "100644 blob ca0b7837554c896389e2750170ff43f4ff28d69e\tdocs/ISSUE_EVALUATION_PROMPT.md",
+        "equals_head_blob": true
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob f43b5168ce508a9a054dc85ba7231e27d8c70809\tdocs/ISSUE_EVALUATION_PROMPT.md",
+        "absent": false,
+        "sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1",
+        "bytes": 2146
+      },
+      "raw_equal": false
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "17c6ff1fabc939d33f9bbb424ac586d25f0f22a888d4eaf5bfc479bf382d7329",
+        "bytes": 6256,
+        "frozen_repair": false,
+        "head_tree": "100644 blob 9923ec416475b50702794a4d8ff0099c3dffe1da\tdocs/dependency-maintenance.md",
+        "equals_head_blob": true
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0\tdocs/dependency-maintenance.md",
+        "absent": false,
+        "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6",
+        "bytes": 6448
+      },
+      "raw_equal": false
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "ps_candidate": {
+        "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+        "sha256": "48864f76b8511d349922614b49dafc7cde0df70ba3fc3dc8c23240fe621e7e2a",
+        "bytes": 9769,
+        "frozen_repair": true,
+        "head_tree": "100644 blob 2cd28ecaa2a8c96d2201a474905153654dc0ac27\t.github/workflows/agent-instructions.yml",
+        "equals_head_blob": false
+      },
+      "tf_base": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree_entry": "100644 blob 7bf29f43ea081e9861ad53ecf0951831bf878075\t.github/workflows/agent-instructions.yml",
+        "absent": false,
+        "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c",
+        "bytes": 9558
+      },
+      "raw_equal": false
+    }
+  ],
+  "ps_candidate_state": "exact fe3d673 head for eight paths plus four matching frozen working-tree repairs; not an accepted commit",
+  "method": "Read-only Git object/file inspection and raw hashes. No validation tests or product execution."
+}
