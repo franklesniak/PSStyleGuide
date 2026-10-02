@@ -1,0 +1,22 @@
+[
+  {
+    "repository": "franklesniak/PSStyleGuide",
+    "patch": "protected-PS.patch",
+    "sha256": "a76b445cd67eb60098e0229e9cb92f0648682a072650bcb412b276dc865f6a73",
+    "paths": [
+      ".github/copilot-instructions.md",
+      "AGENTS.md",
+      "CLAUDE.md"
+    ]
+  },
+  {
+    "repository": "franklesniak/TerraformStyleGuide",
+    "patch": "protected-TF.patch",
+    "sha256": "d313f1544479e8da872c3dc51240e9915ccdb02b8c128357077616b0ad91e463",
+    "paths": [
+      ".github/copilot-instructions.md",
+      "AGENTS.md",
+      "CLAUDE.md"
+    ]
+  }
+]

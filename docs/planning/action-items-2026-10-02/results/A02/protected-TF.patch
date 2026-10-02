@@ -1,0 +1,229 @@
+diff --git a/AGENTS.md b/AGENTS.md
+--- a/AGENTS.md
++++ b/AGENTS.md
+@@ -1,13 +1,13 @@
+ <!-- markdownlint-disable MD013 -->
+ # Agent Instructions for OpenAI Codex CLI
+ 
+-**Version:** 1.7.20261001.0
++**Version:** 1.7.20261002.0
+ 
+ ## Metadata
+ 
+ - **Status:** Active
+ - **Owner:** Repository maintainer (@franklesniak)
+-- **Last Updated:** 2026-10-01
++- **Last Updated:** 2026-10-02
+ - **Scope:** Agent-specific entry point for OpenAI Codex CLI and compatible AI coding agents operating in TerraformStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
+ <!-- template-sync: begin markdown-reference-only -->
+ - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
+@@ -57,18 +57,19 @@
+   - Respect allowlisted file access boundaries; reject path traversal and symlink escapes.
+ 
+ - **Pre-commit and validation**
+-  - First install PowerShell 7's `pwsh` on `PATH` ([guide](https://learn.microsoft.com/powershell/scripting/install/install-powershell)); verify: `pwsh -NoProfile -Command 'if ($PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'`.
+-  - Install Python 3.12 and the pinned runner: Windows, `py -3.12 -m pip install --requirement requirements-dev.txt`; elsewhere, `python3.12 -m pip install --requirement requirements-dev.txt`. A verified equivalent is allowed.
+-  - On clone or lock changes, run `node .github/workflows/NpmTools.mjs install`. See [dependency maintenance](docs/dependency-maintenance.md) for script and hook behavior.
+-  - Pre-commit: Windows, `py -3.12 -m pre_commit run --all-files`; elsewhere, `python3.12 -m pre_commit run --all-files`. Use the same equivalent.
+-  - Retain Husky's staged-Markdown checks: `npm --prefix .github/workflows run lint:md` and `npm --prefix .github/workflows run lint:md:nested`.
+-  - Commit auto-fixes with the related change.
++  - Install PowerShell 7 (`pwsh`) on `PATH`. Verify it with `pwsh -NoProfile -Command 'if ($PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'`.
++  - Install Python 3.12 and the pre-commit runner. Follow [dependency maintenance](docs/dependency-maintenance.md) for the repository's installation and pinning requirements.
++  - Use the exact Node and npm versions declared in [ci-toolchain.json](.github/workflows/ci-toolchain.json).
++  - Run `node .github/workflows/NpmTools.mjs install` after a fresh clone or lockfile change.
++  - Before every commit, run `py -3.12 -m pre_commit run --all-files` on Windows or `python3.12 -m pre_commit run --all-files` elsewhere. A verified equivalent Python 3.12 command is allowed.
++  - Retain the existing Husky Markdown checks. Run `npm --prefix .github/workflows run lint:md` and `npm --prefix .github/workflows run lint:md:nested` when applicable.
++  - Include all auto-fixes in the same commit as the related change.
+   - Do not push until pre-commit and required validation pass.
+   - Run the applicable repository commands:
+     - `npm run lint:md`
+     - `npm run lint:md:nested`
+     - `npm run test:agent-instructions`
+-  - These module commands use the active hooks in [`.pre-commit-config.yaml`](.pre-commit-config.yaml), the authoritative list.
++  - [.pre-commit-config.yaml](.pre-commit-config.yaml) is the authoritative list of active hooks.
+   - Retained JSON checks include strict JSON syntax (`check-json`).
+   - Retained YAML checks include YAML parsing (`check-yaml`) and style (`yamllint`).
+   - Retained GitHub Actions checks include GitHub Actions linting (`actionlint`).
+@@ -89,14 +90,15 @@
+ 
+ ## Compact Execution and Evidence
+ 
+-Use one active task record, one final validation record, and targeted remote readback. Reuse unchanged results. Do not create per-command approvals, duplicate evidence, a per-round ledger, or a separate placement receipt.
+-
+-- **R0:** Read-only work needs no approval record.
+-- **R1:** The active task authorizes routine reversible work, commits, non-force topic pushes, PR or Issue updates, comments, and review requests.
+-- **R2:** Explicit task scope, complete affected-boundary validation, and independent review govern trust roots, protected instructions, privileged workflows, and externally observable behavior.
+-- **R3:** Current final readiness governs merges, force, deletion, settings, credentials, permissions, protections, and gate changes. Never infer authority for a force, deletion, settings, credential, permission, protection, override, or bypass action.
+-
+-The active task authorizes its R0 and R1 work and an R2 action that it expressly requires. A merge is on-plan only when the task names it, identities and scope match, current checks and review pass, no material finding remains, and no control is bypassed. Do not request another approval for an on-plan merge. Ask only for an off-plan merge, a scope expansion, a human-assigned decision, or another R3 action.
++Use one active task record, one final validation record, and targeted remote readback. Reuse a result only while its inputs remain unchanged. Do not create duplicate per-command approvals, per-round ledgers, or public placement receipts.
++
++- Read-only work needs no approval record.
++- Perform routine reversible work only within the actual current task authority and path scope.
++- Keep explicit protected-file authority and all required review and validation gates. A general task or review request does not authorize a protected instruction-file change.
++- Retain the native request baselines, reviewed input identities, clocks, counters, and terminal results required by the active review policy. Do not repeat a pending or possibly accepted mutation.
++- Before an authorized consequential action, verify current readiness and the affected preimage. Never infer authority for force, deletion, settings, credentials, permissions, protections, administrator override, or gate bypass.
++
++An on-plan merge requires actual task authority for the repository, PR, target, head, tree, and scope. Current required checks and reviews must pass. No material finding may remain. The merge method must bypass no control. Do not request another approval for an on-plan merge. Obtain missing authority for an off-plan action, a scope expansion, or a decision assigned to a human.
+ 
+ ## GitHub Plugin Usage
+ 
+@@ -142,9 +144,12 @@
+ 
+ These terms are the operative protected-file authorization contract for the review-comment workflow below:
+ 
+-- **Protected instruction file:** `.github/copilot-instructions.md`, a root agent entry point, or a file under `.github/instructions/` or `.cursor/rules/`.
+-- **Explicit protected-file authorization:** A direct current-task instruction that names the file or bounds the protected change set. A PR, review, generic feedback request, reusable prompt, review loop, or branch-placement authority is not sufficient by itself.
+-- Existing PR scope is context, not authorization. A new protected file or a broader protected edit exceeds narrow authority. Treat a secondary style-guide recommendation as a separate protected change.
++- **Protected instruction file:** Any file covered by this document's protected instruction rules, including `.github/copilot-instructions.md`, the root agent entry points (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`), files under `.github/instructions/`, and files under `.cursor/rules/`.
++- **Explicit protected-file authorization:** A direct maintainer or owner instruction in the current task authorizing the specific protected instruction-file change, either by naming the file or by clearly bounding the protected-file change set. The following are not sufficient on their own: a PR existing, a review comment existing, a generic "address the feedback" request, a reusable prompt, an automated review loop or active review workflow, or generic branch-placement authorization.
++- **Already in the PR's scope:** The protected file appears in the PR's changed-files list or diff against its base branch before the review-driven edit under consideration. This is relevant context, not authorization.
++- **Newly introduced protected file:** A protected file the PR did not modify before the review-driven edit. Introducing one exceeds any authorization scoped to the PR's existing changes and requires the narrow authorization question in step 7.
++- **Within the already-authorized scope:** An edit that resolves the reviewer's comment without expanding the protected file's changes beyond the specific protected-file change the maintainer already explicitly authorized for this task. A larger or more structural change, or one that newly introduces a protected file, exceeds the already-authorized scope.
++- **Secondary style-guide recommendation:** A step-8 recommendation to update a style guide to prevent similar issues in the future, distinct from the selected step-7 fix for the current review comment.
+ 
+ 1. **Signal processing (conditional).** If the GitHub plugin (or a documented fallback) supports adding emoji reactions to review comments, add an `eyes` (👀) reaction when work begins on the comment and remove it when the comment is fully processed (after step 9, or after the early-exit path in step 2). The reaction's `content` value is the literal string `eyes` as used by the GitHub Reactions API, not the Markdown shortcode `:eyes:`. If reaction tooling is not available in the current runtime, skip this step silently.
+ 
+diff --git a/CLAUDE.md b/CLAUDE.md
+--- a/CLAUDE.md
++++ b/CLAUDE.md
+@@ -1,13 +1,13 @@
+ <!-- markdownlint-disable MD013 -->
+ # Agent Instructions for Claude Code
+ 
+-**Version:** 1.10.20261001.0
++**Version:** 1.10.20261002.0
+ 
+ ## Metadata
+ 
+ - **Status:** Active
+ - **Owner:** Repository maintainer (@franklesniak)
+-- **Last Updated:** 2026-10-01
++- **Last Updated:** 2026-10-02
+ - **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in TerraformStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
+ <!-- template-sync: begin markdown-reference-only -->
+ - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
+@@ -54,18 +54,19 @@
+   - Respect allowlisted file access boundaries; reject path traversal and symlink escapes.
+ 
+ - **Pre-commit and validation**
+-  - PowerShell 7 (`pwsh`) must be on `PATH` first. [Install](https://learn.microsoft.com/powershell/scripting/install/install-powershell), then verify with `pwsh -NoProfile -Command 'if ($PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'`.
+-  - Install Python 3.12 and the pinned runner. On Windows, run `py -3.12 -m pip install --requirement requirements-dev.txt`. Elsewhere, run `python3.12 -m pip install --requirement requirements-dev.txt`; substitute a verified Python 3.12 command if needed.
+-  - Run `node .github/workflows/NpmTools.mjs install` after a fresh clone or lockfile change. See [dependency maintenance](docs/dependency-maintenance.md) for script and hook behavior.
+-  - Before every commit, run `py -3.12 -m pre_commit run --all-files` on Windows or `python3.12 -m pre_commit run --all-files` elsewhere; make the same substitution if needed.
+-  - Retain the repository's existing Husky pre-commit checks for staged Markdown. They run `npm --prefix .github/workflows run lint:md` and `npm --prefix .github/workflows run lint:md:nested`.
++  - Install PowerShell 7 (`pwsh`) on `PATH`. Verify it with `pwsh -NoProfile -Command 'if ($PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'`.
++  - Install Python 3.12 and the pre-commit runner. Follow [dependency maintenance](docs/dependency-maintenance.md) for the repository's installation and pinning requirements.
++  - Use the exact Node and npm versions declared in [ci-toolchain.json](.github/workflows/ci-toolchain.json).
++  - Run `node .github/workflows/NpmTools.mjs install` after a fresh clone or lockfile change.
++  - Before every commit, run `py -3.12 -m pre_commit run --all-files` on Windows or `python3.12 -m pre_commit run --all-files` elsewhere. A verified equivalent Python 3.12 command is allowed.
++  - Retain the existing Husky Markdown checks. Run `npm --prefix .github/workflows run lint:md` and `npm --prefix .github/workflows run lint:md:nested` when applicable.
+   - Include all auto-fixes in the same commit as the related change.
+-  - Do not push code when pre-commit or required validation checks are failing; fix issues and re-run until the checks pass.
++  - Do not push until pre-commit and required validation pass.
+   - Run the applicable repository commands:
+     - `npm run lint:md`
+     - `npm run lint:md:nested`
+     - `npm run test:agent-instructions`
+-  - These module commands use the active hooks in [`.pre-commit-config.yaml`](.pre-commit-config.yaml), the authoritative list.
++  - [.pre-commit-config.yaml](.pre-commit-config.yaml) is the authoritative list of active hooks.
+   - Retained JSON checks include strict JSON syntax (`check-json`).
+   - Retained YAML checks include YAML parsing (`check-yaml`) and style (`yamllint`).
+   - Retained GitHub Actions checks include GitHub Actions linting (`actionlint`).
+@@ -86,14 +87,15 @@
+ 
+ ## Compact Execution and Evidence
+ 
+-Use one active task record, one final validation record, and targeted remote readback. Reuse a result while its inputs remain unchanged. Do not create per-command approvals, duplicate evidence, a per-round ledger, or a separate placement receipt.
+-
+-- **R0 — read-only:** Inspect local or remote state without an approval record.
+-- **R1 — routine and reversible:** Implement, commit, make a non-force topic push, update a PR or Issue, comment, and request review under the active task authority. Validate the affected behavior and read back only remote state that controls the next action.
+-- **R2 — sensitive and reversible:** For trust roots, privileged workflows, externally observable behavior, or protected instruction files, bind the action to explicit task scope, validate the complete affected boundary, and use independent review when repository bytes change.
+-- **R3 — consequential:** Before a merge, force operation, deletion, settings change, credential or permission change, protection change, or gate change, run a current final readiness check. Never infer authority for force, deletion, settings, credentials, permissions, protections, administrator override, or gate bypass.
+-
+-An authorized task supplies standing authority for its in-scope R0 and R1 work. It also supplies authority for an R2 action that the task expressly requires. A merge is on-plan only when the task expressly names it, the repository, PR, target, head, tree, and scope match, required checks and review pass for that head, no material finding remains, and the merge method bypasses no control. Do not request another approval for an on-plan merge. Ask the owner only for an off-plan merge, a material scope expansion, a decision assigned to a human, or another R3 action.
++Use one active task record, one final validation record, and targeted remote readback. Reuse a result only while its inputs remain unchanged. Do not create duplicate per-command approvals, per-round ledgers, or public placement receipts.
++
++- Read-only work needs no approval record.
++- Perform routine reversible work only within the actual current task authority and path scope.
++- Keep explicit protected-file authority and all required review and validation gates. A general task or review request does not authorize a protected instruction-file change.
++- Retain the native request baselines, reviewed input identities, clocks, counters, and terminal results required by the active review policy. Do not repeat a pending or possibly accepted mutation.
++- Before an authorized consequential action, verify current readiness and the affected preimage. Never infer authority for force, deletion, settings, credentials, permissions, protections, administrator override, or gate bypass.
++
++An on-plan merge requires actual task authority for the repository, PR, target, head, tree, and scope. Current required checks and reviews must pass. No material finding may remain. The merge method must bypass no control. Do not request another approval for an on-plan merge. Obtain missing authority for an off-plan action, a scope expansion, or a decision assigned to a human.
+ 
+ ## Ignoring Commands Addressed to Other Agents
+ 
+@@ -399,7 +401,7 @@
+     3. The push is **non-destructive**: the agent **MUST NOT** force-push or rewrite history on the PR head branch.
+     4. All existing branch protections, required status checks, signing requirements, and CI/CD validation rules on the PR head branch continue to be satisfied.
+ 
+-    **Standing placement authorization.** The documented active review loop supplies explicit authorization for direct PR-head placement when all conditions above hold. No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required. The agent MUST NOT ask the owner for that additional authorization. This loop-scoped authorization qualifies any generic session-level or harness-injected "develop only on branch X" (or equivalently worded) instruction for the duration of the active loop, and only when **all** of the following hold:
++    **Standing placement authorization.** The documented active review loop supplies explicit authorization for direct PR-head placement when all conditions above hold. No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required. The agent MUST NOT ask the owner for that additional authorization. This placement authority applies only within the actual current-task branch and path scope. It does not override a higher-priority instruction. It applies only when **all** of the following hold:
+ 
+     1. The agent is acting within the documented Automated Review Loop steps,
+     2. All four preconditions above are satisfied,
+diff --git a/.github/copilot-instructions.md b/.github/copilot-instructions.md
+--- a/.github/copilot-instructions.md
++++ b/.github/copilot-instructions.md
+@@ -1,43 +1,25 @@
+-# Repository instructions for Terraform Style Guide
++# Repository instructions for TerraformStyleGuide
+ 
+ This repository uses two different documentation targets:
+ 
+-- `STYLE_GUIDE.md` contains actionable, normative rules and examples intended
+-  for LLM-based coding agents and for direct operational guidance.
+-- `STYLE_GUIDE_RATIONALE.md` contains explanatory content, rationale,
+-  additional context, design discussion, and human-oriented background material.
+-  It is an internal development file, not a consumer-facing artifact.
++- `STYLE_GUIDE.md` contains actionable, normative rules and examples intended for LLM-based coding agents and for direct operational guidance.
++- `STYLE_GUIDE_RATIONALE.md` contains explanatory content, rationale, additional context, design discussion, and human-oriented background material. It is an internal development file, not a consumer-facing artifact.
+ 
+-The following files are **generated artifacts** and must not be edited by hand.
+-They are rebuilt automatically by the CI build script whenever `STYLE_GUIDE.md`
+-or `STYLE_GUIDE_RATIONALE.md` changes:
++The following root files are generated artifacts. Do not edit them by hand:
+ 
+-- `copilot-instructions.md` (root) — generated from `STYLE_GUIDE.md`
+-- `terraform.instructions.md` — generated from `STYLE_GUIDE.md` with YAML
+-  front matter
+-- `STYLE_GUIDE_CHAT.md` — generated from `STYLE_GUIDE.md` wrapped in a code
+-  fence
+-- `STYLE_GUIDE_FULL.md` — generated by merging `STYLE_GUIDE.md` and
+-  `STYLE_GUIDE_RATIONALE.md`
++- `copilot-instructions.md` — generated from `STYLE_GUIDE.md`; distinct from this repository guidance file, `.github/copilot-instructions.md`.
++- `terraform.instructions.md` — generated from `STYLE_GUIDE.md` with YAML front matter.
++- `STYLE_GUIDE_CHAT.md` — generated from `STYLE_GUIDE.md` inside a code fence.
++- `STYLE_GUIDE_FULL.md` — generated from `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`.
++
++After either source changes, run `.github/workflows/Generate-StyleGuideArtifacts.ps1`. Review the generated changes. Commit all changed outputs with the source changes in the same pull request. CI checks generated-file drift and uploads the committed outputs. CI does not commit regenerated files. See [contributor guidance](../CONTRIBUTING.md#regenerate-and-publish-the-style-guide-artifacts).
+ 
+ When making changes:
+ 
+-1. Put normative rules, requirements, prohibitions, and concise
+-   compliant/non-compliant examples in `STYLE_GUIDE.md`.
+-2. Put extended explanation, reasoning, historical context, tradeoff discussion,
+-   and other human-oriented explanatory material in
+-   `STYLE_GUIDE_RATIONALE.md`.
+-3. Do not place extended rationale in `STYLE_GUIDE.md` unless it is necessary
+-   to understand or apply the rule.
+-4. If a change introduces or modifies a rule in `STYLE_GUIDE.md`, add or update
+-   corresponding rationale in `STYLE_GUIDE_RATIONALE.md` when useful.
+-5. Keep `STYLE_GUIDE.md` concise, scannable, and optimized for
+-   instruction-following by coding agents.
+-6. Consumer-facing style guide files (`STYLE_GUIDE.md` and its generated
+-   derivatives: `copilot-instructions.md`, `terraform.instructions.md`,
+-   `STYLE_GUIDE_CHAT.md`, `STYLE_GUIDE_FULL.md`) must not cross-reference
+-   other files in this repository, including each other.
+-7. `STYLE_GUIDE_RATIONALE.md` may cross-reference `STYLE_GUIDE.md` to help
+-   human contributors navigate between rationale and the corresponding rule.
+-   The CI build script strips these cross-references when generating
+-   consumer-facing artifacts.
++1. Put normative rules, requirements, prohibitions, and concise compliant/non-compliant examples in `STYLE_GUIDE.md`.
++2. Put extended explanation, reasoning, historical context, tradeoff discussion, and other human-oriented explanatory material in `STYLE_GUIDE_RATIONALE.md`.
++3. Do not place extended rationale in `STYLE_GUIDE.md` unless it is necessary to understand or apply the rule.
++4. If a change introduces or modifies a rule in `STYLE_GUIDE.md`, add or update corresponding rationale in `STYLE_GUIDE_RATIONALE.md` when useful.
++5. Keep `STYLE_GUIDE.md` concise, scannable, and optimized for instruction-following by coding agents.
++6. Consumer-facing style guide files (`STYLE_GUIDE.md` and its generated derivatives: `/copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, `STYLE_GUIDE_FULL.md`) must not cross-reference other files in this repository, including each other.
++7. `STYLE_GUIDE_RATIONALE.md` may cross-reference `STYLE_GUIDE.md` to help human contributors navigate between rationale and the corresponding rule. The CI build script strips these cross-references when generating consumer-facing artifacts.
