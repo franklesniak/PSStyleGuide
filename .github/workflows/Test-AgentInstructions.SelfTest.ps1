@@ -30,7 +30,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.5.20260927.0
+# Version: 1.5.20261002.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -45,12 +45,377 @@ param(
     [string] $MaximumMetadataUtcDate
 )
 
+function Assert-DocumentMetadataClassificationSelfTest {
+    # .SYNOPSIS
+    # Exercises classification coverage and trusted-baseline exemption safety.
+    #
+    # .DESCRIPTION
+    # Checks malformed data, undiscovered governed documents, and attempted
+    # candidate-only exemptions through the actual classification consumers.
+    #
+    # .PARAMETER MaximumMetadataUtcDate
+    # The trusted finalization UTC date used by the loaded validator.
+    #
+    # .EXAMPLE
+    # Assert-DocumentMetadataClassificationSelfTest -MaximumMetadataUtcDate '2026-10-02'
+    #
+    # # Throws if classification permits an unsafe exemption or misses a path.
+    #
+    # .INPUTS
+    # None. This function does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # None. The function throws when a security fixture is accepted.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER. Positional parameters are disabled.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param([Parameter(Mandatory)][string] $MaximumMetadataUtcDate)
+
+    $arrTrackedFixturePaths = @(
+        'README.md', 'generated.md', '.cursor/rules/operations.mdc',
+        'docs/RUNBOOK.md', 'docs/decisions/0001-safety.md')
+    $strValidClassification = '{"schemaVersion":2,"authorizedExemptionPaths":[],' +
+        '"tier2Paths":["README.md"],"generatedPaths":["generated.md"]}'
+    $objValidContext = Get-DocumentMetadataClassificationContext `
+        -Content $strValidClassification -TrackedPath $arrTrackedFixturePaths
+    if ($null -ne $objValidContext.Failure) {
+        throw 'The valid exact classification fixture was rejected.'
+    }
+    $arrDiscoveredFixturePaths = @(Get-DiscoveredGovernedMarkdownDocumentPath `
+            -CandidatePath $arrTrackedFixturePaths `
+            -KnownGovernedPath @('docs/decisions/0001-safety.md') `
+            -ExemptPath $objValidContext.ExemptPaths)
+    if ($arrDiscoveredFixturePaths.Count -ne 2 -or
+        $arrDiscoveredFixturePaths -cnotcontains '.cursor/rules/operations.mdc' -or
+        $arrDiscoveredFixturePaths -cnotcontains 'docs/RUNBOOK.md') {
+        throw 'New or hidden governed Markdown escaped classification discovery.'
+    }
+    foreach ($strDiscoveredFixturePath in $arrDiscoveredFixturePaths) {
+        $objMissingMetadataContext = Get-DocumentMetadataContext `
+            -Content "# Operational procedure`n`nRun the reviewed procedure.`n" `
+            -RequiresVersion $false
+        if ($null -eq $objMissingMetadataContext.Failure) {
+            throw "Discovered governed content accepted a missing header: $strDiscoveredFixturePath"
+        }
+    }
+
+    $arrInvalidClassificationFixtures = @(
+        $strValidClassification.Replace('"schemaVersion":2', '"schemaVersion":1'),
+        $strValidClassification.Replace('"schemaVersion":2', '"schemaVersion":"2"'),
+        $strValidClassification.Replace('"schemaVersion":2,', ''),
+        $strValidClassification.Replace('"schemaVersion":2', '"schemaVersion":2,"schemaVersion":2'),
+        $strValidClassification.Replace('"schemaVersion":2', '"schemaVersion":2,"unknown":true'),
+        $strValidClassification.Replace('"tier2Paths":["README.md"]', '"tier2Paths":null'),
+        $strValidClassification.Replace('"README.md"', '42'),
+        $strValidClassification.Replace('"README.md"', '"README.md","README.md"'),
+        $strValidClassification.Replace('"README.md"', '"generated.md","README.md"'),
+        $strValidClassification.Replace('"README.md"', '"untracked.md"'),
+        $strValidClassification.Replace('"generated.md"', '"README.md"'),
+        $strValidClassification.Replace('"README.md"', '"../README.md"'),
+        $strValidClassification.Replace('"README.md"', '"/README.md"'),
+        $strValidClassification.Replace('"README.md"', '"docs\\README.md"'),
+        $strValidClassification.Replace('"README.md"', '"README\u000a.md"'),
+        $strValidClassification.Replace('"README.md"', '"README.txt"'),
+        $strValidClassification.Replace('"authorizedExemptionPaths":[]', '"authorizedExemptionPaths":null'),
+        $strValidClassification.Replace('"authorizedExemptionPaths":[]', '"authorizedExemptionPaths":["README.md"]'),
+        $strValidClassification.Replace('"authorizedExemptionPaths":[]', '"authorizedExemptionPaths":["../future.md"]'),
+        $strValidClassification.Replace('"authorizedExemptionPaths":[]', '"authorizedExemptionPaths":["future.md","future.md"]'),
+        $strValidClassification.Replace('"authorizedExemptionPaths":[]', '"authorizedExemptionPaths":["z.md","a.md"]'),
+        $strValidClassification.Replace('"schemaVersion":2', '"schemaVersion":[[[[[[[[[[2]]]]]]]]]]'),
+        $strValidClassification.Replace('"schemaVersion":2', '"schemaVersion":2/*comment*/'),
+        $strValidClassification.TrimEnd('}') + ',}'
+    )
+    foreach ($strInvalidClassification in $arrInvalidClassificationFixtures) {
+        $objInvalidContext = Get-DocumentMetadataClassificationContext `
+            -Content $strInvalidClassification -TrackedPath $arrTrackedFixturePaths
+        if ($null -eq $objInvalidContext.Failure) {
+            throw "An unsafe classification fixture was accepted: $strInvalidClassification"
+        }
+    }
+
+    $arrCandidateActivePaths = @('README.md', 'docs/RUNBOOK.md')
+    $arrCandidateOnlyFailures = @(Get-DocumentMetadataClassificationExpansionFailure `
+            -HasTrustedBaselineManifest $true `
+            -TrustedBaselineExemptPath @('README.md') `
+            -TrustedBaselineAuthorizedExemptionPath @() `
+            -CandidateExemptPath $arrCandidateActivePaths)
+    if ($arrCandidateOnlyFailures.Count -ne 1 -or
+        $arrCandidateOnlyFailures[0] -notmatch 'docs/RUNBOOK\.md') {
+        throw 'Candidate-only metadata exemption bypassed the trusted baseline.'
+    }
+    $strCandidateAuthorization = $strValidClassification.Replace(
+        '"authorizedExemptionPaths":[]',
+        '"authorizedExemptionPaths":["docs/RUNBOOK.md"]')
+    $objCandidateAuthorizationContext = Get-DocumentMetadataClassificationContext `
+        -Content $strCandidateAuthorization -TrackedPath $arrTrackedFixturePaths
+    if ($null -ne $objCandidateAuthorizationContext.Failure -or
+        $objCandidateAuthorizationContext.ExemptPaths -ccontains 'docs/RUNBOOK.md') {
+        throw 'A candidate future authorization became an active exemption.'
+    }
+    $arrAuthorizedFailures = @(Get-DocumentMetadataClassificationExpansionFailure `
+            -HasTrustedBaselineManifest $true `
+            -TrustedBaselineExemptPath @('README.md') `
+            -TrustedBaselineAuthorizedExemptionPath @('docs/RUNBOOK.md') `
+            -CandidateExemptPath $arrCandidateActivePaths)
+    if ($arrAuthorizedFailures.Count -ne 0) {
+        throw 'The exact trusted baseline authorization was rejected.'
+    }
+    $arrWrongAuthorizationFailures = @(Get-DocumentMetadataClassificationExpansionFailure `
+            -HasTrustedBaselineManifest $true `
+            -TrustedBaselineExemptPath @('README.md') `
+            -TrustedBaselineAuthorizedExemptionPath @('docs/another.md') `
+            -CandidateExemptPath $arrCandidateActivePaths)
+    if ($arrWrongAuthorizationFailures.Count -ne 1) {
+        throw 'An authorization for another path permitted the candidate exemption.'
+    }
+    $arrBootstrapFailures = @(Get-DocumentMetadataClassificationExpansionFailure `
+            -HasTrustedBaselineManifest $false `
+            -TrustedBaselineExemptPath @() `
+            -TrustedBaselineAuthorizedExemptionPath @() `
+            -CandidateExemptPath $objValidContext.ExemptPaths)
+    if ($arrBootstrapFailures.Count -ne 0) {
+        throw 'Initial exact-path classification bootstrap was rejected.'
+    }
+    foreach ($strUnsafeDiscoveryPath in @('../escape.md', '/root.md', 'docs\bad.md')) {
+        $boolDiscoveryRejected = $false
+        try {
+            $null = @(Get-DiscoveredGovernedMarkdownDocumentPath `
+                    -CandidatePath @($strUnsafeDiscoveryPath) `
+                    -KnownGovernedPath @() -ExemptPath @())
+        } catch {
+            $boolDiscoveryRejected = $true
+        }
+        if (-not $boolDiscoveryRejected) {
+            throw "Unsafe tracked document discovery was accepted: $strUnsafeDiscoveryPath"
+        }
+    }
+    $boolGovernedExemptionRejected = $false
+    try {
+        $null = @(Get-DiscoveredGovernedMarkdownDocumentPath `
+                -CandidatePath @('docs/RUNBOOK.md') `
+                -KnownGovernedPath @('docs/RUNBOOK.md') `
+                -ExemptPath @('docs/RUNBOOK.md'))
+    } catch {
+        $boolGovernedExemptionRejected = $true
+    }
+    if (-not $boolGovernedExemptionRejected) {
+        throw 'A known governed document was allowed to exempt itself.'
+    }
+
+    foreach ($objIgnoreFixture in @(
+            [pscustomobject]@{ Path = 'CLAUDE.local.md'; Rules = "CLAUDE.local.md`n"; Expected = $true },
+            [pscustomobject]@{ Path = 'nested/CLAUDE.local.md'; Rules = "CLAUDE.local.md`n"; Expected = $true },
+            [pscustomobject]@{ Path = 'nested/CLAUDE.local.md'; Rules = "/CLAUDE.local.md`n"; Expected = $false },
+            [pscustomobject]@{ Path = 'CLAUDE.local.md'; Rules = "CLAUDE.local.md`n!CLAUDE.local.md`n"; Expected = $false },
+            [pscustomobject]@{ Path = 'nested/CLAUDE.local.md'; Rules = "CLAUDE.local.md`n!nested/CLAUDE.local.md`n"; Expected = $false },
+            [pscustomobject]@{ Path = 'CLAUDE.md'; Rules = "CLAUDE.local.md`n"; Expected = $false },
+            [pscustomobject]@{ Path = 'nested/CLAUDE.md'; Rules = "CLAUDE.local.md`n"; Expected = $false },
+            [pscustomobject]@{ Path = 'CLAUDE.md'; Rules = "CLAUDE*.md`n"; Expected = $true }
+        )) {
+        $boolIgnoreResult = Test-GitIgnorePathEffective `
+            -GitIgnoreContent $objIgnoreFixture.Rules `
+            -RepositoryRelativePath $objIgnoreFixture.Path
+        if ($boolIgnoreResult -ne $objIgnoreFixture.Expected) {
+            throw "Personal-memory ignore scope fixture failed: $($objIgnoreFixture.Path)"
+        }
+    }
+
+    $arrTimestampFixtures = @(
+        '2026-10-29T23:59:59Z',
+        '2026-10-29T23:59:59.123456789+05:45',
+        '2026-10-29T23:59:59.000000001-07:30')
+    $strTimestampMarkdown = 'Values: ' +
+        (($arrTimestampFixtures | ForEach-Object { '`' + $_ + '`' }) -join ', ') + ".`n"
+    $objTimestampContext = Get-MarkdownParseContext -Content $strTimestampMarkdown -LineCount 2
+    $arrActualTimestampValues = @($objTimestampContext.ProseBlocks[0].Code)
+    if ($arrActualTimestampValues.Count -ne $arrTimestampFixtures.Count) {
+        throw 'The real Markdown parser lost timestamp code spans.'
+    }
+    for ($intTimestampIndex = 0; $intTimestampIndex -lt $arrTimestampFixtures.Count; $intTimestampIndex++) {
+        if ($arrActualTimestampValues[$intTimestampIndex] -isnot [string] -or
+            $arrActualTimestampValues[$intTimestampIndex] -cne $arrTimestampFixtures[$intTimestampIndex]) {
+            throw 'The real Markdown parser changed timestamp type, offset or precision.'
+        }
+    }
+    $objTypedJson = ConvertFrom-ParserJsonContext `
+        -Content '{"empty":[],"one":[null],"nested":[[1]],"null":null,"true":true,"false":false,"integer":1,"decimal":1.25,"text":"2026-10-29T23:59:59.123456789+05:45"}' `
+        -MaximumBytes 4096
+    if ($objTypedJson.empty -isnot [array] -or $objTypedJson.empty.Count -ne 0 -or
+        $objTypedJson.one -isnot [array] -or $objTypedJson.one.Count -ne 1 -or
+        $null -ne $objTypedJson.one[0] -or $objTypedJson.nested[0] -isnot [array] -or
+        $null -ne $objTypedJson.null -or $objTypedJson.true -isnot [bool] -or
+        -not $objTypedJson.true -or $objTypedJson.false -isnot [bool] -or $objTypedJson.false -or
+        $objTypedJson.integer -isnot [int64] -or $objTypedJson.integer -ne 1 -or
+        $objTypedJson.decimal -isnot [double] -or $objTypedJson.decimal -ne 1.25 -or
+        $objTypedJson.text -isnot [string] -or $objTypedJson.text -cne $arrTimestampFixtures[1]) {
+        throw 'Parser JSON decoding changed typed context shape.'
+    }
+    foreach ($strInvalidParserJson in @(
+            '[]', '{"a":1,"a":2}', '{"a":1,"A":2}', '{"a":1,}',
+            '{"a":/* comment */1}', '{"a":1e400}',
+            ('{"a":' + ('[' * 65) + '1' + (']' * 65) + '}'),
+            ('{"a":"' + ('x' * 4096) + '"}'))) {
+        $boolParserJsonRejected = $false
+        try {
+            $null = ConvertFrom-ParserJsonContext -Content $strInvalidParserJson -MaximumBytes 4096
+        } catch {
+            $boolParserJsonRejected = $true
+        }
+        if (-not $boolParserJsonRejected) {
+            throw 'Parser JSON decoding accepted malformed, ambiguous or unbounded input.'
+        }
+    }
+
+    $strProvedPriorValidatorSha256 = '5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5'
+    $strLegacyMetadataContent = "# Procedure`n`n- **Status:** Active`n- **Owner:** Maintainers`n- **Last Updated:** 2026-10-01`n- **Scope:** Operational procedure.`n"
+    $strInitialGovernedContent = "# Procedure`n`n## Metadata`n`n- **Status:** Active`n- **Owner:** Maintainers`n- **Last Updated:** $MaximumMetadataUtcDate`n- **Scope:** Operational procedure.`n"
+    foreach ($objBootstrapFixture in @(
+            [pscustomobject]@{ Name = 'valid first governed state'; Path = 'docs/RUNBOOK.md'; Manifest = $false; Current = $strInitialGovernedContent; ExpectedFailure = $false },
+            [pscustomobject]@{ Name = 'invalid first governed state'; Path = 'docs/RUNBOOK.md'; Manifest = $false; Current = $strLegacyMetadataContent; ExpectedFailure = $true },
+            [pscustomobject]@{ Name = 'stale first governed state'; Path = 'docs/RUNBOOK.md'; Manifest = $false; Current = $strInitialGovernedContent.Replace($MaximumMetadataUtcDate, '2020-01-01'); ExpectedFailure = $true },
+            [pscustomobject]@{ Name = 'existing manifest keeps parent checks'; Path = 'docs/RUNBOOK.md'; Manifest = $true; Current = $strInitialGovernedContent; ExpectedFailure = $true },
+            [pscustomobject]@{ Name = 'prior governed path keeps parent checks'; Path = 'AGENTS.md'; Manifest = $false; Current = $strInitialGovernedContent; ExpectedFailure = $true }
+        )) {
+        $boolInitialCoverageFixture = Test-InitialMetadataCoveragePath `
+            -HasTrustedBaselineManifest $objBootstrapFixture.Manifest `
+            -TrustedBaselineValidatorSha256 $strProvedPriorValidatorSha256 `
+            -RepositoryRelativePath $objBootstrapFixture.Path
+        $objFixtureBaseContent = $strLegacyMetadataContent
+        if ($boolInitialCoverageFixture) { $objFixtureBaseContent = $null }
+        $arrBootstrapMetadataFailures = @(Get-PublishedEndpointLastUpdatedFailure `
+                -Name $objBootstrapFixture.Path -CurrentContent $objBootstrapFixture.Current `
+                -BaseContent $objFixtureBaseContent -TrustedEventUtcDate '' `
+                -RequireCurrentMaximumDateForRenderedChange $boolInitialCoverageFixture)
+        if (($arrBootstrapMetadataFailures.Count -gt 0) -ne $objBootstrapFixture.ExpectedFailure) {
+            throw "Initial metadata coverage fixture failed: $($objBootstrapFixture.Name)"
+        }
+    }
+    # Candidate classification/catalog choices are not inputs to proved prior coverage.
+    foreach ($strPriorGovernedFixturePath in @('AGENTS.md', 'docs/decisions/0001-safety.md', '.github/workflows/scripts-README.md')) {
+        if (Test-InitialMetadataCoveragePath -HasTrustedBaselineManifest $false `
+                -TrustedBaselineValidatorSha256 $strProvedPriorValidatorSha256 `
+                -RepositoryRelativePath $strPriorGovernedFixturePath) {
+            throw 'Candidate reclassification escaped proved prior governed coverage.'
+        }
+    }
+    $boolUnknownCoverageRejected = $false
+    try {
+        $null = Test-InitialMetadataCoveragePath -HasTrustedBaselineManifest $false `
+            -TrustedBaselineValidatorSha256 ('0' * 64) -RepositoryRelativePath 'docs/RUNBOOK.md'
+    } catch { $boolUnknownCoverageRejected = $true }
+    if (-not $boolUnknownCoverageRejected) {
+        throw 'Unknown trusted prior validator coverage was accepted.'
+    }
+}
+
+function Assert-PublishedMetadataGitFixture {
+    # .SYNOPSIS
+    # Tests final-state metadata on a real three-commit scratch branch.
+    #
+    # .DESCRIPTION
+    # Reads baseline, invalid intermediate and valid final bytes from Git.
+    # Proves the published endpoint comparison does not walk topic transitions.
+    #
+    # .PARAMETER MaximumMetadataUtcDate
+    # The trusted UTC date used for the final fixture metadata.
+    #
+    # .EXAMPLE
+    # Assert-PublishedMetadataGitFixture -MaximumMetadataUtcDate '2026-10-02'
+    #
+    # # Throws when invalid intermediate metadata poisons a valid final state.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None. The function throws if a fixture fails.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER. Positional parameters are disabled.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param([Parameter(Mandatory)][string] $MaximumMetadataUtcDate)
+
+    $strTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strFixtureRoot = [IO.Path]::GetFullPath([IO.Path]::Combine(
+            $strTempRoot, 'agent-metadata-endpoints-' + [Guid]::NewGuid().ToString('N')))
+    if (-not $strFixtureRoot.StartsWith($strTempRoot, [StringComparison]::OrdinalIgnoreCase) -or
+        $strFixtureRoot -ceq $strTempRoot) {
+        throw 'The published metadata fixture root is unsafe.'
+    }
+    $strEmptyHooks = [IO.Path]::Combine($strFixtureRoot, 'empty-hooks')
+    [void][IO.Directory]::CreateDirectory($strEmptyHooks)
+    $strFixtureFile = [IO.Path]::Combine($strFixtureRoot, 'fixture.md')
+    $strPriorDate = [DateTime]::ParseExact($MaximumMetadataUtcDate, 'yyyy-MM-dd',
+        [Globalization.CultureInfo]::InvariantCulture).AddDays(-1).ToString(
+        'yyyy-MM-dd', [Globalization.CultureInfo]::InvariantCulture)
+    $strBaselineContent = "# Fixture`n`n**Version:** 1.0.$($strPriorDate.Replace('-', '')).0`n`n## Metadata`n`n- **Status:** Active`n- **Owner:** Fixture Maintainers`n- **Last Updated:** $strPriorDate`n- **Scope:** Published endpoint regression.`n`n## Content`n`nPublished baseline.`n"
+    $strIntermediateContent = $strBaselineContent.Replace('Published baseline.', 'Intermediate change without metadata advancement.')
+    $strFinalContent = $strBaselineContent.Replace($strPriorDate, $MaximumMetadataUtcDate).
+        Replace($strPriorDate.Replace('-', ''), $MaximumMetadataUtcDate.Replace('-', '')).
+        Replace('Published baseline.', 'Corrected final state.')
+    $listRevisions = [Collections.Generic.List[string]]::new()
+    try {
+        & git -c "init.templateDir=$strEmptyHooks" -C $strFixtureRoot init --quiet --initial-branch=topic
+        if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the metadata branch fixture.' }
+        foreach ($strContent in @($strBaselineContent, $strIntermediateContent, $strFinalContent)) {
+            [IO.File]::WriteAllText($strFixtureFile, $strContent, [Text.UTF8Encoding]::new($false))
+            & git -c core.autocrlf=false -C $strFixtureRoot add -- fixture.md
+            if ($LASTEXITCODE -ne 0) { throw 'Could not index the metadata branch fixture.' }
+            & git -C $strFixtureRoot -c user.name=MetadataFixture `
+                -c user.email=metadata-fixture@example.invalid -c commit.gpgsign=false `
+                -c "core.hooksPath=$strEmptyHooks" commit --quiet --no-gpg-sign --message=fixture
+            if ($LASTEXITCODE -ne 0) { throw 'Could not commit the metadata branch fixture.' }
+            $strRevision = [string](& git -C $strFixtureRoot rev-parse --verify 'HEAD^{commit}')
+            if ($LASTEXITCODE -ne 0 -or $strRevision.Trim() -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'Could not read the metadata fixture commit identity.'
+            }
+            $listRevisions.Add($strRevision.Trim())
+        }
+        if (@($listRevisions | Select-Object -Unique).Count -ne 3) {
+            throw 'The metadata branch fixture did not create three distinct commits.'
+        }
+        $arrCommittedContent = @(foreach ($strRevision in $listRevisions) {
+                Read-GitRevisionText -RepositoryRootPath $strFixtureRoot `
+                    -Revision $strRevision -RepositoryRelativePath 'fixture.md' `
+                    -MaximumBytes 4096 -RequireRegularFile
+            })
+        $arrIntermediateFailures = @(Get-PublishedEndpointMetadataFailure `
+                -Name 'fixture.md' -CurrentContent $arrCommittedContent[1] `
+                -ParentContent $arrCommittedContent[0] -ExpectedUtcDate $MaximumMetadataUtcDate `
+                -IsNewDocumentTransition $false)
+        $arrFinalFailures = @(Get-PublishedEndpointMetadataFailure `
+                -Name 'fixture.md' -CurrentContent $arrCommittedContent[2] `
+                -ParentContent $arrCommittedContent[0] -ExpectedUtcDate $MaximumMetadataUtcDate `
+                -IsNewDocumentTransition $false)
+        $arrChangedPaths = @(Read-GitPublishedEndpointChangedPath `
+                -RepositoryRootPath $strFixtureRoot -BaselineRevision $listRevisions[0] `
+                -FinalRevision $listRevisions[2] -MaximumBytes 4096)
+        if ($arrIntermediateFailures.Count -eq 0 -or $arrFinalFailures.Count -ne 0 -or
+            $arrChangedPaths.Count -ne 1 -or $arrChangedPaths[0] -cne 'fixture.md') {
+            throw 'A real multi-commit invalid intermediate or valid final endpoint regressed.'
+        }
+    } finally {
+        if ([IO.Directory]::Exists($strFixtureRoot) -and
+            $strFixtureRoot.StartsWith($strTempRoot, [StringComparison]::OrdinalIgnoreCase) -and
+            $strFixtureRoot -cne $strTempRoot) {
+            Remove-Item -LiteralPath $strFixtureRoot -Recurse -Force
+        }
+    }
+}
+
 $arrDeclaredOutputTypes = @($MyInvocation.MyCommand.OutputType.Name)
 if ($arrDeclaredOutputTypes.Count -ne 1 -or
     $arrDeclaredOutputTypes[0] -cne 'System.Void') {
     throw 'The extracted self-test must declare one void output contract.'
 }
 $script:strMaximumMetadataUtcDate = $MaximumMetadataUtcDate
+Assert-DocumentMetadataClassificationSelfTest -MaximumMetadataUtcDate $MaximumMetadataUtcDate
+Assert-PublishedMetadataGitFixture -MaximumMetadataUtcDate $MaximumMetadataUtcDate
 
 $intCapacityMaximumBytes = 573440
 # Exercise the actual bounded reader at both sides of the finite role cap.

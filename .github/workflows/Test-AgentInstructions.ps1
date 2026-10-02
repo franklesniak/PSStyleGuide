@@ -3,7 +3,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.16.20260929.0
+# Version: 1.16.20261002.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -23,6 +23,7 @@ $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
 $intStyleGuideRationaleMaximumInputBytes = 196608
 $intGitPathListMaximumBytes = 1048576
+$intDocumentClassificationMaximumInputBytes = 32768
 $strPythonPrerequisite =
     'Python 3.12 is required to validate .codex/config.toml. On Windows, ' +
     'install the Python launcher for `py -3.12`; otherwise, expose ' +
@@ -52,6 +53,7 @@ $script:arrPushGovernedExactPaths = @(
     $script:arrCheckoutAttributePaths
     $script:arrOperationalLintGuidePaths
     '.codex/config.toml',
+    '.github/document-metadata-classification.json',
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/workflow-policy-cases.json',
@@ -197,6 +199,153 @@ $script:strClaudeImportFailure =
     'CLAUDE.md must not contain active @path imports.'
 
 #region Private helper functions
+
+function ConvertFrom-ParserJsonContext {
+    # .SYNOPSIS
+    # Decodes bounded parser JSON without coercing timestamp strings.
+    #
+    # .DESCRIPTION
+    # Preserves JSON types for the caller's existing exact shape checks.
+    # Rejects nonobject roots, ambiguous properties and excessive input.
+    #
+    # .PARAMETER Content
+    # The exact successful parser output.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted UTF-8 output size.
+    #
+    # .EXAMPLE
+    # ConvertFrom-ParserJsonContext -Content '{"value":"2026-10-02T00:00:00Z"}' -MaximumBytes 4096
+    #
+    # # Preserves value as the original string.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] Decoded JSON object.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER. Positional parameters are disabled.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Content,
+        [Parameter(Mandatory)][ValidateRange(1, 16777216)][int] $MaximumBytes
+    )
+
+    if ([Text.Encoding]::UTF8.GetByteCount($Content) -gt $MaximumBytes) {
+        throw 'The parser returned oversized JSON context.'
+    }
+    $objOptions = [System.Text.Json.JsonDocumentOptions]@{
+        AllowTrailingCommas = $false
+        CommentHandling = [System.Text.Json.JsonCommentHandling]::Disallow
+        MaxDepth = 64
+    }
+    $scriptBlockDecode = {
+        param([System.Text.Json.JsonElement] $Element)
+
+        switch ($Element.ValueKind) {
+            ([System.Text.Json.JsonValueKind]::Object) {
+                $hashtableProperties = [ordered]@{}
+                foreach ($objProperty in $Element.EnumerateObject()) {
+                    if ([string]::IsNullOrEmpty($objProperty.Name) -or
+                        $hashtableProperties.Contains($objProperty.Name)) {
+                        throw 'The parser returned ambiguous JSON properties.'
+                    }
+                    $hashtableProperties[$objProperty.Name] =
+                        & $scriptBlockDecode -Element $objProperty.Value
+                }
+                return [pscustomobject]$hashtableProperties
+            }
+            ([System.Text.Json.JsonValueKind]::Array) {
+                $listValues = [Collections.Generic.List[object]]::new()
+                foreach ($objElement in $Element.EnumerateArray()) {
+                    $listValues.Add((& $scriptBlockDecode -Element $objElement))
+                }
+                return ,$listValues.ToArray()
+            }
+            ([System.Text.Json.JsonValueKind]::String) { return $Element.GetString() }
+            ([System.Text.Json.JsonValueKind]::Number) {
+                $intValue = [int64]0
+                if ($Element.TryGetInt64([ref]$intValue)) { return $intValue }
+                $doubleValue = $Element.GetDouble()
+                if ([double]::IsNaN($doubleValue) -or [double]::IsInfinity($doubleValue)) {
+                    throw 'The parser returned an unsupported JSON number.'
+                }
+                return $doubleValue
+            }
+            ([System.Text.Json.JsonValueKind]::True) { return $true }
+            ([System.Text.Json.JsonValueKind]::False) { return $false }
+            ([System.Text.Json.JsonValueKind]::Null) { return $null }
+            default { throw 'The parser returned an unsupported JSON type.' }
+        }
+    }
+    $objDocument = $null
+    try {
+        $objDocument = [System.Text.Json.JsonDocument]::Parse($Content, $objOptions)
+        if ($objDocument.RootElement.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) {
+            throw 'The parser JSON context root must be an object.'
+        }
+        return & $scriptBlockDecode -Element $objDocument.RootElement
+    } finally {
+        if ($null -ne $objDocument) { $objDocument.Dispose() }
+    }
+}
+
+function Test-InitialMetadataCoveragePath {
+    # .SYNOPSIS
+    # Tests exact prior coverage for a first metadata-classification bootstrap.
+    #
+    # .DESCRIPTION
+    # Requires the accepted native prior validator identity. Candidate catalogs
+    # and exemption declarations cannot alter that proved prior coverage.
+    #
+    # .PARAMETER HasTrustedBaselineManifest
+    # True when the trusted baseline already has classification data.
+    #
+    # .PARAMETER TrustedBaselineValidatorSha256
+    # SHA-256 of validator bytes read from the trusted baseline Git object.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The exact candidate document path validated by the bounded input reader.
+    #
+    # .EXAMPLE
+    # Test-InitialMetadataCoveragePath @hashtableArguments
+    #
+    # # Returns true only for a proved previously ungoverned path.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the path was outside proved prior coverage.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER. Positional parameters are disabled.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)][bool] $HasTrustedBaselineManifest,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $TrustedBaselineValidatorSha256,
+        [Parameter(Mandatory)][string] $RepositoryRelativePath
+    )
+
+    if ($HasTrustedBaselineManifest) { return $false }
+    if ($TrustedBaselineValidatorSha256 -cne
+        '5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5') {
+        throw 'The manifest-absent trusted baseline metadata coverage is unknown.'
+    }
+    $arrProvedPriorGovernedPaths = @(
+        'AGENTS.md', 'CLAUDE.md', '.github/copilot-instructions.md',
+        '.github/instructions/docs.instructions.md', '.github/instructions/yaml.instructions.md',
+        'docs/ISSUE_EVALUATION_PROMPT.md', 'STYLE_GUIDE_RATIONALE.md',
+        '.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md', '.github/workflows/scripts-README.md')
+    return ($arrProvedPriorGovernedPaths -cnotcontains $RepositoryRelativePath -and
+        $RepositoryRelativePath -cnotmatch '^docs/decisions/[0-9]{4}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$')
+}
 
 function ConvertFrom-StrictUtf8Data {
     # .SYNOPSIS
@@ -1786,7 +1935,8 @@ print(json.dumps(r,separators=(",",":"),sort_keys=True))
     }
 
     try {
-        $objParserContext = $strParserOutput | ConvertFrom-Json -ErrorAction Stop
+        $objParserContext = ConvertFrom-ParserJsonContext `
+            -Content $strParserOutput -MaximumBytes 4096
     } catch {
         $objContext.Failure = 'The trusted TOML parser returned invalid typed context.'
         return [pscustomobject]$objContext
@@ -2302,7 +2452,8 @@ function Get-MarkdownParseContext {
     $strParserOutput = $objParserResult.Output
 
     try {
-        $objRawContext = $strParserOutput | ConvertFrom-Json -ErrorAction Stop
+        $objRawContext = ConvertFrom-ParserJsonContext `
+            -Content $strParserOutput -MaximumBytes 16777216
     } catch {
         throw [System.IO.InvalidDataException]::new(
             'The locked Markdown parser returned invalid context data.',
@@ -4361,6 +4512,461 @@ function Get-DecisionRecordLifecycleFailure {
     }
 }
 
+function Get-DocumentMetadataClassificationContext {
+    # .SYNOPSIS
+    # Parses the inert Markdown classification manifest.
+    #
+    # .DESCRIPTION
+    # Requires a strict, bounded JSON object with one schema version and sorted
+    # exact-path arrays for Tier 2, generated, and future authorized exemptions.
+    # Active exemptions must be safe tracked Markdown paths. Authorization paths
+    # are inert until they exist in a trusted published baseline.
+    #
+    # .PARAMETER Content
+    # The strict JSON manifest text.
+    #
+    # .PARAMETER TrackedPath
+    # The complete tracked repository path inventory at the validation revision.
+    #
+    # .EXAMPLE
+    # Get-DocumentMetadataClassificationContext `
+    #     -Content '{"schemaVersion":2,"authorizedExemptionPaths":[],"tier2Paths":[],"generatedPaths":[]}' `
+    #     -TrackedPath @()
+    #
+    # # Returns an empty, valid exemption set.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [pscustomobject] The failure, active exemptions, and authorization paths.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the
+    # public API surface. Parameters, return shape, and positional
+    # contract may change without notice.
+    #
+    # This function does not support positional parameters.
+    # Version: 1.1.20260911.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Content,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $TrackedPath
+    )
+
+    $scriptBlockFailure = {
+        param([string] $Message)
+
+        return [pscustomobject]@{
+            Failure = $Message
+            ExemptPaths = [string[]]@()
+            AuthorizedExemptionPaths = [string[]]@()
+        }
+    }
+    $objJsonOptions = [System.Text.Json.JsonDocumentOptions]@{
+        AllowTrailingCommas = $false
+        CommentHandling = [System.Text.Json.JsonCommentHandling]::Disallow
+        MaxDepth = 8
+    }
+    $objJsonDocument = $null
+    try {
+        $objJsonDocument = [System.Text.Json.JsonDocument]::Parse(
+            $Content,
+            $objJsonOptions
+        )
+        $objRoot = $objJsonDocument.RootElement
+        if ($objRoot.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) {
+            return & $scriptBlockFailure `
+                -Message 'The document classification manifest root must be an object.'
+        }
+
+        $dictionaryProperties =
+            [System.Collections.Generic.Dictionary[
+                string,
+                System.Text.Json.JsonElement
+            ]]::new([System.StringComparer]::Ordinal)
+        $arrAllowedProperties = @(
+            'schemaVersion',
+            'authorizedExemptionPaths',
+            'tier2Paths',
+            'generatedPaths'
+        )
+        foreach ($objProperty in $objRoot.EnumerateObject()) {
+            if ($arrAllowedProperties -cnotcontains $objProperty.Name) {
+                return & $scriptBlockFailure -Message (
+                    'The document classification manifest contains an unknown property: ' +
+                    $objProperty.Name
+                )
+            }
+            if ($dictionaryProperties.ContainsKey($objProperty.Name)) {
+                return & $scriptBlockFailure -Message (
+                    'The document classification manifest contains a duplicate property: ' +
+                    $objProperty.Name
+                )
+            }
+            $dictionaryProperties.Add($objProperty.Name, $objProperty.Value.Clone())
+        }
+        foreach ($strRequiredProperty in $arrAllowedProperties) {
+            if (-not $dictionaryProperties.ContainsKey($strRequiredProperty)) {
+                return & $scriptBlockFailure -Message (
+                    'The document classification manifest is missing property: ' +
+                    $strRequiredProperty
+                )
+            }
+        }
+
+        $intSchemaVersion = 0
+        if ($dictionaryProperties['schemaVersion'].ValueKind -ne [System.Text.Json.JsonValueKind]::Number -or
+            -not $dictionaryProperties['schemaVersion'].TryGetInt32(
+                [ref]$intSchemaVersion
+            ) -or $intSchemaVersion -ne 2) {
+            return & $scriptBlockFailure `
+                -Message 'The document classification schemaVersion must be integer 2.'
+        }
+
+        $setTrackedPaths = [System.Collections.Generic.HashSet[string]]::new(
+            $TrackedPath,
+            [System.StringComparer]::Ordinal
+        )
+        $setExemptPaths = [System.Collections.Generic.HashSet[string]]::new(
+            [System.StringComparer]::Ordinal
+        )
+        $listExemptPaths = [System.Collections.Generic.List[string]]::new()
+        foreach ($strArrayProperty in @('tier2Paths', 'generatedPaths')) {
+            $objArray = $dictionaryProperties[$strArrayProperty]
+            if ($objArray.ValueKind -ne [System.Text.Json.JsonValueKind]::Array) {
+                return & $scriptBlockFailure -Message (
+                    "The document classification $strArrayProperty value must be an array."
+                )
+            }
+            $strPreviousPath = $null
+            foreach ($objPathValue in $objArray.EnumerateArray()) {
+                if ($objPathValue.ValueKind -ne [System.Text.Json.JsonValueKind]::String) {
+                    return & $scriptBlockFailure -Message (
+                        "The document classification $strArrayProperty entries must be strings."
+                    )
+                }
+                $strPath = $objPathValue.GetString()
+                if ([string]::IsNullOrWhiteSpace($strPath) -or
+                    [System.IO.Path]::IsPathRooted($strPath) -or
+                    $strPath.Contains('\', [System.StringComparison]::Ordinal) -or
+                    $strPath -match '(?:^|/)\.\.(?:/|$)' -or
+                    $strPath -match '[\x00-\x1f\x7f]' -or
+                    $strPath -cnotmatch '\.(?:md|mdc)$') {
+                    return & $scriptBlockFailure -Message (
+                        "The document classification contains an unsafe path: $strPath"
+                    )
+                }
+                if ($null -ne $strPreviousPath -and
+                    [string]::CompareOrdinal($strPreviousPath, $strPath) -ge 0) {
+                    return & $scriptBlockFailure -Message (
+                        "The document classification $strArrayProperty array must be " +
+                        'strictly ordinal-sorted and duplicate-free.'
+                    )
+                }
+                if (-not $setExemptPaths.Add($strPath)) {
+                    return & $scriptBlockFailure -Message (
+                        "The document classification repeats a path: $strPath"
+                    )
+                }
+                if (-not $setTrackedPaths.Contains($strPath)) {
+                    return & $scriptBlockFailure -Message (
+                        "The document classification path is not tracked: $strPath"
+                    )
+                }
+                $listExemptPaths.Add($strPath)
+                $strPreviousPath = $strPath
+            }
+        }
+
+        $objAuthorizationArray = $dictionaryProperties['authorizedExemptionPaths']
+        if ($objAuthorizationArray.ValueKind -ne [System.Text.Json.JsonValueKind]::Array) {
+            return & $scriptBlockFailure -Message (
+                'The document classification authorizedExemptionPaths value must be an array.'
+            )
+        }
+        $listAuthorizedExemptionPaths = [System.Collections.Generic.List[string]]::new()
+        $strPreviousAuthorizationPath = $null
+        foreach ($objPathValue in $objAuthorizationArray.EnumerateArray()) {
+            if ($objPathValue.ValueKind -ne [System.Text.Json.JsonValueKind]::String) {
+                return & $scriptBlockFailure -Message (
+                    'The document classification authorizedExemptionPaths entries must be strings.'
+                )
+            }
+            $strPath = $objPathValue.GetString()
+            if ([string]::IsNullOrWhiteSpace($strPath) -or
+                [System.IO.Path]::IsPathRooted($strPath) -or
+                $strPath.Contains('\', [System.StringComparison]::Ordinal) -or
+                $strPath -match '(?:^|/)\.\.(?:/|$)' -or
+                $strPath -match '[\x00-\x1f\x7f]' -or
+                $strPath -cnotmatch '\.(?:md|mdc)$') {
+                return & $scriptBlockFailure -Message (
+                    "The document classification contains an unsafe path: $strPath"
+                )
+            }
+            if ($null -ne $strPreviousAuthorizationPath -and
+                [string]::CompareOrdinal(
+                    $strPreviousAuthorizationPath,
+                    $strPath
+                ) -ge 0) {
+                return & $scriptBlockFailure -Message (
+                    'The document classification authorizedExemptionPaths array must be ' +
+                    'strictly ordinal-sorted and duplicate-free.'
+                )
+            }
+            if ($setExemptPaths.Contains($strPath) -or
+                $listAuthorizedExemptionPaths.Contains($strPath)) {
+                return & $scriptBlockFailure -Message (
+                    "The document classification repeats a path: $strPath"
+                )
+            }
+            $listAuthorizedExemptionPaths.Add($strPath)
+            $strPreviousAuthorizationPath = $strPath
+        }
+
+        return [pscustomobject]@{
+            Failure = $null
+            ExemptPaths = [string[]]$listExemptPaths.ToArray()
+            AuthorizedExemptionPaths =
+                [string[]]$listAuthorizedExemptionPaths.ToArray()
+        }
+    }
+    catch [System.Text.Json.JsonException] {
+        return & $scriptBlockFailure `
+            -Message 'The document classification manifest is not strict JSON.'
+    }
+    finally {
+        if ($null -ne $objJsonDocument) {
+            $objJsonDocument.Dispose()
+        }
+    }
+}
+
+function Get-DocumentMetadataClassificationExpansionFailure {
+    # .SYNOPSIS
+    # Rejects candidate-only Markdown metadata exemptions.
+    #
+    # .DESCRIPTION
+    # Compares the parsed candidate exemption set with an authenticated baseline.
+    # A new active exemption must already be active or authorized in the trusted
+    # published baseline. Candidate-only authorizations are inert. A missing
+    # baseline manifest is permitted only for the one-time manifest bootstrap.
+    # Removals are permitted because they strengthen metadata validation.
+    #
+    # .PARAMETER HasTrustedBaselineManifest
+    # Indicates that the authenticated baseline contains the manifest.
+    #
+    # .PARAMETER TrustedBaselineExemptPath
+    # Parsed exact exemptions in the authenticated baseline.
+    #
+    # .PARAMETER TrustedBaselineAuthorizedExemptionPath
+    # Parsed exact future exemptions authorized in the authenticated baseline.
+    #
+    # .PARAMETER CandidateExemptPath
+    # Parsed exact exemptions in the candidate revision.
+    #
+    # .EXAMPLE
+    # Get-DocumentMetadataClassificationExpansionFailure `
+    #     -HasTrustedBaselineManifest $true `
+    #     -TrustedBaselineExemptPath @('README.md') `
+    #     -TrustedBaselineAuthorizedExemptionPath @('docs/guide.md') `
+    #     -CandidateExemptPath @('README.md', 'docs/RUNBOOK.md')
+    #
+    # # Reports docs/RUNBOOK.md as an unauthenticated exemption addition.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] One failure for each candidate-only exemption path.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the
+    # public API surface. Parameters, return shape, and positional
+    # contract may change without notice.
+    #
+    # This function does not support positional parameters.
+    # Version: 1.1.20260911.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [bool] $HasTrustedBaselineManifest,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $TrustedBaselineExemptPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $TrustedBaselineAuthorizedExemptionPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $CandidateExemptPath
+    )
+
+    if (-not $HasTrustedBaselineManifest) {
+        return
+    }
+    $setTrustedBaselineExemptPaths =
+        [System.Collections.Generic.HashSet[string]]::new(
+            $TrustedBaselineExemptPath,
+            [System.StringComparer]::Ordinal
+        )
+    $setTrustedBaselineAuthorizedExemptionPaths =
+        [System.Collections.Generic.HashSet[string]]::new(
+            $TrustedBaselineAuthorizedExemptionPath,
+            [System.StringComparer]::Ordinal
+        )
+    foreach ($strCandidateExemptPath in
+        ($CandidateExemptPath | Sort-Object -CaseSensitive -Unique)) {
+        if ($setTrustedBaselineExemptPaths.Contains($strCandidateExemptPath) -or
+            $setTrustedBaselineAuthorizedExemptionPaths.Contains(
+                $strCandidateExemptPath
+            )) {
+            continue
+        }
+        Write-Output (
+            'The document classification adds an unauthenticated metadata ' +
+            "exemption: $strCandidateExemptPath. Add the exact path to " +
+            'authorizedExemptionPaths in a separate change and publish that ' +
+            'authorization before activating the exemption.'
+        )
+    }
+}
+
+function Get-DiscoveredGovernedMarkdownDocumentPath {
+    # .SYNOPSIS
+    # Selects tracked Markdown that is not already classified.
+    #
+    # .DESCRIPTION
+    # Partitions every tracked Markdown or Cursor Markdown path between the
+    # reviewed governed catalog, a bounded Tier 2/generated exception list, and
+    # a fail-closed Tier 1 default. Rejects ambiguous or unsafe path inventories.
+    #
+    # .PARAMETER CandidatePath
+    # The complete tracked repository path inventory at the validation revision.
+    #
+    # .PARAMETER KnownGovernedPath
+    # Paths already present in the reviewed governed-document catalog.
+    #
+    # .PARAMETER ExemptPath
+    # Exact reviewed Tier 2 or generated-document paths that do not require
+    # document-level metadata validation.
+    #
+    # .EXAMPLE
+    # Get-DiscoveredGovernedMarkdownDocumentPath `
+    #     -CandidatePath @('README.md', 'docs/RELEASE-RUNBOOK.md') `
+    #     -KnownGovernedPath @() -ExemptPath @('README.md')
+    #
+    # # Returns docs/RELEASE-RUNBOOK.md for Tier 1 metadata validation.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] One newly discovered governed Markdown path.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the
+    # public API surface. Parameters, return shape, and positional
+    # contract may change without notice.
+    #
+    # This function does not support positional parameters.
+    # Version: 1.0.20260910.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $CandidatePath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $KnownGovernedPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $ExemptPath
+    )
+
+    $scriptBlockAssertSafeMarkdownPath = {
+        param(
+            [string] $Path,
+            [string] $InventoryName
+        )
+
+        if ([string]::IsNullOrWhiteSpace($Path) -or
+            [System.IO.Path]::IsPathRooted($Path) -or
+            $Path.Contains('\', [System.StringComparison]::Ordinal) -or
+            $Path -match '(?:^|/)\.\.(?:/|$)' -or
+            $Path -match '[\x00-\x1f\x7f]' -or
+            $Path -cnotmatch '\.(?:md|mdc)$') {
+            throw "$InventoryName contains an unsafe Markdown path: $Path"
+        }
+    }
+
+    $setCandidates = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strCandidatePath in $CandidatePath) {
+        if ($strCandidatePath -cnotmatch '\.(?:md|mdc)$') {
+            continue
+        }
+        & $scriptBlockAssertSafeMarkdownPath `
+            -Path $strCandidatePath `
+            -InventoryName 'The tracked document inventory'
+        if (-not $setCandidates.Add($strCandidatePath)) {
+            throw "The tracked document inventory contains a duplicate path: $strCandidatePath"
+        }
+    }
+
+    $setKnownGoverned = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strKnownGovernedPath in $KnownGovernedPath) {
+        & $scriptBlockAssertSafeMarkdownPath `
+            -Path $strKnownGovernedPath `
+            -InventoryName 'The governed document catalog'
+        if (-not $setKnownGoverned.Add($strKnownGovernedPath)) {
+            throw "The governed document catalog contains a duplicate path: $strKnownGovernedPath"
+        }
+    }
+
+    $setExempt = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strExemptPath in $ExemptPath) {
+        & $scriptBlockAssertSafeMarkdownPath `
+            -Path $strExemptPath `
+            -InventoryName 'The Tier 2/generated exception catalog'
+        if (-not $setExempt.Add($strExemptPath)) {
+            throw "The Tier 2/generated exception catalog contains a duplicate path: $strExemptPath"
+        }
+        if ($setKnownGoverned.Contains($strExemptPath)) {
+            throw "A Markdown path is both governed and exempt: $strExemptPath"
+        }
+        if (-not $setCandidates.Contains($strExemptPath)) {
+            throw "A Tier 2/generated exception is not tracked: $strExemptPath"
+        }
+    }
+
+    return @(
+        $setCandidates |
+            Where-Object {
+                -not $setKnownGoverned.Contains($_) -and
+                -not $setExempt.Contains($_)
+            } |
+            Sort-Object -CaseSensitive
+    )
+}
+
 function Get-DocumentMetadataContext {
     # .SYNOPSIS
     # Gets validated document-level metadata context.
@@ -5814,6 +6420,93 @@ $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
         -RepositoryRootPath $strRepositoryRootPath `
         -Revision $strValidatedInputRevision `
         -MaximumBytes $intGitPathListMaximumBytes)
+
+# Classification is candidate data. Use only the existing bounded safe readers.
+$strDocumentClassificationRelativePath = '.github/document-metadata-classification.json'
+$strDocumentClassificationPath = Join-Path -Path $strRepositoryRootPath `
+    -ChildPath $strDocumentClassificationRelativePath
+$strDocumentClassificationContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
+    ConvertFrom-StrictUtf8Data `
+        -Bytes (Read-RepositoryInputData `
+            -Path $strDocumentClassificationPath `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -RepositoryRelativePath $strDocumentClassificationRelativePath `
+            -DisplayName $strDocumentClassificationRelativePath `
+            -MaximumBytes $intDocumentClassificationMaximumInputBytes) `
+        -DisplayName $strDocumentClassificationRelativePath
+} else {
+    Read-GitRevisionText `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $strValidatedInputRevision `
+        -RepositoryRelativePath $strDocumentClassificationRelativePath `
+        -MaximumBytes $intDocumentClassificationMaximumInputBytes `
+        -RequireRegularFile
+}
+$objDocumentClassificationContext = Get-DocumentMetadataClassificationContext `
+    -Content $strDocumentClassificationContent `
+    -TrackedPath $arrTrackedRepositoryPaths
+if ($null -ne $objDocumentClassificationContext.Failure) {
+    throw $objDocumentClassificationContext.Failure
+}
+$strDocumentClassificationBaselineRevision = if (
+    [string]::IsNullOrEmpty($strValidatedInputRevision)
+) { $strCheckedOutRevision } else { $PublishedBaselineRevision }
+$boolHasTrustedBaselineClassificationManifest = $false
+$arrTrustedBaselineClassificationExemptPaths = @()
+$arrTrustedBaselineClassificationAuthorizedExemptionPaths = @()
+if (-not [string]::IsNullOrEmpty($strDocumentClassificationBaselineRevision)) {
+    $arrBaselineClassificationTrackedPaths = @(Read-GitTrackedPath `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $strDocumentClassificationBaselineRevision `
+        -MaximumBytes $intGitPathListMaximumBytes)
+    if ($arrBaselineClassificationTrackedPaths -ccontains $strDocumentClassificationRelativePath) {
+        $strBaselineDocumentClassificationContent = Read-GitRevisionText `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -Revision $strDocumentClassificationBaselineRevision `
+            -RepositoryRelativePath $strDocumentClassificationRelativePath `
+            -MaximumBytes $intDocumentClassificationMaximumInputBytes `
+            -RequireRegularFile
+        $objBaselineDocumentClassificationContext = Get-DocumentMetadataClassificationContext `
+            -Content $strBaselineDocumentClassificationContent `
+            -TrackedPath $arrBaselineClassificationTrackedPaths
+        if ($null -ne $objBaselineDocumentClassificationContext.Failure) {
+            throw ('The trusted baseline document classification is invalid: ' +
+                $objBaselineDocumentClassificationContext.Failure)
+        }
+        $boolHasTrustedBaselineClassificationManifest = $true
+        $arrTrustedBaselineClassificationExemptPaths = @(
+            $objBaselineDocumentClassificationContext.ExemptPaths)
+        $arrTrustedBaselineClassificationAuthorizedExemptionPaths = @(
+            $objBaselineDocumentClassificationContext.AuthorizedExemptionPaths)
+    }
+}
+$arrDocumentClassificationExpansionFailures = @(
+    Get-DocumentMetadataClassificationExpansionFailure `
+        -HasTrustedBaselineManifest $boolHasTrustedBaselineClassificationManifest `
+        -TrustedBaselineExemptPath $arrTrustedBaselineClassificationExemptPaths `
+        -TrustedBaselineAuthorizedExemptionPath $arrTrustedBaselineClassificationAuthorizedExemptionPaths `
+        -CandidateExemptPath $objDocumentClassificationContext.ExemptPaths)
+if ($arrDocumentClassificationExpansionFailures.Count -gt 0) {
+    throw ('Document classification expansion failed:' + [Environment]::NewLine + '- ' +
+        ($arrDocumentClassificationExpansionFailures -join ([Environment]::NewLine + '- ')))
+}
+
+$strTrustedBaselineValidatorSha256 = ''
+if (-not $boolHasTrustedBaselineClassificationManifest -and
+    -not [string]::IsNullOrEmpty($strDocumentClassificationBaselineRevision)) {
+    $strTrustedPriorValidator = Read-GitRevisionText `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $strDocumentClassificationBaselineRevision `
+        -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+        -MaximumBytes 573440 -RequireRegularFile
+    $objPriorValidatorSha256 = [Security.Cryptography.SHA256]::Create()
+    try {
+        $strTrustedBaselineValidatorSha256 = ([BitConverter]::ToString(
+                $objPriorValidatorSha256.ComputeHash([Text.Encoding]::UTF8.GetBytes(
+                        $strTrustedPriorValidator)))).Replace('-', '').ToLowerInvariant()
+    } finally { $objPriorValidatorSha256.Dispose() }
+}
+
 $arrPublishedBaselinePaths = @()
 $arrPublishedChangedPaths = @()
 if ($boolPublishedEndpointsRequested) {
@@ -5878,6 +6571,26 @@ if ($arrGovernedInstructionInventoryFailures.Count -gt 0) {
         'Governed instruction inventory failed:' + [Environment]::NewLine + '- ' +
         ($arrGovernedInstructionInventoryFailures -join ([Environment]::NewLine + '- '))
     )
+}
+
+$arrGovernedMetadataDocuments += [pscustomobject]@{
+    Path = 'STYLE_GUIDE.md'
+    MaximumBytes = 262144
+    RequiresMetadata = $true
+    RequiresVersion = $true
+}
+$arrDiscoveredGovernedMarkdownPaths = @(
+    Get-DiscoveredGovernedMarkdownDocumentPath `
+        -CandidatePath $arrTrackedRepositoryPaths `
+        -KnownGovernedPath @($arrGovernedMetadataDocuments.Path) `
+        -ExemptPath $objDocumentClassificationContext.ExemptPaths)
+foreach ($strDiscoveredGovernedMarkdownPath in $arrDiscoveredGovernedMarkdownPaths) {
+    $arrGovernedMetadataDocuments += [pscustomobject]@{
+        Path = $strDiscoveredGovernedMarkdownPath
+        MaximumBytes = $intInstructionDocumentMaximumInputBytes
+        RequiresMetadata = $true
+        RequiresVersion = $false
+    }
 }
 
 if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
@@ -6041,11 +6754,27 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
             IsWorktreeTransition = $false
         }
     }
+    $boolInitialMetadataCoverage = $false
+    $objMetadataParentContent = $objParentContext.ParentContent
+    if ($objDocumentSpec.RequiresMetadata -and -not $objDocumentSpec.RequiresVersion -and
+        $null -ne $objMetadataParentContent) {
+        $objPriorMetadataContext = Get-DocumentMetadataContext `
+            -Content $objMetadataParentContent -RequiresVersion $false
+        if ($null -ne $objPriorMetadataContext.Failure) {
+            $boolInitialMetadataCoverage = Test-InitialMetadataCoveragePath `
+                -HasTrustedBaselineManifest $boolHasTrustedBaselineClassificationManifest `
+                -TrustedBaselineValidatorSha256 $strTrustedBaselineValidatorSha256 `
+                -RepositoryRelativePath $objDocumentSpec.Path
+            if ($boolInitialMetadataCoverage) { $objMetadataParentContent = $null }
+        }
+    }
     $listGovernedDocumentContexts.Add([pscustomobject]@{
             Path = $objDocumentSpec.Path
             MaximumBytes = $objDocumentSpec.MaximumBytes
             Content = $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
             ParentContent = $objParentContext.ParentContent
+            MetadataParentContent = $objMetadataParentContent
+            IsInitialMetadataCoverage = $boolInitialMetadataCoverage
             ExpectedUtcDate = $objParentContext.ExpectedUtcDate
             IsWorktreeTransition = $objParentContext.IsWorktreeTransition
             RequiresMetadata = $objDocumentSpec.RequiresMetadata
@@ -6077,12 +6806,21 @@ $strGitIgnoreContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) 
         -MaximumBytes $intGitIgnoreMaximumInputBytes `
         -RequireRegularFile
 }
-if ($strGitIgnoreContent -cnotmatch '(?m)^/CLAUDE\.local\.md$') {
-    $listRepositoryFailures.AddRange([string[]] 'The root CLAUDE.local.md ignore rule is missing.')
-} elseif (-not (Test-GitIgnorePathEffective `
+foreach ($strPersonalMemoryPath in @('CLAUDE.local.md', 'nested/CLAUDE.local.md')) {
+    if (-not (Test-GitIgnorePathEffective `
             -GitIgnoreContent $strGitIgnoreContent `
-            -RepositoryRelativePath 'CLAUDE.local.md')) {
-    $listRepositoryFailures.AddRange([string[]] 'The root CLAUDE.local.md ignore rule is ineffective.')
+            -RepositoryRelativePath $strPersonalMemoryPath)) {
+        $listRepositoryFailures.AddRange([string[]] (
+            "The personal CLAUDE.local.md ignore rule is ineffective: $strPersonalMemoryPath"))
+    }
+}
+foreach ($strPublicInstructionPath in @('CLAUDE.md', 'nested/CLAUDE.md')) {
+    if (Test-GitIgnorePathEffective `
+            -GitIgnoreContent $strGitIgnoreContent `
+            -RepositoryRelativePath $strPublicInstructionPath) {
+        $listRepositoryFailures.AddRange([string[]] (
+            "The public instruction file must not be ignored: $strPublicInstructionPath"))
+    }
 }
 $listRepositoryFailures.AddRange([string[]] @(Get-DocumentationClaimFailure `
         -Content $strDocsInstructionsContent `
@@ -6145,10 +6883,10 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
         $listRepositoryFailures.AddRange([string[]] @(Get-PublishedEndpointLastUpdatedFailure `
                 -Name $objDocumentContext.Path `
                 -CurrentContent $objDocumentContext.Content `
-                -BaseContent $objDocumentContext.ParentContent `
+                -BaseContent $objDocumentContext.MetadataParentContent `
                 -TrustedEventUtcDate $objDocumentContext.ExpectedUtcDate `
                 -RequireCurrentMaximumDateForRenderedChange `
-                    $objDocumentContext.IsWorktreeTransition))
+                    ($objDocumentContext.IsWorktreeTransition -or $objDocumentContext.IsInitialMetadataCoverage)))
     }
 }
 if ($listRepositoryFailures.Count -gt 0) {

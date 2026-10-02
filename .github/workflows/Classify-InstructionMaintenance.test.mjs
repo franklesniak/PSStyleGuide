@@ -50,6 +50,16 @@ test('checker, helper, workflow and dependency-only changes require maintenance'
   }
 });
 
+test('metadata classification table-only changes require maintenance', () => {
+  for (const name of ['.github/document-metadata-classification.json',
+    '.GITHUB/DOCUMENT-METADATA-CLASSIFICATION.JSON']) {
+    const result = classify([name]);
+    assert.equal(result.classification, 'maintenance_required');
+    assert.deepEqual(result.maintenancePaths, [name]);
+    assert.equal(result.policy, base);
+  }
+});
+
 test('candidate authority data cannot change classification', () => {
   const result = classifyInstructionMaintenance({ base, head,
     changedPaths: ['.github/workflows/Classify-InstructionMaintenance.mjs'], authorized: true,
