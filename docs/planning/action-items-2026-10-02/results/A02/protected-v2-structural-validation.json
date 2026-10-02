@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "v1 protected-PS.patch hash unchanged",
+    "v1 protected-TF.patch hash unchanged",
+    "AGENTS.md exact common bytes except repo/language facts",
+    "CLAUDE.md exact common bytes except repo/language facts",
+    ".github/copilot-instructions.md exact common bytes except repo/language facts",
+    "PS patch applies to immutable native bytes with no whitespace errors",
+    "PS only three summary regions and two nonnormative intro paragraphs changed vs v1; full other protocols unchanged",
+    "PS exact concrete commands retained; no absent installation file",
+    "TF patch applies to immutable native bytes with no whitespace errors",
+    "TF only three summary regions and two nonnormative intro paragraphs changed vs v1; full other protocols unchanged",
+    "TF exact concrete commands retained; no absent installation file"
+  ]
+}

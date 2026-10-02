@@ -1,0 +1,98 @@
+{
+  "state": "frozen-proposal-ready-awaiting-direct-protected-authority",
+  "files": [
+    {
+      "repository": "PS",
+      "path": "AGENTS.md",
+      "bytes": 32750,
+      "sha256": "0b973a7ed81d4d3ddfa540bb43dbea2c7df03385c8beba9d2a67bbdb637c61f4",
+      "baseline_sha256": "ce1860e518783cdd75d78124a1ab078257233807f689839eb7cb3e3749f8847b"
+    },
+    {
+      "repository": "PS",
+      "path": "CLAUDE.md",
+      "bytes": 79164,
+      "sha256": "df87b2a32c0c1b82c441dc374c5d8c9fe40764639ede8ef5d7bda695bf624293",
+      "baseline_sha256": "527069c020934a6e73774dadef98359911bee71754ac6d67ab60796ac757c591"
+    },
+    {
+      "repository": "PS",
+      "path": ".github/copilot-instructions.md",
+      "bytes": 2517,
+      "sha256": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6",
+      "baseline_sha256": "e8c5d01dc227dc109e412f364c2d036ad17d59d5c56be942b87b0e5a16b2be34"
+    },
+    {
+      "repository": "TF",
+      "path": "AGENTS.md",
+      "bytes": 32849,
+      "sha256": "51f0f15d0996e8c32c804e48221338718138513efba27476c749e511bfbf2d39",
+      "baseline_sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266"
+    },
+    {
+      "repository": "TF",
+      "path": "CLAUDE.md",
+      "bytes": 79281,
+      "sha256": "9f182175aaab2ac17e43dceeac1261f69a8626306d10ba781727d921bbae13b7",
+      "baseline_sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2"
+    },
+    {
+      "repository": "TF",
+      "path": ".github/copilot-instructions.md",
+      "bytes": 2522,
+      "sha256": "5e9744858581ca9c663945c2eac4f636e18aff899e604d0c6f845505972783c6",
+      "baseline_sha256": "81fbe1615dd96fe99afca2738ff5888a6f7b7390068c1087d3d817fad73ff614"
+    }
+  ],
+  "patches": [
+    {
+      "file": "protected-v2-PS.patch",
+      "sha256": "d59862d3ec3ab253fd3239c1b930dc3a843e70920fee4cd021c4ccd5d40862ce",
+      "source_sha256": "d59862d3ec3ab253fd3239c1b930dc3a843e70920fee4cd021c4ccd5d40862ce",
+      "normalization": "LF checkout representation; patch content unchanged"
+    },
+    {
+      "file": "protected-v2-TF.patch",
+      "sha256": "d7bf17daecfa69ada8161d98b923d21847c5b3ea09ca704152e5789a7b7038f7",
+      "source_sha256": "d7bf17daecfa69ada8161d98b923d21847c5b3ea09ca704152e5789a7b7038f7",
+      "normalization": "LF checkout representation; patch content unchanged"
+    }
+  ],
+  "frozen_utc": "2026-10-02T07:36:13.189849+00:00",
+  "validation_scope": "Actual PS and TF root validator buffers, immutable native parent/configuration, exact proposed PS placement coupling; structural patch/common-clause checks and all six preview Markdown lint. Not full product acceptance.",
+  "logs": [
+    {
+      "file": "protected-v2-root-test-PS.log",
+      "sha256": "f7b28726c8efbf2814819727fd807ae03e06b3a13b374055f5329054093cfc55",
+      "exit_code": 0
+    },
+    {
+      "file": "protected-v2-root-test-TF.log",
+      "sha256": "91f863afb3efb148ccf17909fc0427564b532097081c55f713818aa3d8406620",
+      "exit_code": 0
+    },
+    {
+      "file": "protected-v2-markdownlint.log",
+      "sha256": "08068e8ecb3d4900104d854b4e877b604ffda614340973ec88fdb1fb73a17c8e",
+      "exit_code": 0
+    }
+  ],
+  "budgets": {
+    "PS": {
+      "agents_bytes": 32750,
+      "per_file_limit": 32768,
+      "remaining_per_file": 18,
+      "project_doc_max_bytes": 65536
+    },
+    "TF": {
+      "agents_bytes": 32849,
+      "per_file_limit": 65536,
+      "configured_reserve": 32687,
+      "minimum_reserve": 16384,
+      "project_doc_max_bytes": 65536
+    },
+    "composed_chain": "not measured; no composed instruction budget claim",
+    "cap_convergence": "A06"
+  },
+  "coordinator_verification": "All six native baselines/previews, both exact patch applications using native .gitattributes and three log hashes verified; full PS/TF patches reviewed; five primary and three refinement score totals verified."
+}
