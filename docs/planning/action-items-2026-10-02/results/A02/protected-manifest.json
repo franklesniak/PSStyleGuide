@@ -2,21 +2,25 @@
   {
     "repository": "franklesniak/PSStyleGuide",
     "patch": "protected-PS.patch",
-    "sha256": "a76b445cd67eb60098e0229e9cb92f0648682a072650bcb412b276dc865f6a73",
+    "sha256": "d9815b66831b40e9ec25667d53aff7ca412a059f498cdfc45e46f881b44edefd",
     "paths": [
       ".github/copilot-instructions.md",
       "AGENTS.md",
       "CLAUDE.md"
-    ]
+    ],
+    "source_patch_sha256": "a76b445cd67eb60098e0229e9cb92f0648682a072650bcb412b276dc865f6a73",
+    "hash_scope": "raw Git blob with LF line endings; source_patch_sha256 retains the frozen scratch CRLF bytes"
   },
   {
     "repository": "franklesniak/TerraformStyleGuide",
     "patch": "protected-TF.patch",
-    "sha256": "d313f1544479e8da872c3dc51240e9915ccdb02b8c128357077616b0ad91e463",
+    "sha256": "cba65c81ee04fd6c65d8ea82c41e295617531d9636b9e13199fdea77096895dc",
     "paths": [
       ".github/copilot-instructions.md",
       "AGENTS.md",
       "CLAUDE.md"
-    ]
+    ],
+    "source_patch_sha256": "d313f1544479e8da872c3dc51240e9915ccdb02b8c128357077616b0ad91e463",
+    "hash_scope": "raw Git blob with LF line endings; source_patch_sha256 retains the frozen scratch CRLF bytes"
   }
 ]
