@@ -1,0 +1,340 @@
+{
+  "status": "PASS for bounded preparation evidence only",
+  "checkedUtc": "2026-10-02T07:07:21.429489+00:00",
+  "nativeSourcesRawBlobAndModeVerified": 30,
+  "finalRefsUnchanged": true,
+  "originalIds": [
+    352,
+    353,
+    354,
+    355,
+    356,
+    357,
+    358,
+    359,
+    360,
+    361,
+    362,
+    363,
+    364,
+    365,
+    366,
+    367,
+    368,
+    369,
+    370,
+    371,
+    372,
+    373,
+    374,
+    375,
+    376,
+    377,
+    378
+  ],
+  "originalStatesUnchanged": true,
+  "scoreRows": [
+    {
+      "option": "N",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "ratings": [
+        1,
+        4,
+        4,
+        5,
+        5
+      ],
+      "total": 63.0
+    },
+    {
+      "option": "Z",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "ratings": [
+        3,
+        1,
+        5,
+        5,
+        4
+      ],
+      "total": 65.0
+    },
+    {
+      "option": "R",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "ratings": [
+        4,
+        5,
+        5,
+        5,
+        5
+      ],
+      "total": 93.0
+    },
+    {
+      "option": "T",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "ratings": [
+        5,
+        2,
+        5,
+        4,
+        3
+      ],
+      "total": 80.0
+    },
+    {
+      "option": "L",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "ratings": [
+        3,
+        5,
+        5,
+        5,
+        4
+      ],
+      "total": 85.0
+    },
+    {
+      "option": "W",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "ratings": [
+        5,
+        5,
+        4,
+        2,
+        2
+      ],
+      "total": 84.0
+    },
+    {
+      "option": "N",
+      "weights": [
+        45,
+        20,
+        15,
+        15,
+        5
+      ],
+      "ratings": [
+        1,
+        2,
+        2,
+        5,
+        5
+      ],
+      "total": 43.0
+    },
+    {
+      "option": "Q",
+      "weights": [
+        45,
+        20,
+        15,
+        15,
+        5
+      ],
+      "ratings": [
+        5,
+        5,
+        5,
+        5,
+        4
+      ],
+      "total": 99.0
+    },
+    {
+      "option": "H",
+      "weights": [
+        45,
+        20,
+        15,
+        15,
+        5
+      ],
+      "ratings": [
+        3,
+        4,
+        3,
+        2,
+        2
+      ],
+      "total": 60.0
+    },
+    {
+      "option": "E",
+      "weights": [
+        45,
+        20,
+        15,
+        15,
+        5
+      ],
+      "ratings": [
+        4,
+        4,
+        4,
+        2,
+        2
+      ],
+      "total": 72.0
+    },
+    {
+      "option": "F",
+      "weights": [
+        45,
+        20,
+        15,
+        15,
+        5
+      ],
+      "ratings": [
+        5,
+        5,
+        5,
+        2,
+        1
+      ],
+      "total": 87.0
+    },
+    {
+      "option": "N",
+      "weights": [
+        40,
+        30,
+        15,
+        10,
+        5
+      ],
+      "ratings": [
+        2,
+        3,
+        5,
+        5,
+        5
+      ],
+      "total": 64.0
+    },
+    {
+      "option": "S",
+      "weights": [
+        40,
+        30,
+        15,
+        10,
+        5
+      ],
+      "ratings": [
+        2,
+        2,
+        5,
+        4,
+        5
+      ],
+      "total": 56.0
+    },
+    {
+      "option": "C",
+      "weights": [
+        40,
+        30,
+        15,
+        10,
+        5
+      ],
+      "ratings": [
+        5,
+        5,
+        4,
+        4,
+        3
+      ],
+      "total": 93.0
+    },
+    {
+      "option": "R",
+      "weights": [
+        40,
+        30,
+        15,
+        10,
+        5
+      ],
+      "ratings": [
+        3,
+        2,
+        2,
+        1,
+        1
+      ],
+      "total": 45.0
+    }
+  ],
+  "completedSegmentProbes": 27,
+  "watchdogsExpired": 0,
+  "fullHelperPlatformRejections": 2,
+  "sameNativeDownloadExitDigestSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+  "productImplementation": false,
+  "fullLinuxHelperAcceptance": false,
+  "remoteReviewOrNativeMutation": false,
+  "transferCounter": "0/8",
+  "prClock": null,
+  "limits": [
+    "Windows curl8.21.0 and PowerShell7.6.5 only; no Ubuntu full-helper run",
+    "No official archive extraction or execution by these fixtures",
+    "Scaled time probes are not production-duration acceptance",
+    "Config probe used dummy header; no live credential leak demonstrated",
+    "A02/A03/A07 incomplete; A03 enforcement choice unresolved"
+  ],
+  "durableFiles": [
+    "design.md",
+    "threat-map.md",
+    "native-evidence.json",
+    "probe-results.json",
+    "original-dispositions.json",
+    "validation.json"
+  ],
+  "coordinatorChecks": {
+    "rawNativeSourceHashesAndModes": 30,
+    "scoreTotals": 15,
+    "probeRows": 27,
+    "noExpiredFixtureWatchdog": true,
+    "fullDesignAndThreatMapReviewed": true,
+    "actualLinuxAcceptance": false
+  }
+}

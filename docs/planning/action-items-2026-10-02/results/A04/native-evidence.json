@@ -1,0 +1,279 @@
+{
+  "capturedUtc": "2026-10-02T06:51:37.018987+00:00",
+  "repositories": {
+    "PS": {
+      "name": "franklesniak/PSStyleGuide",
+      "main": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc",
+      "sources": [
+        {
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+          "mode": "100644",
+          "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+          "bytes": 5844
+        },
+        {
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "blob": "0773070a6505b1678c5522c16c8a5c32979f6338",
+          "mode": "100644",
+          "sha256": "a20f0822eb0c8512a5bb86b1af920cae2a8b6a739bb132c01990b41bdcb4d012",
+          "bytes": 37696
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "blob": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+          "mode": "100644",
+          "sha256": "a8f12abf35f250c7f2d0a0ab753a18a42fca7516a36aae9e3dd90eac76805160",
+          "bytes": 25672
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "blob": "3f0abda0049fdeacb85c8493937b768ddc999c4a",
+          "mode": "100644",
+          "sha256": "09c32c6e780a325bfac5a2d6d2505f747fd3cdfff297edb7b74107fc79bbcaca",
+          "bytes": 15077
+        },
+        {
+          "path": ".github/workflows/workflow-policy-cases.json",
+          "blob": "a0dbaeea819a469fd0da0fed6b8db28db03acd2e",
+          "mode": "100644",
+          "sha256": "0073945f15d4137ef11e886cf265d346567981b4c1fcc95d180666c3cf69d38d",
+          "bytes": 13116
+        },
+        {
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "blob": "d44a87f46f60e0cc80a3293aa90d7ed6e1c5d161",
+          "mode": "100644",
+          "sha256": "0414d5e9a498b0bf7f9f5ce258a733679bc1ad6963af5bbdb3e6f2ecb30901ee",
+          "bytes": 1448
+        },
+        {
+          "path": ".github/workflows/ci-toolchain.json",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "mode": "100644",
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+          "bytes": 91
+        },
+        {
+          "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+          "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+          "mode": "100644",
+          "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+          "bytes": 3081
+        },
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "blob": "d6f0628d492f6d2f76fe1ab65b3e0b316b52c729",
+          "mode": "100644",
+          "sha256": "37d5d156f61bcf29391e86f3d6da17f1ed5e5f177086d97466c2dcdbff1fd364",
+          "bytes": 5562
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+          "mode": "100644",
+          "sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0",
+          "bytes": 4361
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "blob": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+          "mode": "100644",
+          "sha256": "73b1eb08b07254ffcb9d437e260bee8a38cce2e8cc65af1c921a3a9c4ed47bfa",
+          "bytes": 6604
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "blob": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+          "mode": "100644",
+          "sha256": "1c9457868eb262fc7ed8583d1cfff2903288286f11c103a46f91703b04bef67d",
+          "bytes": 9504
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+          "mode": "100644",
+          "sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa",
+          "bytes": 26612
+        },
+        {
+          "path": ".github/workflows/scripts-README.md",
+          "blob": "0350d4979fd5ba109ba4dbb910e1593debd0138d",
+          "mode": "100644",
+          "sha256": "b6af48d2e2d29449c7ab302dcde88cdafa30c6573b89065fcd31ab5adf25b8f2",
+          "bytes": 3038
+        },
+        {
+          "path": "package.json",
+          "blob": "f700e931201cac80accde177a11b1a0bb5c75bb2",
+          "mode": "100644",
+          "sha256": "50f91f5901669fc74d624ce0ca8d90e50cf335c0eb437fdfdd6f4723d7226a3a",
+          "bytes": 1025
+        }
+      ]
+    },
+    "TF": {
+      "name": "franklesniak/TerraformStyleGuide",
+      "main": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "sources": [
+        {
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "mode": "100644",
+          "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+          "bytes": 5706
+        },
+        {
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+          "mode": "100644",
+          "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab",
+          "bytes": 33662
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "mode": "100644",
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7",
+          "bytes": 25568
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+          "mode": "100644",
+          "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327",
+          "bytes": 14948
+        },
+        {
+          "path": ".github/workflows/workflow-policy-cases.json",
+          "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+          "mode": "100644",
+          "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89",
+          "bytes": 13047
+        },
+        {
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "mode": "100644",
+          "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222",
+          "bytes": 1407
+        },
+        {
+          "path": ".github/workflows/ci-toolchain.json",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "mode": "100644",
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+          "bytes": 91
+        },
+        {
+          "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+          "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+          "mode": "100644",
+          "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487",
+          "bytes": 3088
+        },
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+          "mode": "100644",
+          "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528",
+          "bytes": 5632
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "mode": "100644",
+          "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd",
+          "bytes": 4222
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+          "mode": "100644",
+          "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad",
+          "bytes": 6632
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "mode": "100644",
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c",
+          "bytes": 9558
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+          "mode": "100644",
+          "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae",
+          "bytes": 33862
+        },
+        {
+          "path": ".github/workflows/scripts-README.md",
+          "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+          "mode": "100644",
+          "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6",
+          "bytes": 5421
+        },
+        {
+          "path": "package.json",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "mode": "100644",
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+          "bytes": 837
+        }
+      ]
+    }
+  },
+  "issue213": {
+    "number": 213,
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/issues/213",
+    "title": "Bound remaining ordinary Node archive transfers and coupled policy tests",
+    "body": "<!-- markdownlint-disable MD013 -->\n\n# Bound remaining ordinary Node archive transfers and coupled policy tests\n\n## Current Task402 disposition\n\nThis remains an open, repository-maintainer-owned reliability follow-up under the existing [CR-212-04 merits-based decision](https://github.com/franklesniak/PSStyleGuide/pull/212#issuecomment-5896646906). It is not claimed complete by removal of the old inline commands or by successful normal setup.\n\nAt accepted PS main `48f4d8a36c8faceee12afac78aaecea0d176125d`, the old sites below have been replaced or deleted. The reachable ordinary download is now in `.github/workflows/Initialize-CiToolchain.ps1`. It has `--connect-timeout 20`, `--max-time 180` and `--retry 2`, but no total retry-duration option. The actual Terraform counterpart at `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` has the same transfer/retry flags. The separate Copilot setup already has `--retry-max-time 300`. Existing helper tests cover download failure and wrong bytes; they do not prove ordinary Retry-After exhaustion behavior.\n\nA bounded local curl8.5.0 test used a loopback HTTP503 response with Retry-After5. With connection/transfer limits1second and retry2, the process was still sleeping when the harness stopped it at2.005seconds; this is an intentionally stopped run, not a pass. Adding retry-max-time1 produced native exit22 in0.005seconds. This measures curl retry semantics only, not an outage or integrity bypass in the official Node download. [Primary curl documentation](https://curl.se/docs/manpage.html#--retry-max-time) explains that max-time resets for each transfer and retry-max-time does not stop an already active transfer.\n\nWhen this follow-up starts, recheck the current actual download consumers and the shared Terraform initializer. Use the full decision process to choose a useful retry/overall failure budget and coupled negative tests. Preserve archive origin, digest-before-execution, locked runtime selection and native failure handling. Test delayed retries and partial/native failures through the actual caller without a live-service outage. Do not restore retired workflows or add a dependency on completing this cleanup plan.\n\nThe historical three-site inventory below records the finding's origin. It is not the current repair locator.\n\n## Historical issue requirements\n\n<!-- markdownlint-disable MD013 -->\n# Bound the remaining ordinary Node archive transfers\n\nOrigin: Claude finding CR-212-04 on [PR212](https://github.com/franklesniak/PSStyleGuide/pull/212), validated and selected through the [complete fresh decision](https://github.com/franklesniak/PSStyleGuide/pull/212#issuecomment-5896646906).\n\nAt immutable PS head `1a2d0a75e4c5f274c9bdf56587b772549c6c0ecf`, three anonymous Node archive commands lack explicit retry/connect/transfer/retry-duration bounds: `.github/workflows/markdownlint.yml` lines94 and486, and `.github/workflows/pull-request-body-identity.yml` line558. They use the reviewed Node24.18.1 archive and SHA256 `D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0`. These are three sites in two files, separate from the two Node24.18.0 ordinary agent/Copilot commands addressed by issue211. The body-identity candidate-blob transfer at line204 already has its own bounds and is not this Node-download finding.\n\nNo live outage or integrity bypass is claimed. This is a verified reliability and usable-failure improvement. A connection or transfer stall currently relies on the containing job limit. The change belongs with the ordinary workflow-policy contracts and their trusted admission, rather than expanding the U1-only protected installation in issue211. Existing issue149 does not include this complete two-workflow scope. This deferral was selected on policy-domain, verification and scope merits, not worker time or reviewer availability.\n\n## Scope and constraints\n\n- Inventory all three sites from the current immutable base before implementation. Retain exact runtime versions, archive digests, official URLs, fixed tool resolution, digest-before-execution, credential/config exclusion and nonzero native status handling.\n- Choose finite connection, individual transfer and total retry-start bounds with usable failure diagnostics; document the maximum attempt/time behavior. Compare the already bounded U1 pair as evidence, not as permission to copy unrelated runtime pins or policies.\n- Update all coupled ordinary workflow-policy constants, contracts, reference fixtures and negative cases. Trace `.github/workflows/Validate-WorkflowPolicy.mjs` and the body-identity validator/admission callers before editing.\n- Preserve the existing trust source, path/byte/history limits, job authority, immutable supplies and canonical inactive terminal manifest. Candidate content remains inert during privileged admission. Do not change settings, protection, credentials, package governance, Node versions or unrelated agent roles.\n- Use the applicable trusted maintenance mechanism. This issue grants no direct-main installation, force push, administrator bypass or permission to reuse issue211's bounded exception.\n\n## Acceptance and validation\n\n1. All three final Node commands have the selected finite transfer policy. Test missing/asymmetric bounds and native download failures. Include connection/transfer timeout and retry-exhaustion behavior through isolated local fixtures with no production endpoint mutation.\n2. Retain digest mismatch rejection before extraction/execution and positive exact-digest behavior. Prove no token or extra authority is introduced.\n3. Run affected complete ordinary workflow-policy/body-identity/admission tests, workflow shape checks, PowerShell analysis and applicable hooks. Verify the exact admitted input through the real callers and retain negative results honestly.\n4. Complete exact-input external review, fresh independent quality, current-head CI and the normal merge/landed verification lifecycle. A skipped, stale, pending or unavailable result is not success.\n5. Publish immutable source/final identities, exact site census, selected limits, actual tests and any deliberately retained differences.\n\n## Ownership, dependencies and reopen condition\n\nThe next assigned implementation agent owns this focused follow-up; repository maintainers own its scheduling and final acceptance. Creating it does not commence implementation. Native blocked-by/blocking edges must reflect actual unfinished prerequisites. No such prerequisite is established now; do not add an edge to issue211, issue149 or an umbrella merely for bookkeeping.\n\nReopen if a final transfer is unbounded, paired policy diverges without evidence, retry/time semantics are misreported, immutable supply verification weakens, or tests fail to cover one of the three sites. Cite this issue from PR212 before closing CR-212-04.\n\nGenerated with Codex\n",
+    "state": "open",
+    "updated_at": "2026-10-02T00:34:48Z",
+    "comments": 0,
+    "commentPages": [
+      []
+    ]
+  },
+  "issue151": {
+    "number": 151,
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/issues/151",
+    "title": "Validate Node preflight and measured runtime defenses",
+    "state": "closed",
+    "updated_at": "2026-10-02T00:33:22Z",
+    "comments": 3,
+    "bodySha256": "365a33f3d5d92244e383d4e5618371996489e32f477bce07d3c98a91a99b5a9e",
+    "commentsRead": [
+      {
+        "id": 5941999128,
+        "url": "https://github.com/franklesniak/PSStyleGuide/issues/151#issuecomment-5941999128",
+        "author": "franklesniak",
+        "updatedAt": "2026-10-01T22:32:08Z",
+        "bodySha256": "4be35ec0737119466a7639291f111f138a2a6216f2b169a0a1689a2ddc41f7f9",
+        "characters": 12474
+      },
+      {
+        "id": 5942259014,
+        "url": "https://github.com/franklesniak/PSStyleGuide/issues/151#issuecomment-5942259014",
+        "author": "franklesniak",
+        "updatedAt": "2026-10-01T22:52:29Z",
+        "bodySha256": "640cc4e7d426b2a02a67cfddcafcfabeec48a47bf794f71341c98f5691eefd59",
+        "characters": 4551
+      },
+      {
+        "id": 5943329047,
+        "url": "https://github.com/franklesniak/PSStyleGuide/issues/151#issuecomment-5943329047",
+        "author": "franklesniak",
+        "updatedAt": "2026-10-02T00:33:07Z",
+        "bodySha256": "47151f7985c3b5c38f38775d421ba7e8915807ae0509d8253653e07d6882ec9f",
+        "characters": 1092
+      }
+    ],
+    "retainedMeaning": "D90 duplicate decoded JSON members in five existing Node preflight files; D91 accidental-operation permission guard only; D94 actual caller with prepended independent probes rather than internal-source string replacement. Closure5943329047 explicitly excludes retry213. Historical service grants are not current authority."
+  },
+  "finalRevalidationUtc": "2026-10-02T07:07:20.470443+00:00",
+  "finalRefsUnchanged": true
+}

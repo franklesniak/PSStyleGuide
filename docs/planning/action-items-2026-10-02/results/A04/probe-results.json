@@ -1,0 +1,600 @@
+{
+  "environment": {
+    "os": "Windows",
+    "curl": "curl 8.21.0 (Windows) libcurl/8.21.0 Schannel zlib/1.3.2 WinIDN WinLDAP",
+    "pwsh": "7.6.5"
+  },
+  "scope": "Exact extracted native download/exit/digest segment; tool path, endpoint, per-process fixture CA and proxy exclusion adapted. Full Linux helper not executed. Option experiments are not product candidate acceptance. Scaled cases replace literal time values only. Marker is after the actual digest gate, not actual extraction/execution. No production endpoint or system trust/policy change.",
+  "rows": [
+    {
+      "name": "PS-baseline-valid",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.594,
+      "requests": [
+        0.375
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": ""
+    },
+    {
+      "name": "PS-baseline-wrong-digest",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.703,
+      "requests": [
+        0.391
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 24,
+      "diagnostic": "The runtime archive digest is incorrect for $strUr \u00e2\u20ac\u00a6; The runtime archive digest is incorrect for https://127.0.0.1:61843/runtime. Check package.json engines.node and"
+    },
+    {
+      "name": "PS-baseline-partial",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.563,
+      "requests": [
+        0.375
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 24,
+      "diagnostic": "curl: (56) schannel: server closed abruptly (missing close_notify); Runtime download failed: 56"
+    },
+    {
+      "name": "PS-baseline-http404",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.594,
+      "requests": [
+        0.391
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 0,
+      "diagnostic": "curl: (22) The requested URL returned error: 404; Runtime download failed: 22"
+    },
+    {
+      "name": "PS-baseline-exhaust",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 3.61,
+      "requests": [
+        0.344,
+        1.406,
+        3.438
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 0,
+      "diagnostic": "curl: (22) The requested URL returned error: 503; Runtime download failed: 22"
+    },
+    {
+      "name": "PS-baseline-retry-after",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 4.61,
+      "requests": [
+        0.344,
+        4.391
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": "curl: (22) The requested URL returned error: 503"
+    },
+    {
+      "name": "PS-baseline-scaled-stall",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline-scaled",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 1,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 6.5,
+      "requests": [
+        0.344,
+        2.328,
+        5.36
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 24,
+      "diagnostic": "curl: (28) Operation timed out after 1006 milliseconds with 24 out of 124 bytes received; curl: (28) Operation timed out after 1007 milliseconds with 24 out of 124 bytes received; curl: (28) Operation timed out after 1009 milliseconds with 24 out of 124 bytes received; Runtime download failed: 28"
+    },
+    {
+      "name": "TF-baseline-valid",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.61,
+      "requests": [
+        0.344
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": ""
+    },
+    {
+      "name": "TF-baseline-wrong-digest",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.672,
+      "requests": [
+        0.328
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 24,
+      "diagnostic": "The runtime archive digest is incorrect for $strUr \u00e2\u20ac\u00a6; The runtime archive digest is incorrect for https://127.0.0.1:61860/runtime. Check package.json engines.node and"
+    },
+    {
+      "name": "TF-baseline-partial",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.547,
+      "requests": [
+        0.391
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 24,
+      "diagnostic": "curl: (56) schannel: server closed abruptly (missing close_notify); Runtime download failed: 56"
+    },
+    {
+      "name": "TF-baseline-http404",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.485,
+      "requests": [
+        0.329
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 0,
+      "diagnostic": "curl: (22) The requested URL returned error: 404; Runtime download failed: 22"
+    },
+    {
+      "name": "TF-baseline-exhaust",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 3.625,
+      "requests": [
+        0.391,
+        1.437,
+        3.453
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 0,
+      "diagnostic": "curl: (22) The requested URL returned error: 503; Runtime download failed: 22"
+    },
+    {
+      "name": "TF-baseline-retry-after",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 4.593,
+      "requests": [
+        0.328,
+        4.359
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": "curl: (22) The requested URL returned error: 503"
+    },
+    {
+      "name": "TF-baseline-scaled-stall",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline-scaled",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 1,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 6.469,
+      "requests": [
+        0.312,
+        2.312,
+        5.312
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 24,
+      "diagnostic": "curl: (28) Operation timed out after 1005 milliseconds with 24 out of 124 bytes received; curl: (28) Operation timed out after 1001 milliseconds with 24 out of 124 bytes received; curl: (28) Operation timed out after 1006 milliseconds with 24 out of 124 bytes received; Runtime download failed: 28"
+    },
+    {
+      "name": "PS-option-R300-long-retry-after",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "option-R300",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": 300
+      },
+      "elapsedSeconds": 0.625,
+      "requests": [
+        0.312
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 0,
+      "diagnostic": "curl: (22) The requested URL returned error: 503"
+    },
+    {
+      "name": "PS-option-R300-exhaust",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "option-R300",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": 300
+      },
+      "elapsedSeconds": 3.625,
+      "requests": [
+        0.375,
+        1.422,
+        3.453
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 0,
+      "diagnostic": "curl: (22) The requested URL returned error: 503; Runtime download failed: 22"
+    },
+    {
+      "name": "PS-option-R300-valid",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "option-R300",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": 300
+      },
+      "elapsedSeconds": 0.593,
+      "requests": [
+        0.359
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": ""
+    },
+    {
+      "name": "PS-option-R300-wrong-digest",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "option-R300",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": 300
+      },
+      "elapsedSeconds": 0.625,
+      "requests": [
+        0.313
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 24,
+      "diagnostic": "The runtime archive digest is incorrect for $strUr \u00e2\u20ac\u00a6; The runtime archive digest is incorrect for https://127.0.0.1:57076/runtime. Check package.json engines.node and"
+    },
+    {
+      "name": "PS-option-scaled-stall",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "option-scaled",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 1,
+        "retry": 2,
+        "retryMaxTime": 3
+      },
+      "elapsedSeconds": 3.516,
+      "requests": [
+        0.328,
+        2.313
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 24,
+      "diagnostic": "curl: (28) Operation timed out after 1013 milliseconds with 24 out of 124 bytes received; curl: (28) Operation timed out after 1010 milliseconds with 24 out of 124 bytes received; Runtime download failed: 28"
+    },
+    {
+      "name": "PS-option-scaled-overshoot",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "option-scaled",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 3,
+        "retry": 2,
+        "retryMaxTime": 2
+      },
+      "elapsedSeconds": 4.5,
+      "requests": [
+        0.328,
+        1.359
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "downloadedBytes": 24,
+      "diagnostic": "curl: (22) The requested URL returned error: 503; curl: (28) Operation timed out after 3010 milliseconds with 24 out of 124 bytes received; Runtime download failed: 28"
+    },
+    {
+      "name": "PS-baseline-config",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.578,
+      "requests": [
+        0.343
+      ],
+      "configHeaders": [
+        "default-config-loaded"
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": ""
+    },
+    {
+      "name": "PS-option-disable-config",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "option-disable",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.532,
+      "requests": [
+        0.313
+      ],
+      "configHeaders": [
+        null
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": ""
+    },
+    {
+      "name": "TF-baseline-config",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.782,
+      "requests": [
+        0.563
+      ],
+      "configHeaders": [
+        "default-config-loaded"
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": ""
+    },
+    {
+      "name": "TF-option-disable-config",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "option-disable",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 180,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 0.547,
+      "requests": [
+        0.312
+      ],
+      "configHeaders": [
+        null
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": ""
+    },
+    {
+      "name": "PS-baseline-scaled-retry-partial",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline-scaled",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 1,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 2.593,
+      "requests": [
+        0.375,
+        2.39
+      ],
+      "configHeaders": [
+        null,
+        null
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": "curl: (28) Operation timed out after 1001 milliseconds with 24 out of 124 bytes received"
+    },
+    {
+      "name": "TF-baseline-scaled-retry-partial",
+      "sourceSegmentSha256": "5e84f78352fcfa91d07bba26533e11acbe6010ce41083be4075daa36a95a29d0",
+      "variant": "baseline-scaled",
+      "parameters": {
+        "connectTimeout": 20,
+        "maxTime": 1,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 2.531,
+      "requests": [
+        0.328,
+        2.328
+      ],
+      "configHeaders": [
+        null,
+        null
+      ],
+      "exitCode": 0,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": true,
+      "downloadedBytes": 24,
+      "diagnostic": "curl: (28) Operation timed out after 1013 milliseconds with 24 out of 124 bytes received"
+    },
+    {
+      "name": "PS-baseline-scaled-connect",
+      "variant": "baseline-scaled",
+      "parameters": {
+        "connectTimeout": 1,
+        "maxTime": 3,
+        "retry": 2,
+        "retryMaxTime": null
+      },
+      "elapsedSeconds": 6.5,
+      "requests": [
+        0.281,
+        2.281,
+        5.312
+      ],
+      "exitCode": 1,
+      "fixtureWatchdogExpired": false,
+      "digestGatePassed": false,
+      "diagnostic": "Runtime download failed: 28"
+    }
+  ],
+  "fullHelperPlatformChecks": [
+    {
+      "repository": "PS",
+      "exitCode": 1,
+      "diagnostic": "The CI runtime installer requires Linux.",
+      "meaning": "Correct native platform guard; no whole-helper runtime acceptance on Windows"
+    },
+    {
+      "repository": "TF",
+      "exitCode": 1,
+      "diagnostic": "The CI runtime installer requires Linux.",
+      "meaning": "Correct native platform guard; no whole-helper runtime acceptance on Windows"
+    }
+  ]
+}

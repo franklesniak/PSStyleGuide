@@ -1,0 +1,17 @@
+{
+  "coordinatorRawSourceHashesAndModes": 145,
+  "measuredProbeRecords": 19,
+  "negativeStructuredResults": 16,
+  "weightedScoreRows": 8,
+  "originalDispositions": 54,
+  "productAcceptance": false,
+  "prerequisitesPending": [
+    "A06",
+    "A07"
+  ],
+  "coupledAlignment": [
+    "A03",
+    "A04"
+  ],
+  "blankLineReceiptLimit": "Worker observed exact final success message; separate native exit was not captured. No rerun."
+}

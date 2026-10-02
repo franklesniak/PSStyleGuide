@@ -1,0 +1,247 @@
+[
+  {
+    "repo": "PS",
+    "case": "duplicate-root-key",
+    "exit": 1,
+    "result": {
+      "schema": "PSStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "PS",
+    "case": "escaped-duplicate-key",
+    "exit": 1,
+    "result": {
+      "schema": "PSStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "PS",
+    "case": "duplicate-nested-key",
+    "exit": 1,
+    "result": {
+      "schema": "PSStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "contract-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "PS",
+    "case": "BOM",
+    "exit": 1,
+    "result": {
+      "schema": "PSStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "PS",
+    "case": "invalid-utf8",
+    "exit": 1,
+    "result": {
+      "schema": "PSStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "PS",
+    "case": "malformed-json",
+    "exit": 1,
+    "result": {
+      "schema": "PSStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "PS",
+    "case": "forbidden-key",
+    "exit": 1,
+    "result": {
+      "schema": "PSStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "PS",
+    "case": "lock-mismatch",
+    "exit": 1,
+    "result": {
+      "schema": "PSStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "lock-shape"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "PS",
+    "case": "permission-denials",
+    "exit": 1,
+    "stdout": "{\"schema\":\"PSStyleGuide.WorkflowPreflightResult.v1\",\"validatorVersion\":\"2.0.0\",\"success\":true,\"contractCanonicalSha256\":\"ce37af7763fce291631112f22bb4a7044d92ae83e2d9ff0e53ec62ccc27d93dd\"}\n",
+    "denials": [
+      "WRITE_ERR_ACCESS_DENIED",
+      "CHILD_ERR_ACCESS_DENIED"
+    ],
+    "markerExists": false,
+    "kind": "instrumented pinned validator process; not production Linux caller acceptance"
+  },
+  {
+    "repo": "TF",
+    "case": "baseline",
+    "exit": 0,
+    "result": {
+      "schema": "TerraformStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": true,
+      "contractCanonicalSha256": "69af650884aa61d499ccdf5aa2c10567f60c57bba8b3a7cbc43dd8bf163c3d4e"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "TF",
+    "case": "duplicate-root-key",
+    "exit": 1,
+    "result": {
+      "schema": "TerraformStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "TF",
+    "case": "escaped-duplicate-key",
+    "exit": 1,
+    "result": {
+      "schema": "TerraformStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "TF",
+    "case": "duplicate-nested-key",
+    "exit": 1,
+    "result": {
+      "schema": "TerraformStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "contract-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "TF",
+    "case": "BOM",
+    "exit": 1,
+    "result": {
+      "schema": "TerraformStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "TF",
+    "case": "invalid-utf8",
+    "exit": 1,
+    "result": {
+      "schema": "TerraformStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "TF",
+    "case": "malformed-json",
+    "exit": 1,
+    "result": {
+      "schema": "TerraformStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "TF",
+    "case": "forbidden-key",
+    "exit": 1,
+    "result": {
+      "schema": "TerraformStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "package-json"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "TF",
+    "case": "lock-mismatch",
+    "exit": 1,
+    "result": {
+      "schema": "TerraformStyleGuide.WorkflowPreflightResult.v1",
+      "validatorVersion": "2.0.0",
+      "success": false,
+      "category": "lock-shape"
+    },
+    "stderr": "",
+    "kind": "actual pinned validator process; changed input fixture"
+  },
+  {
+    "repo": "TF",
+    "case": "permission-denials",
+    "exit": 1,
+    "stdout": "{\"schema\":\"TerraformStyleGuide.WorkflowPreflightResult.v1\",\"validatorVersion\":\"2.0.0\",\"success\":true,\"contractCanonicalSha256\":\"69af650884aa61d499ccdf5aa2c10567f60c57bba8b3a7cbc43dd8bf163c3d4e\"}\n",
+    "denials": [
+      "WRITE_ERR_ACCESS_DENIED",
+      "CHILD_ERR_ACCESS_DENIED"
+    ],
+    "markerExists": false,
+    "kind": "instrumented pinned validator process; not production Linux caller acceptance"
+  }
+]

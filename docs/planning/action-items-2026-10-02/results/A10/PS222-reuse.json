@@ -1,0 +1,51 @@
+[
+  {
+    "path": "STYLE_GUIDE.md",
+    "acceptedMerge": "8d9d8e4dc7a82b0ab705b3347adadb8295945044",
+    "current": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "rawEqual": true,
+    "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd"
+  },
+  {
+    "path": "STYLE_GUIDE_RATIONALE.md",
+    "acceptedMerge": "8d9d8e4dc7a82b0ab705b3347adadb8295945044",
+    "current": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "rawEqual": true,
+    "sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4"
+  },
+  {
+    "path": "copilot-instructions.md",
+    "acceptedMerge": "8d9d8e4dc7a82b0ab705b3347adadb8295945044",
+    "current": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "rawEqual": true,
+    "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd"
+  },
+  {
+    "path": "powershell.instructions.md",
+    "acceptedMerge": "8d9d8e4dc7a82b0ab705b3347adadb8295945044",
+    "current": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "rawEqual": true,
+    "sha256": "fd993b9658f434af7b668d18670326c19d76a0728a170465c686d628ce2597f8"
+  },
+  {
+    "path": "STYLE_GUIDE_CHAT.md",
+    "acceptedMerge": "8d9d8e4dc7a82b0ab705b3347adadb8295945044",
+    "current": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "rawEqual": true,
+    "sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb"
+  },
+  {
+    "path": "STYLE_GUIDE_FULL.md",
+    "acceptedMerge": "8d9d8e4dc7a82b0ab705b3347adadb8295945044",
+    "current": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "rawEqual": true,
+    "sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d"
+  },
+  {
+    "path": ".github/workflows/Test-BlankLineExamples.ps1",
+    "acceptedMerge": "8d9d8e4dc7a82b0ab705b3347adadb8295945044",
+    "current": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "rawEqual": true,
+    "sha256": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7"
+  }
+]
