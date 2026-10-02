@@ -117,6 +117,20 @@ Each score is 1 (fails the criterion), 2 (major gaps), 3 (adequate with limits),
 
 **Selected action (controlled English).** Use C. Read the complete issue and the fixture appendix. Map each acceptance requirement to a current file and a test. Keep a distinct approval for each gate. Do not run a real destructive command to validate a guide. Use isolated state and provider fixtures. Keep the exact safety requirements unless a new finding decision and applicable owner approval change them. Do not restore retired machinery to satisfy a stale filename or phase label.
 
+## D07: Apply the independent plan review and reduce execution overhead
+
+The [owner direction](evidence/independent-review-owner-direction.md) accepts the plan's convergence, retirement, issue-ownership and separate-budget policies and requires the execution corrections below. This is the single consolidated planning decision authorized by that message; no separate scoring record is required for each correction.
+
+Preserve PR224 repairs and finish its released validation, normal publication and round2. Preserve the original first-request clock, deadline, round count and A02 transfer count. Move the tracker chronology verbatim to task journals, keep STATUS within16,384 bytes and make restart reads task-scoped. Use the full finding process for material product changes and product review findings; use a five-line note for nonproduction fixture/setup defects. Keep PR replies to three lines plus a decision link. The PR body carries the durable reviewer-facing decision summary. Sample worker evidence at round boundaries and retain independent final quality. Require two full pre-commit passes only where the issue requires them, including PS175.
+
+Split protected instructions into A20 and validator/classification convergence into A21 after PR224 merges. A21 must select one base implementation before convergence; do not continue region-by-region porting. Assign developer-tool paths to A07, release A07/A08 from the A02 dependency, and move A10/A11 residual verification to A18. Keep one writer per worktree and let the PR owner draft decisions and implement without a publication checkpoint before each edit. Retain the real owner-authority boundaries.
+
+Use one historical ledger with native delivery provenance, one remaining owner per original ID and unchanged26 historical credits. Preserve every original-contract byte. Remove per-original routing and duplicate disposition copies after their notes are folded into that ledger. Keep advisory three-tier routing, with A21 and final A19 reconciliation at the highest tier and census work light. Use the no-routing wrapper when the optional skill is absent.
+
+At a review limit, obtain one dated owner choice: `extend once by N days`, `accept at limit`, or `close`; never reset counters or silently extend. The four exception classes in LOOP-POLICY receive one class decision each and per-path evidence. Synchronize metadata when convergence edits a shared file in both repositories; untouched historical metadata remains an allowed class.
+
+No checkbox in the owner message is selected. A03-D1, protected-v2, A05, the A08 root protocol proposal now owned by A20, A13 and any eventual deadline extension remain pending. Prepare option L read-only; do not implement it without the owner decision. Prior retirements and issue closures stand. Validation of these planning corrections belongs in REVIEW and the plan verifier; this decision does not claim product completion.
+
 ## References and validation
 
 - [Official model selection guidance](https://developers.openai.com/api/docs/guides/model-selection): use the lightest setting that meets the quality bar. The runtime catalog remains the availability source.

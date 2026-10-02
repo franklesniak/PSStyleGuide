@@ -1,10 +1,14 @@
 {
-  "validated_at": "2026-10-02T05:41:55.487643+00:00",
+  "validated_at": "2026-10-02T14:28:25.525483+00:00",
   "result": "PASS",
   "original_ids": 402,
   "present_dispositions": {
-    "unverified": 339,
-    "replaced": 63
+    "unverified-administrative-leaf": 121,
+    "delivered-historically": 72,
+    "superseded": 88,
+    "delivered-then-retired": 12,
+    "pending": 76,
+    "conditional-no-trigger": 33
   },
   "prior_historical_credits_preserved": 26,
   "unowned_original_ids": 0,

@@ -21,7 +21,7 @@ Both native mains were refreshed and remained PS `48f4d8a36c8faceee12afac78aaece
 
 Since those handoffs, each helper changed only one profile filename reference; each test changed only nine profile filename references. This is an exact characterized delta, not whole-file raw equality. Current `supplyFreeze` objects equal the accepted old contract objects field-for-field and type-for-type. Current package inputs differ, so old strict-success evidence cannot establish current whole-suite success. Unchanged safety algorithm evidence remains useful within its original environment and threat limits.
 
-[PS158](https://github.com/franklesniak/PSStyleGuide/issues/158) remains closed/completed. Its starting-point and commencement comments remain historical evidence, not new authority or acceptance. All29 original126–154 have an explicit current assessment in [original dispositions](original-dispositions.json). The seven A00 historical credits remain unchanged;22 RETAIN entries are not upgraded. A09 owns repairs/current acceptance; A18/A19 retain final reciprocal/umbrella closure. No historical service failure, skipped platform result or advisory expiry is relabeled.
+[PS158](https://github.com/franklesniak/PSStyleGuide/issues/158) remains closed/completed. Its starting-point and commencement comments remain historical evidence, not new authority or acceptance. All29 original126–154 have an explicit current assessment in [original dispositions](../A00/dispositions.json). The seven A00 historical credits remain unchanged;22 RETAIN entries are not upgraded. A09 owns repairs/current acceptance; A18/A19 retain final reciprocal/umbrella closure. No historical service failure, skipped platform result or advisory expiry is relabeled.
 
 ## Minimal candidate scope
 

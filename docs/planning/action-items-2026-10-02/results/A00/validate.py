@@ -11,18 +11,21 @@ document = json.loads((out / 'dispositions.json').read_text(encoding='utf-8'))
 ledger = document['records']
 original = json.loads((root / 'historical-map.json').read_text(encoding='utf-8-sig'))
 assert [x['id'] for x in ledger] == list(range(1, 403))
-allowed = {f'A{i:02}' for i in range(1, 20)}
+allowed = {f'A{i:02}' for i in range(1, 22)}
+dispositions = {'delivered-historically', 'delivered-then-retired', 'superseded',
+                'conditional-no-trigger', 'pending', 'unverified-administrative-leaf'}
 for row, old in zip(ledger, original):
     assert row['id'] == old['id']
     assert row['original_body_sha256'] == old['original_body_sha256']
     assert (out / row['source_contract']).is_file()
-    assert row['remaining_owners'] and set(row['remaining_owners']) <= allowed
+    assert row['remaining_owner'] in allowed and 'remaining_owners' not in row
+    assert row['remaining_owner'] == old['remaining_owner']
+    assert isinstance(row['delivered_via'], list)
     policy = document['policies'][row['policy']]
     assert policy['reason'] and policy['retained_guarantee'] and policy['next_action']
     assert row['historical_credit'] == old['original_audit_status']
-    assert row['present_disposition'] in {'unverified', 'replaced'}
-    if row['present_disposition'] == 'replaced':
-        assert policy['decision'] in {'R01', 'R06'}
+    assert row['present_disposition'] in dispositions
+    assert row['present_disposition'] == old['present_disposition']
 matrix = json.loads((out / 'research-pr78-matrix.json').read_text())
 assert len(matrix['paths']) == matrix['path_count'] == 28
 assert len({x['path'] for x in matrix['paths']}) == 28

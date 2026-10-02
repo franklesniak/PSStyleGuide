@@ -21,7 +21,7 @@
   },
   {
     "id": "A02",
-    "title": "Converge shared governance, metadata and repository documentation",
+    "title": "Non-protected shared governance",
     "dependencies": [
       "A00",
       "A01"
@@ -94,8 +94,7 @@
     "title": "Converge dependency, lint and local toolchain behavior",
     "dependencies": [
       "A00",
-      "A01",
-      "A02"
+      "A01"
     ],
     "repository": "PS first, then TF",
     "model": "gpt-6.1-sol",
@@ -108,8 +107,7 @@
     "title": "Converge repository review instructions",
     "dependencies": [
       "A00",
-      "A01",
-      "A02"
+      "A01"
     ],
     "repository": "PS first, then TF",
     "model": "gpt-6.1-sol",
@@ -145,7 +143,9 @@
     "model": "gpt-6.1-sol",
     "reasoning": "medium",
     "transfer_cap": 8,
-    "file": "tasks/A10.md"
+    "file": "tasks/A10.md",
+    "state": "superseded",
+    "disposition": "no defect found; residual verification is an A18 checklist item"
   },
   {
     "id": "A11",
@@ -160,7 +160,9 @@
     "model": "gpt-6-astra",
     "reasoning": "high",
     "transfer_cap": 8,
-    "file": "tasks/A11.md"
+    "file": "tasks/A11.md",
+    "state": "superseded",
+    "disposition": "no defect found; residual verification is an A18 checklist item"
   },
   {
     "id": "A12",
@@ -219,8 +221,7 @@
     "dependencies": [
       "A15",
       "A06",
-      "A07",
-      "A11"
+      "A07"
     ],
     "repository": "TF first; port only shared primitives",
     "model": "gpt-6-astra",
@@ -252,11 +253,11 @@
       "A07",
       "A08",
       "A09",
-      "A10",
-      "A11",
       "A13",
       "A14",
-      "A17"
+      "A17",
+      "A20",
+      "A21"
     ],
     "repository": "both; original research source read-only where required",
     "model": "gpt-6-astra",
@@ -271,9 +272,35 @@
       "A18"
     ],
     "repository": "both + planning tracker",
-    "model": "gpt-6.1-sol",
+    "model": "gpt-6-astra",
     "reasoning": "high",
     "transfer_cap": 8,
     "file": "tasks/A19.md"
+  },
+  {
+    "id": "A20",
+    "title": "Protected instruction files",
+    "dependencies": [
+      "A02"
+    ],
+    "dependency_condition": "PS PR224 merged; explicit owner authority also required for A20",
+    "repository": "PS first, then TF",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 8,
+    "file": "tasks/A20.md"
+  },
+  {
+    "id": "A21",
+    "title": "Instruction validator, SelfTest, and classification manifest convergence",
+    "dependencies": [
+      "A02"
+    ],
+    "dependency_condition": "PS PR224 merged",
+    "repository": "PS first, then TF",
+    "model": "gpt-6-astra",
+    "reasoning": "high",
+    "transfer_cap": 12,
+    "file": "tasks/A21.md"
   }
 ]

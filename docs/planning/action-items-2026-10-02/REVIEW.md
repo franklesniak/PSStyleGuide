@@ -3,7 +3,7 @@
 
 The read-only audit worker reviewed the drafted current tasks, issue coverage, dependencies, byte verification, loop limits and authority. It found the five live issues covered and the material retirement losses explicitly assigned. It raised three P2 findings. Requested worker settings were `gpt-6-astra/high`; effective settings were not exposed. The parent checked each finding against the actual text before changing it.
 
-Scores are 1–5. Weighted totals below are recomputed from the displayed criterion scores; they supersede preliminary chat estimates.
+Scores are 1â€“5. Weighted totals below are recomputed from the displayed criterion scores; they supersede preliminary chat estimates.
 
 ## CR1: Residual trigger scope was inconsistent
 
@@ -98,3 +98,9 @@ The parent applies these corrections to A14, the reviewer protocol, the post-mer
 | C | 5 | 3 | 1 | 5 | 78 |
 
 **Selected action.** Use B. Add a narrow MD012 directive before the preserved historical body. Keep that body's bytes unchanged. Run lint again on the complete changed Markdown scope and verify every source hash.
+
+## Corrections from the independent review
+
+[Owner-directed D07](DECISIONS.md#d07-apply-the-independent-plan-review-and-reduce-execution-overhead) consolidates the tracker/journal split, materiality and reply limits, task/ownership changes, historical ledger and advisory routing corrections. PR224 repairs and its original budgets are preserved. Plan verification, changed-Markdown lint and original-contract byte checks are required before publication; no unchecked owner box supplies authority.
+
+The independent D07 reader checked the final structure and all 90 migrated chronology units. Two journal attribution errors and two punctuation changes were corrected against the frozen previous STATUS. `verify-plan.py` passes for 22 tasks, 402 intact contracts, 26 retained credits, one primary owner per ID, 81 baseline paths and the dependency graph. A00's validator also passes against unchanged native mains. STATUS is 8,489 bytes. The normal commit hook validates the complete changed Markdown scope before publication.

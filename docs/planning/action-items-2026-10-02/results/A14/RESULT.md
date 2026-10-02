@@ -57,7 +57,7 @@ Runtime/date changes alone are not triggers. The old in-process journal rollback
 
 ## Original379–390 coverage and limits
 
-[Original dispositions](original-dispositions.json) preserve all twelve IDs and source hashes. Current trigger assessment replaces original379's obsolete keep-both-issues-open instruction through D93, without claiming the original contract was executed literally. Original380's triggered repair predicate is absent. Original381–388 remain conditional-no-trigger; their issue/commencement/implementation/review/merge/handoff actions were not replayed.
+[Original dispositions](../A00/dispositions.json) preserve all twelve IDs and source hashes. Current trigger assessment replaces original379's obsolete keep-both-issues-open instruction through D93, without claiming the original contract was executed literally. Original380's triggered repair predicate is absent. Original381–388 remain conditional-no-trigger; their issue/commencement/implementation/review/merge/handoff actions were not replayed.
 
 Original389's full reciprocal foundation acceptance and original390's fixed-point publication remain unverified with explicit A06/A18/A19 ownership. No `FIXED_POINT_READY` or old closure record is fabricated from this narrower assessment. The A14 conditional result is compatible with those remaining whole-product obligations.
 

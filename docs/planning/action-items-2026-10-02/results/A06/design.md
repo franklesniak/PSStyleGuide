@@ -5,7 +5,7 @@ This is research ahead of A02/A03 acceptance, not product acceptance. No product
 
 Both authenticated native main pins remain PS `48f4d8a36c8faceee12afac78aaecea0d176125d` and TF `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c`. [Native evidence](native-evidence.json) supplies their trees and 30 exact source/output blobs, modes and SHA-256 values. Local snapshots came from those Git objects with LF checkout. Mutable A02 work was not used as accepted input.
 
-Read STATUS first, A06, the current lifecycle/decision process, A00/R01–R07, A03 design, A14 conditional assessment, A15 design, and original069–097/183–209/223–260 ownership. Original070/071,079,088 and184 supplied the relevant identity, culture, diagnostics and P1A contracts. [Original dispositions](original-dispositions.json) preserve all94 IDs: 35 replaced,59 unverified, with existing owners and source hashes. No disposition changed here. Writer/archive obligations remain replaced through A00 R06; original226/229/230 retain their distinct assessment/authority/settings ownership. The old direct-main exceptions are not new authority.
+Read STATUS first, A06, the current lifecycle/decision process, A00/R01–R07, A03 design, A14 conditional assessment, A15 design, and original069–097/183–209/223–260 ownership. Original070/071,079,088 and184 supplied the relevant identity, culture, diagnostics and P1A contracts. [Original dispositions](../A00/dispositions.json) preserve all94 IDs: 35 replaced,59 unverified, with existing owners and source hashes. No disposition changed here. Writer/archive obligations remain replaced through A00 R06; original226/229/230 retain their distinct assessment/authority/settings ownership. The old direct-main exceptions are not new authority.
 
 ## Measured baseline
 

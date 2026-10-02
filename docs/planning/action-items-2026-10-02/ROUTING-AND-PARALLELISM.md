@@ -1,41 +1,28 @@
 <!-- markdownlint-disable MD013 -->
-# Models and safe parallel work
+# Advisory models and safe parallel work
 
-The owner invoked [model-routing-advisor](C:/Users/flesniak/.agents/skills/model-routing-advisor/SKILL.md). Read its current installed instructions at execution. Do not copy an evergreen model list into the runtime. The catalog exposed to this planning session supports exact `gpt-6-luna`, `gpt-6.1-sol`, and `gpt-6-astra` overrides at the low/medium/high reasoning levels used here. Other available models are not needed by these initial recommendations. Prices and comparative task latency were not verified; these are capability-based starting choices, not a proved cheapest allocation.
+Routing is advisory. If the model-routing skill is available, use it; otherwise use the [no-routing wrapper](../coding-agent-loop-without-model-routing.md). This plan does not require a local skill installation or a manual model switch. Resolve exact supported overrides from the runtime catalog; public model descriptions do not establish account availability. Prices are not verified.
 
-[Official selection guidance](https://developers.openai.com/api/docs/guides/model-selection) supports using the lightest setting that meets the quality bar. Runtime/account metadata establishes availability and supported effort. The task files and [task-index.json](task-index.json) specify each active route. Every original leaf also has a revisited route in [historical-map.json](historical-map.json); those are conditional recommendations if a distinct missing step is needed, not 402 automatic dispatches.
+Effective model and effort settings are not exposed in this runtime. This limitation is recorded here once; do not repeat an attestation in task results or rerun accepted historical work to recover it.
 
-## Dispatch and verification
+## Three tiers
 
-- `gpt-6-luna/medium`: bounded factual inventory (A01) and mechanical historical leaves. Escalate uncertain classification before it affects scope.
-- `gpt-6.1-sol/medium`: routine review-instruction or established example work (A08/A10).
-- `gpt-6.1-sol/high`: coupled ordinary implementation, dependency changes, current supply analysis and final evidence reconciliation (A02/A04/A05/A07/A09/A19).
-- `gpt-6-astra/high`: conflicting historical evidence, trust/security boundaries, generator integration, operational recovery, residual assessment and final convergence (A00/A03/A06/A11–A18 where specified).
-
-At dispatch, show the skill's compact recommendation and use the exact supported override. Increase effort first when the model remains capable; escalate model for material ambiguity, security, coupled architecture or repeated inadequate analysis. Do not reroute merely because a deterministic test failed. Keep a healthy worker on its task and provide the failure evidence.
-
-The parent retains integration and native mutation authority. Routed workers must not spawn descendants. Use at most one implementing worker for a given outcome/scope; reuse it for repairs. Different independent outcome workers are allowed by the owner's request for thoughtful parallelism and the runtime's concurrency limit. Do not create a new user-owned Codex chat for these subtasks.
-
-After spawning, verify effective model/effort if authoritative metadata exposes it. This session's spawn response returned an agent ID without effective settings, so the completion audit's requested `gpt-6-astra/high` override was not independently verified. Unknown metadata is not a failed product test or a reason to repeat an accepted historical review. Record actual reviewer identities; never claim a local agent is Copilot, remote Codex or an unavailable Claude service.
-
-## Ready work and ownership
-
-Use at most the current runtime capacity. This session has four slots: one coordinator and up to three workers. Capacity is a ceiling, not a target. The coordinator owns STATUS, dispatch, scopes, transfer counters, merge order and final acceptance.
-
-| Stage | Useful concurrent work | Write constraints |
+| Tier | Current advisory route | Use |
 | --- | --- | --- |
-| Initial audit | A00 historical/retirement analysis; A01 issue/tree census; read-only preparation for A15 | Coordinator alone writes shared tracker; distinct evidence handoffs |
-| After baseline | A12 protection assessment; A14 residual research; A15 T4 design while A02 proceeds | A12/A14/A15 are initially read-only; protected edits require actual authority |
-| Shared foundations | A03 workflow design, A07 dependency analysis and A08 review-command work | A03/A07 share policy and CI surfaces; analysis can overlap, implementation must acquire those paths and integrate serially |
-| After shared foundations | A10 PS language examples and A11 TF language recovery | Separate worktrees/repositories; shared generator/toolchain edits belong to A06/A07 and cannot be duplicated |
-| T4 implementation | Gate A helper/test work split into independent read-only design or tests once interfaces are fixed | One Gate A integration writer; Gate B cannot begin before Gate A's actual approval |
-| Review waits | Peer diff, independent quality on immutable inputs, unrelated ready read-only tasks | Do not implement both sides of the same outcome simultaneously; pending request state has one owner |
-| Final integration | A18 full union audit and independent evidence inspection | Serialize product merges; capture a stable pair of native main commits |
+| Light | gpt-6-luna / medium | A01 and bounded census/extraction parts of A19 |
+| Balanced | gpt-6.1-sol / medium or high | Ordinary bounded implementation, tooling and review-instruction work |
+| Highest | gpt-6-astra / high | Security/integration decisions; A21 complete validator selection/convergence; A19 final reconciliation; A18 final union audit |
 
-Each writer gets a separate worktree created from the selected repository's current main, allowed paths, relevant contracts, test commands, acceptance predicate and actual public-action authority. Reject overlap in generated outputs, lockfiles, workflow validators or their fixtures, even if source filenames differ. Share interface contracts before parallel tests or research; do not let independent workers invent incompatible helper APIs.
+Task recommendations are starting points, not 402 dispatches. Increase effort or tier when concrete ambiguity warrants it; do not reroute merely because a deterministic test fails. Use a healthy PR-owning worker for its repairs. No routed worker spawns descendants.
 
-Serialize merges per repository. After any merge, assess its effect on the other workers' pinned base and validation; refresh only invalidated results. One outcome may wait for external review while another proceeds, but that does not permit two incompatible main-branch integrations.
+## Ownership and parallel work
 
-## Durable handoff
+The worker that owns a PR drafts its finding decisions and implements inside that PR. Complete the selected materiality process before a material edit; no publish-each-decision-before-each-edit gate is required. The coordinator reviews at round boundaries, samples hashes and score totals, and owns native operations, STATUS and counters. Independent final quality verifies integrity at PR level.
 
-Before a real wait or restart, return the actual head/base, allowed/changed paths, selected decisions, tests, pending native request and next action. The coordinator updates STATUS at that meaningful boundary. A worker may use one local scratch handoff while running; final evidence belongs in the outcome result. Do not commit ephemeral timing logs, browser data, credentials, or a new hierarchy of routing/activation receipts.
+Keep one writer per worktree and outcome. The coordinator alone integrates planning files. Serialize shared workflows, lockfiles and generated outputs, and serialize product merges. Never implement both repositories' side of the same convergence outcome simultaneously. Read-only research and immutable-input reviews can run in parallel. Use at most current runtime capacity; capacity is a ceiling, not a target.
+
+A07 and A08 can start after A00/A01. A07 must leave Invoke-MarkdownLint.ps1 and MARKDOWN-LINTING-IMPLEMENTATION.md untouched until PR224 merges; respect all other active path ownership. A08's root protected proposal belongs to A20. A20 and A21 start product implementation after PR224 merges, with explicit authority additionally required for A20. A21 chooses one validator base once and coordinates its classifier interface with A03; it does not port by region. A10/A11 have no new worker lifecycle; A18 owns their residual verification. Continue A15 read-only until its real foundations and gate choices are ready.
+
+## Handoff and restart
+
+Read STATUS's table, README, LOOP-POLICY, your task and its RESULT. Open a journal only when resuming that task; it is append-only history, not mandatory restart input. Keep STATUS within 16 KB and its local configuration within 2 KB. At a meaningful boundary report the pinned input, scoped result, pending native request and next action. Preserve counters and reconcile ambiguous writes before retrying. Do not create per-command receipts or new model-attestation records. Local paths and runtime locations belong only in STATUS's Local configuration.

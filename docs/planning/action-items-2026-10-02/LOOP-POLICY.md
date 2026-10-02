@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # Implementation, review and paired convergence
 
-This is the single current lifecycle policy for A00–A19. Repository instructions and actual owner authority still govern their scopes. [STATUS.md](STATUS.md) holds progress; archived task bodies and old TEMP state do not select current work.
+This is the single current lifecycle policy for A00–A21. Repository instructions and actual owner authority still govern their scopes. [STATUS.md](STATUS.md) holds progress; archived task bodies and old TEMP state do not select current work.
 
 ## One outcome, two loops
 
@@ -25,7 +25,7 @@ Declare the transfer cap at task start. Narrow means one behavioral objective an
 5. Run the PR review loop below. After applicable findings are resolved, obtain fresh independent final quality for the actual candidate. It must inspect diff, test relevance, scope, security and pair implications; a second copy of the same review is insufficient. Record actual reviewer identity and capabilities.
 6. Recheck actual head, base, checks, mergeability, required approval and scope immediately before the on-plan merge. If the base changed, assess its effect and rerun invalidated validation/review; do not reuse stale acceptance. Use an allowed normal merge method with no override. Read back merged commit/tree and relevant landed CI/service behavior. A merge alone does not prove deployed acceptance.
 7. Compare the delivered paths and all coupled common contracts to the peer's current main. Compare raw Git blobs and modes, including missing/renamed files and affected generated outputs. For a genuine language-only change, prove the peer has no applicable shared delta; do not manufacture a counterpart PR.
-8. If a useful common difference remains, increment the transfer count **before** starting that destination repair. Carry the accepted source identity, relevant decision and validation into a focused peer PR. Repeat steps 2–7. Review-driven improvements in the peer must be checked back against the first repository. Never declare completion after a one-way port alone.
+8. If a useful common difference remains, increment the transfer count **before** starting that destination repair. Carry the accepted source identity, relevant decision and validation into a focused peer PR. Repeat steps 2â€“7. Review-driven improvements in the peer must be checked back against the first repository. Never declare completion after a one-way port alone.
 9. End this outcome only on verified equality plus justified exceptions, or a truthful cap/blocker result. Store one final task result. A18 later repeats the full-tree audit so task-local comparisons cannot conceal drift elsewhere.
 
 No simultaneous source/peer implementations of the same outcome. Read-only counterpart analysis may run during review. Different independent outcomes may run in parallel under the ownership rules; rebase and revalidate affected inputs before integration.
@@ -46,6 +46,8 @@ The two code reviewers are GitHub Copilot and remote Codex. A local worker is no
 
 Serialize request sets across changed inputs. If one reviewer returns a finding while the other issued request is pending, safe local repair and validation can proceed. Do not request a new-input pair until each issued old-input request is authenticated terminal or has an applicable terminal reconciliation/disposition. Retain pending requests and their input attribution. Record supersession without calling the old input clean; never reuse an old result for changed bytes. The PR clock and round history continue during this wait.
 
+One reply per thread per round is permitted, at most three lines plus a decision link. The PR body carries the decision summary. Planning-branch links are supporting evidence, not the record of truth, because that branch is never merged. The PR owner drafts and implements decisions; the coordinator reviews at round boundaries and owns native operations, STATUS and counters. Do not require publication of each decision before each edit.
+
 Wait in bounded intervals; perform independent safe work while external results are pending. Do not poll unchanged state continuously. Save pending input and next action before leaving the active session. Future scheduled wakeups require a user request; this plan alone does not create an automation.
 
 ## What happens at a limit
@@ -56,12 +58,21 @@ At the transfer cap, complete and merge the last allowed focused repair **when r
 
 This is the owner's requested finite loop, not permission to bypass repository controls. `Accepted at limit` is a truthful distinct disposition only when the remaining feedback is resolved or explicitly nonmaterial, independent quality and all required gates pass, and the final paired result is verified. It is never called `both reviewers clean` unless both actually were clean.
 
+When a PR reaches round80 or its eight-day deadline, the coordinator records a dated owner decision with exactly one value: `extend once by N days` (N stated), `accept at limit`, or `close`. Waiting on the owner's own pending authority is a valid reason to request an extension. No silent extension is permitted. An extension changes only the authorized deadline; it does not reset rounds, the original clock or transfers. Do not invent a decision while the owner has not answered. Required quality and merge gates still apply to acceptance at limit.
+
 ## Exact byte comparison and necessary exceptions
 
 Use Git blobs from named native commits, not checkout text, CRLF-normalized diffs or hashes of generated summaries. Enumerate the complete path union and compare modes/type as well as bytes. For submodules, use the pinned gitlink identity and inspect required content separately. For a renamed counterpart, name both paths. A missing required path in both trees is a missing capability until a justified retirement proves otherwise.
 
 For each actual exception, keep one entry in the owning task result and final comparison with: PS/TF paths and commits/blobs; exact differing region or whole-file language scope; the supported use that requires it; why one identical common implementation plus narrow configuration is insufficient; the finding decision; and the test/inspection proving the boundary. Mixed files must retain identical shared regions. No wildcard directory exemption, normalize-and-compare substitute, or generic `repo-specific` label is enough.
 
-Necessary examples may include PS/TF normative guide content, scoped output filename/glob, an actual repository URL, and immutable factual history. These are candidates, not preapproved blanket exclusions. Common algorithms, CI security, dependency versions, helper names and harmless wording must converge unless a concrete supported difference is proved. Prefer factoring a shared algorithm with minimal language configuration when that reduces justified mixed-file differences without a new framework.
+Four classes are pre-approved by D07, with one decision per class and a per-path row in the owning result and A18:
+
+- Repository identity strings: owner/repo slug, clone URL, product name and copyright holders.
+- Language-scoped file names: powershell.instructions.md versus terraform.instructions.md and their references.
+- Normative guide content and its generated derivatives.
+- Metadata lines (Version, Last Updated and .NOTES versions) in a file no convergence PR has touched.
+
+Each row must still show the exact necessary difference and verify that common regions converge. When a convergence PR touches a shared file in both repositories, synchronize its metadata lines so the file converges. Do not preserve stale dates as history in a file being edited. This supersedes D-A02-01's preservation reading for touched files only. Common algorithms, CI security, dependency versions, helper names and harmless wording must converge unless a concrete supported difference is proved. Prefer factoring a shared algorithm with minimal language configuration when that reduces justified mixed-file differences without a new framework.
 
 At A18, refresh both native refs, compare the full tracked union plus historical required-path/capability inventory, inspect every exception and verify refs again. No new unclassified path is allowed. Record equality outside exceptions separately from the raw count of different files. The product comparison is main/main; the intentionally unmerged planning branch is not a product divergence.

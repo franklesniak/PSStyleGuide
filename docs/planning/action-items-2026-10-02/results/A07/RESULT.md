@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A07 read-only preparation result
 
+D07 update: A07 now depends only on A00/A01. Start its scoped tooling work. Hold Invoke-MarkdownLint.ps1 and MARKDOWN-LINTING-IMPLEMENTATION.md until PR224 merges, and serialize other paths currently edited by that PR. All instruction-validator, SelfTest and classifier integration below transfers to A21; its one whole-base decision supersedes these historical region-port suggestions. A07 provides toolchain interface requirements to A21 without editing those paths. The assessment below remains evidence, with this update and the current task governing execution.
+
 Date: 2026-10-02 UTC. Requested route: gpt-6.1-sol/high. Effective settings metadata is unavailable. No descendant agent was used. Implementation prerequisite A02 is not accepted. Transfer counter remains 0/12. There is no A07 PR, review clock, public mutation or completed product outcome.
 
 The worker wrote only `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002`. Raw scratch logs and execution files named below remain there; this integrated result retains the native scope/history summaries, current raw audit reports, meaningful hook outputs and one validation summary. Native Git objects were read from PS main `48f4d8a36c8faceee12afac78aaecea0d176125d`, tree `640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc`, and TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c`, tree `dc8f6b82588b8f874d34cd5d0155791aea5793f1`. Scratch archives and separate scratch Git repositories retain those inputs. `native-scope.json` identifies all assessed paths, exact blobs, modes, SHA-256 and byte counts. Checkout normalization is not the comparison method.

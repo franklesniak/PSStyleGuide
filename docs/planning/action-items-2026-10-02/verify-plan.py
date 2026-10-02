@@ -17,8 +17,27 @@ tasks = read_json('task-index.json')
 historical = read_json('historical-map.json')
 counts = read_json('evidence/historical-completion-counts.json')
 by_id = {t['id']: t for t in tasks}
-check(len(tasks) == len(by_id) == 20, 'Expected 20 unique active outcomes')
-check(set(by_id) == {f'A{i:02}' for i in range(20)}, 'Unexpected active task IDs')
+check(len(tasks) == len(by_id) == 22, 'Expected 22 unique outcomes')
+check(set(by_id) == {f'A{i:02}' for i in range(22)}, 'Unexpected task IDs')
+status_bytes = (ROOT/'STATUS.md').read_bytes()
+check(len(status_bytes) <= 16384, 'STATUS.md exceeds 16,384 bytes')
+status = status_bytes.decode('utf-8')
+check(len(status.split('\n\n', 1)[0].splitlines()) == 5, 'STATUS header must have five lines')
+state_vocabulary = {'pending', 'active', 'validating', 'waiting_external', 'waiting_human',
+                    'complete', 'verified', 'conditional-no-trigger', 'superseded', 'convergence-blocked'}
+status_rows = [line for line in status.splitlines() if re.match(r'^\| \[A\d{2}\]', line)]
+check(len(status_rows) == 22, 'STATUS must have one row per task')
+for row in status_rows:
+    cells = [x.strip() for x in row.strip('|').split('|')]
+    check(len(cells) == 11 and cells[2] in state_vocabulary, 'Bad STATUS columns or state')
+config = status.split('## Local configuration and in-flight native operations\n', 1)[1].split('## Final results', 1)[0]
+check(len(config.encode('utf-8')) <= 2048, 'STATUS local configuration exceeds 2 KB')
+ledger_document = read_json('results/A00/dispositions.json')
+ledger = ledger_document['records']
+ledger_by_id = {row['id']: row for row in ledger}
+dispositions = {'delivered-historically', 'delivered-then-retired', 'superseded',
+                'conditional-no-trigger', 'pending', 'unverified-administrative-leaf'}
+check([row['id'] for row in ledger] == list(range(1, 403)), 'Ledger IDs not exactly 1..402')
 visiting, visited = set(), set()
 def visit(id):
     if id in visiting:
@@ -40,6 +59,7 @@ for task in tasks:
     check(task['model'] in ('gpt-6-luna', 'gpt-6.1-sol', 'gpt-6-astra'), 'Unknown snapshot model')
     check(task['reasoning'] in ('low', 'medium', 'high'), 'Unsupported snapshot effort')
     body = (ROOT / task['file']).read_text(encoding='utf-8')
+    check((ROOT/'results'/task['id']/'RESULT.md').is_file(), 'Missing restart RESULT ' + task['id'])
     for required in ('## Scope', '## Work', '## Validation', '## Complete when', '## Original requirements and restart', '80 rounds', '8 elapsed days'):
         check(required in body, f'{task["id"]} lacks {required}')
     check(f"`{task['model']}` / `{task['reasoning']}`" in body, 'Route mismatch ' + task['id'])
@@ -52,13 +72,27 @@ for h in historical:
     body = (ROOT/h['file']).read_text(encoding='utf-8')
     original_body = body.split('<!-- ORIGINAL CONTRACT START -->\n', 1)[1].split('<!-- ORIGINAL CONTRACT END -->', 1)[0]
     check(hashlib.sha256(original_body.encode()).hexdigest() == h['original_body_sha256'], 'Original contract altered: ' + str(h['id']))
-    check(all(owner in by_id for owner in h['current_owners']), 'Unowned historical task ' + str(h['id']))
-    check(bool(h['current_owners']), 'Empty original ownership')
+    row = ledger_by_id[h['id']]
+    check(isinstance(row.get('remaining_owner'), str) and row['remaining_owner'] in by_id,
+          'Original ID requires one valid remaining_owner: ' + str(h['id']))
+    check('remaining_owners' not in row, 'Duplicate owner array in canonical ledger')
+    check(h.get('remaining_owner') == row.get('remaining_owner'), 'Historical owner mismatch')
+    check(row.get('present_disposition') in dispositions, 'Unknown ledger disposition')
+    check(h.get('present_disposition') == row.get('present_disposition'), 'Historical disposition mismatch')
+    check('delivered_via' in row and isinstance(row['delivered_via'], list), 'Missing delivery provenance')
+    check(not any(field in h for field in ('model', 'reasoning', 'routing_reason', 'current_owners')),
+          'Per-original route or duplicate owner array retained')
+    check(row['historical_credit'] == h['original_audit_status'], 'Ledger historical credit changed')
+    check('Current disposition' in body.split('<!-- ORIGINAL CONTRACT START -->')[0], 'Missing current disposition bullet')
     check(h['previous_completed'] == (h['id'] in counts['previous_completed']), 'Completion claim mismatch')
     check((h['original_audit_status']=='COMPLETE_VERIFIED') == (h['id'] in counts['verified_historical']), 'Historical credit mismatch')
 
 source = ROOT.parent/'action-items-2026-08-30.md'
 check(hashlib.sha256(source.read_bytes()).hexdigest()==counts['original_source_sha256'], 'August source changed')
+check(sum(row['historical_credit'] == 'COMPLETE_VERIFIED' for row in ledger) == 26,
+      'The 26 historical credits must remain unchanged')
+check(not list((ROOT/'results').glob('*/original-dispositions.json')), 'Duplicate task disposition ledger remains')
+check(not (ROOT/'results/A08/wrapper-original-dispositions.json').exists(), 'Duplicate A08 wrapper ledger remains')
 snapshot = read_json('evidence/tree-union.json')
 inventory = read_json('evidence/path-ownership.json')
 union = set().union(*(set(t) for t in snapshot['trees'].values()))
@@ -74,9 +108,13 @@ for repo in ('PSStyleGuide','TerraformStyleGuide'):
 check(issue_count==5, 'Dated issue count mismatch')
 
 # Check actionable local Markdown links, excluding quoted historical context.
-files = [p for p in ROOT.rglob('*.md') if 'archive' not in p.relative_to(ROOT).parts]
+files = [p for p in ROOT.rglob('*.md')
+         if not {'archive', 'snapshots'} & set(p.relative_to(ROOT).parts)]
 files += [ROOT.parent/'coding-agent-loop.md', ROOT.parent/'action-items-2026-10-02.md', ROOT.parent/'coding-agent-loop-without-model-routing.md']
 for path in files:
+    if path.name == 'journal.md':
+        # D07 requires verbatim relocated history. Its relative links retain the old STATUS context.
+        continue
     body = path.read_text(encoding='utf-8')
     if 'original-tasks' in path.parts:
         body = body.split('<!-- ORIGINAL CONTRACT START -->')[0]
@@ -109,4 +147,6 @@ for filename, sections in weights.items():
 if errors:
     print('\n'.join(errors))
     raise SystemExit(1)
-print(f'PASS: {len(tasks)} active tasks; 402 intact contracts; acyclic dependencies; 5 issues; 81 paths; links, routes, counts and decision arithmetic.')
+print(f'PASS: {len(tasks)} outcomes; 402 intact contracts with one owner; 26 historical credits; '
+      f'STATUS {len(status_bytes)}/16384 bytes; acyclic dependencies; 5 dated issues; '
+      '81 baseline paths; links, advisory routes, dispositions and decision arithmetic.')

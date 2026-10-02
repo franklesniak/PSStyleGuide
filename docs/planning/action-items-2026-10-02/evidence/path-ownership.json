@@ -28,7 +28,7 @@
       "oid": "89eb76dba2ac64bf811cf4272b033a30de241d80"
     },
     "status": "equal",
-    "owner": "A02",
+    "owner": "A18",
     "exception_status": "none approved"
   },
   {
@@ -44,7 +44,7 @@
       "oid": "6313b56c57848efce05faa7aa7e901ccfc2886ea"
     },
     "status": "equal",
-    "owner": "A02",
+    "owner": "A18",
     "exception_status": "none approved"
   },
   {
@@ -60,7 +60,7 @@
       "oid": "d4ad431a6c629203aa6cd88b9cea6f9caa4c293b"
     },
     "status": "different",
-    "owner": "A02",
+    "owner": "A20",
     "exception_status": "none approved"
   },
   {
@@ -88,8 +88,9 @@
       "oid": "79b79ebef9da1175a18a42748c1f69b6df58af35"
     },
     "status": "TF-only",
-    "owner": "A02",
-    "exception_status": "none approved"
+    "owner": "A21",
+    "exception_status": "none approved",
+    "handoff": "After PS PR224 merges; current in-flight scope stays with A02"
   },
   {
     "path": ".github/instructions/docs.instructions.md",
@@ -104,7 +105,7 @@
       "oid": "4a8f2addc02af857928205199b66cf3918ae9a82"
     },
     "status": "different",
-    "owner": "A02",
+    "owner": "A18",
     "exception_status": "none approved"
   },
   {
@@ -120,7 +121,7 @@
       "oid": "924d12c833d07def47d05137b532e622db622fa4"
     },
     "status": "different",
-    "owner": "A02",
+    "owner": "A05",
     "exception_status": "none approved"
   },
   {
@@ -184,8 +185,9 @@
       "oid": "00c5857b701c9c85668f9fe66e33838f82d313e8"
     },
     "status": "different",
-    "owner": "A03",
-    "exception_status": "none approved"
+    "owner": "A21",
+    "exception_status": "none approved",
+    "handoff": "After PS PR224 merges; current in-flight scope stays with A02"
   },
   {
     "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
@@ -200,8 +202,9 @@
       "oid": "c24be2165520a02cb622f47dc03c4e4ad9ddd716"
     },
     "status": "different",
-    "owner": "A03",
-    "exception_status": "none approved"
+    "owner": "A21",
+    "exception_status": "none approved",
+    "handoff": "After PS PR224 merges; current in-flight scope stays with A02"
   },
   {
     "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
@@ -292,8 +295,9 @@
       "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a"
     },
     "status": "different",
-    "owner": "A02",
-    "exception_status": "none approved"
+    "owner": "A07",
+    "exception_status": "none approved",
+    "handoff": "After PS PR224 merges; current in-flight scope stays with A02"
   },
   {
     "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
@@ -308,8 +312,9 @@
       "oid": "5622bb03dd0af81ed44d4709a7eda8c644ce9530"
     },
     "status": "different",
-    "owner": "A02",
-    "exception_status": "none approved"
+    "owner": "A07",
+    "exception_status": "none approved",
+    "handoff": "After PS PR224 merges; current in-flight scope stays with A02"
   },
   {
     "path": ".github/workflows/NpmTools.mjs",
@@ -352,8 +357,9 @@
     },
     "TF": null,
     "status": "PS-only",
-    "owner": "A06",
-    "exception_status": "none approved"
+    "owner": "A21",
+    "exception_status": "none approved",
+    "handoff": "After PS PR224 merges; current in-flight scope stays with A02"
   },
   {
     "path": ".github/workflows/Test-AgentInstructions.ps1",
@@ -368,8 +374,9 @@
       "oid": "c84d9067c1b315e037850f2cd40e79c0704356b5"
     },
     "status": "different",
-    "owner": "A06",
-    "exception_status": "none approved"
+    "owner": "A21",
+    "exception_status": "none approved",
+    "handoff": "After PS PR224 merges; current in-flight scope stays with A02"
   },
   {
     "path": ".github/workflows/Test-BlankLineExamples.ps1",
@@ -380,7 +387,7 @@
     },
     "TF": null,
     "status": "PS-only",
-    "owner": "A10 / A11 / A16–A17",
+    "owner": "A18 / A16\u2013A17",
     "exception_status": "none approved"
   },
   {
@@ -452,7 +459,7 @@
       "oid": "0c53093e6a5de264deae9f9269e11c5981d4bdad"
     },
     "status": "TF-only",
-    "owner": "A11 / A15–A17",
+    "owner": "A18 / A15\u2013A17",
     "exception_status": "none approved"
   },
   {
@@ -548,8 +555,9 @@
       "oid": "740a7749945acbf53e9981241ea553dc1431d3c8"
     },
     "status": "equal",
-    "owner": "A02",
-    "exception_status": "none approved"
+    "owner": "A07",
+    "exception_status": "none approved",
+    "handoff": "After PS PR224 merges; current in-flight scope stays with A02"
   },
   {
     "path": ".github/workflows/copilot-setup-steps.yml",
@@ -676,8 +684,9 @@
       "oid": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0"
     },
     "status": "equal",
-    "owner": "A02",
-    "exception_status": "none approved"
+    "owner": "A07",
+    "exception_status": "none approved",
+    "handoff": "After PS PR224 merges; current in-flight scope stays with A02"
   },
   {
     "path": ".github/workflows/package-lock.json",
@@ -820,7 +829,7 @@
       "oid": "b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d"
     },
     "status": "different",
-    "owner": "A02",
+    "owner": "A18",
     "exception_status": "none approved"
   },
   {
@@ -836,7 +845,7 @@
       "oid": "f1ae2dd938628424412d9edd6787e99a9246f5ff"
     },
     "status": "different",
-    "owner": "A02",
+    "owner": "A18",
     "exception_status": "none approved"
   },
   {
@@ -852,7 +861,7 @@
       "oid": "aa643a442d6a0c59c05d2aff8737564981147fc6"
     },
     "status": "different",
-    "owner": "A02",
+    "owner": "A20",
     "exception_status": "none approved"
   },
   {
@@ -868,7 +877,7 @@
       "oid": "3cc21fc793944033be430ad08722081db4e7b9dd"
     },
     "status": "different",
-    "owner": "A02",
+    "owner": "A20",
     "exception_status": "none approved"
   },
   {
@@ -900,7 +909,7 @@
       "oid": "98ca721ce2a880acbcbce1d9690cab0100b8bb7a"
     },
     "status": "different",
-    "owner": "A02",
+    "owner": "A18",
     "exception_status": "none approved"
   },
   {
@@ -932,7 +941,7 @@
       "oid": "f872e52ee5b7ded737157dcf745cb93013005a2b"
     },
     "status": "different",
-    "owner": "A10 / A11 / A16–A17",
+    "owner": "A18 / A16\u2013A17",
     "exception_status": "none approved"
   },
   {
@@ -948,7 +957,7 @@
       "oid": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8"
     },
     "status": "different",
-    "owner": "A10 / A11 / A16–A17",
+    "owner": "A18 / A16\u2013A17",
     "exception_status": "none approved"
   },
   {
@@ -964,7 +973,7 @@
       "oid": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00"
     },
     "status": "different",
-    "owner": "A10 / A11 / A16–A17",
+    "owner": "A18 / A16\u2013A17",
     "exception_status": "none approved"
   },
   {
@@ -980,7 +989,7 @@
       "oid": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c"
     },
     "status": "different",
-    "owner": "A10 / A11 / A16–A17",
+    "owner": "A18 / A16\u2013A17",
     "exception_status": "none approved"
   },
   {
@@ -996,7 +1005,7 @@
       "oid": "f872e52ee5b7ded737157dcf745cb93013005a2b"
     },
     "status": "different",
-    "owner": "A10 / A11 / A16–A17",
+    "owner": "A18 / A16\u2013A17",
     "exception_status": "none approved"
   },
   {
@@ -1168,7 +1177,7 @@
     },
     "TF": null,
     "status": "PS-only",
-    "owner": "A10 / A11 / A16–A17",
+    "owner": "A18 / A16\u2013A17",
     "exception_status": "none approved"
   },
   {
@@ -1224,7 +1233,7 @@
       "oid": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98"
     },
     "status": "TF-only",
-    "owner": "A11 / A15–A17",
+    "owner": "A18 / A15\u2013A17",
     "exception_status": "none approved"
   }
 ]

@@ -3,7 +3,7 @@
 
 The active plan is now [action-items-2026-10-02/README.md](action-items-2026-10-02/README.md).
 
-- [20 current outcome tasks and restart tracker](action-items-2026-10-02/STATUS.md)
+- [22 outcome tasks and restart tracker](action-items-2026-10-02/STATUS.md)
 - [All 402 original task contracts and current owners](action-items-2026-10-02/HISTORICAL-MAP.md)
 - [230 claimed completions versus 26 verified historical leaves](action-items-2026-10-02/COMPLETION-REVIEW.md)
 - [All open issues](action-items-2026-10-02/ISSUE-COVERAGE.md)
@@ -13,4 +13,4 @@ The active plan is now [action-items-2026-10-02/README.md](action-items-2026-10-
 
 Keep this plan on `planning-CRT-PR-852`; do not merge the planning branch into main. The restored [August source](action-items-2026-08-30.md) is unchanged. Original IDs are preserved in separate reference files; the old monolith's shared context is [archived](action-items-2026-10-02/archive/october-shared-context.md). Current policy and explicitly recorded dispositions control execution; archived instructions do not restart obsolete work or grant authority.
 
-Product execution has not started under this revised plan. Historical completion, deliberately retired requirements, current gaps and final paired acceptance remain distinct.
+Product execution has started: A02 is active and [PR224](https://github.com/franklesniak/PSStyleGuide/pull/224) is in round2. Read [STATUS](action-items-2026-10-02/STATUS.md) for current inputs and the next action. Historical completion, deliberately retired requirements, current gaps and final paired acceptance remain distinct.

@@ -5,6 +5,10 @@ A00's bounded reconciliation is complete. [The disposition ledger](dispositions.
 
 Research ran in `planning-CRT-PR-852` at planning HEAD `75d1b295723e887f9df268b12e5f9f38cb8ec248`. Only this result directory was written. No native mutation, product edit, commit, push, issue comment, settings change, reviewer request or PR clock occurred. Transfers used: **0/8**. Requested route: `gpt-6-astra/high`. Effective model and effort were not exposed by authoritative runtime metadata. No descendant was spawned. The installed model-routing-advisor was read; its delegated-child rule applies.
 
+## D07 current ledger
+
+The [single ledger](dispositions.json) now records one primary remaining owner and native family delivery for every original ID, using the [42 merged PR records](family-delivery-evidence.json). Current dispositions distinguish historical delivery, retirement, supersession, conditional work, pending work and unverified administrative leaves. All 26 original credits remain unchanged. Owner-specific notes from seven duplicate ledgers are folded into this ledger; those copies are removed. The earlier decisions below remain historical rationale, with D07 governing current ownership and vocabulary. A18 fixed-point verification and A19 final acceptance remain unfinished.
+
 ## Native evidence and limits
 
 Authenticated GitHub API reads used `gh api`; authenticated identity was `franklesniak`. Immutable Git tree/blob reads and complete PR-file pagination supplied the native evidence. No browser session data, credentials or tokens were recorded.
