@@ -1,0 +1,55 @@
+{
+  "checkedUtc": "2026-10-02T06:45:45.4751270Z",
+  "native": [
+    {
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc",
+      "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "repository": "PSStyleGuide",
+      "files": [
+        {
+          "path": "CLAUDE.md",
+          "sha256": "527069c020934a6e73774dadef98359911bee71754ac6d67ab60796ac757c591",
+          "treeEntry": "100644 blob 3bb0afcae09e05b6a8022d339b12721e8a1473d2\tCLAUDE.md"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "ce1860e518783cdd75d78124a1ab078257233807f689839eb7cb3e3749f8847b",
+          "treeEntry": "100644 blob f7543d786156f0efc39c3fe2927ffcd186b29f39\tAGENTS.md"
+        }
+      ]
+    },
+    {
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "repository": "TerraformStyleGuide",
+      "files": [
+        {
+          "path": "CLAUDE.md",
+          "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2",
+          "treeEntry": "100644 blob 3cc21fc793944033be430ad08722081db4e7b9dd\tCLAUDE.md"
+        },
+        {
+          "path": "AGENTS.md",
+          "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266",
+          "treeEntry": "100644 blob aa643a442d6a0c59c05d2aff8737564981147fc6\tAGENTS.md"
+        }
+      ]
+    }
+  ],
+  "upstreamInputs": [
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A08-design-20261002/RESULT.md",
+      "sha256": "8c55934af9829dd04114a924a09ef924699377c24cc1eb0ce34dd78655549840"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A08-design-20261002/source-evidence.json",
+      "sha256": "38228ca720433e76c368c0b494fc708894b0e3925bcdcd71c91238f4967c4e3f"
+    },
+    {
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A08-design-20261002/original-dispositions.json",
+      "sha256": "6adb794839bc244e3aefdd6d56f8adb0b1100457b8992dd5f7cc2a92c010d2ed"
+    }
+  ],
+  "originalDispositionChanges": 0,
+  "originalCount": 37
+}

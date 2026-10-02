@@ -1,0 +1,202 @@
+{
+  "observedUtc": "2026-10-02T06:28:59.7393303Z",
+  "scope": "Pinned native read-only source assessment and isolated scratch probes",
+  "repos": [
+    {
+      "scratchTrackedState": "clean",
+      "name": "PSStyleGuide",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc",
+      "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "sources": [
+        {
+          "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+          "sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48",
+          "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+          "mode": "100644"
+        },
+        {
+          "blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+          "sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909",
+          "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+          "mode": "100644"
+        },
+        {
+          "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+          "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996",
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "mode": "100644"
+        },
+        {
+          "blob": "0773070a6505b1678c5522c16c8a5c32979f6338",
+          "sha256": "a20f0822eb0c8512a5bb86b1af920cae2a8b6a739bb132c01990b41bdcb4d012",
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "mode": "100644"
+        },
+        {
+          "blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+          "sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0",
+          "path": ".github/workflows/build.yml",
+          "mode": "100644"
+        },
+        {
+          "blob": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+          "sha256": "a8f12abf35f250c7f2d0a0ab753a18a42fca7516a36aae9e3dd90eac76805160",
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "mode": "100644"
+        },
+        {
+          "blob": "a0dbaeea819a469fd0da0fed6b8db28db03acd2e",
+          "sha256": "0073945f15d4137ef11e886cf265d346567981b4c1fcc95d180666c3cf69d38d",
+          "path": ".github/workflows/workflow-policy-cases.json",
+          "mode": "100644"
+        },
+        {
+          "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+          "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+          "path": "STYLE_GUIDE.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "afb5ba370810e36a9c1ba103aa8e5691a3131581",
+          "sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4",
+          "path": "STYLE_GUIDE_RATIONALE.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+          "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+          "path": "copilot-instructions.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "556538c7664327652bc42875b63a5bf6bc16783f",
+          "sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+          "path": "STYLE_GUIDE_CHAT.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "c06830461f45d089c1f1f2c36d7a7b6472e3d6aa",
+          "sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+          "path": "STYLE_GUIDE_FULL.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "798aec2eacbdee846266299d2725069514fe6d58",
+          "sha256": "01091a192353fc5c571d6cdc37c451c5c5c33c115c55280fb1c71053bf78c5cc",
+          "path": "CONTRIBUTING.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "e68999483c41c07e732772d88b2c43dd1467f367",
+          "sha256": "fd993b9658f434af7b668d18670326c19d76a0728a170465c686d628ce2597f8",
+          "path": "powershell.instructions.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "068c7139a9e6a9276073211f48eca88464204362",
+          "sha256": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7",
+          "path": ".github/workflows/Test-BlankLineExamples.ps1",
+          "mode": "100644"
+        }
+      ]
+    },
+    {
+      "scratchTrackedState": "clean",
+      "name": "TerraformStyleGuide",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "sources": [
+        {
+          "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+          "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c",
+          "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+          "mode": "100644"
+        },
+        {
+          "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+          "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0",
+          "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+          "mode": "100644"
+        },
+        {
+          "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+          "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4",
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "mode": "100644"
+        },
+        {
+          "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+          "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab",
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "mode": "100644"
+        },
+        {
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd",
+          "path": ".github/workflows/build.yml",
+          "mode": "100644"
+        },
+        {
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7",
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "mode": "100644"
+        },
+        {
+          "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+          "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89",
+          "path": ".github/workflows/workflow-policy-cases.json",
+          "mode": "100644"
+        },
+        {
+          "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+          "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+          "path": "STYLE_GUIDE.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+          "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74",
+          "path": "STYLE_GUIDE_RATIONALE.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+          "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e",
+          "path": "copilot-instructions.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+          "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72",
+          "path": "STYLE_GUIDE_CHAT.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+          "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab",
+          "path": "STYLE_GUIDE_FULL.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "94beedee85478c14d284ca830e94d4a5f4ece202",
+          "sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda",
+          "path": "CONTRIBUTING.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+          "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+          "path": "terraform.instructions.md",
+          "mode": "100644"
+        },
+        {
+          "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+          "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca",
+          "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+          "mode": "100644"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "checked_utc": "2026-10-02T06:30:21.614428+00:00",
+  "status": "read-only preparation reviewed",
+  "source_blobs_verified": 38,
+  "weighted_totals_verified": 29,
+  "current_native_input_tests": {
+    "platform": "Windows",
+    "node": "24.18.1",
+    "npm": "11.16.0",
+    "PS_npm_tests": {
+      "pass": 26,
+      "fail": 0,
+      "skipped": 0
+    },
+    "TF_npm_tests": {
+      "pass": 27,
+      "fail": 0,
+      "skipped": 0
+    },
+    "TF_cold_precommit": {
+      "pass": 11,
+      "fail": 0
+    },
+    "staged_nested_fixture": {
+      "PS_exit": 0,
+      "TF_exit": 1
+    },
+    "current_audit_reports": {
+      "reports": 4,
+      "vulnerabilities": 0,
+      "exceptions": 0
+    }
+  },
+  "limits": [
+    "No proposed product candidate tested",
+    "No Linux test executed",
+    "Python pre-commit orchestrator used disposable locked venv; module launcher used matching system Python3.12 closure",
+    "Earlier incomplete runtime tool failures remain distinct from recovered results",
+    "Historical failed remote services were not relabeled clean"
+  ],
+  "transfer_count": 0,
+  "transfer_cap": 12
+}

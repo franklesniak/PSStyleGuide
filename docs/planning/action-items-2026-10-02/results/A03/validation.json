@@ -1,0 +1,15 @@
+{
+  "checkedUtc": "2026-10-02T06:15:03.4190651Z",
+  "status": "read-only design mechanically validated",
+  "productTestsRun": false,
+  "scoredOptions": 15,
+  "originalIds": 78,
+  "originalDispositionsChanged": 0,
+  "sourceRecords": 26,
+  "coordinatorChecks": {
+    "exactNativeBlobRecords": 26,
+    "weightedScores": 15,
+    "result": "PASS",
+    "productTestsRun": false
+  }
+}

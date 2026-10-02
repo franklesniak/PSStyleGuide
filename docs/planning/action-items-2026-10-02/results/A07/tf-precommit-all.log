@@ -1,0 +1,17 @@
+[INFO] Initializing environment for https://github.com/rhysd/actionlint.
+[INFO] Installing environment for https://github.com/rhysd/actionlint.
+[INFO] Once installed this environment will be reused.
+[INFO] This may take a few minutes...
+check json...............................................................Passed
+check yaml...............................................................Passed
+fix end of files.........................................................Passed
+trim trailing whitespace.................................................Passed
+yamllint.................................................................Passed
+Lint GitHub Actions workflow files.......................................Passed
+Validate Dependabot Config (v2)..........................................Passed
+Validate GitHub Workflows................................................Passed
+staged Markdown..........................................................Passed
+workflow policy contract.................................................Passed
+agent instruction contract and mutation tests............................Passed
+
+STDERR

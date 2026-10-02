@@ -1,0 +1,15 @@
+{
+  "checkedUtc": "2026-10-02T06:35:40.3709423Z",
+  "status": "read-only preparation; not outcome acceptance",
+  "rawSourceBlobChecks": 30,
+  "scoreRows": 12,
+  "originalIds": 94,
+  "originalDispositionChanges": 0,
+  "hostVersion": "7.6.5",
+  "coordinatorChecks": {
+    "rawSourceBlobAndModeChecks": 30,
+    "scoreRows": 12,
+    "result": "PASS",
+    "outcomeAccepted": false
+  }
+}

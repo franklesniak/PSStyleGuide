@@ -1,0 +1,21 @@
+{
+  "checkedUtc": "2026-10-02T06:45:46.7897475Z",
+  "status": "scratch proposal validated; no product permission or acceptance",
+  "patchApplyChecks": 2,
+  "patchPaths": [
+    "PS:CLAUDE.md",
+    "TF:CLAUDE.md"
+  ],
+  "scoreRows": 12,
+  "originalRows": 37,
+  "unchangedDefaultsAndFreshPassClause": true,
+  "nativeRequests": 0,
+  "coordinatorChecks": {
+    "nativeRawSourceHashesAndModes": 8,
+    "identicalPairedPatchBytes": true,
+    "sourcePatchHashesVerified": true,
+    "persistedPatchesNormalizedToLF": true,
+    "fullAssessmentAndPatchRead": true,
+    "productAcceptance": false
+  }
+}

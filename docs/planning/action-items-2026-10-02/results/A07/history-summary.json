@@ -1,0 +1,155 @@
+[
+  {
+    "number": 219,
+    "title": "Remediate lint dependencies and add bounded npm checks",
+    "merge": "44eb21d9957cdb905fc0db599b1fb77e16fa583f",
+    "head": "5b32fde68e076cd384a81eb82e9774591e8daea5",
+    "mergedAt": "2026-10-01T04:42:21Z",
+    "comments": [
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5922701097",
+        "author": "chatgpt-codex-connector",
+        "createdAt": "2026-10-01T01:12:06Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5922783952",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T01:19:59Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5923161144",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T01:55:31Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5923681304",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T02:43:56Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5923808442",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T02:56:13Z",
+        "containsFailed": false
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5923821223",
+        "author": "chatgpt-codex-connector",
+        "createdAt": "2026-10-01T02:57:30Z",
+        "containsFailed": false
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5924067652",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T03:21:53Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5924403356",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T03:54:33Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5924717237",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T04:24:57Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5924748196",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T04:28:08Z",
+        "containsFailed": false
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5924763199",
+        "author": "chatgpt-codex-connector",
+        "createdAt": "2026-10-01T04:29:43Z",
+        "containsFailed": false
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5924888388",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T04:42:18Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/219#issuecomment-5925007350",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T04:54:26Z",
+        "containsFailed": true
+      }
+    ]
+  },
+  {
+    "number": 220,
+    "title": "Fix ordinary npm audit authority in Copilot sessions",
+    "merge": "4c2eee95119531d2faa0683d689c3057911a8ee1",
+    "head": "f7e68996a43cf535441243896220af0f1c26d7ca",
+    "mergedAt": "2026-10-01T05:36:29Z",
+    "comments": [
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/220#issuecomment-5925122966",
+        "author": "chatgpt-codex-connector",
+        "createdAt": "2026-10-01T05:06:02Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/220#issuecomment-5925306201",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T05:24:29Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/220#issuecomment-5925430840",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T05:36:23Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/PSStyleGuide/pull/220#issuecomment-5925589817",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T05:51:57Z",
+        "containsFailed": true
+      }
+    ]
+  },
+  {
+    "number": 62,
+    "title": "Remediate dependency risk and preserve isolated Terraform setup",
+    "merge": "83cc3bdc55905c7349cafb4fe02e291d0c99a983",
+    "head": "e042caa92783bcceac4afa744908fbc552b6e2c0",
+    "mergedAt": "2026-10-01T14:53:56Z",
+    "comments": [
+      {
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/62#issuecomment-5932117995",
+        "author": "chatgpt-codex-connector",
+        "createdAt": "2026-10-01T13:08:39Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/62#issuecomment-5933437217",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T14:22:55Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/62#issuecomment-5933983259",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T14:52:59Z",
+        "containsFailed": true
+      },
+      {
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/62#issuecomment-5934618037",
+        "author": "franklesniak",
+        "createdAt": "2026-10-01T15:26:43Z",
+        "containsFailed": false
+      }
+    ]
+  }
+]

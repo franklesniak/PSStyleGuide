@@ -1,0 +1,26 @@
+[
+  {
+    "repository": "PS",
+    "path": "CLAUDE.md",
+    "base": "frozen A02 proposed root",
+    "baseSha256": "63f296e37190f16a4f549e0db6e2a7c6e39a201426d544948a16674e3076d142",
+    "proposedSha256": "84cb0d80da021a08c1a496a66f5c4dc847f92bda5cf37e08b4c43c6521e68001",
+    "patch": "proposed-PS.patch",
+    "patchSha256": "12b1067ec6385be398064150c6a8ab5ef0159c73b414e44a85165999262034fc",
+    "nativePolicyPreimageMatchesFrozen": true,
+    "sourcePatchSha256": "12b1067ec6385be398064150c6a8ab5ef0159c73b414e44a85165999262034fc",
+    "patchEncoding": "UTF-8/LF; only CRLF-to-LF conversion from source scratch patch"
+  },
+  {
+    "repository": "TF",
+    "path": "CLAUDE.md",
+    "base": "frozen A02 proposed root",
+    "baseSha256": "42a495edceaaff447ee1b7fc459d56f32cf02ee4c06bb45ecc13fa712055fb1d",
+    "proposedSha256": "c7a279f95d2c6bae4d749e2256be6d4fd850b11d99a5564ce42f441a188ca5f0",
+    "patch": "proposed-TF.patch",
+    "patchSha256": "12b1067ec6385be398064150c6a8ab5ef0159c73b414e44a85165999262034fc",
+    "nativePolicyPreimageMatchesFrozen": true,
+    "sourcePatchSha256": "12b1067ec6385be398064150c6a8ab5ef0159c73b414e44a85165999262034fc",
+    "patchEncoding": "UTF-8/LF; only CRLF-to-LF conversion from source scratch patch"
+  }
+]

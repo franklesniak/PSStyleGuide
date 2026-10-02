@@ -1,0 +1,90 @@
+{
+  "ps-root-raw-audit": {
+    "auditReportVersion": 2,
+    "vulnerabilities": {},
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 1,
+        "dev": 91,
+        "optional": 0,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 91
+      }
+    }
+  },
+  "ps-workflow-raw-audit": {
+    "auditReportVersion": 2,
+    "vulnerabilities": {},
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 1,
+        "dev": 100,
+        "optional": 0,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 100
+      }
+    }
+  },
+  "tf-root-raw-audit": {
+    "auditReportVersion": 2,
+    "vulnerabilities": {},
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 1,
+        "dev": 7,
+        "optional": 0,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 7
+      }
+    }
+  },
+  "tf-workflow-raw-audit": {
+    "auditReportVersion": 2,
+    "vulnerabilities": {},
+    "metadata": {
+      "vulnerabilities": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "dependencies": {
+        "prod": 1,
+        "dev": 100,
+        "optional": 0,
+        "peer": 0,
+        "peerOptional": 0,
+        "total": 100
+      }
+    }
+  }
+}

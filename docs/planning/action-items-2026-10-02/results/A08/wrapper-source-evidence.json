@@ -1,0 +1,109 @@
+{
+  "PS": {
+    "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc",
+    "checkout_branch": "planning-CRT-PR-852",
+    "checkout_head": "e0b6765d4bc4772d20a5d101b2daddfce3c1ca1a",
+    "files": {
+      ".claude/commands/review-loop.md": {
+        "tree_entry": "100644 blob 8f361e184eef8b292370d1d6e5b00425ab8226c2\t.claude/commands/review-loop.md",
+        "sha256": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+        "bytes": 4400,
+        "lines": 53
+      },
+      "CLAUDE.md": {
+        "tree_entry": "100644 blob 3bb0afcae09e05b6a8022d339b12721e8a1473d2\tCLAUDE.md",
+        "sha256": "527069c020934a6e73774dadef98359911bee71754ac6d67ab60796ac757c591",
+        "bytes": 82478,
+        "lines": 436
+      },
+      "AGENTS.md": {
+        "tree_entry": "100644 blob f7543d786156f0efc39c3fe2927ffcd186b29f39\tAGENTS.md",
+        "sha256": "ce1860e518783cdd75d78124a1ab078257233807f689839eb7cb3e3749f8847b",
+        "bytes": 32680,
+        "lines": 252
+      },
+      ".github/copilot-instructions.md": {
+        "tree_entry": "100644 blob 62ff9fcfb1fb56dea8fd894d4d622cd3c598f875\t.github/copilot-instructions.md",
+        "sha256": "e8c5d01dc227dc109e412f364c2d036ad17d59d5c56be942b87b0e5a16b2be34",
+        "bytes": 1634,
+        "lines": 16
+      }
+    }
+  },
+  "TF": {
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+    "checkout_branch": "planning-CRT-PR-852",
+    "checkout_head": "8e852a9f4fd382a122f32c1ce7461796f8762f8e",
+    "files": {
+      ".claude/commands/review-loop.md": {
+        "tree_entry": "100644 blob 62b63fabdc8ce64ede8539b884aa904a46cb3eaf\t.claude/commands/review-loop.md",
+        "sha256": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437",
+        "bytes": 4448,
+        "lines": 53
+      },
+      "CLAUDE.md": {
+        "tree_entry": "100644 blob 3cc21fc793944033be430ad08722081db4e7b9dd\tCLAUDE.md",
+        "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2",
+        "bytes": 80980,
+        "lines": 451
+      },
+      "AGENTS.md": {
+        "tree_entry": "100644 blob aa643a442d6a0c59c05d2aff8737564981147fc6\tAGENTS.md",
+        "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266",
+        "bytes": 33422,
+        "lines": 260
+      },
+      ".github/copilot-instructions.md": {
+        "tree_entry": "100644 blob d4ad431a6c629203aa6cd88b9cea6f9caa4c293b\t.github/copilot-instructions.md",
+        "sha256": "81fbe1615dd96fe99afca2738ff5888a6f7b7390068c1087d3d817fad73ff614",
+        "bytes": 2231,
+        "lines": 43
+      }
+    }
+  },
+  "command_comparison": {
+    "equal_lines": 46,
+    "different_lines": [
+      {
+        "line": 2,
+        "PS": "description: Run the PSStyleGuide automated dual-reviewer pull-request review loop",
+        "TF": "description: Run the TerraformStyleGuide automated dual-reviewer pull-request review loop"
+      },
+      {
+        "line": 15,
+        "PS": "- **Last Updated:** 2026-09-22",
+        "TF": "- **Last Updated:** 2026-09-23"
+      },
+      {
+        "line": 17,
+        "PS": "- **Related:** [Claude Code instructions](../../CLAUDE.md), [implementation issue](https://github.com/franklesniak/PSStyleGuide/issues/163)",
+        "TF": "- **Related:** [Claude Code instructions](../../CLAUDE.md), [implementation issue](https://github.com/franklesniak/TerraformStyleGuide/issues/56)"
+      },
+      {
+        "line": 23,
+        "PS": "Before starting the review loop or changing remote state, confirm that the URL uses `github.com` and names `franklesniak/PSStyleGuide`. Then use an authenticated GitHub readback to verify the canonical pull-request identity, including its number, and confirm that its owning/base repository is exactly `franklesniak/PSStyleGuide`. Confirm that the pull request reports `state` as `open` and `merged` as `false`. Record and preserve its `draft` value; do not change the pull-request stage. Do not use an unverified URL as an authentication target.",
+        "TF": "Before starting the review loop or changing remote state, confirm that the URL uses `github.com` and names `franklesniak/TerraformStyleGuide`. Then use an authenticated GitHub readback to verify the canonical pull-request identity, including its number, and confirm that its owning/base repository is exactly `franklesniak/TerraformStyleGuide`. Confirm that the pull request reports `state` as `open` and `merged` as `false`. Record and preserve its `draft` value; do not change the pull-request stage. Do not use an unverified URL as an authentication target."
+      },
+      {
+        "line": 25,
+        "PS": "Treat an empty or malformed value, a different host or repository, and a closed or merged pull request as invalid. Tell the caller the specific reason and ask for a valid open, unmerged `franklesniak/PSStyleGuide` pull-request URL. If the authenticated readback reports a draft, preserve that stage and continue with the same complete protocol; do not mark it ready automatically.",
+        "TF": "Treat an empty or malformed value, a different host or repository, and a closed or merged pull request as invalid. Tell the caller the specific reason and ask for a valid open, unmerged `franklesniak/TerraformStyleGuide` pull-request URL. If the authenticated readback reports a draft, preserve that stage and continue with the same complete protocol; do not mark it ready automatically."
+      },
+      {
+        "line": 39,
+        "PS": "- **Valid input:** The caller supplies a URL of the form `https://github.com/franklesniak/PSStyleGuide/pull/<number>`, where authenticated readback reports `state` as `open` and `merged` as `false`.",
+        "TF": "- **Valid input:** The caller supplies a URL of the form `https://github.com/franklesniak/TerraformStyleGuide/pull/<number>`, where authenticated readback reports `state` as `open` and `merged` as `false`."
+      },
+      {
+        "line": 46,
+        "PS": "  **Result:** Explain that the pull request is outside `franklesniak/PSStyleGuide` and ask for the correct URL before changing remote state.",
+        "TF": "  **Result:** Explain that the pull request is outside `franklesniak/TerraformStyleGuide` and ask for the correct URL before changing remote state."
+      }
+    ],
+    "same_line_count": true,
+    "same_mode": true,
+    "LF_only": true
+  }
+}

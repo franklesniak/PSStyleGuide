@@ -1,0 +1,211 @@
+{
+  "host": "Windows",
+  "powerShell7": "7.6.5",
+  "powerShell51": "5.1.26100.9549",
+  "generatorRuns": [
+    {
+      "host": "powershell.exe",
+      "repo": "PSStyleGuide",
+      "run": 1,
+      "exit": 1,
+      "overall": null,
+      "limit": "File execution refused by default Restricted policy; no generator code ran"
+    },
+    {
+      "host": "powershell.exe",
+      "repo": "PSStyleGuide",
+      "run": 2,
+      "exit": 1,
+      "overall": null,
+      "limit": "File execution refused by default Restricted policy; no generator code ran"
+    },
+    {
+      "host": "pwsh.exe",
+      "repo": "PSStyleGuide",
+      "run": 1,
+      "exit": 0,
+      "overall": "NoChange",
+      "limit": null
+    },
+    {
+      "host": "pwsh.exe",
+      "repo": "PSStyleGuide",
+      "run": 2,
+      "exit": 0,
+      "overall": "NoChange",
+      "limit": null
+    },
+    {
+      "host": "powershell.exe",
+      "repo": "TerraformStyleGuide",
+      "run": 1,
+      "exit": 1,
+      "overall": null,
+      "limit": "File execution refused by default Restricted policy; no generator code ran"
+    },
+    {
+      "host": "powershell.exe",
+      "repo": "TerraformStyleGuide",
+      "run": 2,
+      "exit": 1,
+      "overall": null,
+      "limit": "File execution refused by default Restricted policy; no generator code ran"
+    },
+    {
+      "host": "pwsh.exe",
+      "repo": "TerraformStyleGuide",
+      "run": 1,
+      "exit": 0,
+      "overall": "NoChange",
+      "limit": null
+    },
+    {
+      "host": "pwsh.exe",
+      "repo": "TerraformStyleGuide",
+      "run": 2,
+      "exit": 0,
+      "overall": "NoChange",
+      "limit": null
+    }
+  ],
+  "publication": [
+    {
+      "bytesRestored": true,
+      "repo": "PSStyleGuide",
+      "candidateEqualsFinalIdentity": true,
+      "exit": 0,
+      "case": "stale-existing",
+      "method": "File.Replace",
+      "candidateEqualsFinalDigest": true
+    },
+    {
+      "bytesRestored": true,
+      "repo": "PSStyleGuide",
+      "candidateEqualsFinalIdentity": true,
+      "exit": 0,
+      "case": "absent-index-tracked",
+      "method": "File.Move",
+      "candidateEqualsFinalDigest": true
+    },
+    {
+      "bytesRestored": true,
+      "repo": "TerraformStyleGuide",
+      "candidateEqualsFinalIdentity": true,
+      "exit": 0,
+      "case": "stale-existing",
+      "method": "File.Replace",
+      "candidateEqualsFinalDigest": true
+    },
+    {
+      "bytesRestored": true,
+      "repo": "TerraformStyleGuide",
+      "candidateEqualsFinalIdentity": true,
+      "exit": 0,
+      "case": "absent-index-tracked",
+      "method": "File.Move",
+      "candidateEqualsFinalDigest": true
+    }
+  ],
+  "culture": [
+    {
+      "expected": true,
+      "error": null,
+      "rationaleInserted": true,
+      "repo": "PSStyleGuide",
+      "culture": "en-US",
+      "mutationIndex": -1
+    },
+    {
+      "expected": true,
+      "error": null,
+      "rationaleInserted": true,
+      "repo": "PSStyleGuide",
+      "culture": "en-US",
+      "mutationIndex": 0
+    },
+    {
+      "expected": true,
+      "error": null,
+      "rationaleInserted": true,
+      "repo": "PSStyleGuide",
+      "culture": "en-US",
+      "mutationIndex": 1
+    },
+    {
+      "expected": true,
+      "error": null,
+      "rationaleInserted": true,
+      "repo": "PSStyleGuide",
+      "culture": "tr-TR",
+      "mutationIndex": -1
+    },
+    {
+      "expected": true,
+      "error": null,
+      "rationaleInserted": false,
+      "repo": "PSStyleGuide",
+      "culture": "tr-TR",
+      "mutationIndex": 0
+    },
+    {
+      "expected": true,
+      "error": null,
+      "rationaleInserted": false,
+      "repo": "PSStyleGuide",
+      "culture": "tr-TR",
+      "mutationIndex": 1
+    },
+    {
+      "expected": true,
+      "error": null,
+      "rationaleInserted": true,
+      "repo": "TerraformStyleGuide",
+      "culture": "en-US",
+      "mutationIndex": -1
+    },
+    {
+      "expected": true,
+      "error": null,
+      "rationaleInserted": true,
+      "repo": "TerraformStyleGuide",
+      "culture": "en-US",
+      "mutationIndex": 0
+    },
+    {
+      "expected": true,
+      "error": null,
+      "rationaleInserted": true,
+      "repo": "TerraformStyleGuide",
+      "culture": "tr-TR",
+      "mutationIndex": -1
+    },
+    {
+      "expected": true,
+      "error": "missing-rationale-anchor",
+      "rationaleInserted": false,
+      "repo": "TerraformStyleGuide",
+      "culture": "tr-TR",
+      "mutationIndex": 0
+    }
+  ],
+  "parseOnly51": [
+    {
+      "exactVerifierErrors": 0,
+      "repo": "PSStyleGuide",
+      "generatorErrors": 0
+    },
+    {
+      "exactVerifierErrors": 0,
+      "repo": "TerraformStyleGuide",
+      "generatorErrors": 0
+    }
+  ],
+  "notRun": [
+    "Linux native ext4 runtime",
+    "macOS/BSD runtime",
+    "Windows5.1 generator runtime",
+    "full CI artifact verifier",
+    "surviving Linux-only CI-helper tests",
+    "adversarial competing-writer probes"
+  ]
+}

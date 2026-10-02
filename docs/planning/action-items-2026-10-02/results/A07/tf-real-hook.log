@@ -1,0 +1,23 @@
+Running staged Markdown lint against the Git index...
+markdownlint-cli2 v0.23.3 (markdownlint v0.41.1)
+Finding: 
+Linting: 1 file
+Summary: 0 issues in 0 files
+[36ma07-hook-fixture.md[0m: Found 1 nested Markdown block(s)
+
+Total nested Markdown blocks found: 1
+
+
+[1m[31mNested Markdown Linting Issues:[0m
+
+[36mFile:[0m a07-hook-fixture.md
+  [33mCode fence at line 3 (markdown block #1) (line 3):[0m
+    4:1 [31mMD022/blanks-around-headings[0m Headings should be surrounded by blank lines
+      [33mExpected: 1; Actual: 0; Below[0m
+
+
+Staged Markdown lint reported errors. Review the output above, then retry.
+
+STDERR
+pre-commit: Nested Markdown lint failed for staged Markdown.
+To check all Markdown files, run: npm --prefix .github/workflows run lint:md:nested

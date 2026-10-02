@@ -1,0 +1,235 @@
+{
+  "observedUtc": "2026-10-02T06:09:52.7430111Z",
+  "purpose": "Read-only A03 design; no product tests or acceptance",
+  "repos": [
+    {
+      "name": "PSStyleGuide",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc",
+      "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "effectiveMainRules": [],
+      "blobs": [
+        {
+          "mode": "100644",
+          "path": ".github/workflows/agent-instructions.yml",
+          "blob": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/build.yml",
+          "blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/markdownlint.yml",
+          "blob": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "blob": "d6f0628d492f6d2f76fe1ab65b3e0b316b52c729",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+          "blob": "1e7a60a42a8e9b28811c64de3d1b7e4c1bbec76a",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "blob": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "blob": "3f0abda0049fdeacb85c8493937b768ddc999c4a",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "blob": "d44a87f46f60e0cc80a3293aa90d7ed6e1c5d161",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/workflow-policy-cases.json",
+          "blob": "a0dbaeea819a469fd0da0fed6b8db28db03acd2e",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "blob": "0773070a6505b1678c5522c16c8a5c32979f6338",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+          "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+          "type": "blob"
+        }
+      ]
+    },
+    {
+      "name": "TerraformStyleGuide",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "effectiveMainRules": [
+        {
+          "type": "deletion",
+          "ruleset_source_type": "Repository",
+          "ruleset_source": "franklesniak/TerraformStyleGuide",
+          "ruleset_id": 20623677
+        },
+        {
+          "type": "non_fast_forward",
+          "ruleset_source_type": "Repository",
+          "ruleset_source": "franklesniak/TerraformStyleGuide",
+          "ruleset_id": 20623677
+        },
+        {
+          "type": "pull_request",
+          "parameters": {
+            "required_approving_review_count": 0,
+            "dismiss_stale_reviews_on_push": false,
+            "required_reviewers": [],
+            "require_code_owner_review": false,
+            "require_last_push_approval": false,
+            "required_review_thread_resolution": true,
+            "require_extra_approval_for_unattributed_changes": true,
+            "allowed_merge_methods": [
+              "merge",
+              "squash",
+              "rebase"
+            ]
+          },
+          "ruleset_source_type": "Repository",
+          "ruleset_source": "franklesniak/TerraformStyleGuide",
+          "ruleset_id": 20623677
+        },
+        {
+          "type": "required_status_checks",
+          "parameters": {
+            "strict_required_status_checks_policy": true,
+            "do_not_enforce_on_create": false,
+            "required_status_checks": [
+              {
+                "context": "markdownlint",
+                "integration_id": 15368
+              },
+              {
+                "context": "policy",
+                "integration_id": 15368
+              },
+              {
+                "context": "verify",
+                "integration_id": 15368
+              }
+            ]
+          },
+          "ruleset_source_type": "Repository",
+          "ruleset_source": "franklesniak/TerraformStyleGuide",
+          "ruleset_id": 20623677
+        }
+      ],
+      "blobs": [
+        {
+          "mode": "100644",
+          "path": ".github/workflows/agent-instructions.yml",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/build.yml",
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/markdownlint.yml",
+          "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+          "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/workflow-policy-cases.json",
+          "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+          "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "type": "blob"
+        },
+        {
+          "mode": "100644",
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+          "type": "blob"
+        }
+      ]
+    }
+  ]
+}
