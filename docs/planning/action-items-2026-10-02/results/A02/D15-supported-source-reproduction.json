@@ -1,0 +1,38 @@
+{
+  "capturedUtc": "2026-10-02T11:03:15.908678+00:00",
+  "scope": "Three separate test-fixture setup failures; production correctly enforces its existing contracts. No product/native mutation or accepted aggregate result.",
+  "frozenInputs": {
+    "validatorSha256": "ba8dc366bd8e5d28a90b43e3d275bb610b23da4457392e923de78264bb0ee29e",
+    "selfTestSha256": "3fb3d24c0ca6b386eb4dedddbae0e86687fa65cf25584ceaf0996d4a6862d567",
+    "nativeBase": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "candidateTree": "931389bc5efffba6413788b6b1ce5885437f0cff"
+  },
+  "actualCases": [
+    {
+      "case": "Native-base aggregate",
+      "exit": 1,
+      "logSha256": "018136a426e663bab41ff95fe804835d0478b83f63a616e926b9b50c61ccdc0e",
+      "result": "Nine hooks pass; outer content contract passes; first private F2 positive rejects inherited root-only .gitignore. Before/after HEAD,71-path staged tree,raw bytes and source HEAD/index remain unchanged."
+    },
+    {
+      "case": "Fully committed candidate source with current-date guide",
+      "sourceFixtureCommit": "6da2bdf3ed37a4c21efac47334cccf0a9388554d",
+      "exit": 1,
+      "logSha256": "c782302644279967ad81f84ee457910da8fa4e37c667b94a618cda8bd195645b",
+      "result": "Initial private baseline commit has no changes and fails. Did not reach date cases."
+    },
+    {
+      "case": "Current-date source guide with uncommitted proposed checker",
+      "sourceFixtureCommit": "194864b466398bccb34f372a824f7506432f57aa",
+      "exit": 1,
+      "logSha256": "c4786efb145f021d78b8e94a9755777db9241cd5fdc599022953cc0a8cfdd71b",
+      "result": "Full exact F2 caller reaches versioned yesterday-date candidate and rejects Version date moving backward from20261002 to20261001, instead of expected Last Updated finalization failure. No delayed success claimed."
+    }
+  ],
+  "parentVerification": {
+    "bothActualCallerHarnesses": "Exact complete production prefix and SelfTest helper bytes; only locked dependency-root substitution.",
+    "syntheticSourceDiffs": "First source differs from frozen candidate tree only at STYLE_GUIDE.md; second differs from fe3 only at STYLE_GUIDE.md before proposed checker worktree overlay.",
+    "dateProbe": "Exact production versioned transition helper independently rejects today-to-yesterday with no expected-date context.",
+    "adjacentFixtureAudit": "F1 and F3 use fresh Git repositories and controlled initial files, not inherited source dates or a potentially empty copied-code baseline."
+  }
+}
