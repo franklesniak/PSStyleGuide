@@ -161,7 +161,8 @@ function Assert-DocumentMetadataClassificationSelfTest {
             -HasTrustedBaselineManifest $true `
             -TrustedBaselineExemptPath @('README.md') `
             -TrustedBaselineAuthorizedExemptionPath @() `
-            -CandidateExemptPath $arrCandidateActivePaths)
+            -CandidateExemptPath $arrCandidateActivePaths `
+            -TrustedBaselineGeneratedPath @() -CandidateGeneratedPath @())
     if ($arrCandidateOnlyFailures.Count -ne 1 -or
         $arrCandidateOnlyFailures[0] -notmatch 'docs/RUNBOOK\.md') {
         throw 'Candidate-only metadata exemption bypassed the trusted baseline.'
@@ -179,7 +180,8 @@ function Assert-DocumentMetadataClassificationSelfTest {
             -HasTrustedBaselineManifest $true `
             -TrustedBaselineExemptPath @('README.md') `
             -TrustedBaselineAuthorizedExemptionPath @('docs/RUNBOOK.md') `
-            -CandidateExemptPath $arrCandidateActivePaths)
+            -CandidateExemptPath $arrCandidateActivePaths `
+            -TrustedBaselineGeneratedPath @() -CandidateGeneratedPath @())
     if ($arrAuthorizedFailures.Count -ne 0) {
         throw 'The exact trusted baseline authorization was rejected.'
     }
@@ -187,7 +189,8 @@ function Assert-DocumentMetadataClassificationSelfTest {
             -HasTrustedBaselineManifest $true `
             -TrustedBaselineExemptPath @('README.md') `
             -TrustedBaselineAuthorizedExemptionPath @('docs/another.md') `
-            -CandidateExemptPath $arrCandidateActivePaths)
+            -CandidateExemptPath $arrCandidateActivePaths `
+            -TrustedBaselineGeneratedPath @() -CandidateGeneratedPath @())
     if ($arrWrongAuthorizationFailures.Count -ne 1) {
         throw 'An authorization for another path permitted the candidate exemption.'
     }
@@ -195,9 +198,52 @@ function Assert-DocumentMetadataClassificationSelfTest {
             -HasTrustedBaselineManifest $false `
             -TrustedBaselineExemptPath @() `
             -TrustedBaselineAuthorizedExemptionPath @() `
-            -CandidateExemptPath $objValidContext.ExemptPaths)
+            -CandidateExemptPath $objValidContext.ExemptPaths `
+            -TrustedBaselineGeneratedPath @() -CandidateGeneratedPath $objValidContext.GeneratedPaths)
     if ($arrBootstrapFailures.Count -ne 1) {
         throw 'A missing trusted manifest bypassed the closed initialization proof.'
+    }
+    $strJoinerPath = 'a' + [char]0x200d + 'b.md'
+    $strComposedPath = [string][char]0x00e9 + '.md'
+    $strDecomposedPath = 'e' + [char]0x0301 + '.md'
+    $arrCategoryTrackedPaths = @('a.md', 'b.md', 'ab.md', $strJoinerPath, $strComposedPath, $strDecomposedPath)
+    $arrCategoryCases = @(
+        @{ Name = 'unchanged'; BT = @('a.md'); BG = @('b.md'); BA = @(); CT = @('a.md'); CG = @('b.md'); CA = @(); Failure = '' },
+        @{ Name = 'Tier2 to generated'; BT = @('a.md'); BG = @(); BA = @(); CT = @(); CG = @('a.md'); CA = @(); Failure = 'unauthenticated generated status: a.md' },
+        @{ Name = 'generated to Tier2'; BT = @(); BG = @('a.md'); BA = @(); CT = @('a.md'); CG = @(); CA = @(); Failure = '' },
+        @{ Name = 'category swap'; BT = @('a.md'); BG = @('b.md'); BA = @(); CT = @('b.md'); CG = @('a.md'); CA = @(); Failure = 'unauthenticated generated status: a.md' },
+        @{ Name = 'remove Tier2'; BT = @('a.md'); BG = @('b.md'); BA = @(); CT = @(); CG = @('b.md'); CA = @(); Failure = '' },
+        @{ Name = 'remove generated'; BT = @('a.md'); BG = @('b.md'); BA = @(); CT = @('a.md'); CG = @(); CA = @(); Failure = '' },
+        @{ Name = 'remove all'; BT = @('a.md'); BG = @('b.md'); BA = @(); CT = @(); CG = @(); CA = @(); Failure = '' },
+        @{ Name = 'new Tier2'; BT = @(); BG = @(); BA = @(); CT = @('a.md'); CG = @(); CA = @(); Failure = 'unauthenticated metadata exemption: a.md' },
+        @{ Name = 'new generated'; BT = @(); BG = @(); BA = @(); CT = @(); CG = @('a.md'); CA = @(); Failure = 'unauthenticated generated status: a.md' },
+        @{ Name = 'authorized Tier2'; BT = @(); BG = @(); BA = @('a.md'); CT = @('a.md'); CG = @(); CA = @(); Failure = '' },
+        @{ Name = 'authorized generated'; BT = @(); BG = @(); BA = @('a.md'); CT = @(); CG = @('a.md'); CA = @(); Failure = '' },
+        @{ Name = 'wrong authorization'; BT = @('a.md'); BG = @(); BA = @('b.md'); CT = @(); CG = @('a.md'); CA = @(); Failure = 'unauthenticated generated status: a.md' },
+        @{ Name = 'candidate authorization inert'; BT = @('a.md'); BG = @(); BA = @(); CT = @('a.md'); CG = @(); CA = @('b.md'); Failure = '' },
+        @{ Name = 'remove and authorize'; BT = @('a.md'); BG = @(); BA = @(); CT = @(); CG = @(); CA = @('a.md'); Failure = '' },
+        @{ Name = 'ordinal generated joiner'; BT = @($strJoinerPath); BG = @('ab.md'); BA = @(); CT = @(); CG = @('ab.md', $strJoinerPath); CA = @(); Failure = "unauthenticated generated status: $strJoinerPath" },
+        @{ Name = 'ordinal union joiner'; BT = @('ab.md'); BG = @(); BA = @(); CT = @('ab.md', $strJoinerPath); CG = @(); CA = @(); Failure = "unauthenticated metadata exemption: $strJoinerPath" },
+        @{ Name = 'ordinal normalization distinction'; BT = @($strComposedPath); BG = @($strDecomposedPath); BA = @(); CT = @(); CG = @($strDecomposedPath, $strComposedPath); CA = @(); Failure = "unauthenticated generated status: $strComposedPath" },
+        @{ Name = 'ordinal exact authorization'; BT = @(); BG = @('ab.md'); BA = @($strJoinerPath); CT = @(); CG = @('ab.md', $strJoinerPath); CA = @(); Failure = '' }
+    )
+    foreach ($objCase in $arrCategoryCases) {
+        $strBaseline = @{ schemaVersion = 2; tier2Paths = $objCase.BT; generatedPaths = $objCase.BG; authorizedExemptionPaths = $objCase.BA } | ConvertTo-Json -Compress
+        $strCandidate = @{ schemaVersion = 2; tier2Paths = $objCase.CT; generatedPaths = $objCase.CG; authorizedExemptionPaths = $objCase.CA } | ConvertTo-Json -Compress
+        $objBaseline = Get-DocumentMetadataClassificationContext -Content $strBaseline -TrackedPath $arrCategoryTrackedPaths
+        $objCandidate = Get-DocumentMetadataClassificationContext -Content $strCandidate -TrackedPath $arrCategoryTrackedPaths
+        if ($objBaseline.Failure -or $objCandidate.Failure) { throw "Invalid category fixture: $($objCase.Name)" }
+        $arrFailures = @(Get-DocumentMetadataClassificationExpansionFailure `
+                -HasTrustedBaselineManifest $true `
+                -TrustedBaselineExemptPath $objBaseline.ExemptPaths `
+                -TrustedBaselineAuthorizedExemptionPath $objBaseline.AuthorizedExemptionPaths `
+                -CandidateExemptPath $objCandidate.ExemptPaths `
+                -TrustedBaselineGeneratedPath $objBaseline.GeneratedPaths `
+                -CandidateGeneratedPath $objCandidate.GeneratedPaths)
+        if (($objCase.Failure -ceq '' -and $arrFailures.Count -ne 0) -or
+            ($objCase.Failure -cne '' -and -not ($arrFailures -match [regex]::Escape($objCase.Failure)))) {
+            throw "Category transition failed: $($objCase.Name): $($arrFailures -join '; ')"
+        }
     }
     $arrInitialTier2 = @('ACKNOWLEDGMENTS.md', 'CONTRIBUTING.md', 'README.md',
         'samples/test-nested-markdown-linting.md', 'samples/test-recursive-nested-markdown.md')
@@ -638,6 +684,29 @@ function Assert-ClassificationAdmissionGitFixture {
         $strBaseline = & $scriptblockCommit
         # This accepted fixture installs the proposed checker; it is not native first-install authority.
         & $scriptblockCheck $strBaseline $strBaseline $true 'Metadata classification data validated'
+        $strGeneratedManifest = '{"schemaVersion":2,"authorizedExemptionPaths":[],"tier2Paths":[],"generatedPaths":["README.md"]}'
+        [IO.File]::WriteAllText($strManifestPath, $strGeneratedManifest, [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText([IO.Path]::Combine($strFixtureRoot, 'README.md'),
+            "# Reader`n`n- **Status:** Broken`n- **Last Updated:** 2099-99-99`n", [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText($strValidatorPath, "throw 'CANDIDATE_EXECUTED'", [Text.UTF8Encoding]::new($false))
+        $strReclassifiedCandidate = & $scriptblockCommit
+        & $scriptblockCheck $strBaseline $strReclassifiedCandidate $false '(?s)unauthenticated generated status:.*README[.]md'
+        # The existing published path-authorization route still permits activation.
+        $strReadmeAuthorization = '{"schemaVersion":2,"authorizedExemptionPaths":["README.md"],"tier2Paths":[],"generatedPaths":[]}'
+        [IO.File]::WriteAllText($strManifestPath, $strReadmeAuthorization, [Text.UTF8Encoding]::new($false))
+        $strReadmeAuthorizedBaseline = & $scriptblockCommit
+        & $scriptblockCheck $strBaseline $strReadmeAuthorizedBaseline $true 'Metadata classification data validated'
+        & git -C $strFixtureRoot checkout --quiet --detach $strReadmeAuthorizedBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Generated authorization baseline checkout failed.' }
+        [IO.File]::WriteAllText($strManifestPath, $strGeneratedManifest, [Text.UTF8Encoding]::new($false))
+        $strGeneratedCandidate = & $scriptblockCommit
+        & $scriptblockCheck $strReadmeAuthorizedBaseline $strGeneratedCandidate $true 'Metadata classification data validated'
+        & $scriptblockCheck $strGeneratedCandidate $strGeneratedCandidate $true 'Metadata classification data validated'
+        [IO.File]::WriteAllText($strManifestPath, $strPlainManifest, [Text.UTF8Encoding]::new($false))
+        $strTier2Candidate = & $scriptblockCommit
+        & $scriptblockCheck $strGeneratedCandidate $strTier2Candidate $true 'Metadata classification data validated'
+        & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Category fixture baseline restoration failed.' }
         [IO.File]::WriteAllText($strManifestPath, $strActivatedManifest, [Text.UTF8Encoding]::new($false))
         [IO.File]::WriteAllText($strValidatorPath,
             "throw 'CANDIDATE_EXECUTED'", [Text.UTF8Encoding]::new($false))
@@ -1216,6 +1285,40 @@ function Assert-AuthorFinalizationGitFixture {
         & git -C $strFixtureRoot -c "core.hooksPath=$strEmptyHooks" checkout --quiet --detach $strBaseline
         if ($LASTEXITCODE -ne 0) { throw 'Optional metadata fixture baseline restoration failed.' }
         Write-Verbose 'Optional retained Tier2/catalog and invalid-prior caller controls passed.'
+        # A generated-to-Tier2 move must gain the same real metadata checks.
+        $strGeneratedReadmeManifestPath = [IO.Path]::Combine($strFixtureRoot, '.github', 'document-metadata-classification.json')
+        $strOriginalReadmeManifest = [IO.File]::ReadAllText($strGeneratedReadmeManifestPath)
+        $objGeneratedReadmeManifest = $strOriginalReadmeManifest | ConvertFrom-Json
+        $objGeneratedReadmeManifest.tier2Paths = @($objGeneratedReadmeManifest.tier2Paths | Where-Object { $_ -cne 'README.md' })
+        $objGeneratedReadmeManifest.generatedPaths = [string[]]@($objGeneratedReadmeManifest.generatedPaths) + @('README.md')
+        [Array]::Sort($objGeneratedReadmeManifest.generatedPaths, [StringComparer]::Ordinal)
+        [IO.File]::WriteAllText($strGeneratedReadmeManifestPath,
+            ($objGeneratedReadmeManifest | ConvertTo-Json -Depth 5), [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText($strOptionalReadmePath,
+            $strMetadataDocument.Replace('DATE', $strPriorDate), [Text.UTF8Encoding]::new($false))
+        $strBaseline = & $scriptblockCommit
+        [IO.File]::WriteAllText($strGeneratedReadmeManifestPath, $strOriginalReadmeManifest, [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText($strOptionalReadmePath,
+            $strMetadataDocument.Replace('DATE', $strCurrentDate), [Text.UTF8Encoding]::new($false))
+        $strGeneratedToTier2Candidate = & $scriptblockCommit
+        & $scriptblockCheck $strGeneratedToTier2Candidate $true $false $true 'Author finalization UTC date checked'
+        [IO.File]::WriteAllText($strGeneratedReadmeManifestPath, $strOriginalReadmeManifest, [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText($strOptionalReadmePath,
+            $strMetadataDocument.Replace('DATE', $strCurrentDate).Replace('Status:** Active', 'Status:** Broken'), [Text.UTF8Encoding]::new($false))
+        $strMalformedTier2Candidate = & $scriptblockCommit
+        & $scriptblockCheck $strMalformedTier2Candidate $false $false $false 'exact top-level Status'
+        [IO.File]::WriteAllText($strOptionalReadmePath,
+            $strMetadataDocument.Replace('DATE', $strPriorDate).Replace('Status:** Active', 'Status:** Broken'), [Text.UTF8Encoding]::new($false))
+        $strBaseline = & $scriptblockCommit
+        [IO.File]::WriteAllText($strGeneratedReadmeManifestPath, $strOriginalReadmeManifest, [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText($strOptionalReadmePath,
+            $strMetadataDocument.Replace('DATE', $strCurrentDate), [Text.UTF8Encoding]::new($false))
+        $strInvalidGeneratedParentCandidate = & $scriptblockCommit
+        & $scriptblockCheck $strInvalidGeneratedParentCandidate $false $false $false 'parent of README.md .*Status'
+        $strBaseline = $strBeforeOptionalBaseline
+        & git -C $strFixtureRoot -c "core.hooksPath=$strEmptyHooks" checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Generated-to-Tier2 fixture baseline restoration failed.' }
+        Write-Verbose 'Generated-to-Tier2 actual content and prior-header controls passed.'
         # Promotion must remain valid on a later no-context rerun.
         $strManifestPath = [IO.Path]::Combine($strFixtureRoot, '.github', 'document-metadata-classification.json')
         $objManifest = [IO.File]::ReadAllText($strManifestPath) | ConvertFrom-Json

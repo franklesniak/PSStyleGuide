@@ -4928,7 +4928,9 @@ function Get-DocumentMetadataClassificationExpansionFailure {
     # published baseline. Candidate-only authorizations are inert. A missing
     # baseline manifest fails this helper and requires the separate closed
     # initialization proof.
-    # Removals are permitted because they strengthen metadata validation.
+    # Generated status must already be generated or authorized in the baseline;
+    # membership in the baseline Tier2 category does not authorize that change.
+    # Removals and generated-to-Tier2 moves strengthen metadata validation.
     #
     # .PARAMETER HasTrustedBaselineManifest
     # Indicates that the authenticated baseline contains the manifest.
@@ -4942,12 +4944,19 @@ function Get-DocumentMetadataClassificationExpansionFailure {
     # .PARAMETER CandidateExemptPath
     # Parsed exact exemptions in the candidate revision.
     #
+    # .PARAMETER TrustedBaselineGeneratedPath
+    # Parsed generated paths in the authenticated baseline.
+    #
+    # .PARAMETER CandidateGeneratedPath
+    # Parsed generated paths in the candidate revision.
+    #
     # .EXAMPLE
     # Get-DocumentMetadataClassificationExpansionFailure `
     #     -HasTrustedBaselineManifest $true `
     #     -TrustedBaselineExemptPath @('README.md') `
     #     -TrustedBaselineAuthorizedExemptionPath @('docs/guide.md') `
-    #     -CandidateExemptPath @('README.md', 'docs/RUNBOOK.md')
+    #     -CandidateExemptPath @('README.md', 'docs/RUNBOOK.md') `
+    #     -TrustedBaselineGeneratedPath @() -CandidateGeneratedPath @()
     #
     # # Reports docs/RUNBOOK.md as an unauthenticated exemption addition.
     #
@@ -4955,7 +4964,7 @@ function Get-DocumentMetadataClassificationExpansionFailure {
     # None. You can't pipe objects to this function.
     #
     # .OUTPUTS
-    # [string] One failure for each candidate-only exemption path.
+    # [string] One failure for each unauthorized exemption or generated classification.
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the
@@ -4963,7 +4972,7 @@ function Get-DocumentMetadataClassificationExpansionFailure {
     # contract may change without notice.
     #
     # This function does not support positional parameters.
-    # Version: 1.1.20260911.0
+    # Version: 1.2.20261002.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4980,7 +4989,15 @@ function Get-DocumentMetadataClassificationExpansionFailure {
 
         [Parameter(Mandatory)]
         [AllowEmptyCollection()]
-        [string[]] $CandidateExemptPath
+        [string[]] $CandidateExemptPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $TrustedBaselineGeneratedPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $CandidateGeneratedPath
     )
 
     if (-not $HasTrustedBaselineManifest) {
@@ -4997,8 +5014,12 @@ function Get-DocumentMetadataClassificationExpansionFailure {
             $TrustedBaselineAuthorizedExemptionPath,
             [System.StringComparer]::Ordinal
         )
-    foreach ($strCandidateExemptPath in
-        ($CandidateExemptPath | Sort-Object -CaseSensitive -Unique)) {
+    $setTrustedBaselineGeneratedPaths =
+        [System.Collections.Generic.HashSet[string]]::new(
+            $TrustedBaselineGeneratedPath,
+            [System.StringComparer]::Ordinal
+        )
+    foreach ($strCandidateExemptPath in $CandidateExemptPath) {
         if ($setTrustedBaselineExemptPaths.Contains($strCandidateExemptPath) -or
             $setTrustedBaselineAuthorizedExemptionPaths.Contains(
                 $strCandidateExemptPath
@@ -5010,6 +5031,17 @@ function Get-DocumentMetadataClassificationExpansionFailure {
             "exemption: $strCandidateExemptPath. Add the exact path to " +
             'authorizedExemptionPaths in a separate change and publish that ' +
             'authorization before activating the exemption.'
+        )
+    }
+    foreach ($strCandidateGeneratedPath in $CandidateGeneratedPath) {
+        if ($setTrustedBaselineGeneratedPaths.Contains($strCandidateGeneratedPath) -or
+            $setTrustedBaselineAuthorizedExemptionPaths.Contains($strCandidateGeneratedPath)) {
+            continue
+        }
+        Write-Output (
+            "The document classification adds unauthenticated generated status: $strCandidateGeneratedPath. " +
+            'The exact path must already be generated or authorized in the trusted baseline; ' +
+            'a Tier2 exemption does not authorize generated status.'
         )
     }
 }
@@ -6752,6 +6784,7 @@ $strDocumentClassificationBaselineRevision = if ($boolPublishedEndpointsRequeste
 } else { $strCheckedOutRevision }
 $boolHasTrustedBaselineClassificationManifest = $false
 $arrTrustedBaselineClassificationExemptPaths = @()
+$arrTrustedBaselineClassificationGeneratedPaths = @()
 $arrTrustedBaselineClassificationAuthorizedExemptionPaths = @()
 if (-not [string]::IsNullOrEmpty($strDocumentClassificationBaselineRevision)) {
     $arrBaselineClassificationTrackedPaths = @(Read-GitTrackedPath `
@@ -6775,6 +6808,8 @@ if (-not [string]::IsNullOrEmpty($strDocumentClassificationBaselineRevision)) {
         $boolHasTrustedBaselineClassificationManifest = $true
         $arrTrustedBaselineClassificationExemptPaths = @(
             $objBaselineDocumentClassificationContext.ExemptPaths)
+        $arrTrustedBaselineClassificationGeneratedPaths = @(
+            $objBaselineDocumentClassificationContext.GeneratedPaths)
         $arrTrustedBaselineClassificationAuthorizedExemptionPaths = @(
             $objBaselineDocumentClassificationContext.AuthorizedExemptionPaths)
     }
@@ -6800,7 +6835,9 @@ $arrDocumentClassificationExpansionFailures = @(if ($boolHasTrustedBaselineClass
         -HasTrustedBaselineManifest $true `
         -TrustedBaselineExemptPath $arrTrustedBaselineClassificationExemptPaths `
         -TrustedBaselineAuthorizedExemptionPath $arrTrustedBaselineClassificationAuthorizedExemptionPaths `
-        -CandidateExemptPath $objDocumentClassificationContext.ExemptPaths)
+        -CandidateExemptPath $objDocumentClassificationContext.ExemptPaths `
+        -TrustedBaselineGeneratedPath $arrTrustedBaselineClassificationGeneratedPaths `
+        -CandidateGeneratedPath $objDocumentClassificationContext.GeneratedPaths)
 } else {
     @(Get-InitialDocumentMetadataClassificationFailure `
         -BaselineRevision $strDocumentClassificationBaselineRevision `
