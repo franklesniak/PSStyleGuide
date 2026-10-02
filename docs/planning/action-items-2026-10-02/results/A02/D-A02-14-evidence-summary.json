@@ -1,0 +1,467 @@
+{
+  "kind": "read-only independent inspection of worker characterization; no test execution",
+  "evidence": [
+    {
+      "file": "heading-mismatch-reproduction.json",
+      "sha256": "405fb8f778ff61455b5f439a459429dff81310f3c02b65a166a673732e385a72",
+      "scope": "Scratch actual-helper/parser reproduction only; no product edit or selected repair.",
+      "results": [
+        {
+          "Name": "optional-version-unrequired-heading",
+          "RequiresVersion": false,
+          "InputSha256": "97dae7871d214ee956aad991d3ec8a49b33007fcba9781830267d30a4e45112b",
+          "Context": {
+            "Failure": "must place Metadata as the first level-two heading immediately after the H1 and within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#optional-version-unrequired-heading"
+        },
+        {
+          "Name": "no-h1-frontmatter-title-direct",
+          "RequiresVersion": false,
+          "InputSha256": "e4449b8daf1567706c2f65bce5059157c624c5bb994d30189af96f28abe8abd6",
+          "Context": {
+            "Failure": "must contain exactly one document-level H1 within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#no-h1-frontmatter-title-direct"
+        },
+        {
+          "Name": "no-h1-frontmatter-leading-directive",
+          "RequiresVersion": false,
+          "InputSha256": "18bacaa1ff8585f6758f2485fd53b40191d85e7cf85d9a459a13b9f705d1686e",
+          "Context": {
+            "Failure": "must contain exactly one document-level H1 within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#no-h1-frontmatter-leading-directive"
+        },
+        {
+          "Name": "late-h1-frontmatter-title-direct",
+          "RequiresVersion": false,
+          "InputSha256": "680638be4f3e74af5d94d10395a4cc3baa29f02b349b5a69501023870f733c5b",
+          "Context": {
+            "Failure": "must contain exactly one document-level H1 within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#late-h1-frontmatter-title-direct"
+        },
+        {
+          "Name": "h1-body-line30-heading",
+          "RequiresVersion": false,
+          "InputSha256": "84f7cbc28253b7d20c6a0f29d564f9ab3f1c8d1adae91cfd2256b39fcb20b9d4",
+          "Context": {
+            "Failure": "must place Metadata as the first level-two heading immediately after the H1 and within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#h1-body-line30-heading"
+        },
+        {
+          "Name": "h1-body-line30-direct",
+          "RequiresVersion": false,
+          "InputSha256": "8a68f56f21d69ad57c592408af86199fdf7181cc5887ca5b269e921346200123",
+          "Context": {
+            "Failure": "must place Metadata as the first level-two heading immediately after the H1 and within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#h1-body-line30-direct"
+        },
+        {
+          "Name": "versioned-heading",
+          "RequiresVersion": true,
+          "InputSha256": "97dae7871d214ee956aad991d3ec8a49b33007fcba9781830267d30a4e45112b",
+          "Context": {
+            "Failure": null,
+            "Status": "Active",
+            "Major": "1",
+            "Minor": "0",
+            "VersionDate": "20261002",
+            "UpdatedDate": "2026-10-02",
+            "Revision": "0",
+            "VersionLineIndex": 2,
+            "UpdatedLineIndex": 8
+          },
+          "InputReference": "heading-policy-reproduction.json#versioned-heading"
+        },
+        {
+          "Name": "versioned-direct",
+          "RequiresVersion": true,
+          "InputSha256": "be3aa354bed6264331a2006cdf4956aead6d3b2c379c638a05cb7ae6398ce95f",
+          "Context": {
+            "Failure": "must place Metadata as the first level-two heading immediately after Version and within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#versioned-direct"
+        },
+        {
+          "Name": "unversioned-heading",
+          "RequiresVersion": false,
+          "InputSha256": "721cd8c9048a563c064ca057102b9dd6a296bcf8e21d42a2d10fddd4add55447",
+          "Context": {
+            "Failure": null,
+            "Status": "Active",
+            "Major": null,
+            "Minor": null,
+            "VersionDate": null,
+            "UpdatedDate": "2026-10-02",
+            "Revision": null,
+            "VersionLineIndex": -1,
+            "UpdatedLineIndex": 6
+          },
+          "InputReference": "heading-policy-reproduction.json#unversioned-heading"
+        },
+        {
+          "Name": "unversioned-direct",
+          "RequiresVersion": false,
+          "InputSha256": "f0da78e1d72f3f67f2e1ac5d56db547ceacc2246dc3435bc8d1011c7491d7315",
+          "Context": {
+            "Failure": "must place Metadata as the first level-two heading immediately after the H1 and within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#unversioned-direct"
+        },
+        {
+          "Name": "versioned-invalid-placement",
+          "RequiresVersion": true,
+          "InputSha256": "07a3aa6989e3294bd47350ccb02c02647ff55c03795a868e4e020eff7b3dd528",
+          "Context": {
+            "Failure": "must place Metadata as the first level-two heading immediately after Version and within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#versioned-invalid-placement"
+        },
+        {
+          "Name": "versioned-duplicate-section",
+          "RequiresVersion": true,
+          "InputSha256": "cf938741e0df73f416c45dd1938527d6cf944adad0ea7a09518d6ec08c8c788d",
+          "Context": {
+            "Failure": "must place Metadata as the first level-two heading immediately after Version and within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#versioned-duplicate-section"
+        },
+        {
+          "Name": "versioned-duplicate-direct",
+          "RequiresVersion": true,
+          "InputSha256": "a358831c67c2d954975ee353c0a856dc4529b8dd085c26d672a7f2d9cbfdd82c",
+          "Context": {
+            "Failure": "must place Metadata as the first level-two heading immediately after Version and within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "heading-policy-reproduction.json#versioned-duplicate-direct"
+        }
+      ]
+    },
+    {
+      "file": "native-coverage-characterization.json",
+      "sha256": "9c879f210eaef8d71fa979b98faf1bf8676e493cdd4b24216b3341c427d7f987",
+      "scope": "Actual immutable TF native helper definitions; only PSScriptRoot parser-resource binding points to read-only PS locked markdown-it14.3.2. Native PS document bytes unchanged. Characterization is not a selected PS repair or grandfathering grant.",
+      "results": [
+        {
+          "Path": ".claude/commands/review-loop.md",
+          "Blob": "8f361e184eef8b292370d1d6e5b00425ab8226c2",
+          "Sha256": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+          "RequiresVersion": false,
+          "Context": {
+            "Failure": null,
+            "HasVersion": false,
+            "Status": "Active",
+            "Major": null,
+            "Minor": null,
+            "VersionDate": null,
+            "UpdatedDate": "2026-09-22",
+            "Revision": null,
+            "VersionLineIndex": -1,
+            "UpdatedLineIndex": 14,
+            "MetadataContentStart": 10,
+            "MetadataContentEnd": 18
+          },
+          "NativeParserError": null,
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:.claude/commands/review-loop.md"
+        },
+        {
+          "Path": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "Blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+          "Sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+          "RequiresVersion": false,
+          "Context": null,
+          "NativeParserError": "The locked Markdown parser returned a malformed prose block.",
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:docs/P1-SUPPLY-FREEZE-v1.md"
+        },
+        {
+          "Path": "docs/dependency-maintenance.md",
+          "Blob": "34c9dec3cd9f640fd3a8346583fe8b1569056fb8",
+          "Sha256": "6371e711abad12c5d0a153e12ba519870034aa39c6455c11608d0969c185822a",
+          "RequiresVersion": false,
+          "Context": {
+            "Failure": null,
+            "HasVersion": false,
+            "Status": "Active",
+            "Major": null,
+            "Minor": null,
+            "VersionDate": null,
+            "UpdatedDate": "2026-10-01",
+            "Revision": null,
+            "VersionLineIndex": -1,
+            "UpdatedLineIndex": 6,
+            "MetadataContentStart": 3,
+            "MetadataContentEnd": 9
+          },
+          "NativeParserError": null,
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:docs/dependency-maintenance.md"
+        },
+        {
+          "Path": "STYLE_GUIDE.md",
+          "Blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+          "Sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+          "RequiresVersion": true,
+          "Context": {
+            "Failure": null,
+            "HasVersion": true,
+            "Status": "Active",
+            "Major": "2",
+            "Minor": "23",
+            "VersionDate": "20261001",
+            "UpdatedDate": "2026-10-01",
+            "Revision": "0",
+            "VersionLineIndex": 4,
+            "UpdatedLineIndex": 10,
+            "MetadataContentStart": 6,
+            "MetadataContentEnd": 13
+          },
+          "NativeParserError": null,
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:STYLE_GUIDE.md"
+        }
+      ]
+    },
+    {
+      "file": "native-coverage-typed-boundary-characterization.json",
+      "sha256": "146c829927b67d18738c97f288d1fd76026722c0534a5301d15037c1dade7082",
+      "scope": "TF native metadata algorithm with separately labeled scratch-only PS bounded typed JSON decoder at its two output sites (TOML4096/Markdown10MiB) to isolate existing timestamp coercion; this is not unchanged native TF execution or a complete placement-policy oracle. Actual immutable TF native helper definitions; only PSScriptRoot parser-resource binding points to read-only PS locked markdown-it14.3.2. Native PS document bytes unchanged. Characterization is not a selected PS repair or grandfathering grant.",
+      "results": [
+        {
+          "Path": ".claude/commands/review-loop.md",
+          "Blob": "8f361e184eef8b292370d1d6e5b00425ab8226c2",
+          "Sha256": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+          "RequiresVersion": false,
+          "Context": {
+            "Failure": null,
+            "HasVersion": false,
+            "Status": "Active",
+            "Major": null,
+            "Minor": null,
+            "VersionDate": null,
+            "UpdatedDate": "2026-09-22",
+            "Revision": null,
+            "VersionLineIndex": -1,
+            "UpdatedLineIndex": 14,
+            "MetadataContentStart": 10,
+            "MetadataContentEnd": 18
+          },
+          "NativeParserError": null,
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:.claude/commands/review-loop.md"
+        },
+        {
+          "Path": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "Blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+          "Sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+          "RequiresVersion": false,
+          "Context": {
+            "Failure": null,
+            "HasVersion": false,
+            "Status": "Active",
+            "Major": null,
+            "Minor": null,
+            "VersionDate": null,
+            "UpdatedDate": "2026-09-30",
+            "Revision": null,
+            "VersionLineIndex": -1,
+            "UpdatedLineIndex": 7,
+            "MetadataContentStart": 3,
+            "MetadataContentEnd": 11
+          },
+          "NativeParserError": null,
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:docs/P1-SUPPLY-FREEZE-v1.md"
+        },
+        {
+          "Path": "docs/dependency-maintenance.md",
+          "Blob": "34c9dec3cd9f640fd3a8346583fe8b1569056fb8",
+          "Sha256": "6371e711abad12c5d0a153e12ba519870034aa39c6455c11608d0969c185822a",
+          "RequiresVersion": false,
+          "Context": {
+            "Failure": null,
+            "HasVersion": false,
+            "Status": "Active",
+            "Major": null,
+            "Minor": null,
+            "VersionDate": null,
+            "UpdatedDate": "2026-10-01",
+            "Revision": null,
+            "VersionLineIndex": -1,
+            "UpdatedLineIndex": 6,
+            "MetadataContentStart": 3,
+            "MetadataContentEnd": 9
+          },
+          "NativeParserError": null,
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:docs/dependency-maintenance.md"
+        },
+        {
+          "Path": "STYLE_GUIDE.md",
+          "Blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+          "Sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+          "RequiresVersion": true,
+          "Context": {
+            "Failure": null,
+            "HasVersion": true,
+            "Status": "Active",
+            "Major": "2",
+            "Minor": "23",
+            "VersionDate": "20261001",
+            "UpdatedDate": "2026-10-01",
+            "Revision": "0",
+            "VersionLineIndex": 4,
+            "UpdatedLineIndex": 10,
+            "MetadataContentStart": 6,
+            "MetadataContentEnd": 13
+          },
+          "NativeParserError": null,
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:STYLE_GUIDE.md"
+        }
+      ]
+    },
+    {
+      "file": "native-coverage-current-PS-characterization.json",
+      "sha256": "8f5dae3b35e30a8899664570837d821dabde8a17a34a5cd420c1d1e67ab50e5c",
+      "scope": "Actual current PS helper/parser over exact native48f4 newly discovered docs; no adaptation to policy/algorithm.",
+      "results": [
+        {
+          "Path": ".claude/commands/review-loop.md",
+          "Blob": "8f361e184eef8b292370d1d6e5b00425ab8226c2",
+          "Sha256": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+          "RequiresVersion": false,
+          "Context": {
+            "Failure": null,
+            "Status": "Active",
+            "Major": null,
+            "Minor": null,
+            "VersionDate": null,
+            "UpdatedDate": "2026-09-22",
+            "Revision": null,
+            "VersionLineIndex": -1,
+            "UpdatedLineIndex": 14
+          },
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:.claude/commands/review-loop.md"
+        },
+        {
+          "Path": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "Blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+          "Sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+          "RequiresVersion": false,
+          "Context": {
+            "Failure": null,
+            "Status": "Active",
+            "Major": null,
+            "Minor": null,
+            "VersionDate": null,
+            "UpdatedDate": "2026-09-30",
+            "Revision": null,
+            "VersionLineIndex": -1,
+            "UpdatedLineIndex": 7
+          },
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:docs/P1-SUPPLY-FREEZE-v1.md"
+        },
+        {
+          "Path": "docs/dependency-maintenance.md",
+          "Blob": "34c9dec3cd9f640fd3a8346583fe8b1569056fb8",
+          "Sha256": "6371e711abad12c5d0a153e12ba519870034aa39c6455c11608d0969c185822a",
+          "RequiresVersion": false,
+          "Context": {
+            "Failure": "must place Metadata as the first level-two heading immediately after the H1 and within the first 30 body lines.",
+            "VersionDate": null,
+            "UpdatedDate": null,
+            "Revision": null
+          },
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:docs/dependency-maintenance.md"
+        },
+        {
+          "Path": "STYLE_GUIDE.md",
+          "Blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+          "Sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+          "RequiresVersion": true,
+          "Context": {
+            "Failure": null,
+            "Status": "Active",
+            "Major": "2",
+            "Minor": "23",
+            "VersionDate": "20261001",
+            "UpdatedDate": "2026-10-01",
+            "Revision": "0",
+            "VersionLineIndex": 4,
+            "UpdatedLineIndex": 10
+          },
+          "InputReference": "48f4d8a36c8faceee12afac78aaecea0d176125d:STYLE_GUIDE.md"
+        }
+      ]
+    }
+  ],
+  "native_inputs": {
+    "ps_baseline": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "tf_revision": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "tf_validator_sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875",
+    "tf_validator_blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+    "sources": [
+      {
+        "path": ".claude/commands/review-loop.md",
+        "version": false,
+        "sha256": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3",
+        "blob": "8f361e184eef8b292370d1d6e5b00425ab8226c2",
+        "input_reference": "48f4d8a36c8faceee12afac78aaecea0d176125d:.claude/commands/review-loop.md"
+      },
+      {
+        "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+        "version": false,
+        "sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+        "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+        "input_reference": "48f4d8a36c8faceee12afac78aaecea0d176125d:docs/P1-SUPPLY-FREEZE-v1.md"
+      },
+      {
+        "path": "docs/dependency-maintenance.md",
+        "version": false,
+        "sha256": "6371e711abad12c5d0a153e12ba519870034aa39c6455c11608d0969c185822a",
+        "blob": "34c9dec3cd9f640fd3a8346583fe8b1569056fb8",
+        "input_reference": "48f4d8a36c8faceee12afac78aaecea0d176125d:docs/dependency-maintenance.md"
+      },
+      {
+        "path": "STYLE_GUIDE.md",
+        "version": true,
+        "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+        "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+        "input_reference": "48f4d8a36c8faceee12afac78aaecea0d176125d:STYLE_GUIDE.md"
+      }
+    ]
+  },
+  "all_four_document_hashes_match_native_git": true,
+  "coordinator_verification": "Verified all thirteen exact input hashes, the production-prefix dependency-root-only substitution, all four input bytes/blob identities against native Git, all ten weighted scores, and the typed characterization diff: existing decoder plus only two parser-output boundary substitutions. Evidence does not establish full TF runtime acceptance."
+}

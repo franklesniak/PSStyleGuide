@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # D-A02-10: Admit a valid first governed state without rewriting published history
 
+**Superseded by [D-A02-14](review-D-A02-14-decision.md).** The original decision below is retained as history. The governing policy permits the native direct list; the complete native consumer census supports removing this manifest-absent invalid-parent allowance and reversing the unnecessary candidate heading/date edit. F1 trusted existing-exemption promotion and F3 closed classification initialization remain separate controls.
+
 **Validate.** The current native `docs/dependency-maintenance.md` has the required fields immediately after H1 but lacks `## Metadata`. Its candidate now has the correct heading and finalization date. The existing nonversioned transition rejects the published parent before accepting that repair. PS prior coverage never included this path; the trusted baseline has no metadata-classification manifest. Original4 requires complete current fields/placement, published-baseline-to-final evaluation and retained safety. It does not require rewriting old ordinary documents before adding a consumer. This is a migration of validation coverage, not permission for an invalid final header or for an existing governed baseline failure.
 
 **Stakeholders.** Both maintainers, existing and new documentation authors, metadata and dependency maintainers, local/CI operators, security reviewers, auditors/history custodians, and schedule owners need repairability with truthful immutable history. Cloud operations, privacy and accessibility have no distinct surface changed by this exact validation migration.

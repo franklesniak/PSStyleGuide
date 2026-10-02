@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A02 preparation and proposed changes
 
+**Current D14 disposition:** [D-A02-14](review-D-A02-14-decision.md) corrects the earlier D10 heading premise and selects complete policy placement support, removal of the unused absent-manifest parent allowance, and reversal of the candidate-only dependency heading/date edit. Earlier implementation/validation descriptions below remain historical input-specific evidence. Current repair, final validation and paired acceptance are pending.
+
 A00 and A01 are accepted. A02 has an authorized local PS implementation in the sole-writer product worktree `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`, branch `codex/shared-governance`, based on PS `48f4d8a36c8faceee12afac78aaecea0d176125d`. Eleven nonprotected paths are changed. Protected bytes remain native pending direct authority. The coordinator committed this scope as `fe3d6738d5b331f88e21bf6b9815883b3bb353b8` and published [draft PS224](https://github.com/franklesniak/PSStyleGuide/pull/224). Round1 Copilot Balanced and remote Codex reviews are pending; STATUS retains the fixed clock and native request identities. Transfers are 0/12. Requested route is `gpt-6.1-sol/high`; effective settings are not exposed. No descendant was spawned. This scratch result is not product or paired-main acceptance.
 
 ## Inputs and coverage

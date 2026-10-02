@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # D-A02-11: Trusted exemption promotion
 
+**D-A02-14 correction:** [D-A02-14](review-D-A02-14-decision.md) supersedes only this record's claim that D10's manifest-absent branch remains necessary. The complete native census supports removing that branch after policy-conformant parsing. F1's selected trusted existing-exemption promotion, known-governed/ADR protections and actual-parent comparisons remain required. The original decision below records what was selected before this later finding.
+
 **Finding:** Codex4163722040, review5389295737, exact reviewed headfe3d6738d5b331f88e21bf6b9815883b3bb353b8. No product edit preceded this decision. The coordinator owns public step6 and must release implementation after publishing this complete decision.
 
 **Validate.** Reproduced with the actual final helper: manifest=true makes Test-InitialMetadataCoveragePath false for README, so a valid current Tier1 header fails against its metadata-less prior onboarding text. Exact log: review-round1-reproduction.log, F1. Native docs.instructions.md content precedence permits Tier2-to-Tier1 promotion; an invalid old exempt header is not an old Tier1 policy violation. Prior governed paths must not acquire this exception through a table flag. D10's manifest-absent guard remains necessary and is reused unchanged for that branch; its blanket manifest-present rejection is the new defect.

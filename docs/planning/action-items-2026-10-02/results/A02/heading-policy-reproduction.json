@@ -1,0 +1,181 @@
+{
+  "Utc": "2026-10-02T09:36:57.2650319+00:00",
+  "ValidatorPath": ".github/workflows/Test-AgentInstructions.ps1",
+  "ValidatorSha256": "da64afc90f005280f218569fd37a7a8eeb6097db0ee9738e25162671f9699f73",
+  "MarkdownPackageVersion": "14.3.2",
+  "NodeVersion": "v24.18.1",
+  "NativePsBaseline": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+  "FrozenReviewHead": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+  "Results": [
+    {
+      "Name": "optional-version-unrequired-heading",
+      "RequiresVersion": false,
+      "InputSha256": "97dae7871d214ee956aad991d3ec8a49b33007fcba9781830267d30a4e45112b",
+      "Context": {
+        "Failure": "must place Metadata as the first level-two heading immediately after the H1 and within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "# Metadata fixture\n\n**Version:** 1.0.20261002.0\n\n## Metadata\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "no-h1-frontmatter-title-direct",
+      "RequiresVersion": false,
+      "InputSha256": "e4449b8daf1567706c2f65bce5059157c624c5bb994d30189af96f28abe8abd6",
+      "Context": {
+        "Failure": "must contain exactly one document-level H1 within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "---\ntitle: Metadata fixture\n---\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "no-h1-frontmatter-leading-directive",
+      "RequiresVersion": false,
+      "InputSha256": "18bacaa1ff8585f6758f2485fd53b40191d85e7cf85d9a459a13b9f705d1686e",
+      "Context": {
+        "Failure": "must contain exactly one document-level H1 within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "---\ntitle: Metadata fixture\n---\n<!-- markdownlint-disable MD013 -->\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "late-h1-frontmatter-title-direct",
+      "RequiresVersion": false,
+      "InputSha256": "680638be4f3e74af5d94d10395a4cc3baa29f02b349b5a69501023870f733c5b",
+      "Context": {
+        "Failure": "must contain exactly one document-level H1 within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "---\ntitle: Metadata fixture\n---\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# Later title\n\nProcedure.\n"
+    },
+    {
+      "Name": "h1-body-line30-heading",
+      "RequiresVersion": false,
+      "InputSha256": "84f7cbc28253b7d20c6a0f29d564f9ab3f1c8d1adae91cfd2256b39fcb20b9d4",
+      "Context": {
+        "Failure": "must place Metadata as the first level-two heading immediately after the H1 and within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# Metadata fixture\n\n## Metadata\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "h1-body-line30-direct",
+      "RequiresVersion": false,
+      "InputSha256": "8a68f56f21d69ad57c592408af86199fdf7181cc5887ca5b269e921346200123",
+      "Context": {
+        "Failure": "must place Metadata as the first level-two heading immediately after the H1 and within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n# Metadata fixture\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "versioned-heading",
+      "RequiresVersion": true,
+      "InputSha256": "97dae7871d214ee956aad991d3ec8a49b33007fcba9781830267d30a4e45112b",
+      "Context": {
+        "Failure": null,
+        "Status": "Active",
+        "Major": "1",
+        "Minor": "0",
+        "VersionDate": "20261002",
+        "UpdatedDate": "2026-10-02",
+        "Revision": "0",
+        "VersionLineIndex": 2,
+        "UpdatedLineIndex": 8
+      },
+      "InputUtf8": "# Metadata fixture\n\n**Version:** 1.0.20261002.0\n\n## Metadata\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "versioned-direct",
+      "RequiresVersion": true,
+      "InputSha256": "be3aa354bed6264331a2006cdf4956aead6d3b2c379c638a05cb7ae6398ce95f",
+      "Context": {
+        "Failure": "must place Metadata as the first level-two heading immediately after Version and within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "# Metadata fixture\n\n**Version:** 1.0.20261002.0\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "unversioned-heading",
+      "RequiresVersion": false,
+      "InputSha256": "721cd8c9048a563c064ca057102b9dd6a296bcf8e21d42a2d10fddd4add55447",
+      "Context": {
+        "Failure": null,
+        "Status": "Active",
+        "Major": null,
+        "Minor": null,
+        "VersionDate": null,
+        "UpdatedDate": "2026-10-02",
+        "Revision": null,
+        "VersionLineIndex": -1,
+        "UpdatedLineIndex": 6
+      },
+      "InputUtf8": "# Metadata fixture\n\n## Metadata\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "unversioned-direct",
+      "RequiresVersion": false,
+      "InputSha256": "f0da78e1d72f3f67f2e1ac5d56db547ceacc2246dc3435bc8d1011c7491d7315",
+      "Context": {
+        "Failure": "must place Metadata as the first level-two heading immediately after the H1 and within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "# Metadata fixture\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "versioned-invalid-placement",
+      "RequiresVersion": true,
+      "InputSha256": "07a3aa6989e3294bd47350ccb02c02647ff55c03795a868e4e020eff7b3dd528",
+      "Context": {
+        "Failure": "must place Metadata as the first level-two heading immediately after Version and within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "# Metadata fixture\n\n**Version:** 1.0.20261002.0\n\nUnrelated introduction.\n\n## Metadata\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "versioned-duplicate-section",
+      "RequiresVersion": true,
+      "InputSha256": "cf938741e0df73f416c45dd1938527d6cf944adad0ea7a09518d6ec08c8c788d",
+      "Context": {
+        "Failure": "must place Metadata as the first level-two heading immediately after Version and within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "# Metadata fixture\n\n**Version:** 1.0.20261002.0\n\n## Metadata\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Metadata\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    },
+    {
+      "Name": "versioned-duplicate-direct",
+      "RequiresVersion": true,
+      "InputSha256": "a358831c67c2d954975ee353c0a856dc4529b8dd085c26d672a7f2d9cbfdd82c",
+      "Context": {
+        "Failure": "must place Metadata as the first level-two heading immediately after Version and within the first 30 body lines.",
+        "VersionDate": null,
+        "UpdatedDate": null,
+        "Revision": null
+      },
+      "InputUtf8": "# Metadata fixture\n\n**Version:** 1.0.20261002.0\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n- **Status:** Active\n- **Owner:** Fixture Maintainers\n- **Last Updated:** 2026-10-02\n- **Scope:** Optional metadata heading reproduction.\n\n## Procedure\n\nRun the reviewed procedure.\n"
+    }
+  ],
+  "Finding": "Two intended-valid headed forms pass; eight policy-valid direct/optional-Version/fallback/boundary forms fail. Three invalid controls fail through the early heading guard, which does not establish duplicate rejection after a repair.",
+  "Scope": "Scratch actual-helper/parser reproduction only; no product edit or selected repair.",
+  "SourceEvidenceSha256": "405fb8f778ff61455b5f439a459429dff81310f3c02b65a166a673732e385a72",
+  "HarnessVerification": "Coordinator compared the complete production prefix/helpers with the reproduction: exact after one explicit PSScriptRoot replacement binding locked parser dependencies to the product workflow directory. No semantic helper change."
+}
