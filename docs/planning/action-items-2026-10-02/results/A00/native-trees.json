@@ -1,0 +1,1434 @@
+{
+  "PSStyleGuide": [
+    {
+      "path": ".claude",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "40866784c2819516c3d41f0f7736d812d25e63f3",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/40866784c2819516c3d41f0f7736d812d25e63f3"
+    },
+    {
+      "path": ".claude/commands",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "07802c6462b847fad0c4f511ac79e32cbdf38081",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/07802c6462b847fad0c4f511ac79e32cbdf38081"
+    },
+    {
+      "path": ".claude/commands/review-loop.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8f361e184eef8b292370d1d6e5b00425ab8226c2",
+      "size": 4400,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/8f361e184eef8b292370d1d6e5b00425ab8226c2"
+    },
+    {
+      "path": ".codex",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "926072a0cff995e10b22fb605642707b7b406101",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/926072a0cff995e10b22fb605642707b7b406101"
+    },
+    {
+      "path": ".codex/config.toml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+      "size": 205,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/89eb76dba2ac64bf811cf4272b033a30de241d80"
+    },
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6313b56c57848efce05faa7aa7e901ccfc2886ea",
+      "size": 19,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/6313b56c57848efce05faa7aa7e901ccfc2886ea"
+    },
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "14356fb45f85a2bc6af385555331000b41d3e125",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/14356fb45f85a2bc6af385555331000b41d3e125"
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "62ff9fcfb1fb56dea8fd894d4d622cd3c598f875",
+      "size": 1634,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/62ff9fcfb1fb56dea8fd894d4d622cd3c598f875"
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+      "size": 112,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/ca79ca5b4d5245d3dbcf49889b73d7fd0f076132"
+    },
+    {
+      "path": ".github/instructions",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "8a23d9f6cd004bf8853fbab13ac1f7d8873d3d28",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/8a23d9f6cd004bf8853fbab13ac1f7d8873d3d28"
+    },
+    {
+      "path": ".github/instructions/docs.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd",
+      "size": 46230,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/0b0c1ddc83938cfa9706418d45f619b1bfa03ffd"
+    },
+    {
+      "path": ".github/instructions/yaml.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "edef19560d3403985d1417af4772d74bbf9eacf4",
+      "size": 54645,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/edef19560d3403985d1417af4772d74bbf9eacf4"
+    },
+    {
+      "path": ".github/workflows",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "69df377d14ca7af3572f1ad842a0a5539e9b5c5a",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/69df377d14ca7af3572f1ad842a0a5539e9b5c5a"
+    },
+    {
+      "path": ".github/workflows/.markdownlint.jsonc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd9b559b7254dab422b97e493bdb41c40b5511c1",
+      "size": 480,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/cd9b559b7254dab422b97e493bdb41c40b5511c1"
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3babe4848f5d97ffd5757255983463231d4163f7",
+      "size": 20485,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/3babe4848f5d97ffd5757255983463231d4163f7"
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3a98a55e7d01a1dfd95f2112e8fa656f79df6df2",
+      "size": 27466,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/3a98a55e7d01a1dfd95f2112e8fa656f79df6df2"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6f0628d492f6d2f76fe1ab65b3e0b316b52c729",
+      "size": 5562,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/d6f0628d492f6d2f76fe1ab65b3e0b316b52c729"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1e7a60a42a8e9b28811c64de3d1b7e4c1bbec76a",
+      "size": 6328,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/1e7a60a42a8e9b28811c64de3d1b7e4c1bbec76a"
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a23d38c42770d7463920704e108ccd63240dc90b",
+      "size": 86655,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/a23d38c42770d7463920704e108ccd63240dc90b"
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+      "size": 376988,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/009f29663399b9f9c0b669a214859a3b52dbb5a6"
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "19240ed44a8811d0a98bb0c67e4a732b5a749f58",
+      "size": 150171,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/19240ed44a8811d0a98bb0c67e4a732b5a749f58"
+    },
+    {
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+      "size": 5844,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/dc0d195c72d8404e45c6eb39cb102898fd22b667"
+    },
+    {
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "92743273da44ad7f6d46113a763089b9e1675f82",
+      "size": 1509,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/92743273da44ad7f6d46113a763089b9e1675f82"
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bed8c585a495c3cab2875cac036a5717acd82bb6",
+      "size": 8689,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/bed8c585a495c3cab2875cac036a5717acd82bb6"
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+      "size": 7375,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/6f1739b6dfd0108f813506f86f95ec4f2a75bd7e"
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "77a1313b9044bb934159a165e07219a3c1c9306b",
+      "size": 9686,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/77a1313b9044bb934159a165e07219a3c1c9306b"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "41a955fc4ef68f47b3391417babbcb91824a2726",
+      "size": 19602,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/41a955fc4ef68f47b3391417babbcb91824a2726"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+      "size": 378451,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/bf2b013289afc7d5bc1f760de49e7abcc7cfdda2"
+    },
+    {
+      "path": ".github/workflows/Test-BlankLineExamples.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "068c7139a9e6a9276073211f48eca88464204362",
+      "size": 15201,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/068c7139a9e6a9276073211f48eca88464204362"
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+      "size": 3081,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/85905890f1eebd304fb8f6613b3e93a67c42043a"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0773070a6505b1678c5522c16c8a5c32979f6338",
+      "size": 37696,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/0773070a6505b1678c5522c16c8a5c32979f6338"
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+      "size": 253910,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "18b8048aac58ed7b1d28a532a2aa413890483042",
+      "size": 32648,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/18b8048aac58ed7b1d28a532a2aa413890483042"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+      "size": 25672,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/f90f1dd32a8944651de3d5311e84b08043801fd4"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f0abda0049fdeacb85c8493937b768ddc999c4a",
+      "size": 15077,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/3f0abda0049fdeacb85c8493937b768ddc999c4a"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+      "size": 9504,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/2cd28ecaa2a8c96d2201a474905153654dc0ac27"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "73a13567131229fb10f8360334bf758b7c7deaa7",
+      "size": 4361,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/73a13567131229fb10f8360334bf758b7c7deaa7"
+    },
+    {
+      "path": ".github/workflows/ci-toolchain.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "740a7749945acbf53e9981241ea553dc1431d3c8",
+      "size": 91,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/740a7749945acbf53e9981241ea553dc1431d3c8"
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "66d7cda6249a8811490742004a90f5eb644ab688",
+      "size": 26612,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/66d7cda6249a8811490742004a90f5eb644ab688"
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dde42437f9f5d579abee2e944321488a2ba4f793",
+      "size": 3863,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/dde42437f9f5d579abee2e944321488a2ba4f793"
+    },
+    {
+      "path": ".github/workflows/historical-supply-profile.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "224f6fba1aa90174dad8eec57dc6012697d8be33",
+      "size": 4461,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/224f6fba1aa90174dad8eec57dc6012697d8be33"
+    },
+    {
+      "path": ".github/workflows/install-husky.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "600f6bfd664d0550238916f01de3a41109fe9fbf",
+      "size": 703,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/600f6bfd664d0550238916f01de3a41109fe9fbf"
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b20dc7f318cf3e14e743eb4bb0bf193be7ad1f62",
+      "size": 13668,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/b20dc7f318cf3e14e743eb4bb0bf193be7ad1f62"
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6985333e619493640aa5cb4a0cb3925153f8273",
+      "size": 3449,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/d6985333e619493640aa5cb4a0cb3925153f8273"
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+      "size": 6604,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/599f0ff30a26ed5a41d3bcbd8a15405211e2441d"
+    },
+    {
+      "path": ".github/workflows/npm-risk-exceptions.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+      "size": 23,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/b5aac17ff77c7ce0f773ffd7534ec28749216fd0"
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0f2ba8fde17782391a0589fb8e02045c8322d956",
+      "size": 55584,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/0f2ba8fde17782391a0589fb8e02045c8322d956"
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "753a464d066c0832e8b360d21a541b176ed61456",
+      "size": 1137,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/753a464d066c0832e8b360d21a541b176ed61456"
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0350d4979fd5ba109ba4dbb910e1593debd0138d",
+      "size": 3038,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/0350d4979fd5ba109ba4dbb910e1593debd0138d"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a0dbaeea819a469fd0da0fed6b8db28db03acd2e",
+      "size": 13116,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/a0dbaeea819a469fd0da0fed6b8db28db03acd2e"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d44a87f46f60e0cc80a3293aa90d7ed6e1c5d161",
+      "size": 1448,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/d44a87f46f60e0cc80a3293aa90d7ed6e1c5d161"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7429fc67b0c38c8ad6b57211c88797b5e8f13140",
+      "size": 250,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/7429fc67b0c38c8ad6b57211c88797b5e8f13140"
+    },
+    {
+      "path": ".husky",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "612c3295d28373126cc0911ab932713db147654b",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/612c3295d28373126cc0911ab932713db147654b"
+    },
+    {
+      "path": ".husky/pre-commit",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "28e5c7bcb9a5616b37abbbcbed727339f2dbc823",
+      "size": 460,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/28e5c7bcb9a5616b37abbbcbed727339f2dbc823"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "808609311d98e9792dc7f3d76d20aa220aab2256",
+      "size": 3143,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/808609311d98e9792dc7f3d76d20aa220aab2256"
+    },
+    {
+      "path": ".vscode",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "42a14c3e115ae8c1ad939f26c09bc4965c4879bd",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/42a14c3e115ae8c1ad939f26c09bc4965c4879bd"
+    },
+    {
+      "path": ".vscode/settings.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bbccb6f224a56a77909ddd133b79adaea68564e1",
+      "size": 39,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/bbccb6f224a56a77909ddd133b79adaea68564e1"
+    },
+    {
+      "path": "ACKNOWLEDGMENTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f10ae23380e94de3feb20d88274635c4fe2ed308",
+      "size": 2543,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/f10ae23380e94de3feb20d88274635c4fe2ed308"
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f7543d786156f0efc39c3fe2927ffcd186b29f39",
+      "size": 32680,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/f7543d786156f0efc39c3fe2927ffcd186b29f39"
+    },
+    {
+      "path": "CLAUDE.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3bb0afcae09e05b6a8022d339b12721e8a1473d2",
+      "size": 82478,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/3bb0afcae09e05b6a8022d339b12721e8a1473d2"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "798aec2eacbdee846266299d2725069514fe6d58",
+      "size": 6210,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/798aec2eacbdee846266299d2725069514fe6d58"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fc77effb1732726e1d7445c687023889fe7180f0",
+      "size": 1070,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/fc77effb1732726e1d7445c687023889fe7180f0"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "90646a6ec020a2708d79412110d2acc2896382c4",
+      "size": 4742,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/90646a6ec020a2708d79412110d2acc2896382c4"
+    },
+    {
+      "path": "STYLE_GUIDE.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+      "size": 148759,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/21bbb515429eb5fdac47f14128a95d5fd55122aa"
+    },
+    {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "556538c7664327652bc42875b63a5bf6bc16783f",
+      "size": 148852,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/556538c7664327652bc42875b63a5bf6bc16783f"
+    },
+    {
+      "path": "STYLE_GUIDE_FULL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c06830461f45d089c1f1f2c36d7a7b6472e3d6aa",
+      "size": 257290,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/c06830461f45d089c1f1f2c36d7a7b6472e3d6aa"
+    },
+    {
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "afb5ba370810e36a9c1ba103aa8e5691a3131581",
+      "size": 135295,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/afb5ba370810e36a9c1ba103aa8e5691a3131581"
+    },
+    {
+      "path": "copilot-instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+      "size": 148759,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/21bbb515429eb5fdac47f14128a95d5fd55122aa"
+    },
+    {
+      "path": "docs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1aa7005da84cf24fdee44ca38dc82ef226fede2e",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/1aa7005da84cf24fdee44ca38dc82ef226fede2e"
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6835e35d318e3f8af8f48ba0d7d773f10475918b",
+      "size": 2214,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/6835e35d318e3f8af8f48ba0d7d773f10475918b"
+    },
+    {
+      "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+      "size": 57610,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/fc3fb7b657c62702f8b77b196735ff6a458c89e5"
+    },
+    {
+      "path": "docs/decisions",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "d08b48b290d3779eee372120740c027fffc8ff39",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/d08b48b290d3779eee372120740c027fffc8ff39"
+    },
+    {
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+      "size": 12177,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/0386f596033b6871f01bb4c7c8f471b1087476bd"
+    },
+    {
+      "path": "docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+      "size": 8744,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995"
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "34c9dec3cd9f640fd3a8346583fe8b1569056fb8",
+      "size": 6243,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/34c9dec3cd9f640fd3a8346583fe8b1569056fb8"
+    },
+    {
+      "path": "package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5a8244af74fde546f0bfa55af366ce3ca13cea51",
+      "size": 51357,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/5a8244af74fde546f0bfa55af366ce3ca13cea51"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f700e931201cac80accde177a11b1a0bb5c75bb2",
+      "size": 1025,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/f700e931201cac80accde177a11b1a0bb5c75bb2"
+    },
+    {
+      "path": "powershell.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e68999483c41c07e732772d88b2c43dd1467f367",
+      "size": 148832,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/e68999483c41c07e732772d88b2c43dd1467f367"
+    },
+    {
+      "path": "samples",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5d5f4ff4786321115438f0dbf84dee4777345b29",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/trees/5d5f4ff4786321115438f0dbf84dee4777345b29"
+    },
+    {
+      "path": "samples/test-nested-markdown-linting.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d06987410afac4fdf845d5d976dd9e984639156",
+      "size": 1086,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/1d06987410afac4fdf845d5d976dd9e984639156"
+    },
+    {
+      "path": "samples/test-recursive-nested-markdown.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "381310a48f8b7f0c3482d5554c42b797cd685ed6",
+      "size": 1322,
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/blobs/381310a48f8b7f0c3482d5554c42b797cd685ed6"
+    }
+  ],
+  "TerraformStyleGuide": [
+    {
+      "path": ".claude",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "cfec6469ee9612f24e0ed4891848a69e61e55386",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/cfec6469ee9612f24e0ed4891848a69e61e55386"
+    },
+    {
+      "path": ".claude/commands",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "efbf340be55beff83ab46916d0f08a58c47473f0",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/efbf340be55beff83ab46916d0f08a58c47473f0"
+    },
+    {
+      "path": ".claude/commands/review-loop.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "62b63fabdc8ce64ede8539b884aa904a46cb3eaf",
+      "size": 4448,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/62b63fabdc8ce64ede8539b884aa904a46cb3eaf"
+    },
+    {
+      "path": ".codex",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "926072a0cff995e10b22fb605642707b7b406101",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/926072a0cff995e10b22fb605642707b7b406101"
+    },
+    {
+      "path": ".codex/config.toml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+      "size": 205,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/89eb76dba2ac64bf811cf4272b033a30de241d80"
+    },
+    {
+      "path": ".gitattributes",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6313b56c57848efce05faa7aa7e901ccfc2886ea",
+      "size": 19,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/6313b56c57848efce05faa7aa7e901ccfc2886ea"
+    },
+    {
+      "path": ".github",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "a6f31d756ab8d4e9d94c2bf2d184f7290c510801",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/a6f31d756ab8d4e9d94c2bf2d184f7290c510801"
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d4ad431a6c629203aa6cd88b9cea6f9caa4c293b",
+      "size": 2231,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/d4ad431a6c629203aa6cd88b9cea6f9caa4c293b"
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+      "size": 112,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/ca79ca5b4d5245d3dbcf49889b73d7fd0f076132"
+    },
+    {
+      "path": ".github/document-metadata-classification.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+      "size": 387,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/79b79ebef9da1175a18a42748c1f69b6df58af35"
+    },
+    {
+      "path": ".github/instructions",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "9f922f8f428f286f58cfdc8121fea3d07c7546bd",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/9f922f8f428f286f58cfdc8121fea3d07c7546bd"
+    },
+    {
+      "path": ".github/instructions/docs.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "4a8f2addc02af857928205199b66cf3918ae9a82",
+      "size": 46254,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/4a8f2addc02af857928205199b66cf3918ae9a82"
+    },
+    {
+      "path": ".github/instructions/yaml.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "924d12c833d07def47d05137b532e622db622fa4",
+      "size": 54645,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/924d12c833d07def47d05137b532e622db622fa4"
+    },
+    {
+      "path": ".github/workflows",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "7df63becb5c789ffe740183b2a0e018c6089ab28",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/7df63becb5c789ffe740183b2a0e018c6089ab28"
+    },
+    {
+      "path": ".github/workflows/.markdownlint.jsonc",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cd9b559b7254dab422b97e493bdb41c40b5511c1",
+      "size": 480,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/cd9b559b7254dab422b97e493bdb41c40b5511c1"
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+      "size": 20499,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0"
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+      "size": 27494,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/54684b739a74e0c64df50d4a9cd697f0c57b447d"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+      "size": 5632,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/00c5857b701c9c85668f9fe66e33838f82d313e8"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+      "size": 6799,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/c24be2165520a02cb622f47dc03c4e4ad9ddd716"
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+      "size": 95329,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/a3e7e664e441d2e51f0b6f5709b8a010d6877e82"
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+      "size": 377161,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/33771aa438f441bd96a0fcaa4c103a379fc8b302"
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+      "size": 154151,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/25abdcb61aca8a1c0df9e3643aa7b68781ab6052"
+    },
+    {
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "906460d818674199b32294185ed6525c143b48bb",
+      "size": 5706,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/906460d818674199b32294185ed6525c143b48bb"
+    },
+    {
+      "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+      "size": 3127,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/e6e566ed7de9fc065c98338d93ef08699e40b354"
+    },
+    {
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+      "size": 1510,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/8331d93c54fae6eba440e25e5d489f5dd1ec0f3a"
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+      "size": 2603,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/5622bb03dd0af81ed44d4709a7eda8c644ce9530"
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+      "size": 7375,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/6f1739b6dfd0108f813506f86f95ec4f2a75bd7e"
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+      "size": 11402,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/65416a6fd9bd3f46f871af51833f91ad031b9ec7"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+      "size": 460163,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/c84d9067c1b315e037850f2cd40e79c0704356b5"
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+      "size": 3088,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/45db9b3fdfa3e85f05d6b567fbaa547d16a8132d"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7855cc0c1be90096abae979168ed1e282d535998",
+      "size": 33662,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/7855cc0c1be90096abae979168ed1e282d535998"
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+      "size": 253918,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/0a9f312d62ca753689abe05d3519cf0e64e74ea0"
+    },
+    {
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "87f68f5f02eb2303059be06c219253ab37853197",
+      "size": 4346,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/87f68f5f02eb2303059be06c219253ab37853197"
+    },
+    {
+      "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+      "size": 22102,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/0c53093e6a5de264deae9f9269e11c5981d4bdad"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+      "size": 31949,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "995b72a7b48dea2636094d81226893a519950797",
+      "size": 25568,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/995b72a7b48dea2636094d81226893a519950797"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+      "size": 14948,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/aa1be01df5a3c8b5369bf8e4313089de9c356365"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+      "size": 9558,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/7bf29f43ea081e9861ad53ecf0951831bf878075"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+      "size": 4222,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/6cbd7f1233baf28ea2242b2a6207b6ebd29ad073"
+    },
+    {
+      "path": ".github/workflows/ci-toolchain.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "740a7749945acbf53e9981241ea553dc1431d3c8",
+      "size": 91,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/740a7749945acbf53e9981241ea553dc1431d3c8"
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+      "size": 33862,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/de6d55690478deacc6bb58f65f4f437cb43cc87e"
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+      "size": 7645,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec"
+    },
+    {
+      "path": ".github/workflows/historical-supply-profile.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+      "size": 2783,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/471fe6dd03676739c2c8a031f2d42010169b8dea"
+    },
+    {
+      "path": ".github/workflows/install-husky.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a12568776f6473472193bc98638f1856a7c9dec",
+      "size": 625,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/6a12568776f6473472193bc98638f1856a7c9dec"
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+      "size": 16481,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/9ea34e743098b6d527195ae81e06c77c7d7c06d6"
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c35575990d5854ea6da9d5f6d49d23287df43146",
+      "size": 5971,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/c35575990d5854ea6da9d5f6d49d23287df43146"
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+      "size": 6632,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/e665a1b1e45de4f33b62b64fd75c4974b9156b4d"
+    },
+    {
+      "path": ".github/workflows/npm-risk-exceptions.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+      "size": 23,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/b5aac17ff77c7ce0f773ffd7534ec28749216fd0"
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "8836c53a7d86ea9eeab8d0ba10b4026cb848b3ae",
+      "size": 55624,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/8836c53a7d86ea9eeab8d0ba10b4026cb848b3ae"
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "65aebbba501747454aede48fe32ce406a2ce43ff",
+      "size": 1105,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/65aebbba501747454aede48fe32ce406a2ce43ff"
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+      "size": 5421,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/cc6a3b60a9c19249d9d3e083493ea76e9c006ad3"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+      "size": 13047,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/7e63fc866ac9ee62b5cf436ab9d06789c804ae4e"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+      "size": 1407,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/09ccc8139ef8a90da08e75f2c467ac47a0b868ff"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+      "size": 249,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/76b672659bef2bda7a97f7fa8e7878e1cacafdc9"
+    },
+    {
+      "path": ".husky",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "79adabc55390b5cf96079bc0d66f20facbfaebf6",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/79adabc55390b5cf96079bc0d66f20facbfaebf6"
+    },
+    {
+      "path": ".husky/pre-commit",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+      "size": 3544,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/71d8f4949043c1b64ffc68c92dcee58a4c3bde4b"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "size": 5405,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/d6fa21489388686703c94ea33c39d0dd41b8bd16"
+    },
+    {
+      "path": ".vscode",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "ca655db18ecc985b6b49674963af3496af5cc4de",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/ca655db18ecc985b6b49674963af3496af5cc4de"
+    },
+    {
+      "path": ".vscode/settings.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d",
+      "size": 46,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d"
+    },
+    {
+      "path": "ACKNOWLEDGMENTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f1ae2dd938628424412d9edd6787e99a9246f5ff",
+      "size": 674,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/f1ae2dd938628424412d9edd6787e99a9246f5ff"
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+      "size": 33422,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/aa643a442d6a0c59c05d2aff8737564981147fc6"
+    },
+    {
+      "path": "CLAUDE.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3cc21fc793944033be430ad08722081db4e7b9dd",
+      "size": 80980,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/3cc21fc793944033be430ad08722081db4e7b9dd"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "94beedee85478c14d284ca830e94d4a5f4ece202",
+      "size": 5813,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/94beedee85478c14d284ca830e94d4a5f4ece202"
+    },
+    {
+      "path": "LICENSE",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "98ca721ce2a880acbcbce1d9690cab0100b8bb7a",
+      "size": 1101,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/98ca721ce2a880acbcbce1d9690cab0100b8bb7a"
+    },
+    {
+      "path": "README.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f04368718d580fe61d9a22f4c92cdfdf8287b28d",
+      "size": 5063,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/f04368718d580fe61d9a22f4c92cdfdf8287b28d"
+    },
+    {
+      "path": "STYLE_GUIDE.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+      "size": 152868,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/f872e52ee5b7ded737157dcf745cb93013005a2b"
+    },
+    {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+      "size": 152962,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8"
+    },
+    {
+      "path": "STYLE_GUIDE_FULL.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+      "size": 222292,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/faaf49ee2bcde0d23da2acd397a73511fe2b6f00"
+    },
+    {
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+      "size": 73953,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/b5efeee6cb8b6ded6099bbee13b6307ea103cc5c"
+    },
+    {
+      "path": "copilot-instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+      "size": 152868,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/f872e52ee5b7ded737157dcf745cb93013005a2b"
+    },
+    {
+      "path": "docs",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "3225416228788351b16f9f7ee517165055435223",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/3225416228788351b16f9f7ee517165055435223"
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "f43b5168ce508a9a054dc85ba7231e27d8c70809",
+      "size": 2146,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/f43b5168ce508a9a054dc85ba7231e27d8c70809"
+    },
+    {
+      "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b567f286e9a00add2ef345ef11481efe19516ca8",
+      "size": 65689,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/b567f286e9a00add2ef345ef11481efe19516ca8"
+    },
+    {
+      "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "9e04225a355997850e4817f9163868089a773332",
+      "size": 127363,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/9e04225a355997850e4817f9163868089a773332"
+    },
+    {
+      "path": "docs/decisions",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "1b344b09c2aca78a154356ccabe6c8db93265e5e",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/1b344b09c2aca78a154356ccabe6c8db93265e5e"
+    },
+    {
+      "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "b1065e9a330dc2a37e6f56eedc38f720558e6528",
+      "size": 16511,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/b1065e9a330dc2a37e6f56eedc38f720558e6528"
+    },
+    {
+      "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "970afd6f1df559f3085bd39cff2f7b961cc96a15",
+      "size": 21626,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/970afd6f1df559f3085bd39cff2f7b961cc96a15"
+    },
+    {
+      "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba",
+      "size": 11644,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba"
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+      "size": 6448,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0"
+    },
+    {
+      "path": "package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+      "size": 3566,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/83641b58e56c6a01690c32af410b4a5423be9ad1"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+      "size": 837,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/dec41f61c36e5770487eb431bd57f2f7dfe62832"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+      "size": 5920,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/1409f6e150f9880b881b8a4dd6ceb699f11ee53c"
+    },
+    {
+      "path": "samples",
+      "mode": "040000",
+      "type": "tree",
+      "sha": "5d5f4ff4786321115438f0dbf84dee4777345b29",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/trees/5d5f4ff4786321115438f0dbf84dee4777345b29"
+    },
+    {
+      "path": "samples/test-nested-markdown-linting.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "1d06987410afac4fdf845d5d976dd9e984639156",
+      "size": 1086,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/1d06987410afac4fdf845d5d976dd9e984639156"
+    },
+    {
+      "path": "samples/test-recursive-nested-markdown.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "381310a48f8b7f0c3482d5554c42b797cd685ed6",
+      "size": 1322,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/381310a48f8b7f0c3482d5554c42b797cd685ed6"
+    },
+    {
+      "path": "terraform.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+      "size": 153067,
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/blobs/59eeedcfe4cab11ebf87d439d5117f7203b0ea98"
+    }
+  ],
+  "research-misc": [
+    {
+      "path": ".codex/config.toml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+      "size": 205,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/89eb76dba2ac64bf811cf4272b033a30de241d80"
+    },
+    {
+      "path": ".github/instructions/docs.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "96c50a1f4213d90646553c8daf4bf7d93fa27cbe",
+      "size": 54529,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/96c50a1f4213d90646553c8daf4bf7d93fa27cbe"
+    },
+    {
+      "path": ".github/instructions/yaml.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "3f013b485e333fcfe8480c926361a642f5ebc8a4",
+      "size": 54492,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/3f013b485e333fcfe8480c926361a642f5ebc8a4"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructionParserManifest.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "0716a34b6b7f9cf22bcf60d242582174c17b85b3",
+      "size": 38982,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/0716a34b6b7f9cf22bcf60d242582174c17b85b3"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "a9e23ed70deda2a9de12fc8962282ad167d4bde9",
+      "size": 306638,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/a9e23ed70deda2a9de12fc8962282ad167d4bde9"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "d4f380f61ce00092a416dac4ed3eaf6d11cbb7bc",
+      "size": 5742,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/d4f380f61ce00092a416dac4ed3eaf6d11cbb7bc"
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "bd4f100bf2f713fa86f72c489e1fff5cde8e1ead",
+      "size": 7711,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/bd4f100bf2f713fa86f72c489e1fff5cde8e1ead"
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "5599eb27bd42af85bed376e82a60bff4524dcc70",
+      "size": 30461,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/5599eb27bd42af85bed376e82a60bff4524dcc70"
+    },
+    {
+      "path": ".gitignore",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e42d3bbc695f8bb78fb6a49a5672f973803719a3",
+      "size": 194,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/e42d3bbc695f8bb78fb6a49a5672f973803719a3"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "6a138c59a0ce62ad9679c815e024c9d6e9902ccf",
+      "size": 7318,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/6a138c59a0ce62ad9679c815e024c9d6e9902ccf"
+    },
+    {
+      "path": "AGENTS.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "63a09836e309e3e0e9dc1e6abff7807b5c3e77b1",
+      "size": 32537,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/63a09836e309e3e0e9dc1e6abff7807b5c3e77b1"
+    },
+    {
+      "path": "CLAUDE.md",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "c5e8dd2eb9622d2b95edc80876a23997060b285d",
+      "size": 82250,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/c5e8dd2eb9622d2b95edc80876a23997060b285d"
+    },
+    {
+      "path": "package-lock.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "e9efa0381e686a265c41eb36662671791da9e837",
+      "size": 48914,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/e9efa0381e686a265c41eb36662671791da9e837"
+    },
+    {
+      "path": "package.json",
+      "mode": "100644",
+      "type": "blob",
+      "sha": "062a0fc09368701f07a9db3d8b09877866463644",
+      "size": 723,
+      "url": "https://api.github.com/repos/franklesniak/research-misc/git/blobs/062a0fc09368701f07a9db3d8b09877866463644"
+    }
+  ]
+}

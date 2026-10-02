@@ -1,0 +1,3767 @@
+[
+  {
+    "repository": "PSStyleGuide",
+    "path": ".codex/config.toml",
+    "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+    "mode": "100644",
+    "type": "blob",
+    "size": 205,
+    "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.codex/config.toml",
+    "excerpts": [
+      {
+        "line": 1,
+        "text": "# Preserve enough project-instruction capacity for the complete review workflow."
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/instructions/docs.instructions.md",
+    "blob": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd",
+    "mode": "100644",
+    "type": "blob",
+    "size": 46230,
+    "sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/instructions/docs.instructions.md",
+    "excerpts": [
+      {
+        "line": 65,
+        "text": "- Process and operational documents intended as durable repository policy, such as review guides, linting guides, testing guides, and release runbooks."
+      },
+      {
+        "line": 134,
+        "text": "A non-normative historical artifact is a Markdown file committed to preserve provenance, such as a verbatim AI-assistant prompt, transcript excerpt, quoted source excerpt, or similar historical material used to produce or review another artifact. For these files, \"preserved\" means content-level fidelity; repository hooks can still normalize trailing whitespace and final newlines."
+      },
+      {
+        "line": 136,
+        "text": "- **Classification.** Treat a non-normative historical artifact as Tier 2, so the metadata header block is **NOT REQUIRED**, unless its current, non-quoted framing independently meets the Tier 1 criteria. Copied prompts, requirements language, review text, or source excerpts inside preserved historical content do not promote the file to Tier 1. Classify the file by its current purpose and framing, not by copied historical text."
+      },
+      {
+        "line": 141,
+        "text": "- **Fencing rationale.** Fenced code blocks keep preserved content from being parsed as live headings or directives. For an artifact under `docs/`, fenced code blocks also distinguish quoted `TODO:`, `TBD`, or `FIXME` examples from active normative text during manual authoring and review. Block quotes and other rendered quote forms are not equivalent because they can still read as live requirements."
+      },
+      {
+        "line": 142,
+        "text": "- **Related sources.** The file SHOULD link to canonical repository documents or inspectable public sources it relates to when they exist, such as the specification, ADR, issue, public upstream source, or quoted source it was used to produce or review. These references MUST follow the existing reproducible-source and repository self-containment rules. Required interpretation MUST NOT depend on machine-local paths, agent session routes, private re"
+      },
+      {
+        "line": 149,
+        "text": "# Historical Artifact (Non-Normative): AI Review Prompt for ADR-0003"
+      },
+      {
+        "line": 151,
+        "text": "This file preserves the AI review prompt used while preparing ADR-0003. The preserved content is provenance/history only; it is not current specification, review, policy, requirements, or implementation guidance."
+      },
+      {
+        "line": 218,
+        "text": "When committed Markdown documentation, including analysis write-ups, research notes, review artifacts, and other durable Markdown records, cites sources or evidence, it **MUST** cite only sources another reader can inspect or reproduce from repository contents or clearly linked public references. This subsection makes the repository's self-containment requirement concrete for Markdown citations; it does not create a separate source-of-truth rule."
+      },
+      {
+        "line": 404,
+        "text": "**Background.** Mirrored excerpts that drift from their source are a recurring source of documentation inconsistency, and partial fixes that touch only reviewer-flagged lines can leave parallel copies of the same excerpt inconsistent and force repeat review rounds for the same root cause."
+      },
+      {
+        "line": 407,
+        "text": "   - Be a verbatim copy of the corresponding source-of-truth lines for the included literal content, without paraphrasing or selectively rewriting copied literals; if the excerpt is intentionally partial, the surrounding prose **MUST** make that scope clear and **MUST NOT** imply the excerpt is the complete file or complete configuration, **OR**"
+      },
+      {
+        "line": 410,
+        "text": "   When the verbatim-copy path is taken for a fenced or multi-line excerpt, authors SHOULD use the file's existing `Source:` citation convention from the `Markdown Conventions` section to anchor the excerpt to its source-of-truth file with a line-range link."
+      },
+      {
+        "line": 412,
+        "text": "2. **Full-file audit on consistency fixes.** When fixing a code/doc consistency issue in a mirrored excerpt that was flagged on specific lines, the fix **MUST** audit the entire mirrored excerpt block and the affected Markdown file's other excerpts of the same source-of-truth file for all literal occurrences of the old pattern, not just the lines explicitly mentioned by the reviewer. The fix is not complete until every literal in every mirrored e"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/instructions/yaml.instructions.md",
+    "blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+    "mode": "100644",
+    "type": "blob",
+    "size": 54645,
+    "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/instructions/yaml.instructions.md",
+    "excerpts": [
+      {
+        "line": 40,
+        "text": "- **[Actions]** A privileged `pull_request_target` workflow **MUST** execute only trusted-revision bytes. Proposed files that select executable bytes **MUST** fail closed as trust-root changes or pass bounded inert-data validation by trusted code."
+      },
+      {
+        "line": 41,
+        "text": "- **[Actions]** A privileged workflow that fetches a proposed pull-request revision into a persistent local ref **MUST NOT** force-update that ref. It **MUST** verify that the fetched commit equals the expected event commit."
+      },
+      {
+        "line": 43,
+        "text": "- **[Actions]** `setup-*` actions in workflow files under `.github/workflows/` **MUST** resolve runtimes from checked-in release-line selectors by default and **MUST NOT** use broad floating selectors such as `'3.x'`, `'latest'`, or `'*'`. `actions/setup-node` **MAY** instead use `node-version-file` only when a tracked file supplies one unambiguous exact stable SemVer, no competing `node-version` input exists, and a later step verifies the instal"
+      },
+      {
+        "line": 61,
+        "text": "- Indentation **MUST** be exactly **2 spaces** per level. Tabs **MUST NOT** appear in YAML files."
+      },
+      {
+        "line": 114,
+        "text": "GitHub does not evaluate `on.push.paths` or `on.push.paths-ignore` for tag pushes. A `push` workflow that uses a path filter **MUST** define its branch and tag intent explicitly. Do not assume that a path filter restricts tag events. See [GitHub's workflow syntax for path filters](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onpushpull_requestpull_request_targetpathspaths-ignore)."
+      },
+      {
+        "line": 131,
+        "text": "## GitHub Actions Privileged-Workflow Trust Roots"
+      },
+      {
+        "line": 133,
+        "text": "GitHub runs `pull_request_target` in the base repository's default-branch context. This context can have privileges that an ordinary pull-request workflow does not have. A `pull_request_target` workflow **MUST NOT** check out or execute untrusted pull-request code. See [GitHub's event reference](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request_target) and [secure-use reference](https://"
+      },
+      {
+        "line": 135,
+        "text": "The executable trust root includes all checked-in files that can select or alter executable bytes in the privileged job. The inventory **MUST** include applicable files from these categories:"
+      },
+      {
+        "line": 143,
+        "text": "Path filters **MUST** cover every supported file in this inventory. A proposed change **MUST NOT** bypass the validation job because the changed selector is absent from `on.pull_request_target.paths`."
+      },
+      {
+        "line": 150,
+        "text": "Inert-data validation **MUST** read the exact proposed Git object without replacing trusted workspace files. It **MUST** validate the object type, byte limit, encoding, syntax, required semantic identity, and every error or indeterminate state. Store proposed revision values in environment variables or pass them as action inputs. Do not interpolate untrusted values into generated shell source."
+      },
+      {
+        "line": 152,
+        "text": "When a privileged job fetches a proposed pull-request revision into a persistent local ref, the fetch **MUST NOT** use a leading `+` refspec or `--force`. An unexpected non-fast-forward destination state **MUST** stop the job. After the fetch, the workflow **MUST** resolve the fetched commit and compare it with the expected event commit before it reads proposed objects. A fetch that writes only `FETCH_HEAD` does not update a persistent local ref,"
+      },
+      {
+        "line": 154,
+        "text": "A privileged job **MUST NOT** install, import, source, or execute proposed dependency bytes. Options such as npm's `--ignore-scripts` stop lifecycle scripts, but they do not make proposed package code trusted."
+      },
+      {
+        "line": 156,
+        "text": "When a trusted parser validates proposed documents, the proposed post-merge package state **MUST** preserve the exact parser identity and its resolved runtime dependency closure. Otherwise, the privileged job **MUST** reject the proposal as a trust-root change. The validation **SHOULD** compare the manifest declaration, root lock declaration, version, resolved artifact, integrity value, dependency paths, and dependency descriptors."
+      },
+      {
+        "line": 162,
+        "text": "An unprivileged `pull_request` install test **MAY** add defense in depth. It does not authorize proposed-code execution in a privileged `pull_request_target` job."
+      },
+      {
+        "line": 168,
+        "text": "  contents: read"
+      },
+      {
+        "line": 177,
+        "text": "          ref: ${{ github.sha }}"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/agent-instructions.yml",
+    "blob": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+    "mode": "100644",
+    "type": "blob",
+    "size": 9504,
+    "sha256": "1c9457868eb262fc7ed8583d1cfff2903288286f11c103a46f91703b04bef67d",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/agent-instructions.yml",
+    "excerpts": [
+      {
+        "line": 10,
+        "text": "  pull_request_target:"
+      },
+      {
+        "line": 22,
+        "text": "    if: github.event_name == 'pull_request_target'"
+      },
+      {
+        "line": 48,
+        "text": "          $strRevision = if ($env:EXPECTED_BASE) { $env:EXPECTED_BASE } else { $env:GITHUB_SHA }"
+      },
+      {
+        "line": 58,
+        "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision"
+      },
+      {
+        "line": 60,
+        "text": "              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }"
+      },
+      {
+        "line": 63,
+        "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+      },
+      {
+        "line": 64,
+        "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }"
+      },
+      {
+        "line": 66,
+        "text": "          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }"
+      },
+      {
+        "line": 79,
+        "text": "      - name: Classify exact PR input and validate ordinary content"
+      },
+      {
+        "line": 93,
+        "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $env:EXPECTED_HEAD"
+      },
+      {
+        "line": 95,
+        "text": "              if ($intAttempt -eq 3) { throw 'PR data fetch failed after three attempts.' }"
+      },
+      {
+        "line": 98,
+        "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+      },
+      {
+        "line": 99,
+        "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $env:EXPECTED_HEAD) { throw 'PR data commit mismatch.' }"
+      },
+      {
+        "line": 108,
+        "text": "          } elseif ($objResult.classification -ceq 'maintenance_required') {"
+      },
+      {
+        "line": 109,
+        "text": "              Write-Output 'MAINTENANCE_REQUIRED: candidate tests, scoped owner authority and fresh independent review are required before merge. This is not ordinary policy admission.'"
+      },
+      {
+        "line": 113,
+        "text": "    if: github.event_name != 'pull_request_target'"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/copilot-setup-steps.yml",
+    "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+    "mode": "100644",
+    "type": "blob",
+    "size": 26612,
+    "sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/copilot-setup-steps.yml",
+    "excerpts": [
+      {
+        "line": 80,
+        "text": "          $strSha = $env:GITHUB_SHA"
+      },
+      {
+        "line": 88,
+        "text": "          # the fetch resolve to whatever the ref points at when the fetch runs,"
+      },
+      {
+        "line": 118,
+        "text": "          # Fetching the commit itself, not a ref that names it. No credential"
+      },
+      {
+        "line": 122,
+        "text": "              & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strSha"
+      },
+      {
+        "line": 123,
+        "text": "              $intFetchExitCode = $LASTEXITCODE"
+      },
+      {
+        "line": 124,
+        "text": "              if ($intFetchExitCode -eq 0) { break }"
+      },
+      {
+        "line": 127,
+        "text": "          if ($intFetchExitCode -ne 0) { throw \"acquire: git fetch exited $intFetchExitCode after three attempts\" }"
+      },
+      {
+        "line": 128,
+        "text": "          & $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD"
+      },
+      {
+        "line": 136,
+        "text": "              throw 'acquire: git rev-parse must return exactly one line'"
+      },
+      {
+        "line": 142,
+        "text": "          Write-Information \"acquire: anonymous exact checkout of $strSha\" -InformationAction Continue"
+      },
+      {
+        "line": 182,
+        "text": "              throw 'credential-policy: unable to resolve exactly one origin URL'"
+      },
+      {
+        "line": 193,
+        "text": "          $arrAuthorizationKeys = @(& $strGitPath config --local --name-only --get-regexp '^http\\..*\\.extraheader$')"
+      },
+      {
+        "line": 194,
+        "text": "          $intAuthorizationExit = $LASTEXITCODE"
+      },
+      {
+        "line": 196,
+        "text": "          if (($intAuthorizationExit -ne 0 -and $intAuthorizationExit -ne 1) -or $arrAuthorizationKeys.Count -ne 0) {"
+      },
+      {
+        "line": 197,
+        "text": "              throw 'credential-policy: persisted HTTP authorization is configured'"
+      },
+      {
+        "line": 311,
+        "text": "              $strReviewedSha256 = 'DF770B2A6F130ED8627C9782C988FDA9669FA23898329A61A871E32F965E007D'"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/devcontainer-ci.yml",
+    "blob": "dde42437f9f5d579abee2e944321488a2ba4f793",
+    "mode": "100644",
+    "type": "blob",
+    "size": 3863,
+    "sha256": "0deabaded368671ae8759f4c4fc02445e2e3c0c930cfe3a3a20df728a1e988de",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/devcontainer-ci.yml",
+    "excerpts": [
+      {
+        "line": 15,
+        "text": "# Keep each exact-ref check independent. A superseded run can still prove the"
+      },
+      {
+        "line": 16,
+        "text": "# immutable commit that triggered it, and cancellation cannot obscure failure."
+      },
+      {
+        "line": 28,
+        "text": "      EXPECTED_REVISION: ${{ github.sha }}"
+      },
+      {
+        "line": 82,
+        "text": "            fetch --no-tags --no-recurse-submodules --depth=1 origin \\"
+      },
+      {
+        "line": 85,
+        "text": "          fetched_revision=\"$("
+      },
+      {
+        "line": 89,
+        "text": "          readonly fetched_revision"
+      },
+      {
+        "line": 90,
+        "text": "          test \"${fetched_revision}\" = \"${EXPECTED_REVISION}\""
+      },
+      {
+        "line": 98,
+        "text": "              \"${fetched_revision}\""
+      },
+      {
+        "line": 108,
+        "text": "            'The exact event commit preserves the PS devcontainer exclusion.'"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/lint-nested-markdown.js",
+    "blob": "b20dc7f318cf3e14e743eb4bb0bf193be7ad1f62",
+    "mode": "100644",
+    "type": "blob",
+    "size": 13668,
+    "sha256": "b20aaab172224da4377cda75fa6cad1a8eeb00f8bdd26737ffe0e6c2ad222492",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/lint-nested-markdown.js",
+    "excerpts": [
+      {
+        "line": 6,
+        "text": " * This script extracts Markdown code blocks from Markdown files and runs"
+      },
+      {
+        "line": 179,
+        "text": " * Extract markdown code fences from content (recursive)"
+      },
+      {
+        "line": 185,
+        "text": " * @returns {Array} Array of extracted blocks with metadata"
+      },
+      {
+        "line": 187,
+        "text": "function extractMarkdownFencesRecursive(content, filePath, baseLine = 0, depth = 0, parentPath = '') {"
+      },
+      {
+        "line": 213,
+        "text": "            // Recursively extract nested markdown fences"
+      },
+      {
+        "line": 215,
+        "text": "                const nestedBlocks = extractMarkdownFencesRecursive("
+      },
+      {
+        "line": 231,
+        "text": " * Extract markdown code fences from a file"
+      },
+      {
+        "line": 233,
+        "text": " * @returns {Array} Array of extracted blocks with metadata"
+      },
+      {
+        "line": 235,
+        "text": "function extractMarkdownFences(filePath, repoRoot) {"
+      },
+      {
+        "line": 238,
+        "text": "    return extractMarkdownFencesRecursive(content, safeInputPath, 0, 0, '');"
+      },
+      {
+        "line": 242,
+        "text": " * Run markdownlint on extracted content"
+      },
+      {
+        "line": 341,
+        "text": "            const blocks = extractMarkdownFences(file, repoRoot);"
+      },
+      {
+        "line": 347,
+        "text": "                // Lint each extracted block"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/lint-staged-markdown.mjs",
+    "blob": "d6985333e619493640aa5cb4a0cb3925153f8273",
+    "mode": "100644",
+    "type": "blob",
+    "size": 3449,
+    "sha256": "d0fdf5d89c7d54489c4d40d9cde88485cd0c2df5fb3ee4bb5b9282fbb44243c9",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/lint-staged-markdown.mjs",
+    "excerpts": [
+      {
+        "line": 86,
+        "text": "    nonFileContents: stagedMarkdownByAbsolutePosixPath,"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+    "blob": "bed8c585a495c3cab2875cac036a5717acd82bb6",
+    "mode": "100644",
+    "type": "blob",
+    "size": 8689,
+    "sha256": "a708e153c12b4576bc65fb5df50b322353d1f6d050c28df8d6575be7ce4a7955",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+    "excerpts": [
+      {
+        "line": 20,
+        "text": "- **markdown-it** (^14.0.0): Markdown parser for extracting code blocks"
+      },
+      {
+        "line": 21,
+        "text": "- **markdownlint** (^0.36.1): Core markdownlint library for linting extracted content"
+      },
+      {
+        "line": 25,
+        "text": "### 2. Extraction Script ([lint-nested-markdown.js](lint-nested-markdown.js))"
+      },
+      {
+        "line": 30,
+        "text": "- Uses markdown-it to parse each file and extract the AST"
+      },
+      {
+        "line": 32,
+        "text": "- Runs markdownlint on each extracted block"
+      },
+      {
+        "line": 39,
+        "text": "- **Supports recursive nesting**: Extracts and lints markdown at any depth (markdown inside markdown inside markdown, etc.)"
+      },
+      {
+        "line": 102,
+        "text": "   - Extracts the content"
+      },
+      {
+        "line": 104,
+        "text": "   - **Recursively processes the extracted content** to find nested markdown blocks"
+      },
+      {
+        "line": 172,
+        "text": "- [x] The workflow successfully extracts Markdown content from code fences"
+      },
+      {
+        "line": 173,
+        "text": "- [x] Extracted content is validated using markdownlint with repository's configuration"
+      },
+      {
+        "line": 197,
+        "text": "- Recursively extracts markdown blocks from within extracted blocks"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/markdownlint.yml",
+    "blob": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+    "mode": "100644",
+    "type": "blob",
+    "size": 6604,
+    "sha256": "73b1eb08b07254ffcb9d437e260bee8a38cce2e8cc65af1c921a3a9c4ed47bfa",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/markdownlint.yml",
+    "excerpts": [
+      {
+        "line": 18,
+        "text": "      - name: Acquire the exact revision without credentials"
+      },
+      {
+        "line": 36,
+        "text": "          $strRevision = $env:GITHUB_SHA"
+      },
+      {
+        "line": 46,
+        "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision"
+      },
+      {
+        "line": 48,
+        "text": "              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }"
+      },
+      {
+        "line": 51,
+        "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+      },
+      {
+        "line": 52,
+        "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }"
+      },
+      {
+        "line": 54,
+        "text": "          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }"
+      },
+      {
+        "line": 62,
+        "text": "      - name: Install the reviewed runtime and locked tools"
+      },
+      {
+        "line": 78,
+        "text": "      - name: Acquire the exact revision without credentials"
+      },
+      {
+        "line": 96,
+        "text": "          $strRevision = $env:GITHUB_SHA"
+      },
+      {
+        "line": 106,
+        "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision"
+      },
+      {
+        "line": 108,
+        "text": "              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }"
+      },
+      {
+        "line": 111,
+        "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+      },
+      {
+        "line": 112,
+        "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }"
+      },
+      {
+        "line": 114,
+        "text": "          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }"
+      },
+      {
+        "line": 122,
+        "text": "      - name: Install the reviewed runtime and locked tools"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/package.json",
+    "blob": "753a464d066c0832e8b360d21a541b176ed61456",
+    "mode": "100644",
+    "type": "blob",
+    "size": 1137,
+    "sha256": "a01509018203f9d0d092549b5a220447818d6af8fc58f6ad7d93681a37b63a98",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/package.json",
+    "excerpts": []
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/scripts-README.md",
+    "blob": "0350d4979fd5ba109ba4dbb910e1593debd0138d",
+    "mode": "100644",
+    "type": "blob",
+    "size": 3038,
+    "sha256": "b6af48d2e2d29449c7ab302dcde88cdafa30c6573b89065fcd31ab5adf25b8f2",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/scripts-README.md",
+    "excerpts": [
+      {
+        "line": 16,
+        "text": "This script extracts Markdown code blocks from Markdown files and validates them using markdownlint. It's used by the GitHub Actions workflow to ensure that nested Markdown content (inside code fences with language identifier `markdown` or `md`) follows the same linting rules as the outer Markdown files."
+      },
+      {
+        "line": 18,
+        "text": "**This script supports recursive nesting** - it will extract and lint markdown at any depth level (markdown inside markdown inside markdown, etc.)."
+      },
+      {
+        "line": 35,
+        "text": "2. Parses each file using `markdown-it` to extract the AST"
+      },
+      {
+        "line": 37,
+        "text": "4. Runs markdownlint on each extracted block"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Test-AgentInstructions.ps1",
+    "blob": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+    "mode": "100644",
+    "type": "blob",
+    "size": 378451,
+    "sha256": "5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Test-AgentInstructions.ps1",
+    "excerpts": [
+      {
+        "line": 51,
+        "text": "$script:arrPushGovernedExactPaths = @("
+      },
+      {
+        "line": 75,
+        "text": "$script:strStandingPlacementAuthorization ="
+      },
+      {
+        "line": 76,
+        "text": "    'No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required.'"
+      },
+      {
+        "line": 78,
+        "text": "    '**Standing placement authorization.**',"
+      },
+      {
+        "line": 82,
+        "text": "    'The agent MUST NOT ask the owner for that additional authorization.',"
+      },
+      {
+        "line": 94,
+        "text": "    '`reviewThreads`',"
+      },
+      {
+        "line": 97,
+        "text": "    'review:<review-id>:<section-label>:<ordinal>'"
+      },
+      {
+        "line": 101,
+        "text": "    'review-body-only finding',"
+      },
+      {
+        "line": 104,
+        "text": "    'every review-submission body',"
+      },
+      {
+        "line": 110,
+        "text": "    'owner authorization',"
+      },
+      {
+        "line": 115,
+        "text": "    'both reviewers'"
+      },
+      {
+        "line": 120,
+        "text": "        StructuralLiteral = '- **Maximum rounds:** 8 review iterations per cycle invocation.'"
+      },
+      {
+        "line": 121,
+        "text": "        ProseLiteral = 'Maximum rounds: 8 review iterations per cycle invocation.'"
+      },
+      {
+        "line": 122,
+        "text": "        WeakStructuralLiteral = '- **Maximum rounds:** 80 review iterations per cycle invocation.'"
+      },
+      {
+        "line": 134,
+        "text": "        StructuralLiteral = '- **Maximum rounds:** 80 review iterations per loop invocation.'"
+      },
+      {
+        "line": 135,
+        "text": "        ProseLiteral = 'Maximum rounds: 80 review iterations per loop invocation.'"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "blob": "41a955fc4ef68f47b3391417babbcb91824a2726",
+    "mode": "100644",
+    "type": "blob",
+    "size": 19602,
+    "sha256": "becb1877caa33c3cbdb949ce710676674ad8475384252072aef8e63496710bba",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "excerpts": [
+      {
+        "line": 2,
+        "text": "# Runs the extracted metadata and bounded-input self-tests."
+      },
+      {
+        "line": 13,
+        "text": "# The exact Git commit used as an authenticated endpoint fixture."
+      },
+      {
+        "line": 24,
+        "text": "# # Runs the extracted self-tests with validated named arguments."
+      },
+      {
+        "line": 51,
+        "text": "    throw 'The extracted self-test must declare one void output contract.'"
+      },
+      {
+        "line": 80,
+        "text": "        throw 'The validator capacity boundary did not fail closed exactly.'"
+      },
+      {
+        "line": 87,
+        "text": "    -Failure 'missing Git index entry mutation must have exactly one Git index entry.'"
+      },
+      {
+        "line": 213,
+        "text": "    # Returns the exact bounded property shape that the created-push evidence"
+      },
+      {
+        "line": 276,
+        "text": "    '- **Scope:** Extracted final-state regression.'"
+      },
+      {
+        "line": 287,
+        "text": "    '- **Scope:** Extracted final-state regression.'"
+      },
+      {
+        "line": 295,
+        "text": "    throw 'The extracted published-final regression was rejected.'"
+      },
+      {
+        "line": 306,
+        "text": "    ('fixture.md Version revision must be exactly 0 when a published-baseline ' +"
+      },
+      {
+        "line": 308,
+        "text": "    throw 'The extracted higher-order revision reset did not fail closed.'"
+      },
+      {
+        "line": 322,
+        "text": "    ('fixture.md Version revision must be exactly 0 when a published-baseline ' +"
+      },
+      {
+        "line": 324,
+        "text": "    throw 'The extracted metadata-only higher-order reset did not fail closed.'"
+      },
+      {
+        "line": 334,
+        "text": "    throw 'The extracted metadata-only higher-order reset was rejected.'"
+      },
+      {
+        "line": 345,
+        "text": "    throw 'The extracted metadata-only same-tuple increment was rejected.'"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+    "blob": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+    "mode": "100644",
+    "type": "blob",
+    "size": 25672,
+    "sha256": "a8f12abf35f250c7f2d0a0ab753a18a42fca7516a36aae9e3dd90eac76805160",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Validate-WorkflowPolicy.mjs",
+    "excerpts": [
+      {
+        "line": 24,
+        "text": "  assertReviewedParserTree(parserRoot, contract.parser.treeSha256);"
+      },
+      {
+        "line": 68,
+        "text": "  const hash = crypto.createHash('sha256');"
+      },
+      {
+        "line": 101,
+        "text": "function assertReviewedParserTree(root, expected, reader) {"
+      },
+      {
+        "line": 134,
+        "text": "function sha256(value) {"
+      },
+      {
+        "line": 135,
+        "text": "  return crypto.createHash('sha256').update(value).digest('hex');"
+      },
+      {
+        "line": 142,
+        "text": "function expectExactKeys(value, expectedKeys, category) {"
+      },
+      {
+        "line": 300,
+        "text": "// maintenance authorization, live-base authentication, or merge approval."
+      },
+      {
+        "line": 361,
+        "text": "  expectExactKeys(contract, ['schema', 'parser', 'actions'], 'contract-shape');"
+      },
+      {
+        "line": 363,
+        "text": "  expectExactKeys(contract.parser, ['version', 'resolved', 'integrity', 'treeSha256'], 'contract-parser');"
+      },
+      {
+        "line": 364,
+        "text": "  if (!/^[0-9a-f]{64}$/u.test(contract.parser.treeSha256)) fail('contract-parser');"
+      },
+      {
+        "line": 366,
+        "text": "  expectExactKeys(contract.actions, ['checkout', 'uploadArtifact'], 'contract-actions');"
+      },
+      {
+        "line": 368,
+        "text": "    expectExactKeys(action, ['uses', 'inputs'], 'contract-action');"
+      },
+      {
+        "line": 369,
+        "text": "    const repository = name === 'checkout' ? 'actions/checkout' : 'actions/upload-artifact';"
+      },
+      {
+        "line": 457,
+        "text": "  expectExactKeys(step, keys, 'code-step-shape');"
+      },
+      {
+        "line": 462,
+        "text": "    // covered by accepted-loader behavior tests and maintenance review; this is"
+      },
+      {
+        "line": 485,
+        "text": "  expectExactKeys(workflow, ['name', 'on', 'permissions', 'jobs'], 'workflow-shape');"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/workflow-policy-cases.json",
+    "blob": "a0dbaeea819a469fd0da0fed6b8db28db03acd2e",
+    "mode": "100644",
+    "type": "blob",
+    "size": 13116,
+    "sha256": "0073945f15d4137ef11e886cf265d346567981b4c1fcc95d180666c3cf69d38d",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/workflow-policy-cases.json",
+    "excerpts": [
+      {
+        "line": 9,
+        "text": "        \"pull_request_target\""
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/workflow-policy-contract.json",
+    "blob": "d44a87f46f60e0cc80a3293aa90d7ed6e1c5d161",
+    "mode": "100644",
+    "type": "blob",
+    "size": 1448,
+    "sha256": "0414d5e9a498b0bf7f9f5ce258a733679bc1ad6963af5bbdb3e6f2ecb30901ee",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/workflow-policy-contract.json",
+    "excerpts": [
+      {
+        "line": 7,
+        "text": "    \"treeSha256\": \"ce50e3ffc11ca6ee6cbcde528ef7a0cca908241ee3394d8e01d9e7a813bdd53e\""
+      },
+      {
+        "line": 14,
+        "text": "        \"ref\": \"${{ github.sha }}\","
+      },
+      {
+        "line": 18,
+        "text": "        \"fetch-depth\": 1,"
+      },
+      {
+        "line": 19,
+        "text": "        \"fetch-tags\": false,"
+      },
+      {
+        "line": 28,
+        "text": "      \"uses\": \"actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a\","
+      },
+      {
+        "line": 37,
+        "text": "        \"archive\": true"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".gitignore",
+    "blob": "7429fc67b0c38c8ad6b57211c88797b5e8f13140",
+    "mode": "100644",
+    "type": "blob",
+    "size": 250,
+    "sha256": "a75dc3cbfa65dd2cba13326062c5039e04b7a15f6cb9a4c6c4983c2262c00bad",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.gitignore",
+    "excerpts": []
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".pre-commit-config.yaml",
+    "blob": "808609311d98e9792dc7f3d76d20aa220aab2256",
+    "mode": "100644",
+    "type": "blob",
+    "size": 3143,
+    "sha256": "f5babbf1733ee1065ba34f717050e4e831eeef649adbacd73f99301edc650d23",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.pre-commit-config.yaml",
+    "excerpts": [
+      {
+        "line": 64,
+        "text": "    # This exact upstream commit fixes the v1.7.12 ShellCheck stdin deadlock."
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": "AGENTS.md",
+    "blob": "f7543d786156f0efc39c3fe2927ffcd186b29f39",
+    "mode": "100644",
+    "type": "blob",
+    "size": 32680,
+    "sha256": "ce1860e518783cdd75d78124a1ab078257233807f689839eb7cb3e3749f8847b",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/AGENTS.md",
+    "excerpts": [
+      {
+        "line": 16,
+        "text": "This file provides PSStyleGuide-specific instructions for OpenAI Codex CLI and compatible AI coding agents. These instructions apply the repository's PowerShell, documentation, safety, and review contracts."
+      },
+      {
+        "line": 22,
+        "text": "This file intentionally keeps only a minimal inline summary of the highest-priority shared rules so that agents receive critical guidance immediately. The full shared rule set remains in the canonical file above."
+      },
+      {
+        "line": 28,
+        "text": "- **Instruction scope.** Codex builds its instruction chain once per run, from global guidance through the launch working directory. Use bounded discovery for a deeper `AGENTS.md`; the remote reviewer applies the closest file. Restart Codex after an active instruction changes, and do not re-read supplied instructions unless exact bytes matter. See [OpenAI's `AGENTS.md` guidance](https://developers.openai.com/codex/guides/agents-md)."
+      },
+      {
+        "line": 29,
+        "text": "- **Agents and interfaces.** The local agent implements work; `chatgpt-codex-connector[bot]` is a separate reviewer requested by `@codex review`. Use `rg`, `apply_patch`, and focused validation locally. Prefer the GitHub connector; use authenticated `gh api graphql` for missing thread, pagination, review-body, or inline context, and verify mutations by authenticated readback. Use primary official sources and record their impact. See [OpenAI's Cod"
+      },
+      {
+        "line": 35,
+        "text": "Instruction files and style guides are protected governance files. Do not create, edit, delete, rename, or otherwise change `.github/copilot-instructions.md`, files under `.github/instructions/`, files under `.cursor/rules/`, or root agent instruction files (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) unless the repository owner or maintainer has directly and explicitly authorized that specific instruction-file change in the current task"
+      },
+      {
+        "line": 39,
+        "text": "During downstream template adoption and stack selection, perform non-protected cleanup first, record the protected instruction-file edits needed to remove references to deleted tools or stacks, obtain explicit maintainer authorization, then update `.github/copilot-instructions.md`, remaining root agent files, and relevant `.github/instructions/*.instructions.md` files. Bump `Last Updated` and `Version` metadata where present, and avoid temporary "
+      },
+      {
+        "line": 91,
+        "text": "- **Prefer the GitHub plugin** for GitHub Issues, pull requests, PR comments, review comments, labels, reactions, PR creation, branch management on GitHub, and any other read or write against remote GitHub state."
+      },
+      {
+        "line": 93,
+        "text": "- **Local `git` remains appropriate** for local working-tree operations: inspecting diffs (`git diff`, `git log`, `git status`), creating branches, staging, committing, and pushing. Use the GitHub plugin for the corresponding remote-side actions (creating PRs, posting comments, reading review state)."
+      },
+      {
+        "line": 96,
+        "text": "The `.codex/config.toml` file at the repository root declares `[plugins.\"github@openai-curated\"] enabled = true` so that trusted Codex checkouts can opt the plugin in by default. Enabling the plugin in this file does not, by itself, grant GitHub authorization: actual access still depends on the GitHub app/connector installation, the Codex account performing the operation, and the repository's permissions."
+      },
+      {
+        "line": 98,
+        "text": "## PR Review Workflow (Codex-adapted)"
+      },
+      {
+        "line": 100,
+        "text": "This section is retained Codex platform protocol. Thin-entry-point pruning must preserve it unless the repository owner explicitly waives Codex PR review protocol for the retained Codex entry point."
+      },
+      {
+        "line": 102,
+        "text": "This workflow adapts the Claude-targeted process documented in `CLAUDE.md` for Codex's capabilities and runtime limitations. Use it when responding to review feedback on a pull request. All GitHub-side reads and writes in the steps below SHOULD go through the GitHub plugin first; fall back to `gh`, GraphQL, or manual owner action only when the plugin does not expose the needed capability (see **Fallbacks for unsupported plugin capabilities** belo"
+      },
+      {
+        "line": 106,
+        "text": "- **No autonomous wake-up.** Codex has no equivalent of `subscribe_pr_activity`. Codex MUST NOT promise webhook-driven wake-up, background polling, or scheduled review responses. The workflow runs only when the user explicitly starts or resumes it inside an active Codex session."
+      },
+      {
+        "line": 107,
+        "text": "- **Agent-command boundary.** Do not treat `@copilot` commands or the `@codex review` remote-review trigger as findings. Other `@codex` comments reach the local session only when its runtime routes them there. No form gives local Codex autonomous wake-up."
+      },
+      {
+        "line": 110,
+        "text": "### Handling each review comment"
+      },
+      {
+        "line": 112,
+        "text": "For each finding received from GitHub Copilot (`copilot-pull-request-reviewer[bot]`), remote Codex (`chatgpt-codex-connector[bot]`), a human reviewer, or any other reviewer, follow these steps. Process every reviewer identically and address findings one at a time."
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": "CLAUDE.md",
+    "blob": "3bb0afcae09e05b6a8022d339b12721e8a1473d2",
+    "mode": "100644",
+    "type": "blob",
+    "size": 82478,
+    "sha256": "527069c020934a6e73774dadef98359911bee71754ac6d67ab60796ac757c591",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/CLAUDE.md",
+    "excerpts": [
+      {
+        "line": 16,
+        "text": "This file provides PSStyleGuide-specific instructions for Claude Code and compatible AI coding agents. These instructions apply the repository's PowerShell, documentation, safety, and review contracts."
+      },
+      {
+        "line": 28,
+        "text": "Instruction files and style guides are protected governance files. Do not create, edit, delete, rename, or otherwise change `.github/copilot-instructions.md`, files under `.github/instructions/`, files under `.cursor/rules/`, or root agent instruction files (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) unless the repository owner or maintainer has directly and explicitly authorized that specific instruction-file change in the current task"
+      },
+      {
+        "line": 32,
+        "text": "During downstream template adoption and stack selection, perform non-protected cleanup first, record the protected instruction-file edits needed to remove references to deleted tools or stacks, obtain explicit maintainer authorization, then update `.github/copilot-instructions.md`, remaining root agent files, and relevant `.github/instructions/*.instructions.md` files. Bump `Last Updated` and `Version` metadata where present, and avoid temporary "
+      },
+      {
+        "line": 36,
+        "text": "Tracked `CLAUDE.local.md` files are prohibited at every supported project scope. Claude Code loads these files as operative project memory, while the repository's reviewed instruction catalog intentionally governs only shared instruction files. Keep the root `CLAUDE.local.md` path ignored and keep any personal project memory untracked."
+      },
+      {
+        "line": 84,
+        "text": "PR comments and review comments that begin with `@copilot` are commands addressed to GitHub Copilot's coding agent, **not** to Claude Code. **Ignore** these entirely \u2014 do not process them, do not reply to them, and do not treat them as review feedback."
+      },
+      {
+        "line": 86,
+        "text": "An exact `@codex review` PR comment requests a review from the separate remote Codex reviewer. It is not a finding for Claude Code. Process the review produced by `chatgpt-codex-connector[bot]`, not the trigger comment."
+      },
+      {
+        "line": 90,
+        "text": "This section governs how the agent runs any authorized multi-step task in this repository, whether that task is a Structured Decision Framework pass, an Automated Review Loop round, or an owner-approved set of changes. It exists because the agent has ended its turn after producing analysis while authorized, unblocked work remained \u2014 a stall that wastes owner time and hides progress."
+      },
+      {
+        "line": 93,
+        "text": "- **Yield only for a listed reason.** End the turn and return control to the owner only when one of the following holds: (a) the agent needs an input it genuinely cannot obtain on its own; (b) an enumerated pause defined elsewhere in this file applies, such as an Automated Review Loop pause trigger; or (c) the task is complete."
+      },
+      {
+        "line": 95,
+        "text": "- **A \"Next: ...\" preview is not a stop.** If the agent can state the next step, the agent can take the next step. State it, then do it."
+      },
+      {
+        "line": 97,
+        "text": "- **Continuity does not remove required approvals.** Where another rule requires explicit owner authorization \u2014 most importantly the **Protected Instruction Files** rule \u2014 the agent still obtains that authorization first. Execution continuity removes needless turn hand-backs; it never removes a required approval gate and never licenses an outward action the owner has not approved."
+      },
+      {
+        "line": 99,
+        "text": "The Automated Review Loop defines additional pause rules specific to the review cycle; see **Pause discipline** in that section."
+      },
+      {
+        "line": 105,
+        "text": "This framework is the repository's default method for resolving a **finding**: a reviewer comment, a bug, a design question, a discovered defect, or any choice between materially different ways to change the repository. Apply it whenever a finding admits more than one reasonable response and the choice would change the resulting code, tests, documentation, or security posture. Skip it only for mechanical work with a single correct answer, such as"
+      },
+      {
+        "line": 132,
+        "text": "- **Build the rubric once and apply it once.** If, after scoring, you find yourself wanting to add or drop criteria in order to produce a different winner, that is analysis paralysis: commit to the rubric output. Re-scoring with revised criteria is permitted only when a **new external information source** arrives, such as a reviewer follow-up, a CI failure, or a newly discovered repository constraint."
+      },
+      {
+        "line": 144,
+        "text": "Select the highest-scoring option, subject to the escalation gate in **Handling Code Review Comments** step 5 when the finding is a review comment. Then state the selected option **in detail, so that someone coming in cold can act on it without reconstructing the analysis**. Assume the reader has not read the thread, does not know the codebase, and will not infer intent. Write the statement in Simplified Technical English, so that a reader whose "
+      },
+      {
+        "line": 150,
+        "text": "- **Local testing information**, when testing applies: the environment used, the exact commands run, and the specific results observed. Report what the commands actually printed, including failures and anything that could not be run and why. A claim that something passes **MUST** be backed by the observed output, not by expectation."
+      },
+      {
+        "line": 168,
+        "text": "## Handling Code Review Comments"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+    "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+    "mode": "100644",
+    "type": "blob",
+    "size": 12177,
+    "sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/docs/decisions/0001-accept-in-repository-trust-root.md",
+    "excerpts": [
+      {
+        "line": 1,
+        "text": "# Decision 0001: Accept the in-repository trust root for pull-request policy checks"
+      },
+      {
+        "line": 16,
+        "text": "review triggers in the last section fire, this decision must be reopened."
+      },
+      {
+        "line": 23,
+        "text": "digests hard-coded in the workflow itself. Each link was hardened during the review of"
+      },
+      {
+        "line": 35,
+        "text": "the trust root sits: every pin in this design is anchored in a file the pull request can"
+      },
+      {
+        "line": 46,
+        "text": "`contents: read` at the job level, do not persist checkout credentials, and consume no"
+      },
+      {
+        "line": 48,
+        "text": "receives a read-only token and no secrets regardless of what the workflow file asks for"
+      },
+      {
+        "line": 61,
+        "text": "disabled every policy check that job exists to perform. Nothing is stolen; the reviewer is"
+      },
+      {
+        "line": 80,
+        "text": "- **D. Gate the job behind a GitHub Environment with a required reviewer.** Execution"
+      },
+      {
+        "line": 82,
+        "text": "- **E. Move policy enforcement into a `pull_request_target` workflow.** That event uses the"
+      },
+      {
+        "line": 84,
+        "text": "- **F. Add a CODEOWNERS entry for `.github/workflows/` and require code-owner review.**"
+      },
+      {
+        "line": 85,
+        "text": "  Makes any workflow edit require an explicit, enforced approval rather than reviewer"
+      },
+      {
+        "line": 92,
+        "text": "| Senior engineer | E is the strongest in-repository fix on paper, but `pull_request_target` is a well-documented footgun: it runs with a write-capable token, so a mistake there is worse than the problem being solved. |"
+      },
+      {
+        "line": 97,
+        "text": "| Security executive | Wants the residual formally accepted, owned, dated, and given explicit review triggers, rather than left implicit. |"
+      },
+      {
+        "line": 151,
+        "text": "1. The owner reviews every pull-request diff before merge, and a workflow-file edit is"
+      },
+      {
+        "line": 158,
+        "text": "Adding the owner as a required reviewer via a GitHub Environment (option D) was"
+      },
+      {
+        "line": 159,
+        "text": "specifically considered and rejected: the owner is already the sole reviewer of every pull"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": "docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+    "blob": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+    "mode": "100644",
+    "type": "blob",
+    "size": 8744,
+    "sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+    "excerpts": [
+      {
+        "line": 9,
+        "text": "- **Scope:** Records the accepted limitation on automatic offline verification of supply-freeze baseline provenance, the separate manual verification method, and reconsideration conditions. Does not redefine enforcement of current reviewed bytes."
+      },
+      {
+        "line": 18,
+        "text": "If the review triggers in the last section fire, reopen it."
+      },
+      {
+        "line": 22,
+        "text": "The September 30 cleanup moves the unchanged `supplyFreeze` assertions to [the historical profile](../../.github/workflows/historical-supply-profile.json). The [manual procedure](../P1-SUPPLY-FREEZE-v1.md#verify-historical-git-provenance-separately) reads that file. Historical equality is no longer an active workflow or ordinary dependency-update requirement. The current installer uses reviewed lockfiles and authenticates its runtime and parser b"
+      },
+      {
+        "line": 35,
+        "text": "    \"sha256\": \"05da30054a296c0b2a409a527958abcae149bec72b6c8f50ce30b2bf45b77260\""
+      },
+      {
+        "line": 40,
+        "text": "    \"sha256\": \"25ffbe3c4e5b26615318235dffe2908dbddcf2788a40f7c7bdb620ec0314415d\""
+      },
+      {
+        "line": 48,
+        "text": "Note the distinction from its sibling `supplyFreeze.reviewedWorkingBytes`, which records the"
+      },
+      {
+        "line": 49,
+        "text": "*current* reviewed bytes and **is** enforced \u2014 `verifyPackageDigests()` compares the real"
+      },
+      {
+        "line": 56,
+        "text": "Codex found during review of pull request #150 that `baseline.packageLockJson` recorded a"
+      },
+      {
+        "line": 75,
+        "text": "This issue 158 amendment was first committed on 2026-09-20. The [P1 reproduction method](../P1-SUPPLY-FREEZE-v1.md#verify-historical-git-provenance-separately) now provides separate raw-byte Git verification. It checks the historical commit type, both commit/path relationships, exact blob identifiers, byte lengths, and SHA-256 values. Missing objects and mismatches refuse. Object acquisition is a separate explicit fetch before the read-only inter"
+      },
+      {
+        "line": 80,
+        "text": "with `fetch-depth: 1`, where the historical object need not be present at all."
+      },
+      {
+        "line": 89,
+        "text": "| Can a wrong value cause a bad install? | No. The install is gated by `reviewedWorkingBytes` and by literals in `markdownlint.yml`, neither of which involves the baseline. |"
+      },
+      {
+        "line": 90,
+        "text": "| Can a wrong value authorize a current install? | No. The current reviewed bytes remain the installation authority. The manual provenance comparison refuses a mismatch. |"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+    "blob": "6835e35d318e3f8af8f48ba0d7d773f10475918b",
+    "mode": "100644",
+    "type": "blob",
+    "size": 2214,
+    "sha256": "13cf6d01fe951c4f8197e6a1b27740e5554b68f2f0b8add7a675322833ef4594",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/docs/ISSUE_EVALUATION_PROMPT.md",
+    "excerpts": [
+      {
+        "line": 15,
+        "text": "1. A coding agent (e.g., Claude) identifies a potential style guide improvement during a code review loop and suggests a GitHub Issue description."
+      },
+      {
+        "line": 34,
+        "text": "Adjust the issue description if necessary and eliminate unnecessary line breaks. Return your answer in exactly two parts, in this order:"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": "package-lock.json",
+    "blob": "5a8244af74fde546f0bfa55af366ce3ca13cea51",
+    "mode": "100644",
+    "type": "blob",
+    "size": 51357,
+    "sha256": "63e3455bc1e4d04c4390dea1ddddb340bf89c48206ee6deeb851241e1177b6fe",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/package-lock.json",
+    "excerpts": []
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": "package.json",
+    "blob": "f700e931201cac80accde177a11b1a0bb5c75bb2",
+    "mode": "100644",
+    "type": "blob",
+    "size": 1025,
+    "sha256": "50f91f5901669fc74d624ce0ca8d90e50cf335c0eb437fdfdd6f4723d7226a3a",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/package.json",
+    "excerpts": []
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": "STYLE_GUIDE_RATIONALE.md",
+    "blob": "afb5ba370810e36a9c1ba103aa8e5691a3131581",
+    "mode": "100644",
+    "type": "blob",
+    "size": 135295,
+    "sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/STYLE_GUIDE_RATIONALE.md",
+    "excerpts": [
+      {
+        "line": 21,
+        "text": "  - [Line Endings for Byte-Exact Text Artifacts](#line-endings-for-byte-exact-text-artifacts)"
+      },
+      {
+        "line": 80,
+        "text": "Within these constraints, the author adheres closely to community best practices for readability, naming, documentation, and maintainability. Functions are designed as reusable tools with a single purpose\u2014e.g., performing targeted data transformations or validations. Outputs are explicit and controlled: a status code (e.g., an integer indicating full success, partial success, or failure) is typically returned, while complex results are passed via"
+      },
+      {
+        "line": 132,
+        "text": "### Line Endings for Byte-Exact Text Artifacts"
+      },
+      {
+        "line": 134,
+        "text": "> For the actionable rule, see [Line Endings for Byte-Exact Text Artifacts](STYLE_GUIDE.md#line-endings-for-byte-exact-text-artifacts) in the main guide."
+      },
+      {
+        "line": 136,
+        "text": "Some PowerShell workloads produce text whose identity is its exact byte sequence: golden/snapshot test baselines, files fed into cryptographic hash functions, signed payloads, and other artifacts that are later compared byte-for-byte. For these artifacts, a single stray CRLF where an LF was expected \u2014 or vice versa \u2014 is enough to cause a hash mismatch, a signature verification failure, or a confusing snapshot diff."
+      },
+      {
+        "line": 140,
+        "text": "On the read side, `Get-Content` without `-Raw` is also unsuitable for byte-exact comparison. It returns an array of lines rather than the original on-disk text, and the line terminators themselves are stripped during that split. The reconstructed string is therefore not guaranteed to equal the bytes that were written \u2014 it loses both the specific terminator used (CRLF vs LF) and any trailing newline. `Get-Content -Raw` reads the entire file into a"
+      },
+      {
+        "line": 142,
+        "text": "Repository-level controls such as `.gitattributes` entries that pin committed text files to LF can also matter for artifacts stored in version control, because Git's own line-ending handling can otherwise rewrite bytes between commit and checkout. That concern sits above the PowerShell language layer and is intentionally out of scope for `STYLE_GUIDE.md`, which only covers how `.ps1` code serializes and reads byte-exact text."
+      },
+      {
+        "line": 227,
+        "text": "| **2. Plain camelCase** (e.g., `$message`, `$count`) | Community alternative **(not permitted in this codebase)** | \u2022 Cleaner, more modern aesthetic \u2022 Aligns with .NET naming simplicity \u2022 Shorter, easier to type | \u2022 Requires IDE/IntelliSense for type clarity \u2022 Risk of confusion in complex logic \u2022 Less resilient in plain-text review |"
+      },
+      {
+        "line": 258,
+        "text": "3. **Code reviewers** (via complete behavioral contracts)"
+      },
+      {
+        "line": 333,
+        "text": "The review distinction behind this rule is between module-specific implementation glue and vendored reusable helpers. A helper that exists only so one script, module, or tool can do its work is an implementation detail even when it has excellent help. A vendored helper, by contrast, may be kept unexported by a consuming module while still carrying a stable, versioned, reusable contract of its own. Export visibility and API stability are therefore"
+      },
+      {
+        "line": 335,
+        "text": "`FunctionsToExport` and `Export-ModuleMember` control which members a module exports to callers. They do not prove that a reusable helper is unstable, and they do not hide source code or prevent a reader from copying, reviewing, or invoking an unexported implementation. This is why a function omitted from `FunctionsToExport` remains a private-helper signal for module-specific code, but not an absolute classification rule for vendored/distributabl"
+      },
+      {
+        "line": 337,
+        "text": "The exemption test uses two signals together: a per-function `#region License` block and clear cross-project reuse intent. The license region is strong evidence that the function is carried as a distributable unit with its own provenance, but it is not enough by itself because boilerplate can be copied without a real reusable contract. Conversely, a `Version:` line alone is insufficient because ordinary internal helpers also carry version metadat"
+      },
+      {
+        "line": 432,
+        "text": "1. **Parameter reordering or insertion creates breaking changes.** If a maintainer adds a new parameter between existing ones, or reorders the `param()` block, every positional caller that relied on the original declaration order will silently bind arguments to the wrong parameters. Because the binding change is invisible at the call site, it is difficult to detect during code review or testing."
+      },
+      {
+        "line": 445,
+        "text": "PSScriptAnalyzer's `PSAvoidUsingPositionalParameters` rule is documented as an Information-severity rule that detects commands called with three or more positional parameters. The guide cites that documented threshold rather than asserting exact runtime behavior, and the exception remains intentionally narrower than the general named-argument preference."
+      },
+      {
+        "line": 451,
+        "text": "| `Write-Verbose` | `-Message` at Position 0 | Real parameter | Listed in the archived Windows PowerShell 1.0 cmdlet set; covered by the syntax exception when otherwise permitted. |"
+      },
+      {
+        "line": 452,
+        "text": "| `Write-Warning` | `-Message` at Position 0 | Real parameter | Listed in the archived Windows PowerShell 1.0 cmdlet set; covered by the syntax exception when otherwise permitted. |"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/build.yml",
+    "blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+    "mode": "100644",
+    "type": "blob",
+    "size": 4361,
+    "sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/build.yml",
+    "excerpts": [
+      {
+        "line": 16,
+        "text": "      - name: Acquire the exact revision without credentials"
+      },
+      {
+        "line": 34,
+        "text": "          $strRevision = $env:GITHUB_SHA"
+      },
+      {
+        "line": 44,
+        "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision"
+      },
+      {
+        "line": 46,
+        "text": "              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }"
+      },
+      {
+        "line": 49,
+        "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+      },
+      {
+        "line": 50,
+        "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }"
+      },
+      {
+        "line": 52,
+        "text": "          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }"
+      },
+      {
+        "line": 69,
+        "text": "      contents: read"
+      },
+      {
+        "line": 77,
+        "text": "          ref: ${{ github.sha }}"
+      },
+      {
+        "line": 81,
+        "text": "          fetch-depth: 1"
+      },
+      {
+        "line": 82,
+        "text": "          fetch-tags: false"
+      },
+      {
+        "line": 90,
+        "text": "        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1"
+      },
+      {
+        "line": 103,
+        "text": "          archive: true"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+    "blob": "d6f0628d492f6d2f76fe1ab65b3e0b316b52c729",
+    "mode": "100644",
+    "type": "blob",
+    "size": 5562,
+    "sha256": "37d5d156f61bcf29391e86f3d6da17f1ed5e5f177086d97466c2dcdbff1fd364",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Classify-InstructionMaintenance.mjs",
+    "excerpts": [
+      {
+        "line": 20,
+        "text": "    'Generate-StyleGuideArtifacts.ps1', 'Test-ExactGitPathSet.ps1',"
+      },
+      {
+        "line": 31,
+        "text": "// dependency changes an already listed caller and requires closure review."
+      },
+      {
+        "line": 68,
+        "text": "    classification: maintenancePaths.length ? 'maintenance_required' : 'ordinary',"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Initialize-CiToolchain.ps1",
+    "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+    "mode": "100644",
+    "type": "blob",
+    "size": 5844,
+    "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Initialize-CiToolchain.ps1",
+    "excerpts": [
+      {
+        "line": 3,
+        "text": "# Installs the reviewed Linux runtime and the requested locked dependency trees."
+      },
+      {
+        "line": 27,
+        "text": "        throw \"Unreviewed npm configuration selector: $strRelativePath\""
+      },
+      {
+        "line": 44,
+        "text": "# Package engines are the single version source; the CI file supplies archive identity."
+      },
+      {
+        "line": 49,
+        "text": "    $objPin.linuxX64Sha256 -cnotmatch '^[a-f0-9]{64}$') {"
+      },
+      {
+        "line": 50,
+        "text": "    throw 'The reviewed runtime declaration is invalid.'"
+      },
+      {
+        "line": 53,
+        "text": "$strArchive = Join-Path $env:RUNNER_TEMP 'styleguide-node.tar.xz'"
+      },
+      {
+        "line": 54,
+        "text": "if ([IO.Path]::Exists($strNodeRoot) -or [IO.Path]::Exists($strArchive)) {"
+      },
+      {
+        "line": 60,
+        "text": "    --retry 2 --output $strArchive $strUrl"
+      },
+      {
+        "line": 62,
+        "text": "if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash.ToLowerInvariant() -cne"
+      },
+      {
+        "line": 63,
+        "text": "    $objPin.linuxX64Sha256) { throw \"The runtime archive digest is incorrect for $strUrl. Check package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256. Verify the official release checksum before changing the declaration.\" }"
+      },
+      {
+        "line": 65,
+        "text": "& /usr/bin/tar -xJf $strArchive -C $strNodeRoot --strip-components=1"
+      },
+      {
+        "line": 66,
+        "text": "if ($LASTEXITCODE -ne 0) { throw \"Runtime extraction failed: $LASTEXITCODE\" }"
+      },
+      {
+        "line": 86,
+        "text": "    $arrBefore = @($arrManifestPaths | ForEach-Object { (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash })"
+      },
+      {
+        "line": 87,
+        "text": "    & $strNpm --prefix $strInstallRoot ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true"
+      },
+      {
+        "line": 89,
+        "text": "    $arrAfter = @($arrManifestPaths | ForEach-Object { (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash })"
+      },
+      {
+        "line": 104,
+        "text": "Write-Output \"Installed Node $strNodeVersion and npm $strNpmVersion from the reviewed runtime declaration.\""
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+    "mode": "100644",
+    "type": "blob",
+    "size": 32648,
+    "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Test-StyleGuideArtifacts.ps1",
+    "excerpts": [
+      {
+        "line": 49,
+        "text": "    # standard error concurrently. It returns the exact native exit code,"
+      },
+      {
+        "line": 60,
+        "text": "    # # Captures working-tree path records and the exact Git exit code."
+      },
+      {
+        "line": 211,
+        "text": "    # Asserts one decoded Git path set against an exact allowlist."
+      },
+      {
+        "line": 226,
+        "text": "    # Exact case-sensitive path allowlist for the selected surface."
+      },
+      {
+        "line": 374,
+        "text": "    $objSha = [System.Security.Cryptography.SHA256]::Create()"
+      },
+      {
+        "line": 400,
+        "text": "# Publication uses another runner and independently fetches committed bytes."
+      },
+      {
+        "line": 407,
+        "text": "# expected\" for exactly this purpose. Either makes a stale artifact"
+      },
+      {
+        "line": 422,
+        "text": "# bytes that reach consumers come from the commit, fetched by a job"
+      },
+      {
+        "line": 434,
+        "text": "# exactly like a generator that did nothing; refusing keeps the signal."
+      },
+      {
+        "line": 442,
+        "text": "    # every reparse point, excludes only the exact .git directory, and"
+      },
+      {
+        "line": 455,
+        "text": "    # # Records the same map shape after generation for exact comparison."
+      },
+      {
+        "line": 479,
+        "text": "    $objSha = [System.Security.Cryptography.SHA256]::Create()"
+      },
+      {
+        "line": 634,
+        "text": "$strVerifierCommand = '& ''./.github/workflows/Test-ExactGitPathSet.ps1'' -RepositoryRoot $env:GITHUB_WORKSPACE -GitExecutablePath ''/usr/bin/git'' -ExpectedPath @() -Mode Both -RequireCleanWorkingAgainstIndex'"
+      },
+      {
+        "line": 683,
+        "text": "    throw 'Exact-path verification returned an invalid shape.'"
+      },
+      {
+        "line": 688,
+        "text": "    throw 'Exact-path verification returned invalid JSON.'"
+      },
+      {
+        "line": 692,
+        "text": "    $objPathSetResult.Schema -isnot [string] -or $objPathSetResult.Schema -cne 'PSStyleGuide.ExactGitPathSetResult.v2' -or"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    "blob": "3f0abda0049fdeacb85c8493937b768ddc999c4a",
+    "mode": "100644",
+    "type": "blob",
+    "size": 15077,
+    "sha256": "09c32c6e780a325bfac5a2d6d2505f747fd3cdfff297edb7b74107fc79bbcaca",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Validate-WorkflowPolicy.test.mjs",
+    "excerpts": [
+      {
+        "line": 9,
+        "text": "  LIMITS, readContract, validatePackagePair, foldParserTree, assertReviewedParserTree,"
+      },
+      {
+        "line": 31,
+        "text": "      'runs-on': 'ubuntu-24.04', 'timeout-minutes': 10, permissions: { contents: 'read' }, needs: 'verify_generated_artifacts',"
+      },
+      {
+        "line": 127,
+        "text": "test('reviewed locked dependency updates do not need historical hashes or waiver fields', () => {"
+      },
+      {
+        "line": 140,
+        "text": "  ['arbitrary archive origin', value => { value.packages['node_modules/yaml'].resolved = 'https://example.test/yaml.tgz'; }, 'lock-integrity'],"
+      },
+      {
+        "line": 216,
+        "text": "  assertReviewedParserTree(parserDirectory, digest);"
+      },
+      {
+        "line": 244,
+        "text": "  const dangerous = clone(fixtures['build.yml']); dangerous.permissions = { contents: 'write' };"
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Test-CiHelpers.test.mjs",
+    "blob": "0773070a6505b1678c5522c16c8a5c32979f6338",
+    "mode": "100644",
+    "type": "blob",
+    "size": 37696,
+    "sha256": "a20f0822eb0c8512a5bb86b1af920cae2a8b6a739bb132c01990b41bdcb4d012",
+    "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Test-CiHelpers.test.mjs",
+    "excerpts": [
+      {
+        "line": 31,
+        "text": "if (args.includes('fetch')) {"
+      },
+      {
+        "line": 33,
+        "text": "  const count = calls.filter(row => row.includes('fetch')).length;"
+      },
+      {
+        "line": 34,
+        "text": "  if (mode === 'fetch-failure' || (mode === 'retry-success' && count < 3)) process.exit(7);"
+      },
+      {
+        "line": 51,
+        "text": "      GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head,"
+      },
+      {
+        "line": 70,
+        "text": "  test(`${file}/${job}: exact acquisition and bounded retries`, { skip: !linux }, t => {"
+      },
+      {
+        "line": 75,
+        "text": "    const requests = f.calls().filter(row => row.includes('fetch'));"
+      },
+      {
+        "line": 80,
+        "text": "  for (const mode of ['init-failure', 'fetch-failure', 'wrong-head', 'empty-output', 'checkout-failure', 'wrong-checkout']) {"
+      },
+      {
+        "line": 84,
+        "text": "      assert.ok(f.calls().filter(row => row.includes('fetch')).length <= 3);"
+      },
+      {
+        "line": 121,
+        "text": "    { GITHUB_REPOSITORY: 'someone/else' }, { GITHUB_SHA: 'main' }]) {"
+      },
+      {
+        "line": 141,
+        "text": "fs.writeFileSync(args[args.indexOf('--output')+1], 'incorrect archive bytes');"
+      },
+      {
+        "line": 150,
+        "text": "    if (mode === 'invalid-digest') fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), '{\"linuxX64Sha256\":\"bad\"}');"
+      },
+      {
+        "line": 161,
+        "text": "      mode === 'native-download-failure' ? /Runtime download failed/ : /archive digest is incorrect/);"
+      },
+      {
+        "line": 203,
+        "text": "  const archiveRoot = path.join(f.root, 'archive');"
+      },
+      {
+        "line": 204,
+        "text": "  const bin = path.join(archiveRoot, 'runtime/bin'); fs.mkdirSync(bin, { recursive: true });"
+      },
+      {
+        "line": 214,
+        "text": "  if (args.includes('ci') && !args.includes('--ignore-scripts')) process.exit(98);"
+      },
+      {
+        "line": 219,
+        "text": "  const archive = path.join(f.root, 'fixture.tar.xz');"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".codex/config.toml",
+    "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+    "mode": "100644",
+    "type": "blob",
+    "size": 205,
+    "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.codex/config.toml",
+    "excerpts": [
+      {
+        "line": 1,
+        "text": "# Preserve enough project-instruction capacity for the complete review workflow."
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/instructions/docs.instructions.md",
+    "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+    "mode": "100644",
+    "type": "blob",
+    "size": 46254,
+    "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/instructions/docs.instructions.md",
+    "excerpts": [
+      {
+        "line": 65,
+        "text": "- Process and operational documents intended as durable repository policy, such as review guides, linting guides, testing guides, and release runbooks."
+      },
+      {
+        "line": 134,
+        "text": "A non-normative historical artifact is a Markdown file committed to preserve provenance, such as a verbatim AI-assistant prompt, transcript excerpt, quoted source excerpt, or similar historical material used to produce or review another artifact. For these files, \"preserved\" means content-level fidelity; repository hooks can still normalize trailing whitespace and final newlines."
+      },
+      {
+        "line": 136,
+        "text": "- **Classification.** Treat a non-normative historical artifact as Tier 2, so the metadata header block is **NOT REQUIRED**, unless its current, non-quoted framing independently meets the Tier 1 criteria. Copied prompts, requirements language, review text, or source excerpts inside preserved historical content do not promote the file to Tier 1. Classify the file by its current purpose and framing, not by copied historical text."
+      },
+      {
+        "line": 141,
+        "text": "- **Fencing rationale.** Fenced code blocks keep preserved content from being parsed as live headings or directives. For an artifact under `docs/`, fenced code blocks also distinguish quoted `TODO:`, `TBD`, or `FIXME` examples from active normative text during manual authoring and review. Block quotes and other rendered quote forms are not equivalent because they can still read as live requirements."
+      },
+      {
+        "line": 142,
+        "text": "- **Related sources.** The file SHOULD link to canonical repository documents or inspectable public sources it relates to when they exist, such as the specification, ADR, issue, public upstream source, or quoted source it was used to produce or review. These references MUST follow the existing reproducible-source and repository self-containment rules. Required interpretation MUST NOT depend on machine-local paths, agent session routes, private re"
+      },
+      {
+        "line": 149,
+        "text": "# Historical Artifact (Non-Normative): AI Review Prompt for ADR-0003"
+      },
+      {
+        "line": 151,
+        "text": "This file preserves the AI review prompt used while preparing ADR-0003. The preserved content is provenance/history only; it is not current specification, review, policy, requirements, or implementation guidance."
+      },
+      {
+        "line": 218,
+        "text": "When committed Markdown documentation, including analysis write-ups, research notes, review artifacts, and other durable Markdown records, cites sources or evidence, it **MUST** cite only sources another reader can inspect or reproduce from repository contents or clearly linked public references. This subsection makes the repository's self-containment requirement concrete for Markdown citations; it does not create a separate source-of-truth rule."
+      },
+      {
+        "line": 404,
+        "text": "**Background.** Mirrored excerpts that drift from their source are a recurring source of documentation inconsistency, and partial fixes that touch only reviewer-flagged lines can leave parallel copies of the same excerpt inconsistent and force repeat review rounds for the same root cause."
+      },
+      {
+        "line": 407,
+        "text": "   - Be a verbatim copy of the corresponding source-of-truth lines for the included literal content, without paraphrasing or selectively rewriting copied literals; if the excerpt is intentionally partial, the surrounding prose **MUST** make that scope clear and **MUST NOT** imply the excerpt is the complete file or complete configuration, **OR**"
+      },
+      {
+        "line": 410,
+        "text": "   When the verbatim-copy path is taken for a fenced or multi-line excerpt, authors SHOULD use the file's existing `Source:` citation convention from the `Markdown Conventions` section to anchor the excerpt to its source-of-truth file with a line-range link."
+      },
+      {
+        "line": 412,
+        "text": "2. **Full-file audit on consistency fixes.** When fixing a code/doc consistency issue in a mirrored excerpt that was flagged on specific lines, the fix **MUST** audit the entire mirrored excerpt block and the affected Markdown file's other excerpts of the same source-of-truth file for all literal occurrences of the old pattern, not just the lines explicitly mentioned by the reviewer. The fix is not complete until every literal in every mirrored e"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/instructions/yaml.instructions.md",
+    "blob": "924d12c833d07def47d05137b532e622db622fa4",
+    "mode": "100644",
+    "type": "blob",
+    "size": 54645,
+    "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/instructions/yaml.instructions.md",
+    "excerpts": [
+      {
+        "line": 40,
+        "text": "- **[Actions]** A privileged `pull_request_target` workflow **MUST** execute only trusted-revision bytes. Proposed files that select executable bytes **MUST** fail closed as trust-root changes or pass bounded inert-data validation by trusted code."
+      },
+      {
+        "line": 41,
+        "text": "- **[Actions]** A privileged workflow that fetches a proposed pull-request revision into a persistent local ref **MUST NOT** force-update that ref. It **MUST** verify that the fetched commit equals the expected event commit."
+      },
+      {
+        "line": 43,
+        "text": "- **[Actions]** `setup-*` actions in workflow files under `.github/workflows/` **MUST** resolve runtimes from checked-in release-line selectors by default and **MUST NOT** use broad floating selectors such as `'3.x'`, `'latest'`, or `'*'`. `actions/setup-node` **MAY** instead use `node-version-file` only when a tracked file supplies one unambiguous exact stable SemVer, no competing `node-version` input exists, and a later step verifies the instal"
+      },
+      {
+        "line": 61,
+        "text": "- Indentation **MUST** be exactly **2 spaces** per level. Tabs **MUST NOT** appear in YAML files."
+      },
+      {
+        "line": 114,
+        "text": "GitHub does not evaluate `on.push.paths` or `on.push.paths-ignore` for tag pushes. A `push` workflow that uses a path filter **MUST** define its branch and tag intent explicitly. Do not assume that a path filter restricts tag events. See [GitHub's workflow syntax for path filters](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onpushpull_requestpull_request_targetpathspaths-ignore)."
+      },
+      {
+        "line": 131,
+        "text": "## GitHub Actions Privileged-Workflow Trust Roots"
+      },
+      {
+        "line": 133,
+        "text": "GitHub runs `pull_request_target` in the base repository's default-branch context. This context can have privileges that an ordinary pull-request workflow does not have. A `pull_request_target` workflow **MUST NOT** check out or execute untrusted pull-request code. See [GitHub's event reference](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request_target) and [secure-use reference](https://"
+      },
+      {
+        "line": 135,
+        "text": "The executable trust root includes all checked-in files that can select or alter executable bytes in the privileged job. The inventory **MUST** include applicable files from these categories:"
+      },
+      {
+        "line": 143,
+        "text": "Path filters **MUST** cover every supported file in this inventory. A proposed change **MUST NOT** bypass the validation job because the changed selector is absent from `on.pull_request_target.paths`."
+      },
+      {
+        "line": 150,
+        "text": "Inert-data validation **MUST** read the exact proposed Git object without replacing trusted workspace files. It **MUST** validate the object type, byte limit, encoding, syntax, required semantic identity, and every error or indeterminate state. Store proposed revision values in environment variables or pass them as action inputs. Do not interpolate untrusted values into generated shell source."
+      },
+      {
+        "line": 152,
+        "text": "When a privileged job fetches a proposed pull-request revision into a persistent local ref, the fetch **MUST NOT** use a leading `+` refspec or `--force`. An unexpected non-fast-forward destination state **MUST** stop the job. After the fetch, the workflow **MUST** resolve the fetched commit and compare it with the expected event commit before it reads proposed objects. A fetch that writes only `FETCH_HEAD` does not update a persistent local ref,"
+      },
+      {
+        "line": 154,
+        "text": "A privileged job **MUST NOT** install, import, source, or execute proposed dependency bytes. Options such as npm's `--ignore-scripts` stop lifecycle scripts, but they do not make proposed package code trusted."
+      },
+      {
+        "line": 156,
+        "text": "When a trusted parser validates proposed documents, the proposed post-merge package state **MUST** preserve the exact parser identity and its resolved runtime dependency closure. Otherwise, the privileged job **MUST** reject the proposal as a trust-root change. The validation **SHOULD** compare the manifest declaration, root lock declaration, version, resolved artifact, integrity value, dependency paths, and dependency descriptors."
+      },
+      {
+        "line": 162,
+        "text": "An unprivileged `pull_request` install test **MAY** add defense in depth. It does not authorize proposed-code execution in a privileged `pull_request_target` job."
+      },
+      {
+        "line": 168,
+        "text": "  contents: read"
+      },
+      {
+        "line": 177,
+        "text": "          ref: ${{ github.sha }}"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/agent-instructions.yml",
+    "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+    "mode": "100644",
+    "type": "blob",
+    "size": 9558,
+    "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/agent-instructions.yml",
+    "excerpts": [
+      {
+        "line": 8,
+        "text": "  pull_request_target:"
+      },
+      {
+        "line": 18,
+        "text": "    if: github.event_name == 'pull_request_target'"
+      },
+      {
+        "line": 44,
+        "text": "          $strRevision = if ($env:EXPECTED_BASE) { $env:EXPECTED_BASE } else { $env:GITHUB_SHA }"
+      },
+      {
+        "line": 54,
+        "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision"
+      },
+      {
+        "line": 56,
+        "text": "              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }"
+      },
+      {
+        "line": 59,
+        "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+      },
+      {
+        "line": 60,
+        "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }"
+      },
+      {
+        "line": 62,
+        "text": "          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }"
+      },
+      {
+        "line": 75,
+        "text": "      - name: Classify exact PR input and validate ordinary content"
+      },
+      {
+        "line": 89,
+        "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $env:EXPECTED_HEAD"
+      },
+      {
+        "line": 91,
+        "text": "              if ($intAttempt -eq 3) { throw 'PR data fetch failed after three attempts.' }"
+      },
+      {
+        "line": 94,
+        "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+      },
+      {
+        "line": 95,
+        "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $env:EXPECTED_HEAD) { throw 'PR data commit mismatch.' }"
+      },
+      {
+        "line": 104,
+        "text": "          } elseif ($objResult.classification -ceq 'maintenance_required') {"
+      },
+      {
+        "line": 105,
+        "text": "              Write-Output 'MAINTENANCE_REQUIRED: candidate tests, scoped owner authority and fresh independent review are required before merge. This is not ordinary policy admission.'"
+      },
+      {
+        "line": 109,
+        "text": "    if: github.event_name != 'pull_request_target' && github.event.deleted != true"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/copilot-setup-steps.yml",
+    "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+    "mode": "100644",
+    "type": "blob",
+    "size": 33862,
+    "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/copilot-setup-steps.yml",
+    "excerpts": [
+      {
+        "line": 96,
+        "text": "          $strSha = $env:GITHUB_SHA"
+      },
+      {
+        "line": 104,
+        "text": "          # the fetch resolve to whatever the ref points at when the fetch runs,"
+      },
+      {
+        "line": 134,
+        "text": "          # Fetching the commit itself, not a ref that names it. No credential"
+      },
+      {
+        "line": 137,
+        "text": "          & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --no-tags --no-recurse-submodules origin $strSha"
+      },
+      {
+        "line": 138,
+        "text": "          if ($LASTEXITCODE -ne 0) { throw \"acquire: git fetch exited $LASTEXITCODE\" }"
+      },
+      {
+        "line": 139,
+        "text": "          & $strGitPath -c core.hooksPath=/dev/null checkout --quiet --detach FETCH_HEAD"
+      },
+      {
+        "line": 147,
+        "text": "              throw 'acquire: git rev-parse must return exactly one line'"
+      },
+      {
+        "line": 153,
+        "text": "          Write-Information \"acquire: anonymous exact checkout of $strSha\" -InformationAction Continue"
+      },
+      {
+        "line": 193,
+        "text": "              throw 'credential-policy: unable to resolve exactly one origin URL'"
+      },
+      {
+        "line": 204,
+        "text": "          $arrAuthorizationKeys = @(& $strGitPath config --local --name-only --get-regexp '^http\\..*\\.extraheader$')"
+      },
+      {
+        "line": 205,
+        "text": "          $intAuthorizationExit = $LASTEXITCODE"
+      },
+      {
+        "line": 207,
+        "text": "          if (($intAuthorizationExit -ne 0 -and $intAuthorizationExit -ne 1) -or $arrAuthorizationKeys.Count -ne 0) {"
+      },
+      {
+        "line": 208,
+        "text": "              throw 'credential-policy: persisted HTTP authorization is configured'"
+      },
+      {
+        "line": 241,
+        "text": "          git fetch --no-tags --no-recurse-submodules origin \\"
+      },
+      {
+        "line": 425,
+        "text": "              $strReviewedSha256 = $objRuntimePin.linuxX64Sha256.ToUpperInvariant()"
+      },
+      {
+        "line": 426,
+        "text": "              $strDigestSource = 'package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256'"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/devcontainer-ci.yml",
+    "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+    "mode": "100644",
+    "type": "blob",
+    "size": 7645,
+    "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/devcontainer-ci.yml",
+    "excerpts": [
+      {
+        "line": 15,
+        "text": "# Keep each exact-ref check independent. A superseded run can still prove the"
+      },
+      {
+        "line": 16,
+        "text": "# immutable commit that triggered it, and cancellation cannot obscure failure."
+      },
+      {
+        "line": 28,
+        "text": "      EXPECTED_REVISION: ${{ github.sha }}"
+      },
+      {
+        "line": 160,
+        "text": "            fetch --no-tags --no-recurse-submodules --depth=1 origin \\"
+      },
+      {
+        "line": 163,
+        "text": "          fetched_revision=\"$("
+      },
+      {
+        "line": 167,
+        "text": "          readonly fetched_revision"
+      },
+      {
+        "line": 168,
+        "text": "          test \"${fetched_revision}\" = \"${EXPECTED_REVISION}\""
+      },
+      {
+        "line": 176,
+        "text": "            \"${fetched_revision}\" > \"${devcontainer_inventory}\""
+      },
+      {
+        "line": 191,
+        "text": "            'The exact event commit preserves the Terraform devcontainer exclusion.'"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/lint-nested-markdown.js",
+    "blob": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+    "mode": "100644",
+    "type": "blob",
+    "size": 16481,
+    "sha256": "5f3bbefdd02af786bd39ae6a31685a4daf073981c2c072a51b590c75a6626205",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/lint-nested-markdown.js",
+    "excerpts": [
+      {
+        "line": 6,
+        "text": " * This script extracts Markdown code blocks from Markdown files and runs"
+      },
+      {
+        "line": 200,
+        "text": " * Extract markdown code fences from content (recursive)"
+      },
+      {
+        "line": 206,
+        "text": " * @returns {Array} Array of extracted blocks with metadata"
+      },
+      {
+        "line": 208,
+        "text": "function extractMarkdownFencesRecursive(content, filePath, baseLine = 0, depth = 0, parentPath = '') {"
+      },
+      {
+        "line": 234,
+        "text": "            // Recursively extract nested markdown fences"
+      },
+      {
+        "line": 236,
+        "text": "                const nestedBlocks = extractMarkdownFencesRecursive("
+      },
+      {
+        "line": 252,
+        "text": " * Run markdownlint on extracted content"
+      },
+      {
+        "line": 304,
+        "text": "        const blocks = extractMarkdownFencesRecursive("
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/lint-staged-markdown.mjs",
+    "blob": "c35575990d5854ea6da9d5f6d49d23287df43146",
+    "mode": "100644",
+    "type": "blob",
+    "size": 5971,
+    "sha256": "0e8b0b5c725227b98a338e44e630f6b50a90f725e2f01b2f0262284ffdd6926b",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/lint-staged-markdown.mjs",
+    "excerpts": [
+      {
+        "line": 10,
+        "text": "const exactSemanticVersionPattern = /^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$/u;"
+      },
+      {
+        "line": 33,
+        "text": "if (typeof requiredNodeVersion !== 'string' || !exactSemanticVersionPattern.test(requiredNodeVersion)) {"
+      },
+      {
+        "line": 34,
+        "text": "  console.error('pre-commit: Root package.json must declare engines.node as one exact semantic version.');"
+      },
+      {
+        "line": 117,
+        "text": "    nonFileContents: stagedMarkdownByAbsolutePosixPath,"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+    "blob": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+    "mode": "100644",
+    "type": "blob",
+    "size": 2603,
+    "sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+    "excerpts": [
+      {
+        "line": 36,
+        "text": "Both lint phases exit 0 when no violation exists. A lint violation or tooling failure produces a nonzero exit. The CI workflow also verifies its reviewed package, lock, lint configuration, nested-lint helper, Node distribution, and workflow-policy inputs before it accepts the result."
+      },
+      {
+        "line": 40,
+        "text": "The recursive parser handles empty fences, different fence lengths, `markdown` and `md` identifiers, sibling blocks, and Markdown nested to arbitrary depth. It disables MD041 for extracted snippets because a snippet does not need a top-level heading. It also disables MD051 because example or placeholder fragment links can target anchors outside the extracted string. All other configured rules remain active."
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/markdownlint.yml",
+    "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+    "mode": "100644",
+    "type": "blob",
+    "size": 6632,
+    "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/markdownlint.yml",
+    "excerpts": [
+      {
+        "line": 18,
+        "text": "      - name: Acquire the exact revision without credentials"
+      },
+      {
+        "line": 36,
+        "text": "          $strRevision = $env:GITHUB_SHA"
+      },
+      {
+        "line": 46,
+        "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision"
+      },
+      {
+        "line": 48,
+        "text": "              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }"
+      },
+      {
+        "line": 51,
+        "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+      },
+      {
+        "line": 52,
+        "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }"
+      },
+      {
+        "line": 54,
+        "text": "          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }"
+      },
+      {
+        "line": 62,
+        "text": "      - name: Install the reviewed runtime and locked tools"
+      },
+      {
+        "line": 78,
+        "text": "      - name: Acquire the exact revision without credentials"
+      },
+      {
+        "line": 96,
+        "text": "          $strRevision = $env:GITHUB_SHA"
+      },
+      {
+        "line": 106,
+        "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision"
+      },
+      {
+        "line": 108,
+        "text": "              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }"
+      },
+      {
+        "line": 111,
+        "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+      },
+      {
+        "line": 112,
+        "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }"
+      },
+      {
+        "line": 114,
+        "text": "          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }"
+      },
+      {
+        "line": 122,
+        "text": "      - name: Install the reviewed runtime and locked tools"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/package.json",
+    "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+    "mode": "100644",
+    "type": "blob",
+    "size": 1105,
+    "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/package.json",
+    "excerpts": []
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/scripts-README.md",
+    "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+    "mode": "100644",
+    "type": "blob",
+    "size": 5421,
+    "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/scripts-README.md",
+    "excerpts": [
+      {
+        "line": 19,
+        "text": "| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |"
+      },
+      {
+        "line": 27,
+        "text": "The native required checks keep their existing names. `verify` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; th"
+      },
+      {
+        "line": 37,
+        "text": "PowerShell 7 (`pwsh`) must be on `PATH` first. [Install](https://learn.microsoft.com/powershell/scripting/install/install-powershell), then verify with `pwsh -NoProfile -Command 'if ($PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'`. Use the exact Node and npm versions in the root `package.json`. After a fresh clone or lock change, run `node .github/workflows/NpmTools.mjs install`. Install the pinned Python tools after a fresh clone or `require"
+      },
+      {
+        "line": 39,
+        "text": "The nested Markdown linter uses `.github/workflows/.markdownlint.jsonc`. It reports the outer file, source line, nesting depth, and parent path. It exits 0 only when all extracted blocks pass."
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/Test-AgentInstructions.ps1",
+    "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+    "mode": "100644",
+    "type": "blob",
+    "size": 460163,
+    "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Test-AgentInstructions.ps1",
+    "excerpts": [
+      {
+        "line": 7,
+        "text": "# entry points retain portable review, placement, and deferral contracts, and"
+      },
+      {
+        "line": 93,
+        "text": "$script:strStandingPlacementAuthorization ="
+      },
+      {
+        "line": 94,
+        "text": "    'No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required.'"
+      },
+      {
+        "line": 96,
+        "text": "    '**Standing placement authorization.**',"
+      },
+      {
+        "line": 100,
+        "text": "    'The agent MUST NOT ask the owner for that additional authorization.',"
+      },
+      {
+        "line": 111,
+        "text": "    '`reviewThreads`',"
+      },
+      {
+        "line": 114,
+        "text": "    'review:<review-id>:<section-label>:<ordinal>'"
+      },
+      {
+        "line": 118,
+        "text": "    'review-body-only finding',"
+      },
+      {
+        "line": 121,
+        "text": "    'every review-submission body',"
+      },
+      {
+        "line": 127,
+        "text": "    'owner authorization',"
+      },
+      {
+        "line": 132,
+        "text": "    'both reviewers',"
+      },
+      {
+        "line": 141,
+        "text": "        StructuralLiteral = '- **Maximum rounds:** 8 review iterations per cycle invocation.'"
+      },
+      {
+        "line": 142,
+        "text": "        ProseLiteral = 'Maximum rounds: 8 review iterations per cycle invocation.'"
+      },
+      {
+        "line": 143,
+        "text": "        WeakStructuralLiteral = '- **Maximum rounds:** 80 review iterations per cycle invocation.'"
+      },
+      {
+        "line": 155,
+        "text": "        StructuralLiteral = '- **Maximum rounds:** 80 review iterations per loop invocation.'"
+      },
+      {
+        "line": 156,
+        "text": "        ProseLiteral = 'Maximum rounds: 80 review iterations per loop invocation.'"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+    "blob": "995b72a7b48dea2636094d81226893a519950797",
+    "mode": "100644",
+    "type": "blob",
+    "size": 25568,
+    "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Validate-WorkflowPolicy.mjs",
+    "excerpts": [
+      {
+        "line": 24,
+        "text": "  assertReviewedParserTree(parserRoot, contract.parser.treeSha256);"
+      },
+      {
+        "line": 68,
+        "text": "  const hash = crypto.createHash('sha256');"
+      },
+      {
+        "line": 101,
+        "text": "function assertReviewedParserTree(root, expected, reader) {"
+      },
+      {
+        "line": 134,
+        "text": "function sha256(value) {"
+      },
+      {
+        "line": 135,
+        "text": "  return crypto.createHash('sha256').update(value).digest('hex');"
+      },
+      {
+        "line": 142,
+        "text": "function expectExactKeys(value, expectedKeys, category) {"
+      },
+      {
+        "line": 300,
+        "text": "// maintenance authorization, live-base authentication, or merge approval."
+      },
+      {
+        "line": 361,
+        "text": "  expectExactKeys(contract, ['schema', 'parser', 'actions'], 'contract-shape');"
+      },
+      {
+        "line": 363,
+        "text": "  expectExactKeys(contract.parser, ['version', 'resolved', 'integrity', 'treeSha256'], 'contract-parser');"
+      },
+      {
+        "line": 364,
+        "text": "  if (!/^[0-9a-f]{64}$/u.test(contract.parser.treeSha256)) fail('contract-parser');"
+      },
+      {
+        "line": 366,
+        "text": "  expectExactKeys(contract.actions, ['checkout', 'uploadArtifact'], 'contract-actions');"
+      },
+      {
+        "line": 368,
+        "text": "    expectExactKeys(action, ['uses', 'inputs'], 'contract-action');"
+      },
+      {
+        "line": 369,
+        "text": "    const repository = name === 'checkout' ? 'actions/checkout' : 'actions/upload-artifact';"
+      },
+      {
+        "line": 457,
+        "text": "  expectExactKeys(step, keys, 'code-step-shape');"
+      },
+      {
+        "line": 462,
+        "text": "    // covered by accepted-loader behavior tests and maintenance review; this is"
+      },
+      {
+        "line": 485,
+        "text": "  expectExactKeys(workflow, ['name', 'on', 'permissions', 'jobs'], 'workflow-shape');"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/workflow-policy-cases.json",
+    "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+    "mode": "100644",
+    "type": "blob",
+    "size": 13047,
+    "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/workflow-policy-cases.json",
+    "excerpts": [
+      {
+        "line": 9,
+        "text": "        \"pull_request_target\""
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/workflow-policy-contract.json",
+    "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+    "mode": "100644",
+    "type": "blob",
+    "size": 1407,
+    "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/workflow-policy-contract.json",
+    "excerpts": [
+      {
+        "line": 7,
+        "text": "    \"treeSha256\": \"ce50e3ffc11ca6ee6cbcde528ef7a0cca908241ee3394d8e01d9e7a813bdd53e\""
+      },
+      {
+        "line": 14,
+        "text": "        \"ref\": \"${{ github.sha }}\","
+      },
+      {
+        "line": 18,
+        "text": "        \"fetch-depth\": 1,"
+      },
+      {
+        "line": 19,
+        "text": "        \"fetch-tags\": false,"
+      },
+      {
+        "line": 28,
+        "text": "      \"uses\": \"actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a\","
+      },
+      {
+        "line": 37,
+        "text": "        \"archive\": true"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".gitignore",
+    "blob": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+    "mode": "100644",
+    "type": "blob",
+    "size": 249,
+    "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.gitignore",
+    "excerpts": []
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".pre-commit-config.yaml",
+    "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+    "mode": "100644",
+    "type": "blob",
+    "size": 5405,
+    "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.pre-commit-config.yaml",
+    "excerpts": [
+      {
+        "line": 4,
+        "text": "# requirements-dev.txt. The remote actionlint hook builds its exact Git revision"
+      },
+      {
+        "line": 108,
+        "text": "    # This exact upstream commit fixes the v1.7.12 ShellCheck stdin deadlock."
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": "AGENTS.md",
+    "blob": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+    "mode": "100644",
+    "type": "blob",
+    "size": 33422,
+    "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/AGENTS.md",
+    "excerpts": [
+      {
+        "line": 16,
+        "text": "This file provides TerraformStyleGuide-specific instructions for OpenAI Codex CLI and compatible AI coding agents. These instructions apply the repository's Terraform, PowerShell, documentation, safety, and review contracts."
+      },
+      {
+        "line": 22,
+        "text": "This file intentionally keeps only a minimal inline summary of the highest-priority shared rules so that agents receive critical guidance immediately. The full shared rule set remains in the canonical file above."
+      },
+      {
+        "line": 28,
+        "text": "- **Instruction scope.** Codex builds its instruction chain once per run, from global guidance through the launch working directory. Use bounded discovery for a deeper `AGENTS.md`; the remote reviewer applies the closest file. Restart Codex after an active instruction changes, and do not re-read supplied instructions unless exact bytes matter. See [OpenAI's `AGENTS.md` guidance](https://developers.openai.com/codex/guides/agents-md)."
+      },
+      {
+        "line": 29,
+        "text": "- **Agents and interfaces.** The local agent implements work; `chatgpt-codex-connector[bot]` is a separate reviewer requested by `@codex review`. Use `rg`, `apply_patch`, and focused validation locally. Prefer the GitHub connector; use authenticated `gh api graphql` for missing thread, pagination, review-body, or inline context, and verify mutations by authenticated readback. Use primary official sources and record their impact. See [OpenAI's Cod"
+      },
+      {
+        "line": 35,
+        "text": "Instruction files and style guides are protected governance files. Do not create, edit, delete, rename, or otherwise change `.github/copilot-instructions.md`, files under `.github/instructions/`, files under `.cursor/rules/`, or root agent instruction files (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) unless the repository owner or maintainer has directly and explicitly authorized that specific instruction-file change in the current task"
+      },
+      {
+        "line": 39,
+        "text": "During downstream template adoption and stack selection, perform non-protected cleanup first, record the protected instruction-file edits needed to remove references to deleted tools or stacks, obtain explicit maintainer authorization, then update `.github/copilot-instructions.md`, remaining root agent files, and relevant `.github/instructions/*.instructions.md` files. Bump `Last Updated` and `Version` metadata where present, and avoid temporary "
+      },
+      {
+        "line": 94,
+        "text": "- **R0:** Read-only work needs no approval record."
+      },
+      {
+        "line": 95,
+        "text": "- **R1:** The active task authorizes routine reversible work, commits, non-force topic pushes, PR or Issue updates, comments, and review requests."
+      },
+      {
+        "line": 96,
+        "text": "- **R2:** Explicit task scope, complete affected-boundary validation, and independent review govern trust roots, protected instructions, privileged workflows, and externally observable behavior."
+      },
+      {
+        "line": 99,
+        "text": "The active task authorizes its R0 and R1 work and an R2 action that it expressly requires. A merge is on-plan only when the task names it, identities and scope match, current checks and review pass, no material finding remains, and no control is bypassed. Do not request another approval for an on-plan merge. Ask only for an off-plan merge, a scope expansion, a human-assigned decision, or another R3 action."
+      },
+      {
+        "line": 107,
+        "text": "- **Prefer the GitHub plugin** for GitHub Issues, pull requests, PR comments, review comments, labels, reactions, PR creation, branch management on GitHub, and any other read or write against remote GitHub state."
+      },
+      {
+        "line": 109,
+        "text": "- **Local `git` remains appropriate** for local working-tree operations: inspecting diffs (`git diff`, `git log`, `git status`), creating branches, staging, committing, and pushing. Use the GitHub plugin for the corresponding remote-side actions (creating PRs, posting comments, reading review state)."
+      },
+      {
+        "line": 112,
+        "text": "The `.codex/config.toml` file at the repository root declares `[plugins.\"github@openai-curated\"] enabled = true` so that trusted Codex checkouts can opt the plugin in by default. Enabling the plugin in this file does not, by itself, grant GitHub authorization: actual access still depends on the GitHub app/connector installation, the Codex account performing the operation, and the repository's permissions."
+      },
+      {
+        "line": 114,
+        "text": "## PR Review Workflow (Codex-adapted)"
+      },
+      {
+        "line": 116,
+        "text": "This section is retained Codex platform protocol. Thin-entry-point pruning must preserve it unless the repository owner explicitly waives Codex PR review protocol for the retained Codex entry point."
+      },
+      {
+        "line": 118,
+        "text": "This workflow adapts the Claude-targeted process documented in `CLAUDE.md` for Codex's capabilities and runtime limitations. Use it when responding to review feedback on a pull request. All GitHub-side reads and writes in the steps below SHOULD go through the GitHub plugin first; fall back to `gh`, GraphQL, or manual owner action only when the plugin does not expose the needed capability (see **Fallbacks for unsupported plugin capabilities** belo"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": "CLAUDE.md",
+    "blob": "3cc21fc793944033be430ad08722081db4e7b9dd",
+    "mode": "100644",
+    "type": "blob",
+    "size": 80980,
+    "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/CLAUDE.md",
+    "excerpts": [
+      {
+        "line": 16,
+        "text": "This file provides TerraformStyleGuide-specific instructions for Claude Code and compatible AI coding agents. These instructions apply the repository's Terraform, PowerShell, documentation, safety, and review contracts."
+      },
+      {
+        "line": 28,
+        "text": "Instruction files and style guides are protected governance files. Do not create, edit, delete, rename, or otherwise change `.github/copilot-instructions.md`, files under `.github/instructions/`, files under `.cursor/rules/`, or root agent instruction files (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) unless the repository owner or maintainer has directly and explicitly authorized that specific instruction-file change in the current task"
+      },
+      {
+        "line": 32,
+        "text": "During downstream template adoption and stack selection, perform non-protected cleanup first, record the protected instruction-file edits needed to remove references to deleted tools or stacks, obtain explicit maintainer authorization, then update `.github/copilot-instructions.md`, remaining root agent files, and relevant `.github/instructions/*.instructions.md` files. Bump `Last Updated` and `Version` metadata where present, and avoid temporary "
+      },
+      {
+        "line": 36,
+        "text": "Tracked `CLAUDE.local.md` files are prohibited at every supported project scope. Claude Code loads these files as operative project memory, while the repository's reviewed instruction catalog intentionally governs only shared instruction files. Keep the root `CLAUDE.local.md` path ignored and keep any personal project memory untracked."
+      },
+      {
+        "line": 91,
+        "text": "- **R0 \u2014 read-only:** Inspect local or remote state without an approval record."
+      },
+      {
+        "line": 92,
+        "text": "- **R1 \u2014 routine and reversible:** Implement, commit, make a non-force topic push, update a PR or Issue, comment, and request review under the active task authority. Validate the affected behavior and read back only remote state that controls the next action."
+      },
+      {
+        "line": 93,
+        "text": "- **R2 \u2014 sensitive and reversible:** For trust roots, privileged workflows, externally observable behavior, or protected instruction files, bind the action to explicit task scope, validate the complete affected boundary, and use independent review when repository bytes change."
+      },
+      {
+        "line": 96,
+        "text": "An authorized task supplies standing authority for its in-scope R0 and R1 work. It also supplies authority for an R2 action that the task expressly requires. A merge is on-plan only when the task expressly names it, the repository, PR, target, head, tree, and scope match, required checks and review pass for that head, no material finding remains, and the merge method bypasses no control. Do not request another approval for an on-plan merge. Ask t"
+      },
+      {
+        "line": 100,
+        "text": "PR comments and review comments that begin with `@copilot` are commands addressed to GitHub Copilot's coding agent, **not** to Claude Code. **Ignore** these entirely \u2014 do not process them, do not reply to them, and do not treat them as review feedback."
+      },
+      {
+        "line": 102,
+        "text": "An exact `@codex review` PR comment requests a review from the separate remote Codex reviewer. It is not a finding for Claude Code. Process the review produced by `chatgpt-codex-connector[bot]`, not the trigger comment."
+      },
+      {
+        "line": 106,
+        "text": "This section governs how the agent runs any authorized multi-step task in this repository, whether that task is a Structured Decision Framework pass, an Automated Review Loop round, or an owner-approved set of changes. It exists because the agent has ended its turn after producing analysis while authorized, unblocked work remained \u2014 a stall that wastes owner time and hides progress."
+      },
+      {
+        "line": 109,
+        "text": "- **Yield only for a listed reason.** End the turn and return control to the owner only when one of the following holds: (a) the agent needs an input it genuinely cannot obtain on its own; (b) an enumerated pause defined elsewhere in this file applies, such as an Automated Review Loop pause trigger; or (c) the task is complete."
+      },
+      {
+        "line": 111,
+        "text": "- **A \"Next: ...\" preview is not a stop.** If the agent can state the next step, the agent can take the next step. State it, then do it."
+      },
+      {
+        "line": 113,
+        "text": "- **Continuity does not remove required approvals.** Where another rule requires explicit owner authorization \u2014 most importantly the **Protected Instruction Files** rule \u2014 the agent still obtains that authorization first. Execution continuity removes needless turn hand-backs; it never removes a required approval gate and never licenses an outward action the owner has not approved."
+      },
+      {
+        "line": 115,
+        "text": "The Automated Review Loop defines additional pause rules specific to the review cycle; see **Pause discipline** in that section."
+      },
+      {
+        "line": 121,
+        "text": "This framework is the repository's default method for resolving a **finding**: a reviewer comment, a bug, a design question, a discovered defect, or any choice between materially different ways to change the repository. Apply it whenever a finding admits more than one reasonable response and the choice would change the resulting code, tests, documentation, or security posture. Skip it only for mechanical work with a single correct answer, such as"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+    "blob": "f43b5168ce508a9a054dc85ba7231e27d8c70809",
+    "mode": "100644",
+    "type": "blob",
+    "size": 2146,
+    "sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/docs/ISSUE_EVALUATION_PROMPT.md",
+    "excerpts": [
+      {
+        "line": 15,
+        "text": "1. A coding agent (e.g., Claude) identifies a potential style guide improvement during a code review loop and suggests a GitHub Issue description."
+      },
+      {
+        "line": 34,
+        "text": "Adjust the issue description if necessary and eliminate unnecessary line breaks. Return your answer in exactly two parts, in this order:"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": "package-lock.json",
+    "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+    "mode": "100644",
+    "type": "blob",
+    "size": 3566,
+    "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/package-lock.json",
+    "excerpts": []
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": "package.json",
+    "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+    "mode": "100644",
+    "type": "blob",
+    "size": 837,
+    "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/package.json",
+    "excerpts": []
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": "STYLE_GUIDE_RATIONALE.md",
+    "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+    "mode": "100644",
+    "type": "blob",
+    "size": 73953,
+    "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/STYLE_GUIDE_RATIONALE.md",
+    "excerpts": [
+      {
+        "line": 43,
+        "text": "- **Modular and reusable:** Common infrastructure patterns **SHOULD** be extracted into versioned modules with well-defined interfaces. Modules **MUST** be designed for reuse across projects."
+      },
+      {
+        "line": 86,
+        "text": "| **Directory-based** | Different configurations per environment; team isolation needed; production requires explicit review; compliance requirements | Explicit, reviewable configuration per environment; no risk of workspace confusion; better audit trail; environment-specific customization | Some code duplication; requires discipline to keep shared modules updated |"
+      },
+      {
+        "line": 99,
+        "text": "- Code review cannot distinguish between environment configurations"
+      },
+      {
+        "line": 105,
+        "text": "1. **Explicit configuration:** Each environment has its own visible, reviewable configuration in version control"
+      },
+      {
+        "line": 143,
+        "text": "- **Least Privilege violation:** Consumers gain access to **all** outputs in the source state file, potentially exposing sensitive data not intended for sharing. This over-fetching of permissions violates security best practices."
+      },
+      {
+        "line": 190,
+        "text": "The rule is intentionally scoped to documentation/navigation comments only. It **does not** alter executable configuration: provider constraints, module `source` addresses, module `version` arguments, `.terraform.lock.hcl`, and selected module `source` references must continue to express the exact, intentional version pinning required for deterministic, reproducible infrastructure. Pinning in those places is a feature; pinning in comments is a ma"
+      },
+      {
+        "line": 237,
+        "text": "# 3. Review current plan (baseline)"
+      },
+      {
+        "line": 262,
+        "text": "2. Review the changelog for all breaking changes and deprecated features"
+      },
+      {
+        "line": 267,
+        "text": "7. Run `terraform plan` and carefully review all changes"
+      },
+      {
+        "line": 711,
+        "text": "The normative guide contains the guarded discovery and exact-version retrieval procedure. Prefix listing alone is not exact blob selection, and Azure CLI downloads overwrite by default. Explicit login, exact-name filtering, native no-overwrite and separate private publication address those risks."
+      },
+      {
+        "line": 737,
+        "text": "      with_state         = \"ARCHIVED\""
+      },
+      {
+        "line": 757,
+        "text": "The network-free regression harness extracts the actual `SR-SETUP` and seven action blocks from the normative source; it does not maintain separate runnable copies. Stub execution tests local behavior and targeting under the documented Linux assumptions. It cannot prove live cloud authorization, provider availability or the operator's storage policy. Adjacent manual backup, remote state mutation and corruption-recovery examples have a separate de"
+      },
+      {
+        "line": 954,
+        "text": "- Service principal lacks `Microsoft.Authorization/*/register/action` permission"
+      },
+      {
+        "line": 1314,
+        "text": "- Review `terraform plan` output carefully before removing providers"
+      },
+      {
+        "line": 1361,
+        "text": "- Review resource relationships before adding cross-references"
+      },
+      {
+        "line": 1759,
+        "text": "After importing, review the state and update your configuration to match the imported resource's attributes."
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/build.yml",
+    "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+    "mode": "100644",
+    "type": "blob",
+    "size": 4222,
+    "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/build.yml",
+    "excerpts": [
+      {
+        "line": 16,
+        "text": "      - name: Acquire the exact revision without credentials"
+      },
+      {
+        "line": 34,
+        "text": "          $strRevision = $env:GITHUB_SHA"
+      },
+      {
+        "line": 44,
+        "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision"
+      },
+      {
+        "line": 46,
+        "text": "              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }"
+      },
+      {
+        "line": 49,
+        "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+      },
+      {
+        "line": 50,
+        "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }"
+      },
+      {
+        "line": 52,
+        "text": "          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }"
+      },
+      {
+        "line": 69,
+        "text": "      contents: read"
+      },
+      {
+        "line": 77,
+        "text": "          ref: ${{ github.sha }}"
+      },
+      {
+        "line": 81,
+        "text": "          fetch-depth: 1"
+      },
+      {
+        "line": 82,
+        "text": "          fetch-tags: false"
+      },
+      {
+        "line": 90,
+        "text": "        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1"
+      },
+      {
+        "line": 103,
+        "text": "          archive: true"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+    "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+    "mode": "100644",
+    "type": "blob",
+    "size": 5632,
+    "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Classify-InstructionMaintenance.mjs",
+    "excerpts": [
+      {
+        "line": 21,
+        "text": "    'Generate-StyleGuideArtifacts.ps1', 'Test-ExactGitPathSet.ps1',"
+      },
+      {
+        "line": 32,
+        "text": "// dependency changes an already listed caller and requires closure review."
+      },
+      {
+        "line": 68,
+        "text": "    classification: maintenancePaths.length ? 'maintenance_required' : 'ordinary',"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/Initialize-CiToolchain.ps1",
+    "blob": "906460d818674199b32294185ed6525c143b48bb",
+    "mode": "100644",
+    "type": "blob",
+    "size": 5706,
+    "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Initialize-CiToolchain.ps1",
+    "excerpts": [
+      {
+        "line": 3,
+        "text": "# Installs the reviewed Linux runtime and the requested locked dependency trees."
+      },
+      {
+        "line": 27,
+        "text": "        throw \"Unreviewed npm configuration selector: $strRelativePath\""
+      },
+      {
+        "line": 48,
+        "text": "    $objPin.linuxX64Sha256 -cnotmatch '^[a-f0-9]{64}$') {"
+      },
+      {
+        "line": 49,
+        "text": "    throw 'The reviewed runtime declaration is invalid.'"
+      },
+      {
+        "line": 52,
+        "text": "$strArchive = Join-Path $env:RUNNER_TEMP 'styleguide-node.tar.xz'"
+      },
+      {
+        "line": 53,
+        "text": "if ([IO.Path]::Exists($strNodeRoot) -or [IO.Path]::Exists($strArchive)) {"
+      },
+      {
+        "line": 59,
+        "text": "    --retry 2 --output $strArchive $strUrl"
+      },
+      {
+        "line": 61,
+        "text": "if ((Get-FileHash -LiteralPath $strArchive -Algorithm SHA256).Hash.ToLowerInvariant() -cne"
+      },
+      {
+        "line": 62,
+        "text": "    $objPin.linuxX64Sha256) { throw \"The runtime archive digest is incorrect for $strUrl. Check package.json engines.node and .github/workflows/ci-toolchain.json linuxX64Sha256. Verify the official release checksum before changing the declaration.\" }"
+      },
+      {
+        "line": 64,
+        "text": "& /usr/bin/tar -xJf $strArchive -C $strNodeRoot --strip-components=1"
+      },
+      {
+        "line": 65,
+        "text": "if ($LASTEXITCODE -ne 0) { throw \"Runtime extraction failed: $LASTEXITCODE\" }"
+      },
+      {
+        "line": 85,
+        "text": "    $arrBefore = @($arrManifestPaths | ForEach-Object { (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash })"
+      },
+      {
+        "line": 86,
+        "text": "    & $strNpm --prefix $strInstallRoot ci --ignore-scripts --no-audit --fund=false --include=dev --package-lock=true"
+      },
+      {
+        "line": 88,
+        "text": "    $arrAfter = @($arrManifestPaths | ForEach-Object { (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash })"
+      },
+      {
+        "line": 103,
+        "text": "Write-Output \"Installed Node $strNodeVersion and npm $strNpmVersion from the reviewed runtime declaration.\""
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+    "mode": "100644",
+    "type": "blob",
+    "size": 31949,
+    "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Test-StyleGuideArtifacts.ps1",
+    "excerpts": [
+      {
+        "line": 43,
+        "text": "    # standard error concurrently. It returns the exact native exit code,"
+      },
+      {
+        "line": 54,
+        "text": "    # # Captures working-tree path records and the exact Git exit code."
+      },
+      {
+        "line": 183,
+        "text": "    # Asserts one decoded Git path set against an exact allowlist."
+      },
+      {
+        "line": 198,
+        "text": "    # Exact case-sensitive path allowlist for the selected surface."
+      },
+      {
+        "line": 324,
+        "text": "    $objSha = [System.Security.Cryptography.SHA256]::Create()"
+      },
+      {
+        "line": 346,
+        "text": "# Publication uses another runner and independently fetches committed bytes."
+      },
+      {
+        "line": 353,
+        "text": "# expected\" for exactly this purpose. Either makes a stale artifact"
+      },
+      {
+        "line": 368,
+        "text": "# bytes that reach consumers come from the commit, fetched by a job"
+      },
+      {
+        "line": 380,
+        "text": "# exactly like a generator that did nothing; refusing keeps the signal."
+      },
+      {
+        "line": 388,
+        "text": "    # every reparse point, excludes only the exact .git directory, and"
+      },
+      {
+        "line": 401,
+        "text": "    # # Records the same map shape after generation for exact comparison."
+      },
+      {
+        "line": 423,
+        "text": "    $objSha = [System.Security.Cryptography.SHA256]::Create()"
+      },
+      {
+        "line": 581,
+        "text": "$strVerifierCommand = '& ''./.github/workflows/Test-ExactGitPathSet.ps1'' -RepositoryRoot $env:GITHUB_WORKSPACE -GitExecutablePath ''/usr/bin/git'' -ExpectedPath @() -Mode Both -RequireCleanWorkingAgainstIndex'"
+      },
+      {
+        "line": 626,
+        "text": "if ($arrPathSetResult.Count -ne 1) { throw 'Exact-path verification returned an invalid shape.' }"
+      },
+      {
+        "line": 628,
+        "text": "catch { throw 'Exact-path verification returned invalid JSON.' }"
+      },
+      {
+        "line": 631,
+        "text": "    $objPathSetResult.Schema -isnot [string] -or $objPathSetResult.Schema -cne 'TerraformStyleGuide.ExactGitPathSetResult.v2' -or"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+    "mode": "100644",
+    "type": "blob",
+    "size": 14948,
+    "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Validate-WorkflowPolicy.test.mjs",
+    "excerpts": [
+      {
+        "line": 9,
+        "text": "  LIMITS, readContract, validatePackagePair, foldParserTree, assertReviewedParserTree,"
+      },
+      {
+        "line": 31,
+        "text": "      'runs-on': 'ubuntu-24.04', 'timeout-minutes': 10, permissions: { contents: 'read' }, needs: 'verify',"
+      },
+      {
+        "line": 127,
+        "text": "test('reviewed locked dependency updates do not need historical hashes or waiver fields', () => {"
+      },
+      {
+        "line": 140,
+        "text": "  ['arbitrary archive origin', value => { value.packages['node_modules/yaml'].resolved = 'https://example.test/yaml.tgz'; }, 'lock-integrity'],"
+      },
+      {
+        "line": 216,
+        "text": "  assertReviewedParserTree(parserDirectory, digest);"
+      },
+      {
+        "line": 244,
+        "text": "  const dangerous = clone(fixtures['build.yml']); dangerous.permissions = { contents: 'write' };"
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/Test-CiHelpers.test.mjs",
+    "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+    "mode": "100644",
+    "type": "blob",
+    "size": 33662,
+    "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab",
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Test-CiHelpers.test.mjs",
+    "excerpts": [
+      {
+        "line": 31,
+        "text": "if (args.includes('fetch')) {"
+      },
+      {
+        "line": 33,
+        "text": "  const count = calls.filter(row => row.includes('fetch')).length;"
+      },
+      {
+        "line": 34,
+        "text": "  if (mode === 'fetch-failure' || (mode === 'retry-success' && count < 3)) process.exit(7);"
+      },
+      {
+        "line": 49,
+        "text": "      GITHUB_REPOSITORY: 'franklesniak/TerraformStyleGuide', GITHUB_SHA: head,"
+      },
+      {
+        "line": 70,
+        "text": "  test(`${file}/${job}: exact acquisition and bounded retries`, { skip: !linux }, t => {"
+      },
+      {
+        "line": 75,
+        "text": "    const requests = f.calls().filter(row => row.includes('fetch'));"
+      },
+      {
+        "line": 80,
+        "text": "  for (const mode of ['init-failure', 'fetch-failure', 'wrong-head', 'empty-output', 'checkout-failure', 'wrong-checkout']) {"
+      },
+      {
+        "line": 84,
+        "text": "      assert.ok(f.calls().filter(row => row.includes('fetch')).length <= 3);"
+      },
+      {
+        "line": 121,
+        "text": "    { GITHUB_REPOSITORY: 'someone/else' }, { GITHUB_SHA: 'main' }]) {"
+      },
+      {
+        "line": 141,
+        "text": "fs.writeFileSync(args[args.indexOf('--output')+1], 'incorrect archive bytes');"
+      },
+      {
+        "line": 155,
+        "text": "    if (mode === 'invalid-digest') fs.writeFileSync(path.join(workflows, 'ci-toolchain.json'), JSON.stringify({ linuxX64Sha256: 'wrong' }));"
+      },
+      {
+        "line": 163,
+        "text": "      mode === 'native-download-failure' ? /Runtime download failed/ : /archive digest is incorrect/);"
+      },
+      {
+        "line": 187,
+        "text": "  const archiveRoot = path.join(f.root, 'archive');"
+      },
+      {
+        "line": 188,
+        "text": "  const bin = path.join(archiveRoot, 'runtime/bin'); fs.mkdirSync(bin, { recursive: true });"
+      },
+      {
+        "line": 198,
+        "text": "  if (args.includes('ci') && !args.includes('--ignore-scripts')) process.exit(98);"
+      },
+      {
+        "line": 203,
+        "text": "  const archive = path.join(f.root, 'fixture.tar.xz');"
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": ".codex/config.toml",
+    "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+    "mode": "100644",
+    "type": "blob",
+    "size": 205,
+    "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.codex/config.toml",
+    "excerpts": [
+      {
+        "line": 1,
+        "text": "# Preserve enough project-instruction capacity for the complete review workflow."
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": ".github/instructions/docs.instructions.md",
+    "blob": "96c50a1f4213d90646553c8daf4bf7d93fa27cbe",
+    "mode": "100644",
+    "type": "blob",
+    "size": 54529,
+    "sha256": "8b935528b270e941127373f955eb7d61c110e40fc0203e3028095210e89af74c",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/instructions/docs.instructions.md",
+    "excerpts": [
+      {
+        "line": 67,
+        "text": "- Process and operational documents intended as durable repository policy, such as review guides, linting guides, testing guides, and release runbooks."
+      },
+      {
+        "line": 128,
+        "text": "A non-normative historical artifact is a Markdown file committed to preserve provenance, such as a verbatim AI-assistant prompt, transcript excerpt, quoted source excerpt, or similar historical material used to produce or review another artifact. For these files, \"preserved\" means content-level fidelity; repository hooks can still normalize trailing whitespace and final newlines."
+      },
+      {
+        "line": 130,
+        "text": "- **Classification.** Treat a non-normative historical artifact as Tier 2, so the metadata header block is **NOT REQUIRED**, unless its current, non-quoted framing independently meets the Tier 1 criteria. Copied prompts, requirements language, review text, or source excerpts inside preserved historical content do not promote the file to Tier 1. Classify the file by its current purpose and framing, not by copied historical text."
+      },
+      {
+        "line": 136,
+        "text": "- **Related sources.** The file SHOULD link to canonical repository documents or inspectable public sources it relates to when they exist, such as the specification, ADR, issue, public upstream source, or quoted source it was used to produce or review. These references MUST follow the existing reproducible-source and repository self-containment rules. Required interpretation MUST NOT depend on machine-local paths, agent session routes, private re"
+      },
+      {
+        "line": 143,
+        "text": "# Historical Artifact (Non-Normative): AI Review Prompt for ADR-0003"
+      },
+      {
+        "line": 145,
+        "text": "This file preserves the AI review prompt used while preparing ADR-0003. The preserved content is provenance/history only; it is not current specification, review, policy, requirements, or implementation guidance."
+      },
+      {
+        "line": 212,
+        "text": "When committed Markdown documentation, including analysis write-ups, research notes, review artifacts, and other durable Markdown records, cites sources or evidence, it **MUST** cite only sources another reader can inspect or reproduce from repository contents or clearly linked public references. This is the Markdown-specific application of the [Repository Self-Containment](../copilot-instructions.md#repository-self-containment) rule, not a separ"
+      },
+      {
+        "line": 419,
+        "text": "**Background.** Mirrored excerpts that drift from their source are a recurring source of documentation inconsistency, and partial fixes that touch only reviewer-flagged lines can leave parallel copies of the same excerpt inconsistent and force repeat review rounds for the same root cause."
+      },
+      {
+        "line": 422,
+        "text": "   - Be a verbatim copy of the corresponding source-of-truth lines for the included literal content, without paraphrasing or selectively rewriting copied literals; if the excerpt is intentionally partial, the surrounding prose **MUST** make that scope clear and **MUST NOT** imply the excerpt is the complete file or complete configuration, **OR**"
+      },
+      {
+        "line": 425,
+        "text": "   When the verbatim-copy path is taken for a fenced or multi-line excerpt, authors SHOULD use the file's existing `Source:` citation convention from the `Markdown Conventions` section to anchor the excerpt to its source-of-truth file with a line-range link."
+      },
+      {
+        "line": 427,
+        "text": "2. **Full-file audit on consistency fixes.** When fixing a code/doc consistency issue in a mirrored excerpt that was flagged on specific lines, the fix **MUST** audit the entire mirrored excerpt block and the affected Markdown file's other excerpts of the same source-of-truth file for all literal occurrences of the old pattern, not just the lines explicitly mentioned by the reviewer. The fix is not complete until every literal in every mirrored e"
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": ".github/instructions/yaml.instructions.md",
+    "blob": "3f013b485e333fcfe8480c926361a642f5ebc8a4",
+    "mode": "100644",
+    "type": "blob",
+    "size": 54492,
+    "sha256": "19c1a172a558c61a578c4ebd612e8c3853350f8f1e0ba9510b46e3265a6f60f6",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/instructions/yaml.instructions.md",
+    "excerpts": [
+      {
+        "line": 40,
+        "text": "- **[Actions]** A privileged `pull_request_target` workflow **MUST** execute only trusted-revision bytes. Proposed files that select executable bytes **MUST** fail closed as trust-root changes or pass bounded inert-data validation by trusted code."
+      },
+      {
+        "line": 41,
+        "text": "- **[Actions]** A privileged workflow that fetches a proposed pull-request revision into a persistent local ref **MUST NOT** force-update that ref. It **MUST** verify that the fetched commit equals the expected event commit."
+      },
+      {
+        "line": 43,
+        "text": "- **[Actions]** `setup-*` actions in workflow files under `.github/workflows/` **MUST** resolve runtimes from checked-in release-line selectors by default and **MUST NOT** use broad floating selectors such as `'3.x'`, `'latest'`, or `'*'`. `actions/setup-node` **MAY** instead use `node-version-file` only when a tracked file supplies one unambiguous exact stable SemVer, no competing `node-version` input exists, and a later step verifies the instal"
+      },
+      {
+        "line": 61,
+        "text": "- Indentation **MUST** be exactly **2 spaces** per level. Tabs **MUST NOT** appear in YAML files."
+      },
+      {
+        "line": 114,
+        "text": "GitHub does not evaluate `on.push.paths` or `on.push.paths-ignore` for tag pushes. A `push` workflow that uses a path filter **MUST** define its branch and tag intent explicitly. Do not assume that a path filter restricts tag events. See [GitHub's workflow syntax for path filters](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onpushpull_requestpull_request_targetpathspaths-ignore)."
+      },
+      {
+        "line": 131,
+        "text": "## GitHub Actions Privileged-Workflow Trust Roots"
+      },
+      {
+        "line": 133,
+        "text": "GitHub runs `pull_request_target` in the base repository's default-branch context. This context can have privileges that an ordinary pull-request workflow does not have. A `pull_request_target` workflow **MUST NOT** check out or execute untrusted pull-request code. See [GitHub's event reference](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#pull_request_target) and [secure-use reference](https://"
+      },
+      {
+        "line": 135,
+        "text": "The executable trust root includes all checked-in files that can select or alter executable bytes in the privileged job. The inventory **MUST** include applicable files from these categories:"
+      },
+      {
+        "line": 143,
+        "text": "Path filters **MUST** cover every supported file in this inventory. A proposed change **MUST NOT** bypass the validation job because the changed selector is absent from `on.pull_request_target.paths`."
+      },
+      {
+        "line": 150,
+        "text": "Inert-data validation **MUST** read the exact proposed Git object without replacing trusted workspace files. It **MUST** validate the object type, byte limit, encoding, syntax, required semantic identity, and every error or indeterminate state. Store proposed revision values in environment variables or pass them as action inputs. Do not interpolate untrusted values into generated shell source."
+      },
+      {
+        "line": 152,
+        "text": "When a privileged job fetches a proposed pull-request revision into a persistent local ref, the fetch **MUST NOT** use a leading `+` refspec or `--force`. An unexpected non-fast-forward destination state **MUST** stop the job. After the fetch, the workflow **MUST** resolve the fetched commit and compare it with the expected event commit before it reads proposed objects. A fetch that writes only `FETCH_HEAD` does not update a persistent local ref,"
+      },
+      {
+        "line": 154,
+        "text": "A privileged job **MUST NOT** install, import, source, or execute proposed dependency bytes. Options such as npm's `--ignore-scripts` stop lifecycle scripts, but they do not make proposed package code trusted."
+      },
+      {
+        "line": 156,
+        "text": "When a trusted parser validates proposed documents, the proposed post-merge package state **MUST** preserve the exact parser identity and its resolved runtime dependency closure. Otherwise, the privileged job **MUST** reject the proposal as a trust-root change. The validation **SHOULD** compare the manifest declaration, root lock declaration, version, resolved artifact, integrity value, dependency paths, and dependency descriptors."
+      },
+      {
+        "line": 162,
+        "text": "An unprivileged `pull_request` install test **MAY** add defense in depth. It does not authorize proposed-code execution in a privileged `pull_request_target` job."
+      },
+      {
+        "line": 168,
+        "text": "  contents: read"
+      },
+      {
+        "line": 177,
+        "text": "          ref: ${{ github.sha }}"
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": ".github/workflows/agent-instructions.yml",
+    "blob": "d4f380f61ce00092a416dac4ed3eaf6d11cbb7bc",
+    "mode": "100644",
+    "type": "blob",
+    "size": 5742,
+    "sha256": "d2905d7d7558fdb380d80af3c562ea2ee03376fa7703eaab84a5eda2f62e5610",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/workflows/agent-instructions.yml",
+    "excerpts": [
+      {
+        "line": 28,
+        "text": "  pull_request_target:"
+      },
+      {
+        "line": 51,
+        "text": "  contents: read"
+      },
+      {
+        "line": 63,
+        "text": "          ref: ${{ github.sha }}"
+      },
+      {
+        "line": 67,
+        "text": "          fetch-depth: 0"
+      },
+      {
+        "line": 68,
+        "text": "          fetch-tags: false"
+      },
+      {
+        "line": 90,
+        "text": "      - name: Fetch pull request head as data"
+      },
+      {
+        "line": 91,
+        "text": "        if: github.event_name == 'pull_request_target'"
+      },
+      {
+        "line": 101,
+        "text": "          authorization=\"$(printf 'x-access-token:%s' \"${GITHUB_TOKEN}\" | base64 -w 0)\""
+      },
+      {
+        "line": 105,
+        "text": "            GIT_CONFIG_VALUE_0=\"Authorization: Basic ${authorization}\" \\"
+      },
+      {
+        "line": 106,
+        "text": "            git fetch --no-tags --no-recurse-submodules origin \\"
+      },
+      {
+        "line": 108,
+        "text": "          unset authorization"
+      },
+      {
+        "line": 109,
+        "text": "          fetched_head=\"$(git rev-parse --verify \\"
+      },
+      {
+        "line": 111,
+        "text": "          test \"${fetched_head}\" = \"${PR_HEAD_SHA}\""
+      },
+      {
+        "line": 118,
+        "text": "          TRUSTED_REVISION: ${{ github.sha }}"
+      },
+      {
+        "line": 120,
+        "text": "            ${{ github.event_name == 'pull_request_target' &&"
+      },
+      {
+        "line": 121,
+        "text": "              github.event.pull_request.head.sha || github.sha }}"
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": ".github/workflows/copilot-setup-steps.yml",
+    "blob": "bd4f100bf2f713fa86f72c489e1fff5cde8e1ead",
+    "mode": "100644",
+    "type": "blob",
+    "size": 7711,
+    "sha256": "0179ee85f742a4de3dda6053081b323d92683d779ecf6eadc41ce16f77b21527",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/workflows/copilot-setup-steps.yml",
+    "excerpts": [
+      {
+        "line": 25,
+        "text": "  contents: read"
+      },
+      {
+        "line": 59,
+        "text": "        run: npm ci --ignore-scripts --no-audit --fund=false"
+      },
+      {
+        "line": 82,
+        "text": "          # The version and per-architecture archive hashes are extracted from"
+      },
+      {
+        "line": 89,
+        "text": "          expected_sha256=\"$(awk -v arch=\"${asset_arch}\" '"
+      },
+      {
+        "line": 91,
+        "text": "            found && index($0, \"shellcheck_archive_sha256=\\\"\") {"
+      },
+      {
+        "line": 92,
+        "text": "              sub(/.*shellcheck_archive_sha256=\"/, \"\")"
+      },
+      {
+        "line": 97,
+        "text": "          [[ \"${expected_sha256}\" =~ ^[0-9a-f]{64}$ ]]"
+      },
+      {
+        "line": 98,
+        "text": "          archive=\"shellcheck-v${shellcheck_version}.linux.${asset_arch}.tar.xz\""
+      },
+      {
+        "line": 99,
+        "text": "          curl -fsSL --retry 3 -o \"${RUNNER_TEMP}/${archive}\" \\"
+      },
+      {
+        "line": 100,
+        "text": "            \"https://github.com/koalaman/shellcheck/releases/download/v${shellcheck_version}/${archive}\""
+      },
+      {
+        "line": 101,
+        "text": "          printf '%s  %s\\n' \"${expected_sha256}\" \"${RUNNER_TEMP}/${archive}\" \\"
+      },
+      {
+        "line": 102,
+        "text": "            | sha256sum --check --strict -"
+      },
+      {
+        "line": 103,
+        "text": "          tar -xJf \"${RUNNER_TEMP}/${archive}\" -C \"${RUNNER_TEMP}\" \\"
+      },
+      {
+        "line": 173,
+        "text": "          # devcontainer-pinned version rather than an exact match so a runner image"
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": ".github/workflows/devcontainer-ci.yml",
+    "blob": "5599eb27bd42af85bed376e82a60bff4524dcc70",
+    "mode": "100644",
+    "type": "blob",
+    "size": 30461,
+    "sha256": "e48b96b5cebd3527ace4c5a819b1e71a736fbefc9633829b01b366ef0afba00b",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/workflows/devcontainer-ci.yml",
+    "excerpts": [
+      {
+        "line": 14,
+        "text": "  contents: read"
+      },
+      {
+        "line": 56,
+        "text": "          fetch-depth: 0"
+      },
+      {
+        "line": 111,
+        "text": "          fetch-depth: 0"
+      },
+      {
+        "line": 151,
+        "text": "          npm ci --ignore-scripts --no-audit --fund=false"
+      },
+      {
+        "line": 169,
+        "text": "          fixture_image=\"research-misc-devcontainer-fixture:${GITHUB_SHA}-${{ matrix.architecture }}\""
+      },
+      {
+        "line": 174,
+        "text": "          # re-attempts the flaky network fetch and warms the cache for the"
+      },
+      {
+        "line": 201,
+        "text": "      - name: Exercise immutable-policy negative fixtures"
+      },
+      {
+        "line": 205,
+        "text": "          bash .devcontainer/tests/test-immutable-toolchain.sh \"${FIXTURE_IMAGE}\""
+      },
+      {
+        "line": 249,
+        "text": "            /opt/hardened-devcontainer/bin/verify-immutable-toolchain"
+      },
+      {
+        "line": 279,
+        "text": "            npm ci --ignore-scripts --no-audit --fund=false"
+      },
+      {
+        "line": 298,
+        "text": "                  -exec sha256sum -- '{}' +"
+      },
+      {
+        "line": 299,
+        "text": "              } | LC_ALL=C sort | sha256sum"
+      },
+      {
+        "line": 365,
+        "text": "              npm install --global --ignore-scripts ."
+      },
+      {
+        "line": 368,
+        "text": "            immutable_snapshot() {"
+      },
+      {
+        "line": 387,
+        "text": "                  -type f -exec sha256sum -- '{}' +"
+      },
+      {
+        "line": 388,
+        "text": "              } | LC_ALL=C sort | sha256sum"
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": ".github/workflows/Test-AgentInstructionParserManifest.mjs",
+    "blob": "0716a34b6b7f9cf22bcf60d242582174c17b85b3",
+    "mode": "100644",
+    "type": "blob",
+    "size": 38982,
+    "sha256": "138d3a5949f4334dd7a39a05e47978135ff800c916abd49ac61ce5bcc017eade",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/workflows/Test-AgentInstructionParserManifest.mjs",
+    "excerpts": [
+      {
+        "line": 469,
+        "text": "    fail(`package.json must declare ${PARSER_NAME} at exact version ${expectedVersion}.`);"
+      },
+      {
+        "line": 472,
+        "text": "    fail(`package-lock.json must declare ${PARSER_NAME} at exact version ${expectedVersion}.`);"
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": ".github/workflows/Test-AgentInstructions.ps1",
+    "blob": "a9e23ed70deda2a9de12fc8962282ad167d4bde9",
+    "mode": "100644",
+    "type": "blob",
+    "size": 306638,
+    "sha256": "3b40a377fe6eb5b1c2194ca618c63851c504db73beaa99a713b5b3214e9ca5c4",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/workflows/Test-AgentInstructions.ps1",
+    "excerpts": [
+      {
+        "line": 7,
+        "text": "# entry points retain portable review, placement, and deferral contracts, and"
+      },
+      {
+        "line": 93,
+        "text": "$script:strStandingPlacementAuthorization ="
+      },
+      {
+        "line": 94,
+        "text": "    'No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required.'"
+      },
+      {
+        "line": 96,
+        "text": "    '**Standing placement authorization.**',"
+      },
+      {
+        "line": 100,
+        "text": "    'The agent MUST NOT ask the owner for that additional authorization.',"
+      },
+      {
+        "line": 112,
+        "text": "    '`reviewThreads`',"
+      },
+      {
+        "line": 115,
+        "text": "    'review:<review-id>:<section-label>:<ordinal>'"
+      },
+      {
+        "line": 119,
+        "text": "    'review-body-only finding',"
+      },
+      {
+        "line": 122,
+        "text": "    'every review-submission body',"
+      },
+      {
+        "line": 128,
+        "text": "    'owner authorization',"
+      },
+      {
+        "line": 133,
+        "text": "    'both reviewers'"
+      },
+      {
+        "line": 138,
+        "text": "        StructuralLiteral = '- **Maximum rounds:** 8 review iterations per cycle invocation.'"
+      },
+      {
+        "line": 139,
+        "text": "        ProseLiteral = 'Maximum rounds: 8 review iterations per cycle invocation.'"
+      },
+      {
+        "line": 140,
+        "text": "        WeakStructuralLiteral = '- **Maximum rounds:** 80 review iterations per cycle invocation.'"
+      },
+      {
+        "line": 152,
+        "text": "        StructuralLiteral = '- **Maximum rounds:** 80 review iterations per loop invocation.'"
+      },
+      {
+        "line": 153,
+        "text": "        ProseLiteral = 'Maximum rounds: 80 review iterations per loop invocation.'"
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": ".gitignore",
+    "blob": "e42d3bbc695f8bb78fb6a49a5672f973803719a3",
+    "mode": "100644",
+    "type": "blob",
+    "size": 194,
+    "sha256": "7fd0380a67d3a9952e24a8ca815f8111dce89e1d4a8eb00d2aa41794e6f2376b",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.gitignore",
+    "excerpts": []
+  },
+  {
+    "repository": "research-misc",
+    "path": ".pre-commit-config.yaml",
+    "blob": "6a138c59a0ce62ad9679c815e024c9d6e9902ccf",
+    "mode": "100644",
+    "type": "blob",
+    "size": 7318,
+    "sha256": "4c0ec5c0bf12afe953e2635c2903fb0ce5d0d3232eebfc2b5fc74af68f1ea3e6",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.pre-commit-config.yaml",
+    "excerpts": [
+      {
+        "line": 125,
+        "text": "      # interpreter- and platform-specific, and outside the manifest in exactly"
+      },
+      {
+        "line": 127,
+        "text": "      # strongly, not less. Raised by GitHub Copilot in review."
+      },
+      {
+        "line": 135,
+        "text": "          SHA256SUMS.txt, so sha256sum -c reports a clean package while these"
+      },
+      {
+        "line": 142,
+        "text": "        # Raised by Codex in PR #21 review."
+      },
+      {
+        "line": 144,
+        "text": "      # Runs on every commit rather than only when a SHA256SUMS.txt changes:"
+      },
+      {
+        "line": 146,
+        "text": "      # stays put, so keying the hook to the manifest would miss exactly the"
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": "AGENTS.md",
+    "blob": "63a09836e309e3e0e9dc1e6abff7807b5c3e77b1",
+    "mode": "100644",
+    "type": "blob",
+    "size": 32537,
+    "sha256": "6b350f1c2ccf19c3b10d4e093aec138df06d5319e43eef14ece8faff7ece13d3",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/AGENTS.md",
+    "excerpts": [
+      {
+        "line": 22,
+        "text": "This file intentionally keeps only a minimal inline summary of the highest-priority shared rules so that agents receive critical guidance immediately. The full shared rule set remains in the canonical file above."
+      },
+      {
+        "line": 28,
+        "text": "- **Instruction scope.** Codex builds its instruction chain once per run, from global guidance through the launch working directory. Use bounded discovery for a deeper `AGENTS.md`; the remote reviewer applies the closest file. Restart Codex after an active instruction changes, and do not re-read supplied instructions unless exact bytes matter. See [OpenAI's `AGENTS.md` guidance](https://developers.openai.com/codex/guides/agents-md)."
+      },
+      {
+        "line": 29,
+        "text": "- **Agents and interfaces.** The local agent implements work; `chatgpt-codex-connector[bot]` is a separate reviewer requested by `@codex review`. Use `rg`, `apply_patch`, and focused validation locally. Prefer the GitHub connector; use authenticated `gh api graphql` for missing thread, pagination, review-body, or inline context, and verify mutations by authenticated readback. Use primary official sources and record their impact. See [OpenAI's Cod"
+      },
+      {
+        "line": 35,
+        "text": "Instruction files and style guides are protected governance files. Do not create, edit, delete, rename, or otherwise change `.github/copilot-instructions.md`, files under `.github/instructions/`, files under `.cursor/rules/`, or root agent instruction files (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) unless the repository owner or maintainer has directly and explicitly authorized that specific instruction-file change in the current task"
+      },
+      {
+        "line": 39,
+        "text": "During downstream template adoption and stack selection, perform non-protected cleanup first, record the protected instruction-file edits needed to remove references to deleted tools or stacks, obtain explicit maintainer authorization, then update `.github/copilot-instructions.md`, remaining root agent files, and relevant `.github/instructions/*.instructions.md` files. Bump `Last Updated` and `Version` metadata where present, and avoid temporary "
+      },
+      {
+        "line": 129,
+        "text": "- **Prefer the GitHub plugin** for GitHub Issues, pull requests, PR comments, review comments, labels, reactions, PR creation, branch management on GitHub, and any other read or write against remote GitHub state."
+      },
+      {
+        "line": 131,
+        "text": "- **Local `git` remains appropriate** for local working-tree operations: inspecting diffs (`git diff`, `git log`, `git status`), creating branches, staging, committing, and pushing. Use the GitHub plugin for the corresponding remote-side actions (creating PRs, posting comments, reading review state)."
+      },
+      {
+        "line": 134,
+        "text": "The `.codex/config.toml` file at the repository root declares `[plugins.\"github@openai-curated\"] enabled = true` so that trusted Codex checkouts can opt the plugin in by default. Enabling the plugin in this file does not, by itself, grant GitHub authorization: actual access still depends on the GitHub app/connector installation, the Codex account performing the operation, and the repository's permissions."
+      },
+      {
+        "line": 136,
+        "text": "## PR Review Workflow (Codex-adapted)"
+      },
+      {
+        "line": 138,
+        "text": "This section is retained Codex platform protocol. Thin-entry-point pruning must preserve it unless the repository owner explicitly waives Codex PR review protocol for the retained Codex entry point."
+      },
+      {
+        "line": 140,
+        "text": "This workflow adapts the Claude-targeted process documented in `CLAUDE.md` for Codex's capabilities and runtime limitations. Use it when responding to review feedback on a pull request. All GitHub-side reads and writes in the steps below SHOULD go through the GitHub plugin first; fall back to `gh`, GraphQL, or manual owner action only when the plugin does not expose the needed capability (see **Fallbacks for unsupported plugin capabilities** belo"
+      },
+      {
+        "line": 144,
+        "text": "- **No autonomous wake-up.** Codex has no equivalent of `subscribe_pr_activity`. Codex MUST NOT promise webhook-driven wake-up, background polling, or scheduled review responses. The workflow runs only when the user explicitly starts or resumes it inside an active Codex session."
+      },
+      {
+        "line": 145,
+        "text": "- **Agent-command boundary.** Do not treat `@copilot` commands or the `@codex review` remote-review trigger as findings. Other `@codex` comments reach the local session only when its runtime routes them there. No form gives local Codex autonomous wake-up."
+      },
+      {
+        "line": 148,
+        "text": "### Handling each review comment"
+      },
+      {
+        "line": 150,
+        "text": "For each finding received from GitHub Copilot (`copilot-pull-request-reviewer[bot]`), remote Codex (`chatgpt-codex-connector[bot]`), a human reviewer, or any other reviewer, follow these steps. Process every reviewer identically and address findings one at a time."
+      },
+      {
+        "line": 152,
+        "text": "Review feedback has two co-equal surfaces. Inspect both in every round and whole-PR audit:"
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": "CLAUDE.md",
+    "blob": "c5e8dd2eb9622d2b95edc80876a23997060b285d",
+    "mode": "100644",
+    "type": "blob",
+    "size": 82250,
+    "sha256": "b87dc92e6fece8b3a0c878722ef2fccce18e38adfe862af6fdf79610088e41c1",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/CLAUDE.md",
+    "excerpts": [
+      {
+        "line": 28,
+        "text": "Instruction files and style guides are protected governance files. Do not create, edit, delete, rename, or otherwise change `.github/copilot-instructions.md`, files under `.github/instructions/`, files under `.cursor/rules/`, or root agent instruction files (`.hermes.md`, `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`) unless the repository owner or maintainer has directly and explicitly authorized that specific instruction-file change in the current task"
+      },
+      {
+        "line": 32,
+        "text": "During downstream template adoption and stack selection, perform non-protected cleanup first, record the protected instruction-file edits needed to remove references to deleted tools or stacks, obtain explicit maintainer authorization, then update `.github/copilot-instructions.md`, remaining root agent files, and relevant `.github/instructions/*.instructions.md` files. Bump `Last Updated` and `Version` metadata where present, and avoid temporary "
+      },
+      {
+        "line": 40,
+        "text": "Do not create, edit, delete, rename, or otherwise change a protected security-critical file unless the repository owner or a maintainer directly and explicitly authorizes the specific change in the current task, or the change comes from the prescribed code-review adjudication process (the **Structured Decision Framework** applied to a reviewer comment on an open pull request). The owner grants standing authorization for a review-adjudication-deri"
+      },
+      {
+        "line": 126,
+        "text": "PR comments and review comments that begin with `@copilot` are commands addressed to GitHub Copilot's coding agent, **not** to Claude Code. **Ignore** these entirely \u2014 do not process them, do not reply to them, and do not treat them as review feedback."
+      },
+      {
+        "line": 128,
+        "text": "An exact `@codex review` PR comment requests a review from the separate remote Codex reviewer. It is not a finding for Claude Code. Process the review produced by `chatgpt-codex-connector[bot]`, not the trigger comment."
+      },
+      {
+        "line": 132,
+        "text": "This section governs how the agent runs any authorized multi-step task in this repository, whether that task is a Structured Decision Framework pass, an Automated Review Loop round, or an owner-approved set of changes. It exists because the agent has ended its turn after producing analysis while authorized, unblocked work remained \u2014 a stall that wastes owner time and hides progress."
+      },
+      {
+        "line": 135,
+        "text": "- **Yield only for a listed reason.** End the turn and return control to the owner only when one of the following holds: (a) the agent needs an input it genuinely cannot obtain on its own; (b) an enumerated pause defined elsewhere in this file applies, such as an Automated Review Loop pause trigger; or (c) the task is complete."
+      },
+      {
+        "line": 137,
+        "text": "- **A \"Next: ...\" preview is not a stop.** If the agent can state the next step, the agent can take the next step. State it, then do it."
+      },
+      {
+        "line": 139,
+        "text": "- **Continuity does not remove required approvals.** Where another rule requires explicit owner authorization \u2014 most importantly the **Protected Instruction Files** rule \u2014 the agent still obtains that authorization first. Execution continuity removes needless turn hand-backs; it never removes a required approval gate and never licenses an outward action the owner has not approved."
+      },
+      {
+        "line": 141,
+        "text": "The Automated Review Loop defines additional pause rules specific to the review cycle; see **Pause discipline** in that section."
+      },
+      {
+        "line": 147,
+        "text": "This framework is the repository's default method for resolving a **finding**: a reviewer comment, a bug, a design question, a discovered defect, or any choice between materially different ways to change the repository. Apply it whenever a finding admits more than one reasonable response and the choice would change the resulting code, tests, documentation, or security posture. Skip it only for mechanical work with a single correct answer, such as"
+      },
+      {
+        "line": 174,
+        "text": "- **Build the rubric once and apply it once.** If, after scoring, you find yourself wanting to add or drop criteria in order to produce a different winner, that is analysis paralysis: commit to the rubric output. Re-scoring with revised criteria is permitted only when a **new external information source** arrives, such as a reviewer follow-up, a CI failure, or a newly discovered repository constraint."
+      },
+      {
+        "line": 186,
+        "text": "Select the highest-scoring option, subject to the escalation gate in **Handling Code Review Comments** step 5 when the finding is a review comment. Then state the selected option **in detail, so that someone coming in cold can act on it without reconstructing the analysis**. Assume the reader has not read the thread, does not know the codebase, and will not infer intent. Write the statement in Simplified Technical English, so that a reader whose "
+      },
+      {
+        "line": 192,
+        "text": "- **Local testing information**, when testing applies: the environment used, the exact commands run, and the specific results observed. Report what the commands actually printed, including failures and anything that could not be run and why. A claim that something passes **MUST** be backed by the observed output, not by expectation."
+      },
+      {
+        "line": 210,
+        "text": "## Handling Code Review Comments"
+      },
+      {
+        "line": 212,
+        "text": "This section is retained Claude platform protocol. Thin-entry-point pruning must preserve it unless the repository owner explicitly waives Claude review-comment protocol for the retained Claude entry point."
+      }
+    ]
+  },
+  {
+    "repository": "research-misc",
+    "path": "package-lock.json",
+    "blob": "e9efa0381e686a265c41eb36662671791da9e837",
+    "mode": "100644",
+    "type": "blob",
+    "size": 48914,
+    "sha256": "362734c4f423023a2f97ddaf93d4505ab6a9f77aa6fca1aea6820a3046da6ba5",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/package-lock.json",
+    "excerpts": []
+  },
+  {
+    "repository": "research-misc",
+    "path": "package.json",
+    "blob": "062a0fc09368701f07a9db3d8b09877866463644",
+    "mode": "100644",
+    "type": "blob",
+    "size": 723,
+    "sha256": "977f9803d16bd09c8333ab59f57688110ebf79be166be1e028f857234842a74d",
+    "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/package.json",
+    "excerpts": []
+  }
+]

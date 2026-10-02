@@ -1,0 +1,911 @@
+{
+  "refs": {
+    "PSStyleGuide": {
+      "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc",
+      "commit_url": "https://github.com/franklesniak/PSStyleGuide/commit/48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "ref": "refs/heads/main"
+    },
+    "TerraformStyleGuide": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "commit_url": "https://github.com/franklesniak/TerraformStyleGuide/commit/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "ref": "refs/heads/main"
+    },
+    "research-misc": {
+      "commit": "51dbeb560dd518b904cf1b571dc7d01fd8045749",
+      "tree": "ec9c46e3770ab79169d5520f2f743cb1d1853c16",
+      "commit_url": "https://github.com/franklesniak/research-misc/commit/51dbeb560dd518b904cf1b571dc7d01fd8045749",
+      "ref": "pinned PR78 merge"
+    }
+  },
+  "path_count": 28,
+  "cell_count": 84,
+  "paths": [
+    {
+      "path": ".codex/config.toml",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+          "mode": "100644",
+          "type": "blob",
+          "size": 205,
+          "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.codex/config.toml"
+        },
+        "TerraformStyleGuide": {
+          "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+          "mode": "100644",
+          "type": "blob",
+          "size": 205,
+          "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.codex/config.toml"
+        },
+        "research-misc": {
+          "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+          "mode": "100644",
+          "type": "blob",
+          "size": 205,
+          "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.codex/config.toml"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A02",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/instructions/docs.instructions.md",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd",
+          "mode": "100644",
+          "type": "blob",
+          "size": 46230,
+          "sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/instructions/docs.instructions.md"
+        },
+        "TerraformStyleGuide": {
+          "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+          "mode": "100644",
+          "type": "blob",
+          "size": 46254,
+          "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/instructions/docs.instructions.md"
+        },
+        "research-misc": {
+          "blob": "96c50a1f4213d90646553c8daf4bf7d93fa27cbe",
+          "mode": "100644",
+          "type": "blob",
+          "size": 54529,
+          "sha256": "8b935528b270e941127373f955eb7d61c110e40fc0203e3028095210e89af74c",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/instructions/docs.instructions.md"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A02",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/instructions/yaml.instructions.md",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+          "mode": "100644",
+          "type": "blob",
+          "size": 54645,
+          "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/instructions/yaml.instructions.md"
+        },
+        "TerraformStyleGuide": {
+          "blob": "924d12c833d07def47d05137b532e622db622fa4",
+          "mode": "100644",
+          "type": "blob",
+          "size": 54645,
+          "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/instructions/yaml.instructions.md"
+        },
+        "research-misc": {
+          "blob": "3f013b485e333fcfe8480c926361a642f5ebc8a4",
+          "mode": "100644",
+          "type": "blob",
+          "size": 54492,
+          "sha256": "19c1a172a558c61a578c4ebd612e8c3853350f8f1e0ba9510b46e3265a6f60f6",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/instructions/yaml.instructions.md"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A02",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+          "mode": "100644",
+          "type": "blob",
+          "size": 9504,
+          "sha256": "1c9457868eb262fc7ed8583d1cfff2903288286f11c103a46f91703b04bef67d",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/agent-instructions.yml"
+        },
+        "TerraformStyleGuide": {
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "mode": "100644",
+          "type": "blob",
+          "size": 9558,
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/agent-instructions.yml"
+        },
+        "research-misc": {
+          "blob": "d4f380f61ce00092a416dac4ed3eaf6d11cbb7bc",
+          "mode": "100644",
+          "type": "blob",
+          "size": 5742,
+          "sha256": "d2905d7d7558fdb380d80af3c562ea2ee03376fa7703eaab84a5eda2f62e5610",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/workflows/agent-instructions.yml"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A03",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+          "mode": "100644",
+          "type": "blob",
+          "size": 26612,
+          "sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/copilot-setup-steps.yml"
+        },
+        "TerraformStyleGuide": {
+          "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+          "mode": "100644",
+          "type": "blob",
+          "size": 33862,
+          "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/copilot-setup-steps.yml"
+        },
+        "research-misc": {
+          "blob": "bd4f100bf2f713fa86f72c489e1fff5cde8e1ead",
+          "mode": "100644",
+          "type": "blob",
+          "size": 7711,
+          "sha256": "0179ee85f742a4de3dda6053081b323d92683d779ecf6eadc41ce16f77b21527",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/workflows/copilot-setup-steps.yml"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A03",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "dde42437f9f5d579abee2e944321488a2ba4f793",
+          "mode": "100644",
+          "type": "blob",
+          "size": 3863,
+          "sha256": "0deabaded368671ae8759f4c4fc02445e2e3c0c930cfe3a3a20df728a1e988de",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/devcontainer-ci.yml"
+        },
+        "TerraformStyleGuide": {
+          "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+          "mode": "100644",
+          "type": "blob",
+          "size": 7645,
+          "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/devcontainer-ci.yml"
+        },
+        "research-misc": {
+          "blob": "5599eb27bd42af85bed376e82a60bff4524dcc70",
+          "mode": "100644",
+          "type": "blob",
+          "size": 30461,
+          "sha256": "e48b96b5cebd3527ace4c5a819b1e71a736fbefc9633829b01b366ef0afba00b",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/workflows/devcontainer-ci.yml"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A03",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "b20dc7f318cf3e14e743eb4bb0bf193be7ad1f62",
+          "mode": "100644",
+          "type": "blob",
+          "size": 13668,
+          "sha256": "b20aaab172224da4377cda75fa6cad1a8eeb00f8bdd26737ffe0e6c2ad222492",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/lint-nested-markdown.js"
+        },
+        "TerraformStyleGuide": {
+          "blob": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+          "mode": "100644",
+          "type": "blob",
+          "size": 16481,
+          "sha256": "5f3bbefdd02af786bd39ae6a31685a4daf073981c2c072a51b590c75a6626205",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/lint-nested-markdown.js"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A07",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "d6985333e619493640aa5cb4a0cb3925153f8273",
+          "mode": "100644",
+          "type": "blob",
+          "size": 3449,
+          "sha256": "d0fdf5d89c7d54489c4d40d9cde88485cd0c2df5fb3ee4bb5b9282fbb44243c9",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/lint-staged-markdown.mjs"
+        },
+        "TerraformStyleGuide": {
+          "blob": "c35575990d5854ea6da9d5f6d49d23287df43146",
+          "mode": "100644",
+          "type": "blob",
+          "size": 5971,
+          "sha256": "0e8b0b5c725227b98a338e44e630f6b50a90f725e2f01b2f0262284ffdd6926b",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/lint-staged-markdown.mjs"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A07",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "bed8c585a495c3cab2875cac036a5717acd82bb6",
+          "mode": "100644",
+          "type": "blob",
+          "size": 8689,
+          "sha256": "a708e153c12b4576bc65fb5df50b322353d1f6d050c28df8d6575be7ce4a7955",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md"
+        },
+        "TerraformStyleGuide": {
+          "blob": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+          "mode": "100644",
+          "type": "blob",
+          "size": 2603,
+          "sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A07",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+          "mode": "100644",
+          "type": "blob",
+          "size": 6604,
+          "sha256": "73b1eb08b07254ffcb9d437e260bee8a38cce2e8cc65af1c921a3a9c4ed47bfa",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/markdownlint.yml"
+        },
+        "TerraformStyleGuide": {
+          "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+          "mode": "100644",
+          "type": "blob",
+          "size": 6632,
+          "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/markdownlint.yml"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A07",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "753a464d066c0832e8b360d21a541b176ed61456",
+          "mode": "100644",
+          "type": "blob",
+          "size": 1137,
+          "sha256": "a01509018203f9d0d092549b5a220447818d6af8fc58f6ad7d93681a37b63a98",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/package.json"
+        },
+        "TerraformStyleGuide": {
+          "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+          "mode": "100644",
+          "type": "blob",
+          "size": 1105,
+          "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/package.json"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A07",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "0350d4979fd5ba109ba4dbb910e1593debd0138d",
+          "mode": "100644",
+          "type": "blob",
+          "size": 3038,
+          "sha256": "b6af48d2e2d29449c7ab302dcde88cdafa30c6573b89065fcd31ab5adf25b8f2",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/scripts-README.md"
+        },
+        "TerraformStyleGuide": {
+          "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+          "mode": "100644",
+          "type": "blob",
+          "size": 5421,
+          "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/scripts-README.md"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A03",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructionParserManifest.mjs",
+      "cells": {
+        "PSStyleGuide": {
+          "absent": true
+        },
+        "TerraformStyleGuide": {
+          "absent": true
+        },
+        "research-misc": {
+          "blob": "0716a34b6b7f9cf22bcf60d242582174c17b85b3",
+          "mode": "100644",
+          "type": "blob",
+          "size": 38982,
+          "sha256": "138d3a5949f4334dd7a39a05e47978135ff800c916abd49ac61ce5bcc017eade",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/workflows/Test-AgentInstructionParserManifest.mjs"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A03",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+          "mode": "100644",
+          "type": "blob",
+          "size": 378451,
+          "sha256": "5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Test-AgentInstructions.ps1"
+        },
+        "TerraformStyleGuide": {
+          "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+          "mode": "100644",
+          "type": "blob",
+          "size": 460163,
+          "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Test-AgentInstructions.ps1"
+        },
+        "research-misc": {
+          "blob": "a9e23ed70deda2a9de12fc8962282ad167d4bde9",
+          "mode": "100644",
+          "type": "blob",
+          "size": 306638,
+          "sha256": "3b40a377fe6eb5b1c2194ca618c63851c504db73beaa99a713b5b3214e9ca5c4",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.github/workflows/Test-AgentInstructions.ps1"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A03",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "41a955fc4ef68f47b3391417babbcb91824a2726",
+          "mode": "100644",
+          "type": "blob",
+          "size": 19602,
+          "sha256": "becb1877caa33c3cbdb949ce710676674ad8475384252072aef8e63496710bba",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Test-AgentInstructions.SelfTest.ps1"
+        },
+        "TerraformStyleGuide": {
+          "absent": true
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A03",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+          "mode": "100644",
+          "type": "blob",
+          "size": 25672,
+          "sha256": "a8f12abf35f250c7f2d0a0ab753a18a42fca7516a36aae9e3dd90eac76805160",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Validate-WorkflowPolicy.mjs"
+        },
+        "TerraformStyleGuide": {
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "mode": "100644",
+          "type": "blob",
+          "size": 25568,
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Validate-WorkflowPolicy.mjs"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A03",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "a0dbaeea819a469fd0da0fed6b8db28db03acd2e",
+          "mode": "100644",
+          "type": "blob",
+          "size": 13116,
+          "sha256": "0073945f15d4137ef11e886cf265d346567981b4c1fcc95d180666c3cf69d38d",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/workflow-policy-cases.json"
+        },
+        "TerraformStyleGuide": {
+          "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+          "mode": "100644",
+          "type": "blob",
+          "size": 13047,
+          "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/workflow-policy-cases.json"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A03",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "d44a87f46f60e0cc80a3293aa90d7ed6e1c5d161",
+          "mode": "100644",
+          "type": "blob",
+          "size": 1448,
+          "sha256": "0414d5e9a498b0bf7f9f5ce258a733679bc1ad6963af5bbdb3e6f2ecb30901ee",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/workflow-policy-contract.json"
+        },
+        "TerraformStyleGuide": {
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "mode": "100644",
+          "type": "blob",
+          "size": 1407,
+          "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/workflow-policy-contract.json"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A03",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".gitignore",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "7429fc67b0c38c8ad6b57211c88797b5e8f13140",
+          "mode": "100644",
+          "type": "blob",
+          "size": 250,
+          "sha256": "a75dc3cbfa65dd2cba13326062c5039e04b7a15f6cb9a4c6c4983c2262c00bad",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.gitignore"
+        },
+        "TerraformStyleGuide": {
+          "blob": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+          "mode": "100644",
+          "type": "blob",
+          "size": 249,
+          "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.gitignore"
+        },
+        "research-misc": {
+          "blob": "e42d3bbc695f8bb78fb6a49a5672f973803719a3",
+          "mode": "100644",
+          "type": "blob",
+          "size": 194,
+          "sha256": "7fd0380a67d3a9952e24a8ca815f8111dce89e1d4a8eb00d2aa41794e6f2376b",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.gitignore"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A02",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "808609311d98e9792dc7f3d76d20aa220aab2256",
+          "mode": "100644",
+          "type": "blob",
+          "size": 3143,
+          "sha256": "f5babbf1733ee1065ba34f717050e4e831eeef649adbacd73f99301edc650d23",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.pre-commit-config.yaml"
+        },
+        "TerraformStyleGuide": {
+          "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+          "mode": "100644",
+          "type": "blob",
+          "size": 5405,
+          "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.pre-commit-config.yaml"
+        },
+        "research-misc": {
+          "blob": "6a138c59a0ce62ad9679c815e024c9d6e9902ccf",
+          "mode": "100644",
+          "type": "blob",
+          "size": 7318,
+          "sha256": "4c0ec5c0bf12afe953e2635c2903fb0ce5d0d3232eebfc2b5fc74af68f1ea3e6",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/.pre-commit-config.yaml"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A07",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": "AGENTS.md",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "f7543d786156f0efc39c3fe2927ffcd186b29f39",
+          "mode": "100644",
+          "type": "blob",
+          "size": 32680,
+          "sha256": "ce1860e518783cdd75d78124a1ab078257233807f689839eb7cb3e3749f8847b",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/AGENTS.md"
+        },
+        "TerraformStyleGuide": {
+          "blob": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+          "mode": "100644",
+          "type": "blob",
+          "size": 33422,
+          "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/AGENTS.md"
+        },
+        "research-misc": {
+          "blob": "63a09836e309e3e0e9dc1e6abff7807b5c3e77b1",
+          "mode": "100644",
+          "type": "blob",
+          "size": 32537,
+          "sha256": "6b350f1c2ccf19c3b10d4e093aec138df06d5319e43eef14ece8faff7ece13d3",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/AGENTS.md"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A02",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": "CLAUDE.md",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "3bb0afcae09e05b6a8022d339b12721e8a1473d2",
+          "mode": "100644",
+          "type": "blob",
+          "size": 82478,
+          "sha256": "527069c020934a6e73774dadef98359911bee71754ac6d67ab60796ac757c591",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/CLAUDE.md"
+        },
+        "TerraformStyleGuide": {
+          "blob": "3cc21fc793944033be430ad08722081db4e7b9dd",
+          "mode": "100644",
+          "type": "blob",
+          "size": 80980,
+          "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/CLAUDE.md"
+        },
+        "research-misc": {
+          "blob": "c5e8dd2eb9622d2b95edc80876a23997060b285d",
+          "mode": "100644",
+          "type": "blob",
+          "size": 82250,
+          "sha256": "b87dc92e6fece8b3a0c878722ef2fccce18e38adfe862af6fdf79610088e41c1",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/CLAUDE.md"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A02",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+          "mode": "100644",
+          "type": "blob",
+          "size": 12177,
+          "sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/docs/decisions/0001-accept-in-repository-trust-root.md"
+        },
+        "TerraformStyleGuide": {
+          "absent": true
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A02",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": "docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+          "mode": "100644",
+          "type": "blob",
+          "size": 8744,
+          "sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/docs/decisions/0002-accept-unverifiable-baseline-provenance.md"
+        },
+        "TerraformStyleGuide": {
+          "absent": true
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A02",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "6835e35d318e3f8af8f48ba0d7d773f10475918b",
+          "mode": "100644",
+          "type": "blob",
+          "size": 2214,
+          "sha256": "13cf6d01fe951c4f8197e6a1b27740e5554b68f2f0b8add7a675322833ef4594",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/docs/ISSUE_EVALUATION_PROMPT.md"
+        },
+        "TerraformStyleGuide": {
+          "blob": "f43b5168ce508a9a054dc85ba7231e27d8c70809",
+          "mode": "100644",
+          "type": "blob",
+          "size": 2146,
+          "sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/docs/ISSUE_EVALUATION_PROMPT.md"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A02",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": "package-lock.json",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "5a8244af74fde546f0bfa55af366ce3ca13cea51",
+          "mode": "100644",
+          "type": "blob",
+          "size": 51357,
+          "sha256": "63e3455bc1e4d04c4390dea1ddddb340bf89c48206ee6deeb851241e1177b6fe",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/package-lock.json"
+        },
+        "TerraformStyleGuide": {
+          "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+          "mode": "100644",
+          "type": "blob",
+          "size": 3566,
+          "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/package-lock.json"
+        },
+        "research-misc": {
+          "blob": "e9efa0381e686a265c41eb36662671791da9e837",
+          "mode": "100644",
+          "type": "blob",
+          "size": 48914,
+          "sha256": "362734c4f423023a2f97ddaf93d4505ab6a9f77aa6fca1aea6820a3046da6ba5",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/package-lock.json"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A07",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": "package.json",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "f700e931201cac80accde177a11b1a0bb5c75bb2",
+          "mode": "100644",
+          "type": "blob",
+          "size": 1025,
+          "sha256": "50f91f5901669fc74d624ce0ca8d90e50cf335c0eb437fdfdd6f4723d7226a3a",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/package.json"
+        },
+        "TerraformStyleGuide": {
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "mode": "100644",
+          "type": "blob",
+          "size": 837,
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/package.json"
+        },
+        "research-misc": {
+          "blob": "062a0fc09368701f07a9db3d8b09877866463644",
+          "mode": "100644",
+          "type": "blob",
+          "size": 723,
+          "sha256": "977f9803d16bd09c8333ab59f57688110ebf79be166be1e028f857234842a74d",
+          "url": "https://github.com/franklesniak/research-misc/blob/51dbeb560dd518b904cf1b571dc7d01fd8045749/package.json"
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A07",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    },
+    {
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "cells": {
+        "PSStyleGuide": {
+          "blob": "afb5ba370810e36a9c1ba103aa8e5691a3131581",
+          "mode": "100644",
+          "type": "blob",
+          "size": 135295,
+          "sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4",
+          "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/STYLE_GUIDE_RATIONALE.md"
+        },
+        "TerraformStyleGuide": {
+          "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+          "mode": "100644",
+          "type": "blob",
+          "size": 73953,
+          "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/STYLE_GUIDE_RATIONALE.md"
+        },
+        "research-misc": {
+          "absent": true
+        }
+      },
+      "disposition": "remaining-owner",
+      "remaining_owners": [
+        "A02",
+        "A18"
+      ],
+      "reason": "Preserve the pinned governance source. Current target conformance or justified replacement must be accepted by the owning outcome; historical raw differences are not automatic language exceptions."
+    }
+  ]
+}

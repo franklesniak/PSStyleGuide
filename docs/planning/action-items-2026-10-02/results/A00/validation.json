@@ -1,0 +1,20 @@
+{
+  "validated_at": "2026-10-02T05:41:55.487643+00:00",
+  "result": "PASS",
+  "original_ids": 402,
+  "present_dispositions": {
+    "unverified": 339,
+    "replaced": 63
+  },
+  "prior_historical_credits_preserved": 26,
+  "unowned_original_ids": 0,
+  "catalog_paths": 28,
+  "catalog_cells": 84,
+  "native_raw_blobs_read": 77,
+  "research_catalog_raw_blobs_read": 14,
+  "final_main_refs": {
+    "PSStyleGuide": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "TerraformStyleGuide": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+  },
+  "limits": "Coverage and native evidence validation only. No product tests, historical review reruns or product exception acceptance."
+}
