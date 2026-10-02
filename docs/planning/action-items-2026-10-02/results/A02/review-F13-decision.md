@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # F13: compare push endpoints in the explicitly proposed-policy role
 
-Status: selected before corresponding product edits.
+Status: selected before corresponding product edits; implemented; focused controls pass; final aggregate held.
 
 ## Validation and stakeholders
 
@@ -43,3 +43,7 @@ In the existing candidate-tests push caller, read event before/after through env
 Required paths: validator, SelfTest, agent-instructions.yml and existing Classify-InstructionMaintenance.test.mjs. No classifier algorithm, manifest, protected file, settings or new external helper. This narrowly justified explicit CLI mode is needed because accepted checkout==B must remain intact; it avoids silently weakening that mode.
 
 Validate real proposed full B/H on H: ordinary success, unauthorized expansion rejection, backward metadata rejection and exact initial B48f compatibility using proposed code. Retain default wrong-checkout rejection; reject bad mode combinations and missing/zero/unavailable endpoints. Test actual extracted workflow control flow with bounded stubs for native failures, event endpoint mismatch, fetch identity, zero-before, and no push call for PR/manual. Assert accepted caller cannot select the proposed switch. Retain all prior F1–F12 controls and one final-byte combined aggregate. Actual GitHub run/landing remains a later native gate. No claim of immutable enforcement, owner acceptance or authenticated finalization date. Parent owns publication, round8/80/original deadline/transfer0/12; A07 remains frozen.
+
+## Validation checkpoint
+
+Implemented within the four authorized code/workflow paths. All focused controls pass; provisional tree0cde16e0dc69df235b98f6e739fa112bf7c1e3eb has no unstaged changes. RESULT.md records exact identities, terminal logs and limits. Code is frozen for independent review. No aggregate has started: the two separately authorized metadata date lines will be refreshed only on actual UTC October3, then one normal final-byte aggregate will run. No native installation/owner/immutable-workflow acceptance is claimed.

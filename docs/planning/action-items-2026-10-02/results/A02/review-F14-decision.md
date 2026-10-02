@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # F14: recognize spaced emphasized optional metadata markers
 
-Status: selected before product edits.
+Status: selected before product edits; implemented; focused controls pass; final aggregate held.
 
 ## Validation and stakeholders
 
@@ -34,3 +34,7 @@ S closes the reproduced boundary with one existing expression change. Scores exp
 Select S. Permit whitespace between an emphasized reserved label and its existing colon or closing emphasis. Keep the parsed context boundaries. Keep strict canonical metadata validation unchanged. Preserve un-emphasized generic Owner/Scope prose. Apply the same detector to current and prior data. Change only validator/SelfTest.
 
 Test Owner/Scope and case/space siblings as lone incomplete markers, current and real prior metadata. Retain canonical complete headers and generic Owner/Scope prose. Retain fences, quotes, front matter, nested items, inline code, later H3 examples and H1 titles. Run a real optional current/prior B/H caller rejection. Then freeze with F13/F15 and run one normal final-byte aggregate. No guide text changes or new public interface. Parent owns native publication and final quality; round8/80, original deadline and transfer0/12 remain.
+
+## Validation checkpoint
+
+Implemented within the four authorized code/workflow paths. All focused controls pass; provisional tree0cde16e0dc69df235b98f6e739fa112bf7c1e3eb has no unstaged changes. RESULT.md records exact identities, terminal logs and limits. Code is frozen for independent review. No aggregate has started: the two separately authorized metadata date lines will be refreshed only on actual UTC October3, then one normal final-byte aggregate will run. No native installation/owner/immutable-workflow acceptance is claimed.

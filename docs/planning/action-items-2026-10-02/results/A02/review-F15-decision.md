@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # F15: retain regular Git entry requirements for generated exemptions
 
-Status: selected before product edits.
+Status: selected before product edits; implemented; focused controls pass; final aggregate held.
 
 ## Validation and stakeholders
 
@@ -35,3 +35,7 @@ M is a small reuse of the already verified entry parser, with a narrow index gra
 Select M. Extract the existing bounded raw Git tree entry proof into one internal helper that returns the validated blob identity. Keep Read-GitRevisionText content semantics unchanged. For local input, inspect literal NUL stage0 index metadata with the same bounds and exact path comparison. Check every active candidate generated path before the data-only early return. Do not read its body. Do not add physical chmod or follow targets. Preserve prior authorization, category provenance, missing/removed-path semantics and the closed initial mapping.
 
 Exercise actual authorized B/H activation and already-generated mode changes for100644,100755,120000,160000, tree/missing and exact Unicode/literal paths. Test stage0 index success and invalid modes/stages. Prove metadata-only inspection accepts a100644 binary/oversized-content object without body decoding and does not call cat-file. Reuse F12 framing/native exit/overflow/timeout/raw-object controls through the factored reader. Run both data-only and full callers where applicable, then one combined final-byte normal aggregate. No schema, public mode or protected changes. Parent owns actual endpoints/native gates; private installed fixtures do not supply native installation/owner authority. Round8/80 and transfer0/12 remain.
+
+## Validation checkpoint
+
+Implemented within the four authorized code/workflow paths. All focused controls pass; provisional tree0cde16e0dc69df235b98f6e739fa112bf7c1e3eb has no unstaged changes. RESULT.md records exact identities, terminal logs and limits. Code is frozen for independent review. No aggregate has started: the two separately authorized metadata date lines will be refreshed only on actual UTC October3, then one normal final-byte aggregate will run. No native installation/owner/immutable-workflow acceptance is claimed.
