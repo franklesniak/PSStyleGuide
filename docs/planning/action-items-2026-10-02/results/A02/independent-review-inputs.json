@@ -1,0 +1,95 @@
+{
+  "refs": {
+    "base": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8"
+  },
+  "native": {
+    "head": "fe3d6738d5b331f88e21bf6b9815883b3bb353b8",
+    "base": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "url": "https://github.com/franklesniak/PSStyleGuide/pull/224"
+  },
+  "sources": [
+    {
+      "role": "base",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "blob": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+      "mode": "100644",
+      "sha256": "5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5"
+    },
+    {
+      "role": "base",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "blob": "41a955fc4ef68f47b3391417babbcb91824a2726",
+      "mode": "100644",
+      "sha256": "becb1877caa33c3cbdb949ce710676674ad8475384252072aef8e63496710bba"
+    },
+    {
+      "role": "base",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "blob": "d6f0628d492f6d2f76fe1ab65b3e0b316b52c729",
+      "mode": "100644",
+      "sha256": "37d5d156f61bcf29391e86f3d6da17f1ed5e5f177086d97466c2dcdbff1fd364"
+    },
+    {
+      "role": "base",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "blob": "1e7a60a42a8e9b28811c64de3d1b7e4c1bbec76a",
+      "mode": "100644",
+      "sha256": "274321f2fae5e18d7f9a8878522606f7e9961948dc8d035f90765fce21f0fd20"
+    },
+    {
+      "role": "base",
+      "path": ".github/workflows/agent-instructions.yml",
+      "blob": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+      "mode": "100644",
+      "sha256": "1c9457868eb262fc7ed8583d1cfff2903288286f11c103a46f91703b04bef67d"
+    },
+    {
+      "role": "base",
+      "path": ".github/document-metadata-classification.json",
+      "absent": true
+    },
+    {
+      "role": "head",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "blob": "3e60de7ada8f9fa356e5a69f80a7081cc9444b94",
+      "mode": "100644",
+      "sha256": "bb65599fde7cf98ecd868a608d43c85559282705df694f8a3f116c185bed2492"
+    },
+    {
+      "role": "head",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "blob": "47d3c60496d1b5872d3147e822fda1c59217b8d3",
+      "mode": "100644",
+      "sha256": "93c193d607687f1c2b2b9fce2f11f066b010bfb53cc53a679561ea13f95801b9"
+    },
+    {
+      "role": "head",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "blob": "1e03c3fe9d1845fe73a8f05820e8acb09d04f918",
+      "mode": "100644",
+      "sha256": "a17bfe6ab678793fde20248d32cd35cbbb5668c4fe430f59679e05157b60acff"
+    },
+    {
+      "role": "head",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "blob": "10501fb25bef1e57f51e8d147900f298a9dcb39b",
+      "mode": "100644",
+      "sha256": "8255b514c8d9a724c2a12a269783b19b408d4c51f413ae48a39ed486c0b2c839"
+    },
+    {
+      "role": "head",
+      "path": ".github/workflows/agent-instructions.yml",
+      "blob": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+      "mode": "100644",
+      "sha256": "1c9457868eb262fc7ed8583d1cfff2903288286f11c103a46f91703b04bef67d"
+    },
+    {
+      "role": "head",
+      "path": ".github/document-metadata-classification.json",
+      "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+      "mode": "100644",
+      "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c"
+    }
+  ]
+}

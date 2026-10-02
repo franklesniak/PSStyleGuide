@@ -1,0 +1,38 @@
+[
+  {
+    "case": "actual-published-delayed",
+    "clock": "2026-10-03",
+    "contentDate": "2026-10-02",
+    "eventDate": "",
+    "failureCount": 0,
+    "failures": []
+  },
+  {
+    "case": "proposed-null-strict-delayed",
+    "clock": "2026-10-03",
+    "contentDate": "2026-10-02",
+    "eventDate": "",
+    "failureCount": 1,
+    "failures": [
+      "docs/RUNBOOK.md Last Updated must be 2026-10-03 after a rendered-content change without a trusted event date."
+    ]
+  },
+  {
+    "case": "explicit-original-context-delayed",
+    "clock": "2026-10-03",
+    "contentDate": "2026-10-02",
+    "eventDate": "2026-10-02",
+    "failureCount": 0,
+    "failures": []
+  },
+  {
+    "case": "wrong-context-rejects",
+    "clock": "2026-10-03",
+    "contentDate": "2026-10-02",
+    "eventDate": "2026-10-01",
+    "failureCount": 1,
+    "failures": [
+      "docs/RUNBOOK.md Last Updated must be 2026-10-01 after the current event input changes rendered content."
+    ]
+  }
+]
