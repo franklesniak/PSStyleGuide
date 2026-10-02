@@ -30,7 +30,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.5.20261002.0
+# Version: 1.6.20261002.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -988,8 +988,9 @@ function Assert-AuthorFinalizationGitFixture {
             '$script:objMaximumCommitUtcTimestamp = $script:objValidationUtcNow.AddMinutes(5) }; '
         } else { '' }
         $strCommand = '$ErrorActionPreference = ''Stop''; $checker = ''' + $strValidatorPath.Replace("'", "''") + '''; ' +
-            $strClockShim + '& $checker -InputRevision ' + $Candidate + ' -PublishedBaselineRevision ' + $strBaseline +
-            $(if ($Now) { ' -FinalizeMetadataNow' } else { '' })
+            $strClockShim + 'try { & $checker -InputRevision ' + $Candidate + ' -PublishedBaselineRevision ' + $strBaseline +
+            $(if ($Now) { ' -FinalizeMetadataNow' } else { '' }) +
+            ' } catch { [Console]::Out.WriteLine($_.Exception.Message); exit 1 }'
         $strOutput = (& $strHostPath -NoLogo -NoProfile -NonInteractive -Command $strCommand 2>&1 | Out-String)
         $intExit = $LASTEXITCODE
         if (($intExit -eq 0) -ne $Accept -or $strOutput -notmatch $Expected) {
