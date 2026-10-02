@@ -1,0 +1,52 @@
+{
+  "scope": "static design only, no product or operational tests",
+  "inputs": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\TerraformStyleGuide\\06TerraformStyleGuideT4.md",
+      "bytes": 86973,
+      "sha256": "8aa5e97ada2b1ca0d8865d96e08f19e9ca8ea7da988f1e2742b508a32883a5f7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "bytes": 8845,
+      "sha256": "e5b892d95792145f98aeb4b96c1b2c704cd858cdbd714ceba95af69971bc91ed"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A15.md",
+      "bytes": 3662,
+      "sha256": "5aad23b76457b58c02a48e86540f25a4497e8c9b1ea0db2f20f7aaf52d2449c6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A15\\RESULT.md",
+      "bytes": 1754,
+      "sha256": "6d0c484a559f5a4533a31bc73f24fc3f8e9f7f04438e2017fcb960724688f4e3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A15\\read-only-design.md",
+      "bytes": 42462,
+      "sha256": "88b1a33a856b782a83bad4becc9c7ff0ec47617124a1553b6a3885595ae885e1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A15-design-20261002\\D07-continuation\\design-continuation.md",
+      "bytes": 8074,
+      "sha256": "50b8d3f16135bd5427f5e93a0eb4608f21c962857ccdd81c349f200dfd40ae72"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A15-design-20261002\\D07-continuation\\D1-per-gate-path-manifest.json",
+      "bytes": 15821,
+      "sha256": "67a7aa47997af72103e373c71ffaa3ccffe57f25f0fd144235265e17c543e221"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A15-design-20261002\\D07-continuation\\D3-D4-identity-handoff.md",
+      "bytes": 14052,
+      "sha256": "e4ee20cef591113d352793a3053e9c8516c90b369ba612b373430a37eb38b102"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A15-design-20261002\\D07-continuation\\TF64-current-T2-identity.json",
+      "bytes": 1986,
+      "sha256": "4ef710d66f444ebfea2410ec1d3b67c96e9282c2dd84f8ddbfa1167a8d4e4c7e"
+    }
+  ],
+  "tfMain": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+  "tfPinned": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+}

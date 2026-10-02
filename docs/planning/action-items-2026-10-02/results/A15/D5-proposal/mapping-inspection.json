@@ -1,0 +1,32 @@
+{
+  "existingNamedIds": 224,
+  "signalIds": 108,
+  "totalProposedIds": 2261,
+  "newNonSignalIds": 1929,
+  "duplicateIds": 0,
+  "runtimeCellsAreProposals": true,
+  "executedFixtureCount": 0,
+  "realGateApprovalCount": 0,
+  "confirmationBoundaryStaticInputs": [
+    4095,
+    4096,
+    4097
+  ],
+  "originalFamilyCounts": {
+    "BASH-BACKUP": 20,
+    "PS-BACKUP": 23,
+    "PS-UTF8": 15,
+    "CONFIRM": 69,
+    "BASH-CORR": 15,
+    "BASH-PUSH": 29,
+    "BASH-RM": 17,
+    "ADDRESS": 36
+  },
+  "gateCounts": {
+    "A": 1957,
+    "B": 304
+  },
+  "mappingSha256": "ad2d45560f0dc86fd3b1ddbbb1d65ee38be74b67eb51e0267075498ecde139a2",
+  "workerScratchMappingSha256": "ad2d45560f0dc86fd3b1ddbbb1d65ee38be74b67eb51e0267075498ecde139a2",
+  "publicationNote": "Repository eol=lf publication; worker scratch hash retained separately. Case content unchanged."
+}

@@ -1,0 +1,53 @@
+{
+  "checks": "static proposal consistency only",
+  "pass": true,
+  "counts": {
+    "existing": 224,
+    "signals": 108,
+    "namedSplits": 39,
+    "unnamedAllocated": 1890
+  },
+  "total": 2261,
+  "boundaryCorrection": {
+    "oldIdsRemoved": 0,
+    "existingRowsChanged": 331,
+    "appendedRows": 99,
+    "knownOwnedPostcreationCasesChecked": 192,
+    "phaseBoundaryCheck": "PASS (static oracle inspection only)"
+  },
+  "executedProductTests": 0,
+  "realGateApprovals": 0,
+  "files": [
+    {
+      "name": "case-oracle-mapping.tsv",
+      "bytes": 1446552,
+      "sha256": "ad2d45560f0dc86fd3b1ddbbb1d65ee38be74b67eb51e0267075498ecde139a2"
+    },
+    {
+      "name": "confirmation-boundary-inputs.json",
+      "bytes": 13041,
+      "sha256": "5141322cb2c203d66c331e11b90059586c09df7131064f75a132be9019e45a7b"
+    },
+    {
+      "name": "D5-continuation.md",
+      "bytes": 15418,
+      "sha256": "6a6e14c09f1fa9e251cae17c3533121d4664f2ae1e9cd56b28fd73980914fc3d"
+    },
+    {
+      "name": "input-receipt.json",
+      "bytes": 2426,
+      "sha256": "1149f5d48859d67001df7015666ef74b210b711455205ce359be2c8b8480f479"
+    },
+    {
+      "name": "inspect-mapping.py",
+      "bytes": 6547,
+      "sha256": "55c66bc706be20a2bc210d1cf6becc44fddeac89e0ee8c064a1b0085917fc841"
+    },
+    {
+      "name": "mapping-inspection.json",
+      "bytes": 847,
+      "sha256": "d3841ec62454dfd14fb5d1ad6f65dc7177b70219df0b99d0d4f37efafc3eb2f6"
+    }
+  ],
+  "publicationNote": "Current file identities are repository LF bytes. Worker scratch hashes and original review attribution are retained in mapping-inspection.json and D5-quality.md."
+}

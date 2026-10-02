@@ -1,0 +1,46 @@
+{
+  "checks": "static proposal consistency only",
+  "pass": true,
+  "counts": {
+    "existing": 224,
+    "signals": 108,
+    "namedSplits": 39,
+    "unnamedAllocated": 1791
+  },
+  "total": 2162,
+  "executedProductTests": 0,
+  "realGateApprovals": 0,
+  "files": [
+    {
+      "name": "case-oracle-mapping.tsv",
+      "bytes": 1218248,
+      "sha256": "e03361991af52c823cf01d3cbb200cb52f122009d5aaa7eabb0991ff1d66ec6f"
+    },
+    {
+      "name": "confirmation-boundary-inputs.json",
+      "bytes": 13070,
+      "sha256": "29ec16a78dd5172ac11e7f60e143766c8184a32c392f091d1a3cb27686691d4a"
+    },
+    {
+      "name": "D5-continuation.md",
+      "bytes": 11805,
+      "sha256": "02bd1131b117242a348b080ff8441b2c4bce0002d95148959370dc1bebf68ec4"
+    },
+    {
+      "name": "input-receipt.json",
+      "bytes": 2478,
+      "sha256": "1f1a593ca39090816647dc2d2fea25a1b77e2b300de9319f107cf664c7a6e079"
+    },
+    {
+      "name": "inspect-mapping.py",
+      "bytes": 3641,
+      "sha256": "f859514852a94bd0e329fad54ba8a03c2f61840ea0ee66e4789b4bf1da5801a5"
+    },
+    {
+      "name": "mapping-inspection.json",
+      "bytes": 657,
+      "sha256": "b3b2437720fe8fb9e2a0daf9c0f348dee57c95c91df109fcdb6a10ef3967ba07"
+    }
+  ],
+  "fileIdentityScope": "Historical worker scratch before repository LF publication. Current published mapping hash is in mapping-inspection.json."
+}
