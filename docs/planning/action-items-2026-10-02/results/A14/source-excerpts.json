@@ -1,0 +1,529 @@
+[
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+    "ranges": [
+      {
+        "start": 710,
+        "end": 722,
+        "lines": [
+          "        [DllImport(\"kernel32.dll\", SetLastError = true)]",
+          "        private static extern bool GetFileInformationByHandle(",
+          "            Microsoft.Win32.SafeHandles.SafeFileHandle handle,",
+          "            out ByHandleFileInformation information);",
+          "",
+          "        public static string Read(string path) {",
+          "            using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {",
+          "                ByHandleFileInformation information;",
+          "                if (!GetFileInformationByHandle(stream.SafeFileHandle, out information)) {",
+          "                    throw new Win32Exception(Marshal.GetLastWin32Error());",
+          "                }",
+          "                if (information.NumberOfLinks != 1) {",
+          "                    throw new InvalidDataException(\"hardlink-alias\");"
+        ]
+      },
+      {
+        "start": 1710,
+        "end": 1717,
+        "lines": [
+          "                $objCandidateStream = New-Object System.IO.FileStream(",
+          "                    $strTemporaryPath,",
+          "                    [System.IO.FileMode]::CreateNew,",
+          "                    [System.IO.FileAccess]::Write,",
+          "                    [System.IO.FileShare]::None",
+          "                )",
+          "                $hashtableRecord.TemporaryDisposition = 'Created'",
+          "                break"
+        ]
+      },
+      {
+        "start": 1733,
+        "end": 1745,
+        "lines": [
+          "        # Write and flush through the retained CreateNew handle rather than closing it",
+          "        # and reopening the path. A path-based reopen (FileMode.Open) would follow a",
+          "        # symlink that another process could substitute at the candidate path after",
+          "        # the close, sending the payload to the link target; the CreateNew handle is",
+          "        # bound to the file this process created, so the write cannot be redirected.",
+          "        # The ordinary-path assertion and identity capture below then confirm the",
+          "        # on-disk candidate and fail closed if the path was replaced during the write.",
+          "        $strPhase = 'write-candidate'",
+          "        try {",
+          "            $objCandidateStream.Write($CompletePayloadBytes, 0, $CompletePayloadBytes.Length)",
+          "            $strPhase = 'flush-candidate'",
+          "            $objCandidateStream.Flush($true)",
+          "        } finally {"
+        ]
+      },
+      {
+        "start": 1798,
+        "end": 1832,
+        "lines": [
+          "        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File)",
+          "        if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity -or",
+          "            (Get-FileSha256Hex -LiteralPath $strTemporaryPath) -cne $hashtableRecord.CandidateSha256) {",
+          "            throw 'candidate-content-drift'",
+          "        }",
+          "",
+          "        # ACCEPTED BOUNDED RESIDUAL (publication substitution window). The revalidation",
+          "        # above re-proves the candidate identity and bytes, but File.Replace and",
+          "        # File.Move resolve the source by PATH. Between that final proof and the",
+          "        # rename below, a second writer with write access to the parent directory",
+          "        # could rename the verified candidate away and place a different object at",
+          "        # the same temporary path, with either the same or different bytes; the",
+          "        # path-based rename would then publish that substituted object. No portable",
+          "        # mechanism closes this: .NET exposes no handle-bound rename, POSIX rename",
+          "        # is not fd-bound and does not honor a share mode, and a delete-denying handle",
+          "        # held across the call would instead block the very rename this code must",
+          "        # perform. The residual is bounded and never yields a false success -- the",
+          "        # verify-publication phase below binds the final object to the candidate",
+          "        # identity and verifies its bytes. It reports a final-candidate-identity-mismatch",
+          "        # or final-byte-drift under ReplacementStateUncertain, so a substitution fails",
+          "        # closed with truthful evidence. The window requires a concurrent second",
+          "        # writer racing a sub-second interval, which the single-actor CI trust root",
+          "        # (docs/decisions/0001) does not have,",
+          "        # and such a writer already has directory write access and so gains nothing",
+          "        # beyond a truthfully reported failure it could cause by writing directly.",
+          "        $strPhase = 'publish-destination'",
+          "        if ($hashtableRecord.OriginalState -eq 'Existing') {",
+          "            $hashtableRecord.PublicationMethod = 'File.Replace'",
+          "            [PSStyleGuide.AtomicFileReplacement]::Replace($strTemporaryPath, $strDestinationPath)",
+          "            $hashtableRecord.TemporaryDisposition = 'ConsumedByReplace'",
+          "        } else {",
+          "            $hashtableRecord.PublicationMethod = 'File.Move'",
+          "            [System.IO.File]::Move($strTemporaryPath, $strDestinationPath)",
+          "            $hashtableRecord.TemporaryDisposition = 'ConsumedByMove'",
+          "        }"
+        ]
+      },
+      {
+        "start": 1911,
+        "end": 1917,
+        "lines": [
+          "                        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File)",
+          "                        if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity) {",
+          "                            throw 'candidate-identity-drift'",
+          "                        }",
+          "                        [System.IO.File]::Delete($strTemporaryPath)",
+          "                        if (Test-FileSystemEntry -LiteralPath $strTemporaryPath) {",
+          "                            throw 'candidate-cleanup-failure'"
+        ]
+      },
+      {
+        "start": 2061,
+        "end": 2066,
+        "lines": [
+          "        if ($hashtableIdentities.ContainsKey($strIdentity)) {",
+          "            throw \"duplicate-source-identity\"",
+          "        }",
+          "        $hashtableIdentities[$strIdentity] = $strRepositoryPath",
+          "        $hashtableSourceBytes[$strSourceId] = [System.IO.File]::ReadAllBytes($strSourcePath)",
+          "    }"
+        ]
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+    "ranges": [
+      {
+        "start": 710,
+        "end": 722,
+        "lines": [
+          "        [DllImport(\"kernel32.dll\", SetLastError = true)]",
+          "        private static extern bool GetFileInformationByHandle(",
+          "            Microsoft.Win32.SafeHandles.SafeFileHandle handle,",
+          "            out ByHandleFileInformation information);",
+          "",
+          "        public static string Read(string path) {",
+          "            using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {",
+          "                ByHandleFileInformation information;",
+          "                if (!GetFileInformationByHandle(stream.SafeFileHandle, out information)) {",
+          "                    throw new Win32Exception(Marshal.GetLastWin32Error());",
+          "                }",
+          "                if (information.NumberOfLinks != 1) {",
+          "                    throw new InvalidDataException(\"hardlink-alias\");"
+        ]
+      },
+      {
+        "start": 1896,
+        "end": 1903,
+        "lines": [
+          "                $objCandidateStream = New-Object System.IO.FileStream(",
+          "                    $strTemporaryPath,",
+          "                    [System.IO.FileMode]::CreateNew,",
+          "                    [System.IO.FileAccess]::Write,",
+          "                    [System.IO.FileShare]::None",
+          "                )",
+          "                $hashtableRecord.TemporaryDisposition = 'Created'",
+          "                break"
+        ]
+      },
+      {
+        "start": 1919,
+        "end": 1931,
+        "lines": [
+          "        # Write and flush through the retained CreateNew handle rather than closing it",
+          "        # and reopening the path. A path-based reopen (FileMode.Open) would follow a",
+          "        # symlink that another process could substitute at the candidate path after",
+          "        # the close, sending the payload to the link target; the CreateNew handle is",
+          "        # bound to the file this process created, so the write cannot be redirected.",
+          "        # The ordinary-path assertion and identity capture below then confirm the",
+          "        # on-disk candidate and fail closed if the path was replaced during the write.",
+          "        $strPhase = 'write-candidate'",
+          "        try {",
+          "            $objCandidateStream.Write($CompletePayloadBytes, 0, $CompletePayloadBytes.Length)",
+          "            $strPhase = 'flush-candidate'",
+          "            $objCandidateStream.Flush($true)",
+          "        } finally {"
+        ]
+      },
+      {
+        "start": 1984,
+        "end": 2018,
+        "lines": [
+          "        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File)",
+          "        if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity -or",
+          "            (Get-FileSha256Hex -LiteralPath $strTemporaryPath) -cne $hashtableRecord.CandidateSha256) {",
+          "            throw 'candidate-content-drift'",
+          "        }",
+          "",
+          "        # ACCEPTED BOUNDED RESIDUAL (publication substitution window). The revalidation",
+          "        # above re-proves the candidate identity and bytes, but File.Replace and",
+          "        # File.Move resolve the source by PATH. Between that final proof and the",
+          "        # rename below, a second writer with write access to the parent directory",
+          "        # could rename the verified candidate away and place a different object at",
+          "        # the same temporary path, with either the same or different bytes; the",
+          "        # path-based rename would then publish that substituted object. No portable",
+          "        # mechanism closes this: .NET exposes no handle-bound rename, POSIX rename",
+          "        # is not fd-bound and does not honor a share mode, and a delete-denying handle",
+          "        # held across the call would instead block the very rename this code must",
+          "        # perform. The residual is bounded and never yields a false success -- the",
+          "        # verify-publication phase below binds the final object to the candidate",
+          "        # identity and verifies its bytes. It reports a final-candidate-identity-mismatch",
+          "        # or final-byte-drift under ReplacementStateUncertain, so a substitution fails",
+          "        # closed with truthful evidence. The window requires a concurrent second",
+          "        # writer racing a sub-second interval, which the single-actor CI trust root",
+          "        # (docs/decisions/0001) does not have,",
+          "        # and such a writer already has directory write access and so gains nothing",
+          "        # beyond a truthfully reported failure it could cause by writing directly.",
+          "        $strPhase = 'publish-destination'",
+          "        if ($hashtableRecord.OriginalState -eq 'Existing') {",
+          "            $hashtableRecord.PublicationMethod = 'File.Replace'",
+          "            [TerraformStyleGuide.AtomicFileReplacement]::Replace($strTemporaryPath, $strDestinationPath)",
+          "            $hashtableRecord.TemporaryDisposition = 'ConsumedByReplace'",
+          "        } else {",
+          "            $hashtableRecord.PublicationMethod = 'File.Move'",
+          "            [System.IO.File]::Move($strTemporaryPath, $strDestinationPath)",
+          "            $hashtableRecord.TemporaryDisposition = 'ConsumedByMove'",
+          "        }"
+        ]
+      },
+      {
+        "start": 2097,
+        "end": 2103,
+        "lines": [
+          "                        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File)",
+          "                        if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity) {",
+          "                            throw 'candidate-identity-drift'",
+          "                        }",
+          "                        [System.IO.File]::Delete($strTemporaryPath)",
+          "                        if (Test-FileSystemEntry -LiteralPath $strTemporaryPath) {",
+          "                            throw 'candidate-cleanup-failure'"
+        ]
+      },
+      {
+        "start": 2247,
+        "end": 2252,
+        "lines": [
+          "        if ($hashtableIdentities.ContainsKey($strIdentity)) {",
+          "            throw \"duplicate-source-identity\"",
+          "        }",
+          "        $hashtableIdentities[$strIdentity] = $strRepositoryPath",
+          "        $hashtableSourceBytes[$strSourceId] = [System.IO.File]::ReadAllBytes($strSourcePath)",
+          "    }"
+        ]
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+    "ranges": [
+      {
+        "start": 4324,
+        "end": 4330,
+        "lines": [
+          "    # even for a config subcommand with --no-includes. Probe fixed config files through a",
+          "    # neutral Git directory, which reports include keys without opening their targets.",
+          "    $strNeutralGitDirectory = [System.IO.Path]::Combine(",
+          "        [System.IO.Path]::GetTempPath(),",
+          "        ('exactgitpathset-neutral-' + [System.Guid]::NewGuid().ToString('N')))",
+          "    [void][System.IO.Directory]::CreateDirectory($strNeutralGitDirectory)",
+          "    try {"
+        ]
+      },
+      {
+        "start": 4415,
+        "end": 4419,
+        "lines": [
+          "    } finally {",
+          "        if ([System.IO.Directory]::Exists($strNeutralGitDirectory)) {",
+          "            [System.IO.Directory]::Delete($strNeutralGitDirectory, $true)",
+          "        }",
+          "    }"
+        ]
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+    "ranges": [
+      {
+        "start": 4325,
+        "end": 4331,
+        "lines": [
+          "    # even for a config subcommand with --no-includes. Probe fixed config files through a",
+          "    # neutral Git directory, which reports include keys without opening their targets.",
+          "    $strNeutralGitDirectory = [System.IO.Path]::Combine(",
+          "        [System.IO.Path]::GetTempPath(),",
+          "        ('exactgitpathset-neutral-' + [System.Guid]::NewGuid().ToString('N')))",
+          "    [void][System.IO.Directory]::CreateDirectory($strNeutralGitDirectory)",
+          "    try {"
+        ]
+      },
+      {
+        "start": 4416,
+        "end": 4420,
+        "lines": [
+          "    } finally {",
+          "        if ([System.IO.Directory]::Exists($strNeutralGitDirectory)) {",
+          "            [System.IO.Directory]::Delete($strNeutralGitDirectory, $true)",
+          "        }",
+          "    }"
+        ]
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    "ranges": [
+      {
+        "start": 1,
+        "end": 9,
+        "lines": [
+          "#Requires -Version 7.0",
+          "",
+          "# .SYNOPSIS",
+          "# Checks that committed style-guide artifacts match deterministic generation.",
+          "#",
+          "# .DESCRIPTION",
+          "# Runs in the Linux CI checkout without credentials or publication authority.",
+          "# Checks native results, interface schemas, filesystem changes, Git control data,",
+          "# and runner communication files. Release comments do not select compatibility."
+        ]
+      },
+      {
+        "start": 566,
+        "end": 570,
+        "lines": [
+          "$arrResult = @(& $strPowerShellPath `",
+          "    -NoLogo `",
+          "    -NoProfile `",
+          "    -NonInteractive `",
+          "    -File './.github/workflows/Generate-StyleGuideArtifacts.ps1')"
+        ]
+      },
+      {
+        "start": 634,
+        "end": 639,
+        "lines": [
+          "$strVerifierCommand = '& ''./.github/workflows/Test-ExactGitPathSet.ps1'' -RepositoryRoot $env:GITHUB_WORKSPACE -GitExecutablePath ''/usr/bin/git'' -ExpectedPath @() -Mode Both -RequireCleanWorkingAgainstIndex'",
+          "$strEncodedVerifierCommand = [System.Convert]::ToBase64String(",
+          "    [System.Text.Encoding]::Unicode.GetBytes($strVerifierCommand)",
+          ")",
+          "$arrPathSetResult = @(& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -EncodedCommand $strEncodedVerifierCommand)",
+          "$intPathSetExit = $LASTEXITCODE"
+        ]
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    "ranges": [
+      {
+        "start": 1,
+        "end": 12,
+        "lines": [
+          "#Requires -Version 7.0",
+          "",
+          "<#",
+          ".SYNOPSIS",
+          "Checks committed Terraform style-guide artifacts against deterministic generation.",
+          "",
+          ".DESCRIPTION",
+          "Runs without credentials or publication authority. Checks native results, stable",
+          "interface schemas, filesystem changes, Git controls and runner communication files.",
+          "",
+          ".NOTES",
+          "Version: 1.1.20261001.1"
+        ]
+      },
+      {
+        "start": 513,
+        "end": 517,
+        "lines": [
+          "$arrResult = @(& $strPowerShellPath `",
+          "    -NoLogo `",
+          "    -NoProfile `",
+          "    -NonInteractive `",
+          "    -File './.github/workflows/Generate-StyleGuideArtifacts.ps1')"
+        ]
+      },
+      {
+        "start": 581,
+        "end": 586,
+        "lines": [
+          "$strVerifierCommand = '& ''./.github/workflows/Test-ExactGitPathSet.ps1'' -RepositoryRoot $env:GITHUB_WORKSPACE -GitExecutablePath ''/usr/bin/git'' -ExpectedPath @() -Mode Both -RequireCleanWorkingAgainstIndex'",
+          "$strEncodedVerifierCommand = [System.Convert]::ToBase64String(",
+          "    [System.Text.Encoding]::Unicode.GetBytes($strVerifierCommand)",
+          ")",
+          "$arrPathSetResult = @(& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -EncodedCommand $strEncodedVerifierCommand)",
+          "$intPathSetExit = $LASTEXITCODE"
+        ]
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": "CONTRIBUTING.md",
+    "ranges": [
+      {
+        "start": 75,
+        "end": 80,
+        "lines": [
+          "## Regenerate and publish the style guide artifacts",
+          "",
+          "After you change either source document, run this command from the repository root in Windows PowerShell 5.1 or PowerShell 7:",
+          "",
+          "```powershell",
+          "./.github/workflows/Generate-StyleGuideArtifacts.ps1"
+        ]
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": "CONTRIBUTING.md",
+    "ranges": [
+      {
+        "start": 25,
+        "end": 30,
+        "lines": [
+          "## Regenerate and publish the style guide artifacts",
+          "",
+          "After you change either source document, run this command from the repository root in Windows PowerShell 5.1 or PowerShell 7:",
+          "",
+          "```powershell",
+          "./.github/workflows/Generate-StyleGuideArtifacts.ps1"
+        ]
+      }
+    ]
+  },
+  {
+    "repository": "PSStyleGuide",
+    "path": ".github/workflows/build.yml",
+    "ranges": [
+      {
+        "start": 9,
+        "end": 14,
+        "lines": [
+          "permissions: {}",
+          "jobs:",
+          "  verify_generated_artifacts:",
+          "    runs-on: ubuntu-24.04",
+          "    timeout-minutes: 30",
+          "    permissions: {}"
+        ]
+      },
+      {
+        "start": 60,
+        "end": 81,
+        "lines": [
+          "      - name: Generate and verify committed artifacts",
+          "        id: generate_style_guide_artifacts",
+          "        shell: pwsh",
+          "        run: |",
+          "          ./.github/workflows/Test-StyleGuideArtifacts.ps1",
+          "  publish_committed_artifacts:",
+          "    runs-on: ubuntu-24.04",
+          "    timeout-minutes: 10",
+          "    permissions:",
+          "      contents: read",
+          "    needs: verify_generated_artifacts",
+          "    steps:",
+          "      - name: Checkout repository",
+          "        id: checkout_repository",
+          "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
+          "        with:",
+          "          repository: ${{ github.repository }}",
+          "          ref: ${{ github.sha }}",
+          "          token: ${{ github.token }}",
+          "          persist-credentials: false",
+          "          clean: true",
+          "          fetch-depth: 1"
+        ]
+      }
+    ]
+  },
+  {
+    "repository": "TerraformStyleGuide",
+    "path": ".github/workflows/build.yml",
+    "ranges": [
+      {
+        "start": 9,
+        "end": 14,
+        "lines": [
+          "permissions: {}",
+          "jobs:",
+          "  verify:",
+          "    runs-on: ubuntu-24.04",
+          "    timeout-minutes: 30",
+          "    permissions: {}"
+        ]
+      },
+      {
+        "start": 60,
+        "end": 81,
+        "lines": [
+          "      - name: Generate and verify committed artifacts",
+          "        id: generate-and-verify",
+          "        shell: pwsh",
+          "        run: |",
+          "          ./.github/workflows/Test-StyleGuideArtifacts.ps1",
+          "  publish:",
+          "    runs-on: ubuntu-24.04",
+          "    timeout-minutes: 10",
+          "    permissions:",
+          "      contents: read",
+          "    needs: verify",
+          "    steps:",
+          "      - name: Checkout repository",
+          "        id: checkout",
+          "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1",
+          "        with:",
+          "          repository: ${{ github.repository }}",
+          "          ref: ${{ github.sha }}",
+          "          token: ${{ github.token }}",
+          "          persist-credentials: false",
+          "          clean: true",
+          "          fetch-depth: 1"
+        ]
+      }
+    ]
+  }
+]

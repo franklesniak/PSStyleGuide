@@ -1,0 +1,55 @@
+{
+  "issues": [
+    {
+      "url": "https://github.com/franklesniak/PSStyleGuide/issues/155",
+      "number": 155,
+      "title": "Artifact generator and verifier: remaining filesystem race and path-identity limitations",
+      "state": "open",
+      "state_reason": null,
+      "updated_at": "2026-10-02T00:33:56Z",
+      "current_disposition": "<!-- markdownlint-disable MD013 -->\n\n# Artifact generator and verifier: remaining filesystem race and path-identity limitations\n\n## Current disposition\n\nThe repository maintainer owns this open residual record. Task379 selects no product repair at this time. Accepted [PR221](https://github.com/franklesniak/PSStyleGuide/pull/221) retired the old archive extractor, invocation-context helper, harness and catalog. Their extraction, directory-adoption and two-root alias paths have no remaining consumer. Removal reduces applicability; it does not fix their historical races.\n\nThe current `Generate-StyleGuideArtifacts.ps1` and `Test-ExactGitPathSet.ps1` still use paths for some reads, publication and cleanup. Before/after checks do not prove that no transient replacement occurred. The verifier's GUID-named temporary-directory creation and cleanup also have a race surface under a competing-writer threat model. This assessment did not reproduce a supported-caller failure, establish a new untrusted-writer requirement, or prove universal Windows alias/handle identity.\n\nReassess when a supported current caller reproduces a failure, a deliberate requirement admits concurrent untrusted writers, a concrete usable runtime/API improvement addresses these operations, or a new consumer has materially different authority. A date, version change alone, retired phase name or old test count does not trigger implementation. Start any selected repair with a scoped decision and meaningful tests. Do not recreate deleted helpers merely to close their old findings.\n\nThe original findings and measured/unmeasured limits below remain historical evidence. Retired coverage obligations are recorded in [issue156](https://github.com/franklesniak/PSStyleGuide/issues/156).\n\nFull validation, options, separate weighted rubrics, scores and selected instructions: [Task379 decisions D92/D93](https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5943334454).\n\n"
+    },
+    {
+      "url": "https://github.com/franklesniak/PSStyleGuide/issues/156",
+      "number": 156,
+      "title": "Retired P1A helpers: historical coverage limitations",
+      "state": "closed",
+      "state_reason": "not_planned",
+      "updated_at": "2026-10-02T00:33:59Z",
+      "current_disposition": "<!-- markdownlint-disable MD013 -->\n\n# Retired P1A helpers: historical coverage limitations\n\n## Current disposition\n\nClosed as **not planned** because accepted [PR221](https://github.com/franklesniak/PSStyleGuide/pull/221) removed the relevant extractor, invocation-context helper, test harness and catalog. No executable consumer of the old proof-wiring assertion, journal cap or E05 case remains. Retirement is complete; the old tests are not newly passing and the historical filesystem races are not claimed repaired.\n\nKeep the measured, unmeasured and unreachable coverage below as history. Current generator/verifier risks and their repository-maintainer owner are recorded in [issue155](https://github.com/franklesniak/PSStyleGuide/issues/155). That current implementation does not inherit old ACL, non-GNU stat or E05 coverage.\n\nAdd a new coverage task only when a specific supported consumer needs the property, a current failure is reproduced, or a changed runtime/security requirement makes a particular branch relevant. Do not recreate the old helper or catalog solely to satisfy an obsolete test obligation. No product code changed for this disposition.\n\nFull validation, options, separate weighted rubrics, scores and selected instructions: [Task379 decisions D92/D93](https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5943334454).\n\n"
+    }
+  ],
+  "comments": [
+    {
+      "url": "https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5227199805",
+      "id": 5227199805,
+      "author": "franklesniak",
+      "title": "## Added residual (PR #153, round 74): journal-corruption rollback leak"
+    },
+    {
+      "url": "https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5233004306",
+      "id": 5233004306,
+      "author": "franklesniak",
+      "title": "## Added residual (PR #153 pre-merge sweep): the harness runs the path, not the authenticated bytes"
+    },
+    {
+      "url": "https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5233025993",
+      "id": 5233025993,
+      "author": "franklesniak",
+      "title": "## Dependencies (implementation order)"
+    },
+    {
+      "url": "https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5943334454",
+      "id": 5943334454,
+      "author": "franklesniak",
+      "title": "<!-- markdownlint-disable MD013 -->\r"
+    },
+    {
+      "url": "https://github.com/franklesniak/PSStyleGuide/issues/156#issuecomment-5233026690",
+      "id": 5233026690,
+      "author": "franklesniak",
+      "title": "## Dependencies (implementation order)"
+    }
+  ],
+  "source": "GitHub connector fetch_issue and all-page fetch_issue_comments; no native mutation"
+}

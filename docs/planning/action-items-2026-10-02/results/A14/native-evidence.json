@@ -1,0 +1,616 @@
+{
+  "read_at": "2026-10-02T05:46:55.243454+00:00",
+  "refs": {
+    "PSStyleGuide": {
+      "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc"
+    },
+    "TerraformStyleGuide": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "sources": [
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+      "mode": "100644",
+      "size": 86655,
+      "sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48",
+      "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Generate-StyleGuideArtifacts.ps1"
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+      "mode": "100644",
+      "size": 253910,
+      "sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909",
+      "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Test-ExactGitPathSet.ps1"
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+      "mode": "100644",
+      "size": 32648,
+      "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996",
+      "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Test-StyleGuideArtifacts.ps1"
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": "CONTRIBUTING.md",
+      "blob": "798aec2eacbdee846266299d2725069514fe6d58",
+      "mode": "100644",
+      "size": 6210,
+      "sha256": "01091a192353fc5c571d6cdc37c451c5c5c33c115c55280fb1c71053bf78c5cc",
+      "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/CONTRIBUTING.md"
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/build.yml",
+      "blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+      "mode": "100644",
+      "size": 4361,
+      "sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0",
+      "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/build.yml"
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "blob": "0773070a6505b1678c5522c16c8a5c32979f6338",
+      "mode": "100644",
+      "size": 37696,
+      "sha256": "a20f0822eb0c8512a5bb86b1af920cae2a8b6a739bb132c01990b41bdcb4d012",
+      "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/Test-CiHelpers.test.mjs"
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/agent-instructions.yml",
+      "blob": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+      "mode": "100644",
+      "size": 9504,
+      "sha256": "1c9457868eb262fc7ed8583d1cfff2903288286f11c103a46f91703b04bef67d",
+      "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/.github/workflows/agent-instructions.yml"
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+      "mode": "100644",
+      "size": 12177,
+      "sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+      "url": "https://github.com/franklesniak/PSStyleGuide/blob/48f4d8a36c8faceee12afac78aaecea0d176125d/docs/decisions/0001-accept-in-repository-trust-root.md"
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+      "mode": "100644",
+      "size": 95329,
+      "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c",
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Generate-StyleGuideArtifacts.ps1"
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+      "mode": "100644",
+      "size": 253918,
+      "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0",
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Test-ExactGitPathSet.ps1"
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+      "mode": "100644",
+      "size": 31949,
+      "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4",
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Test-StyleGuideArtifacts.ps1"
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": "CONTRIBUTING.md",
+      "blob": "94beedee85478c14d284ca830e94d4a5f4ece202",
+      "mode": "100644",
+      "size": 5813,
+      "sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda",
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/CONTRIBUTING.md"
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/build.yml",
+      "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+      "mode": "100644",
+      "size": 4222,
+      "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd",
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/build.yml"
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+      "mode": "100644",
+      "size": 33662,
+      "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab",
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/Test-CiHelpers.test.mjs"
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/agent-instructions.yml",
+      "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+      "mode": "100644",
+      "size": 9558,
+      "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c",
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/blob/06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/.github/workflows/agent-instructions.yml"
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "absent": true
+    }
+  ],
+  "prior_assessment_comparison": {
+    "commit": "8d9d8e4dc7a82b0ab705b3347adadb8295945044",
+    "paths": [
+      {
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "old_blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+        "current_blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+        "same": true
+      },
+      {
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "old_blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+        "current_blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+        "same": true
+      },
+      {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "old_blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "current_blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "same": true
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "old_blob": "798aec2eacbdee846266299d2725069514fe6d58",
+        "current_blob": "798aec2eacbdee846266299d2725069514fe6d58",
+        "same": true
+      },
+      {
+        "path": ".github/workflows/build.yml",
+        "old_blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+        "current_blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+        "same": true
+      }
+    ]
+  },
+  "retired_paths": [
+    {
+      "path": ".github/workflows/Expand-StyleGuideCandidateArtifact.ps1",
+      "absent": {
+        "PSStyleGuide": true,
+        "TerraformStyleGuide": true
+      }
+    },
+    {
+      "path": ".github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1",
+      "absent": {
+        "PSStyleGuide": true,
+        "TerraformStyleGuide": true
+      }
+    },
+    {
+      "path": ".github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1",
+      "absent": {
+        "PSStyleGuide": true,
+        "TerraformStyleGuide": true
+      }
+    },
+    {
+      "path": ".github/workflows/style-guide-candidate-cases.json",
+      "absent": {
+        "PSStyleGuide": true,
+        "TerraformStyleGuide": true
+      }
+    }
+  ],
+  "executable_census": [
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/dependabot.yml",
+      "blob": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "blob": "3babe4848f5d97ffd5757255983463231d4163f7",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "blob": "3a98a55e7d01a1dfd95f2112e8fa656f79df6df2",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "blob": "d6f0628d492f6d2f76fe1ab65b3e0b316b52c729",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "blob": "1e7a60a42a8e9b28811c64de3d1b7e4c1bbec76a",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "blob": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "blob": "19240ed44a8811d0a98bb0c67e4a732b5a749f58",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "blob": "92743273da44ad7f6d46113a763089b9e1675f82",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/NpmTools.mjs",
+      "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "blob": "77a1313b9044bb934159a165e07219a3c1c9306b",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "blob": "41a955fc4ef68f47b3391417babbcb91824a2726",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "blob": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Test-BlankLineExamples.ps1",
+      "blob": "068c7139a9e6a9276073211f48eca88464204362",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "blob": "0773070a6505b1678c5522c16c8a5c32979f6338",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "blob": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "blob": "3f0abda0049fdeacb85c8493937b768ddc999c4a",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/agent-instructions.yml",
+      "blob": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/build.yml",
+      "blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "blob": "dde42437f9f5d579abee2e944321488a2ba4f793",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/install-husky.mjs",
+      "blob": "600f6bfd664d0550238916f01de3a41109fe9fbf",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "blob": "b20dc7f318cf3e14e743eb4bb0bf193be7ad1f62",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "blob": "d6985333e619493640aa5cb4a0cb3925153f8273",
+      "hits": []
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/markdownlint.yml",
+      "blob": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/dependabot.yml",
+      "blob": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "blob": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "blob": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "blob": "906460d818674199b32294185ed6525c143b48bb",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+      "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/NpmTools.mjs",
+      "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "blob": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "blob": "87f68f5f02eb2303059be06c219253ab37853197",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+      "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "blob": "995b72a7b48dea2636094d81226893a519950797",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/agent-instructions.yml",
+      "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/build.yml",
+      "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/install-husky.mjs",
+      "blob": "6a12568776f6473472193bc98638f1856a7c9dec",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "blob": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "blob": "c35575990d5854ea6da9d5f6d49d23287df43146",
+      "hits": []
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/markdownlint.yml",
+      "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+      "hits": []
+    }
+  ],
+  "prior_decision": {
+    "url": "https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5943334454",
+    "author": "franklesniak",
+    "created_at": "2026-10-02T00:33:39Z",
+    "updated_at": "2026-10-02T00:33:39Z",
+    "body_sha256": "2c9e63ed939ba54d72b4b66602c20138c5bd78f64a8194ec3af61b505bca5fec",
+    "decisions": [
+      "D92",
+      "D93"
+    ]
+  },
+  "self_hosted_runners": {
+    "PSStyleGuide": {
+      "total_count": 0,
+      "runners": []
+    },
+    "TerraformStyleGuide": {
+      "total_count": 0,
+      "runners": []
+    }
+  },
+  "validation": {
+    "completed_at": "2026-10-02T05:49:36.090584+00:00",
+    "result": "PASS",
+    "D92_totals": [
+      42,
+      96,
+      70,
+      87,
+      45
+    ],
+    "D93_totals": [
+      39,
+      100,
+      84,
+      58
+    ],
+    "final_main_refs_unchanged": true,
+    "product_tests_run": false
+  }
+}

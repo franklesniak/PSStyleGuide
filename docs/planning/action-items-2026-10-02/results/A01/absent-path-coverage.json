@@ -1,0 +1,976 @@
+{
+  "captured_scope": [
+    "all 402 original task contracts",
+    "all five current open issue bodies and six comments",
+    "all 28 rows of A00 research-pr78-matrix.json",
+    "A00 PR218/221/TF63 removal file lists",
+    "A15 read-only design for current Terraform #25"
+  ],
+  "current_native_refs": {
+    "PS": {
+      "repo": "franklesniak/PSStyleGuide",
+      "ref": "origin/main",
+      "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "tree": "640ee4c0974fb604b2ebf0a1e1e1a328bd213ddc"
+    },
+    "TF": {
+      "repo": "franklesniak/TerraformStyleGuide",
+      "ref": "origin/main",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "counts": {
+    "absent_both_product_path_references": 26,
+    "retirement_removed_paths": 18,
+    "current_TF25_missing_paths": 7,
+    "stale_locator": 1,
+    "planning_only_references": 4,
+    "A00_matrix_absent_in_both": 1
+  },
+  "ledger_reference": "../A00/dispositions.json — all historical IDs have named non-A00 product owners after A00 handoff",
+  "paths": [
+    {
+      "path": ".github/actionlint.yaml",
+      "original_task_ids": [],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A07",
+      "collaborators": [
+        "A03"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R07: ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "PR218 records removal. This inventory does not infer current lint behavior is deficient; A07 checks surviving validators and callers.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/Confirm-StateMutation.mjs",
+      "original_task_ids": [],
+      "live_contract_refs": [
+        "TerraformStyleGuide#25"
+      ],
+      "retirement_pr_refs": [],
+      "primary_current_owner": "A16",
+      "collaborators": [
+        "A15",
+        "A17"
+      ],
+      "classification": "current-live-requirement-absent-at-baseline",
+      "retirement_decision": "A15 design / A16–A17 outcome; not retired",
+      "classification_uncertainty": "Gate A confirmation helper; exact implementation and path scope remain subject to A15/A16 acceptance.",
+      "owner_assignment_source": "A15 read-only design and current A16/A17 task contracts"
+    },
+    {
+      "path": ".github/workflows/Expand-StyleGuideCandidateArtifact.ps1",
+      "original_task_ids": [
+        223,
+        224,
+        225,
+        227,
+        228,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        379,
+        380,
+        381,
+        382,
+        383,
+        384,
+        385,
+        386,
+        387,
+        388,
+        389,
+        390
+      ],
+      "live_contract_refs": [
+        "PS#155"
+      ],
+      "retirement_pr_refs": [
+        "PSStyleGuide#221",
+        "TerraformStyleGuide#63"
+      ],
+      "primary_current_owner": "A06",
+      "collaborators": [
+        "A12",
+        "A13",
+        "A14"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R06/R07: ../../RETIREMENT-REVIEW.md#r06-dormant-archive-promotion-and-automatic-writer; ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "Retirement is selected for the current no-promotion-consumer design, but old oracle equivalence is incomplete. A14 owns live residual reassessment; revisit if a promotion consumer returns.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/Inspect-TerraformState.mjs",
+      "original_task_ids": [],
+      "live_contract_refs": [
+        "TerraformStyleGuide#25"
+      ],
+      "retirement_pr_refs": [],
+      "primary_current_owner": "A16",
+      "collaborators": [
+        "A15",
+        "A17"
+      ],
+      "classification": "current-live-requirement-absent-at-baseline",
+      "retirement_decision": "A15 design / A16–A17 outcome; not retired",
+      "classification_uncertainty": "Gate A read-only state inspector; scope and tests are in the A15 design.",
+      "owner_assignment_source": "A15 read-only design and current A16/A17 task contracts"
+    },
+    {
+      "path": ".github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1",
+      "original_task_ids": [
+        223,
+        224,
+        225,
+        227,
+        228,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        379,
+        380,
+        381,
+        382,
+        383,
+        384,
+        385,
+        386,
+        387,
+        388,
+        389,
+        390
+      ],
+      "live_contract_refs": [
+        "PS#155"
+      ],
+      "retirement_pr_refs": [
+        "PSStyleGuide#221",
+        "TerraformStyleGuide#63"
+      ],
+      "primary_current_owner": "A06",
+      "collaborators": [
+        "A12",
+        "A13",
+        "A14"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R06/R07: ../../RETIREMENT-REVIEW.md#r06-dormant-archive-promotion-and-automatic-writer; ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "Retirement is selected for the current no-promotion-consumer design, but old oracle equivalence is incomplete. A14 owns live residual reassessment; revisit if a promotion consumer returns.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/Prepare-TerraformStateRecovery.mjs",
+      "original_task_ids": [],
+      "live_contract_refs": [
+        "TerraformStyleGuide#25"
+      ],
+      "retirement_pr_refs": [],
+      "primary_current_owner": "A17",
+      "collaborators": [
+        "A15",
+        "A16"
+      ],
+      "classification": "current-live-requirement-absent-at-baseline",
+      "retirement_decision": "A15 design / A16–A17 outcome; not retired",
+      "classification_uncertainty": "Gate B recovery preparer; it consumes the frozen Gate A inspector contract.",
+      "owner_assignment_source": "A15 read-only design and current A16/A17 task contracts"
+    },
+    {
+      "path": ".github/workflows/Resolve-TerraformStateAddress.mjs",
+      "original_task_ids": [],
+      "live_contract_refs": [
+        "TerraformStyleGuide#25"
+      ],
+      "retirement_pr_refs": [],
+      "primary_current_owner": "A16",
+      "collaborators": [
+        "A15",
+        "A17"
+      ],
+      "classification": "current-live-requirement-absent-at-baseline",
+      "retirement_decision": "A15 design / A16–A17 outcome; not retired",
+      "classification_uncertainty": "Gate A address resolver/parser; required in the live TF #25 contract.",
+      "owner_assignment_source": "A15 read-only design and current A16/A17 task contracts"
+    },
+    {
+      "path": ".github/workflows/Review-TerraformStateDifference.mjs",
+      "original_task_ids": [],
+      "live_contract_refs": [
+        "TerraformStyleGuide#25"
+      ],
+      "retirement_pr_refs": [],
+      "primary_current_owner": "A16",
+      "collaborators": [
+        "A15",
+        "A17"
+      ],
+      "classification": "current-live-requirement-absent-at-baseline",
+      "retirement_decision": "A15 design / A16–A17 outcome; not retired",
+      "classification_uncertainty": "Gate A difference reviewer; no mutation behavior belongs in it.",
+      "owner_assignment_source": "A15 read-only design and current A16/A17 task contracts"
+    },
+    {
+      "path": ".github/workflows/Set-AgentInstructionCurrentBaseStatus.mjs",
+      "original_task_ids": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A08",
+        "A12"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R04: ../../RETIREMENT-REVIEW.md#r04-global-current-base-status-sweeps",
+      "classification_uncertainty": "Global sweep was judged excess machinery; current-base freshness remains required. Verify surviving targeted readiness and merge checks in A03/A12.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/StateRecoveryCaseCatalog.json",
+      "original_task_ids": [],
+      "live_contract_refs": [
+        "TerraformStyleGuide#25"
+      ],
+      "retirement_pr_refs": [],
+      "primary_current_owner": "A16",
+      "collaborators": [
+        "A15",
+        "A17"
+      ],
+      "classification": "current-live-requirement-absent-at-baseline",
+      "retirement_decision": "A15 design / A16–A17 outcome; not retired",
+      "classification_uncertainty": "Catalog must be frozen at Gate A; final contents remain an acceptance boundary.",
+      "owner_assignment_source": "A15 read-only design and current A16/A17 task contracts"
+    },
+    {
+      "path": ".github/workflows/Sync-PullRequestBodyIdentity.mjs",
+      "original_task_ids": [
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A08"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R01: ../../RETIREMENT-REVIEW.md#r01-mandatory-pr-body-identity-duplication",
+      "classification_uncertainty": "Duplicate mutable identity storage was deliberately retired. A03/A08 must accept current native-head/material-scope guarantees; do not infer the old writer is still required.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructionParserManifest.mjs",
+      "original_task_ids": [
+        4,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A02",
+        "A07",
+        "A18"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R02/R07: ../../RETIREMENT-REVIEW.md#r02-exact-semantic-source-and-release-label-profiles; ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "R02 retired brittle copied-profile coupling; R07 says full equivalence is unproved. A03/A07 must map real threats to current callers before deciding if behavior is missing.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership",
+      "a00_matrix_source": "A00/research-pr78-matrix.json (the PR78 row marks this path absent)"
+    },
+    {
+      "path": ".github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1",
+      "original_task_ids": [
+        223,
+        224,
+        225,
+        227,
+        228,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        379,
+        380,
+        381,
+        382,
+        383,
+        384,
+        385,
+        386,
+        387,
+        388,
+        389,
+        390
+      ],
+      "live_contract_refs": [
+        "PS#155"
+      ],
+      "retirement_pr_refs": [
+        "PSStyleGuide#221",
+        "TerraformStyleGuide#63"
+      ],
+      "primary_current_owner": "A06",
+      "collaborators": [
+        "A12",
+        "A13",
+        "A14"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R06/R07: ../../RETIREMENT-REVIEW.md#r06-dormant-archive-promotion-and-automatic-writer; ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "Retirement is selected for the current no-promotion-consumer design, but old oracle equivalence is incomplete. A14 owns live residual reassessment; revisit if a promotion consumer returns.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/Test-StateRecoveryExamples.sh",
+      "original_task_ids": [],
+      "live_contract_refs": [
+        "TerraformStyleGuide#25"
+      ],
+      "retirement_pr_refs": [],
+      "primary_current_owner": "A15",
+      "collaborators": [
+        "A11",
+        "A16",
+        "A17"
+      ],
+      "classification": "stale-live-issue-locator-not-a-restoration-requirement",
+      "retirement_decision": "A15 D1 recommendation in read-only-design.md; pending owner acceptance",
+      "classification_uncertainty": "TF #25 contains an old .sh locator. A15 states the actual native harness is Test-StateRecoveryExamples.mjs and recommends keeping that file; do not add an .sh wrapper without a new accepted requirement. The .mjs is TF-only in the current union."
+    },
+    {
+      "path": ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+      "original_task_ids": [],
+      "live_contract_refs": [
+        "TerraformStyleGuide#25"
+      ],
+      "retirement_pr_refs": [],
+      "primary_current_owner": "A16",
+      "collaborators": [
+        "A15",
+        "A17"
+      ],
+      "classification": "current-live-requirement-absent-at-baseline",
+      "retirement_decision": "A15 design / A16–A17 outcome; not retired",
+      "classification_uncertainty": "Proposed Windows PowerShell acceptance harness; cases and runtime topology remain to be accepted.",
+      "owner_assignment_source": "A15 read-only design and current A16/A17 task contracts"
+    },
+    {
+      "path": ".github/workflows/Test-TrustRootAuthorization.ps1",
+      "original_task_ids": [
+        72,
+        73,
+        82
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A06",
+        "A12",
+        "A13"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R03: ../../RETIREMENT-REVIEW.md#r03-exact-byte-maintenance-admission",
+      "classification_uncertainty": "The old exact-byte authorizer was retired, but R03 records a substantive authorization guarantee and an open enforcement assessment. Path absence alone proves neither safety nor defect.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/agent-instruction-current-base.yml",
+      "original_task_ids": [
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A08",
+        "A12"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R04: ../../RETIREMENT-REVIEW.md#r04-global-current-base-status-sweeps",
+      "classification_uncertainty": "Global sweep was judged excess machinery; current-base freshness remains required. Verify surviving targeted readiness and merge checks in A03/A12.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/pull-request-body-identity-cases.json",
+      "original_task_ids": [
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A08"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R01: ../../RETIREMENT-REVIEW.md#r01-mandatory-pr-body-identity-duplication",
+      "classification_uncertainty": "Duplicate mutable identity storage was deliberately retired. A03/A08 must accept current native-head/material-scope guarantees; do not infer the old writer is still required.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/pull-request-body-identity.yml",
+      "original_task_ids": [
+        41,
+        42,
+        43,
+        44,
+        45,
+        46,
+        47,
+        48,
+        49,
+        50,
+        51,
+        52,
+        53,
+        54,
+        55,
+        56,
+        57,
+        58,
+        59,
+        60,
+        61,
+        62,
+        63,
+        64,
+        65,
+        66,
+        67,
+        68
+      ],
+      "live_contract_refs": [
+        "PS#213"
+      ],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A08"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R01: ../../RETIREMENT-REVIEW.md#r01-mandatory-pr-body-identity-duplication",
+      "classification_uncertainty": "Duplicate mutable identity storage was deliberately retired. A03/A08 must accept current native-head/material-scope guarantees; do not infer the old writer is still required.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/style-guide-candidate-cases.json",
+      "original_task_ids": [
+        223,
+        224,
+        225,
+        227,
+        228,
+        231,
+        232,
+        233,
+        234,
+        235,
+        236,
+        237,
+        238,
+        239,
+        240,
+        241,
+        242,
+        243,
+        244,
+        245,
+        246,
+        247,
+        248,
+        249,
+        250,
+        251,
+        252,
+        253,
+        254,
+        255,
+        256,
+        257,
+        258,
+        259,
+        260,
+        379,
+        380,
+        381,
+        382,
+        383,
+        384,
+        385,
+        386,
+        387,
+        388,
+        389,
+        390
+      ],
+      "live_contract_refs": [
+        "PS#155"
+      ],
+      "retirement_pr_refs": [
+        "PSStyleGuide#221",
+        "TerraformStyleGuide#63"
+      ],
+      "primary_current_owner": "A06",
+      "collaborators": [
+        "A12",
+        "A13",
+        "A14"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R06/R07: ../../RETIREMENT-REVIEW.md#r06-dormant-archive-promotion-and-automatic-writer; ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "Retirement is selected for the current no-promotion-consumer design, but old oracle equivalence is incomplete. A14 owns live residual reassessment; revisit if a promotion consumer returns.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/trust-root-authorization.json",
+      "original_task_ids": [
+        72,
+        73,
+        82
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A06",
+        "A12",
+        "A13"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R03: ../../RETIREMENT-REVIEW.md#r03-exact-byte-maintenance-admission",
+      "classification_uncertainty": "The old exact-byte authorizer was retired, but R03 records a substantive authorization guarantee and an open enforcement assessment. Path absence alone proves neither safety nor defect.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/workflow-common-reference.json",
+      "original_task_ids": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A02",
+        "A07",
+        "A18"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R02/R07: ../../RETIREMENT-REVIEW.md#r02-exact-semantic-source-and-release-label-profiles; ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "R02 retired brittle copied-profile coupling; R07 says full equivalence is unproved. A03/A07 must map real threats to current callers before deciding if behavior is missing.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/workflow-common-validator.reference.txt",
+      "original_task_ids": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A02",
+        "A07",
+        "A18"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R02/R07: ../../RETIREMENT-REVIEW.md#r02-exact-semantic-source-and-release-label-profiles; ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "R02 retired brittle copied-profile coupling; R07 says full equivalence is unproved. A03/A07 must map real threats to current callers before deciding if behavior is missing.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/workflow-isolation-reference.json",
+      "original_task_ids": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A02",
+        "A07",
+        "A18"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R02/R07: ../../RETIREMENT-REVIEW.md#r02-exact-semantic-source-and-release-label-profiles; ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "R02 retired brittle copied-profile coupling; R07 says full equivalence is unproved. A03/A07 must map real threats to current callers before deciding if behavior is missing.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/workflow-isolation-validator.reference.txt",
+      "original_task_ids": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A02",
+        "A07",
+        "A18"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R02/R07: ../../RETIREMENT-REVIEW.md#r02-exact-semantic-source-and-release-label-profiles; ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "R02 retired brittle copied-profile coupling; R07 says full equivalence is unproved. A03/A07 must map real threats to current callers before deciding if behavior is missing.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    },
+    {
+      "path": ".github/workflows/workflow-ordinary-selftest-reference.json",
+      "original_task_ids": [
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39,
+        40
+      ],
+      "live_contract_refs": [],
+      "retirement_pr_refs": [
+        "PSStyleGuide#218"
+      ],
+      "primary_current_owner": "A03",
+      "collaborators": [
+        "A02",
+        "A07",
+        "A18"
+      ],
+      "classification": "retired-product-path",
+      "retirement_decision": "R02/R07: ../../RETIREMENT-REVIEW.md#r02-exact-semantic-source-and-release-label-profiles; ../../RETIREMENT-REVIEW.md#r07-removed-and-relocated-runtime-tests",
+      "classification_uncertainty": "R02 retired brittle copied-profile coupling; R07 says full equivalence is unproved. A03/A07 must map real threats to current callers before deciding if behavior is missing.",
+      "owner_assignment_source": "../A00/dispositions.json + current outcome/decision ownership"
+    }
+  ],
+  "planning_only_references": [
+    {
+      "path": "docs/planning/coding-agent-loop-performance-plan-2026-08-25.md",
+      "original_task_id": 12,
+      "classification": "planning-only-reference-outside-product-tree-union",
+      "primary_current_owner": "A08",
+      "owner_assignment_source": "A00 dispositions ledger; A08 review-instruction outcome"
+    },
+    {
+      "path": "docs/planning/coding-agent-loop-without-model-routing.md",
+      "original_task_id": 12,
+      "classification": "planning-only-reference-outside-product-tree-union",
+      "primary_current_owner": "A08",
+      "owner_assignment_source": "A00 dispositions ledger; A08 review-instruction outcome"
+    },
+    {
+      "path": "docs/planning/coding-agent-loop.md",
+      "original_task_id": 12,
+      "classification": "planning-only-reference-outside-product-tree-union",
+      "primary_current_owner": "A08",
+      "owner_assignment_source": "A00 dispositions ledger; A08 review-instruction outcome"
+    },
+    {
+      "path": "docs/planning/prompt-action-items-update.md",
+      "original_task_id": 12,
+      "classification": "planning-only-reference-outside-product-tree-union",
+      "primary_current_owner": "A08",
+      "owner_assignment_source": "A00 dispositions ledger; A08 review-instruction outcome"
+    }
+  ],
+  "validation_note": "Every product path reference absent from both pinned native trees found by the listed source scans is listed. A path deletion does not establish a missing capability. Current-live T4 paths remain open requirements. The .sh locator is marked stale per A15; no wrapper restoration is inferred."
+}
