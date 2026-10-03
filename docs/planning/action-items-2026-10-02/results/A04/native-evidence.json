@@ -275,5 +275,78 @@
     "retainedMeaning": "D90 duplicate decoded JSON members in five existing Node preflight files; D91 accidental-operation permission guard only; D94 actual caller with prepended independent probes rather than internal-source string replacement. Closure5943329047 explicitly excludes retry213. Historical service grants are not current authority."
   },
   "finalRevalidationUtc": "2026-10-02T07:07:20.470443+00:00",
-  "finalRefsUnchanged": true
+  "finalRefsUnchanged": true,
+  "foundationRefresh20261003": {
+    "capturedUtc": "2026-10-03T17:53:08.163144+00:00",
+    "nativeMain": {
+      "PS": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "scope": "Compare every source entry already recorded; no runtime test, product edit, new API request or task acceptance.",
+    "repositories": {
+      "PS": {
+        "count": 15,
+        "unchanged": 10,
+        "changedEntries": [
+          {
+            "path": ".github/workflows/Test-CiHelpers.test.mjs",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "d29e7bec8d4c9cdf04714bb601b0be5cc93f4350"
+            },
+            "currentSha256": "a24ca411e2dd9a96daaedc34bc3db89ae9d225265c929a4a730f028742c4878d",
+            "currentBytes": 42116
+          },
+          {
+            "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0"
+            },
+            "currentSha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7",
+            "currentBytes": 5786
+          },
+          {
+            "path": ".github/workflows/agent-instructions.yml",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "bd559e5e9b7015d83f45f705a4e7862dc2dc11d5"
+            },
+            "currentSha256": "ee0595c59dd9601e0a6296b295969842faa5d4db35b2ba20fffa2d5273e915d7",
+            "currentBytes": 11495
+          },
+          {
+            "path": ".github/workflows/scripts-README.md",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7"
+            },
+            "currentSha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b",
+            "currentBytes": 6613
+          },
+          {
+            "path": "package.json",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358"
+            },
+            "currentSha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+            "currentBytes": 816
+          }
+        ]
+      },
+      "TF": {
+        "count": 15,
+        "unchanged": 15,
+        "changedEntries": []
+      }
+    },
+    "nativeRefsStableAfterRead": true,
+    "comparisonMethod": "Compared every previously recorded source path against the exact native tree; unchanged entries reuse the original identities. Only changed entries are repeated below."
+  }
 }

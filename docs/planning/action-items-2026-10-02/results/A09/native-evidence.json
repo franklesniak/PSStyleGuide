@@ -1363,5 +1363,148 @@
       "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
     }
   },
-  "finalRefsCheckedUtc": "2026-10-02T07:54:06.333606+00:00"
+  "finalRefsCheckedUtc": "2026-10-02T07:54:06.333606+00:00",
+  "foundationRefresh20261003": {
+    "capturedUtc": "2026-10-03T17:53:09.454821+00:00",
+    "nativeMain": {
+      "PS": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+      "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+    },
+    "scope": "Compare every source entry already recorded; no runtime test, product edit, new API request or task acceptance.",
+    "repositories": {
+      "PS": {
+        "count": 28,
+        "unchanged": 16,
+        "changedEntries": [
+          {
+            "path": ".github/workflows/Check-NpmAudit.mjs",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "79d69370982018adb479c8d860722797445de03c"
+            },
+            "currentSha256": "4f2a0f56771aa73d05dc67ca97f95ad1f39254b26287117d798219dba161e425",
+            "currentBytes": 20536
+          },
+          {
+            "path": ".github/workflows/Check-NpmAudit.test.mjs",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "3212445f4dde58475d7f8409002114b76396bfb9"
+            },
+            "currentSha256": "f0078a6263621a7aaba6c16caffdfaa7ea73886ee23da6cc19e21d805c9a3d67",
+            "currentBytes": 27450
+          },
+          {
+            "path": ".github/workflows/NpmTools.test.mjs",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "8249cd855785e2847df7ab6fad60caf219da59bc"
+            },
+            "currentSha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b",
+            "currentBytes": 11392
+          },
+          {
+            "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad"
+            },
+            "currentSha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6",
+            "currentBytes": 218742
+          },
+          {
+            "path": ".github/workflows/Test-AgentInstructions.ps1",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "99e9214ec8c5a6c99a132c4f7ad613e10b48825b"
+            },
+            "currentSha256": "6ae042634adfdfbbe7ee896c3242233dc3513654fd61e9b54be6cabca1771e60",
+            "currentBytes": 470265
+          },
+          {
+            "path": ".github/workflows/agent-instructions.yml",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "bd559e5e9b7015d83f45f705a4e7862dc2dc11d5"
+            },
+            "currentSha256": "ee0595c59dd9601e0a6296b295969842faa5d4db35b2ba20fffa2d5273e915d7",
+            "currentBytes": 11495
+          },
+          {
+            "path": ".github/workflows/package-lock.json",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "27cc70ba810dfb3f410014542142154f86509196"
+            },
+            "currentSha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+            "currentBytes": 38822
+          },
+          {
+            "path": ".github/workflows/package.json",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "b09ca859508430050dc0b023b3dba62e50748680"
+            },
+            "currentSha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+            "currentBytes": 844
+          },
+          {
+            "path": ".github/workflows/scripts-README.md",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7"
+            },
+            "currentSha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b",
+            "currentBytes": 6613
+          },
+          {
+            "path": "docs/dependency-maintenance.md",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda"
+            },
+            "currentSha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21",
+            "currentBytes": 9672
+          },
+          {
+            "path": "package-lock.json",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7"
+            },
+            "currentSha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+            "currentBytes": 3552
+          },
+          {
+            "path": "package.json",
+            "current": {
+              "mode": "100644",
+              "type": "blob",
+              "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358"
+            },
+            "currentSha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+            "currentBytes": 816
+          }
+        ]
+      },
+      "TF": {
+        "count": 29,
+        "unchanged": 29,
+        "changedEntries": []
+      }
+    },
+    "nativeRefsStableAfterRead": true,
+    "comparisonMethod": "Compared every previously recorded source path against the exact native tree; unchanged entries reuse the original identities. Only changed entries are repeated below."
+  }
 }

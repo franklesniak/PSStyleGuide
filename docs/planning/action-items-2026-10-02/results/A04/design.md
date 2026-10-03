@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A04 read-only download preparation
 
+Current continuation,2026-10-03: D08 has resolved the A03 owner choice as P; PS A02/A07 sources are accepted. [RESULT.md](RESULT.md) records the current425795b/06ad4f7 input refresh. The download findings and selections below still apply to unchanged helper bytes. Implementation follows accepted A03/A07 interfaces; no new owner choice is pending. The original prerequisite and authority descriptions below are dated preparation history, not current blockers.
+
 This is a bounded proposal, not A04 acceptance. No product, planning, native object or host setting changed. Requested route: `gpt-6-astra/high`; effective metadata is unavailable. Transfers remain 0/8. No PR clock exists. A01 is accepted; A02, A03 and A07 implementation prerequisites remain incomplete. The A03 maintenance-enforcement disposition and all separate protected/settings authority remain pending.
 
 ## Current native inputs and caller census

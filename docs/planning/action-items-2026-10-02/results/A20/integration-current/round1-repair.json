@@ -1,6 +1,6 @@
 {
   "base": "b319758478cf8626f617e362ee1fe1a86619a314",
-  "state": "Frozen two-root repair; sole aggregate running in accepted-base complete-candidate fixture.",
+  "state": "Aggregate passed; frozen product/index remain unchanged for parent lifecycle.",
   "files": [
     {
       "repository": "PS",
@@ -646,9 +646,29 @@
         "sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
       }
     ],
-    "state": "running",
+    "state": "passed",
     "started_utc": "2026-10-03T17:31:58.348888+00:00",
     "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A20-integration-20261003\\round1-repair-aggregate.log",
-    "before_identity_passed": true
+    "before_identity_passed": true,
+    "exit_code": 0,
+    "terminal_utc": "2026-10-03T18:32:37.810836+00:00",
+    "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+    "log_bytes": 880,
+    "after_identity_passed": true,
+    "passed_hooks": [
+      "check json...............................................................Passed",
+      "check yaml...............................................................Passed",
+      "fix end of files.........................................................Passed",
+      "trim trailing whitespace.................................................Passed",
+      "yamllint.................................................................Passed",
+      "Lint GitHub Actions workflow files.......................................Passed",
+      "Validate Dependabot Config (v2)..........................................Passed",
+      "Validate GitHub Workflows................................................Passed",
+      "staged Markdown..........................................................Passed",
+      "workflow policy contract.................................................Passed",
+      "agent instruction contract and mutation tests............................Passed"
+    ],
+    "passed_hook_count": 11,
+    "skipped_hook_count": 0
   }
 }
