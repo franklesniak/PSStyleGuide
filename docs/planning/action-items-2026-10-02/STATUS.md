@@ -2,18 +2,18 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `34ba56430c64f387897c8822620c27632423b4fe` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `e38aaeee9fedcddb49294a1d4eda710d87fee3c2` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | [A00](tasks/A00.md) | Reconcile historical obligations and retirement decisions | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A00/RESULT.md) | Reuse the canonical native delivery ledger |
-| [A01](tasks/A01.md) | Refresh issue coverage and full-tree baseline | complete | a00 + coordinator verification | PS/TF main | PS2a2d14a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Post226 inventory](results/A01/CURRENT-REFRESH-POST226.md) | Refresh at next native mutation; preserve historical 81 |
+| [A01](tasks/A01.md) | Refresh issue coverage and full-tree baseline | complete | coordinator; native refresh verified | PS/TF main | PSc13abc4 / TF06ad4f7 | — | 0/80; not started | 0/8 | [Post227 inventory](results/A01/post227/CURRENT-REFRESH-POST227.md) | Refresh at next native mutation; preserve historical 81 |
 | [A02](tasks/A02.md) | Non-protected shared governance | active | coordinator; local quality passed | TF codex/a02-peer-docs | TF06ad4f7 / PS2a2d14a | —;226 accepted | peer not started;226 used10/80 | 1/12 | [Evidence](results/A02/RESULT.md) | Retain reviewed two docs; satisfy current A07 audit gate before acceptance |
 | [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A03/RESULT.md) | Exact option L prepared; await owner choice |
 | [A04](tasks/A04.md) | Bound ordinary Node downloads and test retries | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A04/design.md) | Integrate after A03/A07 acceptance |
 | [A05](tasks/A05.md) | Require immutable event acquisition in the YAML guide | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A05/design.md) | Await exact two-guide authority |
 | [A06](tasks/A06.md) | Converge the generator and artifact verification | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A06/RESULT.md) | Retain retirements; validate current generator |
-| [A07](tasks/A07.md) | Converge dependency, lint and local toolchain behavior | waiting_external | coordinator; reviews clean, CI pending | PS codex/a07-tooling-followup | c9e0b24 / 2a2d14a | [227](https://github.com/franklesniak/PSStyleGuide/pull/227) | 2/80;2026-10-11T09:51:36.838999Z | 0/12 | [Evidence](results/A07/RESULT.md) | Wait hosted instruction CI; then final quality and native readiness |
+| [A07](tasks/A07.md) | Converge dependency, lint and local toolchain behavior | active | coordinator; PS source accepted | PS main; TF integration pending | PSc13abc4 / TF06ad4f7 | [227 merged](https://github.com/franklesniak/PSStyleGuide/pull/227) | 2/80;2026-10-11T09:51:36.838999Z | 0/12 | [Evidence](results/A07/RESULT.md) | Integrate coherent TF foundation after accepted A21 and scoped grants |
 | [A08](tasks/A08.md) | Converge repository review instructions | verified | a00 + independent d07 | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A08/RESULT.md) | Recheck wrapper only after relevant input change |
 | [A09](tasks/A09.md) | Converge current supply checks and preserve truthful history | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A09/RESULT.md) | Repair affected current supply tests after prerequisites |
 | [A10](tasks/A10.md) | Revalidate PowerShell examples and bounded preflight outcomes | superseded | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A10/RESULT.md) | A18 verifies examples and preflight residuals |
@@ -27,19 +27,19 @@ Planning head: `34ba56430c64f387897c8822620c27632423b4fe` (prior published check
 | [A18](tasks/A18.md) | Close remaining byte differences and verify convergence | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](tasks/A18.md) | Run final union and A10/A11 checklist after products |
 | [A19](tasks/A19.md) | Reconcile issues and publish final acceptance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](tasks/A19.md) | Refresh final issue census after A18 |
 | [A20](tasks/A20.md) | Protected instruction files | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A02/protected-v2-request.md) | PR224 merged; await explicit protected authority |
-| [A21](tasks/A21.md) | Instruction validator, SelfTest, and classification manifest convergence | validating | coordinator; local quality passed | PS codex/instruction-validator-convergence | candidate da2f117 / accepted2a2 | — | 0/80; not started | 0/12 | [Evidence](results/A21/RESULT.md) | Reconcile actual accepted A07 source and callers before final gates |
+| [A21](tasks/A21.md) | Instruction validator, SelfTest, and classification manifest convergence | validating | coordinator; aggregate38432 active | PS codex/instruction-validator-convergence | staged5cc022a / acceptedc13abc4 | — | 0/80; not started | 0/12 | [Evidence](results/A21/RESULT.md) | Reconcile sole aggregate and independent quality; commit and test actual B/H |
 
 ## Local configuration and in-flight native operations
 
 - Planning: `C:/Users/flesniak/GitHub/PSStyleGuide`; peer: `C:/Users/flesniak/GitHub/TerraformStyleGuide`.
-- A21 product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`; codex/instruction-validator-convergence at reviewed da2; root owns reviewed frozen slice.
+- A21 product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`; codex/instruction-validator-convergence atc13; root owns four staged files/tree5cc.
 - Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 suffix `A02-design-20261002`, resume `PR224-review-state.json`; D07 suffix `plan-review-20261002`.
 - Node24.18.1/npm11.16.0: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 Restricted; no Docker container remains.
 - A02 source: PR226 accepted2a2; round10; four landed runs pass. Worktree suffix `governance-push-exit/PSStyleGuide`; scratch `A02-landed-exit-20261003/repair-review-state.json`.
-- A07 follow-up: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; codex/a07-tooling-followup from2a2; clean c9 repair published; all local gates and round2 reviews pass; hosted instruction CI pending. Resume: scratch suffix `A07-reconcile-20261003/execution-state.json`; merge serialized.
+- A07 follow-up: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; clean reviewedc9; PR227 mergedc13 and all five landed runs pass. Resume: scratch suffix `A07-reconcile-20261003/execution-state.json`; source accepted.
 - A02 peer: scratch `A02-peer-current-20261003/execution-state.json`; product TEMP `TerraformStyleGuide-A02-peer-docs-20261003`, codex/a02-peer-docs. root owns reviewed docs; audit FINDINGS; transfer1/12.
 - Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; treec68b5e1. Reconciliation complete; preserve index and unrelated edits.
-- A21: resume scratch suffix `A21-selection-20261003/execution-state.json`; coupled local quality passed; accepted source precedes final validation.
+- A21: scratch suffix `A21-selection-20261003/execution-state.json`; sole aggregate38432 live; assembled quality passed; source landed gate cleared.
 - Await A03-D1: owner-label L, procedural P or other direction.
 - Await A20: six protected-v2 files and separate two-CLAUDE protocol grant.
 - Await A05: two YAML-guide patch grant.

@@ -1,0 +1,319 @@
+{
+  "A14_five_generation_caller_inputs": [
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "repository": "PS",
+      "prior": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a23d38c42770d7463920704e108ccd63240dc90b",
+        "size": 86655,
+        "raw_sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+      },
+      "current": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a23d38c42770d7463920704e108ccd63240dc90b",
+        "size": 86655,
+        "raw_sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "repository": "TF",
+      "prior": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+        "size": 95329,
+        "raw_sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+      },
+      "current": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+        "size": 95329,
+        "raw_sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "repository": "PS",
+      "prior": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+        "size": 253910,
+        "raw_sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+      },
+      "current": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+        "size": 253910,
+        "raw_sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "repository": "TF",
+      "prior": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+        "size": 253918,
+        "raw_sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+      },
+      "current": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+        "size": 253918,
+        "raw_sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "repository": "PS",
+      "prior": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "size": 32648,
+        "raw_sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+      },
+      "current": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "size": 32648,
+        "raw_sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "repository": "TF",
+      "prior": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+        "size": 31949,
+        "raw_sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+      },
+      "current": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+        "size": 31949,
+        "raw_sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "repository": "PS",
+      "prior": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+        "size": 9114,
+        "raw_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+      },
+      "current": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+        "size": 9114,
+        "raw_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "repository": "TF",
+      "prior": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "94beedee85478c14d284ca830e94d4a5f4ece202",
+        "size": 5813,
+        "raw_sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda"
+      },
+      "current": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "94beedee85478c14d284ca830e94d4a5f4ece202",
+        "size": 5813,
+        "raw_sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "repository": "PS",
+      "prior": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "73a13567131229fb10f8360334bf758b7c7deaa7",
+        "size": 4361,
+        "raw_sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0"
+      },
+      "current": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "73a13567131229fb10f8360334bf758b7c7deaa7",
+        "size": 4361,
+        "raw_sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "repository": "TF",
+      "prior": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+        "size": 4222,
+        "raw_sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+      },
+      "current": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+        "size": 4222,
+        "raw_sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+      },
+      "raw_identity_unchanged": true
+    }
+  ],
+  "A12_all_workflow_yaml": [
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "bd559e5e9b7015d83f45f705a4e7862dc2dc11d5",
+        "size": 11495,
+        "raw_sha256": "ee0595c59dd9601e0a6296b295969842faa5d4db35b2ba20fffa2d5273e915d7"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+        "size": 9558,
+        "raw_sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "73a13567131229fb10f8360334bf758b7c7deaa7",
+        "size": 4361,
+        "raw_sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+        "size": 4222,
+        "raw_sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "66d7cda6249a8811490742004a90f5eb644ab688",
+        "size": 26612,
+        "raw_sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+        "size": 33862,
+        "raw_sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "dde42437f9f5d579abee2e944321488a2ba4f793",
+        "size": 3863,
+        "raw_sha256": "0deabaded368671ae8759f4c4fc02445e2e3c0c930cfe3a3a20df728a1e988de"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+        "size": 7645,
+        "raw_sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+      },
+      "raw_identity_unchanged": true
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+        "size": 6604,
+        "raw_sha256": "73b1eb08b07254ffcb9d437e260bee8a38cce2e8cc65af1c921a3a9c4ed47bfa"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+        "size": 6632,
+        "raw_sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+      },
+      "raw_identity_unchanged": true
+    }
+  ],
+  "runtime_engines": {
+    "PS": {
+      "before": {
+        "node": "24.18.1",
+        "npm": "11.16.0"
+      },
+      "after": {
+        "node": "24.18.1",
+        "npm": "11.16.0"
+      },
+      "equal": true
+    },
+    "TF": {
+      "before": {
+        "node": "24.18.1",
+        "npm": "11.16.0"
+      },
+      "after": {
+        "node": "24.18.1",
+        "npm": "11.16.0"
+      },
+      "equal": true
+    }
+  },
+  "A14_runtime_toolchain_inputs_unchanged": [
+    ".github/workflows/ci-toolchain.json",
+    ".github/workflows/Initialize-CiToolchain.ps1"
+  ],
+  "A14_changed_A07_executable_inputs_have_no_retired_consumer_or_new_writer_reference": true,
+  "A14_bounded_disposition": "Five generation/caller blobs and declared runtimes/initializer remain identical; selected new locked Python setup and lint/hook tests do not introduce a generator/archive-promotion caller, adopted path primitive or changed build authority. PS155 discussion unchanged. Retain D92/D93 conditional result for these inputs, without runtime/race acceptance or universal alias proof. Closed PS156 live read is preserved separately.",
+  "A12_bounded_disposition": "All workflow YAML is byte-identical frompost226 in both repositories. Actual validation coverage changes through A07 classifier/audit/lint/helper/setup inputs; retained selected check contexts, job names, triggers and permissions are unchanged. No settings/collaborator/ruleset enumeration or permission is supplied. A03 admission and A13 exact owner authority remain open; recheck actual current required-check/source facts before any future settings mutation.",
+  "A21_disposition": "Native classifier pair now has frozen A21 common selectors/tests; validator/SelfTest/manifest remain prior accepted bytes. A07 actual callers must be integrated into A21 final gates, with landed-source instruction success separate. No unmerged A21 product compared.",
+  "owner_preservation": "All83 paths retain a primary integration owner. Narrow A07 .gitignore execution does not remove A02 final four-path paired equality obligation. Original81 paths/402 obligations/26 absent-both references retained with their original dispositions."
+}

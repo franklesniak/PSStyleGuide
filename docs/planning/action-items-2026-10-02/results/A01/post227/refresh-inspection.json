@@ -1,0 +1,203 @@
+{
+  "checked_utc": "2026-10-03T12:18:07.078503+00:00",
+  "stability": {
+    "PSStyleGuide": {
+      "ref_commit_tree_identical": true,
+      "complete_issue_and_comment_payloads_identical": true,
+      "open_prs": 0,
+      "collection_pagination": {
+        "issues": {
+          "pages": 1,
+          "per_page": 100,
+          "counts": [
+            4
+          ]
+        },
+        "open_prs": {
+          "pages": 1,
+          "per_page": 100,
+          "counts": [
+            0
+          ]
+        },
+        "comments": {
+          "213": {
+            "pages": 1,
+            "per_page": 100,
+            "counts": [
+              0
+            ]
+          },
+          "175": {
+            "pages": 1,
+            "per_page": 100,
+            "counts": [
+              0
+            ]
+          },
+          "155": {
+            "pages": 1,
+            "per_page": 100,
+            "counts": [
+              4
+            ]
+          },
+          "152": {
+            "pages": 1,
+            "per_page": 100,
+            "counts": [
+              3
+            ]
+          }
+        }
+      }
+    },
+    "TerraformStyleGuide": {
+      "ref_commit_tree_identical": true,
+      "complete_issue_and_comment_payloads_identical": true,
+      "open_prs": 0,
+      "collection_pagination": {
+        "issues": {
+          "pages": 1,
+          "per_page": 100,
+          "counts": [
+            1
+          ]
+        },
+        "open_prs": {
+          "pages": 1,
+          "per_page": 100,
+          "counts": [
+            0
+          ]
+        },
+        "comments": {
+          "25": {
+            "pages": 1,
+            "per_page": 100,
+            "counts": [
+              0
+            ]
+          }
+        }
+      }
+    }
+  },
+  "counts": {
+    "PS": 75,
+    "TF": 75,
+    "union": 83,
+    "different": 54,
+    "equal": 13,
+    "PS-only": 8,
+    "TF-only": 8
+  },
+  "changed_paths": [
+    [
+      ".github/workflows/Check-NpmAudit.mjs",
+      "A07"
+    ],
+    [
+      ".github/workflows/Check-NpmAudit.test.mjs",
+      "A07"
+    ],
+    [
+      ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "A21"
+    ],
+    [
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "A21"
+    ],
+    [
+      ".github/workflows/Invoke-LockedPythonHook.ps1",
+      "A07"
+    ],
+    [
+      ".github/workflows/Invoke-MarkdownLint.ps1",
+      "A07"
+    ],
+    [
+      ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "A07"
+    ],
+    [
+      ".github/workflows/NpmTools.test.mjs",
+      "A07"
+    ],
+    [
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      "A03"
+    ],
+    [
+      ".github/workflows/install-husky.mjs",
+      "A07"
+    ],
+    [
+      ".github/workflows/lint-markdown.test.mjs",
+      "A07"
+    ],
+    [
+      ".github/workflows/package.json",
+      "A07"
+    ],
+    [
+      ".github/workflows/scripts-README.md",
+      "A07"
+    ],
+    [
+      ".gitignore",
+      "A02"
+    ],
+    [
+      ".husky/pre-commit",
+      "A07"
+    ],
+    [
+      ".pre-commit-config.yaml",
+      "A07"
+    ],
+    [
+      "docs/dependency-maintenance.md",
+      "A07"
+    ],
+    [
+      "package-lock.json",
+      "A07"
+    ],
+    [
+      "package.json",
+      "A07"
+    ],
+    [
+      "requirements-dev.txt",
+      "A07"
+    ]
+  ],
+  "all83_owned": true,
+  "historical": {
+    "original_paths": 81,
+    "original_obligations": 402,
+    "absent_both": 26,
+    "all26_still_absent": true,
+    "source_files_unchanged": true,
+    "source_sha256": {
+      "A01\\native-tree-union.json": "3bc84e3e1cdd94048095bac0103e0c5b6f3c871176ab96263a212fdbecefd00f",
+      "A00\\dispositions.json": "45e83dca413045ee58d22930dbdaf771caa832bd3ea831b575dc28c4f2b42e47",
+      "A01\\absent-path-coverage.json": "8e3fcc725a4d3a8d03165b052d2962e27370720b53e58f3dc94a06f6e17ece57"
+    }
+  },
+  "closed_PS156": {
+    "state": "closed",
+    "state_reason": "not_planned",
+    "updated_at": "2026-10-02T00:33:59Z",
+    "comments": 1
+  },
+  "landed_instruction": {
+    "id": 37122047604,
+    "status": "in_progress",
+    "conclusion": null,
+    "head": "c13abc4623e2593d7dac703685da6c608451211a"
+  },
+  "read_only_limit": "Authenticated native GETs and immutable Git objects only; no suites, installations, settings, product/planning/index/branch/ref/GitHub mutations or descendants. Native source merge is separate from still-pending landed acceptance."
+}

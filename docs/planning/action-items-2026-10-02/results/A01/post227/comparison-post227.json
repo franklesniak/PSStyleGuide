@@ -1,0 +1,782 @@
+{
+  "prior_refs": {
+    "PS": {
+      "repo": "franklesniak/PSStyleGuide",
+      "commit": "2a2d14a9969226b0c55d02d4f0c20f2451ed40b6",
+      "tree": "f5a83173a667d0d08225ec0cd391cedb4e659a77"
+    },
+    "TF": {
+      "repo": "franklesniak/TerraformStyleGuide",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "current_refs": {
+    "PS": {
+      "repo": "franklesniak/PSStyleGuide",
+      "commit": "c13abc4623e2593d7dac703685da6c608451211a",
+      "tree": "427efd5ccf51bd55ac0874b53bf10f0e885d70dc"
+    },
+    "TF": {
+      "repo": "franklesniak/TerraformStyleGuide",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "prior_counts": {
+    "PS": 73,
+    "TF": 75,
+    "union": 83,
+    "different": 55,
+    "equal": 10,
+    "TF-only": 10,
+    "PS-only": 8
+  },
+  "current_counts": {
+    "PS": 75,
+    "TF": 75,
+    "union": 83,
+    "different": 54,
+    "equal": 13,
+    "PS-only": 8,
+    "TF-only": 8
+  },
+  "changed_paths": [
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3babe4848f5d97ffd5757255983463231d4163f7",
+        "size": 20485,
+        "raw_sha256": "0110c31f21d9037991cb87ca0a2f00b3360995ba7ca815defaafd4a08d19c90d"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "79d69370982018adb479c8d860722797445de03c",
+        "size": 20536,
+        "raw_sha256": "4f2a0f56771aa73d05dc67ca97f95ad1f39254b26287117d798219dba161e425"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+        "size": 20499,
+        "raw_sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+        "size": 20499,
+        "raw_sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3a98a55e7d01a1dfd95f2112e8fa656f79df6df2",
+        "size": 27466,
+        "raw_sha256": "42fb09ef61f7d67d40a33a0b8b71c8ffd952876d8bac9140300975cf1db86b08"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3212445f4dde58475d7f8409002114b76396bfb9",
+        "size": 27450,
+        "raw_sha256": "f0078a6263621a7aaba6c16caffdfaa7ea73886ee23da6cc19e21d805c9a3d67"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+        "size": 27494,
+        "raw_sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+        "size": 27494,
+        "raw_sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "owner": "A21",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1e03c3fe9d1845fe73a8f05820e8acb09d04f918",
+        "size": 5613,
+        "raw_sha256": "a17bfe6ab678793fde20248d32cd35cbbb5668c4fe430f59679e05157b60acff"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "c36ffc6bf2f845f2ff297e2045799331365634e0",
+        "size": 5786,
+        "raw_sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+        "size": 5632,
+        "raw_sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+        "size": 5632,
+        "raw_sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "owner": "A21",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e05a22e85727e64cf491b1bd009fd943029dd770",
+        "size": 12599,
+        "raw_sha256": "44080988676f921d472569bdde743edc25c2b66acd50565f9ff51f3edeb28acc"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "98a19faa7ae2da75e8a09d146508c34aa70b3a64",
+        "size": 21583,
+        "raw_sha256": "980257c408ee4dee430d7fb6e144ff7cb9d8c1dc90565071d99054479304d311"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+        "size": 6799,
+        "raw_sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+        "size": 6799,
+        "raw_sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+      "owner": "A07",
+      "old_ps": null,
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+        "size": 3127,
+        "raw_sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+        "size": 3127,
+        "raw_sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+        "size": 3127,
+        "raw_sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+      },
+      "prior_status": "TF-only",
+      "status": "equal"
+    },
+    {
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "92743273da44ad7f6d46113a763089b9e1675f82",
+        "size": 1509,
+        "raw_sha256": "43c629f08ddb78a423187887db2ee7e53705bf2681ca0f1b49a169e1887e3452"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "size": 1510,
+        "raw_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "size": 1510,
+        "raw_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "size": 1510,
+        "raw_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      },
+      "prior_status": "different",
+      "status": "equal"
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e2bc4578d24e8f65e5b856fe67e55ae1e03c8fea",
+        "size": 2453,
+        "raw_sha256": "c06f3bb95338d074191247737cddd25aa4b62fce7ac47c27d17bb8901e4fa2b1"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "c55c95be61b704291d384f043e078f26472a3f2b",
+        "size": 3017,
+        "raw_sha256": "6d5463da1938f3dbacbccff47d594b2522ee4558369b05eb4459e2413fa83ac2"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+        "size": 2603,
+        "raw_sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+        "size": 2603,
+        "raw_sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "77a1313b9044bb934159a165e07219a3c1c9306b",
+        "size": 9686,
+        "raw_sha256": "0b328c28f566e3d337831026eb0c7055b8158c8895c0552c77d9dbb8e3808c42"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8249cd855785e2847df7ab6fad60caf219da59bc",
+        "size": 11392,
+        "raw_sha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+        "size": 11402,
+        "raw_sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+        "size": 11402,
+        "raw_sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "owner": "A03",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0773070a6505b1678c5522c16c8a5c32979f6338",
+        "size": 37696,
+        "raw_sha256": "a20f0822eb0c8512a5bb86b1af920cae2a8b6a739bb132c01990b41bdcb4d012"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d29e7bec8d4c9cdf04714bb601b0be5cc93f4350",
+        "size": 42116,
+        "raw_sha256": "a24ca411e2dd9a96daaedc34bc3db89ae9d225265c929a4a730f028742c4878d"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7855cc0c1be90096abae979168ed1e282d535998",
+        "size": 33662,
+        "raw_sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7855cc0c1be90096abae979168ed1e282d535998",
+        "size": 33662,
+        "raw_sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/install-husky.mjs",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "600f6bfd664d0550238916f01de3a41109fe9fbf",
+        "size": 703,
+        "raw_sha256": "b5996d505e1ad202c8188579094117221c1c3cdc53f17976275e9e8c6ef8df2b"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6a12568776f6473472193bc98638f1856a7c9dec",
+        "size": 625,
+        "raw_sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6a12568776f6473472193bc98638f1856a7c9dec",
+        "size": 625,
+        "raw_sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6a12568776f6473472193bc98638f1856a7c9dec",
+        "size": 625,
+        "raw_sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7"
+      },
+      "prior_status": "different",
+      "status": "equal"
+    },
+    {
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "27d2e5143682b6bfe02776eef56bae7b23472599",
+        "size": 12301,
+        "raw_sha256": "e878b7e7b831c9e498306594ae7357c76d3052586f9f4646e64bcc5d7cd0092d"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "2d79be38b1caeeb871de4ed2c8222b950c4a6ae7",
+        "size": 12676,
+        "raw_sha256": "e93be06d32fff7ef9b02a33668918213f068c460f477ecd62e668f43c7004c76"
+      },
+      "old_tf": null,
+      "new_tf": null,
+      "prior_status": "PS-only",
+      "status": "PS-only"
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b6225545b1e0570900261bfb6fc5c08afaff84bf",
+        "size": 877,
+        "raw_sha256": "d1b6908de4c3e70d9b42155b0a3e4eeb7e10c0c10d680ff17763e19e4cc84a8e"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b09ca859508430050dc0b023b3dba62e50748680",
+        "size": 844,
+        "raw_sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "65aebbba501747454aede48fe32ce406a2ce43ff",
+        "size": 1105,
+        "raw_sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "65aebbba501747454aede48fe32ce406a2ce43ff",
+        "size": 1105,
+        "raw_sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d5cf90a6e6dede9f4fb514ae733cf8bf09a18896",
+        "size": 5034,
+        "raw_sha256": "8af2b01273015a8b9993a732316d68ceeb3e9cad32160063af7815e5e304d1a9"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "eb9ab7f8edb15b9b85e853c1b8e260f93b300928",
+        "size": 5657,
+        "raw_sha256": "986e7ed7688652a24d144e19b548feb7e46d1da1f40b12a6a9efbc9d32a33f32"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+        "size": 5421,
+        "raw_sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+        "size": 5421,
+        "raw_sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".gitignore",
+      "owner": "A02",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+        "size": 249,
+        "raw_sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+        "size": 289,
+        "raw_sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+        "size": 249,
+        "raw_sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+        "size": 249,
+        "raw_sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+      },
+      "prior_status": "equal",
+      "status": "different"
+    },
+    {
+      "path": ".husky/pre-commit",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "28e5c7bcb9a5616b37abbbcbed727339f2dbc823",
+        "size": 460,
+        "raw_sha256": "8c59449406d5bf5935ef4a5e2377abae841f477d4ddcad72975b328d2ebbc711"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "size": 3249,
+        "raw_sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+        "size": 3544,
+        "raw_sha256": "1888b6c6e29c1c06baebbdf2946cc7b465ce5adcc869c2977dfd774d68b96df0"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+        "size": 3544,
+        "raw_sha256": "1888b6c6e29c1c06baebbdf2946cc7b465ce5adcc869c2977dfd774d68b96df0"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "808609311d98e9792dc7f3d76d20aa220aab2256",
+        "size": 3143,
+        "raw_sha256": "f5babbf1733ee1065ba34f717050e4e831eeef649adbacd73f99301edc650d23"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0688b48f0065acf8a57181c0eb13816d6f363796",
+        "size": 5373,
+        "raw_sha256": "a3c8998aabe4f78f1b29267ece80c727fa10f01bbce3d63cdb3d4f471c40180e"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "size": 5405,
+        "raw_sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "size": 5405,
+        "raw_sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "9c7e9535493d77099aa7b2a8c5eebfc4a90e4f05",
+        "size": 7918,
+        "raw_sha256": "40c7a91096e878bdff64902fd6ca480e8df75b5b01ce435c22255ccd70303af0"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7478f929942accd00195f8bf5d5dce56a80b0fda",
+        "size": 9672,
+        "raw_sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+        "size": 6448,
+        "raw_sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+        "size": 6448,
+        "raw_sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": "package-lock.json",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "210dbd7695cc858a199e17c83b7dd1da144a4f33",
+        "size": 3518,
+        "raw_sha256": "8c3195455767df733620d7d038bd50899820694b1b88d88eab26cd4e613d4797"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+        "size": 3552,
+        "raw_sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+        "size": 3566,
+        "raw_sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+        "size": 3566,
+        "raw_sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": "package.json",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6def13021be9d4f17d491ba0450ce2cbe02cd588",
+        "size": 797,
+        "raw_sha256": "b80d65d36e1bd3ae7f4fb0d7a54e30a20fbf303c7ed59f3a3d62cd0b5cc8f953"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+        "size": 816,
+        "raw_sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "size": 837,
+        "raw_sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "size": 837,
+        "raw_sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": "requirements-dev.txt",
+      "owner": "A07",
+      "old_ps": null,
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+        "size": 5920,
+        "raw_sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+        "size": 5920,
+        "raw_sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+        "size": 5920,
+        "raw_sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+      },
+      "prior_status": "TF-only",
+      "status": "equal"
+    }
+  ],
+  "added_paths": [
+    ".github/workflows/Invoke-LockedPythonHook.ps1",
+    "requirements-dev.txt"
+  ],
+  "removed_paths": [],
+  "issues": {
+    "PS": {
+      "count": 4,
+      "numbers": [
+        213,
+        175,
+        155,
+        152
+      ],
+      "body_title_state_count_timestamp_equal": true
+    },
+    "TF": {
+      "count": 1,
+      "numbers": [
+        25
+      ],
+      "body_title_state_count_timestamp_equal": true
+    }
+  },
+  "comments": {
+    "PS": {
+      "213": {
+        "count": 0,
+        "ids": [],
+        "complete_payload_equal": true
+      },
+      "175": {
+        "count": 0,
+        "ids": [],
+        "complete_payload_equal": true
+      },
+      "155": {
+        "count": 4,
+        "ids": [
+          5227199805,
+          5233004306,
+          5233025993,
+          5943334454
+        ],
+        "complete_payload_equal": true
+      },
+      "152": {
+        "count": 3,
+        "ids": [
+          5152385509,
+          5233025100,
+          5946563885
+        ],
+        "complete_payload_equal": true
+      }
+    },
+    "TF": {
+      "25": {
+        "count": 0,
+        "ids": [],
+        "complete_payload_equal": true
+      }
+    }
+  },
+  "open_prs": {
+    "PS": 0,
+    "TF": 0
+  },
+  "historical_preservation": {
+    "original_union": 81,
+    "original_obligations": 402,
+    "absent_both_paths": 26,
+    "all26_still_absent": true,
+    "retirements_and_dispositions_unchanged": true
+  },
+  "bounded_conditional_inputs": {
+    "A14": "Requires bounded refresh of unchanged five generation/caller blobs plus changed A07 runtime/setup coverage; see conditional-inputs.json. Prior generation-section and residual dispositions are retained.",
+    "A12": "Workflow YAML/check names unchanged frompost226; actual validation/helper coverage changed. See conditional-inputs.json. No settings enumeration/authority or immutable-enforcement claim.",
+    "A21": "Classifier pair changes to exact A21 frozen closure; validator/SelfTest/manifest unchanged. A07 callers are now native source; landed instruction gate is separate. Unmerged working-tree candidate excluded."
+  }
+}

@@ -1,7 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # A01 current issue and native tree inventory
 
-## Current refresh after PR224: 2026-10-03
+## Current refresh after PR227: 2026-10-03
+
+Current native inventory at PS `c13abc4623e2593d7dac703685da6c608451211a` and TF `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c`: **83 paths:13 equal,54 different,8 PS-only,8 TF-only**; 75 tracked files per repository. The worker verified all150 raw entries and complete pagination; root independently sampled both repositories' requirements, Python launcher and .gitignore blobs/modes/lengths/SHA256. Five issues and seven comments are unchanged; neither repository has an open PR at this census. All402 original obligations,81 historical paths and26 absent-both references remain intact.
+
+See the [dated post227 report](post227/CURRENT-REFRESH-POST227.md), [complete raw matrix](post227/native-tree-union-post227.json), [delta](post227/comparison-post227.json), [final native readback](post227/final-native-recheck-post227.json) and [source evidence identities](post227/evidence-hashes.json). The report's pending landed-CI observation is retained as dated evidence; the coordinator subsequently confirmed all five exact-c13 push workflows passed and recorded [source acceptance](https://github.com/franklesniak/PSStyleGuide/pull/227#issuecomment-5969203731). Inventory acceptance is not paired convergence. A14's scoped inputs and A12/A03 workflow YAML remain unchanged; changed helper coverage now names c13. No settings/protected authority is inferred.
+
+## Previous refresh after PR224: 2026-10-03
 
 Accepted inventory at PS main `3ba0f4d9686af41ae0e77c65ea374fff9d1cef53`, TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c`: **83 paths:10 equal,55 different,8 PS-only,10 TF-only**. All148 raw entries and all83 current owners are accounted for. Five issue bodies and seven comments are unchanged; neither repository has an open PR. Landed source CI remains separately pending.
 
