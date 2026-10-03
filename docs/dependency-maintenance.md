@@ -54,4 +54,15 @@ py -3.12 -m pip --isolated install --require-hashes --only-binary=:all: --index-
 py -3.12 -m pre_commit run --all-files
 ```
 
-On Linux, replace `py -3.12` with `python3.12`. The hashed [requirements closure](../requirements-dev.txt) supplies the Python hooks. The [launcher](../.github/workflows/Invoke-LockedPythonHook.ps1) selects Python 3.12 and invokes only its listed modules. It uses `-E -P` to ignore Python environment variables and exclude the unsafe current-directory import path; it does not attest installed package bytes or exclude every site-package source. Install the closure into the interpreter that the launcher selects. The remote actionlint hook retains its exact reviewed Git revision and checksummed Go dependencies.
+On Linux, use a Python 3.12 virtual environment. On Ubuntu 24.04, install its venv support first with `sudo apt-get install python3.12-venv`; see [Ubuntu's Python setup guidance](https://documentation.ubuntu.com/ubuntu-for-developers/howto/python-setup/) for package prerequisites. From the repository root, run these commands in a Bash-compatible shell:
+
+```sh
+python3.12 -m venv .venv
+. .venv/bin/activate
+python3.12 -m pip --isolated install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r requirements-dev.txt
+python3.12 -m pre_commit run --all-files
+```
+
+Keep that virtual environment active when running the Python hooks. The launcher selects its `python3.12` application from `PATH`. The virtual environment supplies pip and keeps installed packages separate from Ubuntu's externally managed system Python.
+
+The hashed [requirements closure](../requirements-dev.txt) supplies the Python hooks. The [launcher](../.github/workflows/Invoke-LockedPythonHook.ps1) selects Python 3.12 and invokes only its listed modules. It uses `-E -P` to ignore Python environment variables and exclude the unsafe current-directory import path; it does not attest installed package bytes or exclude every site-package source. Install the closure into the interpreter that the launcher selects. The remote actionlint hook retains its exact reviewed Git revision and checksummed Go dependencies.

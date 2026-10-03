@@ -1,6 +1,9 @@
 # Node.js dependencies
 node_modules/
 
+# Local Python hook environment
+.venv/
+
 # Personal Claude Code project memory must remain untracked.
 CLAUDE.local.md
 
