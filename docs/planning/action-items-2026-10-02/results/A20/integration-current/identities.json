@@ -205,7 +205,7 @@
       "Get-AgentInstructionFailure"
     ]
   },
-  "state": "four frozen product paths staged at recorded tree; standalone SelfTest passed; explicit full aggregate running; no commit or native mutation",
+  "state": "Local source implementation and standalone/full aggregate passed; exact four-file candidate staged and released to parent for normal lifecycle; no commit or native mutation by worker",
   "transfer_counts": {
     "A20": "0/8",
     "A21": "0/12"
@@ -241,8 +241,54 @@
   },
   "aggregate": {
     "command": "py -3.12 -m pre_commit run --all-files",
-    "state": "running",
+    "state": "passed",
     "session": 72862,
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A20-integration-20261003\\source-aggregate.log"
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A20-integration-20261003\\source-aggregate.log",
+    "exit_code": 0,
+    "log_sha256": "d09e206d66261c3903d23b8170d9563b06b938bac204f7807576915153d20943",
+    "log_bytes": 891,
+    "started_utc": "2026-10-03T15:56:43.128357+00:00",
+    "log_last_write_utc": "2026-10-03T16:53:05.276700+00:00",
+    "terminal_observed_utc": "2026-10-03T16:54:11.118978+00:00",
+    "passed_hook_count": 11,
+    "passed_hooks": [
+      "check json",
+      "check yaml",
+      "fix end of files",
+      "trim trailing whitespace",
+      "yamllint",
+      "Lint GitHub Actions workflow files",
+      "Validate Dependabot Config (v2)",
+      "Validate GitHub Workflows",
+      "staged Markdown",
+      "workflow policy contract",
+      "agent instruction contract and mutation tests"
+    ],
+    "skipped_hook_count": 0,
+    "candidate_tree": "522069cc69d37c9aeaaff65f5dec7ea0823436ef",
+    "raw_worktree_equals_index": [
+      {
+        "path": "AGENTS.md",
+        "raw_equals_index": true,
+        "sha256": "58367236cdbdaa69a356b6b24f13b1cc43167e31d9ef20a9b346a414caf70b97"
+      },
+      {
+        "path": "CLAUDE.md",
+        "raw_equals_index": true,
+        "sha256": "8fca7c0af2c031d1d2d22064868a01a5e0f0272acc864860d6cf63d840853019"
+      },
+      {
+        "path": ".github/copilot-instructions.md",
+        "raw_equals_index": true,
+        "sha256": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6"
+      },
+      {
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "raw_equals_index": true,
+        "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+      }
+    ],
+    "staged_paths_exact": true,
+    "no_unstaged_or_untracked_paths": true
   }
 }

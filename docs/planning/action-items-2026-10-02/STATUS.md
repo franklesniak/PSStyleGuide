@@ -2,7 +2,7 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `590e71cc46715b7f4103d85658ef3c59ae3c2cda` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `0f3ebd0d277b2e2fd67569f32eede98e7d9c292b` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -26,22 +26,22 @@ Planning head: `590e71cc46715b7f4103d85658ef3c59ae3c2cda` (prior published check
 | [A17](tasks/A17.md) | Deliver Terraform Gate B destructive-procedure guidance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/16 | [Evidence](tasks/A17.md) | Wait for accepted Gate A and owner approval |
 | [A18](tasks/A18.md) | Close remaining byte differences and verify convergence | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](tasks/A18.md) | Run final union and A10/A11 checklist after products |
 | [A19](tasks/A19.md) | Reconcile issues and publish final acceptance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](tasks/A19.md) | Refresh final issue census after A18 |
-| [A20](tasks/A20.md) | Protected instruction files | active | block_decision_audit; coordinator lifecycle | PS codex/protected-instruction-integration | PS425795b / TF06ad4f7 | — | 0/80; not started | 0/8 | [Decision](results/A20/integration-current/DECISION.md) | Standalone passed; finish single aggregate, then source PR lifecycle |
+| [A20](tasks/A20.md) | Protected instruction files | validating | coordinator; source worker released | PS codex/protected-instruction-integration | b319758 /425795b | [229 open](https://github.com/franklesniak/PSStyleGuide/pull/229) | 1/80;2026-10-11T17:00:14Z | 0/8 | [Decision](results/A20/integration-current/DECISION.md) | All local gates passed; finish reviews, final quality, merge and landed CI |
 | [A21](tasks/A21.md) | Instruction validator, SelfTest, and classification manifest convergence | validating | coordinator; PS source accepted | PS codex/instruction-validator-convergence | 425795b / c13abc4 | [228 merged](https://github.com/franklesniak/PSStyleGuide/pull/228) | 1/80;2026-10-11T13:06:25Z | 0/12 | [Evidence](results/A21/RESULT.md) | Integrate A20 coupling, then coherent whole-source TF transfer |
 
 ## Local configuration and in-flight native operations
 
 - Planning: `C:/Users/flesniak/GitHub/PSStyleGuide`; peer: `C:/Users/flesniak/GitHub/TerraformStyleGuide`.
-- A20 product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`; codex/protected-instruction-integration from425; worker owns four files, root owns lifecycle.
+- A20 product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`; b319758 from425; root owns released scope and lifecycle.
 - Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 suffix `A02-design-20261002`, resume `PR224-review-state.json`; D07 suffix `plan-review-20261002`.
 - Node24.18.1/npm11.16.0: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 Restricted; no Docker container remains.
-- A02 source: PR226 accepted2a2; round10; four landed runs pass. Worktree suffix `governance-push-exit/PSStyleGuide`; scratch `A02-landed-exit-20261003/repair-review-state.json`.
-- A03 product: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; codex/workflow-convergence from425, eight workflow/validator/test files edited. Scratch A03-current-20261003; rebase after A20 acceptance.
+- A02 source: PR226 accepted2a2; scratch `A02-landed-exit-20261003/repair-review-state.json`.
+- A03 product: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; codex/workflow-convergence from425, nine edits. Scratch A03-current-20261003; rebase after A20 acceptance.
 - A02 peer: scratch `A02-peer-current-20261003/execution-state.json`; product TEMP `TerraformStyleGuide-A02-peer-docs-20261003`, codex/a02-peer-docs. root owns reviewed docs; audit FINDINGS; transfer1/12.
 - Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; treec68b5e1. Reconciliation complete; preserve index and unrelated edits.
-- A21: scratch suffix `A21-selection-20261003/execution-state.json`; PR228 accepted425795b; both reviews/final quality/all5 landed runs pass; comment5969842262. No native operation live.
+- A21: scratch `A21-selection-20261003/execution-state.json`; PR228 accepted425795b; no native operation live.
 - D08 grants: A03 P, CLAUDE repairs, YAML patches, A13 settings; A20/A15 clear-winner execution.
-- A20: staged tree522069cc; standalone passed; aggregate72862 running. Scratch A20-source-lifecycle-20261003/execution-state.json; no pending native write.
+- A20: PR229/tree522069cc; local gates passed. Copilot32406109538 confirmed; automatic Codex pending. Scratch A20-source-lifecycle-20261003/execution-state.json; manual trigger only after automatic terminal.
 - A13: active24419725; PR proof due; scratch suffix A13-approval-20261003.
 - A15: repaired proposal passed independent review; actual GateA/B human approvals later.
 

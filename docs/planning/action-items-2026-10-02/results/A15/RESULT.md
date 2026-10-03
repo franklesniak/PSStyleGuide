@@ -13,6 +13,8 @@ Independent proposal review by `block_decision_audit` on2026-10-03 recomputed th
 
 The same independent reviewer then verified the repaired delta: G assigns the private job during creation, refuses unsupported attributes, preserves both PowerShell editions on supported Windows hosts, and has no separate-assignment fallback. D63/G95 scores,18 job cases,total2,279 and the unchanged2,261 earlier raw rows were independently confirmed. No material proposal gap remained. This completes the requested proposal preparation and review, not A16 runtime evidence or operational gate acceptance.
 
+The reviewer also checked the final590e71c-to-0f3ebd0 delta. The six shorter Selection paragraphs preserve every selected option, scope, identity/lifecycle obligation, test gate and real human approval boundary. The corrected static receipt matches the published LF Git blob:1,460,128 bytes, SHA256 `8adec61c243b8e4c67f1847ad675f5309255407ba6bc9810dc6873f2b6da4808`, zero CR bytes and2,279 data rows. No case or oracle changed in that correction. This was a bounded final-input review; no new product test or whole-proposal rerun was claimed.
+
 ## Earlier preparation history
 
 D07 continuation: A00/A01 are accepted. TF25 was read again through authenticated GitHub; it remains open with zero comments, the same 64,232-character body and update time `2026-07-31T11:48:27Z`. The existing 31-row acceptance table and 332-case floor remain the design inputs. No operational approval or scope amendment has arrived.
