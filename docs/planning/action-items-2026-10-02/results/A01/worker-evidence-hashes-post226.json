@@ -1,0 +1,45 @@
+{
+  "frozen_utc": "2026-10-03T08:18:02.712625+00:00",
+  "files": [
+    {
+      "path": "comparison-post226.json",
+      "bytes": 5213,
+      "sha256": "a4bdb2cda3d270a08148b9477dc9699c68e23eb8dcd9e0d5d6c471e0fb29d6a4"
+    },
+    {
+      "path": "CURRENT-REFRESH-POST226.md",
+      "bytes": 5147,
+      "sha256": "848688d9934c7ffb2cd998fc386e0bc1c3a6dbd83c8f6f13e87dacfe70ebef51"
+    },
+    {
+      "path": "final-native-recheck-post226.json",
+      "bytes": 240098,
+      "sha256": "4adebf246bb51eaa3174f5ab8cf4da01c4cd4bce7ad0cc11f4b627b90235393d"
+    },
+    {
+      "path": "freeze-evidence.py",
+      "bytes": 2896,
+      "sha256": "3a5e6a1cad9e1afbbb0795588cbd022d1863c8c437df9f70142ac8443c07fed8"
+    },
+    {
+      "path": "native-census.json",
+      "bytes": 332711,
+      "sha256": "3d358175fd9c0cf464b59e61977e720fd3f71b2583f6efa403a17efda199a911"
+    },
+    {
+      "path": "native-tree-union-post226.json",
+      "bytes": 61955,
+      "sha256": "157c212b2cad5e60f401d944d2e9c0ad7f73e15e6f00758cf93889bb7a1d593e"
+    },
+    {
+      "path": "refresh-inspection.json",
+      "bytes": 1560,
+      "sha256": "342b9224397702855942f1d3c2a7c389281224c9c73edf907c0bc9e7699337ea"
+    },
+    {
+      "path": "refresh-inventory.py",
+      "bytes": 6257,
+      "sha256": "2cf29bb002d0702e06e31a24044a5a09e8dfa7eef80699b0adf6a6fb787ce161"
+    }
+  ]
+}

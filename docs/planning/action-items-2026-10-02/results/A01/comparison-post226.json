@@ -1,0 +1,191 @@
+{
+  "prior_refs": {
+    "PS": {
+      "repo": "franklesniak/PSStyleGuide",
+      "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+      "tree": "ea7e8d7da19cc80b4ec727d5a9c3dfd0e599f9b3"
+    },
+    "TF": {
+      "repo": "franklesniak/TerraformStyleGuide",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "current_refs": {
+    "PS": {
+      "repo": "franklesniak/PSStyleGuide",
+      "commit": "2a2d14a9969226b0c55d02d4f0c20f2451ed40b6",
+      "tree": "f5a83173a667d0d08225ec0cd391cedb4e659a77"
+    },
+    "TF": {
+      "repo": "franklesniak/TerraformStyleGuide",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "prior_counts": {
+    "PS": 73,
+    "TF": 75,
+    "union": 83,
+    "different": 55,
+    "equal": 10,
+    "TF-only": 10,
+    "PS-only": 8
+  },
+  "current_counts": {
+    "PS": 73,
+    "TF": 75,
+    "union": 83,
+    "different": 55,
+    "equal": 10,
+    "TF-only": 10,
+    "PS-only": 8
+  },
+  "changed_paths": [
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "owner": "A21",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b137e7160cdd79d77731d14ac1db814ccdab873d",
+        "size": 11404,
+        "raw_sha256": "30219a53aa082db93b74541a871f3910693bd932d8d826a76bcecbbed6b2a1d7"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e05a22e85727e64cf491b1bd009fd943029dd770",
+        "size": 12599,
+        "raw_sha256": "44080988676f921d472569bdde743edc25c2b66acd50565f9ff51f3edeb28acc"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+        "size": 6799,
+        "raw_sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+        "size": 6799,
+        "raw_sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "owner": "A03",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a935e25b641cd4117eb3a554b723e53caa52f10e",
+        "size": 11507,
+        "raw_sha256": "aff7fac6602e3fb95a61e096fb7899763d1de741ddad7f0cbc9a3d6ce6e85e6d"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "bd559e5e9b7015d83f45f705a4e7862dc2dc11d5",
+        "size": 11495,
+        "raw_sha256": "ee0595c59dd9601e0a6296b295969842faa5d4db35b2ba20fffa2d5273e915d7"
+      },
+      "old_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+        "size": 9558,
+        "raw_sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+      },
+      "new_tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+        "size": 9558,
+        "raw_sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+      },
+      "prior_status": "different",
+      "status": "different"
+    }
+  ],
+  "added_paths": [],
+  "removed_paths": [],
+  "issues": {
+    "PS": {
+      "count": 4,
+      "numbers": [
+        213,
+        175,
+        155,
+        152
+      ],
+      "body_title_state_count_timestamp_equal": true
+    },
+    "TF": {
+      "count": 1,
+      "numbers": [
+        25
+      ],
+      "body_title_state_count_timestamp_equal": true
+    }
+  },
+  "comments": {
+    "PS": {
+      "152": {
+        "count": 3,
+        "ids": [
+          5152385509,
+          5233025100,
+          5946563885
+        ],
+        "complete_payload_equal": true
+      },
+      "155": {
+        "count": 4,
+        "ids": [
+          5227199805,
+          5233004306,
+          5233025993,
+          5943334454
+        ],
+        "complete_payload_equal": true
+      },
+      "175": {
+        "count": 0,
+        "ids": [],
+        "complete_payload_equal": true
+      },
+      "213": {
+        "count": 0,
+        "ids": [],
+        "complete_payload_equal": true
+      }
+    },
+    "TF": {
+      "25": {
+        "count": 0,
+        "ids": [],
+        "complete_payload_equal": true
+      }
+    }
+  },
+  "open_prs": {
+    "PS": 0,
+    "TF": 0
+  },
+  "historical_preservation": {
+    "original_union": 81,
+    "original_obligations": 402,
+    "absent_both_paths": 26,
+    "all26_still_absent": true,
+    "retirements_and_dispositions_unchanged": true
+  },
+  "bounded_conditional_inputs": {
+    "A14": "All five previous scoped inputs including CONTRIBUTING whole blob unchanged since3ba; no new source-trigger. Prior section evidence retained.",
+    "A12": "Real workflow caller changed. No settings enumeration/authority or immutable-enforcement claim.",
+    "A21": "Classifier.test caller fixture changed; validator/SelfTest/manifest/classifier production unchanged. Unmerged working-tree candidate excluded."
+  }
+}

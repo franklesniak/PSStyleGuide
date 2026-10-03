@@ -1,0 +1,1940 @@
+{
+  "captured_utc": "2026-10-03T08:14:12.314Z",
+  "refs": {
+    "PS": {
+      "repo": "franklesniak/PSStyleGuide",
+      "commit": "2a2d14a9969226b0c55d02d4f0c20f2451ed40b6",
+      "tree": "f5a83173a667d0d08225ec0cd391cedb4e659a77"
+    },
+    "TF": {
+      "repo": "franklesniak/TerraformStyleGuide",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "counts": {
+    "PS": 73,
+    "TF": 75,
+    "union": 83,
+    "different": 55,
+    "equal": 10,
+    "TF-only": 10,
+    "PS-only": 8
+  },
+  "raw_verification": "All148 native-enumerated entries compared with exact local Git ls-tree -rz paths/modes/types/OIDs. Read raw blobs with git cat-file --batch; recomputed raw Git SHA1, size and SHA256. Direct byte comparison without normalization; all100644/blob. No working-tree input used.",
+  "paths": [
+    {
+      "path": ".claude/commands/review-loop.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8f361e184eef8b292370d1d6e5b00425ab8226c2",
+        "size": 4400,
+        "raw_sha256": "4e8a06fb11542176a77c988e522d88807c81f15910542638b9b4baaf4c363cd3"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "62b63fabdc8ce64ede8539b884aa904a46cb3eaf",
+        "size": 4448,
+        "raw_sha256": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437"
+      },
+      "raw_equal": false,
+      "primary_owner": "A08",
+      "collaborators": [],
+      "current_owner_label": "A08",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".codex/config.toml",
+      "status": "equal",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+        "size": 205,
+        "raw_sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+        "size": 205,
+        "raw_sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+      },
+      "raw_equal": true,
+      "primary_owner": "A18",
+      "collaborators": [],
+      "current_owner_label": "A18",
+      "prior_post224_status": "equal",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".gitattributes",
+      "status": "equal",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6313b56c57848efce05faa7aa7e901ccfc2886ea",
+        "size": 19,
+        "raw_sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6313b56c57848efce05faa7aa7e901ccfc2886ea",
+        "size": 19,
+        "raw_sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+      },
+      "raw_equal": true,
+      "primary_owner": "A18",
+      "collaborators": [],
+      "current_owner_label": "A18",
+      "prior_post224_status": "equal",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "62ff9fcfb1fb56dea8fd894d4d622cd3c598f875",
+        "size": 1634,
+        "raw_sha256": "e8c5d01dc227dc109e412f364c2d036ad17d59d5c56be942b87b0e5a16b2be34"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d4ad431a6c629203aa6cd88b9cea6f9caa4c293b",
+        "size": 2231,
+        "raw_sha256": "81fbe1615dd96fe99afca2738ff5888a6f7b7390068c1087d3d817fad73ff614"
+      },
+      "raw_equal": false,
+      "primary_owner": "A20",
+      "collaborators": [],
+      "current_owner_label": "A20",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/dependabot.yml",
+      "status": "equal",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+        "size": 112,
+        "raw_sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+        "size": 112,
+        "raw_sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7"
+      },
+      "raw_equal": true,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "equal",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/document-metadata-classification.json",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+        "size": 388,
+        "raw_sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+        "size": 387,
+        "raw_sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+      },
+      "raw_equal": false,
+      "primary_owner": "A21",
+      "collaborators": [],
+      "current_owner_label": "A21",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/instructions/docs.instructions.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd",
+        "size": 46230,
+        "raw_sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "4a8f2addc02af857928205199b66cf3918ae9a82",
+        "size": 46254,
+        "raw_sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [],
+      "current_owner_label": "A18",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/instructions/yaml.instructions.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "edef19560d3403985d1417af4772d74bbf9eacf4",
+        "size": 54645,
+        "raw_sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "924d12c833d07def47d05137b532e622db622fa4",
+        "size": 54645,
+        "raw_sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+      },
+      "raw_equal": false,
+      "primary_owner": "A05",
+      "collaborators": [],
+      "current_owner_label": "A05",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/.markdownlint.jsonc",
+      "status": "equal",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "cd9b559b7254dab422b97e493bdb41c40b5511c1",
+        "size": 480,
+        "raw_sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "cd9b559b7254dab422b97e493bdb41c40b5511c1",
+        "size": 480,
+        "raw_sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300"
+      },
+      "raw_equal": true,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "equal",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3babe4848f5d97ffd5757255983463231d4163f7",
+        "size": 20485,
+        "raw_sha256": "0110c31f21d9037991cb87ca0a2f00b3360995ba7ca815defaafd4a08d19c90d"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+        "size": 20499,
+        "raw_sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3a98a55e7d01a1dfd95f2112e8fa656f79df6df2",
+        "size": 27466,
+        "raw_sha256": "42fb09ef61f7d67d40a33a0b8b71c8ffd952876d8bac9140300975cf1db86b08"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+        "size": 27494,
+        "raw_sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1e03c3fe9d1845fe73a8f05820e8acb09d04f918",
+        "size": 5613,
+        "raw_sha256": "a17bfe6ab678793fde20248d32cd35cbbb5668c4fe430f59679e05157b60acff"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+        "size": 5632,
+        "raw_sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+      },
+      "raw_equal": false,
+      "primary_owner": "A21",
+      "collaborators": [],
+      "current_owner_label": "A21",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e05a22e85727e64cf491b1bd009fd943029dd770",
+        "size": 12599,
+        "raw_sha256": "44080988676f921d472569bdde743edc25c2b66acd50565f9ff51f3edeb28acc"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+        "size": 6799,
+        "raw_sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+      },
+      "raw_equal": false,
+      "primary_owner": "A21",
+      "collaborators": [],
+      "current_owner_label": "A21",
+      "prior_post224_status": "different",
+      "changed_since_post224": true
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a23d38c42770d7463920704e108ccd63240dc90b",
+        "size": 86655,
+        "raw_sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+        "size": 95329,
+        "raw_sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+      },
+      "raw_equal": false,
+      "primary_owner": "A06",
+      "collaborators": [],
+      "current_owner_label": "A06",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+        "size": 376988,
+        "raw_sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+        "size": 377161,
+        "raw_sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f"
+      },
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "19240ed44a8811d0a98bb0c67e4a732b5a749f58",
+        "size": 150171,
+        "raw_sha256": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+        "size": 154151,
+        "raw_sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57"
+      },
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+        "size": 5844,
+        "raw_sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "906460d818674199b32294185ed6525c143b48bb",
+        "size": 5706,
+        "raw_sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+      },
+      "raw_equal": false,
+      "primary_owner": "A04",
+      "collaborators": [
+        "A07"
+      ],
+      "current_owner_label": "A04 / A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+      "status": "TF-only",
+      "ps": null,
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+        "size": 3127,
+        "raw_sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "TF-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "92743273da44ad7f6d46113a763089b9e1675f82",
+        "size": 1509,
+        "raw_sha256": "43c629f08ddb78a423187887db2ee7e53705bf2681ca0f1b49a169e1887e3452"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "size": 1510,
+        "raw_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e2bc4578d24e8f65e5b856fe67e55ae1e03c8fea",
+        "size": 2453,
+        "raw_sha256": "c06f3bb95338d074191247737cddd25aa4b62fce7ac47c27d17bb8901e4fa2b1"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+        "size": 2603,
+        "raw_sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "status": "equal",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+        "size": 7375,
+        "raw_sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+        "size": 7375,
+        "raw_sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+      },
+      "raw_equal": true,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "equal",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "77a1313b9044bb934159a165e07219a3c1c9306b",
+        "size": 9686,
+        "raw_sha256": "0b328c28f566e3d337831026eb0c7055b8158c8895c0552c77d9dbb8e3808c42"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+        "size": 11402,
+        "raw_sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "status": "PS-only",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "bb4ce3d8199b9a28f7c018bbaf528b8560741b02",
+        "size": 183983,
+        "raw_sha256": "c0023ee88f825dbc823307a9f7ff0f66fff8ba0cedc4ea198aba75ede8d4d65c"
+      },
+      "tf": null,
+      "raw_equal": false,
+      "primary_owner": "A21",
+      "collaborators": [],
+      "current_owner_label": "A21",
+      "prior_post224_status": "PS-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6b8088076a1d620dba5997d776c54ed803535100",
+        "size": 434252,
+        "raw_sha256": "80a198eaf809407d5e121994b24acd007fe819d4cc7ee2cdd9deb731710f3ade"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+        "size": 460163,
+        "raw_sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+      },
+      "raw_equal": false,
+      "primary_owner": "A21",
+      "collaborators": [],
+      "current_owner_label": "A21",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Test-BlankLineExamples.ps1",
+      "status": "PS-only",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "068c7139a9e6a9276073211f48eca88464204362",
+        "size": 15201,
+        "raw_sha256": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7"
+      },
+      "tf": null,
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [
+        "A16",
+        "A17"
+      ],
+      "current_owner_label": "A18 / A16–A17",
+      "prior_post224_status": "PS-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+        "size": 3081,
+        "raw_sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+        "size": 3088,
+        "raw_sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0773070a6505b1678c5522c16c8a5c32979f6338",
+        "size": 37696,
+        "raw_sha256": "a20f0822eb0c8512a5bb86b1af920cae2a8b6a739bb132c01990b41bdcb4d012"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7855cc0c1be90096abae979168ed1e282d535998",
+        "size": 33662,
+        "raw_sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+        "size": 253910,
+        "raw_sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+        "size": 253918,
+        "raw_sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+      },
+      "raw_equal": false,
+      "primary_owner": "A06",
+      "collaborators": [],
+      "current_owner_label": "A06",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "status": "TF-only",
+      "ps": null,
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "87f68f5f02eb2303059be06c219253ab37853197",
+        "size": 4346,
+        "raw_sha256": "41e8d68636cd8a32569266eb4daf14da9559160679cbb1793d194533f9d32ba5"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "TF-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+      "status": "TF-only",
+      "ps": null,
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+        "size": 22102,
+        "raw_sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [
+        "A15",
+        "A17"
+      ],
+      "current_owner_label": "A18 / A15–A17",
+      "prior_post224_status": "TF-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "size": 32648,
+        "raw_sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+        "size": 31949,
+        "raw_sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+      },
+      "raw_equal": false,
+      "primary_owner": "A06",
+      "collaborators": [],
+      "current_owner_label": "A06",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+        "size": 25672,
+        "raw_sha256": "a8f12abf35f250c7f2d0a0ab753a18a42fca7516a36aae9e3dd90eac76805160"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "995b72a7b48dea2636094d81226893a519950797",
+        "size": 25568,
+        "raw_sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3f0abda0049fdeacb85c8493937b768ddc999c4a",
+        "size": 15077,
+        "raw_sha256": "09c32c6e780a325bfac5a2d6d2505f747fd3cdfff297edb7b74107fc79bbcaca"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+        "size": 14948,
+        "raw_sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "bd559e5e9b7015d83f45f705a4e7862dc2dc11d5",
+        "size": 11495,
+        "raw_sha256": "ee0595c59dd9601e0a6296b295969842faa5d4db35b2ba20fffa2d5273e915d7"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+        "size": 9558,
+        "raw_sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": true
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "73a13567131229fb10f8360334bf758b7c7deaa7",
+        "size": 4361,
+        "raw_sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+        "size": 4222,
+        "raw_sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/ci-toolchain.json",
+      "status": "equal",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "size": 91,
+        "raw_sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "size": 91,
+        "raw_sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+      },
+      "raw_equal": true,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "equal",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "66d7cda6249a8811490742004a90f5eb644ab688",
+        "size": 26612,
+        "raw_sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+        "size": 33862,
+        "raw_sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "dde42437f9f5d579abee2e944321488a2ba4f793",
+        "size": 3863,
+        "raw_sha256": "0deabaded368671ae8759f4c4fc02445e2e3c0c930cfe3a3a20df728a1e988de"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+        "size": 7645,
+        "raw_sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/historical-supply-profile.json",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "224f6fba1aa90174dad8eec57dc6012697d8be33",
+        "size": 4461,
+        "raw_sha256": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+        "size": 2783,
+        "raw_sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d"
+      },
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/install-husky.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "600f6bfd664d0550238916f01de3a41109fe9fbf",
+        "size": 703,
+        "raw_sha256": "b5996d505e1ad202c8188579094117221c1c3cdc53f17976275e9e8c6ef8df2b"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6a12568776f6473472193bc98638f1856a7c9dec",
+        "size": 625,
+        "raw_sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "status": "PS-only",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "9b0abb08d1a17ed4306ef771822d980aabff86b5",
+        "size": 1691,
+        "raw_sha256": "3410d109d4c842a83bf41dc5674874db8d046929742a7fadba0e60026203c126"
+      },
+      "tf": null,
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "PS-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "status": "PS-only",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "27d2e5143682b6bfe02776eef56bae7b23472599",
+        "size": 12301,
+        "raw_sha256": "e878b7e7b831c9e498306594ae7357c76d3052586f9f4646e64bcc5d7cd0092d"
+      },
+      "tf": null,
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "PS-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0c7633c0793be84ce6768698387052807a149329",
+        "size": 18348,
+        "raw_sha256": "6f90d52361c564772094ee0a2410f9cc407803f4784aafda3c5e8096c2281327"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+        "size": 16481,
+        "raw_sha256": "5f3bbefdd02af786bd39ae6a31685a4daf073981c2c072a51b590c75a6626205"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "21063b3c86ffcee7c928b149d390065b8bcc1840",
+        "size": 5611,
+        "raw_sha256": "c473b3df463d99d88de07ef883214f0a8aaedce111579d676bf39324902d14d3"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "c35575990d5854ea6da9d5f6d49d23287df43146",
+        "size": 5971,
+        "raw_sha256": "0e8b0b5c725227b98a338e44e630f6b50a90f725e2f01b2f0262284ffdd6926b"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+        "size": 6604,
+        "raw_sha256": "73b1eb08b07254ffcb9d437e260bee8a38cce2e8cc65af1c921a3a9c4ed47bfa"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+        "size": 6632,
+        "raw_sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/npm-risk-exceptions.json",
+      "status": "equal",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+        "size": 23,
+        "raw_sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+        "size": 23,
+        "raw_sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+      },
+      "raw_equal": true,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "equal",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "27cc70ba810dfb3f410014542142154f86509196",
+        "size": 38822,
+        "raw_sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8836c53a7d86ea9eeab8d0ba10b4026cb848b3ae",
+        "size": 55624,
+        "raw_sha256": "ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b6225545b1e0570900261bfb6fc5c08afaff84bf",
+        "size": 877,
+        "raw_sha256": "d1b6908de4c3e70d9b42155b0a3e4eeb7e10c0c10d680ff17763e19e4cc84a8e"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "65aebbba501747454aede48fe32ce406a2ce43ff",
+        "size": 1105,
+        "raw_sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d5cf90a6e6dede9f4fb514ae733cf8bf09a18896",
+        "size": 5034,
+        "raw_sha256": "8af2b01273015a8b9993a732316d68ceeb3e9cad32160063af7815e5e304d1a9"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+        "size": 5421,
+        "raw_sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a0dbaeea819a469fd0da0fed6b8db28db03acd2e",
+        "size": 13116,
+        "raw_sha256": "0073945f15d4137ef11e886cf265d346567981b4c1fcc95d180666c3cf69d38d"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+        "size": 13047,
+        "raw_sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d44a87f46f60e0cc80a3293aa90d7ed6e1c5d161",
+        "size": 1448,
+        "raw_sha256": "0414d5e9a498b0bf7f9f5ce258a733679bc1ad6963af5bbdb3e6f2ecb30901ee"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+        "size": 1407,
+        "raw_sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+      },
+      "raw_equal": false,
+      "primary_owner": "A03",
+      "collaborators": [],
+      "current_owner_label": "A03",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".gitignore",
+      "status": "equal",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+        "size": 249,
+        "raw_sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+        "size": 249,
+        "raw_sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+      },
+      "raw_equal": true,
+      "primary_owner": "A02",
+      "collaborators": [],
+      "current_owner_label": "A02",
+      "prior_post224_status": "equal",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".husky/pre-commit",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "28e5c7bcb9a5616b37abbbcbed727339f2dbc823",
+        "size": 460,
+        "raw_sha256": "8c59449406d5bf5935ef4a5e2377abae841f477d4ddcad72975b328d2ebbc711"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+        "size": 3544,
+        "raw_sha256": "1888b6c6e29c1c06baebbdf2946cc7b465ce5adcc869c2977dfd774d68b96df0"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "808609311d98e9792dc7f3d76d20aa220aab2256",
+        "size": 3143,
+        "raw_sha256": "f5babbf1733ee1065ba34f717050e4e831eeef649adbacd73f99301edc650d23"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "size": 5405,
+        "raw_sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": ".vscode/settings.json",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "bbccb6f224a56a77909ddd133b79adaea68564e1",
+        "size": 39,
+        "raw_sha256": "a15459993da7abc895615079e283122c110694db963a538bdf7f43d563fce24c"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d",
+        "size": 46,
+        "raw_sha256": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [],
+      "current_owner_label": "A18",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "ACKNOWLEDGMENTS.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f10ae23380e94de3feb20d88274635c4fe2ed308",
+        "size": 2543,
+        "raw_sha256": "2eb74a8475145e01f55895df7299b8c35aa81386bd981d5343b8511ef77d1d20"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f1ae2dd938628424412d9edd6787e99a9246f5ff",
+        "size": 674,
+        "raw_sha256": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [],
+      "current_owner_label": "A18",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "AGENTS.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f7543d786156f0efc39c3fe2927ffcd186b29f39",
+        "size": 32680,
+        "raw_sha256": "ce1860e518783cdd75d78124a1ab078257233807f689839eb7cb3e3749f8847b"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+        "size": 33422,
+        "raw_sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266"
+      },
+      "raw_equal": false,
+      "primary_owner": "A20",
+      "collaborators": [],
+      "current_owner_label": "A20",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "CLAUDE.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3bb0afcae09e05b6a8022d339b12721e8a1473d2",
+        "size": 82478,
+        "raw_sha256": "527069c020934a6e73774dadef98359911bee71754ac6d67ab60796ac757c591"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3cc21fc793944033be430ad08722081db4e7b9dd",
+        "size": 80980,
+        "raw_sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2"
+      },
+      "raw_equal": false,
+      "primary_owner": "A20",
+      "collaborators": [],
+      "current_owner_label": "A20",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+        "size": 9114,
+        "raw_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "94beedee85478c14d284ca830e94d4a5f4ece202",
+        "size": 5813,
+        "raw_sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda"
+      },
+      "raw_equal": false,
+      "primary_owner": "A02",
+      "collaborators": [],
+      "current_owner_label": "A02",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "LICENSE",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "fc77effb1732726e1d7445c687023889fe7180f0",
+        "size": 1070,
+        "raw_sha256": "92f60fd7d9711fb9c898af1b4781d2314e364bde7104090f3fbdd363f74199b9"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "98ca721ce2a880acbcbce1d9690cab0100b8bb7a",
+        "size": 1101,
+        "raw_sha256": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [],
+      "current_owner_label": "A18",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "README.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0dbd77c1fe581bc1b32aa97e4dfb6c5119192560",
+        "size": 4720,
+        "raw_sha256": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f04368718d580fe61d9a22f4c92cdfdf8287b28d",
+        "size": 5063,
+        "raw_sha256": "affbdcdced05773f20895a397d1e062d716fb9e2b2215d0a4f412d7ed8b7a200"
+      },
+      "raw_equal": false,
+      "primary_owner": "A02",
+      "collaborators": [],
+      "current_owner_label": "A02",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "STYLE_GUIDE.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+        "size": 148759,
+        "raw_sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "size": 152868,
+        "raw_sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [
+        "A16",
+        "A17"
+      ],
+      "current_owner_label": "A18 / A16–A17",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "556538c7664327652bc42875b63a5bf6bc16783f",
+        "size": 148852,
+        "raw_sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+        "size": 152962,
+        "raw_sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [
+        "A16",
+        "A17"
+      ],
+      "current_owner_label": "A18 / A16–A17",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "STYLE_GUIDE_FULL.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "c06830461f45d089c1f1f2c36d7a7b6472e3d6aa",
+        "size": 257290,
+        "raw_sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+        "size": 222292,
+        "raw_sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [
+        "A16",
+        "A17"
+      ],
+      "current_owner_label": "A18 / A16–A17",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "afb5ba370810e36a9c1ba103aa8e5691a3131581",
+        "size": 135295,
+        "raw_sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+        "size": 73953,
+        "raw_sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [
+        "A16",
+        "A17"
+      ],
+      "current_owner_label": "A18 / A16–A17",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "copilot-instructions.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+        "size": 148759,
+        "raw_sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "size": 152868,
+        "raw_sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [
+        "A16",
+        "A17"
+      ],
+      "current_owner_label": "A18 / A16–A17",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "761e87c11c1c03f805ad832331866b963294c1e5",
+        "size": 2179,
+        "raw_sha256": "f863b58355ec00530b349f8417a78dd1dd31711a6d85ee954436a0aabcb878a9"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f43b5168ce508a9a054dc85ba7231e27d8c70809",
+        "size": 2146,
+        "raw_sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1"
+      },
+      "raw_equal": false,
+      "primary_owner": "A02",
+      "collaborators": [],
+      "current_owner_label": "A02",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+      "status": "PS-only",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+        "size": 57610,
+        "raw_sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5"
+      },
+      "tf": null,
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "PS-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+      "status": "TF-only",
+      "ps": null,
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b567f286e9a00add2ef345ef11481efe19516ca8",
+        "size": 65689,
+        "raw_sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2"
+      },
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "TF-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+      "status": "TF-only",
+      "ps": null,
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "9e04225a355997850e4817f9163868089a773332",
+        "size": 127363,
+        "raw_sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93"
+      },
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "TF-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+      "status": "TF-only",
+      "ps": null,
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b1065e9a330dc2a37e6f56eedc38f720558e6528",
+        "size": 16511,
+        "raw_sha256": "d2b20a47d918b31e6443d17bb8a305a83a1d3102cc5ad3b9362c0594440d570f"
+      },
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "TF-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "status": "PS-only",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+        "size": 12177,
+        "raw_sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1"
+      },
+      "tf": null,
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "PS-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+      "status": "TF-only",
+      "ps": null,
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "970afd6f1df559f3085bd39cff2f7b961cc96a15",
+        "size": 21626,
+        "raw_sha256": "88f628441c80c9aa7ec99e94e8f67e87dedade21f9275547147508950fd15d87"
+      },
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "TF-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": "docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+      "status": "PS-only",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+        "size": 8744,
+        "raw_sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c"
+      },
+      "tf": null,
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "PS-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+      "status": "TF-only",
+      "ps": null,
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba",
+        "size": 11644,
+        "raw_sha256": "c8994c132bf13fae0500e0cd429999cd36c9ccf4fa26bdcffe7f97a6cd9cf5cc"
+      },
+      "raw_equal": false,
+      "primary_owner": "A09",
+      "collaborators": [],
+      "current_owner_label": "A09",
+      "prior_post224_status": "TF-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "9c7e9535493d77099aa7b2a8c5eebfc4a90e4f05",
+        "size": 7918,
+        "raw_sha256": "40c7a91096e878bdff64902fd6ca480e8df75b5b01ce435c22255ccd70303af0"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+        "size": 6448,
+        "raw_sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "package-lock.json",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "210dbd7695cc858a199e17c83b7dd1da144a4f33",
+        "size": 3518,
+        "raw_sha256": "8c3195455767df733620d7d038bd50899820694b1b88d88eab26cd4e613d4797"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+        "size": 3566,
+        "raw_sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "package.json",
+      "status": "different",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6def13021be9d4f17d491ba0450ce2cbe02cd588",
+        "size": 797,
+        "raw_sha256": "b80d65d36e1bd3ae7f4fb0d7a54e30a20fbf303c7ed59f3a3d62cd0b5cc8f953"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "size": 837,
+        "raw_sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "different",
+      "changed_since_post224": false
+    },
+    {
+      "path": "powershell.instructions.md",
+      "status": "PS-only",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e68999483c41c07e732772d88b2c43dd1467f367",
+        "size": 148832,
+        "raw_sha256": "fd993b9658f434af7b668d18670326c19d76a0728a170465c686d628ce2597f8"
+      },
+      "tf": null,
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [
+        "A16",
+        "A17"
+      ],
+      "current_owner_label": "A18 / A16–A17",
+      "prior_post224_status": "PS-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": "requirements-dev.txt",
+      "status": "TF-only",
+      "ps": null,
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+        "size": 5920,
+        "raw_sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+      },
+      "raw_equal": false,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "TF-only",
+      "changed_since_post224": false
+    },
+    {
+      "path": "samples/test-nested-markdown-linting.md",
+      "status": "equal",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1d06987410afac4fdf845d5d976dd9e984639156",
+        "size": 1086,
+        "raw_sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1d06987410afac4fdf845d5d976dd9e984639156",
+        "size": 1086,
+        "raw_sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54"
+      },
+      "raw_equal": true,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "equal",
+      "changed_since_post224": false
+    },
+    {
+      "path": "samples/test-recursive-nested-markdown.md",
+      "status": "equal",
+      "ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "381310a48f8b7f0c3482d5554c42b797cd685ed6",
+        "size": 1322,
+        "raw_sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+      },
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "381310a48f8b7f0c3482d5554c42b797cd685ed6",
+        "size": 1322,
+        "raw_sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+      },
+      "raw_equal": true,
+      "primary_owner": "A07",
+      "collaborators": [],
+      "current_owner_label": "A07",
+      "prior_post224_status": "equal",
+      "changed_since_post224": false
+    },
+    {
+      "path": "terraform.instructions.md",
+      "status": "TF-only",
+      "ps": null,
+      "tf": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+        "size": 153067,
+        "raw_sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+      },
+      "raw_equal": false,
+      "primary_owner": "A18",
+      "collaborators": [
+        "A15",
+        "A17"
+      ],
+      "current_owner_label": "A18 / A15–A17",
+      "prior_post224_status": "TF-only",
+      "changed_since_post224": false
+    }
+  ]
+}

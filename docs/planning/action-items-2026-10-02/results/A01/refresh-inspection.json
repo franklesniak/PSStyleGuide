@@ -1,0 +1,53 @@
+{
+  "checked_utc": "2026-10-03T08:16:36.241Z",
+  "stability": {
+    "PS": {
+      "ref_matches_start": true,
+      "issue_body_title_state_count_timestamp_unchanged": true,
+      "all_complete_comments_unchanged": true,
+      "open_prs": 0,
+      "terminal_collection_page": 1,
+      "per_page": 100
+    },
+    "TF": {
+      "ref_matches_start": true,
+      "issue_body_title_state_count_timestamp_unchanged": true,
+      "all_complete_comments_unchanged": true,
+      "open_prs": 0,
+      "terminal_collection_page": 1,
+      "per_page": 100
+    }
+  },
+  "raw_entries_verified": 148,
+  "current_counts": {
+    "PS": 73,
+    "TF": 75,
+    "union": 83,
+    "different": 55,
+    "equal": 10,
+    "TF-only": 10,
+    "PS-only": 8
+  },
+  "changed_paths": [
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+    ".github/workflows/agent-instructions.yml"
+  ],
+  "historical": {
+    "original_paths": 81,
+    "original_obligations": 402,
+    "absent_both": 26,
+    "all26_checked_still_absent": true
+  },
+  "conditional": {
+    "A14_scoped_generation_inputs_unchanged": true,
+    "A12_real_caller_changed_no_settings_authority": true,
+    "A21_current_test_blob_changed_algorithm_unchanged": true
+  },
+  "landed_instruction": {
+    "id": 37108666604,
+    "status": "in_progress",
+    "conclusion": null,
+    "head": "2a2d14a9969226b0c55d02d4f0c20f2451ed40b6"
+  },
+  "read_only_limit": "Native GETs and immutable Git-object reads only. No settings reads, product suites, product/index/ref/planning/GitHub mutations, acceptance claim or descendants."
+}
