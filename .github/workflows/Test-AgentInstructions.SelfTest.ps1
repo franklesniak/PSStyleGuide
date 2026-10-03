@@ -6,6 +6,9 @@
 # bounded input readers and linked-path rejection with functions loaded by
 # Test-AgentInstructions.ps1.
 #
+# .PARAMETER RuntimeContext
+# The shared runtime state supplied by the validator through the child-script boundary.
+#
 # .PARAMETER RepositoryRootPath
 # The absolute path of the repository that supplies Git and document fixtures.
 #
@@ -30,11 +33,12 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.6.20261002.0
+# Version: 1.8.20261003.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
 param(
+    [Parameter(Mandatory)][hashtable] $RuntimeContext,
     [Parameter(Mandatory)][string] $RepositoryRootPath,
     [Parameter(Mandatory)][string] $Revision,
     [Parameter(Mandatory)]
@@ -44,6 +48,8 @@ param(
     [ValidatePattern('^\d{4}-\d{2}-\d{2}$')]
     [string] $MaximumMetadataUtcDate
 )
+
+$hashtableRuntimeContext = $RuntimeContext
 
 function Assert-DocumentMetadataClassificationSelfTest {
     # .SYNOPSIS
@@ -1898,8 +1904,9 @@ function Assert-OptionalMetadataSelfTest {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261002.0
+    # Version: 1.0.20261003.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $MaximumMetadataUtcDate)
@@ -2086,7 +2093,9 @@ function Assert-GitRevisionTextSelfTest {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
-    # Version: 1.0.20261002.0
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; there are no parameters.
+    # Version: 1.0.20261003.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param()
@@ -2260,6 +2269,557 @@ function Assert-GitRevisionTextSelfTest {
     }
 }
 
+function Assert-AgentSetupSelfTest {
+    # .SYNOPSIS
+    # Tests actual setup inputs, finite contracts and staged-reader closure.
+    #
+    # .DESCRIPTION
+    # Runs positive and weakening controls through production helpers from the
+    # separate SelfTest child. Private Git fixtures never mutate the source.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The repository whose actual setup texts supply the positive control.
+    #
+    # .EXAMPLE
+    # Assert-AgentSetupSelfTest -RepositoryRootPath $RepositoryRootPath
+    #
+    # # Throws when a setup contract or staged closure regression is accepted.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [void] No output. Throws when a control fails.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param([Parameter(Mandatory)][string] $RepositoryRootPath)
+    $setEmpty = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $hashtableContent = Read-AgentSetupInputContent -RepositoryRootPath $RepositoryRootPath `
+        -Revision '' -StagedInputPaths $setEmpty
+    $arrPositive = @(Get-AgentSetupContractFailure -Content $hashtableContent)
+    if ($arrPositive.Count) { throw "Actual setup positive control failed: $($arrPositive -join '; ')" }
+    $scriptblockReject = {
+        param([string] $Name, [string] $Path, [string] $Text, [string] $Expected)
+        if ($Text -ceq $hashtableContent[$Path]) { throw "Setup mutation did not change input: $Name" }
+        $hashtableMutation = $hashtableContent.Clone()
+        $hashtableMutation[$Path] = $Text
+        $arrFailures = @(Get-AgentSetupContractFailure -Content $hashtableMutation)
+        if (-not ($arrFailures -match $Expected)) {
+            throw "Setup mutation was not rejected by its contract: $Name ($($arrFailures -join '; '))"
+        }
+    }
+    foreach ($arrMutation in @(
+            ,@('package.json', 'node .github/workflows/NpmTools.mjs install', 'npm ci', 'Setup package command')
+            ,@('package.json', 'npm --prefix .github/workflows run lint:md"', 'node bypass.mjs"', 'Setup package command')
+            ,@('package.json', 'npm --prefix .github/workflows run lint:md:nested', 'node bypass.mjs', 'Setup package command')
+            ,@('package.json', '.github/workflows/Test-AgentInstructions.ps1 -SelfTest', 'true', 'Setup package command')
+            ,@('package.json', '"scripts": {', '"Scripts": {', 'exact scripts object')
+            ,@('package.json', '"scripts": {', '"scripts": null, "scripts": {', 'strict unambiguous JSON')
+            ,@('package.json', '"scripts": {', '"scripts": null, "Scripts": {', 'strict unambiguous JSON')
+            ,@('package.json', '"devDependencies": {', '"devDependencies": {"markdownlint":"0.41.1",', 'must not declare direct markdownlint')
+            ,@('package.json', '"devDependencies": {', '"devDependencies": {"markdownlint-cli2":"0.23.2",', 'must not declare direct markdownlint-cli2')
+            ,@('.github/workflows/package.json', 'node lint-markdown.mjs', 'node lint-nested-markdown.js --outer', 'Setup package command')
+            ,@('.github/workflows/package.json', 'node install-husky.mjs', 'node install-husky.mjs || true', 'Setup package command')
+            ,@('.husky/pre-commit', " '*.mdc'", '', 'reviewed guard/lint phase')
+            ,@('.husky/pre-commit', '--diff-filter=ACMR', '--diff-filter=ACM', 'reviewed guard/lint phase')
+            ,@('.husky/pre-commit', 'if node .github/workflows/lint-staged-markdown.mjs; then', 'if true; then', 'reviewed guard/lint phase')
+            ,@('.husky/pre-commit', 'if npm --prefix .github/workflows run lint:md:nested; then', 'if true; then', 'reviewed guard/lint phase')
+            ,@('.pre-commit-config.yaml', '011a6d15e749bb3f2d771eed9c7aa0e7e3e10ee7', 'v1.7.12', 'full lowercase commit pin')
+            ,@('.pre-commit-config.yaml', 'repo: local', 'repo: https://example.invalid/python-hooks', 'two local groups')
+            ,@('.pre-commit-config.yaml', 'language: system', 'language: python', 'separate dependency environment')
+            ,@('.pre-commit-config.yaml', '-Module yamllint', '-Module pip', 'reviewed system launcher/module')
+            ,@('.pre-commit-config.yaml', 'files: ^.*\.ya?ml$', 'files: ^docs/.*\.ya?ml$', 'all repository YAML')
+            ,@('.pre-commit-config.yaml', '\.github/document-metadata-classification\.json', 'unrelated\.json', 'select the classification manifest')
+            ,@('.pre-commit-config.yaml', 'files: ^(\.github/workflows/lint-staged-markdown\.mjs|.*\.(md|mdc))$', 'files: ^.*\.(md|mdc)$', 'reviewed activation and selector')
+            ,@('.pre-commit-config.yaml', ' -RequireStagedInputMatch', '', 'reviewed activation and selector')
+            ,@('requirements-dev.txt', 'pre-commit==4.6.2', 'pre-commit>=4.6.2', 'Python requirements')
+            ,@('requirements-dev.txt', '--require-hashes', '', 'Python requirements')
+            ,@('requirements-dev.txt', '--only-binary=:all:', '', 'Python requirements')
+            ,@('requirements-dev.txt', '    --hash=sha256:a8dc6b26ad22ff227d2634a65cb388215ce6cc96bbcc5cfde7641ae87e8dacc0', '', 'Python requirements')
+            ,@('requirements-dev.txt', 'check-jsonschema==', 'other-package==', 'Python requirements')
+            ,@('requirements-dev.txt', 'attrs==26.1.0', 'cfgv==26.1.0', 'Python requirements')
+        )) {
+        & $scriptblockReject ($arrMutation[1] + ' near miss') $arrMutation[0] `
+            ($hashtableContent[$arrMutation[0]].Replace($arrMutation[1], $arrMutation[2])) $arrMutation[3]
+    }
+    $strPackage = $hashtableContent['package.json']
+    & $scriptblockReject 'nonobject package' 'package.json' '[]' 'strict unambiguous JSON'
+    & $scriptblockReject 'non-string command' 'package.json' `
+        ($strPackage.Replace('"npm --prefix .github/workflows run lint:md"', 'true')) 'Setup package command'
+    & $scriptblockReject 'extra unparsed lock data' 'requirements-dev.txt' `
+        ($hashtableContent['requirements-dev.txt'] + "`n--extra-index-url https://example.invalid/simple`n") 'Python requirements'
+    $strHook = $hashtableContent['.husky/pre-commit']
+    $strOuter = 'if npm --prefix .github/workflows run lint:md; then'
+    $strNested = 'if npm --prefix .github/workflows run lint:md:nested; then'
+    & $scriptblockReject 'reordered phases' '.husky/pre-commit' `
+        ($strHook.Replace($strOuter, 'SWAP_PHASE').Replace($strNested, $strOuter).Replace('SWAP_PHASE', $strNested)) `
+        'reviewed guard/lint phase'
+    & $scriptblockReject 'duplicate phase' '.husky/pre-commit' ($strHook + "`n$strOuter`n") 'reviewed guard/lint phase'
+    & $scriptblockReject 'separate extra dependencies' '.pre-commit-config.yaml' `
+        ($hashtableContent['.pre-commit-config.yaml'] + "`n        additional_dependencies: []`n") 'separate dependency environment'
+    & $scriptblockReject 'extra hook group' '.pre-commit-config.yaml' `
+        ($hashtableContent['.pre-commit-config.yaml'] + "`n  - repo: local`n    hooks: []`n") 'two local groups'
+    $strSetup = $hashtableContent['.github/workflows/copilot-setup-steps.yml']
+    foreach ($strProjection in @(
+            'GITHUB_TOKEN: value', 'GH_TOKEN: value', 'ACTIONS_RUNTIME_TOKEN: value'
+            'ALIAS: ${{ github.token }}', "ALIAS: `${{ github['token'] }}"
+            'ALIAS: ${{ secrets.TOKEN }}', 'ALIAS: ${{ toJSON(github) }}'
+        )) {
+        & $scriptblockReject 'credential projection' '.github/workflows/copilot-setup-steps.yml' `
+            ($strSetup + "`n        env:`n          $strProjection`n") 'must not project credentials'
+    }
+    & $scriptblockReject 'action step' '.github/workflows/copilot-setup-steps.yml' `
+        ($strSetup + "`n      - uses: actions/checkout@v4`n") 'must not execute an action'
+    $hashtableHarmless = $hashtableContent.Clone()
+    $hashtableHarmless['.github/workflows/copilot-setup-steps.yml'] += "`n        env:`n          REVISION: `${{ github.sha }}`n"
+    if (@(Get-AgentSetupContractFailure -Content $hashtableHarmless).Count) {
+        throw 'Harmless setup revision expression was rejected.'
+    }
+    $strIndex = $hashtableContent['.github/workflows/scripts-README.md']
+    foreach ($arrNearMiss in @(
+            ,@('--isolated install', 'install')
+            ,@('--require-hashes ', '')
+            ,@('--only-binary=:all: ', '')
+            ,@('https://pypi.org/simple', 'https://example.invalid/simple')
+            ,@('-r requirements-dev.txt', '-r other-requirements.txt')
+            ,@('py -3.12 -m pip', 'py -3.11 -m pip')
+            ,@('python3.12 -m pip', 'python3.11 -m pip')
+            ,@('py -3.12 -m pre_commit run --all-files', 'pre-commit run --all-files')
+            ,@('python3.12 -m pre_commit run --all-files', 'pre-commit run --all-files')
+            ,@('-lt 7', '-lt 6')
+        )) {
+        & $scriptblockReject ('bootstrap ' + $arrNearMiss[0]) '.github/workflows/scripts-README.md' `
+            ($strIndex.Replace($arrNearMiss[0], $arrNearMiss[1])) 'Script index must contain'
+    }
+    $strRunSpan = '`py -3.12 -m pre_commit run --all-files`'
+    foreach ($strReplacement in @('', "<!-- $strRunSpan -->", "~~$strRunSpan~~", "$strRunSpan $strRunSpan")) {
+        & $scriptblockReject 'missing hidden deleted or duplicate span' '.github/workflows/scripts-README.md' `
+            ($strIndex.Replace($strRunSpan, $strReplacement)) 'Script index must contain'
+    }
+    $strTemporaryRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strFixtureRoot = Join-Path $strTemporaryRoot ('agent-setup-' + [Guid]::NewGuid().ToString('N'))
+    [void][IO.Directory]::CreateDirectory($strFixtureRoot)
+    $objEncoding = [Text.UTF8Encoding]::new($false)
+    try {
+        & git -C $strFixtureRoot init --quiet
+        if ($LASTEXITCODE -ne 0) { throw 'Setup fixture initialization failed.' }
+        foreach ($strPath in $hashtableContent.Keys) {
+            $strTarget = Join-Path $strFixtureRoot $strPath
+            [void][IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($strTarget))
+            [IO.File]::WriteAllText($strTarget, $hashtableContent[$strPath], $objEncoding)
+        }
+        & git -C $strFixtureRoot -c core.autocrlf=false add --all
+        if ($LASTEXITCODE -ne 0) { throw 'Setup fixture indexing failed.' }
+        & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+            -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m setup
+        if ($LASTEXITCODE -ne 0) { throw 'Setup fixture baseline failed.' }
+        $strBaseline = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
+        if ($LASTEXITCODE -ne 0) { throw 'Setup fixture revision failed.' }
+        $hashtableRevision = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot `
+            -Revision $strBaseline -StagedInputPaths $setEmpty
+        foreach ($strPath in $hashtableContent.Keys) {
+            if ($hashtableRevision[$strPath] -cne $hashtableContent[$strPath]) {
+                throw "Setup immutable revision did not preserve input: $strPath"
+            }
+            $strTarget = Join-Path $strFixtureRoot $strPath
+            [IO.File]::AppendAllText($strTarget, "`n", $objEncoding)
+            & git -C $strFixtureRoot -c core.autocrlf=false add -- $strPath
+            if ($LASTEXITCODE -ne 0) { throw 'Setup staged change failed.' }
+            $setStaged = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+            foreach ($strStaged in @(Read-GitStagedInputPath -RepositoryRootPath $strFixtureRoot -MaximumBytes 1048576)) {
+                [void]$setStaged.Add($strStaged)
+            }
+            if ($setStaged.Count -ne 1 -or -not $setStaged.Contains($strPath)) {
+                throw "Setup helper-only staged set differs: $strPath"
+            }
+            $null = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setStaged
+            [IO.File]::AppendAllText($strTarget, "worktree-only`n", $objEncoding)
+            $boolRejected = $false
+            try {
+                $null = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setStaged
+            } catch {
+                if (-not $_.Exception.Message.Contains('must match its staged Git index blob.', [StringComparison]::Ordinal)) { throw }
+                $boolRejected = $true
+            }
+            if (-not $boolRejected) { throw "Setup partial staging was accepted: $strPath" }
+            $null = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
+            [IO.File]::WriteAllText($strTarget, $hashtableContent[$strPath], $objEncoding)
+            & git -C $strFixtureRoot -c core.autocrlf=false add -- $strPath
+            if ($LASTEXITCODE -ne 0) { throw 'Setup fixture restoration failed.' }
+        }
+        foreach ($strMissing in @('requirements-dev.txt', '.github/workflows/Invoke-LockedPythonHook.ps1')) {
+            $strTarget = Join-Path $strFixtureRoot $strMissing
+            [IO.File]::Delete($strTarget)
+            $boolRejected = $false
+            try {
+                $null = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
+            } catch { $boolRejected = $true }
+            if (-not $boolRejected) { throw "Required installed setup input was silently omitted: $strMissing" }
+            [IO.File]::WriteAllText($strTarget, $hashtableContent[$strMissing], $objEncoding)
+        }
+        $strBoundPath = '.github/workflows/copilot-setup-steps.yml'
+        $objBoundSpec = @(Get-AgentSetupInputSpec | Where-Object { $_.Path -ceq $strBoundPath })
+        if ($objBoundSpec.Count -ne 1 -or $objBoundSpec[0].MaximumBytes -ne 65536) { throw 'Setup workflow read bound changed.' }
+        foreach ($intExtra in @(0, 1)) {
+            [IO.File]::WriteAllText((Join-Path $strFixtureRoot $strBoundPath), ('a' * (65536 + $intExtra)), $objEncoding)
+            $boolRejected = $false
+            try {
+                $hashtableBound = Read-AgentSetupInputContent -RepositoryRootPath $strFixtureRoot -Revision '' -StagedInputPaths $setEmpty
+                if ($hashtableBound[$strBoundPath].Length -ne 65536) { throw 'Setup bound did not preserve bytes.' }
+            } catch {
+                if ($intExtra -eq 0 -or $_.Exception.Message -notmatch 'must not exceed') { throw }
+                $boolRejected = $true
+            }
+            if ($intExtra -eq 1 -and -not $boolRejected) { throw 'One-byte oversized setup input was accepted.' }
+        }
+    } finally {
+        if ([IO.Path]::GetDirectoryName($strFixtureRoot).TrimEnd([IO.Path]::DirectorySeparatorChar) -cne
+            $strTemporaryRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) -or
+            -not [IO.Path]::GetFileName($strFixtureRoot).StartsWith('agent-setup-', [StringComparison]::Ordinal)) {
+            throw 'Refusing setup fixture cleanup outside its private temporary root.'
+        }
+        Remove-Item -LiteralPath $strFixtureRoot -Recurse -Force
+    }
+}
+
+function Assert-StagedInputSelfTest {
+    # .SYNOPSIS
+    # Tests staged matching against a real private Git index.
+    #
+    # .DESCRIPTION
+    # Checks partial staging, helper-only changes, ordinal content, index modes,
+    # native failure and byte bounds without changing the source repository.
+    #
+    # .EXAMPLE
+    # Assert-StagedInputSelfTest
+    #
+    # # Throws if a retained staged-input boundary fails.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [void] No output. Throws on a failed fixture.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; there are no parameters.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param()
+    $strTemporaryRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strFixtureRoot = [IO.Path]::Combine($strTemporaryRoot, 'staged-input-' + [Guid]::NewGuid().ToString('N'))
+    [void][IO.Directory]::CreateDirectory($strFixtureRoot)
+    $strFixturePath = [IO.Path]::Combine($strFixtureRoot, 'input name.md')
+    $objEncoding = [Text.UTF8Encoding]::new($false)
+    $hashtableReader = @{
+        Path = $strFixturePath; RepositoryRootPath = $strFixtureRoot
+        RepositoryRelativePath = 'input name.md'; DisplayName = 'staged fixture'; MaximumBytes = 128
+    }
+    try {
+        & git -C $strFixtureRoot init --quiet
+        if ($LASTEXITCODE -ne 0) { throw 'Staged fixture initialization failed.' }
+        [IO.File]::WriteAllText($strFixturePath, "accepted`n", $objEncoding)
+        & git -C $strFixtureRoot -c core.autocrlf=false add -- 'input name.md'
+        if ($LASTEXITCODE -ne 0) { throw 'Staged fixture indexing failed.' }
+        $arrStagedPaths = @(Read-GitStagedInputPath -RepositoryRootPath $strFixtureRoot -MaximumBytes 4096)
+        if ($arrStagedPaths.Count -ne 1 -or $arrStagedPaths[0] -cne 'input name.md') {
+            throw 'The staged query did not retain the exact added path.'
+        }
+        $arrMatchedBytes = [byte[]]@(Read-RepositoryInputData @hashtableReader -RequireIndexContentMatch)
+        if ([Text.Encoding]::UTF8.GetString($arrMatchedBytes) -cne "accepted`n") {
+            throw 'Matching staged content was not returned intact.'
+        }
+        foreach ($strPartialContent in @("ACCEPTED`n", "worktree-only repair`n")) {
+            [IO.File]::WriteAllText($strFixturePath, $strPartialContent, $objEncoding)
+            $boolRejected = $false
+            try { $null = Read-RepositoryInputData @hashtableReader -RequireIndexContentMatch } catch {
+                if (-not $_.Exception.Message.Contains('must match its staged Git index blob.', [StringComparison]::Ordinal)) {
+                    throw
+                }
+                $boolRejected = $true
+            }
+            if (-not $boolRejected) { throw 'Partial staging or ordinal content mismatch was accepted.' }
+            $arrUnmatchedBytes = [byte[]]@(Read-RepositoryInputData @hashtableReader)
+            if ([Text.Encoding]::UTF8.GetString($arrUnmatchedBytes) -cne $strPartialContent) {
+                throw 'Ordinary local validation lost its worktree input semantics.'
+            }
+        }
+        [IO.File]::WriteAllText($strFixturePath, "accepted`n", $objEncoding)
+        & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+            -c core.hooksPath=/dev/null -c commit.gpgsign=false commit --quiet -m baseline
+        if ($LASTEXITCODE -ne 0) { throw 'Private staged fixture baseline failed.' }
+        if (@(Read-GitStagedInputPath -RepositoryRootPath $strFixtureRoot -MaximumBytes 4096).Count -ne 0) {
+            throw 'An unchanged index reported a staged input.'
+        }
+        [IO.File]::WriteAllText($strFixturePath, "unstaged`n", $objEncoding)
+        if (@(Read-GitStagedInputPath -RepositoryRootPath $strFixtureRoot -MaximumBytes 4096).Count -ne 0) {
+            throw 'A worktree-only change became a staged input.'
+        }
+        [IO.File]::WriteAllText($strFixturePath, "accepted`n", $objEncoding)
+        $strHelperPath = [IO.Path]::Combine($strFixtureRoot, 'helper.ps1')
+        [IO.File]::WriteAllText($strHelperPath, "Write-Output 'fixture'`n", $objEncoding)
+        & git -C $strFixtureRoot -c core.autocrlf=false add -- helper.ps1
+        if ($LASTEXITCODE -ne 0) { throw 'The helper-only fixture was not indexed.' }
+        $arrHelperPaths = @(Read-GitStagedInputPath -RepositoryRootPath $strFixtureRoot -MaximumBytes 4096)
+        if ($arrHelperPaths.Count -ne 1 -or $arrHelperPaths[0] -cne 'helper.ps1') {
+            throw 'The staged query omitted a helper-only change.'
+        }
+        $boolBoundRejected = $false
+        try { $null = Read-GitStagedInputPath -RepositoryRootPath $strFixtureRoot -MaximumBytes 1 } catch {
+            if (-not $_.Exception.Message.Contains('must not exceed', [StringComparison]::Ordinal)) { throw }
+            $boolBoundRejected = $true
+        }
+        if (-not $boolBoundRejected) { throw 'Oversized staged path output was accepted.' }
+        $strIndexBlob = Get-GitRegularFileBlobId -RepositoryRootPath $strFixtureRoot -RepositoryRelativePath 'input name.md'
+        foreach ($strMode in @('100755', '120000')) {
+            & git -C $strFixtureRoot update-index --cacheinfo "$strMode,$strIndexBlob,input name.md"
+            if ($LASTEXITCODE -ne 0) { throw 'The unsafe index-mode fixture was not installed.' }
+            $boolModeRejected = $false
+            try { $null = Read-RepositoryInputData @hashtableReader -RequireIndexContentMatch } catch {
+                if (-not $_.Exception.Message.Contains('stage-0 regular file', [StringComparison]::Ordinal)) { throw }
+                $boolModeRejected = $true
+            }
+            if (-not $boolModeRejected) { throw 'An unsafe staged index mode was accepted.' }
+        }
+        $boolNativeRejected = $false
+        try { $null = Read-GitStagedInputPath -RepositoryRootPath $strFixturePath -MaximumBytes 4096 } catch {
+            if (-not $_.Exception.Message.Contains('Could not inspect staged', [StringComparison]::Ordinal)) { throw }
+            $boolNativeRejected = $true
+        }
+        if (-not $boolNativeRejected) { throw 'A failed native staged query was accepted.' }
+    } finally {
+        if ([IO.Path]::GetDirectoryName($strFixtureRoot).TrimEnd([IO.Path]::DirectorySeparatorChar) -cne
+            $strTemporaryRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) -or
+            -not [IO.Path]::GetFileName($strFixtureRoot).StartsWith('staged-input-', [StringComparison]::Ordinal)) {
+            throw 'Refusing cleanup outside the private staged fixture.'
+        }
+        Remove-Item -LiteralPath $strFixtureRoot -Recurse -Force
+    }
+}
+
+function Assert-ApplicationRuntimeSelfTest {
+    # .SYNOPSIS
+    # Tests application-only runtime selection and bounded live probes.
+    #
+    # .DESCRIPTION
+    # Uses explicit resolver fixtures for unavailable, shadowed, malformed and
+    # fallback identities. Live probes retain exact Python and Node execution.
+    #
+    # .EXAMPLE
+    # Assert-ApplicationRuntimeSelfTest
+    #
+    # # Throws if a runtime-selection or probe contract fails.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [void] No output. Throws on a failed fixture.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; there are no parameters.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param()
+    $objSavedPythonContext = $hashtableRuntimeContext.PythonCommandContext
+    $objSavedNodeContext = $hashtableRuntimeContext.NodeApplicationContext
+    $strSavedPythonKey = $hashtableRuntimeContext.PythonResolutionKey
+    $strApplicationPath = (Get-Command pwsh -CommandType Application | Select-Object -First 1).Path
+    $strOtherPath = [IO.Path]::Combine([IO.Path]::GetDirectoryName($strApplicationPath), 'other-runtime')
+    foreach ($objFixture in @(
+            @{ Name = 'launcher'; Windows = $true; Type = 'Application'; Version = $true; Expected = $true }
+            @{ Name = 'PATH'; Windows = $false; Type = 'Application'; Version = $true; Expected = $true }
+            @{ Name = 'alias'; Windows = $false; Type = 'Alias'; Version = $true; Expected = $false }
+            @{ Name = 'function'; Windows = $false; Type = 'Function'; Version = $true; Expected = $false }
+            @{ Name = 'wrong version'; Windows = $false; Type = 'Application'; Version = $false; Expected = $false }
+        )) {
+        $strExpectedName = if ($objFixture.Windows) { 'py' } else { 'python3.12' }
+        $scriptblockResolver = {
+            param([string] $Name)
+            if ($Name -ceq $strExpectedName) {
+                [pscustomobject]@{ CommandType = $objFixture.Type; Path = $strApplicationPath }
+            }
+        }.GetNewClosure()
+        $scriptblockProbe = {
+            param([string] $Path, [string[]] $PrefixArgument)
+            if ($Path -cne $strApplicationPath) { throw 'Unexpected Python fixture path.' }
+            if ($objFixture.Windows -and ($PrefixArgument.Count -ne 1 -or $PrefixArgument[0] -cne '-3.12')) {
+                throw 'The Windows launcher prefix was lost.'
+            }
+            return $objFixture.Version
+        }.GetNewClosure()
+        $objResolved = Get-Python312CommandContext -WindowsPlatform $objFixture.Windows `
+            -CommandResolver $scriptblockResolver -VersionProbe $scriptblockProbe
+        if (($null -ne $objResolved) -ne $objFixture.Expected) {
+            throw "Python runtime fixture failed: $($objFixture.Name)."
+        }
+    }
+    $scriptblockFallback = {
+        param([string] $Name)
+        if ($Name -ceq 'python3.12') { [pscustomobject]@{ CommandType = 'Application'; Path = $strOtherPath } }
+        if ($Name -ceq 'python') { [pscustomobject]@{ CommandType = 'Application'; Path = $strApplicationPath } }
+    }.GetNewClosure()
+    $scriptblockCompatible = { param([string] $Path) $Path -ceq $strApplicationPath }.GetNewClosure()
+    $objFallback = Get-Python312CommandContext -WindowsPlatform $false `
+        -CommandResolver $scriptblockFallback -VersionProbe $scriptblockCompatible
+    if ($null -eq $objFallback -or $objFallback.Path -cne $strApplicationPath) {
+        throw 'Python resolution lost its supported fallback.'
+    }
+    $scriptblockNodeCandidates = {
+        param([string] $Name)
+        if ($Name -ceq 'node') {
+            [pscustomobject]@{ CommandType = 'Application'; Path = $strOtherPath }
+        }
+    }.GetNewClosure()
+    foreach ($objFixture in @(
+            @{ Name = 'wrapper to direct'; Type = 'Application'; Version = '24.18.1'; Output = ''; Expected = $true }
+            @{ Name = 'minimum version'; Type = 'Application'; Version = '22.0.0'; Output = ''; Expected = $true }
+            @{ Name = 'old version'; Type = 'Application'; Version = '20.0.0'; Output = ''; Expected = $false }
+            @{ Name = 'malformed version'; Type = 'Application'; Version = '24.0'; Output = ''; Expected = $false }
+            @{ Name = 'reported alias'; Type = 'Alias'; Version = '24.18.1'; Output = ''; Expected = $false }
+            @{ Name = 'reported function'; Type = 'Function'; Version = '24.18.1'; Output = ''; Expected = $false }
+            @{ Name = 'invalid JSON'; Type = 'Application'; Version = '24.18.1'; Output = '{'; Expected = $false }
+            @{ Name = 'duplicate identity'; Type = 'Application'; Version = '24.18.1'; Output = '{"execPath":"node","execPath":"node","nodeVersion":"24.18.1"}'; Expected = $false }
+            @{ Name = 'wrong version type'; Type = 'Application'; Version = '24.18.1'; Output = '{"execPath":"node","nodeVersion":24}'; Expected = $false }
+            @{ Name = 'oversized JSON'; Type = 'Application'; Version = '24.18.1'; Output = (' ' * 4097); Expected = $false }
+            @{ Name = 'relative executable'; Type = 'Application'; Version = '24.18.1'; Output = '{"execPath":"node","nodeVersion":"24.18.1"}'; Expected = $false }
+        )) {
+        $scriptblockProbe = {
+            param([string] $Path)
+            if ($Path -cne $strOtherPath) { throw 'Unexpected Node fixture path.' }
+            if ($objFixture.Output) { return $objFixture.Output }
+            return @{ execPath = $strApplicationPath; nodeVersion = $objFixture.Version } | ConvertTo-Json -Compress
+        }.GetNewClosure()
+        $scriptblockDirect = {
+            param([string] $Path)
+            [pscustomobject]@{ CommandType = $objFixture.Type; Path = $Path }
+        }.GetNewClosure()
+        $objResolved = Get-NodeApplicationContext -CommandResolver $scriptblockNodeCandidates `
+            -RuntimeProbe $scriptblockProbe -ApplicationResolver $scriptblockDirect
+        if (($null -ne $objResolved) -ne $objFixture.Expected) {
+            throw "Node runtime fixture failed: $($objFixture.Name)."
+        }
+        if ($null -ne $objResolved -and $objResolved.Path -cne $strApplicationPath) {
+            throw 'Node resolution retained a wrapper instead of its direct executable.'
+        }
+    }
+    if (-not [object]::ReferenceEquals($objSavedPythonContext, $hashtableRuntimeContext.PythonCommandContext) -or
+        -not [object]::ReferenceEquals($objSavedNodeContext, $hashtableRuntimeContext.NodeApplicationContext) -or
+        $strSavedPythonKey -cne $hashtableRuntimeContext.PythonResolutionKey) {
+        throw 'Injected runtime fixtures changed the live application cache.'
+    }
+    $objPython = Get-Python312CommandContext
+    if ($null -eq $objPython -or -not (Test-Python312Application -Path $objPython.Path -PrefixArgument $objPython.Arguments)) {
+        throw 'The actual Python 3.12 application was rejected.'
+    }
+    if (Test-Python312Application -Path $strApplicationPath) { throw 'PowerShell was accepted as Python.' }
+    $objNode = Get-NodeApplicationContext
+    if ($null -eq $objNode -or $null -eq (Invoke-NodeRuntimeProbe -Path $objNode.Path)) {
+        throw 'The actual Node application was rejected.'
+    }
+    if (-not [object]::ReferenceEquals($objPython, (Get-Python312CommandContext)) -or
+        -not [object]::ReferenceEquals($objNode, (Get-NodeApplicationContext))) {
+        throw 'Live application resolution did not retain its verified cache.'
+    }
+    $strTemporaryRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strChildPath = [IO.Path]::Combine($strTemporaryRoot, 'runtime-scope-' + [Guid]::NewGuid().ToString('N') + '.ps1')
+    $strChildProgram = @'
+param([Parameter(Mandatory)][hashtable] $RuntimeContext)
+Set-StrictMode -Version Latest
+$hashtableRuntimeContext = $RuntimeContext
+$objExpectedPython = $RuntimeContext.PythonCommandContext
+$objExpectedNode = $RuntimeContext.NodeApplicationContext
+if (-not [object]::ReferenceEquals($objExpectedPython, (Get-Python312CommandContext)) -or
+    -not [object]::ReferenceEquals($objExpectedNode, (Get-NodeApplicationContext))) {
+    throw 'The runtime child did not reuse the verified parent cache.'
+}
+$boolSavedPlatform = $RuntimeContext.WindowsPlatform
+$arrSavedNames = $RuntimeContext.PythonPathNames
+try {
+    $RuntimeContext.WindowsPlatform = $false
+    $RuntimeContext.PythonPathNames = @('missing-runtime-scope-python')
+    if ($null -ne (Get-Python312CommandContext)) {
+        throw 'The runtime child reused a cache for different Python names.'
+    }
+} finally {
+    $RuntimeContext.WindowsPlatform = $boolSavedPlatform
+    $RuntimeContext.PythonPathNames = $arrSavedNames
+}
+if (-not [object]::ReferenceEquals($objExpectedPython, (Get-Python312CommandContext))) {
+    throw 'The runtime child failed to restore the parent resolution contract.'
+}
+'@
+    try {
+        [IO.File]::WriteAllText($strChildPath, $strChildProgram, [Text.UTF8Encoding]::new($false))
+        & $strChildPath -RuntimeContext $hashtableRuntimeContext
+        if (-not $?) { throw 'The runtime child script failed.' }
+    } finally {
+        if ([IO.Path]::GetDirectoryName($strChildPath).TrimEnd([IO.Path]::DirectorySeparatorChar) -cne
+            $strTemporaryRoot.TrimEnd([IO.Path]::DirectorySeparatorChar) -or
+            -not [IO.Path]::GetFileName($strChildPath).StartsWith('runtime-scope-', [StringComparison]::Ordinal)) {
+            throw 'Refusing cleanup outside the private runtime child fixture.'
+        }
+        Remove-Item -LiteralPath $strChildPath -Force
+    }
+    $strSavedNodeOptions = $env:NODE_OPTIONS
+    $strSavedNodePath = $env:NODE_PATH
+    try {
+        $env:NODE_OPTIONS = '--require=nonexistent-a21-probe-preload'
+        $env:NODE_PATH = 'nonexistent-a21-probe-module-path'
+        if ($null -eq (Invoke-NodeRuntimeProbe -Path $objNode.Path)) {
+            throw 'The Node identity probe inherited preload environment variables.'
+        }
+    } finally {
+        $env:NODE_OPTIONS = $strSavedNodeOptions
+        $env:NODE_PATH = $strSavedNodePath
+    }
+    foreach ($objProcessFixture in @(
+            @{ Name = 'stderr'; Program = '[Console]::Error.Write("noise")'; Bytes = 16; Milliseconds = 10000; Failure = 'returned unexpected error output.' }
+            @{ Name = 'oversized stdout'; Program = '[Console]::Write("x" * 100)'; Bytes = 16; Milliseconds = 10000; Failure = 'must not exceed 16 bytes.' }
+            @{ Name = 'timeout'; Program = 'Start-Sleep -Seconds 30'; Bytes = 16; Milliseconds = 100; Failure = 'timed out.' }
+        )) {
+        $objStartInfo = [Diagnostics.ProcessStartInfo]::new($strApplicationPath)
+        $objStartInfo.UseShellExecute = $false
+        $objStartInfo.CreateNoWindow = $true
+        $objStartInfo.RedirectStandardOutput = $true
+        $objStartInfo.RedirectStandardError = $true
+        foreach ($strArgument in @('-NoProfile', '-NonInteractive', '-Command', $objProcessFixture.Program)) {
+            $objStartInfo.ArgumentList.Add($strArgument)
+        }
+        $objProcess = [Diagnostics.Process]::new()
+        $objProcess.StartInfo = $objStartInfo
+        $boolRejected = $false
+        try {
+            $null = Read-BoundedProcessData -Process $objProcess -MaximumBytes $objProcessFixture.Bytes `
+                -TimeoutMilliseconds $objProcessFixture.Milliseconds -DisplayName $objProcessFixture.Name `
+                -RejectStandardError
+        } catch {
+            if (-not $_.Exception.Message.Contains($objProcessFixture.Failure, [StringComparison]::Ordinal)) {
+                throw
+            }
+            $boolRejected = $true
+        }
+        if (-not $boolRejected) { throw "An invalid process probe was accepted: $($objProcessFixture.Name)." }
+    }
+}
+
+
+Assert-AgentSetupSelfTest -RepositoryRootPath $RepositoryRootPath
+
+Assert-StagedInputSelfTest
+Assert-ApplicationRuntimeSelfTest
 Assert-GitRevisionTextSelfTest
 Assert-DocumentMetadataClassificationSelfTest -MaximumMetadataUtcDate $MaximumMetadataUtcDate
 Assert-OptionalMetadataSelfTest -MaximumMetadataUtcDate $MaximumMetadataUtcDate
