@@ -2,13 +2,13 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `12d761904cf6e948810e9f4c9d70582a57b8a3cf` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `7457f641351982b59a9e45220ed6c187440a24fa` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | [A00](tasks/A00.md) | Reconcile historical obligations and retirement decisions | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A00/RESULT.md) | Reuse the canonical native delivery ledger |
 | [A01](tasks/A01.md) | Refresh issue coverage and full-tree baseline | complete | a00 + coordinator verification | PS/TF main | PS3ba0f4d / TF06ad4f7 | — | 0/80; not started | 0/8 | [Post224 inventory](results/A01/CURRENT-REFRESH-POST224.md) | Refresh at next native mutation; preserve historical 81 |
-| [A02](tasks/A02.md) | Non-protected shared governance | active | a02 reproduction; coordinator | PS main | 3ba0f4d / a71f16a | [224](https://github.com/franklesniak/PSStyleGuide/pull/224) | 9/80; 2026-10-10T07:26:08.214692Z | 0/12 | [Evidence](results/A02/RESULT.md) | Reproduce landed push status failure; retain F13/round9 clock |
+| [A02](tasks/A02.md) | Non-protected shared governance | active | a02 repair; coordinator | PS codex/governance-push-exit | 3ba0f4d / 3ba0f4d | [224](https://github.com/franklesniak/PSStyleGuide/pull/224) | 9/80; 2026-10-10T07:26:08.214692Z | 0/12 | [Evidence](results/A02/RESULT.md) | Implement selected F13 status repair; then focused tests/aggregate |
 | [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A03/RESULT.md) | Exact option L prepared; await owner choice |
 | [A04](tasks/A04.md) | Bound ordinary Node downloads and test retries | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A04/design.md) | Integrate after A03/A07 acceptance |
 | [A05](tasks/A05.md) | Require immutable event acquisition in the YAML guide | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A05/design.md) | Await exact two-guide authority |
@@ -26,7 +26,7 @@ Planning head: `12d761904cf6e948810e9f4c9d70582a57b8a3cf` (prior published check
 | [A17](tasks/A17.md) | Deliver Terraform Gate B destructive-procedure guidance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/16 | [Evidence](tasks/A17.md) | Wait for accepted Gate A and owner approval |
 | [A18](tasks/A18.md) | Close remaining byte differences and verify convergence | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](tasks/A18.md) | Run final union and A10/A11 checklist after products |
 | [A19](tasks/A19.md) | Reconcile issues and publish final acceptance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](tasks/A19.md) | Refresh final issue census after A18 |
-| [A20](tasks/A20.md) | Protected instruction files | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A02/protected-v2-request.md) | Await PR224 merge and explicit protected authority |
+| [A20](tasks/A20.md) | Protected instruction files | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A02/protected-v2-request.md) | PR224 merged; await explicit protected authority |
 | [A21](tasks/A21.md) | Instruction validator, SelfTest, and classification manifest convergence | active | a21 worker; coordinator | PS/TF main | PS3ba0f4d / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A21/RESULT.md) | PS base selected; hold edits for A02 landed-status repair |
 
 ## Local configuration and in-flight native operations
@@ -35,7 +35,7 @@ Planning head: `12d761904cf6e948810e9f4c9d70582a57b8a3cf` (prior published check
 - A21 product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`; new codex/instruction-validator-convergence clean3ba/treeea7. PR224 branch/history preserved; root owns landed acceptance.
 - Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 suffix `A02-design-20261002`, resume `PR224-review-state.json`; D07 suffix `plan-review-20261002`.
 - Node24.18.1/npm11.16.0: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 Restricted; no Docker container remains.
-- A02: PR224 merged3ba; round9 clean Balanced/Codex and final quality approved. Landed37101903079 failed after validator success; repair worktree suffix `governance-push-exit/PSStyleGuide`, branch codex/governance-push-exit. Repro scratch suffix `A02-landed-exit-20261003`; no native write.
+- A02: PR224 merged3ba; landed37101903079 failed after validator success. F13 S96 selected; a02 owns two-path repair in worktree suffix `governance-push-exit/PSStyleGuide`, branch codex/governance-push-exit. Scratch suffix `A02-landed-exit-20261003`; focused checks next.
 - A07 follow-up: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; new codex/a07-tooling-followup clean3ba. Accepted PR225 branch/history preserved. Resume: scratch suffix `A07-reconcile-20261003/execution-state.json`; no edits released.
 - Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; treec68b5e1. Reconciliation complete; preserve index and unrelated edits.
 - A21: PS whole base selected; resume scratch suffix `A21-selection-20261003/execution-state.json`; no product edits.

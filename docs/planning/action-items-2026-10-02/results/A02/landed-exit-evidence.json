@@ -1,0 +1,86 @@
+{
+  "selected": "S96",
+  "scope": [
+    ".github/workflows/agent-instructions.yml",
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs"
+  ],
+  "boundedCases": 16,
+  "caseObservationsVerified": true,
+  "scoreTotals": {
+    "N": 72,
+    "S": 96,
+    "C": 93,
+    "T": 76,
+    "Z": 66,
+    "W": 50,
+    "V": 77,
+    "F": 76,
+    "R": 41,
+    "E": 27
+  },
+  "sourceInputs": {
+    "base": "a71f16a8d76beeca1ba8fdc3b1c95e1958e0973c",
+    "head": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "old": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+    "workflowSha256": "aff7fac6602e3fb95a61e096fb7899763d1de741ddad7f0cbc9a3d6ce6e85e6d",
+    "validatorSha256": "80a198eaf809407d5e121994b24acd007fe819d4cc7ee2cdd9deb731710f3ade",
+    "testSha256": "30219a53aa082db93b74541a871f3910693bd932d8d826a76bcecbbed6b2a1d7"
+  },
+  "files": [
+    {
+      "path": "review-F13-decision.md",
+      "bytes": 26943,
+      "sha256": "feae132f03e039ef2a41d28ea0865c8adbffe89c1269b4045fcc4f1d7206a1c6"
+    },
+    {
+      "path": "direct-real-validator-reproduction.md",
+      "bytes": 1513,
+      "sha256": "7dab47aee328437b3c5254b4fa6dcbf4bb6b22c8d95bd99d95b582afa67a3cd3"
+    },
+    {
+      "path": "reproduce.mjs",
+      "bytes": 5922,
+      "sha256": "aa067a902e340eeee752e04fd7edfd8279a01691d2acd965a20648b13c01ce04"
+    },
+    {
+      "path": "actual-run-block.ps1",
+      "bytes": 1772,
+      "sha256": "10099f6b1dcd968b279acb6383521e2c2824b22b2b7ab2da1a0a085bd8461c3b"
+    },
+    {
+      "path": "reproduction-results.json",
+      "bytes": 5874,
+      "sha256": "16f2ac035e9fa6375317c3de45a12f545b927c59924c9a858de3d9b55c0cd63c"
+    },
+    {
+      "path": "reproduction-run.log",
+      "bytes": 4212,
+      "sha256": "3cd9cccbf9478be22fdc9ced8d0c5b1e626f16c9b2be8e2ff49654e1109b31eb"
+    },
+    {
+      "path": "repair-powershell-status-repro.mjs",
+      "bytes": 2407,
+      "sha256": "4b46001f0d51fd9f7e72cca62682049540ecc570209797d7f9886b40c402e134"
+    },
+    {
+      "path": "repair-status-results.json",
+      "bytes": 838,
+      "sha256": "274f4c6253e2be29fc2f95efc66090d56046160c9ff5ca76942a280d22f19bc2"
+    },
+    {
+      "path": "repair-status-run.log",
+      "bytes": 572,
+      "sha256": "9e81b8cda923ff99619ce662977f5451a57431bca5517090a4037ee47208c53f"
+    },
+    {
+      "path": "exact-a71-3ba.status.log",
+      "bytes": 685,
+      "sha256": "c4b5f326d728d2b7b0506ff32c2f8bfc0fcce4d248e0a0d12d9848bc455f6389"
+    },
+    {
+      "path": "old48-rejection.status.log",
+      "bytes": 715,
+      "sha256": "ada5c6c3a25c6cc31c3f7098f0131df4813d25c9d3d137cfe22893aed6b2388b"
+    }
+  ]
+}
