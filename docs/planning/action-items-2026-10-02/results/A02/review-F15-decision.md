@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # F15: retain regular Git entry requirements for generated exemptions
 
-Status: selected before product edits; implemented; focused controls pass; final aggregate held.
+Status: selected before product edits; implemented; focused controls and final aggregate pass.
 
 ## Validation and stakeholders
 
@@ -38,4 +38,6 @@ Exercise actual authorized B/H activation and already-generated mode changes for
 
 ## Validation checkpoint
 
-Implemented within the four authorized code/workflow paths. All focused controls pass; provisional tree0cde16e0dc69df235b98f6e739fa112bf7c1e3eb has no unstaged changes. RESULT.md records exact identities, terminal logs and limits. Code is frozen for independent review. No aggregate has started: the two separately authorized metadata date lines will be refreshed only on actual UTC October3, then one normal final-byte aggregate will run. No native installation/owner/immutable-workflow acceptance is claimed.
+Implemented within the four authorized code/workflow paths. All focused controls pass; provisional tree0cde16e0dc69df235b98f6e739fa112bf7c1e3eb has no unstaged changes. RESULT.md records exact identities, terminal logs and limits. Provisional code passed independent whole-PR quality. At actual UTC October3, only the two authorized Last Updated lines changed to2026-10-03; code blobs remain unchanged. Final six-path tree7d79b48a15f80fddabb8f062eba8819b0ad7cf6b is frozen. One normal aggregate30624 passed all10 hooks, exit0, start2026-10-03T00:01:05.9074447Z and end2026-10-03T00:40:20.8387851Z. Final readback confirms identical six-path tree/blobs/raw bytes, no unstaged changes and diffcheck0. Product/index ownership is released to the parent for normal commit and exact endpoint/native gates. No native installation/owner/immutable-workflow acceptance is claimed.
+
+Normal commit `61f1bec6a3c3b1c09d38e006165dd33332d4ce4c` has parent25b17e8, final tree `7d79b48a15f80fddabb8f062eba8819b0ad7cf6b`, exactly six approved100644 changes and a clean product worktree. One normal final-byte aggregate30624 passed all ten hooks at2026-10-03T00:40:20.8387851Z; its SHA256 is87bdf2eb787456abc5dbdb22262cf96537d7e1281c57aeb73fd176ded449ab73. The normal commit hook passed without bypass. Root endpoint32751 then passed actual B48f/H61f author-finalization (captured UTC2026-10-03), classification-only and full ProposedPolicy checks, ending00:45:00.381298Z. The accepted-base fixture remains HEAD48f/index7d79b48 with no unstaged changes. These are proposed-code checks on actual committed inputs, not installed native-base enforcement. [Independent whole-PR local quality](F13-F15-quality.md) approves actual61f and reconciles every final identity and saved result. Fresh remote review, current CI and immediate native merge gates remain pending.
