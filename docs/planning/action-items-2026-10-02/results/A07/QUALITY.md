@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # A07 urgent dependency repair: independent source quality
 
-Disposition: frozen-tree source and saved-evidence review is locally sound for `a4b016f03e2da45e79e65039bb828ee2f21599f0` on base `48f4d8a36c8faceee12afac78aaecea0d176125d`; no concrete material issue found in the D/E implementation. Final source identity is reconciled below. Required normal aggregate, actual commit and native review/CI/admission gates remain pending; this is not merge acceptance.
+Disposition: whole-candidate local source and validation quality approved for actual normal commit `0abe8bdd6d1c0359544171edbfe2305baea9b48e`, exact tree `a4b016f03e2da45e79e65039bb828ee2f21599f0`, parent/base `48f4d8a36c8faceee12afac78aaecea0d176125d`. No concrete local blocker remains; the candidate is locally ready for source publication through the coordinator. Final source identity, required normal aggregate and actual commit are reconciled below. Fresh native review/CI/admission gates remain pending; this is not merge acceptance.
 
 Reviewer: independent delegated Codex agent `/root/d07_ledger`, not the product writer. Read-only source, Git diff, JSON and saved-evidence inspection only; no tests, probes, installations, worker-job polling or product/planning/native writes. No model/effective-setting or human-attestation claim is made.
 
@@ -47,3 +47,19 @@ The handoff records terminal0 for the actual native instruction/mutation command
 The worker's handoff captures its earlier raw index-file hash; the root subsequently observed a stat-cache-only index byte change during read-only inspection, with baseline tree/entries and all raw source identities unchanged. Git entry/tree identity, not incidental index-file bytes, is the acceptance boundary. Current staged candidate tree/modes were independently checked as above.
 
 Parent released exactly one required normal aggregate after the freeze; its terminal result is not yet credited and this reviewer did not poll it. Pending: that aggregate, normal actual commit/clean readback and native review/CI/admission gates. Protected/held/topology/authority limits, original c68 overlap and PR224 new-base/TF consequences remain as stated above.
+
+## Terminal normal aggregate reconciliation
+
+Read `api-normal-precommit.log`: all ten hooks Passed; independently verified SHA256 `8a08f43aa8f330c8f47ebdaff5ab88a771be2476eb2d143fb9f5ba5323b171b4`. Read end receipt `api-normal-precommit-end.json`, SHA256 `1aa9f00f8d9fa7cb94bb2f3ef39291a01eda9ba92f21d69c0be617392ce2dcb9`: native exit0 from `py -3.12 -m pre_commit run --all-files`, start2026-10-03T03:42:19.998247Z/end03:50:41.308577Z, Node24.18.1/npm11.16.0/Python3.12.10/pre-commit4.6.2, SKIP/HUSKY unset. Parent attributes the terminal result to worker session70596 and confirms explicit writer release.
+
+The end guard records unchanged base48f/candidate treea4b016f0, all72 raw identities, identical complete index tuple digest, no unstaged/untracked files, and guardPass=true. This supports the exact reviewed frozen input; incidental index stat-cache bytes are not used as source identity. No repeated tests, source review or worker polling occurred here.
+
+Frozen-input local validation is complete. Pending: normal actual commit/clean identity reconciliation, followed by fresh native review/CI/admission gates and the already stated PR224/c68/paired consequences. No source publication or merge approval is inferred from the aggregate.
+
+## Actual normal commit reconciliation
+
+Independently inspected actual commit `0abe8bdd6d1c0359544171edbfe2305baea9b48e`: parent48f4d8a, exact reviewed treea4b016f0, ten approved changes all100644, two new scripts included and clean product worktree. All72 raw lengths/SHA256 still match the frozen inventory. No source identity changed, so no source review or tests were repeated.
+
+Read `normal-api-commit.log`: normal staged/nested hook success precedes the successful0abe8bd commit summary (ten files; both new scripts100644). Parent reports no bypass. Its wrapper later failed printing a checkmark through cp1252 after the commit succeeded; actual Git identity and saved success log establish the completed commit, and no repeat commit is needed or credited. The print failure is not concealed or mistaken for a product validation result.
+
+Actual-commit local quality is complete and supports coordinator source publication. Fresh exact-head remote reviews, native CI and immediate admission gates remain open; earlier proposed/source/fixture evidence does not replace them. All owner-authority, original c68 overlap, PR224 changed-base closed-initializer and TF/reverse-comparison limits remain unchanged.
