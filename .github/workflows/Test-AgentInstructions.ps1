@@ -23,7 +23,7 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.18.20261003.0
+# Version: 1.18.20261003.1
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
@@ -113,12 +113,11 @@ $script:arrPlacementProseLiterals = @(
     'The agent MUST NOT ask the owner for that additional authorization.',
     'same repository',
     'non-destructive',
-    'per-round ledger',
-    'entire outgoing range',
-    'every commit SHA and every changed path',
+    'inspect the outgoing range',
+    'each commit and changed path',
     'clean descendant',
     'higher-priority',
-    'resulting PR-head commit SHA(s)',
+    'one authenticated readback',
     'Outside an active'
 )
 $script:arrSharedStructuralLiterals = @(
@@ -502,6 +501,58 @@ function Get-AgentSetupPackageFailure {
     }
 }
 
+function Get-AgentBootstrapCommandFailure {
+    # .SYNOPSIS
+    # Checks the finite operative setup commands in one document.
+    #
+    # .DESCRIPTION
+    # Requires each canonical preflight, install and validation command exactly
+    # once in operative prose. Hidden, deleted and duplicate spans do not pass.
+    #
+    # .PARAMETER Name
+    # The document name used in failure diagnostics.
+    #
+    # .PARAMETER MarkdownContext
+    # The actual operative Markdown parser result for the document.
+    #
+    # .EXAMPLE
+    # Get-AgentBootstrapCommandFailure -Name 'AGENTS.md' -MarkdownContext $objMarkdown
+    #
+    # # Emits no output for a valid document; otherwise emits missing-command diagnostics.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [string] One diagnostic for each command whose operative count is not one.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261003.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $Name,
+        [Parameter(Mandatory)][psobject] $MarkdownContext
+    )
+
+    $strInstall = '-m pip --isolated install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r requirements-dev.txt'
+    $arrCommands = @(
+        "pwsh -NoProfile -Command 'if (`$PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'"
+        "py -3.12 $strInstall"
+        "python3.12 $strInstall"
+        'py -3.12 -m pre_commit run --all-files'
+        'python3.12 -m pre_commit run --all-files'
+    )
+    foreach ($strCommand in $arrCommands) {
+        if (@($MarkdownContext.ProseBlocks.Code | Where-Object { $_ -ceq $strCommand }).Count -ne 1) {
+            Write-Output "$Name must contain this setup command exactly once: $strCommand"
+        }
+    }
+}
+
 function Get-AgentSetupContractFailure {
     # .SYNOPSIS
     # Checks the retained local hook, lock and setup contracts.
@@ -529,7 +580,7 @@ function Get-AgentSetupContractFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261003.0
+    # Version: 1.0.20261003.1
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter(Mandatory)][hashtable] $Content)
@@ -660,20 +711,8 @@ function Get-AgentSetupContractFailure {
     if (-not $boolLockValid -or $strBody.Length -ne 0) {
         Write-Output 'Python requirements must have binary/hash flags, unique pinned packages and complete SHA-256 records.'
     }
-    $strInstall = '-m pip --isolated install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r requirements-dev.txt'
-    $arrCommands = @(
-        "pwsh -NoProfile -Command 'if (`$PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'"
-        "py -3.12 $strInstall"
-        "python3.12 $strInstall"
-        'py -3.12 -m pre_commit run --all-files'
-        'python3.12 -m pre_commit run --all-files'
-    )
     $objMarkdown = Get-OperativeMarkdownContext -Content $Content['.github/workflows/scripts-README.md']
-    foreach ($strCommand in $arrCommands) {
-        if (@($objMarkdown.ProseBlocks.Code | Where-Object { $_ -ceq $strCommand }).Count -ne 1) {
-            Write-Output "Script index must contain this setup command exactly once: $strCommand"
-        }
-    }
+    Get-AgentBootstrapCommandFailure -Name 'Script index' -MarkdownContext $objMarkdown
 }
 
 function Test-InitialMetadataCoveragePath {
@@ -6861,7 +6900,7 @@ function Get-AgentInstructionFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261003.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -6958,6 +6997,8 @@ function Get-AgentInstructionFailure {
 
     $objAgentsMarkdownContext = Get-OperativeMarkdownContext -Content $AgentsContent
     $objClaudeMarkdownContext = Get-OperativeMarkdownContext -Content $ClaudeContent
+    Get-AgentBootstrapCommandFailure -Name 'AGENTS.md' -MarkdownContext $objAgentsMarkdownContext
+    Get-AgentBootstrapCommandFailure -Name 'CLAUDE.md' -MarkdownContext $objClaudeMarkdownContext
     $strAgentsOperativeContent = $objAgentsMarkdownContext.Text
     $strClaudeOperativeContent = $objClaudeMarkdownContext.Text
     $objAgentsPlacementContext = Get-MarkdownLevelTwoSectionContext `
@@ -11354,6 +11395,50 @@ if ($SelfTest) {
         -CodexConfigContent (ConvertTo-DisabledGitHubPluginMutation `
             -Content $strLaterLiteralStringConfig) `
         -Failure 'The github@openai-curated plugin table must declare enabled = true exactly once.'
+
+    # Keep the root-command oracle independent of the implementation helper.
+    $arrRootSetupCommands = @(
+        "pwsh -NoProfile -Command 'if (`$PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'"
+        'py -3.12 -m pip --isolated install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r requirements-dev.txt'
+        'python3.12 -m pip --isolated install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r requirements-dev.txt'
+        'py -3.12 -m pre_commit run --all-files'
+        'python3.12 -m pre_commit run --all-files'
+    )
+    foreach ($objRootDocument in @(
+            [pscustomobject]@{ Name = 'AGENTS.md'; Parameter = 'AgentsContent'; Content = $strAgentsContent }
+            [pscustomobject]@{ Name = 'CLAUDE.md'; Parameter = 'ClaudeContent'; Content = $strClaudeContent }
+        )) {
+        foreach ($strCommand in $arrRootSetupCommands) {
+            $strSpan = [string][char]96 + $strCommand + [string][char]96
+            foreach ($strReplacement in @('', "<!-- $strSpan -->", "~~$strSpan~~", "$strSpan $strSpan")) {
+                $strMutation = $objRootDocument.Content.Replace($strSpan, $strReplacement)
+                if ($strMutation -ceq $objRootDocument.Content) {
+                    throw "Root setup mutation did not change $($objRootDocument.Name): $strCommand"
+                }
+                $hashtableMutation = @{ Failure = "$($objRootDocument.Name) must contain this setup command exactly once: $strCommand" }
+                $hashtableMutation[$objRootDocument.Parameter] = $strMutation
+                Assert-Failure @hashtableMutation
+            }
+        }
+        foreach ($arrNearMiss in @(
+                ,@('--isolated install', 'install', $arrRootSetupCommands[1])
+                ,@('--require-hashes ', '', $arrRootSetupCommands[1])
+                ,@('--only-binary=:all: ', '', $arrRootSetupCommands[1])
+                ,@('https://pypi.org/simple', 'https://example.invalid/simple', $arrRootSetupCommands[1])
+                ,@('-r requirements-dev.txt', '-r other-requirements.txt', $arrRootSetupCommands[1])
+                ,@('py -3.12 -m pip', 'py -3.11 -m pip', $arrRootSetupCommands[1])
+                ,@('python3.12 -m pip', 'python3.11 -m pip', $arrRootSetupCommands[2])
+                ,@('-lt 7', '-lt 6', $arrRootSetupCommands[0])
+            )) {
+            $strMutation = $objRootDocument.Content.Replace($arrNearMiss[0], $arrNearMiss[1])
+            if ($strMutation -ceq $objRootDocument.Content) {
+                throw "Root setup near miss did not change $($objRootDocument.Name): $($arrNearMiss[0])"
+            }
+            $hashtableMutation = @{ Failure = "$($objRootDocument.Name) must contain this setup command exactly once: $($arrNearMiss[2])" }
+            $hashtableMutation[$objRootDocument.Parameter] = $strMutation
+            Assert-Failure @hashtableMutation
+        }
+    }
 
     $intCurrentBytes = [Text.Encoding]::UTF8.GetByteCount($strAgentsContent)
     $intDefaultFillerLength = [Math]::Max(1, 32768 - $intCurrentBytes + 1)

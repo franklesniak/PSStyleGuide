@@ -1,34 +1,30 @@
 <!-- markdownlint-disable MD013 -->
 # Agent Instructions for OpenAI Codex CLI
 
-**Version:** 1.7.20261001.0
+**Version:** 1.7.20261003.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-10-01
-- **Scope:** Agent-specific entry point for OpenAI Codex CLI and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.
+- **Last Updated:** 2026-10-03
+- **Scope:** Codex and compatible agents in PSStyleGuide. Brief shared rules and full Codex protocols; `.github/copilot-instructions.md` governs documentation authoring.
 <!-- template-sync: begin markdown-reference-only -->
 - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
 <!-- template-sync: end markdown-reference-only -->
 
-This file provides PSStyleGuide-specific instructions for OpenAI Codex CLI and compatible AI coding agents. These instructions apply the repository's PowerShell, documentation, safety, and review contracts.
-
 ## Canonical Instructions
 
-The authoritative source of truth for PSStyleGuide documentation authoring is **`.github/copilot-instructions.md`**. Its normative-versus-rationale split and generated-artifact rules apply without exception. **Read that file before changing style-guide content.**
+Read **`.github/copilot-instructions.md`** before changing style-guide content. Follow its full documentation-authoring rules, including the normative/rationale split and generated-artifact rules, without exception.
 
-This file intentionally keeps only a minimal inline summary of the highest-priority shared rules so that agents receive critical guidance immediately. The full shared rule set remains in the canonical file above.
-
-**Thin entry point classification:** A thin entry point keeps shared repository rules brief; it does not mean platform-specific or required protocol sections may be discarded. Sections explicitly labeled as platform protocol or required protocol must be preserved unless the repository owner explicitly waives that protocol for the retained agent platform.
+**Thin entry point classification:** Keep shared rules brief. Preserve every section labeled platform protocol or required protocol unless the owner explicitly waives that protocol for the retained agent platform.
 
 ## Codex Execution Model and Interfaces
 
-- **Instruction scope.** Codex builds its instruction chain once per run, from global guidance through the launch working directory. Use bounded discovery for a deeper `AGENTS.md`; the remote reviewer applies the closest file. Restart Codex after an active instruction changes, and do not re-read supplied instructions unless exact bytes matter. See [OpenAI's `AGENTS.md` guidance](https://developers.openai.com/codex/guides/agents-md).
-- **Agents and interfaces.** The local agent implements work; `chatgpt-codex-connector[bot]` is a separate reviewer requested by `@codex review`. Use `rg`, `apply_patch`, and focused validation locally. Prefer the GitHub connector; use authenticated `gh api graphql` for missing thread, pagination, review-body, or inline context, and verify mutations by authenticated readback. Use primary official sources and record their impact. See [OpenAI's Codex GitHub guidance](https://developers.openai.com/codex/integrations/github).
-- **Mutation and delegation.** Preserve unrelated work and keep one writer per worktree. Before mutation or user-requested delegation, pin repository, branch, head, tree, allowed paths, finding inventory, and public actions. Give each subagent one bounded task, the requested model and effort or inherited defaults, and analysis, first-edit, validation, and public-mutation checkpoints. Prevent shared-workspace overlap.
-- **Communication and stopping.** Report useful phase boundaries. Quiet reasoning is not a hang. Stop on an unauthorized path, ambiguous public mutation, changed pinned identity, or user stop; preserve validated decisions and scoped edits first.
+- **Scope.** Once per run, chain: global guidance to launch directory. Discover deeper `AGENTS.md` with bounds; remote review uses the closest file. Restart after active-instruction changes; re-read supplied text only for exact bytes. See [OpenAI](https://developers.openai.com/codex/guides/agents-md).
+- **Interfaces.** Local agents implement; separate `chatgpt-codex-connector[bot]` reviews via `@codex review`. Use `rg`, `apply_patch`, focused checks. Prefer GitHub connector; authenticated `gh api graphql` fills missing thread/pagination/body/inline context. Verify mutations by authenticated readback. Use official primary sources; record impact. See [OpenAI](https://developers.openai.com/codex/integrations/github).
+- **Work.** Preserve unrelated work; one writer per worktree. Before mutation/user-requested delegation, pin repository/branch/head/tree, allowed paths, findings and public actions. Give each subagent one bounded task, requested/inherited model/effort, and analysis/first-edit/validation/public-mutation checkpoints. Prevent overlap.
+- **Stopping.** Report useful phases; quiet reasoning is not a hang. Stop on unauthorized paths, ambiguous public mutation, changed pinned identity or user stop; first preserve validated decisions/scoped edits.
 
 ## Protected Instruction Files
 
@@ -44,9 +40,11 @@ During downstream template adoption and stack selection, perform non-protected c
   - PSStyleGuide defines actionable PowerShell rules for humans and coding agents.
   - `STYLE_GUIDE.md` is the normative source. Put extended explanation and design rationale in `STYLE_GUIDE_RATIONALE.md`.
   - Do not hand-edit `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.
+  - Regenerate these files with `.github/workflows/Generate-StyleGuideArtifacts.ps1`. CI rejects generated-file drift.
 
 - **PowerShell conformance**
   - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in `STYLE_GUIDE.md`.
+  - This rule applies to `.github/workflows/Generate-StyleGuideArtifacts.ps1` and inline `pwsh` steps in GitHub Actions workflows.
   - Leave every modified PowerShell file with zero parser errors, zero applicable PSScriptAnalyzer warnings or errors, and zero uncovered `MUST` or `MUST NOT` violations.
 
 - **Safety and security**
@@ -55,19 +53,14 @@ During downstream template adoption and stack selection, perform non-protected c
   - Respect allowlisted file access boundaries; reject path traversal and symlink escapes.
 
 - **Pre-commit and validation**
-  - Install Python 3.12 before validation. On Windows, use `py -3.12`; otherwise, expose `python3.12`, `python3`, or `python` on `PATH` as Python 3.12.
-  - Run `node .github/workflows/NpmTools.mjs install` after a fresh clone or lockfile change. See [dependency maintenance](docs/dependency-maintenance.md) for script and hook behavior.
-  - Run `pre-commit run --all-files` before every commit.
-  - Include all auto-fixes in the same commit as the related change.
-  - Do not push code when pre-commit or required validation checks are failing; fix issues and re-run until the checks pass.
-  - Run the applicable repository commands:
-    - `npm run lint:md`
-    - `npm run lint:md:nested`
-    - `npm run test:agent-instructions`
-  - The `pre-commit run --all-files` command exercises the active hooks configured in [`.pre-commit-config.yaml`](.pre-commit-config.yaml), the authoritative list of active hooks.
-  - Retained JSON checks include strict JSON syntax (`check-json`).
-  - Retained YAML checks include YAML parsing (`check-yaml`) and style (`yamllint`).
-  - Retained GitHub Actions checks include GitHub Actions linting (`actionlint`).
+  - Require `pwsh` 7 on `PATH`: `pwsh -NoProfile -Command 'if ($PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'`.
+  - Follow [Python 3.12 setup](docs/dependency-maintenance.md), including the Linux virtual environment. From the repository root, install pinned tools: Windows `py -3.12 -m pip --isolated install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r requirements-dev.txt`; Linux `python3.12 -m pip --isolated install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r requirements-dev.txt`.
+  - Use exact Node/npm from [ci-toolchain.json](.github/workflows/ci-toolchain.json). After clone or lock changes: `node .github/workflows/NpmTools.mjs install`.
+  - Before every commit: Windows `py -3.12 -m pre_commit run --all-files`; elsewhere `python3.12 -m pre_commit run --all-files`; verified 3.12 equivalents allowed.
+  - Keep Husky staged checks: `npm --prefix .github/workflows run lint:md`, `npm --prefix .github/workflows run lint:md:nested`.
+  - Run applicable `npm run lint:md`, `npm run lint:md:nested`, `npm run test:agent-instructions`. Commit auto-fixes with changes. Push only after all required validation passes.
+  - [.pre-commit-config.yaml](.pre-commit-config.yaml) governs hooks: strict JSON `check-json`, YAML parse `check-yaml`/style `yamllint`, Actions `actionlint`.
+  - CI: `node .github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml`; artifact zero-drift checks.
 
 - **Modular instruction files**
   - Read the relevant file under `.github/instructions/` before modifying matching files:
@@ -82,9 +75,17 @@ During downstream template adoption and stack selection, perform non-protected c
   - Invent behavior when requirements are ambiguous; use an explicit Open Question.
   - Create separate formatting-only or lint-only commits.
 
+## Compact Execution and Evidence
+
+Keep one active task record and one final validation record. Use targeted remote readback. Reuse unchanged-input results only. Require no duplicate command approvals, round ledgers or public placement receipts. Read-only work needs no approval record.
+
+Retain task/path authority, explicit protected-file grants, native baselines, reviewed identities, clocks, counters, terminal results and every review/validation gate. Reconcile pending or possibly accepted mutations. Check readiness and preimages before consequential actions. Infer no force, deletion, settings, credential, permission, protection, admin-override or bypass authority.
+
+An on-plan merge needs repository/PR/target/head/tree/scope authority, passing current checks/reviews, no material finding and no bypass. Do not ask again. Obtain missing authority for off-plan work, scope expansion or human decisions.
+
 ## GitHub Plugin Usage
 
-This section is retained Codex platform protocol. Thin-entry-point pruning must preserve it unless the repository owner explicitly waives Codex GitHub plugin protocol for the retained Codex entry point.
+Retained Codex platform protocol. Apply the [preservation rule](#canonical-instructions).
 
 Codex can use the OpenAI-curated GitHub plugin (`github@openai-curated`) in this repository when the user has installed and authorized it. The plugin is the preferred mechanism for any operation that touches remote GitHub state.
 
@@ -97,7 +98,7 @@ The `.codex/config.toml` file at the repository root declares `[plugins."github@
 
 ## PR Review Workflow (Codex-adapted)
 
-This section is retained Codex platform protocol. Thin-entry-point pruning must preserve it unless the repository owner explicitly waives Codex PR review protocol for the retained Codex entry point.
+Retained Codex platform protocol. Apply the [preservation rule](#canonical-instructions).
 
 This workflow adapts the Claude-targeted process documented in `CLAUDE.md` for Codex's capabilities and runtime limitations. Use it when responding to review feedback on a pull request. All GitHub-side reads and writes in the steps below SHOULD go through the GitHub plugin first; fall back to `gh`, GraphQL, or manual owner action only when the plugin does not expose the needed capability (see **Fallbacks for unsupported plugin capabilities** below).
 
@@ -165,18 +166,13 @@ These terms are the operative protected-file authorization contract for the revi
     This checkpoint governs authorization to change protected-file content only. It does not restrict where an authorized fix lands. Use these placement rules:
 
     - **Outside an active automated review loop:** Push to the working branch only. State whether a merge or cherry-pick is required to make the fix visible on the PR head.
-    - **During an active automated review loop:** Push the fix directly to the PR head when all conditions below hold:
-        1. The PR head is in the **same repository** as the working branch.
-        2. The remote PR head is an ancestor of the fix, so the push is **non-destructive** and does not rewrite history.
-        3. Branch protections, required checks, signing rules, and CI/CD policy remain satisfied.
-        4. The fix remains on the agent's development branch as a per-round ledger.
-        5. No higher-priority instruction or explicit owner direction forbids the push.
+    - **During an active automated review loop:** Push directly to the PR head only when it is in the **same repository**, the remote head is an ancestor of the fix, the push is **non-destructive**, all repository controls remain satisfied, and no higher-priority instruction forbids it.
 
       **Standing placement authorization.** The documented active review loop supplies explicit authorization for direct PR-head placement when all conditions above hold. No additional per-round, per-session, or PR-specific direct-push authorization from the owner is required. The agent MUST NOT ask the owner for that additional authorization.
 
-      **Outgoing-range audit.** Before the push, audit the entire outgoing range from the fetched remote PR-head SHA through the fix. Match every commit SHA and every changed path to the pinned per-round ledger and allowed paths, and validate the exact tree. If a commit or path is unlisted, do not push it. Construct and validate a clean descendant of the fetched head that contains only authorized fix commits, or use the safe fallback.
+      **Outgoing-range audit.** Before the push, inspect the outgoing range from the fetched remote PR-head SHA through the fix once. Confirm that each commit and changed path belongs to the active task, and validate the exact tree. If the range contains unrelated work, construct a clean descendant of the fetched head that contains only authorized fixes, or use the safe fallback.
 
-      Before the push, fetch the remote PR head and verify ancestry. Use an explicit non-force source-to-destination refspec; never use `--force` or a leading `+`. If a condition fails or GitHub rejects the update, use the documented safe fallback and do not bypass policy. After placement, read the head back through authenticated GitHub tooling, record the resulting PR-head commit SHA(s), and post the placement receipt.
+      Before the push, fetch the remote PR head and verify ancestry. Use an explicit non-force source-to-destination refspec; never use `--force` or a leading `+`. If a condition fails or GitHub rejects the update, use the documented safe fallback and do not bypass policy. After placement, use one authenticated readback to confirm that the intended commit is the PR head. Put that result in the active task record; do not post a separate placement receipt.
 
 8. **Evaluate style guide impact.** Determine whether the relevant language instruction file(s) under `.github/instructions/` should be updated to prevent the same issue in the future. **Read the full applicable style guide(s) before answering** so the recommendation accounts for what the guide already covers and does not duplicate or contradict existing rules. The protected-file authorization checkpoint in step 7 governs selected fixes that would directly change any protected instruction file, including a style guide under `.github/instructions/`. This step governs secondary style-guide recommendations. If such a secondary update is warranted, write a prompt in a Markdown code fence (suitable for sending to GitHub Copilot's coding agent) that describes the style-guide change. For an inline finding, post the prompt as a reply in the same review thread. For a review-body-only finding, post the prompt as a standalone PR-level comment that cites its synthetic key, source review, reviewed commit, and location when available. In either secondary-recommendation case, do **not** modify the style guide directly; if the maintainer later authorizes that change, handle it through the step-7 protected-file authorization checkpoint.
 
