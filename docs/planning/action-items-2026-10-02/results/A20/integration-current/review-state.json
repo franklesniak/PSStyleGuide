@@ -28,8 +28,8 @@
       "cap": 12
     }
   },
-  "status": "round2_reviews_and_candidate_ci_pending",
-  "next_action": "Collect both current-input results and candidate CI, process any confirmed finding, then obtain fresh independent final quality before normal merge.",
+  "status": "source_merged_landed_ci_pending",
+  "next_action": "Verify all applicable landed main workflows for the merged commit; only then accept source and integrate A03.",
   "copilot_request": {
     "round": 2,
     "head": "84fb436cffe621f10a10486d588225337af97ef0",
@@ -37,9 +37,9 @@
     "body_sha256": "fe2c20eeeff112d995a29a7065a0a92719291e5eea0d38293f32ba44d8ed0bb5",
     "baseline": "round2-pre-request.json",
     "started": "2026-10-03T18:46:30.923228+00:00",
-    "state": "accepted_pending",
+    "state": "completed_clean",
     "requested_effort": "Balanced",
-    "observed_effort": null,
+    "observed_effort": "Balanced",
     "transport": "gh pr edit --add-reviewer '@copilot'",
     "attempt": 1,
     "fallback_reason": "Fresh GitHub PR229 IAB page is signed out. The Reviewers effort menu opens with Balanced selected, but Lite/Balanced/Max are disabled and there is no request control. No browser review request was sent.",
@@ -47,7 +47,10 @@
     "event_id": 32409912288,
     "event_at": "2026-10-03T18:46:26Z",
     "workflow_run_id": 37145470847,
-    "acceptance_snapshot": "round2-copilot-acceptance.json"
+    "acceptance_snapshot": "round2-copilot-acceptance.json",
+    "review_id": 5402248858,
+    "completed_at": "2026-10-03T18:52:53Z",
+    "completion_evidence": "round2-observation-01.json"
   },
   "codex_request": {
     "round": 2,
@@ -56,13 +59,18 @@
     "body_sha256": "fe2c20eeeff112d995a29a7065a0a92719291e5eea0d38293f32ba44d8ed0bb5",
     "baseline": "round2-copilot-acceptance.json",
     "started": "2026-10-03T18:47:42.032934+00:00",
-    "state": "trigger_confirmed_pending_result",
+    "state": "completed_clean",
     "attempt": 1,
     "trigger": "@codex review",
     "prior_automatic_disposition": "Authenticated summary5971346822 remains completed for b319758; no new automatic run or competing request appears in complete current baseline.",
     "comment_id": 5972344898,
     "comment_at": "2026-10-03T18:47:41Z",
-    "readback": "round2-codex-trigger-readback.json"
+    "readback": "round2-codex-trigger-readback.json",
+    "result_comment_id": 5972366736,
+    "summary_comment_id": 5971346822,
+    "completed_at": "2026-10-03T18:50:02.363211Z",
+    "completion_evidence": "round2-observation-01.json",
+    "attribution": "One explicit manual trigger after prior automatic run terminal; new authenticated result excluded from baseline identifies84fb436cff; authenticated service summary identifies84fb436, Manual request and terminal time. Head/base/body remained fixed; complete findings inventory contains no new finding. Generic invitation for another round is not an actionable finding or owner instruction."
   },
   "round_history": [
     {
@@ -210,5 +218,56 @@
     "note": "Git push exited0 and remote branch advanced. The immediate PR read returned the earlier head; a subsequent authenticated PR read and native remote-ref read confirmed the placed head. No push was repeated."
   },
   "record_reconciliation": "Restored the successful current-head audit receipt after the later endpoint writer saved its earlier state snapshot. No native action or test was repeated.",
-  "source_state_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A20-source-lifecycle-20261003\\execution-state.json"
+  "source_state_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A20-source-lifecycle-20261003\\execution-state.json",
+  "final_quality": {
+    "reviewer": "root coordinator; independent from product implementer /root/block_decision_audit",
+    "at": "2026-10-03T18:56:33.650439+00:00",
+    "head": "84fb436cffe621f10a10486d588225337af97ef0",
+    "tree": "1a3389702ebe93f677bd86bd2169b61e1578f82d",
+    "base": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+    "capabilities": "Read-only full four-path diff and coupled context inspection; Git path/tree/raw-byte verification; terminal local test receipts; authenticated paginated native review and rules/thread inventory. No claim of human review or independently exposed effective model settings.",
+    "result": "passed_no_material_finding",
+    "checks": [
+      "Authority and scope: four approved source paths; no settings, workflow, dependency, generated file or TF product delta.",
+      "Behavior and security: five exact operative commands share one helper; hidden, duplicate and weakened cases are rejected. Existing parser and accepted policy boundaries remain.",
+      "Review protocol: serialized request attribution excludes unresolved automatic/older work; exact commit and scope preserved; original stricter clock wins on resume.",
+      "API fallback: actual returned SHA chain, every authorized intermediate path, complete tree/modes, authenticated head and later reachability are verified; no bypass.",
+      "Tests: 112 focused controls, guard-removal discrimination, actual reader boundary, parser/analyzer, source/peer Markdown and final complete-tree11-hook aggregate; actual baseline endpoint checks and ordinary audit passed.",
+      "Pair implications: TF remains a scratch preview;101/9-byte raw margins are explicit limits, not proof of whole-chain capacity. Accepted-source and A03 integration precede peer installation.",
+      "Feedback: both current-input remote results terminal clean; all native threads resolved; no remaining synthetic finding or untracked PR promise in this bounded source outcome."
+    ],
+    "limitations": [
+      "Actual API fallback was not invoked; instructions and local commit-identity demonstration were checked.",
+      "Peer delivery and whole-plan acceptance remain separate.",
+      "Hosted candidate instruction CI remains pending; this quality result does not authorize merging before it succeeds."
+    ]
+  },
+  "merge": {
+    "requested_at": "2026-10-03T19:03:26.698421+00:00",
+    "method": "merge",
+    "expected_head": "84fb436cffe621f10a10486d588225337af97ef0",
+    "expected_base": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+    "expected_tree": "1a3389702ebe93f677bd86bd2169b61e1578f82d",
+    "preflight": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A20-source-lifecycle-20261003\\round2-premerge-gates.json",
+    "response": {
+      "sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+      "merged": true,
+      "message": "Pull Request successfully merged"
+    },
+    "sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+    "tree": "1a3389702ebe93f677bd86bd2169b61e1578f82d",
+    "parents": [
+      "425795bd49d6001081d32abd769c87e17dd1d9d5",
+      "84fb436cffe621f10a10486d588225337af97ef0"
+    ],
+    "merged_at": "2026-10-03T19:03:23Z",
+    "verified_at": "2026-10-03T19:03:30.801155+00:00"
+  },
+  "candidate_ci": {
+    "run_id": 37145225960,
+    "head": "84fb436cffe621f10a10486d588225337af97ef0",
+    "status": "completed",
+    "conclusion": "success",
+    "updated_at": "2026-10-03T19:01:53Z"
+  }
 }

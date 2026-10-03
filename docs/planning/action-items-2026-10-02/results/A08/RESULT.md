@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # A08 independent final no-change verification
 
-**PASS: the narrowed current A08 scope is complete with seven exact exceptions.** No wrapper change or PR is justified. A20 retains the protected root repair and its unanswered authority. A02 is not an A08 dependency. Transfers remain **0/8**; no A08 PR clock or pending native operation.
+**PASS: the narrowed current A08 scope remains complete with seven exact exceptions.** No wrapper change or PR is justified. A20 owns the approved protected root repair; its PS source is now merged through PR229 and peer delivery remains pending. A02 is not an A08 dependency. Transfers remain **0/8**; no A08 PR clock or pending native operation. The original independent evidence below retains its historical inputs; the post229 continuation records the changed delegated protocol.
 
 Independent reader `d07_ledger` checked `a00_history`'s refreshed inspection of the existing [wrapper evidence](wrapper-result.md), current task/STATUS, existing wrapper evidence and complete wrapper text. Authenticated GitHub ref reads before and after this check returned unchanged native mains. Recursive native tree entries confirmed mode/blob identities; native blob base64 decoded to the expected raw UTF-8 bytes and SHA-256. No checkout-normalized comparison was used.
 
@@ -25,3 +25,9 @@ The wrapper requires a PR URL and authenticated canonical open/unmerged target, 
 Native root identities also remain unchanged: PS CLAUDE `3bb0afcae09e05b6a8022d339b12721e8a1473d2`, AGENTS `f7543d786156f0efc39c3fe2927ffcd186b29f39`; TF CLAUDE `3cc21fc793944033be430ad08722081db4e7b9dd`, AGENTS `aa643a442d6a0c59c05d2aff8737564981147fc6`, all100644. Sampled root Balanced UI preference, observed effort, quoted CLI fallback and distinct Codex trigger clauses remain compatible with wrapper delegation. Known root attribution/resume findings remain A20; accepting the wrapper neither repairs them nor activates a competing controller. Current goal LOOP-POLICY still governs this execution.
 
 This is independent source/protocol verification, not a live Claude invocation, executed URL parser, reviewer-service test or product-suite pass. No product/planning/native writes, new review or historical lifecycle replay occurred. Coordinator may record the current A08 no-change result as independently verified and carry these seven per-line exceptions into A18. Reopen only if wrapper bytes, delegated protocol, supported command interface or repository identity changes.
+
+## Post229 delegated-protocol continuation
+
+Native PS main3e068afa36fbc963c4d716df9efb245468791fe8 changes delegated CLAUDE to blobc3058de820b228bdd5b03cce1ec9f288c9dff02d. TF remains06ad4f7. The [complete native inventory](../A01/post229/CURRENT-REFRESH-POST229.md) verifies that both wrapper blobs/modes and all seven exceptions are unchanged. Because the delegated protocol changed, root reopened this retained result and read both complete immutable wrapper texts plus the final CLAUDE diff.
+
+The wrapper delegates the current local protocol instead of copying its request-attribution, completion or resume rules. It adds no competing reset, result-detection rule, request trigger or placement mechanism. Its verified open/unmerged target and preserved draft stage remain compatible with the repaired protocol. The A08-D1/D2 no-change conclusion therefore remains valid; no new finding, wrapper edit, test or PR is needed. This does not claim TF has received A20, a live Claude invocation passed, or landed source acceptance. Future relevant input changes still reopen this assessment.
