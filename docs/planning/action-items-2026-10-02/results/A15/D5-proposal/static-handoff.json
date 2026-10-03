@@ -20,8 +20,8 @@
   "files": [
     {
       "name": "case-oracle-mapping.tsv",
-      "bytes": 1460146,
-      "sha256": "cf2be7204634cf2d8b08b4d7c267c9bffa79758f7252b9691da233a64b73e263"
+      "bytes": 1460128,
+      "sha256": "8adec61c243b8e4c67f1847ad675f5309255407ba6bc9810dc6873f2b6da4808"
     },
     {
       "name": "confirmation-boundary-inputs.json",

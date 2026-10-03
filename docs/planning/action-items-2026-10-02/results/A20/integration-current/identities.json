@@ -205,9 +205,44 @@
       "Get-AgentInstructionFailure"
     ]
   },
-  "state": "product and TF preview frozen; source SelfTest pending; no commit or native mutation",
+  "state": "four frozen product paths staged at recorded tree; standalone SelfTest passed; explicit full aggregate running; no commit or native mutation",
   "transfer_counts": {
     "A20": "0/8",
     "A21": "0/12"
+  },
+  "staged_source": {
+    "timestamp_utc": "2026-10-03T15:56:28.421753+00:00",
+    "base": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+    "branch": "codex/protected-instruction-integration",
+    "candidate_tree": "522069cc69d37c9aeaaff65f5dec7ea0823436ef",
+    "staged_paths": [
+      ".github/copilot-instructions.md",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      "AGENTS.md",
+      "CLAUDE.md"
+    ],
+    "staged_raw_matches_frozen": true,
+    "preexisting_index_empty": true,
+    "standalone_selftest": {
+      "exit_code": 0,
+      "start_utc": "2026-10-03T14:54:32Z",
+      "terminal_observed_utc": "2026-10-03T15:56:28.643006+00:00",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A20-integration-20261003\\source-selftest.log"
+    }
+  },
+  "standalone_selftest": {
+    "command": "npm run test:agent-instructions",
+    "exit_code": 0,
+    "started_utc": "2026-10-03T14:54:32Z",
+    "log_last_write_utc": "2026-10-03T15:55:52.882523+00:00",
+    "log_sha256": "9b593840d4dac71f6de21b59a3f2544c461346417a9071edfec2757b56ad3f91",
+    "terminal_result": "Agent-instruction mutation self-tests passed.",
+    "limitations": "Windows PowerShell7.6.5 only; fixture Git CRLF warnings were nonfatal; no Linux/native/TF product acceptance inferred."
+  },
+  "aggregate": {
+    "command": "py -3.12 -m pre_commit run --all-files",
+    "state": "running",
+    "session": 72862,
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A20-integration-20261003\\source-aggregate.log"
   }
 }
