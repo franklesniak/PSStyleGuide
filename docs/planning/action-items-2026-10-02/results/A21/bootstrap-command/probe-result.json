@@ -1,0 +1,54 @@
+{
+  "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "pip": "25.0.1",
+  "cases": [
+    {
+      "case": "bare-user",
+      "index": "https://user.invalid/simple",
+      "extraIndexes": [
+        "https://user-extra.invalid/simple"
+      ],
+      "requireHashes": false,
+      "onlyBinary": []
+    },
+    {
+      "case": "bare-env",
+      "index": "https://env.invalid/simple",
+      "extraIndexes": [
+        "https://env-extra.invalid/simple"
+      ],
+      "requireHashes": false,
+      "onlyBinary": []
+    },
+    {
+      "case": "canonical-user-env",
+      "index": "https://pypi.org/simple",
+      "extraIndexes": [],
+      "requireHashes": true,
+      "onlyBinary": [
+        ":all:"
+      ]
+    }
+  ],
+  "requirementsDirectives": {
+    "requireHashes": true,
+    "onlyBinary": [
+      ":all:"
+    ]
+  },
+  "sources": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\Lib\\site-packages\\pip\\_internal\\configuration.py",
+      "sha256": "f8a3a893a8e1de11735cc3d014f275fc416306902c81ef914ab790b8b1cb9b3a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\Lib\\site-packages\\pip\\_internal\\cli\\main.py",
+      "sha256": "04365e7fe6d67bd83d269af8395b387437fef38e4726c2b0f37e53ec0a849c07"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Python\\pythoncore-3.12-64\\Lib\\site-packages\\pip\\_internal\\req\\req_file.py",
+      "sha256": "7b2b3cd8c72068808e1a27365194478c3ef6d2988a24fc2679261d5e55b097ac"
+    }
+  ],
+  "limits": "Parser only, no installer/network; configuration search locations replaced with one scratch user file and empty global/site lists. --isolated still permits global/site and explicit PIP_CONFIG_FILE per inspected pip source; no total hermeticity claim."
+}
