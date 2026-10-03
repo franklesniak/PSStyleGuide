@@ -671,7 +671,7 @@ function Assert-ClassificationAdmissionGitFixture {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261002.0
+    # Version: 1.0.20261003.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
@@ -743,6 +743,7 @@ function Assert-ClassificationAdmissionGitFixture {
         & $scriptblockCheck $strReadmeAuthorizedBaseline $strGeneratedCandidate $true 'Metadata classification data validated'
         & $scriptblockCheck $strGeneratedCandidate $strGeneratedCandidate $true 'Metadata classification data validated'
         # Existing generated provenance cannot authorize a nonregular Git entry.
+        # Keep these candidate objects out of the regular baseline checkout.
         foreach ($strMode in @('100755', '120000', '160000')) {
             & git -C $strFixtureRoot checkout --quiet --detach $strGeneratedCandidate
             if ($LASTEXITCODE -ne 0) { throw 'Generated type baseline checkout failed.' }
@@ -751,10 +752,40 @@ function Assert-ClassificationAdmissionGitFixture {
             }
             & git -C $strFixtureRoot update-index --cacheinfo "$strMode,$strObject,README.md"
             if ($LASTEXITCODE -ne 0) { throw 'Generated type fixture indexing failed.' }
-            & git -C $strFixtureRoot -c user.name=AdmissionFixture -c user.email=admission-fixture@example.invalid `
-                -c commit.gpgsign=false -c "core.hooksPath=$strEmptyHooks" commit --quiet --no-gpg-sign --message=mode
-            if ($LASTEXITCODE -ne 0) { throw 'Generated type fixture commit failed.' }
-            $strModeCandidate = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
+            $strModeTree = & git -C $strFixtureRoot write-tree
+            if ($LASTEXITCODE -ne 0 -or $strModeTree -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'Generated type fixture tree failed.'
+            }
+            $strModeCandidate = & git -C $strFixtureRoot -c user.name=AdmissionFixture `
+                -c user.email=admission-fixture@example.invalid -c commit.gpgsign=false `
+                commit-tree $strModeTree -p $strGeneratedCandidate -m mode
+            if ($LASTEXITCODE -ne 0 -or $strModeCandidate -cnotmatch '^[0-9a-f]{40}$') {
+                throw 'Generated type fixture commit failed.'
+            }
+            $strCandidateTree = & git -C $strFixtureRoot rev-parse "$strModeCandidate^{tree}"
+            if ($LASTEXITCODE -ne 0 -or $strCandidateTree -cne $strModeTree) {
+                throw 'Generated type fixture tree identity changed.'
+            }
+            $strCandidateParent = & git -C $strFixtureRoot rev-parse "$strModeCandidate^"
+            if ($LASTEXITCODE -ne 0 -or $strCandidateParent -cne $strGeneratedCandidate) {
+                throw 'Generated type fixture parent changed.'
+            }
+            $strObjectType = if ($strMode -ceq '160000') { 'commit' } else { 'blob' }
+            $strCandidateEntry = & git -C $strFixtureRoot ls-tree $strModeCandidate -- README.md
+            if ($LASTEXITCODE -ne 0 -or
+                $strCandidateEntry -cne "$strMode $strObjectType $strObject`tREADME.md") {
+                throw 'Generated type fixture entry changed.'
+            }
+            & git -C $strFixtureRoot read-tree $strGeneratedCandidate
+            if ($LASTEXITCODE -ne 0) { throw 'Generated type fixture index restoration failed.' }
+            $strRestoredHead = & git -C $strFixtureRoot rev-parse HEAD
+            if ($LASTEXITCODE -ne 0 -or $strRestoredHead -cne $strGeneratedCandidate) {
+                throw 'Generated type fixture changed the baseline checkout.'
+            }
+            $arrRestoredStatus = @(& git -C $strFixtureRoot status --porcelain --untracked-files=no)
+            if ($LASTEXITCODE -ne 0 -or $arrRestoredStatus.Count -ne 0) {
+                throw 'Generated type fixture did not restore a clean baseline index and worktree.'
+            }
             & $scriptblockCheck $strGeneratedCandidate $strModeCandidate $false 'not one regular 100644 blob'
             & $scriptblockCheck $strReadmeAuthorizedBaseline $strModeCandidate $false 'not one regular 100644 blob'
         }
