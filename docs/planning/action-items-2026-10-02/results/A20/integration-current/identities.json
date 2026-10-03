@@ -1,0 +1,213 @@
+{
+  "source_heads": {
+    "PS": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+    "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+  },
+  "files": [
+    {
+      "repository": "PS",
+      "path": "AGENTS.md",
+      "base": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+      "base_blob": "f7543d786156f0efc39c3fe2927ffcd186b29f39",
+      "base_sha256": "ce1860e518783cdd75d78124a1ab078257233807f689839eb7cb3e3749f8847b",
+      "bytes": 32565,
+      "sha256": "58367236cdbdaa69a356b6b24f13b1cc43167e31d9ef20a9b346a414caf70b97",
+      "mode": "100644",
+      "scope": "product"
+    },
+    {
+      "repository": "PS",
+      "path": "CLAUDE.md",
+      "base": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+      "base_blob": "3bb0afcae09e05b6a8022d339b12721e8a1473d2",
+      "base_sha256": "527069c020934a6e73774dadef98359911bee71754ac6d67ab60796ac757c591",
+      "bytes": 81192,
+      "sha256": "8fca7c0af2c031d1d2d22064868a01a5e0f0272acc864860d6cf63d840853019",
+      "mode": "100644",
+      "scope": "product"
+    },
+    {
+      "repository": "PS",
+      "path": ".github/copilot-instructions.md",
+      "base": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+      "base_blob": "62ff9fcfb1fb56dea8fd894d4d622cd3c598f875",
+      "base_sha256": "e8c5d01dc227dc109e412f364c2d036ad17d59d5c56be942b87b0e5a16b2be34",
+      "bytes": 2517,
+      "sha256": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6",
+      "mode": "100644",
+      "scope": "product"
+    },
+    {
+      "repository": "PS",
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "base": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+      "base_blob": "99e9214ec8c5a6c99a132c4f7ad613e10b48825b",
+      "base_sha256": "6ae042634adfdfbbe7ee896c3242233dc3513654fd61e9b54be6cabca1771e60",
+      "bytes": 474787,
+      "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11",
+      "mode": "100644",
+      "scope": "product"
+    },
+    {
+      "repository": "TF",
+      "path": "AGENTS.md",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "base_blob": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+      "base_sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266",
+      "bytes": 32657,
+      "sha256": "27a720988af84c3122e980cf9c415abe77745fbbc0240d39f8b835589746eeab",
+      "mode": "100644",
+      "scope": "scratch-preview"
+    },
+    {
+      "repository": "TF",
+      "path": "CLAUDE.md",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "base_blob": "3cc21fc793944033be430ad08722081db4e7b9dd",
+      "base_sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2",
+      "bytes": 81309,
+      "sha256": "baf56a0dac691b5f40b18005b281acb319ef4f4594ba7f4a0b82547327b08f12",
+      "mode": "100644",
+      "scope": "scratch-preview"
+    },
+    {
+      "repository": "TF",
+      "path": ".github/copilot-instructions.md",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "base_blob": "d4ad431a6c629203aa6cd88b9cea6f9caa4c293b",
+      "base_sha256": "81fbe1615dd96fe99afca2738ff5888a6f7b7390068c1087d3d817fad73ff614",
+      "bytes": 2522,
+      "sha256": "5e9744858581ca9c663945c2eac4f636e18aff899e604d0c6f845505972783c6",
+      "mode": "100644",
+      "scope": "scratch-preview"
+    }
+  ],
+  "paired_exceptions": [
+    {
+      "path": "AGENTS.md",
+      "different_regions": [
+        {
+          "PS_start": 11,
+          "TF_start": 11,
+          "PS_text": "- **Scope:** Codex and compatible agents in PSStyleGuide. Brief shared rules and full Codex protocols; `.github/copilot-instructions.md` governs documentation authoring.\n",
+          "TF_text": "- **Scope:** Codex and compatible agents in TerraformStyleGuide. Brief shared rules and full Codex protocols; `.github/copilot-instructions.md` governs documentation authoring.\n"
+        },
+        {
+          "PS_start": 40,
+          "TF_start": 40,
+          "PS_text": "  - PSStyleGuide defines actionable PowerShell rules for humans and coding agents.\n",
+          "TF_text": "  - TerraformStyleGuide defines actionable Terraform rules for humans and coding agents.\n"
+        },
+        {
+          "PS_start": 42,
+          "TF_start": 42,
+          "PS_text": "  - Do not hand-edit `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n",
+          "TF_text": "  - Do not hand-edit `copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n"
+        },
+        {
+          "PS_start": 46,
+          "TF_start": 46,
+          "PS_text": "  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in `STYLE_GUIDE.md`.\n",
+          "TF_text": "  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in the [PSStyleGuide](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md).\n"
+        },
+        {
+          "PS_start": 248,
+          "TF_start": 248,
+          "PS_text": "> This file is the Codex entry point for PSStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n",
+          "TF_text": "> This file is the Codex entry point for TerraformStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n"
+        }
+      ],
+      "reason": "Actual repository/product/language identity or language-scoped filename; PowerShell guide is local in PS and external in TF. All intervening raw line byte segments compare exactly equal."
+    },
+    {
+      "path": "CLAUDE.md",
+      "different_regions": [
+        {
+          "PS_start": 11,
+          "TF_start": 11,
+          "PS_text": "- **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.\n",
+          "TF_text": "- **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in TerraformStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.\n"
+        },
+        {
+          "PS_start": 16,
+          "TF_start": 16,
+          "PS_text": "This file provides PSStyleGuide-specific instructions for Claude Code and compatible AI coding agents. These instructions apply the repository's PowerShell, documentation, safety, and review contracts.\n",
+          "TF_text": "This file provides TerraformStyleGuide-specific instructions for Claude Code and compatible AI coding agents. These instructions apply the repository's Terraform, PowerShell, documentation, safety, and review contracts.\n"
+        },
+        {
+          "PS_start": 20,
+          "TF_start": 20,
+          "PS_text": "The authoritative source of truth for PSStyleGuide documentation authoring is **`.github/copilot-instructions.md`**. Its normative-versus-rationale split and generated-artifact rules apply without exception. **Read that file before changing style-guide content.**\n",
+          "TF_text": "The authoritative source of truth for TerraformStyleGuide documentation authoring is **`.github/copilot-instructions.md`**. Its normative-versus-rationale split and generated-artifact rules apply without exception. **Read that file before changing style-guide content.**\n"
+        },
+        {
+          "PS_start": 41,
+          "TF_start": 41,
+          "PS_text": "  - PSStyleGuide defines actionable PowerShell rules for humans and coding agents.\n",
+          "TF_text": "  - TerraformStyleGuide defines actionable Terraform rules for humans and coding agents.\n"
+        },
+        {
+          "PS_start": 43,
+          "TF_start": 43,
+          "PS_text": "  - Do not hand-edit `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n",
+          "TF_text": "  - Do not hand-edit `copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n"
+        },
+        {
+          "PS_start": 47,
+          "TF_start": 47,
+          "PS_text": "  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in `STYLE_GUIDE.md`.\n",
+          "TF_text": "  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in the [PSStyleGuide](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md).\n"
+        },
+        {
+          "PS_start": 441,
+          "TF_start": 441,
+          "PS_text": "> This file is the Claude entry point for PSStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n",
+          "TF_text": "> This file is the Claude entry point for TerraformStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n"
+        }
+      ],
+      "reason": "Actual repository/product/language identity or language-scoped filename; PowerShell guide is local in PS and external in TF. All intervening raw line byte segments compare exactly equal."
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "different_regions": [
+        {
+          "PS_start": 1,
+          "TF_start": 1,
+          "PS_text": "# Repository instructions for PSStyleGuide\n",
+          "TF_text": "# Repository instructions for TerraformStyleGuide\n"
+        },
+        {
+          "PS_start": 11,
+          "TF_start": 11,
+          "PS_text": "- `powershell.instructions.md` \u2014 generated from `STYLE_GUIDE.md` with YAML front matter.\n",
+          "TF_text": "- `terraform.instructions.md` \u2014 generated from `STYLE_GUIDE.md` with YAML front matter.\n"
+        },
+        {
+          "PS_start": 24,
+          "TF_start": 24,
+          "PS_text": "6. Consumer-facing style guide files (`STYLE_GUIDE.md` and its generated derivatives: `/copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, `STYLE_GUIDE_FULL.md`) must not cross-reference other files in this repository, including each other.\n",
+          "TF_text": "6. Consumer-facing style guide files (`STYLE_GUIDE.md` and its generated derivatives: `/copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, `STYLE_GUIDE_FULL.md`) must not cross-reference other files in this repository, including each other.\n"
+        }
+      ],
+      "reason": "Actual repository/product/language identity or language-scoped filename; PowerShell guide is local in PS and external in TF. All intervening raw line byte segments compare exactly equal."
+    }
+  ],
+  "functions": {
+    "before": 68,
+    "parserErrors": 0,
+    "added": [
+      "Get-AgentBootstrapCommandFailure"
+    ],
+    "after": 69,
+    "removed": [],
+    "changed": [
+      "Get-AgentSetupContractFailure",
+      "Get-AgentInstructionFailure"
+    ]
+  },
+  "state": "product and TF preview frozen; source SelfTest pending; no commit or native mutation",
+  "transfer_counts": {
+    "A20": "0/8",
+    "A21": "0/12"
+  }
+}

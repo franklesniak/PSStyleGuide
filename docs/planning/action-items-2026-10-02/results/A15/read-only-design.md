@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A15 read-only design and owner decisions
 
+Current disposition, 2026-10-03: the owner directs completion through proposal preparation and use of a clear winner (D08). The six decisions below now explicitly cover UX and QA, list alternatives before their separate rubrics, and retain their complete scoring tables. Their clear winners are selected for implementation under that direction. The earlier preparation dates and unreceived-approval statements below are historical; actual Gate A/B operator and independent-peer approvals are still future requirements. Proposal completeness is not product or operational acceptance.
+
 Prepared 2026-10-02. This is preparation, not A15 acceptance or product completion. A00 and A01 are not accepted in the tracker read for this task. No product file, GitHub object, setting, branch, commit, or review request was changed. Transfers: **0/8**. PR clock: **not started**. Requested route: `gpt-6-astra/high`; effective settings were not exposed. The model-routing skill was read; this delegated worker did not create descendants.
 
 ## Evidence and current consumer
@@ -104,7 +106,11 @@ These are recommendations awaiting the stated owner decisions. No implementation
 
 **Validity.** The old list names a nonexistent `.sh` and excludes current consumers required by Windows/CI changes. Exact sixteen-file equality would either require an artificial rename or exclude necessary tests/integration. Stakeholders: both maintainers, T2/A06/A07/A03 owners, authors, generated-output consumers, CI/review engineers, agents, audit/history owners and schedule/cost owner. End users are affected through published examples; no accessibility or cloud-permission change is proposed.
 
-**Options/rubric.** Compare literal preservation, historical reconstruction, exact current manifest, and deferral. Weights: capability completeness 35, wrong-scope prevention 30, reviewability 25, churn 10. Hard constraints: no safety item disappears; no unowned coupled edit; owner approves the changed scope.
+**Options before the rubric.** Keep the old list literally; reconstruct the old `.sh` layout; use one exact current manifest for each gate; or defer. Adding a wrapper solely to preserve the old filename is historical reconstruction. Dropping required integration to fit sixteen files fails completeness. A current manifest plus separately owned foundation batches is the third option, not an unrestricted path exception.
+
+**UX and QA.** A new contributor must find the actual executable test file. Reviewers must see which gate owns each changed path. QA must compare exact paths and required capabilities, rather than accept a matching file count.
+
+**Finding-specific rubric.** Capability completeness35 measures preservation of every source, test and integration requirement. Wrong-scope prevention30 measures exact path ownership and exclusion of unrelated changes. Reviewability25 measures whether a new reviewer can trace each path to its gate and requirement. Churn10 measures avoidable moves and duplicate entry points. Scores0–5:0 contradicts the criterion;1 has a fundamental gap;2 has major limits;3 is workable with material limits;4 is strong with a bounded tradeoff;5 fully addresses the design criterion. Totals are weighted judgments, not measured runtime reliability. Hard constraints: preserve safety requirements and single-writer ownership; use the owner's D08 clear-winner direction for the described scope amendment.
 
 | Option | Complete | Scope | Review | Churn | Total | Limit |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
@@ -123,7 +129,11 @@ Concrete base list remains the same two sources and four generated files; the `.
 
 **Validity.** Publication already depends on Linux T2 tests through `verify`; the old reusable Markdown topology no longer exists. Windows evidence and reviewed Windows runtime acquisition are absent. Stakeholders: CI/platform/security engineers, maintainers of both repos, release consumers, review/agent operators and cost owners. Backend operators need trustworthy platform evidence but do not authorize CI topology; no live backend access is required.
 
-**Options/rubric.** Weights: same-SHA fail-closed gate 40, platform reproducibility 30, integration clarity 20, maintenance 10. Hard constraints: Windows 5.1 and 7 must execute; failure/missing/skipped evidence blocks publishing; no new privilege, unreviewed external action, or independent green-run substitution.
+**Options before the rubric.** Keep Linux-only validation; restore the old reusable Markdown topology; add Windows jobs to the accepted build graph; use an independent Windows workflow and badge; or defer. A separate workflow whose result is only linked remains the badge option. A shared helper called by jobs in the same dependency graph belongs to the third option. Restoring old actions or privilege is not necessary for either viable topology.
+
+**UX and QA.** Contributors need one visible result for the exact proposed revision. QA needs negative cases for absent, skipped, failed and wrong-revision platform results. A green badge from another run is not adequate evidence.
+
+**Finding-specific rubric.** Same-SHA fail-closed gate40 measures whether publication depends on every required result for the same revision. Platform reproducibility30 measures explicit Windows5.1/7 and supported Linux execution. Integration clarity20 measures understandable job dependencies and failure diagnosis. Maintenance10 measures ongoing workflow duplication. Use the stated0–5 anchors. Hard constraints: both Windows editions must execute; missing/skipped/failed evidence prevents publication; preserve permissions and reviewed runtime acquisition.
 
 | Option | Gate | Platform | Clarity | Maintain | Total | Limit |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
@@ -141,7 +151,11 @@ Concrete base list remains the same two sources and four generated files; the `.
 
 **Validity.** T4 requires `.NET FileShare.None` creation with an exclusive retained handle, then Node reopening that path. .NET documents that another open fails until that handle closes. AC08 requires raw .NET capture on both editions; the inspector section instead prohibits separate stream-limit implementation and mandates a shared Node collector. Windows Node signal termination is abrupt; it cannot truthfully implement POSIX graceful TERM then KILL semantics. Stakeholders: Windows/Linux operators, security and incident engineers, state-data owners, runtime/platform maintainers, reviewers, authors and cost owners. No cloud account access is needed to establish these contradictions.
 
-**Options/rubric.** Weights: protected identity/no-clobber 35, bounded byte/process correctness 35, cross-edition clarity 20, maintenance 10. Hard constraints: no unlocked silent path handoff, no string decoding of state, all stream/timeout/cleanup oracles, honest platform termination semantics, explicit approved contract amendment.
+**Options before the rubric.** Attempt both incompatible instructions literally; close the exclusive writer and transfer capture to Node; capture with one Windows .NET implementation and use a common Node tokenizer; build native handle transfer into Node; rely on PowerShell7.4 redirection; or defer Windows. Sharing policy limits with separate platform collectors is part of the third option. A generic native plugin expands the handle-transfer option. Omitting5.1, stream bounds or identity checks is not a valid combination.
+
+**UX and QA.** Operators need the same raw bytes and understandable failure rules on both PowerShell editions. QA must distinguish capture from parsing, verify refused writes/deletes during reads, and exercise identity substitution and inherited-pipe failures. No instruction may imply that a closed handle still protects a file.
+
+**Finding-specific rubric.** Protected identity/no-clobber35 measures correct ownership, identity transitions and preservation of existing output. Bounded byte/process correctness35 measures exact bytes, stream/deadline limits and truthful child completion. Cross-edition clarity20 measures one understandable contract that works on5.1 and7. Maintenance10 measures duplicate parser and interop burden. Use the stated0–5 anchors. Hard constraints: explicit checked handoffs, no state-to-string conversion, full failure oracles and honest platform termination; D08 authorizes the clear winning contract correction.
 
 | Option | Identity | Bounds | Clarity | Maintain | Total | Limit |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
@@ -160,7 +174,11 @@ Concrete base list remains the same two sources and four generated files; the `.
 
 **Validity.** The “sole allocation” omits the separately required difference manifest, current/proposed show files, provider schema, HMAC indexes, configuration/module/lock identities, repeated rm match path and corruption source. Inspector's only two modes cannot capture provider schema or state-list using the same bounded collector without another fixed interface. The difference CLI calls its configuration-root argument an ordinary file although it must be a directory. These gaps can cause secret storage outside the protected context or inferred role reuse. Stakeholders: privacy/data owners, incident and backend operators, security engineers, Terraform/module/provider maintainers, developers/reviewers, and audit owners. Accessibility is not changed by file allocation; diagnostic clarity still matters to operators.
 
-**Options/rubric.** Weights: complete secret/identity authority 40, bounded correctness 30, operator clarity 20, implementation cost 10. Hard constraints: no generic command runner, ambient temp, guessed tuple, or unreviewed directory-as-file treatment.
+**Options before the rubric.** Infer missing paths; remove the affected review/recovery requirements; extend the exact role table with fixed operations; introduce a general command/role plugin system; or defer. Shared collector code behind fixed operations belongs to the third option. A general runner restricted only by caller-supplied arguments remains the fourth option. Reusing a backup path for a report violates role separation under every option.
+
+**UX and QA.** Each required input needs an explicit name, purpose and error. QA must cover missing and empty inputs separately, role aliasing, forbidden arguments and wrong file-versus-directory types. Operators must not guess which sensitive file can be overwritten.
+
+**Finding-specific rubric.** Complete secret/identity authority40 measures explicit storage, identity, ownership and lifetime for every sensitive role. Bounded correctness30 measures closed operations and correct limits/failure behavior. Operator clarity20 measures understandable inputs and recovery diagnostics. Implementation cost10 measures added interfaces and dependencies. Use the stated0–5 anchors. Hard constraints: no generic command runner, ambient temp, inferred tuple or directory treated as an ordinary file.
 
 | Option | Authority | Correct | Clear | Cost | Total | Limit |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
@@ -180,7 +198,11 @@ Proposed public triple prefixes: `DIFF_MANIFEST`, `DIFF_CURRENT_SHOW`, `DIFF_PRO
 
 **Validity.** Native T2 cleanup-only status is 74. T4 says exact T2 reuse but specifies cleanup-only 1 and general uncertainty 72. Several “atomic” rows still combine failures (CORR-03 directory/link; CORR-04 any final class; CONFIRM-67 three field mismatches; ADDRESS-32 nonzero/signal). The corruption paragraph says both names are absent before-link failure, contradicting source retention; its role bound excludes the explicitly allowed empty corrupt source. Address prose globally forbids whitespace while allowing an internal quoted-key space. Existing-final refusal cannot make final absent, and post-publication uncertainty cannot delete output to satisfy a blanket absence sentence. Stakeholders: test authors, operators consuming status, reviewers, both maintainers, auditors and automated acceptance consumers. These differences affect recovery and not just wording.
 
-**Options/rubric.** Weights: unambiguous failure safety 40, compatibility/evidence continuity 25, oracle completeness 25, churn 10. Hard constraints: preserve source and uncertain evidence; one exact result per ID/cell; no relaxed confirmation/address parsing.
+**Options before the rubric.** Retain conflicting assertions; rewrite and renumber every case; preserve old IDs while adding atomic cases and explicit precedence; delete grouped cases; or defer disputed rows. Generating a product catalog from the reviewed allocation map is implementation of the third option, not a new oracle. Combining old IDs with ambiguous success conditions does not meet that option. A cleanup rule that deletes uncertain evidence is ineligible regardless of convenience.
+
+**UX and QA.** An operator needs one clear outcome and instructions that preserve recovery evidence. QA needs one fixture and exact expected outcome per case/runtime cell. Case counts alone must never stand in for executed evidence.
+
+**Finding-specific rubric.** Unambiguous failure safety40 measures exact status, cleanup and retained-evidence outcomes at each phase. Compatibility/evidence continuity25 measures preservation of T2 behavior and traceable original IDs. Oracle completeness25 measures atomic conditions, full family coverage and unique applicable results. Churn10 measures unnecessary renumbering and harness rewrites. Use the stated0–5 anchors. Hard constraints: preserve source and uncertain evidence; one exact result per ID/cell; do not relax confirmation or address parsing.
 
 | Option | Safety | Continuity | Complete | Churn | Total | Limit |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
@@ -198,7 +220,11 @@ Proposed public triple prefixes: `DIFF_MANIFEST`, `DIFF_CURRENT_SHOW`, `DIFF_PRO
 
 **Validity.** Current direct push/rm/corrupt-move examples are real unsafe consumers. Removing all manual guidance is smaller, but loses the issue's exceptional-recovery use case. Full custom automation is also unnecessary: the issue requests copy-safe manual procedures with human authority. Stakeholders: incident responders, backend/cloud administrators, infrastructure/security/privacy owners, maintainers, new and experienced Terraform users, reviewers, auditors, vendor-support and downtime/cost owners. The PS peer needs only genuinely common tool changes, not Terraform recovery text.
 
-**Options/rubric.** Weights: incident safety 40, supported recovery coverage 30, operator comprehension 20, maintenance 10. Hard constraints: no force/lock bypass, no blind old-backup push, no automatic retry/rollback after unknown outcome, genuine two-gate human approvals.
+**Options before the rubric.** Retain the commands with warnings; remove manual operations and use only native/declarative methods; prefer native/declarative methods with a bounded exceptional manual procedure; build general recovery automation; or defer while retaining the issue. Native restore and declarative changes are complementary first choices within the third option. A manual fallback without its guards is the first option. Removing a fallback for one proved unsupported backend needs its own scoped disposition; it is not a blanket omission.
+
+**UX and QA.** A new operator must see the safer normal path first. The exceptional path must state prerequisites, one-attempt limits and the action after uncertainty. QA must prove zero mutation calls after each failed prerequisite and cannot use real infrastructure to test recovery instructions.
+
+**Finding-specific rubric.** Incident safety40 measures prevention of wrong-state changes, lost backups and repeated unknown outcomes. Supported recovery coverage30 measures the required exceptional cases as well as ordinary alternatives. Operator comprehension20 measures clear choices and executable stop conditions. Maintenance10 measures ongoing support burden. Use the stated0–5 anchors. Hard constraints: no force/lock bypass, blind old-backup push, automatic retry/rollback after uncertainty or substitute for real Gate A/B approvals.
 
 | Option | Safety | Coverage | Comprehension | Maintain | Total | Limit |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |

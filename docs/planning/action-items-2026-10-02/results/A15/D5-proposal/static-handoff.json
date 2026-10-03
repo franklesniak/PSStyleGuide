@@ -5,13 +5,13 @@
     "existing": 224,
     "signals": 108,
     "namedSplits": 39,
-    "unnamedAllocated": 1890
+    "unnamedAllocated": 1908
   },
-  "total": 2261,
+  "total": 2279,
   "boundaryCorrection": {
     "oldIdsRemoved": 0,
     "existingRowsChanged": 331,
-    "appendedRows": 99,
+    "appendedRows": 117,
     "knownOwnedPostcreationCasesChecked": 192,
     "phaseBoundaryCheck": "PASS (static oracle inspection only)"
   },
@@ -20,8 +20,8 @@
   "files": [
     {
       "name": "case-oracle-mapping.tsv",
-      "bytes": 1446552,
-      "sha256": "ad2d45560f0dc86fd3b1ddbbb1d65ee38be74b67eb51e0267075498ecde139a2"
+      "bytes": 1460146,
+      "sha256": "cf2be7204634cf2d8b08b4d7c267c9bffa79758f7252b9691da233a64b73e263"
     },
     {
       "name": "confirmation-boundary-inputs.json",
@@ -30,8 +30,8 @@
     },
     {
       "name": "D5-continuation.md",
-      "bytes": 15418,
-      "sha256": "6a6e14c09f1fa9e251cae17c3533121d4664f2ae1e9cd56b28fd73980914fc3d"
+      "bytes": 16119,
+      "sha256": "0b434f3dec7a69226418ec280912e97f2391491e361c2cb6746c8f7bec2c9368"
     },
     {
       "name": "input-receipt.json",
@@ -48,6 +48,5 @@
       "bytes": 847,
       "sha256": "d3841ec62454dfd14fb5d1ad6f65dc7177b70219df0b99d0d4f37efafc3eb2f6"
     }
-  ],
-  "publicationNote": "Current file identities are repository LF bytes. Worker scratch hashes and original review attribution are retained in mapping-inspection.json and D5-quality.md."
+  ]
 }

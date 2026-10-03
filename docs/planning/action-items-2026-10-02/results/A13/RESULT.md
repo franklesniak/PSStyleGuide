@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD013 -->
 # A13 current result
 
-State: waiting_human. No additional acceptance is claimed by this restart pointer.
+State: validating. The owner approved the exact A12 recommendation on 2026-10-03, including bounded restoration and ordinary-PR validation instead of a direct-push drill. No further settings authority is pending for this selected scope.
 
-Read [the current task](../../tasks/A13.md) and [latest evidence](../../results/A12/desired-ps-ruleset.json). Next: Await exact ruleset authority.
+Refreshed authenticated native main425795b, complete empty inherited/effective rules, classic-protection404, sole maintainer, Actions app15368 and all three successful current contexts before mutation. Submitted the unchanged [approved payload](../A12/desired-ps-ruleset.json), SHA256 eaba9b64d06ef014b6c0075a203c4c475ac96f6b66ce11be414ba3eee8195433, once. Created active PS ruleset24419725. No TF setting, bypass, credential or direct-main push changed.
+
+[Native installed evidence](installed-ruleset.json) verifies every authorized field in both detail and effective rules, including strict policy/markdownlint/verify_generated_artifacts from15368 and an empty bypass list. GitHub adds required_reviewers=[] and require_extra_approval_for_unattributed_changes=true. Official [GitHub documentation](https://docs.github.com/en/enterprise-cloud%40latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#additional-approval-for-unattributed-copilot-pull-requests) states the latter has no effect with zero required approvals, as configured. The initial strict JSON equality assertion rejected these server defaults; the readback comparison was corrected to require every selected field exactly and allow only these two explicitly checked additions. This was a local verification defect, not failed creation; no duplicate request or restoration occurred.
+
+Next: validate the required contexts and a normal current-head merge on the next actual focused product PR. Installation/readback is complete; ordinary-PR behavior remains unverified. Scratch native preimage/create/readback records are in C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A13-approval-20261003. Do not repeat creation. A relevant settings or check-behavior change reopens this assessment.

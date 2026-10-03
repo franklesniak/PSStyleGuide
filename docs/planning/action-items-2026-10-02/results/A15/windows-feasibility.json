@@ -1,0 +1,44 @@
+[
+  {
+    "powershell": "5.1.26100.9549",
+    "runtime": "4.0.30319.42000",
+    "exclusiveRead": {
+      "exit": 7,
+      "output": "EBUSY"
+    },
+    "sharedRead": {
+      "exit": 0,
+      "output": "OPEN"
+    },
+    "sharedWrite": {
+      "exit": 7,
+      "output": "EBUSY"
+    },
+    "deleteDenied": true,
+    "rawBytes": 14,
+    "rawBase64": "AAoNQcOp5rC08J+YgP8=",
+    "mutationCalls": 0,
+    "scope": "Synthetic primitive probe only: not complete ACL/FileId/reparse/process-tree/collector/Gate proof"
+  },
+  {
+    "powershell": "7.6.5",
+    "runtime": "10.0.11",
+    "exclusiveRead": {
+      "exit": 7,
+      "output": "EBUSY"
+    },
+    "sharedRead": {
+      "exit": 0,
+      "output": "OPEN"
+    },
+    "sharedWrite": {
+      "exit": 7,
+      "output": "EBUSY"
+    },
+    "deleteDenied": true,
+    "rawBytes": 14,
+    "rawBase64": "AAoNQcOp5rC08J+YgP8=",
+    "mutationCalls": 0,
+    "scope": "Synthetic primitive probe only: not complete ACL/FileId/reparse/process-tree/collector/Gate proof"
+  }
+]

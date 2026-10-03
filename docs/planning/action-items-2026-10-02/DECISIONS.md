@@ -131,6 +131,14 @@ At a review limit, obtain one dated owner choice: `extend once by N days`, `acce
 
 No checkbox in the owner message is selected. A03-D1, protected-v2, A05, the A08 root protocol proposal now owned by A20, A13 and any eventual deadline extension remain pending. Prepare option L read-only; do not implement it without the owner decision. Prior retirements and issue closures stand. Validation of these planning corrections belongs in REVIEW and the plan verifier; this decision does not claim product completion.
 
+## D08: Owner decisions and revised preparation direction, 2026-10-03
+
+The human answered the six numbered blocks in the active chat. Items 1, 3, 4 and 5 each say, "I approve your recommendation." This selects A03 option P with its stated procedural limits; authorizes the separate two-CLAUDE attribution/resume repair with existing defaults preserved; authorizes the two YAML immutable-event-acquisition guide patches; and authorizes the exact A12 PS ruleset with bounded restoration and ordinary-PR validation replacing a direct-push drill. These are current scoped grants; D07's earlier empty checkboxes remain historical evidence, not current holds. No owner-label gate or fourth required check is selected.
+
+For item 2, the owner instructs validation and a proposal only if something is actually needed from them, and says to use a clear decision-process winner. For item 6, the owner requires the full process through at least proposal preparation and again directs use of a clear winner. Complete the current A20 capacity/bootstrap/protocol integration decision and A15 requirement/design decisions, including UX-director and QA perspectives, before implementation. Select and implement a clear winner inside the described scope without returning routine technical choices to the owner. These directions do not constitute the later real operator/independent-peer Gate A/B approvals on implemented immutable Terraform results, nor authorize a live recovery operation.
+
+Keep existing counters, deadlines, source/peer order and one-writer ownership. The prior incomplete ASD-STE100 verification is corrected in the current process; do not label an earlier record fully compliant retroactively. Record implementation and remaining evidence in existing task results rather than creating a separate approval ledger.
+
 ## References and validation
 
 - [Official model selection guidance](https://developers.openai.com/api/docs/guides/model-selection): use the lightest setting that meets the quality bar. The runtime catalog remains the availability source.

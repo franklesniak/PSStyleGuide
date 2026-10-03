@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD013 -->
 # A03 read-only preparation
 
+Current disposition,2026-10-03: D08 selects P for D1. D2 option R90 and D3 option C96 remain selected. Their options, distinct rubrics and score tables below precede implementation. PS main425795b contains accepted A02/A07/A21 foundations; A13 has installed the ordinary three-check ruleset24419725. P remains a procedural boundary. The dated native48f4d8a assessment and unselected L design below are history.
+
+Current implementation detail under D3 C: put only `artifactVerifier` in a closed `roles` object, accepting the two existing IDs `verify_generated_artifacts` and `verify`. Keep publisher and step names common. Use common StyleGuide result/contract/case schema names; all tracked callers inspected in both repositories consume the CLI result status rather than a repository-specific prefix. Exercise both role values with the same mutation catalog. Only the accepted checkout supplies this contract. UX reviewers need unchanged required-check names and clear deletion-event behavior; QA needs both role configurations, rejected extra roles and expressions, unchanged privilege negatives, and live PR routing. These checks strengthen D2 correctness/security and D3 compatibility without increasing churn weight. Native current-input review remains separate from local fixture success.
+
 This is a scoped design, not A03 acceptance. A00/A01 are accepted. A02 implementation is still a predecessor. No product file, native object, review request, or setting was changed. Requested worker route: `gpt-6-astra/high`; effective settings are not exposed. Transfers: 0/12. No PR clock has started.
 
 Use [native-evidence.json](native-evidence.json) for the read time, both authenticated native main commits/trees, effective rules, and 26 exact source blobs/modes. PS remains `48f4d8a36c8faceee12afac78aaecea0d176125d`; TF remains `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c`. Source inspection used these Git objects, not working-tree differences. No product test suite was run for this preparation.

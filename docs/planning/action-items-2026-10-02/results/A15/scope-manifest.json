@@ -1,5 +1,5 @@
 {
-  "status": "Frozen design proposal only; no scope amendment or operational approval. Must refresh after foundation acceptance.",
+  "status": "Selected design under owner direction D08; clear winners authorized for implementation. No Gate A/B operational approval. Refresh after foundation acceptance.",
   "TFBase": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
   "TFBaseTree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
   "GateA": {
@@ -69,7 +69,7 @@
         ".github/workflows/markdownlint.yml",
         ".github/workflows/workflow-policy-contract.json"
       ],
-      "contract": "Same-revision Linux/T2 plus Windows5.1/7 gate before read-only publication; native build-graph recommendation awaits D2/topology authority. Do not change action allowlist/contract merely for a new job if unchanged. Alternative reusable topology requires same canonical D2 revision."
+      "contract": "Same-revision Linux/T2 plus Windows5.1/7 gate before read-only publication; D2 selects the native build graph under D08. Do not change action allowlist/contract merely for a new job if unchanged. Alternative reusable topology requires same canonical D2 revision."
     },
     "A06": {
       "requiredIntegrationPaths": [
