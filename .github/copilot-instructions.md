@@ -5,6 +5,15 @@ This repository uses two different documentation targets:
 - `STYLE_GUIDE.md` contains actionable, normative rules and examples intended for LLM-based coding agents and for direct operational guidance.
 - `STYLE_GUIDE_RATIONALE.md` contains explanatory content, rationale, additional context, design discussion, and human-oriented background material. It is an internal development file, not a consumer-facing artifact.
 
+The following root files are generated artifacts. Do not edit them by hand:
+
+- `copilot-instructions.md` — generated from `STYLE_GUIDE.md`; distinct from this repository guidance file, `.github/copilot-instructions.md`.
+- `powershell.instructions.md` — generated from `STYLE_GUIDE.md` with YAML front matter.
+- `STYLE_GUIDE_CHAT.md` — generated from `STYLE_GUIDE.md` inside a code fence.
+- `STYLE_GUIDE_FULL.md` — generated from `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`.
+
+After either source changes, run `.github/workflows/Generate-StyleGuideArtifacts.ps1`. Review the generated changes. Commit all changed outputs with the source changes in the same pull request. CI checks generated-file drift and uploads the committed outputs. CI does not commit regenerated files. See [contributor guidance](../CONTRIBUTING.md#regenerate-and-publish-the-style-guide-artifacts).
+
 When making changes:
 
 1. Put normative rules, requirements, prohibitions, and concise compliant/non-compliant examples in `STYLE_GUIDE.md`.
