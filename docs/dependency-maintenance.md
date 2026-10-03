@@ -4,7 +4,7 @@
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-10-01
+- **Last Updated:** 2026-10-03
 - **Scope:** Locked npm tools, the local Markdown hook, and current dependency-risk checks in PSStyleGuide.
 
 Setup and audit require the exact Node and bundled npm versions declared in the root [package.json](../package.json). If either version differs, install or select that Node distribution before retrying. Check `node --version` and `npm --version`. From the repository root, run:
@@ -14,7 +14,7 @@ node .github/workflows/NpmTools.mjs install
 node .github/workflows/Check-NpmAudit.mjs
 ```
 
-The first command installs both locked package trees with dependency lifecycle scripts disabled. It then runs the existing Husky installer explicitly. CI, `HUSKY=0` and production mode retain their hook-installation suppression. A normal contributor clone gets the staged Markdown hook. The hook needs Node 22 or later; use the declared development runtime for reproducible installation and validation.
+The first command installs both locked package trees with dependency lifecycle scripts disabled. It then runs the existing Husky installer explicitly. CI, `HUSKY=0` and production mode retain their hook-installation suppression. A normal contributor clone gets the staged Markdown hook. The staged hook requires the exact Node version declared in the root package; use that development runtime for reproducible installation and validation.
 
 The Node entry removes inherited npm configuration before invoking npm. It uses separate empty user/global configuration files and the public registry, and rejects repository `.npmrc` or shrinkwrap selectors. The existing `npm run bootstrap:agent-instructions` name remains a convenience alias. That outer npm process has already read configuration, so use the direct Node command when configuration isolation is required. No persistent npm setting is changed.
 
@@ -37,4 +37,10 @@ The current [exception record](../.github/workflows/npm-risk-exceptions.json) is
 
 If a compatible repair is unavailable, prepare one scoped proposal with package root/name, advisory identifiers, node/version bounds, owner, reason, controls and UTC expiry. Existing approved bounds may cover fewer findings, but cannot cover a new advisory, node, version or package root. An unused expired record does not block a clean tree. A candidate cannot approve itself, and expiry never renews itself. New or expanded risk needs an authenticated owner decision and the existing independent review. The current implementation does not provide an exceptional merge route around a failing proposal check; resolve its actual required-check behavior before attempting such an admission. Do not bypass the ordinary check or invent a clean result.
 
-CLI 0.23.3 declares Markdown 15.0.1, which falls within the publisher's [smartquotes advisory](https://github.com/markdown-it/markdown-it/security/advisories/GHSA-r7fv-28h4-cvq7). The manifests override only that parent's Markdown dependency to patched 15.0.2. Direct parser consumers stay on patched 14.3.2. Remove the scoped override when a reviewed CLI update supplies a patched parser itself. This substitution repairs the dependency; it is not an accepted-risk exception.
+Markdown lint uses the `markdownlint` library for full outer files, exact staged contents and nested snippets. All use the workflow rules file. The root lint commands delegate to the workflow package. The full outer caller runs the existing `--outer` child with a two-minute deadline and a two-MiB output limit. The direct instruction parser and nested extraction stay on patched `markdown-it` 14.3.2. The CLI dependency chains and scoped parser override are removed; no risk exception replaces them.
+
+Run `npm run lint:md`, `npm run lint:md:nested`, and `node --test .github/workflows/lint-markdown.test.mjs` after a lint-tool change. The staged hook checks the index, including nested snippets, even when the worktree differs. Full-file lint discovers hidden `.md`/`.mdc` paths, excludes dependency directories, and validates regular in-repository inputs before the API. An empty discovered set succeeds explicitly. A path whose resolved target escapes the repository or whose leaf is a symlink is a tooling failure.
+
+The supported rules input is `.github/workflows/.markdownlint.jsonc`, with `.markdownlint.json` in that directory as a fallback. JSONC comments are supported. Put rule changes in that file. Alternate or per-directory repository configuration files, CLI2 option files, ignore files and `extends` are refused rather than silently skipped or merged. The API receives explicit parsed rules and named contents; ambient `markdownlint_` environment settings and home/system/ancestor rc selectors are not loaded. Literal filenames are data, including option-shaped or glob-metacharacter names. Introduced patterns cannot enter the removed braces expansion path. This does not provide atomic confinement against a competing filesystem writer.
+
+Lint wrappers return 0 for success, 1 for actual lint findings and 2 for missing tools, invalid inputs or other tooling failures. A full-file child failure reports its native status before normalization; timeout, output-limit and launch failures retain their cause. Correct the reported cause; do not replace an applicable failed check with a different input.

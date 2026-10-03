@@ -4979,7 +4979,7 @@ function Get-InitialDocumentMetadataClassificationFailure {
         [Parameter(Mandatory)][pscustomobject] $CandidateContext
     )
 
-    if ($BaselineRevision -cne '48f4d8a36c8faceee12afac78aaecea0d176125d' -or
+    if ($BaselineRevision -cne 'a71f16a8d76beeca1ba8fdc3b1c95e1958e0973c' -or
         $TrustedBaselineValidatorSha256 -cne
         '5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5') {
         Write-Output 'The manifest-absent classification baseline is not the supported exact initialization.'

@@ -298,13 +298,14 @@ function Assert-DocumentMetadataClassificationSelfTest {
     $strInitialMapping = $hashtableInitialMapping | ConvertTo-Json -Depth 5
     $objInitialMapping = Get-DocumentMetadataClassificationContext -Content $strInitialMapping `
         -TrackedPath @($arrInitialTier2 + $arrInitialGenerated + @('docs/extra.md'))
-    $strInitialBase = '48f4d8a36c8faceee12afac78aaecea0d176125d'
+    $strInitialBase = 'a71f16a8d76beeca1ba8fdc3b1c95e1958e0973c'
     $strInitialValidatorSha = '5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5'
     if (@(Get-InitialDocumentMetadataClassificationFailure -BaselineRevision $strInitialBase `
                 -TrustedBaselineValidatorSha256 $strInitialValidatorSha -CandidateContext $objInitialMapping).Count -ne 0) {
         throw 'The parsed closed initial mapping with harmless formatting was rejected.'
     }
     foreach ($objInitialNegative in @(
+            @{ Base = '48f4d8a36c8faceee12afac78aaecea0d176125d'; Sha = $strInitialValidatorSha; Context = $objInitialMapping },
             @{ Base = ('0' * 40); Sha = $strInitialValidatorSha; Context = $objInitialMapping },
             @{ Base = $strInitialBase; Sha = ('0' * 64); Context = $objInitialMapping })) {
         if (@(Get-InitialDocumentMetadataClassificationFailure -BaselineRevision $objInitialNegative.Base `
