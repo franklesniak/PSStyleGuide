@@ -193,7 +193,7 @@ jobs:
               $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'
               if ($LASTEXITCODE -ne 0 -or $strFetched -cne $env:EXPECTED_PUSH_BASE) { throw 'Push baseline commit mismatch.' }
               & ./.github/workflows/Test-AgentInstructions.ps1 -ProposedPolicy -InputRevision $env:EXPECTED_PUSH_HEAD -PublishedBaselineRevision $env:EXPECTED_PUSH_BASE
-              if ($LASTEXITCODE -ne 0) { throw 'Proposed push transition checks failed.' }
+              if (-not $?) { throw 'Proposed push transition checks failed.' }
           }
           & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs
           if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }

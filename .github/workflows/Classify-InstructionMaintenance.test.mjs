@@ -21,7 +21,19 @@ test('push transition caller binds event endpoints and preserves proposed-code p
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'instruction-push-caller-'));
   try {
     const script = path.join(root, 'caller.ps1'), log = path.join(root, 'calls.jsonl');
-    // Execute the real run block; only its native/test dependencies are stubbed.
+    // Keep direct checker calls intact so PowerShell script completion is real.
+    const checker = path.join(root, '.github/workflows/Test-AgentInstructions.ps1');
+    fs.mkdirSync(path.dirname(checker), { recursive: true });
+    fs.writeFileSync(checker, `
+if ($args -contains '-ProposedPolicy' -and $env:GIT_NO_REPLACE_OBJECTS -ne '1') { throw 'Replacement objects were not disabled.' }
+[IO.File]::AppendAllText($env:FIXTURE_LOG, (@('checker') + @($args) | ConvertTo-Json -Compress -AsArray) + "\n")
+if ($args -contains '-ProposedPolicy') {
+  if ($env:FIXTURE_MODE -eq 'check-failure') { throw 'Rejected transition.' }
+  if ($env:FIXTURE_MODE -eq 'check-exit') { exit 9 }
+  & pwsh -NoProfile -NonInteractive -Command 'exit 37'
+  Write-Output 'Transition passed despite an internal native nonzero status.'
+}
+`);
     const prefix = `
 function Invoke-FixtureGit {
   [IO.File]::AppendAllText($env:FIXTURE_LOG, (@($args) | ConvertTo-Json -Compress -AsArray) + "\n")
@@ -32,17 +44,15 @@ function Invoke-FixtureGit {
     if ($env:FIXTURE_MODE -eq 'wrong-identity') { 'c' * 40 } else { $env:EXPECTED_PUSH_BASE }
   }
 }
-function Invoke-FixtureChecker {
-  if ($args -contains '-ProposedPolicy' -and $env:GIT_NO_REPLACE_OBJECTS -ne '1') { throw 'Replacement objects were not disabled.' }
-  [IO.File]::AppendAllText($env:FIXTURE_LOG, (@('checker') + @($args) | ConvertTo-Json -Compress -AsArray) + "\n")
-  $global:LASTEXITCODE = if ($args -contains '-ProposedPolicy' -and $env:FIXTURE_MODE -eq 'check-failure') { 9 } else { 0 }
+function Invoke-FixtureTests {
+  [IO.File]::AppendAllText($env:FIXTURE_LOG, (@('node') + @($args) | ConvertTo-Json -Compress -AsArray) + "\n")
+  if ($env:FIXTURE_MODE -eq 'node-failure') { & pwsh -NoProfile -NonInteractive -Command 'exit 7' }
+  else { & pwsh -NoProfile -NonInteractive -Command 'exit 0' }
 }
-function Invoke-FixtureTests { $global:LASTEXITCODE = 0 }
 function Start-Sleep {}
 `;
     fs.writeFileSync(script, prefix + step.run
       .replaceAll('/usr/bin/git', 'Invoke-FixtureGit')
-      .replaceAll('./.github/workflows/Test-AgentInstructions.ps1', 'Invoke-FixtureChecker')
       .replaceAll('& node --test', '& Invoke-FixtureTests --test'));
     for (const item of [
       { name: 'push', event: 'push', pass: true, calls: 1 },
@@ -56,19 +66,28 @@ function Start-Sleep {}
       { name: 'unavailable B', mode: 'fetch-failure', pass: false, fetches: 3 },
       { name: 'wrong fetched B', mode: 'wrong-identity', pass: false },
       { name: 'native identity failure', mode: 'identity-failure', pass: false },
-      { name: 'rejected transition', mode: 'check-failure', pass: false },
+      { name: 'rejected transition', mode: 'check-failure', pass: false, diagnostic: /Rejected transition/ },
+      { name: 'explicit checker exit', mode: 'check-exit', pass: false, diagnostic: /Proposed push transition checks failed/ },
+      { name: 'subsequent Node failure', mode: 'node-failure', pass: false, node: true,
+        diagnostic: /Workflow behavior tests failed/ },
     ]) {
       fs.writeFileSync(log, '');
       const result = spawnSync('pwsh', ['-NoProfile', '-NonInteractive', '-File', script], {
-        encoding: 'utf8', timeout: 30000, windowsHide: true,
+        cwd: root, encoding: 'utf8', timeout: 30000, windowsHide: true,
         env: { ...process.env, FIXTURE_LOG: log, FIXTURE_MODE: item.mode ?? '',
           GITHUB_EVENT_NAME: item.event ?? 'push', GITHUB_SHA: head,
           EXPECTED_PUSH_BASE: item.before ?? base, EXPECTED_PUSH_HEAD: item.after ?? head },
       });
       assert.equal(result.status === 0, item.pass, `${item.name}: ${result.stderr}`);
+      if (item.diagnostic) assert.match(result.stderr, item.diagnostic, item.name);
       const rows = fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
       const proposed = rows.filter(row => row.includes('-ProposedPolicy'));
+      assert.equal(rows.filter(row => row[0] === 'node').length, item.pass || item.node ? 1 : 0,
+        `${item.name}: subsequent Node reach`);
       if (item.calls !== undefined) assert.equal(proposed.length, item.calls, item.name);
+      if (proposed.length && (item.pass || item.node)) {
+        assert.match(result.stdout, /Transition passed despite an internal native nonzero status/);
+      }
       for (const row of proposed) {
         assert.deepEqual(row, ['checker', '-ProposedPolicy', '-InputRevision', head,
           '-PublishedBaselineRevision', base]);
