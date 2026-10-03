@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # A02 preparation and proposed changes
 
-**Current checkpoint:** Product9652b46 is published with all final local checks and independent quality passed. Current native CI and fresh reviews remain pending. Owner-directed planning corrections are published in e60425f9d7cf0799abeb806dd53c2afe939fd304; all22 outcomes/402 contracts remain intact.
+**Current checkpoint:** Product9652b46 is published with all final local checks and independent quality passed. Native candidate CI and dependency audit failed; repairs and assessment are active before fresh reviews. Owner-directed planning corrections are published in e60425f9d7cf0799abeb806dd53c2afe939fd304; all22 outcomes/402 contracts remain intact.
 
 Round3 is terminal on f81f769: Copilot review5393527247 explicitly reports Balanced and no findings; Codex review5393521315/comment4167109675 identified optional-header coverage F5. The [canonical decision and final validation](review-F5-decision.md) implement the two-file repair, including malformed intent before the title and ordinary title-only negatives. Two intermediate runs were interrupted for actual detector corrections and are not accepted results.
 
@@ -53,7 +53,11 @@ Native fixture repair freeze, 2026-10-03: Linux reproduction proves100755/120000
 
 Final candidate `9652b46e9442d1fb375277f9a106b2c432877a98`, tree `855b1f44ffeaeee8dedd6825244778f60067e373`, includes the fixture-only correction to the prior F13-F15 repair61f1bec. The exact admission function passes on Windows/Linux with all three modes and both provenance rejection calls retained. One normal replacement aggregate85955 passed all ten hooks at2026-10-03T01:52:06.7758152Z; normal commit completed without bypass. Actual proposed-code B48f/H965 finalization (UTC2026-10-03), classification and full ProposedPolicy checks passed in root76260, ending01:56:36.923231Z. Static Error checks and Warning-only PSScriptAnalyzer1.24.0 checks cover both changed PowerShell files with zero findings at the recorded severities. [Independent whole-PR local quality](F13-F15-quality.md) reconciles the actual commit and final evidence. Normal non-force push and authenticated PR readback confirm965/base48f. New candidate CI, reviews and immediate native gates remain pending; predecessor61f native CI failure is retained as historical evidence.
 
-The bounded replies and resolutions for F13/F14/F15, complete current-input baselines and round9 pair are next. Round8/80, the original October10 deadline and transfers0/12 remain; no merge or A07/A21 release.
+Native965 checkpoint: candidate run37088281932 completed with failure at2026-10-03T02:08:33Z. SelfTest1494 expected a proposed-transition mode-boundary diagnostic but received the accepted-baseline checkout refusal from validator6849. The earlier mode-checkout repair passed this point; this is a distinct fixture/environment investigation. A00 owns only SelfTest and scratch, with focused Windows/Linux reproduction before any scoped correction. No new aggregate or candidate is accepted.
+
+Markdown run37088281916 also failed its current locked-dependency audit. Both package roots report HIGH braces3.0.3 advisory GHSA-vfj7-8cjw-p6xm (CVE-2026-93687); the current exception record is empty. [The upstream advisory](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm) lists no patched version. A07's prior CLEAN observations remain historical; they do not establish current acceptance. Read-only caller, graph and remedy assessment is active under A07 ownership. No exception, retry or audit weakening is authorized or applied by this checkpoint.
+
+Resolve these native failures before the bounded F13/F14/F15 replies, complete current-input baselines and round9 pair. Round8/80, the original October10 deadline and transfers0/12 remain; no merge or A07/A21 release.
 
 ## Inputs and coverage
 
