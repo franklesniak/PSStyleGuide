@@ -1,0 +1,21 @@
+<!-- markdownlint-disable MD013 -->
+# F13 landed completion repair handoff
+
+Selected S96 is implemented in exactly the two released paths. The direct ProposedPolicy checker is immediately guarded by PowerShell `$?`; native Git acquisition and later Node status checks remain unchanged. The caller regression executes an actual checker.ps1 at the unchanged relative path: native37 followed by successful script completion reaches Node, a real throw or explicit exit9 stops before Node, and native Node7 is rejected after Node is reached. All prior endpoint/provenance/fetch cases remain.
+
+Frozen candidate tree: `f5a83173a667d0d08225ec0cd391cedb4e659a77`. Full73-entry raw/blob/mode inventory is `repair-final-freeze.json`, SHA256 `b0fa83bcc1c6e5bf10de06eb371431b1aa1044a7624f344ef3d73aaba9044acd`. Product HEAD remains `3ba0f4d9686af41ae0e77c65ea374fff9d1cef53`; product index remains tree `ea7e8d7da19cc80b4ec727d5a9c3dfd0e599f9b3`, with no staged/untracked paths and exactly the two expected unstaged files. Candidate index/objects are scratch-only. All71 other paths match the accepted HEAD blobs.
+
+| Final path | SHA256 | Git blob |
+| --- | --- | --- |
+| `.github/workflows/agent-instructions.yml` | `ee0595c59dd9601e0a6296b295969842faa5d4db35b2ba20fffa2d5273e915d7` | `bd559e5e9b7015d83f45f705a4e7862dc2dc11d5` |
+| `.github/workflows/Classify-InstructionMaintenance.test.mjs` | `44080988676f921d472569bdde743edc25c2b66acd50565f9ff51f3edeb28acc` | `e05a22e85727e64cf491b1bd009fd943029dd770` |
+
+Normal pinned NpmTools install exited0 (`repair-setup.log`). Windows Node24.18.1/PowerShell7.6.5 and isolated Linux Node24.18.1/npm11.16.0/PowerShell7.5.0 each passed all9 classification/caller tests. The push-caller test contains14 scenarios. On both platforms the old-check mutation exits1 at the positive native37 case; deleted-check exits1 because explicit checker exit9 incorrectly reaches Node and succeeds. `windows-final/results.json` and `linux-final/results.json` retain exact commands/times/native exits; associated final/mutation logs retain actual diagnostics. Their driver sessions46654 and7499 are terminal0.
+
+Affected Node syntax, diff, YAML syntax/style, actionlint, workflow schema, EOF and whitespace hooks passed normally without bypass or hook modifications (`static-results.json`). A final indentation-only correction restores14 spaces around the guard. Both parsed YAML objects differ only in that run-block whitespace; ordered trimmed run lines and complete PowerShell token sequences are identical, both ASTs have0 errors (`check-format.mjs/.ps1`, `tested-run.ps1`, `final-run.ps1`). Final-byte YAML syntax/style/actionlint/schema and diff checks passed again (`format-static/static-results.json`). No functional behavior was changed after the Windows/Linux passes.
+
+Linux container `07951f3482f542665913896b5ed99a8f396a920ce1a332c917701afcb76497b4`, image `sha256:2540dd9d184baa1f2bae22b0572200342a54d1d0bd7ab0dbdb326c36cee5bcdb`, had zero host mounts. Source was copied from tracked raw bytes only; normal setup occurred privately. Exact owned container stop/remove both exited0 and subsequent exact-ID listing was empty. The first Linux driver exited1 before setup/tests because its version-print expression was expanded by the shell; the failed `linux-driver.log` is preserved, and `linux-driver-corrected.log` records the corrected successful invocation. No product repair was required for that tooling error.
+
+Limits: bounded caller fixtures stub native Git acquisition and later Node execution, while the checker itself is a real minimal script; they do not execute the full validator/SelfTest. Previously completed real a71/3ba success and old48 rejection evidence is reused unchanged. The original landed hosted failure remains preserved; no hosted rerun, aggregate, endpoint gate, commit, PR or review was triggered. Root owns the required single normal full aggregate and eventual actual committed-head/public checks. Original round9/80, Oct10 deadline and transfer0/12 remain unchanged.
+
+All live handles are terminal. Sole product/index writer ownership is explicitly released to the coordinator; this worker will make no further product edits or tests without assignment.
