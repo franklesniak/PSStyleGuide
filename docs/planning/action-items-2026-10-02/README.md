@@ -60,7 +60,7 @@ Read-only discovery for independent future tasks may run ahead. An implementatio
 ## Evidence and review
 
 - [ISSUE-COVERAGE.md](ISSUE-COVERAGE.md): all five current open issues, their acceptance owners and improvements.
-- [PATH-INVENTORY.md](PATH-INVENTORY.md): all 81 current native-main paths and owners.
+- [PATH-INVENTORY.md](PATH-INVENTORY.md): current 83-path native-main inventory and owners, with the historical 81-path baseline retained.
 - [HISTORICAL-MAP.md](HISTORICAL-MAP.md): all 402 original IDs and the 26 historical credits.
 - [DECISIONS.md](DECISIONS.md): options, finding-specific weights, scores and selected plan design.
 - [VALIDATION.md](VALIDATION.md): checks performed on this plan and their limits.

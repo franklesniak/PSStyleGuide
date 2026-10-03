@@ -1,6 +1,17 @@
 <!-- markdownlint-disable MD013 -->
 # Full native-main path inventory
 
+## Current refresh: 2026-10-03
+
+PS main `a71f16a8d76beeca1ba8fdc3b1c95e1958e0973c` has 72 paths; TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` has 75. The complete union is **83 paths = 9 equal + 55 different + 8 PS-only + 11 TF-only**. [Dated raw entries and current owners](results/A01/native-tree-union-20261003.json) cover every path, including the two additions below. The ten changed PS paths match merged PR225. [A01 acceptance](results/A01/CURRENT-REFRESH-20261003.md) records independent verification and bounded reuse of issue, historical absence and conditional-risk evidence. PR224 retains its eleven in-flight paths until merge.
+
+| Added path | Raw status | Outcome owner | Exception |
+| --- | --- | --- | --- |
+| `.github/workflows/lint-markdown.mjs` | PS-only | A07 | none approved |
+| `.github/workflows/lint-markdown.test.mjs` | PS-only | A07 | none approved |
+
+## Historical 81-path baseline and post-PR224 ownership
+
 PS `48f4d8a36c8faceee12afac78aaecea0d176125d`: 70 entries. TF `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c`: 75 entries. Union: **81 paths = 9 equal + 55 different + 6 PS-only + 11 TF-only**. Complete raw blob IDs/modes are in [tree-union.json](evidence/tree-union.json); every path has an owner in [path-ownership.json](evidence/path-ownership.json). No product equality is claimed by this plan.
 
 This snapshot uses native main Git objects, not the planning checkout. The planning branch and its task files are not part of the main/main product comparison and must never be merged into main. At execution, rebuild the union; do not use this list as an exclusion filter. The known counterpart mappings are powershell.instructions.md â†” terraform.instructions.md and the P1/T1 supply documents. A counterpart mapping is not an exemption.

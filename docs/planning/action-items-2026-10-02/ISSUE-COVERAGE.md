@@ -1,7 +1,9 @@
 <!-- markdownlint-disable MD013 -->
 # Open issue coverage and plan improvements
 
-Authenticated live inventory during this planning review: **four PS issues, one TF issue, zero open PRs**. Full bodies and update times are preserved in [PS snapshot](evidence/PSStyleGuide-open-issues.json) and [TF snapshot](evidence/TerraformStyleGuide-open-issues.json). These are dated observations; A01 and A19 refresh the complete census and discussions. New issues require explicit task ownership.
+Current authenticated refresh at **2026-10-03T05:01:25.951515Z**: the same four PS issues and one TF issue remain open; all five bodies/titles and six prior comments are unchanged. There are now seven comments. The sole addition, [PS152 assessment comment](https://github.com/franklesniak/PSStyleGuide/issues/152#issuecomment-5946563885), reports the pending A12/A13 proposal and adds no requirement or settings authority. PR224 is the only open PR across the two repositories; PR225 is merged. See [A01 current evidence](results/A01/CURRENT-REFRESH-20261003.md). The task assignments below remain applicable.
+
+Historical inventory during the initial planning review: **four PS issues, one TF issue, zero open PRs**. Full bodies and update times are preserved in [PS snapshot](evidence/PSStyleGuide-open-issues.json) and [TF snapshot](evidence/TerraformStyleGuide-open-issues.json). These are dated observations; A01 and A19 refresh the complete census and discussions. New issues require explicit task ownership.
 
 | Issue | Current requirement | Owners | Disposition required |
 | --- | --- | --- | --- |

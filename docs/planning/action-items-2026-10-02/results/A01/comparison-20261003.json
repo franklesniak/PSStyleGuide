@@ -1,0 +1,300 @@
+{
+  "historical_counts": {
+    "PS": 70,
+    "TF": 75,
+    "union": 81,
+    "equal": 9,
+    "different": 55,
+    "PS-only": 6,
+    "TF-only": 11
+  },
+  "current_counts": {
+    "PS": 72,
+    "TF": 75,
+    "union": 83,
+    "different": 55,
+    "equal": 9,
+    "TF-only": 11,
+    "PS-only": 8
+  },
+  "added_union_paths": [
+    ".github/workflows/lint-markdown.mjs",
+    ".github/workflows/lint-markdown.test.mjs"
+  ],
+  "removed_union_paths": [],
+  "changed_paths": [
+    ".github/workflows/lint-markdown.mjs",
+    ".github/workflows/lint-markdown.test.mjs",
+    ".github/workflows/lint-nested-markdown.js",
+    ".github/workflows/lint-staged-markdown.mjs",
+    ".github/workflows/package-lock.json",
+    ".github/workflows/package.json",
+    ".github/workflows/scripts-README.md",
+    "docs/dependency-maintenance.md",
+    "package-lock.json",
+    "package.json"
+  ],
+  "issues": [
+    {
+      "repository": "PS",
+      "number": 213,
+      "body_unchanged": true,
+      "title_unchanged": true,
+      "old_comment_count": 0,
+      "current_comment_count": 0,
+      "added_comment_ids": [],
+      "removed_comment_ids": [],
+      "changed_comment_bodies": []
+    },
+    {
+      "repository": "PS",
+      "number": 175,
+      "body_unchanged": true,
+      "title_unchanged": true,
+      "old_comment_count": 0,
+      "current_comment_count": 0,
+      "added_comment_ids": [],
+      "removed_comment_ids": [],
+      "changed_comment_bodies": []
+    },
+    {
+      "repository": "PS",
+      "number": 155,
+      "body_unchanged": true,
+      "title_unchanged": true,
+      "old_comment_count": 4,
+      "current_comment_count": 4,
+      "added_comment_ids": [],
+      "removed_comment_ids": [],
+      "changed_comment_bodies": []
+    },
+    {
+      "repository": "PS",
+      "number": 152,
+      "body_unchanged": true,
+      "title_unchanged": true,
+      "old_comment_count": 2,
+      "current_comment_count": 3,
+      "added_comment_ids": [
+        5946563885
+      ],
+      "removed_comment_ids": [],
+      "changed_comment_bodies": []
+    },
+    {
+      "repository": "TF",
+      "number": 25,
+      "body_unchanged": true,
+      "title_unchanged": true,
+      "old_comment_count": 0,
+      "current_comment_count": 0,
+      "added_comment_ids": [],
+      "removed_comment_ids": [],
+      "changed_comment_bodies": []
+    }
+  ],
+  "absent_both_reuse": {
+    "source": "results/A01/absent-path-coverage.json",
+    "product_path_count": 26,
+    "all_remain_absent": true,
+    "planning_only_reference_count": 4,
+    "live_issue_bodies_and_prior_comment_bodies_unchanged": true,
+    "new_comment_scope": "PS152 comment5946563885 repeats pending A12/A13 assessment; explicitly no settings changed, no owner grant. No added absent product requirement."
+  },
+  "pr225": {
+    "number": 225,
+    "state": "closed",
+    "merged": true,
+    "merged_at": "2026-10-03T04:18:11Z",
+    "merge_commit_sha": "a71f16a8d76beeca1ba8fdc3b1c95e1958e0973c",
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/225",
+    "title": "Remove vulnerable Markdown CLI chains while preserving lint checks"
+  },
+  "open_prs": [
+    {
+      "number": 224,
+      "title": "Validate document classification, metadata placement, and finalization",
+      "url": "https://github.com/franklesniak/PSStyleGuide/pull/224",
+      "head": "56b1e6ba930d1c4ddde981e3003437e0b099f69f",
+      "api_base_sha": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "base_ref": "main"
+    }
+  ],
+  "literal_path_overlap_224_225": [],
+  "ownership_updates_from_historical_snapshot": [
+    {
+      "path": ".codex/config.toml",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18"
+    },
+    {
+      "path": ".gitattributes",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18"
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A20",
+      "current_owner_label": "A20"
+    },
+    {
+      "path": ".github/document-metadata-classification.json",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A21",
+      "current_owner_label": "A21"
+    },
+    {
+      "path": ".github/instructions/docs.instructions.md",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18"
+    },
+    {
+      "path": ".github/instructions/yaml.instructions.md",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A05",
+      "current_owner_label": "A05"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "historical_primary_owner": "A03",
+      "current_primary_owner": "A21",
+      "current_owner_label": "A21"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "historical_primary_owner": "A03",
+      "current_primary_owner": "A21",
+      "current_owner_label": "A21"
+    },
+    {
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "historical_primary_owner": "A07",
+      "current_primary_owner": "A04",
+      "current_owner_label": "A04 / A07"
+    },
+    {
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A07",
+      "current_owner_label": "A07"
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A07",
+      "current_owner_label": "A07"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "historical_primary_owner": "A06",
+      "current_primary_owner": "A21",
+      "current_owner_label": "A21"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "historical_primary_owner": "A06",
+      "current_primary_owner": "A21",
+      "current_owner_label": "A21"
+    },
+    {
+      "path": ".github/workflows/Test-BlankLineExamples.ps1",
+      "historical_primary_owner": "A10",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18 / A16–A17"
+    },
+    {
+      "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+      "historical_primary_owner": "A11",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18 / A15–A17"
+    },
+    {
+      "path": ".github/workflows/ci-toolchain.json",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A07",
+      "current_owner_label": "A07"
+    },
+    {
+      "path": ".github/workflows/npm-risk-exceptions.json",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A07",
+      "current_owner_label": "A07"
+    },
+    {
+      "path": ".vscode/settings.json",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18"
+    },
+    {
+      "path": "ACKNOWLEDGMENTS.md",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18"
+    },
+    {
+      "path": "AGENTS.md",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A20",
+      "current_owner_label": "A20"
+    },
+    {
+      "path": "CLAUDE.md",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A20",
+      "current_owner_label": "A20"
+    },
+    {
+      "path": "LICENSE",
+      "historical_primary_owner": "A02",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18"
+    },
+    {
+      "path": "STYLE_GUIDE.md",
+      "historical_primary_owner": "A10",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18 / A16–A17"
+    },
+    {
+      "path": "STYLE_GUIDE_CHAT.md",
+      "historical_primary_owner": "A10",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18 / A16–A17"
+    },
+    {
+      "path": "STYLE_GUIDE_FULL.md",
+      "historical_primary_owner": "A10",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18 / A16–A17"
+    },
+    {
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "historical_primary_owner": "A10",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18 / A16–A17"
+    },
+    {
+      "path": "copilot-instructions.md",
+      "historical_primary_owner": "A10",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18 / A16–A17"
+    },
+    {
+      "path": "powershell.instructions.md",
+      "historical_primary_owner": "A10",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18 / A16–A17"
+    },
+    {
+      "path": "terraform.instructions.md",
+      "historical_primary_owner": "A11",
+      "current_primary_owner": "A18",
+      "current_owner_label": "A18 / A15–A17"
+    }
+  ]
+}

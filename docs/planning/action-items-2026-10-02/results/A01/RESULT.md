@@ -1,6 +1,16 @@
 <!-- markdownlint-disable MD013 -->
 # A01 current issue and native tree inventory
 
+## Current refresh: 2026-10-03
+
+Accepted after PR225 merged: PS main `a71f16a8d76beeca1ba8fdc3b1c95e1958e0973c`, TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c`. The complete union is **83 paths: 9 equal, 55 different, 8 PS-only and 11 TF-only**. All paths have current owners; the two new lint helpers belong to A07. Five open issue bodies remain unchanged, with seven comments and no new requirement. PR224 is the only open PR; PR225 is merged.
+
+See the [dated refresh and coordinator acceptance](CURRENT-REFRESH-20261003.md), [complete raw tree and ownership](native-tree-union-20261003.json), [bounded comparison](comparison-20261003.json) and [final native readback](final-native-recheck-20261003.json). This refresh preserves the 26 absent-both dispositions and all 402 original contracts. It grants no protected/settings authority and is not final convergence acceptance.
+
+## Historical accepted snapshot: 2026-10-02
+
+The following 81-path snapshot and its original owner labels are retained as dated evidence; current ownership follows the refresh above and PATH-INVENTORY.
+
 Captured 2026-10-02 at 05:35:52 UTC from authenticated GitHub REST (`gh api --paginate --slurp`) and fetched `origin/main` Git objects. Full issue bodies and paginated issue comments are in [live-issues-and-open-prs.json](../A01/live-issues-and-open-prs.json). Complete tree entries with path, mode, type, blob ID and one primary owner are in [native-tree-union.json](native-tree-union.json). Comprehensive references to paths absent from both pinned product trees are in [absent-path-coverage.json](absent-path-coverage.json). Blob equality was checked against raw bytes and modes.
 
 ## Pinned product inputs
