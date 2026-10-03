@@ -5,6 +5,12 @@
 
 A07 depends only on A00/A01. Hold the staged batch until PR224 merges, then refresh inputs and integrate Invoke-MarkdownLint.ps1 and MARKDOWN-LINTING-IMPLEMENTATION.md. Validator/SelfTest/classifier work belongs to A21; no region-port instruction below remains executable. The actual current PS validator passed; missing future RequireStagedInputMatch is an explicit A21 interface gap, not an invented failure. A03 owns setup/admission closure integration. Transfers remain0/12; there is no A07 PR, review clock or native write pending. The worker retains sole checkout ownership. No independent final quality, peer delivery or complete outcome is claimed.
 
+## Urgent advisory repair selected before implementation
+
+The coordinator selects [K90](review-braces-decision.md) after [current investigation](braces-investigation.md): replace the full-file CLI with maintained markdownlint-cli0.49.1 and use the existing named-string API for staged inputs. All eleven scores and six immutable package/lock/audit/exception identities were checked. Static registry resolution found a compatible candidate closure without the affected chain; this is not installation, audit or runtime acceptance. A02 worker owns a separate clean current-main48f worktree for the released package, staged/nested, thin-wrapper/test and nonprotected documentation scope. No risk exception, audit weakening, held-path or protected edit is released. Reuse selected D07-3 staged/nested behavior in the isolated repair; leave unrelated Python/install/hook topology in the frozen batch.
+
+This changes the execution order for the urgent security subset, not A07 dependencies or completion: deliver its own ordinary source PR before admitting PR224. No PR, review clock or transfer has started. The original c68 worktree remains untouched. After acceptance, reconcile known overlapping files explicitly; the old fifteen-path patch cannot be replayed blindly as unchanged. A security-first merge changes224 B, so reassess its exact known-baseline initializer and refresh affected validation/reviews before admission. Remaining A07 held paths and paired acceptance still follow their real prerequisites.
+
 ## Historical read-only preparation
 
 The remainder records the October2 native comparison and selected decisions before this batch. D07's current ownership and lifecycle govern later integration.
