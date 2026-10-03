@@ -5,11 +5,25 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-08-30
-- **Scope:** Describes the maintainer-facing nested-Markdown lint script, its use, configuration, and output. It does not define repository-wide documentation policy.
+- **Last Updated:** 2026-10-03
+- **Scope:** Describes the maintainer-facing outer, staged and nested Markdown lint scripts, their use, configuration, and output. It does not define repository-wide documentation policy.
 - **Related:** [Nested Markdown Linting Implementation Summary](MARKDOWN-LINTING-IMPLEMENTATION.md), [Documentation Writing Style](../instructions/docs.instructions.md)
 
 This directory contains utility scripts for the repository.
+
+## Outer and staged Markdown
+
+The root `npm run lint:md` command delegates to the workflow package and runs [lint-markdown.mjs](lint-markdown.mjs). The helper runs the existing `--outer` child with a two-minute deadline and a two-MiB output limit. That child uses the `markdownlint` named-string API on validated literal inputs. It includes hidden `.md`/`.mdc` files and excludes `node_modules`, `.git` and `.venv` directories. An empty discovered set succeeds explicitly. It reports file, line, column, rule and detail for lint findings and preserves native tool failure evidence.
+
+[lint-staged-markdown.mjs](lint-staged-markdown.mjs) reads exact Git index contents. It checks outer rules through the shared library adapter, then checks recursive nested snippets. An invalid worktree does not change a clean staged input, and a clean worktree does not hide a staged error. The native hook definitions remain [.husky/pre-commit](../../.husky/pre-commit) and [.pre-commit-config.yaml](../../.pre-commit-config.yaml).
+
+Run the focused caller, configuration, path and hook controls with:
+
+```text
+node --test .github/workflows/lint-markdown.test.mjs
+```
+
+All wrappers return 0 for success, 1 for lint findings and 2 for tooling failure. Use the exact Node version in [package.json](../../package.json). Follow [dependency maintenance](../../docs/dependency-maintenance.md) for locked setup and audit checks.
 
 ## [lint-nested-markdown.js](lint-nested-markdown.js)
 
@@ -36,13 +50,16 @@ node .github/workflows/lint-nested-markdown.js
 3. **Recursively** identifies code fences with language identifier `markdown` or `md` at all nesting depths
 4. Runs markdownlint on each extracted block
 5. Reports any violations with context (source file, line number, nesting depth, parent path)
-6. Exits with error code 1 if any violations are found
+6. Returns 1 for violations, 2 for tooling failure, or 0 when the applicable checks pass
 
 ### Configuration
 
-The script uses the `.markdownlint.jsonc` (or `.markdownlint.json`) configuration file in the `.github/workflows` directory, with one modification:
+The script uses the `.markdownlint.jsonc` (or `.markdownlint.json`) configuration file in the `.github/workflows` directory, with two modifications:
 
 - **MD041** (first-line-heading) is disabled for nested markdown blocks, since code snippets may not start with a top-level heading
+- **MD051** (link-fragments) is disabled for nested snippets, since example anchors can exist outside them
+
+The shared config loader preserves JSONC comments and rejects malformed or missing rules. Alternate repository/CLI2 configs, ignore files and `extends` are explicitly refused. The API does not load ambient rc/environment selectors, so those inputs cannot override explicit rules. Put rule changes in the workflow rules file. See [dependency maintenance](../../docs/dependency-maintenance.md) for the exact supported boundary.
 
 ### Output Example
 

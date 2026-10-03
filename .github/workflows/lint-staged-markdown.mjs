@@ -1,21 +1,49 @@
 import { spawnSync } from 'node:child_process';
-import { dirname, resolve, sep } from 'node:path';
+import { readFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const requiredNodeMajor = 22;
-const currentNodeMajor = Number(process.versions.node.split('.')[0]);
+const workflowsDir = dirname(fileURLToPath(import.meta.url));
+const repoRoot = resolve(workflowsDir, '../..');
+const rootPackagePath = resolve(repoRoot, 'package.json');
+const exactSemanticVersionPattern = /^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/u;
+const exitStatus = Object.freeze({
+  success: 0,
+  lintFailure: 1,
+  toolingFailure: 2
+});
+const normalizeMarkdownlintExitCode = (value) =>
+  value === exitStatus.success || value === exitStatus.lintFailure
+    ? value
+    : exitStatus.toolingFailure;
 
-if (!Number.isInteger(currentNodeMajor) || currentNodeMajor < requiredNodeMajor) {
-  console.error('pre-commit: Node.js 22 or newer is required to lint staged Markdown.');
+let rootPackage;
+
+try {
+  rootPackage = JSON.parse(readFileSync(rootPackagePath, 'utf8'));
+} catch {
+  console.error('pre-commit: Failed to read the root package.json Node.js selector.');
+  process.exit(exitStatus.toolingFailure);
+}
+
+const requiredNodeVersion = rootPackage?.engines?.node;
+const currentNodeVersion = process.versions.node;
+
+if (typeof requiredNodeVersion !== 'string' || !exactSemanticVersionPattern.test(requiredNodeVersion)) {
+  console.error('pre-commit: Root package.json must declare engines.node as one exact semantic version.');
+  process.exit(exitStatus.toolingFailure);
+}
+
+if (currentNodeVersion !== requiredNodeVersion) {
+  console.error(`pre-commit: Node.js ${requiredNodeVersion} is required to lint staged Markdown.`);
   console.error(`Current version: ${process.version || 'unknown'}`);
   console.error('If you use a Node version manager with a GUI Git client, add its initialization to');
   console.error('~/.config/husky/init.sh, which Husky sources before running hooks.');
   console.error('To bypass this one commit only, use: git commit --no-verify');
-  process.exit(1);
+  process.exit(exitStatus.toolingFailure);
 }
 
-const workflowsDir = dirname(fileURLToPath(import.meta.url));
-const repoRoot = resolve(workflowsDir, '../..');
 const maxBuffer = 100 * 1024 * 1024;
 
 const runGit = (args) => {
@@ -38,7 +66,6 @@ const runGit = (args) => {
 };
 
 const parseNulDelimitedPaths = (value) => value.split('\0').filter(Boolean);
-const toAbsolutePosixPath = (repoRelativePath) => resolve(repoRoot, repoRelativePath).split(sep).join('/');
 
 const stagedMarkdownPathspecs = Object.freeze(['*.md', '*.mdc']);
 let stagedMarkdownPaths;
@@ -57,47 +84,72 @@ try {
 } catch (error) {
   console.error(error);
   console.error('pre-commit: Failed to inspect staged Markdown files.');
-  process.exit(2);
+  process.exit(exitStatus.toolingFailure);
 }
 
 if (stagedMarkdownPaths.length === 0) {
-  process.exit(0);
+  process.exit(exitStatus.success);
 }
 
-const stagedMarkdownByAbsolutePosixPath = {};
+const stagedMarkdownInputs = [];
 
 try {
   for (const repoRelativePath of stagedMarkdownPaths) {
-    stagedMarkdownByAbsolutePosixPath[toAbsolutePosixPath(repoRelativePath)] = runGit(['show', `:${repoRelativePath}`]);
+    const content = runGit(['show', `:${repoRelativePath}`]);
+    stagedMarkdownInputs.push({ filePath: repoRelativePath, content });
   }
 } catch (error) {
   console.error(error);
   console.error('pre-commit: Failed to read staged Markdown content from Git.');
-  process.exit(2);
+  process.exit(exitStatus.toolingFailure);
 }
 
 let exitCode;
 
 try {
-  const { main: markdownlintCli2 } = await import('markdownlint-cli2');
-  exitCode = await markdownlintCli2({
-    directory: repoRoot,
-    argv: ['--config', '.github/workflows/.markdownlint.jsonc'],
-    nonFileContents: stagedMarkdownByAbsolutePosixPath,
-    logMessage: console.log,
-    logError: console.error
-  });
+  const require = createRequire(import.meta.url);
+  const { lintOuterMarkdownContents } = require('./lint-nested-markdown.js');
+  const markdownlintExitCode = await lintOuterMarkdownContents(repoRoot, stagedMarkdownInputs);
+  exitCode = normalizeMarkdownlintExitCode(markdownlintExitCode);
+  if (exitCode === exitStatus.toolingFailure) {
+    console.error('pre-commit: Markdown lint tooling returned an unexpected exit status.');
+    console.error('Rebuild the locked tools: node .github/workflows/NpmTools.mjs install');
+  }
 } catch (error) {
   console.error(error);
   console.error('pre-commit: Markdown lint tooling failed to run.');
   console.error('Rebuild the locked tools: node .github/workflows/NpmTools.mjs install');
-  process.exit(2);
+  process.exit(exitStatus.toolingFailure);
 }
 
-if (exitCode !== 0) {
+if (exitCode === exitStatus.lintFailure) {
   console.error('');
   console.error('pre-commit: Markdown lint failed for staged Markdown.');
   console.error('To check all Markdown files, run: npm --prefix .github/workflows run lint:md');
+} else if (exitCode === exitStatus.success) {
+  try {
+    const require = createRequire(import.meta.url);
+    const {
+      displayResults,
+      lintNestedMarkdownContents
+    } = require('./lint-nested-markdown.js');
+    const { totalBlocks, allResults } = lintNestedMarkdownContents(
+      stagedMarkdownInputs,
+      undefined,
+      console.log
+    );
+    console.log(`\nTotal nested Markdown blocks found: ${totalBlocks}\n`);
+    if (displayResults(allResults)) {
+      console.error('pre-commit: Nested Markdown lint failed for staged Markdown.');
+      console.error('To check all Markdown files, run: npm --prefix .github/workflows run lint:md:nested');
+      exitCode = exitStatus.lintFailure;
+    }
+  } catch (error) {
+    console.error(error);
+    console.error('pre-commit: Nested Markdown lint tooling failed to run.');
+    console.error('Rebuild the locked tools: node .github/workflows/NpmTools.mjs install');
+    exitCode = exitStatus.toolingFailure;
+  }
 }
 
 process.exitCode = exitCode;
