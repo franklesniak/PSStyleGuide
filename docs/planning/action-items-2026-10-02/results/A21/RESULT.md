@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # A21 current result
 
-State: pending PR224 merge. Transfers0/12; no PR clock, base selection, implementation or native mutation.
+State: active implementation preparation. [D-A21-01](selection-20261003/DECISION.md) selects the complete landed PS3ba0f4d validator/SelfTest/classifier/test/manifest once. All useful TF staged/runtime/bootstrap contracts remain in its retained matrix; no region-by-region selection or parallel engine is authorized. Parent verified four raw samples and all seven score totals. Transfers0/12; no A21 PR clock or product edit. Landed PS instruction CI37101903079 failed at the workflow caller status check. A02 investigates; A21 product execution waits for source acceptance and explicit writer release. A20 protected capacity/protocol differences and actual A03/A07 caller activation remain temporary convergence boundaries. Earlier censuses below remain historical evidence, not competing base choices.
 
 The [read-only whole-base census](preselection.md) compares immutable PSf81f769 and TF06ad4f7 across the complete five-path scope, with exact [input identities](input-identities.json), [function AST census](function-ast-census.json), and [staged A07 interfaces](A07-interface-identities.json). The coordinator independently checked all nine present raw blobs/modes/hashes and TF's absent SelfTest. It identifies surviving capabilities and tests without region-port instructions or a premature rubric/choice.
 

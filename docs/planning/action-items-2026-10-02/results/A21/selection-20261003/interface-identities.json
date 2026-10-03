@@ -1,0 +1,285 @@
+[
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".codex/config.toml",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+    "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+    "bytes": 205
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/ci-toolchain.json",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+    "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+    "bytes": 91
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/copilot-setup-steps.yml",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+    "sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa",
+    "bytes": 26612
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/lint-markdown.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "9b0abb08d1a17ed4306ef771822d980aabff86b5",
+    "sha256": "3410d109d4c842a83bf41dc5674874db8d046929742a7fadba0e60026203c126",
+    "bytes": 1691
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/lint-markdown.test.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "27d2e5143682b6bfe02776eef56bae7b23472599",
+    "sha256": "e878b7e7b831c9e498306594ae7357c76d3052586f9f4646e64bcc5d7cd0092d",
+    "bytes": 12301
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/lint-nested-markdown.js",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "0c7633c0793be84ce6768698387052807a149329",
+    "sha256": "6f90d52361c564772094ee0a2410f9cc407803f4784aafda3c5e8096c2281327",
+    "bytes": 18348
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/lint-staged-markdown.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "21063b3c86ffcee7c928b149d390065b8bcc1840",
+    "sha256": "c473b3df463d99d88de07ef883214f0a8aaedce111579d676bf39324902d14d3",
+    "bytes": 5611
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/Test-LocalValidation.test.mjs",
+    "present": false
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+    "present": false
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/NpmTools.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+    "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587",
+    "bytes": 7375
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/NpmTools.test.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "77a1313b9044bb934159a165e07219a3c1c9306b",
+    "sha256": "0b328c28f566e3d337831026eb0c7055b8158c8895c0552c77d9dbb8e3808c42",
+    "bytes": 9686
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": "docs/dependency-maintenance.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "9c7e9535493d77099aa7b2a8c5eebfc4a90e4f05",
+    "sha256": "40c7a91096e878bdff64902fd6ca480e8df75b5b01ce435c22255ccd70303af0",
+    "bytes": 7918
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/scripts-README.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "d5cf90a6e6dede9f4fb514ae733cf8bf09a18896",
+    "sha256": "8af2b01273015a8b9993a732316d68ceeb3e9cad32160063af7815e5e304d1a9",
+    "bytes": 5034
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": "requirements-dev.txt",
+    "present": false
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".codex/config.toml",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+    "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c",
+    "bytes": 205
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/ci-toolchain.json",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+    "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+    "bytes": 91
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/copilot-setup-steps.yml",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+    "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae",
+    "bytes": 33862
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/lint-markdown.mjs",
+    "present": false
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/lint-markdown.test.mjs",
+    "present": false
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/lint-nested-markdown.js",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+    "sha256": "5f3bbefdd02af786bd39ae6a31685a4daf073981c2c072a51b590c75a6626205",
+    "bytes": 16481
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/lint-staged-markdown.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "c35575990d5854ea6da9d5f6d49d23287df43146",
+    "sha256": "0e8b0b5c725227b98a338e44e630f6b50a90f725e2f01b2f0262284ffdd6926b",
+    "bytes": 5971
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Test-LocalValidation.test.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "87f68f5f02eb2303059be06c219253ab37853197",
+    "sha256": "41e8d68636cd8a32569266eb4daf14da9559160679cbb1793d194533f9d32ba5",
+    "bytes": 4346
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+    "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+    "bytes": 3127
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/NpmTools.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+    "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587",
+    "bytes": 7375
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/NpmTools.test.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+    "sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b",
+    "bytes": 11402
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": "docs/dependency-maintenance.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+    "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6",
+    "bytes": 6448
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/scripts-README.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+    "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6",
+    "bytes": 5421
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": "requirements-dev.txt",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+    "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+    "bytes": 5920
+  }
+]

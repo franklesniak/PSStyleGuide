@@ -1,0 +1,346 @@
+[
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/copilot-instructions.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "62ff9fcfb1fb56dea8fd894d4d622cd3c598f875",
+    "sha256": "e8c5d01dc227dc109e412f364c2d036ad17d59d5c56be942b87b0e5a16b2be34",
+    "bytes": 1634,
+    "lines": 16,
+    "matches": []
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/agent-instructions.yml",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "a935e25b641cd4117eb3a554b723e53caa52f10e",
+    "sha256": "aff7fac6602e3fb95a61e096fb7899763d1de741ddad7f0cbc9a3d6ce6e85e6d",
+    "bytes": 11507,
+    "lines": 199,
+    "matches": [
+      {
+        "line": 100,
+        "text": "          & ./.github/workflows/Test-AgentInstructions.ps1 -MetadataClassificationOnly -InputRevision $env:EXPECTED_HEAD -PublishedBaselineRevision $env:EXPECTED_BASE"
+      },
+      {
+        "line": 102,
+        "text": "          $strResult = & node .github/workflows/Classify-InstructionMaintenance.mjs $PWD.Path $env:EXPECTED_BASE $env:EXPECTED_HEAD"
+      },
+      {
+        "line": 107,
+        "text": "              & ./.github/workflows/Test-AgentInstructions.ps1 -InputRevision $env:EXPECTED_HEAD -PublishedBaselineRevision $env:EXPECTED_BASE"
+      },
+      {
+        "line": 178,
+        "text": "          ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest"
+      },
+      {
+        "line": 195,
+        "text": "              & ./.github/workflows/Test-AgentInstructions.ps1 -ProposedPolicy -InputRevision $env:EXPECTED_PUSH_HEAD -PublishedBaselineRevision $env:EXPECTED_PUSH_BASE"
+      },
+      {
+        "line": 198,
+        "text": "          & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs"
+      }
+    ]
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/package.json",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "b6225545b1e0570900261bfb6fc5c08afaff84bf",
+    "sha256": "d1b6908de4c3e70d9b42155b0a3e4eeb7e10c0c10d680ff17763e19e4cc84a8e",
+    "bytes": 877,
+    "lines": 34,
+    "matches": []
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".husky/pre-commit",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "28e5c7bcb9a5616b37abbbcbed727339f2dbc823",
+    "sha256": "8c59449406d5bf5935ef4a5e2377abae841f477d4ddcad72975b328d2ebbc711",
+    "bytes": 460,
+    "lines": 11,
+    "matches": []
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".pre-commit-config.yaml",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "808609311d98e9792dc7f3d76d20aa220aab2256",
+    "sha256": "f5babbf1733ee1065ba34f717050e4e831eeef649adbacd73f99301edc650d23",
+    "bytes": 3143,
+    "lines": 97,
+    "matches": [
+      {
+        "line": 94,
+        "text": "          .github/workflows/Test-AgentInstructions.ps1 -SelfTest"
+      }
+    ]
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": "AGENTS.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "f7543d786156f0efc39c3fe2927ffcd186b29f39",
+    "sha256": "ce1860e518783cdd75d78124a1ab078257233807f689839eb7cb3e3749f8847b",
+    "bytes": 32680,
+    "lines": 252,
+    "matches": []
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": "CLAUDE.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "3bb0afcae09e05b6a8022d339b12721e8a1473d2",
+    "sha256": "527069c020934a6e73774dadef98359911bee71754ac6d67ab60796ac757c591",
+    "bytes": 82478,
+    "lines": 436,
+    "matches": []
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": "CONTRIBUTING.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+    "sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4",
+    "bytes": 9114,
+    "lines": 114,
+    "matches": [
+      {
+        "line": 87,
+        "text": "Set the metadata date and applicable version for your last author-controlled update, commit the final candidate, and validate that exact candidate at finalization. Once the accepted base contains `-FinalizeMetadataNow`, use its checker in an accepted-base worktree. Run this example from the candidate repository after refreshing the destination by the normal fetch procedure:"
+      },
+      {
+        "line": 103,
+        "text": "    pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -InputRevision $strFinalHead -PublishedBaselineRevision $strPolicyBase -FinalizeMetadataNow"
+      },
+      {
+        "line": 114,
+        "text": "For later verification of identical base/head, run the same accepted checker with the same endpoints and omit `-FinalizeMetadataNow`. It retains structural, calendar, baseline and version checks and explicitly reports that this invocation did not verify finalization date. Reuse the original successful finalization output for unchanged inputs. Missing original evidence supplies no historical finalization-date proof; CI event time, run time and candidate metadata are not substitutes. This capability does not create an automatic remote freshness gate or grant maintenance, owner or merge authority."
+      }
+    ]
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": "package.json",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "6def13021be9d4f17d491ba0450ce2cbe02cd588",
+    "sha256": "b80d65d36e1bd3ae7f4fb0d7a54e30a20fbf303c7ed59f3a3d62cd0b5cc8f953",
+    "bytes": 797,
+    "lines": 25,
+    "matches": [
+      {
+        "line": 16,
+        "text": "    \"test:agent-instructions\": \"pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -SelfTest\""
+      }
+    ]
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/copilot-instructions.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "d4ad431a6c629203aa6cd88b9cea6f9caa4c293b",
+    "sha256": "81fbe1615dd96fe99afca2738ff5888a6f7b7390068c1087d3d817fad73ff614",
+    "bytes": 2231,
+    "lines": 43,
+    "matches": []
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+    "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96",
+    "bytes": 3127,
+    "lines": 103,
+    "matches": []
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/agent-instructions.yml",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+    "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c",
+    "bytes": 9558,
+    "lines": 169,
+    "matches": [
+      {
+        "line": 96,
+        "text": "          $strResult = & node .github/workflows/Classify-InstructionMaintenance.mjs $PWD.Path $env:EXPECTED_BASE $env:EXPECTED_HEAD"
+      },
+      {
+        "line": 101,
+        "text": "              & ./.github/workflows/Test-AgentInstructions.ps1 -InputRevision $env:EXPECTED_HEAD -PublishedBaselineRevision $env:EXPECTED_BASE"
+      },
+      {
+        "line": 167,
+        "text": "          ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest"
+      },
+      {
+        "line": 168,
+        "text": "          & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/Test-LocalValidation.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs"
+      }
+    ]
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/package.json",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+    "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f",
+    "bytes": 1105,
+    "lines": 40,
+    "matches": []
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/scripts-README.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+    "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6",
+    "bytes": 5421,
+    "lines": 39,
+    "matches": [
+      {
+        "line": 24,
+        "text": "| `Test-AgentInstructions.ps1` | Validates governed instruction capacity, operative policy, final-state metadata, staged-input matching, and behavioral mutation controls. | `npm run test:agent-instructions` |"
+      },
+      {
+        "line": 31,
+        "text": "The shared Linux CI helpers are `Initialize-CiToolchain.ps1`, `Test-CheckoutCredentials.ps1`, `Test-StyleGuideArtifacts.ps1`, and `Invoke-MarkdownLint.ps1`. The runtime declaration is `ci-toolchain.json`. Run helper behavior tests with `node --test .github/workflows/Test-CiHelpers.test.mjs .github/workflows/Test-LocalValidation.test.mjs`; Linux is required for the loader, runtime, and shell-hook cases. Run classifier tests with `node --test .github/workflows/Classify-InstructionMaintenance.test.mjs`."
+      }
+    ]
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".husky/pre-commit",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+    "sha256": "1888b6c6e29c1c06baebbdf2946cc7b465ce5adcc869c2977dfd774d68b96df0",
+    "bytes": 3544,
+    "lines": 120,
+    "matches": []
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".pre-commit-config.yaml",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+    "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+    "bytes": 5405,
+    "lines": 165,
+    "matches": [
+      {
+        "line": 162,
+        "text": "          .github/workflows/Test-AgentInstructions.ps1 -SelfTest -RequireStagedInputMatch"
+      }
+    ]
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": "AGENTS.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+    "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266",
+    "bytes": 33422,
+    "lines": 260,
+    "matches": []
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": "CLAUDE.md",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "3cc21fc793944033be430ad08722081db4e7b9dd",
+    "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2",
+    "bytes": 80980,
+    "lines": 451,
+    "matches": []
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": "package.json",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+    "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+    "bytes": 837,
+    "lines": 25,
+    "matches": [
+      {
+        "line": 16,
+        "text": "    \"test:agent-instructions\": \"pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -SelfTest\""
+      }
+    ]
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": "requirements-dev.txt",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+    "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652",
+    "bytes": 5920,
+    "lines": 94,
+    "matches": []
+  }
+]

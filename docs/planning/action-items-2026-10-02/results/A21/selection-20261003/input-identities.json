@@ -1,0 +1,116 @@
+[
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/document-metadata-classification.json",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+    "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c",
+    "bytes": 388,
+    "lines": 17
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "1e03c3fe9d1845fe73a8f05820e8acb09d04f918",
+    "sha256": "a17bfe6ab678793fde20248d32cd35cbbb5668c4fe430f59679e05157b60acff",
+    "bytes": 5613,
+    "lines": 113
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "b137e7160cdd79d77731d14ac1db814ccdab873d",
+    "sha256": "30219a53aa082db93b74541a871f3910693bd932d8d826a76bcecbbed6b2a1d7",
+    "bytes": 11404,
+    "lines": 203
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "bb4ce3d8199b9a28f7c018bbaf528b8560741b02",
+    "sha256": "c0023ee88f825dbc823307a9f7ff0f66fff8ba0cedc4ea198aba75ede8d4d65c",
+    "bytes": 183983,
+    "lines": 2707
+  },
+  {
+    "repository": "PS",
+    "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "path": ".github/workflows/Test-AgentInstructions.ps1",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "6b8088076a1d620dba5997d776c54ed803535100",
+    "sha256": "80a198eaf809407d5e121994b24acd007fe819d4cc7ee2cdd9deb731710f3ade",
+    "bytes": 434252,
+    "lines": 10676
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/document-metadata-classification.json",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+    "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+    "bytes": 387,
+    "lines": 17
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+    "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528",
+    "bytes": 5632,
+    "lines": 112
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+    "sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706",
+    "bytes": 6799,
+    "lines": 123
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Test-AgentInstructions.ps1",
+    "present": true,
+    "mode": "100644",
+    "kind": "blob",
+    "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+    "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875",
+    "bytes": 460163,
+    "lines": 11379
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "present": false
+  }
+]

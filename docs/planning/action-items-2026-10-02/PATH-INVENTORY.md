@@ -103,3 +103,7 @@ Ownership below names the post-PR224 owner. PR224 retains its exact in-flight pa
 | `samples/test-nested-markdown-linting.md` | equal | A07 | none approved |
 | `samples/test-recursive-nested-markdown.md` | equal | A07 | none approved |
 | `terraform.instructions.md` | TF-only | A18 / A15–A17 | none approved |
+
+## Current native refresh after PR224
+
+The [post224 native inventory](results/A01/CURRENT-REFRESH-POST224.md) pins PS3ba0f4d and TF06ad4f7:83 paths,10 raw-equal,55 different,8 PS-only,10 TF-only. The manifest is now shared/different and .gitignore is equal. All83 existing owners remain; eleven changed source paths map to A21five, A07one, A03one and A02four. Earlier tables remain dated history. Landed source acceptance is a separate CI gate.

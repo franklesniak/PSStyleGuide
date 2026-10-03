@@ -1,7 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # A01 current issue and native tree inventory
 
-## Current refresh: 2026-10-03
+## Current refresh after PR224: 2026-10-03
+
+Accepted inventory at PS main `3ba0f4d9686af41ae0e77c65ea374fff9d1cef53`, TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c`: **83 paths:10 equal,55 different,8 PS-only,10 TF-only**. All148 raw entries and all83 current owners are accounted for. Five issue bodies and seven comments are unchanged; neither repository has an open PR. Landed source CI remains separately pending.
+
+See the [post224 refresh and coordinator verification](CURRENT-REFRESH-POST224.md), [complete current tree](native-tree-union-post224.json), [comparison](comparison-post224.json) and [final native readback](final-native-recheck-post224.json). The bounded A12 caller change and unchanged A14 scoped contract are recorded; no settings/protected authority or final convergence is inferred.
+
+## Previous accepted refresh after PR225: 2026-10-03
 
 Accepted after PR225 merged: PS main `a71f16a8d76beeca1ba8fdc3b1c95e1958e0973c`, TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c`. The complete union is **83 paths: 9 equal, 55 different, 8 PS-only and 11 TF-only**. All paths have current owners; the two new lint helpers belong to A07. Five open issue bodies remain unchanged, with seven comments and no new requirement. PR224 is the only open PR; PR225 is merged.
 

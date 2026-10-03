@@ -1,0 +1,1245 @@
+[
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.ps1",
+    "parseErrors": [],
+    "publicParameters": [
+      "SelfTest",
+      "MetadataClassificationOnly",
+      "FinalizeMetadataNow",
+      "ProposedPolicy",
+      "InputRevision",
+      "PublishedBaselineRevision"
+    ],
+    "functions": [
+      {
+        "name": "ConvertFrom-ParserJsonContext",
+        "start": 222,
+        "end": 316,
+        "parameters": [
+          "Content",
+          "MaximumBytes"
+        ],
+        "sha256": "fdc9ba99208a602458a30ef85394c593f7f85f462f4b2d841f480a788c427c8e"
+      },
+      {
+        "name": "Test-InitialMetadataCoveragePath",
+        "start": 318,
+        "end": 373,
+        "parameters": [
+          "HasTrustedBaselineManifest",
+          "TrustedBaselineExemptPath",
+          "RepositoryRelativePath"
+        ],
+        "sha256": "1b573bc860abd6042b7cb2a9834c5c61db8936f4141310675bd2a339dd7fa618"
+      },
+      {
+        "name": "ConvertFrom-StrictUtf8Data",
+        "start": 375,
+        "end": 447,
+        "parameters": [
+          "Bytes",
+          "DisplayName"
+        ],
+        "sha256": "576b37bdde7b76d44206fb546570b6dcd17641b431ba75b5675f6ef89c3e8826"
+      },
+      {
+        "name": "Assert-EncodingMutationRejected",
+        "start": 449,
+        "end": 498,
+        "parameters": [
+          "Name",
+          "Bytes"
+        ],
+        "sha256": "3a4a3726afb54530d7636361831b2973d4dd55ad64ef2e54c0679a4ad130a335"
+      },
+      {
+        "name": "Get-RepositoryInputMetadataFailure",
+        "start": 500,
+        "end": 597,
+        "parameters": [
+          "DisplayName",
+          "GitIndexEntryCount",
+          "GitMode",
+          "GitStage",
+          "IsFileInfo",
+          "Attributes",
+          "LinkType",
+          "UnixMode"
+        ],
+        "sha256": "d3d127525f51db7b103f468b4c0dc2116a128ec7ce24f50a261fec797490d214"
+      },
+      {
+        "name": "Assert-RepositoryInputMetadataMutationRejected",
+        "start": 599,
+        "end": 699,
+        "parameters": [
+          "Name",
+          "GitIndexEntryCount",
+          "GitMode",
+          "GitStage",
+          "IsFileInfo",
+          "Attributes",
+          "LinkType",
+          "UnixMode",
+          "Failure"
+        ],
+        "sha256": "20f4a73f082725a5802a4d8cfe110c4da9a7841258160af43dd177a0f19aa0c3"
+      },
+      {
+        "name": "Read-BoundedStreamData",
+        "start": 701,
+        "end": 789,
+        "parameters": [
+          "Stream",
+          "MaximumBytes",
+          "DisplayName",
+          "CancellationToken"
+        ],
+        "sha256": "281f63f62909d1c1469514adf7e7f9c8c704aaf57f5bd4be427ebae3a1da61fa"
+      },
+      {
+        "name": "Read-BoundedProcessData",
+        "start": 791,
+        "end": 885,
+        "parameters": [
+          "Process",
+          "MaximumBytes",
+          "TimeoutMilliseconds",
+          "DisplayName"
+        ],
+        "sha256": "0384bf30d813b5082a930b20daf56769158cad0217889c6aaabd2e27fd493813"
+      },
+      {
+        "name": "ConvertFrom-GitPathListData",
+        "start": 887,
+        "end": 970,
+        "parameters": [
+          "Bytes",
+          "AllowDuplicatePath"
+        ],
+        "sha256": "48ff3041e4793c484793087c373c12470b2924603413f4c32a85be3d613c4ad2"
+      },
+      {
+        "name": "Read-GitTrackedPath",
+        "start": 972,
+        "end": 1044,
+        "parameters": [
+          "RepositoryRootPath",
+          "Revision",
+          "MaximumBytes"
+        ],
+        "sha256": "b542dab680b6813893a7115c69aa346bd7aecb8a0878b3f0ea4e1f857fbbca45"
+      },
+      {
+        "name": "Read-GitPublishedEndpointChangedPath",
+        "start": 1046,
+        "end": 1117,
+        "parameters": [
+          "RepositoryRootPath",
+          "BaselineRevision",
+          "FinalRevision",
+          "MaximumBytes"
+        ],
+        "sha256": "b73ebb2d09d2141e024c37d7f60a2d374f4b4e55088b8019722efb2609e29569"
+      },
+      {
+        "name": "Read-RepositoryInputData",
+        "start": 1119,
+        "end": 1319,
+        "parameters": [
+          "Path",
+          "RepositoryRootPath",
+          "RepositoryRelativePath",
+          "DisplayName",
+          "MaximumBytes"
+        ],
+        "sha256": "7399dfc1cbf80f1cdf29166f0f1d5d09bbcce73c172a1d888b226b27673ef363"
+      },
+      {
+        "name": "Get-GitRegularFileBlobId",
+        "start": 1321,
+        "end": 1403,
+        "parameters": [
+          "RepositoryRootPath",
+          "RepositoryRelativePath",
+          "Revision"
+        ],
+        "sha256": "d538941a1d2b18c259d301f3f98d88486f3597cc8d7bb850c6e702b14dab067f"
+      },
+      {
+        "name": "Read-GitRevisionText",
+        "start": 1405,
+        "end": 1499,
+        "parameters": [
+          "RepositoryRootPath",
+          "Revision",
+          "RepositoryRelativePath",
+          "MaximumBytes",
+          "RequireRegularFile"
+        ],
+        "sha256": "5a9465a0a2ae8cd90d47d47957c07f1a111b5eaabd3042ca5008bf27fbecf1da"
+      },
+      {
+        "name": "Get-PublishedBaselineDocumentContext",
+        "start": 1501,
+        "end": 1579,
+        "parameters": [
+          "RepositoryRootPath",
+          "RepositoryRelativePath",
+          "MaximumBytes"
+        ],
+        "sha256": "16aa0f74361e121185f7a1a354ce2e2195e550614b80d4d0ef6b8072e4adc9f8"
+      },
+      {
+        "name": "Assert-OversizedStreamMutationRejected",
+        "start": 1581,
+        "end": 1704,
+        "parameters": [
+          null
+        ],
+        "sha256": "adca1a8796ed64215fbdff1b658a63247af6b09fa54d406fd10d106a9a6c7ed1"
+      },
+      {
+        "name": "Assert-MarkdownParserTransportCleanup",
+        "start": 1706,
+        "end": 1813,
+        "parameters": [
+          null
+        ],
+        "sha256": "880c7c4439900462c5cfd15f67aafbb06a72c72a229bbdbf2bd758c740f8e96b"
+      },
+      {
+        "name": "Get-TomlParseContext",
+        "start": 1815,
+        "end": 2107,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "58edc092b8636c89c2c89e25057a126d578d9cd2c5f37d196659374fe0e3dd15"
+      },
+      {
+        "name": "Invoke-MarkdownParserProcess",
+        "start": 2109,
+        "end": 2325,
+        "parameters": [
+          "StartInfo",
+          "Content"
+        ],
+        "sha256": "7b2e6d3eddeb7681218384ac0a394c7e736b648a21e301ba9301ded6e27196cb"
+      },
+      {
+        "name": "Get-MarkdownParseContext",
+        "start": 2327,
+        "end": 2830,
+        "parameters": [
+          "Content",
+          "LineCount"
+        ],
+        "sha256": "1c4ab3ce142944b1d01e6cbd6b752da2cf13101936477be270c0364ff0a833ed"
+      },
+      {
+        "name": "Assert-MarkdownParserExactContext",
+        "start": 2832,
+        "end": 3029,
+        "parameters": [
+          null
+        ],
+        "sha256": "b96c1c3a3260bec5eaf65f3352b67508dd28de9542ae36b400c12dcab320e818"
+      },
+      {
+        "name": "Get-OperativeMarkdownContext",
+        "start": 3031,
+        "end": 3100,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "5424901850c2a12b690d7395dd78afe84f2ffe0da7a5c68a9acf5325357b789b"
+      },
+      {
+        "name": "ConvertTo-OperativeMarkdownText",
+        "start": 3102,
+        "end": 3136,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "070d0ba74a3d62ff49b5eaa7930b25e2deb4d1568dc2a4f9df77999a117e7b0f"
+      },
+      {
+        "name": "Get-ActiveClaudeImportReference",
+        "start": 3138,
+        "end": 3183,
+        "parameters": [
+          "MarkdownContext"
+        ],
+        "sha256": "94ef96bc2095492b352c8e8112fe3fc4571c2009ab5ac62c796bf6a4b3efe1cd"
+      },
+      {
+        "name": "Get-ClaudeImportFailure",
+        "start": 3185,
+        "end": 3228,
+        "parameters": [
+          "Name",
+          "MarkdownContext"
+        ],
+        "sha256": "f4eeda9ef7b770ee1768091dbe7f7c9fcf27415110cadadca33a403a2e4d1a90"
+      },
+      {
+        "name": "Get-NestedClaudeImportFailure",
+        "start": 3230,
+        "end": 3274,
+        "parameters": [
+          "DocumentContexts"
+        ],
+        "sha256": "1431f03376e258899ca35210e27517704394fbe3e76314619471cfa7b2935b39"
+      },
+      {
+        "name": "Get-MarkdownLevelTwoSectionContext",
+        "start": 3276,
+        "end": 3371,
+        "parameters": [
+          "MarkdownContext",
+          "Heading"
+        ],
+        "sha256": "f4c5580b596428c52842730d7b58a528872aaf39afc4998ae6a5f9e0e49533b2"
+      },
+      {
+        "name": "Test-MetadataCalendarDatePair",
+        "start": 3373,
+        "end": 3429,
+        "parameters": [
+          "VersionDate",
+          "UpdatedDate"
+        ],
+        "sha256": "ae9688a9305bd82d64627f219071b5fbecbf0264e465cd6b968fc0db42d9ed06"
+      },
+      {
+        "name": "ConvertTo-MetadataComparisonText",
+        "start": 3431,
+        "end": 3501,
+        "parameters": [
+          "Content",
+          "MetadataContext"
+        ],
+        "sha256": "9fd18abe52440758cfccc3ead8ba382eb7496d13a67810480d08de4159c93ff4"
+      },
+      {
+        "name": "Get-PublishedEndpointLastUpdatedFailure",
+        "start": 3503,
+        "end": 3640,
+        "parameters": [
+          "Name",
+          "CurrentContent",
+          "BaseContent",
+          "TrustedEventUtcDate",
+          "RequireCurrentMaximumDateForRenderedChange"
+        ],
+        "sha256": "bffdf409a0932f3fb225c0ffd8eabf21f8fe535ea16c8afff7977ea72e1bfb84"
+      },
+      {
+        "name": "Get-MarkdownParserBootstrapFailure",
+        "start": 3642,
+        "end": 3680,
+        "parameters": [
+          "RepositoryRootPath"
+        ],
+        "sha256": "fb1275d092d345202911b2d031061a73bf8208ad78817319e3e7d282db29500d"
+      },
+      {
+        "name": "Invoke-SafeTemporaryDirectoryRemoval",
+        "start": 3682,
+        "end": 3777,
+        "parameters": [
+          "LiteralPath",
+          "SystemTemporaryRootPath",
+          "MaximumAttempts",
+          "InitialDelayMilliseconds"
+        ],
+        "sha256": "f3f39e0faf5ba6bb74bef59f3a6309c7b4c39429b8d57d76e0244d206b29bf15"
+      },
+      {
+        "name": "Test-RecursivePersonalMemoryIgnoreContract",
+        "start": 3779,
+        "end": 3836,
+        "parameters": [
+          "GitIgnoreContent",
+          "TrackedPath"
+        ],
+        "sha256": "52e07ce1e8680cfaba59064da1abeafb55fa96f33337567dac4b8beac4c0d80b"
+      },
+      {
+        "name": "Test-GitIgnorePathEffective",
+        "start": 3838,
+        "end": 3924,
+        "parameters": [
+          "GitIgnoreContent",
+          "RepositoryRelativePath"
+        ],
+        "sha256": "040c9ada2d2a3de262687ca6f69d709cb39b983169506311fc7143897e3b9017"
+      },
+      {
+        "name": "Test-ProhibitedClaudeLocalPath",
+        "start": 3926,
+        "end": 3957,
+        "parameters": [
+          "RepositoryRelativePath"
+        ],
+        "sha256": "5ea99ae263c73aa937ab0d768647f19131ed578a3fe59419de789460c03e8631"
+      },
+      {
+        "name": "Test-GovernedInstructionPath",
+        "start": 3959,
+        "end": 4026,
+        "parameters": [
+          "RepositoryRelativePath",
+          "GovernedRootPaths"
+        ],
+        "sha256": "af0fdf461f879c2daacef929b5ede3f6e3b32f1c07803ee1d620aadf36c8a013"
+      },
+      {
+        "name": "Test-GovernedInstructionPathCaseMismatch",
+        "start": 4028,
+        "end": 4088,
+        "parameters": [
+          "RepositoryRelativePath",
+          "GovernedRootPaths"
+        ],
+        "sha256": "37cb2c1346fa0d186cb8390140823f58c8589cfba28ab66065c0be325ed8d7ed"
+      },
+      {
+        "name": "Test-ExactPathCaseMismatch",
+        "start": 4090,
+        "end": 4134,
+        "parameters": [
+          "RepositoryRelativePath",
+          "CanonicalPaths"
+        ],
+        "sha256": "a1f4d1f5c75a2c386a9b39e840eb653d94888f373fb82ca7e66931b53d6bc93d"
+      },
+      {
+        "name": "Test-GovernedInstructionInventoryPath",
+        "start": 4136,
+        "end": 4182,
+        "parameters": [
+          "RepositoryRelativePath"
+        ],
+        "sha256": "d2150587fa9a5083c07388d17addab118fca4ed2f12b45df96756606c8be5fbf"
+      },
+      {
+        "name": "Test-AgentInstructionWorkflowPath",
+        "start": 4184,
+        "end": 4232,
+        "parameters": [
+          "RepositoryRelativePath"
+        ],
+        "sha256": "a90cd7309f50913a04a9e6c70d195a36f90875e99a7d54e2d0fc5dc92973e7b4"
+      },
+      {
+        "name": "Get-DecisionRecordPathFailure",
+        "start": 4234,
+        "end": 4268,
+        "parameters": [
+          "RepositoryRelativePath"
+        ],
+        "sha256": "798860e3688426b9733d39a276e1481ca3e5ad8b2ece5a60f27026dd2b660b31"
+      },
+      {
+        "name": "Get-GovernedInstructionInventoryFailure",
+        "start": 4270,
+        "end": 4362,
+        "parameters": [
+          "CatalogPaths",
+          "TrackedPaths"
+        ],
+        "sha256": "7b149cbadfe48de0a10636982d891c70cb272d88df1bc6cb4e5e39172a95d579"
+      },
+      {
+        "name": "Get-DocumentationClaimFailure",
+        "start": 4364,
+        "end": 4431,
+        "parameters": [
+          "Content",
+          "TrackedPaths"
+        ],
+        "sha256": "2f21f9cbfe162047a6f5ae0c05f7a26ab85b9af161de3e66d0a47ed3f486289a"
+      },
+      {
+        "name": "Get-DecisionLifecyclePolicyFailure",
+        "start": 4433,
+        "end": 4521,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "3a7a18525bf5d025b909325108925c4bf9fbe15bffb3ae50a8c2fc27aa7d4feb"
+      },
+      {
+        "name": "Test-DecisionLifecycleStatusLabel",
+        "start": 4523,
+        "end": 4563,
+        "parameters": [
+          "Label"
+        ],
+        "sha256": "38397f243e667db72279c1208f374638fa8add1ed3d5d96d6712c145fd059ac2"
+      },
+      {
+        "name": "Get-DecisionRecordLifecycleFailure",
+        "start": 4565,
+        "end": 4693,
+        "parameters": [
+          "Name",
+          "CurrentContent",
+          "BaselineContent"
+        ],
+        "sha256": "b48bd3ab7047478050f8fe25585c9131704d6ece334eec91a1d3a25afdeb502b"
+      },
+      {
+        "name": "Get-DocumentMetadataClassificationContext",
+        "start": 4695,
+        "end": 4938,
+        "parameters": [
+          "Content",
+          "TrackedPath"
+        ],
+        "sha256": "36cca43ee8fa1a51e8308444784bb73169f6ae18c81b70acac835bae0e9e6319"
+      },
+      {
+        "name": "Get-InitialDocumentMetadataClassificationFailure",
+        "start": 4940,
+        "end": 5001,
+        "parameters": [
+          "BaselineRevision",
+          "TrustedBaselineValidatorSha256",
+          "CandidateContext"
+        ],
+        "sha256": "4546f4167f8fa38a6b35655a87e46da0282ac9054ab686dae4ed1810ae8283ab"
+      },
+      {
+        "name": "Get-DocumentMetadataClassificationExpansionFailure",
+        "start": 5003,
+        "end": 5129,
+        "parameters": [
+          "HasTrustedBaselineManifest",
+          "TrustedBaselineExemptPath",
+          "TrustedBaselineAuthorizedExemptionPath",
+          "CandidateExemptPath",
+          "TrustedBaselineGeneratedPath",
+          "CandidateGeneratedPath"
+        ],
+        "sha256": "8cf6a76c90377c808a9be0f7b02d57357824d1faf09e9df97fb5bdb954857f69"
+      },
+      {
+        "name": "Get-DiscoveredGovernedMarkdownDocumentPath",
+        "start": 5131,
+        "end": 5255,
+        "parameters": [
+          "CandidatePath",
+          "KnownGovernedPath",
+          "ExemptPath"
+        ],
+        "sha256": "4c4bb014b6b3c9c5da5e6f95d88b7fbd153d5088c9496dc47fae9460647955b8"
+      },
+      {
+        "name": "Test-DocumentMetadataHeaderIntent",
+        "start": 5257,
+        "end": 5369,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "b1baf6a1e5adc3547ff62870fb0a9f5f63bdd47a711a63a3f61577100a800be2"
+      },
+      {
+        "name": "Get-DocumentMetadataContext",
+        "start": 5371,
+        "end": 5666,
+        "parameters": [
+          "Content",
+          "RequiresVersion"
+        ],
+        "sha256": "c3ee1357acc4ff42ce79e0f19f3dd033595326e856c81ceb70c4987833b7bd25"
+      },
+      {
+        "name": "Get-PublishedEndpointMetadataFailure",
+        "start": 5668,
+        "end": 5915,
+        "parameters": [
+          "Name",
+          "CurrentContent",
+          "ParentContent",
+          "ExpectedUtcDate",
+          "IsNewDocumentTransition",
+          "RequireExpectedUtcDateForRenderedChange"
+        ],
+        "sha256": "f9be223836ef9a08b93d630750f52ae396f336e487a1a537479b8bcb512ded76"
+      },
+      {
+        "name": "Get-TomlSemanticStatementContext",
+        "start": 5917,
+        "end": 5980,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "d5b7cc75a441811ca18ccf15d212e25f1adfe0e7e10523feffcb73826a26bd13"
+      },
+      {
+        "name": "Get-GitHubPluginEnablementContext",
+        "start": 5982,
+        "end": 6046,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "83d7b1420a54f359c9d5e108662111b6f5b4fa76ce6df0e2f6dd50b18e23e5f9"
+      },
+      {
+        "name": "ConvertTo-DisabledGitHubPluginMutation",
+        "start": 6048,
+        "end": 6102,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "b4cbc4783a90b47cde6e77db05ca168503fd5813c18840f503e8b0cd031ae07e"
+      },
+      {
+        "name": "Get-AgentInstructionFailure",
+        "start": 6104,
+        "end": 6535,
+        "parameters": [
+          "AgentsContent",
+          "ClaudeContent",
+          "CodexConfigContent",
+          "ParentAgentsContent",
+          "ParentClaudeContent",
+          "AgentsExpectedUtcDate",
+          "ClaudeExpectedUtcDate"
+        ],
+        "sha256": "3f9861c5cfe3b34063d827818d9a8eb3e5ed499f034c20c28150a59b37b483b8"
+      },
+      {
+        "name": "Assert-Failure",
+        "start": 6537,
+        "end": 6640,
+        "parameters": [
+          "Name",
+          "AgentsContent",
+          "ClaudeContent",
+          "CodexConfigContent",
+          "Failure",
+          "ParentAgentsContent",
+          "ParentClaudeContent",
+          "AgentsExpectedUtcDate",
+          "ClaudeExpectedUtcDate"
+        ],
+        "sha256": "c2ab0e25bf8ab00bdf9fe10bff477564de2ca0300d18111e72dc1c076d56235c"
+      },
+      {
+        "name": "Assert-FixtureAccepted",
+        "start": 6642,
+        "end": 6736,
+        "parameters": [
+          "Name",
+          "AgentsContent",
+          "ClaudeContent",
+          "CodexConfigContent",
+          "ParentAgentsContent",
+          "ParentClaudeContent",
+          "AgentsExpectedUtcDate",
+          "ClaudeExpectedUtcDate"
+        ],
+        "sha256": "a6f4c509eab1ec9aed3f492e2fde0fdb24a56472563a3a3a91194738e0338ca5"
+      }
+    ]
+  },
+  {
+    "repository": "PS",
+    "file": "Test-AgentInstructions.SelfTest.ps1",
+    "parseErrors": [],
+    "publicParameters": [
+      "RepositoryRootPath",
+      "Revision",
+      "MaximumBytes",
+      "MaximumMetadataUtcDate"
+    ],
+    "functions": [
+      {
+        "name": "Assert-DocumentMetadataClassificationSelfTest",
+        "start": 48,
+        "end": 495,
+        "parameters": [
+          "MaximumMetadataUtcDate"
+        ],
+        "sha256": "a5d5a01ec908ff01b54e49eb3bfa45012615724275c4a44ea76b78d1b08c1fd0"
+      },
+      {
+        "name": "Assert-PublishedMetadataGitFixture",
+        "start": 497,
+        "end": 646,
+        "parameters": [
+          "MaximumMetadataUtcDate"
+        ],
+        "sha256": "b29b7c9adcae1902a758e3960fa7e9c819cafd36eec7e101a7430d9fc6d753db"
+      },
+      {
+        "name": "Assert-ClassificationAdmissionGitFixture",
+        "start": 648,
+        "end": 886,
+        "parameters": [
+          "RepositoryRootPath"
+        ],
+        "sha256": "3bded53d45dcbd4c3e7ac92e601ad4a4ba8754aee752517939eb3c853ac1217e"
+      },
+      {
+        "name": "Assert-AuthorFinalizationGitFixture",
+        "start": 888,
+        "end": 1704,
+        "parameters": [
+          "RepositoryRootPath"
+        ],
+        "sha256": "63953174ea7a80a2ee7027891e913a915afc919efc7b6c6d33dc8feae3396aa3"
+      },
+      {
+        "name": "Assert-DocumentMetadataPlacementSelfTest",
+        "start": 1706,
+        "end": 1869,
+        "parameters": [
+          "RepositoryRootPath",
+          "MaximumMetadataUtcDate"
+        ],
+        "sha256": "0227922a9771151f1fa5c45205cbb9197af43a04ac72a10809290ec8452cd6a1"
+      },
+      {
+        "name": "Assert-OptionalMetadataSelfTest",
+        "start": 1877,
+        "end": 2066,
+        "parameters": [
+          "MaximumMetadataUtcDate"
+        ],
+        "sha256": "f6f113d4d31bb57f70bd577485ce5821400687f75fb6c5c993767cfd778f478d"
+      },
+      {
+        "name": "Assert-GitRevisionTextSelfTest",
+        "start": 2068,
+        "end": 2261,
+        "parameters": [
+          null
+        ],
+        "sha256": "f187ead89513fd2b4b428d73f363b4d5494c529058cddb7cacfc62e9a2c1a875"
+      },
+      {
+        "name": "Read-BoundedProcessData",
+        "start": 2216,
+        "end": 2241,
+        "parameters": [
+          "Process",
+          "MaximumBytes",
+          "TimeoutMilliseconds",
+          "DisplayName"
+        ],
+        "sha256": "8a004547e6355fcbcf3c7154abed9bcf63adfc5e467061f8cd325c6910415e5b"
+      },
+      {
+        "name": "ConvertTo-CreatedPushCommitEvidenceObject",
+        "start": 2424,
+        "end": 2483,
+        "parameters": [
+          "Id",
+          "Distinct",
+          "Timestamp"
+        ],
+        "sha256": "c04929f4c6d5ba9d808299ec1f8a1aab892d7dcfa28bc4bf79fcad7f9ebf5625"
+      }
+    ]
+  },
+  {
+    "repository": "TF",
+    "file": "Test-AgentInstructions.ps1",
+    "parseErrors": [],
+    "publicParameters": [
+      "SelfTest",
+      "RequireStagedInputMatch",
+      "InputRevision",
+      "PublishedBaselineRevision"
+    ],
+    "functions": [
+      {
+        "name": "ConvertFrom-StrictUtf8Data",
+        "start": 210,
+        "end": 287,
+        "parameters": [
+          "Bytes",
+          "DisplayName"
+        ],
+        "sha256": "f70897ae796b1002d65c2a7952df1a1a4bd9b1fc1c8eb8a4e19788e8930b679a"
+      },
+      {
+        "name": "Assert-EncodingMutationRejected",
+        "start": 289,
+        "end": 341,
+        "parameters": [
+          "Name",
+          "Bytes"
+        ],
+        "sha256": "9445d65fa1c6468d89d5752bb306d1653397a1843fc381cc76d13c36c5102d4e"
+      },
+      {
+        "name": "Get-RepositoryInputMetadataFailure",
+        "start": 343,
+        "end": 446,
+        "parameters": [
+          "DisplayName",
+          "GitIndexEntryCount",
+          "GitMode",
+          "GitStage",
+          "IsFileInfo",
+          "Attributes",
+          "LinkType",
+          "UnixMode"
+        ],
+        "sha256": "c7446a4031bfc5816d8e18da76cffcbe4884c7a70ca5e72b182343ed142ea5fc"
+      },
+      {
+        "name": "Assert-RepositoryInputMetadataMutationRejected",
+        "start": 448,
+        "end": 553,
+        "parameters": [
+          "Name",
+          "GitIndexEntryCount",
+          "GitMode",
+          "GitStage",
+          "IsFileInfo",
+          "Attributes",
+          "LinkType",
+          "UnixMode",
+          "ExpectedFailure"
+        ],
+        "sha256": "7666f5527fa25914abad9b458e954aed61c3135720a36d675596d9b39667d47f"
+      },
+      {
+        "name": "Get-StagedInputMatchFailure",
+        "start": 555,
+        "end": 621,
+        "parameters": [
+          "DisplayName",
+          "RequireMatch",
+          "WorktreeContent",
+          "IndexContent"
+        ],
+        "sha256": "ada3dc6c04d2ae33299cbcfbd988cf9f133b9885235fbf81676d45a2c02f4074"
+      },
+      {
+        "name": "Read-BoundedStreamData",
+        "start": 623,
+        "end": 699,
+        "parameters": [
+          "Stream",
+          "MaximumBytes",
+          "DisplayName"
+        ],
+        "sha256": "4df5693f2188907ecd57608a1a2d591a211659e756ad62b884395ec17117c25c"
+      },
+      {
+        "name": "Read-RepositoryInputData",
+        "start": 701,
+        "end": 937,
+        "parameters": [
+          "Path",
+          "RepositoryRootPath",
+          "RepositoryRelativePath",
+          "DisplayName",
+          "MaximumBytes",
+          "RequireIndexContentMatch"
+        ],
+        "sha256": "c4d16c755aca75a7af7e49d83eedab017baee2465354720c257cb8404db607f8"
+      },
+      {
+        "name": "Read-GitRevisionText",
+        "start": 939,
+        "end": 1065,
+        "parameters": [
+          "RepositoryRootPath",
+          "Revision",
+          "RepositoryRelativePath",
+          "MaximumBytes",
+          "RequireRegularFile"
+        ],
+        "sha256": "c9fd9206bc38b21fbdb3f50a31ce8339a08f27e77c43894be3f80ca933f0dfb2"
+      },
+      {
+        "name": "Invoke-GitNulRecordQuery",
+        "start": 1067,
+        "end": 1179,
+        "parameters": [
+          "RepositoryRootPath",
+          "Argument",
+          "DisplayName",
+          "MaximumBytes"
+        ],
+        "sha256": "1f8c8d79862c30d57a1d4988b90f55d9714c2170fa1a6c7a4abe49f75f6bc613"
+      },
+      {
+        "name": "Get-GitRevisionTreeEntryContext",
+        "start": 1181,
+        "end": 1263,
+        "parameters": [
+          "RepositoryRootPath",
+          "Revision",
+          "RepositoryRelativePath"
+        ],
+        "sha256": "2dca0df0671977eac34d422c98fac8d38809971fe9a86c0e95a30ca01670d75f"
+      },
+      {
+        "name": "Get-GovernedDocumentParentContext",
+        "start": 1265,
+        "end": 1323,
+        "parameters": [
+          "RepositoryRootPath",
+          "RepositoryRelativePath",
+          "MaximumBytes",
+          "Revision",
+          "LocalBaselineRevision",
+          "PublishedBaselineRevision"
+        ],
+        "sha256": "afced2a375a6a7135b1243f4a23eb24d46c53434126ca7f5cef9e8bfca8676c0"
+      },
+      {
+        "name": "Assert-OversizedStreamMutationRejected",
+        "start": 1325,
+        "end": 1372,
+        "parameters": [
+          null
+        ],
+        "sha256": "fd7009483b9d43a3c0e42fa50783cca4ea1a1f0f40e452f55e6bdd9520746717"
+      },
+      {
+        "name": "Test-WorkflowCredentialProjection",
+        "start": 1374,
+        "end": 1429,
+        "parameters": [
+          "WorkflowContent"
+        ],
+        "sha256": "3a2c2167435148b7ce72d3f8827be8c9d8fa8edbbaa7fa88d43065889c9a7cc2"
+      },
+      {
+        "name": "Get-HuskySetupContractFailure",
+        "start": 1432,
+        "end": 1736,
+        "parameters": [
+          "RootPackageContent",
+          "WorkflowPackageContent",
+          "HookContent",
+          "CopilotSetupContent",
+          "PreCommitConfigContent"
+        ],
+        "sha256": "b6b6af557059af5c0cc052bfe883724a1418abc75565b6da3dfa7956912ad2c4"
+      },
+      {
+        "name": "Get-PreCommitBootstrapContractFailure",
+        "start": 1739,
+        "end": 1874,
+        "parameters": [
+          "AgentsContent",
+          "ClaudeContent",
+          "ScriptIndexContent",
+          "RequirementsContent"
+        ],
+        "sha256": "02dc1e5d07b5cc6098cf890c412dc70e973be74f27283210ed270d54b6662371"
+      },
+      {
+        "name": "Test-Python312Application",
+        "start": 1876,
+        "end": 1961,
+        "parameters": [
+          "Path",
+          "PrefixArgument"
+        ],
+        "sha256": "e4143fb2c56072f7e6b899bb603e3e6f59b5fd0a02743a41538440d7def610dd"
+      },
+      {
+        "name": "Get-Python312CommandContext",
+        "start": 1963,
+        "end": 2069,
+        "parameters": [
+          "WindowsPlatform",
+          "CommandResolver",
+          "VersionProbe"
+        ],
+        "sha256": "26967ce36a3c75d2d14ba6c09fc015164a94098050f703fd3387a9107c582898"
+      },
+      {
+        "name": "Get-TomlParseContext",
+        "start": 2071,
+        "end": 2368,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "36358382c2370541acf5613102b3260eca73444d0df31d301fd3fc7261b5ad35"
+      },
+      {
+        "name": "Invoke-NodeRuntimeProbe",
+        "start": 2370,
+        "end": 2448,
+        "parameters": [
+          "Path"
+        ],
+        "sha256": "6e7d73e2241c0c7a40200f5f86733b34c814ad7e83122b943c19e50f5e01110b"
+      },
+      {
+        "name": "Get-NodeApplicationContext",
+        "start": 2450,
+        "end": 2615,
+        "parameters": [
+          "CommandResolver",
+          "RuntimeProbe",
+          "ApplicationResolver"
+        ],
+        "sha256": "d141e97e8f59c22dc2d51a06960bf2f61434948efc07b7677398d80761ea6bf8"
+      },
+      {
+        "name": "Get-MarkdownParseContext",
+        "start": 2617,
+        "end": 2987,
+        "parameters": [
+          "Content",
+          "LineCount"
+        ],
+        "sha256": "8030ca081537a941cf859038026673aca8d63912f90389e9ab41c17c0714c2d4"
+      },
+      {
+        "name": "Get-OperativeMarkdownContext",
+        "start": 2989,
+        "end": 3057,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "9e0f506906739cd236953a644e93881f4cecae2e2d9cb55eea7ebfda1f71ec1a"
+      },
+      {
+        "name": "ConvertTo-OperativeMarkdownText",
+        "start": 3059,
+        "end": 3095,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "9fe396490dcbc9d59768067e05ec05739c5b15229a927eae895a9243acbf5cc4"
+      },
+      {
+        "name": "Get-MarkdownLevelTwoSectionContext",
+        "start": 3097,
+        "end": 3194,
+        "parameters": [
+          "MarkdownContext",
+          "Heading"
+        ],
+        "sha256": "f8b6ee824e52767a7d5aef8fcd553b78251552ab5341f48abf40b10b1f81e02e"
+      },
+      {
+        "name": "Test-MetadataCalendarDate",
+        "start": 3196,
+        "end": 3242,
+        "parameters": [
+          "Date"
+        ],
+        "sha256": "bf5adee766049acb800aeb6b2fbbf647359b2724d1d6aa5691050ad1d310e5b2"
+      },
+      {
+        "name": "Test-MetadataCalendarDatePair",
+        "start": 3244,
+        "end": 3292,
+        "parameters": [
+          "VersionDate",
+          "UpdatedDate"
+        ],
+        "sha256": "955eda27a2fbbe23c0f53bb6eb71a7094489870f2e087c6bb8f303bad45a3b32"
+      },
+      {
+        "name": "ConvertTo-MetadataComparisonText",
+        "start": 3294,
+        "end": 3368,
+        "parameters": [
+          "Content",
+          "MetadataContext"
+        ],
+        "sha256": "d2972a92aa5f4be3cba79ab00c020374c2974b5777f284309be29b101de34df2"
+      },
+      {
+        "name": "Get-GovernedInstructionInventoryFailure",
+        "start": 3370,
+        "end": 3457,
+        "parameters": [
+          "CatalogPaths",
+          "TrackedPaths"
+        ],
+        "sha256": "a8a87872c85298b03b3fe078a94b322b8bc0a204c160df93dc99eae743fbd3d6"
+      },
+      {
+        "name": "Get-GovernedDecisionDocumentPath",
+        "start": 3459,
+        "end": 3506,
+        "parameters": [
+          "CandidatePath"
+        ],
+        "sha256": "a1f7675114af1eb76bdf6b87af03fe5ec685702e1a7c8f0f1bfe30a8279288a9"
+      },
+      {
+        "name": "Get-DecisionRecordContractFailure",
+        "start": 3508,
+        "end": 3639,
+        "parameters": [
+          "Name",
+          "Content",
+          "MetadataContext"
+        ],
+        "sha256": "d4417d18331fb59af5f72a04b0b92dba561e1b2a243c30da3f397c08531a7188"
+      },
+      {
+        "name": "Get-DocumentMetadataClassificationContext",
+        "start": 3641,
+        "end": 3873,
+        "parameters": [
+          "Content",
+          "TrackedPath"
+        ],
+        "sha256": "68d8ff85fd63b22fcd7882f58cb0b844668e8202f13fdc201e7e8e14a6ce79a1"
+      },
+      {
+        "name": "Get-DocumentMetadataClassificationExpansionFailure",
+        "start": 3875,
+        "end": 3967,
+        "parameters": [
+          "HasTrustedBaselineManifest",
+          "TrustedBaselineExemptPath",
+          "TrustedBaselineAuthorizedExemptionPath",
+          "CandidateExemptPath"
+        ],
+        "sha256": "567b788f5ce13b4e5861fe92e2c40fe671348ed1e88939a4a383e953fffa9cb9"
+      },
+      {
+        "name": "Get-DiscoveredGovernedMarkdownDocumentPath",
+        "start": 3969,
+        "end": 4093,
+        "parameters": [
+          "CandidatePath",
+          "KnownGovernedPath",
+          "ExemptPath"
+        ],
+        "sha256": "874160f026e42e3b2705a72cbd71ba986b838f122603e6e7b7a5427ddb338522"
+      },
+      {
+        "name": "Get-ProhibitedTrackedClaudeLocalFailure",
+        "start": 4095,
+        "end": 4141,
+        "parameters": [
+          "TrackedPaths"
+        ],
+        "sha256": "eadab76a1c712ffcfa12ec9e1f054a4ed22964418dc714c411c0b22bc70fd705"
+      },
+      {
+        "name": "Get-DocumentMetadataContext",
+        "start": 4143,
+        "end": 4439,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "72798f41f3b069947b5b9c121e7a61e3844d0ffcb4b49ca5bf93e9d4bd84733a"
+      },
+      {
+        "name": "Test-DocumentMetadataHeaderIntent",
+        "start": 4441,
+        "end": 4524,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "72512738fab3a2fcf4672340a32f60329b9165d0bc8737f018d2f2f968a5c935"
+      },
+      {
+        "name": "Get-DocumentMetadataTransitionFailure",
+        "start": 4526,
+        "end": 4859,
+        "parameters": [
+          "Name",
+          "CurrentContent",
+          "ParentContent",
+          "ExpectedUtcDate",
+          "IsNewDocumentTransition",
+          "RequireExpectedUtcDateForRenderedChange",
+          "RequirePublishedRevisionConvention",
+          "MetadataRequired"
+        ],
+        "sha256": "8c34708854326059c50b6657d9ef28d6e0a6e1c44c90e782764185362057e128"
+      },
+      {
+        "name": "Get-TomlSemanticStatementContext",
+        "start": 4861,
+        "end": 4927,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "db92fcbf043e93c897a27a452eceeeb443f76ae467bfcfc6cf1db44012938321"
+      },
+      {
+        "name": "Get-GitHubPluginEnablementContext",
+        "start": 4929,
+        "end": 4996,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "9e6adc907695ed19b1320bfb4a381cb0c730f92dbcc8553970cb864d5c062b80"
+      },
+      {
+        "name": "ConvertTo-DisabledGitHubPluginMutation",
+        "start": 4998,
+        "end": 5055,
+        "parameters": [
+          "Content"
+        ],
+        "sha256": "b8606bbcc3f8f7d3a432baa956dafd6b8065b85277536168fc57bb3b92947631"
+      },
+      {
+        "name": "Get-AgentInstructionFailure",
+        "start": 5057,
+        "end": 5500,
+        "parameters": [
+          "AgentsContent",
+          "ClaudeContent",
+          "CodexConfigContent",
+          "ParentAgentsContent",
+          "ParentClaudeContent",
+          "AgentsExpectedUtcDate",
+          "ClaudeExpectedUtcDate"
+        ],
+        "sha256": "1652c883fee36f6a6249dc7b4209bae6f44875a3e9ae1122c6daf4ed59302d99"
+      },
+      {
+        "name": "Assert-MutationRejected",
+        "start": 5502,
+        "end": 5607,
+        "parameters": [
+          "Name",
+          "AgentsContent",
+          "ClaudeContent",
+          "CodexConfigContent",
+          "ExpectedFailure",
+          "ParentAgentsContent",
+          "ParentClaudeContent",
+          "AgentsExpectedUtcDate",
+          "ClaudeExpectedUtcDate"
+        ],
+        "sha256": "9cca2937b134e59896d5cc74813dc78b40d8eb5f05cfe37b1abde6a5942a11eb"
+      },
+      {
+        "name": "Assert-FixtureAccepted",
+        "start": 5609,
+        "end": 5704,
+        "parameters": [
+          "Name",
+          "AgentsContent",
+          "ClaudeContent",
+          "CodexConfigContent",
+          "ParentAgentsContent",
+          "ParentClaudeContent",
+          "AgentsExpectedUtcDate",
+          "ClaudeExpectedUtcDate"
+        ],
+        "sha256": "609d0a0fd35db195346e618c9e4a64bd4b5d0c805b5589b49e94a7d95c50ad7d"
+      }
+    ]
+  }
+]

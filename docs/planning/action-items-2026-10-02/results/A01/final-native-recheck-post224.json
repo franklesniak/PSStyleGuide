@@ -1,0 +1,32 @@
+{
+  "checked_utc": "2026-10-03T06:13:15.045198+00:00",
+  "refs": {
+    "PS": {
+      "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+      "tree": "ea7e8d7da19cc80b4ec727d5a9c3dfd0e599f9b3",
+      "matches_start": true
+    },
+    "TF": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "matches_start": true
+    }
+  },
+  "issue_enumeration_unchanged": {
+    "PS": true,
+    "TF": true
+  },
+  "open_prs": {
+    "PS": [],
+    "TF": []
+  },
+  "landed_instruction_run": {
+    "id": 37101903079,
+    "head_sha": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "event": "push",
+    "status": "in_progress",
+    "conclusion": null,
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37101903079"
+  },
+  "acceptance_limit": "Read-only inventory only. Landed source acceptance remains parent-owned; no CI success inferred from merge or this census."
+}

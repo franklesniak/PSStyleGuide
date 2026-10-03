@@ -1,0 +1,356 @@
+{
+  "prior_refs": {
+    "PS": {
+      "repo": "franklesniak/PSStyleGuide",
+      "commit": "a71f16a8d76beeca1ba8fdc3b1c95e1958e0973c",
+      "tree": "a4b016f03e2da45e79e65039bb828ee2f21599f0"
+    },
+    "TF": {
+      "repo": "franklesniak/TerraformStyleGuide",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "current_refs": {
+    "PS": {
+      "repo": "franklesniak/PSStyleGuide",
+      "commit": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+      "tree": "ea7e8d7da19cc80b4ec727d5a9c3dfd0e599f9b3"
+    },
+    "TF": {
+      "repo": "franklesniak/TerraformStyleGuide",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    }
+  },
+  "prior_counts": {
+    "PS": 72,
+    "TF": 75,
+    "union": 83,
+    "different": 55,
+    "equal": 9,
+    "TF-only": 11,
+    "PS-only": 8
+  },
+  "current_counts": {
+    "PS": 73,
+    "TF": 75,
+    "union": 83,
+    "different": 55,
+    "equal": 10,
+    "TF-only": 10,
+    "PS-only": 8
+  },
+  "changed_paths": [
+    {
+      "path": ".github/document-metadata-classification.json",
+      "owner": "A21",
+      "old_ps": null,
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+        "size": 388,
+        "raw_sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c"
+      },
+      "prior_status": "TF-only",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "owner": "A21",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d6f0628d492f6d2f76fe1ab65b3e0b316b52c729",
+        "size": 5562,
+        "raw_sha256": "37d5d156f61bcf29391e86f3d6da17f1ed5e5f177086d97466c2dcdbff1fd364"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1e03c3fe9d1845fe73a8f05820e8acb09d04f918",
+        "size": 5613,
+        "raw_sha256": "a17bfe6ab678793fde20248d32cd35cbbb5668c4fe430f59679e05157b60acff"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "owner": "A21",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1e7a60a42a8e9b28811c64de3d1b7e4c1bbec76a",
+        "size": 6328,
+        "raw_sha256": "274321f2fae5e18d7f9a8878522606f7e9961948dc8d035f90765fce21f0fd20"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b137e7160cdd79d77731d14ac1db814ccdab873d",
+        "size": 11404,
+        "raw_sha256": "30219a53aa082db93b74541a871f3910693bd932d8d826a76bcecbbed6b2a1d7"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "owner": "A07",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "bed8c585a495c3cab2875cac036a5717acd82bb6",
+        "size": 8689,
+        "raw_sha256": "a708e153c12b4576bc65fb5df50b322353d1f6d050c28df8d6575be7ce4a7955"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e2bc4578d24e8f65e5b856fe67e55ae1e03c8fea",
+        "size": 2453,
+        "raw_sha256": "c06f3bb95338d074191247737cddd25aa4b62fce7ac47c27d17bb8901e4fa2b1"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "owner": "A21",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "41a955fc4ef68f47b3391417babbcb91824a2726",
+        "size": 19602,
+        "raw_sha256": "becb1877caa33c3cbdb949ce710676674ad8475384252072aef8e63496710bba"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "bb4ce3d8199b9a28f7c018bbaf528b8560741b02",
+        "size": 183983,
+        "raw_sha256": "c0023ee88f825dbc823307a9f7ff0f66fff8ba0cedc4ea198aba75ede8d4d65c"
+      },
+      "prior_status": "PS-only",
+      "status": "PS-only"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "owner": "A21",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+        "size": 378451,
+        "raw_sha256": "5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6b8088076a1d620dba5997d776c54ed803535100",
+        "size": 434252,
+        "raw_sha256": "80a198eaf809407d5e121994b24acd007fe819d4cc7ee2cdd9deb731710f3ade"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "owner": "A03",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+        "size": 9504,
+        "raw_sha256": "1c9457868eb262fc7ed8583d1cfff2903288286f11c103a46f91703b04bef67d"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a935e25b641cd4117eb3a554b723e53caa52f10e",
+        "size": 11507,
+        "raw_sha256": "aff7fac6602e3fb95a61e096fb7899763d1de741ddad7f0cbc9a3d6ce6e85e6d"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": ".gitignore",
+      "owner": "A02",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7429fc67b0c38c8ad6b57211c88797b5e8f13140",
+        "size": 250,
+        "raw_sha256": "a75dc3cbfa65dd2cba13326062c5039e04b7a15f6cb9a4c6c4983c2262c00bad"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+        "size": 249,
+        "raw_sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+      },
+      "prior_status": "different",
+      "status": "equal"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "owner": "A02",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "798aec2eacbdee846266299d2725069514fe6d58",
+        "size": 6210,
+        "raw_sha256": "01091a192353fc5c571d6cdc37c451c5c5c33c115c55280fb1c71053bf78c5cc"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+        "size": 9114,
+        "raw_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": "README.md",
+      "owner": "A02",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "90646a6ec020a2708d79412110d2acc2896382c4",
+        "size": 4742,
+        "raw_sha256": "e2e32feb1415250b4913e57de0bebbdf937195095fc18fc14037cf1cb6fdbe76"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0dbd77c1fe581bc1b32aa97e4dfb6c5119192560",
+        "size": 4720,
+        "raw_sha256": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d"
+      },
+      "prior_status": "different",
+      "status": "different"
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "owner": "A02",
+      "old_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6835e35d318e3f8af8f48ba0d7d773f10475918b",
+        "size": 2214,
+        "raw_sha256": "13cf6d01fe951c4f8197e6a1b27740e5554b68f2f0b8add7a675322833ef4594"
+      },
+      "new_ps": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "761e87c11c1c03f805ad832331866b963294c1e5",
+        "size": 2179,
+        "raw_sha256": "f863b58355ec00530b349f8417a78dd1dd31711a6d85ee954436a0aabcb878a9"
+      },
+      "prior_status": "different",
+      "status": "different"
+    }
+  ],
+  "added_union_paths": [],
+  "issues": [
+    {
+      "repository": "PS",
+      "number": 213,
+      "body_unchanged": true,
+      "title_unchanged": true,
+      "all_comment_ids_and_bodies_unchanged": true,
+      "comment_count": 0,
+      "primary_owner": "A04"
+    },
+    {
+      "repository": "PS",
+      "number": 175,
+      "body_unchanged": true,
+      "title_unchanged": true,
+      "all_comment_ids_and_bodies_unchanged": true,
+      "comment_count": 0,
+      "primary_owner": "A05"
+    },
+    {
+      "repository": "PS",
+      "number": 155,
+      "body_unchanged": true,
+      "title_unchanged": true,
+      "all_comment_ids_and_bodies_unchanged": true,
+      "comment_count": 4,
+      "primary_owner": "A14"
+    },
+    {
+      "repository": "PS",
+      "number": 152,
+      "body_unchanged": true,
+      "title_unchanged": true,
+      "all_comment_ids_and_bodies_unchanged": true,
+      "comment_count": 3,
+      "primary_owner": "A12"
+    },
+    {
+      "repository": "TF",
+      "number": 25,
+      "body_unchanged": true,
+      "title_unchanged": true,
+      "all_comment_ids_and_bodies_unchanged": true,
+      "comment_count": 0,
+      "primary_owner": "A15"
+    }
+  ],
+  "absent_both": {
+    "all26_remain_absent": true,
+    "unchanged_live_bodies_and_comments": true,
+    "reuse": "results/A01/absent-path-coverage.json; all402 and26 credits unchanged"
+  },
+  "merged224": {
+    "number": 224,
+    "merged": true,
+    "merged_at": "2026-10-03T06:05:19Z",
+    "merge_commit_sha": "3ba0f4d9686af41ae0e77c65ea374fff9d1cef53",
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/224"
+  },
+  "open_prs": {
+    "PS": [],
+    "TF": []
+  },
+  "removed_union_paths": [],
+  "conditional_inputs": {
+    "A14": {
+      "four_executable_role_blobs_unchanged": {
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": true,
+        ".github/workflows/Test-ExactGitPathSet.ps1": true,
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": true,
+        ".github/workflows/build.yml": true
+      },
+      "contributing_whole_blob_changed": true,
+      "contributing_generation_section_equal": true,
+      "contributing_generation_section_sha256": "1dbec16414632dcbdabaa29ba2f2fb46466c283a7739175eff681c20685b9fa2",
+      "result": "Changed whole CONTRIBUTING input rechecked narrowly; scoped generator commands, runtime advice and publication authority are identical. New private SelfTest reader is A02/A21, not an implied competing-writer admission or automatic PS155 repair."
+    },
+    "A12": {
+      "instruction_workflow_changed": true,
+      "job_identifiers_and_names_before": [
+        "  accepted-policy:",
+        "    name: Classify maintenance and validate ordinary instructions",
+        "  candidate-tests:",
+        "    name: Test proposed instruction and workflow behavior"
+      ],
+      "job_identifiers_and_names_after": [
+        "  accepted-policy:",
+        "    name: Classify maintenance and validate ordinary instructions",
+        "  candidate-tests:",
+        "    name: Test proposed instruction and workflow behavior"
+      ],
+      "job_identifiers_and_names_equal": true,
+      "result": "Accepted-base classification and candidate-owned push diagnostics changed; evaluate alongside already recorded A02/A03 authority limits. Required context identities unchanged; no immutable producer/owner grant inferred. Settings not re-enumerated."
+    }
+  }
+}
