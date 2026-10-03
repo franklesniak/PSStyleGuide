@@ -1,6 +1,10 @@
 # .SYNOPSIS
 # Validates governed agent instructions and optional authenticated Git ranges.
 #
+# .PARAMETER RequireStagedInputMatch
+# Requires staged validator inputs to match the worktree content being checked.
+# Applies only to local validation, including SelfTest; cannot combine revision modes.
+#
 # .PARAMETER MetadataClassificationOnly
 # Validates bounded classification data against exact accepted B/H endpoints.
 # Requires checkout B and returns before Markdown dependency/bootstrap work.
@@ -19,12 +23,13 @@
 #
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.16.20261002.0
+# Version: 1.18.20261003.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
 param(
     [Parameter()][switch] $SelfTest,
+    [Parameter()][switch] $RequireStagedInputMatch,
     [Parameter()][switch] $MetadataClassificationOnly,
     [Parameter()][switch] $FinalizeMetadataNow,
     [Parameter()][switch] $ProposedPolicy,
@@ -47,8 +52,13 @@ $strPythonPrerequisite =
     'Python 3.12 is required to validate .codex/config.toml. On Windows, ' +
     'install the Python launcher for `py -3.12`; otherwise, expose ' +
     '`python3.12`, `python3`, or `python` on PATH.'
-$script:useWindowsPythonLauncher = $IsWindows
-$script:pythonPathNames = @('python3.12', 'python3', 'python')
+$hashtableRuntimeContext = @{
+    WindowsPlatform = $IsWindows
+    PythonPathNames = @('python3.12', 'python3', 'python')
+    PythonCommandContext = $null
+    PythonResolutionKey = ''
+    NodeApplicationContext = $null
+}
 $script:objValidationUtcNow = [DateTimeOffset]::UtcNow
 $script:strMaximumMetadataUtcDate = $script:objValidationUtcNow.ToString('yyyy-MM-dd')
 $script:objMaximumCommitUtcTimestamp = $script:objValidationUtcNow.AddMinutes(5)
@@ -312,6 +322,357 @@ function ConvertFrom-ParserJsonContext {
         return & $scriptBlockDecode -Element $objDocument.RootElement
     } finally {
         if ($null -ne $objDocument) { $objDocument.Dispose() }
+    }
+}
+
+function Get-AgentSetupInputSpec {
+    # .SYNOPSIS
+    # Lists the finite setup inputs admitted by the instruction validator.
+    #
+    # .DESCRIPTION
+    # Keeps the actual setup readers bounded and includes their local executable inputs.
+    #
+    # .EXAMPLE
+    # Get-AgentSetupInputSpec
+    #
+    # # Returns the supported paths and byte limits.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [pscustomobject] A repository-relative path and its byte limit.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; there are no parameters.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param()
+    foreach ($arrSpec in @(
+            ,@('.github/workflows/agent-instructions.yml', 65536)
+            ,@('package.json', 16384)
+            ,@('.github/workflows/package.json', 16384)
+            ,@('.github/workflows/package-lock.json', 131072)
+            ,@('.github/workflows/copilot-setup-steps.yml', 65536)
+            ,@('.github/workflows/lint-staged-markdown.mjs', 32768)
+            ,@('.github/workflows/Invoke-LockedPythonHook.ps1', 32768)
+            ,@('.github/workflows/install-husky.mjs', 16384)
+            ,@('.husky/pre-commit', 16384)
+            ,@('.pre-commit-config.yaml', 16384)
+            ,@('.github/workflows/scripts-README.md', 32768)
+            ,@('requirements-dev.txt', 16384)
+        )) {
+        [pscustomobject]@{ Path = [string]$arrSpec[0]; MaximumBytes = [int]$arrSpec[1] }
+    }
+}
+
+function Read-AgentSetupInputContent {
+    # .SYNOPSIS
+    # Reads the complete setup closure through the existing safe readers.
+    #
+    # .DESCRIPTION
+    # Selects local or immutable revision inputs and checks each staged local read.
+    # Missing inputs are failures, not optional setup profiles.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The actual repository root.
+    #
+    # .PARAMETER Revision
+    # The exact input revision, or an empty string for local inputs.
+    #
+    # .PARAMETER StagedInputPaths
+    # The exact ACMR path set, empty when staged matching is not selected.
+    #
+    # .EXAMPLE
+    # Read-AgentSetupInputContent -RepositoryRootPath $strRoot -Revision '' -StagedInputPaths $setPaths
+    #
+    # # Reads all required setup inputs with the matching byte bounds.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [hashtable] Setup text indexed by repository-relative path.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([hashtable])]
+    param(
+        [Parameter(Mandatory)][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Revision,
+        [Parameter(Mandatory)][AllowEmptyCollection()]
+        [Collections.Generic.HashSet[string]] $StagedInputPaths
+    )
+    $hashtableContent = @{}
+    foreach ($objSpec in @(Get-AgentSetupInputSpec)) {
+        $hashtableContent[$objSpec.Path] = if ([string]::IsNullOrEmpty($Revision)) {
+            ConvertFrom-StrictUtf8Data -Bytes (Read-RepositoryInputData `
+                    -Path (Join-Path $RepositoryRootPath $objSpec.Path) `
+                    -RepositoryRootPath $RepositoryRootPath -RepositoryRelativePath $objSpec.Path `
+                    -DisplayName $objSpec.Path -MaximumBytes $objSpec.MaximumBytes `
+                    -RequireIndexContentMatch:($StagedInputPaths.Contains($objSpec.Path))) `
+                -DisplayName $objSpec.Path
+        } else {
+            Read-GitRevisionText -RepositoryRootPath $RepositoryRootPath -Revision $Revision `
+                -RepositoryRelativePath $objSpec.Path -MaximumBytes $objSpec.MaximumBytes -RequireRegularFile
+        }
+    }
+    return $hashtableContent
+}
+
+function Get-AgentSetupPackageFailure {
+    # .SYNOPSIS
+    # Checks the finite package delegation and prepare contracts.
+    #
+    # .DESCRIPTION
+    # Uses the strict JSON decoder and exact string properties, without coercion.
+    #
+    # .PARAMETER Content
+    # The safely read setup content map.
+    #
+    # .EXAMPLE
+    # Get-AgentSetupPackageFailure -Content $hashtableSetup
+    #
+    # # Emits failures for changed package commands or root lint dependencies.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [string] One record for each invalid setup contract.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][hashtable] $Content)
+    foreach ($strPath in @('package.json', '.github/workflows/package.json')) {
+        try {
+            $objPackage = ConvertFrom-ParserJsonContext -Content $Content[$strPath] -MaximumBytes 16384
+        } catch {
+            Write-Output "Setup package must be strict unambiguous JSON: $strPath"
+            continue
+        }
+        $arrScripts = @($objPackage.PSObject.Properties | Where-Object { $_.Name -ceq 'scripts' })
+        if ($arrScripts.Count -ne 1 -or $arrScripts[0].Value -isnot [pscustomobject]) {
+            Write-Output "Setup package requires an exact scripts object: $strPath"
+            continue
+        }
+        $hashtableExpected = if ($strPath -ceq 'package.json') {
+            @{
+                'bootstrap:agent-instructions' = 'node .github/workflows/NpmTools.mjs install'
+                'lint:md' = 'npm --prefix .github/workflows run lint:md'
+                'lint:md:nested' = 'npm --prefix .github/workflows run lint:md:nested'
+                'test:agent-instructions' = 'pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -SelfTest'
+            }
+        } else {
+            @{ 'lint:md' = 'node lint-markdown.mjs'; prepare = 'node install-husky.mjs' }
+        }
+        foreach ($strName in $hashtableExpected.Keys) {
+            $arrProperty = @($arrScripts[0].Value.PSObject.Properties | Where-Object { $_.Name -ceq $strName })
+            if ($arrProperty.Count -ne 1 -or $arrProperty[0].Value -isnot [string] -or
+                $arrProperty[0].Value -cne $hashtableExpected[$strName]) {
+                Write-Output "Setup package command must match the reviewed caller: $strPath scripts.$strName"
+            }
+        }
+        if ($strPath -ceq 'package.json') {
+            $arrDependencies = @($objPackage.PSObject.Properties | Where-Object { $_.Name -ceq 'devDependencies' })
+            if ($arrDependencies.Count -ne 1 -or $arrDependencies[0].Value -isnot [pscustomobject]) {
+                Write-Output 'Root package requires an exact devDependencies object.'
+            } else {
+                foreach ($strForbidden in @('markdownlint', 'markdownlint-cli2')) {
+                    if (@($arrDependencies[0].Value.PSObject.Properties | Where-Object {
+                                $_.Name -ieq $strForbidden
+                            }).Count -ne 0) {
+                        Write-Output "Root package must not declare direct $strForbidden."
+                    }
+                }
+            }
+        }
+    }
+}
+
+function Get-AgentSetupContractFailure {
+    # .SYNOPSIS
+    # Checks the retained local hook, lock and setup contracts.
+    #
+    # .DESCRIPTION
+    # Validates finite actual caller forms and nonprotected bootstrap prose.
+    # Lock grammar and module availability do not attest installed package bytes.
+    # Protected bootstrap prose retains its separately authorized instruction checks.
+    #
+    # .PARAMETER Content
+    # The complete safely read setup content map.
+    #
+    # .EXAMPLE
+    # Get-AgentSetupContractFailure -Content $hashtableSetup
+    #
+    # # Emits setup contract violations without installing or executing hooks.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [string] One record for each invalid setup contract.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][hashtable] $Content)
+    Get-AgentSetupPackageFailure -Content $Content
+    $strHook = $Content['.husky/pre-commit'].Replace("`r`n", "`n")
+    $arrHookCommands = @(
+        "if git diff --cached --quiet --diff-filter=ACMR -- '*.md' '*.mdc'; then"
+        'if node .github/workflows/lint-staged-markdown.mjs; then'
+        'if npm --prefix .github/workflows run lint:md; then'
+        'if npm --prefix .github/workflows run lint:md:nested; then'
+    )
+    $intPrevious = -1
+    foreach ($strCommand in $arrHookCommands) {
+        $arrMatches = @([regex]::Matches($strHook, '(?m)^' + [regex]::Escape($strCommand) + '$'))
+        if ($arrMatches.Count -ne 1 -or $arrMatches[0].Index -le $intPrevious) {
+            Write-Output "Husky must run each reviewed guard/lint phase once in order: $strCommand"
+        } else { $intPrevious = $arrMatches[0].Index }
+    }
+    $strConfig = $Content['.pre-commit-config.yaml'].Replace("`r`n", "`n")
+    $arrRepositories = @([regex]::Matches($strConfig,
+            '(?ms)^  - repo: (?<Name>[^\n]+)\n(?<Body>.*?)(?=^  - repo:|\z)'))
+    $arrLocal = @($arrRepositories | Where-Object { $_.Groups['Name'].Value -ceq 'local' })
+    $arrRemote = @($arrRepositories | Where-Object { $_.Groups['Name'].Value -cne 'local' })
+    if ($arrRepositories.Count -ne 3 -or $arrLocal.Count -ne 2 -or $arrRemote.Count -ne 1) {
+        Write-Output 'Pre-commit requires two local groups and one immutable actionlint group.'
+    }
+    if ($arrRemote.Count -ne 1 -or
+        $arrRemote[0].Groups['Name'].Value -cne 'https://github.com/rhysd/actionlint' -or
+        [regex]::Matches($arrRemote[0].Groups['Body'].Value, '(?m)^    rev: "[0-9a-f]{40}"(?: # [^\n]+)?$').Count -ne 1 -or
+        [regex]::Matches($arrRemote[0].Groups['Body'].Value, '(?m)^      - id: actionlint$').Count -ne 1 -or
+        [regex]::Matches($arrRemote[0].Groups['Body'].Value, '(?m)^      - id:').Count -ne 1) {
+        Write-Output 'The sole remote hook must be actionlint at a full lowercase commit pin.'
+    }
+    if ($strConfig -cmatch '(?m)^        (?:language: python(?:\s|$)|additional_dependencies:)') {
+        Write-Output 'Python hooks must not resolve a separate dependency environment.'
+    }
+    $hashtableModules = [ordered]@{
+        'check-json' = 'pre_commit_hooks.check_json'
+        'check-yaml' = 'pre_commit_hooks.check_yaml'
+        'end-of-file-fixer' = 'pre_commit_hooks.end_of_file_fixer'
+        'trailing-whitespace' = 'pre_commit_hooks.trailing_whitespace_fixer'
+        yamllint = 'yamllint'
+        'check-dependabot' = 'check_jsonschema'
+        'check-github-workflows' = 'check_jsonschema'
+    }
+    $hashtableHookBodies = @{}
+    foreach ($strId in @($hashtableModules.Keys) + @('staged-markdown', 'agent-instruction-contract')) {
+        $arrHooks = @([regex]::Matches($strConfig,
+                '(?ms)^      - id: ' + [regex]::Escape($strId) + '\n(?<Body>.*?)(?=^      - id:|^  - repo:|\z)'))
+        if ($arrHooks.Count -ne 1) {
+            Write-Output "Pre-commit requires one hook definition: $strId"
+            $hashtableHookBodies[$strId] = ''
+        } else { $hashtableHookBodies[$strId] = $arrHooks[0].Groups['Body'].Value }
+    }
+    foreach ($strId in $hashtableModules.Keys) {
+        $strBody = $hashtableHookBodies[$strId]
+        foreach ($strLine in @(
+                '          pwsh -NoLogo -NoProfile -NonInteractive -File'
+                '          .github/workflows/Invoke-LockedPythonHook.ps1'
+                ('          -Module ' + $hashtableModules[$strId])
+                '        language: system'
+            )) {
+            if ([regex]::Matches($strBody, '(?m)^' + [regex]::Escape($strLine) + '$').Count -ne 1) {
+                Write-Output "Python hook must use the reviewed system launcher/module: $strId"
+            }
+        }
+    }
+    foreach ($strId in @('check-yaml', 'yamllint')) {
+        if ([regex]::Matches($hashtableHookBodies[$strId], '(?m)^' +
+                [regex]::Escape('        files: ^.*\.ya?ml$') + '$').Count -ne 1) {
+            Write-Output "Hook must select all repository YAML: $strId"
+        }
+    }
+    foreach ($strId in @('check-json', 'end-of-file-fixer', 'trailing-whitespace')) {
+        if ([regex]::Matches($hashtableHookBodies[$strId], '(?m)^' +
+                [regex]::Escape('            \.github/document-metadata-classification\.json') + '$').Count -ne 1) {
+            Write-Output "Hook must select the classification manifest: $strId"
+        }
+    }
+    foreach ($arrRequiredLine in @(
+            ,@('staged-markdown', '        entry: node .github/workflows/lint-staged-markdown.mjs')
+            ,@('staged-markdown', '        files: ^(\.github/workflows/lint-staged-markdown\.mjs|.*\.(md|mdc))$')
+            ,@('agent-instruction-contract', '          pwsh -NoLogo -NoProfile -NonInteractive -File')
+            ,@('agent-instruction-contract', '          .github/workflows/Test-AgentInstructions.ps1 -SelfTest -RequireStagedInputMatch')
+            ,@('agent-instruction-contract', '        always_run: true')
+            ,@('agent-instruction-contract', '        pass_filenames: false')
+            ,@('agent-instruction-contract', '        language: system')
+        )) {
+        if ([regex]::Matches($hashtableHookBodies[$arrRequiredLine[0]],
+                '(?m)^' + [regex]::Escape($arrRequiredLine[1]) + '$').Count -ne 1) {
+            Write-Output "Hook must retain its reviewed activation and selector: $($arrRequiredLine[0])"
+        }
+    }
+    $strSetup = $Content['.github/workflows/copilot-setup-steps.yml']
+    if ($strSetup -match '(?m)^[ \t]+(?:-[ \t]*)?uses[ \t]*:') {
+        Write-Output 'Copilot setup must not execute an action.'
+    }
+    foreach ($strPattern in @(
+            '(?m)^[ \t]+(?:GITHUB_TOKEN|GH_TOKEN|ACTIONS_RUNTIME_TOKEN)[ \t]*:'
+            '\bgithub\s*\.\s*token\b'
+            '\bgithub\s*\['
+            '\bsecrets\b'
+            '\btojson\s*\(\s*github\s*\)'
+        )) {
+        if ($strSetup -match $strPattern) {
+            Write-Output 'Copilot setup must not project credentials.'
+            break
+        }
+    }
+    $strRequirements = $Content['requirements-dev.txt'].Replace("`r`n", "`n").Replace("`r", "`n")
+    $strPreamble = "--only-binary=:all:`n--require-hashes`n`n"
+    $boolLockValid = $strRequirements.StartsWith($strPreamble, [StringComparison]::Ordinal)
+    $strBody = if ($boolLockValid) { $strRequirements.Substring($strPreamble.Length) } else { $strRequirements }
+    $arrPackages = @([regex]::Matches($strBody,
+            '(?m)^(?<Name>[a-z][a-z0-9-]*)==(?<Version>[^\s\\]+) \\\n' +
+            '(?<Hashes>    --hash=sha256:[0-9a-f]{64}(?: \\\n    --hash=sha256:[0-9a-f]{64})*)\n'))
+    $setNames = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    foreach ($objPackage in $arrPackages) {
+        $strBody = $strBody.Replace($objPackage.Value, '')
+        if (-not $setNames.Add($objPackage.Groups['Name'].Value) -or
+            $objPackage.Groups['Version'].Value -cnotmatch '^\d+\.\d+(?:\.\d+)?(?:[a-zA-Z0-9.+-]*)$') {
+            $boolLockValid = $false
+        }
+    }
+    foreach ($strRequired in @('pre-commit', 'pre-commit-hooks', 'yamllint', 'check-jsonschema')) {
+        if (-not $setNames.Contains($strRequired)) { $boolLockValid = $false }
+    }
+    if (-not $boolLockValid -or $strBody.Length -ne 0) {
+        Write-Output 'Python requirements must have binary/hash flags, unique pinned packages and complete SHA-256 records.'
+    }
+    $strInstall = '-m pip --isolated install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r requirements-dev.txt'
+    $arrCommands = @(
+        "pwsh -NoProfile -Command 'if (`$PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'"
+        "py -3.12 $strInstall"
+        "python3.12 $strInstall"
+        'py -3.12 -m pre_commit run --all-files'
+        'python3.12 -m pre_commit run --all-files'
+    )
+    $objMarkdown = Get-OperativeMarkdownContext -Content $Content['.github/workflows/scripts-README.md']
+    foreach ($strCommand in $arrCommands) {
+        if (@($objMarkdown.ProseBlocks.Code | Where-Object { $_ -ceq $strCommand }).Count -ne 1) {
+            Write-Output "Script index must contain this setup command exactly once: $strCommand"
+        }
     }
 }
 
@@ -807,6 +1168,9 @@ function Read-BoundedProcessData {
     # .PARAMETER DisplayName
     # The trusted label to use in diagnostics.
     #
+    # .PARAMETER RejectStandardError
+    # Rejects any stderr output from an application identity probe.
+    #
     # .EXAMPLE
     # Read-BoundedProcessData @hashtableArguments
     #
@@ -822,14 +1186,15 @@ function Read-BoundedProcessData {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.1.20261003.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
         [Parameter(Mandatory)][Diagnostics.Process] $Process,
         [Parameter(Mandatory)][ValidateRange(1, 2147483646)][int] $MaximumBytes,
         [Parameter(Mandatory)][ValidateRange(1, 60000)][int] $TimeoutMilliseconds,
-        [Parameter(Mandatory)][string] $DisplayName
+        [Parameter(Mandatory)][string] $DisplayName,
+        [Parameter()][switch] $RejectStandardError
     )
     if ($Process.StartInfo.UseShellExecute -or
         -not $Process.StartInfo.RedirectStandardOutput -or
@@ -845,7 +1210,11 @@ function Read-BoundedProcessData {
             throw "Could not start $DisplayName."
         }
         $boolRan = $true
-        $objErrorTask = $Process.StandardError.ReadToEndAsync()
+        $objErrorTask = if ($RejectStandardError) {
+            $Process.StandardError.BaseStream.ReadAsync([byte[]]::new(1), 0, 1)
+        } else {
+            $Process.StandardError.ReadToEndAsync()
+        }
         $arrBytes = Read-BoundedStreamData `
             -Stream $Process.StandardOutput.BaseStream `
             -MaximumBytes $MaximumBytes `
@@ -857,7 +1226,10 @@ function Read-BoundedProcessData {
         if (-not $Process.WaitForExit($intRemaining)) {
             throw [TimeoutException]::new("$DisplayName timed out.")
         }
-        [void]$objErrorTask.GetAwaiter().GetResult()
+        $objStandardError = $objErrorTask.GetAwaiter().GetResult()
+        if ($RejectStandardError -and [int]$objStandardError -ne 0) {
+            throw "$DisplayName returned unexpected error output."
+        }
         return [pscustomobject]@{Bytes = $arrBytes;ExitCode = $Process.ExitCode}
     } catch {
         $objFailure = $_.Exception
@@ -1116,6 +1488,59 @@ function Read-GitPublishedEndpointChangedPath {
     return @($arrPaths | Sort-Object -Unique)
 }
 
+function Read-GitStagedInputPath {
+    # .SYNOPSIS
+    # Reads the bounded staged ACMR path set.
+    #
+    # .DESCRIPTION
+    # Uses NUL Git output and the existing strict path decoder. Native failures,
+    # malformed paths, incomplete records and oversized output are rejected.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum byte size of the complete path output.
+    #
+    # .EXAMPLE
+    # Read-GitStagedInputPath -RepositoryRootPath $strRoot -MaximumBytes 1048576
+    #
+    # # Returns exact staged paths without reading their bodies.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [string] Each validated staged path. No output for an empty staged set.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][ValidateRange(1, 2147483646)][int] $MaximumBytes
+    )
+    $objStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
+    $objStartInfo.UseShellExecute = $false
+    $objStartInfo.CreateNoWindow = $true
+    $objStartInfo.RedirectStandardOutput = $true
+    $objStartInfo.RedirectStandardError = $true
+    foreach ($strArgument in @('-C', $RepositoryRootPath, 'diff', '--cached',
+            '--name-only', '--diff-filter=ACMR', '--no-ext-diff', '--no-textconv', '-z', '--')) {
+        $objStartInfo.ArgumentList.Add($strArgument)
+    }
+    $objProcess = [Diagnostics.Process]::new()
+    $objProcess.StartInfo = $objStartInfo
+    $objResult = Read-BoundedProcessData -Process $objProcess -MaximumBytes $MaximumBytes `
+        -TimeoutMilliseconds 10000 -DisplayName 'staged validator input paths'
+    if ($objResult.ExitCode -ne 0) { throw 'Could not inspect staged validator input paths.' }
+    ConvertFrom-GitPathListData -Bytes $objResult.Bytes
+}
+
 function Read-RepositoryInputData {
     # .SYNOPSIS
     # Reads one governed repository file safely.
@@ -1138,6 +1563,9 @@ function Read-RepositoryInputData {
     # .PARAMETER MaximumBytes
     # The maximum permitted output size in bytes.
     #
+    # .PARAMETER RequireIndexContentMatch
+    # Requires this staged input to equal its bounded strict UTF-8 index content.
+    #
     # .EXAMPLE
     # Read-RepositoryInputData @hashtableArguments
     #
@@ -1153,7 +1581,7 @@ function Read-RepositoryInputData {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.1.20261003.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([byte])]
     param(
@@ -1171,7 +1599,9 @@ function Read-RepositoryInputData {
 
         [Parameter(Mandatory)]
         [ValidateRange(1, 2147483646)]
-        [int] $MaximumBytes
+        [int] $MaximumBytes,
+
+        [Parameter()][switch] $RequireIndexContentMatch
     )
 
     $arrGitIndexEntries = @(& git -C $RepositoryRootPath ls-files --stage -- $RepositoryRelativePath 2>&1)
@@ -1315,6 +1745,29 @@ function Read-RepositoryInputData {
             throw "$DisplayName path components changed during the bounded read."
         }
     }
+    if ($RequireIndexContentMatch) {
+        $strIndexBlob = Get-GitRegularFileBlobId -RepositoryRootPath $RepositoryRootPath `
+            -RepositoryRelativePath $RepositoryRelativePath
+        $objIndexStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
+        $objIndexStartInfo.UseShellExecute = $false
+        $objIndexStartInfo.CreateNoWindow = $true
+        $objIndexStartInfo.RedirectStandardOutput = $true
+        $objIndexStartInfo.RedirectStandardError = $true
+        foreach ($strArgument in @('-C', $RepositoryRootPath, 'cat-file', 'blob', $strIndexBlob)) {
+            $objIndexStartInfo.ArgumentList.Add($strArgument)
+        }
+        $objIndexProcess = [Diagnostics.Process]::new()
+        $objIndexProcess.StartInfo = $objIndexStartInfo
+        $objIndexResult = Read-BoundedProcessData -Process $objIndexProcess `
+            -MaximumBytes $MaximumBytes -TimeoutMilliseconds 10000 `
+            -DisplayName "staged $DisplayName"
+        if ($objIndexResult.ExitCode -ne 0) { throw "Could not read staged $DisplayName." }
+        $strWorktreeContent = ConvertFrom-StrictUtf8Data -Bytes $arrInputBytes -DisplayName $DisplayName
+        $strIndexContent = ConvertFrom-StrictUtf8Data -Bytes $objIndexResult.Bytes -DisplayName "staged $DisplayName"
+        if (-not [string]::Equals($strWorktreeContent, $strIndexContent, [StringComparison]::Ordinal)) {
+            throw "$DisplayName worktree content must match its staged Git index blob."
+        }
+    }
     return $arrInputBytes
 }
 
@@ -1349,8 +1802,9 @@ function Get-GitRegularFileBlobId {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261002.0.
+    # Version: 1.0.20261003.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -1812,6 +2266,327 @@ function Assert-MarkdownParserTransportCleanup {
     }
 }
 
+function Test-Python312Application {
+    # .SYNOPSIS
+    # Tests one isolated Python application for the exact supported version.
+    #
+    # .DESCRIPTION
+    # Uses the bounded process reader and returns false on unavailable, noisy,
+    # oversized, timed-out or incompatible applications.
+    #
+    # .PARAMETER Path
+    # The application path to probe.
+    #
+    # .PARAMETER PrefixArgument
+    # Launcher arguments that precede the isolated probe.
+    #
+    # .EXAMPLE
+    # Test-Python312Application -Path '/usr/bin/python3.12'
+    #
+    # # Returns true only for an exact Python 3.12 application.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [bool] True for Python 3.12; false for all probe failures.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)][string] $Path,
+        [Parameter()][string[]] $PrefixArgument = @()
+    )
+    $objStartInfo = [Diagnostics.ProcessStartInfo]::new($Path)
+    $objStartInfo.UseShellExecute = $false
+    $objStartInfo.CreateNoWindow = $true
+    $objStartInfo.RedirectStandardOutput = $true
+    $objStartInfo.RedirectStandardError = $true
+    foreach ($strArgument in @($PrefixArgument) + @('-I', '-S', '-c',
+            'import sys;sys.stdout.write("3.12" if sys.version_info[:2]==(3,12) else "")')) {
+        $objStartInfo.ArgumentList.Add($strArgument)
+    }
+    $objProcess = [Diagnostics.Process]::new()
+    $objProcess.StartInfo = $objStartInfo
+    try {
+        $objResult = Read-BoundedProcessData -Process $objProcess -MaximumBytes 4 `
+            -TimeoutMilliseconds 5000 -DisplayName 'Python 3.12 prerequisite probe' `
+            -RejectStandardError
+        return $objResult.ExitCode -eq 0 -and
+            [Text.Encoding]::UTF8.GetString($objResult.Bytes) -ceq '3.12'
+    } catch {
+        Write-Debug 'The Python application did not complete the isolated version probe.'
+        return $false
+    }
+}
+
+function Get-Python312CommandContext {
+    # .SYNOPSIS
+    # Resolves and caches an exact Python 3.12 application.
+    #
+    # .DESCRIPTION
+    # Tries the Windows launcher and supported PATH names in order. Rejects
+    # aliases and functions. Fixture resolvers bypass the live cache.
+    # Operational probe failures allow the next supported application.
+    #
+    # .PARAMETER RuntimeContext
+    # The shared runtime state passed through the validator and SelfTest loader.
+    #
+    # .PARAMETER CommandResolver
+    # Optional private fixture resolver for application command records.
+    #
+    # .PARAMETER VersionProbe
+    # Optional private fixture predicate for an application and prefix arguments.
+    #
+    # .PARAMETER WindowsPlatform
+    # Includes the Windows launcher before the supported PATH names.
+    #
+    # .PARAMETER PathNames
+    # The supported Python application names in resolution order.
+    #
+    # .EXAMPLE
+    # Get-Python312CommandContext
+    #
+    # # Returns an application path and its launcher arguments, or null.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [pscustomobject] Path and Arguments for the verified application; null if unavailable.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter()][ValidateNotNull()][hashtable] $RuntimeContext = $hashtableRuntimeContext,
+        [Parameter()][AllowNull()][scriptblock] $CommandResolver,
+        [Parameter()][AllowNull()][scriptblock] $VersionProbe,
+        [Parameter()][bool] $WindowsPlatform = $RuntimeContext.WindowsPlatform,
+        [Parameter()][string[]] $PathNames = $RuntimeContext.PythonPathNames
+    )
+    $boolLiveResolution = $null -eq $CommandResolver -and $null -eq $VersionProbe
+    $strResolutionKey = [string]$WindowsPlatform + ':' + ($PathNames -join '|')
+    if ($boolLiveResolution -and $null -ne $RuntimeContext.PythonCommandContext -and
+        $RuntimeContext.PythonResolutionKey -ceq $strResolutionKey) {
+        return $RuntimeContext.PythonCommandContext
+    }
+    if ($null -eq $CommandResolver) {
+        $CommandResolver = {
+            param([string] $Name)
+            Get-Command -Name $Name -CommandType Application -All -ErrorAction SilentlyContinue
+        }
+    }
+    if ($null -eq $VersionProbe) {
+        $VersionProbe = {
+            param([string] $Path, [string[]] $PrefixArgument)
+            Test-Python312Application -Path $Path -PrefixArgument $PrefixArgument
+        }
+    }
+    $arrCommandNames = @(
+        if ($WindowsPlatform) { 'py' }
+        $PathNames
+    )
+    $setApplications = [Collections.Generic.HashSet[string]]::new($(if ($IsWindows) {
+                [StringComparer]::OrdinalIgnoreCase
+            } else { [StringComparer]::Ordinal }))
+    foreach ($strName in $arrCommandNames) {
+        $arrPrefixArguments = [string[]]@()
+        if ($strName -ceq 'py') { $arrPrefixArguments = [string[]]@('-3.12') }
+        foreach ($objCommand in @(& $CommandResolver $strName)) {
+            if ($null -eq $objCommand -or
+                $null -eq $objCommand.PSObject.Properties['CommandType'] -or
+                [string]$objCommand.CommandType -cne 'Application' -or
+                $null -eq $objCommand.PSObject.Properties['Path'] -or
+                -not [IO.Path]::IsPathFullyQualified([string]$objCommand.Path)) { continue }
+            $strApplicationPath = [IO.Path]::GetFullPath([string]$objCommand.Path)
+            if (-not $setApplications.Add($strApplicationPath + '|' + ($arrPrefixArguments -join '|'))) {
+                continue
+            }
+            try {
+                if (-not (& $VersionProbe $strApplicationPath $arrPrefixArguments)) { continue }
+            } catch {
+                Write-Debug 'The Python version predicate failed; try the next application.'
+                continue
+            }
+            $objContext = [pscustomobject]@{
+                Path = $strApplicationPath
+                Arguments = $arrPrefixArguments
+            }
+            if ($boolLiveResolution) {
+                $RuntimeContext.PythonCommandContext = $objContext
+                $RuntimeContext.PythonResolutionKey = $strResolutionKey
+            }
+            return $objContext
+        }
+    }
+    return $null
+}
+
+function Invoke-NodeRuntimeProbe {
+    # .SYNOPSIS
+    # Reads bounded identity data from one Node application.
+    #
+    # .DESCRIPTION
+    # Removes preload environment variables and runs a fixed identity program.
+    # Returns null on native, timeout, output-size or stderr failure.
+    #
+    # .PARAMETER Path
+    # The application path to probe.
+    #
+    # .EXAMPLE
+    # Invoke-NodeRuntimeProbe -Path '/usr/bin/node'
+    #
+    # # Returns strict JSON identity data for the supported resolver.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [string] Bounded UTF-8 JSON output, or null on probe failure.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param([Parameter(Mandatory)][string] $Path)
+    $objStartInfo = [Diagnostics.ProcessStartInfo]::new($Path)
+    $objStartInfo.UseShellExecute = $false
+    $objStartInfo.CreateNoWindow = $true
+    $objStartInfo.RedirectStandardOutput = $true
+    $objStartInfo.RedirectStandardError = $true
+    [void]$objStartInfo.Environment.Remove('NODE_OPTIONS')
+    [void]$objStartInfo.Environment.Remove('NODE_PATH')
+    $objStartInfo.ArgumentList.Add('-p')
+    $objStartInfo.ArgumentList.Add(
+        'JSON.stringify({execPath:process.execPath,nodeVersion:process.versions.node})')
+    $objProcess = [Diagnostics.Process]::new()
+    $objProcess.StartInfo = $objStartInfo
+    try {
+        $objResult = Read-BoundedProcessData -Process $objProcess -MaximumBytes 4096 `
+            -TimeoutMilliseconds 10000 -DisplayName 'Node application identity probe' `
+            -RejectStandardError
+        if ($objResult.ExitCode -ne 0) { return $null }
+        return ConvertFrom-StrictUtf8Data -Bytes $objResult.Bytes -DisplayName 'Node identity'
+    } catch {
+        Write-Debug 'The Node application did not return a bounded identity.'
+        return $null
+    }
+}
+
+function Get-NodeApplicationContext {
+    # .SYNOPSIS
+    # Resolves and caches the direct supported Node application.
+    #
+    # .DESCRIPTION
+    # Probes application candidates and validates their reported absolute
+    # executable path and Node 22-or-later version with the strict JSON decoder.
+    # Invalid or unavailable candidates fall through; private fixture hooks do not cache.
+    #
+    # .PARAMETER RuntimeContext
+    # The shared runtime state passed through the validator and SelfTest loader.
+    #
+    # .PARAMETER CommandResolver
+    # Optional private resolver for PATH application candidates.
+    #
+    # .PARAMETER RuntimeProbe
+    # Optional private probe that returns the candidate's JSON identity text.
+    #
+    # .PARAMETER ApplicationResolver
+    # Optional private resolver for the reported direct application path.
+    #
+    # .EXAMPLE
+    # Get-NodeApplicationContext
+    #
+    # # Returns the verified direct application path and version, or null.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [pscustomobject] Path and Version for the application; null if unavailable.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261003.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter()][ValidateNotNull()][hashtable] $RuntimeContext = $hashtableRuntimeContext,
+        [Parameter()][AllowNull()][scriptblock] $CommandResolver,
+        [Parameter()][AllowNull()][scriptblock] $RuntimeProbe,
+        [Parameter()][AllowNull()][scriptblock] $ApplicationResolver
+    )
+    $boolLiveResolution = $null -eq $CommandResolver -and $null -eq $RuntimeProbe -and
+        $null -eq $ApplicationResolver
+    if ($boolLiveResolution -and $null -ne $RuntimeContext.NodeApplicationContext) {
+        return $RuntimeContext.NodeApplicationContext
+    }
+    if ($null -eq $CommandResolver) {
+        $CommandResolver = {
+            param([string] $Name)
+            Get-Command -Name $Name -CommandType Application -All -ErrorAction SilentlyContinue
+        }
+    }
+    if ($null -eq $RuntimeProbe) {
+        $RuntimeProbe = { param([string] $Path) Invoke-NodeRuntimeProbe -Path $Path }
+    }
+    if ($null -eq $ApplicationResolver) { $ApplicationResolver = $CommandResolver }
+    foreach ($objCandidate in @(& $CommandResolver 'node')) {
+        if ($null -eq $objCandidate -or
+            $null -eq $objCandidate.PSObject.Properties['CommandType'] -or
+            [string]$objCandidate.CommandType -cne 'Application' -or
+            $null -eq $objCandidate.PSObject.Properties['Path'] -or
+            -not [IO.Path]::IsPathFullyQualified([string]$objCandidate.Path)) { continue }
+        try {
+            $strIdentity = & $RuntimeProbe ([string]$objCandidate.Path)
+            if ($strIdentity -isnot [string]) { continue }
+            $objIdentity = ConvertFrom-ParserJsonContext -Content $strIdentity -MaximumBytes 4096
+            if ($objIdentity.execPath -isnot [string] -or
+                $objIdentity.nodeVersion -isnot [string] -or
+                -not [IO.Path]::IsPathFullyQualified($objIdentity.execPath)) { continue }
+            $objVersion = [regex]::Match($objIdentity.nodeVersion, '\A(?<Major>[0-9]+)\.[0-9]+\.[0-9]+\z')
+            $intMajorVersion = 0
+            if (-not $objVersion.Success -or
+                -not [int]::TryParse($objVersion.Groups['Major'].Value, [ref]$intMajorVersion) -or
+                $intMajorVersion -lt 22) { continue }
+            $strDirectPath = [IO.Path]::GetFullPath($objIdentity.execPath)
+            $objComparison = if ($IsWindows) { [StringComparison]::OrdinalIgnoreCase } else {
+                [StringComparison]::Ordinal
+            }
+            foreach ($objApplication in @(& $ApplicationResolver $strDirectPath)) {
+                if ($null -eq $objApplication -or
+                    $null -eq $objApplication.PSObject.Properties['CommandType'] -or
+                    [string]$objApplication.CommandType -cne 'Application' -or
+                    $null -eq $objApplication.PSObject.Properties['Path'] -or
+                    -not [IO.Path]::IsPathFullyQualified([string]$objApplication.Path) -or
+                    -not [string]::Equals([IO.Path]::GetFullPath([string]$objApplication.Path),
+                        $strDirectPath, $objComparison)) { continue }
+                $objContext = [pscustomobject]@{ Path = $strDirectPath; Version = $objIdentity.nodeVersion }
+                if ($boolLiveResolution) { $RuntimeContext.NodeApplicationContext = $objContext }
+                return $objContext
+            }
+        } catch {
+            Write-Debug 'The Node application identity was invalid; try the next application.'
+        }
+    }
+    return $null
+}
+
 function Get-TomlParseContext {
     # .SYNOPSIS
     # Parses the trusted TOML subset used by the validator.
@@ -1837,7 +2612,7 @@ function Get-TomlParseContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.1.20261003.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -1868,62 +2643,7 @@ function Get-TomlParseContext {
         PluginEnabledValueLength = 0
     }
 
-    $listPythonCandidates = [Collections.Generic.List[pscustomobject]]::new()
-    if ($IsWindows -and $script:useWindowsPythonLauncher) {
-        $strLauncher = Join-Path ([Environment]::GetFolderPath(
-                [Environment+SpecialFolder]::Windows)) 'py.exe'
-        if (Test-Path -LiteralPath $strLauncher -PathType Leaf) {
-            $listPythonCandidates.Add([pscustomobject]@{
-                    Path = $strLauncher; Arguments = [string[]] @('-3.12')
-            })
-        }
-    }
-    foreach ($strName in $script:pythonPathNames) {
-        $objCommand = Get-Command -Name $strName -CommandType Application `
-            -ErrorAction SilentlyContinue | Select-Object -First 1
-        if ($null -ne $objCommand) {
-            $listPythonCandidates.Add([pscustomobject]@{
-                    Path = [IO.Path]::GetFullPath([string] $objCommand.Source)
-                    Arguments = [string[]] @()
-            })
-        }
-    }
-    $objPythonCommand = $null
-    $setPythonPaths = [Collections.Generic.HashSet[string]]::new($(if ($IsWindows) {
-                [StringComparer]::OrdinalIgnoreCase
-            } else {
-                [StringComparer]::Ordinal
-            }))
-    foreach ($objCandidate in $listPythonCandidates) {
-        if (-not $setPythonPaths.Add($objCandidate.Path)) {
-            continue
-        }
-        $objProbeInfo = [Diagnostics.ProcessStartInfo]::new($objCandidate.Path)
-        $objProbeInfo.UseShellExecute = $false
-        $objProbeInfo.CreateNoWindow = $true
-        $objProbeInfo.RedirectStandardOutput = $true
-        $objProbeInfo.RedirectStandardError = $true
-        foreach ($strArgument in @($objCandidate.Arguments) + @(
-                '-I', '-S', '-c',
-                'import sys;sys.stdout.write("3.12" if sys.version_info[:2]==(3,12) else "")'
-            )) {
-            $objProbeInfo.ArgumentList.Add($strArgument)
-        }
-        $objProbe = [Diagnostics.Process]::new()
-        $objProbe.StartInfo = $objProbeInfo
-        try {
-            $objProbeResult = Read-BoundedProcessData -Process $objProbe `
-                -MaximumBytes 4 -TimeoutMilliseconds 5000 `
-                -DisplayName 'Python 3.12 prerequisite probe'
-            if ($objProbeResult.ExitCode -eq 0 -and
-                [Text.Encoding]::UTF8.GetString($objProbeResult.Bytes) -ceq '3.12') {
-                $objPythonCommand = $objCandidate
-                break
-            }
-        } catch {
-            continue
-        }
-    }
+    $objPythonCommand = Get-Python312CommandContext
     if ($null -eq $objPythonCommand) {
         $objContext.Failure = $strPythonPrerequisite
         return [pscustomobject]$objContext
@@ -2356,7 +3076,7 @@ function Get-MarkdownParseContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.1.20261003.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -2379,11 +3099,7 @@ function Get-MarkdownParseContext {
         throw 'The locked markdown-it package is required to validate operative Markdown.'
     }
 
-    $objNodeCommand = Get-Command `
-        -Name 'node' `
-        -CommandType Application `
-        -ErrorAction SilentlyContinue |
-        Select-Object -First 1
+    $objNodeCommand = Get-NodeApplicationContext
     if ($null -eq $objNodeCommand) {
         throw 'A trusted Node.js runtime is required to validate operative Markdown.'
     }
@@ -2532,7 +3248,7 @@ function Get-MarkdownParseContext {
     ) -join "`n"
 
     $objStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
-    $objStartInfo.FileName = $objNodeCommand.Source
+    $objStartInfo.FileName = $objNodeCommand.Path
     $objStartInfo.WorkingDirectory = $strRepositoryRootPath
     $objStartInfo.UseShellExecute = $false
     $objStartInfo.CreateNoWindow = $true
@@ -5281,8 +5997,9 @@ function Test-DocumentMetadataHeaderIntent {
     #
     # .NOTES
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261002.0
+    # Version: 1.0.20261003.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param([Parameter(Mandatory)][AllowEmptyString()][string] $Content)
@@ -6804,6 +7521,11 @@ $arrGovernedMetadataDocuments += @(
         }
     }
 )
+if ($RequireStagedInputMatch -and ($MetadataClassificationOnly -or $FinalizeMetadataNow -or
+        $ProposedPolicy -or -not [string]::IsNullOrEmpty($InputRevision) -or
+        -not [string]::IsNullOrEmpty($PublishedBaselineRevision))) {
+    throw 'Staged-input matching cannot be combined with revision validation or endpoint modes.'
+}
 $strValidatedInputRevision = $InputRevision
 $strEffectivePublishedBaselineRevision = $PublishedBaselineRevision
 $PublishedFinalRevision = $InputRevision
@@ -6849,6 +7571,23 @@ if ($ProposedPolicy) {
     throw 'The trusted instruction checker must be checked out at the accepted baseline.'
 }
 
+$setStagedInputPaths = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+if ($RequireStagedInputMatch) {
+    foreach ($strStagedPath in @(Read-GitStagedInputPath -RepositoryRootPath $strRepositoryRootPath `
+            -MaximumBytes $intGitPathListMaximumBytes)) {
+        [void]$setStagedInputPaths.Add($strStagedPath)
+    }
+    foreach ($strExecutableInputPath in @('.github/workflows/Test-AgentInstructions.ps1',
+            '.github/workflows/Test-AgentInstructions.SelfTest.ps1')) {
+        if ($setStagedInputPaths.Contains($strExecutableInputPath)) {
+            $null = Read-RepositoryInputData -Path (Join-Path $strRepositoryRootPath $strExecutableInputPath) `
+                -RepositoryRootPath $strRepositoryRootPath -RepositoryRelativePath $strExecutableInputPath `
+                -DisplayName $strExecutableInputPath -MaximumBytes $intGitPathListMaximumBytes `
+                -RequireIndexContentMatch
+        }
+    }
+}
+
 $arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
         -RepositoryRootPath $strRepositoryRootPath `
         -Revision $strValidatedInputRevision `
@@ -6865,7 +7604,8 @@ $strDocumentClassificationContent = if ([string]::IsNullOrEmpty($strValidatedInp
             -RepositoryRootPath $strRepositoryRootPath `
             -RepositoryRelativePath $strDocumentClassificationRelativePath `
             -DisplayName $strDocumentClassificationRelativePath `
-            -MaximumBytes $intDocumentClassificationMaximumInputBytes) `
+            -MaximumBytes $intDocumentClassificationMaximumInputBytes `
+            -RequireIndexContentMatch:($RequireStagedInputMatch -and $setStagedInputPaths.Contains($strDocumentClassificationRelativePath))) `
         -DisplayName $strDocumentClassificationRelativePath
 } else {
     Read-GitRevisionText `
@@ -6962,6 +7702,9 @@ if ($MetadataClassificationOnly) {
         'This is not first-install, owner or merge authority.')
     return
 }
+
+$hashtableAgentSetupContent = Read-AgentSetupInputContent -RepositoryRootPath $strRepositoryRootPath `
+    -Revision $strValidatedInputRevision -StagedInputPaths $setStagedInputPaths
 
 $arrBootstrapFailures = @(Get-MarkdownParserBootstrapFailure `
         -RepositoryRootPath $strRepositoryRootPath)
@@ -7089,7 +7832,8 @@ $strAgentsContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
             -RepositoryRootPath $strRepositoryRootPath `
             -RepositoryRelativePath 'AGENTS.md' `
             -DisplayName 'AGENTS.md' `
-            -MaximumBytes $intAgentsMaximumInputBytes) `
+            -MaximumBytes $intAgentsMaximumInputBytes `
+            -RequireIndexContentMatch:($RequireStagedInputMatch -and $setStagedInputPaths.Contains('AGENTS.md'))) `
         -DisplayName 'AGENTS.md'
 } else {
     Read-GitRevisionText `
@@ -7106,7 +7850,8 @@ $strClaudeContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
             -RepositoryRootPath $strRepositoryRootPath `
             -RepositoryRelativePath 'CLAUDE.md' `
             -DisplayName 'CLAUDE.md' `
-            -MaximumBytes $intClaudeMaximumInputBytes) `
+            -MaximumBytes $intClaudeMaximumInputBytes `
+            -RequireIndexContentMatch:($RequireStagedInputMatch -and $setStagedInputPaths.Contains('CLAUDE.md'))) `
         -DisplayName 'CLAUDE.md'
 } else {
     Read-GitRevisionText `
@@ -7123,7 +7868,8 @@ $strCodexConfigContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)
             -RepositoryRootPath $strRepositoryRootPath `
             -RepositoryRelativePath '.codex/config.toml' `
             -DisplayName '.codex/config.toml' `
-            -MaximumBytes $intCodexConfigMaximumInputBytes) `
+            -MaximumBytes $intCodexConfigMaximumInputBytes `
+            -RequireIndexContentMatch:($RequireStagedInputMatch -and $setStagedInputPaths.Contains('.codex/config.toml'))) `
         -DisplayName '.codex/config.toml'
 } else {
     Read-GitRevisionText `
@@ -7140,7 +7886,8 @@ $strDocsInstructionsContent = if ([string]::IsNullOrEmpty($strValidatedInputRevi
             -RepositoryRootPath $strRepositoryRootPath `
             -RepositoryRelativePath '.github/instructions/docs.instructions.md' `
             -DisplayName '.github/instructions/docs.instructions.md' `
-            -MaximumBytes $intDocsInstructionsMaximumInputBytes) `
+            -MaximumBytes $intDocsInstructionsMaximumInputBytes `
+            -RequireIndexContentMatch:($RequireStagedInputMatch -and $setStagedInputPaths.Contains('.github/instructions/docs.instructions.md'))) `
         -DisplayName '.github/instructions/docs.instructions.md'
 } else {
     Read-GitRevisionText `
@@ -7174,7 +7921,8 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
                 -RepositoryRootPath $strRepositoryRootPath `
                 -RepositoryRelativePath $objDocumentSpec.Path `
                 -DisplayName $objDocumentSpec.Path `
-                -MaximumBytes $objDocumentSpec.MaximumBytes) `
+                -MaximumBytes $objDocumentSpec.MaximumBytes `
+            -RequireIndexContentMatch:($RequireStagedInputMatch -and $setStagedInputPaths.Contains($objDocumentSpec.Path))) `
             -DisplayName $objDocumentSpec.Path
     } else {
         Read-GitRevisionText `
@@ -7265,6 +8013,7 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
 }
 
 $listRepositoryFailures = [Collections.Generic.List[string]]::new()
+$listRepositoryFailures.AddRange([string[]] @(Get-AgentSetupContractFailure -Content $hashtableAgentSetupContent))
 $listRepositoryFailures.AddRange([string[]] @(Get-AgentInstructionFailure `
         -AgentsContent $strAgentsContent `
         -ClaudeContent $strClaudeContent `
@@ -7276,7 +8025,8 @@ $strGitIgnoreContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) 
             -RepositoryRootPath $strRepositoryRootPath `
             -RepositoryRelativePath '.gitignore' `
             -DisplayName '.gitignore' `
-            -MaximumBytes $intGitIgnoreMaximumInputBytes) `
+            -MaximumBytes $intGitIgnoreMaximumInputBytes `
+            -RequireIndexContentMatch:($RequireStagedInputMatch -and $setStagedInputPaths.Contains('.gitignore'))) `
         -DisplayName '.gitignore'
 } else {
     Read-GitRevisionText `
@@ -7414,25 +8164,25 @@ if ($SelfTest) {
     }
 
     $strExtractedSelfTestPath = '.github/workflows/Test-AgentInstructions.SelfTest.ps1'
-    $boolSavedWindowsPython = $script:useWindowsPythonLauncher
-    $arrSavedPythonNames = $script:pythonPathNames
+    $boolSavedWindowsPython = $hashtableRuntimeContext.WindowsPlatform
+    $arrSavedPythonNames = $hashtableRuntimeContext.PythonPathNames
     try {
-        $script:useWindowsPythonLauncher = $false
-        $script:pythonPathNames = @('python3.12', 'python3', 'python')
+        $hashtableRuntimeContext.WindowsPlatform = $false
+        $hashtableRuntimeContext.PythonPathNames = @('python3.12', 'python3', 'python')
         if ((Get-TomlParseContext -Content $strCodexConfigContent).Failure) {
             throw 'A compatible PATH Python 3.12 interpreter was rejected.'
         }
         foreach ($strRejectedPythonName in @(
                 'pwsh', 'missing-python312')) {
-            $script:pythonPathNames = @($strRejectedPythonName)
+            $hashtableRuntimeContext.PythonPathNames = @($strRejectedPythonName)
             if ((Get-TomlParseContext -Content $strCodexConfigContent).Failure -cne
                 $strPythonPrerequisite) {
                 throw "Python candidate was accepted: $strRejectedPythonName"
             }
         }
     } finally {
-        $script:useWindowsPythonLauncher = $boolSavedWindowsPython
-        $script:pythonPathNames = $arrSavedPythonNames
+        $hashtableRuntimeContext.WindowsPlatform = $boolSavedWindowsPython
+        $hashtableRuntimeContext.PythonPathNames = $arrSavedPythonNames
     }
 
     $strMissingBootstrapFixture = [IO.Path]::Combine(
@@ -8227,6 +8977,7 @@ if ($SelfTest) {
         $strValidatedInputRevision
     }
     & (Join-Path $strRepositoryRootPath $strExtractedSelfTestPath) `
+        -RuntimeContext $hashtableRuntimeContext `
         -RepositoryRootPath $strRepositoryRootPath `
         -Revision $strExtractedSelfTestRevision `
         -MaximumBytes $intGitPathListMaximumBytes `

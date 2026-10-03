@@ -159,7 +159,7 @@ repos:
         name: agent instruction contract and mutation tests
         entry: >-
           pwsh -NoLogo -NoProfile -NonInteractive -File
-          .github/workflows/Test-AgentInstructions.ps1 -SelfTest
+          .github/workflows/Test-AgentInstructions.ps1 -SelfTest -RequireStagedInputMatch
         language: system
         pass_filenames: false
         always_run: true
