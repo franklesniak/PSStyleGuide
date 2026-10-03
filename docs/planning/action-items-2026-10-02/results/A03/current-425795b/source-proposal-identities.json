@@ -1,0 +1,107 @@
+{
+  "scope": "scratch-only static derivation; no owner L/P choice or tests/settings/ref/product writes",
+  "PS": {
+    "revision": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+    "tree": "5cc022a7f5719c719a3398029cb4aab2a63cf348",
+    "entries": [
+      {
+        "path": ".github/workflows/Assert-MaintenanceLabel.mjs",
+        "base_entry": null,
+        "before_sha256": null,
+        "proposed_sha256": "3503670dab3273b748e55fef27740c6f0b47a1993ae42de42291687d984452d0",
+        "before_length": 0,
+        "proposed_length": 3038,
+        "mode": "100644"
+      },
+      {
+        "path": ".github/workflows/Assert-MaintenanceLabel.test.mjs",
+        "base_entry": null,
+        "before_sha256": null,
+        "proposed_sha256": "82e8ef64ac4f484474ea2648421a1813049967bfd8be510c69478993e7e03114",
+        "before_length": 0,
+        "proposed_length": 5612,
+        "mode": "100644"
+      },
+      {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "base_entry": "100644 blob c36ffc6bf2f845f2ff297e2045799331365634e0\t.github/workflows/Classify-InstructionMaintenance.mjs",
+        "before_sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7",
+        "proposed_sha256": "497f7de679c7427c5a856f4556318637b6d58496bd293c93907f30ca9529595f",
+        "before_length": 5786,
+        "proposed_length": 5857,
+        "mode": "100644"
+      },
+      {
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "base_entry": "100644 blob 98a19faa7ae2da75e8a09d146508c34aa70b3a64\t.github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "before_sha256": "980257c408ee4dee430d7fb6e144ff7cb9d8c1dc90565071d99054479304d311",
+        "proposed_sha256": "f4a9a36194d3ec6ef95e59f904527076e9c16f8d4f47816d16255aeb44d04f97",
+        "before_length": 21583,
+        "proposed_length": 22180,
+        "mode": "100644"
+      },
+      {
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "base_entry": "100644 blob 3f0abda0049fdeacb85c8493937b768ddc999c4a\t.github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "before_sha256": "09c32c6e780a325bfac5a2d6d2505f747fd3cdfff297edb7b74107fc79bbcaca",
+        "proposed_sha256": "c12db80ba9b8b7db773a96a253c52e7880f911253e1dac65a86f4ec9ffc7b460",
+        "before_length": 15077,
+        "proposed_length": 18764,
+        "mode": "100644"
+      },
+      {
+        "path": ".github/workflows/agent-instructions.yml",
+        "base_entry": "100644 blob bd559e5e9b7015d83f45f705a4e7862dc2dc11d5\t.github/workflows/agent-instructions.yml",
+        "before_sha256": "ee0595c59dd9601e0a6296b295969842faa5d4db35b2ba20fffa2d5273e915d7",
+        "proposed_sha256": "0fdec1afde8436f743e1c2ecbefa7508b8be2993900848f0fb30e4c915a0ece5",
+        "before_length": 11495,
+        "proposed_length": 12024,
+        "mode": "100644"
+      }
+    ],
+    "derived_patch_sha256": "31eabe27e3dad9a1ceda998815a564c348d3e7d08f85928cba42227980747c95"
+  },
+  "TF": {
+    "revision": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+    "entries": [
+      {
+        "path": ".github/workflows/Assert-MaintenanceLabel.mjs",
+        "base_entry": null,
+        "unique_preimages": true
+      },
+      {
+        "path": ".github/workflows/Assert-MaintenanceLabel.test.mjs",
+        "base_entry": null,
+        "unique_preimages": true
+      },
+      {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "base_entry": "100644 blob 00c5857b701c9c85668f9fe66e33838f82d313e8\t.github/workflows/Classify-InstructionMaintenance.mjs",
+        "unique_preimages": true
+      },
+      {
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "base_entry": "100644 blob c24be2165520a02cb622f47dc03c4e4ad9ddd716\t.github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "unique_preimages": true
+      },
+      {
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "base_entry": "100644 blob aa1be01df5a3c8b5369bf8e4313089de9c356365\t.github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "unique_preimages": true
+      },
+      {
+        "path": ".github/workflows/agent-instructions.yml",
+        "base_entry": "100644 blob 7bf29f43ea081e9861ad53ecf0951831bf878075\t.github/workflows/agent-instructions.yml",
+        "unique_preimages": true
+      }
+    ],
+    "original_patch_still_exact": true
+  },
+  "originals": {
+    "option-L-PS.patch": "803151b74f8abe1a020a8e3894c759fa4060ebe2c96149682c28766dbcc4d079",
+    "option-L-TF.patch": "09ea868fa963f23e8644b7a964f360f82e0f3d948bae51557550cbb4ccaf281f",
+    "desired-ps-ruleset-option-L.json": "00305f1f0708b401fd850ab6249802a33ae975686a7cbc1389dd0ef896d53351",
+    "option-L-validation.json": "c7658bd85ef65bf355d382de563c8a5678067548259ec7ff9a7180ec7e1977c0"
+  }
+}

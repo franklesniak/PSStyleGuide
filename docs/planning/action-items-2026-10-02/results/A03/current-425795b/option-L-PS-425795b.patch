@@ -1,0 +1,313 @@
+diff --git a/.github/workflows/Assert-MaintenanceLabel.mjs b/.github/workflows/Assert-MaintenanceLabel.mjs
+new file mode 100644
+--- /dev/null
++++ b/.github/workflows/Assert-MaintenanceLabel.mjs
+@@ -0,0 +1,56 @@
++import fs from 'node:fs';
++import path from 'node:path';
++import { fileURLToPath } from 'node:url';
++
++export const approvalLabel = 'maintenance-approved';
++
++// This verifies one platform-provided event, not current remote state or human intent.
++// Labels on synchronize/edited events do not identify who originally applied them.
++export function assertMaintenanceLabel({ classification, event, eventName, repository,
++  base, head, runAttempt }) {
++  if (!['ordinary', 'maintenance_required'].includes(classification)) {
++    throw new Error('Unknown maintenance classification.');
++  }
++  if (eventName !== 'pull_request_target' || !/^[a-f0-9]{40}$/.test(base ?? '') ||
++      !/^[a-f0-9]{40}$/.test(head ?? '') ||
++      !/^franklesniak\/(PSStyleGuide|TerraformStyleGuide)$/.test(repository ?? '') ||
++      event?.repository?.full_name !== repository ||
++      event?.pull_request?.base?.repo?.full_name !== repository ||
++      event?.pull_request?.base?.sha !== base || event?.pull_request?.head?.sha !== head ||
++      event?.pull_request?.state !== 'open' || !Number.isSafeInteger(event?.number) ||
++      event.number <= 0 || event.pull_request.number !== event.number) {
++    throw new Error('Expected an open, matching repository and exact PR input.');
++  }
++  if (classification === 'ordinary') return 'ordinary';
++
++  const owner = event.repository.owner;
++  const sender = event.sender;
++  const label = event.label;
++  const labels = event.pull_request.labels;
++  if (runAttempt !== '1' || event.action !== 'labeled' ||
++      owner?.login !== 'franklesniak' || owner?.type !== 'User' ||
++      !Number.isSafeInteger(owner?.id) || owner.id <= 0 ||
++      sender?.id !== owner.id || sender?.login !== owner.login || sender?.type !== 'User' ||
++      label?.name !== approvalLabel || !Number.isSafeInteger(label?.id) || label.id <= 0 ||
++      !Array.isArray(labels) || labels.filter(item => item?.name === approvalLabel).length !== 1 ||
++      !labels.some(item => item?.id === label.id && item?.name === approvalLabel)) {
++    throw new Error('MAINTENANCE_REQUIRED: owner must freshly apply maintenance-approved to this PR input; retained labels and reruns do not prove approval.');
++  }
++  return 'owner-label-event';
++}
++
++if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
++  try {
++    if (process.argv.length !== 5) {
++      throw new Error('Usage: node Assert-MaintenanceLabel.mjs CLASSIFICATION BASE HEAD');
++    }
++    const event = JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8'));
++    const result = assertMaintenanceLabel({ classification: process.argv[2], base: process.argv[3],
++      head: process.argv[4], event, eventName: process.env.GITHUB_EVENT_NAME,
++      repository: process.env.GITHUB_REPOSITORY, runAttempt: process.env.GITHUB_RUN_ATTEMPT });
++    process.stdout.write(`Maintenance admission: ${result}; exact-input review and merge gates still apply.\n`);
++  } catch (error) {
++    process.stderr.write(`Maintenance admission refused: ${error.message}\n`);
++    process.exitCode = 1;
++  }
++}
+diff --git a/.github/workflows/Assert-MaintenanceLabel.test.mjs b/.github/workflows/Assert-MaintenanceLabel.test.mjs
+new file mode 100644
+--- /dev/null
++++ b/.github/workflows/Assert-MaintenanceLabel.test.mjs
+@@ -0,0 +1,94 @@
++import assert from 'node:assert/strict';
++import fs from 'node:fs';
++import os from 'node:os';
++import path from 'node:path';
++import { spawnSync } from 'node:child_process';
++import test from 'node:test';
++import { fileURLToPath } from 'node:url';
++import { assertMaintenanceLabel, approvalLabel } from './Assert-MaintenanceLabel.mjs';
++import { classifyInstructionMaintenance } from './Classify-InstructionMaintenance.mjs';
++
++const base = 'a'.repeat(40), head = 'b'.repeat(40);
++function fixture(repository = 'franklesniak/PSStyleGuide') {
++  return { classification: 'maintenance_required', eventName: 'pull_request_target',
++    repository, base, head, runAttempt: '1', event: {
++      action: 'labeled', number: 9,
++      repository: { full_name: repository, owner: { id: 41, login: 'franklesniak', type: 'User' } },
++      sender: { id: 41, login: 'franklesniak', type: 'User' },
++      label: { id: 81, name: approvalLabel },
++      pull_request: { number: 9, state: 'open', base: { sha: base, repo: { full_name: repository } },
++        head: { sha: head }, labels: [{ id: 81, name: approvalLabel }] },
++    } };
++}
++
++test('fresh owner label works in both repositories; classification remains separate', () => {
++  for (const repository of ['franklesniak/PSStyleGuide', 'franklesniak/TerraformStyleGuide']) {
++    const input = fixture(repository);
++    input.classification = classifyInstructionMaintenance({ base, head,
++      changedPaths: ['.github/workflows/Assert-MaintenanceLabel.mjs'] }).classification;
++    assert.equal(input.classification, 'maintenance_required');
++    assert.equal(assertMaintenanceLabel(input), 'owner-label-event');
++  }
++});
++
++test('ordinary documentation passes without a label; owner label does not exempt maintenance', () => {
++  const input = fixture();
++  input.classification = classifyInstructionMaintenance({ base, head, changedPaths: ['docs/example.md'] }).classification;
++  input.event.action = 'synchronize'; input.event.sender = { id: 99, login: 'contributor' };
++  input.event.pull_request.labels = []; delete input.event.label;
++  assert.equal(assertMaintenanceLabel(input), 'ordinary');
++  input.classification = classifyInstructionMaintenance({ base, head,
++    changedPaths: ['.github/workflows/agent-instructions.yml'] }).classification;
++  assert.throws(() => assertMaintenanceLabel(input), /MAINTENANCE_REQUIRED/);
++});
++
++const denied = {
++  'missing label': x => { x.event.pull_request.labels = []; },
++  'wrong label': x => { x.event.label.name = 'approved'; },
++  'case variant label': x => { x.event.label.name = 'Maintenance-Approved'; },
++  'different label identity': x => { x.event.label.id++; },
++  'duplicate label': x => { x.event.pull_request.labels.push({ ...x.event.label }); },
++  'non-owner applying actor': x => { x.event.sender = { id: 99, login: 'collaborator', type: 'User' }; },
++  'owner display name with different ID': x => { x.event.sender.id++; },
++  'bot actor': x => { x.event.sender.type = 'Bot'; },
++  'rerun of old approval payload': x => { x.runAttempt = '2'; },
++  'missing run attempt': x => { delete x.runAttempt; },
++  'changed head': x => { x.head = 'c'.repeat(40); },
++  'changed base': x => { x.base = 'c'.repeat(40); },
++  'wrong repository': x => { x.event.repository.full_name = 'attacker/PSStyleGuide'; },
++  'wrong base repository': x => { x.event.pull_request.base.repo.full_name = 'attacker/PSStyleGuide'; },
++  'closed PR': x => { x.event.pull_request.state = 'closed'; },
++  'PR number mismatch': x => { x.event.pull_request.number++; },
++  'unprivileged event mistaken for target': x => { x.eventName = 'pull_request'; },
++  'invalid endpoint': x => { x.base = 'main'; },
++  'unknown classification': x => { x.classification = 'approved'; },
++};
++for (const action of ['opened', 'reopened', 'synchronize', 'edited', 'unlabeled']) {
++  denied[`retained label on ${action} does not prove its applying actor`] = x => { x.event.action = action; };
++}
++for (const [name, mutate] of Object.entries(denied)) test(name, () => {
++  const input = fixture(); mutate(input); assert.throws(() => assertMaintenanceLabel(input));
++});
++
++test('synchronize payload is indistinguishable for owner-applied versus collaborator-applied retained label', () => {
++  const ownerHistory = fixture(); ownerHistory.event.action = 'synchronize'; delete ownerHistory.event.label;
++  const otherHistory = structuredClone(ownerHistory);
++  assert.deepEqual(ownerHistory, otherHistory);
++  assert.throws(() => assertMaintenanceLabel(ownerHistory), /freshly apply/);
++  assert.throws(() => assertMaintenanceLabel(otherHistory), /freshly apply/);
++});
++
++test('real CLI exits nonzero for refusal and malformed event, zero for owner event', t => {
++  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'option-l-cli-'));
++  t.after(() => { assert.equal(path.dirname(dir), os.tmpdir()); fs.rmSync(dir, { recursive: true, force: true }); });
++  const eventPath = path.join(dir, 'event.json');
++  const input = fixture();
++  const invoke = () => spawnSync(process.execPath, [fileURLToPath(new URL('./Assert-MaintenanceLabel.mjs', import.meta.url)),
++    input.classification, base, head], { encoding: 'utf8', windowsHide: true, timeout: 10000,
++    env: { ...process.env, GITHUB_EVENT_PATH: eventPath, GITHUB_EVENT_NAME: input.eventName,
++      GITHUB_REPOSITORY: input.repository, GITHUB_RUN_ATTEMPT: input.runAttempt } });
++  fs.writeFileSync(eventPath, JSON.stringify(input.event)); assert.equal(invoke().status, 0);
++  input.event.action = 'unlabeled'; fs.writeFileSync(eventPath, JSON.stringify(input.event));
++  assert.equal(invoke().status, 1);
++  fs.writeFileSync(eventPath, '{'); assert.equal(invoke().status, 1);
++});
+diff --git a/.github/workflows/Classify-InstructionMaintenance.mjs b/.github/workflows/Classify-InstructionMaintenance.mjs
+--- a/.github/workflows/Classify-InstructionMaintenance.mjs
++++ b/.github/workflows/Classify-InstructionMaintenance.mjs
+@@ -12,6 +12,7 @@
+   ...[
+     '.gitattributes', '.npmrc', 'npm-shrinkwrap.json', 'package.json', 'package-lock.json',
+     'Classify-InstructionMaintenance.mjs', 'Classify-InstructionMaintenance.test.mjs',
++    'Assert-MaintenanceLabel.mjs', 'Assert-MaintenanceLabel.test.mjs',
+     'Test-AgentInstructions.ps1', 'Test-AgentInstructions.SelfTest.ps1',
+     'Validate-WorkflowPolicy.mjs',
+     'workflow-policy-contract.json', 'workflow-policy-cases.json',
+diff --git a/.github/workflows/Classify-InstructionMaintenance.test.mjs b/.github/workflows/Classify-InstructionMaintenance.test.mjs
+--- a/.github/workflows/Classify-InstructionMaintenance.test.mjs
++++ b/.github/workflows/Classify-InstructionMaintenance.test.mjs
+@@ -329,15 +329,15 @@
+   if ($args -contains 'rev-parse') { $env:EXPECTED_HEAD }
+ }
+ function Invoke-FixtureNode {
+-  $phase = if ($args[0] -eq '.github/workflows/Classify-InstructionMaintenance.mjs') { 'classify' } else { 'workflow' }
++  $phase = if ($args[0] -eq '.github/workflows/Classify-InstructionMaintenance.mjs') { 'classify' } elseif ($args[0] -eq '.github/workflows/Assert-MaintenanceLabel.mjs') { 'admission' } else { 'workflow' }
+   [IO.File]::AppendAllText($env:FIXTURE_LOG, (@($phase) + @($args) | ConvertTo-Json -Compress -AsArray) + "\n")
+   $global:LASTEXITCODE = 0
+   if ($phase -eq 'classify') { $env:FIXTURE_CLASSIFICATION }
+ }
+ ` + step.run.replaceAll('/usr/bin/git', 'Invoke-FixtureGit').replaceAll('& node ', '& Invoke-FixtureNode '));
+     for (const item of [
+-      { name: 'wrapper-only', paths: ['.github/workflows/lint-markdown.mjs'], phases: ['credentials', 'data', 'classify'] },
+-      { name: 'ordinary documentation', paths: ['docs/example.md'], phases: ['credentials', 'data', 'classify', 'ordinary', 'workflow'] },
++      { name: 'wrapper-only', paths: ['.github/workflows/lint-markdown.mjs'], phases: ['credentials', 'data', 'classify', 'admission'] },
++      { name: 'ordinary documentation', paths: ['docs/example.md'], phases: ['credentials', 'data', 'classify', 'admission', 'ordinary', 'workflow'] },
+       { name: 'invalid helper data', paths: ['.github/workflows/lint-markdown.mjs'], reject: true, phases: ['credentials', 'data'] },
+     ]) {
+       fs.writeFileSync(log, '');
+@@ -356,7 +356,9 @@
+       else {
+         assert.deepEqual(rows.find(row => row[0] === 'classify'),
+           ['classify', '.github/workflows/Classify-InstructionMaintenance.mjs', root, base, head]);
+-        if (item.paths[0].includes('lint-markdown')) assert.match(result.stdout, /This is not ordinary policy admission/);
++        assert.deepEqual(rows.find(row => row[0] === 'admission'),
++          ['admission', '.github/workflows/Assert-MaintenanceLabel.mjs', classify(item.paths).classification, base, head]);
++        if (item.paths[0].includes('lint-markdown')) assert.match(result.stdout, /this is not immutable merge authorization/);
+       }
+     }
+   } finally {
+@@ -365,3 +367,10 @@
+     fs.rmSync(root, { recursive: true, force: true });
+   }
+ });
++
++
++test('maintenance approval implementation and tests cannot become ordinary data', () => {
++  for (const name of ['Assert-MaintenanceLabel.mjs', 'Assert-MaintenanceLabel.test.mjs']) {
++    assert.equal(classify(['.github/workflows/' + name]).classification, 'maintenance_required');
++  }
++});
+diff --git a/.github/workflows/Validate-WorkflowPolicy.test.mjs b/.github/workflows/Validate-WorkflowPolicy.test.mjs
+--- a/.github/workflows/Validate-WorkflowPolicy.test.mjs
++++ b/.github/workflows/Validate-WorkflowPolicy.test.mjs
+@@ -249,3 +249,49 @@
+ test('obsolete catalog execution mode is rejected instead of silently claiming coverage', async () => {
+   await assert.rejects(main(['--ordinary-case-catalog-data']), error => error.category === 'arguments');
+ });
++
++// Option L's workflow wiring is tested with the accepted strict YAML parser.
++const optionLName = "${{ github.event_name == 'pull_request_target' && 'accepted-maintenance-policy' || 'accepted-maintenance-policy-not-applicable' }}";
++function assertOptionLWorkflow(value) {
++  assert.deepEqual(value.permissions, {});
++  for (const action of ['opened', 'reopened', 'synchronize', 'edited', 'labeled', 'unlabeled']) {
++    assert.ok(value.on.pull_request_target.types.includes(action));
++  }
++  const accepted = value.jobs['accepted-policy'];
++  assert.equal(accepted.name, optionLName);
++  assert.equal(accepted.if, "github.event_name == 'pull_request_target'");
++  assert.deepEqual(accepted.permissions, {});
++  assert.equal(accepted.concurrency['cancel-in-progress'], true);
++  assert.equal(accepted.concurrency.group, 'accepted-maintenance-${{ github.event.pull_request.number }}');
++  assert.ok(accepted.steps.every(item => !item.uses && !item['continue-on-error']));
++  assert.ok(!accepted['continue-on-error']);
++  const acquire = accepted.steps.find(item => item.id === 'acquire');
++  assert.equal(acquire.env.EXPECTED_BASE, '${{ github.event.pull_request.base.sha }}');
++  assert.ok(acquire.run.includes("checkout --quiet --detach $strRevision"));
++  const validate = accepted.steps.find(item => item.id === 'validate');
++  const gate = '& node .github/workflows/Assert-MaintenanceLabel.mjs $objResult.classification $env:EXPECTED_BASE $env:EXPECTED_HEAD';
++  assert.ok(validate.run.includes(gate + "\nif ($LASTEXITCODE -ne 0) { throw 'Accepted maintenance admission refused.' }"));
++  assert.ok(validate.run.indexOf(gate) > validate.run.indexOf('Classify-InstructionMaintenance.mjs'));
++  assert.ok(validate.run.indexOf(gate) < validate.run.indexOf("if ($objResult.classification -ceq 'ordinary')"));
++  assert.ok(!validate.run.includes('GITHUB_TOKEN:'));
++  const candidate = value.jobs['candidate-tests'];
++  assert.deepEqual(candidate.permissions, {});
++  assert.ok(candidate.if.startsWith("github.event_name != 'pull_request_target'"));
++  assert.ok(candidate.steps.find(item => item.id === 'test').run.includes('Assert-MaintenanceLabel.test.mjs'));
++}
++const optionLWorkflow = parseStrictYaml(fs.readFileSync(path.join(directory, 'agent-instructions.yml')), LIMITS).value;
++test('option L protects accepted-base invocation and separates skipped candidate check context', () => {
++  assertOptionLWorkflow(optionLWorkflow);
++});
++for (const [name, mutate] of [
++  ['missing revocation event', x => { x.on.pull_request_target.types = x.on.pull_request_target.types.filter(v => v !== 'unlabeled'); }],
++  ['skipped job reuses required context', x => { x.jobs['accepted-policy'].name = 'accepted-maintenance-policy'; }],
++  ['missing gate invocation', x => { x.jobs['accepted-policy'].steps.find(v => v.id === 'validate').run = 'Write-Output success'; }],
++  ['missing gate exit check', x => { const v = x.jobs['accepted-policy'].steps.find(v => v.id === 'validate'); v.run = v.run.replace("if ($LASTEXITCODE -ne 0) { throw 'Accepted maintenance admission refused.' }", ''); }],
++  ['candidate checkout mistaken for base', x => { x.jobs['accepted-policy'].steps[0].env.EXPECTED_BASE = '${{ github.event.pull_request.head.sha }}'; }],
++  ['credential grant', x => { x.jobs['accepted-policy'].permissions = { contents: 'write' }; }],
++  ['ignored refusal', x => { x.jobs['accepted-policy']['continue-on-error'] = true; }],
++  ['old concurrent result unsuppressed', x => { x.jobs['accepted-policy'].concurrency['cancel-in-progress'] = false; }],
++]) test('option L rejects workflow regression: ' + name, () => {
++  const value = clone(optionLWorkflow); mutate(value); assert.throws(() => assertOptionLWorkflow(value));
++});
+diff --git a/.github/workflows/agent-instructions.yml b/.github/workflows/agent-instructions.yml
+--- a/.github/workflows/agent-instructions.yml
++++ b/.github/workflows/agent-instructions.yml
+@@ -15,11 +15,16 @@
+       - reopened
+       - synchronize
+       - edited
++      - labeled
++      - unlabeled
+ permissions: {}
+ jobs:
+   accepted-policy:
+-    name: Classify maintenance and validate ordinary instructions
++    name: ${{ github.event_name == 'pull_request_target' && 'accepted-maintenance-policy' || 'accepted-maintenance-policy-not-applicable' }}
+     if: github.event_name == 'pull_request_target'
++    concurrency:
++      group: accepted-maintenance-${{ github.event.pull_request.number }}
++      cancel-in-progress: true
+     runs-on: ubuntu-24.04
+     timeout-minutes: 20
+     permissions: {}
+@@ -102,13 +107,15 @@
+           $strResult = & node .github/workflows/Classify-InstructionMaintenance.mjs $PWD.Path $env:EXPECTED_BASE $env:EXPECTED_HEAD
+           if ($LASTEXITCODE -ne 0) { throw 'Maintenance classification failed.' }
+           $objResult = $strResult | ConvertFrom-Json -ErrorAction Stop
++          & node .github/workflows/Assert-MaintenanceLabel.mjs $objResult.classification $env:EXPECTED_BASE $env:EXPECTED_HEAD
++          if ($LASTEXITCODE -ne 0) { throw 'Accepted maintenance admission refused.' }
+           [IO.File]::AppendAllText($env:GITHUB_STEP_SUMMARY, "Accepted-policy classification (not merge authority):`n`n$strResult`n")
+           if ($objResult.classification -ceq 'ordinary') {
+               & ./.github/workflows/Test-AgentInstructions.ps1 -InputRevision $env:EXPECTED_HEAD -PublishedBaselineRevision $env:EXPECTED_BASE
+               & node .github/workflows/Validate-WorkflowPolicy.mjs --input-revision $env:EXPECTED_HEAD .github/workflows/build.yml .github/workflows/markdownlint.yml
+               if ($LASTEXITCODE -ne 0) { throw 'Accepted workflow policy rejected ordinary input.' }
+           } elseif ($objResult.classification -ceq 'maintenance_required') {
+-              Write-Output 'MAINTENANCE_REQUIRED: candidate tests, scoped owner authority and fresh independent review are required before merge. This is not ordinary policy admission.'
++              Write-Output 'MAINTENANCE_REQUIRED: owner label event verified for this payload. Candidate tests, scoped authority and fresh independent review remain required; this is not immutable merge authorization.'
+           } else { throw 'Unknown maintenance classification.' }
+   candidate-tests:
+     name: Test proposed instruction and workflow behavior
+@@ -195,5 +202,5 @@
+               & ./.github/workflows/Test-AgentInstructions.ps1 -ProposedPolicy -InputRevision $env:EXPECTED_PUSH_HEAD -PublishedBaselineRevision $env:EXPECTED_PUSH_BASE
+               if (-not $?) { throw 'Proposed push transition checks failed.' }
+           }
+-          & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs
++          & node --test .github/workflows/Assert-MaintenanceLabel.test.mjs .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs
+           if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }

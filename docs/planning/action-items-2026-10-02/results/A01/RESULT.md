@@ -1,7 +1,17 @@
 <!-- markdownlint-disable MD013 -->
 # A01 current issue and native tree inventory
 
-## Current refresh after PR227: 2026-10-03
+## Current refresh after PR228: 2026-10-03
+
+Current native inventory is PS `425795bd49d6001081d32abd769c87e17dd1d9d5` / tree `5cc022a7f5719c719a3398029cb4aab2a63cf348` and TF `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` / tree `dc8f6b82588b8f874d34cd5d0155791aea5793f1`. The complete83-path union retains13 raw equal,54 different,8 PS-only and8 TF-only entries, with75 files per side. Exactly the four released A21 paths changed from c13; no additions/removals/renames or TF delta. The worker checked complete nontruncated native trees against immutable Git entries, read all four new raw blobs, and reused146 prior raw identities only after exact blob/mode/type/size equality. Root read the full report, verified its identity, and independently sampled native raw pre-commit and SelfTest blobs, lengths and hashes.
+
+See the [bounded post228 report](post228/CURRENT-REFRESH-POST228.md), SHA256 `d8a72620def32f111786b5106dd61b440b22a50d93d794d098f796402fcd76dd`, and [complete native/raw data](post228/post228-native-raw.json), SHA256 `a728b0b980c09f7f5ea00334586a17e04bed768da3d7bef2c31bbc22ac4f4409`. Native refs were stable through2026-10-03T13:38Z. Actual tree equals PR228's reviewed source. Landed instruction run37126558154 remains pending at this dated inventory; inventory acceptance is separate from source/paired acceptance.
+
+A12/A03 workflow YAML and names/triggers/permission sources are unchanged; actual validator coverage now names425. All ten paired A14 generation/caller entries remain unchanged. New local staged/runtime checks add no generator or archive-promotion writer, competing-writer requirement or new handle-relative consumer; no A14 reopen trigger is established. Retain its explicit race/alias threat limits. A20/A03 and coherent whole-TF integration gates remain. All81 historical paths/402 obligations/26 absent references retain ownership. The five-issue/seven-comment census remains explicitly dated post227 at12:18:07Z and was not reread or relabeled current for this main change.
+
+Coordinator follow-up: all five exact425 landed workflows subsequently passed and [PS source acceptance](https://github.com/franklesniak/PSStyleGuide/pull/228#issuecomment-5969842262) was recorded. The inventory report retains its original pending-CI observation; no inventory reread was needed for that terminal service result.
+
+## Historical refresh after PR227: 2026-10-03
 
 Current native inventory at PS `c13abc4623e2593d7dac703685da6c608451211a` and TF `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c`: **83 paths:13 equal,54 different,8 PS-only,8 TF-only**; 75 tracked files per repository. The worker verified all150 raw entries and complete pagination; root independently sampled both repositories' requirements, Python launcher and .gitignore blobs/modes/lengths/SHA256. Five issues and seven comments are unchanged; neither repository has an open PR at this census. All402 original obligations,81 historical paths and26 absent-both references remain intact.
 
