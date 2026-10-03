@@ -1,6 +1,10 @@
 <!-- markdownlint-disable MD013 -->
 # A07 decision: remove the affected braces dependency chain
 
+**Current selection: D90, existing bounded Markdown API.** The coordinator selected the reassessment below before corresponding graph/caller edits. It supersedes the initial K selection and K-specific compatibility instructions, including ambient refusal and CLI exit-code tests. The original seven-step record and K evidence remain historical. The distinct new YAML finding selects [E90](review-js-yaml-decision.md).
+
+## Historical initial K decision and mapping
+
 The coordinator selects K before product edits under the ordinary scoped plan authority. This decision supersedes D07-1's no-current-advisory conclusion only for the changed advisory inputs; prior clean observations remain historical. [The investigation](braces-investigation.md) records evidence and limits. The coordinator checked all eleven score totals and six immutable base/candidate package, lock, audit and exception identities. No risk exception, protected edit or bypass is granted. Implementation and verification remain pending.
 
 ## 1. Validate
@@ -111,3 +115,42 @@ Selected K remains fixed. The native48f and frozen c68 trees contain one actual 
 No new policy framework, generic CLI feature implementation or exception is selected. Supported rule changes go in the existing rules file; unsupported config is an intentional fail-closed choice documented in the two released ordinary tool docs. If an actually required consumer contradicts this mapping, stop and reassess the same decision before a different repair. Normal test gates follow implementation; their absence is not a request for new human permission. The coordinator owns commit/public delivery and the new accepted-base/PR224 initializer refresh.
 
 Independent mapping review confirms the actual literal-file, config-merge and ignore-file sources. Terminate CLI options with `--` before relative paths, or use verified absolute paths. Handle an empty discovered set explicitly; help output is not coverage. Match actual readable configuration inputs and do not reject an ordinary parent directory merely because it exists. These are checks of the selected contracts, not new approval gates.
+
+## Current D reassessment and implementation contract
+
+This revises the original braces selection using its original stakeholders, rubric weights and hard constraints. It does not create a duplicate finding/decision, erase the original51-file research freeze or claim implementation acceptance. The distinct js-yaml finding is in [review-js-yaml-decision.md](review-js-yaml-decision.md). No corresponding graph edit has happened yet.
+
+### Changed evidence and option responsibility
+
+K's intended benefit was fewer full-tree runner responsibilities. The actual selected implementation now uses our existing safe discovery/regular-file/root checks and passes literal paths; it parses the same config first, requires the named-string API for staged and D07-3 outer wrappers, adds run-con/home/system/ancestor/env refusal and CLI status handling, and would need a scoped YAML override. There is no current required CLI-only feature. The CLI re-reads the validated files/config and only contributes its call into the same markdownlint0.41.1 library plus formatting already supplied by the implemented adapter. Its10-case Windows controls pass9 plus the separately corrected real native2/3/4 test; existing tools/audit26 pass. The live audit remains red for newly introduced js-yaml5.2.3. These results are not D full acceptance or a Linux PASS.
+
+D can reuse the current named-string adapter in the existing D07-3 --outer child, with the same safe file reader, config/JSONC parser, useful file/line/column/rule/detail formatting and0/1/2 semantics. A thin caller retains runBounded's two-minute/two-MiB bound around that child. It needs no new framework, CLI config engine, formatter or graph override. Explicit unsupported repository config is still refused. Since no selected API loads ambient rc/env, remove that irrelevant machinery and prove ambient data cannot suppress actual lint, rather than refusing normal home data. The parent-provided D07 independent review confirms this source responsibility comparison.
+
+### Reapply the original fixed rubric before selecting
+
+Weights remain security40, required behavior30, verifiable provenance/admission15, sustainable maintenance10, bounded cost5. Scale/hard constraints remain the canonical original decision. Add L, the concrete K+published parent YAML patch combination. All original options remain represented.
+
+| Option | Security40 | Behavior30 | Verification15 | Maintenance10 | Cost5 | Total | Changed-input basis |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | --- |
+| A no change/red | 2 | 5 | 5 | 2 | 5 | 70 | Original graph remains. |
+| B root only | 2 | 5 | 5 | 4 | 4 | 73 | Workflow affected graph remains. |
+| C official braces upgrade | 1 | 5 | 2 | 5 | 4 | 58 | No patched release. |
+| D existing API graph removal | 5 | 4 | 4 | 5 | 4 | 90 | Full child/API exists; bounded wrapper and retained tests remain; cost improved from original2 by actual scope evidence. |
+| E exact upstream braces patch | 4 | 5 | 3 | 2 | 3 | 78 | Unreleased patch/fork/audit treatment unchanged. |
+| F sink mitigation+exception | 3 | 4 | 3 | 3 | 3 | 66 | Controls/authority still absent. |
+| G exception only | 2 | 5 | 4 | 3 | 4 | 68 | Real owner/admission absent. |
+| H defer | 2 | 5 | 4 | 5 | 4 | 72 | Unchanged exposure/wait. |
+| I remove required lint | 5 | 1 | 4 | 5 | 5 | 73; ineligible | Drops required check. |
+| J bypass/false identity | 1 | 5 | 1 | 1 | 5 | 48; ineligible | Violates truth/authority. |
+| K maintained CLI as installed | 3 | 4 | 4 | 3 | 3 | 69 | Braces removed but new live YAML finding; extra config/path duplication remains. |
+| L K+published scoped YAML patch | 5 | 4 | 4 | 3 | 2 | 84 | Can repair advisory, but adds override and minor API compatibility proof without required CLI-only benefit. |
+
+Scores are judgment, not test counts. D90 now wins on objective removed responsibilities and graph, not sunk implementation effort or a fabricated large score margin. L84 is technically possible; it does not offer a demonstrated retained capability absent from D. Behavior/proof remain4 until final Windows/Linux and actual caller gates pass. The original K90 recommendation is superseded for changed facts; its genuine results remain evidence for unaffected properties only.
+
+### Selected proposal and precise implementation mapping
+
+Select D. Keep the current failed audit visible. Remove CLI2/CLI graphs without a risk exception. Root delegates workflow lint:md. The thin lint-markdown.mjs runs the existing lint-nested-markdown.js --outer child via runBounded; it retains0/1/2, native cause, two-minute/two-MiB limits and exact Node selector. The child safely reads all current Markdown/MDC files and calls the same named-string API used by index/outer wrappers. Keep parser/extraction and stronger D07-3 staged/nested behavior, rules/JSON fallback, exclusions, hidden/literal path and useful diagnostic contracts. Keep empty discovery intentional. Remove irrelevant ambient run-con refusals; real API tests must prove ambient files/env cannot change explicit rule enforcement. Retain explicit unsupported repository config/ignore/extends refusal so meaningful introduced selectors are never silently accepted. No corresponding D graph/caller changes have yet occurred.
+
+Normal implementation tests establish acceptance after selection; they are not a new human-permission gate. Preserve all genuine property tests, replace obsolete CLI-internal-specific assertions with actual API/bounded-child failure controls, and test Windows/Linux. Regenerate/install and run unchanged real graph/audit checks on new inputs; no repeat of unchanged failed findings. Freeze before one normal aggregate released by coordinator. Allowed paths, held/protected/no-public limits, c68 reconciliation and exact changed-main/PR224 initializer consequences remain unchanged. No acceptance/transfer/merge is claimed.
+
+Coordinator selection: D90. All twelve reassessment totals and all eight distinct YAML totals were independently recalculated. The pre-edit reassessment source SHA256 is e39492c4945a0f088e921e236925c85753d4dae6ff14647e2ccd9374eb6fee52; the original research freeze is preserved. D07 independently checked the actual source responsibilities and supported D while requiring retained outer bounds. This is implementation selection, not candidate acceptance. The exact eleven-path release and original c68 preservation still apply.
