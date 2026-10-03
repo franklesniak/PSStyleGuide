@@ -2,7 +2,7 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `e38aaeee9fedcddb49294a1d4eda710d87fee3c2` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `d19f5d18f456f46e397c489c7fb438f0866ead2a` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -27,19 +27,19 @@ Planning head: `e38aaeee9fedcddb49294a1d4eda710d87fee3c2` (prior published check
 | [A18](tasks/A18.md) | Close remaining byte differences and verify convergence | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](tasks/A18.md) | Run final union and A10/A11 checklist after products |
 | [A19](tasks/A19.md) | Reconcile issues and publish final acceptance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](tasks/A19.md) | Refresh final issue census after A18 |
 | [A20](tasks/A20.md) | Protected instruction files | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A02/protected-v2-request.md) | PR224 merged; await explicit protected authority |
-| [A21](tasks/A21.md) | Instruction validator, SelfTest, and classification manifest convergence | validating | coordinator; aggregate38432 active | PS codex/instruction-validator-convergence | staged5cc022a / acceptedc13abc4 | — | 0/80; not started | 0/12 | [Evidence](results/A21/RESULT.md) | Reconcile sole aggregate and independent quality; commit and test actual B/H |
+| [A21](tasks/A21.md) | Instruction validator, SelfTest, and classification manifest convergence | waiting_external | coordinator; reviews and CI pending | PS codex/instruction-validator-convergence | 2273a23 / c13abc4 | [228](https://github.com/franklesniak/PSStyleGuide/pull/228) | 1/80;2026-10-11T13:06:25Z | 0/12 | [Evidence](results/A21/RESULT.md) | Reconcile current-head Copilot, automatic Codex and instruction CI |
 
 ## Local configuration and in-flight native operations
 
 - Planning: `C:/Users/flesniak/GitHub/PSStyleGuide`; peer: `C:/Users/flesniak/GitHub/TerraformStyleGuide`.
-- A21 product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`; codex/instruction-validator-convergence atc13; root owns four staged files/tree5cc.
+- A21 product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`; codex/instruction-validator-convergence clean2273a23/tree5cc; root owns lifecycle.
 - Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 suffix `A02-design-20261002`, resume `PR224-review-state.json`; D07 suffix `plan-review-20261002`.
 - Node24.18.1/npm11.16.0: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 Restricted; no Docker container remains.
 - A02 source: PR226 accepted2a2; round10; four landed runs pass. Worktree suffix `governance-push-exit/PSStyleGuide`; scratch `A02-landed-exit-20261003/repair-review-state.json`.
 - A07 follow-up: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; clean reviewedc9; PR227 mergedc13 and all five landed runs pass. Resume: scratch suffix `A07-reconcile-20261003/execution-state.json`; source accepted.
 - A02 peer: scratch `A02-peer-current-20261003/execution-state.json`; product TEMP `TerraformStyleGuide-A02-peer-docs-20261003`, codex/a02-peer-docs. root owns reviewed docs; audit FINDINGS; transfer1/12.
 - Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; treec68b5e1. Reconciliation complete; preserve index and unrelated edits.
-- A21: scratch suffix `A21-selection-20261003/execution-state.json`; sole aggregate38432 live; assembled quality passed; source landed gate cleared.
+- A21: scratch suffix `A21-selection-20261003/execution-state.json`; PR228 round1; Copilot37125185247, automatic Codex5969455000 and instructionCI37125066160 pending; no duplicate request.
 - Await A03-D1: owner-label L, procedural P or other direction.
 - Await A20: six protected-v2 files and separate two-CLAUDE protocol grant.
 - Await A05: two YAML-guide patch grant.
