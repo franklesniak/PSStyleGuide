@@ -2,18 +2,18 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `5e8cea060bd4bed5c11c15a9ebe83e6f7926f3c0` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `4b45b1dcc3ca24eb9540fa3fef319ea952b9c6fc` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | [A00](tasks/A00.md) | Reconcile historical obligations and retirement decisions | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A00/RESULT.md) | Reuse the canonical native delivery ledger |
 | [A01](tasks/A01.md) | Refresh issue coverage and full-tree baseline | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A01/RESULT.md) | Reuse accepted inventory; refresh at next mutation |
-| [A02](tasks/A02.md) | Non-protected shared governance | validating | a00; d07 quality; coordinator gates | PS codex/shared-governance | 56b1e6b / 48f4d8a | [224](https://github.com/franklesniak/PSStyleGuide/pull/224) | 8/80; 2026-10-10T07:26:08.214692Z | 0/12 | [Evidence](results/A02/RESULT.md) | 56b1e6b published; observe native CI and await A07 base reassessment |
+| [A02](tasks/A02.md) | Non-protected shared governance | validating | a00; d07 quality; coordinator gates | PS codex/shared-governance | 56b1e6b / 48f4d8a | [224](https://github.com/franklesniak/PSStyleGuide/pull/224) | 8/80; 2026-10-10T07:26:08.214692Z | 0/12 | [Evidence](results/A02/RESULT.md) | 56b1e6b instruction CI passed; reassess new maina71f16a before integration |
 | [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A03/RESULT.md) | Exact option L prepared; await owner choice |
 | [A04](tasks/A04.md) | Bound ordinary Node downloads and test retries | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A04/design.md) | Integrate after A03/A07 acceptance |
 | [A05](tasks/A05.md) | Require immutable event acquisition in the YAML guide | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A05/design.md) | Await exact two-guide authority |
 | [A06](tasks/A06.md) | Converge the generator and artifact verification | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A06/RESULT.md) | Retain retirements; validate current generator |
-| [A07](tasks/A07.md) | Converge dependency, lint and local toolchain behavior | validating | coordinator gates; d07 quality | PS codex/a07-braces-remediation | 0abe8bd / 48f4d8a | — | 0/80; not started | 0/12 | [Evidence](results/A07/RESULT.md) | 0abe8bd locally approved; publish source PR and start reviews |
+| [A07](tasks/A07.md) | Converge dependency, lint and local toolchain behavior | validating | coordinator gates; d07 quality | PS codex/a07-braces-remediation | 0abe8bd / 48f4d8a | [225](https://github.com/franklesniak/PSStyleGuide/pull/225) | 1/80; 2026-10-11T04:00:00Z | 0/12 | [Evidence](results/A07/RESULT.md) | PR225 merged as a71f16a; verify landed CI and preserve paired boundaries |
 | [A08](tasks/A08.md) | Converge repository review instructions | verified | a00 + independent d07 | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A08/RESULT.md) | Recheck wrapper only after relevant input change |
 | [A09](tasks/A09.md) | Converge current supply checks and preserve truthful history | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A09/RESULT.md) | Repair affected current supply tests after prerequisites |
 | [A10](tasks/A10.md) | Revalidate PowerShell examples and bounded preflight outcomes | superseded | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A10/RESULT.md) | A18 verifies examples and preflight residuals |
@@ -32,18 +32,18 @@ Planning head: `5e8cea060bd4bed5c11c15a9ebe83e6f7926f3c0` (prior published check
 ## Local configuration and in-flight native operations
 
 - Planning: `C:/Users/flesniak/GitHub/PSStyleGuide`; peer: `C:/Users/flesniak/GitHub/TerraformStyleGuide`.
-- PS product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`. Published56b1e6b/tree3f285db. Coordinator owns native gates; identities in A02 resume/RESULT.
-- Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 uses suffix `A02-design-20261002` (resume `PR224-review-state.json`, validation `D14-native-validation`); D07 uses `plan-review-20261002`.
-- Node24.18.1/npm11.16.0: scratch prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 remains Restricted. No Docker container remains.
-- A02:56b1e6b passed focused Windows/Linux, static, all10 hooks and actual B/H endpoints. Local quality approved/published; native instruction CI live, audit still red pending A07. Native965 failures retained; round8 terminal, three threads open, round9 unrequested. No pending write. Reassess224 base after A07 D/E lands.
-- A07 urgent: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; Coordinator owns0abe8bd/treea4b016f; all10 hooks/platform audits and local quality pass. Resume: A07 scratch `braces-remediation-state.json`.
-- A07 is frozen at `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; treec68b5e1 passed11 hooks; preserve it and reconcile known overlap after urgent repair/PR224. Preserve unrelated edits.
-- Await A03-D1: owner-label gate L, procedural boundary P, or another direction.
-- Await A20: six-file protected-v2 grant and separate two-CLAUDE protocol grant.
-- Await A05: two YAML-guide immutable-acquisition patch grant.
-- Await A13: exact PS ruleset and bounded ordinary-PR validation/restoration grant.
-- Await A15: exact D1/D3/D4/D5 design amendments at planning938367c; owner question sent, no answer. Actual Gate approvals remain separate.
-- At PR224 deadline only: request one dated extension/accept-at-limit/close decision; none supplied.
+- PS product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`; clean56b1e6b. Root owns product/native gates; a02 reads new-base impact.
+- Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 suffix `A02-design-20261002`, resume `PR224-review-state.json`; D07 suffix `plan-review-20261002`.
+- Node24.18.1/npm11.16.0: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 Restricted; no Docker container remains.
+- A02:56 passed local/native instruction gates; old audit red. New maina71 requires exact closed-baseline reassessment and affected proof. Round8 terminal, three threads open; round9 unrequested. No pending write.
+- A07 urgent: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; head0abe/treea4b. PR225 merged as a71f16a, both reviews clean (Balanced), final quality approved. Landed CI pending. Resume: A07 scratch `braces-remediation-state.json`.
+- Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; treec68b5e1. Preserve/reconcile overlap after PR224; preserve unrelated edits.
+- Await A03-D1: owner-label L, procedural P or other direction.
+- Await A20: six protected-v2 files and separate two-CLAUDE protocol grant.
+- Await A05: two YAML-guide patch grant.
+- Await A13: exact ruleset and bounded PR validation/restoration grant.
+- Await A15: D1/D3/D4/D5 amendments at938367c; actual Gate grants separate.
+- At PR224 deadline only: request dated extension/accept-at-limit/close choice.
 
 ## Final results
 
