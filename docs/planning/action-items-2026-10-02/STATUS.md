@@ -2,7 +2,7 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `db2d35326d426337ac4d0e28895358542cce3b33` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `c542b461e97fec116a1d9ae762ef52f82feaecf9` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -13,7 +13,7 @@ Planning head: `db2d35326d426337ac4d0e28895358542cce3b33` (prior published check
 | [A04](tasks/A04.md) | Bound ordinary Node downloads and test retries | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A04/design.md) | Integrate after A03/A07 acceptance |
 | [A05](tasks/A05.md) | Require immutable event acquisition in the YAML guide | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A05/design.md) | Await exact two-guide authority |
 | [A06](tasks/A06.md) | Converge the generator and artifact verification | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A06/RESULT.md) | Retain retirements; validate current generator |
-| [A07](tasks/A07.md) | Converge dependency, lint and local toolchain behavior | validating | coordinator; independent a02 | PS codex/a07-tooling-followup | da2f117 / 2a2d14a | [227](https://github.com/franklesniak/PSStyleGuide/pull/227) | 1/80;2026-10-11T09:51:36.838999Z | 0/12 | [Evidence](results/A07/RESULT.md) | Current reviews and instruction CI pending; no duplicate trigger |
+| [A07](tasks/A07.md) | Converge dependency, lint and local toolchain behavior | active | a07 repairs; coordinator native operations | PS codex/a07-tooling-followup | da2f117 / 2a2d14a | [227](https://github.com/franklesniak/PSStyleGuide/pull/227) | 1/80;2026-10-11T09:51:36.838999Z | 0/12 | [Evidence](results/A07/RESULT.md) | Address three findings; old reviews terminal; instruction CI pending |
 | [A08](tasks/A08.md) | Converge repository review instructions | verified | a00 + independent d07 | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A08/RESULT.md) | Recheck wrapper only after relevant input change |
 | [A09](tasks/A09.md) | Converge current supply checks and preserve truthful history | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A09/RESULT.md) | Repair affected current supply tests after prerequisites |
 | [A10](tasks/A10.md) | Revalidate PowerShell examples and bounded preflight outcomes | superseded | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A10/RESULT.md) | A18 verifies examples and preflight residuals |
@@ -36,7 +36,7 @@ Planning head: `db2d35326d426337ac4d0e28895358542cce3b33` (prior published check
 - Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 suffix `A02-design-20261002`, resume `PR224-review-state.json`; D07 suffix `plan-review-20261002`.
 - Node24.18.1/npm11.16.0: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 Restricted; no Docker container remains.
 - A02 source: PR226 accepted2a2; round10; four landed runs pass. Worktree suffix `governance-push-exit/PSStyleGuide`; scratch `A02-landed-exit-20261003/repair-review-state.json`.
-- A07 follow-up: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; codex/a07-tooling-followup from2a2; root owns clean da2; PR227 round1 pending; aggregate25857 passed. Resume: scratch suffix `A07-reconcile-20261003/execution-state.json`; merge serialized.
+- A07 follow-up: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; codex/a07-tooling-followup from2a2; a07 owns bounded repairs on da2; PR227 round1; prior aggregate passed. Resume: scratch suffix `A07-reconcile-20261003/execution-state.json`; merge serialized.
 - A02 peer: scratch `A02-peer-current-20261003/execution-state.json`; product TEMP `TerraformStyleGuide-A02-peer-docs-20261003`, codex/a02-peer-docs. a02 owns two docs; transfer1/12.
 - Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; treec68b5e1. Reconciliation complete; preserve index and unrelated edits.
 - A21: resume scratch suffix `A21-selection-20261003/execution-state.json`; D-A21-03 implementation active; reviewed candidate integrated; accepted source precedes final validation.
