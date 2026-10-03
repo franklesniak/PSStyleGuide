@@ -19,7 +19,7 @@ function fixture() {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'markdown-tool-test-'));
   const tools = path.join(root, '.github/workflows');
   fs.mkdirSync(tools, { recursive: true });
-  for (const name of ['lint-markdown.mjs', 'lint-nested-markdown.js', 'lint-staged-markdown.mjs', 'NpmTools.mjs', '.markdownlint.jsonc']) {
+  for (const name of ['lint-markdown.mjs', 'lint-nested-markdown.js', 'lint-staged-markdown.mjs', 'NpmTools.mjs', '.markdownlint.jsonc', 'package.json']) {
     fs.copyFileSync(path.join(source, name), path.join(tools, name));
   }
   fs.symlinkSync(path.join(source, 'node_modules'), path.join(tools, 'node_modules'), process.platform === 'win32' ? 'junction' : 'dir');
@@ -176,6 +176,12 @@ test('actual staged bytes survive worktree changes, nested phase, rename/delete 
     expect(runBounded(shell, [hook], { cwd: root, env }), 1, /Nested Markdown lint failed/u);
     fs.writeFileSync(file, clean); git(root, 'add', '--', '.hidden/space ü.mdc');
     expect(runBounded(shell, [hook], { cwd: root, env }), 0);
+    const unrelated = write(root, 'unrelated.md', invalid);
+    expect(runBounded(shell, [hook], { cwd: root, env }), 1, /Markdownlint reported errors/u);
+    fs.writeFileSync(unrelated, nestedInvalid);
+    expect(run(root), 0);
+    expect(runBounded(shell, [hook], { cwd: root, env }), 1, /Nested Markdown lint did not pass/u);
+    fs.unlinkSync(unrelated);
     git(root, '-c', 'user.name=Lint fixture', '-c', 'user.email=lint@example.invalid', 'commit', '--quiet', '-m', 'Private fixture baseline');
     git(root, 'mv', '--', '.hidden/space ü.mdc', '.hidden/renamed.md'); expect(run(root, 'lint-staged-markdown.mjs'), 0);
     git(root, 'reset', '--hard', '--quiet', 'HEAD'); git(root, 'rm', '--', '.hidden/space ü.mdc'); expect(run(root, 'lint-staged-markdown.mjs'), 0);

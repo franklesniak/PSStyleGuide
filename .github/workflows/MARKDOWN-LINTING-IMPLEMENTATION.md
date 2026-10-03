@@ -26,10 +26,10 @@ npm --prefix .github/workflows run lint:md
 npm --prefix .github/workflows run lint:md:nested
 ```
 
-The root package also provides `npm run lint:md` and `npm run lint:md:nested`. Each phase returns exit 0 when no violation exists. A lint violation or tooling failure returns a nonzero exit.
+The root package also provides `npm run lint:md` and `npm run lint:md:nested`. Each phase returns 0 for success, 1 for lint findings and 2 for tooling failure. The outer command runs the shared API through a child bounded to two minutes and two MiB of output. See [the script index](scripts-README.md) for its explicit configuration and input boundaries.
 
 ## Hook and CI integration
 
-The active local hook definitions are [.pre-commit-config.yaml](../../.pre-commit-config.yaml) and [.husky/pre-commit](../../.husky/pre-commit). Read those files for the configured staged and full-worktree checks. Do not replace an active check with a passing check from a different input.
+The active local hook definitions are [.pre-commit-config.yaml](../../.pre-commit-config.yaml) and [.husky/pre-commit](../../.husky/pre-commit). The pre-commit framework checks exact Git-index Markdown through [the staged helper](lint-staged-markdown.mjs). When Markdown is staged, the Husky hook checks those staged bytes first, then runs both full-worktree lint phases. A clean worktree cannot hide a staged error; a clean staged input cannot hide an unrelated full-worktree error. Do not replace an active check with a passing check from a different input.
 
-The [Markdown workflow](markdownlint.yml) runs the two lint phases and preserves its separate workflow-policy validation. [Invoke-MarkdownLint.ps1](Invoke-MarkdownLint.ps1) runs both phases and retains each native failure. Dependency versions, trusted inputs, installation, and policy checks remain defined by their live configuration and helper files.
+The [Markdown workflow](markdownlint.yml) runs the two full-worktree lint phases in a separate lint job and preserves the independent workflow-policy job. This separation keeps repository-controlled lint and policy code on separate runner filesystems. [Invoke-MarkdownLint.ps1](Invoke-MarkdownLint.ps1) runs both phases and retains each native failure. Dependency versions, trusted inputs, installation, and policy checks remain defined by their live configuration and helper files.

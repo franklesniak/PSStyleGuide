@@ -2,11 +2,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { lstatSync } from 'node:fs';
 
-if (
-  process.env.CI === 'true' ||
-  process.env.HUSKY === '0' ||
-  process.env.NODE_ENV === 'production'
-) {
+if (process.env.HUSKY === '0') {
   process.exit(0);
 }
 

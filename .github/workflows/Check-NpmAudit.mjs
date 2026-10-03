@@ -4,6 +4,8 @@ import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 import { repositoryRoot, runBounded, withNpmEnvironment } from './NpmTools.mjs';
 
+export const expectedRepository = 'franklesniak/PSStyleGuide';
+
 const exceptionPath = '.github/workflows/npm-risk-exceptions.json';
 const require = createRequire(import.meta.url);
 const severities = ['info', 'low', 'moderate', 'high', 'critical'];
@@ -194,7 +196,7 @@ function git(args, env, root) {
 }
 
 export function hostedAuthorityReference(environment, event) {
-  if (environment.GITHUB_REPOSITORY !== 'franklesniak/PSStyleGuide') fail('Unexpected audit repository.');
+  if (environment.GITHUB_REPOSITORY !== expectedRepository) fail('Unexpected audit repository.');
   let reference;
   if (environment.GITHUB_EVENT_NAME === 'pull_request') {
     if (event?.pull_request?.base?.ref !== 'main' || event?.pull_request?.base?.repo?.full_name !== environment.GITHUB_REPOSITORY) fail('Unexpected PR authority repository or branch.');
@@ -218,7 +220,7 @@ export function acceptedBase({ environment = process.env, root = repositoryRoot,
     const available = git(['cat-file', '-e', `${reference}^{commit}`], env, root);
     if (available.status !== 0) {
       const fetched = git(['fetch', '--quiet', '--depth=1', '--no-tags', '--no-recurse-submodules',
-        'https://github.com/franklesniak/PSStyleGuide', reference], env, root);
+        `https://github.com/${expectedRepository}`, reference], env, root);
       if (fetched.status !== 0) fail('Cannot acquire the event authority commit.');
     }
   }

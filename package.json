@@ -1,8 +1,8 @@
 {
-  "name": "psstyleguide",
+  "name": "psstyleguide-agent-governance",
   "version": "1.0.0",
   "private": true,
-  "description": "A style guide for consistent PowerShell authoring.",
+  "description": "Locked agent-governance validation for PSStyleGuide.",
   "license": "MIT",
   "engines": {
     "node": "24.18.1",
