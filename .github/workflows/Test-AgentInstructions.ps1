@@ -12,6 +12,11 @@
 # Cannot run with SelfTest or MetadataClassificationOnly. Later ordinary checks
 # do not establish the historical finalization date.
 #
+# .PARAMETER ProposedPolicy
+# Runs full B/H transition diagnostics with proposed checker code at H.
+# Requires distinct nonzero endpoints and checkout H. This is not accepted
+# policy, owner, merge or finalization authority. Cannot combine other modes.
+#
 # .NOTES
 # Positional parameters are not supported.
 # Version: 1.16.20261002.0
@@ -22,6 +27,7 @@ param(
     [Parameter()][switch] $SelfTest,
     [Parameter()][switch] $MetadataClassificationOnly,
     [Parameter()][switch] $FinalizeMetadataNow,
+    [Parameter()][switch] $ProposedPolicy,
     [Parameter()][AllowEmptyString()][string] $InputRevision = '',
     [Parameter()][AllowEmptyString()][string] $PublishedBaselineRevision = ''
 )
@@ -1312,6 +1318,90 @@ function Read-RepositoryInputData {
     return $arrInputBytes
 }
 
+function Get-GitRegularFileBlobId {
+    # .SYNOPSIS
+    # Gets one exact regular Git entry identity without reading its content.
+    #
+    # .DESCRIPTION
+    # Uses bounded literal NUL Git metadata. Requires one100644 blob in a
+    # revision, or one100644 stage0 index entry for a local candidate.
+    # Does not inspect worktree file-system types or open generated bodies.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The exact ordinal repository-relative path.
+    #
+    # .PARAMETER Revision
+    # The exact Git revision. Empty selects the current index.
+    #
+    # .EXAMPLE
+    # Get-GitRegularFileBlobId @hashtableArguments
+    #
+    # # Returns a validated blob identity without a content read.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [string] The regular entry's immutable blob identity.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261002.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][string] $RepositoryRelativePath,
+        [Parameter()][AllowEmptyString()][string] $Revision = ''
+    )
+
+    $longTreeMaximumBytes = [long][Text.Encoding]::UTF8.GetByteCount($RepositoryRelativePath) + 78
+    if ($longTreeMaximumBytes -gt 2147483646) {
+        throw 'Git revision entry exceeds the supported bounded output size.'
+    }
+    $objTreeStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
+    $objTreeStartInfo.UseShellExecute = $false
+    $objTreeStartInfo.CreateNoWindow = $true
+    $objTreeStartInfo.RedirectStandardOutput = $true
+    $objTreeStartInfo.RedirectStandardError = $true
+    $arrEntryArguments = @('--literal-pathspecs', '-C', $RepositoryRootPath)
+    if ([string]::IsNullOrEmpty($Revision)) {
+        $arrEntryArguments += @('ls-files', '--stage', '-z', '--', $RepositoryRelativePath)
+    } else {
+        $arrEntryArguments += @('ls-tree', '-z', '--full-tree', $Revision, '--', $RepositoryRelativePath)
+    }
+    foreach ($strArgument in $arrEntryArguments) {
+        $objTreeStartInfo.ArgumentList.Add($strArgument)
+    }
+    $objTreeProcess = [Diagnostics.Process]::new()
+    $objTreeProcess.StartInfo = $objTreeStartInfo
+    $objTreeResult = Read-BoundedProcessData -Process $objTreeProcess `
+        -MaximumBytes ([int]$longTreeMaximumBytes) -TimeoutMilliseconds 10000 `
+        -DisplayName "Git revision entry $Revision`:$RepositoryRelativePath"
+    if ($objTreeResult.ExitCode -ne 0) {
+        throw "Could not inspect $Revision`:$RepositoryRelativePath in Git."
+    }
+    $strTreeRecord = if ($objTreeResult.Bytes.Length -eq 0) { '' } else {
+        ConvertFrom-StrictUtf8Data -Bytes $objTreeResult.Bytes -DisplayName 'Git revision entry'
+    }
+    $strEntryPattern = if ([string]::IsNullOrEmpty($Revision)) {
+        '\A100644 (?<ObjectId>[0-9a-fA-F]{40}|[0-9a-fA-F]{64}) 0\t(?<Path>[^\x00]+)\x00\z'
+    } else {
+        '\A100644 blob (?<ObjectId>[0-9a-fA-F]{40}|[0-9a-fA-F]{64})\t(?<Path>[^\x00]+)\x00\z'
+    }
+    $objTreeMatch = [regex]::Match($strTreeRecord, $strEntryPattern)
+    if (-not $objTreeMatch.Success -or
+        -not [string]::Equals($objTreeMatch.Groups['Path'].Value,
+            $RepositoryRelativePath, [StringComparison]::Ordinal)) {
+        throw "Git revision input is not one regular 100644 blob: $Revision`:$RepositoryRelativePath"
+    }
+    return $objTreeMatch.Groups['ObjectId'].Value
+}
+
 function Read-GitRevisionText {
     # .SYNOPSIS
     # Reads one bounded UTF-8 file from a Git revision.
@@ -1373,38 +1463,8 @@ function Read-GitRevisionText {
 
     $strBlobObject = "${Revision}:$RepositoryRelativePath"
     if ($RequireRegularFile) {
-        $longTreeMaximumBytes = [long][Text.Encoding]::UTF8.GetByteCount($RepositoryRelativePath) + 78
-        if ($longTreeMaximumBytes -gt 2147483646) {
-            throw 'Git revision entry exceeds the supported bounded output size.'
-        }
-        $objTreeStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
-        $objTreeStartInfo.UseShellExecute = $false
-        $objTreeStartInfo.CreateNoWindow = $true
-        $objTreeStartInfo.RedirectStandardOutput = $true
-        $objTreeStartInfo.RedirectStandardError = $true
-        foreach ($strArgument in @('--literal-pathspecs', '-C', $RepositoryRootPath,
-                'ls-tree', '-z', '--full-tree', $Revision, '--', $RepositoryRelativePath)) {
-            $objTreeStartInfo.ArgumentList.Add($strArgument)
-        }
-        $objTreeProcess = [Diagnostics.Process]::new()
-        $objTreeProcess.StartInfo = $objTreeStartInfo
-        $objTreeResult = Read-BoundedProcessData -Process $objTreeProcess `
-            -MaximumBytes ([int]$longTreeMaximumBytes) -TimeoutMilliseconds 10000 `
-            -DisplayName "Git revision entry $Revision`:$RepositoryRelativePath"
-        if ($objTreeResult.ExitCode -ne 0) {
-            throw "Could not inspect $Revision`:$RepositoryRelativePath in Git."
-        }
-        $strTreeRecord = if ($objTreeResult.Bytes.Length -eq 0) { '' } else {
-            ConvertFrom-StrictUtf8Data -Bytes $objTreeResult.Bytes -DisplayName 'Git revision entry'
-        }
-        $objTreeMatch = [regex]::Match($strTreeRecord,
-            '\A100644 blob (?<ObjectId>[0-9a-fA-F]{40}|[0-9a-fA-F]{64})\t(?<Path>[^\x00]+)\x00\z')
-        if (-not $objTreeMatch.Success -or
-            -not [string]::Equals($objTreeMatch.Groups['Path'].Value,
-                $RepositoryRelativePath, [StringComparison]::Ordinal)) {
-            throw "Git revision input is not one regular 100644 blob: $Revision`:$RepositoryRelativePath"
-        }
-        $strBlobObject = $objTreeMatch.Groups['ObjectId'].Value
+        $strBlobObject = Get-GitRegularFileBlobId -RepositoryRootPath $RepositoryRootPath `
+            -Revision $Revision -RepositoryRelativePath $RepositoryRelativePath
     }
 
     $objStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
@@ -5301,7 +5361,7 @@ function Test-DocumentMetadataHeaderIntent {
         # is not an opt-in; explicitly emphasized reserved fields are markers.
         if ($objItem.Text -imatch '^(?:Status|Last\s+Updated)\s*(?::|$)' -or
             $arrLines[$objItem.Start] -imatch
-                '^\s*[-+*]\s+\*\*(?:Status|Owner|Last\s+Updated|Scope)(?::|\*\*)') {
+                '^\s*[-+*]\s+\*\*(?:Status|Owner|Last\s+Updated|Scope)\s*(?::|\*\*)') {
             return $true
         }
     }
@@ -6748,6 +6808,12 @@ $strValidatedInputRevision = $InputRevision
 $strEffectivePublishedBaselineRevision = $PublishedBaselineRevision
 $PublishedFinalRevision = $InputRevision
 $boolPublishedEndpointsRequested = -not [string]::IsNullOrEmpty($PublishedBaselineRevision)
+if ($ProposedPolicy -and ($SelfTest -or $MetadataClassificationOnly -or $FinalizeMetadataNow -or
+        -not $boolPublishedEndpointsRequested -or [string]::IsNullOrEmpty($InputRevision) -or
+        $InputRevision -ceq $PublishedBaselineRevision -or
+        $InputRevision -ceq ('0' * 40) -or $PublishedBaselineRevision -ceq ('0' * 40))) {
+    throw 'ProposedPolicy requires distinct nonzero exact B/H endpoints and cannot combine other modes.'
+}
 if ($MetadataClassificationOnly -and ($SelfTest -or -not $boolPublishedEndpointsRequested)) {
     throw 'MetadataClassificationOnly requires exact B/H endpoints and cannot run with SelfTest.'
 }
@@ -6773,7 +6839,13 @@ if ($LASTEXITCODE -ne 0 -or $strCheckedOutRevision.Trim() -cnotmatch '^[0-9a-f]{
     throw 'The checked-out instruction policy revision is unavailable.'
 }
 $strCheckedOutRevision = $strCheckedOutRevision.Trim()
-if ($boolPublishedEndpointsRequested -and $strCheckedOutRevision -cne $PublishedBaselineRevision) {
+if ($ProposedPolicy) {
+    if ($strCheckedOutRevision -cne $InputRevision) {
+        throw 'The proposed instruction checker must be checked out at the exact candidate head.'
+    }
+    Write-Output ("PROPOSED_POLICY_TRANSITION: B=$PublishedBaselineRevision H=$InputRevision. " +
+        'Candidate checker code supplies diagnostics, not accepted-policy, owner or merge authority.')
+} elseif ($boolPublishedEndpointsRequested -and $strCheckedOutRevision -cne $PublishedBaselineRevision) {
     throw 'The trusted instruction checker must be checked out at the accepted baseline.'
 }
 
@@ -6879,6 +6951,11 @@ $arrDocumentClassificationExpansionFailures = @(if ($boolHasTrustedBaselineClass
 if ($arrDocumentClassificationExpansionFailures.Count -gt 0) {
     throw ('Document classification expansion failed:' + [Environment]::NewLine + '- ' +
         ($arrDocumentClassificationExpansionFailures -join ([Environment]::NewLine + '- ')))
+}
+# Generated exemption affects metadata content only, not candidate Git type.
+foreach ($strGeneratedMetadataPath in $objDocumentClassificationContext.GeneratedPaths) {
+    $null = Get-GitRegularFileBlobId -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $strValidatedInputRevision -RepositoryRelativePath $strGeneratedMetadataPath
 }
 if ($MetadataClassificationOnly) {
     Write-Output ("Metadata classification data validated: B=$PublishedBaselineRevision H=$InputRevision. " +
@@ -7315,6 +7392,10 @@ if ($FinalizeMetadataNow) {
     Write-Output 'Finalization date not verified for committed input; local changed-worktree date checks remain applicable.'
 }
 
+
+if ($ProposedPolicy) {
+    Write-Output "Proposed-policy transition checks passed: B=$PublishedBaselineRevision H=$InputRevision."
+}
 
 #endregion Repository validation
 

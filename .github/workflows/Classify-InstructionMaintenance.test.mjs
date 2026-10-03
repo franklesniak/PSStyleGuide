@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
+import { createRequire } from 'node:module';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -8,6 +9,82 @@ import { classifyInstructionMaintenance, readInstructionMaintenance } from './Cl
 
 const base = 'a'.repeat(40), head = 'b'.repeat(40);
 const classify = changedPaths => classifyInstructionMaintenance({ base, head, changedPaths });
+
+test('push transition caller binds event endpoints and preserves proposed-code provenance', () => {
+  const { parse } = createRequire(import.meta.url)('yaml');
+  const workflow = parse(fs.readFileSync(new URL('./agent-instructions.yml', import.meta.url), 'utf8'));
+  const step = workflow.jobs['candidate-tests'].steps.find(value => value.id === 'test');
+  assert.equal(step.env.EXPECTED_PUSH_BASE, '${{ github.event.before }}');
+  assert.equal(step.env.EXPECTED_PUSH_HEAD, '${{ github.event.after }}');
+  assert.equal(workflow.jobs['accepted-policy'].if, "github.event_name == 'pull_request_target'");
+  assert.ok(!JSON.stringify(workflow.jobs['accepted-policy']).includes('-ProposedPolicy'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'instruction-push-caller-'));
+  try {
+    const script = path.join(root, 'caller.ps1'), log = path.join(root, 'calls.jsonl');
+    // Execute the real run block; only its native/test dependencies are stubbed.
+    const prefix = `
+function Invoke-FixtureGit {
+  [IO.File]::AppendAllText($env:FIXTURE_LOG, (@($args) | ConvertTo-Json -Compress -AsArray) + "\n")
+  $global:LASTEXITCODE = 0
+  if ($args -contains 'fetch' -and $env:FIXTURE_MODE -eq 'fetch-failure') { $global:LASTEXITCODE = 7 }
+  if ($args -contains 'rev-parse') {
+    if ($env:FIXTURE_MODE -eq 'identity-failure') { $global:LASTEXITCODE = 8 }
+    if ($env:FIXTURE_MODE -eq 'wrong-identity') { 'c' * 40 } else { $env:EXPECTED_PUSH_BASE }
+  }
+}
+function Invoke-FixtureChecker {
+  if ($args -contains '-ProposedPolicy' -and $env:GIT_NO_REPLACE_OBJECTS -ne '1') { throw 'Replacement objects were not disabled.' }
+  [IO.File]::AppendAllText($env:FIXTURE_LOG, (@('checker') + @($args) | ConvertTo-Json -Compress -AsArray) + "\n")
+  $global:LASTEXITCODE = if ($args -contains '-ProposedPolicy' -and $env:FIXTURE_MODE -eq 'check-failure') { 9 } else { 0 }
+}
+function Invoke-FixtureTests { $global:LASTEXITCODE = 0 }
+function Start-Sleep {}
+`;
+    fs.writeFileSync(script, prefix + step.run
+      .replaceAll('/usr/bin/git', 'Invoke-FixtureGit')
+      .replaceAll('./.github/workflows/Test-AgentInstructions.ps1', 'Invoke-FixtureChecker')
+      .replaceAll('& node --test', '& Invoke-FixtureTests --test'));
+    for (const item of [
+      { name: 'push', event: 'push', pass: true, calls: 1 },
+      { name: 'manual snapshot', event: 'workflow_dispatch', pass: true, calls: 0 },
+      { name: 'PR snapshot', event: 'pull_request', pass: true, calls: 0 },
+      { name: 'missing B', before: '', pass: false },
+      { name: 'zero B', before: '0'.repeat(40), pass: false },
+      { name: 'zero H', after: '0'.repeat(40), pass: false },
+      { name: 'H/H', before: head, pass: false },
+      { name: 'event H mismatch', after: 'c'.repeat(40), pass: false },
+      { name: 'unavailable B', mode: 'fetch-failure', pass: false, fetches: 3 },
+      { name: 'wrong fetched B', mode: 'wrong-identity', pass: false },
+      { name: 'native identity failure', mode: 'identity-failure', pass: false },
+      { name: 'rejected transition', mode: 'check-failure', pass: false },
+    ]) {
+      fs.writeFileSync(log, '');
+      const result = spawnSync('pwsh', ['-NoProfile', '-NonInteractive', '-File', script], {
+        encoding: 'utf8', timeout: 30000, windowsHide: true,
+        env: { ...process.env, FIXTURE_LOG: log, FIXTURE_MODE: item.mode ?? '',
+          GITHUB_EVENT_NAME: item.event ?? 'push', GITHUB_SHA: head,
+          EXPECTED_PUSH_BASE: item.before ?? base, EXPECTED_PUSH_HEAD: item.after ?? head },
+      });
+      assert.equal(result.status === 0, item.pass, `${item.name}: ${result.stderr}`);
+      const rows = fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
+      const proposed = rows.filter(row => row.includes('-ProposedPolicy'));
+      if (item.calls !== undefined) assert.equal(proposed.length, item.calls, item.name);
+      for (const row of proposed) {
+        assert.deepEqual(row, ['checker', '-ProposedPolicy', '-InputRevision', head,
+          '-PublishedBaselineRevision', base]);
+      }
+      const fetches = rows.filter(row => row.includes('fetch'));
+      if (item.fetches !== undefined) assert.equal(fetches.length, item.fetches);
+      assert.ok(fetches.length <= 3);
+      assert.ok(fetches.every(row => row.at(-1) === base && !row.includes('--force') &&
+        row.includes('credential.helper=') && row.includes('http.extraheader=')));
+    }
+  } finally {
+    assert.equal(path.dirname(root), os.tmpdir());
+    assert.ok(path.basename(root).startsWith('instruction-push-caller-'));
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
 
 test('ordinary documentation needs no maintenance authorization', () => {
   assert.deepEqual(classify(['STYLE_GUIDE.md', 'docs/example.md', 'AGENTS.md',

@@ -742,6 +742,25 @@ function Assert-ClassificationAdmissionGitFixture {
         $strGeneratedCandidate = & $scriptblockCommit
         & $scriptblockCheck $strReadmeAuthorizedBaseline $strGeneratedCandidate $true 'Metadata classification data validated'
         & $scriptblockCheck $strGeneratedCandidate $strGeneratedCandidate $true 'Metadata classification data validated'
+        # Existing generated provenance cannot authorize a nonregular Git entry.
+        foreach ($strMode in @('100755', '120000', '160000')) {
+            & git -C $strFixtureRoot checkout --quiet --detach $strGeneratedCandidate
+            if ($LASTEXITCODE -ne 0) { throw 'Generated type baseline checkout failed.' }
+            $strObject = if ($strMode -ceq '160000') { $strGeneratedCandidate } else {
+                ([string](& git -C $strFixtureRoot rev-parse 'HEAD:README.md')).Trim()
+            }
+            & git -C $strFixtureRoot update-index --cacheinfo "$strMode,$strObject,README.md"
+            if ($LASTEXITCODE -ne 0) { throw 'Generated type fixture indexing failed.' }
+            & git -C $strFixtureRoot -c user.name=AdmissionFixture -c user.email=admission-fixture@example.invalid `
+                -c commit.gpgsign=false -c "core.hooksPath=$strEmptyHooks" commit --quiet --no-gpg-sign --message=mode
+            if ($LASTEXITCODE -ne 0) { throw 'Generated type fixture commit failed.' }
+            $strModeCandidate = ([string](& git -C $strFixtureRoot rev-parse HEAD)).Trim()
+            & $scriptblockCheck $strGeneratedCandidate $strModeCandidate $false 'not one regular 100644 blob'
+            & $scriptblockCheck $strReadmeAuthorizedBaseline $strModeCandidate $false 'not one regular 100644 blob'
+        }
+        & git -C $strFixtureRoot checkout --quiet --detach $strGeneratedCandidate
+        if ($LASTEXITCODE -ne 0) { throw 'Generated type fixture restoration failed.' }
+
         [IO.File]::WriteAllText($strManifestPath, $strPlainManifest, [Text.UTF8Encoding]::new($false))
         $strTier2Candidate = & $scriptblockCommit
         & $scriptblockCheck $strGeneratedCandidate $strTier2Candidate $true 'Metadata classification data validated'
@@ -1417,6 +1436,92 @@ function Assert-AuthorFinalizationGitFixture {
         & $scriptblockCheck $strNestedMetadataExampleHead $false $false $true 'content contract passed'
         Write-Verbose 'Later peer Metadata current/prior rejection and nested example caller controls passed.'
 
+        # Proposed code at H validates B/H without claiming accepted-policy authority.
+        & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Proposed transition baseline checkout failed.' }
+        $strProposedReadmePath = [IO.Path]::Combine($strFixtureRoot, 'README.md')
+        [IO.File]::AppendAllText($strProposedReadmePath, "`nProposed transition fixture.`n", [Text.UTF8Encoding]::new($false))
+        $strProposedHead = & $scriptblockCommit
+        $strProposedOutput = (& $strHostPath -NoProfile -File $strValidatorPath -ProposedPolicy `
+                -InputRevision $strProposedHead -PublishedBaselineRevision $strBaseline 2>&1 | Out-String)
+        if ($LASTEXITCODE -ne 0 -or $strProposedOutput -notmatch 'PROPOSED_POLICY_TRANSITION' -or
+            $strProposedOutput -notmatch 'not accepted-policy, owner or merge authority' -or
+            $strProposedOutput -notmatch 'Proposed-policy transition checks passed') {
+            throw "Proposed transition positive failed: $strProposedOutput"
+        }
+        foreach ($arrArguments in @(
+                @('-InputRevision', $strProposedHead, '-PublishedBaselineRevision', $strBaseline),
+                @('-ProposedPolicy'),
+                @('-ProposedPolicy', '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', $strProposedHead),
+                @('-ProposedPolicy', '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', ('0' * 40)),
+                @('-ProposedPolicy', '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', ('f' * 40)),
+                @('-ProposedPolicy', '-SelfTest', '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', $strBaseline),
+                @('-ProposedPolicy', '-MetadataClassificationOnly', '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', $strBaseline),
+                @('-ProposedPolicy', '-FinalizeMetadataNow', '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', $strBaseline))) {
+            $strRejectedOutput = (& $strHostPath -NoProfile -File $strValidatorPath @arrArguments 2>&1 | Out-String)
+            if ($LASTEXITCODE -eq 0 -or $strRejectedOutput -notmatch 'accepted baseline|requires distinct|unavailable') {
+                throw "Proposed transition mode boundary failed: $strRejectedOutput"
+            }
+        }
+        & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
+        $strWrongCheckoutOutput = (& $strHostPath -NoProfile -File $strValidatorPath -ProposedPolicy `
+                -InputRevision $strProposedHead -PublishedBaselineRevision $strBaseline 2>&1 | Out-String)
+        if ($LASTEXITCODE -eq 0 -or $strWrongCheckoutOutput -notmatch 'exact candidate head') {
+            throw "Proposed transition wrong checkout was accepted: $strWrongCheckoutOutput"
+        }
+        $strProposedManifestPath = [IO.Path]::Combine($strFixtureRoot, '.github', 'document-metadata-classification.json')
+        $objProposedManifest = [IO.File]::ReadAllText($strProposedManifestPath) | ConvertFrom-Json
+        $objProposedManifest.tier2Paths = @($objProposedManifest.tier2Paths) + @('docs/UNAUTHORIZED.md')
+        [Array]::Sort($objProposedManifest.tier2Paths, [StringComparer]::Ordinal)
+        [IO.File]::WriteAllText($strProposedManifestPath, ($objProposedManifest | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($false))
+        [IO.File]::WriteAllText([IO.Path]::Combine($strFixtureRoot, 'docs', 'UNAUTHORIZED.md'), '# Unapproved', [Text.UTF8Encoding]::new($false))
+        $strUnauthorizedHead = & $scriptblockCommit
+        $strUnauthorizedOutput = (& $strHostPath -NoProfile -File $strValidatorPath -ProposedPolicy `
+                -InputRevision $strUnauthorizedHead -PublishedBaselineRevision $strBaseline 2>&1 | Out-String)
+        if ($LASTEXITCODE -eq 0 -or $strUnauthorizedOutput -notmatch 'unauthenticated metadata') {
+            throw "Proposed transition admitted an unapproved exemption: $strUnauthorizedOutput"
+        }
+        & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Proposed transition fixture restoration failed.' }
+        Write-Verbose 'Proposed-policy H checkout, exact endpoints, ordinary success and unauthorized transition controls passed.'
+
+        # Proposed transition diagnostics retain the actual published Version baseline.
+        $strBackwardGuidePath = [IO.Path]::Combine($strFixtureRoot, 'STYLE_GUIDE.md')
+        $strEarlierDate = [DateTime]::ParseExact($strBaselineDate, 'yyyy-MM-dd',
+            [Globalization.CultureInfo]::InvariantCulture).AddDays(-1).ToString('yyyy-MM-dd')
+        $strBackwardGuide = [IO.File]::ReadAllText($strBackwardGuidePath).
+            Replace($strBaselineDate, $strEarlierDate).
+            Replace($strBaselineDate.Replace('-', ''), $strEarlierDate.Replace('-', ''))
+        [IO.File]::WriteAllText($strBackwardGuidePath, $strBackwardGuide, [Text.UTF8Encoding]::new($false))
+        $strBackwardHead = & $scriptblockCommit
+        $strBackwardOutput = (& $strHostPath -NoProfile -File $strValidatorPath -ProposedPolicy `
+                -InputRevision $strBackwardHead -PublishedBaselineRevision $strBaseline 2>&1 | Out-String)
+        if ($LASTEXITCODE -eq 0 -or $strBackwardOutput -notmatch 'Version date must not move backward') {
+            throw "Proposed transition lost the actual published Version baseline: $strBackwardOutput"
+        }
+        & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Proposed backward-date fixture restoration failed.' }
+        Write-Verbose 'Proposed transition actual published Version backward-date rejection passed.'
+
+        # Spaced emphasized optional remnants remain invalid current and prior headers.
+        $strBeforeSpacedBaseline = $strBaseline
+        & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Spaced metadata baseline checkout failed.' }
+        $strReadmePath = [IO.Path]::Combine($strFixtureRoot, 'README.md')
+        [IO.File]::WriteAllText($strReadmePath, "# Reader`n`n- **Owner :** Fixture`n", [Text.UTF8Encoding]::new($false))
+        $strSpacedHead = & $scriptblockCommit
+        & $scriptblockCheck $strSpacedHead $false $false $false 'one exact top-level Status'
+        & git -C $strFixtureRoot checkout --quiet --detach $strSpacedHead
+        if ($LASTEXITCODE -ne 0) { throw 'Spaced metadata prior checkout failed.' }
+        $strBaseline = $strSpacedHead
+        [IO.File]::WriteAllText($strReadmePath, $strMetadataDocument.Replace('DATE', $strCurrentDate), [Text.UTF8Encoding]::new($false))
+        $strAfterSpacedHead = & $scriptblockCommit
+        & $scriptblockCheck $strAfterSpacedHead $false $false $false '(?s)parent of README[.]md.*one exact top-level Status'
+        $strBaseline = $strBeforeSpacedBaseline
+        & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
+        if ($LASTEXITCODE -ne 0) { throw 'Spaced metadata fixture restoration failed.' }
+        Write-Verbose 'Spaced emphasized optional current/prior caller rejections passed.'
+
         # Conflicting reserved fields and raw Unicode paths reach real B/H checks.
         $strBeforeFieldBaseline = $strBaseline
         $strReadmePath = [IO.Path]::Combine($strFixtureRoot, 'README.md')
@@ -1804,6 +1909,15 @@ function Assert-OptionalMetadataSelfTest {
         @{ Name = 'inline code'; Content = '# Reader' + "`n`n- ``**Status:** Active```n"; Expected = $false },
         @{ Name = 'HTML example'; Content = "# Reader`n`n<div>`n$strFields</div>`n"; Expected = $false }
     )
+    foreach ($strLabel in @('Owner', 'Scope', 'OWNER', 'sCoPe')) {
+        foreach ($strSpace in @(' ', '  ', "`t")) {
+            $strMarker = "- **$strLabel${strSpace}:** Fixture"
+            $arrIntentCases += @{ Name = "spaced emphasized $strLabel"; Content = "# Reader`n`n$strMarker`n"; Expected = $true }
+            $arrIntentCases += @{ Name = "quoted spaced $strLabel"; Content = "# Reader`n`n> $strMarker`n"; Expected = $false }
+            $arrIntentCases += @{ Name = "fenced spaced $strLabel"; Content = "# Reader`n`n~~~~markdown`n$strMarker`n~~~~`n"; Expected = $false }
+            $arrIntentCases += @{ Name = "generic spaced $strLabel"; Content = "# Reader`n`n- $strLabel${strSpace}: prose`n"; Expected = $false }
+        }
+    }
     foreach ($objCase in $arrIntentCases) {
         if ((Test-DocumentMetadataHeaderIntent -Content $objCase.Content) -ne $objCase.Expected) {
             throw "Optional metadata intent failed: $($objCase.Name)"
@@ -1982,6 +2096,51 @@ function Assert-GitRevisionTextSelfTest {
             }
             if (-not $boolRejected) { throw "Git entry negative control was accepted: $($objCase.Path)" }
         }
+        # Metadata-only generated inspection must not decode even an invalid UTF-8 body.
+        $strBinaryObject = Get-GitRegularFileBlobId -RepositoryRootPath $strFixtureRoot `
+            -Revision $strRevision -RepositoryRelativePath 'docs/invalid.md'
+        if ($strBinaryObject -cnotmatch '^[0-9a-f]{40}$') { throw 'Generated binary metadata-only inspection failed.' }
+        foreach ($strName in $arrNames) {
+            $strIndexObject = Get-GitRegularFileBlobId -RepositoryRootPath $strFixtureRoot -RepositoryRelativePath $strName
+            $strTreeObject = Get-GitRegularFileBlobId -RepositoryRootPath $strFixtureRoot -Revision $strRevision -RepositoryRelativePath $strName
+            if ($strIndexObject -cne $strTreeObject) { throw 'Exact generated index/tree identity mismatch.' }
+        }
+        foreach ($strName in @('docs/executable.md', 'docs/link.md', 'docs/submodule', 'docs/missing.md', 'docs/upper.md')) {
+            $boolRejected = $false
+            try { $null = Get-GitRegularFileBlobId -RepositoryRootPath $strFixtureRoot -RepositoryRelativePath $strName } catch {
+                if ($_.Exception.Message -notmatch 'not one regular 100644 blob') { throw }
+                $boolRejected = $true
+            }
+            if (-not $boolRejected) { throw "Generated index mode/path admitted: $strName" }
+        }
+        $strStageObject = Get-GitRegularFileBlobId -RepositoryRootPath $strFixtureRoot `
+            -Revision $strRevision -RepositoryRelativePath 'docs/UPPER.md'
+        $objIndexStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
+        $objIndexStartInfo.UseShellExecute = $false
+        $objIndexStartInfo.RedirectStandardInput = $true
+        foreach ($strArgument in @('-C', $strFixtureRoot, 'update-index', '--index-info')) {
+            $objIndexStartInfo.ArgumentList.Add($strArgument)
+        }
+        $objIndexProcess = [Diagnostics.Process]::Start($objIndexStartInfo)
+        try {
+            $objIndexProcess.StandardInput.Write("0 $('0' * 40)`tdocs/UPPER.md`n100644 $strStageObject 1`tdocs/UPPER.md`n")
+            $objIndexProcess.StandardInput.Close()
+            if (-not $objIndexProcess.WaitForExit(10000) -or $objIndexProcess.ExitCode -ne 0) {
+                throw 'Generated unmerged-index fixture setup failed.'
+            }
+        } finally { $objIndexProcess.Dispose() }
+        $strStagedEntry = [string](& git -C $strFixtureRoot ls-files --stage -- docs/UPPER.md)
+        if ($LASTEXITCODE -ne 0 -or $strStagedEntry -cne "100644 $strStageObject 1`tdocs/UPPER.md") {
+            throw 'Generated unmerged-index fixture did not create its exact stage1 entry.'
+        }
+        $boolStageRejected = $false
+        try { $null = Get-GitRegularFileBlobId -RepositoryRootPath $strFixtureRoot -RepositoryRelativePath 'docs/UPPER.md' } catch {
+            if ($_.Exception.Message -notmatch 'not one regular 100644 blob') { throw }
+            $boolStageRejected = $true
+        }
+        if (-not $boolStageRejected) { throw 'Generated nonzero index stage was admitted.' }
+        & git -C $strFixtureRoot reset --quiet $strRevision -- docs/UPPER.md
+        if ($LASTEXITCODE -ne 0) { throw 'Generated index fixture restoration failed.' }
         $scriptBlockActualProcessReader = ${function:Read-BoundedProcessData}
         $strProbePath = 'docs/probe.md'
         $strRecord = '100644 blob ' + ('a' * 40) + "`t$strProbePath" + [char]0
