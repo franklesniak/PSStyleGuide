@@ -911,7 +911,7 @@ function Assert-AuthorFinalizationGitFixture {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261002.0
+    # Version: 1.0.20261003.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
@@ -1155,6 +1155,21 @@ function Assert-AuthorFinalizationGitFixture {
         if (($intExit -eq 0) -ne $Accept -or $strOutput -notmatch $Expected) {
             throw "Author finalization caller failed (Now=$Now Later=$Later Accept=$Accept exit=$intExit): $strOutput"
         }
+    }
+    $scriptblockInvokeProposedCheck = {
+        param([string[]] $Argument)
+        # Preserve the exception message rather than host-specific ConciseView wrapping.
+        $arrParameterTokens = @('-ProposedPolicy', '-InputRevision', '-PublishedBaselineRevision',
+            '-SelfTest', '-MetadataClassificationOnly', '-FinalizeMetadataNow')
+        $strCommandArguments = (@($Argument | ForEach-Object {
+                    if ($arrParameterTokens -ccontains $_) { $_ } else { "'" + $_.Replace("'", "''") + "'" }
+                }) -join ' ')
+        $strCommand = '$ErrorActionPreference = ''Stop''; $checker = ''' + $strValidatorPath.Replace("'", "''") +
+            '''; try { & $checker ' + $strCommandArguments +
+            ' } catch { [Console]::Out.WriteLine($_.Exception.Message); exit 1 }'
+        $strOutput = (& $strHostPath -NoLogo -NoProfile -NonInteractive -Command $strCommand 2>&1 | Out-String)
+        $intExit = $LASTEXITCODE
+        [pscustomobject]@{ Output = $strOutput; ExitCode = $intExit }
     }
     try {
         # Exercise the actual bounded inquiry before the longer installed-policy
@@ -1473,9 +1488,10 @@ function Assert-AuthorFinalizationGitFixture {
         $strProposedReadmePath = [IO.Path]::Combine($strFixtureRoot, 'README.md')
         [IO.File]::AppendAllText($strProposedReadmePath, "`nProposed transition fixture.`n", [Text.UTF8Encoding]::new($false))
         $strProposedHead = & $scriptblockCommit
-        $strProposedOutput = (& $strHostPath -NoProfile -File $strValidatorPath -ProposedPolicy `
-                -InputRevision $strProposedHead -PublishedBaselineRevision $strBaseline 2>&1 | Out-String)
-        if ($LASTEXITCODE -ne 0 -or $strProposedOutput -notmatch 'PROPOSED_POLICY_TRANSITION' -or
+        $objProposedResult = & $scriptblockInvokeProposedCheck -Argument @('-ProposedPolicy',
+            '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', $strBaseline)
+        $strProposedOutput = $objProposedResult.Output
+        if ($objProposedResult.ExitCode -ne 0 -or $strProposedOutput -notmatch 'PROPOSED_POLICY_TRANSITION' -or
             $strProposedOutput -notmatch 'not accepted-policy, owner or merge authority' -or
             $strProposedOutput -notmatch 'Proposed-policy transition checks passed') {
             throw "Proposed transition positive failed: $strProposedOutput"
@@ -1489,15 +1505,17 @@ function Assert-AuthorFinalizationGitFixture {
                 @('-ProposedPolicy', '-SelfTest', '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', $strBaseline),
                 @('-ProposedPolicy', '-MetadataClassificationOnly', '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', $strBaseline),
                 @('-ProposedPolicy', '-FinalizeMetadataNow', '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', $strBaseline))) {
-            $strRejectedOutput = (& $strHostPath -NoProfile -File $strValidatorPath @arrArguments 2>&1 | Out-String)
-            if ($LASTEXITCODE -eq 0 -or $strRejectedOutput -notmatch 'accepted baseline|requires distinct|unavailable') {
+            $objRejectedResult = & $scriptblockInvokeProposedCheck -Argument $arrArguments
+            $strRejectedOutput = $objRejectedResult.Output
+            if ($objRejectedResult.ExitCode -eq 0 -or $strRejectedOutput -notmatch 'accepted baseline|requires distinct|unavailable') {
                 throw "Proposed transition mode boundary failed: $strRejectedOutput"
             }
         }
         & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
-        $strWrongCheckoutOutput = (& $strHostPath -NoProfile -File $strValidatorPath -ProposedPolicy `
-                -InputRevision $strProposedHead -PublishedBaselineRevision $strBaseline 2>&1 | Out-String)
-        if ($LASTEXITCODE -eq 0 -or $strWrongCheckoutOutput -notmatch 'exact candidate head') {
+        $objWrongCheckoutResult = & $scriptblockInvokeProposedCheck -Argument @('-ProposedPolicy',
+            '-InputRevision', $strProposedHead, '-PublishedBaselineRevision', $strBaseline)
+        $strWrongCheckoutOutput = $objWrongCheckoutResult.Output
+        if ($objWrongCheckoutResult.ExitCode -eq 0 -or $strWrongCheckoutOutput -notmatch 'exact candidate head') {
             throw "Proposed transition wrong checkout was accepted: $strWrongCheckoutOutput"
         }
         $strProposedManifestPath = [IO.Path]::Combine($strFixtureRoot, '.github', 'document-metadata-classification.json')
@@ -1507,9 +1525,10 @@ function Assert-AuthorFinalizationGitFixture {
         [IO.File]::WriteAllText($strProposedManifestPath, ($objProposedManifest | ConvertTo-Json -Depth 4), [Text.UTF8Encoding]::new($false))
         [IO.File]::WriteAllText([IO.Path]::Combine($strFixtureRoot, 'docs', 'UNAUTHORIZED.md'), '# Unapproved', [Text.UTF8Encoding]::new($false))
         $strUnauthorizedHead = & $scriptblockCommit
-        $strUnauthorizedOutput = (& $strHostPath -NoProfile -File $strValidatorPath -ProposedPolicy `
-                -InputRevision $strUnauthorizedHead -PublishedBaselineRevision $strBaseline 2>&1 | Out-String)
-        if ($LASTEXITCODE -eq 0 -or $strUnauthorizedOutput -notmatch 'unauthenticated metadata') {
+        $objUnauthorizedResult = & $scriptblockInvokeProposedCheck -Argument @('-ProposedPolicy',
+            '-InputRevision', $strUnauthorizedHead, '-PublishedBaselineRevision', $strBaseline)
+        $strUnauthorizedOutput = $objUnauthorizedResult.Output
+        if ($objUnauthorizedResult.ExitCode -eq 0 -or $strUnauthorizedOutput -notmatch 'unauthenticated metadata') {
             throw "Proposed transition admitted an unapproved exemption: $strUnauthorizedOutput"
         }
         & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
@@ -1525,9 +1544,10 @@ function Assert-AuthorFinalizationGitFixture {
             Replace($strBaselineDate.Replace('-', ''), $strEarlierDate.Replace('-', ''))
         [IO.File]::WriteAllText($strBackwardGuidePath, $strBackwardGuide, [Text.UTF8Encoding]::new($false))
         $strBackwardHead = & $scriptblockCommit
-        $strBackwardOutput = (& $strHostPath -NoProfile -File $strValidatorPath -ProposedPolicy `
-                -InputRevision $strBackwardHead -PublishedBaselineRevision $strBaseline 2>&1 | Out-String)
-        if ($LASTEXITCODE -eq 0 -or $strBackwardOutput -notmatch 'Version date must not move backward') {
+        $objBackwardResult = & $scriptblockInvokeProposedCheck -Argument @('-ProposedPolicy',
+            '-InputRevision', $strBackwardHead, '-PublishedBaselineRevision', $strBaseline)
+        $strBackwardOutput = $objBackwardResult.Output
+        if ($objBackwardResult.ExitCode -eq 0 -or $strBackwardOutput -notmatch 'Version date must not move backward') {
             throw "Proposed transition lost the actual published Version baseline: $strBackwardOutput"
         }
         & git -C $strFixtureRoot checkout --quiet --detach $strBaseline
