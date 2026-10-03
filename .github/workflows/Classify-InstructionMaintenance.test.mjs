@@ -220,3 +220,148 @@ test('Git endpoints detect maintenance without executing proposed files', () => 
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('shared callable closure covers helper-only paths and aliases without absorbing lookalikes', () => {
+  const helpers = ['requirements-dev.txt',
+    '.github/workflows/lint-markdown.mjs', '.github/workflows/lint-markdown.test.mjs',
+    '.github/workflows/Invoke-LockedPythonHook.ps1', '.github/workflows/Test-LocalValidation.test.mjs',
+    '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
+    '.github/workflows/Test-BlankLineExamples.ps1', '.github/workflows/Test-StateRecoveryExamples.mjs'];
+  for (const helper of helpers) {
+    for (const name of [helper, helper.toUpperCase()]) {
+      assert.deepEqual(classify([name]), {
+        base, head, policy: base, classification: 'maintenance_required', maintenancePaths: [name],
+      }, name);
+    }
+    for (const name of [`${helper}.bak`, `examples/${helper}`]) {
+      assert.equal(classify([name]).classification, 'ordinary', name);
+    }
+  }
+  assert.equal(classify(['.github/workflows/unreferenced-example.mjs']).classification, 'ordinary');
+  assert.equal(classify(['.github/workflows/samples/Test-StateRecoveryExamples.mjs']).classification, 'ordinary');
+});
+
+test('real helper-only Git changes, removals and ambient redirection retain accepted-base classification', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'instruction-shared-closure-'));
+  const git = (...args) => execFileSync('git', ['-c', 'core.hooksPath=/dev/null', '-C', root, ...args], {
+    encoding: 'utf8', timeout: 30000, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
+    env: { ...process.env, GIT_CONFIG_NOSYSTEM: '1',
+      GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null' },
+  }).trim();
+  try {
+    git('init', '--quiet');
+    git('config', 'user.name', 'Shared Closure Test');
+    git('config', 'user.email', 'test@example.invalid');
+    git('config', 'commit.gpgsign', 'false');
+    const wrapper = '.github/workflows/lint-markdown.mjs';
+    fs.mkdirSync(path.join(root, '.github/workflows'), { recursive: true });
+    fs.writeFileSync(path.join(root, 'README.md'), 'accepted documentation\n');
+    fs.writeFileSync(path.join(root, wrapper), 'accepted wrapper fixture\n');
+    git('add', '.'); git('commit', '--quiet', '-m', 'accepted fixture');
+    const accepted = git('rev-parse', 'HEAD');
+    const marker = path.join(root, 'candidate-executed');
+    for (const helper of [wrapper, '.github/workflows/lint-markdown.test.mjs',
+      'requirements-dev.txt', '.github/workflows/Invoke-LockedPythonHook.ps1',
+      '.github/workflows/Test-LocalValidation.test.mjs', '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
+      '.github/workflows/Test-BlankLineExamples.ps1', '.github/workflows/Test-StateRecoveryExamples.mjs',
+      '.github/workflows/Classify-InstructionMaintenance.mjs']) {
+      fs.writeFileSync(path.join(root, helper),
+        `import fs from 'node:fs'; fs.writeFileSync(${JSON.stringify(marker)}, 'executed'); throw new Error('Untrusted candidate');\n`);
+      git('add', '--', helper); git('commit', '--quiet', '-m', 'candidate helper');
+      const candidate = git('rev-parse', 'HEAD');
+      git('checkout', '--quiet', '--detach', accepted);
+      const expected = { base: accepted, head: candidate, policy: accepted,
+        classification: 'maintenance_required', maintenancePaths: [helper] };
+      assert.deepEqual(readInstructionMaintenance(root, accepted, candidate), expected, helper);
+      assert.equal(fs.existsSync(marker), false, `${helper}: candidate code executed`);
+      const overrides = { GIT_DIR: path.join(root, 'missing-git-dir'),
+        GIT_WORK_TREE: path.join(root, 'missing-worktree'), GIT_INDEX_FILE: path.join(root, 'missing-index'),
+        GIT_OBJECT_DIRECTORY: path.join(root, 'missing-objects'),
+        GIT_ALTERNATE_OBJECT_DIRECTORIES: path.join(root, 'missing-alternates'),
+        GIT_CONFIG_COUNT: '1', GIT_CONFIG_KEY_0: 'core.bare', GIT_CONFIG_VALUE_0: 'true',
+        GIT_CONFIG_PARAMETERS: "'invalid external configuration" };
+      const saved = Object.fromEntries(Object.keys(overrides).map(name => [name, process.env[name]]));
+      try {
+        Object.assign(process.env, overrides);
+        assert.deepEqual(readInstructionMaintenance(root, accepted, candidate), expected,
+          `${helper}: external Git configuration changed the result`);
+      } finally {
+        for (const [name, value] of Object.entries(saved)) {
+          if (value === undefined) delete process.env[name]; else process.env[name] = value;
+        }
+      }
+    }
+    git('mv', '--', wrapper, 'renamed-wrapper.txt');
+    git('commit', '--quiet', '-m', 'rename helper outside selector');
+    const removed = git('rev-parse', 'HEAD');
+    git('checkout', '--quiet', '--detach', accepted);
+    assert.deepEqual(readInstructionMaintenance(root, accepted, removed), {
+      base: accepted, head: removed, policy: accepted,
+      classification: 'maintenance_required', maintenancePaths: [wrapper],
+    });
+  } finally {
+    assert.equal(path.dirname(root), os.tmpdir());
+    assert.ok(path.basename(root).startsWith('instruction-shared-closure-'));
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('accepted data admission precedes shared-helper classification and ordinary validation', () => {
+  const { parse } = createRequire(import.meta.url)('yaml');
+  const workflow = parse(fs.readFileSync(new URL('./agent-instructions.yml', import.meta.url), 'utf8'));
+  const step = workflow.jobs['accepted-policy'].steps.find(value => value.id === 'validate');
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'instruction-admission-caller-'));
+  try {
+    const directory = path.join(root, '.github/workflows');
+    fs.mkdirSync(directory, { recursive: true });
+    const log = path.join(root, 'calls.jsonl'), script = path.join(root, 'accepted.ps1');
+    fs.writeFileSync(path.join(directory, 'Test-CheckoutCredentials.ps1'),
+      `[IO.File]::AppendAllText($env:FIXTURE_LOG, '["credentials"]' + "\n")\n`);
+    fs.writeFileSync(path.join(directory, 'Test-AgentInstructions.ps1'), `
+$phase = if ($args -contains '-MetadataClassificationOnly') { 'data' } else { 'ordinary' }
+[IO.File]::AppendAllText($env:FIXTURE_LOG, (@($phase) + @($args) | ConvertTo-Json -Compress -AsArray) + "\n")
+if ($phase -eq 'data' -and $env:FIXTURE_MODE -eq 'reject-data') { throw 'Rejected candidate classification data.' }
+& pwsh -NoProfile -NonInteractive -Command 'exit 0'
+`);
+    fs.writeFileSync(script, `
+function Invoke-FixtureGit {
+  $global:LASTEXITCODE = 0
+  if ($args -contains 'rev-parse') { $env:EXPECTED_HEAD }
+}
+function Invoke-FixtureNode {
+  $phase = if ($args[0] -eq '.github/workflows/Classify-InstructionMaintenance.mjs') { 'classify' } else { 'workflow' }
+  [IO.File]::AppendAllText($env:FIXTURE_LOG, (@($phase) + @($args) | ConvertTo-Json -Compress -AsArray) + "\n")
+  $global:LASTEXITCODE = 0
+  if ($phase -eq 'classify') { $env:FIXTURE_CLASSIFICATION }
+}
+` + step.run.replaceAll('/usr/bin/git', 'Invoke-FixtureGit').replaceAll('& node ', '& Invoke-FixtureNode '));
+    for (const item of [
+      { name: 'wrapper-only', paths: ['.github/workflows/lint-markdown.mjs'], phases: ['credentials', 'data', 'classify'] },
+      { name: 'ordinary documentation', paths: ['docs/example.md'], phases: ['credentials', 'data', 'classify', 'ordinary', 'workflow'] },
+      { name: 'invalid helper data', paths: ['.github/workflows/lint-markdown.mjs'], reject: true, phases: ['credentials', 'data'] },
+    ]) {
+      fs.writeFileSync(log, '');
+      const result = spawnSync('pwsh', ['-NoProfile', '-NonInteractive', '-File', script], {
+        cwd: root, encoding: 'utf8', timeout: 30000, windowsHide: true,
+        env: { ...process.env, FIXTURE_LOG: log, FIXTURE_MODE: item.reject ? 'reject-data' : '',
+          FIXTURE_CLASSIFICATION: JSON.stringify(classify(item.paths)), EXPECTED_BASE: base, EXPECTED_HEAD: head,
+          GITHUB_STEP_SUMMARY: path.join(root, 'summary.txt') },
+      });
+      assert.equal(result.status === 0, !item.reject, `${item.name}: ${result.stderr}`);
+      const rows = fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
+      assert.deepEqual(rows.map(row => row[0]), item.phases, item.name);
+      assert.deepEqual(rows.find(row => row[0] === 'data'),
+        ['data', '-MetadataClassificationOnly', '-InputRevision', head, '-PublishedBaselineRevision', base]);
+      if (item.reject) assert.match(result.stderr, /Rejected candidate classification data/);
+      else {
+        assert.deepEqual(rows.find(row => row[0] === 'classify'),
+          ['classify', '.github/workflows/Classify-InstructionMaintenance.mjs', root, base, head]);
+        if (item.paths[0].includes('lint-markdown')) assert.match(result.stdout, /This is not ordinary policy admission/);
+      }
+    }
+  } finally {
+    assert.equal(path.dirname(root), os.tmpdir());
+    assert.ok(path.basename(root).startsWith('instruction-admission-caller-'));
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});

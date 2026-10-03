@@ -5,7 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { acceptedBase, ciAudit, ciScope, documentationOnlyDiff, evaluateFindings, evaluateProposal, hostedAuthorityReference, interpretAudit, parseExceptions, parseJson, readCandidateExceptions, runAuditCommand, validateGraph } from './Check-NpmAudit.mjs';
+import { expectedRepository, acceptedBase, ciAudit, ciScope, documentationOnlyDiff, evaluateFindings, evaluateProposal, hostedAuthorityReference, interpretAudit, parseExceptions, parseJson, readCandidateExceptions, runAuditCommand, validateGraph } from './Check-NpmAudit.mjs';
 
 const id = 'GHSA-abcd-2345-cdef';
 const bytes = value => Buffer.from(JSON.stringify(value));
@@ -312,7 +312,7 @@ test('ordinary CLI keeps local authority under agent variables and reports parse
   const env = Object.fromEntries(Object.entries(process.env).filter(([key]) => !/^(?:GIT_|NODE_PATH$)/iu.test(key)));
   Object.assign(env, { GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null' });
   Object.assign(env, { GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'dynamic',
-    GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_REF: 'refs/heads/copilot/proposal', GITHUB_SHA: 'a'.repeat(40) });
+    GITHUB_REPOSITORY: expectedRepository, GITHUB_REF: 'refs/heads/copilot/proposal', GITHUB_SHA: 'a'.repeat(40) });
   const git = (...args) => execFileSync('git', args, { cwd: root, env, encoding: 'utf8', windowsHide: true, timeout: 10000 }).trim();
   try {
     fs.mkdirSync(directory, { recursive: true });
@@ -356,7 +356,7 @@ test('ordinary CLI keeps local authority under agent variables and reports parse
 
 test('hosted authority is the native event base, not candidate or merge identity', () => {
   const base = 'a'.repeat(40), candidate = 'b'.repeat(40), merge = 'c'.repeat(40);
-  const environment = { GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_EVENT_NAME: 'pull_request', GITHUB_SHA: merge };
+  const environment = { GITHUB_REPOSITORY: expectedRepository, GITHUB_EVENT_NAME: 'pull_request', GITHUB_SHA: merge };
   const event = { pull_request: { base: { sha: base, ref: 'main', repo: { full_name: environment.GITHUB_REPOSITORY } },
     head: { sha: candidate }, merge_commit_sha: merge } };
   assert.equal(hostedAuthorityReference(environment, event), base);
@@ -387,7 +387,7 @@ test('a missing accepted record is empty authority; a failed Git read is an erro
     assert.deepEqual(authority.exceptions, []);
     assert.match(authority.limitation, /Offline/u);
     const agentEnvironment = { GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'dynamic',
-      GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_REF: 'refs/heads/copilot/proposal', GITHUB_SHA: 'a'.repeat(40) };
+      GITHUB_REPOSITORY: expectedRepository, GITHUB_REF: 'refs/heads/copilot/proposal', GITHUB_SHA: 'a'.repeat(40) };
     const agentAuthority = acceptedBase({ root, environment: agentEnvironment });
     assert.equal(agentAuthority.sha, commit);
     assert.deepEqual(agentAuthority.exceptions, []);
@@ -395,7 +395,7 @@ test('a missing accepted record is empty authority; a failed Git read is an erro
     assert.throws(() => ciAudit({ root, environment: agentEnvironment }), /Unsupported hosted audit event/u);
     assert.throws(() => ciAudit({ root, environment: {} }), /requires a hosted event/u);
     // An available exact main commit needs no remote or extra network fetch.
-    const hosted = acceptedBase({ root, hosted: true, environment: { GITHUB_ACTIONS: 'true', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide',
+    const hosted = acceptedBase({ root, hosted: true, environment: { GITHUB_ACTIONS: 'true', GITHUB_REPOSITORY: expectedRepository,
       GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/main', GITHUB_SHA: commit } });
     assert.equal(hosted.sha, commit);
     assert.deepEqual(hosted.exceptions, []);

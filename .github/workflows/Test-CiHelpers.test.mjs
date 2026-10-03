@@ -17,6 +17,92 @@ const head = 'a'.repeat(40), base = 'b'.repeat(40);
 const read = name => fs.readFileSync(path.join(directory, name), 'utf8');
 const quote = value => `'${value.replaceAll("'", "''")}'`;
 
+// Exercise the untouched launcher with a fixed interpreter discovery result.
+// The probe runs as a real Node child. It tests dispatch/version/status controls;
+// actual Python isolation and locked installation are separate integration checks.
+function pythonHookFixture(t) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-python-hook-test-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const log = path.join(root, 'calls.jsonl');
+  const probe = path.join(root, 'interpreter.cjs');
+  fs.writeFileSync(probe, `const fs = require('node:fs');
+const args = process.argv.slice(2), mode = process.env.PYTHON_HOOK_TEST_MODE;
+fs.appendFileSync(process.env.PYTHON_HOOK_TEST_LOG, JSON.stringify(args) + '\\n');
+if (args[0] === '-3.12') args.shift();
+if (args[0] !== '-E' || args[1] !== '-P') process.exit(97);
+if (args[2] === '-c' && args[3].includes('version_info')) {
+  if (mode === 'version-failure') process.exit(19);
+  console.log(mode === 'wrong-minor' ? '3.11' : mode === 'patch-output' ? '3.12.1' : '3.12');
+  if (mode === 'multiline-version') console.log('3.12');
+} else if (args[2] === '-c') {
+  process.exit(mode === 'missing-module' ? 1 : 0);
+} else if (args[2] === '-m') {
+  console.log('selected module');
+  process.exit(mode === 'module-failure' ? 7 : 0);
+} else process.exit(98);
+`);
+  const interpreter = path.join(root, 'interpreter.ps1');
+  fs.writeFileSync(interpreter, `& ${quote(process.execPath)} ${quote(probe)} @args
+`);
+  const script = path.join(root, 'case.ps1');
+  const launcher = path.join(directory, 'Invoke-LockedPythonHook.ps1');
+  function run(mode = '', module = 'pre_commit_hooks.check_json', args = []) {
+    fs.writeFileSync(script, `$ErrorActionPreference = 'Stop'
+function Get-Command {
+    param([string] $Name, [string] $CommandType, [string] $ErrorAction)
+    if ($CommandType -cne 'Application') { throw 'Unexpected discovery type.' }
+    if ($env:PYTHON_HOOK_TEST_MODE -cne 'missing-interpreter') {
+        [pscustomobject]@{ Source = ${quote(interpreter)} }
+    }
+}
+& ${quote(launcher)} -Module ${quote(module)} ${args.map(quote).join(' ')}
+exit $LASTEXITCODE
+`);
+    const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+      cwd: root, env: { ...process.env, PYTHON_HOOK_TEST_MODE: mode, PYTHON_HOOK_TEST_LOG: log },
+      encoding: 'utf8', timeout: 30000,
+    });
+    assert.equal(result.error, undefined, result.error?.message);
+    assert.equal(result.signal, null, result.stderr);
+    return result;
+  }
+  const calls = () => fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse) : [];
+  return { run, calls };
+}
+
+test('locked Python hook rejects an unapproved module before interpreter dispatch', t => {
+  const f = pythonHookFixture(t), result = f.run('', 'json.tool');
+  assert.notEqual(result.status, 0);
+  assert.deepEqual(f.calls(), []);
+});
+
+test('locked Python hook reports missing interpreter and rejects non-exact version probes', t => {
+  for (const mode of ['missing-interpreter', 'wrong-minor', 'patch-output', 'multiline-version', 'version-failure', 'missing-module']) {
+    const f = pythonHookFixture(t), result = f.run(mode);
+    assert.equal(result.status, 2, `${mode}: ${result.stderr}`);
+    assert.match(result.stderr, /Python 3\.12 is required/u);
+    assert.equal(f.calls().some(args => args.includes('-m')), false, mode);
+    if (mode === 'missing-interpreter') assert.deepEqual(f.calls(), []);
+  }
+});
+
+for (const [mode, status] of [['', 0], ['module-failure', 7]]) {
+  test(`locked Python hook isolates every dispatch and preserves arguments/native status: ${mode || 'success'}`, t => {
+    const arguments_ = ['--option-shaped', 'space name.json', 'literal;name.json'];
+    const f = pythonHookFixture(t), result = f.run(mode, 'pre_commit_hooks.check_json', arguments_);
+    assert.equal(result.status, status, result.stderr);
+    assert.match(result.stdout, /selected module/u);
+    const calls = f.calls();
+    assert.equal(calls.length, 3);
+    for (const original of calls) {
+      const args = original[0] === '-3.12' ? original.slice(1) : original;
+      assert.deepEqual(args.slice(0, 2), ['-E', '-P']);
+    }
+    const moduleCall = calls[2][0] === '-3.12' ? calls[2].slice(1) : calls[2];
+    assert.deepEqual(moduleCall, ['-E', '-P', '-m', 'pre_commit_hooks.check_json', ...arguments_]);
+  });
+}
+
 function fixture(t, workDirectoryName = 'work') {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-ci-test-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
@@ -182,7 +268,7 @@ for (const [file, variables] of [
     fs.writeFileSync(helper, read(file));
     const result = f.run(`& ${quote(helper)}`, { [variable]: '' });
     assert.notEqual(result.status, 0);
-    assert.match(result.stderr, new RegExp('requires the runner environment variable ' + variable));
+    assert.match(result.stderr, new RegExp('requires (?:the )?runner environment variable ' + variable));
     assert.equal(f.calls().length, 0);
   });
 }

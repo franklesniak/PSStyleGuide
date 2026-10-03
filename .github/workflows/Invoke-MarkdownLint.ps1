@@ -7,7 +7,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $false
 if ([string]::IsNullOrWhiteSpace($env:RUNNER_TEMP)) {
-    throw 'Markdown lint requires the runner environment variable RUNNER_TEMP.'
+    throw 'The CI lint helper requires runner environment variable RUNNER_TEMP.'
 }
 & "$PSScriptRoot/Test-CheckoutCredentials.ps1"
 $strNpm = Join-Path $env:RUNNER_TEMP 'styleguide-node/bin/npm'

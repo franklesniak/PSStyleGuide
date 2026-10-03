@@ -8,7 +8,7 @@ const selectorPaths = new Set([
   '.gitattributes', '.github/.gitattributes', '.github/actionlint.yaml',
   '.npmrc', 'npm-shrinkwrap.json', 'package.json', 'package-lock.json',
   '.pre-commit-config.yaml', '.github/.npmrc', '.husky/pre-commit',
-  '.github/document-metadata-classification.json',
+  'requirements-dev.txt', '.github/document-metadata-classification.json',
   ...[
     '.gitattributes', '.npmrc', 'npm-shrinkwrap.json', 'package.json', 'package-lock.json',
     'Classify-InstructionMaintenance.mjs', 'Classify-InstructionMaintenance.test.mjs',
@@ -18,14 +18,15 @@ const selectorPaths = new Set([
     'agent-instructions.yml',
     'copilot-setup-steps.yml',
     'build.yml', 'markdownlint.yml', '.markdownlint.jsonc', 'lint-nested-markdown.js',
+    'lint-markdown.mjs', 'lint-markdown.test.mjs',
     'Generate-StyleGuideArtifacts.ps1', 'Test-ExactGitPathSet.ps1',
-    'Test-BlankLineExamples.ps1', 'Test-StyleGuideArtifacts.ps1',
+    'Test-BlankLineExamples.ps1', 'Test-StateRecoveryExamples.mjs', 'Test-StyleGuideArtifacts.ps1',
     'Test-CheckoutCredentials.ps1', 'Initialize-CiToolchain.ps1',
     'Invoke-MarkdownLint.ps1', 'ci-toolchain.json',
     'NpmTools.mjs', 'NpmTools.test.mjs', 'Check-NpmAudit.mjs', 'Check-NpmAudit.test.mjs',
     'npm-risk-exceptions.json', 'install-husky.mjs', 'lint-staged-markdown.mjs',
     'Validate-WorkflowPolicy.test.mjs',
-    'Test-CiHelpers.test.mjs',
+    'Test-CiHelpers.test.mjs', 'Test-LocalValidation.test.mjs', 'Invoke-LockedPythonHook.ps1',
   ].map(name => `.github/workflows/${name}`.toLowerCase()),
 ]);
 // Keep this accepted-code list aligned with actual loader changes. Adding a

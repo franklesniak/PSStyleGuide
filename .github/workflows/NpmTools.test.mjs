@@ -77,6 +77,32 @@ test('configuration and alternate lock selectors are rejected before npm', () =>
   } finally { removeFixture(root); }
 });
 
+test('actual installer activates in CI and production unless explicitly disabled', () => {
+  for (const context of [{}, { CI: 'true' }, { NODE_ENV: 'production' },
+    { CI: 'true', NODE_ENV: 'production' }, { CI: 'true', NODE_ENV: 'production', HUSKY: '0' }]) {
+    const root = inputFixture();
+    try {
+      const workflows = path.join(root, '.github/workflows');
+      fs.copyFileSync(fileURLToPath(new URL('./install-husky.mjs', import.meta.url)), path.join(workflows, 'install-husky.mjs'));
+      fs.cpSync(fileURLToPath(new URL('./node_modules/husky', import.meta.url)), path.join(workflows, 'node_modules/husky'), { recursive: true });
+      const env = { ...process.env };
+      for (const key of Object.keys(env)) {
+        if (/^(?:CI|NODE_ENV|HUSKY)$/iu.test(key) || /^GIT_/iu.test(key)) delete env[key];
+      }
+      Object.assign(env, context);
+      const initialized = runBounded('git', ['init', '--quiet', root], { env });
+      assert.equal(initialized.status, 0, initialized.stderr.toString());
+      const result = runBounded(process.execPath, [path.join(workflows, 'install-husky.mjs')], { cwd: root, env });
+      assert.equal(result.status, 0, result.stderr.toString());
+      const setting = runBounded('git', ['config', '--local', '--get', 'core.hooksPath'], { cwd: root, env });
+      const suppressed = context.HUSKY === '0';
+      assert.equal(setting.status, suppressed ? 1 : 0, JSON.stringify(context));
+      assert.equal(setting.stdout.toString().trim(), suppressed ? '' : '.husky/_', JSON.stringify(context));
+      assert.equal(fs.existsSync(path.join(root, '.husky/_/pre-commit')), !suppressed, JSON.stringify(context));
+    } finally { removeFixture(root); }
+  }
+});
+
 test('real bundled npm version runs with isolated configuration and temporary files are cleaned', () => {
   const root = inputFixture();
   let directory;

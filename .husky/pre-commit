@@ -1,11 +1,113 @@
 #!/bin/sh
 
-if ! command -v node >/dev/null 2>&1; then
-  echo "pre-commit: Node.js is required to lint staged Markdown but was not found on PATH." >&2
-  echo "If you use a Node version manager with a GUI Git client, add its initialization to" >&2
-  echo "~/.config/husky/init.sh, which Husky sources before running hooks." >&2
-  echo "To bypass this one commit only, use: git commit --no-verify" >&2
+# Skip unless an added/copied/modified/renamed Markdown path is staged (any directory).
+if git diff --cached --quiet --diff-filter=ACMR -- '*.md' '*.mdc'; then
+  exit 0
+fi
+
+if ! command -v node >/dev/null 2>&1 || ! command -v npm >/dev/null 2>&1; then
+  echo "Markdown is staged, but Node/npm is not available to this Git hook."
+  echo "Make Node/npm available to the hook environment, then retry."
+  echo "If you use a Node version manager with a GUI Git client, add its initialization"
+  echo "to ~/.config/husky/init.sh, which Husky sources before each hook."
+  echo "(or commit with --no-verify to deliberately skip this check once)"
   exit 1
 fi
 
-node .github/workflows/lint-staged-markdown.mjs
+echo "Running staged Markdown lint against the Git index..."
+
+if node .github/workflows/lint-staged-markdown.mjs; then
+  staged_status=0
+else
+  staged_status=$?
+fi
+
+case "$staged_status" in
+  0)
+    ;;
+  1)
+    echo ""
+    echo "Staged Markdown lint reported errors. Review the output above, then retry."
+    exit 1
+    ;;
+  2)
+    echo ""
+    echo "Staged Markdown lint could not run because of a tooling or configuration problem."
+    echo "Review the output above, then retry."
+    exit 1
+    ;;
+  *)
+    echo ""
+    echo "Staged Markdown lint failed unexpectedly with exit status $staged_status."
+    echo "Review the output above, then retry."
+    exit 1
+    ;;
+esac
+
+echo "Running markdownlint with the repository configuration..."
+
+# Husky runs this file through sh -e, so keep the lint command in an if test
+# to preserve non-zero markdownlint statuses for classification below.
+if npm --prefix .github/workflows run lint:md; then
+  status=0
+else
+  status=$?
+fi
+
+case "$status" in
+  0)
+    ;;
+  1)
+    echo ""
+    echo "Markdownlint reported errors. To see them all, run:"
+    echo "npm --prefix .github/workflows run lint:md"
+    exit 1
+    ;;
+  2)
+    echo ""
+    echo "markdownlint could not run (a tooling or configuration problem)."
+    echo "Review the output above, then run:"
+    echo "npm --prefix .github/workflows run lint:md"
+    exit 1
+    ;;
+  *)
+    echo ""
+    echo "Markdown lint could not complete because npm or the hook failed unexpectedly."
+    echo "Exit status: $status"
+    echo "Review the output above, then run:"
+    echo "npm --prefix .github/workflows run lint:md"
+    exit 1
+    ;;
+esac
+
+echo "Running nested Markdown lint (code fences) with the repository configuration..."
+
+# Mirror the outer lint so the hook checks the same things CI does. Keep the
+# command in an if test to preserve its non-zero status for classification.
+if npm --prefix .github/workflows run lint:md:nested; then
+  nested_status=0
+else
+  nested_status=$?
+fi
+
+case "$nested_status" in
+  0)
+    exit 0
+    ;;
+  1)
+    echo ""
+    echo "Nested Markdown lint did not pass: it reported errors or could not complete"
+    echo "(a lint, tooling, or configuration problem)."
+    echo "Review the output above, then run:"
+    echo "npm --prefix .github/workflows run lint:md:nested"
+    exit 1
+    ;;
+  *)
+    echo ""
+    echo "Nested Markdown lint could not complete because npm or the hook failed unexpectedly."
+    echo "Exit status: $nested_status"
+    echo "Review the output above, then run:"
+    echo "npm --prefix .github/workflows run lint:md:nested"
+    exit 1
+    ;;
+esac

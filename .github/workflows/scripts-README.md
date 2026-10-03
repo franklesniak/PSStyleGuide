@@ -15,7 +15,7 @@ This directory contains utility scripts for the repository.
 
 The root `npm run lint:md` command delegates to the workflow package and runs [lint-markdown.mjs](lint-markdown.mjs). The helper runs the existing `--outer` child with a two-minute deadline and a two-MiB output limit. That child uses the `markdownlint` named-string API on validated literal inputs. It includes hidden `.md`/`.mdc` files and excludes `node_modules`, `.git` and `.venv` directories. An empty discovered set succeeds explicitly. It reports file, line, column, rule and detail for lint findings and preserves native tool failure evidence.
 
-[lint-staged-markdown.mjs](lint-staged-markdown.mjs) reads exact Git index contents. It checks outer rules through the shared library adapter, then checks recursive nested snippets. An invalid worktree does not change a clean staged input, and a clean worktree does not hide a staged error. The native hook definitions remain [.husky/pre-commit](../../.husky/pre-commit) and [.pre-commit-config.yaml](../../.pre-commit-config.yaml).
+[lint-staged-markdown.mjs](lint-staged-markdown.mjs) reads exact Git index contents. It checks outer rules through the shared library adapter, then checks recursive nested snippets. An invalid worktree does not change a clean staged input, and a clean worktree does not hide a staged error. When Markdown is staged, the Husky hook runs the staged checker first, then the full outer and full nested worktree checks. The pre-commit framework runs the staged checker directly. The native hook definitions remain [.husky/pre-commit](../../.husky/pre-commit) and [.pre-commit-config.yaml](../../.pre-commit-config.yaml).
 
 Run the focused caller, configuration, path and hook controls with:
 
@@ -24,6 +24,10 @@ node --test .github/workflows/lint-markdown.test.mjs
 ```
 
 All wrappers return 0 for success, 1 for lint findings and 2 for tooling failure. Use the exact Node version in [package.json](../../package.json). Follow [dependency maintenance](../../docs/dependency-maintenance.md) for locked setup and audit checks.
+
+## Python hooks
+
+[Invoke-LockedPythonHook.ps1](Invoke-LockedPythonHook.ps1) selects Python 3.12 and runs only its allowlisted modules with `-E -P`. Follow [dependency maintenance](../../docs/dependency-maintenance.md#install-python-hooks) to install the hashed binary-only requirements closure into that interpreter. Module availability does not attest installed package bytes. The actionlint hook retains its exact reviewed Git revision.
 
 ## [lint-nested-markdown.js](lint-nested-markdown.js)
 
