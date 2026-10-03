@@ -2,11 +2,11 @@
 
 A comprehensive style guide for writing consistent, maintainable, and professional PowerShell code. Designed for use by both human developers and AI agents (LLMs).
 
-## 📖 About
+## About
 
 This repository contains a detailed PowerShell style guide that establishes coding standards and best practices. Whether you're a developer writing PowerShell scripts or an AI agent generating code, this guide provides clear conventions to ensure consistency and quality.
 
-## 📚 Documentation
+## Documentation
 
 The complete style guide is available in [STYLE_GUIDE.md](STYLE_GUIDE.md). Extended rationale, design philosophy, and historical context are documented in the companion [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md).
 
@@ -14,13 +14,13 @@ The complete style guide is available in [STYLE_GUIDE.md](STYLE_GUIDE.md). Exten
 
 For convenience, this repository provides four generated versions of the style guide:
 
-- **[copilot-instructions.md](copilot-instructions.md)** - For GitHub Copilot custom instructions in repositories that contain exclusively PowerShell code. Copy this file to your repository's `.github` folder as `.github/copilot-instructions.md` to enable Copilot to follow these conventions when generating code across your entire PowerShell project.
+- **[copilot-instructions.md](copilot-instructions.md)** — For GitHub Copilot custom instructions in repositories that contain exclusively PowerShell code. Copy this file to your repository's `.github` folder as `.github/copilot-instructions.md` to enable Copilot to follow these conventions when generating code across your entire PowerShell project.
 
-- **[powershell.instructions.md](powershell.instructions.md)** - For GitHub Copilot file-specific instructions in repositories with multiple programming languages. This version includes YAML frontmatter that targets only `*.ps1` files. Copy this file to your repository as `.github/instructions/powershell.instructions.md` to enable Copilot to follow these PowerShell conventions specifically for `.ps1` files, allowing you to have different instructions for other file types.
+- **[powershell.instructions.md](powershell.instructions.md)** — For GitHub Copilot file-specific instructions in repositories with multiple programming languages. This version includes YAML frontmatter that targets only `*.ps1` files. Copy this file to your repository as `.github/instructions/powershell.instructions.md` to enable Copilot to follow these PowerShell conventions specifically for `.ps1` files, allowing you to have different instructions for other file types.
 
-- **[STYLE_GUIDE_CHAT.md](STYLE_GUIDE_CHAT.md)** - Formatted for copy-pasting into interactive chat sessions with LLMs (ChatGPT, Claude, etc.). The content is wrapped in a markdown code fence for easy sharing.
+- **[STYLE_GUIDE_CHAT.md](STYLE_GUIDE_CHAT.md)** — Formatted for copy-pasting into interactive chat sessions with LLMs (ChatGPT, Claude, etc.). The content is wrapped in a markdown code fence for easy sharing.
 
-- **[STYLE_GUIDE_FULL.md](STYLE_GUIDE_FULL.md)** - A merged version combining the actionable rules from [STYLE_GUIDE.md](STYLE_GUIDE.md) with the design rationale from [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md). This is the comprehensive version intended for human readers who want both the rules and the reasoning behind them in a single document.
+- **[STYLE_GUIDE_FULL.md](STYLE_GUIDE_FULL.md)** — A merged version combining the actionable rules from [STYLE_GUIDE.md](STYLE_GUIDE.md) with the design rationale from [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md). This is the comprehensive version intended for human readers who want both the rules and the reasoning behind them in a single document.
 
 These files are generated from [STYLE_GUIDE.md](STYLE_GUIDE.md) and [STYLE_GUIDE_RATIONALE.md](STYLE_GUIDE_RATIONALE.md). When you change either source, [regenerate the artifacts and commit them in the same pull request](CONTRIBUTING.md#regenerate-and-publish-the-style-guide-artifacts). The [build workflow](.github/workflows/build.yml) rejects generated files that do not match their sources. After that check passes, a separate read-only job uploads the four committed files from the triggering revision without running the generator. CI does not commit changes to the repository.
 
@@ -39,22 +39,22 @@ The [STYLE_GUIDE.md](STYLE_GUIDE.md) document contains the following sections:
 7. [Output Formatting and Streams](STYLE_GUIDE.md#output-formatting-and-streams)
 8. [Performance, Security, and Other](STYLE_GUIDE.md#performance-security-and-other)
 
-## 🎯 Goals
+## Goals
 
 - **Consistency**: Establish uniform coding patterns across all PowerShell projects
 - **Readability**: Make code easier to understand and maintain
 - **Quality**: Promote best practices and professional standards
 - **Accessibility**: Useful for both humans and AI/LLM code generation
 
-## 🤝 Contributing
+## Contributing
 
 This is a living document. Feedback and contributions are welcome to help improve and expand this guide.
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 This style guide was informed by established community resources and official Microsoft guidance. See [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) for detailed attribution and sources.
 
-## 📄 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 

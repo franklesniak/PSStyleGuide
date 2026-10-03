@@ -8,6 +8,7 @@ const selectorPaths = new Set([
   '.gitattributes', '.github/.gitattributes', '.github/actionlint.yaml',
   '.npmrc', 'npm-shrinkwrap.json', 'package.json', 'package-lock.json',
   '.pre-commit-config.yaml', '.github/.npmrc', '.husky/pre-commit',
+  '.github/document-metadata-classification.json',
   ...[
     '.gitattributes', '.npmrc', 'npm-shrinkwrap.json', 'package.json', 'package-lock.json',
     'Classify-InstructionMaintenance.mjs', 'Classify-InstructionMaintenance.test.mjs',

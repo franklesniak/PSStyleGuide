@@ -97,6 +97,8 @@ jobs:
           }
           $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'
           if ($LASTEXITCODE -ne 0 -or $strFetched -cne $env:EXPECTED_HEAD) { throw 'PR data commit mismatch.' }
+          & ./.github/workflows/Test-AgentInstructions.ps1 -MetadataClassificationOnly -InputRevision $env:EXPECTED_HEAD -PublishedBaselineRevision $env:EXPECTED_BASE
+          if ($LASTEXITCODE -ne 0) { throw 'Accepted metadata classification rejected PR data.' }
           $strResult = & node .github/workflows/Classify-InstructionMaintenance.mjs $PWD.Path $env:EXPECTED_BASE $env:EXPECTED_HEAD
           if ($LASTEXITCODE -ne 0) { throw 'Maintenance classification failed.' }
           $objResult = $strResult | ConvertFrom-Json -ErrorAction Stop
@@ -166,8 +168,32 @@ jobs:
           ./.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies -InstructionDependencies
       - name: Test proposed behavior without publication authority
         id: test
+        env:
+          EXPECTED_PUSH_BASE: ${{ github.event.before }}
+          EXPECTED_PUSH_HEAD: ${{ github.event.after }}
         shell: pwsh
         run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $false
           ./.github/workflows/Test-AgentInstructions.ps1 -SelfTest
+          if ($env:GITHUB_EVENT_NAME -ceq 'push') {
+              $env:GIT_NO_REPLACE_OBJECTS = '1'
+              if ($env:EXPECTED_PUSH_BASE -cnotmatch '^[0-9a-f]{40}$' -or
+                  $env:EXPECTED_PUSH_HEAD -cnotmatch '^[0-9a-f]{40}$' -or
+                  $env:EXPECTED_PUSH_BASE -ceq ('0' * 40) -or
+                  $env:EXPECTED_PUSH_HEAD -ceq ('0' * 40) -or
+                  $env:EXPECTED_PUSH_BASE -ceq $env:EXPECTED_PUSH_HEAD -or
+                  $env:EXPECTED_PUSH_HEAD -cne $env:GITHUB_SHA) { throw 'Invalid push transition endpoints.' }
+              for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
+                  & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $env:EXPECTED_PUSH_BASE
+                  if ($LASTEXITCODE -eq 0) { break }
+                  if ($intAttempt -eq 3) { throw 'Push baseline fetch failed after three attempts.' }
+                  Start-Sleep -Seconds 2
+              }
+              $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'
+              if ($LASTEXITCODE -ne 0 -or $strFetched -cne $env:EXPECTED_PUSH_BASE) { throw 'Push baseline commit mismatch.' }
+              & ./.github/workflows/Test-AgentInstructions.ps1 -ProposedPolicy -InputRevision $env:EXPECTED_PUSH_HEAD -PublishedBaselineRevision $env:EXPECTED_PUSH_BASE
+              if ($LASTEXITCODE -ne 0) { throw 'Proposed push transition checks failed.' }
+          }
           & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs
           if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }

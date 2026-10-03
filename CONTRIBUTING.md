@@ -1,76 +1,26 @@
 <!-- markdownlint-disable MD013 -->
 
-# Contributing to PSStyleGuide
+# Contributing to PowerShell Style Guide
 
-Thank you for your interest in contributing to the PSStyleGuide repository! This document describes the conventions used in this project to help you place new content in the right location.
+Thank you for your interest in contributing to this project! This guide explains the conventions used in this repository so that contributions stay consistent.
 
-## Style guide document conventions
+Use the [dependency setup and checks](docs/dependency-maintenance.md) to install the locked tools and local Markdown hook.
 
-This repository maintains two complementary style guide documents:
+## Document roles
 
-### `STYLE_GUIDE.md` — Normative rules and examples
+This repository maintains two primary source documents for the style guide:
 
-`STYLE_GUIDE.md` is the authoritative source for actionable, normative rules. It is optimized for consumption by LLM-based coding agents and for direct operational guidance.
+| File | Purpose |
+| --- | --- |
+| `STYLE_GUIDE.md` | Actionable, normative rules and concise compliant/non-compliant examples. This is the authoritative style guide, optimized for instruction-following by LLM-based coding agents and for direct operational guidance. |
+| `STYLE_GUIDE_RATIONALE.md` | Explanatory content, rationale, additional context, design discussion, and human-oriented background material. This is an internal development file, not a consumer-facing artifact. |
 
-Place the following content in `STYLE_GUIDE.md`:
+Contributors **generate** the following files from `STYLE_GUIDE.md` (and, for the full version, `STYLE_GUIDE_RATIONALE.md`) with the repository generator. Do not edit them by hand:
 
-- Normative rules, requirements, and prohibitions.
-- Concise compliant and non-compliant examples.
-- Only enough context to understand or correctly apply the rule.
-
-### `STYLE_GUIDE_RATIONALE.md` — Rationale and explanatory material
-
-`STYLE_GUIDE_RATIONALE.md` is an internal development file (not a consumer-facing artifact) that provides human-oriented background material.
-
-Place the following content in `STYLE_GUIDE_RATIONALE.md`:
-
-- Extended explanation and reasoning behind rules.
-- Historical context and design discussion.
-- Tradeoff analysis and other background material.
-
-When a rule is added or changed in `STYLE_GUIDE.md`, add or update corresponding rationale in `STYLE_GUIDE_RATIONALE.md` when useful.
-
-### Operational metadata in consumer-facing guide files
-
-Consumer-facing guide files **may** include a concise top-of-document metadata block when the fields help humans, tooling, or LLM-based coding agents identify how to consume the document.
-
-For `STYLE_GUIDE.md`, the allowed metadata fields are:
-
-- `Status`
-- `Owner`
-- `Last Updated`
-- `Scope`
-
-Operational metadata is subject to the following constraints:
-
-- Metadata must remain concise and operational.
-- Extended explanation, history, tradeoffs, and rationale still belong in `STYLE_GUIDE_RATIONALE.md` or other contributor-facing files.
-- Consumer-facing guide files still must not cross-reference other repository files (see [No-cross-referencing norm](#no-cross-referencing-norm)).
-- Do not add a `Related` field or other cross-reference-oriented metadata to consumer-facing guide metadata.
-
-## No-cross-referencing norm
-
-Consumer-facing style guide files must not cross-reference other files in this repository, including each other. The consumer-facing files are:
-
-- `STYLE_GUIDE.md` (source; the authoritative style guide)
-- `/copilot-instructions.md` (generated from `STYLE_GUIDE.md`; distinct from `.github/copilot-instructions.md`, which provides repository-level Copilot instructions)
-- `powershell.instructions.md` (generated from `STYLE_GUIDE.md` with YAML frontmatter)
-- `STYLE_GUIDE_CHAT.md` (generated from `STYLE_GUIDE.md` wrapped in a code fence)
-- `STYLE_GUIDE_FULL.md` (generated; merged from `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`)
-
-**Permitted exception:** `STYLE_GUIDE_RATIONALE.md` may cross-reference `STYLE_GUIDE.md` to help human contributors navigate between rationale and the corresponding rule. The CI build script strips these cross-references when generating consumer-facing artifacts such as `STYLE_GUIDE_FULL.md`.
-
-## Proposing changes
-
-Use the [dependency setup and checks](docs/dependency-maintenance.md) to install the locked tools and local Markdown hook before validation.
-
-When proposing a change:
-
-1. Determine whether your content is normative (belongs in `STYLE_GUIDE.md`) or explanatory (belongs in `STYLE_GUIDE_RATIONALE.md`).
-2. Keep `STYLE_GUIDE.md` concise, scannable, and optimized for instruction-following by coding agents.
-3. Do not place extended rationale in `STYLE_GUIDE.md` unless it is necessary to understand or apply the rule.
-4. If your change introduces or modifies a rule, consider adding corresponding rationale in `STYLE_GUIDE_RATIONALE.md`.
-5. Ensure consumer-facing files do not cross-reference other files in this repository.
+- `copilot-instructions.md` (root) — generated from `STYLE_GUIDE.md`; distinct from `.github/copilot-instructions.md`, which contains repository guidance
+- `powershell.instructions.md` — generated from `STYLE_GUIDE.md` with YAML front matter
+- `STYLE_GUIDE_CHAT.md` — generated from `STYLE_GUIDE.md` wrapped in a code fence
+- `STYLE_GUIDE_FULL.md` — generated by merging `STYLE_GUIDE.md` and `STYLE_GUIDE_RATIONALE.md`
 
 ## Regenerate and publish the style guide artifacts
 
@@ -93,3 +43,72 @@ The generator writes `copilot-instructions.md`, `powershell.instructions.md`, `S
 For example, a change to `STYLE_GUIDE.md` requires regeneration so that the four outputs contain the updated rules. If you commit the source change with stale outputs, the [build workflow](.github/workflows/build.yml) fails its generation check. Regenerate the files, review them, and include the updated files in your pull request.
 
 The build workflow checks deterministic generation without repository write credentials. After validation, a separate job uploads the four committed files from the triggering revision. That publisher does not run repository generator code or commit generated changes. Pull-request uploads are previews from the pull request's merge revision. A `main` push publishes the landed files; identify them by the workflow run's repository, event, and commit, and check the applicable review and merge record separately. An uploaded preview does not establish accepted-main publication.
+
+## Where to place new content
+
+- **Normative rules, requirements, prohibitions, and concise examples** belong in `STYLE_GUIDE.md`.
+- **Extended explanation, reasoning, historical context, tradeoff discussion, and other human-oriented material** belong in `STYLE_GUIDE_RATIONALE.md`.
+- Do not place extended rationale in `STYLE_GUIDE.md` unless it is necessary to understand or apply the rule.
+- When a rule is added or changed in `STYLE_GUIDE.md`, add or update corresponding rationale in `STYLE_GUIDE_RATIONALE.md` when useful.
+- Keep `STYLE_GUIDE.md` concise, scannable, and optimized for instruction-following by coding agents.
+
+## No-cross-referencing norm
+
+Consumer-facing style guide files and their generated derivatives must **not** cross-reference other files in this repository, including each other. The consumer-facing files are:
+
+- `STYLE_GUIDE.md`
+- `copilot-instructions.md`
+- `powershell.instructions.md`
+- `STYLE_GUIDE_CHAT.md`
+- `STYLE_GUIDE_FULL.md`
+
+### Permitted exception
+
+`STYLE_GUIDE_RATIONALE.md` **may** cross-reference `STYLE_GUIDE.md` to help human contributors navigate between rationale and the corresponding rule. The CI build script strips these cross-references when generating consumer-facing artifacts, so they never appear in consumer-facing output.
+
+## Operational metadata
+
+Consumer-facing guide files **may** include a concise top-of-document metadata block when the fields help humans, tooling, or LLM-based coding agents identify how to consume the document. For `STYLE_GUIDE.md`, the allowed metadata fields are:
+
+- `Status`
+- `Owner`
+- `Last Updated`
+- `Scope`
+
+The following constraints apply:
+
+- Metadata **MUST** remain concise and operational.
+- Extended explanation, history, tradeoffs, and rationale still belong in `STYLE_GUIDE_RATIONALE.md` or other contributor-facing files.
+- Consumer-facing guide files still **MUST NOT** cross-reference other repository files (see the no-cross-referencing norm above).
+- Do **not** add a `Related` field or any other cross-reference-oriented metadata to consumer-facing guide files.
+
+## Finalize governed document metadata
+
+Set the metadata date and applicable version for your last author-controlled update, commit the final candidate, and validate that exact candidate at finalization. Once the accepted base contains `-FinalizeMetadataNow`, use its checker in an accepted-base worktree. Run this example from the candidate repository after refreshing the destination by the normal fetch procedure:
+
+```powershell
+$strFinalHead = [string](git rev-parse --verify 'HEAD^{commit}')
+if ($LASTEXITCODE -ne 0) { throw 'Candidate head is unavailable.' }
+$strFinalHead = $strFinalHead.Trim()
+$strPolicyBase = [string](git rev-parse --verify 'origin/main^{commit}')
+if ($LASTEXITCODE -ne 0) { throw 'Accepted base is unavailable.' }
+$strPolicyBase = $strPolicyBase.Trim()
+$strPolicyPath = Join-Path (Split-Path (Get-Location).Path -Parent) 'PSStyleGuide-finalization-policy'
+# Use an absent path; reuse a suitable accepted-base worktree when available.
+git worktree add --detach $strPolicyPath $strPolicyBase
+if ($LASTEXITCODE -ne 0) { throw 'Policy worktree creation failed.' }
+Push-Location $strPolicyPath
+try {
+    # Install this accepted worktree's locked prerequisites from docs/dependency-maintenance.md first.
+    pwsh -NoLogo -NoProfile -NonInteractive -File .github/workflows/Test-AgentInstructions.ps1 -InputRevision $strFinalHead -PublishedBaselineRevision $strPolicyBase -FinalizeMetadataNow
+    if ($LASTEXITCODE -ne 0) { throw 'Author finalization validation failed.' }
+} finally {
+    Pop-Location
+}
+```
+
+Use the actual accepted PR/destination base if it differs from `origin/main`; resolve and fetch that exact commit before creating the policy worktree. The worktree shares the candidate repository's Git objects, so the checker reads the committed candidate without running candidate code. Follow the [dependency setup and checks](docs/dependency-maintenance.md) in that accepted worktree; creating a worktree does not install its dependencies. An older accepted checker without this mode cannot run the command. Initial installation requires separate proposed-code validation and independent review; it is not an installed accepted-base pass.
+
+Keep the successful output's exact base, head and UTC date in the normal final-validation evidence. Correct failures, commit the correction and validate the new exact head. Another author-controlled update requires its applicable finalization check. Automatic target movement and delayed CI reruns follow the existing documentation policy; rerunning checks on identical finalized input does not create a new author finalization.
+
+For later verification of identical base/head, run the same accepted checker with the same endpoints and omit `-FinalizeMetadataNow`. It retains structural, calendar, baseline and version checks and explicitly reports that this invocation did not verify finalization date. Reuse the original successful finalization output for unchanged inputs. Missing original evidence supplies no historical finalization-date proof; CI event time, run time and candidate metadata are not substitutes. This capability does not create an automatic remote freshness gate or grant maintenance, owner or merge authority.

@@ -1,14 +1,33 @@
 # .SYNOPSIS
 # Validates governed agent instructions and optional authenticated Git ranges.
 #
+# .PARAMETER MetadataClassificationOnly
+# Validates bounded classification data against exact accepted B/H endpoints.
+# Requires checkout B and returns before Markdown dependency/bootstrap work.
+# This result is data validation, not merge or owner authority.
+#
+# .PARAMETER FinalizeMetadataNow
+# Checks changed-document metadata against the captured current UTC date at
+# deliberate author finalization. Requires exact accepted B/H and checkout B.
+# Cannot run with SelfTest or MetadataClassificationOnly. Later ordinary checks
+# do not establish the historical finalization date.
+#
+# .PARAMETER ProposedPolicy
+# Runs full B/H transition diagnostics with proposed checker code at H.
+# Requires distinct nonzero endpoints and checkout H. This is not accepted
+# policy, owner, merge or finalization authority. Cannot combine other modes.
+#
 # .NOTES
 # Positional parameters are not supported.
-# Version: 1.16.20260929.0
+# Version: 1.16.20261002.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([string])]
 param(
     [Parameter()][switch] $SelfTest,
+    [Parameter()][switch] $MetadataClassificationOnly,
+    [Parameter()][switch] $FinalizeMetadataNow,
+    [Parameter()][switch] $ProposedPolicy,
     [Parameter()][AllowEmptyString()][string] $InputRevision = '',
     [Parameter()][AllowEmptyString()][string] $PublishedBaselineRevision = ''
 )
@@ -23,6 +42,7 @@ $intDocsInstructionsMaximumInputBytes = 131072
 $intInstructionDocumentMaximumInputBytes = 131072
 $intStyleGuideRationaleMaximumInputBytes = 196608
 $intGitPathListMaximumBytes = 1048576
+$intDocumentClassificationMaximumInputBytes = 32768
 $strPythonPrerequisite =
     'Python 3.12 is required to validate .codex/config.toml. On Windows, ' +
     'install the Python launcher for `py -3.12`; otherwise, expose ' +
@@ -52,6 +72,7 @@ $script:arrPushGovernedExactPaths = @(
     $script:arrCheckoutAttributePaths
     $script:arrOperationalLintGuidePaths
     '.codex/config.toml',
+    '.github/document-metadata-classification.json',
     '.github/workflows/Test-AgentInstructions.SelfTest.ps1',
     '.github/workflows/Test-AgentInstructions.ps1',
     '.github/workflows/workflow-policy-cases.json',
@@ -197,6 +218,159 @@ $script:strClaudeImportFailure =
     'CLAUDE.md must not contain active @path imports.'
 
 #region Private helper functions
+
+function ConvertFrom-ParserJsonContext {
+    # .SYNOPSIS
+    # Decodes bounded parser JSON without coercing timestamp strings.
+    #
+    # .DESCRIPTION
+    # Preserves JSON types for the caller's existing exact shape checks.
+    # Rejects nonobject roots, ambiguous properties and excessive input.
+    #
+    # .PARAMETER Content
+    # The exact successful parser output.
+    #
+    # .PARAMETER MaximumBytes
+    # The maximum permitted UTF-8 output size.
+    #
+    # .EXAMPLE
+    # ConvertFrom-ParserJsonContext -Content '{"value":"2026-10-02T00:00:00Z"}' -MaximumBytes 4096
+    #
+    # # Preserves value as the original string.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Management.Automation.PSCustomObject] Decoded JSON object.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $Content,
+        [Parameter(Mandatory)][ValidateRange(1, 16777216)][int] $MaximumBytes
+    )
+
+    if ([Text.Encoding]::UTF8.GetByteCount($Content) -gt $MaximumBytes) {
+        throw 'The parser returned oversized JSON context.'
+    }
+    $objOptions = [System.Text.Json.JsonDocumentOptions]@{
+        AllowTrailingCommas = $false
+        CommentHandling = [System.Text.Json.JsonCommentHandling]::Disallow
+        MaxDepth = 64
+    }
+    $scriptBlockDecode = {
+        param([System.Text.Json.JsonElement] $Element)
+
+        switch ($Element.ValueKind) {
+            ([System.Text.Json.JsonValueKind]::Object) {
+                $hashtableProperties = [ordered]@{}
+                foreach ($objProperty in $Element.EnumerateObject()) {
+                    if ([string]::IsNullOrEmpty($objProperty.Name) -or
+                        $hashtableProperties.Contains($objProperty.Name)) {
+                        throw 'The parser returned ambiguous JSON properties.'
+                    }
+                    $hashtableProperties[$objProperty.Name] =
+                        & $scriptBlockDecode -Element $objProperty.Value
+                }
+                return [pscustomobject]$hashtableProperties
+            }
+            ([System.Text.Json.JsonValueKind]::Array) {
+                $listValues = [Collections.Generic.List[object]]::new()
+                foreach ($objElement in $Element.EnumerateArray()) {
+                    $listValues.Add((& $scriptBlockDecode -Element $objElement))
+                }
+                return ,$listValues.ToArray()
+            }
+            ([System.Text.Json.JsonValueKind]::String) { return $Element.GetString() }
+            ([System.Text.Json.JsonValueKind]::Number) {
+                $intValue = [int64]0
+                if ($Element.TryGetInt64([ref]$intValue)) { return $intValue }
+                $doubleValue = $Element.GetDouble()
+                if ([double]::IsNaN($doubleValue) -or [double]::IsInfinity($doubleValue)) {
+                    throw 'The parser returned an unsupported JSON number.'
+                }
+                return $doubleValue
+            }
+            ([System.Text.Json.JsonValueKind]::True) { return $true }
+            ([System.Text.Json.JsonValueKind]::False) { return $false }
+            ([System.Text.Json.JsonValueKind]::Null) { return $null }
+            default { throw 'The parser returned an unsupported JSON type.' }
+        }
+    }
+    $objDocument = $null
+    try {
+        $objDocument = [System.Text.Json.JsonDocument]::Parse($Content, $objOptions)
+        if ($objDocument.RootElement.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) {
+            throw 'The parser JSON context root must be an object.'
+        }
+        return & $scriptBlockDecode -Element $objDocument.RootElement
+    } finally {
+        if ($null -ne $objDocument) { $objDocument.Dispose() }
+    }
+}
+
+function Test-InitialMetadataCoveragePath {
+    # .SYNOPSIS
+    # Tests exact trusted prior exemption promotion.
+    #
+    # .DESCRIPTION
+    # Uses exact exemptions from a validated existing baseline manifest.
+    # Without a trusted manifest, no invalid parent can be waived.
+    # Known governed paths cannot become initial coverage.
+    #
+    # .PARAMETER HasTrustedBaselineManifest
+    # True when the trusted baseline already has classification data.
+    #
+    # .PARAMETER TrustedBaselineExemptPath
+    # Exact exemptions read from the validated trusted baseline manifest.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The exact candidate document path validated by the bounded input reader.
+    #
+    # .EXAMPLE
+    # Test-InitialMetadataCoveragePath @hashtableArguments
+    #
+    # # Returns true only for a proved previously ungoverned path.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] True when the path was outside proved prior coverage.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)][bool] $HasTrustedBaselineManifest,
+        [Parameter()][AllowEmptyCollection()][string[]] $TrustedBaselineExemptPath = @(),
+        [Parameter(Mandatory)][string] $RepositoryRelativePath
+    )
+
+    $arrProvedPriorGovernedPaths = @(
+        'AGENTS.md', 'CLAUDE.md', '.github/copilot-instructions.md',
+        '.github/instructions/docs.instructions.md', '.github/instructions/yaml.instructions.md',
+        'docs/ISSUE_EVALUATION_PROMPT.md', 'STYLE_GUIDE_RATIONALE.md',
+        '.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md', '.github/workflows/scripts-README.md')
+    if ($arrProvedPriorGovernedPaths -ccontains $RepositoryRelativePath -or
+        $RepositoryRelativePath -cmatch '^docs/decisions/[0-9]{4}-[a-z0-9]+(?:-[a-z0-9]+)*\.md$') {
+        return $false
+    }
+    if ($HasTrustedBaselineManifest) {
+        return $TrustedBaselineExemptPath -ccontains $RepositoryRelativePath
+    }
+    return $false
+}
 
 function ConvertFrom-StrictUtf8Data {
     # .SYNOPSIS
@@ -1144,12 +1318,97 @@ function Read-RepositoryInputData {
     return $arrInputBytes
 }
 
+function Get-GitRegularFileBlobId {
+    # .SYNOPSIS
+    # Gets one exact regular Git entry identity without reading its content.
+    #
+    # .DESCRIPTION
+    # Uses bounded literal NUL Git metadata. Requires one100644 blob in a
+    # revision, or one100644 stage0 index entry for a local candidate.
+    # Does not inspect worktree file-system types or open generated bodies.
+    #
+    # .PARAMETER RepositoryRootPath
+    # The absolute path of the trusted Git repository.
+    #
+    # .PARAMETER RepositoryRelativePath
+    # The exact ordinal repository-relative path.
+    #
+    # .PARAMETER Revision
+    # The exact Git revision. Empty selects the current index.
+    #
+    # .EXAMPLE
+    # Get-GitRegularFileBlobId @hashtableArguments
+    #
+    # # Returns a validated blob identity without a content read.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [string] The regular entry's immutable blob identity.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261002.0.
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][string] $RepositoryRootPath,
+        [Parameter(Mandatory)][string] $RepositoryRelativePath,
+        [Parameter()][AllowEmptyString()][string] $Revision = ''
+    )
+
+    $longTreeMaximumBytes = [long][Text.Encoding]::UTF8.GetByteCount($RepositoryRelativePath) + 78
+    if ($longTreeMaximumBytes -gt 2147483646) {
+        throw 'Git revision entry exceeds the supported bounded output size.'
+    }
+    $objTreeStartInfo = [Diagnostics.ProcessStartInfo]::new('git')
+    $objTreeStartInfo.UseShellExecute = $false
+    $objTreeStartInfo.CreateNoWindow = $true
+    $objTreeStartInfo.RedirectStandardOutput = $true
+    $objTreeStartInfo.RedirectStandardError = $true
+    $arrEntryArguments = @('--literal-pathspecs', '-C', $RepositoryRootPath)
+    if ([string]::IsNullOrEmpty($Revision)) {
+        $arrEntryArguments += @('ls-files', '--stage', '-z', '--', $RepositoryRelativePath)
+    } else {
+        $arrEntryArguments += @('ls-tree', '-z', '--full-tree', $Revision, '--', $RepositoryRelativePath)
+    }
+    foreach ($strArgument in $arrEntryArguments) {
+        $objTreeStartInfo.ArgumentList.Add($strArgument)
+    }
+    $objTreeProcess = [Diagnostics.Process]::new()
+    $objTreeProcess.StartInfo = $objTreeStartInfo
+    $objTreeResult = Read-BoundedProcessData -Process $objTreeProcess `
+        -MaximumBytes ([int]$longTreeMaximumBytes) -TimeoutMilliseconds 10000 `
+        -DisplayName "Git revision entry $Revision`:$RepositoryRelativePath"
+    if ($objTreeResult.ExitCode -ne 0) {
+        throw "Could not inspect $Revision`:$RepositoryRelativePath in Git."
+    }
+    $strTreeRecord = if ($objTreeResult.Bytes.Length -eq 0) { '' } else {
+        ConvertFrom-StrictUtf8Data -Bytes $objTreeResult.Bytes -DisplayName 'Git revision entry'
+    }
+    $strEntryPattern = if ([string]::IsNullOrEmpty($Revision)) {
+        '\A100644 (?<ObjectId>[0-9a-fA-F]{40}|[0-9a-fA-F]{64}) 0\t(?<Path>[^\x00]+)\x00\z'
+    } else {
+        '\A100644 blob (?<ObjectId>[0-9a-fA-F]{40}|[0-9a-fA-F]{64})\t(?<Path>[^\x00]+)\x00\z'
+    }
+    $objTreeMatch = [regex]::Match($strTreeRecord, $strEntryPattern)
+    if (-not $objTreeMatch.Success -or
+        -not [string]::Equals($objTreeMatch.Groups['Path'].Value,
+            $RepositoryRelativePath, [StringComparison]::Ordinal)) {
+        throw "Git revision input is not one regular 100644 blob: $Revision`:$RepositoryRelativePath"
+    }
+    return $objTreeMatch.Groups['ObjectId'].Value
+}
+
 function Read-GitRevisionText {
     # .SYNOPSIS
     # Reads one bounded UTF-8 file from a Git revision.
     #
     # .DESCRIPTION
-    # Reads one file from an exact Git revision as strict UTF-8.
+    # Reads one file from an exact Git revision as strict UTF-8. Required regular
+    # files use a bounded NUL-delimited tree record and exact ordinal path.
     #
     # .PARAMETER RepositoryRootPath
     # The absolute path of the trusted Git repository.
@@ -1181,7 +1440,7 @@ function Read-GitRevisionText {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.1.20261002.0.
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -1202,19 +1461,10 @@ function Read-GitRevisionText {
         [switch] $RequireRegularFile
     )
 
+    $strBlobObject = "${Revision}:$RepositoryRelativePath"
     if ($RequireRegularFile) {
-        $arrTreeEntries = @(& git -C $RepositoryRootPath ls-tree `
-                $Revision -- $RepositoryRelativePath 2>&1)
-        if ($LASTEXITCODE -ne 0) {
-            throw "Could not inspect $Revision`:$RepositoryRelativePath in Git."
-        }
-        $strExpectedEntryPattern =
-            '^100644 blob (?:[0-9a-fA-F]{40}|[0-9a-fA-F]{64})\t' +
-            [regex]::Escape($RepositoryRelativePath) + '$'
-        if ($arrTreeEntries.Count -ne 1 -or
-            [string]$arrTreeEntries[0] -notmatch $strExpectedEntryPattern) {
-            throw "Git revision input is not one regular 100644 blob: $Revision`:$RepositoryRelativePath"
-        }
+        $strBlobObject = Get-GitRegularFileBlobId -RepositoryRootPath $RepositoryRootPath `
+            -Revision $Revision -RepositoryRelativePath $RepositoryRelativePath
     }
 
     $objStartInfo = [System.Diagnostics.ProcessStartInfo]::new()
@@ -1228,7 +1478,7 @@ function Read-GitRevisionText {
             $RepositoryRootPath,
             'cat-file',
             'blob',
-            "${Revision}:$RepositoryRelativePath"
+            $strBlobObject
         )) {
         $objStartInfo.ArgumentList.Add($strArgument)
     }
@@ -1786,7 +2036,8 @@ print(json.dumps(r,separators=(",",":"),sort_keys=True))
     }
 
     try {
-        $objParserContext = $strParserOutput | ConvertFrom-Json -ErrorAction Stop
+        $objParserContext = ConvertFrom-ParserJsonContext `
+            -Content $strParserOutput -MaximumBytes 4096
     } catch {
         $objContext.Failure = 'The trusted TOML parser returned invalid typed context.'
         return [pscustomobject]$objContext
@@ -2302,7 +2553,8 @@ function Get-MarkdownParseContext {
     $strParserOutput = $objParserResult.Output
 
     try {
-        $objRawContext = $strParserOutput | ConvertFrom-Json -ErrorAction Stop
+        $objRawContext = ConvertFrom-ParserJsonContext `
+            -Content $strParserOutput -MaximumBytes 16777216
     } catch {
         throw [System.IO.InvalidDataException]::new(
             'The locked Markdown parser returned invalid context data.',
@@ -3250,10 +3502,12 @@ function ConvertTo-MetadataComparisonText {
 
 function Get-PublishedEndpointLastUpdatedFailure {
     # .SYNOPSIS
-    # Validates metadata and freshness without a Version field.
+    # Validates metadata and freshness with an optional Version field.
     #
     # .DESCRIPTION
-    # Validates Last Updated metadata for a document that has no Version field.
+    # Validates Last Updated and any present Version. A newly introduced
+    # Version uses revision zero while retaining the actual parent for date
+    # and rendered-content checks; optional removal also retains that parent.
     #
     # .PARAMETER Name
     # The fixture or document name to use in diagnostics.
@@ -3347,6 +3601,24 @@ function Get-PublishedEndpointLastUpdatedFailure {
             )
             return
         }
+    }
+    if ($null -ne $objBaseMetadata -and $null -ne $objBaseMetadata.VersionDate -and
+        $null -eq $objCurrentMetadata.VersionDate) {
+        Write-Output @(Get-PublishedEndpointMetadataFailure -Name "The parent of $Name" `
+                -CurrentContent $BaseContent -ParentContent $null -ExpectedUtcDate '' `
+                -IsNewDocumentTransition $false -RequireExpectedUtcDateForRenderedChange $false)
+    }
+    if ($null -ne $objCurrentMetadata.VersionDate) {
+        $objVersionParentContent = $null
+        if ($null -ne $objBaseMetadata -and $null -ne $objBaseMetadata.VersionDate) {
+            $objVersionParentContent = $BaseContent
+        }
+        # Null here describes only the new Version tuple. The actual parent
+        # has already passed Last Updated and rendered-comparison checks above.
+        Write-Output @(Get-PublishedEndpointMetadataFailure -Name $Name `
+                -CurrentContent $CurrentContent -ParentContent $objVersionParentContent `
+                -ExpectedUtcDate '' -IsNewDocumentTransition ($null -eq $objVersionParentContent) `
+                -RequireExpectedUtcDateForRenderedChange $false)
     }
     if (-not $boolRenderedContentChanged) {
         return
@@ -3502,6 +3774,65 @@ function Invoke-SafeTemporaryDirectoryRemoval {
         )
         Start-Sleep -Milliseconds $intDelayMilliseconds
     }
+}
+
+function Test-RecursivePersonalMemoryIgnoreContract {
+    # .SYNOPSIS
+    # Proves an all-depth personal-memory exclusion in the root ignore file.
+    #
+    # .DESCRIPTION
+    # Supports a root-only tracked ignore inventory. A canonical recursive
+    # exclusion must follow every negation; native Git probes remain separate.
+    # Nested or case-alias ignore files invalidate this bounded proof.
+    #
+    # .PARAMETER GitIgnoreContent
+    # The exact root .gitignore text, not user-local exclusion configuration.
+    #
+    # .PARAMETER TrackedPath
+    # The complete bounded candidate tracked-path inventory.
+    #
+    # .EXAMPLE
+    # Test-RecursivePersonalMemoryIgnoreContract @hashtableArguments
+    #
+    # # Returns true only for the supported root-only all-depth contract.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.Boolean] Whether the bounded recursive proof succeeds.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $GitIgnoreContent,
+        [Parameter(Mandatory)][AllowEmptyCollection()][string[]] $TrackedPath
+    )
+
+    if ($TrackedPath -cnotcontains '.gitignore') { return $false }
+    foreach ($strTrackedPath in $TrackedPath) {
+        if ($strTrackedPath -imatch '(^|/)\.gitignore$' -and
+            $strTrackedPath -cne '.gitignore') {
+            return $false
+        }
+    }
+    $boolRecursiveExclusion = $false
+    foreach ($strRawLine in ($GitIgnoreContent -split '\r?\n')) {
+        # Git ignores unescaped trailing spaces; leading spaces remain literal.
+        $strLine = $strRawLine.TrimEnd([char]' ')
+        if (@('CLAUDE.local.md', '**/CLAUDE.local.md') -ccontains $strLine) {
+            $boolRecursiveExclusion = $true
+        } elseif ($strLine.Length -gt 1 -and
+            $strLine.StartsWith('!', [StringComparison]::Ordinal)) {
+            $boolRecursiveExclusion = $false
+        }
+    }
+    return $boolRecursiveExclusion
 }
 
 function Test-GitIgnorePathEffective {
@@ -4361,12 +4692,691 @@ function Get-DecisionRecordLifecycleFailure {
     }
 }
 
+function Get-DocumentMetadataClassificationContext {
+    # .SYNOPSIS
+    # Parses the inert Markdown classification manifest.
+    #
+    # .DESCRIPTION
+    # Requires a strict, bounded JSON object with one schema version and sorted
+    # exact-path arrays for Tier 2, generated, and future authorized exemptions.
+    # Active exemptions must be safe tracked Markdown paths. Authorization paths
+    # are inert until they exist in a trusted published baseline.
+    #
+    # .PARAMETER Content
+    # The strict JSON manifest text.
+    #
+    # .PARAMETER TrackedPath
+    # The complete tracked repository path inventory at the validation revision.
+    #
+    # .EXAMPLE
+    # Get-DocumentMetadataClassificationContext `
+    #     -Content '{"schemaVersion":2,"authorizedExemptionPaths":[],"tier2Paths":[],"generatedPaths":[]}' `
+    #     -TrackedPath @()
+    #
+    # # Returns an empty, valid exemption set.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [pscustomobject] Failure, schema, exact categories, and authorization paths.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the
+    # public API surface. Parameters, return shape, and positional
+    # contract may change without notice.
+    #
+    # This function does not support positional parameters.
+    # Version: 1.2.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([pscustomobject])]
+    param(
+        [Parameter(Mandatory)]
+        [string] $Content,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $TrackedPath
+    )
+
+    $scriptBlockFailure = {
+        param([string] $Message)
+
+        return [pscustomobject]@{
+            Failure = $Message
+            SchemaVersion = 0
+            Tier2Paths = [string[]]@()
+            GeneratedPaths = [string[]]@()
+            ExemptPaths = [string[]]@()
+            AuthorizedExemptionPaths = [string[]]@()
+        }
+    }
+    $objJsonOptions = [System.Text.Json.JsonDocumentOptions]@{
+        AllowTrailingCommas = $false
+        CommentHandling = [System.Text.Json.JsonCommentHandling]::Disallow
+        MaxDepth = 8
+    }
+    $objJsonDocument = $null
+    try {
+        $objJsonDocument = [System.Text.Json.JsonDocument]::Parse(
+            $Content,
+            $objJsonOptions
+        )
+        $objRoot = $objJsonDocument.RootElement
+        if ($objRoot.ValueKind -ne [System.Text.Json.JsonValueKind]::Object) {
+            return & $scriptBlockFailure `
+                -Message 'The document classification manifest root must be an object.'
+        }
+
+        $dictionaryProperties =
+            [System.Collections.Generic.Dictionary[
+                string,
+                System.Text.Json.JsonElement
+            ]]::new([System.StringComparer]::Ordinal)
+        $arrAllowedProperties = @(
+            'schemaVersion',
+            'authorizedExemptionPaths',
+            'tier2Paths',
+            'generatedPaths'
+        )
+        foreach ($objProperty in $objRoot.EnumerateObject()) {
+            if ($arrAllowedProperties -cnotcontains $objProperty.Name) {
+                return & $scriptBlockFailure -Message (
+                    'The document classification manifest contains an unknown property: ' +
+                    $objProperty.Name
+                )
+            }
+            if ($dictionaryProperties.ContainsKey($objProperty.Name)) {
+                return & $scriptBlockFailure -Message (
+                    'The document classification manifest contains a duplicate property: ' +
+                    $objProperty.Name
+                )
+            }
+            $dictionaryProperties.Add($objProperty.Name, $objProperty.Value.Clone())
+        }
+        foreach ($strRequiredProperty in $arrAllowedProperties) {
+            if (-not $dictionaryProperties.ContainsKey($strRequiredProperty)) {
+                return & $scriptBlockFailure -Message (
+                    'The document classification manifest is missing property: ' +
+                    $strRequiredProperty
+                )
+            }
+        }
+
+        $intSchemaVersion = 0
+        if ($dictionaryProperties['schemaVersion'].ValueKind -ne [System.Text.Json.JsonValueKind]::Number -or
+            -not $dictionaryProperties['schemaVersion'].TryGetInt32(
+                [ref]$intSchemaVersion
+            ) -or $intSchemaVersion -ne 2) {
+            return & $scriptBlockFailure `
+                -Message 'The document classification schemaVersion must be integer 2.'
+        }
+
+        $setTrackedPaths = [System.Collections.Generic.HashSet[string]]::new(
+            $TrackedPath,
+            [System.StringComparer]::Ordinal
+        )
+        $setExemptPaths = [System.Collections.Generic.HashSet[string]]::new(
+            [System.StringComparer]::Ordinal
+        )
+        $listExemptPaths = [System.Collections.Generic.List[string]]::new()
+        $dictionaryCategoryPaths = @{}
+        foreach ($strArrayProperty in @('tier2Paths', 'generatedPaths')) {
+            $listCategoryPaths = [Collections.Generic.List[string]]::new()
+            $objArray = $dictionaryProperties[$strArrayProperty]
+            if ($objArray.ValueKind -ne [System.Text.Json.JsonValueKind]::Array) {
+                return & $scriptBlockFailure -Message (
+                    "The document classification $strArrayProperty value must be an array."
+                )
+            }
+            $strPreviousPath = $null
+            foreach ($objPathValue in $objArray.EnumerateArray()) {
+                if ($objPathValue.ValueKind -ne [System.Text.Json.JsonValueKind]::String) {
+                    return & $scriptBlockFailure -Message (
+                        "The document classification $strArrayProperty entries must be strings."
+                    )
+                }
+                $strPath = $objPathValue.GetString()
+                if ([string]::IsNullOrWhiteSpace($strPath) -or
+                    [System.IO.Path]::IsPathRooted($strPath) -or
+                    $strPath.Contains('\', [System.StringComparison]::Ordinal) -or
+                    $strPath -match '(?:^|/)\.\.(?:/|$)' -or
+                    $strPath -match '[\x00-\x1f\x7f]' -or
+                    $strPath -inotmatch '\.(?:md|mdc)$') {
+                    return & $scriptBlockFailure -Message (
+                        "The document classification contains an unsafe path: $strPath"
+                    )
+                }
+                if ($null -ne $strPreviousPath -and
+                    [string]::CompareOrdinal($strPreviousPath, $strPath) -ge 0) {
+                    return & $scriptBlockFailure -Message (
+                        "The document classification $strArrayProperty array must be " +
+                        'strictly ordinal-sorted and duplicate-free.'
+                    )
+                }
+                if (-not $setExemptPaths.Add($strPath)) {
+                    return & $scriptBlockFailure -Message (
+                        "The document classification repeats a path: $strPath"
+                    )
+                }
+                if (-not $setTrackedPaths.Contains($strPath)) {
+                    return & $scriptBlockFailure -Message (
+                        "The document classification path is not tracked: $strPath"
+                    )
+                }
+                $listExemptPaths.Add($strPath)
+                $listCategoryPaths.Add($strPath)
+                $strPreviousPath = $strPath
+            }
+            $dictionaryCategoryPaths[$strArrayProperty] = $listCategoryPaths.ToArray()
+        }
+
+        $objAuthorizationArray = $dictionaryProperties['authorizedExemptionPaths']
+        if ($objAuthorizationArray.ValueKind -ne [System.Text.Json.JsonValueKind]::Array) {
+            return & $scriptBlockFailure -Message (
+                'The document classification authorizedExemptionPaths value must be an array.'
+            )
+        }
+        $listAuthorizedExemptionPaths = [System.Collections.Generic.List[string]]::new()
+        $strPreviousAuthorizationPath = $null
+        foreach ($objPathValue in $objAuthorizationArray.EnumerateArray()) {
+            if ($objPathValue.ValueKind -ne [System.Text.Json.JsonValueKind]::String) {
+                return & $scriptBlockFailure -Message (
+                    'The document classification authorizedExemptionPaths entries must be strings.'
+                )
+            }
+            $strPath = $objPathValue.GetString()
+            if ([string]::IsNullOrWhiteSpace($strPath) -or
+                [System.IO.Path]::IsPathRooted($strPath) -or
+                $strPath.Contains('\', [System.StringComparison]::Ordinal) -or
+                $strPath -match '(?:^|/)\.\.(?:/|$)' -or
+                $strPath -match '[\x00-\x1f\x7f]' -or
+                $strPath -inotmatch '\.(?:md|mdc)$') {
+                return & $scriptBlockFailure -Message (
+                    "The document classification contains an unsafe path: $strPath"
+                )
+            }
+            if ($null -ne $strPreviousAuthorizationPath -and
+                [string]::CompareOrdinal(
+                    $strPreviousAuthorizationPath,
+                    $strPath
+                ) -ge 0) {
+                return & $scriptBlockFailure -Message (
+                    'The document classification authorizedExemptionPaths array must be ' +
+                    'strictly ordinal-sorted and duplicate-free.'
+                )
+            }
+            if ($setExemptPaths.Contains($strPath) -or
+                $listAuthorizedExemptionPaths.Contains($strPath)) {
+                return & $scriptBlockFailure -Message (
+                    "The document classification repeats a path: $strPath"
+                )
+            }
+            $listAuthorizedExemptionPaths.Add($strPath)
+            $strPreviousAuthorizationPath = $strPath
+        }
+
+        return [pscustomobject]@{
+            Failure = $null
+            SchemaVersion = $intSchemaVersion
+            Tier2Paths = [string[]]$dictionaryCategoryPaths['tier2Paths']
+            GeneratedPaths = [string[]]$dictionaryCategoryPaths['generatedPaths']
+            ExemptPaths = [string[]]$listExemptPaths.ToArray()
+            AuthorizedExemptionPaths =
+                [string[]]$listAuthorizedExemptionPaths.ToArray()
+        }
+    }
+    catch [System.Text.Json.JsonException] {
+        return & $scriptBlockFailure `
+            -Message 'The document classification manifest is not strict JSON.'
+    }
+    finally {
+        if ($null -ne $objJsonDocument) {
+            $objJsonDocument.Dispose()
+        }
+    }
+}
+
+function Get-InitialDocumentMetadataClassificationFailure {
+    # .SYNOPSIS
+    # Validates the one supported initial classification mapping.
+    #
+    # .DESCRIPTION
+    # Requires the exact known manifest-absent baseline and prior validator.
+    # Validates parsed category mappings, not formatting or candidate assertions.
+    # This bootstrap check does not establish first-install or merge authority.
+    #
+    # .PARAMETER BaselineRevision
+    # The exact trusted baseline, whose manifest absence the caller proved.
+    #
+    # .PARAMETER TrustedBaselineValidatorSha256
+    # SHA-256 of the bounded regular validator blob at the trusted baseline.
+    #
+    # .PARAMETER CandidateContext
+    # The result from the shared strict classification parser.
+    #
+    # .EXAMPLE
+    # Get-InitialDocumentMetadataClassificationFailure @hashtableArguments
+    #
+    # # Returns no failure only for the closed initial mapping.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # [System.String] Zero or more bootstrap failures.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Parameters, return shape, and positional contract can change without notice.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)][AllowEmptyString()][string] $BaselineRevision,
+        [Parameter(Mandatory)][AllowEmptyString()][string] $TrustedBaselineValidatorSha256,
+        [Parameter(Mandatory)][pscustomobject] $CandidateContext
+    )
+
+    if ($BaselineRevision -cne 'a71f16a8d76beeca1ba8fdc3b1c95e1958e0973c' -or
+        $TrustedBaselineValidatorSha256 -cne
+        '5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5') {
+        Write-Output 'The manifest-absent classification baseline is not the supported exact initialization.'
+        return
+    }
+    $arrInitialTier2Paths = @(
+        'ACKNOWLEDGMENTS.md', 'CONTRIBUTING.md', 'README.md',
+        'samples/test-nested-markdown-linting.md', 'samples/test-recursive-nested-markdown.md')
+    $arrInitialGeneratedPaths = @(
+        'STYLE_GUIDE_CHAT.md', 'STYLE_GUIDE_FULL.md',
+        'copilot-instructions.md', 'powershell.instructions.md')
+    if ($null -ne $CandidateContext.Failure -or
+        $CandidateContext.SchemaVersion -ne 2 -or
+        $CandidateContext.AuthorizedExemptionPaths.Count -ne 0 -or
+        ($CandidateContext.Tier2Paths -join "`n") -cne ($arrInitialTier2Paths -join "`n") -or
+        ($CandidateContext.GeneratedPaths -join "`n") -cne ($arrInitialGeneratedPaths -join "`n")) {
+        Write-Output 'The initial classification must retain the exact reviewed Tier 2/generated mappings and empty authorizations.'
+    }
+}
+
+function Get-DocumentMetadataClassificationExpansionFailure {
+    # .SYNOPSIS
+    # Rejects candidate-only Markdown metadata exemptions.
+    #
+    # .DESCRIPTION
+    # Compares the parsed candidate exemption set with an authenticated baseline.
+    # A new active exemption must already be active or authorized in the trusted
+    # published baseline. Candidate-only authorizations are inert. A missing
+    # baseline manifest fails this helper and requires the separate closed
+    # initialization proof.
+    # Generated status must already be generated or authorized in the baseline;
+    # membership in the baseline Tier2 category does not authorize that change.
+    # Removals and generated-to-Tier2 moves strengthen metadata validation.
+    #
+    # .PARAMETER HasTrustedBaselineManifest
+    # Indicates that the authenticated baseline contains the manifest.
+    #
+    # .PARAMETER TrustedBaselineExemptPath
+    # Parsed exact exemptions in the authenticated baseline.
+    #
+    # .PARAMETER TrustedBaselineAuthorizedExemptionPath
+    # Parsed exact future exemptions authorized in the authenticated baseline.
+    #
+    # .PARAMETER CandidateExemptPath
+    # Parsed exact exemptions in the candidate revision.
+    #
+    # .PARAMETER TrustedBaselineGeneratedPath
+    # Parsed generated paths in the authenticated baseline.
+    #
+    # .PARAMETER CandidateGeneratedPath
+    # Parsed generated paths in the candidate revision.
+    #
+    # .EXAMPLE
+    # Get-DocumentMetadataClassificationExpansionFailure `
+    #     -HasTrustedBaselineManifest $true `
+    #     -TrustedBaselineExemptPath @('README.md') `
+    #     -TrustedBaselineAuthorizedExemptionPath @('docs/guide.md') `
+    #     -CandidateExemptPath @('README.md', 'docs/RUNBOOK.md') `
+    #     -TrustedBaselineGeneratedPath @() -CandidateGeneratedPath @()
+    #
+    # # Reports docs/RUNBOOK.md as an unauthenticated exemption addition.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] One failure for each unauthorized exemption or generated classification.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the
+    # public API surface. Parameters, return shape, and positional
+    # contract may change without notice.
+    #
+    # This function does not support positional parameters.
+    # Version: 1.2.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [bool] $HasTrustedBaselineManifest,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $TrustedBaselineExemptPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $TrustedBaselineAuthorizedExemptionPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $CandidateExemptPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $TrustedBaselineGeneratedPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $CandidateGeneratedPath
+    )
+
+    if (-not $HasTrustedBaselineManifest) {
+        Write-Output 'Classification expansion requires a trusted manifest or the separately proved closed initialization.'
+        return
+    }
+    $setTrustedBaselineExemptPaths =
+        [System.Collections.Generic.HashSet[string]]::new(
+            $TrustedBaselineExemptPath,
+            [System.StringComparer]::Ordinal
+        )
+    $setTrustedBaselineAuthorizedExemptionPaths =
+        [System.Collections.Generic.HashSet[string]]::new(
+            $TrustedBaselineAuthorizedExemptionPath,
+            [System.StringComparer]::Ordinal
+        )
+    $setTrustedBaselineGeneratedPaths =
+        [System.Collections.Generic.HashSet[string]]::new(
+            $TrustedBaselineGeneratedPath,
+            [System.StringComparer]::Ordinal
+        )
+    foreach ($strCandidateExemptPath in $CandidateExemptPath) {
+        if ($setTrustedBaselineExemptPaths.Contains($strCandidateExemptPath) -or
+            $setTrustedBaselineAuthorizedExemptionPaths.Contains(
+                $strCandidateExemptPath
+            )) {
+            continue
+        }
+        Write-Output (
+            'The document classification adds an unauthenticated metadata ' +
+            "exemption: $strCandidateExemptPath. Add the exact path to " +
+            'authorizedExemptionPaths in a separate change and publish that ' +
+            'authorization before activating the exemption.'
+        )
+    }
+    foreach ($strCandidateGeneratedPath in $CandidateGeneratedPath) {
+        if ($setTrustedBaselineGeneratedPaths.Contains($strCandidateGeneratedPath) -or
+            $setTrustedBaselineAuthorizedExemptionPaths.Contains($strCandidateGeneratedPath)) {
+            continue
+        }
+        Write-Output (
+            "The document classification adds unauthenticated generated status: $strCandidateGeneratedPath. " +
+            'The exact path must already be generated or authorized in the trusted baseline; ' +
+            'a Tier2 exemption does not authorize generated status.'
+        )
+    }
+}
+
+function Get-DiscoveredGovernedMarkdownDocumentPath {
+    # .SYNOPSIS
+    # Selects tracked Markdown that is not already classified.
+    #
+    # .DESCRIPTION
+    # Partitions every tracked Markdown or Cursor Markdown path between the
+    # reviewed governed catalog, a bounded Tier 2/generated exception list, and
+    # a fail-closed Tier 1 default. Rejects ambiguous or unsafe path inventories.
+    #
+    # .PARAMETER CandidatePath
+    # The complete tracked repository path inventory at the validation revision.
+    #
+    # .PARAMETER KnownGovernedPath
+    # Paths already present in the reviewed governed-document catalog.
+    #
+    # .PARAMETER ExemptPath
+    # Exact reviewed Tier 2 or generated-document paths that do not require
+    # document-level metadata validation.
+    #
+    # .EXAMPLE
+    # Get-DiscoveredGovernedMarkdownDocumentPath `
+    #     -CandidatePath @('README.md', 'docs/RELEASE-RUNBOOK.md') `
+    #     -KnownGovernedPath @() -ExemptPath @('README.md')
+    #
+    # # Returns docs/RELEASE-RUNBOOK.md for Tier 1 metadata validation.
+    #
+    # .INPUTS
+    # None. You can't pipe objects to this function.
+    #
+    # .OUTPUTS
+    # [string] One newly discovered governed Markdown path.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the
+    # public API surface. Parameters, return shape, and positional
+    # contract may change without notice.
+    #
+    # This function does not support positional parameters.
+    # Version: 1.1.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param(
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $CandidatePath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $KnownGovernedPath,
+
+        [Parameter(Mandatory)]
+        [AllowEmptyCollection()]
+        [string[]] $ExemptPath
+    )
+
+    $scriptBlockAssertSafeMarkdownPath = {
+        param(
+            [string] $Path,
+            [string] $InventoryName
+        )
+
+        if ([string]::IsNullOrWhiteSpace($Path) -or
+            [System.IO.Path]::IsPathRooted($Path) -or
+            $Path.Contains('\', [System.StringComparison]::Ordinal) -or
+            $Path -match '(?:^|/)\.\.(?:/|$)' -or
+            $Path -match '[\x00-\x1f\x7f]' -or
+            $Path -inotmatch '\.(?:md|mdc)$') {
+            throw "$InventoryName contains an unsafe Markdown path: $Path"
+        }
+    }
+
+    $setCandidates = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strCandidatePath in $CandidatePath) {
+        if ($strCandidatePath -inotmatch '\.(?:md|mdc)$') {
+            continue
+        }
+        & $scriptBlockAssertSafeMarkdownPath `
+            -Path $strCandidatePath `
+            -InventoryName 'The tracked document inventory'
+        if (-not $setCandidates.Add($strCandidatePath)) {
+            throw "The tracked document inventory contains a duplicate path: $strCandidatePath"
+        }
+    }
+
+    $setKnownGoverned = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strKnownGovernedPath in $KnownGovernedPath) {
+        & $scriptBlockAssertSafeMarkdownPath `
+            -Path $strKnownGovernedPath `
+            -InventoryName 'The governed document catalog'
+        if (-not $setKnownGoverned.Add($strKnownGovernedPath)) {
+            throw "The governed document catalog contains a duplicate path: $strKnownGovernedPath"
+        }
+    }
+
+    $setExempt = [System.Collections.Generic.HashSet[string]]::new(
+        [System.StringComparer]::Ordinal
+    )
+    foreach ($strExemptPath in $ExemptPath) {
+        & $scriptBlockAssertSafeMarkdownPath `
+            -Path $strExemptPath `
+            -InventoryName 'The Tier 2/generated exception catalog'
+        if (-not $setExempt.Add($strExemptPath)) {
+            throw "The Tier 2/generated exception catalog contains a duplicate path: $strExemptPath"
+        }
+        if ($setKnownGoverned.Contains($strExemptPath)) {
+            throw "A Markdown path is both governed and exempt: $strExemptPath"
+        }
+        if (-not $setCandidates.Contains($strExemptPath)) {
+            throw "A Tier 2/generated exception is not tracked: $strExemptPath"
+        }
+    }
+
+    return @(
+        $setCandidates |
+            Where-Object {
+                -not $setKnownGoverned.Contains($_) -and
+                -not $setExempt.Contains($_)
+            } |
+            Sort-Object -CaseSensitive
+    )
+}
+
+function Test-DocumentMetadataHeaderIntent {
+    # .SYNOPSIS
+    # Detects intentional optional metadata without accepting its structure.
+    #
+    # .DESCRIPTION
+    # Uses parsed document-level header blocks, excluding leading front matter,
+    # quoted or fenced examples and later ordinary sections. Peer H2 Metadata
+    # sections select validation even when misplaced. Incomplete fields
+    # still select the strict metadata validator. Generated paths are excluded
+    # by the caller, not inferred from their copied source contents.
+    #
+    # .PARAMETER Content
+    # The bounded document text supplied by the existing safe input reader.
+    #
+    # .EXAMPLE
+    # Test-DocumentMetadataHeaderIntent -Content $strDocument
+    #
+    # # Reports recognizable header intent, not valid metadata.
+    #
+    # .INPUTS
+    # None. This function does not accept pipeline input.
+    #
+    # .OUTPUTS
+    # [bool] True when the document header contains metadata markers.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled; internal callers use named arguments.
+    # Version: 1.0.20261002.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([bool])]
+    param([Parameter(Mandatory)][AllowEmptyString()][string] $Content)
+
+    $arrLines = [regex]::Split($Content, '\r\n|\r|\n')
+    $arrParserLines = [string[]]$arrLines.Clone()
+    $intBodyStart = 0
+    if ($arrLines[0] -ceq '---') {
+        $intFrontMatterEnd = -1
+        for ($intLine = 1; $intLine -lt $arrLines.Count; $intLine++) {
+            if ($arrLines[$intLine] -ceq '---') {
+                $intFrontMatterEnd = $intLine
+                break
+            }
+        }
+        # A marked header behind an unclosed delimiter must not disappear as
+        # successful optional coverage. The strict parser reports that error.
+        if ($intFrontMatterEnd -lt 0) {
+            return $Content -imatch '(?m)^(?:#+\s+Metadata|[-+*]\s+\*\*(?:Status|Owner|Last Updated|Scope)|\*\*Version:)'
+        }
+        for ($intLine = 0; $intLine -le $intFrontMatterEnd; $intLine++) {
+            $arrParserLines[$intLine] = ''
+        }
+        $intBodyStart = $intFrontMatterEnd + 1
+    }
+    $objParseContext = Get-MarkdownParseContext `
+        -Content ($arrParserLines -join "`n") -LineCount $arrLines.Count
+    $arrBlocks = @($objParseContext.TopLevelBlocks)
+    # A later peer Metadata section is misplaced intent, not an ordinary
+    # subsection example. Leave deeper headings to the existing header window.
+    foreach ($objBlock in $arrBlocks) {
+        if ($objBlock.Type -ceq 'heading_open' -and $objBlock.Tag -ceq 'h2' -and
+            $objBlock.Text -imatch '^Metadata\s*:?$') { return $true }
+    }
+    $intHeaderStart = $intBodyStart
+    foreach ($objBlock in $arrBlocks) {
+        if ($objBlock.Type -ceq 'heading_open' -and $objBlock.Tag -ceq 'h1' -and
+            ($objBlock.Start - $intBodyStart) -lt 30) {
+            $intHeaderStart = $objBlock.End
+            break
+        }
+    }
+    # A recognizable header before an early title is misplaced, not absent.
+    # Stop this prefix at its first heading so later examples stay excluded.
+    $intPrefixEnd = $intHeaderStart
+    foreach ($objBlock in $arrBlocks) {
+        if ($objBlock.Start -ge $intBodyStart -and $objBlock.Start -lt $intHeaderStart -and
+            $objBlock.Type -ceq 'heading_open') {
+            if ($objBlock.Tag -cne 'h1' -and $objBlock.Text -imatch '^Metadata\s*:?$') { return $true }
+            $intPrefixEnd = $objBlock.Start
+            break
+        }
+    }
+    $intHeaderEnd = $arrLines.Count
+    foreach ($objBlock in $arrBlocks) {
+        if ($objBlock.Start -lt $intHeaderStart -or $objBlock.Type -cne 'heading_open') {
+            continue
+        }
+        if ($objBlock.Tag -cne 'h1' -and $objBlock.Text -imatch '^Metadata\s*:?$') { return $true }
+        $intHeaderEnd = $objBlock.Start
+        break
+    }
+    foreach ($objBlock in $arrBlocks) {
+        $boolInHeader = ($objBlock.Start -ge $intHeaderStart -and $objBlock.Start -lt $intHeaderEnd) -or
+            ($objBlock.Start -ge $intBodyStart -and $objBlock.Start -lt $intPrefixEnd)
+        if ($boolInHeader -and
+            $objBlock.Type -ceq 'paragraph_open' -and $objBlock.Text -imatch '^Version\s*:') {
+            return $true
+        }
+    }
+    foreach ($objItem in $objParseContext.TopLevelListItems) {
+        $boolInHeader = ($objItem.Start -ge $intHeaderStart -and $objItem.Start -lt $intHeaderEnd) -or
+            ($objItem.Start -ge $intBodyStart -and $objItem.Start -lt $intPrefixEnd)
+        if (-not $boolInHeader) { continue }
+        # Status/date labels are distinctive. Generic Owner/Scope prose alone
+        # is not an opt-in; explicitly emphasized reserved fields are markers.
+        if ($objItem.Text -imatch '^(?:Status|Last\s+Updated)\s*(?::|$)' -or
+            $arrLines[$objItem.Start] -imatch
+                '^\s*[-+*]\s+\*\*(?:Status|Owner|Last\s+Updated|Scope)\s*(?::|\*\*)') {
+            return $true
+        }
+    }
+    return $false
+}
+
 function Get-DocumentMetadataContext {
     # .SYNOPSIS
     # Gets validated document-level metadata context.
     #
     # .DESCRIPTION
-    # Parses the document header and validates required Last Updated and optional Version fields.
+    # Parses direct or headed document-level metadata after an early H1,
+    # or direct metadata at body start after an optional leading directive.
+    # Leading YAML front matter is excluded from the 30-line H1 window.
+    # Parses any present Version, independently of whether it is required.
     #
     # .PARAMETER Content
     # The trusted input text to parse or transform.
@@ -4442,14 +5452,48 @@ function Get-DocumentMetadataContext {
         }
     }
 
-    if ($listH1Indices.Count -ne 1 -or
-        ($arrTopLevelBlocks[$listH1Indices[0]].Start - $intBodyStart) -ge 30) {
+    if ($listH1Indices.Count -gt 1) {
         return [pscustomobject]@{
-            Failure = 'must contain exactly one document-level H1 within the first 30 body lines.'
+            Failure = 'must contain at most one document-level H1.'
             VersionDate = $null
             UpdatedDate = $null
             Revision = $null
         }
+    }
+
+    $intH1Index = -1
+    if ($listH1Indices.Count -eq 1 -and
+        ($arrTopLevelBlocks[$listH1Indices[0]].Start - $intBodyStart) -lt 30) {
+        $intH1Index = $listH1Indices[0]
+    }
+    $intMetadataIndex = 0
+    if ($intH1Index -ge 0) {
+        $intMetadataIndex = $intH1Index + 1
+    } elseif ($arrTopLevelBlocks.Count -gt 0 -and
+        $arrTopLevelBlocks[0].Type -ceq 'html_block') {
+        $objLeadingBlock = $arrTopLevelBlocks[0]
+        $strLeadingBlock = ($arrLines[$objLeadingBlock.Start..($objLeadingBlock.End - 1)] -join "`n").Trim()
+        if ($strLeadingBlock -cmatch '^<!-- markdownlint-disable(?: [A-Za-z0-9_-]+)* -->$') {
+            $intMetadataIndex = 1
+        }
+    }
+
+    $intHeaderRegionEnd = $arrLines.Count
+    $intVersionRegionStart = $intBodyStart
+    if ($intH1Index -ge 0) {
+        $intVersionRegionStart = $arrTopLevelBlocks[$intH1Index].End
+    }
+    foreach ($objHeaderBlock in $arrTopLevelBlocks) {
+        if ($objHeaderBlock.Start -lt $intVersionRegionStart -or
+            $objHeaderBlock.Type -cne 'heading_open') {
+            continue
+        }
+        if ($intH1Index -ge 0 -and $objHeaderBlock.Tag -ceq 'h2' -and
+            $objHeaderBlock.Text -ceq 'Metadata') {
+            continue
+        }
+        $intHeaderRegionEnd = $objHeaderBlock.Start
+        break
     }
 
     $strVersionPattern = '^\*\*Version:\*\* (?<Major>\d+)\.(?<Minor>\d+)\.' +
@@ -4457,48 +5501,54 @@ function Get-DocumentMetadataContext {
     $listVersionRecords = [Collections.Generic.List[pscustomobject]]::new()
     for ($intIndex = 0; $intIndex -lt $arrTopLevelBlocks.Count; $intIndex++) {
         $objBlock = $arrTopLevelBlocks[$intIndex]
-        if ($objBlock.Type -cne 'paragraph_open' -or
-            $objBlock.Text -isnot [string] -or
-            -not $objBlock.Text.StartsWith('Version:', [StringComparison]::Ordinal)) {
-            continue
+        if ($objBlock.Start -ge $intVersionRegionStart -and
+            $objBlock.Start -lt $intHeaderRegionEnd -and
+            $objBlock.Type -ceq 'paragraph_open' -and
+            $objBlock.Text -is [string] -and
+            [regex]::IsMatch($objBlock.Text, '^Version\s*:',
+                ([Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+                    [Text.RegularExpressions.RegexOptions]::CultureInvariant))) {
+            $listVersionRecords.Add([pscustomobject]@{ BlockIndex = $intIndex; Block = $objBlock })
         }
-
-        $listVersionRecords.Add([pscustomobject]@{
-                BlockIndex = $intIndex
-                Block = $objBlock
-            })
     }
-
-    $intH1Index = $listH1Indices[0]
-    $intMetadataPredecessorIndex = $intH1Index
     $objVersionMatch = $null
-    if ($RequiresVersion) {
-        if ($listVersionRecords.Count -eq 1 -and
-            $listVersionRecords[0].BlockIndex -eq ($intH1Index + 1) -and
-            $listVersionRecords[0].Block.End -eq ($listVersionRecords[0].Block.Start + 1) -and
-            ($listVersionRecords[0].Block.Start - $intBodyStart) -lt 30) {
+    $boolHasVersion = $listVersionRecords.Count -gt 0
+    if ($RequiresVersion -or $boolHasVersion) {
+        if ($intH1Index -ge 0 -and $listVersionRecords.Count -eq 1 -and
+            $listVersionRecords[0].BlockIndex -eq $intMetadataIndex -and
+            $listVersionRecords[0].Block.End -eq ($listVersionRecords[0].Block.Start + 1)) {
             $objVersionMatch = [regex]::Match(
                 $arrLines[$listVersionRecords[0].Block.Start], $strVersionPattern)
         }
         if ($null -eq $objVersionMatch -or -not $objVersionMatch.Success) {
             return [pscustomobject]@{
-                Failure = 'must contain one exact document-level Version paragraph immediately after the H1 and within the first 30 body lines.'
+                Failure = 'must contain one exact document-level Version paragraph immediately after an H1 within the first 30 body lines.'
                 VersionDate = $null
                 UpdatedDate = $null
                 Revision = $null
             }
         }
-        $intMetadataPredecessorIndex = $listVersionRecords[0].BlockIndex
+        $intMetadataIndex++
     }
 
-    $strMetadataPredecessor = if ($RequiresVersion) {
-        'Version'
-    } else {
-        'the H1'
+    $strMetadataPlacementFailure = 'must place one document-level metadata list immediately after ' +
+        'the early H1 and optional Version, or at body start after an optional leading markdownlint-disable directive; ' +
+        'an optional Metadata section must be the first H2 immediately after the early H1 and optional Version.'
+    $arrMetadataHeadings = @($listH2Indices | Where-Object { $arrTopLevelBlocks[$_].Text -ceq 'Metadata' })
+    if ($arrMetadataHeadings.Count -gt 0) {
+        if ($intH1Index -lt 0 -or $arrMetadataHeadings.Count -ne 1 -or
+            $listH2Indices[0] -ne $intMetadataIndex -or $arrMetadataHeadings[0] -ne $intMetadataIndex) {
+            return [pscustomobject]@{
+                Failure = $strMetadataPlacementFailure
+                VersionDate = $null
+                UpdatedDate = $null
+                Revision = $null
+            }
+        }
+        $intMetadataIndex++
     }
-    $strMetadataPlacementFailure = 'must place Metadata as the first level-two heading ' +
-        "immediately after $strMetadataPredecessor and within the first 30 body lines."
-    if ($listH2Indices.Count -eq 0) {
+    if ($intMetadataIndex -ge $arrTopLevelBlocks.Count -or
+        $arrTopLevelBlocks[$intMetadataIndex].Type -cne 'bullet_list_open') {
         return [pscustomobject]@{
             Failure = $strMetadataPlacementFailure
             VersionDate = $null
@@ -4506,33 +5556,7 @@ function Get-DocumentMetadataContext {
             Revision = $null
         }
     }
-
-    $intMetadataIndex = $listH2Indices[0]
-    $objMetadataBlock = $arrTopLevelBlocks[$intMetadataIndex]
-    $intMetadataHeadingCount = @(
-        $listH2Indices |
-        Where-Object { $arrTopLevelBlocks[$_].Text -ceq 'Metadata' }
-    ).Count
-    if ($objMetadataBlock.Text -cne 'Metadata' -or
-        $intMetadataHeadingCount -ne 1 -or
-        $intMetadataIndex -ne ($intMetadataPredecessorIndex + 1) -or
-        ($objMetadataBlock.Start - $intBodyStart) -ge 30) {
-        return [pscustomobject]@{
-            Failure = $strMetadataPlacementFailure
-            VersionDate = $null
-            UpdatedDate = $null
-            Revision = $null
-        }
-    }
-
-    $intMetadataSectionEnd = $arrLines.Count
-    foreach ($intH2Index in $listH2Indices) {
-        if ($intH2Index -gt $intMetadataIndex) {
-            $intMetadataSectionEnd = $arrTopLevelBlocks[$intH2Index].Start
-            break
-        }
-    }
-
+    $objMetadataList = $arrTopLevelBlocks[$intMetadataIndex]
     $arrRequiredFields = @(
         [pscustomobject]@{
             Name = 'Status'
@@ -4555,21 +5579,21 @@ function Get-DocumentMetadataContext {
     $hashtableFieldMatches = @{}
     $hashtableFieldLineIndices = @{}
     foreach ($objField in $arrRequiredFields) {
+        $strFieldLabelPattern = '^' +
+            (($objField.Name.Split(' ') | ForEach-Object { [regex]::Escape($_) }) -join '\s+') + '\s*:'
         $arrFieldRecords = @(
             $arrTopLevelListItems |
                 Where-Object {
+                    $_.Start -ge $objMetadataList.Start -and
+                    $_.Start -lt $intHeaderRegionEnd -and
                     $_.Text -is [string] -and
-                    $_.Text.StartsWith(
-                        "$($objField.Name):",
-                        [StringComparison]::Ordinal
-                    ) -and
-                    $_.Start -gt $objMetadataBlock.Start -and
-                    $_.Start -lt $intMetadataSectionEnd -and
-                    ($_.Start - $intBodyStart) -lt 30
+                    [regex]::IsMatch($_.Text, $strFieldLabelPattern,
+                        ([Text.RegularExpressions.RegexOptions]::IgnoreCase -bor
+                            [Text.RegularExpressions.RegexOptions]::CultureInvariant))
                 }
         )
         $strFieldFailure = "must contain one exact top-level $($objField.Name) " +
-            'list item in the Metadata section and within the first 30 body lines.'
+            'list item in the document-level metadata list.'
         $boolFieldHasContinuation = $false
         if ($arrFieldRecords.Count -eq 1) {
             for ($intLine = $arrFieldRecords[0].Start + 1;
@@ -4581,7 +5605,9 @@ function Get-DocumentMetadataContext {
                 }
             }
         }
-        if ($arrFieldRecords.Count -ne 1 -or $boolFieldHasContinuation) {
+        if ($arrFieldRecords.Count -ne 1 -or $boolFieldHasContinuation -or
+            $arrFieldRecords[0].Start -lt $objMetadataList.Start -or
+            $arrFieldRecords[0].End -gt $objMetadataList.End) {
             return [pscustomobject]@{
                 Failure = $strFieldFailure
                 VersionDate = $null
@@ -4609,28 +5635,28 @@ function Get-DocumentMetadataContext {
     return [pscustomobject]@{
         Failure = $null
         Status = $hashtableFieldMatches['Status'].Groups['Value'].Value
-        Major = if ($RequiresVersion) {
+        Major = if ($boolHasVersion) {
             $objVersionMatch.Groups['Major'].Value
         } else {
             $null
         }
-        Minor = if ($RequiresVersion) {
+        Minor = if ($boolHasVersion) {
             $objVersionMatch.Groups['Minor'].Value
         } else {
             $null
         }
-        VersionDate = if ($RequiresVersion) {
+        VersionDate = if ($boolHasVersion) {
             $objVersionMatch.Groups['Date'].Value
         } else {
             $null
         }
         UpdatedDate = $objUpdatedMatch.Groups['Date'].Value
-        Revision = if ($RequiresVersion) {
+        Revision = if ($boolHasVersion) {
             $objVersionMatch.Groups['Revision'].Value
         } else {
             $null
         }
-        VersionLineIndex = if ($RequiresVersion) {
+        VersionLineIndex = if ($boolHasVersion) {
             $listVersionRecords[0].Block.Start
         } else {
             -1
@@ -5782,6 +6808,19 @@ $strValidatedInputRevision = $InputRevision
 $strEffectivePublishedBaselineRevision = $PublishedBaselineRevision
 $PublishedFinalRevision = $InputRevision
 $boolPublishedEndpointsRequested = -not [string]::IsNullOrEmpty($PublishedBaselineRevision)
+if ($ProposedPolicy -and ($SelfTest -or $MetadataClassificationOnly -or $FinalizeMetadataNow -or
+        -not $boolPublishedEndpointsRequested -or [string]::IsNullOrEmpty($InputRevision) -or
+        $InputRevision -ceq $PublishedBaselineRevision -or
+        $InputRevision -ceq ('0' * 40) -or $PublishedBaselineRevision -ceq ('0' * 40))) {
+    throw 'ProposedPolicy requires distinct nonzero exact B/H endpoints and cannot combine other modes.'
+}
+if ($MetadataClassificationOnly -and ($SelfTest -or -not $boolPublishedEndpointsRequested)) {
+    throw 'MetadataClassificationOnly requires exact B/H endpoints and cannot run with SelfTest.'
+}
+if ($FinalizeMetadataNow -and ($SelfTest -or $MetadataClassificationOnly -or
+        -not $boolPublishedEndpointsRequested)) {
+    throw 'FinalizeMetadataNow requires exact B/H endpoints and cannot run with other modes.'
+}
 if ($boolPublishedEndpointsRequested -and [string]::IsNullOrEmpty($InputRevision)) {
     throw 'An exact published baseline requires an exact input commit.'
 }
@@ -5800,8 +6839,128 @@ if ($LASTEXITCODE -ne 0 -or $strCheckedOutRevision.Trim() -cnotmatch '^[0-9a-f]{
     throw 'The checked-out instruction policy revision is unavailable.'
 }
 $strCheckedOutRevision = $strCheckedOutRevision.Trim()
-if ($boolPublishedEndpointsRequested -and $strCheckedOutRevision -cne $PublishedBaselineRevision) {
+if ($ProposedPolicy) {
+    if ($strCheckedOutRevision -cne $InputRevision) {
+        throw 'The proposed instruction checker must be checked out at the exact candidate head.'
+    }
+    Write-Output ("PROPOSED_POLICY_TRANSITION: B=$PublishedBaselineRevision H=$InputRevision. " +
+        'Candidate checker code supplies diagnostics, not accepted-policy, owner or merge authority.')
+} elseif ($boolPublishedEndpointsRequested -and $strCheckedOutRevision -cne $PublishedBaselineRevision) {
     throw 'The trusted instruction checker must be checked out at the accepted baseline.'
+}
+
+$arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $strValidatedInputRevision `
+        -MaximumBytes $intGitPathListMaximumBytes)
+
+# Classification is candidate data. Use only the existing bounded safe readers.
+$strDocumentClassificationRelativePath = '.github/document-metadata-classification.json'
+$strDocumentClassificationPath = Join-Path -Path $strRepositoryRootPath `
+    -ChildPath $strDocumentClassificationRelativePath
+$strDocumentClassificationContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
+    ConvertFrom-StrictUtf8Data `
+        -Bytes (Read-RepositoryInputData `
+            -Path $strDocumentClassificationPath `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -RepositoryRelativePath $strDocumentClassificationRelativePath `
+            -DisplayName $strDocumentClassificationRelativePath `
+            -MaximumBytes $intDocumentClassificationMaximumInputBytes) `
+        -DisplayName $strDocumentClassificationRelativePath
+} else {
+    Read-GitRevisionText `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $strValidatedInputRevision `
+        -RepositoryRelativePath $strDocumentClassificationRelativePath `
+        -MaximumBytes $intDocumentClassificationMaximumInputBytes `
+        -RequireRegularFile
+}
+$objDocumentClassificationContext = Get-DocumentMetadataClassificationContext `
+    -Content $strDocumentClassificationContent `
+    -TrackedPath $arrTrackedRepositoryPaths
+if ($null -ne $objDocumentClassificationContext.Failure) {
+    throw $objDocumentClassificationContext.Failure
+}
+$strDocumentClassificationBaselineRevision = if ($boolPublishedEndpointsRequested) {
+    $PublishedBaselineRevision
+} elseif (-not [string]::IsNullOrEmpty($strValidatedInputRevision)) {
+    $strValidatedInputRevision
+} else { $strCheckedOutRevision }
+$boolHasTrustedBaselineClassificationManifest = $false
+$arrTrustedBaselineClassificationExemptPaths = @()
+$arrTrustedBaselineClassificationGeneratedPaths = @()
+$arrTrustedBaselineClassificationAuthorizedExemptionPaths = @()
+if (-not [string]::IsNullOrEmpty($strDocumentClassificationBaselineRevision)) {
+    $arrBaselineClassificationTrackedPaths = @(Read-GitTrackedPath `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $strDocumentClassificationBaselineRevision `
+        -MaximumBytes $intGitPathListMaximumBytes)
+    if ($arrBaselineClassificationTrackedPaths -ccontains $strDocumentClassificationRelativePath) {
+        $strBaselineDocumentClassificationContent = Read-GitRevisionText `
+            -RepositoryRootPath $strRepositoryRootPath `
+            -Revision $strDocumentClassificationBaselineRevision `
+            -RepositoryRelativePath $strDocumentClassificationRelativePath `
+            -MaximumBytes $intDocumentClassificationMaximumInputBytes `
+            -RequireRegularFile
+        $objBaselineDocumentClassificationContext = Get-DocumentMetadataClassificationContext `
+            -Content $strBaselineDocumentClassificationContent `
+            -TrackedPath $arrBaselineClassificationTrackedPaths
+        if ($null -ne $objBaselineDocumentClassificationContext.Failure) {
+            throw ('The trusted baseline document classification is invalid: ' +
+                $objBaselineDocumentClassificationContext.Failure)
+        }
+        $boolHasTrustedBaselineClassificationManifest = $true
+        $arrTrustedBaselineClassificationExemptPaths = @(
+            $objBaselineDocumentClassificationContext.ExemptPaths)
+        $arrTrustedBaselineClassificationGeneratedPaths = @(
+            $objBaselineDocumentClassificationContext.GeneratedPaths)
+        $arrTrustedBaselineClassificationAuthorizedExemptionPaths = @(
+            $objBaselineDocumentClassificationContext.AuthorizedExemptionPaths)
+    }
+}
+$strTrustedBaselineValidatorSha256 = ''
+if (-not $boolHasTrustedBaselineClassificationManifest -and
+    -not [string]::IsNullOrEmpty($strDocumentClassificationBaselineRevision)) {
+    $strTrustedPriorValidator = Read-GitRevisionText `
+        -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $strDocumentClassificationBaselineRevision `
+        -RepositoryRelativePath '.github/workflows/Test-AgentInstructions.ps1' `
+        -MaximumBytes 573440 -RequireRegularFile
+    $objPriorValidatorSha256 = [Security.Cryptography.SHA256]::Create()
+    try {
+        $strTrustedBaselineValidatorSha256 = ([BitConverter]::ToString(
+                $objPriorValidatorSha256.ComputeHash([Text.Encoding]::UTF8.GetBytes(
+                        $strTrustedPriorValidator)))).Replace('-', '').ToLowerInvariant()
+    } finally { $objPriorValidatorSha256.Dispose() }
+}
+
+$arrDocumentClassificationExpansionFailures = @(if ($boolHasTrustedBaselineClassificationManifest) {
+    @(Get-DocumentMetadataClassificationExpansionFailure `
+        -HasTrustedBaselineManifest $true `
+        -TrustedBaselineExemptPath $arrTrustedBaselineClassificationExemptPaths `
+        -TrustedBaselineAuthorizedExemptionPath $arrTrustedBaselineClassificationAuthorizedExemptionPaths `
+        -CandidateExemptPath $objDocumentClassificationContext.ExemptPaths `
+        -TrustedBaselineGeneratedPath $arrTrustedBaselineClassificationGeneratedPaths `
+        -CandidateGeneratedPath $objDocumentClassificationContext.GeneratedPaths)
+} else {
+    @(Get-InitialDocumentMetadataClassificationFailure `
+        -BaselineRevision $strDocumentClassificationBaselineRevision `
+        -TrustedBaselineValidatorSha256 $strTrustedBaselineValidatorSha256 `
+        -CandidateContext $objDocumentClassificationContext)
+})
+if ($arrDocumentClassificationExpansionFailures.Count -gt 0) {
+    throw ('Document classification expansion failed:' + [Environment]::NewLine + '- ' +
+        ($arrDocumentClassificationExpansionFailures -join ([Environment]::NewLine + '- ')))
+}
+# Generated exemption affects metadata content only, not candidate Git type.
+foreach ($strGeneratedMetadataPath in $objDocumentClassificationContext.GeneratedPaths) {
+    $null = Get-GitRegularFileBlobId -RepositoryRootPath $strRepositoryRootPath `
+        -Revision $strValidatedInputRevision -RepositoryRelativePath $strGeneratedMetadataPath
+}
+if ($MetadataClassificationOnly) {
+    Write-Output ("Metadata classification data validated: B=$PublishedBaselineRevision H=$InputRevision. " +
+        'This is not first-install, owner or merge authority.')
+    return
 }
 
 $arrBootstrapFailures = @(Get-MarkdownParserBootstrapFailure `
@@ -5810,10 +6969,6 @@ if ($arrBootstrapFailures.Count -gt 0) {
     throw ($arrBootstrapFailures -join [Environment]::NewLine)
 }
 
-$arrTrackedRepositoryPaths = @(Read-GitTrackedPath `
-        -RepositoryRootPath $strRepositoryRootPath `
-        -Revision $strValidatedInputRevision `
-        -MaximumBytes $intGitPathListMaximumBytes)
 $arrPublishedBaselinePaths = @()
 $arrPublishedChangedPaths = @()
 if ($boolPublishedEndpointsRequested) {
@@ -5878,6 +7033,34 @@ if ($arrGovernedInstructionInventoryFailures.Count -gt 0) {
         'Governed instruction inventory failed:' + [Environment]::NewLine + '- ' +
         ($arrGovernedInstructionInventoryFailures -join ([Environment]::NewLine + '- '))
     )
+}
+
+$arrGovernedMetadataDocuments += [pscustomobject]@{
+    Path = 'STYLE_GUIDE.md'
+    MaximumBytes = 262144
+    RequiresMetadata = $true
+    RequiresVersion = $true
+}
+$arrDiscoveredGovernedMarkdownPaths = @(
+    Get-DiscoveredGovernedMarkdownDocumentPath `
+        -CandidatePath $arrTrackedRepositoryPaths `
+        -KnownGovernedPath @($arrGovernedMetadataDocuments.Path) `
+        -ExemptPath $objDocumentClassificationContext.ExemptPaths)
+foreach ($strDiscoveredGovernedMarkdownPath in $arrDiscoveredGovernedMarkdownPaths) {
+    $arrGovernedMetadataDocuments += [pscustomobject]@{
+        Path = $strDiscoveredGovernedMarkdownPath
+        MaximumBytes = $intInstructionDocumentMaximumInputBytes
+        RequiresMetadata = $true
+        RequiresVersion = $false
+    }
+}
+foreach ($strOptionalMetadataPath in $objDocumentClassificationContext.Tier2Paths) {
+    $arrGovernedMetadataDocuments += [pscustomobject]@{
+        Path = $strOptionalMetadataPath
+        MaximumBytes = $intInstructionDocumentMaximumInputBytes
+        RequiresMetadata = $false
+        RequiresVersion = $false
+    }
 }
 
 if ([string]::IsNullOrEmpty($strValidatedInputRevision)) {
@@ -6041,14 +7224,40 @@ foreach ($objDocumentSpec in $arrGovernedMetadataDocuments) {
             IsWorktreeTransition = $false
         }
     }
+    if ($FinalizeMetadataNow) {
+        $objParentContext.ExpectedUtcDate = $script:strMaximumMetadataUtcDate
+    }
+    $boolInitialMetadataCoverage = $false
+    $objMetadataParentContent = $objParentContext.ParentContent
+    $boolValidateMetadata = $objDocumentSpec.RequiresMetadata
+    if (-not $boolValidateMetadata -and
+        $null -ne $hashtableGovernedInstructionContent[$objDocumentSpec.Path]) {
+        $boolValidateMetadata = Test-DocumentMetadataHeaderIntent `
+            -Content $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
+    }
+    if ($boolValidateMetadata -and -not $objDocumentSpec.RequiresVersion -and
+        $null -ne $objMetadataParentContent) {
+        $boolPriorMetadataIntent = Test-DocumentMetadataHeaderIntent -Content $objMetadataParentContent
+        if (-not $boolPriorMetadataIntent) {
+            $boolInitialMetadataCoverage = -not $objDocumentSpec.RequiresMetadata -or
+                (Test-InitialMetadataCoveragePath `
+                    -HasTrustedBaselineManifest $boolHasTrustedBaselineClassificationManifest `
+                    -TrustedBaselineExemptPath $arrTrustedBaselineClassificationExemptPaths `
+                    -RepositoryRelativePath $objDocumentSpec.Path)
+            if ($boolInitialMetadataCoverage) { $objMetadataParentContent = $null }
+        }
+    }
     $listGovernedDocumentContexts.Add([pscustomobject]@{
             Path = $objDocumentSpec.Path
             MaximumBytes = $objDocumentSpec.MaximumBytes
             Content = $hashtableGovernedInstructionContent[$objDocumentSpec.Path]
             ParentContent = $objParentContext.ParentContent
+            MetadataParentContent = $objMetadataParentContent
+            IsInitialMetadataCoverage = $boolInitialMetadataCoverage
             ExpectedUtcDate = $objParentContext.ExpectedUtcDate
             IsWorktreeTransition = $objParentContext.IsWorktreeTransition
-            RequiresMetadata = $objDocumentSpec.RequiresMetadata
+            RequireFinalizationDate = ($objParentContext.IsWorktreeTransition -or $FinalizeMetadataNow)
+            RequiresMetadata = $boolValidateMetadata
             RequiresVersion = $objDocumentSpec.RequiresVersion
             RequiredDocument = $arrDecisionRecordInventoryPaths -cnotcontains `
                 $objDocumentSpec.Path
@@ -6077,12 +7286,29 @@ $strGitIgnoreContent = if ([string]::IsNullOrEmpty($strValidatedInputRevision)) 
         -MaximumBytes $intGitIgnoreMaximumInputBytes `
         -RequireRegularFile
 }
-if ($strGitIgnoreContent -cnotmatch '(?m)^/CLAUDE\.local\.md$') {
-    $listRepositoryFailures.AddRange([string[]] 'The root CLAUDE.local.md ignore rule is missing.')
-} elseif (-not (Test-GitIgnorePathEffective `
+if (-not (Test-RecursivePersonalMemoryIgnoreContract `
+        -GitIgnoreContent $strGitIgnoreContent -TrackedPath $arrTrackedRepositoryPaths)) {
+    $listRepositoryFailures.AddRange([string[]] (
+        'The root .gitignore must exclude CLAUDE.local.md at every depth with ' +
+        'CLAUDE.local.md or **/CLAUDE.local.md after all negations. ' +
+        'Nested or case-alias ignore files require a separately validated contract.'
+    ))
+}
+foreach ($strPersonalMemoryPath in @('CLAUDE.local.md', 'nested/CLAUDE.local.md', 'tools/project/CLAUDE.local.md')) {
+    if (-not (Test-GitIgnorePathEffective `
             -GitIgnoreContent $strGitIgnoreContent `
-            -RepositoryRelativePath 'CLAUDE.local.md')) {
-    $listRepositoryFailures.AddRange([string[]] 'The root CLAUDE.local.md ignore rule is ineffective.')
+            -RepositoryRelativePath $strPersonalMemoryPath)) {
+        $listRepositoryFailures.AddRange([string[]] (
+            "The personal CLAUDE.local.md ignore rule is ineffective: $strPersonalMemoryPath"))
+    }
+}
+foreach ($strPublicInstructionPath in @('CLAUDE.md', 'nested/CLAUDE.md', 'tools/project/CLAUDE.md')) {
+    if (Test-GitIgnorePathEffective `
+            -GitIgnoreContent $strGitIgnoreContent `
+            -RepositoryRelativePath $strPublicInstructionPath) {
+        $listRepositoryFailures.AddRange([string[]] (
+            "The public instruction file must not be ignored: $strPublicInstructionPath"))
+    }
 }
 $listRepositoryFailures.AddRange([string[]] @(Get-DocumentationClaimFailure `
         -Content $strDocsInstructionsContent `
@@ -6140,15 +7366,15 @@ foreach ($objDocumentContext in $listGovernedDocumentContexts) {
                 -ExpectedUtcDate $objDocumentContext.ExpectedUtcDate `
                 -IsNewDocumentTransition ($null -eq $objDocumentContext.ParentContent) `
                 -RequireExpectedUtcDateForRenderedChange `
-                    $objDocumentContext.IsWorktreeTransition))
+                    $objDocumentContext.RequireFinalizationDate))
     } else {
         $listRepositoryFailures.AddRange([string[]] @(Get-PublishedEndpointLastUpdatedFailure `
                 -Name $objDocumentContext.Path `
                 -CurrentContent $objDocumentContext.Content `
-                -BaseContent $objDocumentContext.ParentContent `
+                -BaseContent $objDocumentContext.MetadataParentContent `
                 -TrustedEventUtcDate $objDocumentContext.ExpectedUtcDate `
                 -RequireCurrentMaximumDateForRenderedChange `
-                    $objDocumentContext.IsWorktreeTransition))
+                    $objDocumentContext.RequireFinalizationDate))
     }
 }
 if ($listRepositoryFailures.Count -gt 0) {
@@ -6156,11 +7382,36 @@ if ($listRepositoryFailures.Count -gt 0) {
 }
 
 Write-Output 'Agent-instruction content contract passed; maintenance authority is checked separately.'
+if ($FinalizeMetadataNow) {
+    Write-Output ("Author finalization UTC date checked: $script:strMaximumMetadataUtcDate; " +
+        "B=$PublishedBaselineRevision H=$InputRevision.")
+} elseif ($boolPublishedEndpointsRequested) {
+    Write-Output ("Finalization date not verified by this invocation; " +
+        "structural, calendar, baseline and version checks passed: B=$PublishedBaselineRevision H=$InputRevision.")
+} else {
+    Write-Output 'Finalization date not verified for committed input; local changed-worktree date checks remain applicable.'
+}
+
+
+if ($ProposedPolicy) {
+    Write-Output "Proposed-policy transition checks passed: B=$PublishedBaselineRevision H=$InputRevision."
+}
 
 #endregion Repository validation
 
 if ($SelfTest) {
     #region Mutation self-tests
+
+    foreach ($strGeneratedMetadataPath in $objDocumentClassificationContext.GeneratedPaths) {
+        if (@($listGovernedDocumentContexts | Where-Object Path -CEQ $strGeneratedMetadataPath).Count -ne 0) {
+            throw 'Generated aggregate metadata was promoted into optional document validation.'
+        }
+    }
+    foreach ($strOptionalMetadataPath in $objDocumentClassificationContext.Tier2Paths) {
+        if (@($listGovernedDocumentContexts | Where-Object Path -CEQ $strOptionalMetadataPath).Count -ne 1) {
+            throw 'A retained Tier2 document is missing its optional metadata context.'
+        }
+    }
 
     $strExtractedSelfTestPath = '.github/workflows/Test-AgentInstructions.SelfTest.ps1'
     $boolSavedWindowsPython = $script:useWindowsPythonLauncher
@@ -7225,23 +8476,6 @@ if ($SelfTest) {
         throw 'A cataloged nested GEMINI.md bypassed rendered metadata transition.'
     }
 
-    $arrUnversionedMetadataContexts = @($listGovernedDocumentContexts |
-            Where-Object { $_.RequiresMetadata -and -not $_.RequiresVersion })
-    foreach ($objDocumentContext in $arrUnversionedMetadataContexts) {
-        $objMetadata = Get-DocumentMetadataContext -Content $objDocumentContext.Content `
-            -RequiresVersion $false
-        if ($null -ne $objMetadata.Failure) {
-            throw "Invalid unversioned metadata: $($objDocumentContext.Path)"
-        }
-        $strMutation = $objDocumentContext.Content -creplace
-            '(?m)^## Metadata(?=\r?$)', ''
-        $arrFailures = @(Get-PublishedEndpointLastUpdatedFailure -Name `
-                $objDocumentContext.Path -CurrentContent $strMutation -BaseContent `
-                $objDocumentContext.Content -TrustedEventUtcDate $objMetadata.UpdatedDate)
-        if (-not ($arrFailures -match 'first level-two heading immediately after the H1')) {
-            throw "$($objDocumentContext.Path) accepted missing Metadata."
-        }
-    }
     $arrRequiredFieldNames = @('Status', 'Owner', 'Last Updated', 'Scope')
     foreach ($objDocumentContext in @(
             $listGovernedDocumentContexts |
@@ -7324,13 +8558,15 @@ if ($SelfTest) {
         $objRepresentativeDocument.Content,
         '(?m)^- \*\*Status:\*\* [^\r\n]+$'
     ).Value
-    foreach ($strHiddenStatus in @(
-            "<div>`n$strStatusLine`n</div>",
-            "- Wrapper`n  $strStatusLine"
+    foreach ($objHiddenStatusCase in @(
+            [pscustomobject]@{ Content = "<div>`n$strStatusLine`n</div>";
+                ExpectedFailure = 'must place one document-level metadata list immediately' },
+            [pscustomobject]@{ Content = "- Wrapper`n  $strStatusLine";
+                ExpectedFailure = 'one exact top-level Status list item' }
         )) {
         $strHiddenStatusMutation = $objRepresentativeDocument.Content.Replace(
             $strStatusLine,
-            $strHiddenStatus
+            $objHiddenStatusCase.Content
         )
         $arrFieldFailures = @(Get-PublishedEndpointMetadataFailure `
                 -Name $objRepresentativeDocument.Path `
@@ -7338,8 +8574,10 @@ if ($SelfTest) {
                 -ParentContent $objRepresentativeDocument.Content `
                 -ExpectedUtcDate $objRepresentativeDocument.ExpectedUtcDate `
                 -IsNewDocumentTransition $false)
-        if (-not ($arrFieldFailures -match 'one exact top-level Status list item')) {
-            throw 'A non-operative Status mutation was accepted.'
+        if ($arrFieldFailures.Count -eq 0 -or -not ($arrFieldFailures -match
+                [regex]::Escape($objHiddenStatusCase.ExpectedFailure))) {
+            throw ("Non-operative Status mutation did not produce its intended failure: " +
+                "$($objHiddenStatusCase.ExpectedFailure). Actual: $($arrFieldFailures -join '; ')")
         }
     }
 
@@ -7463,19 +8701,16 @@ if ($SelfTest) {
             throw "Could not locate the $($objDocument.Name) H1 for structural mutation tests."
         }
         $strCodeFence = '```'
-        $strH1Failure = "$($objDocument.Name) must contain exactly one " +
-            'document-level H1 within the first 30 body lines.'
+        $strH1Failure = "$($objDocument.Name) must contain at most one document-level H1."
         $strVersionFailure = "$($objDocument.Name) must contain one exact " +
-            'document-level Version paragraph immediately after the H1 and within ' +
-            'the first 30 body lines.'
-        $strMetadataHeadingFailure = "$($objDocument.Name) must place Metadata as " +
-            'the first level-two heading immediately after Version and within the ' +
-            'first 30 body lines.'
+            'document-level Version paragraph immediately after an H1 within the first 30 body lines.'
+        $strMetadataHeadingFailure = "$($objDocument.Name) must place one document-level metadata list immediately after " +
+            'the early H1 and optional Version, or at body start after an optional leading markdownlint-disable directive; ' +
+            'an optional Metadata section must be the first H2 immediately after the early H1 and optional Version.'
         $strUpdatedFailure = "$($objDocument.Name) must contain one exact top-level " +
-            'Last Updated list item in the Metadata section and within the first 30 body lines.'
+            'Last Updated list item in the document-level metadata list.'
         $strParentVersionFailure = "The parent of $($objDocument.Name) must contain " +
-            'one exact document-level Version paragraph immediately after the H1 and ' +
-            'within the first 30 body lines.'
+            'one exact document-level Version paragraph immediately after an H1 within the first 30 body lines.'
 
         $arrMetadataStructureMutations = @(
             [pscustomobject]@{
@@ -7487,12 +8722,12 @@ if ($SelfTest) {
                 Failure = $strH1Failure
             },
             [pscustomobject]@{
-                Name = 'H1 after first 30 lines'
+                Name = 'required Version cannot follow a late H1'
                 Content = $objDocument.Content.Replace(
                     $objDocument.H1Line,
                     (("`n" * 30) + $objDocument.H1Line)
                 )
-                Failure = $strH1Failure
+                Failure = $strVersionFailure
             },
             [pscustomobject]@{
                 Name = 'Version in fenced code'
@@ -7624,14 +8859,6 @@ if ($SelfTest) {
                 ).Replace(
                     '## Canonical Instructions',
                     "## Canonical Instructions`n`n$($objDocument.UpdatedLine)"
-                )
-                Failure = $strUpdatedFailure
-            },
-            [pscustomobject]@{
-                Name = 'Last Updated after first 30 lines'
-                Content = $objDocument.Content.Replace(
-                    $objDocument.UpdatedLine,
-                    (("`n" * 25) + $objDocument.UpdatedLine)
                 )
                 Failure = $strUpdatedFailure
             },

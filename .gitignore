@@ -2,7 +2,7 @@
 node_modules/
 
 # Personal Claude Code project memory must remain untracked.
-/CLAUDE.local.md
+CLAUDE.local.md
 
 # npm logs
 npm-debug.log*
