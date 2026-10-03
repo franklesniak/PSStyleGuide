@@ -1,0 +1,65 @@
+{
+  "at": "2026-10-03T17:16:32.373764+00:00",
+  "scope": "Read-only actual-main Git blob/mode refresh; no product execution or source acceptance inferred.",
+  "repositories": [
+    {
+      "repository": "PSStyleGuide",
+      "head": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+      "prior_head": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+      "unchanged": [
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-ExactGitPathSet.ps1",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        ".github/workflows/build.yml",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/workflow-policy-cases.json",
+        "STYLE_GUIDE.md",
+        "STYLE_GUIDE_RATIONALE.md",
+        "copilot-instructions.md",
+        "STYLE_GUIDE_CHAT.md",
+        "STYLE_GUIDE_FULL.md",
+        "powershell.instructions.md",
+        ".github/workflows/Test-BlankLineExamples.ps1"
+      ],
+      "changed": [
+        {
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "before_blob": "0773070a6505b1678c5522c16c8a5c32979f6338",
+          "after_blob": "d29e7bec8d4c9cdf04714bb601b0be5cc93f4350",
+          "before_mode": "100644",
+          "after_mode": "100644"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "before_blob": "798aec2eacbdee846266299d2725069514fe6d58",
+          "after_blob": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+          "before_mode": "100644",
+          "after_mode": "100644"
+        }
+      ]
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "prior_head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "unchanged": [
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-ExactGitPathSet.ps1",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/build.yml",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/workflow-policy-cases.json",
+        "STYLE_GUIDE.md",
+        "STYLE_GUIDE_RATIONALE.md",
+        "copilot-instructions.md",
+        "STYLE_GUIDE_CHAT.md",
+        "STYLE_GUIDE_FULL.md",
+        "CONTRIBUTING.md",
+        "terraform.instructions.md",
+        ".github/workflows/Test-StateRecoveryExamples.mjs"
+      ],
+      "changed": []
+    }
+  ]
+}
