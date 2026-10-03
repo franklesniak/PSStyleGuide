@@ -2,13 +2,13 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `6be412bb57b345c680592ceb5b5787fa6668cca1` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `a33e9cba1f481de7176bbc3ae78da9810d1d629a` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | [A00](tasks/A00.md) | Reconcile historical obligations and retirement decisions | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A00/RESULT.md) | Reuse the canonical native delivery ledger |
 | [A01](tasks/A01.md) | Refresh issue coverage and full-tree baseline | complete | a00 + coordinator verification | PS/TF main | PSa71f16a / TF06ad4f7 | — | 0/80; not started | 0/8 | [83-path refresh](results/A01/CURRENT-REFRESH-20261003.md) | Refresh at next native mutation; preserve historical 81 |
-| [A02](tasks/A02.md) | Non-protected shared governance | validating | coordinator; d07 local quality | PS codex/shared-governance | 4b69e39 / a71f16a | [224](https://github.com/franklesniak/PSStyleGuide/pull/224) | 8/80; 2026-10-10T07:26:08.214692Z | 0/12 | [Local quality](results/A02/a71-quality.md) | Publish actual candidate/body; resolve fixed findings; request round9 |
+| [A02](tasks/A02.md) | Non-protected shared governance | waiting_external | coordinator; d07 local quality | PS codex/shared-governance | 4b69e39 / a71f16a | [224](https://github.com/franklesniak/PSStyleGuide/pull/224) | 9/80; 2026-10-10T07:26:08.214692Z | 0/12 | [Evidence](results/A02/RESULT.md) | Await instruction CI and final quality, then fresh merge gate |
 | [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A03/RESULT.md) | Exact option L prepared; await owner choice |
 | [A04](tasks/A04.md) | Bound ordinary Node downloads and test retries | validating | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A04/design.md) | Integrate after A03/A07 acceptance |
 | [A05](tasks/A05.md) | Require immutable event acquisition in the YAML guide | waiting_human | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A05/design.md) | Await exact two-guide authority |
@@ -35,7 +35,7 @@ Planning head: `6be412bb57b345c680592ceb5b5787fa6668cca1` (prior published check
 - PS product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`; clean local HEAD4b69e39/treeea7, parents56/a71. Root owns publication/native gates; d07 local quality passed.
 - Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 suffix `A02-design-20261002`, resume `PR224-review-state.json`; D07 suffix `plan-review-20261002`.
 - Node24.18.1/npm11.16.0: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 Restricted; no Docker container remains.
-- A02: a71 pin/old48 negative; Windows/Linux focused/audits/static, aggregate46435 all10 and actual a71/4b endpoints55482 pass. Local quality passed. Public head56; three threads open; round9 unrequested. No pending write.
+- A02: published4b69e39/basea71/bodyab3709; all local gates passed, all14 threads resolved. Round9 both clean: Copilot5399275319 Balanced; Codex5966120899. Candidate CI37100515346 active; independent native quality underway. No pending write.
 - A07 urgent: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; head0abe/treea4b. PR225 merged as a71f16a, both reviews clean (Balanced), final quality approved. All landed CI passes; source acceptance recorded. Resume: A07 scratch `braces-remediation-state.json`.
 - Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; treec68b5e1. Preserve/reconcile overlap after PR224; preserve unrelated edits.
 - Await A03-D1: owner-label L, procedural P or other direction.
