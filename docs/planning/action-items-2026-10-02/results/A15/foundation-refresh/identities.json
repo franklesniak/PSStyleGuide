@@ -1,0 +1,275 @@
+{
+  "readAtUtc": "2026-10-04T12:13:07.011128+00:00",
+  "sources": {
+    "PS": {
+      "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+      "tree": "ed7ad456a7147152d2c289908066195689127e85",
+      "paths": {
+        "package.json": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+          "bytes": 816,
+          "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+        },
+        ".github/workflows/package.json": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+          "bytes": 844,
+          "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+        },
+        ".pre-commit-config.yaml": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+          "bytes": 5398,
+          "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+        },
+        ".github/document-metadata-classification.json": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+          "bytes": 388,
+          "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c"
+        },
+        ".github/workflows/build.yml": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+          "bytes": 4375,
+          "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+        },
+        ".github/workflows/Initialize-CiToolchain.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+          "bytes": 5844,
+          "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220"
+        },
+        ".github/workflows/ci-toolchain.json": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "bytes": 91,
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+        },
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+          "bytes": 86655,
+          "sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+        },
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+          "bytes": 32648,
+          "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+        },
+        ".github/workflows/Test-ExactGitPathSet.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+          "bytes": 253910,
+          "sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+        },
+        ".github/workflows/Test-StateRecoveryExamples.mjs": {
+          "exists": false
+        },
+        ".github/workflows/Test-AgentInstructions.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb",
+          "bytes": 474787,
+          "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+        },
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+          "bytes": 218742,
+          "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+        },
+        ".github/workflows/Classify-InstructionMaintenance.mjs": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0",
+          "bytes": 5786,
+          "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.mjs": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+          "bytes": 25947,
+          "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+        },
+        ".github/workflows/workflow-policy-contract.json": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+          "bytes": 1517,
+          "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+        },
+        ".github/workflows/agent-instructions.yml": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+          "bytes": 12748,
+          "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+        },
+        ".github/workflows/Test-CiHelpers.test.mjs": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "72b634c0664b410bca45d6331718501ff8a476f1",
+          "bytes": 43570,
+          "sha256": "a25b8fe08ef317e4d8bd50886e5bbec265d59d287d6115e549855fc2f8085cf1"
+        }
+      }
+    },
+    "TF": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "paths": {
+        "package.json": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "bytes": 837,
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+        },
+        ".github/workflows/package.json": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+          "bytes": 1105,
+          "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+        },
+        ".pre-commit-config.yaml": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+          "bytes": 5405,
+          "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+        },
+        ".github/document-metadata-classification.json": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+          "bytes": 387,
+          "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+        },
+        ".github/workflows/build.yml": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "bytes": 4222,
+          "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+        },
+        ".github/workflows/Initialize-CiToolchain.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "bytes": 5706,
+          "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+        },
+        ".github/workflows/ci-toolchain.json": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "bytes": 91,
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+        },
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+          "bytes": 95329,
+          "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+        },
+        ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+          "bytes": 31949,
+          "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+        },
+        ".github/workflows/Test-ExactGitPathSet.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+          "bytes": 253918,
+          "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+        },
+        ".github/workflows/Test-StateRecoveryExamples.mjs": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+          "bytes": 22102,
+          "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+        },
+        ".github/workflows/Test-AgentInstructions.ps1": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+          "bytes": 460163,
+          "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+        },
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+          "exists": false
+        },
+        ".github/workflows/Classify-InstructionMaintenance.mjs": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+          "bytes": 5632,
+          "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+        },
+        ".github/workflows/Validate-WorkflowPolicy.mjs": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "bytes": 25568,
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+        },
+        ".github/workflows/workflow-policy-contract.json": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "bytes": 1407,
+          "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+        },
+        ".github/workflows/agent-instructions.yml": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "bytes": 9558,
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+        },
+        ".github/workflows/Test-CiHelpers.test.mjs": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+          "bytes": 33662,
+          "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+        }
+      }
+    }
+  },
+  "scopeManifestNativeIdentityMismatches": [],
+  "unacceptedCandidate": {
+    "head": "69e1b0d1b0715bfc4025372c7282fe04c38178dc",
+    "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+    "deltaFromAccepted": [
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/copilot-setup-steps.yml",
+      ".github/workflows/devcontainer-ci.yml"
+    ]
+  },
+  "authenticatedMainRefsStableAtEnd": {
+    "PS": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+  }
+}

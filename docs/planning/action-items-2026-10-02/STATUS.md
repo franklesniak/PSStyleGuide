@@ -21,7 +21,7 @@ Planning head: `e5ada3feae7b2cc20c70d9e0f4770efb6c3e652d` (prior published check
 | [A12](tasks/A12.md) | Assess useful main protection | complete | coordinator | PS/TF main | PSfb32889 / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A12/assessment.md) | Rechecked broadened events; retain approved protection |
 | [A13](tasks/A13.md) | Apply an authorized protection delta, if selected | verified | coordinator; independent closure passed | PS main ruleset24419725 | PSfb32889 | 230 merged | 0/80; not started | 0/8 | [Evidence](results/A13/RESULT.md) | Post230 rules/check producers verified; reassess relevant changes |
 | [A14](tasks/A14.md) | Assess and address live filesystem residuals | conditional-no-trigger | coordinator | PS/TF main | PSfb32889 / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A14/RESULT.md) | Post230 caller reassessed; retain open residual and triggers |
-| [A15](tasks/A15.md) | Reconcile Terraform manual recovery scope against current callers | validating | coordinator; a15_foundation_refresh read-only | PS/TF main | PSfb32889 / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A15/RESULT.md) | Collect read-only foundation-interface map; preserve accepted proposal and A16 dependency gates |
+| [A15](tasks/A15.md) | Reconcile Terraform manual recovery scope against current callers | complete | coordinator; proposal review and interface refresh complete | PS/TF main | PSfb32889 / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A15/RESULT.md) | Use reconciled proposal after A06/A07; refresh changed interfaces before A16 integration |
 | [A16](tasks/A16.md) | Deliver Terraform Gate A nonmutating foundation | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](tasks/A16.md) | Wait for A15/A06/A07 acceptance |
 | [A17](tasks/A17.md) | Deliver Terraform Gate B destructive-procedure guidance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/16 | [Evidence](tasks/A17.md) | Wait for accepted Gate A and owner approval |
 | [A18](tasks/A18.md) | Close remaining byte differences and verify convergence | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](tasks/A18.md) | Run final union and A10/A11 checklist after products |
@@ -37,8 +37,7 @@ Planning head: `e5ada3feae7b2cc20c70d9e0f4770efb6c3e652d` (prior published check
 - A03 product: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`, codex/workflow-setup-convergence, head69e1b0d/basefb328893; staged treec82fa2e. State: `A03-setup-lifecycle-20261004/execution-state.json`. D12/D13 privately repaired, root-verified and integrated; staged preflight passed. Sole aggregate78543 started11:56:40Z; freeze product/index and collect it without restarting. PR231 round1 reviews and all11 hosted checks are terminal on old69e1b0d; fresh pair required after repair publication.
 - A02 peer state: `A02-peer-current-20261003/execution-state.json`; product `C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003`, codex/a02-peer-docs. Root owns preserved two-doc edits; transfer1/12. Coherent integration awaits full A03 acceptance; use verified adoption map.
 - Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`, treec68b5e1; preserve index/unrelated edits. A20 source worktree: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`, clean84fb436; source accepted in PR229.
-- A15: a15_foundation_refresh owns only private read-only map at `A15-foundation-refresh-20261004`; no product changes or gate approval.
-- Retained grants: A03 P, A20 protected previews/CLAUDE repairs, A05 exact YAML patches and A13 settings. A15 proposal passed; actual GateA/B human approvals are later boundaries. PS ruleset24419725 remains active.
+- Retained grants: A03 P, A20 protected previews/CLAUDE repairs, A05 exact YAML patches and A13 settings. A15 preparation complete; actual GateA/B human approvals remain later boundaries. PS ruleset24419725 remains active.
 
 ## Final results
 
@@ -46,3 +45,4 @@ Planning head: `e5ada3feae7b2cc20c70d9e0f4770efb6c3e652d` (prior published check
 - [A01: accepted native inventory](results/A01/RESULT.md)
 - [A08: independently verified wrapper scope](results/A08/RESULT.md)
 - [A12: accepted read-only protection assessment](results/A12/assessment.md)
+- [A15: selected recovery proposal and current foundation interfaces](results/A15/RESULT.md)
