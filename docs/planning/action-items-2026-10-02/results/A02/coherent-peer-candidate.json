@@ -1,12 +1,12 @@
 {
-  "recorded_at": "2026-10-04T14:07:52.962171+00:00",
-  "status": "frozen_staged_candidate; sole full aggregate and independent prepublication review running",
+  "recorded_at": "2026-10-04T14:20:20.108508+00:00",
+  "status": "fixture-corrected staged candidate; replacement full aggregate running",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
   "base_tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
   "head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-  "candidate_tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
+  "candidate_tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
   "accepted_source": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
   "accepted_source_tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
   "changed_paths": [
@@ -208,9 +208,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
       "mode": "100644",
-      "blob": "526c2716b0adfef3008c8a65bcb226579bdf0510",
-      "bytes": 229571,
-      "sha256": "e6eecb7be0555643bf3d97f610e410fa62f35268d08c598bb89a12b846271d81"
+      "blob": "3bae369fa40e6733ec80a68a96c77e5b46e6d92b",
+      "bytes": 229590,
+      "sha256": "c10ab77ca62f1dcdb68945165838ec533a47d90b16309a8470e71e197a719d25"
     },
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
@@ -639,12 +639,12 @@
       ".github/workflows/Test-AgentInstructions.ps1",
       "-RequireStagedInputMatch"
     ],
-    "started_at": "2026-10-04T14:05:21.185310+00:00",
+    "started_at": "2026-10-04T14:18:04.252104+00:00",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\staged-preflight.log",
+    "tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\staged-preflight-fixture-repaired.log",
     "exit_code": 0,
-    "finished_at": "2026-10-04T14:06:07.876825+00:00",
+    "finished_at": "2026-10-04T14:18:45.812736+00:00",
     "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96",
     "all_inputs_unchanged": true
   },
@@ -658,27 +658,28 @@
       "run",
       "--all-files"
     ],
-    "started_at": "2026-10-04T14:06:07.880862+00:00",
+    "started_at": "2026-10-04T14:18:45.823439+00:00",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
     "parent_head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "candidate_tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate.log",
-    "pid": 55616,
+    "candidate_tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-fixture-repaired.log",
+    "pid": 12852,
     "before_identity_passed": true,
     "after_identity_passed": false
   },
   "session": {
-    "session_id": 27780,
-    "script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\validate-staged-candidate.py",
-    "aggregate_pid": 55616,
+    "session_id": 49058,
+    "script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\validate-fixture-repaired-candidate.py",
+    "aggregate_pid": 12852,
     "state": "confirmed_live",
-    "last_confirmed_at": "2026-10-04T14:07:52.960660+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate.log"
+    "last_confirmed_at": "2026-10-04T14:20:20.099317+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-fixture-repaired.log"
   },
   "independent_review": {
     "agent": "/root/a02_tf_prepublication_quality",
-    "state": "running",
-    "scope": "read-only frozen candidate before publication; no duplicate suites"
+    "original_tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
+    "original_status": "bounded pass; later aggregate identified test-only path failure",
+    "current_state": "focused repair reconciliation running"
   },
   "reviews": {
     "pr": null,
@@ -686,5 +687,143 @@
     "first_request_at": null,
     "deadline": null
   },
-  "limits": "No product commit, candidate H/B result, PR, remote review, native CI/landing or paired completion. Unchanged accepted-B classifier fixture is ready but not executed."
+  "limits": "No product commit, candidate H/B result, PR, remote review, native CI/landing or paired completion. Unchanged accepted-B classifier fixture is ready but not executed.",
+  "fixture_repair": {
+    "state": "integrated_and_focused_passed",
+    "worker": "/root/a02_tf_coherent_implementation",
+    "failure": "Retained available-checkout SelfTest reads PS-only docs/P1-SUPPLY-FREEZE-v1.md from actual TF B.",
+    "selection": "Use exact A09 current-method counterpart docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md in this test data only. Preserve every read/size/metadata/coverage assertion; no production or guide change.",
+    "product_scope": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+    ],
+    "repair_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\fixture-repair",
+    "original_candidate_tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
+    "original_aggregate": {
+      "state": "failed",
+      "command": [
+        "py",
+        "-3.12",
+        "-m",
+        "pre_commit",
+        "run",
+        "--all-files"
+      ],
+      "started_at": "2026-10-04T14:06:07.880862+00:00",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "parent_head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "candidate_tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate.log",
+      "pid": 55616,
+      "before_identity_passed": true,
+      "after_identity_passed": true,
+      "exit_code": 1,
+      "finished_at": "2026-10-04T14:10:13.111191+00:00",
+      "passed_hook_count": 10,
+      "skipped_hook_count": 0,
+      "log_sha256": "cc942c7f9fb366ecd6a5e6b5f1cdec89375cf31d1fd5d6a394aee25eeaa21a68"
+    },
+    "recorded_at": "2026-10-04T14:12:57.677890+00:00",
+    "integrated_at": "2026-10-04T14:17:22.562701+00:00",
+    "patch_sha256": "beddf90d326b4ca7e8bbb5405111cf310845ae3e9c20a935eb2aa687a3758abe",
+    "before": {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "526c2716b0adfef3008c8a65bcb226579bdf0510",
+      "bytes": 229571,
+      "sha256": "e6eecb7be0555643bf3d97f610e410fa62f35268d08c598bb89a12b846271d81"
+    },
+    "after": {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "mode": "100644",
+      "blob": "3bae369fa40e6733ec80a68a96c77e5b46e6d92b",
+      "bytes": 229590,
+      "sha256": "c10ab77ca62f1dcdb68945165838ec533a47d90b16309a8470e71e197a719d25"
+    },
+    "focused_pre": {
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\fixture-repair\\focused-pre.ps1"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "child_path_prefix": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64",
+      "started_utc": "2026-10-04T14:15:17Z",
+      "seconds": 13.85613465309143,
+      "exit": 1,
+      "log_sha256": "d5e741060c423f0f6055cef55dfa119576da1232b5ed9027f6588d84f8aa5ace"
+    },
+    "focused_post": {
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\fixture-repair\\focused-post.ps1"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "child_path_prefix": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64",
+      "started_utc": "2026-10-04T14:15:17Z",
+      "seconds": 16.57795238494873,
+      "exit": 0,
+      "log_sha256": "92c614c2e8c6b202059bfd8788498d8731edd3f737330764b1c3d7d9e076c76e"
+    },
+    "root_verification": "Read complete patch and five-line note; exact one-literal replacement independently proved; all assertions remain; both original and repaired actual-function log hashes verified; all other inputs/dependencies unchanged."
+  },
+  "superseded_validation": [
+    {
+      "tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
+      "state_archive": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\pre-fixture-repair-execution-state.json",
+      "archive_sha256": "e1cde05b300a03e4e62c0a6c5af8b919c3203a0bde22454b66ef0ded33fbb8e7",
+      "aggregate": {
+        "state": "failed",
+        "command": [
+          "py",
+          "-3.12",
+          "-m",
+          "pre_commit",
+          "run",
+          "--all-files"
+        ],
+        "started_at": "2026-10-04T14:06:07.880862+00:00",
+        "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "parent_head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "candidate_tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate.log",
+        "pid": 55616,
+        "before_identity_passed": true,
+        "after_identity_passed": true,
+        "exit_code": 1,
+        "finished_at": "2026-10-04T14:10:13.111191+00:00",
+        "passed_hook_count": 10,
+        "skipped_hook_count": 0,
+        "log_sha256": "cc942c7f9fb366ecd6a5e6b5f1cdec89375cf31d1fd5d6a394aee25eeaa21a68"
+      },
+      "staged_preflight": {
+        "state": "passed",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-RequireStagedInputMatch"
+        ],
+        "started_at": "2026-10-04T14:05:21.185310+00:00",
+        "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\staged-preflight.log",
+        "exit_code": 0,
+        "finished_at": "2026-10-04T14:06:07.876825+00:00",
+        "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96",
+        "all_inputs_unchanged": true
+      },
+      "reason": "Test-only exact TF counterpart literal repair; retain failed original aggregate and independent original-tree assessment."
+    }
+  ],
+  "handback_limits": "Original worker handback describes af0c029; current full catalog includes the independently verified one-literal fixture repair to that candidate."
 }
