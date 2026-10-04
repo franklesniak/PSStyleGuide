@@ -88,3 +88,7 @@ Coordinator disposition: the separate recurring lint-suite observation is evalua
 The original37c comparison and identities above remain dated evidence. TF525147aa now adds the independently reviewed three-hunk synthetic fixture repair to the existing main-validator reverse path. Construct and validate the common smaller Scope fixture, then use it only in the rendered-note, maximum-revision and HTML-boundary constructors. No new path, protected-document content, production helper or input limit changes. Keep the extracted SelfTest and its PS P1/TF T1 counterparts as already specified. [The evidence record](reverse-readiness.json) pins the added patch and actual-tree readback.
 
 Windows and Linux375-case focused passes apply to the current TF inputs. Validate the later PS candidate with its actual source documents; do not claim this as PS execution. Refresh all final identities after accepted TF, then release the reverse batch. The current aggregate is live; no native acceptance or transfer increment has occurred.
+
+## Proposed committed identity
+
+The integrated capacity repair is now in proposed He2f0652 with the same525147aa tree. Full local validation and actual B/H diagnostics passed, and [PR66](https://github.com/franklesniak/TerraformStyleGuide/pull/66) is under review. This supersedes the earlier aggregate-running observation without changing the original37c identity proofs. TF is not yet accepted; refresh its actual native accepted identity before the reverse transfer or writer release.

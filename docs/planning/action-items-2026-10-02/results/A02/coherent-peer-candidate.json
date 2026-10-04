@@ -1,11 +1,11 @@
 {
-  "recorded_at": "2026-10-04T15:36:06.956415+00:00",
-  "status": "Capacity fixture repair integrated; staged preflight passed; full aggregate15404 running.",
+  "recorded_at": "2026-10-04T16:50:26.024925+00:00",
+  "status": "PR66 open; round1 Copilot and automatic Codex confirmed pending; hosted checks in progress.",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
   "base_tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
-  "head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+  "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
   "candidate_tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
   "accepted_source": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
   "accepted_source_tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
@@ -649,7 +649,7 @@
     "all_inputs_unchanged": true
   },
   "aggregate": {
-    "state": "running",
+    "state": "passed",
     "command": [
       "py",
       "-3.12",
@@ -665,16 +665,24 @@
     "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-capacity-repaired.log",
     "pid": 186728,
     "before_identity_passed": true,
-    "after_identity_passed": false
+    "after_identity_passed": true,
+    "exit_code": 0,
+    "finished_at": "2026-10-04T16:37:34.948612+00:00",
+    "passed_hook_count": 11,
+    "skipped_hook_count": 0,
+    "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
   },
   "session": {
     "session_id": 15404,
     "script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\validate-capacity-repaired-candidate.py",
     "aggregate_pid": 186728,
-    "state": "running",
+    "state": "terminal_passed",
     "last_confirmed_at": "2026-10-04T15:36:06.956415+00:00",
     "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-capacity-repaired.log",
-    "candidate_tree": "525147aac9804088b8b9e743a7e441a5276d59f2"
+    "candidate_tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
+    "exit_code": 0,
+    "finished_at": "2026-10-04T16:37:34.948612+00:00",
+    "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
   },
   "independent_review": {
     "agent": "/root/a02_tf_prepublication_quality",
@@ -700,12 +708,52 @@
     }
   },
   "reviews": {
-    "pr": null,
-    "rounds_used": 0,
-    "first_request_at": null,
-    "deadline": null
+    "pr": 66,
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66",
+    "rounds_used": 1,
+    "first_request_at": "2026-10-04T16:41:24+00:00",
+    "deadline": "2026-10-12T16:41:24+00:00",
+    "current_round": {
+      "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "body_sha256": "eddb0f92742af206a715ce33a6baf7de48363da3d2e77ca0a7fb53c052297971",
+      "started_at": "2026-10-04T16:41:24+00:00",
+      "clock_basis": "Native PR-open trigger of the authenticated automatic Codex review; conservative earlier event time.",
+      "initial_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-pre-request.json",
+      "pre_copilot_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-pre-copilot-final.json",
+      "automatic_codex": {
+        "state": "request_confirmed_pending_result",
+        "summary_comment_id": 5982194609,
+        "authenticated_author_id": 199175422,
+        "trigger": "PR opened",
+        "native_trigger_at": "2026-10-04T16:41:24Z",
+        "observed_running_since": "2026-10-04T16:41:35.114470Z",
+        "summary_created_at": "2026-10-04T16:41:37Z",
+        "summary_updated_at": "2026-10-04T16:41:37Z",
+        "channel_attempts": 1,
+        "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "body_sha256": "eddb0f92742af206a715ce33a6baf7de48363da3d2e77ca0a7fb53c052297971",
+        "manual_request_sent": false
+      },
+      "copilot": {
+        "state": "request_confirmed_pending_result",
+        "channel_attempts": 1,
+        "started_at": "2026-10-04T16:45:20.546573+00:00",
+        "transport": "gh pr edit 66 --repo franklesniak/TerraformStyleGuide --add-reviewer '@copilot'",
+        "ui_observation": "Fresh GitHub PR66 in-app browser page is signed out. Reviewers says No reviews and exposes no request or effort control. No UI request was submitted. Use the AGENTS-approved CLI fallback; observed result effort remains unknown.",
+        "observed_result_effort": null,
+        "request_exit": 0,
+        "transport_returned_at": "2026-10-04T16:45:23.200266+00:00",
+        "request_log_sha256": "2e886facc888b51f825560e81d176ba377a158a2cb59a3007a148eb80576b0c6",
+        "request_event_id": 32452378343,
+        "native_request_at": "2026-10-04T16:45:16Z",
+        "workflow_run_id": 37217939713,
+        "confirmation_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-post-copilot.json",
+        "confirmed_at": "2026-10-04T16:45:56.042871+00:00"
+      }
+    }
   },
-  "limits": "No product commit, candidate H/B result, PR, remote review, native CI/landing or paired completion. Unchanged accepted-B classifier fixture is ready but not executed.",
+  "limits": "Full local validation, normal commit, actual B/H diagnostics and fresh two-root audit passed. PR66 is open and attached. Both reviewers and remaining hosted checks are pending; fresh final quality, normal merge, landed acceptance and reverse PS repair remain due.",
   "fixture_repair": {
     "state": "integrated_and_focused_passed",
     "worker": "/root/a02_tf_coherent_implementation",
@@ -997,6 +1045,276 @@
   "reverse_readiness": {
     "record": "reverse-readiness.json",
     "scope_count": 11,
-    "state": "Capacity addendum included; refresh actual accepted TF identity before reverse release."
+    "state": "Read-only readiness includes the capacity delta; proposed H e2f0652 has the same525147aa tree. Refresh after accepted native TF before reverse release."
+  },
+  "commit": {
+    "exit_code": 0,
+    "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+    "parent": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
+    "at": "2026-10-04T16:38:24.322779+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\normal-candidate-commit.log",
+    "log_sha256": "1cf5227db2b2c1edc2a9e855060960ff477458011ad6682f13c835851cf0bda4"
+  },
+  "publication": {
+    "exit_code": 0,
+    "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+    "readback": "e2f0652654ef0954e17fc3a255b87375908d0521\trefs/heads/codex/a02-peer-docs",
+    "at": "2026-10-04T16:41:03.013959+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\normal-topic-push.log",
+    "log_sha256": "009a70773492528ccf66d17c495b55acd99cdd1798ea5cf877ac14444053d57f"
+  },
+  "pr_creation": {
+    "state": "confirmed",
+    "started_at": "2026-10-04T16:41:30.159845+00:00",
+    "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+    "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "title": "Converge repository validation and agent setup",
+    "body_sha256": "eddb0f92742af206a715ce33a6baf7de48363da3d2e77ca0a7fb53c052297971",
+    "preexisting_same_topic_pr_ids": [],
+    "exit_code": 0,
+    "number": 66,
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66",
+    "created_at": "2026-10-04T16:41:24Z",
+    "confirmed_at": "2026-10-04T16:41:32.385107+00:00"
+  },
+  "current_audit": {
+    "command": [
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+      ".github/workflows/Check-NpmAudit.mjs"
+    ],
+    "exit_code": 0,
+    "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+    "authority": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "at": "2026-10-04T16:40:22.770786+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\current-audit-e2f0652.log",
+    "sha256": "c0d8c26ced062a80c856e39b0baf08540c7987785bb4c772dfe50b6a9679fecc",
+    "mode": "ordinary local two-root audit after fresh origin/main fetch; external revocation limitation retained"
+  },
+  "current_audit_result": {
+    "status": "CLEAN",
+    "unresolved": [],
+    "acceptedPackages": 0,
+    "unusedExceptions": [],
+    "proposedState": false,
+    "authority": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "authoritySource": "local-origin-main",
+    "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
+    "installedGraphRoots": [
+      ".",
+      ".github/workflows"
+    ],
+    "findings": []
+  },
+  "actual_endpoints": {
+    "status": "passed",
+    "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+    "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+    "results": [
+      {
+        "mode": "accepted-base-inert-classifier",
+        "command": [
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+          ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+          "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+          "e2f0652654ef0954e17fc3a255b87375908d0521"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+        "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "started_at": "2026-10-04T16:39:25.985901+00:00",
+        "finished_at": "2026-10-04T16:39:28.876712+00:00",
+        "exit_code": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\accepted-base-inert-classifier-e2f0652.log",
+        "log_sha256": "792d5508988f9a9ec302246abba1da75bf5776dbe3822ce8af67130e28515b65",
+        "inputs_unchanged": true,
+        "classification": {
+          "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+          "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+          "policy": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+          "classification": "maintenance_required",
+          "maintenancePaths": [
+            ".github/workflows/Check-NpmAudit.mjs",
+            ".github/workflows/Check-NpmAudit.test.mjs",
+            ".github/workflows/Classify-InstructionMaintenance.mjs",
+            ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+            ".github/workflows/NpmTools.test.mjs",
+            ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            ".github/workflows/Test-CiHelpers.test.mjs",
+            ".github/workflows/Test-LocalValidation.test.mjs",
+            ".github/workflows/Validate-WorkflowPolicy.mjs",
+            ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+            ".github/workflows/agent-instructions.yml",
+            ".github/workflows/build.yml",
+            ".github/workflows/copilot-setup-steps.yml",
+            ".github/workflows/devcontainer-ci.yml",
+            ".github/workflows/lint-nested-markdown.js",
+            ".github/workflows/lint-staged-markdown.mjs",
+            ".github/workflows/markdownlint.yml",
+            ".github/workflows/package-lock.json",
+            ".github/workflows/package.json",
+            ".github/workflows/workflow-policy-cases.json",
+            ".github/workflows/workflow-policy-contract.json",
+            ".husky/pre-commit",
+            "package-lock.json"
+          ]
+        }
+      },
+      {
+        "mode": "proposed-policy",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-ProposedPolicy",
+          "-InputRevision",
+          "e2f0652654ef0954e17fc3a255b87375908d0521",
+          "-PublishedBaselineRevision",
+          "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "started_at": "2026-10-04T16:39:28.895207+00:00",
+        "finished_at": "2026-10-04T16:40:08.319383+00:00",
+        "exit_code": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\proposed-policy-e2f0652.log",
+        "log_sha256": "b5174835044cebdaf9b388f8adc327258d93438ecddba73d1017e0b1496be133",
+        "inputs_unchanged": true
+      }
+    ],
+    "mode_policy": "Old accepted B classifier only, with candidate H as inert Git data; proposed H/B validation from exact H. No unsupported old-B metadata flags or copied candidate engine."
+  },
+  "accepted_baseline_file_count": 75,
+  "latest_native_snapshot": {
+    "captured_at": "2026-10-04T16:45:56.042871+00:00",
+    "sha256": "83d3449048f29e758b12661d41a518c56b74175456866c50c3b29f9e70f36622",
+    "complete_paginated_surfaces": [
+      "request events",
+      "requested reviewers",
+      "reviews",
+      "issue comments",
+      "review comments",
+      "workflow runs",
+      "check runs",
+      "review threads and their comments"
+    ],
+    "workflow_runs": [
+      {
+        "id": 37217939713,
+        "name": "Running Copilot Code Review",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "dynamic",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-10-04T16:45:27Z"
+      },
+      {
+        "id": 37217697793,
+        "name": "Agent instruction validation",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "pull_request",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-10-04T16:41:27Z"
+      },
+      {
+        "id": 37217697804,
+        "name": "Copilot setup steps",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "pull_request",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-10-04T16:41:27Z"
+      },
+      {
+        "id": 37217697784,
+        "name": "Dev container boundary",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T16:41:27Z"
+      },
+      {
+        "id": 37217697813,
+        "name": "Markdown Lint",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T16:41:27Z"
+      },
+      {
+        "id": 37217697800,
+        "name": "Agent instruction validation",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "pull_request_target",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T16:41:27Z"
+      },
+      {
+        "id": 37217697781,
+        "name": "Build Style Guide Artifacts",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T16:41:27Z"
+      },
+      {
+        "id": 37217666496,
+        "name": "Markdown Lint",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T16:40:58Z"
+      },
+      {
+        "id": 37217666538,
+        "name": "Build Style Guide Artifacts",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T16:40:58Z"
+      },
+      {
+        "id": 37217666556,
+        "name": "Dev container boundary",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T16:40:58Z"
+      },
+      {
+        "id": 37217666597,
+        "name": "Copilot setup steps",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "push",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-10-04T16:40:58Z"
+      },
+      {
+        "id": 37217666561,
+        "name": "Agent instruction validation",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "push",
+        "status": "in_progress",
+        "conclusion": null,
+        "created_at": "2026-10-04T16:40:58Z"
+      }
+    ],
+    "review_thread_count": 0
   }
 }

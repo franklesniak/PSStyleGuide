@@ -13,4 +13,4 @@ Failure: aggregate49058 failed after10 hooks on accepted synthetic AGENTS capaci
 Cause: actual32759-byte content grows above32768 in four positive constructors; unchanged real helpers reproduced all four overflows on Windows and Linux.
 Fix: three SelfTest-only regions construct and validate a32632-byte copy with only a shorter Scope line; production code, real documents, limits and every original assertion remain unchanged.
 Test:375 actual assertions per platform passed with zero failures, including boundary/oracle checks and supplemental same-Scope note rejection; parser/PSSA and independent private/integrated reviews passed.
-Evidence: [candidate record](../../A02/coherent-peer-candidate.json) pins integrated525147aa and all hashes; staged preflight passed, full aggregate15404 is live. Both earlier full failures remain failed; native acceptance is due.
+Evidence: [candidate record](../../A02/coherent-peer-candidate.json) pins integrated525147aa and all hashes; staged preflight and full aggregate15404 passed11/0; exact He2f0652 is now in PR66. Both earlier full failures remain failed; native acceptance is due.

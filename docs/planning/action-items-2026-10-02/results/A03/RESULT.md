@@ -108,3 +108,7 @@ Next: integrate the implemented D2 event-coverage and D3 common workflow-policy 
 ## Retained Markdown suite caller follow-up
 
 [Canonical D-A07-LINT-CI-01](../A07/recurring-lint-suite-decision.md) selects E97 to run the existing ten-test Markdown suite in the candidate-tests Node command. Preserve the actual native-exit guard and accepted-policy separation. The caller-only edit joins the later PS reverse batch after coherent TF acceptance; it is outside the current private fixture repair. This proposal is selected, not implemented or hosted-verified.
+
+## Coherent TF peer PR66
+
+The shared peer candidate is now committed as e2f0652/tree525147aa and published in [PR66](https://github.com/franklesniak/TerraformStyleGuide/pull/66). Full local11-hook validation, actual accepted-B/proposed-H diagnostics and the fresh two-root audit passed. [The canonical peer record](../A02/coherent-peer-candidate.json) owns current review and hosted-check state: round1/80, fixed deadline2026-10-12T16:41:24Z, both reviewer requests confirmed pending, transfer1 unchanged. Earlier source lifecycle records remain historical. No hosted, landed or paired acceptance is claimed; final quality and reverse comparison remain due.
