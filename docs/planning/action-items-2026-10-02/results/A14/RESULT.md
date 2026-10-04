@@ -3,6 +3,8 @@
 
 ## Current lint-child finding during TF66 round1
 
+The [exact private repair](../A02/TF66-round1-repair-validation.md) now passes final Windows/Linux boundary cases and independent bounded review. The original adapter demonstrably executes forbidden children in three cases on each platform. Full pre-commit validation is running; delivery and paired acceptance remain due. Keep A14 active until the actual delivered inputs are reassessed.
+
 Reopen the changed-caller assessment for the reproduced static lint-child escape at TFe2f0652 and its applicable accepted PS source. [R2 B97.6](../A07/TF66-R2-child-boundary.md) records real Windows/Linux leaf and ancestor-link execution, the selected repair, preserved supported use and residual limits. A07 owns implementation and paired delivery; A14 must verify applicability after that delivery. No extra repository transfer is consumed by this assessment.
 
 This evidence establishes an ordinary static boundary defect without requiring a competing writer. It does not close the generator/verifier path-substitution, cleanup, publication, hardlink or Windows-alias residuals in PS155. The earlier no-trigger conclusions remain historical findings for their named inputs and consumers. Do not extend them to this new lint defect or advertise R2 as an atomic filesystem execution guarantee. Current status is active until the delivered caller and retained residuals are reassessed.

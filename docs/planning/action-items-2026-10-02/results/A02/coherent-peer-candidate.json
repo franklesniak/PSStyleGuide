@@ -1,6 +1,6 @@
 {
-  "recorded_at": "2026-10-04T16:50:26.024925+00:00",
-  "status": "PR66 open; round1 Copilot and automatic Codex confirmed pending; hosted checks in progress.",
+  "recorded_at": "2026-10-04T17:42:08.143934+00:00",
+  "status": "PR66 round1 terminal nonclean; exact private repair and independent review pass; staged preflight passed; sole pre-commit aggregate running.",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -2116,8 +2116,64 @@
         }
       ],
       "parent_readback": "Root inspected both460-pass/0-fail/0-skip candidate tails; both11-hook setup logs; actual accepted-B maintenance-required branch; current event-main ordinary audit. These old-input results do not validate later repairs."
+    },
+    "repair_validation": {
+      "canonical": "TF66-round1-repair-validation.md",
+      "private_record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-proposed-validation.json",
+      "candidate_tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
+      "staged_preflight": {
+        "state": "passed",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-RequireStagedInputMatch"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-proposed-validation-checkout",
+        "started_at": "2026-10-04T17:37:56.605986+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-proposed-staged_preflight.log",
+        "pid": 181424,
+        "candidate_tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
+        "before_identity_passed": true,
+        "after_identity_passed": true,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+        "exit_code": 0,
+        "finished_at": "2026-10-04T17:38:47.793707+00:00",
+        "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
+      },
+      "aggregate": {
+        "state": "running",
+        "command": [
+          "py",
+          "-3.12",
+          "-m",
+          "pre_commit",
+          "run",
+          "--all-files"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-proposed-validation-checkout",
+        "started_at": "2026-10-04T17:38:47.799060+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-proposed-aggregate.log",
+        "pid": 181424,
+        "candidate_tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
+        "before_identity_passed": true,
+        "after_identity_passed": false,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit."
+      },
+      "session_id": 90093,
+      "independent_review": {
+        "result": "bounded_pass",
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-ROUND1-REPAIR-REVIEW-20261004.md",
+        "sha256": "ca490f6a1fad340280d6422ce78b0c019762eab4b72a8a27df66b644374e343b"
+      },
+      "product_unchanged": true,
+      "order": "Staged preflight AND full aggregate on exact proposed B-copy BEFORE normal product commit; actual committed H/B diagnostics afterward.",
+      "limitations": "Private implementation and prepublication quality do not confer native or paired acceptance."
     }
   },
-  "current_review_status": "round1_private_repair_running",
-  "next_action": "Collect exact eight-path private repair, targeted Windows/Linux evidence and postimages; integrate only after root verification. Root owns normal commit and clean-H final aggregate plus H/B diagnostics."
+  "current_review_status": "round1_proposed_aggregate_running",
+  "next_action": "Collect session90093. If all11 hooks pass with zero skips and unchanged inputs, integrate exact eight postimages/tree099bb0f and normal commit; then actual H/B diagnostics, publication and fresh input reviews."
 }
