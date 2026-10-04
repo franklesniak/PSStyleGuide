@@ -242,8 +242,12 @@ jobs:
               $PSNativeCommandUseErrorActionPreference = $false
           }
 
-          $strGitPath = @('/usr/bin/git', '/bin/git') | Where-Object { [IO.File]::Exists($_) } | Select-Object -First 1
-          if ([string]::IsNullOrEmpty($strGitPath)) { throw 'main: fixed Git is unavailable' }
+          $strGitPath = @('/usr/bin/git', '/bin/git') | Where-Object {
+              [IO.File]::Exists($_)
+          } | Select-Object -First 1
+          if ([string]::IsNullOrEmpty($strGitPath)) {
+              throw 'main: fixed Git is unavailable'
+          }
           $arrUrls = @(& $strGitPath remote get-url --all origin)
           if ($LASTEXITCODE -ne 0 -or $arrUrls.Count -ne 1 -or
               $arrUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {
@@ -252,10 +256,16 @@ jobs:
           for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
               & $strGitPath -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --no-tags --no-recurse-submodules origin refs/heads/main:refs/remotes/origin/main
               $intFetchExitCode = $LASTEXITCODE
-              if ($intFetchExitCode -eq 0) { break }
-              if ($intAttempt -lt 3) { Start-Sleep -Seconds 2 }
+              if ($intFetchExitCode -eq 0) {
+                  break
+              }
+              if ($intAttempt -lt 3) {
+                  Start-Sleep -Seconds 2
+              }
           }
-          if ($intFetchExitCode -ne 0) { throw "main: git fetch exited $intFetchExitCode after three attempts" }
+          if ($intFetchExitCode -ne 0) {
+              throw "main: git fetch exited $intFetchExitCode after three attempts"
+          }
           $arrMain = @(& $strGitPath rev-parse --verify refs/remotes/origin/main)
           if ($LASTEXITCODE -ne 0 -or $arrMain.Count -ne 1 -or
               $arrMain[0] -cnotmatch '^[0-9a-f]{40}$' -or $arrMain[0] -ceq ('0' * 40)) {
@@ -491,11 +501,19 @@ jobs:
                   # Preserve service setup for published branches from before the shared declaration.
                   $objPackage = Get-Content -Raw -LiteralPath 'package.json' | ConvertFrom-Json -ErrorAction Stop
                   $strVersion = $objPackage.engines.node
-                  if ($objPackage.engines.npm -cne '11.16.0') { throw 'toolchain: unsupported pre-declaration npm version' }
+                  if ($objPackage.engines.npm -cne '11.16.0') {
+                      throw 'toolchain: unsupported pre-declaration npm version'
+                  }
                   switch -CaseSensitive ($strVersion) {
-                      '24.18.0' { $strReviewedSha256 = '55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742' }
-                      '24.18.1' { $strReviewedSha256 = 'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0' }
-                      default { throw 'toolchain: a current runtime declaration is required' }
+                      '24.18.0' {
+                          $strReviewedSha256 = '55AA7153F9D88F28D765FCDAD5AE6945B5C0F98A36881703817E4C450FA76742'
+                      }
+                      '24.18.1' {
+                          $strReviewedSha256 = 'D6C664DF3F3F61458E8C277585571328522D705166723A7C7823A9253A4D15A0'
+                      }
+                      default {
+                          throw 'toolchain: a current runtime declaration is required'
+                      }
                   }
               }
               if ($strVersion -cnotmatch '^24\.[0-9]+\.[0-9]+$' -or
@@ -888,8 +906,98 @@ jobs:
             echo '::error::Unexpected package-manager configuration source.'
             exit 1
           fi
-          echo 'Dependencies and hooks are ready; running complete validation.'
-          "${npm_environment[@]}" "${VALIDATION_PYTHON}" -E -P -m pre_commit run --all-files
+          # Keep ordinary hook fixes outside the worktree that the agent will use.
+          # This copy isolates side effects; it is not a sandbox for hostile code.
+          for variable in GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE GIT_OBJECT_DIRECTORY \
+            GIT_ALTERNATE_OBJECT_DIRECTORIES GIT_COMMON_DIR GIT_NAMESPACE GIT_SHALLOW_FILE GIT_CONFIG; do
+            if [[ -v "${variable}" ]]; then
+              echo "::error::Unexpected Git path variable: ${variable}"
+              exit 1
+            fi
+          done
+          export GIT_OPTIONAL_LOCKS=0
+          source_root="$(pwd -P)"
+          test "$(git rev-parse --show-toplevel)" = "${source_root}"
+          test -d .git
+          test ! -L .git
+          test "$(git rev-parse --absolute-git-dir)" = "${source_root}/.git"
+          test "$(git rev-parse --path-format=absolute --git-common-dir)" = "${source_root}/.git"
+          if git config --local --get core.worktree; then
+            echo '::error::Unexpected Git worktree redirection.'
+            exit 1
+          else
+            test "$?" -eq 1
+          fi
+          test ! -e .git/objects/info/alternates
+          test ! -L .git/objects/info/alternates
+          test "$(git rev-parse --is-shallow-repository)" = false
+          source_head="$(git rev-parse --verify HEAD)"
+          source_main="$(git rev-parse --verify refs/remotes/origin/main)"
+          test "${source_head}" = "${GITHUB_SHA}"
+          git diff --cached --quiet HEAD --
+          git diff --quiet HEAD --
+          temporary_root="$(realpath -e -- "${RUNNER_TEMP}")"
+          case "${temporary_root}" in
+            "${source_root}"|"${source_root}/"*) echo '::error::Validation temporary root is inside the agent worktree.'; exit 1 ;;
+          esac
+          validation_root="$(mktemp -d -- "${temporary_root}/repository-validation.XXXXXXXX")"
+          cleanup_validation() {
+            status=${1:-$?}
+            trap - EXIT
+            if ! rm -rf -- "${validation_root}"; then
+              echo '::error::Unable to remove the disposable validation copy.'
+              if [[ "${status}" -eq 0 ]]; then status=1; fi
+            fi
+            exit "${status}"
+          }
+          trap 'cleanup_validation' EXIT
+          trap 'exit 130' INT
+          trap 'exit 143' TERM
+          validation_copy="${validation_root}/repository"
+          mkdir -- "${validation_copy}"
+          cp -a --reflink=auto -- "${source_root}/." "${validation_copy}/"
+          # Reject links that would send a normal hook write back to the agent tree.
+          # Keep the prepared Python venv outside both trees; its PATH entry is unchanged.
+          "${VALIDATION_PYTHON}" -E -P - "${source_root}" "${validation_copy}" <<'PY'
+          import os
+          from pathlib import Path
+          import sys
+
+          source, copied = map(Path, sys.argv[1:])
+          for directory, directories, files in os.walk(copied, followlinks=False):
+              for name in directories + files:
+                  entry = Path(directory) / name
+                  if not entry.is_symlink():
+                      continue
+                  relative = entry.relative_to(copied)
+                  target = entry.resolve()
+                  if relative.parts[0] == '.git' or target.is_relative_to(source):
+                      raise SystemExit(f'Validation copy has a shared Git/source link: {relative}')
+                  if 'node_modules' in relative.parts and not target.is_relative_to(copied):
+                      raise SystemExit(f'Validation dependency link leaves the copy: {relative}')
+          PY
+          test "$(git -C "${validation_copy}" rev-parse --show-toplevel)" = "${validation_copy}"
+          test "$(git -C "${validation_copy}" rev-parse --absolute-git-dir)" = "${validation_copy}/.git"
+          test "$(git -C "${validation_copy}" rev-parse --path-format=absolute --git-common-dir)" = "${validation_copy}/.git"
+          test "$(git -C "${validation_copy}" rev-parse --verify HEAD)" = "${source_head}"
+          test "$(git -C "${validation_copy}" rev-parse --verify refs/remotes/origin/main)" = "${source_main}"
+          cmp -- "${source_root}/.git/index" "${validation_copy}/.git/index"
+          git rev-list --objects --all --missing=error > "${validation_root}/source-objects"
+          git -C "${validation_copy}" rev-list --objects --all --missing=error > "${validation_root}/copied-objects"
+          cmp -- "${validation_root}/source-objects" "${validation_root}/copied-objects"
+          git -C "${validation_copy}" diff --cached --quiet HEAD --
+          git -C "${validation_copy}" diff --quiet HEAD --
+          echo 'Dependencies and hooks are ready; running complete validation in a disposable copy.'
+          validation_status=0
+          (
+            cd -- "${validation_copy}" || exit $?
+            export GITHUB_WORKSPACE="${validation_copy}"
+            "${npm_environment[@]}" "${VALIDATION_PYTHON}" -E -P -m pre_commit run --all-files
+          ) || validation_status=$?
+          if [[ "${validation_status}" -ne 0 ]]; then
+            echo "::error::Complete validation failed with status ${validation_status}; fixes remain only in the disposable copy."
+          fi
+          cleanup_validation "${validation_status}"
 
       - name: Verify final immutable setup inputs
         if: always() && steps.toolchain.outcome == 'success'

@@ -994,10 +994,10 @@ test('Copilot setup declares its input closure, supported environment and finite
   assert.match(copilotStep('Run complete repository validation').run, /-m pre_commit run --all-files/);
 });
 
-function copilotBodyFixture(t) {
+function copilotBodyFixture(t, workName = 'work') {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'copilot-convergence-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
-  const work = path.join(root, 'work'); fs.mkdirSync(work);
+  const work = path.join(root, workName); fs.mkdirSync(work);
   const env = { ...process.env, RUNNER_TEMP: root, HOME: root, XDG_CONFIG_HOME: root,
     GITHUB_OUTPUT: path.join(root, 'output'), GITHUB_ENV: path.join(root, 'env'), GITHUB_PATH: path.join(root, 'path') };
   for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS',
@@ -1176,8 +1176,11 @@ for (const mode of ['clean', 'npm-failure', 'hook-wrong', 'suite-failure']) {
   test(`Copilot explicit hook and full-validation caller: ${mode}`, { skip: !linux }, t => {
     const f = copilotBodyFixture(t), bin = path.join(f.root, 'bin'), log = path.join(f.root, 'calls'); fs.mkdirSync(bin);
     f.git('init', '-q'); f.put('fixture'); f.commit();
+    f.git('update-ref', 'refs/remotes/origin/main', 'HEAD');
+    const fixturePython = copilotFixturePython();
     for (const name of ['npm', 'python']) fs.writeFileSync(path.join(bin, name), `#!${process.execPath}
 const fs=require('node:fs'),{spawnSync}=require('node:child_process'),a=process.argv.slice(2);
+if(${JSON.stringify(name)}==='python'&&a[2]==='-'){const r=spawnSync(${JSON.stringify(fixturePython)},a,{stdio:'inherit'});process.exit(r.status??99);}
 if(Object.keys(process.env).some(k=>/^npm_config_/i.test(k)&&!['npm_config_userconfig','npm_config_globalconfig'].includes(k)))process.exit(97);
 fs.appendFileSync(${JSON.stringify(log)},JSON.stringify([${JSON.stringify(name)},...a])+'\\n');
 if(${JSON.stringify(name)}==='npm') {
@@ -1187,6 +1190,7 @@ if(${JSON.stringify(name)}==='npm') {
 } else if(${JSON.stringify(mode)}==='suite-failure')process.exit(37);
 `, { mode: 0o700 });
     const env = { PATH: `${bin}:${process.env.PATH}`, VALIDATION_PYTHON: path.join(bin, 'python'),
+      GITHUB_SHA: f.git('rev-parse', 'HEAD'), GITHUB_WORKSPACE: f.work,
       NPM_CONFIG_SCRIPT_SHELL: 'hostile', 'npm_config_unsafe-name': 'dummy' };
     const hook = f.run('Activate repository hooks', env);
     assert.equal(hook.status === 0, !['npm-failure', 'hook-wrong'].includes(mode), hook.stderr);
@@ -1339,3 +1343,153 @@ for (const layout of ['modern', 'legacy']) {
       : [[...copilotCiArgs, '--prefix', '.github/workflows']]);
   });
 }
+
+function copilotFixturePython(executable = 'python3.12') {
+  const result = spawnSync(executable, ['-I', '-S', '-c',
+    'import json, sys; print(json.dumps({"executable": sys.executable, "implementation": sys.implementation.name, "version": list(sys.version_info[:2])}))'],
+  { encoding: 'utf8' });
+  assert.equal(result.status, 0, result.stderr);
+  const observed = JSON.parse(result.stdout);
+  assert.equal(observed.implementation, 'cpython');
+  assert.deepEqual(observed.version, [3, 12]);
+  assert.ok(path.isAbsolute(observed.executable));
+  return observed.executable;
+}
+
+function copilotValidationFixture(t, alternatePython = false) {
+  const f = copilotBodyFixture(t, 'prepared tree');
+  let fixturePython = copilotFixturePython();
+  if (alternatePython) {
+    const alternate = path.join(f.root, 'alternate python');
+    fs.symlinkSync(fixturePython, alternate);
+    fixturePython = copilotFixturePython(alternate);
+    assert.equal(fixturePython, alternate);
+  }
+  const temporary = path.join(f.root, 'runner temporary'); fs.mkdirSync(temporary);
+  f.git('init', '-q');
+  f.put('.gitignore', 'node_modules/\n.husky/_/\n');
+  f.put('README.md', 'original\n'); f.commit();
+  const event = f.git('rev-parse', 'HEAD');
+  const main = f.git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid',
+    'commit-tree', 'HEAD^{tree}', '-m', 'Independent main');
+  f.git('update-ref', 'refs/remotes/origin/main', main);
+  f.git('checkout', '--detach', '-q', event);
+  f.git('config', 'core.hooksPath', '.husky/_');
+  f.put('.husky/_/pre-commit', '#!/bin/sh\nexit 0\n');
+  fs.chmodSync(path.join(f.work, '.husky/_/pre-commit'), 0o751);
+  f.put('node_modules/package/index.js', 'prepared root dependency\n');
+  f.put('.github/workflows/node_modules/package/index.js', 'prepared nested dependency\n');
+  fs.mkdirSync(path.join(f.work, 'node_modules/.bin'));
+  fs.symlinkSync('../package/index.js', path.join(f.work, 'node_modules/.bin/probe'));
+  const probe = path.join(f.root, 'python'), log = path.join(f.root, 'validation.json');
+  fs.writeFileSync(probe, `#!${process.execPath}
+const fs=require('node:fs'),path=require('node:path'),{spawnSync}=require('node:child_process');
+const args=process.argv.slice(2);
+if(args[2]==='-') { const p=spawnSync(${JSON.stringify(fixturePython)},args,{stdio:'inherit'});process.exit(p.status??99); }
+const git=(...a)=>{const r=spawnSync('/usr/bin/git',a,{encoding:'utf8'});if(r.status!==0)throw Error(r.stderr);return r.stdout.trim();};
+const cwd=process.cwd();
+fs.appendFileSync(${JSON.stringify(log)}+'.dispatch','called\\n');
+if(cwd===${JSON.stringify(f.work)}||process.env.GITHUB_WORKSPACE!==cwd)process.exit(91);
+if(git('rev-parse','HEAD')!==${JSON.stringify(event)}||git('rev-parse','refs/remotes/origin/main')!==${JSON.stringify(main)})process.exit(92);
+if(git('rev-list','--all','--count')!=='2'||git('config','core.hooksPath')!=='.husky/_')process.exit(93);
+if(fs.statSync('.husky/_/pre-commit').mode%512!==489||fs.readlinkSync('node_modules/.bin/probe')!=='../package/index.js')process.exit(94);
+fs.writeFileSync(${JSON.stringify(log)},JSON.stringify({cwd,args,head:git('rev-parse','HEAD'),main:git('rev-parse','refs/remotes/origin/main')}));
+if(process.env.VALIDATION_MODE!=='clean') {
+ fs.writeFileSync('README.md','fixture hook edit\\n');
+ fs.writeFileSync('node_modules/package/index.js','fixture dependency edit\\n');
+ fs.writeFileSync('.github/workflows/node_modules/package/index.js','fixture nested edit\\n');
+ git('add','README.md');
+ git('config','fixture.validation','changed');
+}
+if(process.env.VALIDATION_MODE==='stop') {fs.writeFileSync(${JSON.stringify(log)}+'.ready','ready');setInterval(()=>{},1000);}
+else process.exit(process.env.VALIDATION_MODE==='clean'?0:37);
+`, { mode: 0o700 });
+  const snapshot = () => Object.fromEntries(['README.md', '.git/index', '.git/config', '.git/HEAD',
+    '.git/refs/remotes/origin/main', '.husky/_/pre-commit', 'node_modules/package/index.js',
+    '.github/workflows/node_modules/package/index.js'].map(name => [name, fs.readFileSync(path.join(f.work, name)).toString('base64')]));
+  const before = snapshot();
+  return { ...f, event, main, probe, log, snapshot, before,
+    validationEnv: { VALIDATION_PYTHON: probe, GITHUB_SHA: event, GITHUB_WORKSPACE: f.work, RUNNER_TEMP: temporary } };
+}
+
+for (const mode of ['clean', 'failure', 'alternate-python']) {
+  test(`Copilot isolated complete validation preserves prepared source: ${mode}`, { skip: !linux }, t => {
+    const f = copilotValidationFixture(t, mode === 'alternate-python');
+    const result = f.run('Run complete repository validation', { ...f.validationEnv, VALIDATION_MODE: mode === 'failure' ? mode : 'clean' });
+    assert.equal(result.status, mode === 'failure' ? 37 : 0, result.stdout + result.stderr);
+    assert.deepEqual(f.snapshot(), f.before);
+    const observed = JSON.parse(fs.readFileSync(f.log));
+    assert.deepEqual(observed.args, ['-E', '-P', '-m', 'pre_commit', 'run', '--all-files']);
+    assert.ok(!fs.existsSync(observed.cwd), 'Normal exit removes only the disposable copy.');
+    if (mode === 'failure') assert.match(result.stdout, /failed with status 37; fixes remain only in the disposable copy/);
+  });
+}
+
+for (const mode of ['git-dir', 'git-index', 'alternates', 'git-link', 'dependency-link', 'temporary-root', 'copy-failure', 'temporary-failure', 'missing-main', 'dirty-source', 'core-worktree']) {
+  test(`Copilot isolated validation rejects unsafe preparation: ${mode}`, { skip: !linux }, t => {
+    const f = copilotValidationFixture(t), extra = { ...f.validationEnv };
+    let transform = value => value;
+    if (mode === 'git-dir') extra.GIT_DIR = path.join(f.work, '.git');
+    if (mode === 'git-index') extra.GIT_INDEX_FILE = path.join(f.work, '.git/index');
+    if (mode === 'alternates') fs.writeFileSync(path.join(f.work, '.git/objects/info/alternates'), '\n');
+    if (mode === 'git-link') {
+      fs.renameSync(path.join(f.work, '.git'), path.join(f.root, 'external-git'));
+      fs.writeFileSync(path.join(f.work, '.git'), `gitdir: ${path.join(f.root, 'external-git')}\n`);
+    }
+    if (mode === 'dependency-link') fs.symlinkSync(path.join(f.work, 'README.md'), path.join(f.work, 'node_modules/source-link'));
+    if (mode === 'temporary-root') extra.RUNNER_TEMP = f.work;
+    if (mode === 'copy-failure') transform = value => value.replace('cp -a --reflink=auto --', 'false # cp -a --reflink=auto --');
+    if (mode === 'temporary-failure') transform = value => value.replace('mktemp -d -- "${temporary_root}/repository-validation.XXXXXXXX"', "bash -c 'exit 36'");
+    if (mode === 'missing-main') f.git('update-ref', '-d', 'refs/remotes/origin/main');
+    if (mode === 'dirty-source') f.put('README.md', 'existing agent edit\n');
+    if (mode === 'core-worktree') f.git('config', 'core.worktree', f.work);
+
+    const result = f.run('Run complete repository validation', extra, transform);
+    assert.notEqual(result.status, 0, result.stdout + result.stderr);
+    assert.ok(!fs.existsSync(f.log), 'Unsafe preparation must not invoke the suite.');
+    if (mode === 'temporary-failure') assert.equal(result.status, 36, result.stderr);
+    assert.equal(fs.readFileSync(path.join(f.work, 'README.md'), 'utf8'), mode === 'dirty-source' ? 'existing agent edit\n' : 'original\n');
+  });
+}
+
+test('Copilot isolated validation survives forced stop without source restoration', { skip: !linux }, async t => {
+  const f = copilotValidationFixture(t), script = path.join(f.root, 'stop.sh');
+  fs.writeFileSync(script, copilotStep('Run complete repository validation').run);
+  const child = spawn('bash', ['--noprofile', '--norc', script], { cwd: f.work,
+    env: { ...f.env, ...f.validationEnv, VALIDATION_MODE: 'stop' }, detached: true, stdio: 'ignore' });
+  const closed = new Promise(resolve => child.once('close', (code, signal) => resolve({ code, signal })));
+  try {
+    const deadline = Date.now() + 15000;
+    while (!fs.existsSync(`${f.log}.ready`) && Date.now() < deadline) await new Promise(resolve => setTimeout(resolve, 25));
+    assert.ok(fs.existsSync(`${f.log}.ready`), 'The sentinel must edit the copy before interruption.');
+    process.kill(-child.pid, 'SIGKILL');
+    assert.equal((await closed).signal, 'SIGKILL');
+    assert.deepEqual(f.snapshot(), f.before);
+    const observed = JSON.parse(fs.readFileSync(f.log));
+    assert.equal(fs.readFileSync(path.join(observed.cwd, 'README.md'), 'utf8'), 'fixture hook edit\n');
+    assert.ok(fs.existsSync(observed.cwd), 'SIGKILL did not run cleanup; source integrity cannot depend on it.');
+  } finally {
+    try { process.kill(-child.pid, 'SIGKILL'); } catch (error) { if (error.code !== 'ESRCH') throw error; }
+    await closed;
+  }
+});
+
+for (const mode of ['clean', 'failure']) {
+  test(`Copilot isolated cleanup failure preserves validation status: ${mode}`, { skip: !linux }, t => {
+    const f = copilotValidationFixture(t);
+    const result = f.run('Run complete repository validation', { ...f.validationEnv, VALIDATION_MODE: mode },
+      value => value.replace('rm -rf -- "${validation_root}"', 'false'));
+    assert.equal(result.status, mode === 'clean' ? 1 : 37, result.stdout + result.stderr);
+    assert.match(result.stdout, /Unable to remove the disposable validation copy/);
+    assert.deepEqual(f.snapshot(), f.before);
+  });
+}
+
+test('Copilot isolated validation stops on native directory-change failure', { skip: !linux }, t => {
+  const f = copilotValidationFixture(t);
+  const result = f.run('Run complete repository validation', { ...f.validationEnv, VALIDATION_MODE: 'clean' },
+    value => 'cd() { return 36; }\n' + value);
+  assert.equal(result.status, 36, result.stdout + result.stderr);
+  assert.ok(!fs.existsSync(`${f.log}.dispatch`), 'A failed directory change must not dispatch validation.');
+  assert.deepEqual(f.snapshot(), f.before);
+});
