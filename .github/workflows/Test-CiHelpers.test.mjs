@@ -7,6 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import test from 'node:test';
+import { readContract } from './Validate-WorkflowPolicy.mjs';
 
 // These tests execute the actual loader/helper bodies with fixed external-tool
 // replacements. They test control flow; real locked installation is tested separately.
@@ -15,7 +16,30 @@ const { parse } = createRequire(import.meta.url)('yaml');
 const linux = process.platform === 'linux';
 const head = 'a'.repeat(40), base = 'b'.repeat(40);
 const read = name => fs.readFileSync(path.join(directory, name), 'utf8');
+const artifactVerifier = readContract().roles.artifactVerifier;
 const quote = value => `'${value.replaceAll("'", "''")}'`;
+
+test('actual workflows cover every live push and PR base with an isolated target-event policy', () => {
+  const liveGuard = "github.event_name != 'push' || github.event.deleted != true";
+  for (const file of ['build.yml', 'markdownlint.yml', 'agent-instructions.yml']) {
+    const workflow = parse(read(file));
+    assert.ok(Object.hasOwn(workflow.on, 'push'));
+    assert.ok(Object.hasOwn(workflow.on, 'pull_request'));
+    assert.equal(workflow.on.push, null, 'Branch, tag and path filters would remove live pushes.');
+    assert.equal(workflow.on.pull_request, null, 'Branch filters would remove supported PR bases.');
+    if (file === 'agent-instructions.yml') {
+      assert.deepEqual(workflow.on.pull_request_target, { types: ['opened', 'reopened', 'synchronize', 'edited'] });
+      assert.equal(workflow.jobs['accepted-policy'].if, "github.event_name == 'pull_request_target'");
+      assert.equal(workflow.jobs['candidate-tests'].if, "github.event_name != 'pull_request_target' && (" + liveGuard + ')');
+      assert.deepEqual(workflow.jobs['accepted-policy'].permissions, {});
+      assert.deepEqual(workflow.jobs['candidate-tests'].permissions, {});
+    } else {
+      for (const id of file === 'build.yml' ? [artifactVerifier] : ['policy', 'markdownlint']) {
+        assert.equal(workflow.jobs[id].if, liveGuard);
+      }
+    }
+  }
+});
 
 // Exercise the untouched launcher with a fixed interpreter discovery result.
 // The probe runs as a real Node child. It tests dispatch/version/status controls;
@@ -149,7 +173,7 @@ if (args.includes('config') && (args.includes('--get-all') || args.includes('--g
   return { root, work, git, log, run, calls };
 }
 
-for (const [file, job] of [['build.yml', 'verify_generated_artifacts'],
+for (const [file, job] of [['build.yml', artifactVerifier],
   ['markdownlint.yml', 'policy'], ['markdownlint.yml', 'markdownlint'],
   ['agent-instructions.yml', 'accepted-policy'], ['agent-instructions.yml', 'candidate-tests']]) {
   const source = parse(read(file)).jobs[job].steps.find(step => step.id === 'acquire').run;
@@ -202,7 +226,7 @@ if (process.env.TEST_MODE === 'nested-failure' && args.at(-1) === 'lint:md:neste
 }
 
 test('acquisition rejects credentials, wrong repository, refs and occupied workspaces', { skip: !linux }, t => {
-  const source = parse(read('build.yml')).jobs.verify_generated_artifacts.steps[0].run;
+  const source = parse(read('build.yml')).jobs[artifactVerifier].steps[0].run;
   for (const env of [{ GITHUB_TOKEN: 'fixture' }, { GIT_CONFIG_COUNT: '1' },
     { GITHUB_REPOSITORY: 'someone/else' }, { GITHUB_SHA: 'main' }]) {
     const f = fixture(t);

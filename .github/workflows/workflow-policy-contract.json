@@ -1,5 +1,8 @@
 {
-  "schema": "PSStyleGuide.WorkflowPolicyContract.v2",
+  "schema": "StyleGuide.WorkflowPolicyContract.v3",
+  "roles": {
+    "artifactVerifier": "verify_generated_artifacts"
+  },
   "parser": {
     "version": "2.9.0",
     "resolved": "https://registry.npmjs.org/yaml/-/yaml-2.9.0.tgz",

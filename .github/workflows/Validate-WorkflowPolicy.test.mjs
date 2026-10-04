@@ -17,18 +17,19 @@ await loadYamlBindings(contract);
 const clone = value => structuredClone(value);
 const step = (id, run) => ({ id, shell: 'pwsh', run });
 const codeJob = final => ({
+  if: "github.event_name != 'push' || github.event.deleted != true",
   'runs-on': 'ubuntu-24.04', 'timeout-minutes': 30, permissions: {},
   steps: [step('acquire', "Write-Output 'bootstrap fixture'"),
     step('verify-checkout-credentials', './.github/workflows/Test-CheckoutCredentials.ps1'),
     ...(final.id === 'generate_style_guide_artifacts' ? [] : [step('initialize-toolchain', './.github/workflows/Initialize-CiToolchain.ps1 -WorkflowDependencies')]), final,
     ...(final.id === 'lint' ? [step('audit', "& node ./.github/workflows/Check-NpmAudit.mjs --ci\nif ($LASTEXITCODE -ne 0) { throw 'Dependency audit did not pass.' }")] : [])],
 });
-const common = { name: 'Fixture', on: { push: { branches: ['main'] }, pull_request: { branches: ['main'] } }, permissions: {} };
+const common = { name: 'Fixture', on: { push: null, pull_request: null }, permissions: {} };
 const fixtures = {
   'build.yml': { ...clone(common), jobs: {
-    verify_generated_artifacts: codeJob(step('generate_style_guide_artifacts', './.github/workflows/Test-StyleGuideArtifacts.ps1')),
+    [contract.roles.artifactVerifier]: codeJob(step('generate_style_guide_artifacts', './.github/workflows/Test-StyleGuideArtifacts.ps1')),
     publish_committed_artifacts: {
-      'runs-on': 'ubuntu-24.04', 'timeout-minutes': 10, permissions: { contents: 'read' }, needs: 'verify_generated_artifacts',
+      'runs-on': 'ubuntu-24.04', 'timeout-minutes': 10, permissions: { contents: 'read' }, needs: contract.roles.artifactVerifier,
       steps: ['checkout', 'uploadArtifact'].map((name, index) => ({
         id: index === 0 ? 'checkout_repository' : 'publish_committed_style_guide_artifacts',
         uses: contract.actions[name].uses, with: clone(contract.actions[name].inputs),
@@ -43,7 +44,7 @@ const fixtures = {
 
 test('valid small workflow interfaces; build requires no Node installation', () => {
   for (const [file, value] of Object.entries(fixtures)) validateWorkflowObject(file, value, contract);
-  assert.equal(fixtures['build.yml'].jobs.verify_generated_artifacts.steps.length, 3);
+  assert.equal(fixtures['build.yml'].jobs[contract.roles.artifactVerifier].steps.length, 3);
 });
 
 test('labels, comments, CRLF, whitespace and literal call quoting are harmless', () => {
@@ -65,18 +66,34 @@ test('weekly audit can move to another valid time without a policy edit', () => 
 });
 
 const cases = JSON.parse(fs.readFileSync(path.join(directory, 'workflow-policy-cases.json'), 'utf8'));
-assert.equal(cases.schema, 'PSStyleGuide.WorkflowPolicyCases.v2');
+assert.equal(cases.schema, 'StyleGuide.WorkflowPolicyCases.v3');
 assert.ok(Array.isArray(cases.cases) && cases.cases.length > 0, 'Workflow mutation catalog must contain cases.');
-for (const item of cases.cases) {
-  test(item.name, () => {
+for (const verifier of ['verify_generated_artifacts', 'verify']) {
+  const selectedContract = { ...contract, roles: { artifactVerifier: verifier } };
+  test(`valid common workflow with native check ${verifier}`, () => {
+    const value = clone(fixtures['build.yml']);
+    const job = value.jobs[contract.roles.artifactVerifier];
+    delete value.jobs[contract.roles.artifactVerifier];
+    value.jobs[verifier] = job;
+    value.jobs.publish_committed_artifacts.needs = verifier;
+    validateWorkflowObject('build.yml', value, selectedContract);
+  });
+  for (const item of cases.cases) test(`${verifier}: ${item.name}`, () => {
     const value = clone(fixtures[item.workflow]);
+    if (item.workflow === 'build.yml') {
+      const job = value.jobs[contract.roles.artifactVerifier];
+      delete value.jobs[contract.roles.artifactVerifier];
+      value.jobs[verifier] = job;
+      value.jobs.publish_committed_artifacts.needs = verifier;
+    }
+    const keys = item.path.map(key => key === '$artifactVerifier' ? verifier : key);
     let target = value;
-    for (const key of item.path.slice(0, -1)) target = target[key];
-    const leaf = item.path.at(-1);
+    for (const key of keys.slice(0, -1)) target = target[key];
+    const leaf = keys.at(-1);
     if (item.operation === 'delete') delete target[leaf];
     else if (item.operation === 'set') target[leaf] = clone(item.value);
     else assert.fail('Unknown test operation');
-    assert.throws(() => validateWorkflowObject(item.workflow, value, contract), error => error.category === item.category);
+    assert.throws(() => validateWorkflowObject(item.workflow, value, selectedContract), error => error.category === item.category);
   });
 }
 
@@ -146,10 +163,10 @@ for (const [name, change, category] of [
 });
 
 function makeRepository(t, withParser = false) {
-  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'ps-workflow-policy-'));
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-workflow-policy-'));
   t.after(() => {
     assert.equal(path.dirname(path.resolve(temporary)), path.resolve(os.tmpdir()));
-    assert.ok(path.basename(temporary).startsWith('ps-workflow-policy-'));
+    assert.ok(path.basename(temporary).startsWith('styleguide-workflow-policy-'));
     fs.rmSync(temporary, { recursive: true, force: true });
   });
   const destination = path.join(temporary, '.github/workflows');
@@ -173,6 +190,30 @@ test('built-in preflight works before parser installation; full validation fails
   const fixture = makeRepository(t);
   assert.equal(fixture.run('--preflight').result.success, true);
   assert.equal(fixture.run(...args).status, 1);
+});
+
+for (const [name, roles, category] of [
+  ['missing verifier', {}, 'contract-roles'],
+  ['extra role', { artifactVerifier: 'verify', publisher: 'other' }, 'contract-roles'],
+  ['unknown check', { artifactVerifier: 'other' }, 'contract-roles'],
+  ['expression', { artifactVerifier: '${{ github.job }}' }, 'contract-roles'],
+  ['array', ['verify'], 'contract-roles'],
+  ['null', null, 'contract-roles'],
+]) test(`accepted contract rejects ${name} before parser installation`, t => {
+  const fixture = makeRepository(t);
+  fs.writeFileSync(path.join(fixture.destination, 'workflow-policy-contract.json'), JSON.stringify({ ...contract, roles }));
+  const result = fixture.run('--preflight');
+  assert.equal(result.status, 1);
+  assert.equal(result.result.category, category);
+});
+
+test('accepted contract rejects duplicate verifier roles before parser installation', t => {
+  const fixture = makeRepository(t);
+  const source = JSON.stringify(contract).replace('"artifactVerifier":', '"artifactVerifier":"verify","artifactVerifier":');
+  fs.writeFileSync(path.join(fixture.destination, 'workflow-policy-contract.json'), source);
+  const result = fixture.run('--preflight');
+  assert.equal(result.status, 1);
+  assert.equal(result.result.category, 'contract-json');
 });
 for (const item of [
   { file: 'workflow-policy-contract.json', key: 'schema', category: 'contract-json' },
