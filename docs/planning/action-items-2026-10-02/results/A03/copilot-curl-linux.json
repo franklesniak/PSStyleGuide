@@ -1,0 +1,152 @@
+{
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--name",
+    "ps-copilot-curl-probe-20261004",
+    "--network",
+    "none",
+    "--read-only",
+    "--tmpfs",
+    "/tmp",
+    "--env",
+    "XDG_CACHE_HOME=/tmp/cache",
+    "--env",
+    "XDG_CONFIG_HOME=/tmp/config",
+    "--env",
+    "XDG_DATA_HOME=/tmp/data",
+    "--mount",
+    "type=bind,src=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-Copilot-curl-proposal-20261004\\linux,dst=/fixture,readonly",
+    "--entrypoint",
+    "/usr/bin/pwsh",
+    "sha256:a1ee6dac6ca1c9bad455e8a79cc43851677bcfb6c32f7790caf00ab5d95439a8",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "/fixture/probe.ps1"
+  ],
+  "started_utc": "2026-10-04T05:41:51.961020+00:00",
+  "ended_utc": "2026-10-04T05:41:54.928256+00:00",
+  "exit_code": 0,
+  "cleanup_verified": true,
+  "files": {
+    "inputs.json": "9339926f1c7f2f2227e51528fcd306ab59f9608191c39b0f47e7ba824f540231",
+    "probe.ps1": "b001f85198eba11a4e796a82f47b6a6025b3ee55b0f2b844831372bbec31968d",
+    "probe3.stdout": "b5d63604d1c228b6367c006550a283d6d0130320ba993eec8b357bf2b59ef085",
+    "probe3.stderr": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "result": {
+    "curl": "curl 8.5.0 (x86_64-pc-linux-gnu) libcurl/8.5.0 OpenSSL/3.0.13 zlib/1.3 brotli/1.1.0 zstd/1.5.5 libidn2/2.3.7 libpsl/0.21.2 (+libidn2/2.3.7) libssh/0.10.6/openssl/zlib nghttp2/1.59.0 librtmp/2.3 OpenLDAP/2.6.10",
+    "results": [
+      {
+        "command": "& $strCurlPath --silent --show-error --fail --location --proto '=http' --proto-redir '=http' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl",
+        "mode": "absent",
+        "header_oracle_pass": false,
+        "requests": [
+          {
+            "header": "local-only",
+            "path": "/PS-absent-extra"
+          },
+          {
+            "header": "local-only",
+            "path": "/PS-absent-primary"
+          }
+        ],
+        "output_sha256": "e6d6a55732ed4fe0b26e844ed2cbeb558da6a0b512468b348b342d81a8f69ce2",
+        "exit_code": 0,
+        "additional_url_oracle_pass": false,
+        "repository": "PS"
+      },
+      {
+        "command": "& $strCurlPath --disable --silent --show-error --fail --location --proto '=http' --proto-redir '=http' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl",
+        "mode": "first",
+        "header_oracle_pass": true,
+        "requests": [
+          {
+            "header": null,
+            "path": "/PS-first-primary"
+          }
+        ],
+        "output_sha256": "e6d6a55732ed4fe0b26e844ed2cbeb558da6a0b512468b348b342d81a8f69ce2",
+        "exit_code": 0,
+        "additional_url_oracle_pass": true,
+        "repository": "PS"
+      },
+      {
+        "command": "& $strCurlPath --silent --disable --show-error --fail --location --proto '=http' --proto-redir '=http' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl",
+        "mode": "misplaced",
+        "header_oracle_pass": false,
+        "requests": [
+          {
+            "header": "local-only",
+            "path": "/PS-misplaced-extra"
+          },
+          {
+            "header": "local-only",
+            "path": "/PS-misplaced-primary"
+          }
+        ],
+        "output_sha256": "e6d6a55732ed4fe0b26e844ed2cbeb558da6a0b512468b348b342d81a8f69ce2",
+        "exit_code": 0,
+        "additional_url_oracle_pass": false,
+        "repository": "PS"
+      },
+      {
+        "command": "& $strCurlPath --silent --show-error --fail --location --proto '=http' --proto-redir '=http' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl",
+        "mode": "absent",
+        "header_oracle_pass": false,
+        "requests": [
+          {
+            "header": "local-only",
+            "path": "/TF-absent-extra"
+          },
+          {
+            "header": "local-only",
+            "path": "/TF-absent-primary"
+          }
+        ],
+        "output_sha256": "e6d6a55732ed4fe0b26e844ed2cbeb558da6a0b512468b348b342d81a8f69ce2",
+        "exit_code": 0,
+        "additional_url_oracle_pass": false,
+        "repository": "TF"
+      },
+      {
+        "command": "& $strCurlPath --disable --silent --show-error --fail --location --proto '=http' --proto-redir '=http' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl",
+        "mode": "first",
+        "header_oracle_pass": true,
+        "requests": [
+          {
+            "header": null,
+            "path": "/TF-first-primary"
+          }
+        ],
+        "output_sha256": "e6d6a55732ed4fe0b26e844ed2cbeb558da6a0b512468b348b342d81a8f69ce2",
+        "exit_code": 0,
+        "additional_url_oracle_pass": true,
+        "repository": "TF"
+      },
+      {
+        "command": "& $strCurlPath --silent --disable --show-error --fail --location --proto '=http' --proto-redir '=http' --tlsv1.2 --retry 3 --retry-all-errors --connect-timeout 20 --max-time 120 --retry-max-time 300 --output $strArchive $strUrl",
+        "mode": "misplaced",
+        "header_oracle_pass": false,
+        "requests": [
+          {
+            "header": "local-only",
+            "path": "/TF-misplaced-extra"
+          },
+          {
+            "header": "local-only",
+            "path": "/TF-misplaced-primary"
+          }
+        ],
+        "output_sha256": "e6d6a55732ed4fe0b26e844ed2cbeb558da6a0b512468b348b342d81a8f69ce2",
+        "exit_code": 0,
+        "additional_url_oracle_pass": false,
+        "repository": "TF"
+      }
+    ],
+    "powershell": "7.5.0",
+    "status": "passed"
+  }
+}
