@@ -2,14 +2,14 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `0ea64e1f99b81a4ed24c2cc7e9529cce1b5f71eb` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `bbd3207fadf7a62f3c31f68d7ffabdb6f033dc10` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | [A00](tasks/A00.md) | Reconcile historical obligations and retirement decisions | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A00/RESULT.md) | Reuse the canonical native delivery ledger |
 | [A01](tasks/A01.md) | Refresh issue coverage and full-tree baseline | complete | coordinator; native refresh verified | PS/TF main | PS3e068af / TF06ad4f7 | — | 0/80; not started | 0/8 | [Post229 inventory](results/A01/post229/CURRENT-REFRESH-POST229.md) | Refresh at next native mutation; preserve historical 81 |
 | [A02](tasks/A02.md) | Non-protected shared governance | validating | coordinator; local quality passed | TF codex/a02-peer-docs | TF06ad4f7 / PS2a2d14a | —;226 accepted | peer not started;226 used10/80 | 1/12 | [Evidence](results/A02/RESULT.md) | Retain reviewed docs; integrate TF after A20 and A03 source acceptance |
-| [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | validating | coordinator | PS codex/workflow-convergence | PS3e068af / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A03/RESULT.md) | Collect sole aggregate40177; ten hooks passed, final hook running |
+| [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | validating | coordinator | PS codex/workflow-convergence | f5acdec / PS3e068af | [230](https://github.com/franklesniak/PSStyleGuide/pull/230) | 1/80;2026-10-12T06:07:32Z | 0/12 | [Evidence](results/A03/RESULT.md) | Repair validated non-main hosted-audit coupling; old automatic Codex terminal |
 | [A04](tasks/A04.md) | Bound ordinary Node downloads and test retries | validating | coordinator | PS/TF main | PS425795b / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A04/RESULT.md) | Refreshed inputs; integrate after A03/A07 acceptance |
 | [A05](tasks/A05.md) | Require immutable event acquisition in the YAML guide | active | coordinator | PS/TF main | PS425795b / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A05/RESULT.md) | Exact two-guide authority approved; integrate after A03 foundation |
 | [A06](tasks/A06.md) | Converge the generator and artifact verification | validating | coordinator | PS/TF main | PS425795b / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A06/RESULT.md) | Generator inputs unchanged; reconcile changed helper tests and accepted A03 graph |
@@ -36,7 +36,7 @@ Planning head: `0ea64e1f99b81a4ed24c2cc7e9529cce1b5f71eb` (prior published check
 - Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 suffix `A02-design-20261002`, resume `PR224-review-state.json`; D07 suffix `plan-review-20261002`.
 - Node24.18.1/npm11.16.0: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 Restricted; no Docker container remains.
 - A02 source: PR226 accepted2a2; scratch `A02-landed-exit-20261003/repair-review-state.json`.
-- A03: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; codex/workflow-convergence; base3e068af; nine staged edits; treed527b1a. Scratch A03-source-lifecycle-20261004/execution-state.json; preflight passed; aggregate40177 running since05:00:05Z Oct4.
+- A03: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; cleanf5acdec/base3e; treed527; PR230. Scratch A03-source-lifecycle-20261004/execution-state.json. All11 local hooks/endpoints/audit passed; hosted non-main audit failed. Automatic Codex5977181146 terminal; no manual request.
 - A02 peer: scratch `A02-peer-current-20261003/execution-state.json`; product TEMP `TerraformStyleGuide-A02-peer-docs-20261003`, codex/a02-peer-docs. root owns reviewed docs; audit FINDINGS; transfer1/12.
 - Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; treec68b5e1. Reconciliation complete; preserve index and unrelated edits.
 - A21: scratch `A21-selection-20261003/execution-state.json`; PR228 accepted425795b; no native operation live.
