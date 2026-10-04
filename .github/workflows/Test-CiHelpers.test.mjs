@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
+import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import test from 'node:test';
@@ -600,6 +601,7 @@ fs.copyFileSync(${JSON.stringify(archive)}, args[args.indexOf('--output') + 1]);
     const result = f.run(source, { TOOLCHAIN_LAYOUT: 'modern', TEST_MODE: mode });
     assert.equal(result.status === 0, mode === '', result.stderr);
     const request = f.calls().find(row => row[0] === 'curl');
+    assert.equal(request[1], '--disable');
     assert.ok(request.includes('--retry-all-errors'));
     assert.ok(request.includes('--tlsv1.2'));
     assert.equal(request.at(-1), `https://nodejs.org/dist/v${manifest.engines.node}/node-v${manifest.engines.node}-linux-x64.tar.xz`);
@@ -684,3 +686,656 @@ exit 98
     }
   }
 });
+
+function devcontainerWorkflow() {
+  const workflow = parse(read('devcontainer-ci.yml'));
+  const job = workflow.jobs['validate-no-devcontainer-contract'];
+  return { workflow, job, source: job.steps[0].run };
+}
+
+test('devcontainer workflow preserves native snapshot and unprivileged job shape', () => {
+  const { workflow, job, source } = devcontainerWorkflow();
+  assert.deepEqual(workflow.permissions, {});
+  assert.deepEqual(workflow.on, { workflow_dispatch: null, push: null, pull_request: null,
+    merge_group: { types: ['checks_requested'] }, schedule: [{ cron: '23 06 * * 1' }] });
+  assert.deepEqual(workflow.concurrency, {
+    group: 'devcontainer-boundary-${{ github.workflow }}-${{ github.ref }}', 'cancel-in-progress': false,
+  });
+  assert.deepEqual(Object.keys(workflow.jobs), ['validate-no-devcontainer-contract']);
+  assert.deepEqual(Object.keys(job).sort(), ['env', 'name', 'runs-on', 'steps', 'timeout-minutes']);
+  assert.equal(job['runs-on'], 'ubuntu-24.04');
+  assert.equal(job['timeout-minutes'], 10);
+  assert.deepEqual(job.env, { EXPECTED_REPOSITORY: '${{ github.repository }}',
+    EXPECTED_REVISION: '${{ github.sha }}', EXPECTED_SERVER_URL: '${{ github.server_url }}' });
+  assert.equal(job.steps.length, 1);
+  assert.deepEqual(Object.keys(job.steps[0]).sort(), ['name', 'run', 'shell']);
+  assert.equal(job.steps[0].shell, 'bash');
+  assert.doesNotMatch(source, /\$\{\{|GITHUB_TOKEN|github\.token|git\s+checkout|git\s+switch/u);
+});
+
+// The actual YAML body runs in Bash. Only its absolute Git executable is replaced:
+// the adapter asserts the HTTPS remote and fetch arguments, then substitutes a
+// private file remote. Init, fetch, object identity and tree enumeration stay real.
+// Explicit error modes inject one failing result; nothing checks out candidate code.
+function devcontainerFixture(t, entries = [], includeMarker = true) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-devcontainer-test-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const remote = path.join(root, 'remote.git'), runRoot = path.join(root, 'run');
+  const callsFile = path.join(root, 'calls.jsonl'), marker = path.join(root, 'candidate-executed');
+  fs.mkdirSync(runRoot);
+  const env = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null',
+    GIT_TERMINAL_PROMPT: '0', GIT_AUTHOR_NAME: 'Fixture', GIT_AUTHOR_EMAIL: 'fixture@example.invalid',
+    GIT_COMMITTER_NAME: 'Fixture', GIT_COMMITTER_EMAIL: 'fixture@example.invalid',
+    GIT_AUTHOR_DATE: '2000-01-01T00:00:00Z', GIT_COMMITTER_DATE: '2000-01-01T00:00:00Z' };
+  for (const key of Object.keys(env)) {
+    if (/^GIT_CONFIG_(?:COUNT|KEY_\d+|VALUE_\d+|PARAMETERS)$/u.test(key) ||
+      ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_DIR', 'GIT_WORK_TREE',
+        'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES'].includes(key)) delete env[key];
+  }
+  function git(args, input) {
+    const result = spawnSync('/usr/bin/git', args, { env, input, encoding: 'utf8', timeout: 10000 });
+    assert.equal(result.error, undefined, result.error?.message);
+    assert.equal(result.status, 0, result.stderr);
+    return result.stdout.trim();
+  }
+  git(['init', '--bare', '--quiet', remote]);
+  const object = (args, input) => git(['-C', remote, ...args], input);
+  const blob = object(['hash-object', '-w', '--stdin'], 'inert fixture\n');
+  const empty = object(['mktree'], '');
+  const gitlink = object(['commit-tree', empty], 'inert submodule commit\n');
+  const markerBlob = object(['hash-object', '-w', '--stdin'], `#!/bin/sh\ntouch '${marker}'\n`);
+  const node = new Map();
+  if (includeMarker) node.set('candidate-must-not-run.sh', { mode: '100755', type: 'blob', oid: markerBlob });
+  for (const [file, type = 'blob'] of entries) {
+    const parts = file.split('/'); let current = node;
+    for (const component of parts.slice(0, -1)) {
+      if (!current.has(component)) current.set(component, new Map());
+      current = current.get(component);
+    }
+    current.set(parts.at(-1), type === 'tree' ? { mode: '040000', type, oid: empty } :
+      type === 'commit' ? { mode: '160000', type, oid: gitlink } : { mode: '100644', type, oid: blob });
+  }
+  function writeTree(children) {
+    const records = [...children].map(([name, value]) => {
+      const entry = value instanceof Map ? { mode: '040000', type: 'tree', oid: writeTree(value) } : value;
+      return `${entry.mode} ${entry.type} ${entry.oid}\t${name}\0`;
+    }).join('');
+    return object(['mktree', '-z'], records);
+  }
+  const revision = object(['commit-tree', writeTree(node)], 'candidate snapshot\n');
+  const otherRevision = object(['commit-tree', empty], 'wrong snapshot\n');
+  object(['update-ref', 'refs/heads/event', revision]);
+  const adapter = path.join(root, 'git-adapter');
+  fs.writeFileSync(adapter, `#!${process.execPath}
+const fs = require('node:fs'), assert = require('node:assert/strict');
+const { spawnSync } = require('node:child_process');
+const args = process.argv.slice(2), mode = process.env.DEVCONTAINER_TEST_MODE;
+fs.appendFileSync(${JSON.stringify(callsFile)}, JSON.stringify(args)+'\\n');
+if (args.includes('checkout') || args.includes('switch') || args.includes('clone')) process.exit(98);
+const fetchIndex = args.indexOf('fetch');
+if (fetchIndex !== -1) {
+  assert.deepEqual(args.slice(2), ['-c', 'credential.helper=', '-c', 'core.askPass=',
+    'fetch', '--no-tags', '--no-recurse-submodules', '--depth=1', 'origin',
+    process.env.EXPECTED_REVISION+':refs/remotes/event/target']);
+  if (mode === 'fetch-failure') { console.error('injected fetch failure'); process.exit(17); }
+}
+const remoteIndex = args.indexOf('remote');
+if (remoteIndex !== -1) {
+  assert.deepEqual(args.slice(remoteIndex, -1), ['remote', 'add', 'origin']);
+  assert.equal(args.at(-1), process.env.DEVCONTAINER_EXPECTED_URL);
+  if (mode !== 'invalid-port') args[args.length-1] = ${JSON.stringify('file://' + remote)};
+}
+if (args.includes('rev-parse') && mode === 'wrong-identity') {
+  console.log(${JSON.stringify(otherRevision)}); process.exit(0);
+}
+if (args.includes('ls-tree') && mode === 'inventory-failure') {
+  console.error('injected inventory failure'); process.exit(23);
+}
+if (args.includes('--get-regexp') && mode === 'credential-residue') {
+  console.log('http.https://example.invalid/.extraheader dummy-fixture'); process.exit(0);
+}
+const result = spawnSync('/usr/bin/git', args, { env: process.env, timeout: 10000 });
+if (result.error) { console.error(result.error.message); process.exit(97); }
+process.stdout.write(result.stdout); process.stderr.write(result.stderr);
+if (result.status === 0 && args.includes('ls-tree') && mode === 'malformed-inventory') process.stdout.write('unterminated');
+process.exit(result.status ?? 96);
+`, { mode: 0o700 });
+  function run({ server = 'https://github.com', repository = 'owner/repository', expected = revision,
+    mode = '', existing = false } = {}) {
+    const destination = path.join(runRoot, 'styleguide-devcontainer-boundary');
+    if (existing) fs.mkdirSync(destination);
+    const source = devcontainerWorkflow().source.replaceAll('/usr/bin/git', `'${adapter}'`);
+    const result = spawnSync('bash', ['--noprofile', '--norc', '-c', source], {
+      cwd: runRoot, env: { ...env, RUNNER_TEMP: runRoot, EXPECTED_SERVER_URL: server,
+        EXPECTED_REPOSITORY: repository, EXPECTED_REVISION: expected, DEVCONTAINER_TEST_MODE: mode,
+        DEVCONTAINER_EXPECTED_URL: `${server.replace(/\/$/u, '')}/${repository}.git` },
+      encoding: 'utf8', timeout: 30000,
+    });
+    assert.equal(result.error, undefined, result.error?.message);
+    assert.equal(result.signal, null, result.stderr);
+    assert.equal(fs.existsSync(marker), false, 'candidate code must remain inert');
+    assert.equal(fs.existsSync(path.join(destination, 'candidate-must-not-run.sh')), false, 'no checkout');
+    return result;
+  }
+  return { run, revision, calls: () => fs.existsSync(callsFile) ?
+    fs.readFileSync(callsFile, 'utf8').trim().split('\n').map(JSON.parse) : [] };
+}
+
+for (const [name, entries, forbidden, includeMarker = true] of [
+  ['empty tree', [], false, false],
+  ['root file', [['.devcontainer.json']], true],
+  ['root directory', [['.devcontainer/devcontainer.json']], true],
+  ['nested file', [['module/.devcontainer.json']], true],
+  ['nested directory', [['module/.devcontainer/devcontainer.json']], true],
+  ['ASCII case folding', [['MODULE/.DEVCONTAINER/DEVCONTAINER.JSON']], true],
+  ['UTF-8 parent', [['módulo/.devcontainer.json']], true],
+  ['newline parent', [['module\nname/.devcontainer.json']], true],
+  ['root empty forbidden tree', [['.devcontainer', 'tree']], true],
+  ['root empty file-named tree', [['.devcontainer.json', 'tree']], true],
+  ['nested empty forbidden tree', [['module/.devcontainer', 'tree']], true],
+  ['forbidden gitlink', [['.devcontainer', 'commit']], true],
+  ['near matches', [['.env'], ['module/.devcontainer-example/devcontainer.json'],
+    ['module/.devcontainer.json.bak']], false],
+]) {
+  test(`devcontainer actual Git inventory: ${name}`, { skip: !linux }, t => {
+    const f = devcontainerFixture(t, entries, includeMarker), result = f.run();
+    assert.equal(result.status === 0, !forbidden, result.stdout + result.stderr);
+    assert.match(result.stdout + result.stderr, forbidden ? /no authorized devcontainer contract/u : /preserves the devcontainer exclusion/u);
+    const inventory = f.calls().find(args => args.includes('ls-tree'));
+    assert.ok(inventory);
+    assert.deepEqual(inventory.slice(2), ['ls-tree', '-r', '-t', '--full-tree', '--name-only', '-z', f.revision]);
+  });
+}
+
+for (const [mode, entries, error] of [
+  ['fetch-failure', [], /injected fetch failure/u],
+  ['wrong-identity', [], /./u],
+  ['inventory-failure', [], /injected inventory failure/u],
+  ['malformed-inventory', [], /tracked-path inventory was malformed/u],
+  ['malformed-inventory', [['.devcontainer.json']], /tracked-path inventory was malformed/u],
+  ['credential-residue', [], /./u],
+]) {
+  test(`devcontainer actual caller fails closed: ${mode}${entries.length ? ' after match' : ''}`, { skip: !linux }, t => {
+    const f = devcontainerFixture(t, entries), result = f.run({ mode });
+    assert.notEqual(result.status, 0);
+    assert.doesNotMatch(result.stdout, /preserves the devcontainer exclusion/u);
+    assert.match(result.stdout + result.stderr, error);
+    if (['fetch-failure', 'wrong-identity', 'credential-residue'].includes(mode)) {
+      assert.equal(f.calls().some(args => args.includes('ls-tree')), false);
+    }
+  });
+}
+
+test('devcontainer caller does not reuse an existing destination', { skip: !linux }, t => {
+  const f = devcontainerFixture(t), result = f.run({ existing: true });
+  assert.notEqual(result.status, 0);
+  assert.deepEqual(f.calls(), []);
+});
+
+for (const server of ['https://github.com', 'https://github.com/', 'https://company.ghe.com',
+  'https://ghe.example:8443', 'https://[::1]:8443', 'https://127.0.0.1:8443']) {
+  test(`devcontainer native HTTPS envelope only: ${server}`, { skip: !linux }, t => {
+    const f = devcontainerFixture(t), result = f.run({ server });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    // URL acceptance proves construction, not enterprise hosting or anonymous availability.
+    assert.ok(f.calls().some(args => args.includes('fetch')));
+  });
+}
+
+for (const server of ['http://github.com', 'https://user@github.com', 'https://user:pass@github.com',
+  'https://', 'https://github.com/path', 'https://github.com?x', 'https://github.com#x',
+  'https://github.com//', 'https://github.com\\path', 'https://git hub.com',
+  'https://github.com\n', 'https://github.com\x01']) {
+  test(`devcontainer rejects invalid server before acquisition: ${JSON.stringify(server)}`, { skip: !linux }, t => {
+    const f = devcontainerFixture(t), result = f.run({ server });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Invalid native HTTPS repository URL/u);
+    assert.deepEqual(f.calls(), []);
+  });
+}
+
+for (const repository of ['', 'owner', 'owner/repository/extra', './repository', '../repository',
+  'owner/.', 'owner/..', 'owner/repository?x', 'owner/repository\n', 'owner\\repository']) {
+  test(`devcontainer rejects invalid repository before acquisition: ${JSON.stringify(repository)}`, { skip: !linux }, t => {
+    const f = devcontainerFixture(t), result = f.run({ repository });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Invalid native HTTPS repository URL/u);
+    assert.deepEqual(f.calls(), []);
+  });
+}
+
+for (const expected of ['', '0'.repeat(40), 'a'.repeat(39), 'G'.repeat(40)]) {
+  test(`devcontainer rejects invalid event identity: ${JSON.stringify(expected)}`, { skip: !linux }, t => {
+    const f = devcontainerFixture(t), result = f.run({ expected });
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Invalid event commit identity/u);
+    assert.deepEqual(f.calls(), []);
+  });
+}
+
+test('devcontainer delegates port validation to real Git and propagates its error', { skip: !linux }, t => {
+  const f = devcontainerFixture(t), result = f.run({ server: 'https://github.com:65536', mode: 'invalid-port' });
+  assert.notEqual(result.status, 0);
+  assert.match(result.stderr, /port number|port was not a decimal|port.*65535/iu);
+  assert.ok(f.calls().some(args => args.includes('fetch')));
+  assert.equal(f.calls().some(args => args.includes('ls-tree')), false);
+  assert.doesNotMatch(result.stdout, /preserves the devcontainer exclusion/u);
+});
+
+// Copilot convergence: execute the actual YAML bodies. Network/package transports
+// are substituted only where named below; none of these cases runs the full suite.
+const copilotJob = parse(read('copilot-setup-steps.yml')).jobs['copilot-setup-steps'];
+const copilotStep = name => copilotJob.steps.find(step => step.name === name);
+
+test('Copilot actual curl command rejects ambient headers and additional URLs only with first disable', { skip: !linux }, async t => {
+  const f = copilotBodyFixture(t), hits = [];
+  const server = createServer((request, response) => {
+    hits.push({ path: request.url, header: request.headers['x-copilot-fixture'] });
+    response.end('inert text; never an executable archive\n');
+  });
+  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const url = `http://127.0.0.1:${server.address().port}`;
+  fs.writeFileSync(path.join(f.root, '.curlrc'), `header = "X-Copilot-Fixture: ambient"\nurl = "${url}/extra"\n`);
+  const line = copilotStep('Set up verified official Node.js runtime').run.split('\n').find(value => value.includes('& $strCurlPath '));
+  assert.equal(typeof line, 'string');
+  for (const mode of ['absent', 'misplaced', 'first']) {
+    hits.length = 0;
+    let command = line.replaceAll("'=https'", "'=http'");
+    if (mode !== 'first') command = command.replace('--disable ', '');
+    if (mode === 'misplaced') command = command.replace('--silent ', '--silent --disable ');
+    const script = path.join(f.root, 'curl.ps1');
+    fs.writeFileSync(script, `$strCurlPath='/usr/bin/curl'\n$strArchive=${quote(path.join(f.root, 'inert.txt'))}\n$strUrl=${quote(`${url}/archive`)}\n${command}\nexit $LASTEXITCODE\n`);
+    const result = await new Promise((resolve, reject) => {
+      const child = spawn('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script],
+        { cwd: f.work, env: { ...f.env, CURL_HOME: f.root, XDG_CONFIG_HOME: f.root }, timeout: 15000 });
+      let stdout = '', stderr = ''; child.stdout.on('data', data => { stdout += data; }); child.stderr.on('data', data => { stderr += data; });
+      child.on('error', reject); child.on('close', status => resolve({ status, stdout, stderr }));
+    });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(hits.some(hit => hit.header === 'ambient'), mode !== 'first', `${mode}: header oracle ${JSON.stringify(hits)}`);
+    assert.equal(hits.some(hit => hit.path === '/extra'), mode !== 'first', `${mode}: additional-URL oracle ${JSON.stringify(hits)}`);
+    assert.ok(hits.some(hit => hit.path === '/archive'));
+    if (mode === 'first') assert.equal(hits.length, 1);
+    assert.equal(fs.readFileSync(path.join(f.root, 'inert.txt'), 'utf8'), 'inert text; never an executable archive\n');
+  }
+});
+
+test('Copilot setup declares its input closure, supported environment and finite phase limits', () => {
+  const workflow = parse(read('copilot-setup-steps.yml'));
+  assert.deepEqual(Object.keys(workflow.jobs), ['copilot-setup-steps']);
+  assert.deepEqual(workflow.permissions, {});
+  assert.deepEqual(copilotJob.permissions, {});
+  assert.equal(copilotJob.env, undefined);
+  assert.equal(copilotJob['runs-on'], 'ubuntu-24.04');
+  assert.equal(copilotJob['timeout-minutes'], 59);
+  assert.deepEqual(workflow.on.push.branches, ['**']);
+  assert.equal(workflow.on.pull_request.branches, undefined);
+  for (const event of ['push', 'pull_request']) {
+    for (const input of ['.github/workflows/**', '.husky/**', 'requirements-dev.txt', '**/*.yml', '**/*.yaml',
+      '.npmrc', 'npm-shrinkwrap.json', 'package.json', 'package-lock.json', '.pre-commit-config.yaml']) {
+      assert.ok(workflow.on[event].paths.includes(input), `${event}: ${input}`);
+    }
+  }
+  for (const step of copilotJob.steps) {
+    assert.equal(step['continue-on-error'], undefined);
+    const expected = step.name.startsWith('Acquire ') ? 5 : step.name === 'Set up verified official Node.js runtime' ? 8
+      : step.name.startsWith('Install locked ') ? 10 : step.name === 'Run complete repository validation' ? 45 : 2;
+    assert.equal(step['timeout-minutes'], expected, step.name);
+    assert.match(step.run, /GIT_CONFIG_COUNT/);
+    assert.match(step.run, /GIT_CONFIG_NOSYSTEM/);
+    assert.match(step.run, /ACTIONS_RUNTIME_TOKEN/);
+  }
+  for (const name of ['Set up isolated Python 3.12', 'Install locked Python validation tools',
+    'Activate repository hooks', 'Run complete repository validation']) {
+    assert.equal(copilotStep(name).if, "steps.toolchain.outputs.validation == 'full'");
+  }
+  assert.equal(copilotStep('Verify final immutable setup inputs').if, "always() && steps.toolchain.outcome == 'success'");
+  assert.match(copilotStep('Run complete repository validation').run, /-m pre_commit run --all-files/);
+});
+
+function copilotBodyFixture(t) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'copilot-convergence-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const work = path.join(root, 'work'); fs.mkdirSync(work);
+  const env = { ...process.env, RUNNER_TEMP: root, HOME: root, XDG_CONFIG_HOME: root,
+    GITHUB_OUTPUT: path.join(root, 'output'), GITHUB_ENV: path.join(root, 'env'), GITHUB_PATH: path.join(root, 'path') };
+  for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS',
+    'GIT_CONFIG_NOSYSTEM', 'GIT_CONFIG_GLOBAL', 'GIT_TERMINAL_PROMPT']) delete env[key];
+  const put = (name, text = 'fixture\n') => { const p = path.join(work, name); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, text); };
+  function run(name, extra = {}, transform = value => value) {
+    const step = copilotStep(name), file = path.join(root, step.shell === 'pwsh' ? 'body.ps1' : 'body.sh');
+    // Observe successful-body isolation in the same process, with no job.env seed.
+    const isolationProbe = step.shell === 'pwsh'
+      ? '\nif ($env:GIT_CONFIG_NOSYSTEM -cne "1" -or $env:GIT_CONFIG_GLOBAL -cne "/dev/null" -or $env:GIT_TERMINAL_PROMPT -cne "0") { throw "Fixture: body depends on job.env isolation" }\n'
+      : '\n[[ "${GIT_CONFIG_NOSYSTEM:-}" == 1 && "${GIT_CONFIG_GLOBAL:-}" == /dev/null && "${GIT_TERMINAL_PROMPT:-}" == 0 ]] || { echo "Fixture: body depends on job.env isolation"; exit 93; }\n';
+    fs.writeFileSync(file, transform(step.run) + isolationProbe);
+    return spawnSync(step.shell === 'pwsh' ? 'pwsh' : 'bash', step.shell === 'pwsh'
+      ? ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', file] : ['--noprofile', '--norc', file],
+    { cwd: work, env: { ...env, ...extra }, encoding: 'utf8', timeout: 45000 });
+  }
+  function git(...args) {
+    const r = spawnSync('/usr/bin/git', args, { cwd: work,
+      env: { ...env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: '/dev/null', GIT_TERMINAL_PROMPT: '0' }, encoding: 'utf8' });
+    assert.equal(r.status, 0, r.stderr); return r.stdout.trim();
+  }
+  const commit = () => { git('add', '-A'); return git('-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-qm', 'fixture'); };
+  return { root, work, env, put, run, git, commit };
+}
+const copilotFullInputs = ['requirements-dev.txt', '.github/workflows/Invoke-LockedPythonHook.ps1', '.pre-commit-config.yaml',
+  '.github/workflows/install-husky.mjs', '.husky/pre-commit', '.github/workflows/lint-staged-markdown.mjs'];
+function copilotInputs(f, kind = 'declared') {
+  for (const name of ['.github/workflows/package.json', '.github/workflows/package-lock.json']) f.put(name, '{}');
+  if (kind === 'legacy') return;
+  f.put('package.json', JSON.stringify({ engines: { node: kind === 'historical' ? '24.18.0' : '24.18.1', npm: '11.16.0' } }));
+  f.put('package-lock.json', '{}');
+  if (kind === 'declared') f.put('.github/workflows/ci-toolchain.json', JSON.stringify({ linuxX64Sha256: 'a'.repeat(64) }));
+  if (kind !== 'historical') for (const name of copilotFullInputs) f.put(name);
+}
+for (const kind of ['declared', 'pre-declaration', 'historical', 'legacy', 'historical-full']) {
+  test(`Copilot finite capability classification: ${kind}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t); copilotInputs(f, kind === 'historical-full' ? 'historical' : kind);
+    if (kind === 'historical-full') for (const name of copilotFullInputs) f.put(name);
+    const result = f.run('Detect locked validation-tool layout');
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    const subset = ['historical', 'legacy'].includes(kind);
+    assert.match(fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8'), new RegExp(`validation=${subset ? 'node-only' : 'full'}`));
+    if (subset) assert.match(result.stdout, /Python and full validation are unavailable/);
+  });
+}
+for (const mode of ['partial-root', 'root-symlink', 'nested-directory', 'declaration-symlink', 'declaration-json',
+  'current-deleted-tuple', 'historical-partial-python', 'historical-wrong-version', 'historical-wrong-npm', 'legacy-declaration',
+  ...copilotFullInputs.map(name => `missing:${name}`), ...copilotFullInputs.map(name => `symlink:${name}`)]) {
+  test(`Copilot capability rejects incomplete or unsupported inputs: ${mode}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t);
+    const kind = mode.startsWith('historical') ? 'historical' : mode === 'legacy-declaration' ? 'legacy' : 'declared';
+    copilotInputs(f, kind);
+    const remove = name => fs.rmSync(path.join(f.work, name));
+    if (mode === 'partial-root') remove('package-lock.json');
+    if (mode === 'root-symlink') { remove('package.json'); fs.symlinkSync('package-lock.json', path.join(f.work, 'package.json')); }
+    if (mode === 'nested-directory') { remove('.github/workflows/package.json'); fs.mkdirSync(path.join(f.work, '.github/workflows/package.json')); }
+    if (mode === 'declaration-symlink') { remove('.github/workflows/ci-toolchain.json'); fs.symlinkSync('package.json', path.join(f.work, '.github/workflows/ci-toolchain.json')); }
+    if (mode === 'declaration-json') f.put('.github/workflows/ci-toolchain.json', '{');
+    if (mode === 'current-deleted-tuple') { remove('.github/workflows/ci-toolchain.json'); for (const name of copilotFullInputs) remove(name); }
+    if (mode === 'historical-partial-python') f.put('requirements-dev.txt');
+    if (mode === 'historical-wrong-version') f.put('package.json', '{"engines":{"node":"24.19.0","npm":"11.16.0"}}');
+    if (mode === 'historical-wrong-npm') f.put('package.json', '{"engines":{"node":"24.18.0","npm":"11.17.0"}}');
+    if (mode === 'legacy-declaration') f.put('.github/workflows/ci-toolchain.json', '{}');
+    if (mode.startsWith('missing:')) remove(mode.slice(8));
+    if (mode.startsWith('symlink:')) { const name = mode.slice(8); remove(name); fs.symlinkSync('/dev/null', path.join(f.work, name)); }
+    const result = f.run('Detect locked validation-tool layout');
+    assert.notEqual(result.status, 0, result.stdout + result.stderr);
+    assert.ok(!fs.existsSync(f.env.GITHUB_OUTPUT) || !fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8').includes('validation='));
+  });
+}
+
+for (const mode of ['clean', 'retry', 'failure', 'wrong-origin', 'wrong-type', 'wrong-head', 'multiline', 'zero']) {
+  test(`Copilot separate real-Git event ancestry and main authority: ${mode}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t); f.git('init', '-q'); f.put('history'); f.commit();
+    const common = f.git('rev-parse', 'HEAD'); f.git('branch', '-M', 'main'); f.put('main-only'); f.commit();
+    const main = f.git('rev-parse', 'HEAD'); f.git('checkout', '-qb', 'topic', common); f.put('event-only'); f.commit();
+    const event = f.git('rev-parse', 'HEAD'), remote = path.join(f.root, 'remote');
+    fs.renameSync(f.work, remote); fs.mkdirSync(f.work);
+    const adapter = path.join(f.root, 'git'), calls = path.join(f.root, 'git-calls');
+    fs.writeFileSync(adapter, `#!${process.execPath}
+const {spawnSync}=require('node:child_process'),fs=require('node:fs');
+let a=process.argv.slice(2);fs.appendFileSync(${JSON.stringify(calls)},JSON.stringify(a)+'\\n');
+const mainFetch=a.includes('refs/heads/main:refs/remotes/origin/main');
+if(mainFetch&&['retry','failure'].includes(${JSON.stringify(mode)})) {
+ const count=fs.readFileSync(${JSON.stringify(calls)},'utf8').split('\\n').filter(s=>s.includes('refs/heads/main:')).length;
+ if(${JSON.stringify(mode)}==='failure'||count<3)process.exit(23);
+}
+if(a.includes('fetch'))a[a.indexOf('origin')]=${JSON.stringify(remote)};
+if(${JSON.stringify(mode)}==='wrong-origin'&&a[0]==='remote'&&a[1]==='get-url'){console.log('https://invalid.example/repo');process.exit(0);}
+if(${JSON.stringify(mode)}==='wrong-type'&&a[0]==='cat-file'){console.log('blob');process.exit(0);}
+if(['multiline','zero'].includes(${JSON.stringify(mode)})&&a[0]==='rev-parse'&&a.includes('refs/remotes/origin/main')){
+ console.log(${JSON.stringify(mode)}==='zero'?'0'.repeat(40):${JSON.stringify(main)}+'\\n'+${JSON.stringify(main)});process.exit(0);}
+if(${JSON.stringify(mode)}==='wrong-head'&&a[0]==='rev-parse'&&a[1]==='HEAD'&&fs.existsSync('.git/refs/remotes/origin/main')){console.log(${JSON.stringify(main)});process.exit(0);}
+const r=spawnSync('/usr/bin/git',a,{stdio:'inherit'});process.exit(r.status??99);
+`, { mode: 0o700 });
+    const replace = source => source.replaceAll("'/usr/bin/git'", quote(adapter)).replaceAll("'/bin/git'", quote(adapter));
+    const env = { GITHUB_SHA: event, GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide' };
+    const acquired = f.run('Acquire triggering revision without an action', env, replace);
+    assert.equal(acquired.status, 0, acquired.stderr);
+    assert.equal(f.git('rev-list', '--count', 'HEAD'), '2', 'Event history must not be shallow.');
+    const result = f.run('Acquire published main reference', env, replace);
+    assert.equal(result.status === 0, ['clean', 'retry'].includes(mode), result.stderr);
+    const log = fs.readFileSync(calls, 'utf8').trim().split('\n').map(JSON.parse);
+    const fetches = log.filter(args => args.includes('refs/heads/main:refs/remotes/origin/main'));
+    assert.equal(fetches.length, mode === 'wrong-origin' ? 0 : ['retry', 'failure'].includes(mode) ? 3 : 1);
+    assert.ok(log.filter(args => args.includes('fetch')).every(args => !args.includes('--depth') && !args.some(arg => arg.startsWith('+'))));
+    assert.equal(f.git('rev-parse', 'HEAD'), event);
+    if (result.status === 0) { assert.equal(f.git('rev-parse', 'refs/remotes/origin/main'), main); assert.ok(result.stdout.includes(main)); }
+  });
+}
+
+for (const mode of ['clean', 'missing-cache', 'cache-symlink', 'incomplete', 'escape', 'library-newline', 'existing-venv']) {
+  test(`Copilot guarded real Python cache and fresh venv: ${mode}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t), cache = path.join(f.root, 'cache');
+    const probe = spawnSync('python3.12', ['-I', '-S', '-c',
+      'import json, os, sys, sysconfig; print(json.dumps({"executable": os.path.realpath(sys.executable), "version": ".".join(map(str, sys.version_info[:3])), "implementation": sys.implementation.name, "bits64": sys.maxsize > 2**32, "libdir": sysconfig.get_config_var("LIBDIR")}))'],
+    { encoding: 'utf8' });
+    assert.equal(probe.status, 0, probe.stderr);
+    const runtime = JSON.parse(probe.stdout);
+    assert.match(runtime.version, /^3\.12\.\d+$/); assert.equal(runtime.implementation, 'cpython'); assert.equal(runtime.bits64, true);
+    const selected = path.join(cache, runtime.version, 'x64');
+    fs.mkdirSync(path.join(selected, 'bin'), { recursive: true }); fs.mkdirSync(path.join(selected, 'lib'));
+    fs.copyFileSync(runtime.executable, path.join(selected, 'bin/python3.12')); fs.chmodSync(path.join(selected, 'bin/python3.12'), 0o700);
+    // Shared-library builds need their existing local libpython in the synthetic cache.
+    if (runtime.libdir && fs.existsSync(runtime.libdir)) {
+      for (const name of fs.readdirSync(runtime.libdir).filter(name => /^libpython3\.12\.so(?:\.|$)/.test(name))) {
+        fs.copyFileSync(path.join(runtime.libdir, name), path.join(selected, 'lib', name));
+      }
+    }
+    fs.symlinkSync('python3.12', path.join(selected, 'bin/python')); fs.writeFileSync(`${selected}.complete`, '');
+    if (mode === 'missing-cache') fs.renameSync(cache, `${cache}-absent`);
+    if (mode === 'cache-symlink') { fs.renameSync(cache, `${cache}-target`); fs.symlinkSync(`${cache}-target`, cache); }
+    if (mode === 'incomplete') fs.rmSync(`${selected}.complete`);
+    if (mode === 'escape') { fs.rmSync(path.join(selected, 'bin/python')); fs.symlinkSync(runtime.executable, path.join(selected, 'bin/python')); }
+    if (mode === 'existing-venv') fs.mkdirSync(path.join(f.root, 'agent-validation-python'));
+    const result = f.run('Set up isolated Python 3.12', mode === 'library-newline' ? { LD_LIBRARY_PATH: 'x\ny' } : {},
+      source => source.replace("'/opt/hostedtoolcache/Python'", `'${cache}'`));
+    assert.equal(result.status === 0, mode === 'clean', result.stdout + result.stderr);
+    if (mode !== 'clean') { assert.equal(fs.existsSync(f.env.GITHUB_PATH), false); return; }
+    const bin = fs.readFileSync(f.env.GITHUB_PATH, 'utf8').trim();
+    assert.equal(bin, path.join(f.root, 'agent-validation-python/bin'));
+    const py = spawnSync(path.join(bin, 'python3.12'), ['-I', '-c', 'import sys; print(sys.prefix); print(sys.version_info[:2])'], { encoding: 'utf8' });
+    assert.equal(py.status, 0, py.stderr); assert.ok(py.stdout.includes(path.dirname(bin))); assert.match(py.stdout, /\(3, 12\)/);
+    // Inert local approved module proves the unchanged launcher discovers the venv.
+    const site = path.join(path.dirname(bin), 'lib/python3.12/site-packages/pre_commit_hooks'); fs.mkdirSync(site, { recursive: true });
+    fs.writeFileSync(path.join(site, '__init__.py'), ''); fs.writeFileSync(path.join(site, 'check_json.py'), 'print("VENV_LAUNCHER_FIXTURE")\n');
+    const launched = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File',
+      path.join(directory, 'Invoke-LockedPythonHook.ps1'), '-Module', 'pre_commit_hooks.check_json'],
+    { env: { ...f.env, PATH: `${bin}:${process.env.PATH}` }, cwd: f.work, encoding: 'utf8', timeout: 30000 });
+    assert.equal(launched.status, 0, launched.stderr); assert.match(launched.stdout, /VENV_LAUNCHER_FIXTURE/);
+  });
+}
+
+for (const mode of ['clean', 'install-failure', 'wrong-version', 'check-failure']) {
+  test(`Copilot locked Python command and status: ${mode}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t), interpreter = path.join(f.root, 'python'), log = path.join(f.root, 'python-calls');
+    f.put('requirements-dev.txt', 'pre-commit==4.3.0 \\\n  --hash=sha256:fixture\n');
+    fs.writeFileSync(interpreter, `#!${process.execPath}
+const fs=require('node:fs'),a=process.argv.slice(2);fs.appendFileSync(${JSON.stringify(log)},JSON.stringify(a)+'\\n');
+if(a[0]!=='-E'||a[1]!=='-P')process.exit(98);
+if(a.includes('-c'))console.log('3.12');
+else if(a.includes('install')&&${JSON.stringify(mode)}==='install-failure')process.exit(21);
+else if(a.includes('--version'))console.log('pre-commit '+(${JSON.stringify(mode)}==='wrong-version'?'0.0.0':'4.3.0'));
+else if(a.includes('check')&&${JSON.stringify(mode)}==='check-failure')process.exit(22);
+`, { mode: 0o700 });
+    const result = f.run('Install locked Python validation tools', { VALIDATION_PYTHON: interpreter, PIP_INDEX_URL: 'https://invalid.example' });
+    assert.equal(result.status === 0, mode === 'clean', result.stderr);
+    const calls = fs.readFileSync(log, 'utf8').trim().split('\n').map(JSON.parse);
+    assert.deepEqual(calls.find(args => args.includes('install')), ['-E', '-P', '-m', 'pip', '--isolated', 'install',
+      '--require-hashes', '--only-binary=:all:', '--index-url', 'https://pypi.org/simple', '-r', 'requirements-dev.txt']);
+    assert.equal(calls.length, mode === 'install-failure' ? 2 : mode === 'wrong-version' ? 3 : 4);
+  });
+}
+
+for (const mode of ['clean', 'npm-failure', 'hook-wrong', 'suite-failure']) {
+  test(`Copilot explicit hook and full-validation caller: ${mode}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t), bin = path.join(f.root, 'bin'), log = path.join(f.root, 'calls'); fs.mkdirSync(bin);
+    f.git('init', '-q'); f.put('fixture'); f.commit();
+    for (const name of ['npm', 'python']) fs.writeFileSync(path.join(bin, name), `#!${process.execPath}
+const fs=require('node:fs'),{spawnSync}=require('node:child_process'),a=process.argv.slice(2);
+if(Object.keys(process.env).some(k=>/^npm_config_/i.test(k)&&!['npm_config_userconfig','npm_config_globalconfig'].includes(k)))process.exit(97);
+fs.appendFileSync(${JSON.stringify(log)},JSON.stringify([${JSON.stringify(name)},...a])+'\\n');
+if(${JSON.stringify(name)}==='npm') {
+ if(${JSON.stringify(mode)}==='npm-failure')process.exit(31);
+ spawnSync('/usr/bin/git',['config','core.hooksPath',${JSON.stringify(mode)}==='hook-wrong'?'.bad':'.husky/_']);
+ fs.mkdirSync('.husky/_',{recursive:true});fs.writeFileSync('.husky/_/pre-commit','#!/bin/sh\\nexit 0\\n',{mode:0o700});
+} else if(${JSON.stringify(mode)}==='suite-failure')process.exit(37);
+`, { mode: 0o700 });
+    const env = { PATH: `${bin}:${process.env.PATH}`, VALIDATION_PYTHON: path.join(bin, 'python'),
+      NPM_CONFIG_SCRIPT_SHELL: 'hostile', 'npm_config_unsafe-name': 'dummy' };
+    const hook = f.run('Activate repository hooks', env);
+    assert.equal(hook.status === 0, !['npm-failure', 'hook-wrong'].includes(mode), hook.stderr);
+    if (hook.status === 0) {
+      const suite = f.run('Run complete repository validation', env);
+      assert.equal(suite.status, mode === 'suite-failure' ? 37 : 0, suite.stderr);
+    }
+    const calls = fs.readFileSync(log, 'utf8').trim().split('\n').map(JSON.parse);
+    assert.deepEqual(calls[0], ['npm', '--prefix', '.github/workflows', 'run', 'prepare']);
+    if (hook.status === 0) assert.deepEqual(calls[1], ['python', '-E', '-P', '-m', 'pre_commit', 'run', '--all-files']);
+    else assert.equal(calls.length, 1);
+  });
+}
+
+for (const mode of ['clean', 'worktree', 'index', 'index-masked', 'untracked', 'ignored-untracked']) {
+  test(`Copilot immutable inputs compare acquired HEAD, index and worktree: ${mode}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t); f.git('init', '-q'); copilotInputs(f, 'historical'); f.commit();
+    assert.equal(f.run('Verify acquired immutable setup inputs').status, 0);
+    if (['worktree', 'index', 'index-masked'].includes(mode)) f.put('package.json', 'changed\n');
+    if (mode === 'index' || mode === 'index-masked') f.git('add', 'package.json');
+    if (mode === 'index-masked') f.put('package.json', f.git('show', 'HEAD:package.json'));
+    if (mode.endsWith('untracked')) f.put('requirements-dev.txt');
+    if (mode === 'ignored-untracked') f.put('.gitignore', 'requirements-dev.txt\n');
+    const result = f.run('Verify final immutable setup inputs');
+    assert.equal(result.status === 0, mode === 'clean', result.stdout + result.stderr);
+  });
+}
+
+for (const mode of ['clean', 'wrong-script', 'array-script', 'object-script', 'declared-current', 'older-version',
+  'installer-symlink', 'missing-python', 'missing-hook']) {
+  test(`Copilot finite historical prepare branch: ${mode}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t); copilotInputs(f, 'pre-declaration');
+    fs.rmSync(path.join(f.work, '.github/workflows/install-husky.mjs'));
+    const prepare = mode === 'wrong-script' ? 'echo incomplete' : mode === 'array-script' ? ['cd ../.. && husky']
+      : mode === 'object-script' ? { value: 'cd ../.. && husky' } : 'cd ../.. && husky';
+    f.put('.github/workflows/package.json', JSON.stringify({ scripts: { prepare } }));
+    if (mode === 'declared-current') f.put('.github/workflows/ci-toolchain.json', '{}');
+    if (mode === 'older-version') f.put('package.json', '{"engines":{"node":"24.18.0","npm":"11.16.0"}}');
+    if (mode === 'installer-symlink') fs.symlinkSync('/dev/null', path.join(f.work, '.github/workflows/install-husky.mjs'));
+    if (mode === 'missing-python') fs.rmSync(path.join(f.work, 'requirements-dev.txt'));
+    if (mode === 'missing-hook') fs.rmSync(path.join(f.work, '.husky/pre-commit'));
+    const result = f.run('Detect locked validation-tool layout');
+    assert.equal(result.status === 0, mode === 'clean', result.stdout + result.stderr);
+    if (mode === 'clean') {
+      assert.match(result.stdout, /Retained historical Husky prepare command selected/);
+      assert.match(fs.readFileSync(f.env.GITHUB_OUTPUT, 'utf8'), /validation=full/);
+    }
+  });
+}
+
+for (const historical of [false, true]) {
+  test(`Copilot real locked Husky activation: ${historical ? 'historical' : 'current'}`, { skip: !linux }, t => {
+    const f = copilotBodyFixture(t); f.git('init', '-q');
+    f.put('.github/workflows/package.json', JSON.stringify({ private: true, type: 'module', scripts: {
+      prepare: historical ? 'cd ../.. && husky' : 'node install-husky.mjs' } }));
+    if (!historical) f.put('.github/workflows/install-husky.mjs', read('install-husky.mjs'));
+    f.put('.husky/pre-commit', '#!/bin/sh\nexit 0\n'); f.commit();
+    const modules = path.join(f.work, '.github/workflows/node_modules'); fs.mkdirSync(modules, { recursive: true });
+    fs.cpSync(path.join(directory, 'node_modules/husky'), path.join(modules, 'husky'), { recursive: true });
+    fs.mkdirSync(path.join(modules, '.bin')); fs.symlinkSync('../husky/bin.js', path.join(modules, '.bin/husky'));
+    const result = f.run('Activate repository hooks', { NPM_CONFIG_SCRIPT_SHELL: 'hostile' });
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.equal(f.git('config', '--get', 'core.hooksPath'), '.husky/_');
+    assert.ok(fs.statSync(path.join(f.work, '.husky/_/pre-commit')).mode & 0o111);
+    assert.equal(f.git('diff', '--name-only', 'HEAD'), '');
+  });
+}
+
+// Run the extracted install body with the real built-in-only policy helper and
+// current source inputs. Only npm is replaced; it records installs without
+// downloading packages. Fixtures intentionally have no installed YAML module.
+function copilotPreinstallFixture(t) {
+  const f = copilotBodyFixture(t);
+  const inputs = ['package.json', 'package-lock.json', '.github/workflows/package.json',
+    '.github/workflows/package-lock.json', '.github/workflows/ci-toolchain.json',
+    '.github/workflows/workflow-policy-contract.json', '.github/workflows/Validate-WorkflowPolicy.mjs'];
+  for (const name of inputs) {
+    const target = path.join(f.work, name);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.copyFileSync(path.join(directory, '../..', name), target);
+  }
+  const bin = path.join(f.root, 'bin'), log = path.join(f.root, 'npm-calls');
+  fs.mkdirSync(bin);
+  fs.writeFileSync(path.join(bin, 'npm'), `#!${process.execPath}
+const fs = require('node:fs'), args = process.argv.slice(2);
+fs.appendFileSync(${JSON.stringify(log)}, JSON.stringify(args) + '\\n');
+console.log(JSON.stringify({ npm: args }));
+`, { mode: 0o700 });
+  const calls = () => fs.existsSync(log) ? fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse) : [];
+  const run = layout => {
+    assert.equal(fs.existsSync(path.join(f.work, 'node_modules')), false);
+    assert.equal(fs.existsSync(path.join(f.work, '.github/workflows/node_modules')), false);
+    return f.run('Install locked Node.js validation tools', { TOOLCHAIN_LAYOUT: layout, PATH: `${bin}:${process.env.PATH}` });
+  };
+  return { ...f, calls, run };
+}
+const copilotCiArgs = ['ci', '--ignore-scripts', '--no-audit', '--fund=false', '--include=dev'];
+test('Copilot preinstall real policy succeeds before both npm trees without installed YAML', { skip: !linux }, t => {
+  const f = copilotPreinstallFixture(t), result = f.run('modern');
+  assert.equal(result.status, 0, result.stdout + result.stderr);
+  assert.deepEqual(f.calls(), [copilotCiArgs, [...copilotCiArgs, '--prefix', '.github/workflows']]);
+  const output = result.stdout.trim().split('\n').map(JSON.parse);
+  assert.equal(output.length, 3, 'Preflight must run before either npm install.');
+  assert.equal(output[0].schema, 'StyleGuide.WorkflowPreflightResult.v1');
+  assert.equal(output[0].success, true);
+  assert.deepEqual(output.slice(1).map(row => row.npm), f.calls());
+});
+for (const mode of ['parser-contract-lock-mismatch', 'nonregistry-package-url']) {
+  test(`Copilot preinstall real policy rejects before either npm tree: ${mode}`, { skip: !linux }, t => {
+    const f = copilotPreinstallFixture(t);
+    const name = mode === 'parser-contract-lock-mismatch'
+      ? '.github/workflows/workflow-policy-contract.json' : 'package-lock.json';
+    const target = path.join(f.work, name), input = JSON.parse(fs.readFileSync(target, 'utf8'));
+    if (mode === 'parser-contract-lock-mismatch') input.parser.resolved = 'https://registry.npmjs.org/yaml/-/yaml-99.0.0.tgz';
+    else Object.values(input.packages).find(entry => entry.resolved).resolved = 'https://example.invalid/package.tgz';
+    fs.writeFileSync(target, JSON.stringify(input));
+    const result = f.run('modern');
+    assert.equal(result.status, 1, 'The real preflight native failure must propagate.');
+    assert.deepEqual(f.calls(), [], 'Policy failure must prevent both npm installs.');
+    const output = JSON.parse(result.stdout.trim());
+    assert.equal(output.success, false);
+    assert.equal(output.category, mode === 'parser-contract-lock-mismatch' ? 'parser-lock-identity' : 'lock-integrity');
+  });
+}
+test('Copilot preinstall missing required current helper prevents both npm trees', { skip: !linux }, t => {
+  const f = copilotPreinstallFixture(t);
+  fs.unlinkSync(path.join(f.work, '.github/workflows/Validate-WorkflowPolicy.mjs'));
+  const result = f.run('modern');
+  assert.equal(result.status, 1);
+  assert.deepEqual(f.calls(), []);
+  assert.match(result.stderr, /MODULE_NOT_FOUND/u);
+});
+test('Copilot preinstall preserves native helper exit status', { skip: !linux }, t => {
+  const f = copilotPreinstallFixture(t);
+  // Separate dispatch probe: the two invalid-input cases above use real policy.
+  f.put('.github/workflows/Validate-WorkflowPolicy.mjs', 'process.exit(37);\n');
+  const result = f.run('modern');
+  assert.equal(result.status, 37);
+  assert.deepEqual(f.calls(), []);
+});
+for (const layout of ['modern', 'legacy']) {
+  test(`Copilot preinstall declaration-absent history installs without newer helper: ${layout}`, { skip: !linux }, t => {
+    const f = copilotPreinstallFixture(t);
+    fs.unlinkSync(path.join(f.work, '.github/workflows/ci-toolchain.json'));
+    fs.unlinkSync(path.join(f.work, '.github/workflows/Validate-WorkflowPolicy.mjs'));
+    if (layout === 'legacy') for (const name of ['package.json', 'package-lock.json']) fs.unlinkSync(path.join(f.work, name));
+    const result = f.run(layout);
+    assert.equal(result.status, 0, result.stdout + result.stderr);
+    assert.deepEqual(f.calls(), layout === 'modern' ? [copilotCiArgs, [...copilotCiArgs, '--prefix', '.github/workflows']]
+      : [[...copilotCiArgs, '--prefix', '.github/workflows']]);
+  });
+}
