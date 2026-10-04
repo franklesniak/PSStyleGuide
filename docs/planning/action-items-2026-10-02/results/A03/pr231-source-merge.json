@@ -1,0 +1,830 @@
+{
+  "repository": "franklesniak/PSStyleGuide",
+  "base": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+  "head": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+  "scope": [
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/copilot-setup-steps.yml",
+    ".github/workflows/devcontainer-ci.yml"
+  ],
+  "rounds_used": 2,
+  "first_request_at": "2026-10-04T11:09:49+00:00",
+  "deadline": "2026-10-12T11:09:49+00:00",
+  "transfers": {
+    "used": 0,
+    "cap": 12
+  },
+  "merge": {
+    "requested_at": "2026-10-04T13:07:56.275932+00:00",
+    "method": "merge",
+    "expected_head": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+    "expected_base": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "expected_tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+    "preflight": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-setup-lifecycle-20261004\\round2-premerge-gates.json",
+    "preflight_sha256": "bc083c4eb0f9b844795a9ebce310865d2018695fe8e9c0a69bfc25050ccd88fd",
+    "exit_code": 0,
+    "response": {
+      "sha": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "merged": true,
+      "message": "Pull Request successfully merged"
+    },
+    "sha": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+    "parents": [
+      "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+      "f2c7f738265df29c123f7d627394c6bba1a5c7d0"
+    ],
+    "merged_at": "2026-10-04T13:07:52Z",
+    "verified_at": "2026-10-04T13:08:00.766707+00:00"
+  },
+  "final_quality": {
+    "state": "complete",
+    "reviewer": "/root/a03_pr231_final_quality",
+    "head": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+    "base": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+    "body_sha256": "b1e731dcde618efb20753f548c96ccf44656cff6f4a3ba3cf3595fa4ce58b960",
+    "private_directory": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A03-PR231-final-quality-20261004",
+    "result": "passed_no_material_finding",
+    "report_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-PR231-final-quality-20261004\\REPORT.md",
+    "report_sha256": "75ec00512b703dcca50766775aad9312c49c48cce0acb2eaae89cf2ab0cd3bbb",
+    "identities_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-PR231-final-quality-20261004\\identities.json",
+    "identities_sha256": "464250e5f41af92822f51d56e6665076b2e2ac920e846be4e51d856cb27284e4",
+    "parent_verified_at": "2026-10-04T13:02:25.591339+00:00",
+    "parent_verification": "Read complete report; verified report/catalog hashes, input/scope and three source Git entry/hash samples. No material finding."
+  },
+  "reviews": {
+    "head": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+    "base": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "body_sha256": "b1e731dcde618efb20753f548c96ccf44656cff6f4a3ba3cf3595fa4ce58b960",
+    "started_at": "2026-10-04T12:47:26.772862+00:00",
+    "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-setup-lifecycle-20261004\\round2-pre-copilot.json",
+    "copilot": {
+      "state": "terminal_clean",
+      "channel_attempts": 1,
+      "transport": "gh pr edit --add-reviewer @copilot",
+      "ui_observation": "Fresh PR231 IAB page is signed out. Expanded Reviewers effort menu shows Balanced selected but Lite/Balanced/Max disabled, with no request control. No UI request sent.",
+      "observed_result_effort": "Balanced",
+      "request_exit": 0,
+      "transport_returned_at": "2026-10-04T12:47:29.064657+00:00",
+      "request_event_id": 32443399316,
+      "native_request_at": "2026-10-04T12:47:22Z",
+      "workflow_run_id": 37203327377,
+      "review_id": 5406246978,
+      "submitted_at": "2026-10-04T12:54:12Z",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-setup-lifecycle-20261004\\round2-status-continuation1.json"
+    },
+    "codex": {
+      "state": "terminal_clean",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-setup-lifecycle-20261004\\round2-pre-codex.json",
+      "channel_attempts": 1,
+      "started_at": "2026-10-04T12:48:21.804551+00:00",
+      "body": "@codex review",
+      "comment_id": 5980090848,
+      "url": "https://github.com/franklesniak/PSStyleGuide/pull/231#issuecomment-5980090848",
+      "native_request_at": "2026-10-04T12:48:16Z",
+      "result_comment_id": 5980123124,
+      "result_at": "2026-10-04T12:51:50Z",
+      "summary_comment_id": 5979325045,
+      "summary_updated_at": "2026-10-04T12:51:52Z",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-setup-lifecycle-20261004\\round2-status-1252.json"
+    },
+    "hosted": {
+      "state": "all11_passed",
+      "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-setup-lifecycle-20261004\\round2-hosted-setup-evidence.json",
+      "sha256": "1564be78920152d8b4a2f3181d7a354ca99d7f2a06c6ab56c28014d94fd377bd",
+      "head": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+      "setup_jobs": [
+        {
+          "run_id": 37203161042,
+          "job_id": 111438801850,
+          "event": "push",
+          "job_elapsed_seconds": 1186.0,
+          "passed_hook_count": 11
+        },
+        {
+          "run_id": 37203163630,
+          "job_id": 111438809261,
+          "event": "pull_request",
+          "job_elapsed_seconds": 1190.0,
+          "passed_hook_count": 11
+        }
+      ]
+    }
+  },
+  "hosted_evidence": {
+    "captured_at": "2026-10-04T13:07:22.031020+00:00",
+    "head": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+    "all_ordinary_runs_passed": 11,
+    "setup_runs": [
+      {
+        "run_id": 37203161042,
+        "job_id": 111438801850,
+        "event": "push",
+        "head": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+        "job_started_at": "2026-10-04T12:44:46Z",
+        "job_completed_at": "2026-10-04T13:04:32Z",
+        "job_elapsed_seconds": 1186.0,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-04T12:44:47Z",
+            "completed_at": "2026-10-04T12:44:47Z",
+            "elapsed_seconds": 0.0
+          },
+          {
+            "name": "Acquire triggering revision without an action",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-04T12:44:47Z",
+            "completed_at": "2026-10-04T12:44:54Z",
+            "elapsed_seconds": 7.0
+          },
+          {
+            "name": "Verify checkout credential cleanup",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-04T12:44:54Z",
+            "completed_at": "2026-10-04T12:44:55Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Acquire published main reference",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-04T12:44:55Z",
+            "completed_at": "2026-10-04T12:44:56Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Reject alternate npm install inputs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-04T12:44:56Z",
+            "completed_at": "2026-10-04T12:44:56Z",
+            "elapsed_seconds": 0.0
+          },
+          {
+            "name": "Detect locked validation-tool layout",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-04T12:44:56Z",
+            "completed_at": "2026-10-04T12:44:57Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Verify acquired immutable setup inputs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-04T12:44:57Z",
+            "completed_at": "2026-10-04T12:44:57Z",
+            "elapsed_seconds": 0.0
+          },
+          {
+            "name": "Set up verified official Node.js runtime",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-10-04T12:44:57Z",
+            "completed_at": "2026-10-04T12:45:00Z",
+            "elapsed_seconds": 3.0
+          },
+          {
+            "name": "Verify selected Node.js runtime",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-04T12:45:00Z",
+            "completed_at": "2026-10-04T12:45:01Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Install locked Node.js validation tools",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-10-04T12:45:01Z",
+            "completed_at": "2026-10-04T12:45:02Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Verify locked dependency trees and immutable manifests",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-10-04T12:45:02Z",
+            "completed_at": "2026-10-04T12:45:03Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Set up isolated Python 3.12",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-10-04T12:45:03Z",
+            "completed_at": "2026-10-04T12:45:07Z",
+            "elapsed_seconds": 4.0
+          },
+          {
+            "name": "Install locked Python validation tools",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-10-04T12:45:07Z",
+            "completed_at": "2026-10-04T12:45:11Z",
+            "elapsed_seconds": 4.0
+          },
+          {
+            "name": "Activate repository hooks",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14,
+            "started_at": "2026-10-04T12:45:11Z",
+            "completed_at": "2026-10-04T12:45:11Z",
+            "elapsed_seconds": 0.0
+          },
+          {
+            "name": "Run complete repository validation",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15,
+            "started_at": "2026-10-04T12:45:11Z",
+            "completed_at": "2026-10-04T13:04:30Z",
+            "elapsed_seconds": 1159.0
+          },
+          {
+            "name": "Verify final immutable setup inputs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16,
+            "started_at": "2026-10-04T13:04:30Z",
+            "completed_at": "2026-10-04T13:04:30Z",
+            "elapsed_seconds": 0.0
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17,
+            "started_at": "2026-10-04T13:04:30Z",
+            "completed_at": "2026-10-04T13:04:30Z",
+            "elapsed_seconds": 0.0
+          }
+        ],
+        "complete_job_pages": [
+          {
+            "total_count": 1,
+            "jobs": [
+              {
+                "id": 111438801850,
+                "run_id": 37203161042,
+                "workflow_name": "Copilot setup steps",
+                "head_branch": "codex/workflow-setup-convergence",
+                "run_url": "https://api.github.com/repos/franklesniak/PSStyleGuide/actions/runs/37203161042",
+                "run_attempt": 1,
+                "node_id": "CR_kwDOQkjdhM8AAAAZ8kUrug",
+                "head_sha": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+                "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/actions/jobs/111438801850",
+                "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37203161042/job/111438801850",
+                "status": "completed",
+                "conclusion": "success",
+                "created_at": "2026-10-04T12:44:44Z",
+                "started_at": "2026-10-04T12:44:46Z",
+                "completed_at": "2026-10-04T13:04:32Z",
+                "name": "Install locked repository validation tools",
+                "steps": [
+                  {
+                    "name": "Set up job",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 1,
+                    "started_at": "2026-10-04T12:44:47Z",
+                    "completed_at": "2026-10-04T12:44:47Z"
+                  },
+                  {
+                    "name": "Acquire triggering revision without an action",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 2,
+                    "started_at": "2026-10-04T12:44:47Z",
+                    "completed_at": "2026-10-04T12:44:54Z"
+                  },
+                  {
+                    "name": "Verify checkout credential cleanup",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 3,
+                    "started_at": "2026-10-04T12:44:54Z",
+                    "completed_at": "2026-10-04T12:44:55Z"
+                  },
+                  {
+                    "name": "Acquire published main reference",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 4,
+                    "started_at": "2026-10-04T12:44:55Z",
+                    "completed_at": "2026-10-04T12:44:56Z"
+                  },
+                  {
+                    "name": "Reject alternate npm install inputs",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 5,
+                    "started_at": "2026-10-04T12:44:56Z",
+                    "completed_at": "2026-10-04T12:44:56Z"
+                  },
+                  {
+                    "name": "Detect locked validation-tool layout",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 6,
+                    "started_at": "2026-10-04T12:44:56Z",
+                    "completed_at": "2026-10-04T12:44:57Z"
+                  },
+                  {
+                    "name": "Verify acquired immutable setup inputs",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 7,
+                    "started_at": "2026-10-04T12:44:57Z",
+                    "completed_at": "2026-10-04T12:44:57Z"
+                  },
+                  {
+                    "name": "Set up verified official Node.js runtime",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 8,
+                    "started_at": "2026-10-04T12:44:57Z",
+                    "completed_at": "2026-10-04T12:45:00Z"
+                  },
+                  {
+                    "name": "Verify selected Node.js runtime",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 9,
+                    "started_at": "2026-10-04T12:45:00Z",
+                    "completed_at": "2026-10-04T12:45:01Z"
+                  },
+                  {
+                    "name": "Install locked Node.js validation tools",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 10,
+                    "started_at": "2026-10-04T12:45:01Z",
+                    "completed_at": "2026-10-04T12:45:02Z"
+                  },
+                  {
+                    "name": "Verify locked dependency trees and immutable manifests",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 11,
+                    "started_at": "2026-10-04T12:45:02Z",
+                    "completed_at": "2026-10-04T12:45:03Z"
+                  },
+                  {
+                    "name": "Set up isolated Python 3.12",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 12,
+                    "started_at": "2026-10-04T12:45:03Z",
+                    "completed_at": "2026-10-04T12:45:07Z"
+                  },
+                  {
+                    "name": "Install locked Python validation tools",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 13,
+                    "started_at": "2026-10-04T12:45:07Z",
+                    "completed_at": "2026-10-04T12:45:11Z"
+                  },
+                  {
+                    "name": "Activate repository hooks",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 14,
+                    "started_at": "2026-10-04T12:45:11Z",
+                    "completed_at": "2026-10-04T12:45:11Z"
+                  },
+                  {
+                    "name": "Run complete repository validation",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 15,
+                    "started_at": "2026-10-04T12:45:11Z",
+                    "completed_at": "2026-10-04T13:04:30Z"
+                  },
+                  {
+                    "name": "Verify final immutable setup inputs",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 16,
+                    "started_at": "2026-10-04T13:04:30Z",
+                    "completed_at": "2026-10-04T13:04:30Z"
+                  },
+                  {
+                    "name": "Complete job",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 17,
+                    "started_at": "2026-10-04T13:04:30Z",
+                    "completed_at": "2026-10-04T13:04:30Z"
+                  }
+                ],
+                "check_run_url": "https://api.github.com/repos/franklesniak/PSStyleGuide/check-runs/111438801850",
+                "labels": [
+                  "ubuntu-24.04"
+                ],
+                "runner_id": 1000092928,
+                "runner_name": "GitHub Actions 1000092928",
+                "runner_group_id": 0,
+                "runner_group_name": "GitHub Actions"
+              }
+            ]
+          }
+        ],
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-setup-lifecycle-20261004\\round2-hosted-setup-push.log",
+        "log_sha256": "4c330bdb722f2a0699b5a59c43be3ea7de22230308fca5b4f0d015b56dbc1f05",
+        "passed_hook_count": 11,
+        "passed_hook_lines": [
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:37.2361977Z check json...............................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:38.2602627Z check yaml...............................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:39.8814453Z fix end of files.........................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:41.4715828Z trim trailing whitespace.................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:42.5875333Z yamllint.................................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:44.3126899Z Lint GitHub Actions workflow files.......................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:45.3697589Z Validate Dependabot Config (v2)..........................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:46.7334563Z Validate GitHub Workflows................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:46.7693827Z staged Markdown..........................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:47.5791625Z workflow policy contract.................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T13:04:29.9992797Z agent instruction contract and mutation tests............................Passed"
+        ],
+        "complete_validation_skips": 0
+      },
+      {
+        "run_id": 37203163630,
+        "job_id": 111438809261,
+        "event": "pull_request",
+        "head": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+        "job_started_at": "2026-10-04T12:44:50Z",
+        "job_completed_at": "2026-10-04T13:04:40Z",
+        "job_elapsed_seconds": 1190.0,
+        "steps": [
+          {
+            "name": "Set up job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 1,
+            "started_at": "2026-10-04T12:44:51Z",
+            "completed_at": "2026-10-04T12:44:51Z",
+            "elapsed_seconds": 0.0
+          },
+          {
+            "name": "Acquire triggering revision without an action",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 2,
+            "started_at": "2026-10-04T12:44:51Z",
+            "completed_at": "2026-10-04T12:44:58Z",
+            "elapsed_seconds": 7.0
+          },
+          {
+            "name": "Verify checkout credential cleanup",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 3,
+            "started_at": "2026-10-04T12:44:58Z",
+            "completed_at": "2026-10-04T12:44:59Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Acquire published main reference",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 4,
+            "started_at": "2026-10-04T12:44:59Z",
+            "completed_at": "2026-10-04T12:45:00Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Reject alternate npm install inputs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 5,
+            "started_at": "2026-10-04T12:45:00Z",
+            "completed_at": "2026-10-04T12:45:00Z",
+            "elapsed_seconds": 0.0
+          },
+          {
+            "name": "Detect locked validation-tool layout",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 6,
+            "started_at": "2026-10-04T12:45:00Z",
+            "completed_at": "2026-10-04T12:45:01Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Verify acquired immutable setup inputs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 7,
+            "started_at": "2026-10-04T12:45:01Z",
+            "completed_at": "2026-10-04T12:45:01Z",
+            "elapsed_seconds": 0.0
+          },
+          {
+            "name": "Set up verified official Node.js runtime",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 8,
+            "started_at": "2026-10-04T12:45:01Z",
+            "completed_at": "2026-10-04T12:45:04Z",
+            "elapsed_seconds": 3.0
+          },
+          {
+            "name": "Verify selected Node.js runtime",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 9,
+            "started_at": "2026-10-04T12:45:04Z",
+            "completed_at": "2026-10-04T12:45:04Z",
+            "elapsed_seconds": 0.0
+          },
+          {
+            "name": "Install locked Node.js validation tools",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 10,
+            "started_at": "2026-10-04T12:45:04Z",
+            "completed_at": "2026-10-04T12:45:06Z",
+            "elapsed_seconds": 2.0
+          },
+          {
+            "name": "Verify locked dependency trees and immutable manifests",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 11,
+            "started_at": "2026-10-04T12:45:06Z",
+            "completed_at": "2026-10-04T12:45:07Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Set up isolated Python 3.12",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 12,
+            "started_at": "2026-10-04T12:45:07Z",
+            "completed_at": "2026-10-04T12:45:10Z",
+            "elapsed_seconds": 3.0
+          },
+          {
+            "name": "Install locked Python validation tools",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 13,
+            "started_at": "2026-10-04T12:45:10Z",
+            "completed_at": "2026-10-04T12:45:13Z",
+            "elapsed_seconds": 3.0
+          },
+          {
+            "name": "Activate repository hooks",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 14,
+            "started_at": "2026-10-04T12:45:13Z",
+            "completed_at": "2026-10-04T12:45:14Z",
+            "elapsed_seconds": 1.0
+          },
+          {
+            "name": "Run complete repository validation",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 15,
+            "started_at": "2026-10-04T12:45:14Z",
+            "completed_at": "2026-10-04T13:04:38Z",
+            "elapsed_seconds": 1164.0
+          },
+          {
+            "name": "Verify final immutable setup inputs",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 16,
+            "started_at": "2026-10-04T13:04:38Z",
+            "completed_at": "2026-10-04T13:04:38Z",
+            "elapsed_seconds": 0.0
+          },
+          {
+            "name": "Complete job",
+            "status": "completed",
+            "conclusion": "success",
+            "number": 17,
+            "started_at": "2026-10-04T13:04:38Z",
+            "completed_at": "2026-10-04T13:04:38Z",
+            "elapsed_seconds": 0.0
+          }
+        ],
+        "complete_job_pages": [
+          {
+            "total_count": 1,
+            "jobs": [
+              {
+                "id": 111438809261,
+                "run_id": 37203163630,
+                "workflow_name": "Copilot setup steps",
+                "head_branch": "codex/workflow-setup-convergence",
+                "run_url": "https://api.github.com/repos/franklesniak/PSStyleGuide/actions/runs/37203163630",
+                "run_attempt": 1,
+                "node_id": "CR_kwDOQkjdhM8AAAAZ8kVIrQ",
+                "head_sha": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+                "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/actions/jobs/111438809261",
+                "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37203163630/job/111438809261",
+                "status": "completed",
+                "conclusion": "success",
+                "created_at": "2026-10-04T12:44:46Z",
+                "started_at": "2026-10-04T12:44:50Z",
+                "completed_at": "2026-10-04T13:04:40Z",
+                "name": "Install locked repository validation tools",
+                "steps": [
+                  {
+                    "name": "Set up job",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 1,
+                    "started_at": "2026-10-04T12:44:51Z",
+                    "completed_at": "2026-10-04T12:44:51Z"
+                  },
+                  {
+                    "name": "Acquire triggering revision without an action",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 2,
+                    "started_at": "2026-10-04T12:44:51Z",
+                    "completed_at": "2026-10-04T12:44:58Z"
+                  },
+                  {
+                    "name": "Verify checkout credential cleanup",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 3,
+                    "started_at": "2026-10-04T12:44:58Z",
+                    "completed_at": "2026-10-04T12:44:59Z"
+                  },
+                  {
+                    "name": "Acquire published main reference",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 4,
+                    "started_at": "2026-10-04T12:44:59Z",
+                    "completed_at": "2026-10-04T12:45:00Z"
+                  },
+                  {
+                    "name": "Reject alternate npm install inputs",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 5,
+                    "started_at": "2026-10-04T12:45:00Z",
+                    "completed_at": "2026-10-04T12:45:00Z"
+                  },
+                  {
+                    "name": "Detect locked validation-tool layout",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 6,
+                    "started_at": "2026-10-04T12:45:00Z",
+                    "completed_at": "2026-10-04T12:45:01Z"
+                  },
+                  {
+                    "name": "Verify acquired immutable setup inputs",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 7,
+                    "started_at": "2026-10-04T12:45:01Z",
+                    "completed_at": "2026-10-04T12:45:01Z"
+                  },
+                  {
+                    "name": "Set up verified official Node.js runtime",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 8,
+                    "started_at": "2026-10-04T12:45:01Z",
+                    "completed_at": "2026-10-04T12:45:04Z"
+                  },
+                  {
+                    "name": "Verify selected Node.js runtime",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 9,
+                    "started_at": "2026-10-04T12:45:04Z",
+                    "completed_at": "2026-10-04T12:45:04Z"
+                  },
+                  {
+                    "name": "Install locked Node.js validation tools",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 10,
+                    "started_at": "2026-10-04T12:45:04Z",
+                    "completed_at": "2026-10-04T12:45:06Z"
+                  },
+                  {
+                    "name": "Verify locked dependency trees and immutable manifests",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 11,
+                    "started_at": "2026-10-04T12:45:06Z",
+                    "completed_at": "2026-10-04T12:45:07Z"
+                  },
+                  {
+                    "name": "Set up isolated Python 3.12",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 12,
+                    "started_at": "2026-10-04T12:45:07Z",
+                    "completed_at": "2026-10-04T12:45:10Z"
+                  },
+                  {
+                    "name": "Install locked Python validation tools",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 13,
+                    "started_at": "2026-10-04T12:45:10Z",
+                    "completed_at": "2026-10-04T12:45:13Z"
+                  },
+                  {
+                    "name": "Activate repository hooks",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 14,
+                    "started_at": "2026-10-04T12:45:13Z",
+                    "completed_at": "2026-10-04T12:45:14Z"
+                  },
+                  {
+                    "name": "Run complete repository validation",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 15,
+                    "started_at": "2026-10-04T12:45:14Z",
+                    "completed_at": "2026-10-04T13:04:38Z"
+                  },
+                  {
+                    "name": "Verify final immutable setup inputs",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 16,
+                    "started_at": "2026-10-04T13:04:38Z",
+                    "completed_at": "2026-10-04T13:04:38Z"
+                  },
+                  {
+                    "name": "Complete job",
+                    "status": "completed",
+                    "conclusion": "success",
+                    "number": 17,
+                    "started_at": "2026-10-04T13:04:38Z",
+                    "completed_at": "2026-10-04T13:04:38Z"
+                  }
+                ],
+                "check_run_url": "https://api.github.com/repos/franklesniak/PSStyleGuide/check-runs/111438809261",
+                "labels": [
+                  "ubuntu-24.04"
+                ],
+                "runner_id": 1000092937,
+                "runner_name": "GitHub Actions 1000092937",
+                "runner_group_id": 0,
+                "runner_group_name": "GitHub Actions"
+              }
+            ]
+          }
+        ],
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-setup-lifecycle-20261004\\round2-hosted-setup-pull_request.log",
+        "log_sha256": "ae58ffb3aeca088fbe5cf77cac1378ea96ba833a1dce53065b3e2ebf7a7c56a3",
+        "passed_hook_count": 11,
+        "passed_hook_lines": [
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:38.7223956Z check json...............................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:39.7390276Z check yaml...............................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:41.3453576Z fix end of files.........................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:43.0128390Z trim trailing whitespace.................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:44.1218673Z yamllint.................................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:44.4635739Z Lint GitHub Actions workflow files.......................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:45.5543429Z Validate Dependabot Config (v2)..........................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:46.8321334Z Validate GitHub Workflows................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:46.8669680Z staged Markdown..........................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T12:45:47.6919877Z workflow policy contract.................................................Passed",
+          "Install locked repository validation tools\tRun complete repository validation\t2026-10-04T13:04:37.8673902Z agent instruction contract and mutation tests............................Passed"
+        ],
+        "complete_validation_skips": 0
+      }
+    ],
+    "scope": "Actual ordinary GitHub push/PR Actions setup; current repaired input; not a separate Copilot agent session."
+  },
+  "recorded_at": "2026-10-04T13:22:25.148974+00:00",
+  "status": "source merged; exact-merge full acceptance pending",
+  "remaining": "Collect both landed setup/instruction results and actual landed setup log; then execute guarded source acceptance before coherent TF release."
+}

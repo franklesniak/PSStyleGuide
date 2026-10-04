@@ -1,0 +1,49 @@
+{
+  "captured_utc": "2026-10-04T13:12:22.639364+00:00",
+  "repositories": {
+    "PS": {
+      "repository": "franklesniak/PSStyleGuide",
+      "branch": "main",
+      "commit": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+      "tracked_blobs": 75,
+      "tree_truncated": false,
+      "identity_source": "authenticated GitHub REST commit and exact recursive tree",
+      "commit_object_local": "unavailable"
+    },
+    "TF": {
+      "repository": "franklesniak/TerraformStyleGuide",
+      "branch": "main",
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "tracked_blobs": 75,
+      "tree_truncated": false,
+      "identity_source": "authenticated GitHub REST commit and exact recursive tree",
+      "commit_object_local": "commit"
+    }
+  },
+  "ps_pr231_merge": {
+    "commit": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+    "parents": [
+      "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+      "f2c7f738265df29c123f7d627394c6bba1a5c7d0"
+    ],
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/commit/f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "message": "Merge pull request #231: prepare complete validation without source fixer edits\n\nIntegrate complete supported Copilot setup, independent-copy hook validation, preinstall policy checks and recursive devcontainer tree checks.\n\nGenerated with Codex.",
+    "matches_native_main": true
+  },
+  "final_ref_recheck": {
+    "PSStyleGuide": {
+      "commit": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+      "matches_start": true
+    },
+    "TerraformStyleGuide": {
+      "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+      "matches_start": true
+    }
+  },
+  "proof_limits": "PS commit object absent in supplied local PS store; authenticated REST commit/tree identity is authoritative. Raw bytes for all 150 blobs were independently read from local immutable Git object stores and verified by Git object hash, size and SHA256."
+}

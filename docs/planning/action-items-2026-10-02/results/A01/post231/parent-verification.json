@@ -1,0 +1,75 @@
+{
+  "verified_at": "2026-10-04T13:18:40.502674+00:00",
+  "worker_files": {
+    "REPORT.md": "d2079950f33902ffd4b50fb9ae993d64393d12e488cd7980dd64b743e7b24b6a",
+    "native-tree-union.json": "c67bc9c9496537b03487fedc63f429130b260869ba2f8bc9fe010708768bdc18",
+    "post231-native-raw.json": "0433a9b27ea391df2768202f0874962a6d5ca2096d9c6333c6c38cf96869fe13",
+    "native-identities.json": "8b5dd5ca3126dbdd3b01cf25720f31ee1af5b42b581eb5cee72486861ce11191"
+  },
+  "samples": [
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "side": "PS",
+      "mode": "100644",
+      "type": "blob",
+      "oid": "b0f7fb0b657232fa0e857e946d725fdd6876c028",
+      "size": 52385,
+      "raw_sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f"
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "side": "PS",
+      "mode": "100644",
+      "type": "blob",
+      "oid": "ade80d635425ce90e6520dfe934aa660eed46321",
+      "size": 8391,
+      "raw_sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "side": "PS",
+      "mode": "100644",
+      "type": "blob",
+      "oid": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+      "size": 98497,
+      "raw_sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb"
+    },
+    {
+      "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+      "side": "TF",
+      "mode": "100644",
+      "type": "blob",
+      "oid": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+      "size": 22102,
+      "raw_sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+    }
+  ],
+  "counts": {
+    "different": 54,
+    "equal": 13,
+    "one-sided": 16
+  },
+  "native_recheck": {
+    "PS": {
+      "main": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "repository_runner_pages": [
+        {
+          "total_count": 0,
+          "runners": []
+        }
+      ]
+    },
+    "TF": {
+      "main": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "repository_runner_pages": [
+        {
+          "total_count": 0,
+          "runners": []
+        }
+      ]
+    }
+  },
+  "result": "factual inventory accepted; no new unowned path or open issue; source acceptance is separate",
+  "limits": "Four raw Git blob/mode samples independently verified; remaining entries use worker and prior immutable evidence. No repeated full historical review or runtime race tests.",
+  "setup_note": "Initial scratch count assertions expected separate side labels and null keys; actual matrix uses one-sided and omitted absent keys. Corrected to verify 16 one-sided plus eight missing per side before any planning write."
+}

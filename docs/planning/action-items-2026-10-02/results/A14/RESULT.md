@@ -1,7 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # A14 current filesystem residual assessment
 
-## Changed-caller reassessment after PR230
+## Changed-caller reassessment after PR231
+
+Retain conditional-no-trigger at PS mainf168f83/treec82fa2e and unchanged TF06ad/treedc8f6. The [fresh raw inventory](../A01/post231/post231-native-raw.json) shows only the three A03 setup/devcontainer/test files changed. The generator, exact-path verifier, artifact verifier, CONTRIBUTING and build workflow remain identical to the post230 assessment. Root inspected the new validation-copy body: full hooks run once inside a checked disposable repository copy with GITHUB_WORKSPACE bound to that copy. This protects the original tree from ordinary fixer writes; it does not confine malicious same-user code or repair path-substitution races. Temporary-copy cleanup remains path-based. Copilot and devcontainer jobs retain empty permissions on Ubuntu24.04. Recursive devcontainer tree enumeration introduces no privileged publication consumer.
+
+The refreshed complete issue/comment census identifies no new supported-caller failure or admitted competing writer. PS155 remains open; PS156 remains closed not_planned with its historical limits. Both current complete repository self-hosted runner lists are empty, as recorded in [parent verification](../A01/post231/parent-verification.json). No new primitive or changed supported authority establishes a D92/D93 trigger. Reuse the existing selected conditional decisions; no new material repair or rubric is warranted. No new race, alias or hostile-writer runtime test is claimed. Reassess actual A06 and recovery-consumer changes when they occur.
+
+## Historical changed-caller reassessment after PR230
 
 Retain conditional-no-trigger at PS mainfb328893/treeed7ad456 and TF main06ad4f7/tree dc8f6b8. The current [A01 native matrix](../A01/post230/post230-native-raw.json) and coordinator raw verification show no new generator, exact-path verifier, artifact-verifier or CONTRIBUTING change from post229. The changed build workflow removes main-only push/PR filters and skips deleted pushes; root inspected its full current body and the exact native Git diff. Fresh Ubuntu24.04 verification still uses permissions:{}, anonymous exact-revision acquisition and the same real generator/verifier calls. The separate publication job remains contents:read and publishes committed artifacts only.
 

@@ -1,7 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # A01 current issue and native tree inventory
 
-## Current refresh after PR230: 2026-10-04
+## Current refresh after PR231: 2026-10-04
+
+Accepted factual inventory at PS main `f168f83b89f64b6bca9d520ddec4b58969060fb6` / tree `c82fa2e11bfe333b9bcaf732bf12d1d9cb907380` and unchanged TF `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` / tree `dc8f6b82588b8f874d34cd5d0155791aea5793f1`. The complete83-path union remains13 equal,54 different,8 PS-only and8 TF-only, with75 blobs per side. Only the three PR231 A03 files changed. No new unowned path, open issue or conflicting PR appeared. Five open issues and seven comments remain; closed PS156 retains not_planned and its historical limits. Historical81 paths/402 contracts/26 absent-both references retain their prior dispositions.
+
+The [report](post231/REPORT.md), [complete raw inventory and issue evidence](post231/post231-native-raw.json) and [parent verification](post231/parent-verification.json) bind this observation. Root read the full report, independently sampled all three changed PS blobs plus the TF recovery helper, verified report/catalog hashes and recomputed inventory counts. A fresh native main recheck agrees; both complete repository runner lists remain empty. The dated pending-CI statement is an inventory limit, not source acceptance. Relevant A14 inputs were reassessed separately. This inventory does not establish paired convergence.
+
+## Previous refresh after PR230: 2026-10-04
 
 Accepted factual inventory: PS main `fb3288934215dfa9a25114cf79ad86e60b5fb107` / tree `ed7ad456a7147152d2c289908066195689127e85`; TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` / tree `dc8f6b82588b8f874d34cd5d0155791aea5793f1`. The complete83-path union remains13 equal,54 different,8 PS-only and8 TF-only, with75 blobs per side. Eleven PS blobs changed from post229; no path or TF change occurred. Historical81 paths,402 obligations and26 absent-both references retain their dispositions and owners.
 
