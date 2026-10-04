@@ -92,3 +92,11 @@ Node specifies timeout in milliseconds, maxBuffer in bytes on stdout/stderr, and
 ## Coordinator selection
 
 Root read the full proposal, checked both current production sites and native probes, verified the proposal SHA256 `8161c1f1e00e2d579e523017fa465839e339d96f518a84b2a767c9f768505ab1`, and recalculated all option totals. Options, separate rubrics, score tables and selected actions were displayed to the owner in that order before release. Select E98.6. The original proposal describes pre-edit evidence; no repaired candidate is accepted yet.
+
+## Private implementation and focused verification
+
+The selected one-call change is implemented in frozen private postimages. Windows and Linux each reject the actual3MiB child under current and injected4MiB defaults, and each accepts a smaller valid child. Existing native50ms timeout/failure controls pass; no two-minute sleep is claimed. [Actual commands, logs and exact postimages](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/implementation/round3-review-findings/repair/HANDOFF.md). [Independent bounded repair review](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/TF66-R12-R13-REPAIR-REVIEW-20261004.md) passed with no material finding. Root read the full patch and reports, sampled native logs and verified artifact hashes. Proposed staged preflight passed on tree `d59a740b7b1d88f7986075ac9328d9998629aa71`; the sole full aggregate is running. No product commit, new-head review, final PR acceptance or paired delivery is claimed.
+
+## Published repair and review continuation
+
+The exact three-file repair is published in `dde2b9abe761af69a7f561512df7d44d0dec6745`. The sole full aggregate completed23:13:39Z with all11 hooks passed and zero skips; normal commit/push, actual H/B checks and fresh ordinary audit passed. The review reply is posted, the thread is resolved, and the owned eyes reaction is removed. [Canonical current peer evidence](../A02/coherent-peer-candidate.json) holds the native IDs, final-byte validation and round4 requests. Current-input remote review and hosted results, final independent quality and landed acceptance remain pending. Prior private-stage statements above describe their original checkpoint.
