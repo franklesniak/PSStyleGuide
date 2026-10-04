@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # R11: execute the actual CLI through a linked checkout
 
-Status: H-inline98 selected. Root read the complete proposal, checked its hash and score arithmetic, displayed the options, rubric, scores and controlled-English selection in order, then released private implementation. This is the canonical R11 decision. Product integration and final validation remain pending.
+Status: selected solution implemented privately; focused Windows/Linux checks and independent repair review pass. Complete aggregate and native delivery remain pending. This is the canonical finding decision.
 
 ## Inputs and validated boundary
 
@@ -118,5 +118,11 @@ Node documents `import.meta.main` as actual entry-module detection, added in v24
 The selected private implementation may change the five production modules and their existing counterpart test files. R6 remains frozen. Root owns integration and the final aggregate. This decision does not claim product publication, acceptance, main/main equality or a new transfer.
 
 [Private source proposal and exact evidence](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/implementation/round2-review-findings/copilot-proposals/R11-linked-entry-proposal.md).
+
+## Final private implementation and focused verification
+
+The selected guard is implemented at all five ESM entry sites. Only the classifier adds a built-in fs import. The existing NpmTools test file supplies ten shared entry/import tests; no new helper dependency or workflow is introduced. All ten tests fail against the original guards and pass against the repaired supported-runtime code. The forced fallback passes ten tests/25 child controls on Node24.18.1; that is not an actual older-runtime run. Final combined focused evidence passes40 unique cases per Windows TEMP mode and39 per Linux mode, with one repeated Linux hook per mode. Actual prior180-second Linux timeouts remain recorded; verified identical dependencies in private tmpfs completed the unfinished scopes under unchanged limits.
+
+The [independent review](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/TF66-R8-R9-R11-REPAIR-REVIEW-20261004.md) reports no material product defect. The [exact commands, logs and frozen handoff](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/implementation/round2-review-findings/copilot-repair/HANDOFF.md) bind all results to the frozen postimages. These nine remaining repair files combine with frozen R6 into11 paths and proposed tree `dbedf311df49a23ffb439f129e8d1b174cd2b2dc`. Proposed staged preflight passes. Sole full aggregate8796 is running; product H4375f2e, review counters and transfers are unchanged.
 
 Generated with Codex

@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # R9: Reject conflicting repeated Markdown input labels
 
-Status: C99 selected after the ordered validation, options, rubric and score display. Root read the complete proposal and released the private two-path implementation, combined with the separately selected R8 test-fixture correction. Product integration and validation remain pending. This is the canonical R9 decision.
+Status: selected solution implemented privately; focused Windows/Linux checks and independent repair review pass. Complete aggregate and native delivery remain pending. This is the canonical finding decision.
 
 ## Validated finding and scope limits
 
@@ -85,5 +85,11 @@ This is a JavaScript implementation-specific input contract. The R6 full PowerSh
 [Actual API](https://github.com/franklesniak/TerraformStyleGuide/blob/4375f2e3c98a6aeb0dd916d26620ed63a42abafe/.github/workflows/lint-nested-markdown.js#L369), [staged caller](https://github.com/franklesniak/TerraformStyleGuide/blob/4375f2e3c98a6aeb0dd916d26620ed63a42abafe/.github/workflows/lint-staged-markdown.mjs#L94), [outer caller](https://github.com/franklesniak/TerraformStyleGuide/blob/4375f2e3c98a6aeb0dd916d26620ed63a42abafe/.github/workflows/lint-markdown.mjs). Sources read from immutable local H blobs; installed glob13.0.6 dist/commonjs/walker.js lines23/310/315 corroborate result-set uniqueness for the current discovery implementation. No external caller inventory or universal uniqueness claim is made.
 
 Root's round2-copilot-validation/results.json records the exact current API outcomes at2026-10-04T19:09:58.678Z on Windows Node24.18.1. Reuse its original harness/log hashes; no redundant probe was run here. Root owns public review responses and native lifecycle. This artifact contains no implementation or repair postimage.
+
+## Final private implementation and focused verification
+
+The selected conflict check is implemented in the private nested-Markdown helper with five meaningful API tests. Both conflicting orders fail with the check removed; the repaired tests pass. Clean identical repeats retain0, invalid identical repeats retain1, and distinct exact labels remain independent. All24 lint cases pass in ordinary and linked TEMP on Windows and Linux. Existing staged-byte, native-hook and R2 boundary tests remain. No current duplicate-label caller exploit is asserted.
+
+The [independent review](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/TF66-R8-R9-R11-REPAIR-REVIEW-20261004.md) reports no material product defect. The [exact commands, logs and frozen handoff](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/implementation/round2-review-findings/copilot-repair/HANDOFF.md) bind all results to the frozen postimages. These nine remaining repair files combine with frozen R6 into11 paths and proposed tree `dbedf311df49a23ffb439f129e8d1b174cd2b2dc`. Proposed staged preflight passes. Sole full aggregate8796 is running; product H4375f2e, review counters and transfers are unchanged.
 
 Generated with Codex

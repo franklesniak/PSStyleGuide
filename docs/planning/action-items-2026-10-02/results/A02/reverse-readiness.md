@@ -1,7 +1,17 @@
 <!-- markdownlint-disable MD013 -->
 # Reverse-source readiness from staged Terraform
 
-## Current round1 repair readiness
+## Current round2 repair readiness
+
+The frozen11-file repair produces tree `dbedf311df49a23ffb439f129e8d1b174cd2b2dc`, matching root's actual proposed index. Its full B-to-proposed diff contains40 paths. The actual PS reverse scope is20 paths, up from14. Six additional obligations are Check-NpmAudit.mjs/test, Classify-InstructionMaintenance.mjs, NpmTools.mjs/test and Validate-WorkflowPolicy.mjs under .github/workflows. Existing R6/R8/R9/R11 decisions cover these changes; no new material finding or writer release is implied.
+
+The [complete read-only report](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A02-reverse-round2-readiness-20261004/REPORT.md) and [exact mapping](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A02-reverse-round2-readiness-20261004/mapping.json) bind all40 dispositions, all20 obligations, modes/raw blobs, common-region adaptations and actual PS metadata preimages. All103 static checks pass. Root read the report and verified both hashes and the matching proposed tree. Report SHA256 is `bad964e733225191c1e222fc80532431741b47ea867eb478aa237d1e8946cdf5`; mapping SHA256 is `1a211c227f0e1ae307f76f8ed616c2e6823acd45dff98dae4fe6672f9bcf5b32`.
+
+Nine paths support exact copying after acceptance; the remaining11 require controlled identity, engine, test, workflow, document or metadata integration. Preserve PS P1 history and semantic fixtures. Read the actual accepted PS metadata and authoring UTC before implementation: an advanced date can start at revision0; a changed tuple on its already-published date needs the next revision. Do not copy unpublished TF .0 notes without that check.
+
+This remains preparation. TF acceptance, refreshed accepted TF/current PS identities and the appropriate transfer increments are required before a PS writer is released. Sole aggregate8796 validates the proposed TF tree now. Earlier readiness sections retain their historical inputs and are superseded for current path counts.
+
+## Historical round1 repair readiness
 
 The proposed TF tree `099bb0f83403b6b61cfa2dafa73916b315c791d3` expands the prior eleven-path reverse scope to **fourteen**. It retains exactly39 B-to-candidate paths and8 H-to-repair paths. The three added common paths are `.github/workflows/lint-markdown.mjs`, `lint-markdown.test.mjs` and `lint-nested-markdown.js`. Existing E97/R2/R3/R5 decisions apply; no new material finding or authority question was found.
 

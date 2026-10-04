@@ -1,6 +1,6 @@
 {
-  "recorded_at": "2026-10-04T19:48:11.203209+00:00",
-  "status": "round2_findings_validation_and_private_repair",
+  "recorded_at": "2026-10-04T20:32:38.051983+00:00",
+  "status": "round2_proposed_aggregate_running",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -2858,8 +2858,8 @@
       "old_input_clean": false
     }
   },
-  "current_review_status": "round2_findings_validation_and_private_repair",
-  "next_action": "Collect frozen combined R8/R9/R11 private repair and focused Windows/Linux evidence. Reuse verified R6; complete independent remaining quality, one final aggregate, normal commit/publication and current-input native reviews.",
+  "current_review_status": "round2 terminal/nonclean; frozen repair under full aggregate",
+  "next_action": "Collect the sole round2 proposed-validation process; do not alter product, fixture, dependencies, index or wrapper-owned state.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -2971,14 +2971,14 @@
         "path": ".github/workflows/lint-markdown.test.mjs",
         "line": 31,
         "body": "`remove()` can fail on platforms where `os.tmpdir()` is a symlinked path (common on macOS, e.g. `/var` vs `/private/var`). `mkdtempSync(path.join(os.tmpdir(), ...))` will use the non-realpath form, so `path.dirname(root)` may not equal `fs.realpathSync(os.tmpdir())` even though the directory is correct. Compare realpaths on both sides (e.g., `fs.realpathSync(path.dirname(root))`) or use `path.resolve()` consistently to keep this portability check from failing on non-Linux environments.",
-        "state": "selected_private_implementation_released",
+        "state": "private_repair_verified_pending_integration",
         "worker": "/root/a02_tf_coherent_implementation",
         "reaction_id": 450109084,
         "validation_summary": "Real Windows junction proves lexical parent versus realpath mismatch. Both realpaths compare equal. No recursive cleanup performed by reproduction; repair still pending.",
         "validation_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-copilot-validation\\results.json",
         "selection": "Canonical parent comparison at all six identical test-fixture assertions across three existing test files; preserve names/guards; actual ordinary and linked TEMP validation.",
         "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R8-fixture-note.md",
-        "decision_sha256": "d3ff9a8ee581c7bf490703c8564bf4bce1717cff8aef44b0a70bd18b4fd26966"
+        "decision_sha256": "5928d9955a2c7085dffc5ce4d4af8424dcc31b3208c91a03fa2c19edd3a92e91"
       },
       {
         "key": "R9",
@@ -2988,14 +2988,14 @@
         "path": ".github/workflows/lint-nested-markdown.js",
         "line": 385,
         "body": "`strings[input.filePath] = input.content;` silently overwrites if the same `filePath` appears multiple times in `markdownInputs`, which can hide lint failures for the overwritten content. Consider rejecting duplicates explicitly (throw with a clear tooling-failure message) or normalizing inputs so each path is guaranteed unique before building the `strings` object.",
-        "state": "selected_private_implementation_released",
+        "state": "private_repair_verified_pending_integration",
         "worker": "/root/a02_tf_coherent_implementation",
         "reaction_id": 450109085,
         "validation_summary": "Actual shared API returns0 for invalid then clean content with identical file label; reverse order returns1. No duplicate input demonstrated from current Git/glob production callers. Full decision required.",
         "validation_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-copilot-validation\\results.json",
-        "selection": "Reject conflicting exact labels before lint; accept identical content repeats; retain unique-label behavior. Full table displayed, totals verified including F41. No R9 implementation released yet.",
+        "selection": "Reject conflicting exact labels before lint; accept identical content repeats; retain unique-label behavior. Full table displayed, totals verified including F41.",
         "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R9-conflicting-labels.md",
-        "decision_sha256": "85142f62abd90c312b2f2dd548e0bea1f04654faaa5f2b52f6ac440d7ac78c03"
+        "decision_sha256": "23ac8b60a615e65869a1ad400749e9f6eb84ce412557a5dd379cd4c54a570771"
       },
       {
         "key": "R10",
@@ -3016,7 +3016,7 @@
       {
         "key": "R11",
         "origin": "local linked-temporary-directory validation of R8",
-        "state": "selected_private_implementation_released",
+        "state": "private_repair_verified_pending_integration",
         "summary": "Five direct-entry guards compare lexical argv with the canonical module path and silently skip actual CLI work through a linked directory.",
         "paths": [
           ".github/workflows/lint-markdown.mjs",
@@ -3027,9 +3027,9 @@
         ],
         "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round2-review-findings\\copilot-proposals\\R11-evidence\\results.json",
         "evidence_sha256": "b07d29771314b7e1e975fa11d3c8e479269a12e283d05d5644015aed0fa80c61",
-        "scope": "Production finding separate from R8 fixture cleanup and R9 duplicate-label handling; no R11 implementation released.",
+        "scope": "Production finding separate from R8 fixture cleanup and R9 duplicate-label handling; selected private repair is verified and not yet integrated.",
         "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R11-linked-cli-entry.md",
-        "decision_sha256": "0c3b8b023834838ecf19a8634e3acd929d54db37f00d5a1b7580dfd280004d46",
+        "decision_sha256": "cf2116e04686d27ad631e06a81555804af3ab522fa850f1f2a570c74f9aa01eb",
         "selected_option": "H-inline",
         "selected_score": 98,
         "selected_at": "2026-10-04T19:48:11.181043+00:00"
@@ -3070,6 +3070,133 @@
       "R9_negative_control": "Two guard-removal mutant cases fail at the intended rejection assertion.",
       "linux": "First ordinary Markdown suite exceeded the harness 180-second timeout; incomplete verdict, linked run not reached.",
       "production_integrated": false
+    },
+    "planning_checkpoint": {
+      "head": "e03d2016f96bb510c7dbe0a1b6977db7f2b33ec9",
+      "normal_commit_and_push": true,
+      "record": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-checkpoint-20261004-TF-round2-decisions/publication-state.json"
+    },
+    "frozen_repair": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-repair-admission.json",
+      "sha256": "090033741659f80c39ed93eaa0764e465eab432efe3cfb6f97258e71e1306161",
+      "paths": [
+        ".github/workflows/Check-NpmAudit.mjs",
+        ".github/workflows/Check-NpmAudit.test.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.mjs",
+        ".github/workflows/NpmTools.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/lint-markdown.mjs",
+        ".github/workflows/lint-markdown.test.mjs",
+        ".github/workflows/lint-nested-markdown.js"
+      ],
+      "path_count": 11,
+      "quality_state": "Both disjoint bounded repair reviews PASS; complete proposed aggregate still running.",
+      "linux_state": "Focused Windows/Linux evidence complete; earlier actual timeouts and one repeated Linux hook per mode retained."
+    },
+    "proposed_validation": {
+      "created_at": "2026-10-04T19:58:37.670261+00:00",
+      "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-validation-checkout",
+      "published_base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "product_parent_head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+      "candidate_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+      "dependency_count": 1910,
+      "index_catalog_sha256": "6ce49b8147a2c8135fbe99e3dc1e11819ac21c1f1a142c0a92f85bb0180d4cd6",
+      "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+      "product_unchanged": true,
+      "dependencies_unchanged": true,
+      "state": "aggregate_running",
+      "staged_preflight": {
+        "state": "passed",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-RequireStagedInputMatch"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-validation-checkout",
+        "started_at": "2026-10-04T19:58:59.656008+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-staged_preflight.log",
+        "pid": 168092,
+        "candidate_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+        "before_identity_passed": true,
+        "after_identity_passed": true,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+        "exit_code": 0,
+        "finished_at": "2026-10-04T19:59:51.134522+00:00",
+        "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
+      },
+      "aggregate": {
+        "state": "running",
+        "command": [
+          "py",
+          "-3.12",
+          "-m",
+          "pre_commit",
+          "run",
+          "--all-files"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-validation-checkout",
+        "started_at": "2026-10-04T19:59:51.141055+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-aggregate.log",
+        "pid": 168092,
+        "candidate_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+        "before_identity_passed": true,
+        "after_identity_passed": false,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit."
+      }
+    }
+  },
+  "pending_repair_readiness": {
+    "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+    "proposed_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+    "aggregate_session": 8796,
+    "aggregate_status": "running; owning wrapper must finish before execution-state.json is updated",
+    "repair_quality": [
+      {
+        "verdict": "PASS",
+        "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/TF66-R6-REPAIR-REVIEW-20261004.md",
+        "sha256": "25fea28c7a4d49442f8c6016f9e1b153aa595f9634d59bc18d3bea2b6665a2ed"
+      },
+      {
+        "verdict": "PASS",
+        "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/TF66-R8-R9-R11-REPAIR-REVIEW-20261004.md",
+        "sha256": "5aa6bdef66b746fac275234bf048fa3656597b05216930e3055feea59d0f6f4f"
+      }
+    ],
+    "remaining_private_validation": {
+      "state": "passed",
+      "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/implementation/round2-review-findings/copilot-repair/verification.json",
+      "sha256": "98a8a25c7d296011a885dac6d61606ef461fdd222ebba039a67fab7a445ba9e0",
+      "handoff": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/implementation/round2-review-findings/copilot-repair/HANDOFF.md",
+      "handoff_sha256": "7296298457b2155554d2e49d6ed802b2fda161c21e84cd6bd7acfc394523b6c0",
+      "source_guard": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/implementation/round2-review-findings/copilot-repair/final-source-guard.json",
+      "source_guard_sha256": "7e29384e7be9c3966baf946175e29002144a33ef047779e927dc63d67ee62d57",
+      "windows_unique_per_mode": 40,
+      "linux_unique_per_mode": 39,
+      "linux_executions_per_mode": 40,
+      "linux_limit": "The hook was repeated once per mode by the isolated diagnostic; earlier actual timeouts remain recorded. Identical dependencies in private tmpfs completed previously incomplete scopes under the same timeout.",
+      "fallback_limit": "Forced branch on Node24.18.1, not an actual older-runtime run."
+    },
+    "provisional_reverse": {
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-round2-readiness-20261004\\REPORT.md",
+      "report_sha256": "bad964e733225191c1e222fc80532431741b47ea867eb478aa237d1e8946cdf5",
+      "mapping": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-round2-readiness-20261004\\mapping.json",
+      "mapping_sha256": "1a211c227f0e1ae307f76f8ed616c2e6823acd45dff98dae4fe6672f9bcf5b32",
+      "reverse_paths": 20,
+      "tf_pr_changed_paths": 40,
+      "proposed_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+      "state": "readiness only; TF acceptance and refreshed native identities required before transfer increment and PS writer release"
+    },
+    "review_preparation": {
+      "browser_readiness": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-browser-readiness.json",
+      "reply_drafts": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-thread-replies-draft.json",
+      "state": "Authenticated Balanced control available; five compact replies prepared; no new request or reply sent."
     }
   }
 }
