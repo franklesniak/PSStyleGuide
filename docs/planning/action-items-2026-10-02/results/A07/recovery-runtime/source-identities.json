@@ -1,0 +1,287 @@
+[
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": "package.json",
+    "mode": "100644",
+    "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+    "bytes": 816,
+    "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+  },
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": ".github/workflows/package.json",
+    "mode": "100644",
+    "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+    "bytes": 844,
+    "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+  },
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": ".github/workflows/ci-toolchain.json",
+    "mode": "100644",
+    "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+    "bytes": 91,
+    "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+  },
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": ".github/workflows/Initialize-CiToolchain.ps1",
+    "mode": "100644",
+    "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+    "bytes": 5844,
+    "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220"
+  },
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+    "mode": "100644",
+    "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+    "bytes": 3081,
+    "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+  },
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": ".github/workflows/NpmTools.mjs",
+    "mode": "100644",
+    "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+    "bytes": 7375,
+    "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+  },
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+    "mode": "100644",
+    "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+    "bytes": 25947,
+    "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+  },
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    "mode": "100644",
+    "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+    "bytes": 32648,
+    "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+  },
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+    "absent": true
+  },
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": ".github/workflows/build.yml",
+    "mode": "100644",
+    "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+    "bytes": 4375,
+    "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+  },
+  {
+    "repository": "PS",
+    "commit": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+    "path": ".github/workflows/Test-CiHelpers.test.mjs",
+    "mode": "100644",
+    "blob": "72b634c0664b410bca45d6331718501ff8a476f1",
+    "bytes": 43570,
+    "sha256": "a25b8fe08ef317e4d8bd50886e5bbec265d59d287d6115e549855fc2f8085cf1"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": "package.json",
+    "mode": "100644",
+    "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+    "bytes": 837,
+    "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/package.json",
+    "mode": "100644",
+    "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+    "bytes": 1105,
+    "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/ci-toolchain.json",
+    "mode": "100644",
+    "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+    "bytes": 91,
+    "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Initialize-CiToolchain.ps1",
+    "mode": "100644",
+    "blob": "906460d818674199b32294185ed6525c143b48bb",
+    "bytes": 5706,
+    "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+    "mode": "100644",
+    "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+    "bytes": 3088,
+    "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/NpmTools.mjs",
+    "mode": "100644",
+    "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+    "bytes": 7375,
+    "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+    "mode": "100644",
+    "blob": "995b72a7b48dea2636094d81226893a519950797",
+    "bytes": 25568,
+    "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    "mode": "100644",
+    "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+    "bytes": 31949,
+    "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+    "mode": "100644",
+    "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+    "bytes": 22102,
+    "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/build.yml",
+    "mode": "100644",
+    "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+    "bytes": 4222,
+    "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+  },
+  {
+    "repository": "TF",
+    "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "path": ".github/workflows/Test-CiHelpers.test.mjs",
+    "mode": "100644",
+    "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+    "bytes": 33662,
+    "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+  },
+  {
+    "repository": "PS-planning",
+    "commit": "cd2829da04462677f3899d12abac3a50d024d484",
+    "path": "docs/planning/action-items-2026-10-02/DECISION-PROCESS.md",
+    "mode": "100644",
+    "blob": "38d642e48b761784d31e21dce6ddfe744cd8ff95",
+    "bytes": 5582,
+    "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299"
+  },
+  {
+    "repository": "PS-planning",
+    "commit": "cd2829da04462677f3899d12abac3a50d024d484",
+    "path": "docs/planning/action-items-2026-10-02/tasks/A07.md",
+    "mode": "100644",
+    "blob": "b783c0286a4a29cd9315bc0263f882ebaf41e977",
+    "bytes": 4000,
+    "sha256": "0a815e863ff14348e5fbeaa267af24bb11a6f3f48ee2e7c43b0c03d18f14bdee"
+  },
+  {
+    "repository": "PS-planning",
+    "commit": "cd2829da04462677f3899d12abac3a50d024d484",
+    "path": "docs/planning/action-items-2026-10-02/results/A07/RESULT.md",
+    "mode": "100644",
+    "blob": "6a29c973290aaaa660633600ea881585a41a27fa",
+    "bytes": 56008,
+    "sha256": "96c223288d5cd843dc05f7fa200c59f285c9bf20468ad5b57f53e3a0626256aa"
+  },
+  {
+    "repository": "PS-planning",
+    "commit": "cd2829da04462677f3899d12abac3a50d024d484",
+    "path": "docs/planning/action-items-2026-10-02/results/A04/design.md",
+    "mode": "100644",
+    "blob": "e9fb34af5281753f796f27b922c97e8b51a2e29d",
+    "bytes": 18375,
+    "sha256": "3ce4a86710b9a4ef80bd0cce38a695b444dbbc2664253640998ab8a21377e057"
+  },
+  {
+    "repository": "PS-planning",
+    "commit": "cd2829da04462677f3899d12abac3a50d024d484",
+    "path": "docs/planning/action-items-2026-10-02/results/A03/copilot-curl-decision.md",
+    "mode": "100644",
+    "blob": "d527c670fc65ad95962122059df3d1cd287f7eaa",
+    "bytes": 12593,
+    "sha256": "b99460a2a27ac7f2726c4717b3241c9554d05784089f6507bf0f804d537bb95b"
+  },
+  {
+    "repository": "PS-planning",
+    "commit": "cd2829da04462677f3899d12abac3a50d024d484",
+    "path": "docs/planning/action-items-2026-10-02/results/A15/foundation-refresh/REPORT.md",
+    "mode": "100644",
+    "blob": "d85e368edf3caa7f22d41cef85a76f3373a5e421",
+    "bytes": 16807,
+    "sha256": "f504b47be06d612ae90a94b147617c2459900fe4fb4e5c07e6bb91bacee4f1f6"
+  },
+  {
+    "repository": "PS-planning",
+    "commit": "cd2829da04462677f3899d12abac3a50d024d484",
+    "path": "docs/planning/action-items-2026-10-02/results/A15/scope-manifest.json",
+    "mode": "100644",
+    "blob": "62952ba7de6c986c42e9b11b993880fdf62dea77",
+    "bytes": 15846,
+    "sha256": "6f70f6773014d2a0313184789a72335c6200357e509c08832852003621493a29"
+  },
+  {
+    "repository": "PS-planning",
+    "commit": "cd2829da04462677f3899d12abac3a50d024d484",
+    "path": "docs/planning/action-items-2026-10-02/results/A15/read-only-design.md",
+    "mode": "100644",
+    "blob": "797e6936b9450f5036eb91749a478593a7b54d57",
+    "bytes": 49708,
+    "sha256": "176653b2316a0a613f6b040d7cda54fa98dc04e6728776cb85eaa6d2aa9eca89"
+  },
+  {
+    "repository": "PS-planning",
+    "commit": "cd2829da04462677f3899d12abac3a50d024d484",
+    "path": "docs/planning/action-items-2026-10-02/results/A15/D5-proposal/D5-continuation.md",
+    "mode": "100644",
+    "blob": "7cee9ed9b1e6540151e5152b90d274940dcac006",
+    "bytes": 16119,
+    "sha256": "0b434f3dec7a69226418ec280912e97f2391491e361c2cb6746c8f7bec2c9368"
+  },
+  {
+    "repository": "PS-planning",
+    "commit": "cd2829da04462677f3899d12abac3a50d024d484",
+    "path": "docs/planning/action-items-2026-10-02/results/A15/identity-handoff.md",
+    "mode": "100644",
+    "blob": "c79fd23550f1b1be22ad70b2e36f20a33e77da0c",
+    "bytes": 20291,
+    "sha256": "f5a9e0557fba00345827d0996bc38bbed197b431f7a43198e42945f592f8d0f0"
+  }
+]

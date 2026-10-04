@@ -1,0 +1,14 @@
+<!-- markdownlint-disable MD013 -->
+# Selected recovery runtime foundation
+
+The coordinator selected R5 (95/100) and B1 (94/100) on 2026-10-04 after displaying the validated findings, all options, each separate detailed rubric, the complete scoring tables and the selected instructions. The owner directs execution of clear winners. No new design approval is required. The complete [proposal](PROPOSAL.md) is the selected future implementation contract, subject to its actual prerequisite and verification boundaries.
+
+Extend the existing installer. Keep Node24.18.1/npm11.16.0 for ordinary work. Add the reviewed Windows archive. Add exact Linux Node22.23.3/npm10.9.9 only for recovery compatibility tests. Return its absolute path after successful setup. Do not use Node22 for ordinary package installation. Use fixed reviewed Windows bootstrap tools. Keep the existing Linux credential checks. Update the Windows credential helper and every direct metadata reader in the same coordinated integration.
+
+Copilot setup must admit the explicitly described historical flat declaration and the new schema2 declaration through separate validated branches. Keep the existing historical capability cases, full hooks, immutable-input checks and D6 transport policy. Reject malformed or mixed declarations. Use the final accepted A03 workflow and tests, including D9/D12/D13; do not overwrite them with an older source.
+
+Root read the complete proposal, checked all15 score totals, sampled six native source identities and four evidence hashes, and independently obtained the official Node checksum lists. The final bounded consumer clarification adds no option or score change. Root checked all four immutable f2c7f738 consumer blobs/modes/raw hashes. Source refs remain PSfb328893/TF06ad4f7; f2c7f738 is a proposed source input, not accepted main. [Source identities](source-identities.json) and [evidence manifest](evidence-manifest.json) retain the original limits and private evidence location.
+
+No archive was executed, runtime installed or product changed for this proposal. The three real archive layouts, extraction-limit headroom, Windows access controls, actual runner/tool identities and required platform tests remain implementation obligations. Signature verification is not claimed. The existing foundations must be accepted before A16 integration. Actual operator and independent-peer Gate A/B approvals remain later boundaries after implementation evidence exists.
+
+Formatting note: the worker proposal contained incorrectly decoded punctuation. Root reversed that one encoding error for the canonical copy, verified a byte-exact reverse conversion, and retained the original private bytes/hash. No wording, score, option or selected contract changed.

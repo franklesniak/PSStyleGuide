@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A15 current result
 
+**Future foundation closure:** The selected [A07 R5/B1 proposal](../A07/recovery-runtime/SELECTION.md) now names the missing Windows credential helper and Copilot metadata consumers. The same [scope manifest](scope-manifest.json) adds exactly those two A03 integration paths; its existing CI-helper test path covers their fixtures. Gate A13/Gate B9 recovery-owned paths and all31 acceptance assignments remain unchanged. This records future owner coordination and does not implement or accept A16/A17.
+
 State: complete for A15 read-only design and proposal preparation at PSfb328893/TF06ad4f7. The owner on2026-10-03 requires full decision preparation and directs use of a clear winner; D08 records that authority. D1–D6/D3a winners are selected, the repaired proposal passed independent review, all31 acceptance items have explicit Gate A/B test owners, and current foundation interfaces are reconciled. No repeat design-choice request is pending. This does not complete A16/A17 implementation or actual Gate A/B approvals.
 
 Read [the current task](../../tasks/A15.md) and [updated canonical decisions](read-only-design.md). Options precede each distinct detailed rubric, which precedes its complete table and selection. UX and QA concerns are explicit. D1 current manifest98, D2 current build graph98, D3 Windows collector/common tokenizer92, D4 complete roles/fixed operations92, D5 preserved/split atomic outcomes96 and D6 bounded exceptional fallback92 are the clear winners. [D3a](identity-handoff.md#d3a-select-a-concrete-windows-child-lifetime-mechanism) fills the process-mechanism gap with creation-time private Job Object assignment95; its production execution proof is an A16 obligation.

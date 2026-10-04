@@ -63,13 +63,15 @@
         ".github/workflows/Validate-WorkflowPolicy.mjs",
         ".github/workflows/Validate-WorkflowPolicy.test.mjs",
         ".github/workflows/workflow-policy-cases.json",
-        ".github/workflows/Test-CiHelpers.test.mjs"
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-CheckoutCredentials.ps1",
+        ".github/workflows/copilot-setup-steps.yml"
       ],
       "consumeWithoutAssumingEdit": [
         ".github/workflows/markdownlint.yml",
         ".github/workflows/workflow-policy-contract.json"
       ],
-      "contract": "Same-revision Linux/T2 plus Windows5.1/7 gate before read-only publication; D2 selects the native build graph under D08. Do not change action allowlist/contract merely for a new job if unchanged. Alternative reusable topology requires same canonical D2 revision."
+      "contract": "Same-revision Linux/T2 plus Windows5.1/7 gate before read-only publication; D2 selects the native build graph under D08. Do not change action allowlist/contract merely for a new job if unchanged. Alternative reusable topology requires same canonical D2 revision. Selected A07 R5/B1 requires Windows credential-helper support and explicit flat/schema2 Copilot metadata readers with existing historical/current helper tests retained. Integrate after current A03 source acceptance; do not alter its live PR."
     },
     "A06": {
       "requiredIntegrationPaths": [
@@ -90,7 +92,7 @@
         "package.json",
         "package-lock.json"
       ],
-      "contract": "Checksum-reviewed exact locked Linux and Windows Node/npm acquisition usable by5.1/7 test hosts; native installer is Linux-only7.3. Same-version declaration24.18.1/npm11.16.0 is existing input, not approval of Windows CI installation."
+      "contract": "Checksum-reviewed exact locked Linux and Windows Node/npm acquisition usable by5.1/7 test hosts; native installer is Linux-only7.3. Same-version declaration24.18.1/npm11.16.0 is existing input, not approval of Windows CI installation. Selected R5/B1: preferred24.18.1/11.16.0 Linux/Windows plus separately returned Linux22.23.3/10.9.9 recovery executable; never use Node22 for ordinary root packages. See ../A07/recovery-runtime/SELECTION.md."
     },
     "A21": {
       "requiredIntegrationPaths": [
@@ -377,6 +379,24 @@
       "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
       "bytes": 3566,
       "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+    },
+    ".github/workflows/Test-CheckoutCredentials.ps1": {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+      "bytes": 3088,
+      "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+    },
+    ".github/workflows/copilot-setup-steps.yml": {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+      "bytes": 33862,
+      "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
     }
   }
 }

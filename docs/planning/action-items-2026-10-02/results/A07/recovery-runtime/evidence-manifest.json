@@ -1,0 +1,105 @@
+{
+  "sourceCount": 32,
+  "scoreRowsRecomputed": 15,
+  "productTestsRun": false,
+  "executableArchivesDownloaded": false,
+  "files": [
+    {
+      "file": "native-end.json",
+      "bytes": 308,
+      "sha256": "e1370916e901278e03d0ace36d1f83267c6bd6960ddfb6b4b56e1bc8f732831f"
+    },
+    {
+      "file": "native-start.json",
+      "bytes": 308,
+      "sha256": "3826a2cd9b51aa1171746a4bf40ade4c0c99b5a13142c0e87a5011b636ca31a9"
+    },
+    {
+      "file": "node-index.json",
+      "bytes": 331923,
+      "sha256": "700401a06eb352ec19100649afbf767f76db33f194b22a9b903b3ff48e3bc482",
+      "source": "https://nodejs.org/dist/index.json",
+      "transport": "Official HTTPS text/JSON; no executable archive",
+      "signatureVerified": false
+    },
+    {
+      "file": "node-v22.23.3-SHASUMS256.txt",
+      "bytes": 3981,
+      "sha256": "4fe99a2ba9d552a6f51c13ed68fb11104cfa5df601aec616be689253a8139e7a",
+      "source": "https://nodejs.org/dist/v22.23.3/SHASUMS256.txt",
+      "transport": "Official HTTPS text/JSON; no executable archive",
+      "signatureVerified": false
+    },
+    {
+      "file": "node-v24.18.1-SHASUMS256.txt",
+      "bytes": 2967,
+      "sha256": "963b6fefe0c1b0f0d731da926ae12d4c552c3898090e94f3db1549b62e7bbb93",
+      "source": "https://nodejs.org/dist/v24.18.1/SHASUMS256.txt",
+      "transport": "Official HTTPS text/JSON; no executable archive",
+      "signatureVerified": false
+    },
+    {
+      "file": "powershell-release.json",
+      "bytes": 1031,
+      "sha256": "b04c9ce4f1f68aa8c56b430c2c45d8eab1a09aed4636550458c43f3291d5e9d2",
+      "source": "https://api.github.com/repos/PowerShell/PowerShell/releases/tags/v7.6.5",
+      "transport": "Official HTTPS text/JSON; no executable archive",
+      "signatureVerified": false
+    },
+    {
+      "file": "PROPOSAL.md",
+      "bytes": 34753,
+      "sha256": "786d9d94e61535e2f5919a73cd0d2161cd352ba8de7a4a41c44c09edddff7f57"
+    },
+    {
+      "file": "source-identities.json",
+      "bytes": 10821,
+      "sha256": "3bcd98ce30fda883bf2cf51557dded5e88c63e92d9db3d5e8e372561254c8bb6"
+    }
+  ],
+  "consumerClosureInputs": [
+    {
+      "repository": "PS-A03-proposed",
+      "commit": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "mode": "100644",
+      "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+      "bytes": 5844,
+      "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220"
+    },
+    {
+      "repository": "PS-A03-proposed",
+      "commit": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+      "path": ".github/workflows/ci-toolchain.json",
+      "mode": "100644",
+      "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+      "bytes": 91,
+      "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+    },
+    {
+      "repository": "PS-A03-proposed",
+      "commit": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "mode": "100644",
+      "blob": "b0f7fb0b657232fa0e857e946d725fdd6876c028",
+      "bytes": 52385,
+      "sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f"
+    },
+    {
+      "repository": "PS-A03-proposed",
+      "commit": "f2c7f738265df29c123f7d627394c6bba1a5c7d0",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "blob": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+      "bytes": 98497,
+      "sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb"
+    }
+  ],
+  "consumerClosureScope": "Read-only immutable proposed A03 input; not accepted main. Only PROPOSAL.md and this evidence manifest updated.",
+  "privateSourceDirectory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-recovery-runtime-proposal-20261004",
+  "canonicalProposalFormatting": {
+    "originalWorkerSha256": "bcc965e06fd21e599470f7c787e8f6fd577ed961fb034eb21711a29f8fa19095",
+    "conversion": "Reverse one UTF-8-as-Windows-1252 decoding error; symbols only; no option, score or contract changed.",
+    "canonicalSha256": "786d9d94e61535e2f5919a73cd0d2161cd352ba8de7a4a41c44c09edddff7f57"
+  }
+}
