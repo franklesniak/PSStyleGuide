@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A12 current protection assessment
 
+**Current applicability after PR231:** The selected protection remains applicable at PS mainf168f83/treec82fa2e. [A13 current reassessment](../A13/RESULT.md) and [landed acceptance](../A03/landed-source-acceptance.json) confirm unchanged actual rules, required check names/producers and no bypass. This update preserves the original selection and limits; it introduces no new setting, required human approval or TF protection change.
+
 ## Current selected protection after PR230
 
 The original options/rubric selection remains applicable at PS mainfb328893. The owner-approved A13 ruleset24419725 is installed and unchanged; [A13 reassessment](../A13/RESULT.md) and [current source-batch acceptance](../A03/landed-batch-acceptance.json) verify actual check sources and native rules. A03 widened live event coverage and added deleted-push guards. It retained all three required names and their ordinary main/PR execution; deleted refs are not merge candidates. Candidate-owned workflow behavior remains distinct from immutable platform authority. No new setting, human-approval requirement or bypass is selected. Preserve the original limitations and reconsider only a relevant new input.

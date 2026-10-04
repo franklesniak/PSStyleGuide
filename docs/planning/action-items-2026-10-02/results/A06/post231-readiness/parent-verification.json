@@ -1,0 +1,62 @@
+{
+  "verified_at": "2026-10-04T13:33:01.198922+00:00",
+  "private_hashes": {
+    "REPORT.md": "0d1df30018b422b25055e003aa56d402cd807edd93c2069c592ae5b9499b3fdd",
+    "source-identities.json": "7055c9ea4a0e9990d285c6a1f9982f518ff3bd905f3b6954cc02e7d1bb692c15"
+  },
+  "samples": [
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+      "bytes": 86655,
+      "sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48",
+      "changedSinceA06Refresh": false,
+      "priorMode": "100644",
+      "priorBlob": "a23d38c42770d7463920704e108ccd63240dc90b"
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0",
+      "bytes": 5786,
+      "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7",
+      "changedSinceA06Refresh": false,
+      "priorMode": "100644",
+      "priorBlob": "c36ffc6bf2f845f2ff297e2045799331365634e0"
+    },
+    {
+      "repository": "PSStyleGuide",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+      "bytes": 25947,
+      "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547",
+      "changedSinceA06Refresh": true,
+      "priorMode": "100644",
+      "priorBlob": "f90f1dd32a8944651de3d5311e84b08043801fd4"
+    },
+    {
+      "repository": "TerraformStyleGuide",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "exists": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+      "bytes": 31949,
+      "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4",
+      "changedSinceA06Refresh": false,
+      "priorMode": "100644",
+      "priorBlob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e"
+    }
+  ],
+  "result": "Existing A06 decisions remain applicable; concrete changed-caller handoff verified; no new material finding or product test."
+}

@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A13 current result
 
+**Current reassessment after PR231:** Verified at2026-10-04T13:28:38.761968Z on PS mainf168f83/treec82fa2e. [Actual landed acceptance](../A03/landed-source-acceptance.json) verifies all five workflows, the same three required Actions15368 contexts, unchanged ruleset24419725/detail/effective rules, no other ruleset, empty bypass actors and current_user_can_bypass=never. PR231 merged normally through the original selected protection. The new setup/devcontainer scope changes no required check name or merge setting. No new setting or direct-push/restoration drill is selected or claimed. Retain the original proof limits and reassess actual future changes.
+
 ## Current reassessment after PR230
 
 State: verified on PS mainfb328893/treeed7ad456 at2026-10-04T09:30:08.603535+00:00. [Current native acceptance](../A03/landed-batch-acceptance.json) confirms all four landed workflows, successful policy/markdownlint/verify_generated_artifacts checks from Actions15368, unchanged approved detail/effective rules, only ruleset24419725, empty bypass actors and current_user_can_bypass=never. Premerge CLEAN/normal merge and exact merge parents/tree are separately preserved in the A03 lifecycle. No setting was changed during this reassessment.
