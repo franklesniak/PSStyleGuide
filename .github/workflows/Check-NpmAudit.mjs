@@ -258,7 +258,8 @@ function readAcceptedBase(root, env, context) {
   let sha;
   if (context?.source === 'remote-main') {
     fetchCommit('refs/heads/main', env, root);
-    // Pin this fetch before acquiring a separate PR base can replace FETCH_HEAD.
+    // Save the fetched main commit now.
+    // A later PR-base fetch in readCiScope can overwrite FETCH_HEAD.
     sha = resolvedCommit('FETCH_HEAD', env, root);
   } else if (context) {
     sha = exactCommit(context.reference, env, root);
