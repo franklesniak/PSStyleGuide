@@ -82,3 +82,9 @@ Concrete coupling: locked root/workflow Node dependencies already supply the sui
 Later validation should run this affected suite under the selected locked runtime, actual workflow caller/status tests and the root-owned ordinary aggregate/native candidate checks after the caller edit. Existing Linux/Windows focused results are supporting historical evidence only. Evaluate and allocate this follow-up before the later reverse source batch; do not silently implement it in this readiness task or expand the current TF candidate while its aggregate is live.
 
 Coordinator disposition: the separate recurring lint-suite observation is evaluated in [D-A07-LINT-CI-01](../A07/recurring-lint-suite-decision.md). E97 selects the existing candidate Node caller for the later serialized reverse batch. The original37c readiness remains dated source evidence; this selection makes no current TF edit or acceptance claim.
+
+## Integrated capacity fixture addendum
+
+The original37c comparison and identities above remain dated evidence. TF525147aa now adds the independently reviewed three-hunk synthetic fixture repair to the existing main-validator reverse path. Construct and validate the common smaller Scope fixture, then use it only in the rendered-note, maximum-revision and HTML-boundary constructors. No new path, protected-document content, production helper or input limit changes. Keep the extracted SelfTest and its PS P1/TF T1 counterparts as already specified. [The evidence record](reverse-readiness.json) pins the added patch and actual-tree readback.
+
+Windows and Linux375-case focused passes apply to the current TF inputs. Validate the later PS candidate with its actual source documents; do not claim this as PS execution. Refresh all final identities after accepted TF, then release the reverse batch. The current aggregate is live; no native acceptance or transfer increment has occurred.

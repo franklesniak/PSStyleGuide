@@ -1,12 +1,12 @@
 {
-  "recorded_at": "2026-10-04T15:03:46.123477+00:00",
-  "status": "aggregate49058 terminal failed; synthetic capacity fixture diagnosis pending",
+  "recorded_at": "2026-10-04T15:36:06.956415+00:00",
+  "status": "Capacity fixture repair integrated; staged preflight passed; full aggregate15404 running.",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
   "base_tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
   "head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-  "candidate_tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
+  "candidate_tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
   "accepted_source": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
   "accepted_source_tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
   "changed_paths": [
@@ -215,9 +215,9 @@
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "feb7ccf434e5af8a79b3e3daa98c0e49bd0fe4dd",
-      "bytes": 476802,
-      "sha256": "bcbff0004f621a927f2f43567bd4833b291adbe09edf3c62e91bf948ef0a414d"
+      "blob": "0bc2f1f5fd92c761601ee17b8ee3a6292fde52db",
+      "bytes": 477494,
+      "sha256": "c7852b7d229f950c085cc7d9c33a52e3a838d88491c4319a9eb9eed9778e4303"
     },
     {
       "path": ".github/workflows/Test-CheckoutCredentials.ps1",
@@ -639,17 +639,17 @@
       ".github/workflows/Test-AgentInstructions.ps1",
       "-RequireStagedInputMatch"
     ],
-    "started_at": "2026-10-04T14:18:04.252104+00:00",
+    "started_at": "2026-10-04T15:33:54.127189+00:00",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\staged-preflight-fixture-repaired.log",
+    "tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\staged-preflight-capacity-repaired.log",
     "exit_code": 0,
-    "finished_at": "2026-10-04T14:18:45.812736+00:00",
+    "finished_at": "2026-10-04T15:34:38.580609+00:00",
     "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96",
     "all_inputs_unchanged": true
   },
   "aggregate": {
-    "state": "failed",
+    "state": "running",
     "command": [
       "py",
       "-3.12",
@@ -658,40 +658,45 @@
       "run",
       "--all-files"
     ],
-    "started_at": "2026-10-04T14:18:45.823439+00:00",
+    "started_at": "2026-10-04T15:34:38.591183+00:00",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
     "parent_head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "candidate_tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-fixture-repaired.log",
-    "pid": 12852,
+    "candidate_tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-capacity-repaired.log",
+    "pid": 186728,
     "before_identity_passed": true,
-    "after_identity_passed": true,
-    "exit_code": 1,
-    "finished_at": "2026-10-04T14:55:58.687299+00:00",
-    "passed_hook_count": 10,
-    "skipped_hook_count": 0,
-    "log_sha256": "8ab4b3c34ac9fb2694adcc8e0c6660114c4df78860d6c6e499697cbde3fa5663"
+    "after_identity_passed": false
   },
   "session": {
-    "session_id": 49058,
-    "script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\validate-fixture-repaired-candidate.py",
-    "aggregate_pid": 12852,
-    "state": "terminal_failed",
-    "last_confirmed_at": "2026-10-04T14:20:20.099317+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-fixture-repaired.log",
-    "finished_at": "2026-10-04T14:55:58.687299+00:00",
-    "exit_code": 1
+    "session_id": 15404,
+    "script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\validate-capacity-repaired-candidate.py",
+    "aggregate_pid": 186728,
+    "state": "running",
+    "last_confirmed_at": "2026-10-04T15:36:06.956415+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-capacity-repaired.log",
+    "candidate_tree": "525147aac9804088b8b9e743a7e441a5276d59f2"
   },
   "independent_review": {
     "agent": "/root/a02_tf_prepublication_quality",
     "original_tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
     "original_status": "bounded pass; later aggregate identified test-only path failure",
-    "current_state": "bounded path-repair reconciliation passed; later capacity fixture failure preserved; future repair needs new reconciliation",
+    "current_state": "Private capacity repair and actual integrated525147aa both bounded PASS; aggregate and native acceptance remain due.",
     "reconciliation": {
       "state": "bounded_pass_on_37c_before_later_capacity_fixture_failure",
       "report": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/RECONCILIATION.md",
       "sha256": "f56957bfb2a78b2ec1c3fe07e808fce0d312c37f4dd6176eb6b05c855fb36975",
       "limits": "One-literal path repair reviewed; does not establish aggregate acceptance or review a future repair."
+    },
+    "capacity_report": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\CAPACITY-RECONCILIATION.md",
+      "sha256": "be9a43de78081e933be5563d4b1aea3e67ad6fb85dfec08313afddb6e81d0437"
+    },
+    "integrated_readback": {
+      "state": "passed",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\CAPACITY-INTEGRATED-READBACK.md",
+      "sha256": "c5aebd1dec0c2e960bd19711bf42efc7e4b9c19337a6be40605bbaa893671251",
+      "tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "limits": "Exact integrated bytes only; not aggregate or native acceptance."
     }
   },
   "reviews": {
@@ -836,21 +841,162 @@
         "all_inputs_unchanged": true
       },
       "reason": "Test-only exact TF counterpart literal repair; retain failed original aggregate and independent original-tree assessment."
+    },
+    {
+      "tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
+      "state_archive": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\pre-capacity-repair-execution-state.json",
+      "archive_sha256": "3993321452434cfb8627f77a865874f1bcad834cd8a01f46e984af64bf983a49",
+      "aggregate": {
+        "state": "failed",
+        "command": [
+          "py",
+          "-3.12",
+          "-m",
+          "pre_commit",
+          "run",
+          "--all-files"
+        ],
+        "started_at": "2026-10-04T14:18:45.823439+00:00",
+        "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "parent_head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "candidate_tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-fixture-repaired.log",
+        "pid": 12852,
+        "before_identity_passed": true,
+        "after_identity_passed": true,
+        "exit_code": 1,
+        "finished_at": "2026-10-04T14:55:58.687299+00:00",
+        "passed_hook_count": 10,
+        "skipped_hook_count": 0,
+        "log_sha256": "8ab4b3c34ac9fb2694adcc8e0c6660114c4df78860d6c6e499697cbde3fa5663"
+      },
+      "staged_preflight": {
+        "state": "passed",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-RequireStagedInputMatch"
+        ],
+        "started_at": "2026-10-04T14:18:04.252104+00:00",
+        "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\staged-preflight-fixture-repaired.log",
+        "exit_code": 0,
+        "finished_at": "2026-10-04T14:18:45.812736+00:00",
+        "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96",
+        "all_inputs_unchanged": true
+      },
+      "reason": "Synthetic positive fixture capacity repair only. Preserve both failed aggregates and all original review limits."
     }
   ],
-  "handback_limits": "Original worker handback describes af0c029; current full catalog includes the independently verified one-literal fixture repair to that candidate.",
+  "handback_limits": "Original handback describes af0c029. Current catalog includes the verified one-literal actual-checkout repair and three-hunk synthetic capacity repair. Both original failed aggregates remain failed.",
   "fixture_capacity_failure": {
     "recorded_at": "2026-10-04T14:59:36.371818+00:00",
     "aggregate_session": 49058,
-    "state": "source_validated_pending_focused_reproduction",
+    "state": "integrated_and_focused_passed",
     "finding": "Accepted synthetic AGENTS fixture exceeds unchanged ordinary 32768-byte cap.",
     "source_observation": "Current AGENTS is 32759 bytes; replacing one-digit revision with Int64.MaxValue produces 32777 bytes. Later positive fixtures also append content. Actual focused call attribution and fixture-only repair remain due.",
     "line_endings": "Repository .gitattributes explicitly sets eol=lf. No production CRLF defect is established.",
-    "limits": "No product repair, new aggregate, commit, native publication or acceptance."
+    "limits": "No product repair, new aggregate, commit, native publication or acceptance.",
+    "worker": "/root/a02_tf_coherent_implementation",
+    "private_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\fixture-capacity-repair",
+    "allowed_scope": [
+      ".github/workflows/Test-AgentInstructions.ps1 synthetic SelfTest data only",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1 synthetic fixture data only if needed"
+    ],
+    "integrated_at": "2026-10-04T15:30:59.067365+00:00",
+    "patch_sha256": "977aadaac8a0b1293587a7fdda3b4b2d7fc09232251d43eba06c08ed117f250d",
+    "before": {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "feb7ccf434e5af8a79b3e3daa98c0e49bd0fe4dd",
+      "bytes": 476802,
+      "sha256": "bcbff0004f621a927f2f43567bd4833b291adbe09edf3c62e91bf948ef0a414d"
+    },
+    "after": {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "mode": "100644",
+      "blob": "0bc2f1f5fd92c761601ee17b8ee3a6292fde52db",
+      "bytes": 477494,
+      "sha256": "c7852b7d229f950c085cc7d9c33a52e3a838d88491c4319a9eb9eed9778e4303"
+    },
+    "focused": [
+      {
+        "stem": "focused-windows",
+        "result": {
+          "command": [
+            "pwsh",
+            "-NoProfile",
+            "-File",
+            "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/implementation/fixture-capacity-repair/focused.ps1"
+          ],
+          "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\fixture-capacity-repair",
+          "node_path_prefix": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64",
+          "started_utc": "2026-10-04T15:11:20.123863+00:00",
+          "seconds": 657.266,
+          "exit": 0,
+          "log_sha256": "b05095d15e6e9ac7da0ac61ea0bc44394cf05a2dcc89251dbb33b76fc54128b9"
+        }
+      },
+      {
+        "stem": "focused-linux-v3",
+        "result": {
+          "command": [
+            "docker",
+            "run",
+            "--rm",
+            "--network",
+            "none",
+            "--read-only",
+            "--tmpfs",
+            "/tmp:rw,exec,size=1024m",
+            "--env",
+            "HOME=/tmp",
+            "--env",
+            "XDG_CACHE_HOME=/tmp/cache",
+            "--env",
+            "XDG_DATA_HOME=/tmp/data",
+            "--env",
+            "GIT_CONFIG_GLOBAL=/dev/null",
+            "--env",
+            "GIT_CONFIG_NOSYSTEM=1",
+            "--mount",
+            "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003,target=/candidate,readonly",
+            "--mount",
+            "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\fixture-capacity-repair,target=/evidence,readonly",
+            "--workdir",
+            "/candidate",
+            "4484fb945681e4ac67180b5e7df85a1ade48168ba3d38f8d60d78ec3ecb497a3",
+            "-c",
+            "node -e 'const fs=require('\"'\"'node:fs'\"'\"');\nconst windowsEvidence='\"'\"'C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/implementation/fixture-capacity-repair'\"'\"';\nconst windowsCandidate='\"'\"'C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003'\"'\"';\nfor(const name of ['\"'\"'prefix.ps1'\"'\"','\"'\"'census.ps1'\"'\"','\"'\"'census-post.ps1'\"'\"','\"'\"'focused.ps1'\"'\"']) {\n let s=fs.readFileSync('\"'\"'/evidence/'\"'\"'+name,'\"'\"'utf8'\"'\"').replaceAll(windowsCandidate,'\"'\"'/candidate'\"'\"').replaceAll(windowsCandidate.replaceAll('\"'\"'/'\"'\"','\"'\"'\\\\'\"'\"'),'\"'\"'/candidate'\"'\"').replaceAll(windowsEvidence,'\"'\"'/evidence'\"'\"').replaceAll(windowsEvidence.replaceAll('\"'\"'/'\"'\"','\"'\"'\\\\'\"'\"'),'\"'\"'/evidence'\"'\"').replaceAll('\"'\"'/candidate\\\\.github\\\\workflows'\"'\"','\"'\"'/candidate/.github/workflows'\"'\"');\n if(name.startsWith('\"'\"'census'\"'\"')) {\n   const a=s.indexOf('\"'\"'    // never present'\"'\"');\n   const start=s.indexOf('\"'\"'    # Published endpoint regressions deliberately ignore intermediate topic commits.'\"'\"');\n   const end=s.indexOf('\"'\"'    $strAgentsStandingParagraph ='\"'\"',start);\n   if(start<0||end<start)throw Error('\"'\"'Cannot isolate unrelated endpoint fixture block'\"'\"');\n   s=s.slice(0,start)+s.slice(end);\n   s=s.replaceAll(\"'\"'\"'/evidence/census\", \"'\"'\"'/tmp/census\");\n }\n fs.writeFileSync('\"'\"'/tmp/'\"'\"'+name,s);\n}\n' && pwsh -NoProfile -File /tmp/census.ps1 && pwsh -NoProfile -File /tmp/census-post.ps1 && pwsh -NoProfile -File /tmp/focused.ps1 -EvidenceRoot /tmp -OutputRoot /tmp; result=$?; if test -f /tmp/focused-results.json; then printf \"\\nRESULT_JSON_BEGIN\\n\"; cat /tmp/focused-results.json; printf \"\\nRESULT_JSON_END\\n\"; fi; exit \"$result\""
+          ],
+          "exit": 0,
+          "seconds": 794.657,
+          "started_utc": "2026-10-04T15:13:25.461221+00:00",
+          "log_sha256": "d49941cf1b06c097bdf0131e4561e30d0a6669e3d251e54ea2c49eb73bd6e3eb",
+          "scope": "Actual semantic assertion helpers and native-Linux constructed arguments; unrelated direct endpoint/normalization block excluded only from private census harness. No full SelfTest."
+        }
+      }
+    ],
+    "private_handback_sha256": "d3bcf35f1d3bb8899cb8bff3e0763b754719701b861d71968c8f9a75fc7b0445",
+    "independent_report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\CAPACITY-RECONCILIATION.md",
+    "independent_report_sha256": "be9a43de78081e933be5563d4b1aea3e67ad6fb85dfec08313afddb6e81d0437",
+    "root_verification": "Exact three synthetic SelfTest regions inspected; production prefix and protected files unchanged. Actual375-case Windows/Linux results, four original overflows and isolated same-scope rendered-note oracle reconciled; all78 product files and1910 dependency entries guarded.",
+    "integrated_readback": {
+      "state": "passed",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\CAPACITY-INTEGRATED-READBACK.md",
+      "sha256": "c5aebd1dec0c2e960bd19711bf42efc7e4b9c19337a6be40605bbaa893671251",
+      "tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "limits": "Exact integrated bytes only; not aggregate or native acceptance."
+    }
   },
   "reverse_readiness": {
     "record": "reverse-readiness.json",
     "scope_count": 11,
-    "state": "read-only; refresh after fixture repair and accepted TF"
+    "state": "Capacity addendum included; refresh actual accepted TF identity before reverse release."
   }
 }

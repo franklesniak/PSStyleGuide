@@ -1131,5 +1131,21 @@
     "line_endings": "Repository .gitattributes explicitly sets eol=lf. No production CRLF defect is established.",
     "limits": "No product repair, new aggregate, commit, native publication or acceptance."
   },
-  "limits": "No suite or product mutation in readiness. Refresh after pending fixture repair and actual TF acceptance. Existing transfers remain one; no peer PR or clock."
+  "limits": "No suite or product mutation in readiness. Refresh after pending fixture repair and actual TF acceptance. Existing transfers remain one; no peer PR or clock.",
+  "capacity_repair_addendum": {
+    "recorded_at": "2026-10-04T15:36:06.956415+00:00",
+    "current_TF_staged_tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
+    "private_addendum_sha256": "286224c10f0401825ba78729275aa6171e7dce164e2e657eb65ec4e6e47398d7",
+    "patch_sha256": "977aadaac8a0b1293587a7fdda3b4b2d7fc09232251d43eba06c08ed117f250d",
+    "integrated_readback": {
+      "state": "passed",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\CAPACITY-INTEGRATED-READBACK.md",
+      "sha256": "c5aebd1dec0c2e960bd19711bf42efc7e4b9c19337a6be40605bbaa893671251",
+      "tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "limits": "Exact integrated bytes only; not aggregate or native acceptance."
+    },
+    "path": ".github/workflows/Test-AgentInstructions.ps1",
+    "delta": "Carry the exact three-hunk common synthetic Scope fixture construction, baseline acceptance and three constructors into the existing PS reverse path. No added path or production change.",
+    "limits": "Original37c identities/proofs remain historical and exact for that tree. New common repair needs PS execution against actual documents and refresh against accepted TF before reverse release. No new transfer or acceptance."
+  }
 }
