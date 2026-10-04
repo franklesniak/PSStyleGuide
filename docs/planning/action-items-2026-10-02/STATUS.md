@@ -9,7 +9,7 @@ Planning head: `e5ada3feae7b2cc20c70d9e0f4770efb6c3e652d` (prior published check
 | [A00](tasks/A00.md) | Reconcile historical obligations and retirement decisions | complete | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A00/RESULT.md) | Reuse the canonical native delivery ledger |
 | [A01](tasks/A01.md) | Refresh issue coverage and full-tree baseline | complete | coordinator; post230 verified | PS/TF main | PSfb32889 / TF06ad4f7 | — | 0/80; not started | 0/8 | [Post230 inventory](results/A01/post230/REPORT.md) | Refresh at next native mutation; retain81 historical paths |
 | [A02](tasks/A02.md) | Non-protected shared governance | validating | coordinator; local quality passed | TF codex/a02-peer-docs | TF06ad4f7 / PSfb32889 | —;226 accepted | peer not started;226 used10/80 | 1/12 | [Evidence](results/A02/RESULT.md) | Accept remaining A03 source; use verified first-adoption map for coherent TF integration |
-| [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | validating | coordinator | PS codex/workflow-setup-convergence | treeecae3f2 / basefb32889 | 230 accepted; next none | 230 used3/80; next not started | 0/12 | [Evidence](results/A03/RESULT.md) | Collect sole repaired aggregate5879; keep product/index frozen |
+| [A03](tasks/A03.md) | Converge workflows and retain meaningful admission and freshness controls | validating | coordinator | PS codex/workflow-setup-convergence | 69e1b0d / basefb32889 | [231 open](https://github.com/franklesniak/PSStyleGuide/pull/231);230 accepted | 231:1/80;2026-10-12T11:09:49Z | 0/12 | [Evidence](results/A03/RESULT.md) | Collect PR231 reviews and hosted checks; defer manual Codex until automatic review ends |
 | [A04](tasks/A04.md) | Bound ordinary Node downloads and test retries | validating | coordinator | PS/TF main | PS425795b / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A04/RESULT.md) | Refreshed inputs; integrate after A03/A07 acceptance |
 | [A05](tasks/A05.md) | Require immutable event acquisition in the YAML guide | active | coordinator | PS/TF main | PS425795b / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A05/RESULT.md) | Exact two-guide authority approved; integrate after A03 foundation |
 | [A06](tasks/A06.md) | Converge the generator and artifact verification | validating | coordinator | PS/TF main | PS425795b / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A06/RESULT.md) | C98 frontmatter spacing selected; implement generator convergence after accepted foundations |
@@ -31,19 +31,13 @@ Planning head: `e5ada3feae7b2cc20c70d9e0f4770efb6c3e652d` (prior published check
 
 ## Local configuration and in-flight native operations
 
-- Planning: `C:/Users/flesniak/GitHub/PSStyleGuide`; peer: `C:/Users/flesniak/GitHub/TerraformStyleGuide`.
-- A20 product: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`; clean84fb436; root owns lifecycle.
-- Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; A02 suffix `A02-design-20261002`, resume `PR224-review-state.json`; D07 suffix `plan-review-20261002`.
-- Node24.18.1/npm11.16.0: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64`; Python `py -3.12`; PowerShell7.6.5. PS5.1 Restricted.
-- A02 source: PR226 accepted2a2; scratch `A02-landed-exit-20261003/repair-review-state.json`.
-- A03: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`; codex/workflow-setup-convergence, basefb32889, staged treeecae3f2. Scratch A03-setup-lifecycle-20261004/execution-state.json owns sole repaired aggregate5879 from10:24:19Z; D11 preflight PASS. Prior89382 passed all11 on d13 and is archived in pre-D11-execution-state.json. PR230 accepted; no next PR/request or duplicate aggregate.
-- A02 peer: scratch `A02-peer-current-20261003/execution-state.json`; product TEMP `TerraformStyleGuide-A02-peer-docs-20261003`, codex/a02-peer-docs. root owns reviewed docs; audit FINDINGS; transfer1/12.
-- Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`; treec68b5e1. Reconciliation complete; preserve index and unrelated edits.
-- A21: scratch `A21-selection-20261003/execution-state.json`; PR228 accepted425795b; no native operation live.
-- D08 grants: A03 P, CLAUDE repairs, YAML patches, A13 settings; A20/A15 clear-winner execution.
-- A20: PR229 accepted3e068af/tree1a338970; all reviews/local/landed gates passed. Scratch A20-source-lifecycle-20261003/execution-state.json; peer awaits A03.
-- A13: active24419725; post230 rules and Actions15368 contexts verified atfb32889. Evidence in A03 landed-batch-acceptance.json; no settings change.
-- A15: repaired proposal passed independent review; actual GateA/B human approvals later.
+- Planning: `C:/Users/flesniak/GitHub/PSStyleGuide`; branch planning-CRT-PR-852. Peer: `C:/Users/flesniak/GitHub/TerraformStyleGuide`.
+- Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; all suffixes below are relative to it. Closed lifecycles remain in their task RESULT links.
+- Runtime: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64` (Node24.18.1/npm11.16.0); `py -3.12`; PowerShell7.6.5. PS5.1 Restricted.
+- A03 product: `C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide`, codex/workflow-setup-convergence, head69e1b0d/basefb328893/treeecae3f2. State: `A03-setup-lifecycle-20261004/execution-state.json`. Aggregate5879 and endpoint/audit29531 completed successfully. PR231 round1: Copilot event32439880507 confirmed; automatic Codex5979325045 pending, so manual trigger deferred. Hosted setup/instruction runs pending. No local validation session is live.
+- A02 peer state: `A02-peer-current-20261003/execution-state.json`; product `C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003`, codex/a02-peer-docs. Root owns preserved two-doc edits; transfer1/12. Coherent integration awaits full A03 acceptance; use verified adoption map.
+- Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`, treec68b5e1; preserve index/unrelated edits. A20 source worktree: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`, clean84fb436; source accepted in PR229.
+- Retained grants: A03 P, A20 protected previews/CLAUDE repairs, A05 exact YAML patches and A13 settings. A15 proposal passed; actual GateA/B human approvals are later boundaries. PS ruleset24419725 remains active.
 
 ## Final results
 
