@@ -1,0 +1,355 @@
+{
+  "started_utc": "2026-10-04T04:56:44.175372+00:00",
+  "completed_utc": "2026-10-04T04:56:48.344250+00:00",
+  "result": "PASS for approved bounded A13 installation and ordinary-PR/normal-merge/landed validation",
+  "approved_payload_sha256": "eaba9b64d06ef014b6c0075a203c4c475ac96f6b66ce11be414ba3eee8195433",
+  "ruleset_id": 24419725,
+  "requested_fields_exact": true,
+  "only_two_known_server_defaults": {
+    "required_reviewers": [],
+    "require_extra_approval_for_unattributed_changes": true,
+    "interpretation": "Empty required-reviewer list adds no reviewer obligation; extra unattributed-Copilot approval has no effect with required_approving_review_count0 per current official GitHub docs."
+  },
+  "native_detail": {
+    "id": 24419725,
+    "name": "ps-style-guide-main-protection",
+    "target": "branch",
+    "source_type": "Repository",
+    "source": "franklesniak/PSStyleGuide",
+    "enforcement": "active",
+    "conditions": {
+      "ref_name": {
+        "exclude": [],
+        "include": [
+          "refs/heads/main"
+        ]
+      }
+    },
+    "rules": [
+      {
+        "type": "deletion"
+      },
+      {
+        "type": "non_fast_forward"
+      },
+      {
+        "type": "pull_request",
+        "parameters": {
+          "required_approving_review_count": 0,
+          "dismiss_stale_reviews_on_push": false,
+          "required_reviewers": [],
+          "require_code_owner_review": false,
+          "require_last_push_approval": false,
+          "required_review_thread_resolution": true,
+          "require_extra_approval_for_unattributed_changes": true,
+          "allowed_merge_methods": [
+            "merge",
+            "squash",
+            "rebase"
+          ]
+        }
+      },
+      {
+        "type": "required_status_checks",
+        "parameters": {
+          "strict_required_status_checks_policy": true,
+          "do_not_enforce_on_create": false,
+          "required_status_checks": [
+            {
+              "context": "policy",
+              "integration_id": 15368
+            },
+            {
+              "context": "markdownlint",
+              "integration_id": 15368
+            },
+            {
+              "context": "verify_generated_artifacts",
+              "integration_id": 15368
+            }
+          ]
+        }
+      }
+    ],
+    "node_id": "RRS_lACqUmVwb3NpdG9yec5CSN2EzgF0nY0",
+    "created_at": "2026-10-03T09:43:29.909-05:00",
+    "updated_at": "2026-10-03T09:43:30.003-05:00",
+    "bypass_actors": [],
+    "current_user_can_bypass": "never",
+    "_links": {
+      "self": {
+        "href": "https://api.github.com/repos/franklesniak/PSStyleGuide/rulesets/24419725"
+      },
+      "html": {
+        "href": "https://github.com/franklesniak/PSStyleGuide/rules/24419725"
+      }
+    }
+  },
+  "native_effective_rules": [
+    {
+      "type": "deletion",
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "franklesniak/PSStyleGuide",
+      "ruleset_id": 24419725
+    },
+    {
+      "type": "non_fast_forward",
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "franklesniak/PSStyleGuide",
+      "ruleset_id": 24419725
+    },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": false,
+        "required_reviewers": [],
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true,
+        "require_extra_approval_for_unattributed_changes": true,
+        "allowed_merge_methods": [
+          "merge",
+          "squash",
+          "rebase"
+        ]
+      },
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "franklesniak/PSStyleGuide",
+      "ruleset_id": 24419725
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          {
+            "context": "policy",
+            "integration_id": 15368
+          },
+          {
+            "context": "markdownlint",
+            "integration_id": 15368
+          },
+          {
+            "context": "verify_generated_artifacts",
+            "integration_id": 15368
+          }
+        ]
+      },
+      "ruleset_source_type": "Repository",
+      "ruleset_source": "franklesniak/PSStyleGuide",
+      "ruleset_id": 24419725
+    }
+  ],
+  "native_ruleset_listing": [
+    {
+      "id": 24419725,
+      "name": "ps-style-guide-main-protection",
+      "target": "branch",
+      "source_type": "Repository",
+      "source": "franklesniak/PSStyleGuide",
+      "enforcement": "active",
+      "node_id": "RRS_lACqUmVwb3NpdG9yec5CSN2EzgF0nY0",
+      "_links": {
+        "self": {
+          "href": "https://api.github.com/repos/franklesniak/PSStyleGuide/rulesets/24419725"
+        },
+        "html": {
+          "href": "https://github.com/franklesniak/PSStyleGuide/rules/24419725"
+        }
+      },
+      "created_at": "2026-10-03T09:43:29.909-05:00",
+      "updated_at": "2026-10-03T09:43:30.003-05:00"
+    }
+  ],
+  "start_end_settings_identical": true,
+  "start_end_main": "3e068afa36fbc963c4d716df9efb245468791fe8",
+  "pr": {
+    "number": 229,
+    "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/229",
+    "state": "closed",
+    "merged": true,
+    "merged_at": "2026-10-03T19:03:23Z",
+    "merge_commit_sha": "3e068afa36fbc963c4d716df9efb245468791fe8"
+  },
+  "premerge": {
+    "captured_at": "2026-10-03T19:03:24.235855+00:00",
+    "state": "OPEN",
+    "head": "84fb436cffe621f10a10486d588225337af97ef0",
+    "base": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+    "mergeStateStatus": "CLEAN",
+    "rollup": "SUCCESS",
+    "threads": 2,
+    "all_threads_resolved": true
+  },
+  "normal_merge": {
+    "payload": {
+      "sha": "84fb436cffe621f10a10486d588225337af97ef0",
+      "merge_method": "merge",
+      "commit_title": "Merge pull request #229: align protected setup and review instructions",
+      "commit_message": "Integrate the reviewed protected setup contract and request-attribution/API-placement repairs.\n\nGenerated with Codex"
+    },
+    "response": {
+      "sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+      "merged": true,
+      "message": "Pull Request successfully merged"
+    },
+    "parents": [
+      "425795bd49d6001081d32abd769c87e17dd1d9d5",
+      "84fb436cffe621f10a10486d588225337af97ef0"
+    ],
+    "tree": "1a3389702ebe93f677bd86bd2169b61e1578f82d",
+    "signed_commit_verified": true,
+    "override_requested": false
+  },
+  "required_checks": {
+    "head_checks": [
+      {
+        "id": 111267656586,
+        "name": "markdownlint",
+        "head_sha": "84fb436cffe621f10a10486d588225337af97ef0",
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-03T18:43:01Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37145225806/job/111267656586",
+        "app_id": 15368
+      },
+      {
+        "id": 111267656454,
+        "name": "policy",
+        "head_sha": "84fb436cffe621f10a10486d588225337af97ef0",
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-03T18:42:53Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37145225806/job/111267656454",
+        "app_id": 15368
+      },
+      {
+        "id": 111267656265,
+        "name": "verify_generated_artifacts",
+        "head_sha": "84fb436cffe621f10a10486d588225337af97ef0",
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-03T18:42:51Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37145225783/job/111267656265",
+        "app_id": 15368
+      }
+    ],
+    "landed_checks": [
+      {
+        "id": 111271475175,
+        "name": "markdownlint",
+        "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-03T19:03:42Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516682/job/111271475175",
+        "app_id": 15368
+      },
+      {
+        "id": 111271475138,
+        "name": "verify_generated_artifacts",
+        "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-03T19:03:44Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516685/job/111271475138",
+        "app_id": 15368
+      },
+      {
+        "id": 111271475044,
+        "name": "policy",
+        "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+        "status": "completed",
+        "conclusion": "success",
+        "completed_at": "2026-10-03T19:03:43Z",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516682/job/111271475044",
+        "app_id": 15368
+      }
+    ]
+  },
+  "landed_runs": [
+    {
+      "id": 37146516682,
+      "name": "Markdown Lint",
+      "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T19:03:25Z",
+      "updated_at": "2026-10-03T19:03:44Z",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516682"
+    },
+    {
+      "id": 37146516697,
+      "name": "Dev container boundary",
+      "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T19:03:25Z",
+      "updated_at": "2026-10-03T19:03:32Z",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516697"
+    },
+    {
+      "id": 37146516685,
+      "name": "Build Style Guide Artifacts",
+      "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T19:03:25Z",
+      "updated_at": "2026-10-03T19:03:51Z",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516685"
+    },
+    {
+      "id": 37146516729,
+      "name": "Agent instruction validation",
+      "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "created_at": "2026-10-03T19:03:25Z",
+      "updated_at": "2026-10-03T19:21:13Z",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516729"
+    }
+  ],
+  "parent_acceptance_record": {
+    "accepted_at": "2026-10-04T04:52:58.109085+00:00",
+    "source_result": "accepted"
+  },
+  "receipt_hashes": {
+    "round2-premerge-gates.json": {
+      "sha256": "c20b2026cbd47f7ea3d1e99b65acbe521f112a3d998f9380ab5d419b0267ff6e"
+    },
+    "source-merge-payload.json": {
+      "sha256": "f2caa2dae8edb527b1e85630553e6404d938e91cb77e5ecd1c225fa8f385035d"
+    },
+    "source-merge-response.json": {
+      "sha256": "f70ea1f2f2c94386f1df29be3defe98e5732226e2747a81eef6565a50773caf5"
+    },
+    "source-merge-readback.json": {
+      "sha256": "28e6420487a958af579cb125e17b68b550a5719eca9c454e2a5043a54283d319"
+    },
+    "source-merge-commit.json": {
+      "sha256": "dab99b9e2f8b51a5ca04a0347b1d0bbcdf6ebf69abf217a54cc86afb246a7475"
+    },
+    "landed-source-acceptance.json": {
+      "sha256": "6c5ba1374bebb7fbbd63d6028c03567264cca83a34e8595d4d9b29b1dc87372b"
+    },
+    "merge-accepted-source.py": {
+      "sha256": "734e4c9f712ad9eb5c9553d19e591071369efb9b62f5cde03e8c6abcfcad3f94"
+    }
+  },
+  "official_reference": "https://docs.github.com/en/enterprise-cloud@latest/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets#additional-approval-for-unattributed-copilot-pull-requests",
+  "limits": [
+    "No direct-main rejection, force-push, deletion, stale-base rejection or restoration drill was run. The owner approved ordinary-PR validation instead.",
+    "Normal PR merge proves the ordinary allowed contribution path under the observed settings; it is not an isolated negative test of every rule.",
+    "GitHub Actions app15368 pins producer identity, not immutable candidate workflow behavior; scoped maintenance approval and exact-input review remain procedural.",
+    "No TF settings acceptance or whole-product paired completion is inferred.",
+    "Later relevant settings, branch, check-source or workflow changes require reassessment."
+  ],
+  "actions": "Read-only authenticated GETs plus local receipt reads; new private report/JSON only. No mutation, tests, installs, descendants or A03 worktree access."
+}

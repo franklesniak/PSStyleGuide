@@ -28,8 +28,8 @@
       "cap": 12
     }
   },
-  "status": "source_merged_landed_ci_pending",
-  "next_action": "Verify all applicable landed main workflows for the merged commit; only then accept source and integrate A03.",
+  "status": "source_accepted_peer_waits_for_A03",
+  "next_action": "Integrate accepted3e068af into A03 without altering its nine frozen edits; validate A03 source before coherent TF transfer.",
   "copilot_request": {
     "round": 2,
     "head": "84fb436cffe621f10a10486d588225337af97ef0",
@@ -269,5 +269,130 @@
     "status": "completed",
     "conclusion": "success",
     "updated_at": "2026-10-03T19:01:53Z"
+  },
+  "landed_acceptance": {
+    "accepted_at": "2026-10-04T04:52:58.109085+00:00",
+    "head": "3e068afa36fbc963c4d716df9efb245468791fe8",
+    "tree": "1a3389702ebe93f677bd86bd2169b61e1578f82d",
+    "reviewed_head": "84fb436cffe621f10a10486d588225337af97ef0",
+    "runs": [
+      {
+        "id": 37146516682,
+        "name": "Markdown Lint",
+        "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-03T19:03:25Z",
+        "updated_at": "2026-10-03T19:03:44Z",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516682"
+      },
+      {
+        "id": 37146516697,
+        "name": "Dev container boundary",
+        "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-03T19:03:25Z",
+        "updated_at": "2026-10-03T19:03:32Z",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516697"
+      },
+      {
+        "id": 37146516685,
+        "name": "Build Style Guide Artifacts",
+        "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-03T19:03:25Z",
+        "updated_at": "2026-10-03T19:03:51Z",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516685"
+      },
+      {
+        "id": 37146516729,
+        "name": "Agent instruction validation",
+        "head_sha": "3e068afa36fbc963c4d716df9efb245468791fe8",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-03T19:03:25Z",
+        "updated_at": "2026-10-03T19:21:13Z",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516729"
+      }
+    ],
+    "checks": [
+      {
+        "id": 111271530058,
+        "name": "publish_committed_artifacts",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516685/job/111271530058",
+        "app_id": 15368
+      },
+      {
+        "id": 111271476159,
+        "name": "Classify maintenance and validate ordinary instructions",
+        "status": "completed",
+        "conclusion": "skipped",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516729/job/111271476159",
+        "app_id": 15368
+      },
+      {
+        "id": 111271475475,
+        "name": "Validate the PS devcontainer exclusion",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516697/job/111271475475",
+        "app_id": 15368
+      },
+      {
+        "id": 111271475251,
+        "name": "Test proposed instruction and workflow behavior",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516729/job/111271475251",
+        "app_id": 15368
+      },
+      {
+        "id": 111271475175,
+        "name": "markdownlint",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516682/job/111271475175",
+        "app_id": 15368
+      },
+      {
+        "id": 111271475138,
+        "name": "verify_generated_artifacts",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516685/job/111271475138",
+        "app_id": 15368
+      },
+      {
+        "id": 111271475044,
+        "name": "policy",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37146516682/job/111271475044",
+        "app_id": 15368
+      }
+    ],
+    "review_round": 2,
+    "review_body_sha256": "fe2c20eeeff112d995a29a7065a0a92719291e5eea0d38293f32ba44d8ed0bb5",
+    "merge_method": "normal merge; no override",
+    "parents": [
+      "425795bd49d6001081d32abd769c87e17dd1d9d5",
+      "84fb436cffe621f10a10486d588225337af97ef0"
+    ],
+    "scope": [
+      "AGENTS.md",
+      "CLAUDE.md",
+      ".github/copilot-instructions.md",
+      ".github/workflows/Test-AgentInstructions.ps1"
+    ],
+    "source_result": "accepted",
+    "pair_result": "incomplete; TF transfer follows accepted A03 source"
   }
 }
