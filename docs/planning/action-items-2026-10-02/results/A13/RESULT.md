@@ -1,6 +1,14 @@
 <!-- markdownlint-disable MD013 -->
 # A13 current result
 
+## Current reassessment after PR230
+
+State: verified on PS mainfb328893/treeed7ad456 at2026-10-04T09:30:08.603535+00:00. [Current native acceptance](../A03/landed-batch-acceptance.json) confirms all four landed workflows, successful policy/markdownlint/verify_generated_artifacts checks from Actions15368, unchanged approved detail/effective rules, only ruleset24419725, empty bypass actors and current_user_can_bypass=never. Premerge CLEAN/normal merge and exact merge parents/tree are separately preserved in the A03 lifecycle. No setting was changed during this reassessment.
+
+A03 broadened workflow event coverage but kept the required names, producer and permission blocks. Deleted-push guards do not skip ordinary live main pushes or PRs. The original scoped protection choice remains useful and applicable. This does not prove isolated rejection of every forbidden operation or make mutable workflow code immutable authority. No direct-push/restoration drill or TF settings change occurred.
+
+## Retained installation and earlier verification
+
 State: verified on PS main3e068af. The owner approved the exact A12 recommendation on 2026-10-03, including bounded restoration and ordinary-PR validation instead of a direct-push drill. No further settings authority is pending for this selected scope.
 
 Refreshed authenticated native main425795b, complete empty inherited/effective rules, classic-protection404, sole maintainer, Actions app15368 and all three successful current contexts before mutation. Submitted the unchanged [approved payload](../A12/desired-ps-ruleset.json), SHA256 eaba9b64d06ef014b6c0075a203c4c475ac96f6b66ce11be414ba3eee8195433, once. Created active PS ruleset24419725. No TF setting, bypass, credential or direct-main push changed.

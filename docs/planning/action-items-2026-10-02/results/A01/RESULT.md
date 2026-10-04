@@ -1,7 +1,17 @@
 <!-- markdownlint-disable MD013 -->
 # A01 current issue and native tree inventory
 
-## Current refresh after PR228: 2026-10-03
+## Current refresh after PR230: 2026-10-04
+
+Accepted factual inventory: PS main `fb3288934215dfa9a25114cf79ad86e60b5fb107` / tree `ed7ad456a7147152d2c289908066195689127e85`; TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` / tree `dc8f6b82588b8f874d34cd5d0155791aea5793f1`. The complete83-path union remains13 equal,54 different,8 PS-only and8 TF-only, with75 blobs per side. Eleven PS blobs changed from post229; no path or TF change occurred. Historical81 paths,402 obligations and26 absent-both references retain their dispositions and owners.
+
+The [post230 report](post230/REPORT.md) and [native evidence](post230/post230-native-raw.json) contain the complete current inventory and refreshed issue census. Root independently verified all11 changed Git blobs, all139 reused immutable identities, complete tree membership, counts and a fresh complete issue/comment/PR read. The same five issues and seven comments remain; no open PR or new input was found. [Parent verification](post230/parent-verification.json) completed09:22:15Z. Its first scratch read used the prior schema's wrong key and stopped before any result; reading identities from the prior paths corrected only that fixture assumption.
+
+The inventory's original pending instruction observation remains dated. All four landed workflows subsequently passed; [separate batch acceptance](../A03/landed-batch-acceptance.json) records the terminal result. A12/A13 and A14 changed-input reassessments are recorded in their results. This is not full A03 or paired convergence.
+
+## Retained earlier inventory observations
+
+## Historical refresh after PR228: 2026-10-03
 
 Current native inventory is PS `425795bd49d6001081d32abd769c87e17dd1d9d5` / tree `5cc022a7f5719c719a3398029cb4aab2a63cf348` and TF `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` / tree `dc8f6b82588b8f874d34cd5d0155791aea5793f1`. The complete83-path union retains13 raw equal,54 different,8 PS-only and8 TF-only entries, with75 files per side. Exactly the four released A21 paths changed from c13; no additions/removals/renames or TF delta. The worker checked complete nontruncated native trees against immutable Git entries, read all four new raw blobs, and reused146 prior raw identities only after exact blob/mode/type/size equality. Root read the full report, verified its identity, and independently sampled native raw pre-commit and SelfTest blobs, lengths and hashes.
 

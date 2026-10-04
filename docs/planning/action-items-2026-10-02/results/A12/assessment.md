@@ -1,6 +1,12 @@
 <!-- markdownlint-disable MD013 -->
 # A12 current protection assessment
 
+## Current selected protection after PR230
+
+The original options/rubric selection remains applicable at PS mainfb328893. The owner-approved A13 ruleset24419725 is installed and unchanged; [A13 reassessment](../A13/RESULT.md) and [current source-batch acceptance](../A03/landed-batch-acceptance.json) verify actual check sources and native rules. A03 widened live event coverage and added deleted-push guards. It retained all three required names and their ordinary main/PR execution; deleted refs are not merge candidates. Candidate-owned workflow behavior remains distinct from immutable platform authority. No new setting, human-approval requirement or bypass is selected. Preserve the original limitations and reconsider only a relevant new input.
+
+## Original dated assessment
+
 Read-only preparation at 2026-10-02 05:35 UTC. This assessment has not changed settings. A00/A01 acceptance and independent readiness remain pending. Transfers used: 0/8. No product PR or review clock exists.
 
 ## Exact inputs and observations

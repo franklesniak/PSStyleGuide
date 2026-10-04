@@ -1,7 +1,11 @@
 <!-- markdownlint-disable MD013 -->
 # Open issue coverage and plan improvements
 
-Current authenticated refresh at **2026-10-03T05:01:25.951515Z**: the same four PS issues and one TF issue remain open; all five bodies/titles and six prior comments are unchanged. There are now seven comments. The sole addition, [PS152 assessment comment](https://github.com/franklesniak/PSStyleGuide/issues/152#issuecomment-5946563885), reports the pending A12/A13 proposal and adds no requirement or settings authority. PR224 is the only open PR across the two repositories; PR225 is merged. See [A01 current evidence](results/A01/CURRENT-REFRESH-20261003.md). The task assignments below remain applicable.
+Current complete authenticated census, independently rechecked at **2026-10-04T09:22:15Z**: the same four PS issues (#213, #175, #155, #152), TF #25 and seven PS comments remain. All current titles, bodies, comment IDs/bodies and ownership are accounted for; neither repository has an open PR. See [post230 inventory](results/A01/post230/REPORT.md) and [parent verification](results/A01/post230/parent-verification.json). PR230 is merged. These issue states do not claim final acceptance of the remaining task scopes.
+
+The following earlier observations are preserved with their original dates.
+
+Historical authenticated refresh at **2026-10-03T05:01:25.951515Z**: the same four PS issues and one TF issue remain open; all five bodies/titles and six prior comments are unchanged. There are now seven comments. The sole addition, [PS152 assessment comment](https://github.com/franklesniak/PSStyleGuide/issues/152#issuecomment-5946563885), reports the pending A12/A13 proposal and adds no requirement or settings authority. PR224 is the only open PR across the two repositories; PR225 is merged. See [A01 current evidence](results/A01/CURRENT-REFRESH-20261003.md). The task assignments below remain applicable.
 
 Historical inventory during the initial planning review: **four PS issues, one TF issue, zero open PRs**. Full bodies and update times are preserved in [PS snapshot](evidence/PSStyleGuide-open-issues.json) and [TF snapshot](evidence/TerraformStyleGuide-open-issues.json). These are dated observations; A01 and A19 refresh the complete census and discussions. New issues require explicit task ownership.
 

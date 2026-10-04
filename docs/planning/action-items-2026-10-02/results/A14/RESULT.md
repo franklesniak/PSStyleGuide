@@ -1,6 +1,14 @@
 <!-- markdownlint-disable MD013 -->
 # A14 current filesystem residual assessment
 
+## Changed-caller reassessment after PR230
+
+Retain conditional-no-trigger at PS mainfb328893/treeed7ad456 and TF main06ad4f7/tree dc8f6b8. The current [A01 native matrix](../A01/post230/post230-native-raw.json) and coordinator raw verification show no new generator, exact-path verifier, artifact-verifier or CONTRIBUTING change from post229. The changed build workflow removes main-only push/PR filters and skips deleted pushes; root inspected its full current body and the exact native Git diff. Fresh Ubuntu24.04 verification still uses permissions:{}, anonymous exact-revision acquisition and the same real generator/verifier calls. The separate publication job remains contents:read and publishes committed artifacts only.
+
+Wider live event coverage does not by itself admit a concurrent untrusted local writer, shared runner, hostile parent directory or new privileged promotion consumer. No new filesystem primitive or supported-caller failure is identified by the refreshed issue/comment census. The existing path-based publication/cleanup and alias limitations remain unresolved and visible in PS155. The selected D92/D93 conditional disposition still applies; no new repair finding or rubric is needed merely to repeat it. This source assessment is not a new race/alias runtime test. Reassess after the remaining Copilot/devcontainer, A06 or recovery-caller changes if their relevant inputs change.
+
+## Retained original assessment
+
 **Result: conditional-no-trigger; no product repair selected.** Keep PS155 open for the live generator and exact-path verifier residuals. Preserve PS156's existing `not_planned` retirement and all historical test limitations. This is a current assessment of both repositories. It is not a race fix, universal alias proof, complete test-equivalence result or full-tree convergence declaration. Coordinator accepted this conditional result after A01 baseline validation.
 
 The worker read STATUS first, A14, relevant original379–390 requirements, the current issue bodies and all comments, and the complete prior D92/D93 decision. Requested route remains `gpt-6-astra/high`; effective settings were not exposed. No descendant, native mutation, product edit, issue update, PR, review request or settings change occurred. Transfers: **0/8**. PR clock: none. Only this result directory was written.

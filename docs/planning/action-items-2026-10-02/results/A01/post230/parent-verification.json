@@ -1,0 +1,17 @@
+{
+  "verified_at": "2026-10-04T09:22:15.355795+00:00",
+  "report_sha256": "22704471bbe0daae8d556df0ea05e94c245127f5efbd788d2737cd8aa0963572",
+  "evidence_sha256": "d17bba77d10cef29d96e1d61034db7f9248da24d2bd62971628ec177dafef0aa",
+  "raw_changed_blobs_independently_verified": 11,
+  "unchanged_entries_reused": 139,
+  "union_counts": {
+    "different": 54,
+    "equal": 13,
+    "PS-only": 8,
+    "TF-only": 8
+  },
+  "issue_census_refreshed": true,
+  "comments_compared_complete": true,
+  "open_pull_count": 0,
+  "limits": "Factual inventory verification. Product and conditional decisions remain separately owned."
+}

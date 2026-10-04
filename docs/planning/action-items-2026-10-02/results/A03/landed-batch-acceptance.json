@@ -1,0 +1,139 @@
+{
+  "accepted_at": "2026-10-04T09:30:08.603535+00:00",
+  "head": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+  "tree": "ed7ad456a7147152d2c289908066195689127e85",
+  "parents": [
+    "3e068afa36fbc963c4d716df9efb245468791fe8",
+    "bb21a8e5fc079506c5a7d6c4d24f4621cd2bb1f9"
+  ],
+  "reviewed_head": "bb21a8e5fc079506c5a7d6c4d24f4621cd2bb1f9",
+  "review_round": 3,
+  "review_body_sha256": "dfd23b2fc26112a32e52811d54193b3030386918c1857cd5300161a80a48cf99",
+  "scope": [
+    ".github/workflows/Check-NpmAudit.mjs",
+    ".github/workflows/Check-NpmAudit.test.mjs",
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/Validate-WorkflowPolicy.mjs",
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    ".github/workflows/agent-instructions.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/markdownlint.yml",
+    ".github/workflows/workflow-policy-cases.json",
+    ".github/workflows/workflow-policy-contract.json"
+  ],
+  "merge_method": "normal merge; no override",
+  "runs": [
+    {
+      "id": 37191152585,
+      "name": "Dev container boundary",
+      "event": "push",
+      "head_sha": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152585"
+    },
+    {
+      "id": 37191152600,
+      "name": "Markdown Lint",
+      "event": "push",
+      "head_sha": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152600"
+    },
+    {
+      "id": 37191152618,
+      "name": "Build Style Guide Artifacts",
+      "event": "push",
+      "head_sha": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152618"
+    },
+    {
+      "id": 37191152605,
+      "name": "Agent instruction validation",
+      "event": "push",
+      "head_sha": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+      "status": "completed",
+      "conclusion": "success",
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152605"
+    }
+  ],
+  "checks": [
+    {
+      "id": 111403464359,
+      "name": "publish_committed_artifacts",
+      "status": "completed",
+      "conclusion": "success",
+      "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152618/job/111403464359",
+      "app_id": 15368
+    },
+    {
+      "id": 111403424606,
+      "name": "Classify maintenance and validate ordinary instructions",
+      "status": "completed",
+      "conclusion": "skipped",
+      "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152605/job/111403424606",
+      "app_id": 15368
+    },
+    {
+      "id": 111403423963,
+      "name": "markdownlint",
+      "status": "completed",
+      "conclusion": "success",
+      "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152600/job/111403423963",
+      "app_id": 15368
+    },
+    {
+      "id": 111403423878,
+      "name": "Test proposed instruction and workflow behavior",
+      "status": "completed",
+      "conclusion": "success",
+      "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152605/job/111403423878",
+      "app_id": 15368
+    },
+    {
+      "id": 111403423866,
+      "name": "Validate the PS devcontainer exclusion",
+      "status": "completed",
+      "conclusion": "success",
+      "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152585/job/111403423866",
+      "app_id": 15368
+    },
+    {
+      "id": 111403423849,
+      "name": "verify_generated_artifacts",
+      "status": "completed",
+      "conclusion": "success",
+      "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152618/job/111403423849",
+      "app_id": 15368
+    },
+    {
+      "id": 111403423842,
+      "name": "policy",
+      "status": "completed",
+      "conclusion": "success",
+      "details_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37191152600/job/111403423842",
+      "app_id": 15368
+    }
+  ],
+  "ruleset": {
+    "id": 24419725,
+    "unchanged_from_premerge": true,
+    "required_contexts": [
+      "policy",
+      "markdownlint",
+      "verify_generated_artifacts"
+    ],
+    "producer_app_id": 15368,
+    "bypass_actors": [],
+    "current_user_can_bypass": "never"
+  },
+  "native_evidence_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A03-source-lifecycle-20261004\\landed-batch-native.json",
+  "native_evidence_sha256": "7eec1503936a2ccf8bf1faa7c3bbbc18c3b00ed76a9d55a9a82c90590f1199aa",
+  "source_batch_result": "accepted",
+  "A03_result": "incomplete; remaining Copilot/devcontainer source batch and coherent TF transfer/reverse comparison required",
+  "limits": "Ordinary main push and merge evidence; no isolated direct-push, deletion, force-push or stale-base rejection drill."
+}

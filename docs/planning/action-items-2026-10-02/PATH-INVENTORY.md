@@ -1,7 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # Full native-main path inventory
 
-## Current refresh: 2026-10-03
+## Current refresh after PR230: 2026-10-04
+
+PS main `fb3288934215dfa9a25114cf79ad86e60b5fb107` and TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` each contain75 tracked blobs. The complete union is **83 paths:13 equal,54 different,8 PS-only and8 TF-only**. [Current raw identities and owners](results/A01/post230/post230-native-raw.json) retain every path; [A01 verification](results/A01/post230/parent-verification.json) independently checks the11 changed PS blobs and139 unchanged identities. No path was added or removed. The historical81-path baseline below remains a reference, not the current product inventory.
+
+## Retained earlier inventory observations
+
+## Historical refresh: 2026-10-03
 
 PS main `a71f16a8d76beeca1ba8fdc3b1c95e1958e0973c` has 72 paths; TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` has 75. The complete union is **83 paths = 9 equal + 55 different + 8 PS-only + 11 TF-only**. [Dated raw entries and current owners](results/A01/native-tree-union-20261003.json) cover every path, including the two additions below. The ten changed PS paths match merged PR225. [A01 acceptance](results/A01/CURRENT-REFRESH-20261003.md) records independent verification and bounded reuse of issue, historical absence and conditional-risk evidence. PR224 retains its eleven in-flight paths until merge.
 
