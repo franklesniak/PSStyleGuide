@@ -1,7 +1,7 @@
 <!-- markdownlint-disable MD013 -->
 # D-A07-LINT-CI-01: run the retained Markdown suite in candidate CI
 
-Status: selected E97; implementation waits for accepted coherent TF foundations and the serialized PS reverse batch. No product edit, new test result, transfer or native acceptance is claimed. The coordinator displayed validation/options, then the distinct rubric, then the scoring table, then the selection before preparing this record.
+Status: selected E97. PR66 round1 independently reported this same omission on He2f0652. The current Terraform review repair can implement the selected caller addition before the serialized PowerShell reverse batch. No product edit or new test result is claimed at this checkpoint. The coordinator displayed validation/options, then the distinct rubric, then the scoring table, then the selection before preparing this record.
 
 ## 1. Validated opportunity
 
@@ -68,26 +68,26 @@ Root recomputed the weighted arithmetic. E has a clear lead and satisfies every 
 
 Select E. Use the existing candidate-test command.
 
-1. Wait for acceptance of the current coherent Terraform batch.
-2. Refresh both native main revisions.
-3. Allocate this caller change to the normal PowerShell reverse batch.
+1. Verify the current Terraform review input.
+2. Apply this change in the Terraform review repair.
+3. Keep the PowerShell reverse repair pending until Terraform acceptance.
 4. Add `.github/workflows/lint-markdown.test.mjs` to the existing `candidate-tests` Node command.
 5. Keep the immediate native-exit check.
 6. Keep all existing suites in that command.
 7. Keep the accepted-policy job unchanged.
 8. Run the Markdown suite with the selected locked runtime.
 9. Run the affected workflow-role and native-failure tests.
-10. Confirm that hosted candidate CI executes all ten Markdown tests.
+10. Confirm that hosted candidate CI executes every retained and added Markdown test.
 11. Complete the normal review, merge and landed acceptance checks.
-12. Transfer the same caller change to Terraform through the normal paired loop.
+12. Transfer the accepted caller change to PowerShell through the normal paired loop.
 
 Use short imperative steps and consistent names as above. No formal ASD-STE100 dictionary certification is claimed. Existing owner authority permits this clear winner; no new settings/protected-file approval is needed for the caller-only scope.
 
 ## 7. Implementation and verification state
 
-Proposal and selection are complete. Implementation is intentionally queued behind the real accepted-foundation dependency, alongside the already selected Test-LocalValidation caller transfer. It is not released into the frozen TF fixture-repair scope. No additional transfer is consumed by this read-only decision.
+Proposal and selection are complete. The original schedule deferred implementation to the PowerShell reverse batch. Authenticated PR66 review5407227056/comment4178502044 now reports the identical omitted caller on He2f0652. Root re-read the actual workflow and ten-test suite. The existing candidate role, dependency setup and immediate exit guard remain applicable. The selected E97 design and scores are unchanged; only the implementation order changes to address the current review. The earlier fixture repair and full aggregate are terminal, so this no longer overlaps their frozen scope. Same-repository review repairs do not consume another transfer. No PowerShell writer is released before Terraform acceptance.
 
-The eventual product change belongs to A03's candidate workflow and A07's retained test coverage. Preserve ordinary locked installation, the actual suite source and all existing status/role guards. The first affected Windows/Linux focused commands, actual hosted job output, current commit identities and native review results must be added when they exist. The current full TF aggregate failed on an unrelated synthetic AGENTS fixture; it supplies no acceptance for this proposal.
+The product change belongs to A03's candidate workflow and A07's retained test coverage. Preserve ordinary locked installation, the actual suite source and all existing status/role guards. Add focused Windows/Linux results and actual hosted execution when they exist. He2f0652's full aggregate passed11 hooks; its earlier fixture failures remain preserved. That aggregate predates this caller repair and supplies no acceptance for the changed bytes.
 
 ## Primary evidence and existing decisions
 

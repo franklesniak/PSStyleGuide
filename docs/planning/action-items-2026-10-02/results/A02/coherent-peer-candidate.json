@@ -1193,8 +1193,9 @@
   },
   "accepted_baseline_file_count": 75,
   "latest_native_snapshot": {
-    "captured_at": "2026-10-04T16:45:56.042871+00:00",
-    "sha256": "83d3449048f29e758b12661d41a518c56b74175456866c50c3b29f9e70f36622",
+    "captured_at": "2026-10-04T17:11:42.821076+00:00",
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-observation-03.json",
+    "sha256": "4ba37e6ee9ead5995d4e4eedbc76d58cb83c8c5c0e0065d1404c68f301ff9981",
     "complete_paginated_surfaces": [
       "request events",
       "requested reviewers",
@@ -1211,26 +1212,17 @@
         "name": "Running Copilot Code Review",
         "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
         "event": "dynamic",
-        "status": "in_progress",
-        "conclusion": null,
+        "status": "completed",
+        "conclusion": "cancelled",
         "created_at": "2026-10-04T16:45:27Z"
       },
       {
-        "id": 37217697793,
-        "name": "Agent instruction validation",
+        "id": 37217697781,
+        "name": "Build Style Guide Artifacts",
         "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
         "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null,
-        "created_at": "2026-10-04T16:41:27Z"
-      },
-      {
-        "id": 37217697804,
-        "name": "Copilot setup steps",
-        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
-        "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null,
+        "status": "completed",
+        "conclusion": "success",
         "created_at": "2026-10-04T16:41:27Z"
       },
       {
@@ -1261,8 +1253,17 @@
         "created_at": "2026-10-04T16:41:27Z"
       },
       {
-        "id": 37217697781,
-        "name": "Build Style Guide Artifacts",
+        "id": 37217697804,
+        "name": "Copilot setup steps",
+        "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T16:41:27Z"
+      },
+      {
+        "id": 37217697793,
+        "name": "Agent instruction validation",
         "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
         "event": "pull_request",
         "status": "completed",
@@ -1301,8 +1302,8 @@
         "name": "Copilot setup steps",
         "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
         "event": "push",
-        "status": "in_progress",
-        "conclusion": null,
+        "status": "completed",
+        "conclusion": "success",
         "created_at": "2026-10-04T16:40:58Z"
       },
       {
@@ -1310,11 +1311,813 @@
         "name": "Agent instruction validation",
         "head_sha": "e2f0652654ef0954e17fc3a255b87375908d0521",
         "event": "push",
-        "status": "in_progress",
-        "conclusion": null,
+        "status": "completed",
+        "conclusion": "success",
         "created_at": "2026-10-04T16:40:58Z"
       }
     ],
-    "review_thread_count": 0
-  }
+    "review_thread_count": 5
+  },
+  "round1": {
+    "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+    "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "body_sha256": "eddb0f92742af206a715ce33a6baf7de48363da3d2e77ca0a7fb53c052297971",
+    "started_at": "2026-10-04T16:41:24+00:00",
+    "clock_basis": "Native PR-open trigger of the authenticated automatic Codex review; conservative earlier event time.",
+    "initial_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-pre-request.json",
+    "pre_copilot_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-pre-copilot-final.json",
+    "automatic_codex": {
+      "state": "terminal_with_findings",
+      "summary_comment_id": 5982194609,
+      "authenticated_author_id": 199175422,
+      "trigger": "PR opened",
+      "native_trigger_at": "2026-10-04T16:41:24Z",
+      "observed_running_since": "2026-10-04T16:41:35.114470Z",
+      "summary_created_at": "2026-10-04T16:41:37Z",
+      "summary_updated_at": "2026-10-04T16:49:36Z",
+      "channel_attempts": 1,
+      "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+      "body_sha256": "eddb0f92742af206a715ce33a6baf7de48363da3d2e77ca0a7fb53c052297971",
+      "manual_request_sent": false,
+      "review_id": 5407227056,
+      "submitted_at": "2026-10-04T16:49:32Z",
+      "observed_completed_at": "2026-10-04T16:49:35.258630Z",
+      "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-observation-02.json"
+    },
+    "copilot": {
+      "state": "terminal_with_findings",
+      "channel_attempts": 1,
+      "started_at": "2026-10-04T16:45:20.546573+00:00",
+      "transport": "gh pr edit 66 --repo franklesniak/TerraformStyleGuide --add-reviewer '@copilot'",
+      "ui_observation": "Fresh GitHub PR66 in-app browser page is signed out. Reviewers says No reviews and exposes no request or effort control. No UI request was submitted. Use the AGENTS-approved CLI fallback; observed result effort remains unknown.",
+      "observed_result_effort": "Lite",
+      "request_exit": 0,
+      "transport_returned_at": "2026-10-04T16:45:23.200266+00:00",
+      "request_log_sha256": "2e886facc888b51f825560e81d176ba377a158a2cb59a3007a148eb80576b0c6",
+      "request_event_id": 32452378343,
+      "native_request_at": "2026-10-04T16:45:16Z",
+      "workflow_run_id": 37217939713,
+      "confirmation_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-post-copilot.json",
+      "confirmed_at": "2026-10-04T16:45:56.042871+00:00",
+      "review_id": 5407265563,
+      "submitted_at": "2026-10-04T17:02:42Z",
+      "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-observation-03.json",
+      "agentic_run_conclusion": "cancelled",
+      "agentic_limitation": "Authenticated result says the full agentic review did not start before timeout. A terminal Lite review was delivered and is an allowed AGENTS fallback; do not request again solely for effort."
+    },
+    "findings": [
+      {
+        "comment_id": 4178502044,
+        "thread_id": "PRRT_kwDOSAZRhc6o0iPB",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4178502044",
+        "path": ".github/workflows/agent-instructions.yml",
+        "line": 210,
+        "state": "selected_private_repair_released",
+        "decision": "results/A07/recurring-lint-suite-decision.md",
+        "selection": "E97"
+      },
+      {
+        "comment_id": 4178502047,
+        "thread_id": "PRRT_kwDOSAZRhc6o0iPE",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4178502047",
+        "path": ".github/workflows/lint-markdown.mjs",
+        "line": 16,
+        "state": "selected_private_repair_released",
+        "decision": "results/A07/TF66-R2-child-boundary.md",
+        "selection": "B97.6"
+      },
+      {
+        "comment_id": 4178502051,
+        "thread_id": "PRRT_kwDOSAZRhc6o0iPI",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4178502051",
+        "path": "AGENTS.md",
+        "line": 58,
+        "state": "selected_private_repair_released",
+        "decision": "results/A20/TF66-R3-runtime-pointer.md",
+        "selection": "D98.4"
+      },
+      {
+        "comment_id": 4178540628,
+        "thread_id": "PRRT_kwDOSAZRhc6o0oS7",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4178540628",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "line": 539,
+        "state": "validated_no_change",
+        "decision": "results/A03/TF66-curl-review-disposition.md",
+        "selection": "false_positive_no_change"
+      },
+      {
+        "comment_id": 4178540651,
+        "thread_id": "PRRT_kwDOSAZRhc6o0oTE",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4178540651",
+        "path": ".github/workflows/lint-nested-markdown.js",
+        "line": 193,
+        "state": "selected_private_repair_released",
+        "decision": "results/A07/TF66-R5-config-diagnostic.md",
+        "selection": "C100"
+      }
+    ],
+    "request_set_terminal": true,
+    "clean": false,
+    "repair_release": {
+      "released_at": "2026-10-04T17:20:25.354476+00:00",
+      "writer": "/root/a02_tf_coherent_implementation",
+      "private_only": true,
+      "paths": [
+        ".github/workflows/agent-instructions.yml",
+        ".github/workflows/lint-markdown.mjs",
+        ".github/workflows/lint-markdown.test.mjs",
+        ".github/workflows/lint-nested-markdown.js",
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".github/workflows/scripts-README.md",
+        "docs/dependency-maintenance.md"
+      ],
+      "proposal_handoff_sha256": "8cfb85874572f86ac25f7663dd7db497bf2098e7c33a7965581f25444fefc74f",
+      "preserve": "All original tests, dependencies, limits, protected policy, Oct04.0 published-base metadata, curl --disable. R5 one error string only; no wording-mirroring tests.",
+      "validation_sequence": "Private focused tests and root inspection; root proposed B/staged preflight; normal H-parent commit with hooks; final aggregate on clean new H; explicit H/B diagnostics. No accepted-B authority claim for candidate code."
+    },
+    "hosted_terminal_evidence": {
+      "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+      "run_count": 11,
+      "all_success": true,
+      "collections": [
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-hosted-e2f0652\\terminal-collection-01.json",
+          "sha256": "ca00832e4c89c5aab90a319d1e4a73d3bbc648e8b23fce7c9aee88b69aa3bd01",
+          "runs": [
+            {
+              "id": 37217697781,
+              "name": "Build Style Guide Artifacts",
+              "event": "pull_request",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "f4f3ce0ba6187d0576389113fb5b4c1d1438bdd0b34ecc390709ca9fbd34a969",
+              "log_bytes": 37928,
+              "jobs": [
+                {
+                  "id": 111481478082,
+                  "name": "verify",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire the exact revision without credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Generate and verify committed artifacts",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                },
+                {
+                  "id": 111481564327,
+                  "name": "publish_committed_artifacts",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Checkout repository",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Publish committed style guide artifacts",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Post Checkout repository",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 37217697784,
+              "name": "Dev container boundary",
+              "event": "pull_request",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "0408a0e1af63ccb15c104ee9cb196b826173f72111281c6eca960c94e309d96d",
+              "log_bytes": 34905,
+              "jobs": [
+                {
+                  "id": 111481478218,
+                  "name": "Validate the devcontainer exclusion",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire the event commit anonymously and verify the boundary",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 37217697813,
+              "name": "Markdown Lint",
+              "event": "pull_request",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "932fd7cc7cd0b685fb88e0d6b90e4e1262db39e7f8292c3f8b04e8b4ac0f6559",
+              "log_bytes": 29654,
+              "jobs": [
+                {
+                  "id": 111481478064,
+                  "name": "markdownlint",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire the exact revision without credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install the reviewed runtime and locked tools",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Lint both Markdown surfaces",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Audit current locked dependencies",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                },
+                {
+                  "id": 111481478352,
+                  "name": "policy",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire the exact revision without credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install the reviewed runtime and locked tools",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Validate workflow policy",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 37217697800,
+              "name": "Agent instruction validation",
+              "event": "pull_request_target",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "f0468475a8c6cdcfbaf252fb01afeb006f3812daa486e485997e95d7e5c32854",
+              "log_bytes": 22916,
+              "jobs": [
+                {
+                  "id": 111481478956,
+                  "name": "Classify maintenance and validate ordinary instructions",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire accepted policy without credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install accepted parser dependencies",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Classify exact PR input and validate ordinary content",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                },
+                {
+                  "id": 111481479984,
+                  "name": "Test proposed instruction and workflow behavior",
+                  "conclusion": "skipped",
+                  "steps": []
+                }
+              ]
+            },
+            {
+              "id": 37217666496,
+              "name": "Markdown Lint",
+              "event": "push",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "b390af5207a824ad87d26f62d455cc4fc2e66deaaea78c6abe53336ffead282a",
+              "log_bytes": 29395,
+              "jobs": [
+                {
+                  "id": 111481386999,
+                  "name": "markdownlint",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire the exact revision without credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install the reviewed runtime and locked tools",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Lint both Markdown surfaces",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Audit current locked dependencies",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                },
+                {
+                  "id": 111481387054,
+                  "name": "policy",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire the exact revision without credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install the reviewed runtime and locked tools",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Validate workflow policy",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 37217666538,
+              "name": "Build Style Guide Artifacts",
+              "event": "push",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "ebc6759916a83d938252d8f76b43dbe6b03c404f371b247916c3d0eee0d5b5db",
+              "log_bytes": 37880,
+              "jobs": [
+                {
+                  "id": 111481387068,
+                  "name": "verify",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire the exact revision without credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Generate and verify committed artifacts",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                },
+                {
+                  "id": 111481475024,
+                  "name": "publish_committed_artifacts",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Checkout repository",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Publish committed style guide artifacts",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Post Checkout repository",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 37217666556,
+              "name": "Dev container boundary",
+              "event": "push",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "469edf0d015697c51a0db72c2b2387d0a1309c32207d4d1983673dd191f239ed",
+              "log_bytes": 34899,
+              "jobs": [
+                {
+                  "id": 111481387572,
+                  "name": "Validate the devcontainer exclusion",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire the event commit anonymously and verify the boundary",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 37217666597,
+              "name": "Copilot setup steps",
+              "event": "push",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "7d64f1a1c893abcd628e443f66e74ef85799aaed41ae93259c0f3471101b940a",
+              "log_bytes": 206830,
+              "jobs": [
+                {
+                  "id": 111481387287,
+                  "name": "Install locked repository validation tools",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire triggering revision without an action",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credential cleanup",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire published main reference",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Reject alternate npm install inputs",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Detect locked validation-tool layout",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify acquired immutable setup inputs",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Set up verified official Node.js runtime",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify selected Node.js runtime",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install locked Node.js validation tools",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify locked dependency trees and immutable manifests",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Set up isolated Python 3.12",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install locked Python validation tools",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Activate repository hooks",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Run complete repository validation",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify final immutable setup inputs",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-hosted-e2f0652\\terminal-collection-02.json",
+          "sha256": "3c33d9b8b949f139cf211513c6ac91bfb4247a1ac15426dc96d11e8db0f63f5f",
+          "runs": [
+            {
+              "id": 37217697804,
+              "name": "Copilot setup steps",
+              "event": "pull_request",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "1383d65d85e818fd3f0bf0793826e98a422ace7838e0232f12dd47939e7e6ee3",
+              "log_bytes": 206825,
+              "jobs": [
+                {
+                  "id": 111481478335,
+                  "name": "Install locked repository validation tools",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire triggering revision without an action",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credential cleanup",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire published main reference",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Reject alternate npm install inputs",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Detect locked validation-tool layout",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify acquired immutable setup inputs",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Set up verified official Node.js runtime",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify selected Node.js runtime",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install locked Node.js validation tools",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify locked dependency trees and immutable manifests",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Set up isolated Python 3.12",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install locked Python validation tools",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Activate repository hooks",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Run complete repository validation",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify final immutable setup inputs",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "id": 37217697793,
+              "name": "Agent instruction validation",
+              "event": "pull_request",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "7c7252ee68cf08a42d3fae752d65a7ae5f3c99d30a4f41d389bdd1fd1802706e",
+              "log_bytes": 123887,
+              "jobs": [
+                {
+                  "id": 111481478135,
+                  "name": "Test proposed instruction and workflow behavior",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire the exact revision without credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install locked test dependencies",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Test proposed behavior without publication authority",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                },
+                {
+                  "id": 111481478965,
+                  "name": "Classify maintenance and validate ordinary instructions",
+                  "conclusion": "skipped",
+                  "steps": []
+                }
+              ]
+            },
+            {
+              "id": 37217666561,
+              "name": "Agent instruction validation",
+              "event": "push",
+              "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+              "conclusion": "success",
+              "log_sha256": "6efa82e2850aa177b6c2c1ca1a48fb7dd91014b6065d9773beed48bf384a0b36",
+              "log_bytes": 124160,
+              "jobs": [
+                {
+                  "id": 111481387315,
+                  "name": "Test proposed instruction and workflow behavior",
+                  "conclusion": "success",
+                  "steps": [
+                    {
+                      "name": "Set up job",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Acquire the exact revision without credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Verify checkout credentials",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Install locked test dependencies",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Test proposed behavior without publication authority",
+                      "conclusion": "success"
+                    },
+                    {
+                      "name": "Complete job",
+                      "conclusion": "success"
+                    }
+                  ]
+                },
+                {
+                  "id": 111481388219,
+                  "name": "Classify maintenance and validate ordinary instructions",
+                  "conclusion": "skipped",
+                  "steps": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "parent_readback": "Root inspected both460-pass/0-fail/0-skip candidate tails; both11-hook setup logs; actual accepted-B maintenance-required branch; current event-main ordinary audit. These old-input results do not validate later repairs."
+    }
+  },
+  "current_review_status": "round1_private_repair_running",
+  "next_action": "Collect exact eight-path private repair, targeted Windows/Linux evidence and postimages; integrate only after root verification. Root owns normal commit and clean-H final aggregate plus H/B diagnostics."
 }

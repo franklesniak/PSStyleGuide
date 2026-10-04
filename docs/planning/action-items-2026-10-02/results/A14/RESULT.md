@@ -1,6 +1,12 @@
 <!-- markdownlint-disable MD013 -->
 # A14 current filesystem residual assessment
 
+## Current lint-child finding during TF66 round1
+
+Reopen the changed-caller assessment for the reproduced static lint-child escape at TFe2f0652 and its applicable accepted PS source. [R2 B97.6](../A07/TF66-R2-child-boundary.md) records real Windows/Linux leaf and ancestor-link execution, the selected repair, preserved supported use and residual limits. A07 owns implementation and paired delivery; A14 must verify applicability after that delivery. No extra repository transfer is consumed by this assessment.
+
+This evidence establishes an ordinary static boundary defect without requiring a competing writer. It does not close the generator/verifier path-substitution, cleanup, publication, hardlink or Windows-alias residuals in PS155. The earlier no-trigger conclusions remain historical findings for their named inputs and consumers. Do not extend them to this new lint defect or advertise R2 as an atomic filesystem execution guarantee. Current status is active until the delivered caller and retained residuals are reassessed.
+
 ## Changed-caller reassessment after PR231
 
 Retain conditional-no-trigger at PS mainf168f83/treec82fa2e and unchanged TF06ad/treedc8f6. The [fresh raw inventory](../A01/post231/post231-native-raw.json) shows only the three A03 setup/devcontainer/test files changed. The generator, exact-path verifier, artifact verifier, CONTRIBUTING and build workflow remain identical to the post230 assessment. Root inspected the new validation-copy body: full hooks run once inside a checked disposable repository copy with GITHUB_WORKSPACE bound to that copy. This protects the original tree from ordinary fixer writes; it does not confine malicious same-user code or repair path-substitution races. Temporary-copy cleanup remains path-based. Copilot and devcontainer jobs retain empty permissions on Ubuntu24.04. Recursive devcontainer tree enumeration introduces no privileged publication consumer.
