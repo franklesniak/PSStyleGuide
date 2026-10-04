@@ -1,0 +1,404 @@
+{
+  "accepted": "fb3288934215dfa9a25114cf79ad86e60b5fb107",
+  "candidate": "d13fff62fdfb88dbb2fadad77d852329f92bfe22",
+  "peer": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+  "accepted_changed_paths": [
+    ".github/workflows/Check-NpmAudit.mjs",
+    ".github/workflows/Check-NpmAudit.test.mjs",
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/Validate-WorkflowPolicy.mjs",
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    ".github/workflows/agent-instructions.yml",
+    ".github/workflows/build.yml",
+    ".github/workflows/markdownlint.yml",
+    ".github/workflows/workflow-policy-cases.json",
+    ".github/workflows/workflow-policy-contract.json"
+  ],
+  "candidate_changed_paths": [
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/copilot-setup-steps.yml",
+    ".github/workflows/devcontainer-ci.yml"
+  ],
+  "files": [
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+        "bytes": 12748,
+        "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+        "bytes": 12748,
+        "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+        "bytes": 9558,
+        "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+      }
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+        "bytes": 4375,
+        "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+        "bytes": 4375,
+        "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+        "bytes": 4222,
+        "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+      }
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "ba9e0327030fa8288924fa5b2894bfcd7f28c75f",
+        "bytes": 22392,
+        "sha256": "f5f0655d50c33660c4b43310f7d6b2e5f9cbc556db7d818371a41bdb636c188d"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "ba9e0327030fa8288924fa5b2894bfcd7f28c75f",
+        "bytes": 22392,
+        "sha256": "f5f0655d50c33660c4b43310f7d6b2e5f9cbc556db7d818371a41bdb636c188d"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+        "bytes": 20499,
+        "sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb"
+      }
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "47a1831ad93a2d935106639822ddc1a95484be09",
+        "bytes": 42081,
+        "sha256": "a1335e5717a8a152281bea78a84086cdec9aeec1235c5497d51f644cc5c9c4b8"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "47a1831ad93a2d935106639822ddc1a95484be09",
+        "bytes": 42081,
+        "sha256": "a1335e5717a8a152281bea78a84086cdec9aeec1235c5497d51f644cc5c9c4b8"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+        "bytes": 27494,
+        "sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3"
+      }
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+        "bytes": 25554,
+        "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+        "bytes": 25554,
+        "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+        "bytes": 6799,
+        "sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+      }
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+        "bytes": 26612,
+        "sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "c6e1fe859dde863586338d59a3be4bf8ab68c293",
+        "bytes": 46831,
+        "sha256": "6bf65168c5189a659796c09b4d123176b56b7700a4ad360743eff8c78c29346d"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+        "bytes": 33862,
+        "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+      }
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "dde42437f9f5d579abee2e944321488a2ba4f793",
+        "bytes": 3863,
+        "sha256": "0deabaded368671ae8759f4c4fc02445e2e3c0c930cfe3a3a20df728a1e988de"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "bytes": 8391,
+        "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+        "bytes": 7645,
+        "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+      }
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+        "bytes": 6686,
+        "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+        "bytes": 6686,
+        "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+        "bytes": 6632,
+        "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+        "bytes": 3081,
+        "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+        "bytes": 3081,
+        "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+        "bytes": 3088,
+        "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "72b634c0664b410bca45d6331718501ff8a476f1",
+        "bytes": 43570,
+        "sha256": "a25b8fe08ef317e4d8bd50886e5bbec265d59d287d6115e549855fc2f8085cf1"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "e6f22852b220933691a4f05b4819d62b678ec0e9",
+        "bytes": 83079,
+        "sha256": "d2766949b8b6bfa07769ef48dd893bdf1c2aa30bf97105f1542e1963ccfdb231"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+        "bytes": 33662,
+        "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "bytes": 32648,
+        "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "bytes": 32648,
+        "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+        "bytes": 31949,
+        "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+      }
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+        "bytes": 25947,
+        "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+        "bytes": 25947,
+        "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "995b72a7b48dea2636094d81226893a519950797",
+        "bytes": 25568,
+        "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+      }
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+        "bytes": 14948,
+        "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+      }
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+        "bytes": 13047,
+        "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89"
+      }
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "bytes": 1517,
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "bytes": 1517,
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+        "bytes": 1407,
+        "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+      "PSaccepted": null,
+      "PScandidate": null,
+      "TF": {
+        "mode": "100644",
+        "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+        "bytes": 22102,
+        "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "PSaccepted": null,
+      "PScandidate": null,
+      "TF": {
+        "mode": "100644",
+        "blob": "87f68f5f02eb2303059be06c219253ab37853197",
+        "bytes": 4346,
+        "sha256": "41e8d68636cd8a32569266eb4daf14da9559160679cbb1793d194533f9d32ba5"
+      }
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0",
+        "bytes": 5786,
+        "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0",
+        "bytes": 5786,
+        "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+        "bytes": 5632,
+        "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+      }
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "PSaccepted": {
+        "mode": "100644",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "bytes": 5398,
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+      },
+      "PScandidate": {
+        "mode": "100644",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "bytes": 5398,
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+      },
+      "TF": {
+        "mode": "100644",
+        "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "bytes": 5405,
+        "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      }
+    }
+  ]
+}

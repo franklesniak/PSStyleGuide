@@ -1,0 +1,21 @@
+{
+  "status": "verified_read_only_handoff",
+  "at": "2026-10-04T10:05:15.082623+00:00",
+  "manifest_files_verified": 83,
+  "immutable_blob_entries_verified": 53,
+  "reports": {
+    "REPORT.md": "ade10913e4d403881786c258b6df4dab3249e5ed6055a6e9999a7a4cb2fa8997",
+    "HANDOFF-ADDENDUM.md": "b8c896eac1f091e09ab0b22848bdde65bfa690c435a734f4fb1099961bc695a6",
+    "PREINSTALL-PROPOSAL.md": "44d7855605ff3f566509b666250379563aa7d278559624b0fc6f6216b4f9b719"
+  },
+  "identities_sha256": "0182e40f5932d1e9e37be63a32ab520d44ccf3ba0c0207d280dfece0abca7a38",
+  "native": {
+    "PS": "fb3288934215dfa9a25114cf79ad86e60b5fb107\trefs/heads/main",
+    "TF": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c\trefs/heads/main"
+  },
+  "candidate_accepted": false,
+  "source_followup_acceptance_required": true,
+  "D11": "P98 selected after parent options/rubric/table display; private repair pending",
+  "tests_run": [],
+  "counters_changed": false
+}
