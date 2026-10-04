@@ -1,6 +1,18 @@
 <!-- markdownlint-disable MD013 -->
 # Reverse-source readiness from staged Terraform
 
+## Current round1 repair readiness
+
+The proposed TF tree `099bb0f83403b6b61cfa2dafa73916b315c791d3` expands the prior eleven-path reverse scope to **fourteen**. It retains exactly39 B-to-candidate paths and8 H-to-repair paths. The three added common paths are `.github/workflows/lint-markdown.mjs`, `lint-markdown.test.mjs` and `lint-nested-markdown.js`. Existing E97/R2/R3/R5 decisions apply; no new material finding or authority question was found.
+
+The [complete provisional report](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A02-reverse-round1-readiness-20261004/REPORT.md), [mapping](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A02-reverse-round1-readiness-20261004/mapping.json) and [static checks](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A02-reverse-round1-readiness-20261004/checks.json) bind accepted PSf168, old TFe2 and proposed099. Four files support exact common copying after TF acceptance: Test-LocalValidation and the three added lint paths. Ten require specific integration or PS metadata handling. Preserve the real PS P1 fixture/history, blank-line semantic tests, workflow identity/roles and protected policy; do not copy differing workflow/documents wholesale.
+
+All160 read-only static assertions pass. Root read the full report and independently verified every scoped PS/proposed-TF blob, mode, size and hash, actual39/8 changed sets, exact14 membership and original ten-test prefix. [Root readback](C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/round1-reverse-readiness-parent.json) records those checks. Report SHA256 is `c5a88cc84518b77b2058a073b46400ad95243b123ef3e7200f3fec86349647e5`; mapping SHA256 is `a1d3ffea4c27959729717969c4abc4742be9adc969b5ddacaa9a12cc108959fd`; checks SHA256 is `aaeb2395d5c14c06db891b92b11d7133359649b4da526c635ba37e4a6dcd5cc5`.
+
+This remains candidate preparation, with no accepted TF reverse source. The sole aggregate90093 is still running. Complete TF's current native lifecycle first, then refresh accepted TF and current PS identities, reassess affected inputs and increment the relevant counters immediately before releasing one PS writer. No product, suite, installation, native mutation or transfer occurred in this refresh. Earlier37c/525 observations below retain their original scope and dates; this addendum supersedes their eleven-path count for the proposed099 input.
+
+## Initial eleven-path assessment
+
 Read-only comparison of accepted PSf168f83 and TF staged37c7270 identifies eleven destination paths. [Raw identity and disposition evidence](reverse-readiness.json) accounts for all39 changed TF paths and records23 exact common-region proofs. Root independently checked every scoped PS/TF blob, mode, size and hash. This is preparation, not a writer release, product acceptance or A18 final main/main audit.
 
 Carry back the selected R97 engine and tests, the robust empty/whitespace diagnostic assertions, the retained common local-validation matrix and its actual candidate-workflow call, broader common script documentation, and metadata synchronization for the touched shared files. The scope comprises Test-AgentInstructions.ps1, its SelfTest, Test-CiHelpers.test.mjs, Test-LocalValidation.test.mjs, agent-instructions.yml, scripts-README.md, MARKDOWN-LINTING-IMPLEMENTATION.md, ISSUE_EVALUATION_PROMPT.md, dependency-maintenance.md, AGENTS.md and CLAUDE.md. The source comparison proves exact necessary identity, language, native job and history differences separately. Keep PS's real P1 fixture and blank-line semantic child; TF keeps its actual current-provenance fixture and recovery semantic child.

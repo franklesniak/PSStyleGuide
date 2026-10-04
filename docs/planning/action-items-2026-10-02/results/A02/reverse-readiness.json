@@ -1147,5 +1147,296 @@
     "path": ".github/workflows/Test-AgentInstructions.ps1",
     "delta": "Carry the exact three-hunk common synthetic Scope fixture construction, baseline acceptance and three constructors into the existing PS reverse path. No added path or production change.",
     "limits": "Original37c identities/proofs remain historical and exact for that tree. New common repair needs PS execution against actual documents and refresh against accepted TF before reverse release. No new transfer or acceptance."
+  },
+  "round1_repair_addendum": {
+    "kind": "Superseding provisional14-path readiness; initial37c proof remains historical and neither input is accepted TF.",
+    "recorded_at": "2026-10-04T18:03:08.785556+00:00",
+    "accepted_PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "TF_proposed_tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
+    "initial_reverse_path_count": 11,
+    "current_reverse_path_count": 14,
+    "new_reverse_paths": [
+      ".github/workflows/lint-markdown.mjs",
+      ".github/workflows/lint-markdown.test.mjs",
+      ".github/workflows/lint-nested-markdown.js"
+    ],
+    "paths": [
+      {
+        "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+        "PS": {
+          "mode": "100644",
+          "blob": "c55c95be61b704291d384f043e078f26472a3f2b",
+          "bytes": 3017,
+          "sha256": "6d5463da1938f3dbacbccff47d594b2522ee4558369b05eb4459e2413fa83ac2"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "0be279cf6b4cb76a99d927f6cfcaa97e58ea9c84",
+          "bytes": 3017,
+          "sha256": "9f5321dff431f2a86641f595be9724b260277ddb4afe8bef2d95b13cb0f4527d"
+        },
+        "owner": "A07",
+        "strategy": "PS metadata transition only",
+        "selected_decision": "prior reverse map",
+        "minimal_integration": "Body already exact. Finalize Last Updated only if the selected convergence batch really touches this governed file; use actual authoring UTC and current endpoint semantics."
+      },
+      {
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "PS": {
+          "mode": "100644",
+          "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+          "bytes": 218742,
+          "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "3bae369fa40e6733ec80a68a96c77e5b46e6d92b",
+          "bytes": 229590,
+          "sha256": "c10ab77ca62f1dcdb68945165838ec533a47d90b16309a8470e71e197a719d25"
+        },
+        "owner": "A21",
+        "strategy": "controlled language fixture + header metadata",
+        "selected_decision": "R97",
+        "minimal_integration": "Carry Assert-PublishedBaselineCapacitySelfTest and its maintained invocation. Keep docs/P1-SUPPLY-FREEZE-v1.md in the existing checkout-document fixture; never replace with TF T1. Set .NOTES version from actual PS parent/date."
+      },
+      {
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "PS": {
+          "mode": "100644",
+          "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb",
+          "bytes": 474787,
+          "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "0bc2f1f5fd92c761601ee17b8ee3a6292fde52db",
+          "bytes": 477494,
+          "sha256": "c7852b7d229f950c085cc7d9c33a52e3a838d88491c4319a9eb9eed9778e4303"
+        },
+        "owner": "A21",
+        "strategy": "common complete engine; controlled header metadata",
+        "selected_decision": "R97 + capacity fixture addendum",
+        "minimal_integration": "Carry Read-PublishedBaselineDocumentText and exactly its two parent-read callsites. Carry smaller synthetic Scope fixture and exactly three constructors. Preserve every current cap, role guard, baseline rule and remaining complete engine. Set .NOTES version from actual PS accepted parent/date."
+      },
+      {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "PS": {
+          "mode": "100644",
+          "blob": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+          "bytes": 98497,
+          "sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "26176163225be5ae18585e82b21dccf7ef1f3cda",
+          "bytes": 100034,
+          "sha256": "88a35be62a72e9e31084f6b82dc89056f3da5e84c4469c3ffc13d329dd22a96a"
+        },
+        "owner": "A03/A07",
+        "strategy": "controlled small common loop adaptation",
+        "selected_decision": "D07-3 / prior reverse map",
+        "minimal_integration": "Replace only the missing-environment loop with empty and whitespace inputs and separate diagnostic/variable assertions. Retain PS repository identity and the entire PS artifact child block, including semantic-failure and semantic-side-effect. Do not copy TF recovery/runtime fixtures into PS."
+      },
+      {
+        "path": ".github/workflows/Test-LocalValidation.test.mjs",
+        "PS": null,
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "fdee150a47af7593d8315bb5f2c3b9ee4f9c2030",
+          "bytes": 3870,
+          "sha256": "7a4e5608c55631ecc115431587096049b5035c6abbca352de097edf3687305e1"
+        },
+        "owner": "A07",
+        "strategy": "exact copy new common test file",
+        "selected_decision": "D07-3 / prior reverse map",
+        "minimal_integration": "Add exact TF file with mode100644. Its terraform-local-validation temporary prefix is harmless; preserve all11 status/index/order oracles. Keep stronger existing PS real-tool suite."
+      },
+      {
+        "path": ".github/workflows/agent-instructions.yml",
+        "PS": {
+          "mode": "100644",
+          "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+          "bytes": 12748,
+          "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+          "bytes": 12865,
+          "sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc"
+        },
+        "owner": "A03",
+        "strategy": "controlled two suite arguments only",
+        "selected_decision": "E97 + D07-3",
+        "minimal_integration": "Append Test-LocalValidation.test.mjs then lint-markdown.test.mjs to the maintained candidate-tests Node line. Preserve all five existing suites, immediate native guard, actual PS acquisition literals, permissions and accepted-policy roles."
+      },
+      {
+        "path": ".github/workflows/lint-markdown.mjs",
+        "PS": {
+          "mode": "100644",
+          "blob": "9b0abb08d1a17ed4306ef771822d980aabff86b5",
+          "bytes": 1691,
+          "sha256": "3410d109d4c842a83bf41dc5674874db8d046929742a7fadba0e60026203c126"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "9791cbc586e9a20e27fd54db9738579e047a4f92",
+          "bytes": 2101,
+          "sha256": "955a7a011731e8407aa7d1603a904db53b98bc7b34da39d05d6b3a9492326075"
+        },
+        "owner": "A07",
+        "strategy": "exact common source copy",
+        "selected_decision": "R2 B97.6",
+        "minimal_integration": "Copy exact proposed/then accepted TF guard+adapter with mode100644. Preserve declared Node prerequisite, --outer, cwd, output bounds/statuses. No general loader refactor or sandbox claim."
+      },
+      {
+        "path": ".github/workflows/lint-markdown.test.mjs",
+        "PS": {
+          "mode": "100644",
+          "blob": "2d79be38b1caeeb871de4ed2c8222b950c4a6ae7",
+          "bytes": 12676,
+          "sha256": "e93be06d32fff7ef9b02a33668918213f068c460f477ecd62e668f43c7004c76"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "98e3421da42a3095e08a2d9d67283eb29f8bc455",
+          "bytes": 15409,
+          "sha256": "19e94ec2a4467b1fd7d8a60be617673ac8a1b0f75a7619e67cc1d6b60fe81f6f"
+        },
+        "owner": "A07",
+        "strategy": "exact common source copy",
+        "selected_decision": "R2 B97.6 + E97",
+        "minimal_integration": "Copy exact proposed/then accepted TF nineteen-case suite with mode100644. All ten PS tests are a raw prefix; nine new real-child boundary tests append. Keep positive contained aliases and no-execution negatives."
+      },
+      {
+        "path": ".github/workflows/lint-nested-markdown.js",
+        "PS": {
+          "mode": "100644",
+          "blob": "0c7633c0793be84ce6768698387052807a149329",
+          "bytes": 18348,
+          "sha256": "6f90d52361c564772094ee0a2410f9cc407803f4784aafda3c5e8096c2281327"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "d0339fbba27dee661336e7c41c8b1b6c6fb176be",
+          "bytes": 18400,
+          "sha256": "015d5ef5b885303aab64dfdf14fa0746268c879bb6f1e1b0a2b7700489a7da4e"
+        },
+        "owner": "A07",
+        "strategy": "exact common source copy; one diagnostic delta",
+        "selected_decision": "R5 C100",
+        "minimal_integration": "Copy exact proposed/then accepted TF source with mode100644 or apply only proved one-string remedy delta. Keep JSONC preference, JSON fallback, configuration rejection and every existing oracle. Add no message-mirroring tests."
+      },
+      {
+        "path": ".github/workflows/scripts-README.md",
+        "PS": {
+          "mode": "100644",
+          "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7",
+          "bytes": 6613,
+          "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "9dd6a074db78a47c499aa6c5ac6f02e31afff5a6",
+          "bytes": 11650,
+          "sha256": "15f54dd6f2910656ca21aaf94f85a55937698a6d0c5e8ca4712f335b80a6ac77"
+        },
+        "owner": "A07/A02",
+        "strategy": "controlled common preface with native facts + metadata",
+        "selected_decision": "D07-3 / prior reverse map + R3 D98.4",
+        "minimal_integration": "Carry common inventory/setup/role/mode preface and version/digest distinction. Use P1 operative link; use verify_generated_artifacts job; name blank-line semantic child and document actual Test-BlankLineExamples.ps1 interface instead of TF recovery row. Keep existing outer/staged/nested suffix byte-identical. Finalize Scope and Last Updated on real PS input."
+      },
+      {
+        "path": "AGENTS.md",
+        "PS": {
+          "mode": "100644",
+          "blob": "95d3b39c90e2f1934f34e0e846692143404fe65b",
+          "bytes": 32667,
+          "sha256": "75d4079576bb1037cb552a922707074a2d6948d7a24d7418320ec8b271fdcec7"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "f405b7336889709bac6f1c027079ae565c8822f2",
+          "bytes": 32746,
+          "sha256": "ea658b1ea8a87175461a9f81dc1d7d93c9bf7336cc1ffdff20217048d4f65cca"
+        },
+        "owner": "A20",
+        "strategy": "controlled common runtime sentence + PS metadata",
+        "selected_decision": "R3 D98.4 / retained A20 authority",
+        "minimal_integration": "Replace only bad ci-toolchain runtime sentence with root package.json engines sentence. Preserve PS purpose, own normative guide, artifact filename and entry-point identities. Finalize real PS Version/Last Updated; preserve32768 cap."
+      },
+      {
+        "path": "CLAUDE.md",
+        "PS": {
+          "mode": "100644",
+          "blob": "c3058de820b228bdd5b03cce1ec9f288c9dff02d",
+          "bytes": 83329,
+          "sha256": "01d5067733fe44c9d344a9ebb29321b2441dc67a695ad2df2c3a9a0a3a8a1389"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "cb74f1f845538e1dd5e8adc80a3a693927482d17",
+          "bytes": 83433,
+          "sha256": "6a617b0d5a464ddd85de9d363506bd503a88ae63ba43b4fe50fcc416d6dd1bbf"
+        },
+        "owner": "A20",
+        "strategy": "controlled common runtime sentence + PS metadata",
+        "selected_decision": "R3 D98.4 / retained A20 authority",
+        "minimal_integration": "Use the same runtime sentence as AGENTS. Preserve all PS purpose/language/guide/artifact/entrypoint prose and platform protocols. Finalize real PS Version/Last Updated."
+      },
+      {
+        "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+        "PS": {
+          "mode": "100644",
+          "blob": "761e87c11c1c03f805ad832331866b963294c1e5",
+          "bytes": 2179,
+          "sha256": "f863b58355ec00530b349f8417a78dd1dd31711a6d85ee954436a0aabcb878a9"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "1c86fdcc00c1ab856667c747909ca0a2b75f2187",
+          "bytes": 2179,
+          "sha256": "d2d1d6f086f21b5b9b34d0c5ad67d0d6323854ad39567f78f7c33487e47ffe69"
+        },
+        "owner": "A02",
+        "strategy": "PS metadata transition only",
+        "selected_decision": "prior reverse map",
+        "minimal_integration": "Body already exact. Finalize Last Updated under real PS endpoints/date rather than copying a stale TF date."
+      },
+      {
+        "path": "docs/dependency-maintenance.md",
+        "PS": {
+          "mode": "100644",
+          "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda",
+          "bytes": 9672,
+          "sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21"
+        },
+        "TF_proposed": {
+          "mode": "100644",
+          "blob": "f0705f4aff50b03d54a1cb8fd540fc65b53f435e",
+          "bytes": 9874,
+          "sha256": "0ce689b28747d49c221d65dbe9799930f7cd040ccfbe7557e8677b4ba85008b3"
+        },
+        "owner": "A07",
+        "strategy": "controlled digest sentence + native Scope/date",
+        "selected_decision": "R3 D98.4",
+        "minimal_integration": "Insert the exact selected Linux digest sentence adjacent to version setup. Keep PSStyleGuide Scope, exact versions authority and bootstrap commands. Finalize actual PS date."
+      }
+    ],
+    "full_mapping": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-round1-readiness-20261004\\mapping.json",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-round1-readiness-20261004\\REPORT.md",
+    "checks": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-round1-readiness-20261004\\checks.json",
+    "hashes": {
+      "REPORT.md": "c5a88cc84518b77b2058a073b46400ad95243b123ef3e7200f3fec86349647e5",
+      "mapping.json": "a1d3ffea4c27959729717969c4abc4742be9adc969b5ddacaa9a12cc108959fd",
+      "checks.json": "aaeb2395d5c14c06db891b92b11d7133359649b4da526c635ba37e4a6dcd5cc5"
+    },
+    "root_readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-reverse-readiness-parent.json",
+    "root_readback_sha256": "4ff0369697f1029c8aa4e64cbdc80572b02fb3e5ab525f6f3c46d59ea165fadf",
+    "current_changed_path_count": 39,
+    "repair_path_count": 8,
+    "static_assertions_passed": 160,
+    "new_material_findings": [],
+    "next_action": "Finish actual TF acceptance, refresh accepted source and current PS preimages, then increment relevant counters before the serialized PS writer. No release now."
   }
 }
