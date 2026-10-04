@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { createRequire } from 'node:module';
 import { expectedRepository, acceptedBase, ciAudit, ciScope, documentationOnlyDiff, evaluateFindings, evaluateProposal, hostedAuthorityReference, interpretAudit, parseExceptions, parseJson, readCandidateExceptions, runAuditCommand, validateGraph } from './Check-NpmAudit.mjs';
 
 const id = 'GHSA-abcd-2345-cdef';
@@ -24,6 +25,8 @@ const findings = interpretAudit(result(report('high')), '.', lock);
 const grant = { root: '.', package: 'example', advisories: [id], nodes: [{ path: 'node_modules/example', version: '1.0.0' }],
   owner: 'maintainer', reason: 'Temporary fixture', controls: ['Bound input'], expires: '2030-01-01T00:00:00Z' };
 const now = Date.parse('2026-10-01T00:00:00Z');
+const directory = path.dirname(fileURLToPath(import.meta.url));
+const { parse: parseYaml } = createRequire(import.meta.url)('yaml');
 
 test('CI skips only a complete ordinary-document change, including modes and both rename endpoints', () => {
   const raw = (name, before = '100644', after = '100644', kind = 'M') =>
@@ -69,16 +72,18 @@ test('CI scope uses real complete Git endpoints; mismatches and unavailable obje
     const base = commit('base');
     fs.writeFileSync(path.join(root, 'README.md'), '# After\n');
     const docs = commit('docs');
-    const environment = { GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'pull_request', GITHUB_SHA: docs };
-    const scope = () => ciScope({ root, environment, authority: { sha: base } });
+    const eventPath = path.join(root, 'event.json');
+    fs.writeFileSync(eventPath, bytes({ pull_request: { base: { sha: base, ref: 'topic', repo: { full_name: expectedRepository } } } }));
+    const environment = { GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'pull_request', GITHUB_SHA: docs,
+      GITHUB_REPOSITORY: expectedRepository, GITHUB_EVENT_PATH: eventPath };
+    const scope = () => ciScope({ root, environment });
     assert.equal(scope().applicable, false);
-    assert.throws(() => ciScope({ root, environment: { ...environment, GITHUB_SHA: base }, authority: { sha: base } }), /checkout mismatch/u);
-    assert.throws(() => ciScope({ root, environment, authority: { sha: 'f'.repeat(40) } }), /complete Git change/u);
+    assert.throws(() => ciScope({ root, environment: { ...environment, GITHUB_SHA: base } }), /checkout mismatch/u);
     git('mv', 'tool.js', 'tool.md');
     environment.GITHUB_SHA = commit('rename executable source to prose');
     assert.equal(scope().applicable, true);
     for (const event of ['push', 'schedule', 'workflow_dispatch']) {
-      assert.equal(ciScope({ root, environment: { ...environment, GITHUB_EVENT_NAME: event }, authority: { sha: base } }).applicable, true);
+      assert.equal(ciScope({ root, environment: { ...environment, GITHUB_EVENT_NAME: event, GITHUB_REF: 'refs/heads/main' } }).applicable, true);
     }
     assert.throws(() => ciScope({ root, environment: {}, authority: { sha: base } }), /hosted event/u);
   } finally {
@@ -363,7 +368,7 @@ test('hosted authority is the native event base, not candidate or merge identity
   const invalid = structuredClone(event); delete invalid.pull_request.base.sha;
   assert.throws(() => hostedAuthorityReference(environment, invalid), /full trusted event base/u);
   invalid.pull_request.base.sha = base; invalid.pull_request.base.ref = 'topic';
-  assert.throws(() => hostedAuthorityReference(environment, invalid), /Unexpected PR authority/u);
+  assert.equal(hostedAuthorityReference(environment, invalid), 'refs/heads/main');
   assert.equal(hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/main' }), merge);
   assert.throws(() => hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/main', GITHUB_REPOSITORY: 'franklesniak/Other' }), /Unexpected audit repository/u);
   assert.throws(() => hostedAuthorityReference({ ...environment, GITHUB_EVENT_NAME: 'schedule', GITHUB_REF: 'refs/heads/copilot/proposal' }), /must be the main branch/u);
@@ -415,5 +420,259 @@ test('a missing accepted record is empty authority; a failed Git read is an erro
     assert.equal(path.dirname(root), fs.realpathSync(os.tmpdir()));
     assert.ok(path.basename(root).startsWith('npm-authority-test-'));
     fs.rmSync(root, { recursive: true });
+  }
+});
+
+// Execute the unchanged audit entry point with real Git objects. Only the fixed
+// HTTPS fetch destination and npm process boundary are substituted. No registry
+// or remote GitHub service is contacted by these fixtures.
+function hostedFixture(t) {
+  const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'npm-hosted-authority-'));
+  t.after(() => {
+    assert.equal(path.dirname(temporary), fs.realpathSync(os.tmpdir()));
+    assert.ok(path.basename(temporary).startsWith('npm-hosted-authority-'));
+    fs.rmSync(temporary, { recursive: true, force: true });
+  });
+  const root = path.join(temporary, 'work'), destination = path.join(root, '.github/workflows');
+  fs.mkdirSync(destination, { recursive: true });
+  const env = { ...process.env, GIT_CONFIG_NOSYSTEM: '1',
+    GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null' };
+  const git = (...args) => execFileSync('git', ['-c', 'core.hooksPath=/dev/null', ...args], {
+    cwd: root, env, encoding: 'utf8', windowsHide: true, timeout: 10000,
+  }).trim();
+  git('init', '--quiet');
+  fs.copyFileSync(path.join(directory, 'Check-NpmAudit.mjs'), path.join(destination, 'Check-NpmAudit.mjs'));
+  fs.copyFileSync(path.join(directory, 'NpmTools.mjs'), path.join(destination, 'NpmTools.real.mjs'));
+  fs.cpSync(path.join(directory, 'node_modules/jsonc-parser'), path.join(destination, 'node_modules/jsonc-parser'), { recursive: true });
+  fs.writeFileSync(path.join(destination, 'NpmTools.mjs'), `
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import { pathToFileURL } from 'node:url';
+import { runBounded as realRun, repositoryRoot } from './NpmTools.real.mjs';
+export { repositoryRoot };
+const log = value => fs.appendFileSync(process.env.FIXTURE_LOG, JSON.stringify(value)+'\\n');
+export function runBounded(executable, args, options) {
+  log(['git', ...args]);
+  const mode = process.env.FIXTURE_MODE;
+  if (args.includes('cat-file') && args.at(-1) === process.env.FIXTURE_FORCE_BASE+'^{commit}')
+    return {status:1,stdout:Buffer.alloc(0)};
+  if (args.includes('fetch')) {
+    assert.equal(executable, 'git');
+    assert.equal(options.timeout, 30000);
+    for (const flag of ['core.hooksPath=/dev/null','core.fsmonitor=false','credential.helper=','http.extraheader=',
+      '--depth=1','--no-tags','--no-recurse-submodules']) assert.ok(args.includes(flag), flag);
+    assert.equal(options.env.GIT_NO_REPLACE_OBJECTS, '1');
+    assert.equal(options.env.GIT_CONFIG_NOSYSTEM, '1');
+    assert.equal(options.env.GIT_TERMINAL_PROMPT, '0');
+    assert.equal(args.at(-2), ${JSON.stringify(`https://github.com/${expectedRepository}`)});
+    assert.ok(args.at(-1) === 'refs/heads/main' || /^[a-f0-9]{40}$/.test(args.at(-1)));
+    if (mode === 'fetch-failure') return {status:7,stdout:Buffer.alloc(0)};
+    if (mode === 'fetch-timeout') throw new Error('Fixture bounded fetch timeout');
+    args = [...args]; args[args.length-2] = pathToFileURL(process.env.FIXTURE_REMOTE).href;
+  }
+  if (args.includes('rev-parse') && args.at(-1) === 'FETCH_HEAD^{commit}') {
+    if (mode === 'bad-fetch-output') return {status:0,stdout:Buffer.from('a'.repeat(40)+'\\n'+'b'.repeat(40))};
+    if (mode === 'zero-fetch-output') return {status:0,stdout:Buffer.from('0'.repeat(40))};
+  }
+  if (args.includes('rev-parse') && mode === 'base-mismatch' && args.at(-1) === process.env.FIXTURE_BASE+'^{commit}')
+    return {status:0,stdout:Buffer.from('f'.repeat(40))};
+  if (args.includes('show') && mode === 'blob-failure') return {status:9,stdout:Buffer.alloc(0)};
+  if (args.includes('diff') && mode === 'incomplete-diff') return {status:0,stdout:Buffer.from('incomplete')};
+  return realRun(executable, args, options);
+}
+export function withNpmEnvironment(callback) {
+  return callback({runNpm(args, scope) {
+    log(['npm',scope,...args]);
+    if (args[0] === 'ls') return {status:0,stdout:Buffer.from(JSON.stringify({name:'fixture',version:'1.0.0'}))};
+    return {status:process.env.FIXTURE_FINDING === 'yes' ? 1 : 0,
+      stdout:Buffer.from(process.env.FIXTURE_FINDING === 'yes' ? ${JSON.stringify(JSON.stringify(report('high')))} : ${JSON.stringify(JSON.stringify(report()))})};
+  }});
+}
+`);
+  for (const scope of [root, destination]) {
+    fs.writeFileSync(path.join(scope, 'package.json'), bytes({ name: 'fixture', version: '1.0.0' }));
+    fs.writeFileSync(path.join(scope, 'package-lock.json'), bytes(lock));
+  }
+  const exceptions = records => fs.writeFileSync(path.join(destination, 'npm-risk-exceptions.json'), bytes({ exceptions: records }));
+  exceptions([]);
+  fs.writeFileSync(path.join(root, 'README.md'), '# Initial\n');
+  fs.writeFileSync(path.join(root, 'tool.js'), 'original\n');
+  const commit = message => {
+    git('add', '--all');
+    git('-c', 'user.name=Audit fixture', '-c', 'user.email=audit@example.invalid', 'commit', '--quiet', '-m', message);
+    return git('rev-parse', 'HEAD');
+  };
+  const main = commit('accepted main');
+  fs.writeFileSync(path.join(root, 'tool.js'), 'target change\n');
+  const base = commit('non-main target');
+  fs.writeFileSync(path.join(root, 'README.md'), '# Proposal\n');
+  const docs = commit('prose on target');
+  fs.writeFileSync(path.join(root, 'tool.js'), 'original\n');
+  const head = commit('revert target tool change');
+  const remote = path.join(temporary, 'accepted.git');
+  git('clone', '--quiet', '--bare', root, remote);
+  git('--git-dir', remote, 'update-ref', 'refs/heads/main', main);
+  // Poisoned local tracking state must not authorize the current candidate.
+  git('update-ref', 'refs/remotes/origin/main', head);
+  const eventPath = path.join(temporary, 'event.json'), log = path.join(temporary, 'calls.jsonl');
+  const event = (sha = base, ref = 'topic', repository = expectedRepository) => fs.writeFileSync(eventPath,
+    bytes({ pull_request: { base: { sha, ref, repo: { full_name: repository } } } }));
+  const pushEvent = created => fs.writeFileSync(eventPath, bytes({ created,
+    before: created ? '0'.repeat(40) : base, after: head, deleted: false }));
+  event();
+  const run = (overrides = {}, command) => {
+    fs.writeFileSync(log, '');
+    const result = spawnSync(command ? 'pwsh' : process.execPath,
+      command ? ['-NoProfile', '-NonInteractive', '-Command', command] : [path.join(destination, 'Check-NpmAudit.mjs'), '--ci'], {
+        cwd: root, encoding: 'utf8', timeout: 30000, windowsHide: true,
+        env: { ...env, GITHUB_ACTIONS: 'true', GITHUB_EVENT_NAME: 'push', GITHUB_REF: 'refs/heads/topic',
+          GITHUB_REPOSITORY: expectedRepository, GITHUB_SHA: git('rev-parse', 'HEAD'), GITHUB_EVENT_PATH: eventPath,
+          FIXTURE_REMOTE: remote, FIXTURE_LOG: log, FIXTURE_BASE: base, ...overrides },
+      });
+    assert.equal(result.error, undefined, result.stderr);
+    assert.equal(result.signal, null, result.stderr);
+    return { ...result, calls: fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse),
+      value: command ? undefined : JSON.parse(result.status === 2 ? result.stderr : result.stdout) };
+  };
+  return { root, destination, git, main, base, docs, head, remote, event, pushEvent, exceptions, commit, run };
+}
+
+test('hosted live branches and tags use fetched main; exact main events keep their snapshot', t => {
+  const f = hostedFixture(t);
+  for (const ref of ['refs/heads/topic', 'refs/heads/main-fix', 'refs/heads/Main', 'refs/tags/v1', 'refs/tags/main']) {
+    for (const created of [true, false]) {
+      f.pushEvent(created);
+      const result = f.run({ GITHUB_REF: ref });
+      assert.equal(result.status, 0, result.stderr);
+      assert.equal(result.value.status, 'CLEAN');
+      assert.equal(result.value.authority, f.main);
+      assert.equal(result.value.authoritySource, 'remote-main');
+      assert.equal(result.calls.filter(row => row.includes('fetch')).length, 1);
+      assert.equal(result.calls.filter(row => row[0] === 'npm' && row.includes('audit')).length, 2);
+    }
+  }
+  for (const event of ['push', 'schedule', 'workflow_dispatch']) {
+    const result = f.run({ GITHUB_EVENT_NAME: event, GITHUB_REF: 'refs/heads/main', GITHUB_SHA: f.main });
+    assert.equal(result.status, 0, result.stderr);
+    assert.equal(result.value.authority, f.main);
+    assert.equal(result.value.authoritySource, 'event-main');
+    assert.equal(result.calls.filter(row => row.includes('fetch')).length, 0);
+  }
+  for (const overrides of [
+    { GITHUB_REF: 'refs/heads/bad..name' }, { GITHUB_REF: 'refs/tags/bad tag' },
+    { GITHUB_REF: 'main' }, { GITHUB_REF: 'refs/pull/1/merge' }, { GITHUB_REF: '' },
+    { GITHUB_SHA: '0'.repeat(40) }, { GITHUB_SHA: 'short' },
+    { GITHUB_REPOSITORY: 'other/repository' }, { GITHUB_EVENT_NAME: 'dynamic' },
+    { GITHUB_EVENT_NAME: 'schedule' }, { GITHUB_EVENT_NAME: 'workflow_dispatch' },
+    { GITHUB_EVENT_NAME: 'pull_request_target' },
+  ]) {
+    const result = f.run(overrides);
+    assert.equal(result.status, 2, JSON.stringify(overrides));
+    assert.equal(result.calls.some(row => row.includes('fetch') || row[0] === 'npm'), false);
+  }
+});
+
+test('PR applicability uses actual target B, independently of accepted main A', t => {
+  const f = hostedFixture(t);
+  f.git('checkout', '--quiet', '--detach', f.docs);
+  const docs = f.run({ GITHUB_EVENT_NAME: 'pull_request', FIXTURE_FORCE_BASE: f.base });
+  assert.equal(docs.status, 0, docs.stderr);
+  assert.equal(docs.value.status, 'NOT_APPLICABLE');
+  assert.equal(docs.value.base, f.base);
+  assert.equal(docs.value.head, f.docs);
+  assert.equal(docs.value.authority, f.main);
+  assert.equal(docs.value.authoritySource, 'remote-main');
+  assert.deepEqual(docs.calls.filter(row => row.includes('fetch')).map(row => row.at(-1)), ['refs/heads/main', f.base]);
+  assert.equal(docs.calls.some(row => row[0] === 'npm'), false);
+  f.git('checkout', '--quiet', '--detach', f.head);
+  const code = f.run({ GITHUB_EVENT_NAME: 'pull_request' });
+  assert.equal(code.status, 0, code.stderr);
+  assert.equal(code.value.applicable, true); // A->H is prose; B->H changes tool.js.
+  assert.equal(code.value.base, f.base);
+  assert.equal(code.calls.filter(row => row[0] === 'npm' && row.includes('audit')).length, 2);
+  f.event(f.main, 'main');
+  const mainPR = f.run({ GITHUB_EVENT_NAME: 'pull_request' });
+  assert.equal(mainPR.value.status, 'NOT_APPLICABLE');
+  assert.equal(mainPR.value.authority, f.main);
+  assert.equal(mainPR.value.authoritySource, 'event-main');
+  assert.equal(mainPR.calls.some(row => row.includes('fetch')), false);
+  f.event();
+  for (const overrides of [{ GITHUB_SHA: f.main }, { FIXTURE_MODE: 'incomplete-diff' }, { FIXTURE_MODE: 'base-mismatch' }]) {
+    assert.equal(f.run({ GITHUB_EVENT_NAME: 'pull_request', ...overrides }).status, 2);
+  }
+  f.event('f'.repeat(40));
+  assert.equal(f.run({ GITHUB_EVENT_NAME: 'pull_request' }).status, 2);
+  f.event(f.base, 'bad..branch');
+  assert.equal(f.run({ GITHUB_EVENT_NAME: 'pull_request' }).status, 2);
+  f.event(f.base, 'topic', 'other/repository');
+  const foreign = f.run({ GITHUB_EVENT_NAME: 'pull_request' });
+  assert.equal(foreign.status, 2);
+  assert.match(foreign.value.message, /Unexpected PR authority repository/);
+  assert.equal(foreign.calls.some(row => row.includes('fetch') || row[0] === 'npm'), false);
+});
+
+test('candidate grants and unavailable main cannot become accepted hosted authority', t => {
+  const f = hostedFixture(t);
+  f.exceptions([grant]);
+  const proposed = f.commit('candidate grant');
+  f.git('update-ref', 'refs/remotes/origin/main', proposed);
+  const candidate = f.run({ FIXTURE_FINDING: 'yes' });
+  assert.equal(candidate.status, 3, candidate.stderr);
+  assert.equal(candidate.value.status, 'PROPOSAL');
+  assert.equal(candidate.value.acceptedPackages, 0);
+  assert.equal(candidate.value.authority, f.main);
+  f.event(proposed);
+  fs.writeFileSync(path.join(f.root, 'tool.js'), 'new candidate change\n');
+  f.commit('change above target grant');
+  const target = f.run({ GITHUB_EVENT_NAME: 'pull_request', FIXTURE_FINDING: 'yes' });
+  assert.equal(target.value.status, 'PROPOSAL');
+  assert.equal(target.value.authority, f.main);
+  assert.equal(target.value.acceptedPackages, 0);
+  for (const mode of ['fetch-failure', 'fetch-timeout', 'bad-fetch-output', 'zero-fetch-output', 'blob-failure']) {
+    const result = f.run({ FIXTURE_MODE: mode });
+    assert.equal(result.status, 2, mode);
+    assert.equal(result.value.status, 'ERROR');
+    assert.equal(result.calls.some(row => row[0] === 'npm'), false);
+  }
+  f.exceptions([]);
+  assert.equal(f.run({ FIXTURE_FINDING: 'yes' }).value.status, 'FINDINGS');
+});
+
+test('fetched main preserves legitimate, expired and malformed exception semantics', t => {
+  const f = hostedFixture(t);
+  const publish = records => {
+    f.exceptions(records);
+    const sha = f.commit('fixture accepted state');
+    f.git('--git-dir', f.remote, 'fetch', '--quiet', f.root, sha);
+    f.git('--git-dir', f.remote, 'update-ref', 'refs/heads/main', sha);
+    return sha;
+  };
+  const grants = [grant, { ...grant, root: '.github/workflows' }];
+  const accepted = publish(grants);
+  const result = f.run({ FIXTURE_FINDING: 'yes' });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal(result.value.status, 'ACCEPTED_RISK');
+  assert.equal(result.value.authority, accepted);
+  assert.equal(result.value.acceptedPackages, 2);
+  publish(grants.map(value => ({ ...value, expires: '2000-01-01T00:00:00Z' })));
+  assert.equal(f.run({ FIXTURE_FINDING: 'yes' }).value.status, 'FINDINGS');
+  publish([grant, grant]);
+  const invalid = f.run();
+  assert.equal(invalid.status, 2);
+  assert.match(invalid.value.message, /Duplicate package exception/);
+  assert.equal(invalid.calls.some(row => row[0] === 'npm'), false);
+});
+
+test('the actual YAML audit step preserves hosted success and native failure', t => {
+  const f = hostedFixture(t);
+  const workflow = parseYaml(fs.readFileSync(path.join(directory, 'markdownlint.yml'), 'utf8'));
+  const command = workflow.jobs.markdownlint.steps.find(step => step.id === 'audit').run;
+  const clean = f.run({}, command);
+  assert.equal(clean.status, 0, clean.stderr);
+  assert.equal(JSON.parse(clean.stdout).authority, f.main);
+  for (const overrides of [{ FIXTURE_FINDING: 'yes' }, { FIXTURE_MODE: 'fetch-failure' }]) {
+    const result = f.run(overrides, command);
+    assert.notEqual(result.status, 0);
+    assert.match(result.stderr, /Dependency audit did not pass/);
   }
 });
