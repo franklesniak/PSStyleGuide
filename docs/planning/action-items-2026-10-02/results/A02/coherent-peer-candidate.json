@@ -2172,8 +2172,33 @@
       "product_unchanged": true,
       "order": "Staged preflight AND full aggregate on exact proposed B-copy BEFORE normal product commit; actual committed H/B diagnostics afterward.",
       "limitations": "Private implementation and prepublication quality do not confer native or paired acceptance."
+    },
+    "manual_codex_gate": {
+      "state": "not_issued",
+      "acceptance_eligible": false,
+      "automatic_review": 5407227056,
+      "automatic_summary": 5982194609,
+      "disposition": "Automatic result is authenticated terminal feedback with3 material findings. It does not satisfy the explicit manual-request gate. Round1 remains nonclean and will be superseded; no old-input acceptance or merge is claimed. Do not request an obsolete e2 manual review just to fill a historical step."
+    },
+    "publication_protocol": {
+      "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-review-protocol-reconciliation.json",
+      "current_input_rule": "After final repaired head/body publication, capture complete native baselines and reconcile every possibly pending automatic/manual request. Prefer Copilot Balanced UI/fallback and confirm request. Post exact @codex review once through the GitHub connector, read back the authenticated comment, and record attribution. Do not use automatic review as substitute or send duplicate pending requests. Preserve round1 count, first-request time and fixed deadline.",
+      "transport": "GitHub connector has reply_to_review_comment and add_comment_to_issue; use these for five replies and exact Codex trigger. No exposed PR-body-update or thread-resolution capability was found; retain guarded gh PATCH/GraphQL fallbacks for those missing capabilities.",
+      "root_state_application": "Pending the sole aggregate wrapper becoming terminal; apply-review-protocol-reconciliation.py must run before integration."
+    },
+    "prepublication_assessments": {
+      "prepared_operations": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-ROUND1-PREPARED-OPERATIONS-REVIEW-20261004.md",
+        "sha256": "f0e5bad5ffeed50673e66a3ebfaf15fa2136cae99dcdfb1c62c9aaa06b699ce6",
+        "scope": "Bounded read-only review; no product/native acceptance"
+      },
+      "style_guide_impact": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-ROUND1-STYLE-GUIDE-IMPACT-20261004.md",
+        "sha256": "7f9c821bc4704c6cf8aa093ec0558fbc67124a9fc44d8c1ef0cf69c3fd0beb13",
+        "scope": "Bounded read-only review; no product/native acceptance"
+      }
     }
   },
   "current_review_status": "round1_proposed_aggregate_running",
-  "next_action": "Collect session90093. If all11 hooks pass with zero skips and unchanged inputs, integrate exact eight postimages/tree099bb0f and normal commit; then actual H/B diagnostics, publication and fresh input reviews."
+  "next_action": "Collect sole aggregate90093. After terminal pass, apply review-protocol correction, integrate exact eight postimages and commit normally; run actual endpoints/audit, then final publication, pending suppression and fresh explicitly requested reviewer pair."
 }
