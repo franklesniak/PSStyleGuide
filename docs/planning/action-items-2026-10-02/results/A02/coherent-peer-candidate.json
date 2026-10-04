@@ -1,6 +1,6 @@
 {
-  "recorded_at": "2026-10-04T14:20:20.108508+00:00",
-  "status": "fixture-corrected staged candidate; replacement full aggregate running",
+  "recorded_at": "2026-10-04T15:03:46.123477+00:00",
+  "status": "aggregate49058 terminal failed; synthetic capacity fixture diagnosis pending",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -649,7 +649,7 @@
     "all_inputs_unchanged": true
   },
   "aggregate": {
-    "state": "running",
+    "state": "failed",
     "command": [
       "py",
       "-3.12",
@@ -665,21 +665,34 @@
     "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-fixture-repaired.log",
     "pid": 12852,
     "before_identity_passed": true,
-    "after_identity_passed": false
+    "after_identity_passed": true,
+    "exit_code": 1,
+    "finished_at": "2026-10-04T14:55:58.687299+00:00",
+    "passed_hook_count": 10,
+    "skipped_hook_count": 0,
+    "log_sha256": "8ab4b3c34ac9fb2694adcc8e0c6660114c4df78860d6c6e499697cbde3fa5663"
   },
   "session": {
     "session_id": 49058,
     "script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\validate-fixture-repaired-candidate.py",
     "aggregate_pid": 12852,
-    "state": "confirmed_live",
+    "state": "terminal_failed",
     "last_confirmed_at": "2026-10-04T14:20:20.099317+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-fixture-repaired.log"
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\final-aggregate-fixture-repaired.log",
+    "finished_at": "2026-10-04T14:55:58.687299+00:00",
+    "exit_code": 1
   },
   "independent_review": {
     "agent": "/root/a02_tf_prepublication_quality",
     "original_tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
     "original_status": "bounded pass; later aggregate identified test-only path failure",
-    "current_state": "focused repair reconciliation running"
+    "current_state": "bounded path-repair reconciliation passed; later capacity fixture failure preserved; future repair needs new reconciliation",
+    "reconciliation": {
+      "state": "bounded_pass_on_37c_before_later_capacity_fixture_failure",
+      "report": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/RECONCILIATION.md",
+      "sha256": "f56957bfb2a78b2ec1c3fe07e808fce0d312c37f4dd6176eb6b05c855fb36975",
+      "limits": "One-literal path repair reviewed; does not establish aggregate acceptance or review a future repair."
+    }
   },
   "reviews": {
     "pr": null,
@@ -825,5 +838,19 @@
       "reason": "Test-only exact TF counterpart literal repair; retain failed original aggregate and independent original-tree assessment."
     }
   ],
-  "handback_limits": "Original worker handback describes af0c029; current full catalog includes the independently verified one-literal fixture repair to that candidate."
+  "handback_limits": "Original worker handback describes af0c029; current full catalog includes the independently verified one-literal fixture repair to that candidate.",
+  "fixture_capacity_failure": {
+    "recorded_at": "2026-10-04T14:59:36.371818+00:00",
+    "aggregate_session": 49058,
+    "state": "source_validated_pending_focused_reproduction",
+    "finding": "Accepted synthetic AGENTS fixture exceeds unchanged ordinary 32768-byte cap.",
+    "source_observation": "Current AGENTS is 32759 bytes; replacing one-digit revision with Int64.MaxValue produces 32777 bytes. Later positive fixtures also append content. Actual focused call attribution and fixture-only repair remain due.",
+    "line_endings": "Repository .gitattributes explicitly sets eol=lf. No production CRLF defect is established.",
+    "limits": "No product repair, new aggregate, commit, native publication or acceptance."
+  },
+  "reverse_readiness": {
+    "record": "reverse-readiness.json",
+    "scope_count": 11,
+    "state": "read-only; refresh after fixture repair and accepted TF"
+  }
 }

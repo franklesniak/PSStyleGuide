@@ -1,0 +1,1135 @@
+{
+  "recorded_at": "2026-10-04T15:03:46.123477+00:00",
+  "kind": "Read-only readiness; not accepted TF delivery, implementation release or final A18 audit.",
+  "accepted_PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+  "TF_B": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+  "TF_staged_tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
+  "private_handback_sha256": "78cc0010c02a4a3fde206b6cc6d5c40043ca30387ef3cebf9bd3e1a6c7fb0555",
+  "complete_83_path_catalog_sha256": "c0f8569c7ab7ef92eaf2c9f6bbfb050c22ebc18f132021c28c2fbbe8dfbcc152",
+  "root_scope_identity_verification": "All eleven scope rows independently checked against actual immutable Git blobs, modes, sizes and SHA256; PS absence of local-validation suite verified.",
+  "reverse_scope": {
+    "kind": "readiness only; not a release or implementation",
+    "paths": [
+      {
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "owner": "A21",
+        "delta": "Carry R97 parent-only helper and exactly its two callsites; synchronize top .NOTES version. Whole remaining engine is exact PS source.",
+        "PS": {
+          "mode": "100644",
+          "bytes": 474787,
+          "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11",
+          "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb"
+        },
+        "TF": {
+          "mode": "100644",
+          "bytes": 476802,
+          "sha256": "bcbff0004f621a927f2f43567bd4833b291adbe09edf3c62e91bf948ef0a414d",
+          "blob": "feb7ccf434e5af8a79b3e3daa98c0e49bd0fe4dd"
+        }
+      },
+      {
+        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        "owner": "A21",
+        "delta": "Carry R97 durable helper/invocation and top version; retain actual PS P1 fixture literal. Whole remaining SelfTest is exact source after these explicit regions.",
+        "PS": {
+          "mode": "100644",
+          "bytes": 218742,
+          "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6",
+          "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad"
+        },
+        "TF": {
+          "mode": "100644",
+          "bytes": 229590,
+          "sha256": "c10ab77ca62f1dcdb68945165838ec533a47d90b16309a8470e71e197a719d25",
+          "blob": "3bae369fa40e6733ec80a68a96c77e5b46e6d92b"
+        }
+      },
+      {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "owner": "A03/A07",
+        "delta": "Carry empty+whitespace environment loop and separate diagnostic/variable assertions; preserve repository identity and each actual artifact-semantic fixture.",
+        "PS": {
+          "mode": "100644",
+          "bytes": 98497,
+          "sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb",
+          "blob": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e"
+        },
+        "TF": {
+          "mode": "100644",
+          "bytes": 100034,
+          "sha256": "88a35be62a72e9e31084f6b82dc89056f3da5e84c4469c3ffc13d329dd22a96a",
+          "blob": "26176163225be5ae18585e82b21dccf7ef1f3cda"
+        }
+      },
+      {
+        "path": ".github/workflows/Test-LocalValidation.test.mjs",
+        "owner": "A07",
+        "delta": "Add existing common11-case status/index/hook-order matrix to PS; no production/helper change.",
+        "PS": null,
+        "TF": {
+          "mode": "100644",
+          "bytes": 3870,
+          "sha256": "7a4e5608c55631ecc115431587096049b5035c6abbca352de097edf3687305e1",
+          "blob": "fdee150a47af7593d8315bb5f2c3b9ee4f9c2030"
+        }
+      },
+      {
+        "path": ".github/workflows/agent-instructions.yml",
+        "owner": "A03",
+        "delta": "Append actual Test-LocalValidation file to candidate-tests Node list; keep PS slug/URL and all accepted/proposed roles.",
+        "PS": {
+          "mode": "100644",
+          "bytes": 12748,
+          "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c",
+          "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56"
+        },
+        "TF": {
+          "mode": "100644",
+          "bytes": 12824,
+          "sha256": "2f1eccf9af407ad32e6e60967d0664f0a8cc1d2672cfb64ba0b228c93fecfcce",
+          "blob": "f4402c90eabe7a42376316aa1773316623a93930"
+        }
+      },
+      {
+        "path": ".github/workflows/scripts-README.md",
+        "owner": "A07/A02",
+        "delta": "Carry broader common inventory/purpose/commands, setup/helper/role/mode paragraphs and broadened Scope; adapt only native job/semantic-child/current-method path facts; synchronize metadata.",
+        "PS": {
+          "mode": "100644",
+          "bytes": 6613,
+          "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b",
+          "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7"
+        },
+        "TF": {
+          "mode": "100644",
+          "bytes": 11536,
+          "sha256": "579657bd4702fcc585b8bcacbb5367919a62ceac54ffca39ff6399bf39b0dd21",
+          "blob": "7a1b33e260c55edfe001f5165f072791dc1c3568"
+        }
+      },
+      {
+        "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+        "owner": "A07",
+        "delta": "Only touched-document Last Updated synchronization remains; body is exact common content.",
+        "PS": {
+          "mode": "100644",
+          "bytes": 3017,
+          "sha256": "6d5463da1938f3dbacbccff47d594b2522ee4558369b05eb4459e2413fa83ac2",
+          "blob": "c55c95be61b704291d384f043e078f26472a3f2b"
+        },
+        "TF": {
+          "mode": "100644",
+          "bytes": 3017,
+          "sha256": "9f5321dff431f2a86641f595be9724b260277ddb4afe8bef2d95b13cb0f4527d",
+          "blob": "0be279cf6b4cb76a99d927f6cfcaa97e58ea9c84"
+        }
+      },
+      {
+        "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+        "owner": "A02",
+        "delta": "Only touched-document Last Updated synchronization remains; body is exact common content.",
+        "PS": {
+          "mode": "100644",
+          "bytes": 2179,
+          "sha256": "f863b58355ec00530b349f8417a78dd1dd31711a6d85ee954436a0aabcb878a9",
+          "blob": "761e87c11c1c03f805ad832331866b963294c1e5"
+        },
+        "TF": {
+          "mode": "100644",
+          "bytes": 2179,
+          "sha256": "d2d1d6f086f21b5b9b34d0c5ad67d0d6323854ad39567f78f7c33487e47ffe69",
+          "blob": "1c86fdcc00c1ab856667c747909ca0a2b75f2187"
+        }
+      },
+      {
+        "path": "docs/dependency-maintenance.md",
+        "owner": "A07",
+        "delta": "Synchronize touched Last Updated; retain narrow repository name in Scope. All other bytes equal.",
+        "PS": {
+          "mode": "100644",
+          "bytes": 9672,
+          "sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21",
+          "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda"
+        },
+        "TF": {
+          "mode": "100644",
+          "bytes": 9679,
+          "sha256": "36e1717f967a9af1ef3a26933e5446eda700a903bddf06f90859aa06a58a2da7",
+          "blob": "b7b27a68e808bc4f752d8977e5e2d95ce6dfb34c"
+        }
+      },
+      {
+        "path": "AGENTS.md",
+        "owner": "A20",
+        "delta": "Synchronize touched Version and Last Updated while retaining repository/language/artifact/PowerShell-guide reference facts; no common operative-rule change.",
+        "PS": {
+          "mode": "100644",
+          "bytes": 32667,
+          "sha256": "75d4079576bb1037cb552a922707074a2d6948d7a24d7418320ec8b271fdcec7",
+          "blob": "95d3b39c90e2f1934f34e0e846692143404fe65b"
+        },
+        "TF": {
+          "mode": "100644",
+          "bytes": 32759,
+          "sha256": "d0cb535c7d55efe3f63520f95c951135cdfb74edecd13185968f5a7b3139539b",
+          "blob": "ca8d06f903583803053d58e9438480b2b015ca82"
+        }
+      },
+      {
+        "path": "CLAUDE.md",
+        "owner": "A20",
+        "delta": "Synchronize touched Version and Last Updated while retaining repository/language/artifact/PowerShell-guide reference facts; no common operative-rule change.",
+        "PS": {
+          "mode": "100644",
+          "bytes": 83329,
+          "sha256": "01d5067733fe44c9d344a9ebb29321b2441dc67a695ad2df2c3a9a0a3a8a1389",
+          "blob": "c3058de820b228bdd5b03cce1ec9f288c9dff02d"
+        },
+        "TF": {
+          "mode": "100644",
+          "bytes": 83446,
+          "sha256": "22ecd788827e7776fe3dbf3899c5a55697b48d2f86e60580cfa36f66d9b3a91c",
+          "blob": "0e6d9cd810f4e1222efe502db7d893e95b0fa15a"
+        }
+      }
+    ]
+  },
+  "changed_path_dispositions": [
+    {
+      "path": ".github/copilot-instructions.md",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Repository title and powershell.instructions.md/terraform.instructions.md references only.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 2517,
+        "sha256": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6",
+        "blob": "763aaac2000166b570e39a0c3d8847aa231b294d"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 2522,
+        "sha256": "5e9744858581ca9c663945c2eac4f636e18aff899e604d0c6f845505972783c6",
+        "blob": "5de5474c3e2125d1f0171a305b094d514cc37ff5"
+      }
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Expected repository constant only; audit algorithm/tests common.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 22392,
+        "sha256": "f5f0655d50c33660c4b43310f7d6b2e5f9cbc556db7d818371a41bdb636c188d",
+        "blob": "ba9e0327030fa8288924fa5b2894bfcd7f28c75f"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 22399,
+        "sha256": "c92d3acd9daa7cf89fad652dfea1f0ba61e6f21cc48890066d7534a1837edb61",
+        "blob": "63726f1e32c3d2fd908878dad9af236fc52fffb5"
+      }
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 42081,
+        "sha256": "a1335e5717a8a152281bea78a84086cdec9aeec1235c5497d51f644cc5c9c4b8",
+        "blob": "47a1831ad93a2d935106639822ddc1a95484be09"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 42081,
+        "sha256": "a1335e5717a8a152281bea78a84086cdec9aeec1235c5497d51f644cc5c9c4b8",
+        "blob": "47a1831ad93a2d935106639822ddc1a95484be09"
+      }
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 5786,
+        "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7",
+        "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 5786,
+        "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7",
+        "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0"
+      }
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 25554,
+        "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5",
+        "blob": "dfda67ad00c602280ec716d8407e1816de495452"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 25554,
+        "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5",
+        "blob": "dfda67ad00c602280ec716d8407e1816de495452"
+      }
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A07",
+      "region_and_use": "Only touched-document Last Updated synchronization remains; body is exact common content.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 3017,
+        "sha256": "6d5463da1938f3dbacbccff47d594b2522ee4558369b05eb4459e2413fa83ac2",
+        "blob": "c55c95be61b704291d384f043e078f26472a3f2b"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 3017,
+        "sha256": "9f5321dff431f2a86641f595be9724b260277ddb4afe8bef2d95b13cb0f4527d",
+        "blob": "0be279cf6b4cb76a99d927f6cfcaa97e58ea9c84"
+      }
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 11392,
+        "sha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b",
+        "blob": "8249cd855785e2847df7ab6fad60caf219da59bc"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 11392,
+        "sha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b",
+        "blob": "8249cd855785e2847df7ab6fad60caf219da59bc"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A21",
+      "region_and_use": "Carry R97 durable helper/invocation and top version; retain actual PS P1 fixture literal. Whole remaining SelfTest is exact source after these explicit regions.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 218742,
+        "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6",
+        "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 229590,
+        "sha256": "c10ab77ca62f1dcdb68945165838ec533a47d90b16309a8470e71e197a719d25",
+        "blob": "3bae369fa40e6733ec80a68a96c77e5b46e6d92b"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A21",
+      "region_and_use": "Carry R97 parent-only helper and exactly its two callsites; synchronize top .NOTES version. Whole remaining engine is exact PS source.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 474787,
+        "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11",
+        "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 476802,
+        "sha256": "bcbff0004f621a927f2f43567bd4833b291adbe09edf3c62e91bf948ef0a414d",
+        "blob": "feb7ccf434e5af8a79b3e3daa98c0e49bd0fe4dd"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A03/A07",
+      "region_and_use": "Carry empty+whitespace environment loop and separate diagnostic/variable assertions; preserve repository identity and each actual artifact-semantic fixture.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 98497,
+        "sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb",
+        "blob": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 100034,
+        "sha256": "88a35be62a72e9e31084f6b82dc89056f3da5e84c4469c3ffc13d329dd22a96a",
+        "blob": "26176163225be5ae18585e82b21dccf7ef1f3cda"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A07",
+      "region_and_use": "Add existing common11-case status/index/hook-order matrix to PS; no production/helper change.",
+      "PS": null,
+      "TF": {
+        "mode": "100644",
+        "bytes": 3870,
+        "sha256": "7a4e5608c55631ecc115431587096049b5035c6abbca352de097edf3687305e1",
+        "blob": "fdee150a47af7593d8315bb5f2c3b9ee4f9c2030"
+      }
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 25947,
+        "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547",
+        "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 25947,
+        "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547",
+        "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73"
+      }
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974"
+      }
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A03",
+      "region_and_use": "Append actual Test-LocalValidation file to candidate-tests Node list; keep PS slug/URL and all accepted/proposed roles.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 12748,
+        "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c",
+        "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 12824,
+        "sha256": "2f1eccf9af407ad32e6e60967d0664f0a8cc1d2672cfb64ba0b228c93fecfcce",
+        "blob": "f4402c90eabe7a42376316aa1773316623a93930"
+      }
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Existing native verifier job ID and needs relation, clone/acquisition identity and language artifact upload path.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 4375,
+        "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d",
+        "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 4348,
+        "sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b",
+        "blob": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1"
+      }
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Exactly three acquisition/origin identity literals; D11/D12/D13 and all other bytes equal.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 52385,
+        "sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f",
+        "blob": "b0f7fb0b657232fa0e857e946d725fdd6876c028"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 52406,
+        "sha256": "c276d234e68c8dd81f1437cf676fd69b2b77a4973d2100a5c35b77a978fb1350",
+        "blob": "d94cf1c0572059a79f6968438566478a28d4f523"
+      }
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 8391,
+        "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 8391,
+        "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321"
+      }
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 1691,
+        "sha256": "3410d109d4c842a83bf41dc5674874db8d046929742a7fadba0e60026203c126",
+        "blob": "9b0abb08d1a17ed4306ef771822d980aabff86b5"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 1691,
+        "sha256": "3410d109d4c842a83bf41dc5674874db8d046929742a7fadba0e60026203c126",
+        "blob": "9b0abb08d1a17ed4306ef771822d980aabff86b5"
+      }
+    },
+    {
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 12676,
+        "sha256": "e93be06d32fff7ef9b02a33668918213f068c460f477ecd62e668f43c7004c76",
+        "blob": "2d79be38b1caeeb871de4ed2c8222b950c4a6ae7"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 12676,
+        "sha256": "e93be06d32fff7ef9b02a33668918213f068c460f477ecd62e668f43c7004c76",
+        "blob": "2d79be38b1caeeb871de4ed2c8222b950c4a6ae7"
+      }
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 18348,
+        "sha256": "6f90d52361c564772094ee0a2410f9cc407803f4784aafda3c5e8096c2281327",
+        "blob": "0c7633c0793be84ce6768698387052807a149329"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 18348,
+        "sha256": "6f90d52361c564772094ee0a2410f9cc407803f4784aafda3c5e8096c2281327",
+        "blob": "0c7633c0793be84ce6768698387052807a149329"
+      }
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 5611,
+        "sha256": "c473b3df463d99d88de07ef883214f0a8aaedce111579d676bf39324902d14d3",
+        "blob": "21063b3c86ffcee7c928b149d390065b8bcc1840"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 5611,
+        "sha256": "c473b3df463d99d88de07ef883214f0a8aaedce111579d676bf39324902d14d3",
+        "blob": "21063b3c86ffcee7c928b149d390065b8bcc1840"
+      }
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Exactly acquisition repository/clone URL literals in both jobs.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 6686,
+        "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
+        "blob": "59054973e607c793e821f0ba21fc32143a716b43"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 6714,
+        "sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03",
+        "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d"
+      }
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Two root package-name values; complete dependency graph otherwise common.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 38822,
+        "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+        "blob": "27cc70ba810dfb3f410014542142154f86509196"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 38836,
+        "sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e",
+        "blob": "41f8b76d5ad3a9134a9f2f46b00c81ec62bc4b2f"
+      }
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Package name, repo/bugs/homepage URLs, language keyword, actual named authors; commands/devDependencies match.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 844,
+        "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+        "blob": "b09ca859508430050dc0b023b3dba62e50748680"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 902,
+        "sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c",
+        "blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4"
+      }
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A07/A02",
+      "region_and_use": "Carry broader common inventory/purpose/commands, setup/helper/role/mode paragraphs and broadened Scope; adapt only native job/semantic-child/current-method path facts; synchronize metadata.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 6613,
+        "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b",
+        "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 11536,
+        "sha256": "579657bd4702fcc585b8bcacbb5367919a62ceac54ffca39ff6399bf39b0dd21",
+        "blob": "7a1b33e260c55edfe001f5165f072791dc1c3568"
+      }
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326"
+      }
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Native verifier role ID and language artifact upload filename; schema/pins/guards otherwise common.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 1517,
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 1496,
+        "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+        "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395"
+      }
+    },
+    {
+      "path": ".gitignore",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 289,
+        "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 289,
+        "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6"
+      }
+    },
+    {
+      "path": ".husky/pre-commit",
+      "disposition": "already exact raw equality",
+      "owner": "existing released owner",
+      "region_and_use": "No reverse edit needed; preserve accepted complete common bytes.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 3249,
+        "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 3249,
+        "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7"
+      }
+    },
+    {
+      "path": "AGENTS.md",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A20",
+      "region_and_use": "Synchronize touched Version and Last Updated while retaining repository/language/artifact/PowerShell-guide reference facts; no common operative-rule change.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 32667,
+        "sha256": "75d4079576bb1037cb552a922707074a2d6948d7a24d7418320ec8b271fdcec7",
+        "blob": "95d3b39c90e2f1934f34e0e846692143404fe65b"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 32759,
+        "sha256": "d0cb535c7d55efe3f63520f95c951135cdfb74edecd13185968f5a7b3139539b",
+        "blob": "ca8d06f903583803053d58e9438480b2b015ca82"
+      }
+    },
+    {
+      "path": "CLAUDE.md",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A20",
+      "region_and_use": "Synchronize touched Version and Last Updated while retaining repository/language/artifact/PowerShell-guide reference facts; no common operative-rule change.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 83329,
+        "sha256": "01d5067733fe44c9d344a9ebb29321b2441dc67a695ad2df2c3a9a0a3a8a1389",
+        "blob": "c3058de820b228bdd5b03cce1ec9f288c9dff02d"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 83446,
+        "sha256": "22ecd788827e7776fe3dbf3899c5a55697b48d2f86e60580cfa36f66d9b3a91c",
+        "blob": "0e6d9cd810f4e1222efe502db7d893e95b0fa15a"
+      }
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Title, language artifact filenames and suggested finalization-policy worktree basename; complete governance/finalization common.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 9114,
+        "sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4",
+        "blob": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 9117,
+        "sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d",
+        "blob": "b4a9929050ba641c6f16276e5afa57f3d896d7da"
+      }
+    },
+    {
+      "path": "README.md",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Actual language purpose/file extensions and installation path, normative guide section anchors, attribution and creators; shared navigation/authoring body already present in PS.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 4720,
+        "sha256": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d",
+        "blob": "0dbd77c1fe581bc1b32aa97e4dfb6c5119192560"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 5053,
+        "sha256": "16bd0439b421f4b7b9bcdfd5e4dd2be7239f70934fdcfbe16b16100edf5400d3",
+        "blob": "98f936f0dd1d2101dccf62ebf5f81b3e5f738453"
+      }
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A02",
+      "region_and_use": "Only touched-document Last Updated synchronization remains; body is exact common content.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 2179,
+        "sha256": "f863b58355ec00530b349f8417a78dd1dd31711a6d85ee954436a0aabcb878a9",
+        "blob": "761e87c11c1c03f805ad832331866b963294c1e5"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 2179,
+        "sha256": "d2d1d6f086f21b5b9b34d0c5ad67d0d6323854ad39567f78f7c33487e47ffe69",
+        "blob": "1c86fdcc00c1ab856667c747909ca0a2b75f2187"
+      }
+    },
+    {
+      "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "TF native historical decision, superseded writer/generated-lint-lag history. New canonical guide links mirror a common contract; no PS counterpart history should be invented.",
+      "PS": null,
+      "TF": {
+        "mode": "100644",
+        "bytes": 16605,
+        "sha256": "e751e2a2d172354c6f9476ebbc4ee972798eadb43b5afa6393bd79469b1300f4",
+        "blob": "4482ed5b79da763876462382e60fdd82b8eb2073"
+      }
+    },
+    {
+      "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "TF native historical writer-risk/supersession decision. Preserve history and current link/date header; no same-number PS decision equivalence.",
+      "PS": null,
+      "TF": {
+        "mode": "100644",
+        "bytes": 21720,
+        "sha256": "68423b5dd1b6c8c2101c1aaf37168e93a425302b89e6e4e7d050e1add3fb7704",
+        "blob": "a9100a6448762d6cc8f27821fe2b16b50d2357ad"
+      }
+    },
+    {
+      "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "TF native accepted settings residual. Do not copy its authority/history into PS.",
+      "PS": null,
+      "TF": {
+        "mode": "100644",
+        "bytes": 11738,
+        "sha256": "a81a00b4f8a63c0d946852618d404e41806361db81adb87d0a292c7ed7c5bd86",
+        "blob": "f9064f0bbefa8ff9de463e8fab0a29a4a12e4a09"
+      }
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "disposition": "reverse common repair/selected coverage/touched metadata",
+      "owner": "A07",
+      "region_and_use": "Synchronize touched Last Updated; retain narrow repository name in Scope. All other bytes equal.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 9672,
+        "sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21",
+        "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 9679,
+        "sha256": "36e1717f967a9af1ef3a26933e5446eda700a903bddf06f90859aa06a58a2da7",
+        "blob": "b7b27a68e808bc4f752d8977e5e2d95ce6dfb34c"
+      }
+    },
+    {
+      "path": "package-lock.json",
+      "disposition": "necessary concrete profile/history difference",
+      "owner": "existing released owner",
+      "region_and_use": "Two root package-name values; complete dependency graph otherwise common.",
+      "PS": {
+        "mode": "100644",
+        "bytes": 3552,
+        "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+        "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7"
+      },
+      "TF": {
+        "mode": "100644",
+        "bytes": 3566,
+        "sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77",
+        "blob": "50a7973086b1ed0e596b71b87336469ce48ef653"
+      }
+    }
+  ],
+  "common_region_proofs": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "R97 private helper",
+        "R97 local parent call",
+        "R97 explicit-B parent call",
+        "top version"
+      ],
+      "remainder_sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "R97 focused helper and call",
+        "top version",
+        "single actual-checkout P1/T1 counterpart"
+      ],
+      "remainder_sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "actual artifact semantic fixture (PS blank-line versus TF recovery)",
+        "three repository identity literals",
+        "empty/whitespace diagnostic loop"
+      ],
+      "remainder_sha256": "221de00d681664311355f8ed2842cda66c97b8e78c3f90c749a2a03bef7b8b6c"
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "header scope/date and common/profile inventory preface"
+      ],
+      "remainder_sha256": "33ccffa09bdebbebda4973a0ce4b3375342fc7fe1c60ff9fe3be3b0d3c195590"
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "repository identity literal only"
+      ],
+      "remainder_sha256": "f5f0655d50c33660c4b43310f7d6b2e5f9cbc556db7d818371a41bdb636c188d"
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "repository identity literal only"
+      ],
+      "remainder_sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "repository identity literal only"
+      ],
+      "remainder_sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f"
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "repository identity literal only"
+      ],
+      "remainder_sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "repository identity literal only"
+      ],
+      "remainder_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "repository identity",
+        "extra actual Test-LocalValidation caller"
+      ],
+      "remainder_sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "touched Last Updated",
+        "repository Scope identity when present"
+      ],
+      "remainder_sha256": "6d5463da1938f3dbacbccff47d594b2522ee4558369b05eb4459e2413fa83ac2"
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "touched Last Updated",
+        "repository Scope identity when present"
+      ],
+      "remainder_sha256": "f863b58355ec00530b349f8417a78dd1dd31711a6d85ee954436a0aabcb878a9"
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "touched Last Updated",
+        "repository Scope identity when present"
+      ],
+      "remainder_sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21"
+    },
+    {
+      "path": "AGENTS.md",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "touched Version/Last Updated",
+        "repository/language/generated filename",
+        "TF external PS conformance source",
+        "CLAUDE TF+PS scope when present"
+      ],
+      "remainder_sha256": "75d4079576bb1037cb552a922707074a2d6948d7a24d7418320ec8b271fdcec7"
+    },
+    {
+      "path": "CLAUDE.md",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "touched Version/Last Updated",
+        "repository/language/generated filename",
+        "TF external PS conformance source",
+        "CLAUDE TF+PS scope when present"
+      ],
+      "remainder_sha256": "01d5067733fe44c9d344a9ebb29321b2441dc67a695ad2df2c3a9a0a3a8a1389"
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "repository title/identity",
+        "language artifact filename",
+        "example worktree basename when present"
+      ],
+      "remainder_sha256": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6"
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "repository title/identity",
+        "language artifact filename",
+        "example worktree basename when present"
+      ],
+      "remainder_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+    },
+    {
+      "path": ".github/document-metadata-classification.json",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "repository title/identity",
+        "language artifact filename",
+        "example worktree basename when present"
+      ],
+      "remainder_sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c"
+    },
+    {
+      "path": "package-lock.json",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "two root package-name values"
+      ],
+      "remainder_sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142"
+    },
+    {
+      "path": ".github/workflows/package-lock.json",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "two root package-name values"
+      ],
+      "remainder_sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236"
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "package/repository/language/author metadata only"
+      ],
+      "remainder_sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "repository identity",
+        "native verifier job/needs",
+        "language artifact filename"
+      ],
+      "remainder_sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "exact_remainder_equal": true,
+      "excluded_regions": [
+        "native verifier job role",
+        "language artifact filename"
+      ],
+      "remainder_sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+    }
+  ],
+  "fixture_counterparts": {
+    "PS": {
+      "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+      "mode": "100644",
+      "bytes": 57610,
+      "sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+      "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+      "metadata": "## Metadata\n\n- **Status:** Active\n- **Owner:** Repository Maintainers\n- **Last Updated:** 2026-09-30\n- **Scope:** Manual, read-only supply observation and separate historical provenance verification for issue 158. This method does not change the P1 schema or integrate a workflow gate.\n- **Related:** [Issue 158](https://github.com/franklesniak/PSStyleGuide/issues/158), [historical profile](../.github/workflows/historical-supply-profile.json), [recorder](../.github/workflows/Get-SupplyFreezeDigest.mjs), [focused tests](../.github/workflows/Get-SupplyFreezeDigest.test.mjs), [baseline decision](decisions/0002-accept-unverifiable-baseline-provenance.md)\n",
+      "prepare_anchor_present": true
+    },
+    "TF": {
+      "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+      "mode": "100644",
+      "bytes": 65689,
+      "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2",
+      "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+      "metadata": "## Metadata\n\n- **Status:** Active\n- **Owner:** TerraformStyleGuide Repository Maintainers\n- **Last Updated:** 2026-09-30\n- **Scope:** Defines current-profile observations, field provenance, Linux preparation, separate Git verification, refusals and validation. Historical T1 assertions remain in the linked original record.\n- **Related:** [Historical T1 record](T1-SUPPLY-FREEZE-v1.md), [Issue 54](https://github.com/franklesniak/TerraformStyleGuide/issues/54), [policy contract](../.github/workflows/workflow-policy-contract.json), [recorder](../.github/workflows/Get-SupplyFreezeDigest.mjs), [focused tests](../.github/workflows/Get-SupplyFreezeDigest.test.mjs)\n\nThis companion keeps the complete current method together within the repository's governed-document size limit. The [historical record](T1-SUPPLY-FREEZE-v1.md) retains all original compared and recorded-only assertions, recorder identity and advisory status.\n\nThe recorder is an optional manual diagnostic. It is not a routine CI, dependency-update, or merge requirement. Its historical tuple is retained unchanged in [historical-supply-profile.json](../.github/workflows/historical-supply-profile.json), separate from active workflow policy. The historical blob identities below still describe their recorded commits.\n",
+      "prepare_anchor_present": true
+    }
+  },
+  "worker_stability": {
+    "checked_utc": "2026-10-04T14:59:34.197356+00:00",
+    "expected_staged_tree": "37c7270fc81b03bedac03c36a3d043309c5ede63",
+    "index_sha256_before": "402e1c8d338121e4e9e0351f1eb0d8937d698e2a7c2063b38798581490f81d66",
+    "index_sha256_after": "402e1c8d338121e4e9e0351f1eb0d8937d698e2a7c2063b38798581490f81d66",
+    "path_mode_blob_entries_unchanged": true,
+    "changed_inputs": [],
+    "native_cached_comparison_exit": 0,
+    "HEAD_readback": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "source_accepted_commit": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "scope": "No product/index/dependency/source/planning/ref mutations and no suites executed; only private evidence writes and static comparisons."
+  },
+  "later_capacity_failure": {
+    "recorded_at": "2026-10-04T14:59:36.371818+00:00",
+    "aggregate_session": 49058,
+    "state": "source_validated_pending_focused_reproduction",
+    "finding": "Accepted synthetic AGENTS fixture exceeds unchanged ordinary 32768-byte cap.",
+    "source_observation": "Current AGENTS is 32759 bytes; replacing one-digit revision with Int64.MaxValue produces 32777 bytes. Later positive fixtures also append content. Actual focused call attribution and fixture-only repair remain due.",
+    "line_endings": "Repository .gitattributes explicitly sets eol=lf. No production CRLF defect is established.",
+    "limits": "No product repair, new aggregate, commit, native publication or acceptance."
+  },
+  "limits": "No suite or product mutation in readiness. Refresh after pending fixture repair and actual TF acceptance. Existing transfers remain one; no peer PR or clock."
+}
