@@ -20,62 +20,159 @@ concurrency:
 
 jobs:
   validate-no-devcontainer-contract:
-    name: Validate the PS devcontainer exclusion
+    name: Validate the devcontainer exclusion
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       EXPECTED_REPOSITORY: ${{ github.repository }}
       EXPECTED_REVISION: ${{ github.sha }}
+      EXPECTED_SERVER_URL: ${{ github.server_url }}
     steps:
       - name: Acquire the event commit anonymously and verify the boundary
         shell: bash
         run: |
           set -euo pipefail
-          [[ "${EXPECTED_REPOSITORY}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]]
-          [[ "${EXPECTED_REVISION}" =~ ^[0-9a-f]{40}$ ]]
-
-          has_devcontainer_entry() {
-            local candidate_path
-            local normalized_path
-            local LC_ALL=C
-            while IFS= read -r candidate_path; do
-              normalized_path="${candidate_path,,}"
-              case "${normalized_path}" in
-                .devcontainer|.devcontainer/*|.devcontainer.json)
-                  return 0
-                  ;;
-              esac
-            done
-            return 1
-          }
-
-          has_devcontainer_entry <<< '.devcontainer' || {
-            printf '%s\n' 'Directory boundary fixture was not rejected.' >&2
-            exit 1
-          }
-          has_devcontainer_entry <<< '.devcontainer.json' || {
-            printf '%s\n' 'Root-file boundary fixture was not rejected.' >&2
-            exit 1
-          }
-          has_devcontainer_entry <<< '.DEVCONTAINER' || {
-            printf '%s\n' 'Case-folded directory boundary fixture was not rejected.' >&2
-            exit 1
-          }
-          has_devcontainer_entry <<< '.DEVCONTAINER.JSON' || {
-            printf '%s\n' 'Case-folded root-file boundary fixture was not rejected.' >&2
-            exit 1
-          }
-          if has_devcontainer_entry <<< '.env'; then
-            printf '%s\n' 'Unrelated dot-file boundary fixture was rejected.' >&2
+          if [[ ! "${EXPECTED_REVISION}" =~ ^[0-9a-f]{40}$ ||
+            "${EXPECTED_REVISION}" = 0000000000000000000000000000000000000000 ]]; then
+            printf '%s\n' 'Invalid event commit identity.' >&2
             exit 1
           fi
 
-          readonly checkout_root="${RUNNER_TEMP}/psstyleguide-devcontainer-boundary"
+          build_repository_url() {
+            local server_url="${1%/}"
+            local repository="$2"
+            local authority
+            local LC_ALL=C
+            [[ "${server_url}" = https://* ]] || return 1
+            authority="${server_url#https://}"
+            case "${authority}" in
+              ''|*[@/?#\\]*|*[[:space:][:cntrl:]]*) return 1 ;;
+            esac
+            [[ "${repository}" =~ ^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$ ]] || return 1
+            case "${repository}" in
+              ./*|../*|*/.|*/..) return 1 ;;
+            esac
+            printf '%s/%s.git\n' "${server_url}" "${repository}"
+          }
+
+          test "$(build_repository_url \
+            'https://github.com' 'owner/repository')" = \
+            'https://github.com/owner/repository.git'
+          test "$(build_repository_url \
+            'https://ghe.example/' 'owner/repository')" = \
+            'https://ghe.example/owner/repository.git'
+          if build_repository_url \
+            'https://ghe.example/path' 'owner/repository'; then
+            printf '%s\n' 'A server URL with a path was accepted.' >&2
+            exit 1
+          fi
+
+          has_devcontainer_entry() {
+            local candidate_path=''
+            local match_status=1
+            local normalized_path
+            local LC_ALL=C
+            while IFS= read -r -d '' candidate_path; do
+              normalized_path="${candidate_path,,}"
+              case "${normalized_path}" in
+                .devcontainer|.devcontainer/*|.devcontainer.json)
+                  match_status=0
+                  ;;
+                */.devcontainer|*/.devcontainer/*|*/.devcontainer.json)
+                  match_status=0
+                  ;;
+              esac
+            done
+            if [[ -n "${candidate_path}" ]]; then
+              return 2
+            fi
+            return "${match_status}"
+          }
+
+          has_devcontainer_entry < <(/usr/bin/printf '%s\0' '.devcontainer') || {
+            printf '%s\n' 'Directory boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry < <(/usr/bin/printf '%s\0' '.devcontainer.json') || {
+            printf '%s\n' 'Root-file boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry < <(/usr/bin/printf '%s\0' '.DEVCONTAINER') || {
+            printf '%s\n' 'Case-folded directory boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry < <(/usr/bin/printf '%s\0' '.DEVCONTAINER.JSON') || {
+            printf '%s\n' 'Case-folded root-file boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry \
+            < <(/usr/bin/printf '%s\0' 'module/.devcontainer/devcontainer.json') || {
+            printf '%s\n' 'Nested directory boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry \
+            < <(/usr/bin/printf '%s\0' 'module/.devcontainer.json') || {
+            printf '%s\n' 'Nested file boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry \
+            < <(/usr/bin/printf '%s\0' 'MODULE/.DEVCONTAINER/DEVCONTAINER.JSON') || {
+            printf '%s\n' 'Case-folded nested boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry \
+            < <(/usr/bin/printf '%b\0' 'm\xc3\xb3dulo/.devcontainer.json') || {
+            printf '%s\n' 'UTF-8 nested-file boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          has_devcontainer_entry \
+            < <(/usr/bin/printf '%b\0' 'module\nname/.devcontainer.json') || {
+            printf '%s\n' 'Newline nested-file boundary fixture was not rejected.' >&2
+            exit 1
+          }
+          if has_devcontainer_entry < <(/usr/bin/printf '%s\0' '.env'); then
+            printf '%s\n' 'Unrelated dot-file boundary fixture was rejected.' >&2
+            exit 1
+          fi
+          if has_devcontainer_entry \
+            < <(/usr/bin/printf '%s\0' \
+              'module/.devcontainer-example/devcontainer.json'); then
+            printf '%s\n' 'Similar nested directory fixture was rejected.' >&2
+            exit 1
+          fi
+          if has_devcontainer_entry \
+            < <(/usr/bin/printf '%s\0' 'module/.devcontainer.json.bak'); then
+            printf '%s\n' 'Similar nested file fixture was rejected.' >&2
+            exit 1
+          fi
+          if has_devcontainer_entry < <(/usr/bin/printf '%s' '.env'); then
+            printf '%s\n' 'Line-delimited boundary fixture was accepted.' >&2
+            exit 1
+          else
+            malformed_inventory_status="$?"
+            readonly malformed_inventory_status
+            if [[ "${malformed_inventory_status}" -ne 2 ]]; then
+              printf '%s\n' 'Malformed inventory did not fail closed.' >&2
+              exit 1
+            fi
+          fi
+
+          # This validates the native URL envelope, not enterprise runner or access support.
+          # Git handles authority details; any fetch error remains fatal.
+          if ! repository_remote="$(
+            build_repository_url "${EXPECTED_SERVER_URL}" "${EXPECTED_REPOSITORY}"
+          )"; then
+            printf '%s\n' 'Invalid native HTTPS repository URL.' >&2
+            exit 1
+          fi
+          readonly repository_remote
+
+          readonly checkout_root="${RUNNER_TEMP}/styleguide-devcontainer-boundary"
           test ! -e "${checkout_root}"
           /usr/bin/mkdir -m 0700 -- "${checkout_root}"
           /usr/bin/git -C "${checkout_root}" init --quiet
           /usr/bin/git -C "${checkout_root}" remote add origin \
-            "https://github.com/${EXPECTED_REPOSITORY}.git"
+            "${repository_remote}"
           /usr/bin/git -C "${checkout_root}" \
             -c credential.helper= \
             -c core.askPass= \
@@ -93,16 +190,21 @@ jobs:
               '^(credential\.|http\..*\.extraheader)' || true
           )"
 
-          devcontainer_entries="$(
-            /usr/bin/git -C "${checkout_root}" ls-tree --name-only \
-              "${fetched_revision}"
-          )"
-          readonly devcontainer_entries
-          if has_devcontainer_entry <<< "${devcontainer_entries}"; then
+          readonly devcontainer_inventory="${checkout_root}/tracked-paths.zlist"
+          /usr/bin/git -C "${checkout_root}" ls-tree -r -t --full-tree --name-only -z \
+            "${fetched_revision}" > "${devcontainer_inventory}"
+          if has_devcontainer_entry < "${devcontainer_inventory}"; then
             printf '%s\n' \
-              'PSStyleGuide has no authorized devcontainer contract.' >&2
+              'This repository has no authorized devcontainer contract.' >&2
             exit 1
+          else
+            inventory_status="$?"
+            readonly inventory_status
+            if [[ "${inventory_status}" -ne 1 ]]; then
+              printf '%s\n' 'The tracked-path inventory was malformed.' >&2
+              exit 1
+            fi
           fi
 
           printf '%s\n' \
-            'The exact event commit preserves the PS devcontainer exclusion.'
+            'The exact event commit preserves the devcontainer exclusion.'
