@@ -1,6 +1,6 @@
 {
-  "recorded_at": "2026-10-04T18:45:23.762291+00:00",
-  "status": "Exact repair validated, committed and published; five round1 threads resolved; round2 Copilot and explicit manual Codex requests confirmed, results pending.",
+  "recorded_at": "2026-10-04T19:48:11.203209+00:00",
+  "status": "round2_findings_validation_and_private_repair",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -740,7 +740,7 @@
         "observed_run_conclusion": null
       },
       "manual_codex": {
-        "state": "request_confirmed_pending_result",
+        "state": "completed_with_findings",
         "required": true,
         "started_at": "2026-10-04T18:42:44.604357+00:00",
         "channel_attempts": 1,
@@ -759,11 +759,33 @@
         "confirmed_at": "2026-10-04T18:42:57.459318+00:00",
         "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5983180593",
         "summary_comment_id": 5982194609,
-        "summary_updated_at": "2026-10-04T18:42:54Z",
-        "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \ud83d\udd04 **Running** since <relative-time datetime=\"2026-10-04T18:42:53.253934Z\">2026-10-04T18:42:53.253934Z</relative-time> | `4375f2e` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
-        "observed_running": true
+        "summary_updated_at": "2026-10-04T18:49:13Z",
+        "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \u2705 **Completed** <relative-time datetime=\"2026-10-04T18:49:12.069059Z\">2026-10-04T18:49:12.069059Z</relative-time> | `4375f2e` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
+        "observed_running": false,
+        "review_id": 5407658386,
+        "submitted_at": "2026-10-04T18:49:09Z",
+        "observed_completed_at": "2026-10-04T18:49:12.069059Z",
+        "finding_count": 1,
+        "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-observation-03.json"
       },
-      "clean": false
+      "clean": false,
+      "findings": [
+        {
+          "key": "R6",
+          "comment_id": 4178863046,
+          "thread_id": "PRRT_kwDOSAZRhc6o1afa",
+          "review_id": 5407658386,
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "line": 478,
+          "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Require the nested workflow lint script**\n\nAdd `lint:md:nested = 'node lint-nested-markdown.js'` to the workflow-package expectations. As written, deleting or changing that script in `.github/workflows/package.json` passes `Get-AgentSetupPackageFailure` and the candidate behavior suites, even though `.husky/pre-commit` still invokes it; the next Markdown commit then fails with npm's missing-script error instead of running the required nested lint check.\n\nAGENTS.md reference: [AGENTS.md:L60-L61](https://github.com/franklesniak/TerraformStyleGuide/blob/4375f2e3c98a6aeb0dd916d26620ed63a42abafe/AGENTS.md#L60-L61)\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.",
+          "state": "validating",
+          "worker": "/root/a02_tf_coherent_implementation",
+          "scope": "Private validation and full finding-specific proposal only; root release required before any implementation.",
+          "reaction_id": 450106271,
+          "proposal_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round2-review-findings"
+        }
+      ],
+      "request_set_terminal": false
     }
   },
   "limits": "Current input4375f2e/body52d96a48 awaits both remote results, hosted checks and independent final native quality. No merge, landed acceptance or PS reverse repair is claimed. Round1 automatic Codex feedback did not satisfy its omitted manual gate and remains nonclean.",
@@ -1230,9 +1252,9 @@
   },
   "accepted_baseline_file_count": 75,
   "latest_native_snapshot": {
-    "captured_at": "2026-10-04T18:45:41.193207+00:00",
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-observation-01.json",
-    "sha256": "7906c32943773d88dbe985cbfc9a655baa637d320c1323329e2ff4a5733a9ea9",
+    "captured_at": "2026-10-04T19:04:14.138027+00:00",
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-observation-08.json",
+    "sha256": "6c27c08574e2c696c676d50271fccf27581c9f4dbf2f73220080231c700ccaf0",
     "complete_paginated_surfaces": [
       "request events",
       "requested reviewers",
@@ -1249,8 +1271,8 @@
         "name": "Running Copilot Code Review",
         "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
         "event": "dynamic",
-        "status": "in_progress",
-        "conclusion": null,
+        "status": "completed",
+        "conclusion": "cancelled",
         "created_at": "2026-10-04T18:41:33Z"
       },
       {
@@ -1261,24 +1283,6 @@
         "status": "completed",
         "conclusion": "success",
         "created_at": "2026-10-04T18:37:53Z"
-      },
-      {
-        "id": 37225157092,
-        "name": "Copilot setup steps",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null,
-        "created_at": "2026-10-04T18:37:39Z"
-      },
-      {
-        "id": 37225157095,
-        "name": "Agent instruction validation",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null,
-        "created_at": "2026-10-04T18:37:39Z"
       },
       {
         "id": 37225157094,
@@ -1308,6 +1312,24 @@
         "created_at": "2026-10-04T18:37:39Z"
       },
       {
+        "id": 37225157092,
+        "name": "Copilot setup steps",
+        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T18:37:39Z"
+      },
+      {
+        "id": 37225157095,
+        "name": "Agent instruction validation",
+        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T18:37:39Z"
+      },
+      {
         "id": 37225155638,
         "name": "Agent instruction validation",
         "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
@@ -1315,24 +1337,6 @@
         "status": "completed",
         "conclusion": "success",
         "created_at": "2026-10-04T18:37:37Z"
-      },
-      {
-        "id": 37225154565,
-        "name": "Agent instruction validation",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null,
-        "created_at": "2026-10-04T18:37:36Z"
-      },
-      {
-        "id": 37225154539,
-        "name": "Copilot setup steps",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null,
-        "created_at": "2026-10-04T18:37:36Z"
       },
       {
         "id": 37225154629,
@@ -1360,10 +1364,34 @@
         "status": "completed",
         "conclusion": "success",
         "created_at": "2026-10-04T18:37:36Z"
+      },
+      {
+        "id": 37225154565,
+        "name": "Agent instruction validation",
+        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T18:37:36Z"
+      },
+      {
+        "id": 37225154539,
+        "name": "Copilot setup steps",
+        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "created_at": "2026-10-04T18:37:36Z"
       }
     ],
-    "review_thread_count": 5,
-    "unresolved_thread_ids": []
+    "review_thread_count": 10,
+    "unresolved_thread_ids": [
+      "PRRT_kwDOSAZRhc6o1afa",
+      "PRRT_kwDOSAZRhc6o1fp1",
+      "PRRT_kwDOSAZRhc6o1fqW",
+      "PRRT_kwDOSAZRhc6o1fqx",
+      "PRRT_kwDOSAZRhc6o1frB"
+    ]
   },
   "round1": {
     "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
@@ -2830,8 +2858,8 @@
       "old_input_clean": false
     }
   },
-  "current_review_status": "round2_reviews_pending",
-  "next_action": "Poll complete authenticated current-input reviews and hosted checks at intervals of at least60s; no repeat request. Retain final quality, merge, landed acceptance and reverse comparison gates.",
+  "current_review_status": "round2_findings_validation_and_private_repair",
+  "next_action": "Collect frozen combined R8/R9/R11 private repair and focused Windows/Linux evidence. Reuse verified R6; complete independent remaining quality, one final aggregate, normal commit/publication and current-input native reviews.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -2841,12 +2869,12 @@
     "initial_baseline_sha256": "e147eb72e59397aded3a74b5efa5bc837a65a1e03d9ff32744d7465c3daef958",
     "pending_reconciliation": "All issued old-input requests are authenticated terminal. The PR-open automatic Codex result is historical feedback only; no automatic new-head review or pending review was observed in complete native collections.",
     "copilot": {
-      "state": "request_confirmed_pending_result",
+      "state": "completed_with_findings",
       "started_at": "2026-10-04T18:41:26.178113+00:00",
       "channel_attempts": 1,
       "transport": "gh pr edit 66 --repo franklesniak/TerraformStyleGuide --add-reviewer '@copilot'",
       "ui_observation": "Fresh PR66 in-app browser is signed out. The Reviewers effort menu displays Balanced selected, but Lite/Balanced/Max choices are disabled and no request control is available. No UI request was submitted. Use the documented quoted @copilot CLI fallback. Observed result effort remains unknown.",
-      "observed_result_effort": null,
+      "observed_result_effort": "Lite",
       "request_exit": 0,
       "transport_returned_at": "2026-10-04T18:41:28.952385+00:00",
       "request_log_sha256": "2e886facc888b51f825560e81d176ba377a158a2cb59a3007a148eb80576b0c6",
@@ -2855,11 +2883,18 @@
       "authenticated_actor_id": 11204406,
       "confirmed_at": "2026-10-04T18:42:44.604357+00:00",
       "workflow_run_id": 37225406650,
-      "observed_run_status": "in_progress",
-      "observed_run_conclusion": null
+      "observed_run_status": "completed",
+      "observed_run_conclusion": "cancelled",
+      "review_id": 5407690955,
+      "submitted_at": "2026-10-04T18:59:59Z",
+      "authenticated_author_id": 175728472,
+      "observed_review_body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 4 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (4)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`hostedAuthorityReference()` now returns either a commit SHA (event-main) or the ref string\u2026](#discussion_r4178895861) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`remove()` can fail on platforms where `os.tmpdir()` is a symlinked path (common on macOS, e.g.\u2026](#discussion_r4178895901) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`strings[input.filePath] = input.content;` silently overwrites if the same `filePath` appears\u2026](#discussion_r4178895938) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The hook no longer provides a targeted \u201ctooling not installed\u201d message (previously it told users to\u2026](#discussion_r4178895960) \u00b7 New\n</details>\n\n<details>\n<summary><strong>Resolved since last review (2)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/high-v2-light.png\" alt=\"High severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`curl` does not have a `--disable` flag, so this download will fail immediately with an unknown\u2026](#discussion_r4178540628)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The thrown message only mentions `.github/workflows/.markdownlint.jsonc`, but the implementation\u2026](#discussion_r4178540651)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+      "finding_count": 4,
+      "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-observation-08.json",
+      "service_limit": "Agentic runner did not start before timeout; authenticated Lite fallback review completed with four findings. No retry solely for effort."
     },
     "manual_codex": {
-      "state": "request_confirmed_pending_result",
+      "state": "completed_with_findings",
       "required": true,
       "started_at": "2026-10-04T18:42:44.604357+00:00",
       "channel_attempts": 1,
@@ -2878,10 +2913,163 @@
       "confirmed_at": "2026-10-04T18:42:57.459318+00:00",
       "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5983180593",
       "summary_comment_id": 5982194609,
-      "summary_updated_at": "2026-10-04T18:42:54Z",
-      "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \ud83d\udd04 **Running** since <relative-time datetime=\"2026-10-04T18:42:53.253934Z\">2026-10-04T18:42:53.253934Z</relative-time> | `4375f2e` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
-      "observed_running": true
+      "summary_updated_at": "2026-10-04T18:49:13Z",
+      "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \u2705 **Completed** <relative-time datetime=\"2026-10-04T18:49:12.069059Z\">2026-10-04T18:49:12.069059Z</relative-time> | `4375f2e` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
+      "observed_running": false,
+      "review_id": 5407658386,
+      "submitted_at": "2026-10-04T18:49:09Z",
+      "observed_completed_at": "2026-10-04T18:49:12.069059Z",
+      "finding_count": 1,
+      "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-observation-03.json"
     },
-    "clean": false
+    "clean": false,
+    "findings": [
+      {
+        "key": "R6",
+        "comment_id": 4178863046,
+        "thread_id": "PRRT_kwDOSAZRhc6o1afa",
+        "review_id": 5407658386,
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "line": 478,
+        "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Require the nested workflow lint script**\n\nAdd `lint:md:nested = 'node lint-nested-markdown.js'` to the workflow-package expectations. As written, deleting or changing that script in `.github/workflows/package.json` passes `Get-AgentSetupPackageFailure` and the candidate behavior suites, even though `.husky/pre-commit` still invokes it; the next Markdown commit then fails with npm's missing-script error instead of running the required nested lint check.\n\nAGENTS.md reference: [AGENTS.md:L60-L61](https://github.com/franklesniak/TerraformStyleGuide/blob/4375f2e3c98a6aeb0dd916d26620ed63a42abafe/AGENTS.md#L60-L61)\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.",
+        "state": "private_repair_verified_pending_integration",
+        "worker": "/root/a02_tf_coherent_implementation",
+        "scope": "Private two-path repair only. Root owns integration, aggregate and native lifecycle.",
+        "reaction_id": 450106271,
+        "proposal_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round2-review-findings",
+        "selected_option": "E99 exact command expectation plus two admission mutations",
+        "proposal": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round2-review-findings\\R6-nested-package-contract-proposal.md",
+        "proposal_sha256": "14323d20f84483846a6d8886d4d8551cbbd677adc403c6545e52ced3f96fd306",
+        "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A21\\TF66-R6-nested-package-contract.md",
+        "decision_sha256": "a74fb6f40c62adf8f7581c1e339f850092f45728ec76936f31121279924d2a86",
+        "repair_handoff": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round2-review-findings\\repair\\HANDOFF.md",
+        "repair_handoff_sha256": "b483a0a8fb6e3c06a7f469fe556fe584365d472732b79a5434e951ee4fa4309c",
+        "independent_review": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-R6-REPAIR-REVIEW-20261004.md",
+        "independent_review_sha256": "25fea28c7a4d49442f8c6016f9e1b153aa595f9634d59bc18d3bea2b6665a2ed"
+      },
+      {
+        "key": "R7",
+        "comment_id": 4178895861,
+        "thread_id": "PRRT_kwDOSAZRhc6o1fp1",
+        "review_id": 5407690955,
+        "path": ".github/workflows/Check-NpmAudit.mjs",
+        "line": 225,
+        "body": "`hostedAuthorityReference()` now returns either a commit SHA (event-main) or the ref string `refs/heads/main` (remote-main for non-main PR bases). That\u2019s a concrete return-type change that can break callers that assume a 40-hex commit ID (the old behavior enforced that). Options: (1) update the API to return a structured object (e.g., `{ source, reference }`) and migrate internal callers, or (2) keep `hostedAuthorityReference()` returning a commit SHA only (resolve/fetch main inside the function) and introduce a new helper for the \u201cselector ref\u201d behavior.",
+        "state": "selected_no_change_reply_pending",
+        "worker": "coordinator",
+        "reaction_id": 450109078,
+        "validation_summary": "Actual exported helper has only retained test consumers. Production uses structured hostedContext and resolves authority SHA. Current selector test passes. Compare existing A03 hosted-audit-decision M98 before final disposition.",
+        "validation_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-copilot-validation\\results.json",
+        "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A03\\TF66-R7-disposition.md",
+        "decision_sha256": "6d40243560fcd62b29b3a0b085d1917776ca40062eaedff7c3c12ec54b98fc3f"
+      },
+      {
+        "key": "R8",
+        "comment_id": 4178895901,
+        "thread_id": "PRRT_kwDOSAZRhc6o1fqW",
+        "review_id": 5407690955,
+        "path": ".github/workflows/lint-markdown.test.mjs",
+        "line": 31,
+        "body": "`remove()` can fail on platforms where `os.tmpdir()` is a symlinked path (common on macOS, e.g. `/var` vs `/private/var`). `mkdtempSync(path.join(os.tmpdir(), ...))` will use the non-realpath form, so `path.dirname(root)` may not equal `fs.realpathSync(os.tmpdir())` even though the directory is correct. Compare realpaths on both sides (e.g., `fs.realpathSync(path.dirname(root))`) or use `path.resolve()` consistently to keep this portability check from failing on non-Linux environments.",
+        "state": "selected_private_implementation_released",
+        "worker": "/root/a02_tf_coherent_implementation",
+        "reaction_id": 450109084,
+        "validation_summary": "Real Windows junction proves lexical parent versus realpath mismatch. Both realpaths compare equal. No recursive cleanup performed by reproduction; repair still pending.",
+        "validation_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-copilot-validation\\results.json",
+        "selection": "Canonical parent comparison at all six identical test-fixture assertions across three existing test files; preserve names/guards; actual ordinary and linked TEMP validation.",
+        "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R8-fixture-note.md",
+        "decision_sha256": "d3ff9a8ee581c7bf490703c8564bf4bce1717cff8aef44b0a70bd18b4fd26966"
+      },
+      {
+        "key": "R9",
+        "comment_id": 4178895938,
+        "thread_id": "PRRT_kwDOSAZRhc6o1fqx",
+        "review_id": 5407690955,
+        "path": ".github/workflows/lint-nested-markdown.js",
+        "line": 385,
+        "body": "`strings[input.filePath] = input.content;` silently overwrites if the same `filePath` appears multiple times in `markdownInputs`, which can hide lint failures for the overwritten content. Consider rejecting duplicates explicitly (throw with a clear tooling-failure message) or normalizing inputs so each path is guaranteed unique before building the `strings` object.",
+        "state": "selected_private_implementation_released",
+        "worker": "/root/a02_tf_coherent_implementation",
+        "reaction_id": 450109085,
+        "validation_summary": "Actual shared API returns0 for invalid then clean content with identical file label; reverse order returns1. No duplicate input demonstrated from current Git/glob production callers. Full decision required.",
+        "validation_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-copilot-validation\\results.json",
+        "selection": "Reject conflicting exact labels before lint; accept identical content repeats; retain unique-label behavior. Full table displayed, totals verified including F41. No R9 implementation released yet.",
+        "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R9-conflicting-labels.md",
+        "decision_sha256": "85142f62abd90c312b2f2dd548e0bea1f04654faaa5f2b52f6ac440d7ac78c03"
+      },
+      {
+        "key": "R10",
+        "comment_id": 4178895960,
+        "thread_id": "PRRT_kwDOSAZRhc6o1frB",
+        "review_id": 5407690955,
+        "path": ".husky/pre-commit",
+        "line": 16,
+        "body": "The hook no longer provides a targeted \u201ctooling not installed\u201d message (previously it told users to run `node .github/workflows/NpmTools.mjs install`). When dependencies are missing, users will likely see a generic Node module-load error from the lint scripts. Consider restoring a lightweight preflight check (e.g., verify `.github/workflows/node_modules` exists or that the required packages can be resolved) and printing a single actionable remediation line before exiting with status 1/2.",
+        "state": "selected_no_change_reply_pending",
+        "worker": "coordinator",
+        "reaction_id": 450109086,
+        "validation_summary": "Actual unchanged shell hook and staged checker with absent dependencies exit1 and print NpmTools.mjs install. Compare existing A07 review-TF-hook-prerequisite R96 before final disposition.",
+        "validation_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-copilot-validation\\results.json",
+        "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R10-disposition.md",
+        "decision_sha256": "22390e0aefc60a0f96d7591fd6cefca2ee309a3d421cc1e2104c0647f2bac4fd"
+      },
+      {
+        "key": "R11",
+        "origin": "local linked-temporary-directory validation of R8",
+        "state": "selected_private_implementation_released",
+        "summary": "Five direct-entry guards compare lexical argv with the canonical module path and silently skip actual CLI work through a linked directory.",
+        "paths": [
+          ".github/workflows/lint-markdown.mjs",
+          ".github/workflows/NpmTools.mjs",
+          ".github/workflows/Check-NpmAudit.mjs",
+          ".github/workflows/Classify-InstructionMaintenance.mjs",
+          ".github/workflows/Validate-WorkflowPolicy.mjs"
+        ],
+        "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round2-review-findings\\copilot-proposals\\R11-evidence\\results.json",
+        "evidence_sha256": "b07d29771314b7e1e975fa11d3c8e479269a12e283d05d5644015aed0fa80c61",
+        "scope": "Production finding separate from R8 fixture cleanup and R9 duplicate-label handling; no R11 implementation released.",
+        "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R11-linked-cli-entry.md",
+        "decision_sha256": "0c3b8b023834838ecf19a8634e3acd929d54db37f00d5a1b7580dfd280004d46",
+        "selected_option": "H-inline",
+        "selected_score": 98,
+        "selected_at": "2026-10-04T19:48:11.181043+00:00"
+      }
+    ],
+    "request_set_terminal": true,
+    "nonreview_run_summary": {
+      "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+      "total": 12,
+      "successful": 12,
+      "observed_at": "2026-10-04T19:04:14.138027+00:00"
+    },
+    "hosted_log_collection": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-hosted-4375f2e\\terminal-collection-03.json",
+    "repair_release": {
+      "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+      "tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "paths": [
+        ".github/workflows/Test-AgentInstructions.ps1",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Check-NpmAudit.test.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/lint-markdown.test.mjs",
+        ".github/workflows/lint-nested-markdown.js",
+        ".github/workflows/lint-markdown.mjs",
+        ".github/workflows/NpmTools.mjs",
+        ".github/workflows/Check-NpmAudit.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs"
+      ],
+      "scope": "Private maximum13-path release: frozen independently verified R6, selected R8/R9 and R11 H-inline. Actual test edits may be fewer. No product/index/dependency writes; root owns final integration/aggregate/native lifecycle."
+    },
+    "private_repair_validation": {
+      "windows_ordinary": "29 selected cases pass: 24 Markdown, one installer fixture, four audit cases.",
+      "windows_linked": "16/24 pass; eight failures expose R11. All five R9 tests pass.",
+      "R9_negative_control": "Two guard-removal mutant cases fail at the intended rejection assertion.",
+      "linux": "First ordinary Markdown suite exceeded the harness 180-second timeout; incomplete verdict, linked run not reached.",
+      "production_integrated": false
+    }
   }
 }
