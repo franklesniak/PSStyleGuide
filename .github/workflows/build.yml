@@ -1,14 +1,11 @@
 name: Build Style Guide Artifacts
 on:
   push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
 permissions: {}
 jobs:
   verify_generated_artifacts:
+    if: github.event_name != 'push' || github.event.deleted != true
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     permissions: {}

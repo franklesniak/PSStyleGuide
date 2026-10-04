@@ -1,5 +1,5 @@
 {
-  "schema": "PSStyleGuide.WorkflowPolicyCases.v2",
+  "schema": "StyleGuide.WorkflowPolicyCases.v3",
   "cases": [
     {
       "name": "rejects privileged trigger",
@@ -41,7 +41,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "permissions"
       ],
       "operation": "set",
@@ -55,7 +55,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "needs"
       ],
       "operation": "set",
@@ -67,7 +67,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "container"
       ],
       "operation": "set",
@@ -79,7 +79,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "timeout-minutes"
       ],
       "operation": "set",
@@ -91,7 +91,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "steps",
         3
       ],
@@ -108,7 +108,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "steps",
         2,
         "continue-on-error"
@@ -122,7 +122,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "steps",
         1,
         "env"
@@ -138,7 +138,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "steps",
         0,
         "uses"
@@ -152,7 +152,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "steps",
         0,
         "run"
@@ -166,7 +166,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "steps",
         1,
         "id"
@@ -180,7 +180,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "steps",
         2,
         "run"
@@ -194,7 +194,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "steps",
         2,
         "run"
@@ -208,7 +208,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "steps",
         2,
         "run"
@@ -222,7 +222,7 @@
       "workflow": "build.yml",
       "path": [
         "jobs",
-        "verify_generated_artifacts",
+        "$artifactVerifier",
         "steps",
         2,
         "run"
@@ -562,6 +562,207 @@
       "operation": "set",
       "value": "17 6 3 * 1",
       "category": "workflow-events"
+    },
+    {
+      "name": "rejects restricted push coverage in build.yml",
+      "workflow": "build.yml",
+      "path": [
+        "on",
+        "push"
+      ],
+      "operation": "set",
+      "value": {
+        "branches": [
+          "main"
+        ]
+      },
+      "category": "workflow-events"
+    },
+    {
+      "name": "rejects restricted pull_request coverage in build.yml",
+      "workflow": "build.yml",
+      "path": [
+        "on",
+        "pull_request"
+      ],
+      "operation": "set",
+      "value": {
+        "branches": [
+          "main"
+        ]
+      },
+      "category": "workflow-events"
+    },
+    {
+      "name": "rejects absent deletion guard in $artifactVerifier",
+      "workflow": "build.yml",
+      "path": [
+        "jobs",
+        "$artifactVerifier",
+        "if"
+      ],
+      "operation": "delete",
+      "category": "code-job-shape"
+    },
+    {
+      "name": "rejects live-PR skip in $artifactVerifier",
+      "workflow": "build.yml",
+      "path": [
+        "jobs",
+        "$artifactVerifier",
+        "if"
+      ],
+      "operation": "set",
+      "value": "github.ref == 'refs/heads/main'",
+      "category": "code-job-event"
+    },
+    {
+      "name": "rejects deleted-push execution in $artifactVerifier",
+      "workflow": "build.yml",
+      "path": [
+        "jobs",
+        "$artifactVerifier",
+        "if"
+      ],
+      "operation": "set",
+      "value": "github.event_name != 'pull_request_target'",
+      "category": "code-job-event"
+    },
+    {
+      "name": "rejects unconditional skip in $artifactVerifier",
+      "workflow": "build.yml",
+      "path": [
+        "jobs",
+        "$artifactVerifier",
+        "if"
+      ],
+      "operation": "set",
+      "value": "false",
+      "category": "code-job-event"
+    },
+    {
+      "name": "rejects restricted push coverage in markdownlint.yml",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "on",
+        "push"
+      ],
+      "operation": "set",
+      "value": {
+        "branches": [
+          "main"
+        ]
+      },
+      "category": "workflow-events"
+    },
+    {
+      "name": "rejects restricted pull_request coverage in markdownlint.yml",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "on",
+        "pull_request"
+      ],
+      "operation": "set",
+      "value": {
+        "branches": [
+          "main"
+        ]
+      },
+      "category": "workflow-events"
+    },
+    {
+      "name": "rejects absent deletion guard in policy",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "policy",
+        "if"
+      ],
+      "operation": "delete",
+      "category": "code-job-shape"
+    },
+    {
+      "name": "rejects live-PR skip in policy",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "policy",
+        "if"
+      ],
+      "operation": "set",
+      "value": "github.ref == 'refs/heads/main'",
+      "category": "code-job-event"
+    },
+    {
+      "name": "rejects deleted-push execution in policy",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "policy",
+        "if"
+      ],
+      "operation": "set",
+      "value": "github.event_name != 'pull_request_target'",
+      "category": "code-job-event"
+    },
+    {
+      "name": "rejects unconditional skip in policy",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "policy",
+        "if"
+      ],
+      "operation": "set",
+      "value": "false",
+      "category": "code-job-event"
+    },
+    {
+      "name": "rejects absent deletion guard in markdownlint",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "markdownlint",
+        "if"
+      ],
+      "operation": "delete",
+      "category": "code-job-shape"
+    },
+    {
+      "name": "rejects live-PR skip in markdownlint",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "markdownlint",
+        "if"
+      ],
+      "operation": "set",
+      "value": "github.ref == 'refs/heads/main'",
+      "category": "code-job-event"
+    },
+    {
+      "name": "rejects deleted-push execution in markdownlint",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "markdownlint",
+        "if"
+      ],
+      "operation": "set",
+      "value": "github.event_name != 'pull_request_target'",
+      "category": "code-job-event"
+    },
+    {
+      "name": "rejects unconditional skip in markdownlint",
+      "workflow": "markdownlint.yml",
+      "path": [
+        "jobs",
+        "markdownlint",
+        "if"
+      ],
+      "operation": "set",
+      "value": "false",
+      "category": "code-job-event"
     }
   ]
 }

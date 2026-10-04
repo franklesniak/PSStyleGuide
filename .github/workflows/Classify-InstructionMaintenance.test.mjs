@@ -16,6 +16,7 @@ test('push transition caller binds event endpoints and preserves proposed-code p
   const step = workflow.jobs['candidate-tests'].steps.find(value => value.id === 'test');
   assert.equal(step.env.EXPECTED_PUSH_BASE, '${{ github.event.before }}');
   assert.equal(step.env.EXPECTED_PUSH_HEAD, '${{ github.event.after }}');
+  assert.equal(step.env.EXPECTED_PUSH_CREATED, '${{ toJSON(github.event.created) }}');
   assert.equal(workflow.jobs['accepted-policy'].if, "github.event_name == 'pull_request_target'");
   assert.ok(!JSON.stringify(workflow.jobs['accepted-policy']).includes('-ProposedPolicy'));
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'instruction-push-caller-'));
@@ -27,6 +28,10 @@ test('push transition caller binds event endpoints and preserves proposed-code p
     fs.writeFileSync(checker, `
 if ($args -contains '-ProposedPolicy' -and $env:GIT_NO_REPLACE_OBJECTS -ne '1') { throw 'Replacement objects were not disabled.' }
 [IO.File]::AppendAllText($env:FIXTURE_LOG, (@('checker') + @($args) | ConvertTo-Json -Compress -AsArray) + "\n")
+if ($args -contains '-SelfTest') {
+  if ($env:FIXTURE_MODE -eq 'snapshot-failure') { throw 'Rejected snapshot.' }
+  if ($env:FIXTURE_MODE -eq 'snapshot-exit') { exit 9 }
+}
 if ($args -contains '-ProposedPolicy') {
   if ($env:FIXTURE_MODE -eq 'check-failure') { throw 'Rejected transition.' }
   if ($env:FIXTURE_MODE -eq 'check-exit') { exit 9 }
@@ -38,6 +43,7 @@ if ($args -contains '-ProposedPolicy') {
 function Invoke-FixtureGit {
   [IO.File]::AppendAllText($env:FIXTURE_LOG, (@($args) | ConvertTo-Json -Compress -AsArray) + "\n")
   $global:LASTEXITCODE = 0
+  if ($args -contains 'check-ref-format') { & git check-ref-format $args[-1] }
   if ($args -contains 'fetch' -and $env:FIXTURE_MODE -eq 'fetch-failure') { $global:LASTEXITCODE = 7 }
   if ($args -contains 'rev-parse') {
     if ($env:FIXTURE_MODE -eq 'identity-failure') { $global:LASTEXITCODE = 8 }
@@ -55,7 +61,38 @@ function Start-Sleep {}
       .replaceAll('/usr/bin/git', 'Invoke-FixtureGit')
       .replaceAll('& node --test', '& Invoke-FixtureTests --test'));
     for (const item of [
-      { name: 'push', event: 'push', pass: true, calls: 1 },
+      { name: 'main publication push', event: 'push', pass: true, calls: 1, fetches: 1 },
+      { name: 'draft branch update', ref: 'refs/heads/feature', mode: 'check-failure', pass: true, calls: 0, fetches: 1, snapshot: true },
+      { name: 'near-match main branch', ref: 'refs/heads/main-fix', pass: true, calls: 0, fetches: 1, snapshot: true },
+      { name: 'nested main branch', ref: 'refs/heads/team/main', pass: true, calls: 0, fetches: 1, snapshot: true },
+      { name: 'case-distinct main branch', ref: 'refs/heads/Main', pass: true, calls: 0, fetches: 1, snapshot: true },
+      { name: 'existing tag', ref: 'refs/tags/v1', pass: true, calls: 0, fetches: 1, snapshot: true },
+      { name: 'tag named main', ref: 'refs/tags/main', pass: true, calls: 0, fetches: 1, snapshot: true },
+      { name: 'missing ref', ref: '', pass: false, calls: 0, fetches: 0, diagnostic: /full push branch or tag ref/ },
+      { name: 'short ref', ref: 'main', pass: false, calls: 0, fetches: 0, diagnostic: /full push branch or tag ref/ },
+      { name: 'non-push ref', ref: 'refs/pull/1/merge', pass: false, calls: 0, fetches: 0, diagnostic: /full push branch or tag ref/ },
+      { name: 'empty branch name', ref: 'refs/heads/', pass: false, calls: 0, fetches: 0, diagnostic: /full push branch or tag ref/ },
+      { name: 'invalid branch name', ref: 'refs/heads/main..fix', pass: false, calls: 0, fetches: 0, diagnostic: /Invalid push ref/ },
+      { name: 'invalid tag name', ref: 'refs/tags/bad tag', pass: false, calls: 0, fetches: 0, diagnostic: /Invalid push ref/ },
+      { name: 'draft unavailable B', ref: 'refs/heads/feature', mode: 'fetch-failure', pass: false, calls: 0, fetches: 3 },
+      { name: 'draft Node failure', ref: 'refs/heads/feature', mode: 'node-failure', pass: false, calls: 0, fetches: 1,
+        node: true, diagnostic: /Workflow behavior tests failed/ },
+      { name: 'new branch', ref: 'refs/heads/feature', created: 'true', before: '0'.repeat(40), pass: true, calls: 0, fetches: 0 },
+      { name: 'new tag', ref: 'refs/tags/v1', created: 'true', before: '0'.repeat(40), pass: true, calls: 0, fetches: 0 },
+      { name: 'new reference has B', created: 'true', pass: false },
+      { name: 'missing created', created: '', pass: false },
+      { name: 'null created', created: 'null', pass: false },
+      { name: 'string created', created: '"true"', pass: false },
+      { name: 'number created', created: '1', pass: false },
+      { name: 'mixed-case created', created: 'True', pass: false },
+      { name: 'new reference H mismatch', created: 'true', before: '0'.repeat(40), after: 'c'.repeat(40), pass: false },
+      { name: 'new reference zero H', created: 'true', before: '0'.repeat(40), after: '0'.repeat(40), pass: false },
+      { name: 'new reference snapshot failure', created: 'true', before: '0'.repeat(40), mode: 'snapshot-failure',
+        pass: false, calls: 0, fetches: 0, diagnostic: /Rejected snapshot/ },
+      { name: 'new reference snapshot exit', created: 'true', before: '0'.repeat(40), mode: 'snapshot-exit',
+        pass: false, calls: 0, fetches: 0, diagnostic: /Proposed snapshot checks failed/ },
+      { name: 'new reference Node failure', created: 'true', before: '0'.repeat(40), mode: 'node-failure',
+        pass: false, calls: 0, fetches: 0, node: true, diagnostic: /Workflow behavior tests failed/ },
       { name: 'manual snapshot', event: 'workflow_dispatch', pass: true, calls: 0 },
       { name: 'PR snapshot', event: 'pull_request', pass: true, calls: 0 },
       { name: 'missing B', before: '', pass: false },
@@ -75,13 +112,16 @@ function Start-Sleep {}
       const result = spawnSync('pwsh', ['-NoProfile', '-NonInteractive', '-File', script], {
         cwd: root, encoding: 'utf8', timeout: 30000, windowsHide: true,
         env: { ...process.env, FIXTURE_LOG: log, FIXTURE_MODE: item.mode ?? '',
-          GITHUB_EVENT_NAME: item.event ?? 'push', GITHUB_SHA: head,
+          GITHUB_EVENT_NAME: item.event ?? 'push', GITHUB_SHA: head, GITHUB_REF: item.ref ?? 'refs/heads/main',
+          EXPECTED_PUSH_CREATED: item.created ?? 'false',
           EXPECTED_PUSH_BASE: item.before ?? base, EXPECTED_PUSH_HEAD: item.after ?? head },
       });
       assert.equal(result.status === 0, item.pass, `${item.name}: ${result.stderr}`);
       if (item.diagnostic) assert.match(result.stderr, item.diagnostic, item.name);
+      if (item.snapshot) assert.match(result.stdout, /snapshot checks only; publication admission is not established/);
       const rows = fs.readFileSync(log, 'utf8').trim().split('\n').filter(Boolean).map(JSON.parse);
       const proposed = rows.filter(row => row.includes('-ProposedPolicy'));
+      assert.equal(rows.filter(row => row.includes('-SelfTest')).length, 1, `${item.name}: snapshot reach`);
       assert.equal(rows.filter(row => row[0] === 'node').length, item.pass || item.node ? 1 : 0,
         `${item.name}: subsequent Node reach`);
       if (item.calls !== undefined) assert.equal(proposed.length, item.calls, item.name);
