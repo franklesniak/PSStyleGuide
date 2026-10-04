@@ -4,3 +4,7 @@
 State: active. On2026-10-03 item4 explicitly approved the two-guide immutable-event-acquisition recommendation. Protected authority for that exact scope is resolved; see D08. Product implementation and acceptance remain due.
 
 Read [the current task](../../tasks/A05.md) and [selected design](design.md). Next: refresh the exact two-guide patch against accepted A02/A03 foundations, implement its shared text and portable ref-move fixture, then run the required Windows/Linux checks and PS175's two complete clean passes. Preserve explicit immutable acquisition, exact post-acquisition comparison, least privilege and unavailable-object failure. No permission question remains for those edits.
+
+## Refreshed readiness and Linux local-Git proof
+
+[Current readiness](post231-readiness.md) verifies unchanged approved guide preimages, the identical existing test harness and its actual maintained callers against PSf168 and TF525147aa. The missing Linux probe passed all37 asserted native commands with exact guide fetch flags; historical Windows evidence was reused. Root verified the complete command/result invariants and all ten immutable input identities. No new design or authority question arose. Product implementation remains after accepted foundations; final Windows/Linux product tests, PS175's two clean full passes and the normal paired lifecycle remain due. Transfer0/8 and unstarted review clock are unchanged.

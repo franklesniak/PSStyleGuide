@@ -1,0 +1,179 @@
+{
+  "recorded_at": "2026-10-04T15:56:33.773148+00:00",
+  "status": "Read-only readiness and additional Linux local-Git proof; product implementation remains pending accepted foundations.",
+  "decision": "A05-D1 I99; existing D08 exact two-guide authority, no new decision or approval.",
+  "inputs": [
+    {
+      "repository": "PS",
+      "revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "path": ".github/instructions/yaml.instructions.md",
+      "treeEntry": "100644 blob edef19560d3403985d1417af4772d74bbf9eacf4\t.github/instructions/yaml.instructions.md",
+      "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "bytes": 54645,
+      "snapshot": "PS-yaml.instructions.md"
+    },
+    {
+      "repository": "PS",
+      "revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "treeEntry": "100644 blob 295da6170ae721ca8c02509b308ac3660f66a974\t.github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "bytes": 17320,
+      "snapshot": "PS-Validate-WorkflowPolicy.test.mjs"
+    },
+    {
+      "repository": "PS",
+      "revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "treeEntry": "100644 blob ed4e9ef4b5bea4967477c9b11666e90b2a8be49e\t.github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb",
+      "bytes": 98497,
+      "snapshot": "PS-Test-CiHelpers.test.mjs"
+    },
+    {
+      "repository": "PS",
+      "revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "path": ".github/workflows/agent-instructions.yml",
+      "treeEntry": "100644 blob a35931f8a7de2c9a8d029c24ba796179399b9a56\t.github/workflows/agent-instructions.yml",
+      "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c",
+      "bytes": 12748,
+      "snapshot": "PS-agent-instructions.yml"
+    },
+    {
+      "repository": "PS",
+      "revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "path": ".pre-commit-config.yaml",
+      "treeEntry": "100644 blob f0fcbb13bfdb25d7549cae7aea216ae9b81ee564\t.pre-commit-config.yaml",
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "bytes": 5398,
+      "snapshot": "PS-.pre-commit-config.yaml"
+    },
+    {
+      "repository": "TF-candidate",
+      "revision": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "path": ".github/instructions/yaml.instructions.md",
+      "treeEntry": "100644 blob 924d12c833d07def47d05137b532e622db622fa4\t.github/instructions/yaml.instructions.md",
+      "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+      "bytes": 54645,
+      "snapshot": "TF-candidate-yaml.instructions.md"
+    },
+    {
+      "repository": "TF-candidate",
+      "revision": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "treeEntry": "100644 blob 295da6170ae721ca8c02509b308ac3660f66a974\t.github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "bytes": 17320,
+      "snapshot": "TF-candidate-Validate-WorkflowPolicy.test.mjs"
+    },
+    {
+      "repository": "TF-candidate",
+      "revision": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "treeEntry": "100644 blob 26176163225be5ae18585e82b21dccf7ef1f3cda\t.github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "88a35be62a72e9e31084f6b82dc89056f3da5e84c4469c3ffc13d329dd22a96a",
+      "bytes": 100034,
+      "snapshot": "TF-candidate-Test-CiHelpers.test.mjs"
+    },
+    {
+      "repository": "TF-candidate",
+      "revision": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "path": ".github/workflows/agent-instructions.yml",
+      "treeEntry": "100644 blob f4402c90eabe7a42376316aa1773316623a93930\t.github/workflows/agent-instructions.yml",
+      "sha256": "2f1eccf9af407ad32e6e60967d0664f0a8cc1d2672cfb64ba0b228c93fecfcce",
+      "bytes": 12824,
+      "snapshot": "TF-candidate-agent-instructions.yml"
+    },
+    {
+      "repository": "TF-candidate",
+      "revision": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "path": ".pre-commit-config.yaml",
+      "treeEntry": "100644 blob d6fa21489388686703c94ea33c39d0dd41b8bd16\t.pre-commit-config.yaml",
+      "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+      "bytes": 5405,
+      "snapshot": "TF-candidate-.pre-commit-config.yaml"
+    }
+  ],
+  "private_handback_sha256": "d24019294049bef21164ad1afc406b2a1c9e8f4426ce70f37d5c98693e284146",
+  "identity_stability_sha256": "59a78cb3cb58ae321a18955e6b79177c3c122b06b19a1ad04252a632bd0a88ee",
+  "original_windows": {
+    "sha256": "60d5be8e714937dc57aea2b15ed4a324210e9f56ba9547d2d03addf40b05de24",
+    "environment": {
+      "git": "git version 2.55.0.windows.5",
+      "host": "win32",
+      "transport": "local file URI; no network/service behavior proof",
+      "perProcessTimeoutSeconds": 15
+    },
+    "eventCommit": "dff5cad1c406da513dac9606b484b9b485e95702",
+    "movedBranchCommit": "41583441c91b8f6fd56cb117631d90ed4fe6d007",
+    "allCommandsWithinAssertions": true,
+    "fetchFlagEquality": true,
+    "notRerun": true
+  },
+  "original_preview_sha256": "ed273f8e4b84afdcb433a39c5b6e7c56bb5ef2f0cb5b727713664d114bad3e75",
+  "guide_preimages_unchanged": true,
+  "selected_fetch_flags": [
+    "--no-tags",
+    "--no-recurse-submodules",
+    "--depth=1",
+    "--refmap="
+  ],
+  "linux": {
+    "native_exit": 0,
+    "elapsed_seconds": 0.984,
+    "image": "sha256:4484fb945681e4ac67180b5e7df85a1ade48168ba3d38f8d60d78ec3ecb497a3",
+    "script_sha256": "9cdc59f09ffca47f18fec50798b0ca61e9cf6997a64d714b5840ef48cba5c9ac",
+    "result_sha256": "4f0abb0a59d90ab8266ae48d2d663bc3133bdda7233163cc2d5c53ed69a361fe",
+    "execution_record_sha256": "3dbba2f741f47540ff6e112449ffeca438bc5e88722596832695d5980c69bb8c",
+    "platform": "linux",
+    "node": "v24.18.1",
+    "git": "git version 2.43.0",
+    "uid": 65534,
+    "native_command_count": 37,
+    "per_child_timeout_ms": 15000,
+    "event_commit": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+    "moved_branch_commit": "e4107a36ce420331cef794f137fd47df0ecf262a",
+    "results": [
+      {
+        "case": "immutable",
+        "actualRevision": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+        "expectedEventRevision": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+        "matchesEvent": true,
+        "value": "event A",
+        "exactComparisonNativeExit": 0,
+        "shallowCommitCount": 1
+      },
+      {
+        "case": "mutable",
+        "actualRevision": "e4107a36ce420331cef794f137fd47df0ecf262a",
+        "expectedEventRevision": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+        "matchesEvent": false,
+        "value": "later B",
+        "exactComparisonNativeExit": 1,
+        "shallowCommitCount": 1
+      }
+    ],
+    "missing_object_native_exit": 128,
+    "missing_object_leaves_no_target": true,
+    "fixture_removed": true,
+    "scope": "Local file-URI Git semantics only; no hosted transport, network-deadline or final product claim."
+  },
+  "root_verification": "Read full handback and probe source; verified all10 immutable modes/blobs/byte counts/SHA256 and exact snapshots; reconciled all37 native command outcomes, timeouts/signals/errors, exact fetch flags and three fetch exits0/0/128, acquired revisions/content and negative comparison1; verified original Windows receipt hash and existing actual Node caller.",
+  "later_product_paths": [
+    ".github/instructions/yaml.instructions.md",
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs"
+  ],
+  "caller": {
+    "path": ".github/workflows/agent-instructions.yml",
+    "line": 210,
+    "already_invokes_harness": true,
+    "current_wiring_edit_needed": false
+  },
+  "budgets": {
+    "transfers_used": 0,
+    "transfer_cap": 8,
+    "rounds_used": 0,
+    "review_clock_started": false
+  },
+  "limits": "No product, index, dependency, native or lifecycle-state mutation; no reverse release. Refresh accepted inputs before PS implementation. Final Windows/Linux fixture runs, YAML/instruction/outer-nested checks, PS175 two complete clean passes and normal paired lifecycle remain due."
+}
