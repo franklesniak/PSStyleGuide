@@ -2,7 +2,7 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `1f923bacd34a7d8a3a4dabfe232281a00694258e` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `7f5d56ea2fad147f0172300d24356a6d1122104b` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -35,10 +35,11 @@ Planning head: `1f923bacd34a7d8a3a4dabfe232281a00694258e` (prior published check
 - Scratch prefix: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-`; all suffixes below are relative to it. Closed lifecycles remain in their task RESULT links.
 - Runtime: prefix + `A07-design-20261002/runtime/node-v24.18.1-win-x64` (Node24.18.1/npm11.16.0); `py -3.12`; PowerShell7.6.5. PS5.1 Restricted.
 - A03 source accepted at mainf168f83/treec82fa2e; all candidate and landed checks pass. Closed source state: `A03-setup-lifecycle-20261004/execution-state.json`. Do not repeat merge/reviews.
-- Coherent TF writer: a02_tf_coherent_implementation; product `C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003`, codex/a02-peer-docs at06ad. State: `TF-coherent-20261004/execution-state.json`; handoff in `A02-peer-current-20261003/peer-handoff-post231.md`. Five outcomes transfer1; root owns staging/aggregate/native lifecycle.
+- Coherent TF writer: a02_tf_coherent_implementation; product `C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003`, codex/a02-peer-docs at06ad. State: `TF-coherent-20261004/execution-state.json`; handoff in `A02-peer-current-20261003/peer-handoff-post231.md`. Five outcomes transfer1. R97 Windows/Linux and local content pass;50-path scope includes3 ADR headers; handback pending; current cap unchanged. Root owns staging/aggregate/native lifecycle.
 - Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`, treec68b5e1; preserve index/unrelated edits. A20 source worktree: `C:/Users/flesniak/.codex/worktrees/ps-shared-governance/PSStyleGuide`, clean84fb436; source accepted in PR229.
 - A07 future runtime: R5/B1 selected; canonical results/A07/recovery-runtime. Private evidence: `A07-recovery-runtime-proposal-20261004`; worker complete, no product/installation work started.
 - A06 current handoff: results/A06/post231-readiness; verified; no product writer.
+- TF accepted-base fixture: `TF-accepted-base-20261004`; verified clean B; classifier not yet run.
 - Retained grants: A03 P, A20 protected previews/CLAUDE repairs, A05 exact YAML patches and A13 settings. A15 preparation complete; actual GateA/B human approvals remain later boundaries. PS ruleset24419725 remains active.
 
 ## Final results

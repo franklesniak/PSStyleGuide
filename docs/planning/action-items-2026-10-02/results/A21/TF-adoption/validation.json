@@ -1,0 +1,294 @@
+{
+  "recorded_at": "2026-10-04T13:58:15.574075+00:00",
+  "decision": "D-TF-01 R97",
+  "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+  "accepted_source": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+  "current_writer": "/root/a02_tf_coherent_implementation",
+  "scope_count": 50,
+  "results": {
+    "windows-content": {
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "exit": 1,
+      "seconds": 9.108945846557617,
+      "started_utc": "2026-10-04T13:37:32Z",
+      "log_sha256": "604d61e3147cb396e312b46c823784138b61372b10bcf3bb2f27cee390ff2c9b"
+    },
+    "windows-content-repaired": {
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "exit": 1,
+      "seconds": 31.809646368026733,
+      "started_utc": "2026-10-04T13:44:26Z",
+      "log_sha256": "abc9f853e570c4361223fa126ed68b86b183453f3e7298609669712e6d6d1e52"
+    },
+    "windows-content-final": {
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "exit": 0,
+      "seconds": 36.79462194442749,
+      "started_utc": "2026-10-04T13:53:01Z",
+      "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
+    },
+    "windows-parent-focused-final": {
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-coherent-20261004/implementation/focused-parent.ps1"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "exit": 0,
+      "seconds": 8.237748384475708,
+      "started_utc": "2026-10-04T13:53:28Z",
+      "log_sha256": "0314beaa3b6b41df305a007d0c914d860a78bb20211a419f6e185e607193acc0"
+    },
+    "current-audit": {
+      "command": [
+        "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+        ".github/workflows/Check-NpmAudit.mjs"
+      ],
+      "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+      "exit": 0,
+      "seconds": 12.95413851737976,
+      "started_utc": "2026-10-04T13:44:37Z",
+      "log_sha256": "c0d8c26ced062a80c856e39b0baf08540c7987785bb4c772dfe50b6a9679fecc"
+    },
+    "linux-parent-focused-final-v2": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--network",
+        "none",
+        "--read-only",
+        "--tmpfs",
+        "/tmp:rw,exec,size=1024m",
+        "--env",
+        "HOME=/tmp",
+        "--env",
+        "XDG_CACHE_HOME=/tmp/cache",
+        "--env",
+        "XDG_DATA_HOME=/tmp/data",
+        "--env",
+        "GIT_CONFIG_GLOBAL=/dev/null",
+        "--env",
+        "GIT_CONFIG_NOSYSTEM=1",
+        "--mount",
+        "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003,target=/candidate,readonly",
+        "--workdir",
+        "/candidate",
+        "4484fb945681e4ac67180b5e7df85a1ade48168ba3d38f8d60d78ec3ecb497a3",
+        "-c",
+        "node -e 'const fs=require('\"'\"'node:fs'\"'\"');\nlet p=fs.readFileSync('\"'\"'/candidate/.github/workflows/Test-AgentInstructions.ps1'\"'\"','\"'\"'utf8'\"'\"');\nlet s=fs.readFileSync('\"'\"'/candidate/.github/workflows/Test-AgentInstructions.SelfTest.ps1'\"'\"','\"'\"'utf8'\"'\"');\np=p.slice(0,p.indexOf('\"'\"'#region Repository validation'\"'\"')).replaceAll('\"'\"'$PSScriptRoot'\"'\"',\"'\"'\"'/candidate/.github/workflows'\"'\"'\");\ns=s.slice(s.indexOf('\"'\"'function Assert-PublishedBaselineCapacitySelfTest {'\"'\"'),s.indexOf('\"'\"'function Assert-AgentSetupSelfTest {'\"'\"'));\nfs.writeFileSync('\"'\"'/tmp/focused-parent.ps1'\"'\"',p+'\"'\"'\\n'\"'\"'+s+\"\\nAssert-PublishedBaselineCapacitySelfTest -MaximumMetadataUtcDate ([DateTimeOffset]::UtcNow.ToString('\"'\"'yyyy-MM-dd'\"'\"'))\\nWrite-Output '\"'\"'Historical parent capacity focused controls passed.'\"'\"'\\n\");\n' && pwsh -NoLogo -NoProfile -NonInteractive -File /tmp/focused-parent.ps1"
+      ],
+      "exit": 0,
+      "seconds": 3.228158712387085,
+      "started_utc": "2026-10-04T13:55:19Z",
+      "log_sha256": "d94d4e46f15f583752826b50b4ce300462e6aef2ccef742f89d70ca4f5eac7a3"
+    }
+  },
+  "mutations": [
+    {
+      "mutation": "parent-bound-removed",
+      "rejected": true,
+      "expected_diagnostic": "must not exceed 32768",
+      "evidence": "mutation-parent-bound-removed.json",
+      "execution": {
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\mutant-parent-bound-removed.ps1"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "exit": 1,
+        "seconds": 2.27282452583313,
+        "started_utc": "2026-10-04T13:54:36Z",
+        "log_sha256": "1f33e901c48366021e4d6566e666e963d4779700d38e0dd7cd83d1de4bcdc4a6"
+      }
+    },
+    {
+      "mutation": "current-bound-widened",
+      "rejected": true,
+      "expected_diagnostic": "widened the current instruction reader",
+      "evidence": "mutation-current-bound-widened.json",
+      "execution": {
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\mutant-current-bound-widened.ps1"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "exit": 1,
+        "seconds": 4.893801212310791,
+        "started_utc": "2026-10-04T13:54:39Z",
+        "log_sha256": "272328619082849449484f7480b7a8028a4199e1436fb85de8209cc5aae7d98b"
+      }
+    },
+    {
+      "mutation": "parent-case-insensitive",
+      "rejected": true,
+      "expected_diagnostic": "expanded another path: agents.md",
+      "evidence": "mutation-parent-case-insensitive.json",
+      "execution": {
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\mutant-parent-case-insensitive.ps1"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "exit": 1,
+        "seconds": 3.9515671730041504,
+        "started_utc": "2026-10-04T13:54:44Z",
+        "log_sha256": "cd01b2bc011d3a3546fc758c556dd80968a8f8188e1afe8fcd56f01c31c7980b"
+      }
+    },
+    {
+      "mutation": "historical-bound-widened",
+      "rejected": true,
+      "expected_diagnostic": "negative control was accepted: parent-overflow",
+      "evidence": "mutation-historical-bound-widened.json",
+      "execution": {
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\mutant-historical-bound-widened.ps1"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "exit": 1,
+        "seconds": 7.626917362213135,
+        "started_utc": "2026-10-04T13:54:48Z",
+        "log_sha256": "4769763fc3e0da5c1e95f5bc0c7bde2c949a6c47b8b4d7c6f2ad2f56b4c2261c"
+      }
+    }
+  ],
+  "adr_navigation_closure": {
+    "released_at": "2026-10-04T13:50:48.063578+00:00",
+    "paths": [
+      "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+      "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+      "docs/decisions/0003-accept-required-check-workflow-edit-residual.md"
+    ],
+    "owner": "A02 current navigation and metadata; A21 admission; A09 historical text preserved",
+    "decision": "Mechanical application of D-A21-01 retained ADR operative-link contract; A09 RESULT assigns current metadata/navigation to A02/A07.",
+    "allowed_edits": "Append ../../STYLE_GUIDE.md and ../../STYLE_GUIDE_RATIONALE.md links to existing Related field; Last Updated 2026-10-04 only.",
+    "preserve": "Original Date, Status, Owner, Scope, prior Related link and entire historical body; no policy, lifecycle, security or validator relaxation.",
+    "validation": "Existing actual local instruction validator and diff/metadata verification; final aggregate remains root-owned.",
+    "witness_log_sha256": "abc9f853e570c4361223fa126ed68b86b183453f3e7298609669712e6d6d1e52",
+    "preimages": [
+      {
+        "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+        "mode": "100644",
+        "base_blob": "b1065e9a330dc2a37e6f56eedc38f720558e6528",
+        "bytes": 16511,
+        "sha256": "d2b20a47d918b31e6443d17bb8a305a83a1d3102cc5ad3b9362c0594440d570f"
+      },
+      {
+        "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+        "mode": "100644",
+        "base_blob": "970afd6f1df559f3085bd39cff2f7b961cc96a15",
+        "bytes": 21626,
+        "sha256": "88f628441c80c9aa7ec99e94e8f67e87dedade21f9275547147508950fd15d87"
+      },
+      {
+        "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+        "mode": "100644",
+        "base_blob": "277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba",
+        "bytes": 11644,
+        "sha256": "c8994c132bf13fae0500e0cd429999cd36c9ccf4fa26bdcffe7f97a6cd9cf5cc"
+      }
+    ]
+  },
+  "accepted_base_fixture": {
+    "verified_at": "2026-10-04T13:39:49.762099+00:00",
+    "head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
+    "samples": [
+      {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "raw_sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528",
+        "raw_and_checkout_equal": true
+      },
+      {
+        "path": ".github/workflows/agent-instructions.yml",
+        "raw_sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c",
+        "raw_and_checkout_equal": true
+      },
+      {
+        "path": ".github/document-metadata-classification.json",
+        "raw_sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298",
+        "raw_and_checkout_equal": true
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "raw_sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda",
+        "raw_and_checkout_equal": true
+      }
+    ],
+    "report_sha256": "155c3b16fa621ec0e730025e5936033ca801acc449900a1f4a2432a421400897",
+    "fixture_sha256": "cb0389029c5f6b9c4b69233bb335711d24b58317ae5d9a4725042d6295ff043c",
+    "result": "Unchanged clean full-history accepted-B fixture ready; no candidate or classifier run and no dependencies installed."
+  },
+  "limits": "These are local proposed-code/focused results. Worker remains active. No full aggregate, staged authoring, committed H/B, PR, remote review or landed acceptance yet.",
+  "adr_preservation": [
+    {
+      "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+      "changed_lines": [
+        9,
+        11
+      ],
+      "history_preserved": true
+    },
+    {
+      "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+      "changed_lines": [
+        9,
+        11
+      ],
+      "history_preserved": true
+    },
+    {
+      "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+      "changed_lines": [
+        9,
+        11
+      ],
+      "history_preserved": true
+    }
+  ]
+}

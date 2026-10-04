@@ -5,6 +5,14 @@
 
 Release gate: full A03 source acceptance before TF implementation. Accepted PSfb3288934215dfa9a25114cf79ad86e60b5fb107/treeed7ad456a7147152d2c289908066195689127e85 is PR230's accepted batch. Source candidate ecae3f224ffa53e007ea7f14614f3c8596671648, including D11, is unaccepted; root alone owns aggregate5879. TF remains06ad4f7c9b6847028cafdacf1ae55128d0f2d56c/treedc8f6b82588b8f874d34cd5d0155791aea5793f1. Remote refs are independently pinned in native-start/end.json. A02=1/12; other relevant transfers remain0. All22 outcomes/402 contracts/5 live issues remain in scope.
 
+## Current execution correction, 2026-10-04
+
+The source is now accepted at PSf168f83b89f64b6bca9d520ddec4b58969060fb6/treec82fa2e11bfe333b9bcaf732bf12d1d9cb907380. All five landed workflows passed. The coordinator released the coherent TF writer at2026-10-04T13:28:50Z against unchanged TF06ad4f7. A02/A03/A07/A20/A21 are each at transfer1; source review history remains intact. The older release-gate paragraph below is the original assessment, not current state.
+
+The interface map below remains applicable, but its initial source-only assessment missed an executable metadata-parent capacity defect. The actual proposed local checker rejected the valid33422-byte historical TF AGENTS under the32768-byte current limit even though the replacement is32759 bytes. [D-TF-01](../../A21/TF-adoption/D-TF-01.md) selects a separate bounded65536-byte historical AGENTS metadata reader; current admission stays32768. It repairs local HEAD and explicit-B parent paths without changing endpoint authority, initializer, metadata rules or the old accepted engine. The actual repaired local content check now passes. Full final candidate and native gates remain pending.
+
+The independent full-history accepted-B fixture is verified clean with no alternates and no installed dependencies. Its actual old classifier imports only Node built-ins. The coordinator will fetch the eventual committed H as inert Git data and execute the existing B classifier once. No new modes are invented for B. [Recorded evidence](../../A21/TF-adoption/validation.json) distinguishes fixture readiness from executed classification.
+
 ## Operational roles and commands
 
 Define B as the refreshed accepted TF PR target commit (currently06ad4f7...), H as the final coherent committed TF PR head, and M as the actual tested PR merge or landed commit when applicable. Use full lowercase commit IDs obtained from successful native reads. Keep an unchanged accepted-B checkout and a separate proposed-H checkout. Both must contain the actual B/H Git objects and their own appropriate locked dependencies. Candidate bytes must never replace files/dependencies in the accepted-B checkout. Commands below are future instructions, not commands executed by this assessment.
