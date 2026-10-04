@@ -1,12 +1,12 @@
 {
-  "recorded_at": "2026-10-04T20:32:38.051983+00:00",
-  "status": "round2_proposed_aggregate_running",
+  "recorded_at": "2026-10-04T21:25:47.098208+00:00",
+  "status": "round3_reviews_and_hosted_checks_pending",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
   "base_tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
-  "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-  "candidate_tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
+  "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+  "candidate_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
   "accepted_source": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
   "accepted_source_tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
   "changed_paths": [
@@ -16,6 +16,7 @@
     ".github/workflows/Classify-InstructionMaintenance.mjs",
     ".github/workflows/Classify-InstructionMaintenance.test.mjs",
     ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+    ".github/workflows/NpmTools.mjs",
     ".github/workflows/NpmTools.test.mjs",
     ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
     ".github/workflows/Test-AgentInstructions.ps1",
@@ -117,23 +118,23 @@
     {
       "path": ".github/workflows/Check-NpmAudit.mjs",
       "mode": "100644",
-      "blob": "63726f1e32c3d2fd908878dad9af236fc52fffb5",
-      "bytes": 22399,
-      "sha256": "c92d3acd9daa7cf89fad652dfea1f0ba61e6f21cc48890066d7534a1837edb61"
+      "blob": "28b7ff1974290a15df252631dc782f9c231b34da",
+      "bytes": 22680,
+      "sha256": "0ff46149bd63b69997dfb34e3b572a7389845029ce4f3722b64ee011a5b185bf"
     },
     {
       "path": ".github/workflows/Check-NpmAudit.test.mjs",
       "mode": "100644",
-      "blob": "47a1831ad93a2d935106639822ddc1a95484be09",
-      "bytes": 42081,
-      "sha256": "a1335e5717a8a152281bea78a84086cdec9aeec1235c5497d51f644cc5c9c4b8"
+      "blob": "1b38ba7a9c6e441fb62b276795a951831c709dc9",
+      "bytes": 42149,
+      "sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2"
     },
     {
       "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
       "mode": "100644",
-      "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0",
-      "bytes": 5786,
-      "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7"
+      "blob": "916e0a34258de762772fa888808e403e798099f3",
+      "bytes": 6093,
+      "sha256": "08f0533a20c2292b13434de9e4b858d64d33d77b2c40a3e8888d9b561651af63"
     },
     {
       "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
@@ -194,30 +195,30 @@
     {
       "path": ".github/workflows/NpmTools.mjs",
       "mode": "100644",
-      "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
-      "bytes": 7375,
-      "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "bytes": 7656,
+      "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
     },
     {
       "path": ".github/workflows/NpmTools.test.mjs",
       "mode": "100644",
-      "blob": "8249cd855785e2847df7ab6fad60caf219da59bc",
-      "bytes": 11392,
-      "sha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b"
+      "blob": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+      "bytes": 13810,
+      "sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1"
     },
     {
       "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
       "mode": "100644",
-      "blob": "3bae369fa40e6733ec80a68a96c77e5b46e6d92b",
-      "bytes": 229590,
-      "sha256": "c10ab77ca62f1dcdb68945165838ec533a47d90b16309a8470e71e197a719d25"
+      "blob": "423a1e02869cbcb8b29fe4e56f53a014ebe39e8f",
+      "bytes": 229956,
+      "sha256": "f80f2b3ca171a1010ecd6cffe55e160574d80d2a7b9837aae181910b3f0a1e33"
     },
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
       "mode": "100644",
-      "blob": "0bc2f1f5fd92c761601ee17b8ee3a6292fde52db",
-      "bytes": 477494,
-      "sha256": "c7852b7d229f950c085cc7d9c33a52e3a838d88491c4319a9eb9eed9778e4303"
+      "blob": "f91929885e6069eb83bfd757d882b278551cfe35",
+      "bytes": 477603,
+      "sha256": "5af494dd3c6ecdcf1e6901b709690ad745dbce451a97402a41926dac70b1c6ac"
     },
     {
       "path": ".github/workflows/Test-CheckoutCredentials.ps1",
@@ -264,9 +265,9 @@
     {
       "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
       "mode": "100644",
-      "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
-      "bytes": 25947,
-      "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+      "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+      "bytes": 26228,
+      "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
     },
     {
       "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
@@ -327,23 +328,23 @@
     {
       "path": ".github/workflows/lint-markdown.mjs",
       "mode": "100644",
-      "blob": "9791cbc586e9a20e27fd54db9738579e047a4f92",
-      "bytes": 2101,
-      "sha256": "955a7a011731e8407aa7d1603a904db53b98bc7b34da39d05d6b3a9492326075"
+      "blob": "979096ae0e570f0f2f9deecf49bfd3912dd083f0",
+      "bytes": 2382,
+      "sha256": "7bfbf8429577cb378dbb9e91654405ea048e184b9ff09f28e56c21211fce6d44"
     },
     {
       "path": ".github/workflows/lint-markdown.test.mjs",
       "mode": "100644",
-      "blob": "98e3421da42a3095e08a2d9d67283eb29f8bc455",
-      "bytes": 15409,
-      "sha256": "19e94ec2a4467b1fd7d8a60be617673ac8a1b0f75a7619e67cc1d6b60fe81f6f"
+      "blob": "c166b8e1cbe3fd76d46c98ce9b92bf8a1273f9eb",
+      "bytes": 17530,
+      "sha256": "fae89a84d731f3171fac9053da4a6662f6fe156c6297ce63b4bb284a223ae0a4"
     },
     {
       "path": ".github/workflows/lint-nested-markdown.js",
       "mode": "100644",
-      "blob": "d0339fbba27dee661336e7c41c8b1b6c6fb176be",
-      "bytes": 18400,
-      "sha256": "015d5ef5b885303aab64dfdf14fa0746268c879bb6f1e1b0a2b7700489a7da4e"
+      "blob": "8acfc9642e0b05ec6323ffe5f88b1a0ca9c36653",
+      "bytes": 18667,
+      "sha256": "9b36219d54496f6ae1d57fe46eb058e252454f38bbec1f86ac8f04c3bb416531"
     },
     {
       "path": ".github/workflows/lint-staged-markdown.mjs",
@@ -639,16 +640,16 @@
       ".github/workflows/Test-AgentInstructions.ps1",
       "-RequireStagedInputMatch"
     ],
-    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-proposed-validation-checkout",
-    "started_at": "2026-10-04T17:37:56.605986+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-proposed-staged_preflight.log",
-    "pid": 181424,
-    "candidate_tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
+    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-validation-checkout",
+    "started_at": "2026-10-04T19:58:59.656008+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-staged_preflight.log",
+    "pid": 168092,
+    "candidate_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
     "before_identity_passed": true,
     "after_identity_passed": true,
     "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
     "exit_code": 0,
-    "finished_at": "2026-10-04T17:38:47.793707+00:00",
+    "finished_at": "2026-10-04T19:59:51.134522+00:00",
     "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
   },
   "aggregate": {
@@ -661,27 +662,27 @@
       "run",
       "--all-files"
     ],
-    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-proposed-validation-checkout",
-    "started_at": "2026-10-04T17:38:47.799060+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-proposed-aggregate.log",
-    "pid": 181424,
-    "candidate_tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
+    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-validation-checkout",
+    "started_at": "2026-10-04T19:59:51.141055+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-aggregate.log",
+    "pid": 168092,
+    "candidate_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
     "before_identity_passed": true,
     "after_identity_passed": true,
     "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
     "exit_code": 0,
-    "finished_at": "2026-10-04T18:35:24.529746+00:00",
+    "finished_at": "2026-10-04T21:10:47.028424+00:00",
     "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
     "passed_hook_count": 11,
     "skipped_hook_count": 0
   },
   "session": {
-    "session_id": 90093,
+    "session_id": 8796,
     "state": "terminal_passed",
     "exit_code": 0,
-    "finished_at": "2026-10-04T18:35:24.529746+00:00",
-    "candidate_tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-proposed-aggregate.log",
+    "finished_at": "2026-10-04T21:10:47.028424+00:00",
+    "candidate_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-aggregate.log",
     "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
   },
   "independent_review": {
@@ -710,82 +711,150 @@
   "reviews": {
     "pr": 66,
     "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66",
-    "rounds_used": 2,
+    "rounds_used": 3,
     "first_request_at": "2026-10-04T16:41:24+00:00",
     "deadline": "2026-10-12T16:41:24+00:00",
     "current_round": {
-      "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+      "head": "055f112f762a466ed693c073083225f8ec9ee79d",
       "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-      "body_sha256": "52d96a48a96f4a0da891de0ca0743ef91ad558cb4e4c466ddf058e4651ff90db",
-      "started_at": "2026-10-04T18:41:26.178113+00:00",
-      "initial_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-pre-request-01.json",
-      "initial_baseline_sha256": "e147eb72e59397aded3a74b5efa5bc837a65a1e03d9ff32744d7465c3daef958",
-      "pending_reconciliation": "All issued old-input requests are authenticated terminal. The PR-open automatic Codex result is historical feedback only; no automatic new-head review or pending review was observed in complete native collections.",
+      "body_sha256": "fd2a92eabf68c3b392810844df5ff2cb403be42c44ba57f382b4bf8200f2e50f",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-request-baseline-055f112.json",
+      "baseline_sha256": "c18bd018c1f0abd556e375609d2bac5c73c9093395da5a8cd0307a1058a77414",
+      "prepared_at": "2026-10-04T21:21:24.795146+00:00",
+      "request_set_terminal": false,
+      "clean": false,
       "copilot": {
-        "state": "request_confirmed_pending_result",
-        "started_at": "2026-10-04T18:41:26.178113+00:00",
-        "channel_attempts": 1,
-        "transport": "gh pr edit 66 --repo franklesniak/TerraformStyleGuide --add-reviewer '@copilot'",
-        "ui_observation": "Fresh PR66 in-app browser is signed out. The Reviewers effort menu displays Balanced selected, but Lite/Balanced/Max choices are disabled and no request control is available. No UI request was submitted. Use the documented quoted @copilot CLI fallback. Observed result effort remains unknown.",
-        "observed_result_effort": null,
-        "request_exit": 0,
-        "transport_returned_at": "2026-10-04T18:41:28.952385+00:00",
-        "request_log_sha256": "2e886facc888b51f825560e81d176ba377a158a2cb59a3007a148eb80576b0c6",
-        "request_event_id": 32456441024,
-        "request_event_at": "2026-10-04T18:41:22Z",
-        "authenticated_actor_id": 11204406,
-        "confirmed_at": "2026-10-04T18:42:44.604357+00:00",
-        "workflow_run_id": 37225406650,
+        "transport": "supported GitHub Reviewers UI",
+        "requested_effort": "Balanced",
+        "state": "requested_pending",
+        "request_event_id": 32462177351,
+        "request_event_at": "2026-10-04T21:21:37Z",
+        "request_actor_id": 11204406,
+        "reviewer_id": 175728472,
+        "request_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-after-copilot-request-055f112.json",
+        "request_observation_sha256": "a162375f170f0f313f84d13f50d73a763813b3ee5a393c4c7a2e57c489e6bad6",
+        "result_effort": null,
+        "attempts": 1,
+        "workflow_run_id": 37235784341,
         "observed_run_status": "in_progress",
-        "observed_run_conclusion": null
+        "observed_run_conclusion": null,
+        "ui_observation": "Signed-in supported Reviewers UI selected Balanced, then submitted one request. Timeline event32462177351 says requested a balanced review; sidebar says Reviewing at balanced effort. Actual result effort remains unobserved.",
+        "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-balanced-request.png"
       },
       "manual_codex": {
-        "state": "completed_with_findings",
+        "state": "requested_pending",
+        "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-after-copilot-request-055f112.json",
         "required": true,
-        "started_at": "2026-10-04T18:42:44.604357+00:00",
-        "channel_attempts": 1,
-        "exact_body": "@codex review",
-        "transport": "GitHub connector github_add_comment_to_issue",
-        "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-post-copilot-01.json",
-        "baseline_sha256": "a56ecf13238aa33794f0320c80af575c9ff21c3454ca87a7b52418bf6d355557",
-        "baseline_comment_ids": [
-          5982194609
-        ],
-        "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "body_sha256": "52d96a48a96f4a0da891de0ca0743ef91ad558cb4e4c466ddf058e4651ff90db",
-        "trigger_id": 5983180593,
-        "native_created_at": "2026-10-04T18:42:41Z",
+        "trigger_id": 5984519616,
+        "native_created_at": "2026-10-04T21:22:18Z",
         "authenticated_author_id": 11204406,
-        "confirmed_at": "2026-10-04T18:42:57.459318+00:00",
-        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5983180593",
+        "exact_body": "@codex review",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5984519616",
+        "channel_attempts": 1,
         "summary_comment_id": 5982194609,
-        "summary_updated_at": "2026-10-04T18:49:13Z",
-        "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \u2705 **Completed** <relative-time datetime=\"2026-10-04T18:49:12.069059Z\">2026-10-04T18:49:12.069059Z</relative-time> | `4375f2e` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
-        "observed_running": false,
-        "review_id": 5407658386,
-        "submitted_at": "2026-10-04T18:49:09Z",
-        "observed_completed_at": "2026-10-04T18:49:12.069059Z",
-        "finding_count": 1,
-        "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-observation-03.json"
+        "summary_updated_at": "2026-10-04T21:22:31Z",
+        "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \ud83d\udd04 **Running** since <relative-time datetime=\"2026-10-04T21:22:30.500769Z\">2026-10-04T21:22:30.500769Z</relative-time> | `055f112` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>"
       },
-      "clean": false,
-      "findings": [
+      "started_at": "2026-10-04T21:21:37Z",
+      "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-both-requested-055f112.json",
+      "nonreview_run_summary": [
         {
-          "key": "R6",
-          "comment_id": 4178863046,
-          "thread_id": "PRRT_kwDOSAZRhc6o1afa",
-          "review_id": 5407658386,
-          "path": ".github/workflows/Test-AgentInstructions.ps1",
-          "line": 478,
-          "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Require the nested workflow lint script**\n\nAdd `lint:md:nested = 'node lint-nested-markdown.js'` to the workflow-package expectations. As written, deleting or changing that script in `.github/workflows/package.json` passes `Get-AgentSetupPackageFailure` and the candidate behavior suites, even though `.husky/pre-commit` still invokes it; the next Markdown commit then fails with npm's missing-script error instead of running the required nested lint check.\n\nAGENTS.md reference: [AGENTS.md:L60-L61](https://github.com/franklesniak/TerraformStyleGuide/blob/4375f2e3c98a6aeb0dd916d26620ed63a42abafe/AGENTS.md#L60-L61)\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.",
-          "state": "validating",
-          "worker": "/root/a02_tf_coherent_implementation",
-          "scope": "Private validation and full finding-specific proposal only; root release required before any implementation.",
-          "reaction_id": 450106271,
-          "proposal_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round2-review-findings"
+          "id": 37235178803,
+          "name": "Agent instruction validation",
+          "event": "pull_request_target",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235171661,
+          "name": "Agent instruction validation",
+          "event": "pull_request",
+          "status": "in_progress",
+          "conclusion": null,
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235171645,
+          "name": "Copilot setup steps",
+          "event": "pull_request",
+          "status": "in_progress",
+          "conclusion": null,
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235171697,
+          "name": "Dev container boundary",
+          "event": "pull_request",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235171619,
+          "name": "Markdown Lint",
+          "event": "pull_request",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235171657,
+          "name": "Build Style Guide Artifacts",
+          "event": "pull_request",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235170499,
+          "name": "Agent instruction validation",
+          "event": "pull_request_target",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235168857,
+          "name": "Agent instruction validation",
+          "event": "push",
+          "status": "in_progress",
+          "conclusion": null,
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235168899,
+          "name": "Copilot setup steps",
+          "event": "push",
+          "status": "in_progress",
+          "conclusion": null,
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235168819,
+          "name": "Dev container boundary",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235168865,
+          "name": "Markdown Lint",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+        },
+        {
+          "id": 37235168893,
+          "name": "Build Style Guide Artifacts",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
         }
-      ],
-      "request_set_terminal": false
+      ]
     }
   },
   "limits": "Current input4375f2e/body52d96a48 awaits both remote results, hosted checks and independent final native quality. No merge, landed acceptance or PS reverse repair is claimed. Round1 automatic Codex feedback did not satisfy its omitted manual gate and remains nonclean.",
@@ -1084,43 +1153,43 @@
   },
   "commit": {
     "exit_code": 0,
-    "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-    "parent": "e2f0652654ef0954e17fc3a255b87375908d0521",
-    "tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
-    "at": "2026-10-04T18:35:53.016691+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-normal-repair-commit.log",
-    "log_sha256": "fa69809f03d40dad09678eec7873bcd0c17d5e16beb57860e8176b947303d18c"
+    "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+    "parent": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+    "tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+    "at": "2026-10-04T21:11:17.222350+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-normal-repair-commit.log",
+    "log_sha256": "dc429d1c2c43e84f2a1085f105b0c56e3ee822314edb19b418f700eb881c9adc"
   },
   "publication": {
     "status": "topic_and_body_published",
-    "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-    "previous_native_head": "e2f0652654ef0954e17fc3a255b87375908d0521",
+    "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+    "previous_native_head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "started_at": "2026-10-04T18:37:38.055854+00:00",
-    "prepush_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-repair-prepush-native.json",
-    "prepush_baseline_sha256": "e39e7b57bdf65a0c90dd92d7f27a36f90adbaefc1231ff646df6850017158e2f",
-    "next_body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\PR-body-round1-repair.md",
-    "next_body_sha256": "52d96a48a96f4a0da891de0ca0743ef91ad558cb4e4c466ddf058e4651ff90db",
-    "old_body_sha256": "eddb0f92742af206a715ce33a6baf7de48363da3d2e77ca0a7fb53c052297971",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-normal-repair-push.log",
+    "started_at": "2026-10-04T21:12:50.023181+00:00",
+    "prepush_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-repair-prepush-native.json",
+    "prepush_baseline_sha256": "45e7b4e630b266f23c3ac1963cffef38241479c71431291be027d2536821998c",
+    "next_body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\PR-body-round2-repair.md",
+    "next_body_sha256": "fd2a92eabf68c3b392810844df5ff2cb403be42c44ba57f382b4bf8200f2e50f",
+    "old_body_sha256": "52d96a48a96f4a0da891de0ca0743ef91ad558cb4e4c466ddf058e4651ff90db",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-normal-repair-push.log",
     "review_status": "Old-input set terminal and nonclean; capture new native requests/results after publication. No old review is clean for changed bytes.",
     "exit_code": 0,
-    "finished_at": "2026-10-04T18:37:40.992408+00:00",
-    "readback": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe\trefs/heads/codex/a02-peer-docs",
-    "log_sha256": "e2be6f3eebebe1187a73a06c6118903bafb075c0904b65bdcf8f00e7ea8822a0",
+    "finished_at": "2026-10-04T21:12:52.823207+00:00",
+    "readback": "055f112f762a466ed693c073083225f8ec9ee79d\trefs/heads/codex/a02-peer-docs",
+    "log_sha256": "476fe629f1f001963b20a56834a38d188db79721a92b41245cf8fd648e36df4c",
     "body_update": {
       "status": "confirmed",
-      "started_at": "2026-10-04T18:37:55.959574+00:00",
-      "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+      "started_at": "2026-10-04T21:12:59.577100+00:00",
+      "head": "055f112f762a466ed693c073083225f8ec9ee79d",
       "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-      "before_sha256": "eddb0f92742af206a715ce33a6baf7de48363da3d2e77ca0a7fb53c052297971",
-      "after_sha256": "52d96a48a96f4a0da891de0ca0743ef91ad558cb4e4c466ddf058e4651ff90db",
+      "before_sha256": "52d96a48a96f4a0da891de0ca0743ef91ad558cb4e4c466ddf058e4651ff90db",
+      "after_sha256": "fd2a92eabf68c3b392810844df5ff2cb403be42c44ba57f382b4bf8200f2e50f",
       "exit_code": 0,
-      "response": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-repair-body-update-response.json",
-      "response_sha256": "ede71ff3dc2270628ef83f7c844113b9d0ea97e042af97767e9469ca1569a2d4",
-      "confirmed_at": "2026-10-04T18:37:58.204864+00:00",
-      "readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round1-repair-body-readback.json",
-      "readback_sha256": "18a1077ae4044245118d4ea83e3be4f35bbfbaebd4dfae31b48b56a8bfbb86a1"
+      "response": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-repair-body-update-response.json",
+      "response_sha256": "6c7ba78db225e64058c0711879cd9c5734999b6435b97fadab71d7e53f227e19",
+      "confirmed_at": "2026-10-04T21:13:01.412191+00:00",
+      "readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-repair-body-readback.json",
+      "readback_sha256": "8eeedba4e34b065befb0d3c5f68f08e4a60790e6c88073abaa7efcdd8d0e11af"
     }
   },
   "pr_creation": {
@@ -1143,33 +1212,481 @@
       ".github/workflows/Check-NpmAudit.mjs"
     ],
     "exit_code": 0,
-    "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+    "head": "055f112f762a466ed693c073083225f8ec9ee79d",
     "authority": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "at": "2026-10-04T18:37:16.170584+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\current-audit-4375f2e.log",
+    "at": "2026-10-04T21:12:38.167201+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\current-audit-055f112.log",
     "sha256": "c0d8c26ced062a80c856e39b0baf08540c7987785bb4c772dfe50b6a9679fecc",
     "mode": "ordinary local two-root audit after fresh origin/main fetch; external revocation limitation retained"
   },
   "current_audit_result": {
-    "status": "CLEAN",
-    "unresolved": [],
-    "acceptedPackages": 0,
-    "unusedExceptions": [],
-    "proposedState": false,
+    "result": "CLEAN",
+    "head": "055f112f762a466ed693c073083225f8ec9ee79d",
     "authority": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "authoritySource": "local-origin-main",
-    "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
-    "installedGraphRoots": [
-      ".",
-      ".github/workflows"
-    ],
-    "findings": []
+    "roots": 2,
+    "findings": 0,
+    "exceptions": 0,
+    "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\current-audit-055f112.log",
+    "sha256": "c0d8c26ced062a80c856e39b0baf08540c7987785bb4c772dfe50b6a9679fecc",
+    "limitations": "Ordinary installed-root audit; original external-revocation limitation retained."
   },
   "actual_endpoints": {
     "status": "passed",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+    "head": "055f112f762a466ed693c073083225f8ec9ee79d",
     "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+    "accepted_baseline_files": [
+      {
+        "path": ".claude/commands/review-loop.md",
+        "mode": "100644",
+        "blob": "62b63fabdc8ce64ede8539b884aa904a46cb3eaf",
+        "sha256": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437"
+      },
+      {
+        "path": ".codex/config.toml",
+        "mode": "100644",
+        "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+        "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+      },
+      {
+        "path": ".gitattributes",
+        "mode": "100644",
+        "blob": "6313b56c57848efce05faa7aa7e901ccfc2886ea",
+        "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+      },
+      {
+        "path": ".github/copilot-instructions.md",
+        "mode": "100644",
+        "blob": "d4ad431a6c629203aa6cd88b9cea6f9caa4c293b",
+        "sha256": "81fbe1615dd96fe99afca2738ff5888a6f7b7390068c1087d3d817fad73ff614"
+      },
+      {
+        "path": ".github/dependabot.yml",
+        "mode": "100644",
+        "blob": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+        "sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7"
+      },
+      {
+        "path": ".github/document-metadata-classification.json",
+        "mode": "100644",
+        "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+        "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+      },
+      {
+        "path": ".github/instructions/docs.instructions.md",
+        "mode": "100644",
+        "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+        "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+      },
+      {
+        "path": ".github/instructions/yaml.instructions.md",
+        "mode": "100644",
+        "blob": "924d12c833d07def47d05137b532e622db622fa4",
+        "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+      },
+      {
+        "path": ".github/workflows/.markdownlint.jsonc",
+        "mode": "100644",
+        "blob": "cd9b559b7254dab422b97e493bdb41c40b5511c1",
+        "sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300"
+      },
+      {
+        "path": ".github/workflows/Check-NpmAudit.mjs",
+        "mode": "100644",
+        "blob": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+        "sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb"
+      },
+      {
+        "path": ".github/workflows/Check-NpmAudit.test.mjs",
+        "mode": "100644",
+        "blob": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+        "sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3"
+      },
+      {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "mode": "100644",
+        "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+        "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+      },
+      {
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "mode": "100644",
+        "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+        "sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+      },
+      {
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+        "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+      },
+      {
+        "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+        "mode": "100644",
+        "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+        "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f"
+      },
+      {
+        "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+        "mode": "100644",
+        "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+        "sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57"
+      },
+      {
+        "path": ".github/workflows/Initialize-CiToolchain.ps1",
+        "mode": "100644",
+        "blob": "906460d818674199b32294185ed6525c143b48bb",
+        "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+      },
+      {
+        "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+        "mode": "100644",
+        "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+        "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+      },
+      {
+        "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+        "mode": "100644",
+        "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      },
+      {
+        "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+        "mode": "100644",
+        "blob": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+        "sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a"
+      },
+      {
+        "path": ".github/workflows/NpmTools.mjs",
+        "mode": "100644",
+        "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+        "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+      },
+      {
+        "path": ".github/workflows/NpmTools.test.mjs",
+        "mode": "100644",
+        "blob": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+        "sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b"
+      },
+      {
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "mode": "100644",
+        "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+        "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+      },
+      {
+        "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+        "mode": "100644",
+        "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+        "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+      },
+      {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "mode": "100644",
+        "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+        "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+      },
+      {
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "mode": "100644",
+        "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+        "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+      },
+      {
+        "path": ".github/workflows/Test-LocalValidation.test.mjs",
+        "mode": "100644",
+        "blob": "87f68f5f02eb2303059be06c219253ab37853197",
+        "sha256": "41e8d68636cd8a32569266eb4daf14da9559160679cbb1793d194533f9d32ba5"
+      },
+      {
+        "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+        "mode": "100644",
+        "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+        "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+      },
+      {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "mode": "100644",
+        "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+        "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+      },
+      {
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "mode": "100644",
+        "blob": "995b72a7b48dea2636094d81226893a519950797",
+        "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+      },
+      {
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "mode": "100644",
+        "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+        "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+      },
+      {
+        "path": ".github/workflows/agent-instructions.yml",
+        "mode": "100644",
+        "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+        "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+      },
+      {
+        "path": ".github/workflows/build.yml",
+        "mode": "100644",
+        "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+        "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+      },
+      {
+        "path": ".github/workflows/ci-toolchain.json",
+        "mode": "100644",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+      },
+      {
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "mode": "100644",
+        "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+        "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+      },
+      {
+        "path": ".github/workflows/devcontainer-ci.yml",
+        "mode": "100644",
+        "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+        "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+      },
+      {
+        "path": ".github/workflows/historical-supply-profile.json",
+        "mode": "100644",
+        "blob": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+        "sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d"
+      },
+      {
+        "path": ".github/workflows/install-husky.mjs",
+        "mode": "100644",
+        "blob": "6a12568776f6473472193bc98638f1856a7c9dec",
+        "sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7"
+      },
+      {
+        "path": ".github/workflows/lint-nested-markdown.js",
+        "mode": "100644",
+        "blob": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+        "sha256": "5f3bbefdd02af786bd39ae6a31685a4daf073981c2c072a51b590c75a6626205"
+      },
+      {
+        "path": ".github/workflows/lint-staged-markdown.mjs",
+        "mode": "100644",
+        "blob": "c35575990d5854ea6da9d5f6d49d23287df43146",
+        "sha256": "0e8b0b5c725227b98a338e44e630f6b50a90f725e2f01b2f0262284ffdd6926b"
+      },
+      {
+        "path": ".github/workflows/markdownlint.yml",
+        "mode": "100644",
+        "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+        "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+      },
+      {
+        "path": ".github/workflows/npm-risk-exceptions.json",
+        "mode": "100644",
+        "blob": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+        "sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+      },
+      {
+        "path": ".github/workflows/package-lock.json",
+        "mode": "100644",
+        "blob": "8836c53a7d86ea9eeab8d0ba10b4026cb848b3ae",
+        "sha256": "ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a"
+      },
+      {
+        "path": ".github/workflows/package.json",
+        "mode": "100644",
+        "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+        "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+      },
+      {
+        "path": ".github/workflows/scripts-README.md",
+        "mode": "100644",
+        "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+        "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+      },
+      {
+        "path": ".github/workflows/workflow-policy-cases.json",
+        "mode": "100644",
+        "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+        "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89"
+      },
+      {
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "mode": "100644",
+        "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+        "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+      },
+      {
+        "path": ".gitignore",
+        "mode": "100644",
+        "blob": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+        "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+      },
+      {
+        "path": ".husky/pre-commit",
+        "mode": "100644",
+        "blob": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+        "sha256": "1888b6c6e29c1c06baebbdf2946cc7b465ce5adcc869c2977dfd774d68b96df0"
+      },
+      {
+        "path": ".pre-commit-config.yaml",
+        "mode": "100644",
+        "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      },
+      {
+        "path": ".vscode/settings.json",
+        "mode": "100644",
+        "blob": "b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d",
+        "sha256": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da"
+      },
+      {
+        "path": "ACKNOWLEDGMENTS.md",
+        "mode": "100644",
+        "blob": "f1ae2dd938628424412d9edd6787e99a9246f5ff",
+        "sha256": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42"
+      },
+      {
+        "path": "AGENTS.md",
+        "mode": "100644",
+        "blob": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+        "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266"
+      },
+      {
+        "path": "CLAUDE.md",
+        "mode": "100644",
+        "blob": "3cc21fc793944033be430ad08722081db4e7b9dd",
+        "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2"
+      },
+      {
+        "path": "CONTRIBUTING.md",
+        "mode": "100644",
+        "blob": "94beedee85478c14d284ca830e94d4a5f4ece202",
+        "sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda"
+      },
+      {
+        "path": "LICENSE",
+        "mode": "100644",
+        "blob": "98ca721ce2a880acbcbce1d9690cab0100b8bb7a",
+        "sha256": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb"
+      },
+      {
+        "path": "README.md",
+        "mode": "100644",
+        "blob": "f04368718d580fe61d9a22f4c92cdfdf8287b28d",
+        "sha256": "affbdcdced05773f20895a397d1e062d716fb9e2b2215d0a4f412d7ed8b7a200"
+      },
+      {
+        "path": "STYLE_GUIDE.md",
+        "mode": "100644",
+        "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+      },
+      {
+        "path": "STYLE_GUIDE_CHAT.md",
+        "mode": "100644",
+        "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+        "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72"
+      },
+      {
+        "path": "STYLE_GUIDE_FULL.md",
+        "mode": "100644",
+        "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+        "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab"
+      },
+      {
+        "path": "STYLE_GUIDE_RATIONALE.md",
+        "mode": "100644",
+        "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+        "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+      },
+      {
+        "path": "copilot-instructions.md",
+        "mode": "100644",
+        "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+      },
+      {
+        "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+        "mode": "100644",
+        "blob": "f43b5168ce508a9a054dc85ba7231e27d8c70809",
+        "sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1"
+      },
+      {
+        "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+        "mode": "100644",
+        "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+        "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2"
+      },
+      {
+        "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+        "mode": "100644",
+        "blob": "9e04225a355997850e4817f9163868089a773332",
+        "sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93"
+      },
+      {
+        "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+        "mode": "100644",
+        "blob": "b1065e9a330dc2a37e6f56eedc38f720558e6528",
+        "sha256": "d2b20a47d918b31e6443d17bb8a305a83a1d3102cc5ad3b9362c0594440d570f"
+      },
+      {
+        "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+        "mode": "100644",
+        "blob": "970afd6f1df559f3085bd39cff2f7b961cc96a15",
+        "sha256": "88f628441c80c9aa7ec99e94e8f67e87dedade21f9275547147508950fd15d87"
+      },
+      {
+        "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+        "mode": "100644",
+        "blob": "277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba",
+        "sha256": "c8994c132bf13fae0500e0cd429999cd36c9ccf4fa26bdcffe7f97a6cd9cf5cc"
+      },
+      {
+        "path": "docs/dependency-maintenance.md",
+        "mode": "100644",
+        "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+        "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+      },
+      {
+        "path": "package-lock.json",
+        "mode": "100644",
+        "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+        "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+      },
+      {
+        "path": "package.json",
+        "mode": "100644",
+        "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      },
+      {
+        "path": "requirements-dev.txt",
+        "mode": "100644",
+        "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+        "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+      },
+      {
+        "path": "samples/test-nested-markdown-linting.md",
+        "mode": "100644",
+        "blob": "1d06987410afac4fdf845d5d976dd9e984639156",
+        "sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54"
+      },
+      {
+        "path": "samples/test-recursive-nested-markdown.md",
+        "mode": "100644",
+        "blob": "381310a48f8b7f0c3482d5554c42b797cd685ed6",
+        "sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+      },
+      {
+        "path": "terraform.instructions.md",
+        "mode": "100644",
+        "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+        "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+      }
+    ],
     "results": [
       {
         "mode": "accepted-base-inert-classifier",
@@ -1178,20 +1695,20 @@
           ".github/workflows/Classify-InstructionMaintenance.mjs",
           "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
           "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-          "4375f2e3c98a6aeb0dd916d26620ed63a42abafe"
+          "055f112f762a466ed693c073083225f8ec9ee79d"
         ],
         "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
         "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-        "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "started_at": "2026-10-04T18:36:20.048911+00:00",
-        "finished_at": "2026-10-04T18:36:21.442695+00:00",
+        "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+        "started_at": "2026-10-04T21:11:42.495925+00:00",
+        "finished_at": "2026-10-04T21:11:44.203832+00:00",
         "exit_code": 0,
-        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\accepted-base-inert-classifier-4375f2e.log",
-        "log_sha256": "f2fdc2749ca9d04499c97eef4e0aa59040ad4432aca9736e7db2bb111e6f2400",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\accepted-base-inert-classifier-055f112.log",
+        "log_sha256": "6246a59ac718c048eee5707024a5d2aa3ec6fd3d73e597f9f9be02206f207c47",
         "inputs_unchanged": true,
         "classification": {
           "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-          "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+          "head": "055f112f762a466ed693c073083225f8ec9ee79d",
           "policy": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
           "classification": "maintenance_required",
           "maintenancePaths": [
@@ -1199,6 +1716,7 @@
             ".github/workflows/Check-NpmAudit.test.mjs",
             ".github/workflows/Classify-InstructionMaintenance.mjs",
             ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+            ".github/workflows/NpmTools.mjs",
             ".github/workflows/NpmTools.test.mjs",
             ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
             ".github/workflows/Test-AgentInstructions.ps1",
@@ -1233,18 +1751,18 @@
           ".github/workflows/Test-AgentInstructions.ps1",
           "-ProposedPolicy",
           "-InputRevision",
-          "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+          "055f112f762a466ed693c073083225f8ec9ee79d",
           "-PublishedBaselineRevision",
           "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
         ],
         "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
         "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-        "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "started_at": "2026-10-04T18:36:21.462550+00:00",
-        "finished_at": "2026-10-04T18:37:02.168092+00:00",
+        "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+        "started_at": "2026-10-04T21:11:44.223603+00:00",
+        "finished_at": "2026-10-04T21:12:22.138543+00:00",
         "exit_code": 0,
-        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\proposed-policy-4375f2e.log",
-        "log_sha256": "96bbbd21e0396a91a9ec776eba1371164ff481c5ee3d2552c837f3472dfd8950",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\proposed-policy-055f112.log",
+        "log_sha256": "e9bd584267899d75ca5927dd2f2eb1e60d0ce3b690d2b8e20fac2eb7862a70f9",
         "inputs_unchanged": true
       }
     ],
@@ -1252,146 +1770,9 @@
   },
   "accepted_baseline_file_count": 75,
   "latest_native_snapshot": {
-    "captured_at": "2026-10-04T19:04:14.138027+00:00",
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-observation-08.json",
-    "sha256": "6c27c08574e2c696c676d50271fccf27581c9f4dbf2f73220080231c700ccaf0",
-    "complete_paginated_surfaces": [
-      "request events",
-      "requested reviewers",
-      "reviews",
-      "issue comments",
-      "review comments",
-      "workflow runs",
-      "check runs",
-      "review threads and their comments"
-    ],
-    "workflow_runs": [
-      {
-        "id": 37225406650,
-        "name": "Running Copilot Code Review",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "dynamic",
-        "status": "completed",
-        "conclusion": "cancelled",
-        "created_at": "2026-10-04T18:41:33Z"
-      },
-      {
-        "id": 37225171161,
-        "name": "Agent instruction validation",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "pull_request_target",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:53Z"
-      },
-      {
-        "id": 37225157094,
-        "name": "Dev container boundary",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "pull_request",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:39Z"
-      },
-      {
-        "id": 37225157099,
-        "name": "Markdown Lint",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "pull_request",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:39Z"
-      },
-      {
-        "id": 37225157100,
-        "name": "Build Style Guide Artifacts",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "pull_request",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:39Z"
-      },
-      {
-        "id": 37225157092,
-        "name": "Copilot setup steps",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "pull_request",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:39Z"
-      },
-      {
-        "id": 37225157095,
-        "name": "Agent instruction validation",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "pull_request",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:39Z"
-      },
-      {
-        "id": 37225155638,
-        "name": "Agent instruction validation",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "pull_request_target",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:37Z"
-      },
-      {
-        "id": 37225154629,
-        "name": "Dev container boundary",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "push",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:36Z"
-      },
-      {
-        "id": 37225154614,
-        "name": "Markdown Lint",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "push",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:36Z"
-      },
-      {
-        "id": 37225154552,
-        "name": "Build Style Guide Artifacts",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "push",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:36Z"
-      },
-      {
-        "id": 37225154565,
-        "name": "Agent instruction validation",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "push",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:36Z"
-      },
-      {
-        "id": 37225154539,
-        "name": "Copilot setup steps",
-        "head_sha": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-        "event": "push",
-        "status": "completed",
-        "conclusion": "success",
-        "created_at": "2026-10-04T18:37:36Z"
-      }
-    ],
-    "review_thread_count": 10,
-    "unresolved_thread_ids": [
-      "PRRT_kwDOSAZRhc6o1afa",
-      "PRRT_kwDOSAZRhc6o1fp1",
-      "PRRT_kwDOSAZRhc6o1fqW",
-      "PRRT_kwDOSAZRhc6o1fqx",
-      "PRRT_kwDOSAZRhc6o1frB"
-    ]
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-both-requested-055f112.json",
+    "sha256": "cab95e89661b160ce702db7cec63273577688d2bb17ec829e98a4c2961463f79",
+    "captured_at": "2026-10-04T21:23:05.113722+00:00"
   },
   "round1": {
     "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
@@ -2626,6 +3007,458 @@
       "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
       "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
       "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+      "accepted_baseline_files": [
+        {
+          "path": ".claude/commands/review-loop.md",
+          "mode": "100644",
+          "blob": "62b63fabdc8ce64ede8539b884aa904a46cb3eaf",
+          "sha256": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437"
+        },
+        {
+          "path": ".codex/config.toml",
+          "mode": "100644",
+          "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+          "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+        },
+        {
+          "path": ".gitattributes",
+          "mode": "100644",
+          "blob": "6313b56c57848efce05faa7aa7e901ccfc2886ea",
+          "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "mode": "100644",
+          "blob": "d4ad431a6c629203aa6cd88b9cea6f9caa4c293b",
+          "sha256": "81fbe1615dd96fe99afca2738ff5888a6f7b7390068c1087d3d817fad73ff614"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "mode": "100644",
+          "blob": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+          "sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7"
+        },
+        {
+          "path": ".github/document-metadata-classification.json",
+          "mode": "100644",
+          "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+          "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+        },
+        {
+          "path": ".github/instructions/docs.instructions.md",
+          "mode": "100644",
+          "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+          "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+        },
+        {
+          "path": ".github/instructions/yaml.instructions.md",
+          "mode": "100644",
+          "blob": "924d12c833d07def47d05137b532e622db622fa4",
+          "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+        },
+        {
+          "path": ".github/workflows/.markdownlint.jsonc",
+          "mode": "100644",
+          "blob": "cd9b559b7254dab422b97e493bdb41c40b5511c1",
+          "sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300"
+        },
+        {
+          "path": ".github/workflows/Check-NpmAudit.mjs",
+          "mode": "100644",
+          "blob": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+          "sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb"
+        },
+        {
+          "path": ".github/workflows/Check-NpmAudit.test.mjs",
+          "mode": "100644",
+          "blob": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+          "sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3"
+        },
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "mode": "100644",
+          "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+          "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+        },
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+          "mode": "100644",
+          "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+          "sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+        },
+        {
+          "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+          "mode": "100644",
+          "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+          "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "mode": "100644",
+          "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+          "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f"
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "mode": "100644",
+          "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+          "sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57"
+        },
+        {
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "mode": "100644",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+        },
+        {
+          "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+          "mode": "100644",
+          "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+          "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+        },
+        {
+          "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+          "mode": "100644",
+          "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+          "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+        },
+        {
+          "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+          "mode": "100644",
+          "blob": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+          "sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a"
+        },
+        {
+          "path": ".github/workflows/NpmTools.mjs",
+          "mode": "100644",
+          "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+          "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+        },
+        {
+          "path": ".github/workflows/NpmTools.test.mjs",
+          "mode": "100644",
+          "blob": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+          "sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b"
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "mode": "100644",
+          "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+          "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+        },
+        {
+          "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+          "mode": "100644",
+          "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+          "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+        },
+        {
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "mode": "100644",
+          "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+          "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+        },
+        {
+          "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+          "mode": "100644",
+          "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+          "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+        },
+        {
+          "path": ".github/workflows/Test-LocalValidation.test.mjs",
+          "mode": "100644",
+          "blob": "87f68f5f02eb2303059be06c219253ab37853197",
+          "sha256": "41e8d68636cd8a32569266eb4daf14da9559160679cbb1793d194533f9d32ba5"
+        },
+        {
+          "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+          "mode": "100644",
+          "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+          "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+        },
+        {
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "mode": "100644",
+          "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+          "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "mode": "100644",
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "mode": "100644",
+          "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+          "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "mode": "100644",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "mode": "100644",
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+        },
+        {
+          "path": ".github/workflows/ci-toolchain.json",
+          "mode": "100644",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "mode": "100644",
+          "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+          "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+        },
+        {
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "mode": "100644",
+          "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+          "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+        },
+        {
+          "path": ".github/workflows/historical-supply-profile.json",
+          "mode": "100644",
+          "blob": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+          "sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d"
+        },
+        {
+          "path": ".github/workflows/install-husky.mjs",
+          "mode": "100644",
+          "blob": "6a12568776f6473472193bc98638f1856a7c9dec",
+          "sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7"
+        },
+        {
+          "path": ".github/workflows/lint-nested-markdown.js",
+          "mode": "100644",
+          "blob": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+          "sha256": "5f3bbefdd02af786bd39ae6a31685a4daf073981c2c072a51b590c75a6626205"
+        },
+        {
+          "path": ".github/workflows/lint-staged-markdown.mjs",
+          "mode": "100644",
+          "blob": "c35575990d5854ea6da9d5f6d49d23287df43146",
+          "sha256": "0e8b0b5c725227b98a338e44e630f6b50a90f725e2f01b2f0262284ffdd6926b"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "mode": "100644",
+          "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+          "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+        },
+        {
+          "path": ".github/workflows/npm-risk-exceptions.json",
+          "mode": "100644",
+          "blob": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+          "sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+        },
+        {
+          "path": ".github/workflows/package-lock.json",
+          "mode": "100644",
+          "blob": "8836c53a7d86ea9eeab8d0ba10b4026cb848b3ae",
+          "sha256": "ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a"
+        },
+        {
+          "path": ".github/workflows/package.json",
+          "mode": "100644",
+          "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+          "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+        },
+        {
+          "path": ".github/workflows/scripts-README.md",
+          "mode": "100644",
+          "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+          "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+        },
+        {
+          "path": ".github/workflows/workflow-policy-cases.json",
+          "mode": "100644",
+          "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+          "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89"
+        },
+        {
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "mode": "100644",
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+        },
+        {
+          "path": ".gitignore",
+          "mode": "100644",
+          "blob": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+          "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+        },
+        {
+          "path": ".husky/pre-commit",
+          "mode": "100644",
+          "blob": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+          "sha256": "1888b6c6e29c1c06baebbdf2946cc7b465ce5adcc869c2977dfd774d68b96df0"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "mode": "100644",
+          "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+          "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+        },
+        {
+          "path": ".vscode/settings.json",
+          "mode": "100644",
+          "blob": "b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d",
+          "sha256": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da"
+        },
+        {
+          "path": "ACKNOWLEDGMENTS.md",
+          "mode": "100644",
+          "blob": "f1ae2dd938628424412d9edd6787e99a9246f5ff",
+          "sha256": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42"
+        },
+        {
+          "path": "AGENTS.md",
+          "mode": "100644",
+          "blob": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+          "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266"
+        },
+        {
+          "path": "CLAUDE.md",
+          "mode": "100644",
+          "blob": "3cc21fc793944033be430ad08722081db4e7b9dd",
+          "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "mode": "100644",
+          "blob": "94beedee85478c14d284ca830e94d4a5f4ece202",
+          "sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda"
+        },
+        {
+          "path": "LICENSE",
+          "mode": "100644",
+          "blob": "98ca721ce2a880acbcbce1d9690cab0100b8bb7a",
+          "sha256": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb"
+        },
+        {
+          "path": "README.md",
+          "mode": "100644",
+          "blob": "f04368718d580fe61d9a22f4c92cdfdf8287b28d",
+          "sha256": "affbdcdced05773f20895a397d1e062d716fb9e2b2215d0a4f412d7ed8b7a200"
+        },
+        {
+          "path": "STYLE_GUIDE.md",
+          "mode": "100644",
+          "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+          "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+        },
+        {
+          "path": "STYLE_GUIDE_CHAT.md",
+          "mode": "100644",
+          "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+          "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72"
+        },
+        {
+          "path": "STYLE_GUIDE_FULL.md",
+          "mode": "100644",
+          "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+          "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab"
+        },
+        {
+          "path": "STYLE_GUIDE_RATIONALE.md",
+          "mode": "100644",
+          "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+          "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+        },
+        {
+          "path": "copilot-instructions.md",
+          "mode": "100644",
+          "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+          "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+        },
+        {
+          "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+          "mode": "100644",
+          "blob": "f43b5168ce508a9a054dc85ba7231e27d8c70809",
+          "sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1"
+        },
+        {
+          "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "mode": "100644",
+          "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+          "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2"
+        },
+        {
+          "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+          "mode": "100644",
+          "blob": "9e04225a355997850e4817f9163868089a773332",
+          "sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93"
+        },
+        {
+          "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+          "mode": "100644",
+          "blob": "b1065e9a330dc2a37e6f56eedc38f720558e6528",
+          "sha256": "d2b20a47d918b31e6443d17bb8a305a83a1d3102cc5ad3b9362c0594440d570f"
+        },
+        {
+          "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+          "mode": "100644",
+          "blob": "970afd6f1df559f3085bd39cff2f7b961cc96a15",
+          "sha256": "88f628441c80c9aa7ec99e94e8f67e87dedade21f9275547147508950fd15d87"
+        },
+        {
+          "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+          "mode": "100644",
+          "blob": "277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba",
+          "sha256": "c8994c132bf13fae0500e0cd429999cd36c9ccf4fa26bdcffe7f97a6cd9cf5cc"
+        },
+        {
+          "path": "docs/dependency-maintenance.md",
+          "mode": "100644",
+          "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+          "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+        },
+        {
+          "path": "package-lock.json",
+          "mode": "100644",
+          "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+          "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+        },
+        {
+          "path": "package.json",
+          "mode": "100644",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+        },
+        {
+          "path": "requirements-dev.txt",
+          "mode": "100644",
+          "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+          "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+        },
+        {
+          "path": "samples/test-nested-markdown-linting.md",
+          "mode": "100644",
+          "blob": "1d06987410afac4fdf845d5d976dd9e984639156",
+          "sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54"
+        },
+        {
+          "path": "samples/test-recursive-nested-markdown.md",
+          "mode": "100644",
+          "blob": "381310a48f8b7f0c3482d5554c42b797cd685ed6",
+          "sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+        },
+        {
+          "path": "terraform.instructions.md",
+          "mode": "100644",
+          "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+          "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+        }
+      ],
       "results": [
         {
           "mode": "accepted-base-inert-classifier",
@@ -2704,9 +3537,7 @@
           "inputs_unchanged": true
         }
       ],
-      "mode_policy": "Old accepted B classifier only, with candidate H as inert Git data; proposed H/B validation from exact H. No unsupported old-B metadata flags or copied candidate engine.",
-      "accepted_baseline_file_count": 75,
-      "catalog_source": "Root execution-state.json round1.repair_endpoints.accepted_baseline_files"
+      "mode_policy": "Old accepted B classifier only, with candidate H as inert Git data; proposed H/B validation from exact H. No unsupported old-B metadata flags or copied candidate engine."
     },
     "repair_current_audit": {
       "command": [
@@ -2858,8 +3689,8 @@
       "old_input_clean": false
     }
   },
-  "current_review_status": "round2 terminal/nonclean; frozen repair under full aggregate",
-  "next_action": "Collect the sole round2 proposed-validation process; do not alter product, fixture, dependencies, index or wrapper-owned state.",
+  "current_review_status": "Round3 pending on published H055; round2 terminal/nonclean with all findings dispositioned and all10 native threads resolved.",
+  "next_action": "Collect authenticated round3 reviews and remaining hosted checks, then independent final native quality and normal merge readiness.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -2932,7 +3763,7 @@
         "path": ".github/workflows/Test-AgentInstructions.ps1",
         "line": 478,
         "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Require the nested workflow lint script**\n\nAdd `lint:md:nested = 'node lint-nested-markdown.js'` to the workflow-package expectations. As written, deleting or changing that script in `.github/workflows/package.json` passes `Get-AgentSetupPackageFailure` and the candidate behavior suites, even though `.husky/pre-commit` still invokes it; the next Markdown commit then fails with npm's missing-script error instead of running the required nested lint check.\n\nAGENTS.md reference: [AGENTS.md:L60-L61](https://github.com/franklesniak/TerraformStyleGuide/blob/4375f2e3c98a6aeb0dd916d26620ed63a42abafe/AGENTS.md#L60-L61)\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.",
-        "state": "private_repair_verified_pending_integration",
+        "state": "repair_published_validated",
         "worker": "/root/a02_tf_coherent_implementation",
         "scope": "Private two-path repair only. Root owns integration, aggregate and native lifecycle.",
         "reaction_id": 450106271,
@@ -2945,7 +3776,21 @@
         "repair_handoff": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round2-review-findings\\repair\\HANDOFF.md",
         "repair_handoff_sha256": "b483a0a8fb6e3c06a7f469fe556fe584365d472732b79a5434e951ee4fa4309c",
         "independent_review": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-R6-REPAIR-REVIEW-20261004.md",
-        "independent_review_sha256": "25fea28c7a4d49442f8c6016f9e1b153aa595f9634d59bc18d3bea2b6665a2ed"
+        "independent_review_sha256": "25fea28c7a4d49442f8c6016f9e1b153aa595f9634d59bc18d3bea2b6665a2ed",
+        "current_disposition_head": "055f112f762a466ed693c073083225f8ec9ee79d",
+        "native_disposition": {
+          "key": "R6",
+          "comment_id": 4178863046,
+          "thread_id": "PRRT_kwDOSAZRhc6o1afa",
+          "reply_id": 4179358015,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179358015",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450106271
+          ],
+          "own_eyes_removed_verified": true
+        }
       },
       {
         "key": "R7",
@@ -2955,13 +3800,27 @@
         "path": ".github/workflows/Check-NpmAudit.mjs",
         "line": 225,
         "body": "`hostedAuthorityReference()` now returns either a commit SHA (event-main) or the ref string `refs/heads/main` (remote-main for non-main PR bases). That\u2019s a concrete return-type change that can break callers that assume a 40-hex commit ID (the old behavior enforced that). Options: (1) update the API to return a structured object (e.g., `{ source, reference }`) and migrate internal callers, or (2) keep `hostedAuthorityReference()` returning a commit SHA only (resolve/fetch main inside the function) and introduce a new helper for the \u201cselector ref\u201d behavior.",
-        "state": "selected_no_change_reply_pending",
+        "state": "no_change_disposition_replied_resolved",
         "worker": "coordinator",
         "reaction_id": 450109078,
         "validation_summary": "Actual exported helper has only retained test consumers. Production uses structured hostedContext and resolves authority SHA. Current selector test passes. Compare existing A03 hosted-audit-decision M98 before final disposition.",
         "validation_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-copilot-validation\\results.json",
         "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A03\\TF66-R7-disposition.md",
-        "decision_sha256": "6d40243560fcd62b29b3a0b085d1917776ca40062eaedff7c3c12ec54b98fc3f"
+        "decision_sha256": "6d40243560fcd62b29b3a0b085d1917776ca40062eaedff7c3c12ec54b98fc3f",
+        "current_disposition_head": "055f112f762a466ed693c073083225f8ec9ee79d",
+        "native_disposition": {
+          "key": "R7",
+          "comment_id": 4178895861,
+          "thread_id": "PRRT_kwDOSAZRhc6o1fp1",
+          "reply_id": 4179358512,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179358512",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450109078
+          ],
+          "own_eyes_removed_verified": true
+        }
       },
       {
         "key": "R8",
@@ -2971,14 +3830,28 @@
         "path": ".github/workflows/lint-markdown.test.mjs",
         "line": 31,
         "body": "`remove()` can fail on platforms where `os.tmpdir()` is a symlinked path (common on macOS, e.g. `/var` vs `/private/var`). `mkdtempSync(path.join(os.tmpdir(), ...))` will use the non-realpath form, so `path.dirname(root)` may not equal `fs.realpathSync(os.tmpdir())` even though the directory is correct. Compare realpaths on both sides (e.g., `fs.realpathSync(path.dirname(root))`) or use `path.resolve()` consistently to keep this portability check from failing on non-Linux environments.",
-        "state": "private_repair_verified_pending_integration",
+        "state": "repair_published_validated",
         "worker": "/root/a02_tf_coherent_implementation",
         "reaction_id": 450109084,
-        "validation_summary": "Real Windows junction proves lexical parent versus realpath mismatch. Both realpaths compare equal. No recursive cleanup performed by reproduction; repair still pending.",
+        "validation_summary": "Real Windows junction proves lexical parent versus realpath mismatch. Both realpaths compare equal. No recursive cleanup performed by reproduction; repair now published and validated; original reproduction retained.",
         "validation_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-copilot-validation\\results.json",
         "selection": "Canonical parent comparison at all six identical test-fixture assertions across three existing test files; preserve names/guards; actual ordinary and linked TEMP validation.",
         "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R8-fixture-note.md",
-        "decision_sha256": "5928d9955a2c7085dffc5ce4d4af8424dcc31b3208c91a03fa2c19edd3a92e91"
+        "decision_sha256": "5928d9955a2c7085dffc5ce4d4af8424dcc31b3208c91a03fa2c19edd3a92e91",
+        "current_disposition_head": "055f112f762a466ed693c073083225f8ec9ee79d",
+        "native_disposition": {
+          "key": "R8",
+          "comment_id": 4178895901,
+          "thread_id": "PRRT_kwDOSAZRhc6o1fqW",
+          "reply_id": 4179358588,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179358588",
+          "resolved": true,
+          "resolution_preexisting": true,
+          "own_eyes": [
+            450109084
+          ],
+          "own_eyes_removed_verified": true
+        }
       },
       {
         "key": "R9",
@@ -2988,14 +3861,28 @@
         "path": ".github/workflows/lint-nested-markdown.js",
         "line": 385,
         "body": "`strings[input.filePath] = input.content;` silently overwrites if the same `filePath` appears multiple times in `markdownInputs`, which can hide lint failures for the overwritten content. Consider rejecting duplicates explicitly (throw with a clear tooling-failure message) or normalizing inputs so each path is guaranteed unique before building the `strings` object.",
-        "state": "private_repair_verified_pending_integration",
+        "state": "repair_published_validated",
         "worker": "/root/a02_tf_coherent_implementation",
         "reaction_id": 450109085,
         "validation_summary": "Actual shared API returns0 for invalid then clean content with identical file label; reverse order returns1. No duplicate input demonstrated from current Git/glob production callers. Full decision required.",
         "validation_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-copilot-validation\\results.json",
         "selection": "Reject conflicting exact labels before lint; accept identical content repeats; retain unique-label behavior. Full table displayed, totals verified including F41.",
         "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R9-conflicting-labels.md",
-        "decision_sha256": "23ac8b60a615e65869a1ad400749e9f6eb84ce412557a5dd379cd4c54a570771"
+        "decision_sha256": "23ac8b60a615e65869a1ad400749e9f6eb84ce412557a5dd379cd4c54a570771",
+        "current_disposition_head": "055f112f762a466ed693c073083225f8ec9ee79d",
+        "native_disposition": {
+          "key": "R9",
+          "comment_id": 4178895938,
+          "thread_id": "PRRT_kwDOSAZRhc6o1fqx",
+          "reply_id": 4179358681,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179358681",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450109085
+          ],
+          "own_eyes_removed_verified": true
+        }
       },
       {
         "key": "R10",
@@ -3005,18 +3892,32 @@
         "path": ".husky/pre-commit",
         "line": 16,
         "body": "The hook no longer provides a targeted \u201ctooling not installed\u201d message (previously it told users to run `node .github/workflows/NpmTools.mjs install`). When dependencies are missing, users will likely see a generic Node module-load error from the lint scripts. Consider restoring a lightweight preflight check (e.g., verify `.github/workflows/node_modules` exists or that the required packages can be resolved) and printing a single actionable remediation line before exiting with status 1/2.",
-        "state": "selected_no_change_reply_pending",
+        "state": "no_change_disposition_replied_resolved",
         "worker": "coordinator",
         "reaction_id": 450109086,
         "validation_summary": "Actual unchanged shell hook and staged checker with absent dependencies exit1 and print NpmTools.mjs install. Compare existing A07 review-TF-hook-prerequisite R96 before final disposition.",
         "validation_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-copilot-validation\\results.json",
         "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R10-disposition.md",
-        "decision_sha256": "22390e0aefc60a0f96d7591fd6cefca2ee309a3d421cc1e2104c0647f2bac4fd"
+        "decision_sha256": "22390e0aefc60a0f96d7591fd6cefca2ee309a3d421cc1e2104c0647f2bac4fd",
+        "current_disposition_head": "055f112f762a466ed693c073083225f8ec9ee79d",
+        "native_disposition": {
+          "key": "R10",
+          "comment_id": 4178895960,
+          "thread_id": "PRRT_kwDOSAZRhc6o1frB",
+          "reply_id": 4179358780,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179358780",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450109086
+          ],
+          "own_eyes_removed_verified": true
+        }
       },
       {
         "key": "R11",
         "origin": "local linked-temporary-directory validation of R8",
-        "state": "private_repair_verified_pending_integration",
+        "state": "repair_published_validated",
         "summary": "Five direct-entry guards compare lexical argv with the canonical module path and silently skip actual CLI work through a linked directory.",
         "paths": [
           ".github/workflows/lint-markdown.mjs",
@@ -3027,12 +3928,13 @@
         ],
         "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round2-review-findings\\copilot-proposals\\R11-evidence\\results.json",
         "evidence_sha256": "b07d29771314b7e1e975fa11d3c8e479269a12e283d05d5644015aed0fa80c61",
-        "scope": "Production finding separate from R8 fixture cleanup and R9 duplicate-label handling; selected private repair is verified and not yet integrated.",
+        "scope": "Published production repair separate from R8 fixture cleanup and R9 duplicate-label handling; original decision and validation retained.",
         "decision": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R11-linked-cli-entry.md",
         "decision_sha256": "cf2116e04686d27ad631e06a81555804af3ab522fa850f1f2a570c74f9aa01eb",
         "selected_option": "H-inline",
         "selected_score": 98,
-        "selected_at": "2026-10-04T19:48:11.181043+00:00"
+        "selected_at": "2026-10-04T19:48:11.181043+00:00",
+        "current_disposition_head": "055f112f762a466ed693c073083225f8ec9ee79d"
       }
     ],
     "request_set_terminal": true,
@@ -3093,7 +3995,7 @@
         ".github/workflows/lint-nested-markdown.js"
       ],
       "path_count": 11,
-      "quality_state": "Both disjoint bounded repair reviews PASS; complete proposed aggregate still running.",
+      "quality_state": "Both disjoint bounded repair reviews PASS; full aggregate PASS; published H055 awaits fresh native final quality.",
       "linux_state": "Focused Windows/Linux evidence complete; earlier actual timeouts and one repeated Linux hook per mode retained."
     },
     "proposed_validation": {
@@ -3107,7 +4009,7 @@
       "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
       "product_unchanged": true,
       "dependencies_unchanged": true,
-      "state": "aggregate_running",
+      "state": "aggregate_passed",
       "staged_preflight": {
         "state": "passed",
         "command": [
@@ -3132,7 +4034,7 @@
         "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
       },
       "aggregate": {
-        "state": "running",
+        "state": "passed",
         "command": [
           "py",
           "-3.12",
@@ -3147,16 +4049,15 @@
         "pid": 168092,
         "candidate_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
         "before_identity_passed": true,
-        "after_identity_passed": false,
-        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit."
+        "after_identity_passed": true,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+        "exit_code": 0,
+        "finished_at": "2026-10-04T21:10:47.028424+00:00",
+        "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+        "passed_hook_count": 11,
+        "skipped_hook_count": 0
       }
-    }
-  },
-  "pending_repair_readiness": {
-    "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
-    "proposed_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
-    "aggregate_session": 8796,
-    "aggregate_status": "running; owning wrapper must finish before execution-state.json is updated",
+    },
     "repair_quality": [
       {
         "verdict": "PASS",
@@ -3193,10 +4094,932 @@
       "proposed_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
       "state": "readiness only; TF acceptance and refreshed native identities required before transfer increment and PS writer release"
     },
-    "review_preparation": {
-      "browser_readiness": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-browser-readiness.json",
-      "reply_drafts": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-thread-replies-draft.json",
-      "state": "Authenticated Balanced control available; five compact replies prepared; no new request or reply sent."
+    "repair_integration": {
+      "state": "committed",
+      "started_at": "2026-10-04T21:11:13.547187+00:00",
+      "parent": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+      "tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+      "paths": [
+        ".github/workflows/Check-NpmAudit.mjs",
+        ".github/workflows/Check-NpmAudit.test.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.mjs",
+        ".github/workflows/NpmTools.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/lint-markdown.mjs",
+        ".github/workflows/lint-markdown.test.mjs",
+        ".github/workflows/lint-nested-markdown.js"
+      ],
+      "old_input_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-pre-integration-execution-state.json",
+      "old_input_snapshot_sha256": "47793da18d38c8be8e72820d7e83820ea2d539adcb2ff0072ebf1a3b6e934aff",
+      "independent_reviews": [
+        {
+          "verdict": "PASS",
+          "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/TF66-R6-REPAIR-REVIEW-20261004.md",
+          "sha256": "25fea28c7a4d49442f8c6016f9e1b153aa595f9634d59bc18d3bea2b6665a2ed"
+        },
+        {
+          "verdict": "PASS",
+          "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/TF66-R8-R9-R11-REPAIR-REVIEW-20261004.md",
+          "sha256": "5aa6bdef66b746fac275234bf048fa3656597b05216930e3055feea59d0f6f4f"
+        }
+      ],
+      "precommit_aggregate": {
+        "state": "passed",
+        "command": [
+          "py",
+          "-3.12",
+          "-m",
+          "pre_commit",
+          "run",
+          "--all-files"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-validation-checkout",
+        "started_at": "2026-10-04T19:59:51.141055+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-aggregate.log",
+        "pid": 168092,
+        "candidate_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+        "before_identity_passed": true,
+        "after_identity_passed": true,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+        "exit_code": 0,
+        "finished_at": "2026-10-04T21:10:47.028424+00:00",
+        "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+        "passed_hook_count": 11,
+        "skipped_hook_count": 0
+      },
+      "staged_preflight": {
+        "state": "passed",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-RequireStagedInputMatch"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-validation-checkout",
+        "started_at": "2026-10-04T19:58:59.656008+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-proposed-staged_preflight.log",
+        "pid": 168092,
+        "candidate_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+        "before_identity_passed": true,
+        "after_identity_passed": true,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+        "exit_code": 0,
+        "finished_at": "2026-10-04T19:59:51.134522+00:00",
+        "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
+      },
+      "commit_started_at": "2026-10-04T21:11:15.260923+00:00",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-normal-repair-commit.log",
+      "pid": 99120,
+      "commit": {
+        "exit_code": 0,
+        "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+        "parent": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+        "tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+        "at": "2026-10-04T21:11:17.222350+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-normal-repair-commit.log",
+        "log_sha256": "dc429d1c2c43e84f2a1085f105b0c56e3ee822314edb19b418f700eb881c9adc"
+      },
+      "finished_at": "2026-10-04T21:11:18.607321+00:00",
+      "files_unchanged": true,
+      "dependencies_unchanged": true
+    },
+    "original_input_record": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-pre-integration-execution-state.json",
+      "sha256": "47793da18d38c8be8e72820d7e83820ea2d539adcb2ff0072ebf1a3b6e934aff",
+      "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+      "tree": "099bb0f83403b6b61cfa2dafa73916b315c791d3",
+      "role": "Historical old-input aggregate, diagnostics, audit, publication and reviews; none validate new H."
+    },
+    "repair_endpoints": {
+      "status": "passed",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+      "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+      "accepted_baseline_files": [
+        {
+          "path": ".claude/commands/review-loop.md",
+          "mode": "100644",
+          "blob": "62b63fabdc8ce64ede8539b884aa904a46cb3eaf",
+          "sha256": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437"
+        },
+        {
+          "path": ".codex/config.toml",
+          "mode": "100644",
+          "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+          "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+        },
+        {
+          "path": ".gitattributes",
+          "mode": "100644",
+          "blob": "6313b56c57848efce05faa7aa7e901ccfc2886ea",
+          "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "mode": "100644",
+          "blob": "d4ad431a6c629203aa6cd88b9cea6f9caa4c293b",
+          "sha256": "81fbe1615dd96fe99afca2738ff5888a6f7b7390068c1087d3d817fad73ff614"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "mode": "100644",
+          "blob": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+          "sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7"
+        },
+        {
+          "path": ".github/document-metadata-classification.json",
+          "mode": "100644",
+          "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+          "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+        },
+        {
+          "path": ".github/instructions/docs.instructions.md",
+          "mode": "100644",
+          "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+          "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+        },
+        {
+          "path": ".github/instructions/yaml.instructions.md",
+          "mode": "100644",
+          "blob": "924d12c833d07def47d05137b532e622db622fa4",
+          "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+        },
+        {
+          "path": ".github/workflows/.markdownlint.jsonc",
+          "mode": "100644",
+          "blob": "cd9b559b7254dab422b97e493bdb41c40b5511c1",
+          "sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300"
+        },
+        {
+          "path": ".github/workflows/Check-NpmAudit.mjs",
+          "mode": "100644",
+          "blob": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+          "sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb"
+        },
+        {
+          "path": ".github/workflows/Check-NpmAudit.test.mjs",
+          "mode": "100644",
+          "blob": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+          "sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3"
+        },
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "mode": "100644",
+          "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+          "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+        },
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+          "mode": "100644",
+          "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+          "sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+        },
+        {
+          "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+          "mode": "100644",
+          "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+          "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "mode": "100644",
+          "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+          "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f"
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "mode": "100644",
+          "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+          "sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57"
+        },
+        {
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "mode": "100644",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+        },
+        {
+          "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+          "mode": "100644",
+          "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+          "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+        },
+        {
+          "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+          "mode": "100644",
+          "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+          "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+        },
+        {
+          "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+          "mode": "100644",
+          "blob": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+          "sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a"
+        },
+        {
+          "path": ".github/workflows/NpmTools.mjs",
+          "mode": "100644",
+          "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+          "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+        },
+        {
+          "path": ".github/workflows/NpmTools.test.mjs",
+          "mode": "100644",
+          "blob": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+          "sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b"
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "mode": "100644",
+          "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+          "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+        },
+        {
+          "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+          "mode": "100644",
+          "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+          "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+        },
+        {
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "mode": "100644",
+          "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+          "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+        },
+        {
+          "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+          "mode": "100644",
+          "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+          "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+        },
+        {
+          "path": ".github/workflows/Test-LocalValidation.test.mjs",
+          "mode": "100644",
+          "blob": "87f68f5f02eb2303059be06c219253ab37853197",
+          "sha256": "41e8d68636cd8a32569266eb4daf14da9559160679cbb1793d194533f9d32ba5"
+        },
+        {
+          "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+          "mode": "100644",
+          "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+          "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+        },
+        {
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "mode": "100644",
+          "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+          "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "mode": "100644",
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "mode": "100644",
+          "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+          "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "mode": "100644",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "mode": "100644",
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+        },
+        {
+          "path": ".github/workflows/ci-toolchain.json",
+          "mode": "100644",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "mode": "100644",
+          "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+          "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+        },
+        {
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "mode": "100644",
+          "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+          "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+        },
+        {
+          "path": ".github/workflows/historical-supply-profile.json",
+          "mode": "100644",
+          "blob": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+          "sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d"
+        },
+        {
+          "path": ".github/workflows/install-husky.mjs",
+          "mode": "100644",
+          "blob": "6a12568776f6473472193bc98638f1856a7c9dec",
+          "sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7"
+        },
+        {
+          "path": ".github/workflows/lint-nested-markdown.js",
+          "mode": "100644",
+          "blob": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+          "sha256": "5f3bbefdd02af786bd39ae6a31685a4daf073981c2c072a51b590c75a6626205"
+        },
+        {
+          "path": ".github/workflows/lint-staged-markdown.mjs",
+          "mode": "100644",
+          "blob": "c35575990d5854ea6da9d5f6d49d23287df43146",
+          "sha256": "0e8b0b5c725227b98a338e44e630f6b50a90f725e2f01b2f0262284ffdd6926b"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "mode": "100644",
+          "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+          "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+        },
+        {
+          "path": ".github/workflows/npm-risk-exceptions.json",
+          "mode": "100644",
+          "blob": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+          "sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+        },
+        {
+          "path": ".github/workflows/package-lock.json",
+          "mode": "100644",
+          "blob": "8836c53a7d86ea9eeab8d0ba10b4026cb848b3ae",
+          "sha256": "ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a"
+        },
+        {
+          "path": ".github/workflows/package.json",
+          "mode": "100644",
+          "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+          "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+        },
+        {
+          "path": ".github/workflows/scripts-README.md",
+          "mode": "100644",
+          "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+          "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+        },
+        {
+          "path": ".github/workflows/workflow-policy-cases.json",
+          "mode": "100644",
+          "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+          "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89"
+        },
+        {
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "mode": "100644",
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+        },
+        {
+          "path": ".gitignore",
+          "mode": "100644",
+          "blob": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+          "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+        },
+        {
+          "path": ".husky/pre-commit",
+          "mode": "100644",
+          "blob": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+          "sha256": "1888b6c6e29c1c06baebbdf2946cc7b465ce5adcc869c2977dfd774d68b96df0"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "mode": "100644",
+          "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+          "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+        },
+        {
+          "path": ".vscode/settings.json",
+          "mode": "100644",
+          "blob": "b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d",
+          "sha256": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da"
+        },
+        {
+          "path": "ACKNOWLEDGMENTS.md",
+          "mode": "100644",
+          "blob": "f1ae2dd938628424412d9edd6787e99a9246f5ff",
+          "sha256": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42"
+        },
+        {
+          "path": "AGENTS.md",
+          "mode": "100644",
+          "blob": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+          "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266"
+        },
+        {
+          "path": "CLAUDE.md",
+          "mode": "100644",
+          "blob": "3cc21fc793944033be430ad08722081db4e7b9dd",
+          "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "mode": "100644",
+          "blob": "94beedee85478c14d284ca830e94d4a5f4ece202",
+          "sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda"
+        },
+        {
+          "path": "LICENSE",
+          "mode": "100644",
+          "blob": "98ca721ce2a880acbcbce1d9690cab0100b8bb7a",
+          "sha256": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb"
+        },
+        {
+          "path": "README.md",
+          "mode": "100644",
+          "blob": "f04368718d580fe61d9a22f4c92cdfdf8287b28d",
+          "sha256": "affbdcdced05773f20895a397d1e062d716fb9e2b2215d0a4f412d7ed8b7a200"
+        },
+        {
+          "path": "STYLE_GUIDE.md",
+          "mode": "100644",
+          "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+          "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+        },
+        {
+          "path": "STYLE_GUIDE_CHAT.md",
+          "mode": "100644",
+          "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+          "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72"
+        },
+        {
+          "path": "STYLE_GUIDE_FULL.md",
+          "mode": "100644",
+          "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+          "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab"
+        },
+        {
+          "path": "STYLE_GUIDE_RATIONALE.md",
+          "mode": "100644",
+          "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+          "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+        },
+        {
+          "path": "copilot-instructions.md",
+          "mode": "100644",
+          "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+          "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+        },
+        {
+          "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+          "mode": "100644",
+          "blob": "f43b5168ce508a9a054dc85ba7231e27d8c70809",
+          "sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1"
+        },
+        {
+          "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "mode": "100644",
+          "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+          "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2"
+        },
+        {
+          "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+          "mode": "100644",
+          "blob": "9e04225a355997850e4817f9163868089a773332",
+          "sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93"
+        },
+        {
+          "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+          "mode": "100644",
+          "blob": "b1065e9a330dc2a37e6f56eedc38f720558e6528",
+          "sha256": "d2b20a47d918b31e6443d17bb8a305a83a1d3102cc5ad3b9362c0594440d570f"
+        },
+        {
+          "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+          "mode": "100644",
+          "blob": "970afd6f1df559f3085bd39cff2f7b961cc96a15",
+          "sha256": "88f628441c80c9aa7ec99e94e8f67e87dedade21f9275547147508950fd15d87"
+        },
+        {
+          "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+          "mode": "100644",
+          "blob": "277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba",
+          "sha256": "c8994c132bf13fae0500e0cd429999cd36c9ccf4fa26bdcffe7f97a6cd9cf5cc"
+        },
+        {
+          "path": "docs/dependency-maintenance.md",
+          "mode": "100644",
+          "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+          "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+        },
+        {
+          "path": "package-lock.json",
+          "mode": "100644",
+          "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+          "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+        },
+        {
+          "path": "package.json",
+          "mode": "100644",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+        },
+        {
+          "path": "requirements-dev.txt",
+          "mode": "100644",
+          "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+          "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+        },
+        {
+          "path": "samples/test-nested-markdown-linting.md",
+          "mode": "100644",
+          "blob": "1d06987410afac4fdf845d5d976dd9e984639156",
+          "sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54"
+        },
+        {
+          "path": "samples/test-recursive-nested-markdown.md",
+          "mode": "100644",
+          "blob": "381310a48f8b7f0c3482d5554c42b797cd685ed6",
+          "sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+        },
+        {
+          "path": "terraform.instructions.md",
+          "mode": "100644",
+          "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+          "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+        }
+      ],
+      "results": [
+        {
+          "mode": "accepted-base-inert-classifier",
+          "command": [
+            "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+            ".github/workflows/Classify-InstructionMaintenance.mjs",
+            "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+            "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "055f112f762a466ed693c073083225f8ec9ee79d"
+          ],
+          "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+          "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+          "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+          "started_at": "2026-10-04T21:11:42.495925+00:00",
+          "finished_at": "2026-10-04T21:11:44.203832+00:00",
+          "exit_code": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\accepted-base-inert-classifier-055f112.log",
+          "log_sha256": "6246a59ac718c048eee5707024a5d2aa3ec6fd3d73e597f9f9be02206f207c47",
+          "inputs_unchanged": true,
+          "classification": {
+            "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+            "policy": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "classification": "maintenance_required",
+            "maintenancePaths": [
+              ".github/workflows/Check-NpmAudit.mjs",
+              ".github/workflows/Check-NpmAudit.test.mjs",
+              ".github/workflows/Classify-InstructionMaintenance.mjs",
+              ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+              ".github/workflows/NpmTools.mjs",
+              ".github/workflows/NpmTools.test.mjs",
+              ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+              ".github/workflows/Test-AgentInstructions.ps1",
+              ".github/workflows/Test-CiHelpers.test.mjs",
+              ".github/workflows/Test-LocalValidation.test.mjs",
+              ".github/workflows/Validate-WorkflowPolicy.mjs",
+              ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+              ".github/workflows/agent-instructions.yml",
+              ".github/workflows/build.yml",
+              ".github/workflows/copilot-setup-steps.yml",
+              ".github/workflows/devcontainer-ci.yml",
+              ".github/workflows/lint-nested-markdown.js",
+              ".github/workflows/lint-staged-markdown.mjs",
+              ".github/workflows/markdownlint.yml",
+              ".github/workflows/package-lock.json",
+              ".github/workflows/package.json",
+              ".github/workflows/workflow-policy-cases.json",
+              ".github/workflows/workflow-policy-contract.json",
+              ".husky/pre-commit",
+              "package-lock.json"
+            ]
+          }
+        },
+        {
+          "mode": "proposed-policy",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-ProposedPolicy",
+            "-InputRevision",
+            "055f112f762a466ed693c073083225f8ec9ee79d",
+            "-PublishedBaselineRevision",
+            "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+          ],
+          "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+          "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+          "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+          "started_at": "2026-10-04T21:11:44.223603+00:00",
+          "finished_at": "2026-10-04T21:12:22.138543+00:00",
+          "exit_code": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\proposed-policy-055f112.log",
+          "log_sha256": "e9bd584267899d75ca5927dd2f2eb1e60d0ce3b690d2b8e20fac2eb7862a70f9",
+          "inputs_unchanged": true
+        }
+      ],
+      "mode_policy": "Old accepted B classifier only, with candidate H as inert Git data; proposed H/B validation from exact H. No unsupported old-B metadata flags or copied candidate engine."
+    },
+    "repair_current_audit": {
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        ".github/workflows/Check-NpmAudit.mjs"
+      ],
+      "exit_code": 0,
+      "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+      "authority": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "at": "2026-10-04T21:12:38.167201+00:00",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\current-audit-055f112.log",
+      "sha256": "c0d8c26ced062a80c856e39b0baf08540c7987785bb4c772dfe50b6a9679fecc",
+      "mode": "ordinary local two-root audit after fresh origin/main fetch; external revocation limitation retained"
+    },
+    "repair_publication": {
+      "status": "topic_and_body_published",
+      "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+      "previous_native_head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "started_at": "2026-10-04T21:12:50.023181+00:00",
+      "prepush_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-repair-prepush-native.json",
+      "prepush_baseline_sha256": "45e7b4e630b266f23c3ac1963cffef38241479c71431291be027d2536821998c",
+      "next_body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\PR-body-round2-repair.md",
+      "next_body_sha256": "fd2a92eabf68c3b392810844df5ff2cb403be42c44ba57f382b4bf8200f2e50f",
+      "old_body_sha256": "52d96a48a96f4a0da891de0ca0743ef91ad558cb4e4c466ddf058e4651ff90db",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-normal-repair-push.log",
+      "review_status": "Old-input set terminal and nonclean; capture new native requests/results after publication. No old review is clean for changed bytes.",
+      "exit_code": 0,
+      "finished_at": "2026-10-04T21:12:52.823207+00:00",
+      "readback": "055f112f762a466ed693c073083225f8ec9ee79d\trefs/heads/codex/a02-peer-docs",
+      "log_sha256": "476fe629f1f001963b20a56834a38d188db79721a92b41245cf8fd648e36df4c",
+      "body_update": {
+        "status": "confirmed",
+        "started_at": "2026-10-04T21:12:59.577100+00:00",
+        "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+        "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "before_sha256": "52d96a48a96f4a0da891de0ca0743ef91ad558cb4e4c466ddf058e4651ff90db",
+        "after_sha256": "fd2a92eabf68c3b392810844df5ff2cb403be42c44ba57f382b4bf8200f2e50f",
+        "exit_code": 0,
+        "response": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-repair-body-update-response.json",
+        "response_sha256": "6c7ba78db225e64058c0711879cd9c5734999b6435b97fadab71d7e53f227e19",
+        "confirmed_at": "2026-10-04T21:13:01.412191+00:00",
+        "readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round2-repair-body-readback.json",
+        "readback_sha256": "8eeedba4e34b065befb0d3c5f68f08e4a60790e6c88073abaa7efcdd8d0e11af"
+      }
+    },
+    "native_thread_dispositions": {
+      "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "body_sha256": "fd2a92eabf68c3b392810844df5ff2cb403be42c44ba57f382b4bf8200f2e50f",
+      "threads": [
+        {
+          "key": "R6",
+          "comment_id": 4178863046,
+          "thread_id": "PRRT_kwDOSAZRhc6o1afa",
+          "reply_id": 4179358015,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179358015",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450106271
+          ],
+          "own_eyes_removed_verified": true
+        },
+        {
+          "key": "R7",
+          "comment_id": 4178895861,
+          "thread_id": "PRRT_kwDOSAZRhc6o1fp1",
+          "reply_id": 4179358512,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179358512",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450109078
+          ],
+          "own_eyes_removed_verified": true
+        },
+        {
+          "key": "R8",
+          "comment_id": 4178895901,
+          "thread_id": "PRRT_kwDOSAZRhc6o1fqW",
+          "reply_id": 4179358588,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179358588",
+          "resolved": true,
+          "resolution_preexisting": true,
+          "own_eyes": [
+            450109084
+          ],
+          "own_eyes_removed_verified": true
+        },
+        {
+          "key": "R9",
+          "comment_id": 4178895938,
+          "thread_id": "PRRT_kwDOSAZRhc6o1fqx",
+          "reply_id": 4179358681,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179358681",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450109085
+          ],
+          "own_eyes_removed_verified": true
+        },
+        {
+          "key": "R10",
+          "comment_id": 4178895960,
+          "thread_id": "PRRT_kwDOSAZRhc6o1frB",
+          "reply_id": 4179358780,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179358780",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450109086
+          ],
+          "own_eyes_removed_verified": true
+        }
+      ],
+      "completed_at": "2026-10-04T21:20:03.967560+00:00"
     }
+  },
+  "pending_repair_readiness": {
+    "state": "repair_published; previous readiness fulfilled",
+    "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+    "quality": [
+      {
+        "verdict": "PASS",
+        "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/TF66-R6-REPAIR-REVIEW-20261004.md",
+        "sha256": "25fea28c7a4d49442f8c6016f9e1b153aa595f9634d59bc18d3bea2b6665a2ed"
+      },
+      {
+        "verdict": "PASS",
+        "path": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/TF66-R8-R9-R11-REPAIR-REVIEW-20261004.md",
+        "sha256": "5aa6bdef66b746fac275234bf048fa3656597b05216930e3055feea59d0f6f4f"
+      }
+    ],
+    "provisional_reverse": {
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-round2-readiness-20261004\\REPORT.md",
+      "report_sha256": "bad964e733225191c1e222fc80532431741b47ea867eb478aa237d1e8946cdf5",
+      "mapping": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-round2-readiness-20261004\\mapping.json",
+      "mapping_sha256": "1a211c227f0e1ae307f76f8ed616c2e6823acd45dff98dae4fe6672f9bcf5b32",
+      "reverse_paths": 20,
+      "tf_pr_changed_paths": 40,
+      "proposed_tree": "dbedf311df49a23ffb439f129e8d1b174cd2b2dc",
+      "state": "readiness only; TF acceptance and refreshed native identities required before transfer increment and PS writer release"
+    },
+    "remaining": "Fresh round3 results, hosted checks, independent final native quality, merge/landing and refreshed reverse implementation."
+  },
+  "round3": {
+    "head": "055f112f762a466ed693c073083225f8ec9ee79d",
+    "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "body_sha256": "fd2a92eabf68c3b392810844df5ff2cb403be42c44ba57f382b4bf8200f2e50f",
+    "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-request-baseline-055f112.json",
+    "baseline_sha256": "c18bd018c1f0abd556e375609d2bac5c73c9093395da5a8cd0307a1058a77414",
+    "prepared_at": "2026-10-04T21:21:24.795146+00:00",
+    "request_set_terminal": false,
+    "clean": false,
+    "copilot": {
+      "transport": "supported GitHub Reviewers UI",
+      "requested_effort": "Balanced",
+      "state": "requested_pending",
+      "request_event_id": 32462177351,
+      "request_event_at": "2026-10-04T21:21:37Z",
+      "request_actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "request_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-after-copilot-request-055f112.json",
+      "request_observation_sha256": "a162375f170f0f313f84d13f50d73a763813b3ee5a393c4c7a2e57c489e6bad6",
+      "result_effort": null,
+      "attempts": 1,
+      "workflow_run_id": 37235784341,
+      "observed_run_status": "in_progress",
+      "observed_run_conclusion": null,
+      "ui_observation": "Signed-in supported Reviewers UI selected Balanced, then submitted one request. Timeline event32462177351 says requested a balanced review; sidebar says Reviewing at balanced effort. Actual result effort remains unobserved.",
+      "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-balanced-request.png"
+    },
+    "manual_codex": {
+      "state": "requested_pending",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-after-copilot-request-055f112.json",
+      "required": true,
+      "trigger_id": 5984519616,
+      "native_created_at": "2026-10-04T21:22:18Z",
+      "authenticated_author_id": 11204406,
+      "exact_body": "@codex review",
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5984519616",
+      "channel_attempts": 1,
+      "summary_comment_id": 5982194609,
+      "summary_updated_at": "2026-10-04T21:22:31Z",
+      "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \ud83d\udd04 **Running** since <relative-time datetime=\"2026-10-04T21:22:30.500769Z\">2026-10-04T21:22:30.500769Z</relative-time> | `055f112` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>"
+    },
+    "started_at": "2026-10-04T21:21:37Z",
+    "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-both-requested-055f112.json",
+    "nonreview_run_summary": [
+      {
+        "id": 37235178803,
+        "name": "Agent instruction validation",
+        "event": "pull_request_target",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235171661,
+        "name": "Agent instruction validation",
+        "event": "pull_request",
+        "status": "in_progress",
+        "conclusion": null,
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235171645,
+        "name": "Copilot setup steps",
+        "event": "pull_request",
+        "status": "in_progress",
+        "conclusion": null,
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235171697,
+        "name": "Dev container boundary",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235171619,
+        "name": "Markdown Lint",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235171657,
+        "name": "Build Style Guide Artifacts",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235170499,
+        "name": "Agent instruction validation",
+        "event": "pull_request_target",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235168857,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "status": "in_progress",
+        "conclusion": null,
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235168899,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "status": "in_progress",
+        "conclusion": null,
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235168819,
+        "name": "Dev container boundary",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235168865,
+        "name": "Markdown Lint",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      },
+      {
+        "id": 37235168893,
+        "name": "Build Style Guide Artifacts",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "055f112f762a466ed693c073083225f8ec9ee79d"
+      }
+    ]
   }
 }
