@@ -1,6 +1,6 @@
 {
-  "recorded_at": "2026-10-04T23:32:38.968912+00:00",
-  "status": "round4_reviews_and_hosted_checks_pending",
+  "recorded_at": "2026-10-04T23:51:36.409722+00:00",
+  "status": "round4_findings_validation_and_proposals",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -721,12 +721,12 @@
       "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-request-baseline-dde2b9a.json",
       "baseline_sha256": "8467daef78b9b02f26a81519d85a88f79417678f23b78cfb0c277a30086c3b0a",
       "prepared_at": "2026-10-04T23:21:17.468253+00:00",
-      "request_set_terminal": false,
+      "request_set_terminal": true,
       "clean": false,
       "copilot": {
         "transport": "supported GitHub Reviewers UI",
         "requested_effort": "Balanced",
-        "state": "requested_pending",
+        "state": "completed_with_findings",
         "ui_attempt_started_at": "2026-10-04T23:27:27.743580+00:00",
         "request_event_id": 32466172824,
         "request_event_at": "2026-10-04T23:27:29Z",
@@ -734,16 +734,24 @@
         "reviewer_id": 175728472,
         "request_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-after-copilot-request-dde2b9a.json",
         "request_observation_sha256": "69cb11a6b13b00d7fb0c1545e60b6d2eb3dbc014e3614582a62d64474cc522a2",
-        "result_effort": null,
+        "result_effort": "Lite",
         "attempts": 1,
         "workflow_run_id": 37243832144,
-        "observed_run_status": "in_progress",
-        "observed_run_conclusion": null,
+        "observed_run_status": "completed",
+        "observed_run_conclusion": "cancelled",
         "ui_observation": "Supported signed-in Reviewers UI selected Balanced and submitted once. Current sidebar reports Reviewing at balanced effort; Last completed: lite is historical round3. Actual round4 result effort remains unknown.",
-        "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-review-request-proof.png"
+        "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-review-request-proof.png",
+        "clean": false,
+        "review_id": 5408816975,
+        "submitted_at": "2026-10-04T23:46:11Z",
+        "observed_result_effort": "Lite",
+        "review_body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 3 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (3)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This setup flow embeds specific historical Node/npm versions (`11.16.0`, `24.18.0`, `24.18.1`)\u2026](#discussion_r4179817842) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [When this module is imported (e.g., by `lint-staged-markdown.mjs`) and a dependency is missing, the\u2026](#discussion_r4179817873) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`assertLintConfigurationInputs()` normalizes discovered paths using\u2026](#discussion_r4179817891) \u00b7 New\n</details>\n\n<details>\n<summary><strong>Resolved since last review (2)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [When JSONC parsing fails, the thrown error (`Invalid Markdown lint configuration: ...`) doesn\u2019t\u2026](#discussion_r4179432294)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The outer-lint wrapper describes a bounded execution (notably a two-minute deadline and output\u2026](#discussion_r4179432266)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+        "service_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-copilot-service-disposition.json",
+        "service_disposition_sha256": "98fbf4f1d98dad0d3acc8ccfce6b5e6aede0bbf6381e44ed70542e684d4d100a",
+        "service_disposition_note": "Authenticated job111557680536 ran23:27:43-23:47:58Z. Full hook step ran23:28:27-23:47:55Z and was canceled; processing was skipped. Preserve actual setup execution alongside native timeout warning. Observed Lite review is valid, with three findings; no effort-only retry."
       },
       "manual_codex": {
-        "state": "request_confirmed_pending_result",
+        "state": "completed_clean",
         "started_at": "2026-10-04T23:28:59.749766+00:00",
         "channel_attempts": 1,
         "exact_body": "@codex review",
@@ -764,8 +772,14 @@
         "confirmed_at": "2026-10-04T23:29:13.610485+00:00",
         "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5985594078",
         "summary_comment_id": 5982194609,
-        "summary_updated_at": "2026-10-04T23:29:18Z",
-        "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \ud83d\udd04 **Running** since <relative-time datetime=\"2026-10-04T23:29:15.709448Z\">2026-10-04T23:29:15.709448Z</relative-time> | `dde2b9a` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>"
+        "summary_updated_at": "2026-10-04T23:33:05Z",
+        "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \u2705 **Completed** <relative-time datetime=\"2026-10-04T23:33:04.759520Z\">2026-10-04T23:33:04.759520Z</relative-time> | `dde2b9a` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
+        "clean": true,
+        "result_comment_id": 5985623901,
+        "result_body": "Codex Review: Didn't find any major issues. Can't wait for the next one!\n\n**Reviewed commit:** `dde2b9abe7`\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\".\n\nIf Codex has suggestions, it will comment; otherwise it will react with \ud83d\udc4d.\n\n\n\n\nCodex can also answer questions or update the PR. Try commenting \"@codex address that feedback\".\n            \n</details>",
+        "result_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5985623901",
+        "result_at": "2026-10-04T23:33:03Z",
+        "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-status-2335-dde2b9a.json"
       },
       "started_at": "2026-10-04T23:27:29Z",
       "nonreview_run_summary": [
@@ -773,97 +787,97 @@
           "id": 37243174299,
           "name": "Agent instruction validation",
           "event": "pull_request_target",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
           "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
-        },
-        {
-          "id": 37243162509,
-          "name": "Agent instruction validation",
-          "event": "pull_request",
-          "status": "in_progress",
-          "conclusion": null,
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "conclusion": "success"
         },
         {
           "id": 37243162572,
           "name": "Dev container boundary",
           "event": "pull_request",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
           "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "conclusion": "success"
         },
         {
           "id": 37243162516,
           "name": "Markdown Lint",
           "event": "pull_request",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
           "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
-        },
-        {
-          "id": 37243162531,
-          "name": "Copilot setup steps",
-          "event": "pull_request",
-          "status": "in_progress",
-          "conclusion": null,
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "conclusion": "success"
         },
         {
           "id": 37243162547,
           "name": "Build Style Guide Artifacts",
           "event": "pull_request",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
           "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "conclusion": "success"
+        },
+        {
+          "id": 37243162509,
+          "name": "Agent instruction validation",
+          "event": "pull_request",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 37243162531,
+          "name": "Copilot setup steps",
+          "event": "pull_request",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "status": "completed",
+          "conclusion": "success"
         },
         {
           "id": 37243160790,
           "name": "Agent instruction validation",
           "event": "pull_request_target",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
           "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
-        },
-        {
-          "id": 37243159416,
-          "name": "Agent instruction validation",
-          "event": "push",
-          "status": "in_progress",
-          "conclusion": null,
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
-        },
-        {
-          "id": 37243159463,
-          "name": "Copilot setup steps",
-          "event": "push",
-          "status": "in_progress",
-          "conclusion": null,
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "conclusion": "success"
         },
         {
           "id": 37243159434,
           "name": "Dev container boundary",
           "event": "push",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
           "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "conclusion": "success"
         },
         {
           "id": 37243159367,
           "name": "Markdown Lint",
           "event": "push",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
           "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "conclusion": "success"
         },
         {
           "id": 37243159420,
           "name": "Build Style Guide Artifacts",
           "event": "push",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
           "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "conclusion": "success"
+        },
+        {
+          "id": 37243159463,
+          "name": "Copilot setup steps",
+          "event": "push",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "status": "completed",
+          "conclusion": "success"
+        },
+        {
+          "id": 37243159416,
+          "name": "Agent instruction validation",
+          "event": "push",
+          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "status": "completed",
+          "conclusion": "success"
         }
       ],
       "interim_quality": {
@@ -876,7 +890,126 @@
         "root_verification": "Full report read; report/evidence hashes, six log hashes and three committed repair hashes sampled and matched.",
         "remaining": "Current-input remote reviews, complete finding inventory and hosted checks before final PASS."
       },
-      "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-both-requested-dde2b9a.json"
+      "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-terminal-dde2b9a.json",
+      "all_nonreview_workflows_success": true,
+      "hosted_log_collection": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\round4-hosted-terminal-dde2b9a-collection.json",
+      "hosted_validation_evidence": [
+        {
+          "run": 37243162509,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\37243162509\\log.txt",
+          "log_sha256": "2a4e34034f4b604194c72cb2804c7474e0c060ae195f7463ca4bbbe562a3b6c2",
+          "kind": "instruction",
+          "node_counts": {
+            "tests": 502,
+            "pass": 502,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "mutation_selftest": "passed",
+          "role": "Proposed behavior; committed-input finalization date is explicitly not verified here."
+        },
+        {
+          "run": 37243159416,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\37243159416\\log.txt",
+          "log_sha256": "c9d7937cb3be2f54aa17a0e134aee8aaba69dc7ceb207275cbff85af0d25ec9c",
+          "kind": "instruction",
+          "node_counts": {
+            "tests": 502,
+            "pass": 502,
+            "fail": 0,
+            "cancelled": 0,
+            "skipped": 0
+          },
+          "mutation_selftest": "passed",
+          "role": "Proposed behavior; committed-input finalization date is explicitly not verified here."
+        },
+        {
+          "run": 37243162531,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\37243162531\\log.txt",
+          "log_sha256": "f668ef7d6ed79292139bdaa3e7ba816144923760ca98fda2b0d6ba1b340e602d",
+          "kind": "setup",
+          "passed_hooks": 11,
+          "skipped_hooks": 0,
+          "final_immutable_check": "success"
+        },
+        {
+          "run": 37243159463,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\37243159463\\log.txt",
+          "log_sha256": "b2025602052a645b12b92309c557476ef8d0baa6b9046f6f2cd92f9e0cbe015d",
+          "kind": "setup",
+          "passed_hooks": 11,
+          "skipped_hooks": 0,
+          "final_immutable_check": "success"
+        }
+      ],
+      "provisional_reverse": {
+        "status": "provisional; unaccepted source",
+        "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "tree": "d59a740b7b1d88f7986075ac9328d9998629aa71",
+        "accepted_PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+        "paths": 20,
+        "TF_changed_paths": 40,
+        "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-R12-R13-readiness-20261004\\ADDENDUM.md",
+        "report_sha256": "1aef6dae992ca2904ad4745355e918fe79e4f478580bbac020f15670a4b0c934",
+        "mapping": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-R12-R13-readiness-20261004\\mapping.json",
+        "mapping_sha256": "ad2a833ab9502d996eaae33db5216309af31c6951d49514350deced7d5a9a79f",
+        "reviewer": "/root/a02_reverse_repair_readiness",
+        "root_review": "Complete addendum read, artifact hashes verified; committed three-file hashes previously sampled against the same source. No new material finding.",
+        "remaining": "Actual TF merge/landed acceptance; fresh PS/TF native main and authoring UTC/metadata; coordinator transfer increment before one writer release."
+      },
+      "findings": [
+        {
+          "key": "R14",
+          "comment_id": 4179817842,
+          "thread_id": "PRRT_kwDOSAZRhc6o3tJw",
+          "title": "Historical setup runtime tuple constants",
+          "owner": "A03",
+          "body": "This setup flow embeds specific historical Node/npm versions (`11.16.0`, `24.18.0`, `24.18.1`) directly in the workflow logic. Even if intentional for a \u201cpre-declaration tuple\u201d compatibility path, it creates a high-churn spot on future version bumps and increases the chance of updating one location but missing others (the same versions also appear elsewhere in this workflow). Consider centralizing these tuples into a single well-named data block (within the script) or deriving them from a single authoritative repo file when possible, so future maintenance is less error-prone.",
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "line": 397,
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179817842",
+          "state": "validation_and_complete_proposal_pending",
+          "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "own_eyes_reaction_id": 450162399
+        },
+        {
+          "key": "R15",
+          "comment_id": 4179817873,
+          "thread_id": "PRRT_kwDOSAZRhc6o3tKG",
+          "title": "Imported lint dependency failure boundary",
+          "owner": "A07",
+          "body": "When this module is imported (e.g., by `lint-staged-markdown.mjs`) and a dependency is missing, the code re-throws the raw `require()` error without the `Markdown lint tooling:` prefix and without enforcing a consistent \u201ctooling failure\u201d classification at the boundary. To keep diagnostics stable across direct vs imported execution, consider wrapping/rethrowing with a consistent message (and optionally attaching the original error as `cause`) so callers don\u2019t emit confusing bare loader errors.",
+          "path": ".github/workflows/lint-nested-markdown.js",
+          "line": 23,
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179817873",
+          "state": "validation_and_complete_proposal_pending",
+          "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "own_eyes_reaction_id": 450162402
+        },
+        {
+          "key": "R16",
+          "comment_id": 4179817891,
+          "thread_id": "PRRT_kwDOSAZRhc6o3tKU",
+          "title": "Windows lint selector path normalization",
+          "owner": "A07",
+          "body": "`assertLintConfigurationInputs()` normalizes discovered paths using `relative.split(path.sep).join('/')`. If `globSync()` yields POSIX-style `/` separators on Windows (a common behavior for glob libraries), `path.sep` is `\\\\` and the normalization becomes a no-op, which can cause allowed configs (like `.github/workflows/.markdownlint.jsonc`) to be incorrectly rejected as \u201cunsupported\u201d. Consider normalizing with a separator-agnostic replacement (e.g., replace backslashes with `/` regardless of platform) or using `path.posix` consistently for comparisons.",
+          "path": ".github/workflows/lint-nested-markdown.js",
+          "line": 192,
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179817891",
+          "state": "validation_and_complete_proposal_pending",
+          "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "own_eyes_reaction_id": 450162404
+        }
+      ],
+      "hosted_codex_interim_quality": {
+        "reviewer": "/root/a02_tf_prepublication_quality",
+        "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-ROUND4-HOSTED-CODEX-INTERIM-dde2b9a.md",
+        "report_sha256": "eddf1fdc383320eb6cec7ea0dc15860d40179580f9a4310efb9a8b8f6f8e13fe",
+        "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-ROUND4-HOSTED-CODEX-INTERIM-EVIDENCE-dde2b9a.json",
+        "evidence_sha256": "cfad6c7c7473e1e768aad37e70c0d898aa4f1a04ebbf257ee5324d3095148c5b",
+        "scope": "Independent all12 hosted/Codex/source integrity reconciliation passed; later three Copilot findings keep final quality open. Root read full report and verified hashes."
+      }
     }
   },
   "limits": "Current input4375f2e/body52d96a48 awaits both remote results, hosted checks and independent final native quality. No merge, landed acceptance or PS reverse repair is claimed. Round1 automatic Codex feedback did not satisfy its omitted manual gate and remains nonclean.",
@@ -1169,9 +1302,19 @@
     }
   },
   "reverse_readiness": {
-    "record": "reverse-readiness.json",
-    "scope_count": 11,
-    "state": "Read-only readiness includes the capacity delta; proposed H e2f0652 has the same525147aa tree. Refresh after accepted native TF before reverse release."
+    "status": "provisional; unaccepted source",
+    "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+    "tree": "d59a740b7b1d88f7986075ac9328d9998629aa71",
+    "accepted_PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "paths": 20,
+    "TF_changed_paths": 40,
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-R12-R13-readiness-20261004\\ADDENDUM.md",
+    "report_sha256": "1aef6dae992ca2904ad4745355e918fe79e4f478580bbac020f15670a4b0c934",
+    "mapping": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-R12-R13-readiness-20261004\\mapping.json",
+    "mapping_sha256": "ad2a833ab9502d996eaae33db5216309af31c6951d49514350deced7d5a9a79f",
+    "reviewer": "/root/a02_reverse_repair_readiness",
+    "root_review": "Complete addendum read, artifact hashes verified; committed three-file hashes previously sampled against the same source. No new material finding.",
+    "remaining": "Actual TF merge/landed acceptance; fresh PS/TF native main and authoring UTC/metadata; coordinator transfer increment before one writer release."
   },
   "commit": {
     "exit_code": 0,
@@ -1792,9 +1935,9 @@
   },
   "accepted_baseline_file_count": 75,
   "latest_native_snapshot": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-both-requested-dde2b9a.json",
-    "sha256": "eb6b51f5f9dfbe7cfbde82dcbba913e1220219c2fcbfe9e329dccb9d16f01428",
-    "captured_at": "2026-10-04T23:30:46.163074+00:00"
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-review-observation-02-dde2b9a.json",
+    "sha256": "f16c29a54cf15847dc3d338b030a587991ae6e37a3f1152a034dc2f4b9599e69",
+    "captured_at": "2026-10-04T23:47:44.326649+00:00"
   },
   "round1": {
     "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
@@ -3711,8 +3854,8 @@
       "old_input_clean": false
     }
   },
-  "current_review_status": "Round4 requested on published dde2b9a; both reviewers pending, eight nonreview runs passed/four running. Round3 remains terminal/nonclean historically; all twelve threads resolved after the validated repair.",
-  "next_action": "Collect both current-input review results and remaining hosted checks without duplicate requests; final quality, normal merge and landed acceptance remain.",
+  "current_review_status": "Round4 terminal/nonclean: Codex clean, all12 nonreview workflows pass, Copilot Lite has R14/R15/R16 under validation and full proposals. Its setup run canceled at service deadline; all prior12 threads resolved, three new threads open.",
+  "next_action": "Read author validation, options, unique rubrics and scores for R14/R15/R16; present selections before any material repair.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -6065,12 +6208,12 @@
     "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-request-baseline-dde2b9a.json",
     "baseline_sha256": "8467daef78b9b02f26a81519d85a88f79417678f23b78cfb0c277a30086c3b0a",
     "prepared_at": "2026-10-04T23:21:17.468253+00:00",
-    "request_set_terminal": false,
+    "request_set_terminal": true,
     "clean": false,
     "copilot": {
       "transport": "supported GitHub Reviewers UI",
       "requested_effort": "Balanced",
-      "state": "requested_pending",
+      "state": "completed_with_findings",
       "ui_attempt_started_at": "2026-10-04T23:27:27.743580+00:00",
       "request_event_id": 32466172824,
       "request_event_at": "2026-10-04T23:27:29Z",
@@ -6078,16 +6221,24 @@
       "reviewer_id": 175728472,
       "request_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-after-copilot-request-dde2b9a.json",
       "request_observation_sha256": "69cb11a6b13b00d7fb0c1545e60b6d2eb3dbc014e3614582a62d64474cc522a2",
-      "result_effort": null,
+      "result_effort": "Lite",
       "attempts": 1,
       "workflow_run_id": 37243832144,
-      "observed_run_status": "in_progress",
-      "observed_run_conclusion": null,
+      "observed_run_status": "completed",
+      "observed_run_conclusion": "cancelled",
       "ui_observation": "Supported signed-in Reviewers UI selected Balanced and submitted once. Current sidebar reports Reviewing at balanced effort; Last completed: lite is historical round3. Actual round4 result effort remains unknown.",
-      "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-review-request-proof.png"
+      "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-review-request-proof.png",
+      "clean": false,
+      "review_id": 5408816975,
+      "submitted_at": "2026-10-04T23:46:11Z",
+      "observed_result_effort": "Lite",
+      "review_body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 3 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (3)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This setup flow embeds specific historical Node/npm versions (`11.16.0`, `24.18.0`, `24.18.1`)\u2026](#discussion_r4179817842) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [When this module is imported (e.g., by `lint-staged-markdown.mjs`) and a dependency is missing, the\u2026](#discussion_r4179817873) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`assertLintConfigurationInputs()` normalizes discovered paths using\u2026](#discussion_r4179817891) \u00b7 New\n</details>\n\n<details>\n<summary><strong>Resolved since last review (2)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [When JSONC parsing fails, the thrown error (`Invalid Markdown lint configuration: ...`) doesn\u2019t\u2026](#discussion_r4179432294)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The outer-lint wrapper describes a bounded execution (notably a two-minute deadline and output\u2026](#discussion_r4179432266)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+      "service_disposition": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-copilot-service-disposition.json",
+      "service_disposition_sha256": "98fbf4f1d98dad0d3acc8ccfce6b5e6aede0bbf6381e44ed70542e684d4d100a",
+      "service_disposition_note": "Authenticated job111557680536 ran23:27:43-23:47:58Z. Full hook step ran23:28:27-23:47:55Z and was canceled; processing was skipped. Preserve actual setup execution alongside native timeout warning. Observed Lite review is valid, with three findings; no effort-only retry."
     },
     "manual_codex": {
-      "state": "request_confirmed_pending_result",
+      "state": "completed_clean",
       "started_at": "2026-10-04T23:28:59.749766+00:00",
       "channel_attempts": 1,
       "exact_body": "@codex review",
@@ -6108,8 +6259,14 @@
       "confirmed_at": "2026-10-04T23:29:13.610485+00:00",
       "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5985594078",
       "summary_comment_id": 5982194609,
-      "summary_updated_at": "2026-10-04T23:29:18Z",
-      "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \ud83d\udd04 **Running** since <relative-time datetime=\"2026-10-04T23:29:15.709448Z\">2026-10-04T23:29:15.709448Z</relative-time> | `dde2b9a` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>"
+      "summary_updated_at": "2026-10-04T23:33:05Z",
+      "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \u2705 **Completed** <relative-time datetime=\"2026-10-04T23:33:04.759520Z\">2026-10-04T23:33:04.759520Z</relative-time> | `dde2b9a` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
+      "clean": true,
+      "result_comment_id": 5985623901,
+      "result_body": "Codex Review: Didn't find any major issues. Can't wait for the next one!\n\n**Reviewed commit:** `dde2b9abe7`\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\".\n\nIf Codex has suggestions, it will comment; otherwise it will react with \ud83d\udc4d.\n\n\n\n\nCodex can also answer questions or update the PR. Try commenting \"@codex address that feedback\".\n            \n</details>",
+      "result_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5985623901",
+      "result_at": "2026-10-04T23:33:03Z",
+      "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-status-2335-dde2b9a.json"
     },
     "started_at": "2026-10-04T23:27:29Z",
     "nonreview_run_summary": [
@@ -6117,97 +6274,97 @@
         "id": 37243174299,
         "name": "Agent instruction validation",
         "event": "pull_request_target",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
         "status": "completed",
-        "conclusion": "success",
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
-      },
-      {
-        "id": 37243162509,
-        "name": "Agent instruction validation",
-        "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null,
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+        "conclusion": "success"
       },
       {
         "id": 37243162572,
         "name": "Dev container boundary",
         "event": "pull_request",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
         "status": "completed",
-        "conclusion": "success",
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+        "conclusion": "success"
       },
       {
         "id": 37243162516,
         "name": "Markdown Lint",
         "event": "pull_request",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
         "status": "completed",
-        "conclusion": "success",
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
-      },
-      {
-        "id": 37243162531,
-        "name": "Copilot setup steps",
-        "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null,
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+        "conclusion": "success"
       },
       {
         "id": 37243162547,
         "name": "Build Style Guide Artifacts",
         "event": "pull_request",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
         "status": "completed",
-        "conclusion": "success",
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+        "conclusion": "success"
+      },
+      {
+        "id": 37243162509,
+        "name": "Agent instruction validation",
+        "event": "pull_request",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37243162531,
+        "name": "Copilot setup steps",
+        "event": "pull_request",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "status": "completed",
+        "conclusion": "success"
       },
       {
         "id": 37243160790,
         "name": "Agent instruction validation",
         "event": "pull_request_target",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
         "status": "completed",
-        "conclusion": "success",
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
-      },
-      {
-        "id": 37243159416,
-        "name": "Agent instruction validation",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null,
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
-      },
-      {
-        "id": 37243159463,
-        "name": "Copilot setup steps",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null,
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+        "conclusion": "success"
       },
       {
         "id": 37243159434,
         "name": "Dev container boundary",
         "event": "push",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
         "status": "completed",
-        "conclusion": "success",
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+        "conclusion": "success"
       },
       {
         "id": 37243159367,
         "name": "Markdown Lint",
         "event": "push",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
         "status": "completed",
-        "conclusion": "success",
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+        "conclusion": "success"
       },
       {
         "id": 37243159420,
         "name": "Build Style Guide Artifacts",
         "event": "push",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
         "status": "completed",
-        "conclusion": "success",
-        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+        "conclusion": "success"
+      },
+      {
+        "id": 37243159463,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37243159416,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "status": "completed",
+        "conclusion": "success"
       }
     ],
     "interim_quality": {
@@ -6220,6 +6377,125 @@
       "root_verification": "Full report read; report/evidence hashes, six log hashes and three committed repair hashes sampled and matched.",
       "remaining": "Current-input remote reviews, complete finding inventory and hosted checks before final PASS."
     },
-    "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-both-requested-dde2b9a.json"
+    "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-terminal-dde2b9a.json",
+    "all_nonreview_workflows_success": true,
+    "hosted_log_collection": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\round4-hosted-terminal-dde2b9a-collection.json",
+    "hosted_validation_evidence": [
+      {
+        "run": 37243162509,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\37243162509\\log.txt",
+        "log_sha256": "2a4e34034f4b604194c72cb2804c7474e0c060ae195f7463ca4bbbe562a3b6c2",
+        "kind": "instruction",
+        "node_counts": {
+          "tests": 502,
+          "pass": 502,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "mutation_selftest": "passed",
+        "role": "Proposed behavior; committed-input finalization date is explicitly not verified here."
+      },
+      {
+        "run": 37243159416,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\37243159416\\log.txt",
+        "log_sha256": "c9d7937cb3be2f54aa17a0e134aee8aaba69dc7ceb207275cbff85af0d25ec9c",
+        "kind": "instruction",
+        "node_counts": {
+          "tests": 502,
+          "pass": 502,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "mutation_selftest": "passed",
+        "role": "Proposed behavior; committed-input finalization date is explicitly not verified here."
+      },
+      {
+        "run": 37243162531,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\37243162531\\log.txt",
+        "log_sha256": "f668ef7d6ed79292139bdaa3e7ba816144923760ca98fda2b0d6ba1b340e602d",
+        "kind": "setup",
+        "passed_hooks": 11,
+        "skipped_hooks": 0,
+        "final_immutable_check": "success"
+      },
+      {
+        "run": 37243159463,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\37243159463\\log.txt",
+        "log_sha256": "b2025602052a645b12b92309c557476ef8d0baa6b9046f6f2cd92f9e0cbe015d",
+        "kind": "setup",
+        "passed_hooks": 11,
+        "skipped_hooks": 0,
+        "final_immutable_check": "success"
+      }
+    ],
+    "provisional_reverse": {
+      "status": "provisional; unaccepted source",
+      "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+      "tree": "d59a740b7b1d88f7986075ac9328d9998629aa71",
+      "accepted_PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "paths": 20,
+      "TF_changed_paths": 40,
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-R12-R13-readiness-20261004\\ADDENDUM.md",
+      "report_sha256": "1aef6dae992ca2904ad4745355e918fe79e4f478580bbac020f15670a4b0c934",
+      "mapping": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-R12-R13-readiness-20261004\\mapping.json",
+      "mapping_sha256": "ad2a833ab9502d996eaae33db5216309af31c6951d49514350deced7d5a9a79f",
+      "reviewer": "/root/a02_reverse_repair_readiness",
+      "root_review": "Complete addendum read, artifact hashes verified; committed three-file hashes previously sampled against the same source. No new material finding.",
+      "remaining": "Actual TF merge/landed acceptance; fresh PS/TF native main and authoring UTC/metadata; coordinator transfer increment before one writer release."
+    },
+    "findings": [
+      {
+        "key": "R14",
+        "comment_id": 4179817842,
+        "thread_id": "PRRT_kwDOSAZRhc6o3tJw",
+        "title": "Historical setup runtime tuple constants",
+        "owner": "A03",
+        "body": "This setup flow embeds specific historical Node/npm versions (`11.16.0`, `24.18.0`, `24.18.1`) directly in the workflow logic. Even if intentional for a \u201cpre-declaration tuple\u201d compatibility path, it creates a high-churn spot on future version bumps and increases the chance of updating one location but missing others (the same versions also appear elsewhere in this workflow). Consider centralizing these tuples into a single well-named data block (within the script) or deriving them from a single authoritative repo file when possible, so future maintenance is less error-prone.",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "line": 397,
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179817842",
+        "state": "validation_and_complete_proposal_pending",
+        "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "own_eyes_reaction_id": 450162399
+      },
+      {
+        "key": "R15",
+        "comment_id": 4179817873,
+        "thread_id": "PRRT_kwDOSAZRhc6o3tKG",
+        "title": "Imported lint dependency failure boundary",
+        "owner": "A07",
+        "body": "When this module is imported (e.g., by `lint-staged-markdown.mjs`) and a dependency is missing, the code re-throws the raw `require()` error without the `Markdown lint tooling:` prefix and without enforcing a consistent \u201ctooling failure\u201d classification at the boundary. To keep diagnostics stable across direct vs imported execution, consider wrapping/rethrowing with a consistent message (and optionally attaching the original error as `cause`) so callers don\u2019t emit confusing bare loader errors.",
+        "path": ".github/workflows/lint-nested-markdown.js",
+        "line": 23,
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179817873",
+        "state": "validation_and_complete_proposal_pending",
+        "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "own_eyes_reaction_id": 450162402
+      },
+      {
+        "key": "R16",
+        "comment_id": 4179817891,
+        "thread_id": "PRRT_kwDOSAZRhc6o3tKU",
+        "title": "Windows lint selector path normalization",
+        "owner": "A07",
+        "body": "`assertLintConfigurationInputs()` normalizes discovered paths using `relative.split(path.sep).join('/')`. If `globSync()` yields POSIX-style `/` separators on Windows (a common behavior for glob libraries), `path.sep` is `\\\\` and the normalization becomes a no-op, which can cause allowed configs (like `.github/workflows/.markdownlint.jsonc`) to be incorrectly rejected as \u201cunsupported\u201d. Consider normalizing with a separator-agnostic replacement (e.g., replace backslashes with `/` regardless of platform) or using `path.posix` consistently for comparisons.",
+        "path": ".github/workflows/lint-nested-markdown.js",
+        "line": 192,
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179817891",
+        "state": "validation_and_complete_proposal_pending",
+        "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "own_eyes_reaction_id": 450162404
+      }
+    ],
+    "hosted_codex_interim_quality": {
+      "reviewer": "/root/a02_tf_prepublication_quality",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-ROUND4-HOSTED-CODEX-INTERIM-dde2b9a.md",
+      "report_sha256": "eddf1fdc383320eb6cec7ea0dc15860d40179580f9a4310efb9a8b8f6f8e13fe",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-ROUND4-HOSTED-CODEX-INTERIM-EVIDENCE-dde2b9a.json",
+      "evidence_sha256": "cfad6c7c7473e1e768aad37e70c0d898aa4f1a04ebbf257ee5324d3095148c5b",
+      "scope": "Independent all12 hosted/Codex/source integrity reconciliation passed; later three Copilot findings keep final quality open. Root read full report and verified hashes."
+    }
   }
 }
