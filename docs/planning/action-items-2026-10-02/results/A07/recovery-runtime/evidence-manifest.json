@@ -48,13 +48,19 @@
     },
     {
       "file": "PROPOSAL.md",
-      "bytes": 34753,
-      "sha256": "786d9d94e61535e2f5919a73cd0d2161cd352ba8de7a4a41c44c09edddff7f57"
+      "bytes": 34591,
+      "sha256": "476df9bf1dcf546f082f60a29f8f597993dbd8e53784da74b2a0e920714ee133",
+      "identityScope": "Canonical published LF Git blob; original private evidence identity retained separately.",
+      "prePublicationCheckoutSha256": "786d9d94e61535e2f5919a73cd0d2161cd352ba8de7a4a41c44c09edddff7f57",
+      "prePublicationCheckoutBytes": 34753
     },
     {
       "file": "source-identities.json",
-      "bytes": 10821,
-      "sha256": "3bcd98ce30fda883bf2cf51557dded5e88c63e92d9db3d5e8e372561254c8bb6"
+      "bytes": 10534,
+      "sha256": "d425728ca5b98a910c5f3d4de0a88fc115295d0347ada09e4bad6b14d1a7af5d",
+      "identityScope": "Canonical published LF Git blob; original private evidence identity retained separately.",
+      "prePublicationCheckoutSha256": "3bcd98ce30fda883bf2cf51557dded5e88c63e92d9db3d5e8e372561254c8bb6",
+      "prePublicationCheckoutBytes": 10821
     }
   ],
   "consumerClosureInputs": [
@@ -99,7 +105,9 @@
   "privateSourceDirectory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-recovery-runtime-proposal-20261004",
   "canonicalProposalFormatting": {
     "originalWorkerSha256": "bcc965e06fd21e599470f7c787e8f6fd577ed961fb034eb21711a29f8fa19095",
-    "conversion": "Reverse one UTF-8-as-Windows-1252 decoding error; symbols only; no option, score or contract changed.",
-    "canonicalSha256": "786d9d94e61535e2f5919a73cd0d2161cd352ba8de7a4a41c44c09edddff7f57"
+    "conversion": "Reverse one UTF-8-as-Windows-1252 decoding error; symbols only; no option, score or contract changed. Canonical publication uses LF newlines; original private proposal used CRLF.",
+    "canonicalSha256": "476df9bf1dcf546f082f60a29f8f597993dbd8e53784da74b2a0e920714ee133",
+    "canonicalBytes": 34591,
+    "canonicalIdentityScope": "Published LF Git blob"
   }
 }
