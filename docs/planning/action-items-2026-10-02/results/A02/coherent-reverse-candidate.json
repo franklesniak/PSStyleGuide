@@ -1,6 +1,6 @@
 {
-  "status": "round6_both_reviews_pending",
-  "captured_at": "2026-10-05T10:59:04.502993+00:00",
+  "status": "round6_codex_clean_copilot_pending",
+  "captured_at": "2026-10-05T11:11:58.575836+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -2738,13 +2738,21 @@
       "workflow_run_id": 37299688603
     },
     "codex": {
-      "status": "pending",
+      "status": "clean",
       "baseline": "round6-pre-request.json",
       "trigger_intent_after_snapshot": "round6-copilot-request-confirmation.json",
       "trigger_comment_id": 5993052733,
       "request_at": "2026-10-05T10:56:25Z",
       "actor_id": 11204406,
-      "snapshot": "round6-paired-request-confirmation.json"
+      "snapshot": "round6-codex-terminal-1105.json",
+      "result_kind": "authenticated_exact_commit_conversation",
+      "result_comment_id": 5993152316,
+      "result_at": "2026-10-05T11:03:23Z",
+      "result_author_id": 199175422,
+      "reviewed_commit_abbreviation": "86f35f47cf",
+      "summary_comment_id": 5989249158,
+      "summary_updated_at": "2026-10-05T11:03:28Z",
+      "baseline_exclusion_verified": true
     },
     "hosted_validation": {
       "status": "passed",
@@ -2782,7 +2790,36 @@
       "reused_from": "round5 on identical head/base/body; no source change or repeated suite"
     },
     "started_at": "2026-10-05T10:55:45Z",
-    "latest_snapshot": "round6-paired-request-confirmation.json",
-    "last_native_observation_at": "2026-10-05T10:57:41.866275+00:00"
+    "latest_snapshot": "round6-progress-1110.json",
+    "last_native_observation_at": "2026-10-05T11:10:57.973564+00:00",
+    "planning_publication": {
+      "head": "5168c83a4c44205f2f93148bfc570c0995e1c77b",
+      "parent": "7433b19b1af93129e6477e7aff8bac84cf60dba6",
+      "tree": "866953c585bd6ea2d1ab6ae0985151f6406070ee",
+      "files": [
+        "docs/planning/action-items-2026-10-02/results/A02/PS232-R10-table-repeat.md",
+        "docs/planning/action-items-2026-10-02/results/A02/coherent-reverse-candidate.json",
+        "docs/planning/action-items-2026-10-02/results/A02/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A03/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A07/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A20/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A21/RESULT.md",
+        "docs/planning/action-items-2026-10-02/STATUS.md"
+      ],
+      "status": "published",
+      "commit_log_sha256": "7c6e04bcb8f9bbfaa97ac2803fc3d531f86330a5e2cd3df76ea3fe91fa1000b8",
+      "push_exit": 0,
+      "published_at": "2026-10-05T10:59:51.382800+00:00"
+    },
+    "quality_evidence_delta": {
+      "result": "no_material_issue_final_gates_pending",
+      "reviewer": "/root/a02_tf_prepublication_quality",
+      "report_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round5-final-quality\\DELTA-REPORT.md",
+      "report_sha256": "1f8b8e28e7b72c592987bda533cc38e2ccf41723377c472374ca0b079f9d486a",
+      "evidence_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round5-final-quality\\DELTA-EVIDENCE.json",
+      "evidence_sha256": "177a27babc5dff9a08efa46bec7c2a8a330be078d7c2ba46c93b561e4d1348eb",
+      "root_verification": "Complete report read; 53 cited file identities and all12 hosted log identities verified. Both507-case instruction results, both11-hook setup jobs and R10 raw/server-render proof sampled. No final PR PASS.",
+      "remaining": "Round6 terminal reviewer evidence and fresh native merge gates; newer Codex result will be reconciled with Copilot in final delta."
+    }
   }
 }
