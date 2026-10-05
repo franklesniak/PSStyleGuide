@@ -346,6 +346,56 @@ try {
         $objRun.Result.Overall -ceq 'ReplacementStateUncertain' -and
         $objRun.Result.Artifacts[0].PublicationReturned) -Label 'uncertain publication fails closed'
 
+    # Inject stable final observations that differ from the candidate. The bytes
+    # and publication are real; this is not a native substitution or race test.
+    $strBeforeIdentityRead = '$strFinalIdentityBeforeRead = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath'
+    $strAfterIdentityRead = '$hashtableRecord.FinalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath'
+    $strCandidateEqualityGuard = 'if ($hashtableRecord.FinalOrdinaryIdentity -cne $strCandidateIdentity) {'
+    foreach ($strTarget in @($strBeforeIdentityRead, $strAfterIdentityRead, $strCandidateEqualityGuard)) {
+        Assert-GeneratorCondition -Condition (
+            ([regex]::Matches($strGenerator, [regex]::Escape($strTarget))).Count -eq 1
+        ) -Label 'candidate equality injection target'
+    }
+    $strIdentityInjection = $strGenerator.Replace($strBeforeIdentityRead,
+        '$strFinalIdentityBeforeRead = $strCandidateIdentity + '':injected-final''').Replace($strAfterIdentityRead,
+        '$hashtableRecord.FinalOrdinaryIdentity = $strFinalIdentityBeforeRead')
+    foreach ($boolDisableCandidateEquality in @($false, $true)) {
+        $strControlledGenerator = $strIdentityInjection
+        if ($boolDisableCandidateEquality) {
+            $strControlledGenerator = $strIdentityInjection.Replace($strCandidateEqualityGuard, 'if ($false) {')
+        }
+        [IO.File]::WriteAllText((Join-Path -Path $strScripts -ChildPath 'Generate-StyleGuideArtifacts.ps1'),
+            $strControlledGenerator, $objEncoding)
+        foreach ($strMethod in @('File.Replace', 'File.Move')) {
+            if ($strMethod -eq 'File.Replace') {
+                [IO.File]::WriteAllText($strCopilot, "stale`n", $objEncoding)
+            } else {
+                [IO.File]::Delete($strCopilot)
+            }
+            $objRun = Invoke-GeneratorFixture -Root $strFixture
+            $objArtifact = $objRun.Result.Artifacts[0]
+            Assert-GeneratorCondition -Condition ($objArtifact.PublicationReturned -and
+                $objArtifact.PublicationMethod -ceq $strMethod -and $objArtifact.FinalState -ceq 'Existing' -and
+                $objArtifact.FinalOrdinaryIdentity -ceq ($objArtifact.CandidateOrdinaryIdentity + ':injected-final') -and
+                $objArtifact.CandidateOrdinaryIdentity -cne $objArtifact.FinalOrdinaryIdentity -and
+                $objArtifact.CandidateLength -eq $objArtifact.FinalLength -and
+                $objArtifact.CandidateSha256 -ceq $objArtifact.FinalSha256) -Label 'injected same-byte different-identity publication'
+            $boolIdentityRefusal = $objRun.ExitCode -ne 0 -and
+                $objRun.Result.Overall -ceq 'ReplacementStateUncertain' -and
+                $objArtifact.Status -ceq 'ReplacementStateUncertain' -and
+                $objRun.Result.Phase -ceq 'verify-publication' -and
+                $objRun.Result.Category -ceq 'filesystem-state-uncertain'
+            if ($boolDisableCandidateEquality) {
+                Assert-GeneratorCondition -Condition (-not $boolIdentityRefusal -and $objRun.ExitCode -eq 0 -and
+                    $objRun.Result.Overall -ceq 'Success' -and $objArtifact.Status -ceq 'Success') -Label 'candidate equality mutation killed'
+            } else {
+                Assert-GeneratorCondition -Condition $boolIdentityRefusal -Label 'candidate identity mismatch fails closed'
+            }
+            Assert-GeneratorByteSequence -Root $strFixture -Golden $hashtableGolden
+        }
+    }
+    [IO.File]::WriteAllText((Join-Path -Path $strScripts -ChildPath 'Generate-StyleGuideArtifacts.ps1'), $strGenerator, $objEncoding)
+
     # Synthetic Unix dispatch controls execute the actual identity function.
     $strIdentityFunction = ($arrFunctions | Where-Object { $_.Name -eq 'Get-OrdinaryFileIdentity' }).Extent.Text
     foreach ($strPlatform in @('Linux', 'MacOS', 'FreeBsd', 'Unknown')) {
