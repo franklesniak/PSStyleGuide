@@ -24,7 +24,7 @@ export async function lintMarkdownFiles(root = repoRoot, run = runBounded) {
     throw new Error('Markdown lint requires root package.json engines.node to declare an exact Node version (major.minor.patch).');
   }
   if (required !== process.versions.node) {
-    throw new Error(`Markdown lint requires declared Node ${required ?? 'version'}; observed ${process.versions.node}.`);
+    throw new Error(`Markdown lint requires declared Node ${required}; observed ${process.versions.node}.`);
   }
   const child = path.join(root, '.github/workflows/lint-nested-markdown.js');
   const leaf = fs.lstatSync(child);

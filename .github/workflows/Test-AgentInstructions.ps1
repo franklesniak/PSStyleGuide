@@ -5412,7 +5412,7 @@ function Get-DecisionRecordLifecycleFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261005.0
+    # Version: 1.0.20261005.1
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -6204,7 +6204,7 @@ function Get-DocumentMetadataContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.7.20261005.0
+    # Version: 1.7.20261005.1
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
