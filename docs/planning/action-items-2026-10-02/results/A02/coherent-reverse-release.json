@@ -1,0 +1,483 @@
+{
+  "repository": "franklesniak/PSStyleGuide",
+  "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
+  "branch": "codex/coherent-foundation-reverse",
+  "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+  "base_tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+  "head": null,
+  "accepted_peer": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+  "accepted_peer_tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+  "peer_acceptance_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-acceptance.json",
+  "peer_acceptance_sha256": "0003dd7f852bf1854d29a8bb5dc4625af481b7142b627b1b21b799be79d68f36",
+  "status": "implementation_active",
+  "transfers": {
+    "A02": {
+      "used": 2,
+      "cap": 12
+    },
+    "A20": {
+      "used": 2,
+      "cap": 8
+    },
+    "A21": {
+      "used": 2,
+      "cap": 12
+    },
+    "A03": {
+      "used": 2,
+      "cap": 12
+    },
+    "A07": {
+      "used": 2,
+      "cap": 12
+    }
+  },
+  "scope": [
+    ".github/workflows/Check-NpmAudit.mjs",
+    ".github/workflows/Check-NpmAudit.test.mjs",
+    ".github/workflows/Classify-InstructionMaintenance.mjs",
+    ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+    ".github/workflows/NpmTools.mjs",
+    ".github/workflows/NpmTools.test.mjs",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/Test-LocalValidation.test.mjs",
+    ".github/workflows/Validate-WorkflowPolicy.mjs",
+    ".github/workflows/agent-instructions.yml",
+    ".github/workflows/copilot-setup-steps.yml",
+    ".github/workflows/lint-markdown.mjs",
+    ".github/workflows/lint-markdown.test.mjs",
+    ".github/workflows/lint-nested-markdown.js",
+    ".github/workflows/lint-staged-markdown.mjs",
+    ".github/workflows/scripts-README.md",
+    "AGENTS.md",
+    "CLAUDE.md",
+    "docs/ISSUE_EVALUATION_PROMPT.md",
+    "docs/dependency-maintenance.md"
+  ],
+  "ownership": {
+    "A02": [
+      "docs/ISSUE_EVALUATION_PROMPT.md"
+    ],
+    "A20": [
+      "AGENTS.md",
+      "CLAUDE.md"
+    ],
+    "A21": [
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Classify-InstructionMaintenance.mjs"
+    ],
+    "A03": [
+      ".github/workflows/agent-instructions.yml",
+      ".github/workflows/copilot-setup-steps.yml",
+      ".github/workflows/Validate-WorkflowPolicy.mjs",
+      ".github/workflows/Test-CiHelpers.test.mjs"
+    ],
+    "A07": [
+      "docs/dependency-maintenance.md",
+      ".github/workflows/lint-markdown.mjs",
+      ".github/workflows/lint-markdown.test.mjs",
+      ".github/workflows/lint-staged-markdown.mjs",
+      ".github/workflows/lint-nested-markdown.js",
+      ".github/workflows/NpmTools.mjs",
+      ".github/workflows/NpmTools.test.mjs",
+      ".github/workflows/Check-NpmAudit.mjs",
+      ".github/workflows/Check-NpmAudit.test.mjs",
+      ".github/workflows/Test-LocalValidation.test.mjs",
+      ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      ".github/workflows/scripts-README.md"
+    ]
+  },
+  "preimage": [
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "ba9e0327030fa8288924fa5b2894bfcd7f28c75f",
+        "bytes": 22392,
+        "sha256": "f5f0655d50c33660c4b43310f7d6b2e5f9cbc556db7d818371a41bdb636c188d"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "04cc1ee1b3ac867878e6ebe10af81f322712e34b",
+        "bytes": 23280,
+        "sha256": "729aa4178660a5b20d1947e804937813f73b60497df46a81b8f6dbf023d8a322"
+      }
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "47a1831ad93a2d935106639822ddc1a95484be09",
+        "bytes": 42081,
+        "sha256": "a1335e5717a8a152281bea78a84086cdec9aeec1235c5497d51f644cc5c9c4b8"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "1b38ba7a9c6e441fb62b276795a951831c709dc9",
+        "bytes": 42149,
+        "sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2"
+      }
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0",
+        "bytes": 5786,
+        "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "916e0a34258de762772fa888808e403e798099f3",
+        "bytes": 6093,
+        "sha256": "08f0533a20c2292b13434de9e4b858d64d33d77b2c40a3e8888d9b561651af63"
+      }
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "c55c95be61b704291d384f043e078f26472a3f2b",
+        "bytes": 3017,
+        "sha256": "6d5463da1938f3dbacbccff47d594b2522ee4558369b05eb4459e2413fa83ac2"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "494c6804f05c7ff54364e139004eeb67d8d879cd",
+        "bytes": 3017,
+        "sha256": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6"
+      }
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+        "bytes": 7375,
+        "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "bytes": 7656,
+        "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+      }
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "8249cd855785e2847df7ab6fad60caf219da59bc",
+        "bytes": 11392,
+        "sha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+        "bytes": 13810,
+        "sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+        "bytes": 218742,
+        "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "423a1e02869cbcb8b29fe4e56f53a014ebe39e8f",
+        "bytes": 229956,
+        "sha256": "f80f2b3ca171a1010ecd6cffe55e160574d80d2a7b9837aae181910b3f0a1e33"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb",
+        "bytes": 474787,
+        "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "eee62dff4e2970dc7b8ba197eb3872cc4eca639d",
+        "bytes": 482223,
+        "sha256": "dd77f67a8eb79584d86a69a8806302a7fd0a26251da90b6a9f5e7fd281011790"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+        "bytes": 98497,
+        "sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+        "bytes": 100007,
+        "sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea"
+      }
+    },
+    {
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "PS_preimage": null,
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "86e7b19fa5453efbe5373a1a1dd052b4b2dc7b82",
+        "bytes": 4038,
+        "sha256": "decdffd21c04e3f5bca5364842a734543c2681a60ea6d2792c7acc65e1ae13cb"
+      }
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+        "bytes": 25947,
+        "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+        "bytes": 26228,
+        "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
+      }
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+        "bytes": 12748,
+        "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+        "bytes": 12865,
+        "sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc"
+      }
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "b0f7fb0b657232fa0e857e946d725fdd6876c028",
+        "bytes": 52385,
+        "sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "bytes": 51830,
+        "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+      }
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "9b0abb08d1a17ed4306ef771822d980aabff86b5",
+        "bytes": 1691,
+        "sha256": "3410d109d4c842a83bf41dc5674874db8d046929742a7fadba0e60026203c126"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "8efcf8686a55835ba87af43dbe357011b856c1dd",
+        "bytes": 3063,
+        "sha256": "766d357075fe18d9c8239c31e09065c25bd302777e619adea4787498cf146056"
+      }
+    },
+    {
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "2d79be38b1caeeb871de4ed2c8222b950c4a6ae7",
+        "bytes": 12676,
+        "sha256": "e93be06d32fff7ef9b02a33668918213f068c460f477ecd62e668f43c7004c76"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "e3d5bb84e389d1b6ffe0033aafb1b821eb792a58",
+        "bytes": 26625,
+        "sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235"
+      }
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "0c7633c0793be84ce6768698387052807a149329",
+        "bytes": 18348,
+        "sha256": "6f90d52361c564772094ee0a2410f9cc407803f4784aafda3c5e8096c2281327"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "3284f63d128288ce511391b693b1ba350b918f2c",
+        "bytes": 19388,
+        "sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83"
+      }
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "21063b3c86ffcee7c928b149d390065b8bcc1840",
+        "bytes": 5611,
+        "sha256": "c473b3df463d99d88de07ef883214f0a8aaedce111579d676bf39324902d14d3"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+        "bytes": 5745,
+        "sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0"
+      }
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7",
+        "bytes": 6613,
+        "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "b049d7881a2cd2ba144dd63b67e10bb0287a7aaf",
+        "bytes": 11650,
+        "sha256": "240b53ff2651bd11c30fde2feacd3d259dbd533ee7fa6a646302b0f2874d1480"
+      }
+    },
+    {
+      "path": "AGENTS.md",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "95d3b39c90e2f1934f34e0e846692143404fe65b",
+        "bytes": 32667,
+        "sha256": "75d4079576bb1037cb552a922707074a2d6948d7a24d7418320ec8b271fdcec7"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "be1e52363e92daec056660b3e1147527874ccbf9",
+        "bytes": 32746,
+        "sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f"
+      }
+    },
+    {
+      "path": "CLAUDE.md",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "c3058de820b228bdd5b03cce1ec9f288c9dff02d",
+        "bytes": 83329,
+        "sha256": "01d5067733fe44c9d344a9ebb29321b2441dc67a695ad2df2c3a9a0a3a8a1389"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "6a646684e062c418bf124fa5d78690d3e86611cf",
+        "bytes": 83433,
+        "sha256": "efd0c70621f46bd65119dab82ec9a1cb6fde8a0112a3f0d13d57c83267296bc1"
+      }
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "761e87c11c1c03f805ad832331866b963294c1e5",
+        "bytes": 2179,
+        "sha256": "f863b58355ec00530b349f8417a78dd1dd31711a6d85ee954436a0aabcb878a9"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "f66c405398db94f21d8caeae4b94487fe5ffa75d",
+        "bytes": 2179,
+        "sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d"
+      }
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "PS_preimage": {
+        "mode": "100644",
+        "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda",
+        "bytes": 9672,
+        "sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21"
+      },
+      "accepted_TF_source": {
+        "mode": "100644",
+        "blob": "61977b68f4adc7a31aa822fb224efe41b0ea45af",
+        "bytes": 9874,
+        "sha256": "864427fc673b8d257d384ec55ea45e60612883624a071c5df616170342c32654"
+      }
+    }
+  ],
+  "writer": "/root/a02_tf_coherent_implementation",
+  "writer_release_sent": true,
+  "handoff": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-R12-R13-readiness-20261004\\HANDOFF-pre-release-20261005.md",
+  "handoff_sha256": "956a1876263309df3e1b6ceb46d5b176c370f5741cd67a955013da747b8e611b",
+  "mapping": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-R12-R13-readiness-20261004\\mapping-round6.json",
+  "mapping_sha256": "b79c0388acdc679b1e3b3f4e88ded8251e01cab73d0be7751b45a8464ce39c7a",
+  "fresh_native_pair": {
+    "PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "TF": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "observed_at": "2026-10-05T05:28:07.158926+00:00"
+  },
+  "transfer_incremented_at": "2026-10-05T05:28:07.274396+00:00",
+  "rounds_used": 0,
+  "pr": null,
+  "first_request_at": null,
+  "deadline": null,
+  "prior_lifecycle": {
+    "TF_PR": 66,
+    "rounds_used": 8,
+    "first_request_at": "2026-10-04T16:41:24+00:00",
+    "deadline": "2026-10-12T16:41:24+00:00",
+    "final_quality": {
+      "result": "passed_no_material_finding",
+      "head": "17caede017a8054bed529517ce473ef75682b5bf",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "body_sha256": "a5f0314868a42df0869a100d0de4061e1343e99a31dd4cbbb64aceacfd956628",
+      "report_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\17caede-current-input-20261005\\FINAL-QUALITY-17caede-20261005-REPORT.md",
+      "report_sha256": "8346d9d583881e7d92c35ebcab8ad0627c399a9677a69b46e675abea60a8873e",
+      "evidence_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\17caede-current-input-20261005\\FINAL-QUALITY-17caede-20261005-EVIDENCE.json",
+      "evidence_sha256": "e0f63dec7d9ea3f4fb6e85eb438db4178f7e56bcbd112eb9840701ad4ee6ada5",
+      "native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-terminal-01-17caede.json",
+      "native_snapshot_sha256": "4da6433c582b20ccf36273f4da1aabc5741ee2b8b73c834a3364b21dcac9b2b8",
+      "reviewer": "/root/a02_tf_prepublication_quality",
+      "root_read_complete_report": true,
+      "recorded_at": "2026-10-05T05:02:59.351218+00:00",
+      "limits": "Final current PR input only; immediate native freshness, normal merge, landed checks and reverse pair acceptance remain."
+    },
+    "source_state": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\execution-state.json",
+    "source_batch_transfer": 1,
+    "reason_for_new_PR": "New reverse repair of accepted TF review improvements onto accepted PS main; completed earlier PR lifecycles and budgets remain unchanged."
+  },
+  "authority": "Existing owner A03 procedural P, A20 protected compatibility/runtime-pointer/CLAUDE grants and selected canonical decisions cover these22 paths. No settings, unrelated protected files, B99 or R5/B1 runtime work is released.",
+  "validation": {
+    "full_aggregate_owner": "root",
+    "required_final_byte_passes": 1,
+    "scope_note": "PS175 two-pass requirement belongs to later A05 YAML-guide delivery, outside this batch.",
+    "date_rule": "Capture genuine UTC at author finalization; derive actual published PS endpoint metadata and synchronize touched common lines.",
+    "linux_profile_readiness": {
+      "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+      "available": true,
+      "inputs": "requirements-dev.txt, ci-toolchain.json and Invoke-LockedPythonHook.ps1 raw-identical. .pre-commit-config.yaml differs only in first repository-name comment; all operative bytes equal. Actual PS candidate execution remains required.",
+      "product_validation_claimed": false
+    }
+  },
+  "latest_planning_checkpoint": "9ff3ee88eb1b9509ffcbb309db7020f6f115f6a3",
+  "next_action": "Sole worker implements and freezes22 mapped paths with focused checks; root then verifies actual bytes/metadata and runs final staged/full validation before normal PS PR lifecycle.",
+  "limits": "No PS source change, test, commit, PR, review clock or paired acceptance has occurred.",
+  "prepared_at": "2026-10-05T05:28:07.967550+00:00",
+  "writer_release_recorded_at": "2026-10-05T05:32:09.011868+00:00",
+  "recorded_at": "2026-10-05T05:32:09.028566+00:00",
+  "private_parent_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\execution-state.json",
+  "private_parent_receipt_sha256": "58318bb331cbc079bfbf3e9dd1535a3e706881e8ff93e0753f0f5fbe00bcf995"
+}

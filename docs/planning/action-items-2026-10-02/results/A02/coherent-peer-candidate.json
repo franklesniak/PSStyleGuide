@@ -1,6 +1,6 @@
 {
   "recorded_at": "2026-10-05T05:05:07.058648+00:00",
-  "status": "peer_merged_landed_ci_pending",
+  "status": "peer_batch_accepted_reverse_implementation_active",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -609,23 +609,23 @@
   },
   "transfers": {
     "A02": {
-      "used": 1,
+      "used": 2,
       "cap": 12
     },
     "A20": {
-      "used": 1,
+      "used": 2,
       "cap": 8
     },
     "A21": {
-      "used": 1,
+      "used": 2,
       "cap": 12
     },
     "A03": {
-      "used": 1,
+      "used": 2,
       "cap": 12
     },
     "A07": {
-      "used": 1,
+      "used": 2,
       "cap": 12
     }
   },
@@ -3802,8 +3802,8 @@
       "old_input_clean": false
     }
   },
-  "current_review_status": "Round8 current-input remote reviews and independent final quality passed. Normal merge confirmed; actual landed workflows pending.",
-  "next_action": "Verify landed workflows, setup, current audit and native settings; refresh actual mains before PS reverse transfer2.",
+  "current_review_status": "TF round8 clean/final quality passed; normal merge56cb041 and all5 actual landed push workflows accepted. Reverse PS transfer2 is released on clean nativef168 base; no new PS PR or review clock exists.",
+  "next_action": "Continue PS reverse at coherent-reverse-20261005/execution-state.json. Transfers2 recorded; source TF round8 history retained.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -4967,14 +4967,14 @@
     }
   },
   "pending_repair_readiness": {
-    "state": "peer_merged_landed_pending",
+    "state": "reverse_implementation_active",
     "head": "17caede017a8054bed529517ce473ef75682b5bf",
     "paths": [
       ".github/workflows/Test-AgentInstructions.ps1",
       ".github/workflows/lint-markdown.mjs",
       ".github/workflows/lint-markdown.test.mjs"
     ],
-    "remaining": "Actual TF merged-main acceptance, current PS/authority/date mapping refresh, then root transfer2 release and reverse delivery."
+    "remaining": "Complete22-path PS reverse repair, its own validation/review/quality/merge/landed lifecycle, then compare back."
   },
   "round3": {
     "head": "055f112f762a466ed693c073083225f8ec9ee79d",
@@ -9463,9 +9463,10 @@
     "verified_at": "2026-10-05T05:03:09.953138+00:00"
   },
   "latest_landed_observation": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-progress-01.json",
-    "sha256": "21223c02c464c5bacb9a38df23306d48f4969cd86d7f9d655f9acff209313e8b",
-    "acceptance": false
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-terminal-01.json",
+    "sha256": "07c80952bee80547b50e75215d73aaddfc905991fc6df28cd7fff954fbba7d9a",
+    "acceptance_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-acceptance.json",
+    "acceptance_sha256": "0003dd7f852bf1854d29a8bb5dc4625af481b7142b627b1b21b799be79d68f36"
   },
   "reverse_readiness_refresh": {
     "agent": "/root/a02_reverse_repair_readiness",
@@ -9473,5 +9474,197 @@
     "source_native_main": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
     "source_tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
     "required_gates": "Actual TF landed acceptance, fresh PS/main and applicable authority, then root increments transfer2 before writer release."
-  }
+  },
+  "reverse_release": {
+    "state": "implementation_active",
+    "state_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\execution-state.json",
+    "transfer_incremented_at": "2026-10-05T05:28:07.274396+00:00",
+    "scope_count": 22,
+    "writer": "/root/a02_tf_coherent_implementation",
+    "accepted_pair": {
+      "PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "TF": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "observed_at": "2026-10-05T05:28:07.158926+00:00"
+    },
+    "branch": "codex/coherent-foundation-reverse",
+    "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
+    "state_sha256": "58318bb331cbc079bfbf3e9dd1535a3e706881e8ff93e0753f0f5fbe00bcf995",
+    "writer_release_sent": true
+  },
+  "landed_acceptance": {
+    "accepted_at": "2026-10-05T05:25:04.627912+00:00",
+    "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+    "parents": [
+      "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "17caede017a8054bed529517ce473ef75682b5bf"
+    ],
+    "reviewed_head": "17caede017a8054bed529517ce473ef75682b5bf",
+    "review_round": 8,
+    "review_body_sha256": "a5f0314868a42df0869a100d0de4061e1343e99a31dd4cbbb64aceacfd956628",
+    "native_evidence_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-terminal-01.json",
+    "native_evidence_sha256": "07c80952bee80547b50e75215d73aaddfc905991fc6df28cd7fff954fbba7d9a",
+    "runs": [
+      {
+        "id": 37266076771,
+        "name": "Dev container boundary",
+        "event": "push",
+        "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37266076782,
+        "name": "Markdown Lint",
+        "event": "push",
+        "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37266076754,
+        "name": "Build Style Guide Artifacts",
+        "event": "push",
+        "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37266076803,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37266076765,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "terminal_logs": [
+      {
+        "id": 37266076771,
+        "name": "Dev container boundary",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37266076771",
+        "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076771\\log.txt",
+        "log_sha256": "2b518afdfb0d2755de6c500fe3b3b3c6e2ab842fd963d2df5895adb084cad860",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076771\\jobs.json",
+        "jobs_sha256": "0a5aa2220c7c245df9eea9e4da7257d89a36c71703e33a81a67806a1e9f051c0"
+      },
+      {
+        "id": 37266076782,
+        "name": "Markdown Lint",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37266076782",
+        "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076782\\log.txt",
+        "log_sha256": "94d5bff83f5b770e4c12c634e7c6a783cfaeb3df7307e942947c51f4ad91925d",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076782\\jobs.json",
+        "jobs_sha256": "b5a61ed4b8d6d53aed1720bb21a97bda501197ad4189246c5f7d69131f734f0f"
+      },
+      {
+        "id": 37266076754,
+        "name": "Build Style Guide Artifacts",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37266076754",
+        "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076754\\log.txt",
+        "log_sha256": "e49061528ee7c93f1f474f603b8ad306747a5ae951aa032946ad4e297961f526",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076754\\jobs.json",
+        "jobs_sha256": "320d85697dec90c8a9861c1b35668ffdc5f7866b2c71ee890f2dab9649c92c03"
+      },
+      {
+        "id": 37266076803,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37266076803",
+        "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076803\\log.txt",
+        "log_sha256": "a7dc1a42c5bab4faa25243626d94ff29dc767c380efd08b502947c4d57f12c9f",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076803\\jobs.json",
+        "jobs_sha256": "528eb0d5062a2531ffea629c1092ae565374376ab1f8184964826d4df1d2d7c6"
+      },
+      {
+        "id": 37266076765,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37266076765",
+        "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076765\\log.txt",
+        "log_sha256": "cbc0ffe77df767bce68d6c8451460e78dd64032c125581e38e7c7529dda7961e",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076765\\jobs.json",
+        "jobs_sha256": "f4aeb4df3c85b430afa2fe746a5db1d4e9561a7787d266e16bc55a10fe8b9401"
+      }
+    ],
+    "setup_passed_hooks": [
+      "check json...............................................................Passed",
+      "check yaml...............................................................Passed",
+      "fix end of files.........................................................Passed",
+      "trim trailing whitespace.................................................Passed",
+      "yamllint.................................................................Passed",
+      "Lint GitHub Actions workflow files.......................................Passed",
+      "Validate Dependabot Config (v2)..........................................Passed",
+      "Validate GitHub Workflows................................................Passed",
+      "staged Markdown..........................................................Passed",
+      "workflow policy contract.................................................Passed",
+      "agent instruction contract and mutation tests............................Passed"
+    ],
+    "node_tests": {
+      "passed": 515,
+      "failed": 0,
+      "skipped": 0
+    },
+    "audit": {
+      "status": "CLEAN",
+      "unresolved": [],
+      "acceptedPackages": 0,
+      "unusedExceptions": [],
+      "proposedState": false,
+      "authority": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "authoritySource": "event-main",
+      "limitation": "Authority is the recorded main snapshot; owner/executor must check known revocations before acceptance.",
+      "installedGraphRoots": [
+        ".github/workflows"
+      ],
+      "findings": [],
+      "applicable": true
+    },
+    "workflow_policy": {
+      "schema": "StyleGuide.WorkflowPolicyResult.v1",
+      "validatorVersion": "3.0.0",
+      "success": true,
+      "contractCanonicalSha256": "9d7fadbff11db3e3b837e1e9f059bd5b142ff6e8fc0ad5a83196afca3c9c7f30",
+      "casesPassed": 0,
+      "workflowSha256": {
+        "build.yml": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b",
+        "markdownlint.yml": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+      }
+    },
+    "ruleset_unchanged": 20623677,
+    "peer_batch_result": "accepted",
+    "limits": "Actual merged TF push workflows, including full validation and immutable-input check, passed. Does not establish paired convergence, close any whole outcome, or release the reverse writer. Current PS, authority, date, mapping and transfer2 must be refreshed first."
+  },
+  "peer_batch_transfer_number": 1
 }
