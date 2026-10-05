@@ -1,0 +1,63 @@
+{
+  "recorded_at": "2026-10-05T22:42:17.618099+00:00",
+  "reader": "root",
+  "report_sha256": "82b570823859c6816b4fc8ce678117c4b00541ce1e3d204ba20c677fd62e9c90",
+  "catalog_sha256": "752660478a5bee12b65b3ec54c3683c2c3debf9d6205adc1203498e3e4807a0b",
+  "raw_samples": [
+    {
+      "source": "PS",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+      "mode": "100644",
+      "blob": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+      "bytes": 376988,
+      "sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1"
+    },
+    {
+      "source": "TF",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+      "mode": "100644",
+      "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+      "bytes": 154151,
+      "sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57"
+    },
+    {
+      "source": "A06",
+      "ref": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "bytes": 31176,
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+    },
+    {
+      "source": "TF",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+      "mode": "100644",
+      "blob": "9e04225a355997850e4817f9163868089a773332",
+      "bytes": 127363,
+      "sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93"
+    }
+  ],
+  "retained_artifact_samples": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A09\\decisions.md",
+      "sha256": "4ae9ab7e18439fd1dd6e0c3a2129c65b03779884a17057efab6cc327bcc33db5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A09\\surface-map.md",
+      "sha256": "41531e2f1ad18471b14b2a45de6a77643fd71a3ccf49f6262ce966c4e26d16c7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A09\\validation.json",
+      "sha256": "3f44f1a2fcb029e16387d0daff1830e13e2c19452a9d2a8835d5a96561efce99"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\PS233-landed-acceptance.json",
+      "sha256": "2052c7ea502e13878eae3e0d4732b469d61c50755c2b4f84b30843ca593865ef"
+    }
+  ],
+  "review": "Read full report and original decision record. Verified4raw Git object/mode samples,4retained evidence hashes, actual proposed parser-integrity prefix and selectedD3 arithmetic. Current A06 source-validation snapshot hash may evolve; immutable source refs remain binding. Readiness only, no tests or implementation. D1C92/D2B99/D3F96 retained; A09 0/8/unstarted."
+}

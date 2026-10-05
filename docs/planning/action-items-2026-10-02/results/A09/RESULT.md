@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A09 read-only preparation result
 
+**Post-A06 readiness refreshed,2026-10-05:** [Current raw-input refresh](postA06/REPORT.md) retains D1C92/D2B99/D3F96 against acceptedPSd7b206a/TFe21b74f and proposedA06dec18a6/treefd66ed6. All supply core bytes, profiles and archive remain unchanged; the proposed package/parser-integrity region matches both accepted sources. No routine recorder/profile caller appears in the checked21caller files. Root read the report and decisions, sampled4raw objects/modes and4retained evidence hashes, and verified the actual prefix and D3 arithmetic. No runtime tests, historical installation, risk renewal or product change occurred. Re-pin accepted predecessors before the six-path PS-first implementation and paired lifecycle. A09 stays0/8 with an unstarted clock; no new owner decision.
+
 A focused paired repair is warranted after A03/A07 acceptance: fix the optional Linux test's stale strict-success assumption, correct the obsolete new-freeze instruction, and align unnecessary common diagnostic/test differences while retaining exact necessary historical literal regions. Do not change historical profiles or make deep reproduction a routine gate. [D1–D3](decisions.md) contain separate validation, stakeholders, options, weighted scores, selections and candidate checks.
 
 This is preparation, not A09 acceptance. No product/planning/native write, PR, review request or workflow run was issued. Sole scratch: `C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A09-design-20261002`. Requested route `gpt-6-astra/high` for security/history complexity; effective settings unavailable. No descendants. Transfers0/8; no PR clock. A02 PR224 is not an accepted input.
