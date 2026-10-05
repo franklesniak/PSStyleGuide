@@ -1,0 +1,5 @@
+# Isolated Linux ShellCheck availability <!-- markdownlint-disable MD013 -->
+
+The earlier Linux image lacked ShellCheck, so actionlint omitted that optional rule. Root added official ShellCheck0.11.0, matching Windows, to isolated image `sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4`. The archive matched the official SHA256; base layers and operational configuration stayed unchanged. Pyflakes remains absent on both inspected environments.
+
+Build and smoke passed: default actionlint reports the intentional SC2086 defect, the same input passes with only ShellCheck disabled, and corrected input passes with it enabled. No product file or current Windows validation30940 changed. No full Linux aggregate, complete platform equivalence or speed improvement is claimed; PowerShell remains7.6.3 versus Windows7.6.5. [Canonical evidence](../A02/coherent-peer-candidate.json) records exact commands, image and log identities. [Upstream installation guidance](https://github.com/koalaman/shellcheck/blob/v0.11.0/README.md#installing-a-pre-compiled-binary) supplies the pinned-binary method.

@@ -1,5 +1,5 @@
 {
-  "recorded_at": "2026-10-05T01:16:41.090863+00:00",
+  "recorded_at": "2026-10-05T01:39:40.570963+00:00",
   "status": "round5_proposed_aggregate_running",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
@@ -7190,6 +7190,31 @@
       "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-validation-readiness.json",
       "sha256": "71bad4dc6b9f8346c237a0da69d50ae3cf32f6f4819129fcbe791ecbf61fd4dd",
       "session": 30940
+    },
+    "publication_readiness": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-publication-readiness.json",
+      "sha256": "fc93c1c59815a52d81907984b22f9340c6ec138863fdbc42fe86e0b5ddd29531",
+      "state": "root reviewed; not executed; current Windows aggregate remains active"
+    },
+    "reverse_readiness": {
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-R12-R13-readiness-20261004\\ADDENDUM-round5.md",
+      "report_sha256": "f979e14e018b5b2dd6356750f9506b964fee9fe37834cf60c5c9dd96ca87abb6",
+      "mapping": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A02-reverse-R12-R13-readiness-20261004\\mapping-round5.json",
+      "mapping_sha256": "40efe8f600c5b6528780ee2c41ff3832668371ac64d8e270a531af7d7804b4eb",
+      "paths": 22,
+      "root_review": "Complete addendum read; hashes and four actual Git blobs sampled for both new paths.",
+      "accepted_source": false,
+      "transfer2_released": false
+    },
+    "future_linux_runtime": {
+      "result": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\linux-shellcheck-qualification\\execution-result.json",
+      "sha256": "9893e0f9edafc40142d6c7f43cdd654702189060ef108db8cb601f01855735f8",
+      "status": "identified_shellcheck_gap_closed_bounded_smoke_pass",
+      "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+      "shellcheck": "0.11.0",
+      "full_linux_equivalence": false,
+      "speed_claim": false,
+      "current_windows_run_unchanged": 30940
     }
   }
 }
