@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # PS232 local validation
 
+**Current repair `aafa9a4`:** selected R1/R2 alter exactly two JavaScript lines. Existing Windows tests17/0fail/6 Linux-only skips; Linux43/0fail/0skip. The staged-input preflight and final11-hook aggregate passed with all source/index/configuration/dependency/ref guards unchanged. Normal commit hooks and actual accepted-B/new-H classification, finalization, metadata and proposed-policy diagnostics passed. Fresh ordinary audit CLEAN has zero findings or exceptions. Unchanged full-file PowerShell analysis remains applicable. Earlier input results below retain their original scope and wrapper-failure history.
+
 PR232 contains commit `886f3837cb729b73bffec78e966d9ceb7fa78592`, tree `192a203a1d7e53065fcf6e3d662047df3696c3f5`, from accepted PS baseline `f168f83b89f64b6bca9d520ddec4b58969060fb6`. The exact22-path catalog remains in [canonical evidence](coherent-reverse-candidate.json). Source peer TF66 is accepted at56cb041; final paired acceptance remains pending.
 
 The one complete Linux pre-commit pass ran from05:51:15Z to06:03:13Z on2026-10-05. All11 hooks passed with zero skips. Its log SHA256 is36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c; container result SHA256 is5ebedcbab1c7be91690949beb85016535ff5b8e22c492c5ceec37e586d7abf2e. The staged preflight passed. The private offline runner retained all76 source files and1910 dependency files.
