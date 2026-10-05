@@ -1,0 +1,116 @@
+{
+  "status": "writer_released",
+  "released_at": "2026-10-05T17:25:59.997917+00:00",
+  "repository": "franklesniak/PSStyleGuide",
+  "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
+  "branch": "codex/tf67-compareback",
+  "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+  "base_tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+  "accepted_source": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "accepted_source_tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631",
+  "source_acceptance": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-acceptance.json",
+  "source_acceptance_sha256": "fa624be22b0bd381de4f77c5a0f64721c2e6a254beffe4bad0fd1185d64ac3a7",
+  "catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-postTF67-R1-readiness-20261005\\catalog.json",
+  "catalog_sha256": "d322c8b2c54e44ef8807d6f2d89f5f5c3d8ddd9f4cce982fa98ef1ebc9328c04",
+  "scope": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/lint-markdown.mjs"
+  ],
+  "owners": {
+    "A21": [
+      ".github/workflows/Test-AgentInstructions.ps1"
+    ],
+    "A07": [
+      ".github/workflows/lint-markdown.mjs"
+    ]
+  },
+  "transfers": {
+    "A07": {
+      "used": 4,
+      "cap": 12
+    },
+    "A21": {
+      "used": 4,
+      "cap": 12
+    }
+  },
+  "prior_counters_preserved": {
+    "A02": {
+      "used": 2,
+      "cap": 12
+    },
+    "A03": {
+      "used": 2,
+      "cap": 12
+    },
+    "A20": {
+      "used": 2,
+      "cap": 8
+    }
+  },
+  "source_lifecycle": {
+    "pr": 67,
+    "rounds_used": 2,
+    "first_request_at": "2026-10-05T14:30:38.034661Z",
+    "deadline": "2026-10-13T14:30:38.034661Z"
+  },
+  "rounds_used": 0,
+  "first_request_at": null,
+  "deadline": null,
+  "pr": null,
+  "head": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+  "writer": "root pending bounded assignment",
+  "model": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "owner": "A21",
+      "preimage": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0da8c5c11b1dd18872167b3aeb63bbdb2041ff45",
+        "bytes": 482175,
+        "sha256": "31f41e8833f62810f00ed32e3d6f5c4b857770359bc4f94d9a667fe65edfd64b"
+      },
+      "postimage": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+        "bytes": 482175,
+        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+      },
+      "complete_raw_postimage_equals_TF": true,
+      "operation": "Version lines5415 and6207: same-day published revision0 to1; preserve all other bytes."
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "owner": "A07",
+      "preimage": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "111664ff4fdc416d4599d80f3657d29c9e7dba15",
+        "bytes": 3231,
+        "sha256": "2936daa02f279b8701c9671e3ec610729e3fd09feb9235c26f763e0df65139bf"
+      },
+      "postimage": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+        "bytes": 3218,
+        "sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68"
+      },
+      "complete_raw_postimage_equals_TF": true,
+      "operation": "Replace the single ${required ?? 'version'} with ${required}; preserve all other bytes."
+    }
+  ],
+  "accepted_base_policy": {
+    "operation_id": "4ce74afc-6a53-433a-bb51-d8407bb37882",
+    "requested_ref": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "status": "completed",
+    "purpose": "Read-only accepted PS policy fixture; no destination repair/transfer started",
+    "path": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+    "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\ps-accepted-base-policy.json",
+    "record_sha256": "6a7062c713b314f07eded550f3e87c1081576e4a76e0349eee1fdbed4b11dce6"
+  },
+  "public_authority": "Root owns index, aggregate, commits, native lifecycle and planning. Writer owns only the two product paths and private implementation evidence.",
+  "next_action": "Apply the exact two-file model at real October5 metadata date; meaningful affected checks, one final candidate aggregate, normal lifecycle and actual compare-back remain required."
+}

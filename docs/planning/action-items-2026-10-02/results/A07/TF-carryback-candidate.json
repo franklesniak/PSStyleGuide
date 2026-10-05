@@ -1,5 +1,5 @@
 {
-  "status": "round2_findings_analysis",
+  "status": "peer_batch_accepted_compareback_released",
   "released_at": "2026-10-05T08:43:39.818871-05:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "worktree": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
@@ -84,8 +84,8 @@
     "sha256": "6affb2c788d131c7522b775de2f7ebb61545a495f9a2185b74d066a9f4d86bda",
     "status": "accepted_base_ready"
   },
-  "next_action": "Validate and decide R2/R3; collect current hosted semantic evidence; then dispose findings and complete fresh independent quality before normal gates.",
-  "planning_checkpoint": "818cf71224054ce04c81e7dd79eb4751d8bbd6b6",
+  "next_action": "Reuse accepted TF67 evidence; PS transfer4 is released. Follow the PS compare-back state; do not repeat TF reviews or merge.",
+  "planning_checkpoint": "aedfe1dae29084699e020707a3cec16508bea28e",
   "commit": {
     "exit": 0,
     "head": "443b2fe3cbeda18402f0432e5c95379d09096d6a",
@@ -111,7 +111,7 @@
   },
   "pr": 67,
   "pr_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/67",
-  "body_sha256": "b26760da2ee681df18c941e3ad411a62ef30ff02425a308db6973498f6520d0e",
+  "body_sha256": "ceccdaed934825cf1b9503eaf7751f82ef1e639bf2adab47d50ede95dacb2a37",
   "round1": {
     "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
     "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
@@ -244,10 +244,19 @@
     }
   },
   "independent_quality": {
-    "status": "incomplete_stopped_for_reboot",
+    "status": "pass",
+    "reviewer": "/root/tf67_final_quality_resumed",
     "head": "443b2fe3cbeda18402f0432e5c95379d09096d6a",
-    "checkpoint": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF67-443-final-quality-20261005\\CHECKPOINT.md",
-    "old_head_report_preserved_in": "prior_local_candidates"
+    "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631",
+    "body_sha256": "ceccdaed934825cf1b9503eaf7751f82ef1e639bf2adab47d50ede95dacb2a37",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF67-443-final-quality-20261005\\REPORT.md",
+    "report_sha256": "cbe987e26381e95d00c407528e13ded3ee56cfb857787066010ad3b691563bc3",
+    "evidence_manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF67-443-final-quality-20261005\\evidence-manifest.json",
+    "evidence_manifest_sha256": "4cc42c86f7a2d61b82b2862058a1cde48e44202aaa46692ff7013386ef846ed8",
+    "accepted_at": "2026-10-05T16:59:50.442030+00:00",
+    "root_review": "Full report and final addendum read; source and arithmetic sampled. Complete integrity delegated as authorized.",
+    "canonical_report": "results/A07/TF67-final-quality.md"
   },
   "review_start_planning_publication": {
     "head": "9d593750a426e39b0ea397cd6971981f1d972383",
@@ -734,7 +743,7 @@
         "path": ".github/workflows/lint-markdown.mjs",
         "line": 24,
         "text": "The error message says \u201croot package.json\u201d, but `required` is read from `canonicalManifest` (described just above as the \u201cMarkdown lint package manifest\u201d). This is likely to mislead users during debugging. Consider rewording to reference the actual manifest being read (e.g., \u201cMarkdown lint package.json\u201d / \u201cthe Markdown lint package manifest\u201d) or include the manifest path in the message.",
-        "status": "no_change_selected_pending_native_closure",
+        "status": "refuted_replied_native_resolved",
         "worker": "/root/tf67_round2_disposition",
         "eyes_reaction_id": 450581766,
         "decision": {
@@ -746,7 +755,27 @@
           "canonical_path": "results/A07/TF67-R2-root-manifest.md",
           "canonical_sha256": "08cb45777ee9b84b4a3c8a0de9bdca3e3c59946179c28d05de0de098daccd927",
           "requires_user_action": false
-        }
+        },
+        "reply": {
+          "id": 4186532271,
+          "created_at": "2026-10-05T16:52:41Z",
+          "body": "`canonicalManifest` resolves the same `path.join(root, 'package.json')` file; the CLI uses the repository root, and explicit-root callers use repository fixtures. The diagnostic names the correct file and field, so no product change is selected.\n[Full decision, options, scores and evidence](https://github.com/franklesniak/PSStyleGuide/blob/aedfe1dae29084699e020707a3cec16508bea28e/docs/planning/action-items-2026-10-02/results/A07/TF67-R2-root-manifest.md). Native resolution uses the documented GitHub CLI GraphQL fallback because the plugin has no thread-resolution tool.\nGenerated with Codex",
+          "verified": true
+        },
+        "resolution": {
+          "requested_at": "2026-10-05T16:53:14.140864+00:00",
+          "transport": "gh GraphQL fallback",
+          "response": {
+            "resolveReviewThread": {
+              "thread": {
+                "id": "PRRT_kwDOSAZRhc6pHcd7",
+                "isResolved": true
+              }
+            }
+          },
+          "verified_at": "2026-10-05T16:53:15.165868+00:00"
+        },
+        "eyes_removed_verified": true
       },
       {
         "key": "TF67-R3",
@@ -757,7 +786,7 @@
         "path": ".github/workflows/scripts-README.md",
         "line": 16,
         "text": "The sentence \u201cSelected test commands appear below.\u201d is inaccurate within the shown content (the table follows immediately, and the remainder shown after the table is explanatory prose). If the file ends here (as it appears), please adjust this to reflect where test commands actually live (e.g., \u201cappear in the Supported command column\u201d) or remove the sentence to avoid confusing readers.",
-        "status": "no_change_selected_pending_native_closure",
+        "status": "refuted_replied_native_resolved",
         "worker": "/root/tf67_round2_disposition",
         "eyes_reaction_id": 450581773,
         "decision": {
@@ -769,11 +798,32 @@
           "canonical_path": "results/A07/TF67-R3-test-command-pointer.md",
           "canonical_sha256": "d90cc6a4740bfd510c490cca0913e4352b380e7ea01016b18e145f9713e3829e",
           "requires_user_action": false
-        }
+        },
+        "reply": {
+          "id": 4186535172,
+          "created_at": "2026-10-05T16:53:01Z",
+          "body": "The full file contains helper/classifier test commands at line 43, installer/audit commands at line 45, and the focused lint command at line 58. \u201cSelected test commands appear below\u201d is accurate for these retained commands, so no product change is selected.\n[Full decision, options, scores and evidence](https://github.com/franklesniak/PSStyleGuide/blob/aedfe1dae29084699e020707a3cec16508bea28e/docs/planning/action-items-2026-10-02/results/A07/TF67-R3-test-command-pointer.md). Native resolution uses the documented GitHub CLI GraphQL fallback because the plugin has no thread-resolution tool.\nGenerated with Codex",
+          "verified": true
+        },
+        "resolution": {
+          "requested_at": "2026-10-05T16:53:16.117866+00:00",
+          "transport": "gh GraphQL fallback",
+          "response": {
+            "resolveReviewThread": {
+              "thread": {
+                "id": "PRRT_kwDOSAZRhc6pHce7",
+                "isResolved": true
+              }
+            }
+          },
+          "verified_at": "2026-10-05T16:53:17.214544+00:00"
+        },
+        "eyes_removed_verified": true
       }
     ],
     "all_nonreview_workflows_success": true,
     "nonreview_run_ids": [
+      37344491836,
       37335364263,
       37335152810,
       37335152590,
@@ -801,13 +851,43 @@
       },
       "setup_hooks_each": 11,
       "root_read_semantic_outputs": true,
-      "limitation": "Hosted Markdown audit covers workflow npm graph; separately saved actual local audit covers both roots. Opposite-event job skips are not skipped tests."
+      "limitation": "Hosted Markdown audit covers workflow npm graph; separately saved actual local audit covers both roots. Opposite-event job skips are not skipped tests.",
+      "body_edit_followup": {
+        "id": 37344491836,
+        "conclusion": "success",
+        "log_sha256": "b7886c842298be6076ff5271183d1a28169ea7025cc3f65cf19d2906dee3ee03",
+        "semantic_result": "Accepted metadata B56/H443; MAINTENANCE_REQUIRED, not ordinary admission or merge authority."
+      },
+      "final_collection": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\round2-hosted-443b2fe\\round2-final-checks-1658-collection.json",
+      "final_collection_sha256": "e59906ac186e0b0cf33181d5a29fad85a58d8206b584fcc48b0402d8fbba2c43"
     },
     "disposition_report": {
       "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF67-round2-dispositions-20261005\\REPORT.md",
       "sha256": "d18b62fa96881c0a23fda72bf0c8fe6dd1115176757af6393c498d74592c1cb1",
       "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF67-round2-dispositions-20261005\\evidence.json",
       "evidence_sha256": "9231a4067acf9c253df03cf9b9328ee1d33b46cad6b8b334891c72b62b379448"
+    },
+    "body_update": {
+      "requested_at": "2026-10-05T16:54:40.077474+00:00",
+      "old_sha256": "b26760da2ee681df18c941e3ad411a62ef30ff02425a308db6973498f6520d0e",
+      "new_sha256": "ceccdaed934825cf1b9503eaf7751f82ef1e639bf2adab47d50ede95dacb2a37",
+      "scope_change": "none; factual validation and disposition within unchanged six-path scope",
+      "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\pr-body-round2-disposition.md",
+      "verified_at": "2026-10-05T16:54:44.018327+00:00"
+    },
+    "dispositions_complete": true,
+    "disposition_clean": true,
+    "disposition": "clean after evidence-backed no-change refutation and native closure; Copilot submitted Findings2, preserved clean=false; Codex submitted clean. No source/diff/material scope change.",
+    "final_review_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\round2-final-checks-1658.json",
+    "final_review_snapshot_sha256": "4af225764b7af6513ce016856cad62e828e30ba05f5a565712ea985fb69e35e6",
+    "deferral_sweep": {
+      "all_surfaces_read": true,
+      "reviews": 5,
+      "pr_comments": 5,
+      "inline_comments": 6,
+      "resolved_threads": 3,
+      "open_synthetic_items": 0,
+      "genuine_deferred_work": 0
     }
   },
   "reboot_checkpoint": {
@@ -835,5 +915,251 @@
       "PowerShell7.6.5",
       "Node24.18.1"
     ]
+  },
+  "round2_planning_publication": {
+    "head": "aedfe1dae29084699e020707a3cec16508bea28e",
+    "parent": "818cf71224054ce04c81e7dd79eb4751d8bbd6b6",
+    "tree": "e41a37a65677d724ab52380cdbcdd0cbc797a1c2",
+    "files": [
+      "docs/planning/action-items-2026-10-02/STATUS.md",
+      "docs/planning/action-items-2026-10-02/results/A07/RESULT.md",
+      "docs/planning/action-items-2026-10-02/results/A21/RESULT.md",
+      "docs/planning/action-items-2026-10-02/results/A07/TF-carryback-candidate.json",
+      "docs/planning/action-items-2026-10-02/results/A07/TF67-R2-root-manifest.md",
+      "docs/planning/action-items-2026-10-02/results/A07/TF67-R3-test-command-pointer.md"
+    ],
+    "status": "published",
+    "push_exit": 0,
+    "published_at": "2026-10-05T16:51:45.541742+00:00",
+    "validation_log_sha256": "ae679bdd345170fc6b37e1292cd44554ccd361f4d6e3b6704ffdf3d2037dd256",
+    "commit_log_sha256": "fd0bc5c9f4a982fa9c7da38e1134bb23614f082b3b03c843a37d9e1caf02727d"
+  },
+  "independent_quality_reboot_checkpoint": {
+    "status": "incomplete_stopped_for_reboot",
+    "head": "443b2fe3cbeda18402f0432e5c95379d09096d6a",
+    "checkpoint": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF67-443-final-quality-20261005\\CHECKPOINT.md",
+    "old_head_report_preserved_in": "prior_local_candidates"
+  },
+  "merge": {
+    "requested_at": "2026-10-05T17:00:12.390014+00:00",
+    "method": "merge",
+    "expected_head": "443b2fe3cbeda18402f0432e5c95379d09096d6a",
+    "expected_base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "expected_tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631",
+    "preflight": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\round2-premerge-gates.json",
+    "preflight_sha256": "142fbeaedadd01efbaca8131a7ba8101ac310c721c2b132214bc6bf36cc14240",
+    "exit_code": 0,
+    "response": {
+      "sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "merged": true,
+      "message": "Pull Request successfully merged"
+    },
+    "sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631",
+    "parents": [
+      "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "443b2fe3cbeda18402f0432e5c95379d09096d6a"
+    ],
+    "merged_at": "2026-10-05T17:00:39Z",
+    "verified_at": "2026-10-05T17:00:20.212155+00:00"
+  },
+  "ps_accepted_policy_worktree_creation": {
+    "operation_id": "4ce74afc-6a53-433a-bb51-d8407bb37882",
+    "requested_ref": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "status": "completed",
+    "purpose": "Read-only accepted PS policy fixture; no destination repair/transfer started",
+    "path": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+    "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\ps-accepted-base-policy.json",
+    "record_sha256": "6a7062c713b314f07eded550f3e87c1081576e4a76e0349eee1fdbed4b11dce6"
+  },
+  "landed_acceptance": {
+    "accepted_at": "2026-10-05T17:25:39.813597+00:00",
+    "head": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631",
+    "parents": [
+      "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "443b2fe3cbeda18402f0432e5c95379d09096d6a"
+    ],
+    "reviewed_head": "443b2fe3cbeda18402f0432e5c95379d09096d6a",
+    "review_round": 2,
+    "review_body_sha256": "ceccdaed934825cf1b9503eaf7751f82ef1e639bf2adab47d50ede95dacb2a37",
+    "native_evidence_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-terminal-01.json",
+    "native_evidence_sha256": "13fda53a43e1287df1479f05d6f53351c9773d92b9ee6fae7f0aa6d502d8728f",
+    "runs": [
+      {
+        "id": 37345197151,
+        "name": "Build Style Guide Artifacts",
+        "event": "push",
+        "head_sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37345197183,
+        "name": "Markdown Lint",
+        "event": "push",
+        "head_sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37345196951,
+        "name": "Dev container boundary",
+        "event": "push",
+        "head_sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37345196954,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "head_sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37345197301,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "head_sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "terminal_logs": [
+      {
+        "id": 37345197151,
+        "name": "Build Style Guide Artifacts",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37345197151",
+        "head": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-hosted\\e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\\37345197151\\log.txt",
+        "log_sha256": "573677860796c2d1c31c374d3a2f57ec2c15aec3c014c32001fc317301ffa1f7",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-hosted\\e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\\37345197151\\jobs.json",
+        "jobs_sha256": "8af572919a5d7e18e0f67a1c2dfa55a392b6c56a9e4ab40d85504c9b9dcad5a5"
+      },
+      {
+        "id": 37345197183,
+        "name": "Markdown Lint",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37345197183",
+        "head": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-hosted\\e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\\37345197183\\log.txt",
+        "log_sha256": "6637914df927c2b990c6c22fea6d6cbf25a0cbf31f0f7a4d2afbdc1510b7ef7c",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-hosted\\e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\\37345197183\\jobs.json",
+        "jobs_sha256": "739755a865039cfbeb36b06a96e86fae9069b77941e69e106cd70c20d0a80b34"
+      },
+      {
+        "id": 37345196951,
+        "name": "Dev container boundary",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37345196951",
+        "head": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-hosted\\e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\\37345196951\\log.txt",
+        "log_sha256": "0dc8f79b9d60cd0f08b09990f3a2691f036fe94de7699cc7b9a9146d457a9c03",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-hosted\\e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\\37345196951\\jobs.json",
+        "jobs_sha256": "8db17ee5e99631ffce5162365a74486caf06e3fb6970828b70e661e8dd4000d4"
+      },
+      {
+        "id": 37345196954,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37345196954",
+        "head": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-hosted\\e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\\37345196954\\log.txt",
+        "log_sha256": "ac6192a76b71b6c44e41e0bb17be952bb81967692e9525b934824d0a0a09d5e4",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-hosted\\e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\\37345196954\\jobs.json",
+        "jobs_sha256": "b20b715d4857e48baf52ddcc72d24bbabd3758e23e406fd8ba9731478d590823"
+      },
+      {
+        "id": 37345197301,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37345197301",
+        "head": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-hosted\\e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\\37345197301\\log.txt",
+        "log_sha256": "c189321950ece431699013a2c3f80a91562af0022f80ae313f02f34d9dd195e3",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\landed-peer-hosted\\e21b74fe0b56551008f78f9f2946cd2a0f9c19ce\\37345197301\\jobs.json",
+        "jobs_sha256": "28deb330948ead4bfa9266891d7eb7c38f70ac062566e0facb36247f721c4f8f"
+      }
+    ],
+    "setup_passed_hooks": [
+      "check json...............................................................Passed",
+      "check yaml...............................................................Passed",
+      "fix end of files.........................................................Passed",
+      "trim trailing whitespace.................................................Passed",
+      "yamllint.................................................................Passed",
+      "Lint GitHub Actions workflow files.......................................Passed",
+      "Validate Dependabot Config (v2)..........................................Passed",
+      "Validate GitHub Workflows................................................Passed",
+      "staged Markdown..........................................................Passed",
+      "workflow policy contract.................................................Passed",
+      "agent instruction contract and mutation tests............................Passed"
+    ],
+    "node_tests": {
+      "passed": 515,
+      "failed": 0,
+      "skipped": 0
+    },
+    "audit": {
+      "status": "CLEAN",
+      "unresolved": [],
+      "acceptedPackages": 0,
+      "unusedExceptions": [],
+      "proposedState": false,
+      "authority": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "authoritySource": "event-main",
+      "limitation": "Authority is the recorded main snapshot; owner/executor must check known revocations before acceptance.",
+      "installedGraphRoots": [
+        ".github/workflows"
+      ],
+      "findings": [],
+      "applicable": true
+    },
+    "workflow_policy": {
+      "schema": "StyleGuide.WorkflowPolicyResult.v1",
+      "validatorVersion": "3.0.0",
+      "success": true,
+      "contractCanonicalSha256": "9d7fadbff11db3e3b837e1e9f059bd5b142ff6e8fc0ad5a83196afca3c9c7f30",
+      "casesPassed": 0,
+      "workflowSha256": {
+        "build.yml": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b",
+        "markdownlint.yml": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+      }
+    },
+    "ruleset_unchanged": 20623677,
+    "peer_batch_result": "accepted",
+    "limits": "Actual merged TF push workflows, including full validation and immutable-input check, passed. Does not establish paired convergence, close any whole outcome, or release the reverse writer. Current PS, authority, date, mapping and transfer4 must be refreshed first."
+  },
+  "pending_native_operation": "None. Refresh both actual mains and reverse authority before releasing a writer.",
+  "compareback_release": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\execution-state.json",
+    "transfers": {
+      "A07": {
+        "used": 4,
+        "cap": 12
+      },
+      "A21": {
+        "used": 4,
+        "cap": 12
+      }
+    },
+    "released_at": "2026-10-05T17:25:59.997917+00:00"
   }
 }

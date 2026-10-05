@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A14 current filesystem residual assessment
 
+**Windows host boundary,2026-10-05:** [WQ1 P94](../A07/recovery-runtime/WQ1-Windows-host.md) selected a fresh protected direct-profile root. Actual PowerShell7 storage execution and current integrity checks passed; the original cleanup failure remains recorded, with three passing exact-restoration controls. Product acquisition and real5.1 recovery tests remain open. Existing Temp principal uncertainty is not resolved or waived. No new human input is needed.
+
 ## Current reassessment after accepted PS232: 2026-10-05
 
 The selected R2 child and R21 manifest checks are now delivered at accepted PSf0684ac and TF56cb041. The [fresh assessment](postPS232/REPORT.md) and [exact source/native evidence](postPS232/evidence.json) replace the prior pending-PS-delivery condition. Root verified67 present raw identities,2 absent identities,8 retired-path absences,36 supporting hashes and all9child/11manifest success cases in each existing landed log. [Root verification](postPS232/root-verification.json) records the exact scope. The six generator/verifier engine blobs remain unchanged. PS155 is open; PS156 remains closed not_planned; the canonical D92/D93 decision body is unchanged.
