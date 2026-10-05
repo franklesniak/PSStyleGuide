@@ -1,6 +1,6 @@
 {
-  "recorded_at": "2026-10-05T04:09:35.980328+00:00",
-  "status": "round7_reviews_and_hosted_checks_pending",
+  "recorded_at": "2026-10-05T04:39:42.012852+00:00",
+  "status": "round8_reviews_pending",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -601,7 +601,7 @@
   ],
   "installed_dependency_count": 1910,
   "private_parent_receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\execution-state.json",
-  "private_parent_receipt_sha256": "663eab56ca8b6888819555982902f3d03043559a2c2cd2347b30805218596f74",
+  "private_parent_receipt_sha256": "cc47a188c94420980eaa731e83d352e11f12d7fc10553287c74cb3486a560d57",
   "handback": {
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\HANDOFF.md",
     "sha256": "d522e39459d66dee9e52b87b81256fb7bcebc8ab0f42e0177aaea11d63817437",
@@ -689,48 +689,59 @@
     "evidence_sha256": "ec427df5cdd7e297fb41eb968dfa5e6ab89ce593047468d20be627e548763752",
     "final_pr_pass": false,
     "reviewer": "/root/a02_tf_prepublication_quality",
-    "limitations": "Complete staged integration readiness plus bounded repair/publication checks; fresh native PR acceptance is pending."
+    "limitations": "Complete staged integration readiness plus bounded repair/publication checks; fresh native PR acceptance is pending.",
+    "hosted_delta": {
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\17caede-current-input-20261005\\HOSTED-DELTA-20261005-REPORT.md",
+      "report_sha256": "70f8ec5f750f0ae8e667548b344795f46babbf094802d7de88f0cbfc7528f006",
+      "result": "bounded_hosted_and_duplicate_applicability_pass",
+      "final_pr_pass": false
+    }
   },
   "reviews": {
     "pr": 66,
     "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66",
-    "rounds_used": 7,
+    "rounds_used": 8,
     "first_request_at": "2026-10-04T16:41:24+00:00",
     "deadline": "2026-10-12T16:41:24+00:00",
     "current_round": {
-      "prepared_at": "2026-10-05T04:04:45.857418+00:00",
+      "prepared_at": "2026-10-05T04:35:50.984194+00:00",
       "head": "17caede017a8054bed529517ce473ef75682b5bf",
       "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-      "body_sha256": "80346a9e7a9b449f3b9b093335b247309322f71c176a2a56771fb435ab3f8c33",
-      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-request-baseline-17caede.json",
-      "baseline_sha256": "15abf8de1f0705edebdc143bc56f47767ae5d505acbf163df6aba8eafa85a9f1",
+      "body_sha256": "a5f0314868a42df0869a100d0de4061e1343e99a31dd4cbbb64aceacfd956628",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-request-baseline-17caede.json",
+      "baseline_sha256": "243ae1d229b65b6e30eefaa7c22fb09e73a144d1f7cabdffe93e4c897bf8cfe1",
+      "reason": "Next normal review round after disposing R23 duplicate; review-facing body includes actual round7 result and new current witness. No source change or effort-only retry.",
       "copilot": {
         "state": "requested_pending",
-        "started_at": "2026-10-05T04:04:45.857418+00:00",
+        "started_at": "2026-10-05T04:35:50.984194+00:00",
         "transport": "supported GitHub Reviewers UI",
         "requested_effort": "Balanced",
         "result_effort": null,
         "channel_attempts": 1,
-        "request_event_id": 32476042102,
-        "request_event_at": "2026-10-05T04:05:25Z",
+        "ui_click_count": 1,
+        "ui_submitted_recorded_at": "2026-10-05T04:36:33.751617+00:00",
+        "request_event_id": 32477273650,
+        "request_event_at": "2026-10-05T04:36:05Z",
         "request_actor_id": 11204406,
         "reviewer_id": 175728472,
-        "request_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-confirmed-copilot-request-17caede.json",
-        "request_observation_sha256": "bb8a6782948460d896cabde703a10d06a06a1f778d60885434e25fd24cdb4f9d",
+        "workflow_run_id": 37264245326,
+        "observed_run_status": "in_progress",
+        "observed_run_conclusion": null,
+        "request_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-after-copilot-request-17caede.json",
+        "request_observation_sha256": "228804e99c2f73ce7b24b92f28433a30cfccc3abd8e7f52e68bf5c76c4c18015",
         "attempts": 1,
-        "ui_click_count": 1,
-        "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-review-request-proof.jpg",
-        "ui_screenshot_sha256": "a43c70c3cc9f0c5672b8969c3f36b1fef10c183988842c073bc0235a389e208c",
-        "ui_observation": "Supported Reviewers menu selected Balanced; one re-request click. Refreshed UI says Reviewing at balanced effort. Previous completed Balanced remains historical; new result effort unknown."
+        "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-review-request-proof.jpg",
+        "ui_screenshot_sha256": "9c89b264fc8cab6e0a48a6f32680426a96a3511cf4c911845b46a7158c089d08",
+        "ui_observation": "Supported Reviewers menu selected Balanced and one re-request click. Refreshed sidebar says Reviewing at balanced effort; Last completed: lite is round7 history. Result effort unknown."
       },
       "manual_codex": {
         "state": "request_confirmed_pending_result",
-        "started_at": "2026-10-05T04:06:31.662252+00:00",
+        "started_at": "2026-10-05T04:37:09.386669+00:00",
         "channel_attempts": 1,
         "exact_body": "@codex review",
         "transport": "GitHub connector github_add_comment_to_issue",
-        "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-confirmed-copilot-request-17caede.json",
-        "baseline_sha256": "bb8a6782948460d896cabde703a10d06a06a1f778d60885434e25fd24cdb4f9d",
+        "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-after-copilot-request-17caede.json",
+        "baseline_sha256": "228804e99c2f73ce7b24b92f28433a30cfccc3abd8e7f52e68bf5c76c4c18015",
         "baseline_comment_ids": [
           5982194609,
           5983180593,
@@ -740,20 +751,22 @@
           5985623901,
           5985928054,
           5985975078,
-          5987077643
+          5987077643,
+          5987908188,
+          5987932051
         ],
         "head": "17caede017a8054bed529517ce473ef75682b5bf",
-        "body_sha256": "80346a9e7a9b449f3b9b093335b247309322f71c176a2a56771fb435ab3f8c33",
-        "trigger_id": 5987908188,
-        "native_created_at": "2026-10-05T04:06:32Z",
+        "body_sha256": "a5f0314868a42df0869a100d0de4061e1343e99a31dd4cbbb64aceacfd956628",
+        "trigger_id": 5988197161,
+        "native_created_at": "2026-10-05T04:37:03Z",
         "authenticated_author_id": 11204406,
-        "confirmed_at": "2026-10-05T04:06:44.993621+00:00",
-        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5987908188",
-        "attribution": "Exact connector-returned ID, authenticated author/body/PR, complete baseline exclusion, unique new trigger and native Copilot request ordering; local/native clocks recorded separately."
+        "confirmed_at": "2026-10-05T04:38:08.875733+00:00",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5988197161",
+        "attribution": "New exact trigger ID/body/authenticated author, complete baseline exclusion, ordered after one native Copilot request; same-head prior result cannot satisfy this new body/request."
       },
       "request_set_terminal": false,
       "clean": false,
-      "started_at": "2026-10-05T04:05:25Z"
+      "started_at": "2026-10-05T04:36:05Z"
     }
   },
   "limits": "Current input4375f2e/body52d96a48 awaits both remote results, hosted checks and independent final native quality. No merge, landed acceptance or PS reverse repair is claimed. Round1 automatic Codex feedback did not satisfy its omitted manual gate and remains nonclean.",
@@ -1683,10 +1696,9 @@
   },
   "accepted_baseline_file_count": 75,
   "latest_native_snapshot": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-confirmed-copilot-request-17caede.json",
-    "sha256": "bb8a6782948460d896cabde703a10d06a06a1f778d60885434e25fd24cdb4f9d",
-    "captured_at": "2026-10-05T04:06:24.697285+00:00",
-    "scope": "After one accepted Copilot request; later manual Codex trigger authenticated separately."
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-after-copilot-request-17caede.json",
+    "sha256": "228804e99c2f73ce7b24b92f28433a30cfccc3abd8e7f52e68bf5c76c4c18015",
+    "scope": "Complete after Copilot request; manual trigger confirmed separately."
   },
   "round1": {
     "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
@@ -3603,8 +3615,8 @@
       "old_input_clean": false
     }
   },
-  "current_review_status": "Round7: one confirmed Balanced Copilot request and one confirmed manual Codex trigger on17caede/current body. Both results pending; round6 remains historical nonclean. All21 prior review threads resolved.",
-  "next_action": "Collect both current-input review results and remaining hosted checks without duplicate requests; final quality, normal merge and landed acceptance remain.",
+  "current_review_status": "Round8 requested on unchanged17caede and updated body. Round7 terminal/nonclean: Codex clean, Copilot Lite duplicate R23 disposition resolved. Twelve ordinary runs passed; no current-input acceptance yet.",
+  "next_action": "Collect round8 exact-head/body reviewer results; then final independent native quality, normal merge, landed acceptance and PS reverse transfer2. Reuse unchanged source/validation and retain round7 failure/finding history.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -4768,14 +4780,14 @@
     }
   },
   "pending_repair_readiness": {
-    "state": "published_and_threads_resolved",
+    "state": "unchanged_source_duplicate_disposed",
     "head": "17caede017a8054bed529517ce473ef75682b5bf",
     "paths": [
       ".github/workflows/Test-AgentInstructions.ps1",
       ".github/workflows/lint-markdown.mjs",
       ".github/workflows/lint-markdown.test.mjs"
     ],
-    "remaining": "Fresh round7 reviewers/hosted checks, final native quality, merge and landed acceptance."
+    "remaining": "Round8 remote results, final native quality, normal merge, landed acceptance and reverse delivery."
   },
   "round3": {
     "head": "055f112f762a466ed693c073083225f8ec9ee79d",
@@ -6317,8 +6329,8 @@
       "verified_at": "2026-10-05T00:10:36.479909+00:00"
     }
   },
-  "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\PR-body-round6-repair.md",
-  "body_sha256": "80346a9e7a9b449f3b9b093335b247309322f71c176a2a56771fb435ab3f8c33",
+  "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\PR-body-round8-context.md",
+  "body_sha256": "a5f0314868a42df0869a100d0de4061e1343e99a31dd4cbbb64aceacfd956628",
   "round5": {
     "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -8769,11 +8781,11 @@
     "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-request-baseline-17caede.json",
     "baseline_sha256": "15abf8de1f0705edebdc143bc56f47767ae5d505acbf163df6aba8eafa85a9f1",
     "copilot": {
-      "state": "requested_pending",
+      "state": "completed_with_findings",
       "started_at": "2026-10-05T04:04:45.857418+00:00",
       "transport": "supported GitHub Reviewers UI",
       "requested_effort": "Balanced",
-      "result_effort": null,
+      "result_effort": "Lite",
       "channel_attempts": 1,
       "request_event_id": 32476042102,
       "request_event_at": "2026-10-05T04:05:25Z",
@@ -8785,10 +8797,23 @@
       "ui_click_count": 1,
       "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-review-request-proof.jpg",
       "ui_screenshot_sha256": "a43c70c3cc9f0c5672b8969c3f36b1fef10c183988842c073bc0235a389e208c",
-      "ui_observation": "Supported Reviewers menu selected Balanced; one re-request click. Refreshed UI says Reviewing at balanced effort. Previous completed Balanced remains historical; new result effort unknown."
+      "ui_observation": "Supported Reviewers menu selected Balanced; one re-request click. Refreshed UI says Reviewing at balanced effort. Previous completed Balanced remains historical; new result effort unknown.",
+      "workflow_run_id": 37262024755,
+      "observed_run_name": "Running Copilot Code Review",
+      "observed_run_status": "completed",
+      "observed_run_conclusion": "cancelled",
+      "clean": false,
+      "review_id": 5410001314,
+      "review_submitted_at": "2026-10-05T04:24:11Z",
+      "review_body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 1 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (1)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [Removing the explicit \u201cMarkdown tooling is not installed\u201d check means a developer who stages\u2026](#discussion_r4180717761) \u00b7 New\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+      "observed_result_effort": "Lite",
+      "service_disposition": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-copilot-service-disposition.json",
+        "sha256": "054d46e37a70df8206699d90bd8818ec001ff6a4a5f978fff15c4ba31fcfb0d6"
+      }
     },
     "manual_codex": {
-      "state": "request_confirmed_pending_result",
+      "state": "completed_clean",
       "started_at": "2026-10-05T04:06:31.662252+00:00",
       "channel_attempts": 1,
       "exact_body": "@codex review",
@@ -8813,10 +8838,231 @@
       "authenticated_author_id": 11204406,
       "confirmed_at": "2026-10-05T04:06:44.993621+00:00",
       "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5987908188",
-      "attribution": "Exact connector-returned ID, authenticated author/body/PR, complete baseline exclusion, unique new trigger and native Copilot request ordering; local/native clocks recorded separately."
+      "attribution": "Exact connector-returned ID, authenticated author/body/PR, complete baseline exclusion, unique new trigger and native Copilot request ordering; local/native clocks recorded separately.",
+      "clean": true,
+      "result_comment_id": 5987932051,
+      "result_created_at": "2026-10-05T04:09:17Z",
+      "result_body": "Codex Review: Didn't find any major issues. Nice work!\n\n**Reviewed commit:** `17caede017`\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\".\n\nIf Codex has suggestions, it will comment; otherwise it will react with \ud83d\udc4d.\n\n\n\n\nCodex can also answer questions or update the PR. Try commenting \"@codex address that feedback\".\n            \n</details>",
+      "result_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5987932051",
+      "summary_comment_id": 5982194609,
+      "summary_updated_at": "2026-10-05T04:09:19Z",
+      "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \u2705 **Completed** <relative-time datetime=\"2026-10-05T04:09:18.634254Z\">2026-10-05T04:09:18.634254Z</relative-time> | `17caede` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>"
+    },
+    "request_set_terminal": true,
+    "clean": false,
+    "started_at": "2026-10-05T04:05:25Z",
+    "nonreview_run_summary": [
+      {
+        "id": 37261841576,
+        "name": "Agent instruction validation",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "pull_request_target",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261715486,
+        "name": "Markdown Lint",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261715531,
+        "name": "Dev container boundary",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261715553,
+        "name": "Build Style Guide Artifacts",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261715484,
+        "name": "Agent instruction validation",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261715492,
+        "name": "Copilot setup steps",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261713844,
+        "name": "Agent instruction validation",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "pull_request_target",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261712403,
+        "name": "Dev container boundary",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261712443,
+        "name": "Markdown Lint",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261712436,
+        "name": "Build Style Guide Artifacts",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261712391,
+        "name": "Copilot setup steps",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37261712420,
+        "name": "Agent instruction validation",
+        "head_sha": "17caede017a8054bed529517ce473ef75682b5bf",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "all_nonreview_workflows_success": true,
+    "latest_native_snapshot": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-terminal-01-17caede.json",
+      "sha256": "16d703fb8f774f9fb9dc1fd4e9d9e55cf9bc8238207b8843599f5c8b25defbbb",
+      "captured_at": "2026-10-05T04:27:08.062133+00:00"
+    },
+    "hosted_log_collection": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-hosted-17caede\\round7-terminal-01-17caede-collection.json",
+      "sha256": "568755eecf1a75b065b48d28cd5dac01640fe8849ca6b3d89ccb070286a2197f",
+      "terminal_run_count": 12
+    },
+    "findings": [
+      {
+        "key": "R23",
+        "owner": "A07",
+        "comment_id": 4180717761,
+        "thread_id": "PRRT_kwDOSAZRhc6o53ws",
+        "review_id": 5410001314,
+        "path": ".husky/pre-commit",
+        "line": 16,
+        "body": "Removing the explicit \u201cMarkdown tooling is not installed\u201d check means a developer who stages Markdown without having installed workflow deps will likely see a lower-level Node/module error (or a generic staged-lint failure) without the actionable remediation guidance that previously pointed to `node .github/workflows/NpmTools.mjs install` (and the one-time `--no-verify` escape hatch). Consider reinstating a targeted missing-tools check (either here or in `lint-staged-markdown.mjs`) that prints the install command and clearly classifies it as a tooling failure (exit 2) to preserve a helpful UX.",
+        "state": "duplicate_no_change_replied_and_resolved",
+        "canonical_decision": "docs/planning/action-items-2026-10-02/results/A07/TF66-R10-disposition.md",
+        "selected_existing_decision": "R96 actual caller boundary; R15 N100",
+        "validation_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-r23-validation-02\\results.json",
+        "validation_sha256": "40c2c706f3775baf787d2a2f1919e219dfb360a08acfc34b66a18df13bfcdb66",
+        "product_change": false,
+        "native_reply": {
+          "state": "confirmed",
+          "prepared_at": "2026-10-05T04:32:43.663286+00:00",
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round7-R23-reply.md",
+          "sha256": "0e8abedfeb855eb7f856f276d584754e52344f51c00fdf8c024eef1957d7a951",
+          "baseline_reply_ids": [],
+          "id": 4180750671,
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4180750671",
+          "created_at": "2026-10-05T04:32:46Z"
+        },
+        "native_resolution": {
+          "state": "confirmed",
+          "started_at": "2026-10-05T04:33:22.022340+00:00",
+          "confirmed_at": "2026-10-05T04:33:23.227822+00:00"
+        }
+      }
+    ],
+    "independent_hosted_quality": {
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\17caede-current-input-20261005\\HOSTED-DELTA-20261005-REPORT.md",
+      "report_sha256": "70f8ec5f750f0ae8e667548b344795f46babbf094802d7de88f0cbfc7528f006",
+      "result": "bounded_hosted_and_duplicate_applicability_pass",
+      "final_pr_pass": false
+    }
+  },
+  "round8": {
+    "prepared_at": "2026-10-05T04:35:50.984194+00:00",
+    "head": "17caede017a8054bed529517ce473ef75682b5bf",
+    "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "body_sha256": "a5f0314868a42df0869a100d0de4061e1343e99a31dd4cbbb64aceacfd956628",
+    "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-request-baseline-17caede.json",
+    "baseline_sha256": "243ae1d229b65b6e30eefaa7c22fb09e73a144d1f7cabdffe93e4c897bf8cfe1",
+    "reason": "Next normal review round after disposing R23 duplicate; review-facing body includes actual round7 result and new current witness. No source change or effort-only retry.",
+    "copilot": {
+      "state": "requested_pending",
+      "started_at": "2026-10-05T04:35:50.984194+00:00",
+      "transport": "supported GitHub Reviewers UI",
+      "requested_effort": "Balanced",
+      "result_effort": null,
+      "channel_attempts": 1,
+      "ui_click_count": 1,
+      "ui_submitted_recorded_at": "2026-10-05T04:36:33.751617+00:00",
+      "request_event_id": 32477273650,
+      "request_event_at": "2026-10-05T04:36:05Z",
+      "request_actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "workflow_run_id": 37264245326,
+      "observed_run_status": "in_progress",
+      "observed_run_conclusion": null,
+      "request_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-after-copilot-request-17caede.json",
+      "request_observation_sha256": "228804e99c2f73ce7b24b92f28433a30cfccc3abd8e7f52e68bf5c76c4c18015",
+      "attempts": 1,
+      "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-review-request-proof.jpg",
+      "ui_screenshot_sha256": "9c89b264fc8cab6e0a48a6f32680426a96a3511cf4c911845b46a7158c089d08",
+      "ui_observation": "Supported Reviewers menu selected Balanced and one re-request click. Refreshed sidebar says Reviewing at balanced effort; Last completed: lite is round7 history. Result effort unknown."
+    },
+    "manual_codex": {
+      "state": "request_confirmed_pending_result",
+      "started_at": "2026-10-05T04:37:09.386669+00:00",
+      "channel_attempts": 1,
+      "exact_body": "@codex review",
+      "transport": "GitHub connector github_add_comment_to_issue",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-after-copilot-request-17caede.json",
+      "baseline_sha256": "228804e99c2f73ce7b24b92f28433a30cfccc3abd8e7f52e68bf5c76c4c18015",
+      "baseline_comment_ids": [
+        5982194609,
+        5983180593,
+        5984519616,
+        5984558238,
+        5985594078,
+        5985623901,
+        5985928054,
+        5985975078,
+        5987077643,
+        5987908188,
+        5987932051
+      ],
+      "head": "17caede017a8054bed529517ce473ef75682b5bf",
+      "body_sha256": "a5f0314868a42df0869a100d0de4061e1343e99a31dd4cbbb64aceacfd956628",
+      "trigger_id": 5988197161,
+      "native_created_at": "2026-10-05T04:37:03Z",
+      "authenticated_author_id": 11204406,
+      "confirmed_at": "2026-10-05T04:38:08.875733+00:00",
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5988197161",
+      "attribution": "New exact trigger ID/body/authenticated author, complete baseline exclusion, ordered after one native Copilot request; same-head prior result cannot satisfy this new body/request."
     },
     "request_set_terminal": false,
     "clean": false,
-    "started_at": "2026-10-05T04:05:25Z"
+    "started_at": "2026-10-05T04:36:05Z"
   }
 }
