@@ -26,16 +26,7 @@ const codeJob = final => ({
 });
 const common = { name: 'Fixture', on: { push: null, pull_request: null }, permissions: {} };
 const fixtures = {
-  'build.yml': { ...clone(common), jobs: {
-    [contract.roles.artifactVerifier]: codeJob(step('generate_style_guide_artifacts', './.github/workflows/Test-StyleGuideArtifacts.ps1')),
-    publish_committed_artifacts: {
-      'runs-on': 'ubuntu-24.04', 'timeout-minutes': 10, permissions: { contents: 'read' }, needs: contract.roles.artifactVerifier,
-      steps: ['checkout', 'uploadArtifact'].map((name, index) => ({
-        id: index === 0 ? 'checkout_repository' : 'publish_committed_style_guide_artifacts',
-        uses: contract.actions[name].uses, with: clone(contract.actions[name].inputs),
-      })),
-    },
-  } },
+  'build.yml': parseStrictYaml(fs.readFileSync(path.join(directory, 'build.yml')), LIMITS).value,
   'markdownlint.yml': { ...clone(common), on: { ...clone(common.on), schedule: [{ cron: '17 6 * * 1' }] }, jobs: {
     policy: codeJob(step('validate', "& node ./.github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml\nif ($LASTEXITCODE -ne 0) { throw 'Workflow policy validation failed.' }")),
     markdownlint: codeJob(step('lint', './.github/workflows/Invoke-MarkdownLint.ps1')),
@@ -44,7 +35,7 @@ const fixtures = {
 
 test('valid small workflow interfaces; build requires no Node installation', () => {
   for (const [file, value] of Object.entries(fixtures)) validateWorkflowObject(file, value, contract);
-  assert.equal(fixtures['build.yml'].jobs[contract.roles.artifactVerifier].steps.length, 3);
+  assert.equal(fixtures['build.yml'].jobs[contract.roles.artifactVerifier].steps.length, 4);
 });
 
 test('labels, comments, CRLF, whitespace and literal call quoting are harmless', () => {

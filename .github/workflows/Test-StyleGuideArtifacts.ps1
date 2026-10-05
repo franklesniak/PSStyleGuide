@@ -12,7 +12,7 @@
 # None. A success diagnostic uses the Information stream; failures terminate.
 #
 # .NOTES
-# Version: 1.1.20261001.0
+# Version: 2.0.20261005.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -32,11 +32,18 @@ if (-not [string]::IsNullOrEmpty($env:GITHUB_TOKEN) -or
     -not [string]::IsNullOrEmpty($env:ACTIONS_RUNTIME_TOKEN)) {
     throw 'credential-policy: a token was projected into a code job'
 }
+# BEGIN LANGUAGE DESCRIPTOR
+$script:hashtableArtifactLanguage = @{
+    ScopedId = 'powershell-instructions'
+    ScopedPath = 'powershell.instructions.md'
+    SemanticRole = 'PowerShellExamples'
+}
+# END LANGUAGE DESCRIPTOR
 $arrArtifacts = @(
     'STYLE_GUIDE_CHAT.md'
     'STYLE_GUIDE_FULL.md'
     'copilot-instructions.md'
-    'powershell.instructions.md'
+    $script:hashtableArtifactLanguage.ScopedPath
 )
 
 function Invoke-GitRaw {
@@ -76,7 +83,7 @@ function Invoke-GitRaw {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.1.20261001.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -169,7 +176,7 @@ function ConvertFrom-NulPathRecordStream {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.1.20261001.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -248,7 +255,7 @@ function Assert-AllowedPathSet {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.1.20261001.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -340,7 +347,7 @@ function Get-GitControlSurfaceDigest {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.1.20261001.0
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     [CmdletBinding(PositionalBinding = $false)]
@@ -467,7 +474,7 @@ function Get-WorktreeFileDigestMap {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.1.20261001.0
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     [CmdletBinding(PositionalBinding = $false)]
@@ -519,60 +526,138 @@ function Get-WorktreeFileDigestMap {
     }
     return $objDigestMap
 }
-$objWorktreeBefore = Get-WorktreeFileDigestMap
+function Assert-ChildIntegrity {
+    # .SYNOPSIS
+    # Checks a completed child before another child can hide its effects.
+    #
+    # .DESCRIPTION
+    # Compares Git controls, runner channels and worktree bytes with the snapshot.
+    # Generation may change only the four outputs; the final gate rejects drift.
+    #
+    # .PARAMETER AllowArtifactChanges
+    # Permit the generator's four output paths during this intermediate check.
+    #
+    # .EXAMPLE
+    # Assert-ChildIntegrity
+    #
+    # # Throws if the semantic child changed any observed state.
+    #
+    # .INPUTS
+    # None. Pipeline input is not supported.
+    #
+    # .OUTPUTS
+    # None. Violations terminate with a fixed diagnostic.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not public API. Parameters, return shape and
+    # positional contract may change without notice. All parameters are named.
+    #
+    # Version: 1.0.20261005.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param ([switch]$AllowArtifactChanges)
 
-# The semantic check runs in its own process after the integrity snapshot.
-# Its exit status is authoritative; any worktree side effect is detected by
-# the existing comparison after generation completes.
-try {
-    $strSemanticPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
-} catch {
-    $strSemanticPowerShellPath = $null
-}
-if ([string]::IsNullOrEmpty($strSemanticPowerShellPath) -or
-    -not [System.IO.File]::Exists($strSemanticPowerShellPath)) {
-    throw 'The current PowerShell executable could not be resolved for semantic validation.'
-}
-$arrSemanticResult = @(& $strSemanticPowerShellPath `
-    -NoLogo `
-    -NoProfile `
-    -NonInteractive `
-    -File './.github/workflows/Test-BlankLineExamples.ps1')
-$intSemanticExit = $LASTEXITCODE
-if ($intSemanticExit -isnot [int] -or $intSemanticExit -ne 0) {
-    throw 'The blank-line semantic check failed.'
-}
-if ($arrSemanticResult.Count -ne 1 -or
-    $arrSemanticResult[0] -cne 'Blank-line example semantics passed, including focused mutation checks.') {
-    throw 'The blank-line semantic check returned an unexpected result.'
+    if ((Get-GitControlSurfaceDigest) -cne $strControlSurfaceBefore) {
+        throw 'git-state: a child changed repository Git configuration or hooks'
+    }
+    foreach ($strChannel in $arrChannelPaths) {
+        if ([string]::IsNullOrEmpty($strChannel) -or [System.IO.FileInfo]::new($strChannel).Length -ne 0) {
+            throw 'runner-state: a child changed a runner step communication file'
+        }
+    }
+    $objCurrent = Get-WorktreeFileDigestMap
+    foreach ($strPath in @($objWorktreeBefore.Keys) + @($objCurrent.Keys)) {
+        if ($AllowArtifactChanges -and $arrArtifacts -ccontains $strPath) {
+            continue
+        }
+        if (-not $objCurrent.ContainsKey($strPath) -or -not $objWorktreeBefore.ContainsKey($strPath) -or
+            $objCurrent[$strPath] -cne $objWorktreeBefore[$strPath]) {
+            throw 'git-state: a child changed a path outside the four permitted generated artifacts'
+        }
+    }
 }
 
-# The generator runs in its own process, not in this session. In-session
-# it could shadow a cmdlet with a function, reassign a variable in this
-# scope, or prepend a directory to PATH, and every check below would
-# then be reading what it chose. A process boundary removes the class
-# rather than naming its members: a child process cannot reach this
-# session's functions, variables, or environment.
+# Resolve every executable before any repository child can change the checkout.
 try {
     $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName
 } catch {
-    # Any MainModule resolution failure falls through to the deterministic guard below.
+    # A fixed failure below handles unavailable process metadata.
     $strPowerShellPath = $null
 }
-if ([string]::IsNullOrEmpty($strPowerShellPath) -or
-    -not [System.IO.File]::Exists($strPowerShellPath)) {
+if ([string]::IsNullOrEmpty($strPowerShellPath) -or -not [System.IO.File]::Exists($strPowerShellPath)) {
     throw 'The current PowerShell executable could not be resolved.'
 }
+$strSemanticNodePath = $null
+if ($script:hashtableArtifactLanguage.SemanticRole -eq 'TerraformRecovery') {
+    $objNodeCommand = Get-Command -Name 'node' -CommandType Application -All -TotalCount 1 -ErrorAction Stop
+    $strSemanticNodePath = $objNodeCommand.Source
+} elseif ($script:hashtableArtifactLanguage.SemanticRole -ne 'PowerShellExamples') {
+    throw 'Unsupported semantic role.'
+}
+
+$objWorktreeBefore = Get-WorktreeFileDigestMap
+
+# Both semantic roles run inside the same integrity envelope.
+if ($script:hashtableArtifactLanguage.SemanticRole -eq 'PowerShellExamples') {
+    $arrSemanticResult = @(& $strPowerShellPath `
+        -NoLogo `
+        -NoProfile `
+        -NonInteractive `
+        -File './.github/workflows/Test-BlankLineExamples.ps1')
+    $intSemanticExit = $LASTEXITCODE
+    if ($intSemanticExit -isnot [int] -or $intSemanticExit -ne 0) {
+        throw 'The blank-line semantic check failed.'
+    }
+    if ($arrSemanticResult.Count -ne 1 -or
+        $arrSemanticResult[0] -cne 'Blank-line example semantics passed, including focused mutation checks.') {
+        throw 'The blank-line semantic check returned an unexpected result.'
+    }
+} else {
+    $objRecoveryStart = [System.Diagnostics.ProcessStartInfo]::new()
+    $objRecoveryStart.FileName = $strSemanticNodePath
+    $objRecoveryStart.UseShellExecute = $false
+    $objRecoveryStart.RedirectStandardOutput = $true
+    $objRecoveryStart.RedirectStandardError = $true
+    $objRecoveryStart.ArgumentList.Add('./.github/workflows/Test-StateRecoveryExamples.mjs')
+    $objRecoveryProcess = [System.Diagnostics.Process]::new()
+    $objRecoveryProcess.StartInfo = $objRecoveryStart
+    $intRecoveryExit = -1
+    $boolRecoveryTimedOut = $false
+    try {
+        if (-not $objRecoveryProcess.Start()) {
+            throw 'state-recovery: the test process did not start'
+        }
+        $objRecoveryOutput = $objRecoveryProcess.StandardOutput.ReadToEndAsync()
+        $objRecoveryError = $objRecoveryProcess.StandardError.ReadToEndAsync()
+        if (-not $objRecoveryProcess.WaitForExit(300000)) {
+            $boolRecoveryTimedOut = $true
+            $objRecoveryProcess.Kill($true)
+            $objRecoveryProcess.WaitForExit()
+        }
+        $intRecoveryExit = $objRecoveryProcess.ExitCode
+        # Drain both streams without exposing fixture payloads in a failed run.
+        $null = $objRecoveryOutput.GetAwaiter().GetResult()
+        $null = $objRecoveryError.GetAwaiter().GetResult()
+    } finally {
+        $objRecoveryProcess.Dispose()
+    }
+    if ($boolRecoveryTimedOut -or $intRecoveryExit -ne 0) {
+        throw 'state-recovery: published-example tests did not complete'
+    }
+}
+Assert-ChildIntegrity
+
 $arrResult = @(& $strPowerShellPath `
     -NoLogo `
     -NoProfile `
     -NonInteractive `
     -File './.github/workflows/Generate-StyleGuideArtifacts.ps1')
 $intGeneratorExit = $LASTEXITCODE
+Assert-ChildIntegrity -AllowArtifactChanges
 if ($arrResult.Count -ne 1) {
     throw 'The generator returned an unexpected output shape.'
 }
-# BEGIN P1 GENERATOR RESULT
+# BEGIN GENERATOR RESULT
 try {
     $objResult = $arrResult[0] | ConvertFrom-Json -NoEnumerate -ErrorAction Stop
 } catch {
@@ -586,7 +671,7 @@ $listFailedChecks = [System.Collections.Generic.List[string]]::new()
 if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {
     [void]($listFailedChecks.Add('NativeExit'))
 }
-if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'PSStyleGuide.GeneratorResult.v2') {
+if ($objResult.Schema -isnot [string] -or $objResult.Schema -cne 'StyleGuide.GeneratorResult.v2') {
     [void]($listFailedChecks.Add('Schema'))
 }
 if ($objResult.Overall -isnot [string] -or $objResult.Overall -notin @('Success', 'NoChange')) {
@@ -607,10 +692,10 @@ if (($objResult.ExitCode -isnot [int] -and $objResult.ExitCode -isnot [long]) -o
 if ($listFailedChecks.Count -ne 0) {
     throw ('Artifact generation failed result checks: {0}.' -f ($listFailedChecks -join ', '))
 }
-# END P1 GENERATOR RESULT
+# END GENERATOR RESULT
 $arrExpectedArtifactRecords = @(
     @('copilot', 'copilot-instructions.md'),
-    @('powershell-instructions', 'powershell.instructions.md'),
+    @($script:hashtableArtifactLanguage.ScopedId, $script:hashtableArtifactLanguage.ScopedPath),
     @('chat', 'STYLE_GUIDE_CHAT.md'),
     @('full', 'STYLE_GUIDE_FULL.md')
 )
@@ -689,7 +774,7 @@ try {
 }
 if ($null -eq $objPathSetResult -or $objPathSetResult.GetType() -ne [System.Management.Automation.PSCustomObject] -or
     $intPathSetExit -isnot [int] -or $intPathSetExit -ne 0 -or
-    $objPathSetResult.Schema -isnot [string] -or $objPathSetResult.Schema -cne 'PSStyleGuide.ExactGitPathSetResult.v2' -or
+    $objPathSetResult.Schema -isnot [string] -or $objPathSetResult.Schema -cne 'StyleGuide.ExactGitPathSetResult.v2' -or
     $objPathSetResult.Success -isnot [bool] -or -not $objPathSetResult.Success) {
     throw 'Exact-path verification did not confirm a clean worktree and index.'
 }

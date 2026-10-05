@@ -26,7 +26,7 @@ Optional exact absolute path of the Git executable. When omitted, the script
 uses the module-qualified application resolver once before any Git invocation.
 
 .NOTES
-Version: 1.0.20260818.6
+Version: 2.0.20261005.0
 #>
 
 [CmdletBinding()]
@@ -52,8 +52,8 @@ param (
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strVerifierVersion = '1.0.20260818.6'
-$script:strVerifierResultSchema = 'PSStyleGuide.ExactGitPathSetResult.v2'
+$script:strVerifierVersion = '2.0.20261005.0'
+$script:strVerifierResultSchema = 'StyleGuide.ExactGitPathSetResult.v2'
 # Bound each normally sub-second Git read. This fails closed if a special-file race hangs
 # a read; Invoke-GitRaw exposes an override for tests.
 $script:intNativeCommandTimeoutMilliseconds = 120000
@@ -106,7 +106,7 @@ function Test-WorktreeDirectoryIdentityEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.1
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
@@ -196,7 +196,7 @@ function Test-IgnoredControlFileEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.2
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
@@ -292,7 +292,7 @@ function Test-EmbeddedRepositoryBoundaryEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.1
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
@@ -383,7 +383,7 @@ function Test-AncestorBoundaryValidation {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.1
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
@@ -511,7 +511,7 @@ function Test-PromisorRemoteActive {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -597,7 +597,7 @@ function Test-PromisorRemoteEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
@@ -658,7 +658,7 @@ function Test-TrackedOnlyWorktreeEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.1
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
@@ -834,7 +834,7 @@ function Test-NativeExitResetInvariant {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
@@ -891,7 +891,7 @@ function Test-TrackedOnlyEntryCeiling {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.1
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
@@ -963,7 +963,7 @@ function Test-EffectiveConfigNativeExitReset {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.1
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
@@ -1036,7 +1036,7 @@ function Get-BoundedFileDigest {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1126,7 +1126,7 @@ function Read-BoundedFileContent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1222,7 +1222,7 @@ function Assert-OrdinaryTreeUnder {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260817.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1321,7 +1321,7 @@ function Assert-UnoccupiedControlSlot {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1409,7 +1409,7 @@ function Assert-OrdinaryAbsoluteFile {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1506,7 +1506,7 @@ function Get-GitExecutableRecord {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1573,7 +1573,7 @@ function ConvertTo-NativeArgumentString {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1656,7 +1656,7 @@ function Stop-NativeProcessTree {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260816.3
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1739,7 +1739,7 @@ function Invoke-GitRaw {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.4
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1983,7 +1983,7 @@ function ConvertFrom-NulPathRecordStream {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2068,7 +2068,7 @@ function ConvertTo-IgnoredExclusionPath {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2160,7 +2160,7 @@ function ConvertTo-SubmoduleExclusionPath {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2267,7 +2267,7 @@ function ConvertTo-TrackedRelativePathSet {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2360,7 +2360,7 @@ function New-ExpectedPathKeySet {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2450,7 +2450,7 @@ function Assert-OrdinaryRepositoryRoot {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.1
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2544,7 +2544,7 @@ function Get-FramedStringMapDigest {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2693,7 +2693,7 @@ function Get-TreeEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.4
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3038,7 +3038,7 @@ function Get-GitAdministrativePathRecord {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3147,7 +3147,7 @@ function Get-BoundedControlFileComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3229,7 +3229,7 @@ function Get-EffectiveConfigComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.1
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3370,7 +3370,7 @@ function Resolve-ActiveSharedIndexRecord {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3498,7 +3498,7 @@ function Get-SplitIndexBracketedEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3618,7 +3618,7 @@ function Get-HeadResolvedReferenceComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3733,7 +3733,7 @@ function Get-GitControlSurfaceEvidence {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.4
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -3948,7 +3948,7 @@ function Get-PathSetControlInputDigest {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.5
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -4118,7 +4118,7 @@ function ConvertFrom-NulIndexRecordStream {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -4209,7 +4209,7 @@ function Add-KeySet {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -4265,7 +4265,7 @@ function Write-VerifierResult {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):

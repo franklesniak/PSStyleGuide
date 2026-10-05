@@ -10,14 +10,30 @@ fixed destination. Serialization is UTF-8 without a BOM and normalizes CRLF
 and lone CR to LF at the final payload boundary.
 
 .NOTES
-Version: 1.0.20260919.0
+Version: 2.0.20261005.0
 #>
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$script:strGeneratorVersion = '1.0.20260919.0'
-$script:strGeneratorResultSchema = 'PSStyleGuide.GeneratorResult.v2'
+$script:strGeneratorVersion = '2.0.20261005.0'
+$script:strGeneratorResultSchema = 'StyleGuide.GeneratorResult.v2'
+# BEGIN LANGUAGE DESCRIPTOR
+$script:hashtableLanguage = @{
+    ScopedId = 'powershell-instructions'
+    ScopedPath = 'powershell.instructions.md'
+    Selector = '**/*.ps1'
+    Description = 'PowerShell coding standards'
+    ChatTitle = '# PowerShell Writing Style Guide - Formatted for Copy-Paste Into LLM Chat'
+    GuideAnchor = 'powershell-writing-style'
+    SummaryHeading = 'Executive Summary: Author Profile'
+    SummaryAnchor = 'executive-summary-author-profile'
+    SummaryBefore = ''
+    Composition = 'HeadingLinked'
+    AppendStandalone = $false
+}
+# END LANGUAGE DESCRIPTOR
+
 $script:objUtf8Strict = New-Object System.Text.UTF8Encoding($false, $true)
 $script:objUtf8NoBom = New-Object System.Text.UTF8Encoding($false)
 # Derive the host platform once from the runtime rather than from $env:OS, a
@@ -66,7 +82,7 @@ function ConvertTo-LowerHex {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -115,7 +131,7 @@ function Get-Sha256Hex {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -170,7 +186,7 @@ function Get-FileSha256Hex {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -231,7 +247,7 @@ function Test-PathTextIsSafe {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -303,7 +319,7 @@ function Assert-OrdinaryPathComponent {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -397,7 +413,7 @@ function Get-OrdinaryDestinationState {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -482,7 +498,7 @@ function Test-FileSystemEntry {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -541,7 +557,7 @@ function Assert-OrdinaryAbsolutePath {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -621,7 +637,7 @@ function Test-PathContainedByRoot {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -649,7 +665,7 @@ function Initialize-WindowsFileIdentityType {
     # Loads the Windows ordinary-file identity helper type when required.
     #
     # .DESCRIPTION
-    # On Windows, compiles the PSStyleGuide.NativeFileIdentity type once. The
+    # On Windows, compiles the StyleGuide.NativeFileIdentity type once. The
     # type reads volume and file-index identity from an open handle and rejects
     # files whose hard-link count is not exactly one. Other platforms are no-ops.
     #
@@ -676,12 +692,12 @@ function Initialize-WindowsFileIdentityType {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260818.0
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
 
-    if ((-not $script:boolHostIsWindows) -or ('PSStyleGuide.NativeFileIdentity' -as [type])) {
+    if ((-not $script:boolHostIsWindows) -or ('StyleGuide.NativeFileIdentity' -as [type])) {
         return
     }
 
@@ -691,7 +707,7 @@ using System.ComponentModel;
 using System.IO;
 using System.Runtime.InteropServices;
 
-namespace PSStyleGuide {
+namespace StyleGuide {
     public static class NativeFileIdentity {
         [StructLayout(LayoutKind.Sequential)]
         private struct ByHandleFileInformation {
@@ -769,7 +785,7 @@ function Get-OrdinaryFileIdentity {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260915.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -782,7 +798,7 @@ function Get-OrdinaryFileIdentity {
 
     if ($script:boolHostIsWindows) {
         Initialize-WindowsFileIdentityType
-        return [PSStyleGuide.NativeFileIdentity]::Read($LiteralPath)
+        return [StyleGuide.NativeFileIdentity]::Read($LiteralPath)
     }
 
     $boolHostIsLinux = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
@@ -850,7 +866,7 @@ function Assert-TrackedFile {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260919.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -908,7 +924,7 @@ function ConvertFrom-StrictUtf8 {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -959,7 +975,7 @@ function ConvertTo-NormalizedUtf8 {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1008,7 +1024,7 @@ function New-CopilotPayload {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1027,24 +1043,24 @@ function New-CopilotPayload {
     return $GuideContent
 }
 
-function New-PowerShellInstructionsPayload {
+function New-ScopedInstructionsPayload {
     # .SYNOPSIS
-    # Builds the scoped PowerShell-instructions payload.
+    # Builds the scoped instructions payload.
     #
     # .DESCRIPTION
     # Prefixes the complete normative guide content with the fixed YAML
-    # frontmatter that scopes the generated instructions to PowerShell scripts.
+    # frontmatter from the fixed language descriptor.
     #
     # .PARAMETER GuideContent
     # Complete decoded normative style-guide text.
     #
     # .EXAMPLE
-    # $strPayload = New-PowerShellInstructionsPayload -GuideContent $strGuideContent
+    # $strPayload = New-ScopedInstructionsPayload -GuideContent $strGuideContent
     #
     # # Returns the fixed frontmatter followed by the complete guide content.
     #
     # .EXAMPLE
-    # $strPayload = New-PowerShellInstructionsPayload -GuideContent 'guide'
+    # $strPayload = New-ScopedInstructionsPayload -GuideContent 'guide'
     #
     # # The payload ends with the supplied text 'guide'.
     #
@@ -1060,7 +1076,7 @@ function New-PowerShellInstructionsPayload {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1078,8 +1094,8 @@ function New-PowerShellInstructionsPayload {
 
     $arrFrontmatterLines = @(
         '---',
-        'applyTo:  "**/*.ps1"',
-        'description: "PowerShell coding standards"',
+        ('applyTo: "{0}"' -f $script:hashtableLanguage.Selector),
+        ('description: "{0}"' -f $script:hashtableLanguage.Description),
         '---',
         '',
         ''
@@ -1122,7 +1138,7 @@ function New-ChatPayload {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1148,8 +1164,57 @@ function New-ChatPayload {
     }
     $intOuterFenceLength = [System.Math]::Max(4, $intMaximumBackticks + 1)
     $strOuterFence = '`' * $intOuterFenceLength
-    return "# PowerShell Writing Style Guide - Formatted for Copy-Paste Into LLM Chat`n`n$strOuterFence" +
+    return $script:hashtableLanguage.ChatTitle + "`n`n$strOuterFence" +
         "markdown`n$strContent`n$strOuterFence`n"
+}
+
+function ConvertTo-RationaleBody {
+    # .SYNOPSIS
+    # Cleans one rationale body for inclusion in the full guide.
+    #
+    # .DESCRIPTION
+    # Removes source backlinks, rewrites guide links and trims boundary spacing.
+    # Internal spacing and ordinary blockquotes remain unchanged.
+    #
+    # .PARAMETER Lines
+    # The parsed body, including any nested headings.
+    #
+    # .EXAMPLE
+    # $arrBody = @(ConvertTo-RationaleBody -Lines @('', 'text', '---'))
+    #
+    # # Returns one line, text.
+    #
+    # .INPUTS
+    # None. Pipeline input is not supported.
+    #
+    # .OUTPUTS
+    # System.String. Streams cleaned body lines; an empty body emits no lines.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - Not public API. Parameters, return shape and
+    # positional contract may change without notice. All parameters are named.
+    #
+    # Version: 2.0.20261005.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([string])]
+    param ([AllowEmptyCollection()][string[]]$Lines)
+
+    $arrConverted = @($Lines | Where-Object { $_ -notmatch '^> For .+\(STYLE_GUIDE\.md#' } |
+        ForEach-Object {
+            $_ -replace 'STYLE_GUIDE\.md#', '#' -replace '\[([^\]]+)\]\(STYLE_GUIDE\.md\)',
+                ('[$1](#' + $script:hashtableLanguage.GuideAnchor + ')')
+        })
+    $intStart = 0
+    $intEnd = $arrConverted.Count - 1
+    while ($intStart -le $intEnd -and $arrConverted[$intStart].Trim() -eq '') {
+        $intStart++
+    }
+    while ($intEnd -ge $intStart -and $arrConverted[$intEnd].Trim() -in @('', '---')) {
+        $intEnd--
+    }
+    for ($intIndex = $intStart; $intIndex -le $intEnd; $intIndex++) {
+        $arrConverted[$intIndex]
+    }
 }
 
 function New-FullPayload {
@@ -1191,7 +1256,7 @@ function New-FullPayload {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260916.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1211,85 +1276,50 @@ function New-FullPayload {
         [string]$RationaleContent
     )
 
-    $arrRationaleLines = $RationaleContent -split '\r?\n'
+    # One parse supplies both leaf insertion and top-level standalone emission.
     $hashtableSections = @{}
-    $hashtableRationaleHeadings = @{}
-    $strCurrentAnchor = $null
-    $intCurrentLevel = 0
-    $listCurrentBody = New-Object 'System.Collections.Generic.List[string]'
-
-    foreach ($strLine in $arrRationaleLines) {
-        if ($strLine -match '^(#{2,4}) (.+)$') {
+    $listTopSections = New-Object 'System.Collections.Generic.List[hashtable]'
+    $hashtableLeaf = $null
+    $hashtableTop = $null
+    foreach ($strLine in ($RationaleContent -split '\r?\n')) {
+        if ($strLine -match '^(#{2,3}) (.+)$') {
             $intLevel = $Matches[1].Length
-            $strHeadingText = $Matches[2]
-            if ($null -ne $strCurrentAnchor -and $intCurrentLevel -eq 3) {
-                $hashtableSections[$strCurrentAnchor] = $listCurrentBody.ToArray()
-            }
-            $strAnchor = $strHeadingText.ToLowerInvariant() -replace '[^a-z0-9 -]', '' -replace ' ', '-'
+            $strHeading = $Matches[2]
+            $strAnchor = $strHeading.ToLowerInvariant() -replace '[^a-z0-9 -]', '' -replace ' ', '-'
             $strAnchor = $strAnchor -replace '-+', '-' -replace '^-|-$', ''
-            if ($intLevel -eq 3) {
-                $strCurrentAnchor = $strAnchor
-                $intCurrentLevel = 3
-                $listCurrentBody = New-Object 'System.Collections.Generic.List[string]'
-                $hashtableRationaleHeadings[$strAnchor] = '### ' + $strHeadingText
-            } elseif ($intLevel -eq 2) {
-                $strCurrentAnchor = $null
-                $intCurrentLevel = 2
-            } elseif ($null -ne $strCurrentAnchor -and $intCurrentLevel -eq 3) {
-                $listCurrentBody.Add($strLine)
+            $hashtableLeaf = $null
+            $hashtableSection = @{
+                Heading = ('#' * $intLevel) + ' ' + $strHeading
+                Title = $strHeading
+                Body = New-Object 'System.Collections.Generic.List[string]'
             }
-        } elseif ($null -ne $strCurrentAnchor -and $intCurrentLevel -eq 3) {
-            $listCurrentBody.Add($strLine)
+            if ($intLevel -eq 2) {
+                $hashtableTop = $hashtableSection
+                $listTopSections.Add($hashtableTop)
+                if ($strHeading -eq $script:hashtableLanguage.SummaryHeading) {
+                    $hashtableSections[$script:hashtableLanguage.SummaryAnchor] = $hashtableTop
+                }
+            } else {
+                $hashtableLeaf = $hashtableSection
+                $hashtableSections[$strAnchor] = $hashtableLeaf
+                if ($null -ne $hashtableTop) {
+                    $hashtableTop.Body.Add($strLine)
+                }
+            }
+        } else {
+            if ($null -ne $hashtableLeaf) {
+                $hashtableLeaf.Body.Add($strLine)
+            }
+            if ($null -ne $hashtableTop) {
+                $hashtableTop.Body.Add($strLine)
+            }
         }
     }
-    if ($null -ne $strCurrentAnchor -and $intCurrentLevel -eq 3) {
-        $hashtableSections[$strCurrentAnchor] = $listCurrentBody.ToArray()
+    foreach ($hashtableSection in @($hashtableSections.Values) + $listTopSections.ToArray()) {
+        $hashtableSection.CleanBody = @(ConvertTo-RationaleBody -Lines $hashtableSection.Body.ToArray())
     }
-
-    $boolInExecutiveSummary = $false
-    $listCurrentBody = New-Object 'System.Collections.Generic.List[string]'
-    foreach ($strLine in $arrRationaleLines) {
-        if ($strLine -match '^## Executive Summary: Author Profile') {
-            $boolInExecutiveSummary = $true
-            $listCurrentBody = New-Object 'System.Collections.Generic.List[string]'
-        } elseif ($boolInExecutiveSummary -and $strLine -match '^## ') {
-            $hashtableSections['executive-summary-author-profile'] = $listCurrentBody.ToArray()
-            $hashtableRationaleHeadings['executive-summary-author-profile'] = '## Executive Summary: Author Profile'
-            $boolInExecutiveSummary = $false
-        } elseif ($boolInExecutiveSummary) {
-            $listCurrentBody.Add($strLine)
-        }
-    }
-    if ($boolInExecutiveSummary) {
-        $hashtableSections['executive-summary-author-profile'] = $listCurrentBody.ToArray()
-        $hashtableRationaleHeadings['executive-summary-author-profile'] = '## Executive Summary: Author Profile'
-    }
-
-    $hashtableCleanSections = @{}
-    foreach ($strKey in $hashtableSections.Keys) {
-        $arrFiltered = @($hashtableSections[$strKey] | Where-Object {
-            -not ($_ -match '^> For .+\(STYLE_GUIDE\.md#')
-        })
-        $arrConverted = @($arrFiltered | ForEach-Object {
-            $_ -replace 'STYLE_GUIDE\.md#', '#' -replace '\[([^\]]+)\]\(STYLE_GUIDE\.md\)', '[$1](#powershell-writing-style)'
-        })
-        $intStart = 0
-        while ($intStart -lt $arrConverted.Count -and $arrConverted[$intStart].Trim() -eq '') {
-            $intStart++
-        }
-        $intEnd = $arrConverted.Count - 1
-        while ($intEnd -ge 0 -and
-            ($arrConverted[$intEnd].Trim() -eq '' -or $arrConverted[$intEnd].Trim() -eq '---')) {
-            $intEnd--
-        }
-        if ($intStart -le $intEnd) {
-            $hashtableCleanSections[$strKey] = $arrConverted[$intStart..$intEnd]
-        }
-    }
-
-    $arrGuideLines = $GuideContent -split '\r?\n'
     $listOutputLines = New-Object 'System.Collections.Generic.List[string]'
-    foreach ($strLine in $arrGuideLines) {
+    foreach ($strLine in ($GuideContent -split '\r?\n')) {
         if ($strLine.Trim() -eq '*This section intentionally left blank.*') {
             continue
         }
@@ -1297,35 +1327,80 @@ function New-FullPayload {
             $listOutputLines.Add($Matches[1].Trim())
             continue
         }
-        if ($strLine -match '^\s*<!--\s*rationale-anchor:\s*(.+?)\s*-->\s*$') {
-            $strCommentAnchor = $Matches[1].Trim()
-            if (-not $hashtableCleanSections.ContainsKey($strCommentAnchor) -or
-                -not $hashtableRationaleHeadings.ContainsKey($strCommentAnchor)) {
-                throw "missing-rationale-anchor"
+        if ($strLine -match '^\s*<!--\s*(rationale-anchor|RATIONALE):\s*(.+?)\s*-->\s*$') {
+            $boolIncludeHeading = $Matches[1] -eq 'rationale-anchor'
+            $strAnchor = $Matches[2].Trim()
+            if (-not $hashtableSections.ContainsKey($strAnchor) -or
+                $hashtableSections[$strAnchor].CleanBody.Count -eq 0) {
+                throw 'missing-rationale-anchor'
             }
-            $listOutputLines.Add('')
-            $listOutputLines.Add($hashtableRationaleHeadings[$strCommentAnchor])
-            $listOutputLines.Add('')
-            foreach ($strRationaleLine in $hashtableCleanSections[$strCommentAnchor]) {
-                $listOutputLines.Add($strRationaleLine)
+            if ($boolIncludeHeading) {
+                $listOutputLines.Add('')
+                $listOutputLines.Add($hashtableSections[$strAnchor].Heading)
+                $listOutputLines.Add('')
+            }
+            foreach ($strBodyLine in $hashtableSections[$strAnchor].CleanBody) {
+                $listOutputLines.Add($strBodyLine)
             }
             continue
         }
-
-        $listOutputLines.Add($strLine)
-        if ($strLine -match '^(#{2,3}) (.+)$') {
-            $strHeadingText = $Matches[2]
-            $strAnchor = $strHeadingText.ToLowerInvariant() -replace '[^a-z0-9 -]', '' -replace ' ', '-'
-            $strAnchor = $strAnchor -replace '-+', '-' -replace '^-|-$', ''
-            if ($hashtableCleanSections.ContainsKey($strAnchor)) {
+        if ($script:hashtableLanguage.SummaryBefore -ne '' -and
+            $hashtableSections.ContainsKey($script:hashtableLanguage.SummaryAnchor)) {
+            $strSummaryHeading = $script:hashtableLanguage.SummaryHeading
+            $strSummaryAnchor = $script:hashtableLanguage.SummaryAnchor
+            if ($strLine -match ('^- \[' + [regex]::Escape($script:hashtableLanguage.SummaryBefore) + '\]') -and
+                @($listOutputLines | Where-Object { $_ -match [regex]::Escape($strSummaryHeading) }).Count -eq 0) {
+                $listOutputLines.Add(('- [{0}](#{1})' -f $strSummaryHeading, $strSummaryAnchor))
+            }
+            if ($strLine -match ('^## ' + [regex]::Escape($script:hashtableLanguage.SummaryBefore)) -and
+                @($listOutputLines | Where-Object { $_ -match ('^## ' + [regex]::Escape($strSummaryHeading)) }).Count -eq 0) {
+                while ($listOutputLines.Count -gt 0 -and
+                    $listOutputLines[$listOutputLines.Count - 1].Trim() -in @('', '---')) {
+                    $listOutputLines.RemoveAt($listOutputLines.Count - 1)
+                }
                 $listOutputLines.Add('')
-                foreach ($strRationaleLine in $hashtableCleanSections[$strAnchor]) {
-                    $listOutputLines.Add($strRationaleLine)
+                $listOutputLines.Add('## ' + $strSummaryHeading)
+                $listOutputLines.Add('')
+                foreach ($strBodyLine in $hashtableSections[$strSummaryAnchor].CleanBody) {
+                    $listOutputLines.Add($strBodyLine)
+                }
+                $listOutputLines.Add('')
+                $listOutputLines.Add('---')
+                $listOutputLines.Add('')
+            }
+        }
+        $listOutputLines.Add($strLine)
+        if ($script:hashtableLanguage.Composition -eq 'HeadingLinked' -and $strLine -match '^(#{2,3}) (.+)$') {
+            $strHeading = $Matches[2]
+            $strAnchor = $strHeading.ToLowerInvariant() -replace '[^a-z0-9 -]', '' -replace ' ', '-'
+            $strAnchor = $strAnchor -replace '-+', '-' -replace '^-|-$', ''
+            if ($hashtableSections.ContainsKey($strAnchor) -and $hashtableSections[$strAnchor].CleanBody.Count -gt 0) {
+                $listOutputLines.Add('')
+                foreach ($strBodyLine in $hashtableSections[$strAnchor].CleanBody) {
+                    $listOutputLines.Add($strBodyLine)
                 }
             }
         }
     }
-
+    if ($script:hashtableLanguage.AppendStandalone) {
+        $arrExistingHeadings = @($listOutputLines | Where-Object { $_ -match '^## ' } |
+            ForEach-Object { ($_ -replace '^## ', '').Trim() })
+        foreach ($hashtableSection in $listTopSections) {
+            if ($hashtableSection.Title -eq 'Table of Contents' -or
+                $hashtableSection.Title -match '^Executive Summary|Rationale$' -or
+                $arrExistingHeadings -contains $hashtableSection.Title) {
+                continue
+            }
+            $listOutputLines.Add('')
+            $listOutputLines.Add($hashtableSection.Heading)
+            if ($hashtableSection.CleanBody.Count -gt 0) {
+                $listOutputLines.Add('')
+                foreach ($strBodyLine in $hashtableSection.CleanBody) {
+                    $listOutputLines.Add($strBodyLine)
+                }
+            }
+        }
+    }
     $strOutput = $listOutputLines.ToArray() -join "`n"
     while ($strOutput -match "`n`n`n") {
         $strOutput = $strOutput -replace "`n`n`n", "`n`n"
@@ -1333,13 +1408,14 @@ function New-FullPayload {
     return $strOutput.TrimEnd("`n") + "`n"
 }
 
+
 function New-StyleGuidePayloadMap {
     # .SYNOPSIS
     # Builds all four serialized style-guide payloads in memory.
     #
     # .DESCRIPTION
     # Strictly decodes the two source byte sequences, constructs the Copilot,
-    # PowerShell-instructions, chat, and full text payloads, normalizes each to
+    # scoped instructions, chat, and full text payloads, normalizes each to
     # BOM-free LF-only UTF-8 bytes, and verifies the serialization invariants.
     #
     # .PARAMETER GuideBytes
@@ -1363,7 +1439,7 @@ function New-StyleGuidePayloadMap {
     #
     # .OUTPUTS
     # System.Collections.Specialized.OrderedDictionary. Keys are copilot,
-    # powershell-instructions, chat, and full. Every value is System.Byte[],
+    # the scoped instructions ID, chat, and full. Every value is System.Byte[],
     # including zero- or one-byte payloads. Throws 'utf8-bom', 'payload-bom',
     # 'payload-cr', or a payload-builder failure. Parameter-binding and strict
     # UTF-8 decoding failures propagate.
@@ -1373,7 +1449,7 @@ function New-StyleGuidePayloadMap {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1397,7 +1473,7 @@ function New-StyleGuidePayloadMap {
     $strRationaleContent = ConvertFrom-StrictUtf8 -Bytes $RationaleBytes
     $hashtablePayloadStrings = [ordered]@{
         copilot = New-CopilotPayload -GuideContent $strGuideContent
-        'powershell-instructions' = New-PowerShellInstructionsPayload -GuideContent $strGuideContent
+        ($script:hashtableLanguage.ScopedId) = New-ScopedInstructionsPayload -GuideContent $strGuideContent
         chat = New-ChatPayload -GuideContent $strGuideContent
         full = New-FullPayload -GuideContent $strGuideContent -RationaleContent $strRationaleContent
     }
@@ -1456,7 +1532,7 @@ function New-ArtifactRecord {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260814.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1503,7 +1579,7 @@ function Initialize-AtomicFileReplacementType {
     # Loads the atomic file-replacement helper type when required.
     #
     # .DESCRIPTION
-    # Compiles PSStyleGuide.AtomicFileReplacement once. Its Replace method calls
+    # Compiles StyleGuide.AtomicFileReplacement once. Its Replace method calls
     # System.IO.File.Replace without a backup path so the candidate replaces the
     # existing destination atomically on the same filesystem.
     #
@@ -1530,19 +1606,19 @@ function Initialize-AtomicFileReplacementType {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function declares no parameters.
     param ()
 
-    if ('PSStyleGuide.AtomicFileReplacement' -as [type]) {
+    if ('StyleGuide.AtomicFileReplacement' -as [type]) {
         return
     }
 
     Add-Type -TypeDefinition @'
 using System.IO;
 
-namespace PSStyleGuide {
+namespace StyleGuide {
     public static class AtomicFileReplacement {
         public static void Replace(string candidatePath, string destinationPath) {
             File.Replace(candidatePath, destinationPath, null);
@@ -1565,7 +1641,7 @@ function Write-StyleGuideArtifact {
     # publication call returns.
     #
     # .PARAMETER ArtifactId
-    # Authorized artifact identifier: copilot, powershell-instructions, chat, or full.
+    # Authorized artifact identifier from the fixed destination map.
     #
     # .PARAMETER RawDestinationPath
     # Absolute literal destination path supplied for the selected artifact.
@@ -1605,7 +1681,7 @@ function Write-StyleGuideArtifact {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260915.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -1617,7 +1693,7 @@ function Write-StyleGuideArtifact {
     #   Position 4: DestinationMap
     param (
         [Parameter(Mandatory = $true)]
-        [ValidateSet('copilot', 'powershell-instructions', 'chat', 'full')]
+        [ValidateNotNullOrEmpty()]
         [string]$ArtifactId,
 
         [Parameter(Mandatory = $true)]
@@ -1633,6 +1709,9 @@ function Write-StyleGuideArtifact {
         [System.Collections.IDictionary]$DestinationMap
     )
 
+    if (-not $DestinationMap.Contains($ArtifactId)) {
+        throw 'unknown-artifact'
+    }
     $strExpectedRepositoryPath = $DestinationMap[$ArtifactId]
     $hashtableRecord = New-ArtifactRecord -ArtifactId $ArtifactId -RepositoryPath $strExpectedRepositoryPath
     $hashtableRecord.Status = 'Pending'
@@ -1823,7 +1902,7 @@ function Write-StyleGuideArtifact {
         $strPhase = 'publish-destination'
         if ($hashtableRecord.OriginalState -eq 'Existing') {
             $hashtableRecord.PublicationMethod = 'File.Replace'
-            [PSStyleGuide.AtomicFileReplacement]::Replace($strTemporaryPath, $strDestinationPath)
+            [StyleGuide.AtomicFileReplacement]::Replace($strTemporaryPath, $strDestinationPath)
             $hashtableRecord.TemporaryDisposition = 'ConsumedByReplace'
         } else {
             $hashtableRecord.PublicationMethod = 'File.Move'
@@ -2001,7 +2080,7 @@ function Write-GeneratorResult {
     # surface. Parameters, return shape, and positional contract may change
     # without notice.
     #
-    # Version: 1.0.20260813.0
+    # Version: 2.0.20261005.0
     #
     # This function supports positional parameters
     # (internal-caller contract only; subject to change):
@@ -2021,7 +2100,7 @@ $hashtableSourceMap = [ordered]@{
 }
 $hashtableDestinationMap = [ordered]@{
     copilot = 'copilot-instructions.md'
-    'powershell-instructions' = 'powershell.instructions.md'
+    ($script:hashtableLanguage.ScopedId) = $script:hashtableLanguage.ScopedPath
     chat = 'STYLE_GUIDE_CHAT.md'
     full = 'STYLE_GUIDE_FULL.md'
 }
