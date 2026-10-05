@@ -1,6 +1,6 @@
 {
-  "status": "full_validation_running",
-  "captured_at": "2026-10-05T05:52:26.326328+00:00",
+  "status": "round1_reviews_and_hosted_pending",
+  "captured_at": "2026-10-05T06:27:44.928567+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -500,7 +500,7 @@
     "PowerShell_content": "passed actual PS worktree",
     "changed_helper_analysis": "seven definitions, zero diagnostics",
     "engine_groups": "lifecycle/capacity passed before preserved harness date omission; only unfinished placement/setup groups reran and passed on both platforms",
-    "limits": "Initial wrong-runtime and extraction/date harness failures retained. No full aggregate success claimed."
+    "limits": "Initial wrong-runtime and extraction/date harness failures retained; later full aggregate accepted separately."
   },
   "independent_quality": {
     "result": "bounded_pass",
@@ -515,8 +515,13 @@
     "exec_session_id": 11388,
     "run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\linux-full-validation\\runs\\ps-reverse-final-20261005",
     "staged_preflight": "passed",
-    "aggregate": "running",
-    "started_at": "2026-10-05T05:51:15.316516+00:00"
+    "aggregate": "passed",
+    "started_at": "2026-10-05T05:51:15.316516+00:00",
+    "finished_at": "2026-10-05T06:03:13.404224Z",
+    "hooks_passed": 11,
+    "hooks_skipped": 0,
+    "wrapper_exit": 1,
+    "wrapper_failure": "Only two shared planning refs changed during authorized b3ed424 publication; independent exact-input reconciliation accepted suite and preserved original wrapper failure."
   },
   "transfers": {
     "A02": {
@@ -540,12 +545,207 @@
       "cap": 12
     }
   },
-  "reverse_PR": null,
-  "rounds_used": 0,
-  "first_request_at": null,
-  "deadline": null,
+  "reverse_PR": "https://github.com/franklesniak/PSStyleGuide/pull/232",
+  "rounds_used": 1,
+  "first_request_at": "2026-10-05T06:26:07Z",
+  "deadline": "2026-10-13T06:26:07+00:00",
   "metadata_carry_back": "Six common notes in Test-AgentInstructions.ps1 and SelfTest require later TF synchronization against actual destination baseline/date/revision; paired equality is not claimed.",
-  "remaining": "Full aggregate terminal result, genuine committed-input finalization/classification, current audit, normal publication/two reviewers/final quality/merge/landed acceptance, compare back; full22-outcome/402-contract scope remains.",
+  "remaining": "Current round1 Copilot/Codex results, hosted checks, final quality, normal merge, landed acceptance and compare back. Full22-outcome/402-contract scope remains.",
   "implementation_evidence_sha256": "a974f641c004e31a3b2d47c953e9763338ec5314b7c8fb14afa492a27213e95e",
-  "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8"
+  "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8",
+  "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+  "round1": {
+    "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+    "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "body_sha256": "002158c189fa8da426cb2996f8b794b6defbb175719443c0ce6eac2dbd33841a",
+    "baseline": "round1-request-baseline-886f383.json",
+    "copilot": {
+      "status": "accepted_pending_result",
+      "requested_effort": "Balanced",
+      "started_at": "2026-10-05T06:26:08.074993+00:00",
+      "event_id": 32482227182,
+      "event_at": "2026-10-05T06:26:07Z",
+      "observed_effort": null,
+      "readback": "round1-copilot-request-readback.json",
+      "run_id": 37272410291,
+      "run_status": "in_progress",
+      "ui_current_effort": "Balanced",
+      "ui_effort_observed_at": "2026-10-05T06:27:00Z",
+      "terminal_effort": null
+    },
+    "codex": {
+      "status": "accepted_pending_result",
+      "baseline": "round1-copilot-request-readback.json",
+      "automatic_review_summary": 5989249158,
+      "started_at": "2026-10-05T06:26:58.093448+00:00",
+      "trigger_id": 5989270835,
+      "trigger_at": "2026-10-05T06:26:52Z",
+      "manual_summary_id": 5989249158,
+      "manual_summary_updated_at": "2026-10-05T06:27:08Z"
+    }
+  },
+  "local_validation": {
+    "actual_endpoints": {
+      "status": "passed",
+      "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+      "policy_fixture": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+      "results": [
+        {
+          "mode": "AcceptedMaintenance",
+          "command": [
+            "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+            "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+            "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "886f3837cb729b73bffec78e966d9ceb7fa78592"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+          "started_at": "2026-10-05T06:17:05.479517+00:00",
+          "finished_at": "2026-10-05T06:17:06.047916+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\AcceptedMaintenance-886f383.log",
+          "log_sha256": "a072439dc174cdff3feb600eb735783691bacf277b9a335e68bcd2af329941fa"
+        },
+        {
+          "mode": "FinalizeMetadataNow",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-InputRevision",
+            "886f3837cb729b73bffec78e966d9ceb7fa78592",
+            "-PublishedBaselineRevision",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "-FinalizeMetadataNow"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+          "started_at": "2026-10-05T06:17:07.484878+00:00",
+          "finished_at": "2026-10-05T06:17:38.725909+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\FinalizeMetadataNow-886f383.log",
+          "log_sha256": "f60dbf51985ca0aeda5ac34ead435e24294a10ce70dd9500b2dda1e98075985b"
+        },
+        {
+          "mode": "MetadataClassificationOnly",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-InputRevision",
+            "886f3837cb729b73bffec78e966d9ceb7fa78592",
+            "-PublishedBaselineRevision",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "-MetadataClassificationOnly"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+          "started_at": "2026-10-05T06:17:40.031907+00:00",
+          "finished_at": "2026-10-05T06:17:42.349684+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\MetadataClassificationOnly-886f383.log",
+          "log_sha256": "b91a8d5a7642c4383c7a9ad38a61a91798eec0a093fd6a634c61d8fc238d8237"
+        },
+        {
+          "mode": "ProposedPolicy",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-InputRevision",
+            "886f3837cb729b73bffec78e966d9ceb7fa78592",
+            "-PublishedBaselineRevision",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "-ProposedPolicy"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+          "started_at": "2026-10-05T06:17:43.718602+00:00",
+          "finished_at": "2026-10-05T06:18:17.510457+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\ProposedPolicy-886f383.log",
+          "log_sha256": "2a734ce5fdcb1f109ce6417b4ffc839ab0c3367300d3e9f6bf0f7f63b9dc9780"
+        }
+      ],
+      "maintenance_classification": {
+        "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+        "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+        "policy": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+        "classification": "maintenance_required",
+        "maintenancePaths": [
+          ".github/workflows/Check-NpmAudit.mjs",
+          ".github/workflows/Check-NpmAudit.test.mjs",
+          ".github/workflows/Classify-InstructionMaintenance.mjs",
+          ".github/workflows/NpmTools.mjs",
+          ".github/workflows/NpmTools.test.mjs",
+          ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          ".github/workflows/Test-CiHelpers.test.mjs",
+          ".github/workflows/Test-LocalValidation.test.mjs",
+          ".github/workflows/Validate-WorkflowPolicy.mjs",
+          ".github/workflows/agent-instructions.yml",
+          ".github/workflows/copilot-setup-steps.yml",
+          ".github/workflows/lint-markdown.mjs",
+          ".github/workflows/lint-markdown.test.mjs",
+          ".github/workflows/lint-nested-markdown.js",
+          ".github/workflows/lint-staged-markdown.mjs"
+        ]
+      }
+    },
+    "current_audit": {
+      "exit": 0,
+      "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+      "authority": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "mode": "ordinary local no-argument two-root audit",
+      "started_at": "2026-10-05T06:18:19.921591+00:00",
+      "finished_at": "2026-10-05T06:18:34.334596+00:00",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\current-audit-886f383.log",
+      "sha256": "8c1159f87e22e0169762e31649051bdb7d711e3113aed34ae09e3574004ae950"
+    },
+    "commit": {
+      "started_at": "2026-10-05T06:13:21.355093+00:00",
+      "finished_at": "2026-10-05T06:13:29.332401+00:00",
+      "exit": 0,
+      "head_after": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+      "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "candidate_tree": "192a203a1d7e53065fcf6e3d662047df3696c3f5",
+      "commit_log_sha256": "b257d6678d2e80b94b04133a10151da39a9947d409f2e6fd152708a04c5ad5b6",
+      "aggregate_status_sha256": "4478cdc274421b5a8600c6630c93ec18ac3bde5a4961c3bd8e17561c1df1ae90",
+      "aggregate_result_sha256": "5ebedcbab1c7be91690949beb85016535ff5b8e22c492c5ceec37e586d7abf2e",
+      "full_analysis_sha256": "701bce28d9263a0afa6d6d864c60e6dacd6c04a0cfc5c42e813573da61d23afb",
+      "status": "committed_pending_endpoint_validation",
+      "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+      "author_date": "2026-10-05T01:13:21-05:00",
+      "source_and_dependencies_unchanged": true
+    },
+    "whole_file_analysis": {
+      "sha256": "701bce28d9263a0afa6d6d864c60e6dacd6c04a0cfc5c42e813573da61d23afb",
+      "PowerShell": "7.6.5",
+      "PSScriptAnalyzer": "1.24.0",
+      "files": 2,
+      "parser_errors": 0,
+      "analyzer_warnings_or_errors": 0
+    },
+    "aggregate_acceptance_sha256": "2aa0c4fdc5b747c4c838852a7928d67276e129dc3330f0655cf8d4c7c68fecd2",
+    "independent_reconciliation_sha256": "4ebc13a816adaec18f03f203f337506eb7b5b152d6ed446dfb5bf7373cf297be"
+  },
+  "metadata_readiness": {
+    "report_sha256": "a1fbd09db2a9e7e0878e5c4edf1c80c52ba70d677173856c10b4b1648fbc5b7e",
+    "selected": "Conditional six-line TF note synchronization after PS lands; retain already-current enclosing version. Recompute at actual destination date and baseline. No implementation or transfer3 release yet."
+  }
 }

@@ -1,0 +1,19 @@
+{
+  "root_read_full_report": true,
+  "verified_at": "2026-10-05T06:06:39.127480+00:00",
+  "source_report_sha256": "408b791c1097294a63c534fef6300e410ecab649efd936297a00129892046b81",
+  "public_report_sha256": "88bbc31f24aa04b55078bbfd322cd4713a0fa1ee47b2d6fe88795d9366139d2a",
+  "public_adaptation": "Two local decision links become repository-relative; LF line endings.",
+  "evidence_sha256": "02a0b3180acfb14895e66a3fb3ada3360c63d017c6aafe4ef633f069c406d0a2",
+  "independently_verified_raw_blob_count": 39,
+  "confirmed_absent": [
+    {
+      "side": "TF",
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md"
+    }
+  ],
+  "unchanged_core_engines": 6,
+  "no_new_material_findings": true,
+  "inspection_note": "Initial root preview treated one explicit null/absent TF historical ADR as a blob and stopped before any planning write. Corrected read uses ls-tree to prove that absence; all39 present blobs match. No product test failed or ran.",
+  "limits": "Static accepted-pair reassessment only; PS counterpart and issue155/fullA14 remain pending."
+}

@@ -1,0 +1,4244 @@
+{
+  "kind": "A14 bounded changed-input reassessment; no repair/new behavioral tests",
+  "captured_utc": "2026-10-05T06:02:31.371134+00:00",
+  "accepted_pair": {
+    "PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "TF": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "TF_tree": "377d9980fdd4008e806366ca90b1ce2811c2f519"
+  },
+  "source_guards": {
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A01-postTF66-20261005\\evidence.json": "5baff87e94b8f346b3d7e4710491773d2da69509644eca65c1dcd06ee03d6a1a",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-acceptance.json": "0003dd7f852bf1854d29a8bb5dc4625af481b7142b627b1b21b799be79d68f36",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\native-evidence.json": "6a103ca8b56c7fa01412ef1b77bfac32cea967051b495ec8abc1dc0eda7afd12",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\RESULT.md": "3ec3b972a6de79a29b128b0485f25dcb8449a323297aca7b0cc4eb242ad57cca",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R2-child-boundary.md": "fb6b7d84b389e1e8ce15f5894fa46c8df0b61a8a6b4313d0180e74df53003ef4",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R21-manifest-boundary.md": "07cbe8c90603c95ccc41a0d8fd5e584c61a54684ddb60a2b38ba30d8e2a97605",
+    "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\TF66-round1-repair-validation.md": "cbb25b7c151e85ac57f103a473130880902b9422b39efc1048ed60168f1f8cac"
+  },
+  "native_ref_readback": {
+    "PSStyleGuide": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "TerraformStyleGuide": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9"
+  },
+  "sources": [
+    {
+      "side": "PS",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a23d38c42770d7463920704e108ccd63240dc90b",
+        "size": 86655,
+        "raw_sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "unchanged_from_original_A14_source": true,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+        "size": 95329,
+        "raw_sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "unchanged_from_original_A14_source": true,
+      "changed_from_post231": false
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "size": 1510,
+        "raw_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/Invoke-MarkdownLint.ps1",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "size": 1510,
+        "raw_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/Invoke-MarkdownLint.ps1",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/NpmTools.mjs",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+        "size": 7375,
+        "raw_sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/NpmTools.mjs",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/NpmTools.mjs",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "size": 7656,
+        "raw_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/NpmTools.mjs",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+        "size": 98497,
+        "raw_sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/Test-CiHelpers.test.mjs",
+      "unchanged_from_original_A14_source": false,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+        "size": 100007,
+        "raw_sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/Test-CiHelpers.test.mjs",
+      "unchanged_from_original_A14_source": false,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+        "size": 253910,
+        "raw_sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/Test-ExactGitPathSet.ps1",
+      "unchanged_from_original_A14_source": true,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+        "size": 253918,
+        "raw_sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/Test-ExactGitPathSet.ps1",
+      "unchanged_from_original_A14_source": true,
+      "changed_from_post231": false
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "size": 32648,
+        "raw_sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/Test-StyleGuideArtifacts.ps1",
+      "unchanged_from_original_A14_source": true,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+        "size": 31949,
+        "raw_sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/Test-StyleGuideArtifacts.ps1",
+      "unchanged_from_original_A14_source": true,
+      "changed_from_post231": false
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/agent-instructions.yml",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+        "size": 12748,
+        "raw_sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/agent-instructions.yml",
+      "unchanged_from_original_A14_source": false,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/agent-instructions.yml",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+        "size": 12865,
+        "raw_sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/agent-instructions.yml",
+      "unchanged_from_original_A14_source": false,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/build.yml",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+        "size": 4375,
+        "raw_sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/build.yml",
+      "unchanged_from_original_A14_source": false,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/build.yml",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1",
+        "size": 4348,
+        "raw_sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/build.yml",
+      "unchanged_from_original_A14_source": false,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b0f7fb0b657232fa0e857e946d725fdd6876c028",
+        "size": 52385,
+        "raw_sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/copilot-setup-steps.yml",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "size": 51830,
+        "raw_sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/copilot-setup-steps.yml",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "size": 8391,
+        "raw_sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/devcontainer-ci.yml",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "size": 8391,
+        "raw_sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/devcontainer-ci.yml",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/lint-markdown.mjs",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "9b0abb08d1a17ed4306ef771822d980aabff86b5",
+        "size": 1691,
+        "raw_sha256": "3410d109d4c842a83bf41dc5674874db8d046929742a7fadba0e60026203c126"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/lint-markdown.mjs",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/lint-markdown.mjs",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8efcf8686a55835ba87af43dbe357011b856c1dd",
+        "size": 3063,
+        "raw_sha256": "766d357075fe18d9c8239c31e09065c25bd302777e619adea4787498cf146056"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/lint-markdown.mjs",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "2d79be38b1caeeb871de4ed2c8222b950c4a6ae7",
+        "size": 12676,
+        "raw_sha256": "e93be06d32fff7ef9b02a33668918213f068c460f477ecd62e668f43c7004c76"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/lint-markdown.test.mjs",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e3d5bb84e389d1b6ffe0033aafb1b821eb792a58",
+        "size": 26625,
+        "raw_sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/lint-markdown.test.mjs",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0c7633c0793be84ce6768698387052807a149329",
+        "size": 18348,
+        "raw_sha256": "6f90d52361c564772094ee0a2410f9cc407803f4784aafda3c5e8096c2281327"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/lint-nested-markdown.js",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3284f63d128288ce511391b693b1ba350b918f2c",
+        "size": 19388,
+        "raw_sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/lint-nested-markdown.js",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "21063b3c86ffcee7c928b149d390065b8bcc1840",
+        "size": 5611,
+        "raw_sha256": "c473b3df463d99d88de07ef883214f0a8aaedce111579d676bf39324902d14d3"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/lint-staged-markdown.mjs",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+        "size": 5745,
+        "raw_sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/lint-staged-markdown.mjs",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/package.json",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b09ca859508430050dc0b023b3dba62e50748680",
+        "size": 844,
+        "raw_sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.github/workflows/package.json",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/package.json",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+        "size": 902,
+        "raw_sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.github/workflows/package.json",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".husky/pre-commit",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "size": 3249,
+        "raw_sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.husky/pre-commit",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".husky/pre-commit",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "size": 3249,
+        "raw_sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.husky/pre-commit",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": ".pre-commit-config.yaml",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "size": 5398,
+        "raw_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/.pre-commit-config.yaml",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": ".pre-commit-config.yaml",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "size": 5405,
+        "raw_sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/.pre-commit-config.yaml",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "PS",
+      "path": "CONTRIBUTING.md",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+        "size": 9114,
+        "raw_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/CONTRIBUTING.md",
+      "unchanged_from_original_A14_source": false,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": "CONTRIBUTING.md",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b4a9929050ba641c6f16276e5afa57f3d896d7da",
+        "size": 9117,
+        "raw_sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/CONTRIBUTING.md",
+      "unchanged_from_original_A14_source": false,
+      "changed_from_post231": true
+    },
+    {
+      "side": "PS",
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+        "size": 12177,
+        "raw_sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/docs/decisions/0001-accept-in-repository-trust-root.md",
+      "unchanged_from_original_A14_source": true,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "accepted_identity": null,
+      "source_url": null,
+      "unchanged_from_original_A14_source": true,
+      "changed_from_post231": false
+    },
+    {
+      "side": "PS",
+      "path": "package.json",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+        "size": 816,
+        "raw_sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+      },
+      "source_url": "https://github.com/franklesniak/PSStyleGuide/blob/f168f83b89f64b6bca9d520ddec4b58969060fb6/package.json",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    },
+    {
+      "side": "TF",
+      "path": "package.json",
+      "accepted_identity": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "size": 837,
+        "raw_sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      },
+      "source_url": "https://github.com/franklesniak/TerraformStyleGuide/blob/56cb0418dcdcf71be94acc78d8963ea580b8a9e9/package.json",
+      "unchanged_from_original_A14_source": null,
+      "changed_from_post231": false
+    }
+  ],
+  "source_excerpts": [
+    {
+      "side": "TF",
+      "path": ".github/workflows/lint-markdown.mjs",
+      "first_line": 1,
+      "last_line": 60,
+      "lines": [
+        {
+          "line": 1,
+          "text": "import fs from 'node:fs';"
+        },
+        {
+          "line": 2,
+          "text": "import path from 'node:path';"
+        },
+        {
+          "line": 3,
+          "text": "import { fileURLToPath } from 'node:url';"
+        },
+        {
+          "line": 4,
+          "text": "import { runBounded } from './NpmTools.mjs';"
+        },
+        {
+          "line": 5,
+          "text": ""
+        },
+        {
+          "line": 6,
+          "text": "const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');"
+        },
+        {
+          "line": 7,
+          "text": ""
+        },
+        {
+          "line": 8,
+          "text": "export function normalizeLintStatus(status) { return status === 0 || status === 1 ? status : 2; }"
+        },
+        {
+          "line": 9,
+          "text": ""
+        },
+        {
+          "line": 10,
+          "text": "export async function lintMarkdownFiles(root = repoRoot, run = runBounded) {"
+        },
+        {
+          "line": 11,
+          "text": "  const canonicalRoot = fs.realpathSync(root);"
+        },
+        {
+          "line": 12,
+          "text": "  const manifest = path.join(root, 'package.json');"
+        },
+        {
+          "line": 13,
+          "text": "  const manifestLeaf = fs.lstatSync(manifest);"
+        },
+        {
+          "line": 14,
+          "text": "  if (manifestLeaf.isSymbolicLink() || !manifestLeaf.isFile() || manifestLeaf.size > 1024 * 1024) {"
+        },
+        {
+          "line": 15,
+          "text": "    throw new Error('Markdown lint requires a non-symlink regular package manifest of at most 1 MiB.');"
+        },
+        {
+          "line": 16,
+          "text": "  }"
+        },
+        {
+          "line": 17,
+          "text": "  const canonicalManifest = fs.realpathSync(manifest);"
+        },
+        {
+          "line": 18,
+          "text": "  const manifestRelative = path.relative(canonicalRoot, canonicalManifest);"
+        },
+        {
+          "line": 19,
+          "text": "  if (manifestRelative === '..' || manifestRelative.startsWith(`..${path.sep}`) || path.isAbsolute(manifestRelative)) {"
+        },
+        {
+          "line": 20,
+          "text": "    throw new Error('Markdown lint package manifest resolves outside the repository.');"
+        },
+        {
+          "line": 21,
+          "text": "  }"
+        },
+        {
+          "line": 22,
+          "text": "  const required = JSON.parse(fs.readFileSync(canonicalManifest, 'utf8')).engines?.node;"
+        },
+        {
+          "line": 23,
+          "text": "  if (!/^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$/u.test(required ?? '') || required !== process.versions.node) {"
+        },
+        {
+          "line": 24,
+          "text": "    throw new Error(`Markdown lint requires declared Node ${required ?? 'version'}; observed ${process.versions.node}.`);"
+        },
+        {
+          "line": 25,
+          "text": "  }"
+        },
+        {
+          "line": 26,
+          "text": "  const child = path.join(root, '.github/workflows/lint-nested-markdown.js');"
+        },
+        {
+          "line": 27,
+          "text": "  const leaf = fs.lstatSync(child);"
+        },
+        {
+          "line": 28,
+          "text": "  if (leaf.isSymbolicLink() || !leaf.isFile()) throw new Error('Markdown lint requires a non-symlink regular outer child script.');"
+        },
+        {
+          "line": 29,
+          "text": "  const canonicalChild = fs.realpathSync(child);"
+        },
+        {
+          "line": 30,
+          "text": "  const relative = path.relative(canonicalRoot, canonicalChild);"
+        },
+        {
+          "line": 31,
+          "text": "  if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {"
+        },
+        {
+          "line": 32,
+          "text": "    throw new Error('Markdown lint outer child resolves outside the repository.');"
+        },
+        {
+          "line": 33,
+          "text": "  }"
+        },
+        {
+          "line": 34,
+          "text": "  const result = run(process.execPath, [canonicalChild, '--outer'], { cwd: root, timeout: 120000, maxBuffer: 2 * 1024 * 1024 });"
+        },
+        {
+          "line": 35,
+          "text": "  if (result.stdout?.length) process.stdout.write(result.stdout);"
+        },
+        {
+          "line": 36,
+          "text": "  if (result.stderr?.length) process.stderr.write(result.stderr);"
+        },
+        {
+          "line": 37,
+          "text": "  const status = normalizeLintStatus(result.status);"
+        },
+        {
+          "line": 38,
+          "text": "  if (status === 2) console.error(`Markdown lint tooling failed (native exit ${result.status}).`);"
+        },
+        {
+          "line": 39,
+          "text": "  return status;"
+        },
+        {
+          "line": 40,
+          "text": "}"
+        },
+        {
+          "line": 41,
+          "text": ""
+        },
+        {
+          "line": 42,
+          "text": "// Prefer loader identity; retain direct-call detection on runtimes without this property."
+        },
+        {
+          "line": 43,
+          "text": "const isMain = typeof import.meta.main === 'boolean' ? import.meta.main : (() => {"
+        },
+        {
+          "line": 44,
+          "text": "  if (!process.argv[1]) return false;"
+        },
+        {
+          "line": 45,
+          "text": "  try {"
+        },
+        {
+          "line": 46,
+          "text": "    return fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url));"
+        },
+        {
+          "line": 47,
+          "text": "  } catch {"
+        },
+        {
+          "line": 48,
+          "text": "    return false;"
+        },
+        {
+          "line": 49,
+          "text": "  }"
+        },
+        {
+          "line": 50,
+          "text": "})();"
+        },
+        {
+          "line": 51,
+          "text": ""
+        },
+        {
+          "line": 52,
+          "text": "if (isMain) {"
+        },
+        {
+          "line": 53,
+          "text": "  try {"
+        },
+        {
+          "line": 54,
+          "text": "    if (process.argv.length !== 2) throw new Error('Usage: node .github/workflows/lint-markdown.mjs');"
+        },
+        {
+          "line": 55,
+          "text": "    process.exitCode = await lintMarkdownFiles();"
+        },
+        {
+          "line": 56,
+          "text": "  } catch (error) {"
+        },
+        {
+          "line": 57,
+          "text": "    console.error(`Markdown lint tooling: ${error.message}`);"
+        },
+        {
+          "line": 58,
+          "text": "    process.exitCode = 2;"
+        },
+        {
+          "line": 59,
+          "text": "  }"
+        },
+        {
+          "line": 60,
+          "text": "}"
+        }
+      ]
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/lint-markdown.mjs",
+      "first_line": 1,
+      "last_line": 33,
+      "lines": [
+        {
+          "line": 1,
+          "text": "import fs from 'node:fs';"
+        },
+        {
+          "line": 2,
+          "text": "import path from 'node:path';"
+        },
+        {
+          "line": 3,
+          "text": "import { fileURLToPath } from 'node:url';"
+        },
+        {
+          "line": 4,
+          "text": "import { runBounded } from './NpmTools.mjs';"
+        },
+        {
+          "line": 5,
+          "text": ""
+        },
+        {
+          "line": 6,
+          "text": "const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');"
+        },
+        {
+          "line": 7,
+          "text": ""
+        },
+        {
+          "line": 8,
+          "text": "export function normalizeLintStatus(status) { return status === 0 || status === 1 ? status : 2; }"
+        },
+        {
+          "line": 9,
+          "text": ""
+        },
+        {
+          "line": 10,
+          "text": "export async function lintMarkdownFiles(root = repoRoot, run = runBounded) {"
+        },
+        {
+          "line": 11,
+          "text": "  const required = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).engines?.node;"
+        },
+        {
+          "line": 12,
+          "text": "  if (!/^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$/u.test(required ?? '') || required !== process.versions.node) {"
+        },
+        {
+          "line": 13,
+          "text": "    throw new Error(`Markdown lint requires declared Node ${required ?? 'version'}; observed ${process.versions.node}.`);"
+        },
+        {
+          "line": 14,
+          "text": "  }"
+        },
+        {
+          "line": 15,
+          "text": "  const child = path.join(root, '.github/workflows/lint-nested-markdown.js');"
+        },
+        {
+          "line": 16,
+          "text": "  if (!fs.statSync(child).isFile()) throw new Error('Markdown lint requires the regular outer child script.');"
+        },
+        {
+          "line": 17,
+          "text": "  const result = run(process.execPath, [child, '--outer'], { cwd: root });"
+        },
+        {
+          "line": 18,
+          "text": "  if (result.stdout?.length) process.stdout.write(result.stdout);"
+        },
+        {
+          "line": 19,
+          "text": "  if (result.stderr?.length) process.stderr.write(result.stderr);"
+        },
+        {
+          "line": 20,
+          "text": "  const status = normalizeLintStatus(result.status);"
+        },
+        {
+          "line": 21,
+          "text": "  if (status === 2) console.error(`Markdown lint tooling failed (native exit ${result.status}).`);"
+        },
+        {
+          "line": 22,
+          "text": "  return status;"
+        },
+        {
+          "line": 23,
+          "text": "}"
+        },
+        {
+          "line": 24,
+          "text": ""
+        },
+        {
+          "line": 25,
+          "text": "if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {"
+        },
+        {
+          "line": 26,
+          "text": "  try {"
+        },
+        {
+          "line": 27,
+          "text": "    if (process.argv.length !== 2) throw new Error('Usage: node .github/workflows/lint-markdown.mjs');"
+        },
+        {
+          "line": 28,
+          "text": "    process.exitCode = await lintMarkdownFiles();"
+        },
+        {
+          "line": 29,
+          "text": "  } catch (error) {"
+        },
+        {
+          "line": 30,
+          "text": "    console.error(`Markdown lint tooling: ${error.message}`);"
+        },
+        {
+          "line": 31,
+          "text": "    process.exitCode = 2;"
+        },
+        {
+          "line": 32,
+          "text": "  }"
+        },
+        {
+          "line": 33,
+          "text": "}"
+        }
+      ]
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "first_line": 259,
+      "last_line": 302,
+      "lines": [
+        {
+          "line": 259,
+          "text": "for (const kind of ['regular', 'leaf-inside', 'leaf-outside', 'directory', 'missing', 'broken-link', 'ancestor-outside', 'ancestor-inside', 'root-alias']) {"
+        },
+        {
+          "line": 260,
+          "text": "  test(`actual outer child execution boundary: ${kind}`, async () => {"
+        },
+        {
+          "line": 261,
+          "text": "    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'markdown-tool-test-'));"
+        },
+        {
+          "line": 262,
+          "text": "    fs.mkdirSync(path.join(root, '.github/workflows'), { recursive: true });"
+        },
+        {
+          "line": 263,
+          "text": "    write(root, 'package.json', JSON.stringify({ engines: { node: process.versions.node } }));"
+        },
+        {
+          "line": 264,
+          "text": "    const outside = `${root}-outside`, alias = `${root}-alias`;"
+        },
+        {
+          "line": 265,
+          "text": "    const directoryLink = process.platform === 'win32' ? 'junction' : 'dir';"
+        },
+        {
+          "line": 266,
+          "text": "    const marker = path.join(root, 'child-executed');"
+        },
+        {
+          "line": 267,
+          "text": "    let suppliedRoot = root;"
+        },
+        {
+          "line": 268,
+          "text": "    fs.mkdirSync(outside);"
+        },
+        {
+          "line": 269,
+          "text": "    try {"
+        },
+        {
+          "line": 270,
+          "text": "      const child = path.join(root, '.github/workflows/lint-nested-markdown.js');"
+        },
+        {
+          "line": 271,
+          "text": "      fs.writeFileSync(child, `require('node:fs').writeFileSync(${JSON.stringify(marker)}, 'executed');`);"
+        },
+        {
+          "line": 272,
+          "text": "      if (kind.startsWith('leaf-')) {"
+        },
+        {
+          "line": 273,
+          "text": "        const target = path.join(kind === 'leaf-inside' ? root : outside, 'child.cjs');"
+        },
+        {
+          "line": 274,
+          "text": "        fs.renameSync(child, target); fs.symlinkSync(target, child, 'file');"
+        },
+        {
+          "line": 275,
+          "text": "      } else if (kind === 'directory' || kind === 'missing' || kind === 'broken-link') {"
+        },
+        {
+          "line": 276,
+          "text": "        fs.unlinkSync(child);"
+        },
+        {
+          "line": 277,
+          "text": "        if (kind === 'directory') fs.mkdirSync(child);"
+        },
+        {
+          "line": 278,
+          "text": "        if (kind === 'broken-link') fs.symlinkSync(path.join(outside, 'absent.cjs'), child, 'file');"
+        },
+        {
+          "line": 279,
+          "text": "      } else if (kind.startsWith('ancestor-')) {"
+        },
+        {
+          "line": 280,
+          "text": "        const destination = path.join(kind === 'ancestor-inside' ? root : outside, 'relocated-workflows');"
+        },
+        {
+          "line": 281,
+          "text": "        fs.renameSync(path.dirname(child), destination);"
+        },
+        {
+          "line": 282,
+          "text": "        fs.symlinkSync(destination, path.dirname(child), directoryLink);"
+        },
+        {
+          "line": 283,
+          "text": "      } else if (kind === 'root-alias') {"
+        },
+        {
+          "line": 284,
+          "text": "        fs.symlinkSync(root, alias, directoryLink); suppliedRoot = alias;"
+        },
+        {
+          "line": 285,
+          "text": "      }"
+        },
+        {
+          "line": 286,
+          "text": "      const accepted = ['regular', 'ancestor-inside', 'root-alias'].includes(kind);"
+        },
+        {
+          "line": 287,
+          "text": "      if (accepted) {"
+        },
+        {
+          "line": 288,
+          "text": "        assert.equal(await lintMarkdownFiles(suppliedRoot), 0);"
+        },
+        {
+          "line": 289,
+          "text": "        assert.equal(fs.readFileSync(marker, 'utf8'), 'executed');"
+        },
+        {
+          "line": 290,
+          "text": "      } else {"
+        },
+        {
+          "line": 291,
+          "text": "        const failure = ['missing', 'broken-link'].includes(kind) ? /ENOENT|regular outer child/u : kind === 'ancestor-outside' ? /outside the repository/u : /regular outer child/u;"
+        },
+        {
+          "line": 292,
+          "text": "        const error = await lintMarkdownFiles(suppliedRoot).then(() => null, failure => failure);"
+        },
+        {
+          "line": 293,
+          "text": "        assert.equal(fs.existsSync(marker), false, 'Rejected child must not execute.');"
+        },
+        {
+          "line": 294,
+          "text": "        assert.ok(error instanceof Error, 'Invalid child must report a tooling error.');"
+        },
+        {
+          "line": 295,
+          "text": "        assert.match(error.message, failure);"
+        },
+        {
+          "line": 296,
+          "text": "      }"
+        },
+        {
+          "line": 297,
+          "text": "    } finally {"
+        },
+        {
+          "line": 298,
+          "text": "      if (fs.existsSync(alias)) fs.unlinkSync(alias);"
+        },
+        {
+          "line": 299,
+          "text": "      remove(root);"
+        },
+        {
+          "line": 300,
+          "text": "      fs.rmSync(outside, { recursive: true });"
+        },
+        {
+          "line": 301,
+          "text": "    }"
+        },
+        {
+          "line": 302,
+          "text": "  });"
+        }
+      ]
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "first_line": 435,
+      "last_line": 473,
+      "lines": [
+        {
+          "line": 435,
+          "text": "// These controls use a real bounded child and observable execution markers."
+        },
+        {
+          "line": 436,
+          "text": "for (const kind of ['regular', 'root-alias', 'leaf-inside', 'leaf-outside', 'broken-link', 'directory', 'missing', 'malformed', 'wrong-version', 'one-mib', 'over-one-mib']) {"
+        },
+        {
+          "line": 437,
+          "text": "  test(`actual root manifest execution boundary: ${kind}`, async () => {"
+        },
+        {
+          "line": 438,
+          "text": "    const root = fixture(), outside = `${root}-outside`, alias = `${root}-alias`;"
+        },
+        {
+          "line": 439,
+          "text": "    const manifest = path.join(root, 'package.json'), marker = path.join(root, 'manifest-child-executed');"
+        },
+        {
+          "line": 440,
+          "text": "    const value = JSON.stringify({ engines: { node: process.versions.node } });"
+        },
+        {
+          "line": 441,
+          "text": "    let selectedRoot = root;"
+        },
+        {
+          "line": 442,
+          "text": "    fs.mkdirSync(outside);"
+        },
+        {
+          "line": 443,
+          "text": "    try {"
+        },
+        {
+          "line": 444,
+          "text": "      write(root, '.github/workflows/lint-nested-markdown.js', `require('node:fs').writeFileSync(${JSON.stringify(marker)}, 'executed');`);"
+        },
+        {
+          "line": 445,
+          "text": "      if (kind.startsWith('leaf-')) {"
+        },
+        {
+          "line": 446,
+          "text": "        const target = path.join(kind === 'leaf-inside' ? root : outside, 'manifest.json');"
+        },
+        {
+          "line": 447,
+          "text": "        fs.renameSync(manifest, target); fs.symlinkSync(target, manifest, 'file');"
+        },
+        {
+          "line": 448,
+          "text": "      } else if (['broken-link', 'directory', 'missing'].includes(kind)) {"
+        },
+        {
+          "line": 449,
+          "text": "        fs.unlinkSync(manifest);"
+        },
+        {
+          "line": 450,
+          "text": "        if (kind === 'broken-link') fs.symlinkSync(path.join(outside, 'missing.json'), manifest, 'file');"
+        },
+        {
+          "line": 451,
+          "text": "        if (kind === 'directory') fs.mkdirSync(manifest);"
+        },
+        {
+          "line": 452,
+          "text": "      } else if (kind === 'root-alias') {"
+        },
+        {
+          "line": 453,
+          "text": "        fs.symlinkSync(root, alias, process.platform === 'win32' ? 'junction' : 'dir'); selectedRoot = alias;"
+        },
+        {
+          "line": 454,
+          "text": "      } else if (kind === 'malformed') fs.writeFileSync(manifest, '{');"
+        },
+        {
+          "line": 455,
+          "text": "      else if (kind === 'wrong-version') fs.writeFileSync(manifest, '{\"engines\":{\"node\":\"0.0.0\"}}');"
+        },
+        {
+          "line": 456,
+          "text": "      else if (kind === 'one-mib' || kind === 'over-one-mib') fs.writeFileSync(manifest, value.padEnd(1024 * 1024 + (kind === 'over-one-mib' ? 1 : 0), ' '));"
+        },
+        {
+          "line": 457,
+          "text": "      const accepted = ['regular', 'root-alias', 'one-mib'].includes(kind);"
+        },
+        {
+          "line": 458,
+          "text": "      if (accepted) {"
+        },
+        {
+          "line": 459,
+          "text": "        assert.equal(await lintMarkdownFiles(selectedRoot), 0);"
+        },
+        {
+          "line": 460,
+          "text": "        assert.equal(fs.readFileSync(marker, 'utf8'), 'executed');"
+        },
+        {
+          "line": 461,
+          "text": "        fs.unlinkSync(marker);"
+        },
+        {
+          "line": 462,
+          "text": "      } else {"
+        },
+        {
+          "line": 463,
+          "text": "        await assert.rejects(lintMarkdownFiles(selectedRoot));"
+        },
+        {
+          "line": 464,
+          "text": "        assert.equal(fs.existsSync(marker), false);"
+        },
+        {
+          "line": 465,
+          "text": "      }"
+        },
+        {
+          "line": 466,
+          "text": "      expect(run(selectedRoot), accepted ? 0 : 2, accepted ? undefined : /Markdown lint tooling:/u);"
+        },
+        {
+          "line": 467,
+          "text": "      assert.equal(fs.existsSync(marker), accepted);"
+        },
+        {
+          "line": 468,
+          "text": "    } finally {"
+        },
+        {
+          "line": 469,
+          "text": "      if (fs.existsSync(alias)) fs.unlinkSync(alias);"
+        },
+        {
+          "line": 470,
+          "text": "      remove(root); remove(outside);"
+        },
+        {
+          "line": 471,
+          "text": "    }"
+        },
+        {
+          "line": 472,
+          "text": "  });"
+        },
+        {
+          "line": 473,
+          "text": "}"
+        }
+      ]
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/NpmTools.mjs",
+      "first_line": 1,
+      "last_line": 24,
+      "lines": [
+        {
+          "line": 1,
+          "text": "import { spawnSync } from 'node:child_process';"
+        },
+        {
+          "line": 2,
+          "text": "import fs from 'node:fs';"
+        },
+        {
+          "line": 3,
+          "text": "import os from 'node:os';"
+        },
+        {
+          "line": 4,
+          "text": "import path from 'node:path';"
+        },
+        {
+          "line": 5,
+          "text": "import { fileURLToPath } from 'node:url';"
+        },
+        {
+          "line": 6,
+          "text": ""
+        },
+        {
+          "line": 7,
+          "text": "export const repositoryRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');"
+        },
+        {
+          "line": 8,
+          "text": "export const processLimits = Object.freeze({ timeout: 120000, maxBuffer: 2 * 1024 * 1024 });"
+        },
+        {
+          "line": 9,
+          "text": ""
+        },
+        {
+          "line": 10,
+          "text": "export function runBounded(executable, args, options = {}) {"
+        },
+        {
+          "line": 11,
+          "text": "  const result = spawnSync(executable, args, {"
+        },
+        {
+          "line": 12,
+          "text": "    cwd: repositoryRoot, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],"
+        },
+        {
+          "line": 13,
+          "text": "    ...processLimits, killSignal: 'SIGKILL', ...options,"
+        },
+        {
+          "line": 14,
+          "text": "  });"
+        },
+        {
+          "line": 15,
+          "text": "  if (result.error || result.signal || !Number.isInteger(result.status)) {"
+        },
+        {
+          "line": 16,
+          "text": "    const cause = result.error?.code === 'ETIMEDOUT'"
+        },
+        {
+          "line": 17,
+          "text": "      ? `Process timed out after ${(options.timeout ?? processLimits.timeout) / 1000} seconds.`"
+        },
+        {
+          "line": 18,
+          "text": "      : `Process failed (${result.error?.code || result.signal || 'missing status'}).`;"
+        },
+        {
+          "line": 19,
+          "text": "    const details = [result.stderr, result.stdout]"
+        },
+        {
+          "line": 20,
+          "text": "      .map(output => output?.toString('utf8').slice(0, 4096).trim()).filter(Boolean).join('\\n');"
+        },
+        {
+          "line": 21,
+          "text": "    throw new Error(`${cause}${details ? `\\n${details}` : ''}`);"
+        },
+        {
+          "line": 22,
+          "text": "  }"
+        },
+        {
+          "line": 23,
+          "text": "  return result;"
+        },
+        {
+          "line": 24,
+          "text": "}"
+        }
+      ]
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/build.yml",
+      "first_line": 1,
+      "last_line": 100,
+      "lines": [
+        {
+          "line": 1,
+          "text": "name: Build Style Guide Artifacts"
+        },
+        {
+          "line": 2,
+          "text": "on:"
+        },
+        {
+          "line": 3,
+          "text": "  push:"
+        },
+        {
+          "line": 4,
+          "text": "  pull_request:"
+        },
+        {
+          "line": 5,
+          "text": "permissions: {}"
+        },
+        {
+          "line": 6,
+          "text": "jobs:"
+        },
+        {
+          "line": 7,
+          "text": "  verify:"
+        },
+        {
+          "line": 8,
+          "text": "    if: github.event_name != 'push' || github.event.deleted != true"
+        },
+        {
+          "line": 9,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "line": 10,
+          "text": "    timeout-minutes: 30"
+        },
+        {
+          "line": 11,
+          "text": "    permissions: {}"
+        },
+        {
+          "line": 12,
+          "text": "    steps:"
+        },
+        {
+          "line": 13,
+          "text": "      - name: Acquire the exact revision without credentials"
+        },
+        {
+          "line": 14,
+          "text": "        id: acquire"
+        },
+        {
+          "line": 15,
+          "text": "        shell: pwsh"
+        },
+        {
+          "line": 16,
+          "text": "        run: |"
+        },
+        {
+          "line": 17,
+          "text": "          $ErrorActionPreference = 'Stop'"
+        },
+        {
+          "line": 18,
+          "text": "          $PSNativeCommandUseErrorActionPreference = $false"
+        },
+        {
+          "line": 19,
+          "text": "          if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or"
+        },
+        {
+          "line": 20,
+          "text": "              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {"
+        },
+        {
+          "line": 21,
+          "text": "              throw 'Unexpected acquisition repository.'"
+        },
+        {
+          "line": 22,
+          "text": "          }"
+        },
+        {
+          "line": 23,
+          "text": "          if ($env:GITHUB_TOKEN -or $env:GH_TOKEN -or $env:ACTIONS_RUNTIME_TOKEN -or"
+        },
+        {
+          "line": 24,
+          "text": "              $env:GIT_CONFIG_COUNT -or $env:GIT_CONFIG_PARAMETERS) {"
+        },
+        {
+          "line": 25,
+          "text": "              throw 'Unexpected credentials or external Git configuration.'"
+        },
+        {
+          "line": 26,
+          "text": "          }"
+        },
+        {
+          "line": 27,
+          "text": "          $env:GIT_CONFIG_NOSYSTEM = '1'"
+        },
+        {
+          "line": 28,
+          "text": "          $env:GIT_CONFIG_GLOBAL = '/dev/null'"
+        },
+        {
+          "line": 29,
+          "text": "          $env:GIT_TERMINAL_PROMPT = '0'"
+        },
+        {
+          "line": 30,
+          "text": "          $env:GIT_NO_REPLACE_OBJECTS = '1'"
+        },
+        {
+          "line": 31,
+          "text": "          $strRevision = $env:GITHUB_SHA"
+        },
+        {
+          "line": 32,
+          "text": "          if ($strRevision -cnotmatch '^[0-9a-f]{40}$') { throw 'A full commit hash is required.' }"
+        },
+        {
+          "line": 33,
+          "text": "          if (@([IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {"
+        },
+        {
+          "line": 34,
+          "text": "              throw 'The acquisition workspace must be empty.'"
+        },
+        {
+          "line": 35,
+          "text": "          }"
+        },
+        {
+          "line": 36,
+          "text": "          & /usr/bin/git -c core.hooksPath=/dev/null init --quiet ."
+        },
+        {
+          "line": 37,
+          "text": "          if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }"
+        },
+        {
+          "line": 38,
+          "text": "          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'"
+        },
+        {
+          "line": 39,
+          "text": "          if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }"
+        },
+        {
+          "line": 40,
+          "text": "          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {"
+        },
+        {
+          "line": 41,
+          "text": "              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision"
+        },
+        {
+          "line": 42,
+          "text": "              if ($LASTEXITCODE -eq 0) { break }"
+        },
+        {
+          "line": 43,
+          "text": "              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }"
+        },
+        {
+          "line": 44,
+          "text": "              Start-Sleep -Seconds 2"
+        },
+        {
+          "line": 45,
+          "text": "          }"
+        },
+        {
+          "line": 46,
+          "text": "          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'"
+        },
+        {
+          "line": 47,
+          "text": "          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }"
+        },
+        {
+          "line": 48,
+          "text": "          & /usr/bin/git -c core.hooksPath=/dev/null checkout --quiet --detach $strRevision"
+        },
+        {
+          "line": 49,
+          "text": "          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }"
+        },
+        {
+          "line": 50,
+          "text": "          $strHead = & /usr/bin/git rev-parse --verify 'HEAD^{commit}'"
+        },
+        {
+          "line": 51,
+          "text": "          if ($LASTEXITCODE -ne 0 -or $strHead -cne $strRevision) { throw 'Checked-out commit mismatch.' }"
+        },
+        {
+          "line": 52,
+          "text": "      - name: Verify checkout credentials"
+        },
+        {
+          "line": 53,
+          "text": "        id: verify-checkout-credentials"
+        },
+        {
+          "line": 54,
+          "text": "        shell: pwsh"
+        },
+        {
+          "line": 55,
+          "text": "        run: |"
+        },
+        {
+          "line": 56,
+          "text": "          ./.github/workflows/Test-CheckoutCredentials.ps1"
+        },
+        {
+          "line": 57,
+          "text": "      - name: Generate and verify committed artifacts"
+        },
+        {
+          "line": 58,
+          "text": "        id: generate_style_guide_artifacts"
+        },
+        {
+          "line": 59,
+          "text": "        shell: pwsh"
+        },
+        {
+          "line": 60,
+          "text": "        run: |"
+        },
+        {
+          "line": 61,
+          "text": "          ./.github/workflows/Test-StyleGuideArtifacts.ps1"
+        },
+        {
+          "line": 62,
+          "text": "  publish_committed_artifacts:"
+        },
+        {
+          "line": 63,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "line": 64,
+          "text": "    timeout-minutes: 10"
+        },
+        {
+          "line": 65,
+          "text": "    permissions:"
+        },
+        {
+          "line": 66,
+          "text": "      contents: read"
+        },
+        {
+          "line": 67,
+          "text": "    needs: verify"
+        },
+        {
+          "line": 68,
+          "text": "    steps:"
+        },
+        {
+          "line": 69,
+          "text": "      - name: Checkout repository"
+        },
+        {
+          "line": 70,
+          "text": "        id: checkout_repository"
+        },
+        {
+          "line": 71,
+          "text": "        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1"
+        },
+        {
+          "line": 72,
+          "text": "        with:"
+        },
+        {
+          "line": 73,
+          "text": "          repository: ${{ github.repository }}"
+        },
+        {
+          "line": 74,
+          "text": "          ref: ${{ github.sha }}"
+        },
+        {
+          "line": 75,
+          "text": "          token: ${{ github.token }}"
+        },
+        {
+          "line": 76,
+          "text": "          persist-credentials: false"
+        },
+        {
+          "line": 77,
+          "text": "          clean: true"
+        },
+        {
+          "line": 78,
+          "text": "          fetch-depth: 1"
+        },
+        {
+          "line": 79,
+          "text": "          fetch-tags: false"
+        },
+        {
+          "line": 80,
+          "text": "          show-progress: true"
+        },
+        {
+          "line": 81,
+          "text": "          lfs: false"
+        },
+        {
+          "line": 82,
+          "text": "          submodules: false"
+        },
+        {
+          "line": 83,
+          "text": "          set-safe-directory: true"
+        },
+        {
+          "line": 84,
+          "text": "          allow-unsafe-pr-checkout: false"
+        },
+        {
+          "line": 85,
+          "text": "      - name: Publish committed style guide artifacts"
+        },
+        {
+          "line": 86,
+          "text": "        id: publish_committed_style_guide_artifacts"
+        },
+        {
+          "line": 87,
+          "text": "        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1"
+        },
+        {
+          "line": 88,
+          "text": "        with:"
+        },
+        {
+          "line": 89,
+          "text": "          name: style-guide-committed-${{ github.run_id }}-${{ github.run_attempt }}"
+        },
+        {
+          "line": 90,
+          "text": "          path: |"
+        },
+        {
+          "line": 91,
+          "text": "            copilot-instructions.md"
+        },
+        {
+          "line": 92,
+          "text": "            terraform.instructions.md"
+        },
+        {
+          "line": 93,
+          "text": "            STYLE_GUIDE_CHAT.md"
+        },
+        {
+          "line": 94,
+          "text": "            STYLE_GUIDE_FULL.md"
+        },
+        {
+          "line": 95,
+          "text": "          if-no-files-found: error"
+        },
+        {
+          "line": 96,
+          "text": "          retention-days: 7"
+        },
+        {
+          "line": 97,
+          "text": "          compression-level: 0"
+        },
+        {
+          "line": 98,
+          "text": "          overwrite: false"
+        },
+        {
+          "line": 99,
+          "text": "          include-hidden-files: false"
+        },
+        {
+          "line": 100,
+          "text": "          archive: true"
+        }
+      ]
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "first_line": 914,
+      "last_line": 987,
+      "lines": [
+        {
+          "line": 914,
+          "text": "          else"
+        },
+        {
+          "line": 915,
+          "text": "            test \"$?\" -eq 1"
+        },
+        {
+          "line": 916,
+          "text": "          fi"
+        },
+        {
+          "line": 917,
+          "text": "          test ! -e .git/objects/info/alternates"
+        },
+        {
+          "line": 918,
+          "text": "          test ! -L .git/objects/info/alternates"
+        },
+        {
+          "line": 919,
+          "text": "          test \"$(git rev-parse --is-shallow-repository)\" = false"
+        },
+        {
+          "line": 920,
+          "text": "          source_head=\"$(git rev-parse --verify HEAD)\""
+        },
+        {
+          "line": 921,
+          "text": "          source_main=\"$(git rev-parse --verify refs/remotes/origin/main)\""
+        },
+        {
+          "line": 922,
+          "text": "          test \"${source_head}\" = \"${GITHUB_SHA}\""
+        },
+        {
+          "line": 923,
+          "text": "          git diff --cached --quiet HEAD --"
+        },
+        {
+          "line": 924,
+          "text": "          git diff --quiet HEAD --"
+        },
+        {
+          "line": 925,
+          "text": "          temporary_root=\"$(realpath -e -- \"${RUNNER_TEMP}\")\""
+        },
+        {
+          "line": 926,
+          "text": "          case \"${temporary_root}\" in"
+        },
+        {
+          "line": 927,
+          "text": "            \"${source_root}\"|\"${source_root}/\"*) echo '::error::Validation temporary root is inside the agent worktree.'; exit 1 ;;"
+        },
+        {
+          "line": 928,
+          "text": "          esac"
+        },
+        {
+          "line": 929,
+          "text": "          validation_root=\"$(mktemp -d -- \"${temporary_root}/repository-validation.XXXXXXXX\")\""
+        },
+        {
+          "line": 930,
+          "text": "          cleanup_validation() {"
+        },
+        {
+          "line": 931,
+          "text": "            status=${1:-$?}"
+        },
+        {
+          "line": 932,
+          "text": "            trap - EXIT"
+        },
+        {
+          "line": 933,
+          "text": "            if ! rm -rf -- \"${validation_root}\"; then"
+        },
+        {
+          "line": 934,
+          "text": "              echo '::error::Unable to remove the disposable validation copy.'"
+        },
+        {
+          "line": 935,
+          "text": "              if [[ \"${status}\" -eq 0 ]]; then status=1; fi"
+        },
+        {
+          "line": 936,
+          "text": "            fi"
+        },
+        {
+          "line": 937,
+          "text": "            exit \"${status}\""
+        },
+        {
+          "line": 938,
+          "text": "          }"
+        },
+        {
+          "line": 939,
+          "text": "          trap 'cleanup_validation' EXIT"
+        },
+        {
+          "line": 940,
+          "text": "          trap 'exit 130' INT"
+        },
+        {
+          "line": 941,
+          "text": "          trap 'exit 143' TERM"
+        },
+        {
+          "line": 942,
+          "text": "          validation_copy=\"${validation_root}/repository\""
+        },
+        {
+          "line": 943,
+          "text": "          mkdir -- \"${validation_copy}\""
+        },
+        {
+          "line": 944,
+          "text": "          cp -a --reflink=auto -- \"${source_root}/.\" \"${validation_copy}/\""
+        },
+        {
+          "line": 945,
+          "text": "          # Reject links that would send a normal hook write back to the agent tree."
+        },
+        {
+          "line": 946,
+          "text": "          # Keep the prepared Python venv outside both trees; its PATH entry is unchanged."
+        },
+        {
+          "line": 947,
+          "text": "          \"${VALIDATION_PYTHON}\" -E -P - \"${source_root}\" \"${validation_copy}\" <<'PY'"
+        },
+        {
+          "line": 948,
+          "text": "          import os"
+        },
+        {
+          "line": 949,
+          "text": "          from pathlib import Path"
+        },
+        {
+          "line": 950,
+          "text": "          import sys"
+        },
+        {
+          "line": 951,
+          "text": ""
+        },
+        {
+          "line": 952,
+          "text": "          source, copied = map(Path, sys.argv[1:])"
+        },
+        {
+          "line": 953,
+          "text": "          for directory, directories, files in os.walk(copied, followlinks=False):"
+        },
+        {
+          "line": 954,
+          "text": "              for name in directories + files:"
+        },
+        {
+          "line": 955,
+          "text": "                  entry = Path(directory) / name"
+        },
+        {
+          "line": 956,
+          "text": "                  if not entry.is_symlink():"
+        },
+        {
+          "line": 957,
+          "text": "                      continue"
+        },
+        {
+          "line": 958,
+          "text": "                  relative = entry.relative_to(copied)"
+        },
+        {
+          "line": 959,
+          "text": "                  target = entry.resolve()"
+        },
+        {
+          "line": 960,
+          "text": "                  if relative.parts[0] == '.git' or target.is_relative_to(source):"
+        },
+        {
+          "line": 961,
+          "text": "                      raise SystemExit(f'Validation copy has a shared Git/source link: {relative}')"
+        },
+        {
+          "line": 962,
+          "text": "                  if 'node_modules' in relative.parts and not target.is_relative_to(copied):"
+        },
+        {
+          "line": 963,
+          "text": "                      raise SystemExit(f'Validation dependency link leaves the copy: {relative}')"
+        },
+        {
+          "line": 964,
+          "text": "          PY"
+        },
+        {
+          "line": 965,
+          "text": "          test \"$(git -C \"${validation_copy}\" rev-parse --show-toplevel)\" = \"${validation_copy}\""
+        },
+        {
+          "line": 966,
+          "text": "          test \"$(git -C \"${validation_copy}\" rev-parse --absolute-git-dir)\" = \"${validation_copy}/.git\""
+        },
+        {
+          "line": 967,
+          "text": "          test \"$(git -C \"${validation_copy}\" rev-parse --path-format=absolute --git-common-dir)\" = \"${validation_copy}/.git\""
+        },
+        {
+          "line": 968,
+          "text": "          test \"$(git -C \"${validation_copy}\" rev-parse --verify HEAD)\" = \"${source_head}\""
+        },
+        {
+          "line": 969,
+          "text": "          test \"$(git -C \"${validation_copy}\" rev-parse --verify refs/remotes/origin/main)\" = \"${source_main}\""
+        },
+        {
+          "line": 970,
+          "text": "          cmp -- \"${source_root}/.git/index\" \"${validation_copy}/.git/index\""
+        },
+        {
+          "line": 971,
+          "text": "          git rev-list --objects --all --missing=error > \"${validation_root}/source-objects\""
+        },
+        {
+          "line": 972,
+          "text": "          git -C \"${validation_copy}\" rev-list --objects --all --missing=error > \"${validation_root}/copied-objects\""
+        },
+        {
+          "line": 973,
+          "text": "          cmp -- \"${validation_root}/source-objects\" \"${validation_root}/copied-objects\""
+        },
+        {
+          "line": 974,
+          "text": "          git -C \"${validation_copy}\" diff --cached --quiet HEAD --"
+        },
+        {
+          "line": 975,
+          "text": "          git -C \"${validation_copy}\" diff --quiet HEAD --"
+        },
+        {
+          "line": 976,
+          "text": "          echo 'Dependencies and hooks are ready; running complete validation in a disposable copy.'"
+        },
+        {
+          "line": 977,
+          "text": "          validation_status=0"
+        },
+        {
+          "line": 978,
+          "text": "          ("
+        },
+        {
+          "line": 979,
+          "text": "            cd -- \"${validation_copy}\" || exit $?"
+        },
+        {
+          "line": 980,
+          "text": "            export GITHUB_WORKSPACE=\"${validation_copy}\""
+        },
+        {
+          "line": 981,
+          "text": "            \"${npm_environment[@]}\" \"${VALIDATION_PYTHON}\" -E -P -m pre_commit run --all-files"
+        },
+        {
+          "line": 982,
+          "text": "          ) || validation_status=$?"
+        },
+        {
+          "line": 983,
+          "text": "          if [[ \"${validation_status}\" -ne 0 ]]; then"
+        },
+        {
+          "line": 984,
+          "text": "            echo \"::error::Complete validation failed with status ${validation_status}; fixes remain only in the disposable copy.\""
+        },
+        {
+          "line": 985,
+          "text": "          fi"
+        },
+        {
+          "line": 986,
+          "text": "          cleanup_validation \"${validation_status}\""
+        },
+        {
+          "line": 987,
+          "text": ""
+        }
+      ]
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/agent-instructions.yml",
+      "first_line": 204,
+      "last_line": 211,
+      "lines": [
+        {
+          "line": 204,
+          "text": "                  }"
+        },
+        {
+          "line": 205,
+          "text": "                  else {"
+        },
+        {
+          "line": 206,
+          "text": "                      Write-Output 'Non-publication reference: snapshot checks only; publication admission is not established.'"
+        },
+        {
+          "line": 207,
+          "text": "                  }"
+        },
+        {
+          "line": 208,
+          "text": "              }"
+        },
+        {
+          "line": 209,
+          "text": "          }"
+        },
+        {
+          "line": 210,
+          "text": "          & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs .github/workflows/Test-LocalValidation.test.mjs .github/workflows/lint-markdown.test.mjs"
+        },
+        {
+          "line": 211,
+          "text": "          if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }"
+        }
+      ]
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "first_line": 1710,
+      "last_line": 1832,
+      "lines": [
+        {
+          "line": 1710,
+          "text": "                $objCandidateStream = New-Object System.IO.FileStream("
+        },
+        {
+          "line": 1711,
+          "text": "                    $strTemporaryPath,"
+        },
+        {
+          "line": 1712,
+          "text": "                    [System.IO.FileMode]::CreateNew,"
+        },
+        {
+          "line": 1713,
+          "text": "                    [System.IO.FileAccess]::Write,"
+        },
+        {
+          "line": 1714,
+          "text": "                    [System.IO.FileShare]::None"
+        },
+        {
+          "line": 1715,
+          "text": "                )"
+        },
+        {
+          "line": 1716,
+          "text": "                $hashtableRecord.TemporaryDisposition = 'Created'"
+        },
+        {
+          "line": 1717,
+          "text": "                break"
+        },
+        {
+          "line": 1718,
+          "text": "            } catch [System.IO.IOException] {"
+        },
+        {
+          "line": 1719,
+          "text": "                $boolCollision = Test-FileSystemEntry -LiteralPath $strTemporaryPath"
+        },
+        {
+          "line": 1720,
+          "text": "                $strTemporaryPath = $null"
+        },
+        {
+          "line": 1721,
+          "text": "                if (-not $boolCollision) {"
+        },
+        {
+          "line": 1722,
+          "text": "                    throw"
+        },
+        {
+          "line": 1723,
+          "text": "                }"
+        },
+        {
+          "line": 1724,
+          "text": "                if ($intAttempt -eq 16) {"
+        },
+        {
+          "line": 1725,
+          "text": "                    throw 'candidate-collision-limit'"
+        },
+        {
+          "line": 1726,
+          "text": "                }"
+        },
+        {
+          "line": 1727,
+          "text": "            }"
+        },
+        {
+          "line": 1728,
+          "text": "        }"
+        },
+        {
+          "line": 1729,
+          "text": "        if ($null -eq $objCandidateStream) {"
+        },
+        {
+          "line": 1730,
+          "text": "            throw 'candidate-create-failure'"
+        },
+        {
+          "line": 1731,
+          "text": "        }"
+        },
+        {
+          "line": 1732,
+          "text": ""
+        },
+        {
+          "line": 1733,
+          "text": "        # Write and flush through the retained CreateNew handle rather than closing it"
+        },
+        {
+          "line": 1734,
+          "text": "        # and reopening the path. A path-based reopen (FileMode.Open) would follow a"
+        },
+        {
+          "line": 1735,
+          "text": "        # symlink that another process could substitute at the candidate path after"
+        },
+        {
+          "line": 1736,
+          "text": "        # the close, sending the payload to the link target; the CreateNew handle is"
+        },
+        {
+          "line": 1737,
+          "text": "        # bound to the file this process created, so the write cannot be redirected."
+        },
+        {
+          "line": 1738,
+          "text": "        # The ordinary-path assertion and identity capture below then confirm the"
+        },
+        {
+          "line": 1739,
+          "text": "        # on-disk candidate and fail closed if the path was replaced during the write."
+        },
+        {
+          "line": 1740,
+          "text": "        $strPhase = 'write-candidate'"
+        },
+        {
+          "line": 1741,
+          "text": "        try {"
+        },
+        {
+          "line": 1742,
+          "text": "            $objCandidateStream.Write($CompletePayloadBytes, 0, $CompletePayloadBytes.Length)"
+        },
+        {
+          "line": 1743,
+          "text": "            $strPhase = 'flush-candidate'"
+        },
+        {
+          "line": 1744,
+          "text": "            $objCandidateStream.Flush($true)"
+        },
+        {
+          "line": 1745,
+          "text": "        } finally {"
+        },
+        {
+          "line": 1746,
+          "text": "            $objCandidateStream.Dispose()"
+        },
+        {
+          "line": 1747,
+          "text": "            $objCandidateStream = $null"
+        },
+        {
+          "line": 1748,
+          "text": "        }"
+        },
+        {
+          "line": 1749,
+          "text": ""
+        },
+        {
+          "line": 1750,
+          "text": "        # The write and flush have already returned; this block captures the"
+        },
+        {
+          "line": 1751,
+          "text": "        # candidate's proven identity, so a failure here is not a flush failure."
+        },
+        {
+          "line": 1752,
+          "text": "        # Tag it under its own phase rather than 'flush-candidate' so the artifact"
+        },
+        {
+          "line": 1753,
+          "text": "        # evidence names the step accurately. This phase ends exactly where"
+        },
+        {
+          "line": 1754,
+          "text": "        # $boolTemporaryIdentityProven becomes true, which is the same boundary the"
+        },
+        {
+          "line": 1755,
+          "text": "        # cleanup path uses to decide a retained candidate can be safely removed."
+        },
+        {
+          "line": 1756,
+          "text": "        $strPhase = 'capture-candidate'"
+        },
+        {
+          "line": 1757,
+          "text": "        $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File"
+        },
+        {
+          "line": 1758,
+          "text": "        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison)) {"
+        },
+        {
+          "line": 1759,
+          "text": "            throw 'candidate-parent-mismatch'"
+        },
+        {
+          "line": 1760,
+          "text": "        }"
+        },
+        {
+          "line": 1761,
+          "text": "        $strCandidateIdentity = Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath"
+        },
+        {
+          "line": 1762,
+          "text": "        $boolTemporaryIdentityProven = $true"
+        },
+        {
+          "line": 1763,
+          "text": "        $hashtableRecord.CandidateOrdinaryIdentity = $strCandidateIdentity"
+        },
+        {
+          "line": 1764,
+          "text": ""
+        },
+        {
+          "line": 1765,
+          "text": "        $strPhase = 'verify-candidate'"
+        },
+        {
+          "line": 1766,
+          "text": "        $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File"
+        },
+        {
+          "line": 1767,
+          "text": "        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison) -or"
+        },
+        {
+          "line": 1768,
+          "text": "            (Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath) -cne $strCandidateIdentity) {"
+        },
+        {
+          "line": 1769,
+          "text": "            throw 'candidate-identity-drift'"
+        },
+        {
+          "line": 1770,
+          "text": "        }"
+        },
+        {
+          "line": 1771,
+          "text": "        $arrCandidateBytes = [System.IO.File]::ReadAllBytes($strCandidateFullPath)"
+        },
+        {
+          "line": 1772,
+          "text": "        if ($arrCandidateBytes.Length -ne $CompletePayloadBytes.Length -or"
+        },
+        {
+          "line": 1773,
+          "text": "            (Get-Sha256Hex -Bytes $arrCandidateBytes) -cne $hashtableRecord.CandidateSha256) {"
+        },
+        {
+          "line": 1774,
+          "text": "            throw 'candidate-byte-mismatch'"
+        },
+        {
+          "line": 1775,
+          "text": "        }"
+        },
+        {
+          "line": 1776,
+          "text": "        if (($arrCandidateBytes.Length -ge 3 -and $arrCandidateBytes[0] -eq 0xEF -and"
+        },
+        {
+          "line": 1777,
+          "text": "            $arrCandidateBytes[1] -eq 0xBB -and $arrCandidateBytes[2] -eq 0xBF) -or"
+        },
+        {
+          "line": 1778,
+          "text": "            $arrCandidateBytes -contains [byte]0x0D -or $arrCandidateBytes.Length -eq 0 -or"
+        },
+        {
+          "line": 1779,
+          "text": "            $arrCandidateBytes[$arrCandidateBytes.Length - 1] -ne 0x0A) {"
+        },
+        {
+          "line": 1780,
+          "text": "            throw 'candidate-serialization'"
+        },
+        {
+          "line": 1781,
+          "text": "        }"
+        },
+        {
+          "line": 1782,
+          "text": ""
+        },
+        {
+          "line": 1783,
+          "text": "        $strPhase = 'revalidate-publication'"
+        },
+        {
+          "line": 1784,
+          "text": "        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strParentPath -ExpectedLeafType Directory)"
+        },
+        {
+          "line": 1785,
+          "text": "        $strCurrentDestinationState = Get-OrdinaryDestinationState -LiteralPath $strDestinationPath"
+        },
+        {
+          "line": 1786,
+          "text": "        if ($strCurrentDestinationState -cne $hashtableRecord.OriginalState) {"
+        },
+        {
+          "line": 1787,
+          "text": "            throw 'destination-state-drift'"
+        },
+        {
+          "line": 1788,
+          "text": "        }"
+        },
+        {
+          "line": 1789,
+          "text": "        if ($strCurrentDestinationState -eq 'Existing') {"
+        },
+        {
+          "line": 1790,
+          "text": "            [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)"
+        },
+        {
+          "line": 1791,
+          "text": "            if ((Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath) -cne"
+        },
+        {
+          "line": 1792,
+          "text": "                $hashtableRecord.OriginalOrdinaryIdentity -or"
+        },
+        {
+          "line": 1793,
+          "text": "                (New-Object System.IO.FileInfo($strDestinationPath)).Length -ne $hashtableRecord.OriginalLength -or"
+        },
+        {
+          "line": 1794,
+          "text": "                (Get-FileSha256Hex -LiteralPath $strDestinationPath) -cne $hashtableRecord.OriginalSha256) {"
+        },
+        {
+          "line": 1795,
+          "text": "                throw 'destination-content-drift'"
+        },
+        {
+          "line": 1796,
+          "text": "            }"
+        },
+        {
+          "line": 1797,
+          "text": "        }"
+        },
+        {
+          "line": 1798,
+          "text": "        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File)"
+        },
+        {
+          "line": 1799,
+          "text": "        if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity -or"
+        },
+        {
+          "line": 1800,
+          "text": "            (Get-FileSha256Hex -LiteralPath $strTemporaryPath) -cne $hashtableRecord.CandidateSha256) {"
+        },
+        {
+          "line": 1801,
+          "text": "            throw 'candidate-content-drift'"
+        },
+        {
+          "line": 1802,
+          "text": "        }"
+        },
+        {
+          "line": 1803,
+          "text": ""
+        },
+        {
+          "line": 1804,
+          "text": "        # ACCEPTED BOUNDED RESIDUAL (publication substitution window). The revalidation"
+        },
+        {
+          "line": 1805,
+          "text": "        # above re-proves the candidate identity and bytes, but File.Replace and"
+        },
+        {
+          "line": 1806,
+          "text": "        # File.Move resolve the source by PATH. Between that final proof and the"
+        },
+        {
+          "line": 1807,
+          "text": "        # rename below, a second writer with write access to the parent directory"
+        },
+        {
+          "line": 1808,
+          "text": "        # could rename the verified candidate away and place a different object at"
+        },
+        {
+          "line": 1809,
+          "text": "        # the same temporary path, with either the same or different bytes; the"
+        },
+        {
+          "line": 1810,
+          "text": "        # path-based rename would then publish that substituted object. No portable"
+        },
+        {
+          "line": 1811,
+          "text": "        # mechanism closes this: .NET exposes no handle-bound rename, POSIX rename"
+        },
+        {
+          "line": 1812,
+          "text": "        # is not fd-bound and does not honor a share mode, and a delete-denying handle"
+        },
+        {
+          "line": 1813,
+          "text": "        # held across the call would instead block the very rename this code must"
+        },
+        {
+          "line": 1814,
+          "text": "        # perform. The residual is bounded and never yields a false success -- the"
+        },
+        {
+          "line": 1815,
+          "text": "        # verify-publication phase below binds the final object to the candidate"
+        },
+        {
+          "line": 1816,
+          "text": "        # identity and verifies its bytes. It reports a final-candidate-identity-mismatch"
+        },
+        {
+          "line": 1817,
+          "text": "        # or final-byte-drift under ReplacementStateUncertain, so a substitution fails"
+        },
+        {
+          "line": 1818,
+          "text": "        # closed with truthful evidence. The window requires a concurrent second"
+        },
+        {
+          "line": 1819,
+          "text": "        # writer racing a sub-second interval, which the single-actor CI trust root"
+        },
+        {
+          "line": 1820,
+          "text": "        # (docs/decisions/0001) does not have,"
+        },
+        {
+          "line": 1821,
+          "text": "        # and such a writer already has directory write access and so gains nothing"
+        },
+        {
+          "line": 1822,
+          "text": "        # beyond a truthfully reported failure it could cause by writing directly."
+        },
+        {
+          "line": 1823,
+          "text": "        $strPhase = 'publish-destination'"
+        },
+        {
+          "line": 1824,
+          "text": "        if ($hashtableRecord.OriginalState -eq 'Existing') {"
+        },
+        {
+          "line": 1825,
+          "text": "            $hashtableRecord.PublicationMethod = 'File.Replace'"
+        },
+        {
+          "line": 1826,
+          "text": "            [PSStyleGuide.AtomicFileReplacement]::Replace($strTemporaryPath, $strDestinationPath)"
+        },
+        {
+          "line": 1827,
+          "text": "            $hashtableRecord.TemporaryDisposition = 'ConsumedByReplace'"
+        },
+        {
+          "line": 1828,
+          "text": "        } else {"
+        },
+        {
+          "line": 1829,
+          "text": "            $hashtableRecord.PublicationMethod = 'File.Move'"
+        },
+        {
+          "line": 1830,
+          "text": "            [System.IO.File]::Move($strTemporaryPath, $strDestinationPath)"
+        },
+        {
+          "line": 1831,
+          "text": "            $hashtableRecord.TemporaryDisposition = 'ConsumedByMove'"
+        },
+        {
+          "line": 1832,
+          "text": "        }"
+        }
+      ]
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "first_line": 1896,
+      "last_line": 2018,
+      "lines": [
+        {
+          "line": 1896,
+          "text": "                $objCandidateStream = New-Object System.IO.FileStream("
+        },
+        {
+          "line": 1897,
+          "text": "                    $strTemporaryPath,"
+        },
+        {
+          "line": 1898,
+          "text": "                    [System.IO.FileMode]::CreateNew,"
+        },
+        {
+          "line": 1899,
+          "text": "                    [System.IO.FileAccess]::Write,"
+        },
+        {
+          "line": 1900,
+          "text": "                    [System.IO.FileShare]::None"
+        },
+        {
+          "line": 1901,
+          "text": "                )"
+        },
+        {
+          "line": 1902,
+          "text": "                $hashtableRecord.TemporaryDisposition = 'Created'"
+        },
+        {
+          "line": 1903,
+          "text": "                break"
+        },
+        {
+          "line": 1904,
+          "text": "            } catch [System.IO.IOException] {"
+        },
+        {
+          "line": 1905,
+          "text": "                $boolCollision = Test-FileSystemEntry -LiteralPath $strTemporaryPath"
+        },
+        {
+          "line": 1906,
+          "text": "                $strTemporaryPath = $null"
+        },
+        {
+          "line": 1907,
+          "text": "                if (-not $boolCollision) {"
+        },
+        {
+          "line": 1908,
+          "text": "                    throw"
+        },
+        {
+          "line": 1909,
+          "text": "                }"
+        },
+        {
+          "line": 1910,
+          "text": "                if ($intAttempt -eq 16) {"
+        },
+        {
+          "line": 1911,
+          "text": "                    throw 'candidate-collision-limit'"
+        },
+        {
+          "line": 1912,
+          "text": "                }"
+        },
+        {
+          "line": 1913,
+          "text": "            }"
+        },
+        {
+          "line": 1914,
+          "text": "        }"
+        },
+        {
+          "line": 1915,
+          "text": "        if ($null -eq $objCandidateStream) {"
+        },
+        {
+          "line": 1916,
+          "text": "            throw 'candidate-create-failure'"
+        },
+        {
+          "line": 1917,
+          "text": "        }"
+        },
+        {
+          "line": 1918,
+          "text": ""
+        },
+        {
+          "line": 1919,
+          "text": "        # Write and flush through the retained CreateNew handle rather than closing it"
+        },
+        {
+          "line": 1920,
+          "text": "        # and reopening the path. A path-based reopen (FileMode.Open) would follow a"
+        },
+        {
+          "line": 1921,
+          "text": "        # symlink that another process could substitute at the candidate path after"
+        },
+        {
+          "line": 1922,
+          "text": "        # the close, sending the payload to the link target; the CreateNew handle is"
+        },
+        {
+          "line": 1923,
+          "text": "        # bound to the file this process created, so the write cannot be redirected."
+        },
+        {
+          "line": 1924,
+          "text": "        # The ordinary-path assertion and identity capture below then confirm the"
+        },
+        {
+          "line": 1925,
+          "text": "        # on-disk candidate and fail closed if the path was replaced during the write."
+        },
+        {
+          "line": 1926,
+          "text": "        $strPhase = 'write-candidate'"
+        },
+        {
+          "line": 1927,
+          "text": "        try {"
+        },
+        {
+          "line": 1928,
+          "text": "            $objCandidateStream.Write($CompletePayloadBytes, 0, $CompletePayloadBytes.Length)"
+        },
+        {
+          "line": 1929,
+          "text": "            $strPhase = 'flush-candidate'"
+        },
+        {
+          "line": 1930,
+          "text": "            $objCandidateStream.Flush($true)"
+        },
+        {
+          "line": 1931,
+          "text": "        } finally {"
+        },
+        {
+          "line": 1932,
+          "text": "            $objCandidateStream.Dispose()"
+        },
+        {
+          "line": 1933,
+          "text": "            $objCandidateStream = $null"
+        },
+        {
+          "line": 1934,
+          "text": "        }"
+        },
+        {
+          "line": 1935,
+          "text": ""
+        },
+        {
+          "line": 1936,
+          "text": "        # The write and flush have already returned; this block captures the"
+        },
+        {
+          "line": 1937,
+          "text": "        # candidate's proven identity, so a failure here is not a flush failure."
+        },
+        {
+          "line": 1938,
+          "text": "        # Tag it under its own phase rather than 'flush-candidate' so the artifact"
+        },
+        {
+          "line": 1939,
+          "text": "        # evidence names the step accurately. This phase ends exactly where"
+        },
+        {
+          "line": 1940,
+          "text": "        # $boolTemporaryIdentityProven becomes true, which is the same boundary the"
+        },
+        {
+          "line": 1941,
+          "text": "        # cleanup path uses to decide a retained candidate can be safely removed."
+        },
+        {
+          "line": 1942,
+          "text": "        $strPhase = 'capture-candidate'"
+        },
+        {
+          "line": 1943,
+          "text": "        $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File"
+        },
+        {
+          "line": 1944,
+          "text": "        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison)) {"
+        },
+        {
+          "line": 1945,
+          "text": "            throw 'candidate-parent-mismatch'"
+        },
+        {
+          "line": 1946,
+          "text": "        }"
+        },
+        {
+          "line": 1947,
+          "text": "        $strCandidateIdentity = Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath"
+        },
+        {
+          "line": 1948,
+          "text": "        $boolTemporaryIdentityProven = $true"
+        },
+        {
+          "line": 1949,
+          "text": "        $hashtableRecord.CandidateOrdinaryIdentity = $strCandidateIdentity"
+        },
+        {
+          "line": 1950,
+          "text": ""
+        },
+        {
+          "line": 1951,
+          "text": "        $strPhase = 'verify-candidate'"
+        },
+        {
+          "line": 1952,
+          "text": "        $strCandidateFullPath = Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File"
+        },
+        {
+          "line": 1953,
+          "text": "        if (-not [System.IO.Path]::GetDirectoryName($strCandidateFullPath).Equals($strParentPath, $script:objPathComparison) -or"
+        },
+        {
+          "line": 1954,
+          "text": "            (Get-OrdinaryFileIdentity -LiteralPath $strCandidateFullPath) -cne $strCandidateIdentity) {"
+        },
+        {
+          "line": 1955,
+          "text": "            throw 'candidate-identity-drift'"
+        },
+        {
+          "line": 1956,
+          "text": "        }"
+        },
+        {
+          "line": 1957,
+          "text": "        $arrCandidateBytes = [System.IO.File]::ReadAllBytes($strCandidateFullPath)"
+        },
+        {
+          "line": 1958,
+          "text": "        if ($arrCandidateBytes.Length -ne $CompletePayloadBytes.Length -or"
+        },
+        {
+          "line": 1959,
+          "text": "            (Get-Sha256Hex -Bytes $arrCandidateBytes) -cne $hashtableRecord.CandidateSha256) {"
+        },
+        {
+          "line": 1960,
+          "text": "            throw 'candidate-byte-mismatch'"
+        },
+        {
+          "line": 1961,
+          "text": "        }"
+        },
+        {
+          "line": 1962,
+          "text": "        if (($arrCandidateBytes.Length -ge 3 -and $arrCandidateBytes[0] -eq 0xEF -and"
+        },
+        {
+          "line": 1963,
+          "text": "            $arrCandidateBytes[1] -eq 0xBB -and $arrCandidateBytes[2] -eq 0xBF) -or"
+        },
+        {
+          "line": 1964,
+          "text": "            $arrCandidateBytes -contains [byte]0x0D -or $arrCandidateBytes.Length -eq 0 -or"
+        },
+        {
+          "line": 1965,
+          "text": "            $arrCandidateBytes[$arrCandidateBytes.Length - 1] -ne 0x0A) {"
+        },
+        {
+          "line": 1966,
+          "text": "            throw 'candidate-serialization'"
+        },
+        {
+          "line": 1967,
+          "text": "        }"
+        },
+        {
+          "line": 1968,
+          "text": ""
+        },
+        {
+          "line": 1969,
+          "text": "        $strPhase = 'revalidate-publication'"
+        },
+        {
+          "line": 1970,
+          "text": "        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strParentPath -ExpectedLeafType Directory)"
+        },
+        {
+          "line": 1971,
+          "text": "        $strCurrentDestinationState = Get-OrdinaryDestinationState -LiteralPath $strDestinationPath"
+        },
+        {
+          "line": 1972,
+          "text": "        if ($strCurrentDestinationState -cne $hashtableRecord.OriginalState) {"
+        },
+        {
+          "line": 1973,
+          "text": "            throw 'destination-state-drift'"
+        },
+        {
+          "line": 1974,
+          "text": "        }"
+        },
+        {
+          "line": 1975,
+          "text": "        if ($strCurrentDestinationState -eq 'Existing') {"
+        },
+        {
+          "line": 1976,
+          "text": "            [void](Assert-OrdinaryAbsolutePath -LiteralPath $strDestinationPath -ExpectedLeafType File)"
+        },
+        {
+          "line": 1977,
+          "text": "            if ((Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath) -cne"
+        },
+        {
+          "line": 1978,
+          "text": "                $hashtableRecord.OriginalOrdinaryIdentity -or"
+        },
+        {
+          "line": 1979,
+          "text": "                (New-Object System.IO.FileInfo($strDestinationPath)).Length -ne $hashtableRecord.OriginalLength -or"
+        },
+        {
+          "line": 1980,
+          "text": "                (Get-FileSha256Hex -LiteralPath $strDestinationPath) -cne $hashtableRecord.OriginalSha256) {"
+        },
+        {
+          "line": 1981,
+          "text": "                throw 'destination-content-drift'"
+        },
+        {
+          "line": 1982,
+          "text": "            }"
+        },
+        {
+          "line": 1983,
+          "text": "        }"
+        },
+        {
+          "line": 1984,
+          "text": "        [void](Assert-OrdinaryAbsolutePath -LiteralPath $strTemporaryPath -ExpectedLeafType File)"
+        },
+        {
+          "line": 1985,
+          "text": "        if ((Get-OrdinaryFileIdentity -LiteralPath $strTemporaryPath) -cne $strCandidateIdentity -or"
+        },
+        {
+          "line": 1986,
+          "text": "            (Get-FileSha256Hex -LiteralPath $strTemporaryPath) -cne $hashtableRecord.CandidateSha256) {"
+        },
+        {
+          "line": 1987,
+          "text": "            throw 'candidate-content-drift'"
+        },
+        {
+          "line": 1988,
+          "text": "        }"
+        },
+        {
+          "line": 1989,
+          "text": ""
+        },
+        {
+          "line": 1990,
+          "text": "        # ACCEPTED BOUNDED RESIDUAL (publication substitution window). The revalidation"
+        },
+        {
+          "line": 1991,
+          "text": "        # above re-proves the candidate identity and bytes, but File.Replace and"
+        },
+        {
+          "line": 1992,
+          "text": "        # File.Move resolve the source by PATH. Between that final proof and the"
+        },
+        {
+          "line": 1993,
+          "text": "        # rename below, a second writer with write access to the parent directory"
+        },
+        {
+          "line": 1994,
+          "text": "        # could rename the verified candidate away and place a different object at"
+        },
+        {
+          "line": 1995,
+          "text": "        # the same temporary path, with either the same or different bytes; the"
+        },
+        {
+          "line": 1996,
+          "text": "        # path-based rename would then publish that substituted object. No portable"
+        },
+        {
+          "line": 1997,
+          "text": "        # mechanism closes this: .NET exposes no handle-bound rename, POSIX rename"
+        },
+        {
+          "line": 1998,
+          "text": "        # is not fd-bound and does not honor a share mode, and a delete-denying handle"
+        },
+        {
+          "line": 1999,
+          "text": "        # held across the call would instead block the very rename this code must"
+        },
+        {
+          "line": 2000,
+          "text": "        # perform. The residual is bounded and never yields a false success -- the"
+        },
+        {
+          "line": 2001,
+          "text": "        # verify-publication phase below binds the final object to the candidate"
+        },
+        {
+          "line": 2002,
+          "text": "        # identity and verifies its bytes. It reports a final-candidate-identity-mismatch"
+        },
+        {
+          "line": 2003,
+          "text": "        # or final-byte-drift under ReplacementStateUncertain, so a substitution fails"
+        },
+        {
+          "line": 2004,
+          "text": "        # closed with truthful evidence. The window requires a concurrent second"
+        },
+        {
+          "line": 2005,
+          "text": "        # writer racing a sub-second interval, which the single-actor CI trust root"
+        },
+        {
+          "line": 2006,
+          "text": "        # (docs/decisions/0001) does not have,"
+        },
+        {
+          "line": 2007,
+          "text": "        # and such a writer already has directory write access and so gains nothing"
+        },
+        {
+          "line": 2008,
+          "text": "        # beyond a truthfully reported failure it could cause by writing directly."
+        },
+        {
+          "line": 2009,
+          "text": "        $strPhase = 'publish-destination'"
+        },
+        {
+          "line": 2010,
+          "text": "        if ($hashtableRecord.OriginalState -eq 'Existing') {"
+        },
+        {
+          "line": 2011,
+          "text": "            $hashtableRecord.PublicationMethod = 'File.Replace'"
+        },
+        {
+          "line": 2012,
+          "text": "            [TerraformStyleGuide.AtomicFileReplacement]::Replace($strTemporaryPath, $strDestinationPath)"
+        },
+        {
+          "line": 2013,
+          "text": "            $hashtableRecord.TemporaryDisposition = 'ConsumedByReplace'"
+        },
+        {
+          "line": 2014,
+          "text": "        } else {"
+        },
+        {
+          "line": 2015,
+          "text": "            $hashtableRecord.PublicationMethod = 'File.Move'"
+        },
+        {
+          "line": 2016,
+          "text": "            [System.IO.File]::Move($strTemporaryPath, $strDestinationPath)"
+        },
+        {
+          "line": 2017,
+          "text": "            $hashtableRecord.TemporaryDisposition = 'ConsumedByMove'"
+        },
+        {
+          "line": 2018,
+          "text": "        }"
+        }
+      ]
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "first_line": 4326,
+      "last_line": 4420,
+      "lines": [
+        {
+          "line": 4326,
+          "text": "    $strNeutralGitDirectory = [System.IO.Path]::Combine("
+        },
+        {
+          "line": 4327,
+          "text": "        [System.IO.Path]::GetTempPath(),"
+        },
+        {
+          "line": 4328,
+          "text": "        ('exactgitpathset-neutral-' + [System.Guid]::NewGuid().ToString('N')))"
+        },
+        {
+          "line": 4329,
+          "text": "    [void][System.IO.Directory]::CreateDirectory($strNeutralGitDirectory)"
+        },
+        {
+          "line": 4330,
+          "text": "    try {"
+        },
+        {
+          "line": 4331,
+          "text": "        $strCommonConfigPath = [System.IO.Path]::GetFullPath("
+        },
+        {
+          "line": 4332,
+          "text": "            (Join-Path $hashtableAdministrativePaths.CommonDirectory 'config'))"
+        },
+        {
+          "line": 4333,
+          "text": "        # extensions.worktreeConfig lives in the common config and decides whether Git"
+        },
+        {
+          "line": 4334,
+          "text": "        # reads GitDirectory/config.worktree. Read it the same neutral way so"
+        },
+        {
+          "line": 4335,
+          "text": "        # config.worktree is checked for includes exactly when Git would consult it."
+        },
+        {
+          "line": 4336,
+          "text": "        $boolWorktreeConfigEnabled = $false"
+        },
+        {
+          "line": 4337,
+          "text": "        if ([System.IO.File]::Exists($strCommonConfigPath)) {"
+        },
+        {
+          "line": 4338,
+          "text": "            # F3: refuse a non-ordinary common config (a FIFO/socket/device satisfies"
+        },
+        {
+          "line": 4339,
+          "text": "            # File.Exists) before 'git config --file' opens it, because opening a FIFO blocks"
+        },
+        {
+          "line": 4340,
+          "text": "            # until a writer appears. Assert-OrdinaryAbsoluteFile inspects attributes and the"
+        },
+        {
+          "line": 4341,
+          "text": "            # UnixMode type without opening the path, matching Get-EffectiveConfigComponent."
+        },
+        {
+          "line": 4342,
+          "text": "            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strCommonConfigPath)"
+        },
+        {
+          "line": 4343,
+          "text": "            $strNativeCommand = 'worktree-config-extension'"
+        },
+        {
+          "line": 4344,
+          "text": "            $intNativeExit = $null"
+        },
+        {
+          "line": 4345,
+          "text": "            $hashtableWorktreeConfigResult = Invoke-GitRaw `"
+        },
+        {
+          "line": 4346,
+          "text": "                -GitRecord $hashtableGitExecutable `"
+        },
+        {
+          "line": 4347,
+          "text": "                -WorkingDirectory $strNeutralGitDirectory `"
+        },
+        {
+          "line": 4348,
+          "text": "                -ArgumentList @(('--git-dir=' + $strNeutralGitDirectory), 'config', '--file', $strCommonConfigPath,"
+        },
+        {
+          "line": 4349,
+          "text": "                    '--no-includes', '--type=bool', '--get', 'extensions.worktreeConfig')"
+        },
+        {
+          "line": 4350,
+          "text": "            $listNativeChecks.Add([ordered]@{"
+        },
+        {
+          "line": 4351,
+          "text": "                Name = $strNativeCommand"
+        },
+        {
+          "line": 4352,
+          "text": "                ExitCode = $hashtableWorktreeConfigResult.ExitCode"
+        },
+        {
+          "line": 4353,
+          "text": "                StdoutLength = $hashtableWorktreeConfigResult.Stdout.Length"
+        },
+        {
+          "line": 4354,
+          "text": "                StderrLength = $hashtableWorktreeConfigResult.StderrLength"
+        },
+        {
+          "line": 4355,
+          "text": "            })"
+        },
+        {
+          "line": 4356,
+          "text": "            $intNativeExit = $hashtableWorktreeConfigResult.ExitCode"
+        },
+        {
+          "line": 4357,
+          "text": "            # Exit 0 with a boolean value means the extension is present; exit 1 means the"
+        },
+        {
+          "line": 4358,
+          "text": "            # key is absent (the common case). Any other exit is malformed and fails closed."
+        },
+        {
+          "line": 4359,
+          "text": "            if ($intNativeExit -notin @(0, 1)) {"
+        },
+        {
+          "line": 4360,
+          "text": "                throw 'native-command'"
+        },
+        {
+          "line": 4361,
+          "text": "            }"
+        },
+        {
+          "line": 4362,
+          "text": "            if ($intNativeExit -eq 0) {"
+        },
+        {
+          "line": 4363,
+          "text": "                $boolWorktreeConfigEnabled = ("
+        },
+        {
+          "line": 4364,
+          "text": "                    $script:objUtf8Strict.GetString($hashtableWorktreeConfigResult.Stdout).Trim() -ceq 'true')"
+        },
+        {
+          "line": 4365,
+          "text": "            }"
+        },
+        {
+          "line": 4366,
+          "text": "        }"
+        },
+        {
+          "line": 4367,
+          "text": "        # Probe the common config and, when enabled, per-worktree config. Linked worktrees do"
+        },
+        {
+          "line": 4368,
+          "text": "        # not read GitDirectory/config; scanning it would create false include refusals."
+        },
+        {
+          "line": 4369,
+          "text": "        $listConfigFilePath = New-Object 'System.Collections.Generic.List[string]'"
+        },
+        {
+          "line": 4370,
+          "text": "        foreach ($strCandidateConfigPath in @("
+        },
+        {
+          "line": 4371,
+          "text": "            $strCommonConfigPath"
+        },
+        {
+          "line": 4372,
+          "text": "        )) {"
+        },
+        {
+          "line": 4373,
+          "text": "            if ([System.IO.File]::Exists($strCandidateConfigPath) -and"
+        },
+        {
+          "line": 4374,
+          "text": "                -not $listConfigFilePath.Contains($strCandidateConfigPath)) {"
+        },
+        {
+          "line": 4375,
+          "text": "                $listConfigFilePath.Add($strCandidateConfigPath)"
+        },
+        {
+          "line": 4376,
+          "text": "            }"
+        },
+        {
+          "line": 4377,
+          "text": "        }"
+        },
+        {
+          "line": 4378,
+          "text": "        if ($boolWorktreeConfigEnabled) {"
+        },
+        {
+          "line": 4379,
+          "text": "            $strWorktreeConfigFilePath = [System.IO.Path]::GetFullPath("
+        },
+        {
+          "line": 4380,
+          "text": "                (Join-Path $hashtableAdministrativePaths.GitDirectory 'config.worktree'))"
+        },
+        {
+          "line": 4381,
+          "text": "            if ([System.IO.File]::Exists($strWorktreeConfigFilePath) -and"
+        },
+        {
+          "line": 4382,
+          "text": "                -not $listConfigFilePath.Contains($strWorktreeConfigFilePath)) {"
+        },
+        {
+          "line": 4383,
+          "text": "                $listConfigFilePath.Add($strWorktreeConfigFilePath)"
+        },
+        {
+          "line": 4384,
+          "text": "            }"
+        },
+        {
+          "line": 4385,
+          "text": "        }"
+        },
+        {
+          "line": 4386,
+          "text": "        foreach ($strConfigFilePath in $listConfigFilePath) {"
+        },
+        {
+          "line": 4387,
+          "text": "            # F3: refuse a non-ordinary config file (a FIFO/socket/device satisfies File.Exists)"
+        },
+        {
+          "line": 4388,
+          "text": "            # immediately before 'git config --file' opens it, so a special file swapped in after"
+        },
+        {
+          "line": 4389,
+          "text": "            # the list was built cannot block the read. Matches Get-EffectiveConfigComponent."
+        },
+        {
+          "line": 4390,
+          "text": "            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strConfigFilePath)"
+        },
+        {
+          "line": 4391,
+          "text": "            $strNativeCommand = 'include-config'"
+        },
+        {
+          "line": 4392,
+          "text": "            $intNativeExit = $null"
+        },
+        {
+          "line": 4393,
+          "text": "            $hashtableIncludeResult = Invoke-GitRaw `"
+        },
+        {
+          "line": 4394,
+          "text": "                -GitRecord $hashtableGitExecutable `"
+        },
+        {
+          "line": 4395,
+          "text": "                -WorkingDirectory $strNeutralGitDirectory `"
+        },
+        {
+          "line": 4396,
+          "text": "                -ArgumentList @(('--git-dir=' + $strNeutralGitDirectory), 'config', '--file', $strConfigFilePath,"
+        },
+        {
+          "line": 4397,
+          "text": "                    '--no-includes', '-z', '--name-only', '--get-regexp', '^include(\\.|if\\.)')"
+        },
+        {
+          "line": 4398,
+          "text": "            $listNativeChecks.Add([ordered]@{"
+        },
+        {
+          "line": 4399,
+          "text": "                Name = $strNativeCommand"
+        },
+        {
+          "line": 4400,
+          "text": "                ExitCode = $hashtableIncludeResult.ExitCode"
+        },
+        {
+          "line": 4401,
+          "text": "                StdoutLength = $hashtableIncludeResult.Stdout.Length"
+        },
+        {
+          "line": 4402,
+          "text": "                StderrLength = $hashtableIncludeResult.StderrLength"
+        },
+        {
+          "line": 4403,
+          "text": "            })"
+        },
+        {
+          "line": 4404,
+          "text": "            $intNativeExit = $hashtableIncludeResult.ExitCode"
+        },
+        {
+          "line": 4405,
+          "text": "            # 'git config --get-regexp' exits 1 when no key matches (the hermetic case) and"
+        },
+        {
+          "line": 4406,
+          "text": "            # 0 when an include/includeIf key is present. Any match means an unbracketed"
+        },
+        {
+          "line": 4407,
+          "text": "            # external include could inject a read-relevant setting, so refuse."
+        },
+        {
+          "line": 4408,
+          "text": "            if ($intNativeExit -notin @(0, 1)) {"
+        },
+        {
+          "line": 4409,
+          "text": "                throw 'native-command'"
+        },
+        {
+          "line": 4410,
+          "text": "            }"
+        },
+        {
+          "line": 4411,
+          "text": "            if ($intNativeExit -eq 0) {"
+        },
+        {
+          "line": 4412,
+          "text": "                throw 'git-config-include-active'"
+        },
+        {
+          "line": 4413,
+          "text": "            }"
+        },
+        {
+          "line": 4414,
+          "text": "        }"
+        },
+        {
+          "line": 4415,
+          "text": "    } finally {"
+        },
+        {
+          "line": 4416,
+          "text": "        if ([System.IO.Directory]::Exists($strNeutralGitDirectory)) {"
+        },
+        {
+          "line": 4417,
+          "text": "            [System.IO.Directory]::Delete($strNeutralGitDirectory, $true)"
+        },
+        {
+          "line": 4418,
+          "text": "        }"
+        },
+        {
+          "line": 4419,
+          "text": "    }"
+        },
+        {
+          "line": 4420,
+          "text": ""
+        }
+      ]
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "first_line": 4326,
+      "last_line": 4420,
+      "lines": [
+        {
+          "line": 4326,
+          "text": "    # neutral Git directory, which reports include keys without opening their targets."
+        },
+        {
+          "line": 4327,
+          "text": "    $strNeutralGitDirectory = [System.IO.Path]::Combine("
+        },
+        {
+          "line": 4328,
+          "text": "        [System.IO.Path]::GetTempPath(),"
+        },
+        {
+          "line": 4329,
+          "text": "        ('exactgitpathset-neutral-' + [System.Guid]::NewGuid().ToString('N')))"
+        },
+        {
+          "line": 4330,
+          "text": "    [void][System.IO.Directory]::CreateDirectory($strNeutralGitDirectory)"
+        },
+        {
+          "line": 4331,
+          "text": "    try {"
+        },
+        {
+          "line": 4332,
+          "text": "        $strCommonConfigPath = [System.IO.Path]::GetFullPath("
+        },
+        {
+          "line": 4333,
+          "text": "            (Join-Path $hashtableAdministrativePaths.CommonDirectory 'config'))"
+        },
+        {
+          "line": 4334,
+          "text": "        # extensions.worktreeConfig lives in the common config and decides whether Git"
+        },
+        {
+          "line": 4335,
+          "text": "        # reads GitDirectory/config.worktree. Read it the same neutral way so"
+        },
+        {
+          "line": 4336,
+          "text": "        # config.worktree is checked for includes exactly when Git would consult it."
+        },
+        {
+          "line": 4337,
+          "text": "        $boolWorktreeConfigEnabled = $false"
+        },
+        {
+          "line": 4338,
+          "text": "        if ([System.IO.File]::Exists($strCommonConfigPath)) {"
+        },
+        {
+          "line": 4339,
+          "text": "            # F3: refuse a non-ordinary common config (a FIFO/socket/device satisfies"
+        },
+        {
+          "line": 4340,
+          "text": "            # File.Exists) before 'git config --file' opens it, because opening a FIFO blocks"
+        },
+        {
+          "line": 4341,
+          "text": "            # until a writer appears. Assert-OrdinaryAbsoluteFile inspects attributes and the"
+        },
+        {
+          "line": 4342,
+          "text": "            # UnixMode type without opening the path, matching Get-EffectiveConfigComponent."
+        },
+        {
+          "line": 4343,
+          "text": "            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strCommonConfigPath)"
+        },
+        {
+          "line": 4344,
+          "text": "            $strNativeCommand = 'worktree-config-extension'"
+        },
+        {
+          "line": 4345,
+          "text": "            $intNativeExit = $null"
+        },
+        {
+          "line": 4346,
+          "text": "            $hashtableWorktreeConfigResult = Invoke-GitRaw `"
+        },
+        {
+          "line": 4347,
+          "text": "                -GitRecord $hashtableGitExecutable `"
+        },
+        {
+          "line": 4348,
+          "text": "                -WorkingDirectory $strNeutralGitDirectory `"
+        },
+        {
+          "line": 4349,
+          "text": "                -ArgumentList @(('--git-dir=' + $strNeutralGitDirectory), 'config', '--file', $strCommonConfigPath,"
+        },
+        {
+          "line": 4350,
+          "text": "                    '--no-includes', '--type=bool', '--get', 'extensions.worktreeConfig')"
+        },
+        {
+          "line": 4351,
+          "text": "            $listNativeChecks.Add([ordered]@{"
+        },
+        {
+          "line": 4352,
+          "text": "                Name = $strNativeCommand"
+        },
+        {
+          "line": 4353,
+          "text": "                ExitCode = $hashtableWorktreeConfigResult.ExitCode"
+        },
+        {
+          "line": 4354,
+          "text": "                StdoutLength = $hashtableWorktreeConfigResult.Stdout.Length"
+        },
+        {
+          "line": 4355,
+          "text": "                StderrLength = $hashtableWorktreeConfigResult.StderrLength"
+        },
+        {
+          "line": 4356,
+          "text": "            })"
+        },
+        {
+          "line": 4357,
+          "text": "            $intNativeExit = $hashtableWorktreeConfigResult.ExitCode"
+        },
+        {
+          "line": 4358,
+          "text": "            # Exit 0 with a boolean value means the extension is present; exit 1 means the"
+        },
+        {
+          "line": 4359,
+          "text": "            # key is absent (the common case). Any other exit is malformed and fails closed."
+        },
+        {
+          "line": 4360,
+          "text": "            if ($intNativeExit -notin @(0, 1)) {"
+        },
+        {
+          "line": 4361,
+          "text": "                throw 'native-command'"
+        },
+        {
+          "line": 4362,
+          "text": "            }"
+        },
+        {
+          "line": 4363,
+          "text": "            if ($intNativeExit -eq 0) {"
+        },
+        {
+          "line": 4364,
+          "text": "                $boolWorktreeConfigEnabled = ("
+        },
+        {
+          "line": 4365,
+          "text": "                    $script:objUtf8Strict.GetString($hashtableWorktreeConfigResult.Stdout).Trim() -ceq 'true')"
+        },
+        {
+          "line": 4366,
+          "text": "            }"
+        },
+        {
+          "line": 4367,
+          "text": "        }"
+        },
+        {
+          "line": 4368,
+          "text": "        # Probe the common config and, when enabled, per-worktree config. Linked worktrees do"
+        },
+        {
+          "line": 4369,
+          "text": "        # not read GitDirectory/config; scanning it would create false include refusals."
+        },
+        {
+          "line": 4370,
+          "text": "        $listConfigFilePath = New-Object 'System.Collections.Generic.List[string]'"
+        },
+        {
+          "line": 4371,
+          "text": "        foreach ($strCandidateConfigPath in @("
+        },
+        {
+          "line": 4372,
+          "text": "            $strCommonConfigPath"
+        },
+        {
+          "line": 4373,
+          "text": "        )) {"
+        },
+        {
+          "line": 4374,
+          "text": "            if ([System.IO.File]::Exists($strCandidateConfigPath) -and"
+        },
+        {
+          "line": 4375,
+          "text": "                -not $listConfigFilePath.Contains($strCandidateConfigPath)) {"
+        },
+        {
+          "line": 4376,
+          "text": "                $listConfigFilePath.Add($strCandidateConfigPath)"
+        },
+        {
+          "line": 4377,
+          "text": "            }"
+        },
+        {
+          "line": 4378,
+          "text": "        }"
+        },
+        {
+          "line": 4379,
+          "text": "        if ($boolWorktreeConfigEnabled) {"
+        },
+        {
+          "line": 4380,
+          "text": "            $strWorktreeConfigFilePath = [System.IO.Path]::GetFullPath("
+        },
+        {
+          "line": 4381,
+          "text": "                (Join-Path $hashtableAdministrativePaths.GitDirectory 'config.worktree'))"
+        },
+        {
+          "line": 4382,
+          "text": "            if ([System.IO.File]::Exists($strWorktreeConfigFilePath) -and"
+        },
+        {
+          "line": 4383,
+          "text": "                -not $listConfigFilePath.Contains($strWorktreeConfigFilePath)) {"
+        },
+        {
+          "line": 4384,
+          "text": "                $listConfigFilePath.Add($strWorktreeConfigFilePath)"
+        },
+        {
+          "line": 4385,
+          "text": "            }"
+        },
+        {
+          "line": 4386,
+          "text": "        }"
+        },
+        {
+          "line": 4387,
+          "text": "        foreach ($strConfigFilePath in $listConfigFilePath) {"
+        },
+        {
+          "line": 4388,
+          "text": "            # F3: refuse a non-ordinary config file (a FIFO/socket/device satisfies File.Exists)"
+        },
+        {
+          "line": 4389,
+          "text": "            # immediately before 'git config --file' opens it, so a special file swapped in after"
+        },
+        {
+          "line": 4390,
+          "text": "            # the list was built cannot block the read. Matches Get-EffectiveConfigComponent."
+        },
+        {
+          "line": 4391,
+          "text": "            [void](Assert-OrdinaryAbsoluteFile -LiteralPath $strConfigFilePath)"
+        },
+        {
+          "line": 4392,
+          "text": "            $strNativeCommand = 'include-config'"
+        },
+        {
+          "line": 4393,
+          "text": "            $intNativeExit = $null"
+        },
+        {
+          "line": 4394,
+          "text": "            $hashtableIncludeResult = Invoke-GitRaw `"
+        },
+        {
+          "line": 4395,
+          "text": "                -GitRecord $hashtableGitExecutable `"
+        },
+        {
+          "line": 4396,
+          "text": "                -WorkingDirectory $strNeutralGitDirectory `"
+        },
+        {
+          "line": 4397,
+          "text": "                -ArgumentList @(('--git-dir=' + $strNeutralGitDirectory), 'config', '--file', $strConfigFilePath,"
+        },
+        {
+          "line": 4398,
+          "text": "                    '--no-includes', '-z', '--name-only', '--get-regexp', '^include(\\.|if\\.)')"
+        },
+        {
+          "line": 4399,
+          "text": "            $listNativeChecks.Add([ordered]@{"
+        },
+        {
+          "line": 4400,
+          "text": "                Name = $strNativeCommand"
+        },
+        {
+          "line": 4401,
+          "text": "                ExitCode = $hashtableIncludeResult.ExitCode"
+        },
+        {
+          "line": 4402,
+          "text": "                StdoutLength = $hashtableIncludeResult.Stdout.Length"
+        },
+        {
+          "line": 4403,
+          "text": "                StderrLength = $hashtableIncludeResult.StderrLength"
+        },
+        {
+          "line": 4404,
+          "text": "            })"
+        },
+        {
+          "line": 4405,
+          "text": "            $intNativeExit = $hashtableIncludeResult.ExitCode"
+        },
+        {
+          "line": 4406,
+          "text": "            # 'git config --get-regexp' exits 1 when no key matches (the hermetic case) and"
+        },
+        {
+          "line": 4407,
+          "text": "            # 0 when an include/includeIf key is present. Any match means an unbracketed"
+        },
+        {
+          "line": 4408,
+          "text": "            # external include could inject a read-relevant setting, so refuse."
+        },
+        {
+          "line": 4409,
+          "text": "            if ($intNativeExit -notin @(0, 1)) {"
+        },
+        {
+          "line": 4410,
+          "text": "                throw 'native-command'"
+        },
+        {
+          "line": 4411,
+          "text": "            }"
+        },
+        {
+          "line": 4412,
+          "text": "            if ($intNativeExit -eq 0) {"
+        },
+        {
+          "line": 4413,
+          "text": "                throw 'git-config-include-active'"
+        },
+        {
+          "line": 4414,
+          "text": "            }"
+        },
+        {
+          "line": 4415,
+          "text": "        }"
+        },
+        {
+          "line": 4416,
+          "text": "    } finally {"
+        },
+        {
+          "line": 4417,
+          "text": "        if ([System.IO.Directory]::Exists($strNeutralGitDirectory)) {"
+        },
+        {
+          "line": 4418,
+          "text": "            [System.IO.Directory]::Delete($strNeutralGitDirectory, $true)"
+        },
+        {
+          "line": 4419,
+          "text": "        }"
+        },
+        {
+          "line": 4420,
+          "text": "    }"
+        }
+      ]
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "first_line": 710,
+      "last_line": 724,
+      "lines": [
+        {
+          "line": 710,
+          "text": "        [DllImport(\"kernel32.dll\", SetLastError = true)]"
+        },
+        {
+          "line": 711,
+          "text": "        private static extern bool GetFileInformationByHandle("
+        },
+        {
+          "line": 712,
+          "text": "            Microsoft.Win32.SafeHandles.SafeFileHandle handle,"
+        },
+        {
+          "line": 713,
+          "text": "            out ByHandleFileInformation information);"
+        },
+        {
+          "line": 714,
+          "text": ""
+        },
+        {
+          "line": 715,
+          "text": "        public static string Read(string path) {"
+        },
+        {
+          "line": 716,
+          "text": "            using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {"
+        },
+        {
+          "line": 717,
+          "text": "                ByHandleFileInformation information;"
+        },
+        {
+          "line": 718,
+          "text": "                if (!GetFileInformationByHandle(stream.SafeFileHandle, out information)) {"
+        },
+        {
+          "line": 719,
+          "text": "                    throw new Win32Exception(Marshal.GetLastWin32Error());"
+        },
+        {
+          "line": 720,
+          "text": "                }"
+        },
+        {
+          "line": 721,
+          "text": "                if (information.NumberOfLinks != 1) {"
+        },
+        {
+          "line": 722,
+          "text": "                    throw new InvalidDataException(\"hardlink-alias\");"
+        },
+        {
+          "line": 723,
+          "text": "                }"
+        },
+        {
+          "line": 724,
+          "text": "                ulong index = ((ulong)information.FileIndexHigh << 32) | information.FileIndexLow;"
+        }
+      ]
+    },
+    {
+      "side": "TF",
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "first_line": 710,
+      "last_line": 724,
+      "lines": [
+        {
+          "line": 710,
+          "text": "        [DllImport(\"kernel32.dll\", SetLastError = true)]"
+        },
+        {
+          "line": 711,
+          "text": "        private static extern bool GetFileInformationByHandle("
+        },
+        {
+          "line": 712,
+          "text": "            Microsoft.Win32.SafeHandles.SafeFileHandle handle,"
+        },
+        {
+          "line": 713,
+          "text": "            out ByHandleFileInformation information);"
+        },
+        {
+          "line": 714,
+          "text": ""
+        },
+        {
+          "line": 715,
+          "text": "        public static string Read(string path) {"
+        },
+        {
+          "line": 716,
+          "text": "            using (FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read)) {"
+        },
+        {
+          "line": 717,
+          "text": "                ByHandleFileInformation information;"
+        },
+        {
+          "line": 718,
+          "text": "                if (!GetFileInformationByHandle(stream.SafeFileHandle, out information)) {"
+        },
+        {
+          "line": 719,
+          "text": "                    throw new Win32Exception(Marshal.GetLastWin32Error());"
+        },
+        {
+          "line": 720,
+          "text": "                }"
+        },
+        {
+          "line": 721,
+          "text": "                if (information.NumberOfLinks != 1) {"
+        },
+        {
+          "line": 722,
+          "text": "                    throw new InvalidDataException(\"hardlink-alias\");"
+        },
+        {
+          "line": 723,
+          "text": "                }"
+        },
+        {
+          "line": 724,
+          "text": "                ulong index = ((ulong)information.FileIndexHigh << 32) | information.FileIndexLow;"
+        }
+      ]
+    }
+  ],
+  "unchanged_core_engines_count": 6,
+  "accepted_PS_matches_reproduced_original_R2_adapter": true,
+  "retired_path_checks": [
+    {
+      "path": ".github/workflows/Expand-StyleGuideCandidateArtifact.ps1",
+      "absent_from_both_accepted_native_trees": true
+    },
+    {
+      "path": ".github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1",
+      "absent_from_both_accepted_native_trees": true
+    },
+    {
+      "path": ".github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1",
+      "absent_from_both_accepted_native_trees": true
+    },
+    {
+      "path": ".github/workflows/style-guide-candidate-cases.json",
+      "absent_from_both_accepted_native_trees": true
+    }
+  ],
+  "canonical_D92_D93_comment": {
+    "id": 5943334454,
+    "body_sha256": "2c9e63ed939ba54d72b4b66602c20138c5bd78f64a8194ec3af61b505bca5fec",
+    "unchanged": true,
+    "not_instruction_authority": true
+  },
+  "current_repository_runner_census": {
+    "PSStyleGuide": {
+      "pages": [
+        {
+          "page": 1,
+          "response": {
+            "total_count": 0,
+            "runners": []
+          }
+        }
+      ],
+      "complete": true,
+      "count": 0
+    },
+    "TerraformStyleGuide": {
+      "pages": [
+        {
+          "page": 1,
+          "response": {
+            "total_count": 0,
+            "runners": []
+          }
+        }
+      ],
+      "complete": true,
+      "count": 0
+    }
+  },
+  "TF_acceptance": {
+    "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+    "accepted_at": "2026-10-05T05:25:04.627912+00:00",
+    "five_landed_workflows": [
+      {
+        "id": 37266076771,
+        "name": "Dev container boundary",
+        "conclusion": "success"
+      },
+      {
+        "id": 37266076782,
+        "name": "Markdown Lint",
+        "conclusion": "success"
+      },
+      {
+        "id": 37266076754,
+        "name": "Build Style Guide Artifacts",
+        "conclusion": "success"
+      },
+      {
+        "id": 37266076803,
+        "name": "Agent instruction validation",
+        "conclusion": "success"
+      },
+      {
+        "id": 37266076765,
+        "name": "Copilot setup steps",
+        "conclusion": "success"
+      }
+    ],
+    "landed_node_tests": {
+      "passed": 515,
+      "failed": 0,
+      "skipped": 0
+    },
+    "evidence_source": "existing root-verified acceptance; not rerun here"
+  },
+  "historical_R2_boundary_tests": {
+    "Windows_final_boundary": {
+      "passed": 9,
+      "skipped": 0
+    },
+    "Linux_final_boundary": {
+      "passed": 9,
+      "skipped": 0
+    },
+    "original_adapter_negative_control_each_platform": {
+      "passed": 6,
+      "failed": 3
+    },
+    "not_current_full_Windows_suite": "historical exact inputs; later cleanup/native entry/R12/R21 changes have separate evidence",
+    "different_drive_UNC_hardlink_race_cases_not_proven": true
+  },
+  "current_TF_static_R2_cases": [
+    "regular",
+    "leaf-inside",
+    "leaf-outside",
+    "directory",
+    "missing",
+    "broken-link",
+    "ancestor-outside",
+    "ancestor-inside",
+    "root-alias"
+  ],
+  "trigger_map": [
+    {
+      "family": "Generator/verifier path substitution, publication and cleanup",
+      "selected_decision": "D92 B conditional-no-trigger retained for these named unchanged engines",
+      "current_evidence": "All three generator/exact-path/artifact-verifier objects on both accepted sides unchanged from original A14. Changed TF build expands live events and names/artifact label only, preserving ubuntu24.04, empty verification permissions and separate contents:read committed-only publisher. CONTRIBUTING adds finalization guidance without replacing generation commands.",
+      "reopen": "A06 changes create/read/publish/cleanup or exact-path operations; A03 adds promotion/write authority, shared/hostile workspace or materially different caller; a concrete supported failure or deliberately admitted competing writer; a qualified portable primitive addressing the operation."
+    },
+    {
+      "family": "Outer child static admission",
+      "selected_decision": "R2 B97.6 delivered on accepted TF; accepted PS counterpart still pending",
+      "current_evidence": "TF lstat rejects symbolic/nonregular child leaf; canonical relative containment refuses external ancestor resolution; canonical child goes to bounded spawn. Accepted PS equals the actually reproduced original adapter byte for byte.",
+      "reopen": "A07/A03 changes selected-root/child/cwd/import/loader contract; a supported static escape despite these checks; new admitted concurrent writer or atomic-execution requirement. Reassess PS after its current reverse merge and landed acceptance."
+    },
+    {
+      "family": "Root manifest static admission",
+      "selected_decision": "R21 E98.6 delivered on accepted TF, not atomic identity",
+      "current_evidence": "TF validates non-symlink regular leaf/1048576-byte cap/canonical containment before manifest read; root aliases remain supported. Eleven actual-manifest cases supplement retained child tests.",
+      "reopen": "A07 changes root/manifest selection or identity/read semantics; supported guard bypass; admitted competing writer or stronger immutable module identity requirement."
+    },
+    {
+      "family": "Hardlinks, universal Windows aliases and TOCTOU",
+      "selected_decision": "R2/R21/D92 explicit limits remain live",
+      "current_evidence": "lstat/canonical path checks and later path reads/spawn remain separate operations; spawnSync uses canonical pathname, not a retained descriptor/digest snapshot. Generator GetFileInformationByHandle is pre-existing and later publish/cleanup remain path-based. Contained root/ancestor aliases are deliberately accepted.",
+      "reopen": "Supported hardlink/alias failure, admitted adversarial parent/writer, or A07/R5/B1 host/runtime change that qualifies an actually useful primitive or drops a relevant supported platform branch."
+    },
+    {
+      "family": "Retired extractor/context/harness and PS156 limits",
+      "selected_decision": "D93 B candid retirement retained",
+      "current_evidence": "Four previously inventoried paths remain absent from both native trees; canonical D92/D93 comment IDs/body unchanged; no changed selected consumer reintroduces them. Current repository self-hosted runner inventories are empty.",
+      "reopen": "A06/A16/A17 introduces a current extractor/context/recovery consumer needing the missing property, a supported failure reopens its branch, or an actual available runner plus live consumer supplies new meaningful evidence. Do not revive helpers just for historical closure."
+    }
+  ],
+  "material_new_findings": [],
+  "overall_status": "TF scoped static child/manifest fixes delivered; generator/verifier D92/D93 residuals remain conditional-no-trigger; accepted PS static counterpart pending so no full A14 completion",
+  "pending_PS_counterpart": "root-owned reverse implementation/sole aggregate11388 unaccepted; not inspected or counted as delivery",
+  "limits": [
+    "read-only immutable objects and authenticated GETs; no source/index/ref/state/planning/native mutation",
+    "no suites/install/container/behavioral or adversarial race/alias probes",
+    "repository runner census does not inventory all external services; empty inventory does not prove universal exclusion",
+    "issue155 remains open; no claim race fixed, full A14 done or A18/A19 acceptance"
+  ]
+}

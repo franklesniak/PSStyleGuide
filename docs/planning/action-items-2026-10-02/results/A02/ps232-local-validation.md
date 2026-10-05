@@ -1,0 +1,16 @@
+<!-- markdownlint-disable MD013 -->
+# PS232 local validation
+
+PR232 contains commit `886f3837cb729b73bffec78e966d9ceb7fa78592`, tree `192a203a1d7e53065fcf6e3d662047df3696c3f5`, from accepted PS baseline `f168f83b89f64b6bca9d520ddec4b58969060fb6`. The exact22-path catalog remains in [canonical evidence](coherent-reverse-candidate.json). Source peer TF66 is accepted at56cb041; final paired acceptance remains pending.
+
+The one complete Linux pre-commit pass ran from05:51:15Z to06:03:13Z on2026-10-05. All11 hooks passed with zero skips. Its log SHA256 is36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c; container result SHA256 is5ebedcbab1c7be91690949beb85016535ff5b8e22c492c5ceec37e586d7abf2e. The staged preflight passed. The private offline runner retained all76 source files and1910 dependency files.
+
+The outer wrapper exited1 because its broad shared-ref hash changed during root's authorized planning publication9dd3fe5 to b3ed424. Only refs/heads/planning-CRT-PR-852 and refs/remotes/origin/planning-CRT-PR-852 changed. Restoring those two values reproduces the before hash. Product HEAD/main/tree, raw/logical index, configuration, files and dependencies did not change. Independent reconciliation accepted the exact-input suite; the original failed wrapper record remains preserved. Report SHA256:4ebc13a816adaec18f03f203f337506eb7b5b152d6ed446dfb5bf7373cf297be. This is not an assertion that the wrapper itself passed, and the suite was not rerun.
+
+Whole-file analysis of both current PowerShell scripts passed under PowerShell7.6.5/PSScriptAnalyzer1.24.0, default Error/Warning rules, with zero parser errors and analyzer diagnostics. Receipt SHA256:701bce28d9263a0afa6d6d864c60e6dacd6c04a0cfc5c42e813573da61d23afb. This closes the stale whole-main-file coverage gap; it does not claim that an analyzer proves every prose MUST rule.
+
+The normal commit passed its hooks and preserved the tested tree. In a pristine worktree at actual acceptedBf168, `AcceptedMaintenance`, `FinalizeMetadataNow` and `MetadataClassificationOnly` all exited0 for actualH886. Finalization checked genuine UTC2026-10-05. Candidate `ProposedPolicy` also exited0. `maintenance_required` is the expected classification and uses the existing scoped grant; checker diagnostics supply no owner or merge authority.
+
+After an ordinary fetch confirmed unchanged origin/main, the no-argument local `Check-NpmAudit.mjs` audit covered both installed roots and returned CLEAN with no findings or exceptions. Audit log SHA256:8c1159f87e22e0169762e31649051bdb7d711e3113aed34ae09e3574004ae950. Every endpoint and the audit retained unchanged source/dependency inputs. Command, time and log hashes are recorded in the canonical evidence.
+
+Normal non-force topic push and PR232 creation were confirmed at exactH/B. Round1 starts2026-10-05T06:26:07Z and expires2026-10-13T06:26:07Z. Both reviewer requests are confirmed; review results, hosted gates, final independent quality, normal merge and landed checks remain required. Metadata carry-back readiness found a conditional six-note synchronization without changing the already-current enclosing version. Recheck the actual destination baseline/date after PS lands; no third transfer is released here.

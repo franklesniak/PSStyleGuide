@@ -1,7 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # A14 current filesystem residual assessment
 
-## Current lint-child finding during TF66 round1
+## Current reassessment after accepted TF66: 2026-10-05
+
+TF main56cb041 delivers the selected R2 child and R21 manifest guards; its five landed workflows passed. Accepted PSf168 still has the reproduced original static child gap, so its counterpart remains pending until the current reverse lifecycle lands. The [fresh assessment](postTF66/REPORT.md) retains exact source/test/caller evidence, unchanged D92/D93 choices and explicit reopening triggers. Root read the full report and independently checked all39 present immutable blobs and the one absent historical path; [verification](postTF66/parent-verification.json) records the limits.
+
+The six named generator/verifier objects remain unchanged. No new supported competing-writer, privileged promotion consumer or concrete race trigger was found. Static containment does not prove atomic execution, cleanup/publication race repair, hardlink safety or universal alias confinement. Keep PS155 open and A14 active. Reassess the actual accepted PS reverse next, then relevant A06/runtime/recovery changes. No extra transfer, issue mutation or new test run was performed for this assessment.
+
+## Historical lint-child finding during TF66 round1
 
 The [exact private repair](../A02/TF66-round1-repair-validation.md) now passes final Windows/Linux boundary cases and independent bounded review. The original adapter demonstrably executes forbidden children in three cases on each platform. Full pre-commit validation is running; delivery and paired acceptance remain due. Keep A14 active until the actual delivered inputs are reassessed.
 
