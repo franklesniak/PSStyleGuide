@@ -1,6 +1,6 @@
 {
-  "status": "round4_reviews_pending",
-  "captured_at": "2026-10-05T09:23:13.033586+00:00",
+  "status": "round4_findings_repair_in_progress",
+  "captured_at": "2026-10-05T09:37:37.510951+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -567,7 +567,7 @@
   "first_request_at": "2026-10-05T06:26:07Z",
   "deadline": "2026-10-13T06:26:07+00:00",
   "metadata_carry_back": "A21 currently54 differing Version notes (50main/4SelfTest) plus classifier deletion; A07 shared fixture prefix. Two accepted TF helpers already have Oct5.0 tuples, requiring actual destination/date arithmetic. Transfer3 is not released; refresh accepted peers before it.",
-  "remaining": "Collect the existing round4 Copilot and Codex results; final independent current-input quality; normal merge; landed acceptance; actual paired comparison and applicable prepared repair. All22 outcomes and402 contracts remain in scope.",
+  "remaining": "Complete R7 diagnostic proposal and R9 applicability note; retain R8 duplicate disposition; combine selected repairs with local R6; one final-input aggregate, normal publication, next current review pair, final quality, normal merge, landed acceptance and actual paired repair/comparison. No owner action pending.",
   "implementation_evidence_sha256": "a974f641c004e31a3b2d47c953e9763338ec5314b7c8fb14afa492a27213e95e",
   "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8",
   "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
@@ -1970,6 +1970,24 @@
         "resolution_request_sent": true,
         "resolution_confirmed": true
       }
+    },
+    "reply_marker_format_correction": {
+      "observed_at": "2026-10-05T09:30:19.837633+00:00",
+      "comments": [
+        {
+          "id": 4182389734,
+          "parent": 4182292113,
+          "updated_at": "2026-10-05T09:29:54Z",
+          "verified_exact_marker": true
+        },
+        {
+          "id": 4182389921,
+          "parent": 4182292172,
+          "updated_at": "2026-10-05T09:29:55Z",
+          "verified_exact_marker": true
+        }
+      ],
+      "reason": "Remove terminal period to match literal AGENTS marker; adjudication and links unchanged; no new reply or product change."
     }
   },
   "conditional_carryback": {
@@ -1983,7 +2001,8 @@
       "A21",
       "A07"
     ],
-    "transfer_released": false
+    "transfer_released": false,
+    "R6_impact": "After PS acceptance, add scripts-README.md as fifth path; preserve actual TF Test-StateRecoveryExamples.mjs, T1 link and verify name. Prior four-path catalog retained as historical pre-R6 evidence; refresh before release."
   },
   "body_sha256": "4af6a5e78900cad48ddc84daefc332bf95e85acb28f6bdf9460a464df950f708",
   "round4": {
@@ -1992,10 +2011,10 @@
     "body_sha256": "4af6a5e78900cad48ddc84daefc332bf95e85acb28f6bdf9460a464df950f708",
     "baseline": "round4-pre-request.json",
     "started_at": "2026-10-05T09:16:20Z",
-    "request_set_terminal": false,
+    "request_set_terminal": true,
     "clean": false,
     "copilot": {
-      "status": "pending",
+      "status": "terminal_findings_pending_disposition",
       "request_event_id": 32493339422,
       "request_at": "2026-10-05T09:16:20Z",
       "actor_id": 11204406,
@@ -2003,15 +2022,42 @@
       "workflow_run_id": 37288951716,
       "transport": "GitHub UI",
       "selected_effort": "Balanced",
-      "observed_effort": null,
-      "snapshot": "round4-copilot-request-confirmation.json"
+      "observed_effort": "Lite",
+      "snapshot": "round4-progress-after-selection.json",
+      "review_id": 5412536034,
+      "review_at": "2026-10-05T09:33:57Z",
+      "observed_effort_source": "Authenticated native overview explicitly states Review effort: Lite",
+      "comment_ids": [
+        4182559907,
+        4182559963,
+        4182560011
+      ],
+      "service_status": "cancelled",
+      "fallback": "Valid authenticated Lite review under AGENTS; no effort-only retry.",
+      "service_execution": {
+        "run_id": 37288951716,
+        "job_id": 111694546210,
+        "conclusion": "cancelled",
+        "cause": "Authenticated maximumexecutiontime20m; repositoryvalidation andfinalimmutableinputs succeeded; ProcessingRequestLinux cancelled.",
+        "evidence_directory": "round4-copilot-attempt1",
+        "log_sha256": "6fb843d4f7665c749e3b769dafae09d2e973e8aafb2dc401dab8812b82bcecf9"
+      }
     },
     "codex": {
-      "status": "pending",
+      "status": "terminal_findings_pending_disposition",
       "trigger_comment_id": 5991573223,
       "request_at": "2026-10-05T09:16:57Z",
       "actor_id": 11204406,
-      "baseline": "round4-pre-request.json"
+      "baseline": "round4-pre-request.json",
+      "review_id": 5412443745,
+      "review_at": "2026-10-05T09:25:24Z",
+      "comment_ids": [
+        4182490671
+      ],
+      "reviewer_id": 199175422,
+      "reviewed_head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+      "snapshot": "round4-progress-0931.json",
+      "attribution": "Authenticated bot, exact head, baseline exclusion and ordered manual trigger/result; native summary completed09:25:28.202335Z."
     },
     "hosted_snapshot": {
       "snapshot": "round4-progress-0923.json",
@@ -2019,7 +2065,68 @@
       "ordinary_success": 13,
       "ordinary_pending": 0,
       "resolved_threads": 7
-    }
+    },
+    "pending_planning_publication": {
+      "head": "42ef770d12d12478fc29a57a99e573564c17f4b0",
+      "parent": "f9d5555cd0cbee5a78572997c2d020012465bd9a",
+      "tree": "94f87c8cea73e56757761590d289613a3024428c",
+      "files": [
+        "docs/planning/action-items-2026-10-02/results/A07/recovery-runtime/real-archive-readiness/REPORT.md",
+        "docs/planning/action-items-2026-10-02/results/A07/recovery-runtime/real-archive-readiness/evidence-catalog.json",
+        "docs/planning/action-items-2026-10-02/results/A02/coherent-reverse-candidate.json",
+        "docs/planning/action-items-2026-10-02/results/A02/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A03/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A07/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A20/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A21/RESULT.md",
+        "docs/planning/action-items-2026-10-02/STATUS.md"
+      ],
+      "status": "published",
+      "commit_log_sha256": "7ea2152357907c852a86cb6b9ab4e31f041bd7517172e76cda8195e9996ca883",
+      "push_exit": 0,
+      "published_at": "2026-10-05T09:26:37.617369+00:00"
+    },
+    "interim_quality": {
+      "result": "no_material_R4_R5_or_unchanged_source_issue_final_PASS_held",
+      "report": "round4-final-quality/REPORT.md",
+      "report_sha256": "fa33d96ba258bed189a6c338cac9f5a148f20d9a77d52838ac898ef1b5ccfb13",
+      "evidence": "round4-final-quality/EVIDENCE.json",
+      "evidence_sha256": "886f10b6c6c07116d53e71b6dd2e8e3e93ffe4cccfb1bafb8ba4860e3e1eddd2",
+      "root_read_full_report": true,
+      "pending": "R6 decision/repair and current remote review closure; native freshness before merge."
+    },
+    "decisions": {
+      "R6": {
+        "selection": "O97.4",
+        "selected_at": "2026-10-05T09:37:08.737772+00:00",
+        "proposal_hashes": {
+          "PROPOSAL.md": "2ee3b3aa437c3aa815e3d001e9b9a89a8bdb595c88bcfe341fa34f8173d64182",
+          "evidence.json": "340eb9723ca7019e8850e65e39432a00b36f3dee45fba9f890be65a361d43812"
+        },
+        "root_read_full_proposal": true,
+        "options_rubric_scores_selection_displayed": true,
+        "paths": [
+          ".github/workflows/scripts-README.md"
+        ],
+        "writer": "/root/a02_tf_coherent_implementation",
+        "writer_released": true,
+        "status": "implemented_local_focused_checks_passed",
+        "postimage_sha256": "e782b1a213003ca19f4ece0ccb992f0343eaaec9f89dcc6255b376741dc20881",
+        "repair_evidence": "round4-findings/R6-script-inventory/repair/final-evidence.json",
+        "repair_evidence_sha256": "e3d1f661c423167d495543845911eb15930a753680b3b28b225cf540bc6c74f0",
+        "root_read_diff_and_handoff": true
+      },
+      "R8": {
+        "comment_id": 4182559963,
+        "disposition": "duplicate_disproved_no_change",
+        "canonical": "results/A02/PS232-R5-script-table.md",
+        "canonical_planning_commit": "f9d5555cd0cbee5a78572997c2d020012465bd9a",
+        "exact_head_verified": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+        "root_raw_proof": "All15 original source table lines have singleleadingpipe/fourdelimiters/threecells; same H as prior full decision and rendered proof.",
+        "native_reply_pending": true
+      }
+    },
+    "R9_pending_note": "Owner confirms exact prior H-inline98 versus H-shared96 tradeoff; bounded current applicability note pending, no refactor released."
   },
   "round4_preparation": {
     "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
