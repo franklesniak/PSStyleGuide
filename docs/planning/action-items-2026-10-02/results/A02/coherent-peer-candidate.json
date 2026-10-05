@@ -1,6 +1,6 @@
 {
-  "recorded_at": "2026-10-05T00:23:16.233296+00:00",
-  "status": "round5_reviews_pending",
+  "recorded_at": "2026-10-05T00:37:16.823509+00:00",
+  "status": "round5_findings_under_analysis",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -721,13 +721,13 @@
       "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-request-baseline-dde2b9a.json",
       "baseline_sha256": "275f34ee7284a7732577db5db6ed7ec21888aebb253b307277838a94b7453d96",
       "prepared_at": "2026-10-05T00:12:48.853083+00:00",
-      "request_set_terminal": false,
+      "request_set_terminal": true,
       "clean": false,
       "copilot": {
         "transport": "supported GitHub Reviewers UI",
         "requested_effort": "Balanced",
-        "state": "requested_pending",
-        "result_effort": null,
+        "state": "completed_with_findings",
+        "result_effort": "Lite",
         "ui_submission_recorded_at": "2026-10-05T00:13:24.405791+00:00",
         "ui_click_count": 1,
         "request_event_id": 32467617732,
@@ -738,13 +738,24 @@
         "request_observation_sha256": "01c7243503402a305723eedd8dccdc2c1e0864141f71d040d336b76dfec489c4",
         "attempts": 1,
         "workflow_run_id": 37246631275,
-        "observed_run_status": "in_progress",
-        "observed_run_conclusion": null,
+        "observed_run_status": "completed",
+        "observed_run_conclusion": "cancelled",
         "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-review-request-proof.png",
         "ui_observation": "Signed-in supported Reviewers UI explicitly selected Balanced and submitted one request. Sidebar says Reviewing at balanced effort; Last completed: lite refers to prior round4. Current observed result effort remains unknown.",
         "live_job_id": 111565710806,
-        "observed_active_step": "Run complete repository validation hook set",
-        "active_step_started_at": "2026-10-05T00:13:58Z"
+        "clean": false,
+        "review_id": 5408989852,
+        "review_body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 3 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> \u00b7 1 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (4)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`hostedAuthorityReference()` now effectively operates on a `reference` that can be either a commit\u2026](#discussion_r4179947014) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The job timeout (59 minutes) is lower than the maximum cumulative wall-time implied by later step\u2026](#discussion_r4179947028) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This performs a full repo glob (`**/.markdownlint*`) on every lint configuration load, which can\u2026](#discussion_r4179947038) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The `paths` filter includes broad globs like `.github/workflows/**` and then repeats specific files\u2026](#discussion_r4179947053) \u00b7 New\n</details>\n\n<details>\n<summary><strong>Resolved since last review (3)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`assertLintConfigurationInputs()` normalizes discovered paths using\u2026](#discussion_r4179817891)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [When this module is imported (e.g., by `lint-staged-markdown.mjs`) and a dependency is missing, the\u2026](#discussion_r4179817873)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This setup flow embeds specific historical Node/npm versions (`11.16.0`, `24.18.0`, `24.18.1`)\u2026](#discussion_r4179817842)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+        "review_submitted_at": "2026-10-05T00:32:40Z",
+        "review_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#pullrequestreview-5408989852",
+        "observed_result_effort": "Lite",
+        "service_disposition": {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-copilot-service-disposition.json",
+          "sha256": "915d062809ae599869b2ee5f7a8401e793e99ee7bcc0d7fb5d84280bcd0075ce",
+          "full_validation_conclusion": "success",
+          "processing_conclusion": "cancelled",
+          "service_limit_minutes": 20
+        }
       },
       "manual_codex": {
         "state": "completed_clean",
@@ -888,7 +899,7 @@
       ],
       "hosted_evidence_reused_from": "Round4 same H/B and product tree. Body edit caused additional accepted-base run37246453878, success; its logs remain to collect.",
       "started_at": "2026-10-05T00:12:56Z",
-      "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-continuation-02-dde2b9a.json",
+      "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-terminal-findings-dde2b9a.json",
       "hosted_log_collection": {
         "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\round5-request-baseline-dde2b9a-collection.json",
         "sha256": "be448ab067df6dd5240ef2f958817e297909ea54d442cb3e5bc663779fb8a103",
@@ -954,6 +965,75 @@
         "evidence_sha256": "151e20423d694465ec352155f3d9025784d30eb61ebb32e6069cda85b29ec960",
         "root_verification": "Complete report read; report/evidence hashes and input identity checked; prior sampled source, exact command and log evidence reused.",
         "final_pr_pass": false
+      },
+      "findings": [
+        {
+          "key": "R17",
+          "owner": "A07",
+          "comment_id": 4179947014,
+          "thread_id": "PRRT_kwDOSAZRhc6o4BX1",
+          "path": ".github/workflows/Check-NpmAudit.mjs",
+          "line": 223,
+          "body": "`hostedAuthorityReference()` now effectively operates on a `reference` that can be either a commit SHA (event-main) or a symbolic ref string like `refs/heads/main` (remote-main). Since it\u2019s exported, this mixed return domain is easy to misuse (e.g., treating it as a commit id everywhere). Consider either (mandatory if external callers exist): (1) updating/adding JSDoc that explicitly documents the allowed return forms and when each occurs, or (2) changing the export to return a structured object (or renaming it) so callers don\u2019t accidentally assume a commit SHA.",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947014",
+          "review_id": 5408989852,
+          "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "state": "validating_options",
+          "owned_eyes_reaction_id": 450170649,
+          "reaction_readback_verified": true
+        },
+        {
+          "key": "R18",
+          "owner": "A03",
+          "comment_id": 4179947028,
+          "thread_id": "PRRT_kwDOSAZRhc6o4BX8",
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "line": 50,
+          "body": "The job timeout (59 minutes) is lower than the maximum cumulative wall-time implied by later step timeouts (including a 45-minute full-validation step plus multiple preceding minutes of bounded acquisition/toolchain steps). This can cause the job to be terminated by the job-level timeout before step-level timeouts fire, producing confusing failures and making the upper-bound guarantees inconsistent. Consider increasing the job-level timeout to cover the worst-case step budget for the `full` path, or reduce step timeouts / split the workflow so the job-level limit is a true upper bound.",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947028",
+          "review_id": 5408989852,
+          "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "state": "validating_options",
+          "owned_eyes_reaction_id": 450170650,
+          "reaction_readback_verified": true
+        },
+        {
+          "key": "R19",
+          "owner": "A07",
+          "comment_id": 4179947038,
+          "thread_id": "PRRT_kwDOSAZRhc6o4BYC",
+          "path": ".github/workflows/lint-nested-markdown.js",
+          "line": 193,
+          "body": "This performs a full repo glob (`**/.markdownlint*`) on every lint configuration load, which can become a noticeable cost in pre-commit hooks and CI (especially on larger repos or slower filesystems). If the policy requirement is simply to refuse alternative config selectors, consider tightening the scan (e.g., only check known disallowed root-level filenames and `.github/workflows` siblings), caching results per process invocation, or performing the scan once in the CLI entrypoint and passing a validated config to downstream functions.",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947038",
+          "review_id": 5408989852,
+          "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "state": "validating_options",
+          "owned_eyes_reaction_id": 450170654,
+          "reaction_readback_verified": true
+        },
+        {
+          "key": "R20",
+          "owner": "A03",
+          "comment_id": 4179947053,
+          "thread_id": "PRRT_kwDOSAZRhc6o4BYK",
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "line": 16,
+          "body": "The `paths` filter includes broad globs like `.github/workflows/**` and then repeats specific files within the same directory (e.g., `.github/workflows/ci-toolchain.json`, `.github/workflows/copilot-setup-steps.yml`). This duplication is harmless but makes it harder to audit what changes are intended to trigger the workflow. Consider removing redundant specific entries when a covering glob is already present (or, if the intent is to be explicit, drop the broad glob and enumerate the exact files).",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947053",
+          "review_id": 5408989852,
+          "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "state": "validating_options",
+          "owned_eyes_reaction_id": 450170657,
+          "reaction_readback_verified": true
+        }
+      ],
+      "inventory": {
+        "inline_findings": 4,
+        "body_only_findings": 0,
+        "resolved_prior_threads": 15,
+        "open_threads": 4,
+        "complete_body_and_pagination_checked": true
       }
     }
   },
@@ -1880,9 +1960,9 @@
   },
   "accepted_baseline_file_count": 75,
   "latest_native_snapshot": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-continuation-02-dde2b9a.json",
-    "sha256": "cc67b9e4bb950705437572f9518a8f6340fa8407305152da733e3b8094e9a124",
-    "captured_at": "2026-10-05T00:22:20.929184+00:00"
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-terminal-findings-dde2b9a.json",
+    "sha256": "f29f8a48e7692ec83254f17ed8804eb72765c66d14c7d7b6445b714ad07f726d",
+    "captured_at": "2026-10-05T00:35:22.532448+00:00"
   },
   "round1": {
     "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
@@ -3799,8 +3879,8 @@
       "old_input_clean": false
     }
   },
-  "current_review_status": "Round5 manual Codex5985975078 authenticated clean; Copilot37246631275 remains live. Independent R14-R16 supplement passed. All15threads resolved and all13 nonreview runs pass. Round4 retains its actual three-finding Lite review and no-change dispositions.",
-  "next_action": "Collect Copilot terminal result and full finding inventory; obtain final current-input quality before normal merge.",
+  "current_review_status": "Round5 terminal/nonclean: authenticated Copilot Lite review5408989852 has four new findings R17-R20; Codex clean5985975078. Prior15 threads remain resolved. Full Copilot hook step succeeded; service processing cancelled at20-minute service ceiling. All13 ordinary hosted runs still successful. Decisions and final quality remain.",
+  "next_action": "Complete R17-R20 options, distinct rubrics and scoring; implement selected actions, then refresh review and independent quality.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -4964,9 +5044,9 @@
     }
   },
   "pending_repair_readiness": {
-    "state": "no_product_repair_selected; dispositions_placed",
+    "state": "findings_under_analysis",
     "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-    "remaining": "Round5 reviews, supplemental/final independent quality, normal merge/landing, then actual PS reverse."
+    "remaining": "Complete R17-R20 options, distinct rubrics and scoring; implement selected actions, then refresh review and independent quality."
   },
   "round3": {
     "head": "055f112f762a466ed693c073083225f8ec9ee79d",
@@ -6517,13 +6597,13 @@
     "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-request-baseline-dde2b9a.json",
     "baseline_sha256": "275f34ee7284a7732577db5db6ed7ec21888aebb253b307277838a94b7453d96",
     "prepared_at": "2026-10-05T00:12:48.853083+00:00",
-    "request_set_terminal": false,
+    "request_set_terminal": true,
     "clean": false,
     "copilot": {
       "transport": "supported GitHub Reviewers UI",
       "requested_effort": "Balanced",
-      "state": "requested_pending",
-      "result_effort": null,
+      "state": "completed_with_findings",
+      "result_effort": "Lite",
       "ui_submission_recorded_at": "2026-10-05T00:13:24.405791+00:00",
       "ui_click_count": 1,
       "request_event_id": 32467617732,
@@ -6534,13 +6614,24 @@
       "request_observation_sha256": "01c7243503402a305723eedd8dccdc2c1e0864141f71d040d336b76dfec489c4",
       "attempts": 1,
       "workflow_run_id": 37246631275,
-      "observed_run_status": "in_progress",
-      "observed_run_conclusion": null,
+      "observed_run_status": "completed",
+      "observed_run_conclusion": "cancelled",
       "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-review-request-proof.png",
       "ui_observation": "Signed-in supported Reviewers UI explicitly selected Balanced and submitted one request. Sidebar says Reviewing at balanced effort; Last completed: lite refers to prior round4. Current observed result effort remains unknown.",
       "live_job_id": 111565710806,
-      "observed_active_step": "Run complete repository validation hook set",
-      "active_step_started_at": "2026-10-05T00:13:58Z"
+      "clean": false,
+      "review_id": 5408989852,
+      "review_body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 3 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> \u00b7 1 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (4)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`hostedAuthorityReference()` now effectively operates on a `reference` that can be either a commit\u2026](#discussion_r4179947014) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The job timeout (59 minutes) is lower than the maximum cumulative wall-time implied by later step\u2026](#discussion_r4179947028) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This performs a full repo glob (`**/.markdownlint*`) on every lint configuration load, which can\u2026](#discussion_r4179947038) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The `paths` filter includes broad globs like `.github/workflows/**` and then repeats specific files\u2026](#discussion_r4179947053) \u00b7 New\n</details>\n\n<details>\n<summary><strong>Resolved since last review (3)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`assertLintConfigurationInputs()` normalizes discovered paths using\u2026](#discussion_r4179817891)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [When this module is imported (e.g., by `lint-staged-markdown.mjs`) and a dependency is missing, the\u2026](#discussion_r4179817873)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This setup flow embeds specific historical Node/npm versions (`11.16.0`, `24.18.0`, `24.18.1`)\u2026](#discussion_r4179817842)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+      "review_submitted_at": "2026-10-05T00:32:40Z",
+      "review_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#pullrequestreview-5408989852",
+      "observed_result_effort": "Lite",
+      "service_disposition": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-copilot-service-disposition.json",
+        "sha256": "915d062809ae599869b2ee5f7a8401e793e99ee7bcc0d7fb5d84280bcd0075ce",
+        "full_validation_conclusion": "success",
+        "processing_conclusion": "cancelled",
+        "service_limit_minutes": 20
+      }
     },
     "manual_codex": {
       "state": "completed_clean",
@@ -6684,7 +6775,7 @@
     ],
     "hosted_evidence_reused_from": "Round4 same H/B and product tree. Body edit caused additional accepted-base run37246453878, success; its logs remain to collect.",
     "started_at": "2026-10-05T00:12:56Z",
-    "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-continuation-02-dde2b9a.json",
+    "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-terminal-findings-dde2b9a.json",
     "hosted_log_collection": {
       "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\round5-request-baseline-dde2b9a-collection.json",
       "sha256": "be448ab067df6dd5240ef2f958817e297909ea54d442cb3e5bc663779fb8a103",
@@ -6750,6 +6841,75 @@
       "evidence_sha256": "151e20423d694465ec352155f3d9025784d30eb61ebb32e6069cda85b29ec960",
       "root_verification": "Complete report read; report/evidence hashes and input identity checked; prior sampled source, exact command and log evidence reused.",
       "final_pr_pass": false
+    },
+    "findings": [
+      {
+        "key": "R17",
+        "owner": "A07",
+        "comment_id": 4179947014,
+        "thread_id": "PRRT_kwDOSAZRhc6o4BX1",
+        "path": ".github/workflows/Check-NpmAudit.mjs",
+        "line": 223,
+        "body": "`hostedAuthorityReference()` now effectively operates on a `reference` that can be either a commit SHA (event-main) or a symbolic ref string like `refs/heads/main` (remote-main). Since it\u2019s exported, this mixed return domain is easy to misuse (e.g., treating it as a commit id everywhere). Consider either (mandatory if external callers exist): (1) updating/adding JSDoc that explicitly documents the allowed return forms and when each occurs, or (2) changing the export to return a structured object (or renaming it) so callers don\u2019t accidentally assume a commit SHA.",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947014",
+        "review_id": 5408989852,
+        "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "state": "validating_options",
+        "owned_eyes_reaction_id": 450170649,
+        "reaction_readback_verified": true
+      },
+      {
+        "key": "R18",
+        "owner": "A03",
+        "comment_id": 4179947028,
+        "thread_id": "PRRT_kwDOSAZRhc6o4BX8",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "line": 50,
+        "body": "The job timeout (59 minutes) is lower than the maximum cumulative wall-time implied by later step timeouts (including a 45-minute full-validation step plus multiple preceding minutes of bounded acquisition/toolchain steps). This can cause the job to be terminated by the job-level timeout before step-level timeouts fire, producing confusing failures and making the upper-bound guarantees inconsistent. Consider increasing the job-level timeout to cover the worst-case step budget for the `full` path, or reduce step timeouts / split the workflow so the job-level limit is a true upper bound.",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947028",
+        "review_id": 5408989852,
+        "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "state": "validating_options",
+        "owned_eyes_reaction_id": 450170650,
+        "reaction_readback_verified": true
+      },
+      {
+        "key": "R19",
+        "owner": "A07",
+        "comment_id": 4179947038,
+        "thread_id": "PRRT_kwDOSAZRhc6o4BYC",
+        "path": ".github/workflows/lint-nested-markdown.js",
+        "line": 193,
+        "body": "This performs a full repo glob (`**/.markdownlint*`) on every lint configuration load, which can become a noticeable cost in pre-commit hooks and CI (especially on larger repos or slower filesystems). If the policy requirement is simply to refuse alternative config selectors, consider tightening the scan (e.g., only check known disallowed root-level filenames and `.github/workflows` siblings), caching results per process invocation, or performing the scan once in the CLI entrypoint and passing a validated config to downstream functions.",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947038",
+        "review_id": 5408989852,
+        "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "state": "validating_options",
+        "owned_eyes_reaction_id": 450170654,
+        "reaction_readback_verified": true
+      },
+      {
+        "key": "R20",
+        "owner": "A03",
+        "comment_id": 4179947053,
+        "thread_id": "PRRT_kwDOSAZRhc6o4BYK",
+        "path": ".github/workflows/copilot-setup-steps.yml",
+        "line": 16,
+        "body": "The `paths` filter includes broad globs like `.github/workflows/**` and then repeats specific files within the same directory (e.g., `.github/workflows/ci-toolchain.json`, `.github/workflows/copilot-setup-steps.yml`). This duplication is harmless but makes it harder to audit what changes are intended to trigger the workflow. Consider removing redundant specific entries when a covering glob is already present (or, if the intent is to be explicit, drop the broad glob and enumerate the exact files).",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947053",
+        "review_id": 5408989852,
+        "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "state": "validating_options",
+        "owned_eyes_reaction_id": 450170657,
+        "reaction_readback_verified": true
+      }
+    ],
+    "inventory": {
+      "inline_findings": 4,
+      "body_only_findings": 0,
+      "resolved_prior_threads": 15,
+      "open_threads": 4,
+      "complete_body_and_pagination_checked": true
     }
   }
 }
