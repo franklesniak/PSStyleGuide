@@ -1,6 +1,6 @@
 {
-  "status": "round8_paired_reviews_pending",
-  "captured_at": "2026-10-05T11:58:31.560008+00:00",
+  "status": "round9_paired_reviews_pending",
+  "captured_at": "2026-10-05T12:24:49.858033+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -563,11 +563,11 @@
     }
   },
   "reverse_PR": "https://github.com/franklesniak/PSStyleGuide/pull/232",
-  "rounds_used": 8,
+  "rounds_used": 9,
   "first_request_at": "2026-10-05T06:26:07Z",
   "deadline": "2026-10-13T06:26:07+00:00",
   "metadata_carry_back": "Prepared six-path A21/A07 repair:54 differing Version notes, classifier deletion, local-test prefix, README inventory and lint diagnostics. Genuine destination date/baseline arithmetic and exact language exceptions remain; transfer3 is not released.",
-  "remaining": "Round8 terminal reviews and service evidence, final independent quality/native gates, normal merge, landed acceptance and six-path TF follow-up; no owner action.",
+  "remaining": "Collect current round9 reviews; obtain final independent quality and fresh native gates; normal PS merge/landed acceptance; release conditional six-path TF carry-back and verify paired convergence.",
   "implementation_evidence_sha256": "a974f641c004e31a3b2d47c953e9763338ec5314b7c8fb14afa492a27213e95e",
   "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8",
   "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
@@ -3035,13 +3035,13 @@
     "baseline": "round8-pre-request.json",
     "request_intent_at": "2026-10-05T11:57:25.285678+00:00",
     "reason": "Continue required paired review after round7 duplicate R13 were verified, replied and resolved. No source/body change. Round6 remains a valid Lite review with findings; its separate service cancellation is not relabelled a pass. This request is not an effort-only retry or service-failure replacement.",
-    "request_set_terminal": false,
+    "request_set_terminal": true,
     "clean": false,
     "copilot": {
-      "status": "pending",
+      "status": "terminal_findings_dispositioned",
       "preferred_effort": "Balanced",
       "selected_effort": null,
-      "observed_effort": null,
+      "observed_effort": "Lite",
       "transport": "gh pr edit --add-reviewer @copilot",
       "ui_fallback_reason": "Fresh Edge3 PR232 tab75572477 is signed out (Sign in and Sign in to comment visible), with no authenticated request control. The Balanced effort menu alone cannot submit a request. No UI request was sent.",
       "command_exit": 0,
@@ -3049,10 +3049,31 @@
       "request_at": "2026-10-05T11:57:20Z",
       "actor_id": 11204406,
       "reviewer_id": 175728472,
-      "snapshot": "round8-copilot-request-confirmation.json"
+      "snapshot": "round8-progress-121650.json",
+      "workflow_run_id": 37306286348,
+      "work_started_event_id": 32505083357,
+      "work_started_at": "2026-10-05T11:58:29Z",
+      "workflow_status": "completed",
+      "review_id": 5414329909,
+      "result_at": "2026-10-05T12:15:20Z",
+      "finding_ids": [
+        4183855846,
+        4183855926
+      ],
+      "findings_clean": false,
+      "service": {
+        "status": "completed",
+        "conclusion": "cancelled",
+        "run_id": 37306286348,
+        "check_id": 111750640035,
+        "summary_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round8-copilot-attempt1\\summary.json",
+        "summary_sha256": "b094069984d0e15b6b8a0d0a13fb4dd51a3b2e07750f26e99e831958a26bed73",
+        "log_sha256": "ba6f67d32361e2fcab5f450051c3f571c6b082c03df1ea70b291499c65778575",
+        "cause": "Authenticated20-minute maximum. All11 hook Passed lines printed, last at12:18:17.904Z, but validation step cancelled at12:18:18.129Z and has no successful native completion. Final immutable guard succeeded; Processing Request skipped. Separate Lite review has two findings; neither whole service nor review is relabelled clean/successful."
+      }
     },
     "codex": {
-      "status": "pending",
+      "status": "clean",
       "baseline": "round8-pre-request.json",
       "trigger_intent_after_snapshot": "round8-copilot-request-confirmation.json",
       "trigger_intent_at": "2026-10-05T11:57:47.419267+00:00",
@@ -3060,7 +3081,17 @@
       "trigger_comment_id": 5993954328,
       "request_at": "2026-10-05T11:57:41Z",
       "actor_id": 11204406,
-      "snapshot": "round8-paired-request-confirmation.json"
+      "snapshot": "round8-progress-120538.json",
+      "summary_comment_id": 5989249158,
+      "summary_status": "completed",
+      "summary_started_at": "2026-10-05T11:57:58.899725Z",
+      "summary_updated_at": "2026-10-05T12:05:13Z",
+      "result_kind": "authenticated_exact_commit_conversation",
+      "result_comment_id": 5994076444,
+      "result_at": "2026-10-05T12:05:09Z",
+      "result_author_id": 199175422,
+      "reviewed_commit_abbreviation": "86f35f47cf",
+      "baseline_exclusion_verified": true
     },
     "hosted_validation": {
       "status": "passed",
@@ -3098,7 +3129,127 @@
       "reused_from": "round5 on identical head/base/body; no source change or repeated suite"
     },
     "started_at": "2026-10-05T11:57:20Z",
-    "latest_snapshot": "round8-paired-request-confirmation.json",
-    "last_native_observation_at": "2026-10-05T11:58:31.560008+00:00"
+    "latest_snapshot": "round8-progress-121650.json",
+    "last_native_observation_at": "2026-10-05T12:16:54.925219+00:00",
+    "planning_publication": {
+      "head": "546d99ca2ce764f9c7d34252ae9738cda527bbfd",
+      "parent": "0e3018b2e8df04082e106111b15029367b27fb14",
+      "tree": "603bf24036ebe8ed95569cdadaa5d9692e622094",
+      "files": [
+        "docs/planning/action-items-2026-10-02/results/A02/PS232-review-presentation-assessment.md",
+        "docs/planning/action-items-2026-10-02/results/A02/coherent-reverse-candidate.json",
+        "docs/planning/action-items-2026-10-02/results/A02/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A03/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A07/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A20/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A21/RESULT.md",
+        "docs/planning/action-items-2026-10-02/STATUS.md"
+      ],
+      "status": "published",
+      "commit_log_sha256": "fb76c6280e2c2aaaecc51ddb1df280cebee5b98cc3e1e1fe66beeaee824994bc",
+      "push_exit": 0,
+      "published_at": "2026-10-05T12:00:51.072819+00:00"
+    },
+    "dispositions": {
+      "R14": {
+        "thread": "PRRT_kwDOQkjdhM6pBtcd",
+        "parent_id": 4183855846,
+        "reply_id": 4183907541,
+        "reply_sha256": "3c04c8e60a2185358e2244df605787d51ced0319677189ef465130219239fb8d",
+        "decision": "Existing R7 S98 applies; CLI prefix/native error details/status preserved.",
+        "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+        "body_sha256": "7221c071ff008d322c0f066b17d43b9fc2f5f44eeb98295f3a74643404015e6c",
+        "status": "resolved_confirmed",
+        "intent_at": "2026-10-05T12:22:45.229759+00:00",
+        "confirmed_at": "2026-10-05T12:22:47.868182+00:00"
+      },
+      "R15": {
+        "thread": "PRRT_kwDOQkjdhM6pBtdZ",
+        "parent_id": 4183855926,
+        "reply_id": 4183887927,
+        "reply_sha256": "ad1b6608cf43989fc7e1b6127e39fb4438f1507683ce85a2572fdb5176c5a852",
+        "decision": "Repeated table claim disproved; R5 N100 and separate retained-table N84 apply.",
+        "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+        "body_sha256": "7221c071ff008d322c0f066b17d43b9fc2f5f44eeb98295f3a74643404015e6c",
+        "status": "resolved_confirmed",
+        "intent_at": "2026-10-05T12:22:49.395923+00:00",
+        "confirmed_at": "2026-10-05T12:22:50.864775+00:00"
+      }
+    }
+  },
+  "round9": {
+    "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+    "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "body_sha256": "7221c071ff008d322c0f066b17d43b9fc2f5f44eeb98295f3a74643404015e6c",
+    "baseline": "round9-pre-request.json",
+    "request_intent_at": "2026-10-05T12:23:55.688867+00:00",
+    "reason": "Continue required paired review after round8 R14 existing-decision applicability and R15 duplicate table claim were verified, replied and resolved. No source/body change. Round8 remains a valid Lite review with findings; its separate service cancellation is not relabelled a pass. This request is not an effort-only retry or service-failure replacement.",
+    "request_set_terminal": false,
+    "clean": false,
+    "copilot": {
+      "status": "pending",
+      "preferred_effort": "Balanced",
+      "selected_effort": null,
+      "observed_effort": null,
+      "transport": "gh pr edit --add-reviewer @copilot",
+      "ui_fallback_reason": "Fresh Edge3 PR232 tab75572479 is signed out (Sign in and Sign in to comment visible), with no authenticated request control. The Balanced effort menu alone cannot submit a request. No UI request was sent.",
+      "command_exit": 0,
+      "request_event_id": 32506957441,
+      "request_at": "2026-10-05T12:23:51Z",
+      "actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "snapshot": "round9-copilot-request-confirmation.json",
+      "workflow_run_id": 37309257514,
+      "workflow_status": "in_progress"
+    },
+    "codex": {
+      "status": "pending",
+      "baseline": "round9-pre-request.json",
+      "trigger_intent_after_snapshot": "round9-copilot-request-confirmation.json",
+      "trigger_intent_at": "2026-10-05T12:24:15.604391+00:00",
+      "trigger_body": "@codex review",
+      "trigger_comment_id": 5994378696,
+      "request_at": "2026-10-05T12:24:09Z",
+      "actor_id": 11204406,
+      "snapshot": "round9-paired-request-confirmation.json"
+    },
+    "hosted_validation": {
+      "status": "passed",
+      "terminal_success_ids": [
+        37296273633,
+        37296254033,
+        37296253918,
+        37296253935,
+        37296253922,
+        37296253919,
+        37296249298,
+        37296246381,
+        37296246402,
+        37296246413,
+        37296246433,
+        37296246392
+      ],
+      "pending_run_ids": [],
+      "collected_evidence": "round5-hosted-86f35f4/round5-progress-1048-collection.json",
+      "accepted_run_ids": [
+        37296273633,
+        37296254033,
+        37296253918,
+        37296253935,
+        37296253922,
+        37296253919,
+        37296249298,
+        37296246381,
+        37296246402,
+        37296246413,
+        37296246433,
+        37296246392
+      ],
+      "evidence_readback": "Both proposed instruction jobs:507pass/0fail/0skip and mutation SelfTest PASS. Both setup jobs:all11hooks/0skips and final immutable-input guard PASS. All required producer logs collected on actual86f35f4.",
+      "reused_from": "round5 on identical head/base/body; no source change or repeated suite"
+    },
+    "started_at": "2026-10-05T12:23:51Z",
+    "latest_snapshot": "round9-paired-request-confirmation.json",
+    "last_native_observation_at": "2026-10-05T12:24:49.858033+00:00"
   }
 }
