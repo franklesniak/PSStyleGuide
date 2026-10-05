@@ -1,0 +1,545 @@
+{
+  "status": "read-only readiness; not product acceptance",
+  "sources": [
+    {
+      "label": "PS-accepted",
+      "repository": "franklesniak/PSStyleGuide",
+      "commit": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "accepted": true,
+      "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+      "workflow_policy_schema": "StyleGuide.WorkflowPolicyContract.v3",
+      "workflow_case_schema": "StyleGuide.WorkflowPolicyCases.v3",
+      "roles": {
+        "artifactVerifier": "verify_generated_artifacts"
+      },
+      "test_SelfTest_count": 8,
+      "test_census_paths": [
+        ".github/workflows/Check-NpmAudit.test.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/lint-markdown.test.mjs"
+      ],
+      "changed_test_paths_since_saved": []
+    },
+    {
+      "label": "TF-accepted",
+      "repository": "franklesniak/TerraformStyleGuide",
+      "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "accepted": true,
+      "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "workflow_policy_schema": "StyleGuide.WorkflowPolicyContract.v3",
+      "workflow_case_schema": "StyleGuide.WorkflowPolicyCases.v3",
+      "roles": {
+        "artifactVerifier": "verify"
+      },
+      "test_SelfTest_count": 9,
+      "test_census_paths": [
+        ".github/workflows/Check-NpmAudit.test.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-LocalValidation.test.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/lint-markdown.test.mjs"
+      ],
+      "changed_test_paths_since_saved": [
+        ".github/workflows/Check-NpmAudit.test.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-LocalValidation.test.mjs",
+        ".github/workflows/lint-markdown.test.mjs"
+      ]
+    },
+    {
+      "label": "PS232-proposed",
+      "repository": "franklesniak/PSStyleGuide",
+      "commit": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+      "accepted": false,
+      "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+      "workflow_policy_schema": "StyleGuide.WorkflowPolicyContract.v3",
+      "workflow_case_schema": "StyleGuide.WorkflowPolicyCases.v3",
+      "roles": {
+        "artifactVerifier": "verify_generated_artifacts"
+      },
+      "test_SelfTest_count": 9,
+      "test_census_paths": [
+        ".github/workflows/Check-NpmAudit.test.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-LocalValidation.test.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/lint-markdown.test.mjs"
+      ],
+      "changed_test_paths_since_saved": [
+        ".github/workflows/Check-NpmAudit.test.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-LocalValidation.test.mjs",
+        ".github/workflows/lint-markdown.test.mjs"
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "source": "PS-accepted",
+      "commit": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+      "path": ".github/instructions/yaml.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+      "bytes": 54645,
+      "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "prior_revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+      "prior_bytes": 54645,
+      "prior_sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "unchanged_from_saved": true
+    },
+    {
+      "source": "PS-accepted",
+      "commit": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+      "bytes": 17320,
+      "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "prior_revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+      "prior_bytes": 17320,
+      "prior_sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "unchanged_from_saved": true
+    },
+    {
+      "source": "PS-accepted",
+      "commit": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+      "bytes": 98497,
+      "sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb",
+      "prior_revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_blob": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+      "prior_bytes": 98497,
+      "prior_sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb",
+      "unchanged_from_saved": true
+    },
+    {
+      "source": "PS-accepted",
+      "commit": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+      "bytes": 12748,
+      "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c",
+      "prior_revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+      "prior_bytes": 12748,
+      "prior_sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c",
+      "unchanged_from_saved": true
+    },
+    {
+      "source": "PS-accepted",
+      "commit": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "bytes": 5398,
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "prior_revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "prior_bytes": 5398,
+      "prior_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "unchanged_from_saved": true
+    },
+    {
+      "source": "TF-accepted",
+      "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "path": ".github/instructions/yaml.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "924d12c833d07def47d05137b532e622db622fa4",
+      "bytes": 54645,
+      "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+      "prior_revision": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "prior_blob": "924d12c833d07def47d05137b532e622db622fa4",
+      "prior_bytes": 54645,
+      "prior_sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745",
+      "unchanged_from_saved": true
+    },
+    {
+      "source": "TF-accepted",
+      "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+      "bytes": 17320,
+      "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "prior_revision": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "prior_blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+      "prior_bytes": 17320,
+      "prior_sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "unchanged_from_saved": true
+    },
+    {
+      "source": "TF-accepted",
+      "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+      "bytes": 100007,
+      "sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea",
+      "prior_revision": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "prior_blob": "26176163225be5ae18585e82b21dccf7ef1f3cda",
+      "prior_bytes": 100034,
+      "prior_sha256": "88a35be62a72e9e31084f6b82dc89056f3da5e84c4469c3ffc13d329dd22a96a",
+      "unchanged_from_saved": false
+    },
+    {
+      "source": "TF-accepted",
+      "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+      "bytes": 12865,
+      "sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc",
+      "prior_revision": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "prior_blob": "f4402c90eabe7a42376316aa1773316623a93930",
+      "prior_bytes": 12824,
+      "prior_sha256": "2f1eccf9af407ad32e6e60967d0664f0a8cc1d2672cfb64ba0b228c93fecfcce",
+      "unchanged_from_saved": false
+    },
+    {
+      "source": "TF-accepted",
+      "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "bytes": 5405,
+      "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+      "prior_revision": "525147aac9804088b8b9e743a7e441a5276d59f2",
+      "prior_blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+      "prior_bytes": 5405,
+      "prior_sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+      "unchanged_from_saved": true
+    },
+    {
+      "source": "PS232-proposed",
+      "commit": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+      "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+      "path": ".github/instructions/yaml.instructions.md",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+      "bytes": 54645,
+      "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "prior_revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+      "prior_bytes": 54645,
+      "prior_sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3",
+      "unchanged_from_saved": true
+    },
+    {
+      "source": "PS232-proposed",
+      "commit": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+      "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+      "bytes": 17320,
+      "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "prior_revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+      "prior_bytes": 17320,
+      "prior_sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "unchanged_from_saved": true
+    },
+    {
+      "source": "PS232-proposed",
+      "commit": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+      "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "4098cd1c6d8dadd114fbd1c7a7da5b1918d9eacb",
+      "bytes": 98544,
+      "sha256": "5a14647cf03e46f0c776813ef637b6872097a43210efdedee7a095c523e88002",
+      "prior_revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_blob": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+      "prior_bytes": 98497,
+      "prior_sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb",
+      "unchanged_from_saved": false
+    },
+    {
+      "source": "PS232-proposed",
+      "commit": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+      "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+      "path": ".github/workflows/agent-instructions.yml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+      "bytes": 12837,
+      "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+      "prior_revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+      "prior_bytes": 12748,
+      "prior_sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c",
+      "unchanged_from_saved": false
+    },
+    {
+      "source": "PS232-proposed",
+      "commit": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+      "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+      "path": ".pre-commit-config.yaml",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "bytes": 5398,
+      "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "prior_revision": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+      "prior_bytes": 5398,
+      "prior_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738",
+      "unchanged_from_saved": true
+    }
+  ],
+  "supporting_entries": [
+    {
+      "source": "PS-accepted",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+      "bytes": 1517,
+      "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+    },
+    {
+      "source": "PS-accepted",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+      "bytes": 17621,
+      "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+    },
+    {
+      "source": "PS-accepted",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0",
+      "bytes": 5786,
+      "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7"
+    },
+    {
+      "source": "TF-accepted",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+      "bytes": 1496,
+      "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9"
+    },
+    {
+      "source": "TF-accepted",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+      "bytes": 17621,
+      "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+    },
+    {
+      "source": "TF-accepted",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "916e0a34258de762772fa888808e403e798099f3",
+      "bytes": 6093,
+      "sha256": "08f0533a20c2292b13434de9e4b858d64d33d77b2c40a3e8888d9b561651af63"
+    },
+    {
+      "source": "PS232-proposed",
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+      "bytes": 1517,
+      "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+    },
+    {
+      "source": "PS232-proposed",
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+      "bytes": 17621,
+      "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+    },
+    {
+      "source": "PS232-proposed",
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+      "bytes": 6063,
+      "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae"
+    }
+  ],
+  "reused_evidence": {
+    "readiness_record_sha256": "a26b2bdae826dfba7df2fe4be6632c1f36e0e04c2d538f0b1baa6bbdfb49e7c9",
+    "windows": {
+      "sha256": "60d5be8e714937dc57aea2b15ed4a324210e9f56ba9547d2d03addf40b05de24",
+      "environment": {
+        "git": "git version 2.55.0.windows.5",
+        "host": "win32",
+        "transport": "local file URI; no network/service behavior proof",
+        "perProcessTimeoutSeconds": 15
+      },
+      "eventCommit": "dff5cad1c406da513dac9606b484b9b485e95702",
+      "movedBranchCommit": "41583441c91b8f6fd56cb117631d90ed4fe6d007",
+      "allCommandsWithinAssertions": true,
+      "fetchFlagEquality": true,
+      "notRerun": true
+    },
+    "linux": {
+      "native_exit": 0,
+      "elapsed_seconds": 0.984,
+      "image": "sha256:4484fb945681e4ac67180b5e7df85a1ade48168ba3d38f8d60d78ec3ecb497a3",
+      "script_sha256": "9cdc59f09ffca47f18fec50798b0ca61e9cf6997a64d714b5840ef48cba5c9ac",
+      "result_sha256": "4f0abb0a59d90ab8266ae48d2d663bc3133bdda7233163cc2d5c53ed69a361fe",
+      "execution_record_sha256": "3dbba2f741f47540ff6e112449ffeca438bc5e88722596832695d5980c69bb8c",
+      "platform": "linux",
+      "node": "v24.18.1",
+      "git": "git version 2.43.0",
+      "uid": 65534,
+      "native_command_count": 37,
+      "per_child_timeout_ms": 15000,
+      "event_commit": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+      "moved_branch_commit": "e4107a36ce420331cef794f137fd47df0ecf262a",
+      "results": [
+        {
+          "case": "immutable",
+          "actualRevision": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+          "expectedEventRevision": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+          "matchesEvent": true,
+          "value": "event A",
+          "exactComparisonNativeExit": 0,
+          "shallowCommitCount": 1
+        },
+        {
+          "case": "mutable",
+          "actualRevision": "e4107a36ce420331cef794f137fd47df0ecf262a",
+          "expectedEventRevision": "46a56bf72dbc3aff642d9be897cc152ca22aeceb",
+          "matchesEvent": false,
+          "value": "later B",
+          "exactComparisonNativeExit": 1,
+          "shallowCommitCount": 1
+        }
+      ],
+      "missing_object_native_exit": 128,
+      "missing_object_leaves_no_target": true,
+      "fixture_removed": true,
+      "scope": "Local file-URI Git semantics only; no hosted transport, network-deadline or final product claim."
+    },
+    "probe_not_rerun": true,
+    "original_preview_sha256": "ed273f8e4b84afdcb433a39c5b6e7c56bb5ef2f0cb5b727713664d114bad3e75",
+    "existing_file_hash_checks": [
+      {
+        "sha256": "60d5be8e714937dc57aea2b15ed4a324210e9f56ba9547d2d03addf40b05de24",
+        "matches_saved": true,
+        "evidence_set": "PSStyleGuide-A05-design-20261002",
+        "file": "probe-results.json"
+      },
+      {
+        "sha256": "9cdc59f09ffca47f18fec50798b0ca61e9cf6997a64d714b5840ef48cba5c9ac",
+        "matches_saved": true,
+        "evidence_set": "PSStyleGuide-A05-post231-readiness-20261004",
+        "file": "linux-local-git-probe.mjs"
+      },
+      {
+        "sha256": "4f0abb0a59d90ab8266ae48d2d663bc3133bdda7233163cc2d5c53ed69a361fe",
+        "matches_saved": true,
+        "evidence_set": "PSStyleGuide-A05-post231-readiness-20261004",
+        "file": "linux-probe-results.json"
+      },
+      {
+        "sha256": "3dbba2f741f47540ff6e112449ffeca438bc5e88722596832695d5980c69bb8c",
+        "matches_saved": true,
+        "evidence_set": "PSStyleGuide-A05-post231-readiness-20261004",
+        "file": "linux-execution.json"
+      }
+    ]
+  },
+  "decision": "A05-D1 I99 unchanged; D08 exact two-guide authority remains sufficient",
+  "budgets": {
+    "transfers_used": 0,
+    "transfer_cap": 8,
+    "rounds_used": 0,
+    "review_clock_started": false
+  },
+  "caller": {
+    "path": ".github/workflows/agent-instructions.yml",
+    "line": 210,
+    "native_exit_checked_line": 211,
+    "job": "candidate-tests",
+    "new_wiring_required": false
+  },
+  "guide_preimages_unchanged": true,
+  "approved_preview_patches_reproduce_exact_preview": true,
+  "approved_preview_bytes": 57926,
+  "recorded_at": "2026-10-05T12:37:25.784203+00:00",
+  "native_authentication": {
+    "method": "authenticated gh api GET ref/heads/main, git/commits/:sha, pulls/232; no Git fetch",
+    "main_refs": {
+      "PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "TF": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9"
+    },
+    "pr232": {
+      "state": "open",
+      "merged": false,
+      "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+      "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6"
+    },
+    "trees_match_local_git_objects": true
+  },
+  "changes": {
+    "saved_ten_inputs": "8 unchanged; TF Test-CiHelpers.test.mjs and agent-instructions.yml changed",
+    "TF_Test_CiHelpers": "removes redundant .pre-commit-config.yaml assertion from broad YAML event filter list",
+    "TF_agent_instructions": "adds lint-markdown.test.mjs to existing node test invocation at line210",
+    "PS232_Test_CiHelpers": "adds whitespace-only missing-environment controls; removes redundant YAML path assertion",
+    "PS232_agent_instructions": "adds Test-LocalValidation.test.mjs and lint-markdown.test.mjs; preserves A05 harness invocation and native exit check"
+  },
+  "scope_limits": "Read-only native and immutable-source inspection; only this scratch REPORT.md/catalog were written. No new tests/probes, installs, git fetch, product/planning/index/branch/ref/native mutation or descendants. Full 22 outcomes/402 contracts remain root scope.",
+  "worker_report_sha256": "aca07bfaa34df25e5fb021ae325c9950645552d1cfea1caba5a91b70fe0b0dda",
+  "worker_catalog_sha256": "08301ca420be199843d2b3707493159d93787938085c8bbbc691f43ed7e7fcc3"
+}

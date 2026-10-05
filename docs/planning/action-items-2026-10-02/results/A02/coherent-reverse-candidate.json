@@ -1,6 +1,6 @@
 {
-  "status": "round9_paired_reviews_pending",
-  "captured_at": "2026-10-05T12:24:49.858033+00:00",
+  "status": "round9_codex_clean_copilot_pending",
+  "captured_at": "2026-10-05T12:40:10.651022+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -3203,7 +3203,7 @@
       "workflow_status": "in_progress"
     },
     "codex": {
-      "status": "pending",
+      "status": "clean",
       "baseline": "round9-pre-request.json",
       "trigger_intent_after_snapshot": "round9-copilot-request-confirmation.json",
       "trigger_intent_at": "2026-10-05T12:24:15.604391+00:00",
@@ -3211,7 +3211,17 @@
       "trigger_comment_id": 5994378696,
       "request_at": "2026-10-05T12:24:09Z",
       "actor_id": 11204406,
-      "snapshot": "round9-paired-request-confirmation.json"
+      "snapshot": "round9-progress-122953.json",
+      "result_kind": "authenticated_exact_commit_conversation",
+      "result_comment_id": 5994461147,
+      "result_at": "2026-10-05T12:29:21Z",
+      "result_author_id": 199175422,
+      "reviewed_commit_abbreviation": "86f35f47cf",
+      "baseline_exclusion_verified": true,
+      "summary_comment_id": 5989249158,
+      "summary_status": "completed",
+      "summary_updated_at": "2026-10-05T12:29:26Z",
+      "summary_completed_at": "2026-10-05T12:29:23.559245Z"
     },
     "hosted_validation": {
       "status": "passed",
@@ -3249,7 +3259,7 @@
       "reused_from": "round5 on identical head/base/body; no source change or repeated suite"
     },
     "started_at": "2026-10-05T12:23:51Z",
-    "latest_snapshot": "round9-paired-request-confirmation.json",
-    "last_native_observation_at": "2026-10-05T12:24:49.858033+00:00"
+    "latest_snapshot": "round9-progress-124007.json",
+    "last_native_observation_at": "2026-10-05T12:40:10.651022+00:00"
   }
 }
