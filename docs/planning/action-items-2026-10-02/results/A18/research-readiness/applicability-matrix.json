@@ -1,0 +1,1335 @@
+{
+  "schema": "a18-research-applicability-preparation-v1",
+  "prepared_utc": "2026-10-05T02:00:15.278155+00:00",
+  "authority": "D-A00-02 C98; fixed source read-only; not A18 acceptance",
+  "refs": {
+    "research": {
+      "ref": "51dbeb560dd518b904cf1b571dc7d01fd8045749",
+      "tree": "ec9c46e3770ab79169d5520f2f743cb1d1853c16"
+    },
+    "PS": {
+      "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380"
+    },
+    "TF": {
+      "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    },
+    "TF_candidate": {
+      "ref": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+      "tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197"
+    }
+  },
+  "counts": {
+    "paths": 28,
+    "core_cells": 84,
+    "candidate_overlay_cells": 28,
+    "source_present": 14,
+    "source_absent": 14
+  },
+  "inputs_stable": true,
+  "native_evidence": [
+    "native-start.json",
+    "native-end.json"
+  ],
+  "rows": [
+    {
+      "path": ".codex/config.toml",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+          "bytes": 205,
+          "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+          "bytes": 205,
+          "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+          "bytes": 205,
+          "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+        "bytes": 205,
+        "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+      },
+      "source_guarantees_or_absence": "Project-instruction capacity 65536 and declared Codex feature/plugin settings.",
+      "mapped_disposition": "retained",
+      "owning_outcomes": [
+        "A02"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#path-dispositions-and-narrow-exceptions"
+      ],
+      "current_applicability": "All four raw blobs are identical.",
+      "remaining_verification": "Recheck final mains; no current semantic difference.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/instructions/docs.instructions.md",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "96c50a1f4213d90646553c8daf4bf7d93fa27cbe",
+          "bytes": 54529,
+          "sha256": "8b935528b270e941127373f955eb7d61c110e40fc0203e3028095210e89af74c"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd",
+          "bytes": 46230,
+          "sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+          "bytes": 46254,
+          "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+        "bytes": 46254,
+        "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+      },
+      "source_guarantees_or_absence": "Tiered metadata, rendering-sensitive updates, authoring/ADR/source-citation and placeholder safety.",
+      "mapped_disposition": "replaced",
+      "owning_outcomes": [
+        "A02",
+        "A21"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#d-a02-01-preserve-already-converged-metadata-and-yaml-rules",
+        "results/A21/TF-adoption/D-TF-01.md"
+      ],
+      "current_applicability": "Current policy uses actual style-guide taxonomy, published-baseline finalization, current ADR lifecycle and truthful absent-template enforcement. Research per-internal-commit revision and template assumptions are historical.",
+      "remaining_verification": "Final A18 must preserve exact current facts and prove smallest shared differences; do not restore obsolete metadata semantics.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/instructions/yaml.instructions.md",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3f013b485e333fcfe8480c926361a642f5ebc8a4",
+          "bytes": 54492,
+          "sha256": "19c1a172a558c61a578c4ebd612e8c3853350f8f1e0ba9510b46e3265a6f60f6"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+          "bytes": 54645,
+          "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "924d12c833d07def47d05137b532e622db622fa4",
+          "bytes": 54645,
+          "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "924d12c833d07def47d05137b532e622db622fa4",
+        "bytes": 54645,
+        "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+      },
+      "source_guarantees_or_absence": "YAML conservative syntax, privileged-workflow trust roots, exact setup versions and actual Git-layer ownership.",
+      "mapped_disposition": "retained-with-current-counterparts",
+      "owning_outcomes": [
+        "A02",
+        "A05"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#d-a02-01-preserve-already-converged-metadata-and-yaml-rules",
+        "tasks/A05.md"
+      ],
+      "current_applicability": "Research-to-PS policy diff changes dates and replaces absent gitattributes-guide links with actual LF/BOM/pre-commit rules.",
+      "remaining_verification": "A05 immutable-rule dependency remains open; final guide parity is not accepted here.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d4f380f61ce00092a416dac4ed3eaf6d11cbb7bc",
+          "bytes": 5742,
+          "sha256": "d2905d7d7558fdb380d80af3c562ea2ee03376fa7703eaab84a5eda2f62e5610"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+          "bytes": 12748,
+          "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "bytes": 9558,
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+        "bytes": 12865,
+        "sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc"
+      },
+      "source_guarantees_or_absence": "Accepted-policy execution with proposed bytes as data; native immutable acquisition and bounded failure.",
+      "mapped_disposition": "replaced",
+      "owning_outcomes": [
+        "A03",
+        "A21"
+      ],
+      "canonical_references": [
+        "results/A03/design.md",
+        "results/A03/threat-map.md",
+        "results/A00/RESULT.md#revalidated-retirement-decisions"
+      ],
+      "current_applicability": "Current semantic role/classifier architecture replaces old exact profiles and candidate parser-manifest path.",
+      "remaining_verification": "Reconcile actual final accepted policy/candidate-data authority and same-run checks; candidate is not accepted B.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bd4f100bf2f713fa86f72c489e1fff5cde8e1ead",
+          "bytes": 7711,
+          "sha256": "0179ee85f742a4de3dda6053081b323d92683d779ecf6eadc41ce16f77b21527"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b0f7fb0b657232fa0e857e946d725fdd6876c028",
+          "bytes": 52385,
+          "sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+          "bytes": 33862,
+          "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "bytes": 51830,
+        "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+      },
+      "source_guarantees_or_absence": "Pinned runtime/dependency setup, script-suppressed install, actual complete validation.",
+      "mapped_disposition": "replaced",
+      "owning_outcomes": [
+        "A03",
+        "A07"
+      ],
+      "canonical_references": [
+        "results/A03/copilot-setup-decisions.md",
+        "results/A03/preinstall-policy-decision.md",
+        "results/A03/validation-isolation-decision.md"
+      ],
+      "current_applicability": "Current finite setup/preinstall/isolation replaces research devcontainer update-content source. TF overlay also carries reviewed setup fixes.",
+      "remaining_verification": "Retain actual supported-host and caller evidence; no research devcontainer source-of-truth transplant.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5599eb27bd42af85bed376e82a60bff4524dcc70",
+          "bytes": 30461,
+          "sha256": "e48b96b5cebd3527ace4c5a819b1e71a736fbefc9633829b01b366ef0afba00b"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+          "bytes": 8391,
+          "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+          "bytes": 7645,
+          "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "bytes": 8391,
+        "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "source_guarantees_or_absence": "Research devcontainer source-validation and ordinary process-model jobs, cleanup-aware concurrency.",
+      "mapped_disposition": "replaced-applicability-pending",
+      "owning_outcomes": [
+        "A03",
+        "A07",
+        "A18"
+      ],
+      "canonical_references": [
+        "results/A03/devcontainer-decisions.md",
+        "results/A00/RESULT.md#d-a00-02-preserve-the-original-research-governance-comparison"
+      ],
+      "current_applicability": "Targets instead deliberately reject devcontainer tree entries with action-free exact-SHA inventory. Research build/process-model is not a target runner capability.",
+      "remaining_verification": "Do not mark blanket exception: A03 U98/S96 covers current absence enforcement, A07/A18 still owns source-specific applicability.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0c7633c0793be84ce6768698387052807a149329",
+          "bytes": 18348,
+          "sha256": "6f90d52361c564772094ee0a2410f9cc407803f4784aafda3c5e8096c2281327"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+          "bytes": 16481,
+          "sha256": "5f3bbefdd02af786bd39ae6a31685a4daf073981c2c072a51b590c75a6626205"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3284f63d128288ce511391b693b1ba350b918f2c",
+        "bytes": 19388,
+        "sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83"
+      },
+      "source_guarantees_or_absence": "No source file; target nested fenced Markdown validation is a current capability.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A07"
+      ],
+      "canonical_references": [
+        "results/A07/RESULT.md#d07-3-use-the-stronger-common-staged-and-repository-lint-behavior",
+        "results/A07/review-braces-decision.md"
+      ],
+      "current_applicability": "Present in both accepted targets and overlay; current API bounded lint supersedes CLI graph.",
+      "remaining_verification": "Preserve target capability, rules and diagnostic semantics; source absence does not authorize deletion.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "21063b3c86ffcee7c928b149d390065b8bcc1840",
+          "bytes": 5611,
+          "sha256": "c473b3df463d99d88de07ef883214f0a8aaedce111579d676bf39324902d14d3"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c35575990d5854ea6da9d5f6d49d23287df43146",
+          "bytes": 5971,
+          "sha256": "0e8b0b5c725227b98a338e44e630f6b50a90f725e2f01b2f0262284ffdd6926b"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+        "bytes": 5745,
+        "sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0"
+      },
+      "source_guarantees_or_absence": "No source file; target staged-byte Markdown and bounded child status are current capabilities.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A07"
+      ],
+      "canonical_references": [
+        "results/A07/RESULT.md#d07-3-use-the-stronger-common-staged-and-repository-lint-behavior"
+      ],
+      "current_applicability": "Present in accepted pair; overlay contains reviewed configured-rule/transport refinements.",
+      "remaining_verification": "Final paired raw/semantic alignment remains due.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c55c95be61b704291d384f043e078f26472a3f2b",
+          "bytes": 3017,
+          "sha256": "6d5463da1938f3dbacbccff47d594b2522ee4558369b05eb4459e2413fa83ac2"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+          "bytes": 2603,
+          "sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "494c6804f05c7ff54364e139004eeb67d8d879cd",
+        "bytes": 3017,
+        "sha256": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6"
+      },
+      "source_guarantees_or_absence": "No source file; target documentation describes actual Markdown implementation.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A02",
+        "A07"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#d-a02-08-replace-stale-lint-documentation-with-verified-current-behavior"
+      ],
+      "current_applicability": "Present in both targets; preserve current accurate instructions.",
+      "remaining_verification": "Final docs must match accepted executable callers.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+          "bytes": 6686,
+          "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+          "bytes": 6632,
+          "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+        "bytes": 6714,
+        "sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+      },
+      "source_guarantees_or_absence": "No source file; target Markdown workflow provides read-only lint and dependency checks.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A03",
+        "A07"
+      ],
+      "canonical_references": [
+        "results/A03/design.md",
+        "results/A07/RESULT.md"
+      ],
+      "current_applicability": "Present in both targets; current workflow roles replace historical profile coupling.",
+      "remaining_verification": "Final native and exact-role evidence stays root-owned.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+          "bytes": 844,
+          "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+          "bytes": 1105,
+          "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+        "bytes": 902,
+        "sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c"
+      },
+      "source_guarantees_or_absence": "No source nested package; current target isolated tooling/runtime manifest.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A07"
+      ],
+      "canonical_references": [
+        "results/A07/RESULT.md#d07-2-remove-the-redundant-ps-root-cli-graph",
+        "results/A07/review-braces-decision.md"
+      ],
+      "current_applicability": "Present target capability; research root CLI/dependency graph is not a required nested graph.",
+      "remaining_verification": "Retain actual loader/lock/preinstall closure and current audit, not old versions.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7",
+          "bytes": 6613,
+          "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+          "bytes": 5421,
+          "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b049d7881a2cd2ba144dd63b67e10bb0287a7aaf",
+        "bytes": 11650,
+        "sha256": "240b53ff2651bd11c30fde2feacd3d259dbd533ee7fa6a646302b0f2874d1480"
+      },
+      "source_guarantees_or_absence": "No source scripts README; target caller documentation.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A02",
+        "A07"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#d-a02-05-align-ordinary-shared-documentation-and-harmless-conventions"
+      ],
+      "current_applicability": "Present in targets; current role/runtime descriptions remain required.",
+      "remaining_verification": "Final accepted guide/caller consistency.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructionParserManifest.mjs",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0716a34b6b7f9cf22bcf60d242582174c17b85b3",
+          "bytes": 38982,
+          "sha256": "138d3a5949f4334dd7a39a05e47978135ff800c916abd49ac61ce5bcc017eade"
+        },
+        "PS": {
+          "absent": true
+        },
+        "TF": {
+          "absent": true
+        }
+      },
+      "candidate_overlay": {
+        "absent": true
+      },
+      "source_guarantees_or_absence": "Inert Git parser closure, runtime-selector equality, ordinary-blob and UTF-8/JSON bounds before proposed installation; mutation controls.",
+      "mapped_disposition": "retired-mechanism-oracle-mapping-open",
+      "owning_outcomes": [
+        "A06",
+        "A03",
+        "A07"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#verification-and-readiness",
+        "results/A06/design.md#finding-a06-d2-retain-actual-useful-oracles-after-retirement",
+        "results/A00/RESULT.md#revalidated-retirement-decisions"
+      ],
+      "current_applicability": "Filename absent in all targets; exact-profile machinery is retired. Useful safety properties map to current accepted-policy classification, parser bootstrap and setup validators; this does not prove every old oracle replaced.",
+      "remaining_verification": "Existing A06-owned absent-path obligation: enumerate useful old oracles against actual A03/A07 consumers. No restore-old-suite instruction.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a9e23ed70deda2a9de12fc8962282ad167d4bde9",
+          "bytes": 306638,
+          "sha256": "3b40a377fe6eb5b1c2194ca618c63851c504db73beaa99a713b5b3214e9ca5c4"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb",
+          "bytes": 474787,
+          "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+          "bytes": 460163,
+          "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f91929885e6069eb83bfd757d882b278551cfe35",
+        "bytes": 477603,
+        "sha256": "5af494dd3c6ecdcf1e6901b709690ad745dbce451a97402a41926dac70b1c6ac"
+      },
+      "source_guarantees_or_absence": "Metadata/final-state/rendering validation, protected instruction caps, safe data/parser transport and failure truth.",
+      "mapped_disposition": "replaced",
+      "owning_outcomes": [
+        "A02",
+        "A07",
+        "A21"
+      ],
+      "canonical_references": [
+        "results/A21/TF-adoption/D-TF-01.md",
+        "results/A02/RESULT.md",
+        "results/A07/RESULT.md"
+      ],
+      "current_applicability": "Accepted PS contains evolved engine; accepted TF remains older. Candidate overlays complete PS engine with reviewed TF-specific fixture/role repairs.",
+      "remaining_verification": "Full final-byte aggregate/native acceptance and reverse transfer remain pending; research exact implementation is not preferred.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+          "bytes": 218742,
+          "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+        },
+        "TF": {
+          "absent": true
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "423a1e02869cbcb8b29fe4e56f53a014ebe39e8f",
+        "bytes": 229956,
+        "sha256": "f80f2b3ca171a1010ecd6cffe55e160574d80d2a7b9837aae181910b3f0a1e33"
+      },
+      "source_guarantees_or_absence": "No source separate SelfTest; current PS split mutation suite is retained.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A02",
+        "A21"
+      ],
+      "canonical_references": [
+        "results/A21/TF-adoption/D-TF-01.md"
+      ],
+      "current_applicability": "PS present, accepted TF absent, candidate present. An explicit current accepted-pair mismatch, not an omission approved by this report.",
+      "remaining_verification": "Complete TF lifecycle, then compare accepted pair and useful oracles.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+          "bytes": 25947,
+          "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "bytes": 25568,
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+        "bytes": 26228,
+        "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
+      },
+      "source_guarantees_or_absence": "No source validator; current semantic workflow-policy guard.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A03"
+      ],
+      "canonical_references": [
+        "results/A03/design.md",
+        "results/A03/threat-map.md"
+      ],
+      "current_applicability": "Both targets have guard; candidate uses retained common semantic policy.",
+      "remaining_verification": "Preserve accepted-policy authority and finite closed roles; no candidate-as-accepted-policy claim.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+          "bytes": 17621,
+          "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+          "bytes": 13047,
+          "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      },
+      "source_guarantees_or_absence": "No source case catalog; useful current workflow mutations.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A03"
+      ],
+      "canonical_references": [
+        "results/A00/RESULT.md#revalidated-retirement-decisions",
+        "results/A03/threat-map.md"
+      ],
+      "current_applicability": "Both targets have case catalog. R07 rejects test counts as oracle equivalence.",
+      "remaining_verification": "Final current-caller coverage, not old suite restoration.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+          "bytes": 1517,
+          "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "bytes": 1407,
+          "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+        "bytes": 1496,
+        "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9"
+      },
+      "source_guarantees_or_absence": "No source contract; current finite workflow role contract.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A03"
+      ],
+      "canonical_references": [
+        "results/A03/design.md"
+      ],
+      "current_applicability": "Both targets present; repository artifact verification context is a scoped native value.",
+      "remaining_verification": "Prove only justified role literals differ at final union.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".gitignore",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e42d3bbc695f8bb78fb6a49a5672f973803719a3",
+          "bytes": 194,
+          "sha256": "7fd0380a67d3a9952e24a8ca815f8111dce89e1d4a8eb00d2aa41794e6f2376b"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+          "bytes": 289,
+          "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+          "bytes": 249,
+          "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+        "bytes": 289,
+        "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+      },
+      "source_guarantees_or_absence": "Ignore dependency environments and compiled Python; research local-state archives.",
+      "mapped_disposition": "partly-retained-applicability-open",
+      "owning_outcomes": [
+        "A02",
+        "A07",
+        "A18"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#d-a02-07-protect-nested-personal-agent-memory",
+        "results/A00/RESULT.md#d-a00-02-preserve-the-original-research-governance-comparison"
+      ],
+      "current_applicability": "Target ignores node_modules/.venv and personal memory. Research archive names and compiled-Python rule are not copied. No tracked Python artifacts found in the inspected target trees.",
+      "remaining_verification": "A07/A18 must classify generic compiled-artifact guarantee separately from research-only archive names; absence is not an approved exception.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6a138c59a0ce62ad9679c815e024c9d6e9902ccf",
+          "bytes": 7318,
+          "sha256": "4c0ec5c0bf12afe953e2635c2903fb0ce5d0d3232eebfc2b5fc74af68f1ea3e6"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+          "bytes": 5398,
+          "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+          "bytes": 5405,
+          "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "bytes": 5405,
+        "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      },
+      "source_guarantees_or_absence": "Structured-data/YAML/action/schema/hygiene checks plus research devcontainer, compiled-Python, evidence-manifest, metadata-vocabulary and trope hooks.",
+      "mapped_disposition": "replaced-with-specific-applicability-open",
+      "owning_outcomes": [
+        "A07",
+        "A02",
+        "A03",
+        "A18"
+      ],
+      "canonical_references": [
+        "results/A07/RESULT.md#d07-4-reuse-the-hashed-python-hook-closure",
+        "results/A07/RESULT.md#d07-5-use-explicit-hook-suppression-consistently",
+        "results/A00/RESULT.md#d-a00-02-preserve-the-original-research-governance-comparison"
+      ],
+      "current_applicability": "Current locked hook closure and instruction validator replace remote environments and metadata checker. Target inventories have no tracked Python/SHA256SUMS/manifest/devcontainer paths. Research-specific callers require separate applicability, not automatic omission.",
+      "remaining_verification": "Open owner verification detailed in obligations; no demonstrated live target defect and no suite added.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": "AGENTS.md",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "63a09836e309e3e0e9dc1e6abff7807b5c3e77b1",
+          "bytes": 32537,
+          "sha256": "6b350f1c2ccf19c3b10d4e093aec138df06d5319e43eef14ece8faff7ece13d3"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "95d3b39c90e2f1934f34e0e846692143404fe65b",
+          "bytes": 32667,
+          "sha256": "75d4079576bb1037cb552a922707074a2d6948d7a24d7418320ec8b271fdcec7"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+          "bytes": 33422,
+          "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "be1e52363e92daec056660b3e1147527874ccbf9",
+        "bytes": 32746,
+        "sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f"
+      },
+      "source_guarantees_or_absence": "Independent native reviewer identity, explicit scoped protected-file authority, decision process, bounded review loop.",
+      "mapped_disposition": "retained-through-reviewed-update",
+      "owning_outcomes": [
+        "A02",
+        "A08",
+        "A20"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#d-a02-03-reuse-compact-execution-guidance-without-reducing-authority-or-platform-protocols",
+        "results/A20/RESULT.md",
+        "results/A00/RESULT.md#revalidated-retirement-decisions"
+      ],
+      "current_applicability": "Current native entry points retain governance with actual repo/platform roles and scoped protected-v2 edits. Historical writers/native receipt requirements are not revived.",
+      "remaining_verification": "Final raw paired comparison and direct scope/metadata proof remain required.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": "CLAUDE.md",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c5e8dd2eb9622d2b95edc80876a23997060b285d",
+          "bytes": 82250,
+          "sha256": "b87dc92e6fece8b3a0c878722ef2fccce18e38adfe862af6fdf79610088e41c1"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "c3058de820b228bdd5b03cce1ec9f288c9dff02d",
+          "bytes": 83329,
+          "sha256": "01d5067733fe44c9d344a9ebb29321b2441dc67a695ad2df2c3a9a0a3a8a1389"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3cc21fc793944033be430ad08722081db4e7b9dd",
+          "bytes": 80980,
+          "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6a646684e062c418bf124fa5d78690d3e86611cf",
+        "bytes": 83433,
+        "sha256": "efd0c70621f46bd65119dab82ec9a1cb6fde8a0112a3f0d13d57c83267296bc1"
+      },
+      "source_guarantees_or_absence": "Claude-specific routing plus independent reviewer/decision/authority/loop guarantees.",
+      "mapped_disposition": "retained-through-reviewed-update",
+      "owning_outcomes": [
+        "A02",
+        "A08",
+        "A20"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#d-a02-03-reuse-compact-execution-guidance-without-reducing-authority-or-platform-protocols",
+        "results/A20/RESULT.md"
+      ],
+      "current_applicability": "Current platform protocol remains distinct where supported, common governance retained.",
+      "remaining_verification": "Retain smallest platform/repository differences, not whole-file exception.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+          "bytes": 12177,
+          "sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1"
+        },
+        "TF": {
+          "absent": true
+        }
+      },
+      "candidate_overlay": {
+        "absent": true
+      },
+      "source_guarantees_or_absence": "Research absent; PS historical in-repository trust-root acceptance record.",
+      "mapped_disposition": "source-absent-historical-target-record",
+      "owning_outcomes": [
+        "A03",
+        "A09",
+        "A18"
+      ],
+      "canonical_references": [
+        "results/A00/RESULT.md#revalidated-retirement-decisions",
+        "tasks/A09.md",
+        "results/A03/threat-map.md"
+      ],
+      "current_applicability": "PS present, TF/overlay absent. Historical ADR copying would assert a false local event. Current trust boundary must still be addressed.",
+      "remaining_verification": "A09 preserves history; A18 verifies current counterpart/guarantee, not fabricated historical ADR equality.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": "docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+          "bytes": 8744,
+          "sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c"
+        },
+        "TF": {
+          "absent": true
+        }
+      },
+      "candidate_overlay": {
+        "absent": true
+      },
+      "source_guarantees_or_absence": "Research absent; PS historical unverifiable baseline provenance record.",
+      "mapped_disposition": "source-absent-historical-target-record",
+      "owning_outcomes": [
+        "A03",
+        "A09",
+        "A18"
+      ],
+      "canonical_references": [
+        "results/A00/RESULT.md#revalidated-retirement-decisions",
+        "tasks/A09.md"
+      ],
+      "current_applicability": "PS present, TF/overlay absent. Current native baseline authority is separate from historical provenance.",
+      "remaining_verification": "A09 preserves actual history and current provenance documentation; absence remains explicit.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "761e87c11c1c03f805ad832331866b963294c1e5",
+          "bytes": 2179,
+          "sha256": "f863b58355ec00530b349f8417a78dd1dd31711a6d85ee954436a0aabcb878a9"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "f43b5168ce508a9a054dc85ba7231e27d8c70809",
+          "bytes": 2146,
+          "sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f66c405398db94f21d8caeae4b94487fe5ffa75d",
+        "bytes": 2179,
+        "sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d"
+      },
+      "source_guarantees_or_absence": "No research evaluation prompt; current target finding process.",
+      "mapped_disposition": "source-absent",
+      "owning_outcomes": [
+        "A02"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#d-a02-05-align-ordinary-shared-documentation-and-harmless-conventions"
+      ],
+      "current_applicability": "Present both accepted targets and overlay.",
+      "remaining_verification": "Final paired scoped links and factual identity only.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": "package-lock.json",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "e9efa0381e686a265c41eb36662671791da9e837",
+          "bytes": 48914,
+          "sha256": "362734c4f423023a2f97ddaf93d4505ab6a9f77aa6fca1aea6820a3046da6ba5"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+          "bytes": 3552,
+          "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+          "bytes": 3566,
+          "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "50a7973086b1ed0e596b71b87336469ce48ef653",
+        "bytes": 3566,
+        "sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77"
+      },
+      "source_guarantees_or_absence": "Locked dependency integrity and exact runtime alignment.",
+      "mapped_disposition": "replaced",
+      "owning_outcomes": [
+        "A07",
+        "A03"
+      ],
+      "canonical_references": [
+        "results/A07/RESULT.md#d07-1-keep-the-actual-patched-remediation-and-current-audit",
+        "results/A07/review-braces-decision.md",
+        "results/A03/preinstall-policy-decision.md"
+      ],
+      "current_applicability": "Research includes devcontainers CLI and old Markdown CLI graph. Targets have current independently reviewed self-contained graphs.",
+      "remaining_verification": "Preserve useful lock/parser closure guarantees; never repin historical vulnerable/unused dependencies for equality.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": "package.json",
+      "cells": {
+        "research": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "062a0fc09368701f07a9db3d8b09877866463644",
+          "bytes": 723,
+          "sha256": "977f9803d16bd09c8333ab59f57688110ebf79be166be1e028f857234842a74d"
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+          "bytes": 816,
+          "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "bytes": 837,
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "bytes": 837,
+        "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      },
+      "source_guarantees_or_absence": "Private tooling package, exact runtime selectors and actual script entry points.",
+      "mapped_disposition": "replaced",
+      "owning_outcomes": [
+        "A07",
+        "A03"
+      ],
+      "canonical_references": [
+        "results/A07/RESULT.md#d07-2-remove-the-redundant-ps-root-cli-graph",
+        "results/A03/copilot-setup-decisions.md"
+      ],
+      "current_applicability": "Research trope/devcontainer scripts are not target callers; finite target package contracts apply.",
+      "remaining_verification": "Check operative loaders/runtime selectors and actual root/nested role at final mains.",
+      "acceptance": "not assessed; preparation only"
+    },
+    {
+      "path": "STYLE_GUIDE_RATIONALE.md",
+      "cells": {
+        "research": {
+          "absent": true
+        },
+        "PS": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "afb5ba370810e36a9c1ba103aa8e5691a3131581",
+          "bytes": 135295,
+          "sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4"
+        },
+        "TF": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+          "bytes": 73953,
+          "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+        }
+      },
+      "candidate_overlay": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+        "bytes": 73953,
+        "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+      },
+      "source_guarantees_or_absence": "Research absent; target normative-language rationale and generator input.",
+      "mapped_disposition": "source-absent-language-content",
+      "owning_outcomes": [
+        "A06",
+        "A10",
+        "A11",
+        "A18"
+      ],
+      "canonical_references": [
+        "results/A06/design.md#finding-a06-d1-converge-composition-without-losing-language-content",
+        "tasks/A18.md"
+      ],
+      "current_applicability": "Both target rationales present and intentionally language-specific; TF recovery sections are retained.",
+      "remaining_verification": "Later full-union semantic/generator/example audit remains due; no research-absence deletion.",
+      "acceptance": "not assessed; preparation only"
+    }
+  ],
+  "existing_owner_verification_obligations": [
+    {
+      "id": "existing-parser-oracle-mapping",
+      "owners": [
+        "A06",
+        "A03",
+        "A07"
+      ],
+      "source_regions": [
+        ".github/workflows/Test-AgentInstructionParserManifest.mjs:232-265 (closure)",
+        ".github/workflows/Test-AgentInstructionParserManifest.mjs:329-496 (runtime/contract)",
+        ".github/workflows/Test-AgentInstructionParserManifest.mjs:513-1096 (oracles)",
+        ".github/workflows/Test-AgentInstructionParserManifest.mjs:1098-1148 (inert Git caller)"
+      ],
+      "canonical_references": [
+        "results/A02/RESULT.md#verification-and-readiness",
+        "results/A06/design.md#finding-a06-d2-retain-actual-useful-oracles-after-retirement",
+        "results/A03/preinstall-policy-decision.md",
+        "results/A03/threat-map.md",
+        "results/A00/RESULT.md#revalidated-retirement-decisions"
+      ],
+      "next": "Reconcile only useful retained oracles with accepted-policy/classifier/parser bootstrap/setup callers. Do not restore retired exact-profile machinery or claim filename absence itself proves a defect."
+    },
+    {
+      "id": "existing-research-hook-applicability",
+      "owners": [
+        "A07",
+        "A02",
+        "A03",
+        "A18"
+      ],
+      "source_regions": [
+        ".pre-commit-config.yaml:103-123 (shell/devcontainer)",
+        ".pre-commit-config.yaml:124-146 (compiled Python)",
+        ".pre-commit-config.yaml:147-156 (evidence manifests)",
+        ".pre-commit-config.yaml:157-162 (metadata vocabulary)",
+        ".pre-commit-config.yaml:163-168 (trope)",
+        ".gitignore:1-9"
+      ],
+      "canonical_references": [
+        "results/A07/RESULT.md#d07-4-reuse-the-hashed-python-hook-closure",
+        "results/A07/RESULT.md#d07-5-use-explicit-hook-suppression-consistently",
+        "results/A02/RESULT.md#d-a02-04-converge-metadata-classification-with-its-live-consumer",
+        "results/A03/devcontainer-decisions.md",
+        "results/A00/RESULT.md#d-a00-02-preserve-the-original-research-governance-comparison"
+      ],
+      "observed_fact": "No tracked paths matching Python/compiled-Python, SHA256SUMS/manifest or devcontainer families in either accepted target tree or candidate overlay; target dependencies use ignored node_modules/.venv. This is limited inventory evidence, not permission to omit a general guard.",
+      "next": "Classify each actual source caller against current target inputs and retained guarantees. Record a scoped no-applicability or selected counterpart only after owner proof; if an applicable gap is reproduced, perform finding-specific alternatives before implementation."
+    }
+  ],
+  "new_demonstrated_material_findings": [],
+  "limitations": [
+    "No suite or current acceptance asserted.",
+    "Candidate overlay is a proposed tree, not a commit or accepted main.",
+    "Mappings reuse existing decisions and do not approve raw differences or prove exhaustive oracle equivalence.",
+    "Final full-union required-path audit, final current-main refresh and pair transfer remain required."
+  ],
+  "planning_evidence": {
+    "STATUS.md": {
+      "bytes": 10192,
+      "sha256": "33ddeb80e1dbba65a2678a65ad6dc103aeaea857bc02b460a46cd4d088c6085c"
+    },
+    "tasks/A18.md": {
+      "bytes": 5274,
+      "sha256": "326761e5b218ab2c0a52ea0f015871f14e3b2f93f21c8309fa2040be0d3e7b57"
+    },
+    "results/A18/RESULT.md": {
+      "bytes": 898,
+      "sha256": "a9d559efa3fbb78fc1b45e61e8b772b279ac0c30fc0a612c5d75c4042880d17c"
+    },
+    "results/A00/RESULT.md": {
+      "bytes": 15042,
+      "sha256": "28ad310d71fc3cabe18d4bb482bf5b6ea494846ffc85e209b278cc2375f8acf8"
+    },
+    "results/A00/research-pr78-matrix.json": {
+      "bytes": 41589,
+      "sha256": "1183e0c49e3562aa8f72e8649bb1173505e5604db5fda704d7d85621adb02148"
+    },
+    "results/A00/native-history.json": {
+      "bytes": 14569,
+      "sha256": "1482d5fb87c9354d9e7d6969a9764b5a75e5f71028c36a8a82306c52a6b9cef5"
+    },
+    "original-tasks/019.md": {
+      "bytes": 12109,
+      "sha256": "902fd60ce08f3f0ceff6beb7ee5257c8b6b19e333009136a977fb038f4899095"
+    },
+    "original-tasks/029.md": {
+      "bytes": 14999,
+      "sha256": "46c7307dbadd982409d52be53a0368e1249cb283f96b2720e161bc6c8b44eaad"
+    }
+  },
+  "canonical_preparation_note": "Root omitted machine-local repository paths. Raw identities, applicability rows and pending obligations are unchanged. Native evidence files retain selected fields and hashes of full private GET snapshots.",
+  "source_private_matrix_sha256": "dd51f2a6c6810ebd6db1e3bb0b28f3474a744eec62b68797327974c44de0e1ad"
+}

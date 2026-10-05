@@ -2,7 +2,7 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `c63b627b65c96e7b0af1a56a1b81fb16f7d4f704` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `0d9021c83bb6825b60974004c35658e541817256` (prior published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -24,7 +24,7 @@ Planning head: `c63b627b65c96e7b0af1a56a1b81fb16f7d4f704` (prior published check
 | [A15](tasks/A15.md) | Reconcile Terraform manual recovery scope against current callers | complete | coordinator; proposal review and interface refresh complete | PS/TF main | PSfb32889 / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](results/A15/RESULT.md) | Use reconciled proposal after A06/A07; refresh changed interfaces before A16 integration |
 | [A16](tasks/A16.md) | Deliver Terraform Gate A nonmutating foundation | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](tasks/A16.md) | Wait for A15/A06/A07 acceptance |
 | [A17](tasks/A17.md) | Deliver Terraform Gate B destructive-procedure guidance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/16 | [Evidence](tasks/A17.md) | Wait for accepted Gate A and owner approval |
-| [A18](tasks/A18.md) | Close remaining byte differences and verify convergence | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](tasks/A18.md) | Run final union and A10/A11 checklist after products |
+| [A18](tasks/A18.md) | Close remaining byte differences and verify convergence | pending | coordinator; research prepared | PS/TF main | PSf168f83 / TF06ad4f7 | — | 0/80; not started | 0/12 | [Evidence](results/A18/research-readiness/REPORT.md) | Close two owner mappings; final audit after products |
 | [A19](tasks/A19.md) | Reconcile issues and publish final acceptance | pending | coordinator | PS/TF main | PS48f4d8a / TF06ad4f7 | — | 0/80; not started | 0/8 | [Evidence](tasks/A19.md) | Refresh final issue census after A18 |
 | [A20](tasks/A20.md) | Protected instruction files | validating | coordinator; full validation | TF codex/a02-peer-docs | TFdde2b9a / B06ad4f7; PSf168f83 | [66](https://github.com/franklesniak/TerraformStyleGuide/pull/66) open; source accepted | peer5/80; 2026-10-12T16:41:24Z; source history retained | 1/8 | [Peer evidence](results/A02/coherent-peer-candidate.json) | Collect validation30940; then publish repair |
 | [A21](tasks/A21.md) | Instruction validator, SelfTest, and classification manifest convergence | validating | coordinator; full validation | TF codex/a02-peer-docs | TFdde2b9a / B06ad4f7; PSf168f83 | [66](https://github.com/franklesniak/TerraformStyleGuide/pull/66) open; source accepted | peer5/80; 2026-10-12T16:41:24Z; source history retained | 1/12 | [Evidence](results/A21/RESULT.md) | Collect validation30940; then publish repair |
@@ -37,7 +37,9 @@ Planning head: `c63b627b65c96e7b0af1a56a1b81fb16f7d4f704` (prior published check
 - PR66 round5 terminal/nonclean: Copilot Lite4findings, Codex clean; prior15resolved. Corrected16path private repair passes independent source/focused quality. Product publication, next review and final acceptance remain. No native operation pending. Deadline2026-10-12T16:41:24Z/transfers1; no user action.
 - PS source accepted atf168f83; closed lifecycle A03-setup-lifecycle-20261004/execution-state.json. Retain A03 P, A20 protected/CLAUDE, A05 YAML and A13 grants; actual GateA/B authority comes later.
 - Held A07: `C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide`, treec68b5e1; preserve index/edits. Future R5/B1: results/A07/recovery-runtime. A06: results/A06/post231-readiness. A05: A05-post231-readiness-20261004. Reverse: A02-reverse-R12-R13-readiness-20261004/ADDENDUM-round5.md;22paths verified provisionally; refresh accepted refs/date before transfer2.
-- Prepared publication: TF-coherent-20261004/round5-publication-readiness.json. Future Linux: derived8bdc772 closes missing ShellCheck with3smoke controls; linux-shellcheck-qualification/execution-result.json. No full suite or speed claim.
+- Prepared publication: TF-coherent-20261004/round5-publication-readiness.json. Linux tool smoke: derived8bdc772 passed; linux-shellcheck-qualification/execution-result.json. Future runner preparation: linux-full-validation-readiness (no run).
+
+- A18 research readiness: A18-research-readiness-20261005; final acceptance remains pending.
 
 ## Final results
 

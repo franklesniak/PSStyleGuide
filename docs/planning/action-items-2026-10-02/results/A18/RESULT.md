@@ -3,7 +3,7 @@
 
 State: pending. No additional acceptance is claimed by this restart pointer.
 
-Read [the current task](../../tasks/A18.md) and [latest evidence](../../tasks/A18.md). Next: Run final union and A10/A11 checklist after products.
+Read [the current task](../../tasks/A18.md) and [research readiness](research-readiness/REPORT.md). Read-only comparison now covers the pinned 28-path research catalog against accepted PSf168f83/TF06ad4f7, with a separate unaccepted TF overlay. Two existing-owner verification obligations remain explicit; no new demonstrated defect or final exception approval is claimed. Next: close the A06 parser-oracle and A07 hook-applicability mappings, then perform the full final union and A10/A11 checklist after products.
 
 ## Carried exception rows to revalidate on final mains
 
