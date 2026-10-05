@@ -189,6 +189,7 @@ function Assert-GeneratorByteSequence {
 }
 
 
+$boolPrimaryFailure = $false
 try {
     # Load only the actual function declarations and fixed initialization. Never
     # dot-source the entry point, which would publish into the source checkout.
@@ -456,15 +457,32 @@ try {
             }
         }
     }
-    'Generator tests passed: {0} assertions; edition={1}; version={2}; executable={3}; storage={4}; image={5}/{6}.' -f
-        $script:intAssertions, $PSVersionTable.PSEdition, $PSVersionTable.PSVersion, $strPowerShell, $strStorage,
-        $env:ImageOS, $env:ImageVersion
+} catch {
+    $boolPrimaryFailure = $true
+    throw
 } finally {
-    # Only this invocation's independently named child may be removed.
-    $strResolvedScratch = [IO.Path]::GetFullPath($strScratch)
-    if ([IO.Path]::GetDirectoryName($strResolvedScratch).TrimEnd('\', '/') -cne $strScratchParent.TrimEnd('\', '/') -or
-        [IO.Path]::GetFileName($strResolvedScratch) -cnotmatch '^styleguide-generator-[0-9a-f]{32}$') {
-        throw 'generator-test: cleanup containment failure'
+    $strCleanupFailure = $null
+    try {
+        # Only this invocation's independently named child may be removed.
+        $strResolvedScratch = [IO.Path]::GetFullPath($strScratch)
+        if ([IO.Path]::GetDirectoryName($strResolvedScratch).TrimEnd('\', '/') -cne $strScratchParent.TrimEnd('\', '/') -or
+            [IO.Path]::GetFileName($strResolvedScratch) -cnotmatch '^styleguide-generator-[0-9a-f]{32}$') {
+            $strCleanupFailure = 'generator-test: cleanup containment failure'
+        } else {
+            Remove-Item -LiteralPath $strResolvedScratch -Recurse -Force
+        }
+    } catch {
+        # Classify cleanup without exposing its details or replacing the primary error.
+        $strCleanupFailure = 'generator-test: cleanup failed'
     }
-    Remove-Item -LiteralPath $strResolvedScratch -Recurse -Force
+    if ($null -ne $strCleanupFailure) {
+        if ($boolPrimaryFailure) {
+            Write-Warning -Message $strCleanupFailure -WarningAction Continue
+        } else {
+            throw $strCleanupFailure
+        }
+    }
 }
+'Generator tests passed: {0} assertions; edition={1}; version={2}; executable={3}; storage={4}; image={5}/{6}.' -f
+    $script:intAssertions, $PSVersionTable.PSEdition, $PSVersionTable.PSVersion, $strPowerShell, $strStorage,
+    $env:ImageOS, $env:ImageVersion
