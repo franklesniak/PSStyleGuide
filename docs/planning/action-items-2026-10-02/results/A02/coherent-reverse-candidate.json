@@ -1,5 +1,5 @@
 {
-  "status": "round10_paired_reviews_pending",
+  "status": "round10_clean_pair_final_quality_pending",
   "captured_at": "2026-10-05T12:47:07.007729+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
@@ -3310,14 +3310,14 @@
     "body_sha256": "7221c071ff008d322c0f066b17d43b9fc2f5f44eeb98295f3a74643404015e6c",
     "baseline": "round10-pre-request.json",
     "request_intent_at": "2026-10-05T12:46:15.979143+00:00",
-    "reason": "Continue required paired review after round9 repeated table claim R16 was verified, replied and resolved. No source/body change. Round8 remains a valid Lite review with findings; its separate service cancellation is not relabelled a pass. This request is not an effort-only retry or service-failure replacement.",
-    "request_set_terminal": false,
-    "clean": false,
+    "reason": "Continue required paired review after round9 repeated table claim R16 was verified, replied and resolved. No source/body change. Round9 remains a valid Lite review with findings; its separate service cancellation is not relabelled a pass. This request is not an effort-only retry or service-failure replacement.",
+    "request_set_terminal": true,
+    "clean": true,
     "copilot": {
-      "status": "pending",
+      "status": "clean",
       "preferred_effort": "Balanced",
       "selected_effort": null,
-      "observed_effort": null,
+      "observed_effort": "Balanced",
       "transport": "gh pr edit --add-reviewer @copilot",
       "ui_fallback_reason": "Fresh Edge3 PR232 tab75572481 is signed out (Sign in and Sign in to comment visible), with no authenticated request control. The Balanced effort menu alone cannot submit a request. No UI request was sent.",
       "command_exit": 0,
@@ -3325,12 +3325,51 @@
       "request_at": "2026-10-05T12:46:11Z",
       "actor_id": 11204406,
       "reviewer_id": 175728472,
-      "snapshot": "round10-copilot-request-confirmation.json",
+      "snapshot": "round10-progress-1307.json",
       "workflow_run_id": 37311854249,
-      "workflow_status": "in_progress"
+      "workflow_status": "completed",
+      "review_id": 5414902476,
+      "result_at": "2026-10-05T13:05:14Z",
+      "finding_ids": [],
+      "findings_clean": true,
+      "service": {
+        "status": "completed",
+        "conclusion": "success",
+        "run_id": 37311854249,
+        "check_id": 111768923351,
+        "summary_path": "round10-copilot-attempt1/summary.json",
+        "summary_sha256": "8c6bfcdb8e9b3a3d4faf78000bde991b7227b18d0731b26f11aea326606dae49",
+        "log_sha256": "87ebd656c80b5e9e626f635dd83105eb2c0c1e3e541f7b62e740a93f0ab0b582",
+        "actual_hook_passes": 11,
+        "validation_step": {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 77,
+          "started_at": "2026-10-05T12:47:11Z",
+          "completed_at": "2026-10-05T13:00:51Z"
+        },
+        "final_guard": {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 82,
+          "started_at": "2026-10-05T13:00:52Z",
+          "completed_at": "2026-10-05T13:00:52Z"
+        },
+        "processing_step": {
+          "name": "Processing Request (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 94,
+          "started_at": "2026-10-05T13:00:55Z",
+          "completed_at": "2026-10-05T13:05:03Z"
+        }
+      },
+      "overview_note": "General security-sensitive convergence scrutiny note; independent final quality must reconcile it. No inline finding or native human-approval requirement introduced by review text."
     },
     "codex": {
-      "status": "pending",
+      "status": "clean",
       "baseline": "round10-pre-request.json",
       "trigger_intent_after_snapshot": "round10-copilot-request-confirmation.json",
       "trigger_intent_at": "2026-10-05T12:46:36.075425+00:00",
@@ -3338,7 +3377,17 @@
       "trigger_comment_id": 5994731922,
       "request_at": "2026-10-05T12:46:30Z",
       "actor_id": 11204406,
-      "snapshot": "round10-paired-request-confirmation.json"
+      "snapshot": "round10-progress-1257.json",
+      "result_kind": "authenticated_exact_commit_conversation",
+      "result_comment_id": 5994807685,
+      "result_at": "2026-10-05T12:51:18Z",
+      "result_author_id": 199175422,
+      "reviewed_commit_abbreviation": "86f35f47cf",
+      "baseline_exclusion_verified": true,
+      "summary_comment_id": 5989249158,
+      "summary_status": "completed",
+      "summary_updated_at": "2026-10-05T12:51:21Z",
+      "summary_completed_at": "2026-10-05T12:51:20.564472Z"
     },
     "hosted_validation": {
       "status": "passed",
@@ -3376,7 +3425,11 @@
       "reused_from": "round5 on identical head/base/body; no source change or repeated suite"
     },
     "started_at": "2026-10-05T12:46:11Z",
-    "latest_snapshot": "round10-paired-request-confirmation.json",
-    "last_native_observation_at": "2026-10-05T12:47:07.007729+00:00"
+    "latest_snapshot": "round10-progress-1307.json",
+    "last_native_observation_at": "2026-10-05T13:05:33.519291+00:00",
+    "native_gate": {
+      "path": "round10-native-gate-final.json",
+      "sha256": "5ada8593d4e27dbf9bc14f2a7b11a93f5d807c106f522c3035bfbbc0ee9391b6"
+    }
   }
 }

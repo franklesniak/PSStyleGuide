@@ -1506,5 +1506,2428 @@
     },
     "nativeRefsStableAfterRead": true,
     "comparisonMethod": "Compared every previously recorded source path against the exact native tree; unchanged entries reuse the original identities. Only changed entries are repeated below."
+  },
+  "foundationRefresh20261005": {
+    "catalog": {
+      "capturedUtc": "2026-10-05T12:58:42.589163+00:00",
+      "method": "git ls-tree per recorded path; git cat-file blob stdout bytes; no checkout/fetch/index write; scoped 57 recorded paths plus same 28 PS proposed paths",
+      "acceptedRefs": {
+        "PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+        "TF": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9"
+      },
+      "proposedPSRef": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+      "records": [
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Check-NpmAudit.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ba9e0327030fa8288924fa5b2894bfcd7f28c75f",
+          "bytes": 22392,
+          "sha256": "f5f0655d50c33660c4b43310f7d6b2e5f9cbc556db7d818371a41bdb636c188d",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "3babe4848f5d97ffd5757255983463231d4163f7",
+            "mode": "100644",
+            "bytes": 20485,
+            "sha256": "0110c31f21d9037991cb87ca0a2f00b3360995ba7ca815defaafd4a08d19c90d"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "79d69370982018adb479c8d860722797445de03c",
+            "bytes": 20536,
+            "sha256": "4f2a0f56771aa73d05dc67ca97f95ad1f39254b26287117d798219dba161e425"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Check-NpmAudit.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "47a1831ad93a2d935106639822ddc1a95484be09",
+          "bytes": 42081,
+          "sha256": "a1335e5717a8a152281bea78a84086cdec9aeec1235c5497d51f644cc5c9c4b8",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "3a98a55e7d01a1dfd95f2112e8fa656f79df6df2",
+            "mode": "100644",
+            "bytes": 27466,
+            "sha256": "42fb09ef61f7d67d40a33a0b8b71c8ffd952876d8bac9140300975cf1db86b08"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "3212445f4dde58475d7f8409002114b76396bfb9",
+            "bytes": 27450,
+            "sha256": "f0078a6263621a7aaba6c16caffdfaa7ea73886ee23da6cc19e21d805c9a3d67"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+          "bytes": 376988,
+          "sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+            "mode": "100644",
+            "bytes": 376988,
+            "sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+            "mode": "100644",
+            "bytes": 376988,
+            "sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "19240ed44a8811d0a98bb0c67e4a732b5a749f58",
+          "bytes": 150171,
+          "sha256": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "19240ed44a8811d0a98bb0c67e4a732b5a749f58",
+            "mode": "100644",
+            "bytes": 150171,
+            "sha256": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "19240ed44a8811d0a98bb0c67e4a732b5a749f58",
+            "mode": "100644",
+            "bytes": 150171,
+            "sha256": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+          "bytes": 5844,
+          "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+            "mode": "100644",
+            "bytes": 5844,
+            "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+            "mode": "100644",
+            "bytes": 5844,
+            "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/NpmTools.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+          "bytes": 7375,
+          "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+            "mode": "100644",
+            "bytes": 7375,
+            "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+            "mode": "100644",
+            "bytes": 7375,
+            "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/NpmTools.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8249cd855785e2847df7ab6fad60caf219da59bc",
+          "bytes": 11392,
+          "sha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "77a1313b9044bb934159a165e07219a3c1c9306b",
+            "mode": "100644",
+            "bytes": 9686,
+            "sha256": "0b328c28f566e3d337831026eb0c7055b8158c8895c0552c77d9dbb8e3808c42"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "8249cd855785e2847df7ab6fad60caf219da59bc",
+            "bytes": 11392,
+            "sha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+          "bytes": 218742,
+          "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "41a955fc4ef68f47b3391417babbcb91824a2726",
+            "mode": "100644",
+            "bytes": 19602,
+            "sha256": "becb1877caa33c3cbdb949ce710676674ad8475384252072aef8e63496710bba"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+            "bytes": 218742,
+            "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb",
+          "bytes": 474787,
+          "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "bf2b013289afc7d5bc1f760de49e7abcc7cfdda2",
+            "mode": "100644",
+            "bytes": 378451,
+            "sha256": "5a61845f756be1d1bc4ddb772ffbc6c71ab525f0394d11d8c672f998a05fb4a5"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "99e9214ec8c5a6c99a132c4f7ad613e10b48825b",
+            "bytes": 470265,
+            "sha256": "6ae042634adfdfbbe7ee896c3242233dc3513654fd61e9b54be6cabca1771e60"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+          "bytes": 25947,
+          "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+            "mode": "100644",
+            "bytes": 25672,
+            "sha256": "a8f12abf35f250c7f2d0a0ab753a18a42fca7516a36aae9e3dd90eac76805160"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "f90f1dd32a8944651de3d5311e84b08043801fd4",
+            "mode": "100644",
+            "bytes": 25672,
+            "sha256": "a8f12abf35f250c7f2d0a0ab753a18a42fca7516a36aae9e3dd90eac76805160"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+          "bytes": 17320,
+          "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "3f0abda0049fdeacb85c8493937b768ddc999c4a",
+            "mode": "100644",
+            "bytes": 15077,
+            "sha256": "09c32c6e780a325bfac5a2d6d2505f747fd3cdfff297edb7b74107fc79bbcaca"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "3f0abda0049fdeacb85c8493937b768ddc999c4a",
+            "mode": "100644",
+            "bytes": 15077,
+            "sha256": "09c32c6e780a325bfac5a2d6d2505f747fd3cdfff297edb7b74107fc79bbcaca"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/agent-instructions.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+          "bytes": 12748,
+          "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "2cd28ecaa2a8c96d2201a474905153654dc0ac27",
+            "mode": "100644",
+            "bytes": 9504,
+            "sha256": "1c9457868eb262fc7ed8583d1cfff2903288286f11c103a46f91703b04bef67d"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "bd559e5e9b7015d83f45f705a4e7862dc2dc11d5",
+            "bytes": 11495,
+            "sha256": "ee0595c59dd9601e0a6296b295969842faa5d4db35b2ba20fffa2d5273e915d7"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/build.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+          "bytes": 4375,
+          "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+            "mode": "100644",
+            "bytes": 4361,
+            "sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "73a13567131229fb10f8360334bf758b7c7deaa7",
+            "mode": "100644",
+            "bytes": 4361,
+            "sha256": "d08cd80a10e75f0d998175c23c0a146edc7137f3a4f943da6b0278130bce02c0"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/ci-toolchain.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "bytes": 91,
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+            "mode": "100644",
+            "bytes": 91,
+            "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+            "mode": "100644",
+            "bytes": 91,
+            "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b0f7fb0b657232fa0e857e946d725fdd6876c028",
+          "bytes": 52385,
+          "sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+            "mode": "100644",
+            "bytes": 26612,
+            "sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "66d7cda6249a8811490742004a90f5eb644ab688",
+            "mode": "100644",
+            "bytes": 26612,
+            "sha256": "4fdc2f28d10ee7cb7b443ecb917f95f54a031b1c30e2e6de8adebfd099e317aa"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+          "bytes": 8391,
+          "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "dde42437f9f5d579abee2e944321488a2ba4f793",
+            "mode": "100644",
+            "bytes": 3863,
+            "sha256": "0deabaded368671ae8759f4c4fc02445e2e3c0c930cfe3a3a20df728a1e988de"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "dde42437f9f5d579abee2e944321488a2ba4f793",
+            "mode": "100644",
+            "bytes": 3863,
+            "sha256": "0deabaded368671ae8759f4c4fc02445e2e3c0c930cfe3a3a20df728a1e988de"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/historical-supply-profile.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "224f6fba1aa90174dad8eec57dc6012697d8be33",
+          "bytes": 4461,
+          "sha256": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "224f6fba1aa90174dad8eec57dc6012697d8be33",
+            "mode": "100644",
+            "bytes": 4461,
+            "sha256": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "224f6fba1aa90174dad8eec57dc6012697d8be33",
+            "mode": "100644",
+            "bytes": 4461,
+            "sha256": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/markdownlint.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+          "bytes": 6686,
+          "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+            "mode": "100644",
+            "bytes": 6604,
+            "sha256": "73b1eb08b07254ffcb9d437e260bee8a38cce2e8cc65af1c921a3a9c4ed47bfa"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "599f0ff30a26ed5a41d3bcbd8a15405211e2441d",
+            "mode": "100644",
+            "bytes": 6604,
+            "sha256": "73b1eb08b07254ffcb9d437e260bee8a38cce2e8cc65af1c921a3a9c4ed47bfa"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/package-lock.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "27cc70ba810dfb3f410014542142154f86509196",
+          "bytes": 38822,
+          "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "0f2ba8fde17782391a0589fb8e02045c8322d956",
+            "mode": "100644",
+            "bytes": 55584,
+            "sha256": "ec2139965d08fd8ed42eca2da44759537e1ecdde06845b72af3d5ce6efc22195"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "27cc70ba810dfb3f410014542142154f86509196",
+            "bytes": 38822,
+            "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/package.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+          "bytes": 844,
+          "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "753a464d066c0832e8b360d21a541b176ed61456",
+            "mode": "100644",
+            "bytes": 1137,
+            "sha256": "a01509018203f9d0d092549b5a220447818d6af8fc58f6ad7d93681a37b63a98"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+            "bytes": 844,
+            "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/scripts-README.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7",
+          "bytes": 6613,
+          "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "0350d4979fd5ba109ba4dbb910e1593debd0138d",
+            "mode": "100644",
+            "bytes": 3038,
+            "sha256": "b6af48d2e2d29449c7ab302dcde88cdafa30c6573b89065fcd31ab5adf25b8f2"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7",
+            "bytes": 6613,
+            "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+          "bytes": 57610,
+          "sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+            "mode": "100644",
+            "bytes": 57610,
+            "sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+            "mode": "100644",
+            "bytes": 57610,
+            "sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+          "bytes": 12177,
+          "sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+            "mode": "100644",
+            "bytes": 12177,
+            "sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+            "mode": "100644",
+            "bytes": 12177,
+            "sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": "docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+          "bytes": 8744,
+          "sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+            "mode": "100644",
+            "bytes": 8744,
+            "sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+            "mode": "100644",
+            "bytes": 8744,
+            "sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": "docs/dependency-maintenance.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda",
+          "bytes": 9672,
+          "sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "34c9dec3cd9f640fd3a8346583fe8b1569056fb8",
+            "mode": "100644",
+            "bytes": 6243,
+            "sha256": "6371e711abad12c5d0a153e12ba519870034aa39c6455c11608d0969c185822a"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda",
+            "bytes": 9672,
+            "sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": "package-lock.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+          "bytes": 3552,
+          "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "5a8244af74fde546f0bfa55af366ce3ca13cea51",
+            "mode": "100644",
+            "bytes": 51357,
+            "sha256": "63e3455bc1e4d04c4390dea1ddddb340bf89c48206ee6deeb851241e1177b6fe"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+            "bytes": 3552,
+            "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": "package.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+          "bytes": 816,
+          "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "f700e931201cac80accde177a11b1a0bb5c75bb2",
+            "mode": "100644",
+            "bytes": 1025,
+            "sha256": "50f91f5901669fc74d624ce0ca8d90e50cf335c0eb437fdfdd6f4723d7226a3a"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+            "bytes": 816,
+            "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+          "bytes": 1517,
+          "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+          "originalComparison": {
+            "ref": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+            "blob": "d44a87f46f60e0cc80a3293aa90d7ed6e1c5d161",
+            "mode": "100644",
+            "bytes": 1448,
+            "sha256": "0414d5e9a498b0bf7f9f5ce258a733679bc1ad6963af5bbdb3e6f2ecb30901ee"
+          },
+          "previousComparison": {
+            "ref": "425795bd49d6001081d32abd769c87e17dd1d9d5",
+            "blob": "d44a87f46f60e0cc80a3293aa90d7ed6e1c5d161",
+            "mode": "100644",
+            "bytes": 1448,
+            "sha256": "0414d5e9a498b0bf7f9f5ce258a733679bc1ad6963af5bbdb3e6f2ecb30901ee"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Check-NpmAudit.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "04cc1ee1b3ac867878e6ebe10af81f322712e34b",
+          "bytes": 23280,
+          "sha256": "729aa4178660a5b20d1947e804937813f73b60497df46a81b8f6dbf023d8a322",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+            "mode": "100644",
+            "bytes": 20499,
+            "sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+            "mode": "100644",
+            "bytes": 20499,
+            "sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Check-NpmAudit.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1b38ba7a9c6e441fb62b276795a951831c709dc9",
+          "bytes": 42149,
+          "sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+            "mode": "100644",
+            "bytes": 27494,
+            "sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+            "mode": "100644",
+            "bytes": 27494,
+            "sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+          "bytes": 377161,
+          "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+            "mode": "100644",
+            "bytes": 377161,
+            "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+            "mode": "100644",
+            "bytes": 377161,
+            "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+          "bytes": 154151,
+          "sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+            "mode": "100644",
+            "bytes": 154151,
+            "sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+            "mode": "100644",
+            "bytes": 154151,
+            "sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "bytes": 5706,
+          "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "906460d818674199b32294185ed6525c143b48bb",
+            "mode": "100644",
+            "bytes": 5706,
+            "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "906460d818674199b32294185ed6525c143b48bb",
+            "mode": "100644",
+            "bytes": 5706,
+            "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/NpmTools.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+          "bytes": 7656,
+          "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+            "mode": "100644",
+            "bytes": 7375,
+            "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+            "mode": "100644",
+            "bytes": 7375,
+            "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/NpmTools.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+          "bytes": 13810,
+          "sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+            "mode": "100644",
+            "bytes": 11402,
+            "sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+            "mode": "100644",
+            "bytes": 11402,
+            "sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "eee62dff4e2970dc7b8ba197eb3872cc4eca639d",
+          "bytes": 482223,
+          "sha256": "dd77f67a8eb79584d86a69a8806302a7fd0a26251da90b6a9f5e7fd281011790",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+            "mode": "100644",
+            "bytes": 460163,
+            "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+            "mode": "100644",
+            "bytes": 460163,
+            "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+          "bytes": 26228,
+          "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "995b72a7b48dea2636094d81226893a519950797",
+            "mode": "100644",
+            "bytes": 25568,
+            "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "995b72a7b48dea2636094d81226893a519950797",
+            "mode": "100644",
+            "bytes": 25568,
+            "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+          "bytes": 17320,
+          "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+            "mode": "100644",
+            "bytes": 14948,
+            "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+            "mode": "100644",
+            "bytes": 14948,
+            "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/agent-instructions.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+          "bytes": 12865,
+          "sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+            "mode": "100644",
+            "bytes": 9558,
+            "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+            "mode": "100644",
+            "bytes": 9558,
+            "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/build.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1",
+          "bytes": 4348,
+          "sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+            "mode": "100644",
+            "bytes": 4222,
+            "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+            "mode": "100644",
+            "bytes": 4222,
+            "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/ci-toolchain.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "bytes": 91,
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+            "mode": "100644",
+            "bytes": 91,
+            "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+            "mode": "100644",
+            "bytes": 91,
+            "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+          "bytes": 51830,
+          "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+            "mode": "100644",
+            "bytes": 33862,
+            "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+            "mode": "100644",
+            "bytes": 33862,
+            "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+          "bytes": 8391,
+          "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+            "mode": "100644",
+            "bytes": 7645,
+            "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+            "mode": "100644",
+            "bytes": 7645,
+            "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/historical-supply-profile.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+          "bytes": 2783,
+          "sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+            "mode": "100644",
+            "bytes": 2783,
+            "sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+            "mode": "100644",
+            "bytes": 2783,
+            "sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/markdownlint.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+          "bytes": 6714,
+          "sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+            "mode": "100644",
+            "bytes": 6632,
+            "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+            "mode": "100644",
+            "bytes": 6632,
+            "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/package-lock.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "41f8b76d5ad3a9134a9f2f46b00c81ec62bc4b2f",
+          "bytes": 38836,
+          "sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "8836c53a7d86ea9eeab8d0ba10b4026cb848b3ae",
+            "mode": "100644",
+            "bytes": 55624,
+            "sha256": "ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "8836c53a7d86ea9eeab8d0ba10b4026cb848b3ae",
+            "mode": "100644",
+            "bytes": 55624,
+            "sha256": "ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/package.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+          "bytes": 902,
+          "sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+            "mode": "100644",
+            "bytes": 1105,
+            "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+            "mode": "100644",
+            "bytes": 1105,
+            "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/scripts-README.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b049d7881a2cd2ba144dd63b67e10bb0287a7aaf",
+          "bytes": 11650,
+          "sha256": "240b53ff2651bd11c30fde2feacd3d259dbd533ee7fa6a646302b0f2874d1480",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+            "mode": "100644",
+            "bytes": 5421,
+            "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+            "mode": "100644",
+            "bytes": 5421,
+            "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+          "bytes": 65689,
+          "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+            "mode": "100644",
+            "bytes": 65689,
+            "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+            "mode": "100644",
+            "bytes": 65689,
+            "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9e04225a355997850e4817f9163868089a773332",
+          "bytes": 127363,
+          "sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "9e04225a355997850e4817f9163868089a773332",
+            "mode": "100644",
+            "bytes": 127363,
+            "sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "9e04225a355997850e4817f9163868089a773332",
+            "mode": "100644",
+            "bytes": 127363,
+            "sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "8e8d56ea567eab0f252916804b49b866cafeabc6",
+          "bytes": 16605,
+          "sha256": "dbe787c8d869151b007082937725c8152bef854f5d66db29014cc7ae0b602b94",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "b1065e9a330dc2a37e6f56eedc38f720558e6528",
+            "mode": "100644",
+            "bytes": 16511,
+            "sha256": "d2b20a47d918b31e6443d17bb8a305a83a1d3102cc5ad3b9362c0594440d570f"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "b1065e9a330dc2a37e6f56eedc38f720558e6528",
+            "mode": "100644",
+            "bytes": 16511,
+            "sha256": "d2b20a47d918b31e6443d17bb8a305a83a1d3102cc5ad3b9362c0594440d570f"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "71ab82286d05e83ec83d66eb1ebd666d0d19386b",
+          "bytes": 21720,
+          "sha256": "533f01ff2dccc785c4aca8c52e4e736d26e184ca14bc6fd6fd429d6963901e16",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "970afd6f1df559f3085bd39cff2f7b961cc96a15",
+            "mode": "100644",
+            "bytes": 21626,
+            "sha256": "88f628441c80c9aa7ec99e94e8f67e87dedade21f9275547147508950fd15d87"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "970afd6f1df559f3085bd39cff2f7b961cc96a15",
+            "mode": "100644",
+            "bytes": 21626,
+            "sha256": "88f628441c80c9aa7ec99e94e8f67e87dedade21f9275547147508950fd15d87"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d44dba86a66f6dfc126247c97d81bfeeee8f3763",
+          "bytes": 11738,
+          "sha256": "e7647180e675168ee6dc465d20ab209b5301c5ccd3b15cb53ae34a51baae39ec",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba",
+            "mode": "100644",
+            "bytes": 11644,
+            "sha256": "c8994c132bf13fae0500e0cd429999cd36c9ccf4fa26bdcffe7f97a6cd9cf5cc"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba",
+            "mode": "100644",
+            "bytes": 11644,
+            "sha256": "c8994c132bf13fae0500e0cd429999cd36c9ccf4fa26bdcffe7f97a6cd9cf5cc"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": "docs/dependency-maintenance.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "61977b68f4adc7a31aa822fb224efe41b0ea45af",
+          "bytes": 9874,
+          "sha256": "864427fc673b8d257d384ec55ea45e60612883624a071c5df616170342c32654",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+            "mode": "100644",
+            "bytes": 6448,
+            "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+            "mode": "100644",
+            "bytes": 6448,
+            "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": "package-lock.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "50a7973086b1ed0e596b71b87336469ce48ef653",
+          "bytes": 3566,
+          "sha256": "10a2914f93c10d33a325e1b6bb54d9151801397f181647c16034b205efd44f77",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+            "mode": "100644",
+            "bytes": 3566,
+            "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+            "mode": "100644",
+            "bytes": 3566,
+            "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": "package.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "bytes": 837,
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+            "mode": "100644",
+            "bytes": 837,
+            "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+            "mode": "100644",
+            "bytes": 837,
+            "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+          },
+          "changedFromOriginal": false,
+          "changedFromPrevious": false
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+          "bytes": 1496,
+          "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9",
+          "originalComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+            "mode": "100644",
+            "bytes": 1407,
+            "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+          },
+          "previousComparison": {
+            "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+            "mode": "100644",
+            "bytes": 1407,
+            "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+          },
+          "changedFromOriginal": true,
+          "changedFromPrevious": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Check-NpmAudit.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "a99303ac9e828eb1719fd669d969da31ab79c9e2",
+          "bytes": 23273,
+          "sha256": "7cdb15b87a6e66b254e178c806037a2819a78408e3471dcd3ae7f490eec89c6f",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "ba9e0327030fa8288924fa5b2894bfcd7f28c75f",
+            "bytes": 22392,
+            "sha256": "f5f0655d50c33660c4b43310f7d6b2e5f9cbc556db7d818371a41bdb636c188d"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Check-NpmAudit.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "1b38ba7a9c6e441fb62b276795a951831c709dc9",
+          "bytes": 42149,
+          "sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "47a1831ad93a2d935106639822ddc1a95484be09",
+            "bytes": 42081,
+            "sha256": "a1335e5717a8a152281bea78a84086cdec9aeec1235c5497d51f644cc5c9c4b8"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+          "bytes": 376988,
+          "sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+            "bytes": 376988,
+            "sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "19240ed44a8811d0a98bb0c67e4a732b5a749f58",
+          "bytes": 150171,
+          "sha256": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "19240ed44a8811d0a98bb0c67e4a732b5a749f58",
+            "bytes": 150171,
+            "sha256": "ad9a38f269fb3c4e0c9c1a6a19a5cf0e140edf213dea40c5dab41d29a50383ae"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+          "bytes": 5844,
+          "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+            "bytes": 5844,
+            "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/NpmTools.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+          "bytes": 7656,
+          "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+            "bytes": 7375,
+            "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/NpmTools.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+          "bytes": 13810,
+          "sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "8249cd855785e2847df7ab6fad60caf219da59bc",
+            "bytes": 11392,
+            "sha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+          "bytes": 229936,
+          "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+            "bytes": 218742,
+            "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0da8c5c11b1dd18872167b3aeb63bbdb2041ff45",
+          "bytes": 482175,
+          "sha256": "31f41e8833f62810f00ed32e3d6f5c4b857770359bc4f94d9a667fe65edfd64b",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb",
+            "bytes": 474787,
+            "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+          "bytes": 26228,
+          "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+            "bytes": 25947,
+            "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+          "bytes": 17320,
+          "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+            "bytes": 17320,
+            "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/agent-instructions.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+          "bytes": 12837,
+          "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+            "bytes": 12748,
+            "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/build.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+          "bytes": 4375,
+          "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+            "bytes": 4375,
+            "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/ci-toolchain.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "bytes": 91,
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+            "bytes": 91,
+            "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+          "bytes": 51809,
+          "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "b0f7fb0b657232fa0e857e946d725fdd6876c028",
+            "bytes": 52385,
+            "sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+          "bytes": 8391,
+          "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+            "bytes": 8391,
+            "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/historical-supply-profile.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "224f6fba1aa90174dad8eec57dc6012697d8be33",
+          "bytes": 4461,
+          "sha256": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "224f6fba1aa90174dad8eec57dc6012697d8be33",
+            "bytes": 4461,
+            "sha256": "e5121f1aed689d70f2dd2a3605ab986964cd784b0787498efdf977fa798026d4"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/markdownlint.yml",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+          "bytes": 6686,
+          "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+            "bytes": 6686,
+            "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/package-lock.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "27cc70ba810dfb3f410014542142154f86509196",
+          "bytes": 38822,
+          "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "27cc70ba810dfb3f410014542142154f86509196",
+            "bytes": 38822,
+            "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/package.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+          "bytes": 844,
+          "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+            "bytes": 844,
+            "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/scripts-README.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6446258f0d71c22ff68aceb64c87121d3f9c72d8",
+          "bytes": 13157,
+          "sha256": "e782b1a213003ca19f4ece0ccb992f0343eaaec9f89dcc6255b376741dc20881",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7",
+            "bytes": 6613,
+            "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": "docs/P1-SUPPLY-FREEZE-v1.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+          "bytes": 57610,
+          "sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "fc3fb7b657c62702f8b77b196735ff6a458c89e5",
+            "bytes": 57610,
+            "sha256": "e86357ebc67b4bd99316800a2b881a253f3e79bdbbdc8c845ae8e9e2376929f5"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+          "bytes": 12177,
+          "sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+            "bytes": 12177,
+            "sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": "docs/decisions/0002-accept-unverifiable-baseline-provenance.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+          "bytes": 8744,
+          "sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "d2a3422fd3ab61cc54729a2c3e4c0a9a71e75995",
+            "bytes": 8744,
+            "sha256": "4463bcff37ca46cea3760124b4c087173789471f1d276c6bfab158be6ce2e98c"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": "docs/dependency-maintenance.md",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac",
+          "bytes": 9867,
+          "sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda",
+            "bytes": 9672,
+            "sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21"
+          },
+          "changedFromAccepted": true
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": "package-lock.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+          "bytes": 3552,
+          "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "d1ea73040ebc936011269b802f57dee4ec05baf7",
+            "bytes": 3552,
+            "sha256": "a601c2a6141b37d6981a1fd601b84dc5607f60fd48a4358536e45bc85ea88142"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": "package.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+          "bytes": 816,
+          "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+            "bytes": 816,
+            "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+          },
+          "changedFromAccepted": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "present": true,
+          "mode": "100644",
+          "type": "blob",
+          "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+          "bytes": 1517,
+          "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142",
+          "acceptedComparison": {
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "mode": "100644",
+            "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+            "bytes": 1517,
+            "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+          },
+          "changedFromAccepted": false
+        }
+      ]
+    },
+    "inspection": {
+      "capturedUtc": "2026-10-05T13:01:18.083401+00:00",
+      "supplementalIdentities": [
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/npm-risk-exceptions.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+          "bytes": 23,
+          "sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/npm-risk-exceptions.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+          "bytes": 23,
+          "sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/npm-risk-exceptions.json",
+          "mode": "100644",
+          "type": "blob",
+          "blob": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+          "bytes": 23,
+          "sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+        }
+      ],
+      "manifestComparison": [
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "historicalPins": {
+            "REVIEWED_PACKAGE_SHA256": "59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9",
+            "REVIEWED_LOCK_SHA256": "5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2",
+            "REVIEWED_PACKAGE_BLOB": "84bd0421fcf17984220a408e42c5e0523ef65be6",
+            "REVIEWED_LOCK_BLOB": "c3f949822315ec5ff4cc1028922c31d0186cf9cf"
+          },
+          "package": {
+            "sourceRepository": "PS",
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "path": ".github/workflows/package.json",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+            "bytes": 844,
+            "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+          },
+          "lock": {
+            "sourceRepository": "PS",
+            "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "path": ".github/workflows/package-lock.json",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "27cc70ba810dfb3f410014542142154f86509196",
+            "bytes": 38822,
+            "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236"
+          },
+          "matchesReviewedManifest": false,
+          "method": "Raw Git identity comparison only, no executed guard/probe"
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "historicalPins": {
+            "REVIEWED_PACKAGE_SHA256": "c6db6befda88e58aa5568f52f44ca934af5751e545dba0644297b9fb15577e0d",
+            "REVIEWED_LOCK_SHA256": "84cbe61e33e4c66b653efd2bfbe3f80b0061368a64ad80ef0de4898da28d887d",
+            "REVIEWED_PACKAGE_BLOB": "103075d0d14f61b49d29cf2ed8dc8a7804fe092e",
+            "REVIEWED_LOCK_BLOB": "92a2f83a2d2d6904521800108ad0e1b1436909e2"
+          },
+          "package": {
+            "sourceRepository": "TF",
+            "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "path": ".github/workflows/package.json",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+            "bytes": 902,
+            "sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c"
+          },
+          "lock": {
+            "sourceRepository": "TF",
+            "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "path": ".github/workflows/package-lock.json",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "41f8b76d5ad3a9134a9f2f46b00c81ec62bc4b2f",
+            "bytes": 38836,
+            "sha256": "a74cdb9b7115bf1c92729741de3cbd6cb5edde4e2426193818ab30dce2415c1e"
+          },
+          "matchesReviewedManifest": false,
+          "method": "Raw Git identity comparison only, no executed guard/probe"
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "historicalPins": {
+            "REVIEWED_PACKAGE_SHA256": "59e676d981cffa350cb72e7ea4b1aeec2c49d56621958a095aa0e76733ec2cd9",
+            "REVIEWED_LOCK_SHA256": "5efc1286025cdc3ad03796c5f4e44cc697e674a30e61de05e299b2a30abad1a2",
+            "REVIEWED_PACKAGE_BLOB": "84bd0421fcf17984220a408e42c5e0523ef65be6",
+            "REVIEWED_LOCK_BLOB": "c3f949822315ec5ff4cc1028922c31d0186cf9cf"
+          },
+          "package": {
+            "sourceRepository": "PS",
+            "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+            "path": ".github/workflows/package.json",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+            "bytes": 844,
+            "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+          },
+          "lock": {
+            "sourceRepository": "PS",
+            "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+            "path": ".github/workflows/package-lock.json",
+            "mode": "100644",
+            "type": "blob",
+            "blob": "27cc70ba810dfb3f410014542142154f86509196",
+            "bytes": 38822,
+            "sha256": "1691d73d320fbadd3f9b0c46b2235acef9177e9bb0cdcac11ccd9251052c9236"
+          },
+          "matchesReviewedManifest": false,
+          "method": "Raw Git identity comparison only, no executed guard/probe"
+        }
+      ],
+      "nativeRefsFirstRead": {
+        "PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+        "TF": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9"
+      },
+      "nativeRefsAfterRead": {
+        "PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+        "TF": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9"
+      },
+      "nativeTrees": {
+        "PS": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
+        "TF": "377d9980fdd4008e806366ca90b1ce2811c2f519"
+      },
+      "sourceBoundaries": [
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "start": 5438,
+          "end": 5469
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "start": 2230,
+          "end": 2279
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "start": 1,
+          "end": 37
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "start": 5438,
+          "end": 5469
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "start": 2291,
+          "end": 2340
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "start": 1,
+          "end": 37
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "start": 5438,
+          "end": 5469
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "start": 2230,
+          "end": 2279
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "start": 1,
+          "end": 37
+        }
+      ],
+      "currentRiskRecords": [
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "value": {
+            "exceptions": []
+          }
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "value": {
+            "exceptions": []
+          }
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "value": {
+            "exceptions": []
+          }
+        }
+      ],
+      "currentRuntime": [
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "engines": {
+            "node": "24.18.1",
+            "npm": "11.16.0"
+          },
+          "packageManager": "npm@11.16.0"
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "engines": {
+            "node": "24.18.1",
+            "npm": "11.16.0"
+          },
+          "packageManager": "npm@11.16.0"
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "engines": {
+            "node": "24.18.1",
+            "npm": "11.16.0"
+          },
+          "packageManager": "npm@11.16.0"
+        }
+      ],
+      "ordinaryCallerScope": [
+        {
+          "sourceRepository": "PS",
+          "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "pathsChecked": [
+            "package.json",
+            ".github/workflows/package.json",
+            ".github/workflows/agent-instructions.yml",
+            ".github/workflows/build.yml",
+            ".github/workflows/markdownlint.yml",
+            ".github/workflows/copilot-setup-steps.yml",
+            ".github/workflows/devcontainer-ci.yml"
+          ],
+          "recorderOrProfileReference": false
+        },
+        {
+          "sourceRepository": "TF",
+          "ref": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "pathsChecked": [
+            "package.json",
+            ".github/workflows/package.json",
+            ".github/workflows/agent-instructions.yml",
+            ".github/workflows/build.yml",
+            ".github/workflows/markdownlint.yml",
+            ".github/workflows/copilot-setup-steps.yml",
+            ".github/workflows/devcontainer-ci.yml"
+          ],
+          "recorderOrProfileReference": false
+        },
+        {
+          "sourceRepository": "PS",
+          "ref": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "pathsChecked": [
+            "package.json",
+            ".github/workflows/package.json",
+            ".github/workflows/agent-instructions.yml",
+            ".github/workflows/build.yml",
+            ".github/workflows/markdownlint.yml",
+            ".github/workflows/copilot-setup-steps.yml",
+            ".github/workflows/devcontainer-ci.yml"
+          ],
+          "recorderOrProfileReference": false
+        }
+      ],
+      "nativeRefsStable": true,
+      "proposedTree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+      "checkedUtc": "2026-10-05T13:01:23.305273+00:00"
+    },
+    "workerReportSha256": "d2fe6731b5a950ce9ef8f9526561a7d79d29c6e5948246bedd928fd480b9797a",
+    "workerCatalogSha256": "05f919c02851c3d7935beb8daa90d65d880f4da1ae553abf4a9f409bfd4294ce",
+    "rootVerification": {
+      "checkedUtc": "2026-10-05T13:08:35.471181+00:00",
+      "currentRawIdentities": 85,
+      "currentRawBytes": 4740831,
+      "supplementalRawIdentities": 3,
+      "originalAndPreviousComparisons": 57,
+      "ordinaryCallerFilesChecked": 21,
+      "nativeMainsStable": true,
+      "scope": "Readiness/source identity only; no new runtime acceptance, historical audit, original credit or completion."
+    },
+    "selectedDecisionsRetained": [
+      "D1 C92",
+      "D2 B99",
+      "D3 F96"
+    ],
+    "nextAction": "Repin actual paired A03/A07 acceptance, implement the six-path PS-first repair, then complete candidate verification and review/transfer lifecycle."
   }
 }
