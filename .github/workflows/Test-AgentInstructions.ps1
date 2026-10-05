@@ -534,7 +534,7 @@ function Get-AgentBootstrapCommandFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261003.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -803,7 +803,7 @@ function ConvertFrom-StrictUtf8Data {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -879,7 +879,7 @@ function Assert-EncodingMutationRejected {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -947,7 +947,7 @@ function Get-RepositoryInputMetadataFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -1049,7 +1049,7 @@ function Assert-RepositoryInputMetadataMutationRejected {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -1136,7 +1136,7 @@ function Read-BoundedStreamData {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([byte])]
     param(
@@ -1334,7 +1334,7 @@ function ConvertFrom-GitPathListData {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.1.20260914.0.
+    # Version: 1.1.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -1415,7 +1415,7 @@ function Read-GitTrackedPath {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -1493,7 +1493,7 @@ function Read-GitPublishedEndpointChangedPath {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -1847,7 +1847,7 @@ function Get-GitRegularFileBlobId {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261003.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -1937,7 +1937,7 @@ function Read-GitRevisionText {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.1.20261002.0.
+    # Version: 1.1.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -2084,7 +2084,7 @@ function Get-PublishedBaselineDocumentContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261005.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -2153,7 +2153,7 @@ function Assert-OversizedStreamMutationRejected {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param()
@@ -2278,7 +2278,7 @@ function Assert-MarkdownParserTransportCleanup {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param()
@@ -2953,7 +2953,7 @@ function Invoke-MarkdownParserProcess {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -3666,7 +3666,7 @@ function Assert-MarkdownParserExactContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param()
@@ -3869,7 +3869,7 @@ function Get-OperativeMarkdownContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -3939,7 +3939,7 @@ function ConvertTo-OperativeMarkdownText {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -3976,7 +3976,7 @@ function Get-ActiveClaudeImportReference {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4025,7 +4025,7 @@ function Get-ClaudeImportFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4067,7 +4067,7 @@ function Get-NestedClaudeImportFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4119,7 +4119,7 @@ function Get-MarkdownLevelTwoSectionContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -4215,7 +4215,7 @@ function Test-MetadataCalendarDatePair {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -4269,7 +4269,7 @@ function ConvertTo-MetadataComparisonText {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4354,7 +4354,7 @@ function Get-PublishedEndpointLastUpdatedFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -4479,7 +4479,7 @@ function Get-MarkdownParserBootstrapFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
@@ -4529,7 +4529,7 @@ function Invoke-SafeTemporaryDirectoryRemoval {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -4678,7 +4678,7 @@ function Test-GitIgnorePathEffective {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -4763,7 +4763,7 @@ function Test-ProhibitedClaudeLocalPath {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param([Parameter(Mandatory)][string] $RepositoryRelativePath)
@@ -4811,7 +4811,7 @@ function Test-GovernedInstructionPath {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -4868,7 +4868,7 @@ function Test-GovernedInstructionPathCaseMismatch {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -4930,7 +4930,7 @@ function Test-ExactPathCaseMismatch {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -4973,7 +4973,7 @@ function Test-GovernedInstructionInventoryPath {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -5021,7 +5021,7 @@ function Test-AgentInstructionWorkflowPath {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -5071,7 +5071,7 @@ function Get-DecisionRecordPathFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param([Parameter(Mandatory)][string] $RepositoryRelativePath)
@@ -5112,7 +5112,7 @@ function Get-GovernedInstructionInventoryFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5206,7 +5206,7 @@ function Get-DocumentationClaimFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5272,7 +5272,7 @@ function Get-DecisionLifecyclePolicyFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260902.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -5361,7 +5361,7 @@ function Test-DecisionLifecycleStatusLabel {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([bool])]
     param(
@@ -5412,7 +5412,7 @@ function Get-DecisionRecordLifecycleFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261005.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -6204,7 +6204,7 @@ function Get-DocumentMetadataContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.7.20261005.0.
+    # Version: 1.7.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -6516,7 +6516,7 @@ function Get-PublishedEndpointMetadataFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -6749,7 +6749,7 @@ function Get-TomlSemanticStatementContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -6813,7 +6813,7 @@ function Get-GitHubPluginEnablementContext {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(
@@ -6879,7 +6879,7 @@ function ConvertTo-DisabledGitHubPluginMutation {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260830.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -6953,7 +6953,7 @@ function Get-AgentInstructionFailure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261003.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([string])]
     param(
@@ -7394,7 +7394,7 @@ function Assert-Failure {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
@@ -7496,7 +7496,7 @@ function Assert-FixtureAccepted {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param(
