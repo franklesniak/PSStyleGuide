@@ -1,5 +1,5 @@
 {
-  "status": "round3_codex_clean_copilot_and_hosted_pending",
+  "status": "round3_decisions_selected_pending_native_disposition",
   "captured_at": "2026-10-05T08:58:56.655785+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
@@ -567,7 +567,7 @@
   "first_request_at": "2026-10-05T06:26:07Z",
   "deadline": "2026-10-13T06:26:07+00:00",
   "metadata_carry_back": "A21 currently54 differing Version notes (50main/4SelfTest) plus classifier deletion; A07 shared fixture prefix. Two accepted TF helpers already have Oct5.0 tuples, requiring actual destination/date arithmetic. Transfer3 is not released; refresh accepted peers before it.",
-  "remaining": "Collect existing Copilot review and two ordinary hosted runs; then independent final quality, normal merge, landed acceptance and actual paired comparison. Conditional four-path TF carry-back is prepared but not released. All22 outcomes and402 contracts remain in scope.",
+  "remaining": "Publish R4/R5 decisions, reply once and resolve validated false-positive threads, update PR body, then request round4 on the same product head and new reviewed body after complete baseline.",
   "implementation_evidence_sha256": "a974f641c004e31a3b2d47c953e9763338ec5314b7c8fb14afa492a27213e95e",
   "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8",
   "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
@@ -1834,6 +1834,30 @@
       "all5_threads_resolved": true,
       "snapshot": "round3-pre-request-current.json",
       "resolution_note": "All three R3 threads were already resolved in authenticated pre-reply snapshot. Root added one decision reply each; no resolution mutation sent."
+    },
+    "planning_progress_publication": {
+      "head": "83fa6dc8ec9a134786ae79b031b1a944a605a272",
+      "parent": "aca8312cc597c0355ae22086654db27b73598916",
+      "tree": "b8e1f0cee60236e1ba0d92344beaf28991ab2446",
+      "files": [
+        "docs/planning/action-items-2026-10-02/results/A02/coherent-reverse-candidate.json",
+        "docs/planning/action-items-2026-10-02/results/A21/PS232-carryback-readiness.md",
+        "docs/planning/action-items-2026-10-02/results/A21/PS232-carryback-catalog.json",
+        "docs/planning/action-items-2026-10-02/results/A02/ps232-round3-source-quality.md",
+        "docs/planning/action-items-2026-10-02/results/A02/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A03/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A07/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A20/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A21/RESULT.md",
+        "docs/planning/action-items-2026-10-02/STATUS.md",
+        "docs/planning/action-items-2026-10-02/results/A06/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A06/postTF66-readiness/REPORT.md",
+        "docs/planning/action-items-2026-10-02/results/A06/postTF66-readiness/evidence.json"
+      ],
+      "status": "published",
+      "commit_log_sha256": "fd4cb47a83ef037adc1e13e0db436d68aa0f55bb129d5d6089f60a4286456dad",
+      "push_exit": 0,
+      "published_at": "2026-10-05T09:00:56.100335+00:00"
     }
   },
   "round3": {
@@ -1842,10 +1866,10 @@
     "body_sha256": "0a1daa2b01d307f0f74f28a41e0896f8a51c11a9263ffd67f69b4894ed10095c",
     "baseline": "round3-pre-request-current.json",
     "started_at": "2026-10-05T08:43:19Z",
-    "request_set_terminal": false,
+    "request_set_terminal": true,
     "clean": false,
     "copilot": {
-      "status": "pending",
+      "status": "terminal_findings_pending_disposition",
       "request_event_id": 32491011129,
       "request_at": "2026-10-05T08:43:19Z",
       "actor_id": 11204406,
@@ -1853,8 +1877,24 @@
       "workflow_run_id": 37285407379,
       "transport": "GitHub UI",
       "selected_effort": "Balanced",
-      "observed_effort": null,
-      "snapshot": "round3-paired-request-confirmation.json"
+      "observed_effort": "Lite",
+      "snapshot": "round3-terminal-with-findings.json",
+      "review_id": 5412179344,
+      "review_at": "2026-10-05T09:00:03Z",
+      "observed_effort_source": "Native review overview explicitly states Review effort: Lite",
+      "comment_ids": [
+        4182292113,
+        4182292172
+      ],
+      "service_status": "cancelled",
+      "service_execution": {
+        "run_id": 37285407379,
+        "conclusion": "cancelled",
+        "cause": "Authenticated annotation: maximum execution time20m exceeded. Setup validation and final immutable-input step succeeded; Processing Request (Linux) cancelled.",
+        "evidence_directory": "round3-copilot-attempt1",
+        "log_sha256": "c4d150cd0f94391ec2be2692f5c8887d4e333db1f777ae6efb204dc110bad483"
+      },
+      "fallback": "Authenticated current-head Lite review5412179344 is valid under AGENTS; no effort-only retry."
     },
     "codex": {
       "status": "clean",
@@ -1869,11 +1909,28 @@
       "attribution": "Authenticated trigger and result; baseline exclusion; ordered timestamps; exact unique current-head prefix; no new Codex findings."
     },
     "hosted_snapshot": {
-      "captured_at": "2026-10-05T08:58:56.655785+00:00",
-      "snapshot": "round3-progress-after-carryback.json",
-      "ordinary_success": 10,
-      "ordinary_pending": 2,
-      "all5_threads_resolved": true
+      "captured_at": "2026-10-05T09:02:04.890435+00:00",
+      "snapshot": "round3-progress-0903.json",
+      "ordinary_success": 12,
+      "ordinary_pending": 0,
+      "open_threads": 2,
+      "collection": "round3-hosted-f77a58d/round3-progress-0903-collection.json"
+    },
+    "decisions": {
+      "R4": {
+        "selection": "N100",
+        "disposition": "disproved_no_product_change",
+        "comment_id": 4182292113,
+        "source_proposal_sha256": "b03ad1f7bb48d3c09b517f316b1d2e96eb778caea5118b6fa2c8d4daea51d346",
+        "source_evidence_sha256": "ec19ff1ef3b65fb6b42cfe913005a32f92a017c21716f4b6ef0e1b8f410d4428"
+      },
+      "R5": {
+        "selection": "N100",
+        "disposition": "disproved_no_product_change",
+        "comment_id": 4182292172,
+        "source_proposal_sha256": "80a28c572ef18fecb12969fb16ec5f10447ce1bac1ead684083d900ffff518db",
+        "source_evidence_sha256": "b71b7d24b73ba1a44ba42fa19f8d4e7f3001234e472cab5b950e921a9674b5a4"
+      }
     }
   },
   "conditional_carryback": {

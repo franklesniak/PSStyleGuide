@@ -53,3 +53,25 @@ Native snapshot `round3-progress-0855.json`, captured08:51:31.725760 UTC, binds 
 Pair scope remains **54 differing Version notes plus the two earlier cleanup edits**, compared with accepted TF56cb041. Later TF work must refresh actual accepted mains and genuine destination-date/version arithmetic, particularly the two TF helpers already at October5.0. No six-note-only carry-back, blind copying, final paired convergence or A18/A19 acceptance is implied.
 
 Next action is bounded reconciliation of root-supplied current terminal hosted/Copilot evidence, followed by the root's fresh native merge-readiness gate. This supplement performed no suite, install, product/index/ref/dependency/planning/state/native write or descendant work.
+
+## Ordinary hosted terminal evidence
+
+**All twelve ordinary workflows passed on the current PR input. Final PR PASS remains withheld:** authenticated current Copilot review has two findings, and its separate dynamic service is still in progress in the supplied snapshot. This supplement does not adjudicate R4/R5.
+
+Snapshot `round3-progress-0903.json`, captured2026-10-05 09:02:04.890435 UTC, binds H `f77a58dede8f6f68b45e0d62e5b96e2fed477c58`, B `f168f83b89f64b6bca9d520ddec4b58969060fb6` and body SHA256 `0a1daa2b01d307f0f74f28a41e0896f8a51c11a9263ffd67f69b4894ed10095c`. The existing committed-input source/tree/local-validation conclusions remain unchanged.
+
+Reconciled the complete12-run collection. The nine previously read run/job/log hashes are unchanged. Read the three new complete logs and actual outputs:
+
+| Run | Event | Actual result | Log SHA256 |
+| --- | --- | --- | --- |
+| 37284974966 | pull_request instruction | Content contract and mutation SelfTest passed;507 tests/507 pass/0 fail/0 skipped | f9f79fe8dfec4a689e869ef570c0d7db2a7a8064d4d41d426e2b3bf576285de7 |
+| 37284971399 | push instruction | Content contract and mutation SelfTest passed;507 tests/507 pass/0 fail/0 skipped | cfa1ac3f7f00194489a43f81e05d54fc97b5353356d190c35673a6124c4e72f8 |
+| 37284971421 | push setup | Eleven actual Passed hooks, zero Skipped hooks;final immutable-input step success | ae1b8011a2fb18d68647d1f7931d26f9dacb758057c3868b8e92d79fb6fe3192 |
+
+The previously reviewed PR setup37284974926 also has eleven actual Passed hooks, zero Skipped hooks and successful final immutable-input verification; log SHA256 `f976dc865504429db0053c238a8a91319d80ed9a8fccbb40b49f401693a62ae0`. Both artifact event runs confirm committed bytes match generator output. Markdown/policy and dev-container event jobs remain successful. The two pull_request_target accepted-policy runs return MAINTENANCE_REQUIRED, which supplies no owner grant. Deliberate opposite-event job skips are not suite skips. All event and checkout roles remain explicit; run attribution to PR H is not a blanket assertion of direct-H checkout in every job.
+
+Copilot review5412179344, authenticated bot175728472, was submitted09:00:03 UTC on exactH and explicitly says Lite. Inline reports4182292113 and4182292172 concern parser callback arguments and Markdown table separators. Both new threads are open in this snapshot; the five earlier threads are resolved. Their correctness is pending the root's finding-specific validation, not inferred from overall CI success. Dynamic run37285407379 remains in_progress with null conclusion at snapshot time. The overview's generic startup-timeout statement does not establish this separate run's terminal state. No claim of a clean Copilot result, service success or merge readiness is made.
+
+Ready for root's bounded disposition/service delta and eventual current-input review closure. No suite, install, source/index/ref/dependency/planning/native mutation or descendant work was performed. Prior reports are preserved.
+
+Root subsequent native reconciliation: the Copilot agentic run37285407379 ended cancelled. Its annotation records the20-minute service cap. Setup validation and final immutable-input checks succeeded; Processing Request (Linux) was cancelled. Valid Lite review5412179344 remains distinct from that failure. Root selected [R4 N100](../A07/PS232-R4-jsonc-callback.md) and [R5 N100](PS232-R5-script-table.md) after the full displayed process. Both allegations are disproved; product bytes are unchanged. Native disposition and a fresh review pair for the updated review summary remain pending. No final PR PASS is claimed.
