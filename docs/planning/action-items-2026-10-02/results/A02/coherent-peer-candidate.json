@@ -1,6 +1,6 @@
 {
-  "recorded_at": "2026-10-05T02:34:13.540318+00:00",
-  "status": "round6_reviews_pending",
+  "recorded_at": "2026-10-05T02:54:01.511336+00:00",
+  "status": "round6_findings_under_analysis",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -706,11 +706,11 @@
       "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-request-baseline-db54d68.json",
       "baseline_sha256": "b9dd6cbb54b372d8864ebfa738c1819d4cc01054e7ccc5a4ae4b6fb230b213b2",
       "copilot": {
-        "state": "requested_pending",
+        "state": "completed_clean",
         "started_at": "2026-10-05T02:28:11.246399+00:00",
         "transport": "supported GitHub Reviewers UI",
         "requested_effort": "Balanced",
-        "result_effort": null,
+        "result_effort": "Balanced",
         "channel_attempts": 1,
         "request_event_id": 32472497545,
         "request_event_at": "2026-10-05T02:28:20Z",
@@ -720,15 +720,27 @@
         "request_observation_sha256": "ab78c22cdaedc296ea9b938c2b1bf27254ce2e919ceefd2636ed17ec3d0b1f8d",
         "attempts": 1,
         "workflow_run_id": 37255543195,
-        "observed_run_status": "in_progress",
-        "observed_run_conclusion": null,
+        "observed_run_status": "completed",
+        "observed_run_conclusion": "success",
         "ui_click_count": 1,
         "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-review-request-proof.png",
         "ui_screenshot_sha256": "1ffa58d0d89df94ecadf5d575cfd0cb556e4957496af3998ea57dd40286b1a8c",
-        "ui_observation": "Supported Reviewers menu selected Balanced. After one submission the refreshed UI says Reviewing at balanced effort; Last completed: lite is historical. Current result effort is unknown."
+        "ui_observation": "Supported Reviewers menu selected Balanced. After one submission the refreshed UI says Reviewing at balanced effort; Last completed: lite is historical. Current result effort is unknown.",
+        "clean": true,
+        "review_id": 5409553923,
+        "review_submitted_at": "2026-10-05T02:47:42Z",
+        "review_body": "<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n### \ud83d\udd35 Needs a closer look\n\nThe change spans security-sensitive CI trust-root, workflow-policy, and git-audit logic across many files, and the author explicitly states fresh reviews, independent quality checks, and human approval are still required.\n\n**Review effort:** Balanced  \n**Findings:** None\n\n<details>\n<summary><strong>Resolved since last review (4)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This performs a full repo glob (`**/.markdownlint*`) on every lint configuration load, which can\u2026](#discussion_r4179947038)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The job timeout (59 minutes) is lower than the maximum cumulative wall-time implied by later step\u2026](#discussion_r4179947028)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`hostedAuthorityReference()` now effectively operates on a `reference` that can be either a commit\u2026](#discussion_r4179947014)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The `paths` filter includes broad globs like `.github/workflows/**` and then repeats specific files\u2026](#discussion_r4179947053)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+        "review_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#pullrequestreview-5409553923",
+        "observed_result_effort": "Balanced",
+        "live_job_id": 111591692527,
+        "terminal_jobs": {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-copilot-terminal-jobs.json",
+          "sha256": "0a2e2818f1ff17fde819d6786861b428a79c72a54844336c0b6efd78d429983e"
+        },
+        "body_scope_note": "Needs a closer look is a general reminder of independent quality and actual authority gates, not an additional code finding or approval grant."
       },
       "manual_codex": {
-        "state": "running",
+        "state": "completed_with_findings",
         "started_at": "2026-10-05T02:29:13.571660+00:00",
         "channel_attempts": 1,
         "exact_body": "@codex review",
@@ -760,10 +772,16 @@
         "confirmed_at": "2026-10-05T02:30:25.194100+00:00",
         "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5987077643",
         "summary_comment_id": 5982194609,
-        "summary_updated_at": "2026-10-05T02:29:23Z",
-        "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \ud83d\udd04 **Running** since <relative-time datetime=\"2026-10-05T02:29:22.772824Z\">2026-10-05T02:29:22.772824Z</relative-time> | `db54d68` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>"
+        "summary_updated_at": "2026-10-05T02:40:18Z",
+        "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \u2705 **Completed** <relative-time datetime=\"2026-10-05T02:40:17.294307Z\">2026-10-05T02:40:17.294307Z</relative-time> | `db54d68` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
+        "clean": false,
+        "review_id": 5409525065,
+        "review_body": "\n### \ud83d\udca1 Codex Review\n\nHere are some automated review suggestions for this pull request.\n\n**Reviewed commit:** `db54d687b1`\n    \n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\".\n\nIf Codex has suggestions, it will comment; otherwise it will react with \ud83d\udc4d.\n\n\n\n\nCodex can also answer questions or update the PR. Try commenting \"@codex address that feedback\".\n            \n</details>",
+        "review_submitted_at": "2026-10-05T02:40:13Z",
+        "review_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#pullrequestreview-5409525065",
+        "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-continuation-01-db54d68.json"
       },
-      "request_set_terminal": false,
+      "request_set_terminal": true,
       "clean": false,
       "started_at": "2026-10-05T02:28:20Z",
       "nonreview_run_summary": [
@@ -773,14 +791,6 @@
           "event": "pull_request_target",
           "status": "completed",
           "conclusion": "success",
-          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
-        },
-        {
-          "id": 37254870290,
-          "name": "Agent instruction validation",
-          "event": "pull_request",
-          "status": "in_progress",
-          "conclusion": null,
           "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
@@ -800,16 +810,24 @@
           "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37254870261,
-          "name": "Copilot setup steps",
+          "id": 37254870356,
+          "name": "Markdown Lint",
           "event": "pull_request",
-          "status": "in_progress",
-          "conclusion": null,
+          "status": "completed",
+          "conclusion": "success",
           "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37254870356,
-          "name": "Markdown Lint",
+          "id": 37254870261,
+          "name": "Copilot setup steps",
+          "event": "pull_request",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+        },
+        {
+          "id": 37254870290,
+          "name": "Agent instruction validation",
           "event": "pull_request",
           "status": "completed",
           "conclusion": "success",
@@ -824,27 +842,11 @@
           "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37254866643,
-          "name": "Copilot setup steps",
-          "event": "push",
-          "status": "in_progress",
-          "conclusion": null,
-          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
-        },
-        {
           "id": 37254866686,
           "name": "Dev container boundary",
           "event": "push",
           "status": "completed",
           "conclusion": "success",
-          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
-        },
-        {
-          "id": 37254866650,
-          "name": "Agent instruction validation",
-          "event": "push",
-          "status": "in_progress",
-          "conclusion": null,
           "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
@@ -862,13 +864,71 @@
           "status": "completed",
           "conclusion": "success",
           "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+        },
+        {
+          "id": 37254866643,
+          "name": "Copilot setup steps",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+        },
+        {
+          "id": 37254866650,
+          "name": "Agent instruction validation",
+          "event": "push",
+          "status": "completed",
+          "conclusion": "success",
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         }
       ],
-      "all_nonreview_workflows_success": false,
-      "latest_native_snapshot": {
-        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-both-requested-db54d68.json",
-        "sha256": "3823cd3cf32a26d828e022ef677ed6216e551fd0dccd0466496a06e7e972ab5d",
-        "captured_at": "2026-10-05T02:32:21.052619+00:00"
+      "all_nonreview_workflows_success": true,
+      "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-terminal-db54d68.json",
+      "findings": [
+        {
+          "key": "R21",
+          "owner": "A07",
+          "comment_id": 4180361504,
+          "thread_id": "PRRT_kwDOSAZRhc6o4_-k",
+          "path": ".github/workflows/lint-markdown.mjs",
+          "line": 12,
+          "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Reject escaping package-manifest symlinks before reading**\n\nWhen the root `package.json` is a symlink to a JSON file outside the repository, this read follows the link and trusts the external `engines.node` value; I reproduced this with an escaping manifest link and `lintMarkdownFiles` returned 0. Validate the manifest as a non-symlink regular file and confirm its canonical path remains inside the canonical repository root before reading it, as is already done for the child script.\n\nAGENTS.md reference: [AGENTS.md:L50-L53](https://github.com/franklesniak/TerraformStyleGuide/blob/db54d687b105e548117c1e8a60ba155fab1a376f/AGENTS.md#L50-L53)\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4180361504",
+          "review_id": 5409525065,
+          "original_commit_id": "db54d687b105e548117c1e8a60ba155fab1a376f",
+          "state": "validating_options",
+          "owned_eyes_reaction_id": 450197993,
+          "reaction_readback_verified": true
+        },
+        {
+          "key": "R22",
+          "owner": "A21",
+          "comment_id": 4180361508,
+          "thread_id": "PRRT_kwDOSAZRhc6o4_-m",
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "line": 5443,
+          "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Handle decision records without a Metadata heading**\n\nWhen a new or changed decision record uses the allowed direct metadata-list form\u2014an H1 followed immediately by the Tier 1 list, without the optional `## Metadata` heading\u2014`Get-DocumentMetadataContext` succeeds, but this expression produces `$null`; under `Set-StrictMode`, the subsequent reads of `$objMetadataHeading.Start` terminate validation. This makes a compliant decision record unmergeable, so handle the absent heading and use the parsed metadata-list bounds when computing the exclusion region.\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.",
+          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4180361508",
+          "review_id": 5409525065,
+          "original_commit_id": "db54d687b105e548117c1e8a60ba155fab1a376f",
+          "state": "validating_options",
+          "owned_eyes_reaction_id": 450197995,
+          "reaction_readback_verified": true
+        }
+      ],
+      "inventory": {
+        "inline_findings": 2,
+        "body_only_findings": 0,
+        "resolved_prior_threads": 19,
+        "open_threads": 2,
+        "complete_body_and_pagination_checked": true
+      },
+      "independent_interim_quality": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\db54d68-current-input-20261005\\REPORT.md",
+        "sha256": "8881c5d38eba4a4df70cbca79becba30f19be1d636c4518abd72c761ecf1fa6a",
+        "state": "no_material_source_or_integration_finding_before_new_remote_findings",
+        "final_pass": false,
+        "new_remote_findings_require_resolution": true
       }
     }
   },
@@ -1799,9 +1859,9 @@
   },
   "accepted_baseline_file_count": 75,
   "latest_native_snapshot": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-both-requested-db54d68.json",
-    "sha256": "3823cd3cf32a26d828e022ef677ed6216e551fd0dccd0466496a06e7e972ab5d",
-    "captured_at": "2026-10-05T02:32:21.052619+00:00"
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-terminal-db54d68.json",
+    "sha256": "0a64dadf09e63f833aad59d5902ddb0b47001583730b6777fa88364fcf7e3765",
+    "captured_at": "2026-10-05T02:49:32.882265+00:00"
   },
   "round1": {
     "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
@@ -3718,8 +3778,8 @@
       "old_input_clean": false
     }
   },
-  "current_review_status": "Both round6 reviews pending on db54d68; prior 19 threads resolved. Final quality, merge and reverse transfer remain.",
-  "next_action": "Collect both current-input review results and remaining hosted checks without duplicate requests; final quality, normal merge and landed acceptance remain.",
+  "current_review_status": "Round6 terminal/nonclean: Copilot Balanced5409553923 has no findings and its run succeeded; Codex5409525065 has reproduced R21/R22. All12 nonreview runs pass; two open threads. Full decisions and repair remain.",
+  "next_action": "Complete distinct R21/R22 decisions; implement selected repairs privately, then independent quality and changed-input validation.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -7769,11 +7829,11 @@
     "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-request-baseline-db54d68.json",
     "baseline_sha256": "b9dd6cbb54b372d8864ebfa738c1819d4cc01054e7ccc5a4ae4b6fb230b213b2",
     "copilot": {
-      "state": "requested_pending",
+      "state": "completed_clean",
       "started_at": "2026-10-05T02:28:11.246399+00:00",
       "transport": "supported GitHub Reviewers UI",
       "requested_effort": "Balanced",
-      "result_effort": null,
+      "result_effort": "Balanced",
       "channel_attempts": 1,
       "request_event_id": 32472497545,
       "request_event_at": "2026-10-05T02:28:20Z",
@@ -7783,15 +7843,27 @@
       "request_observation_sha256": "ab78c22cdaedc296ea9b938c2b1bf27254ce2e919ceefd2636ed17ec3d0b1f8d",
       "attempts": 1,
       "workflow_run_id": 37255543195,
-      "observed_run_status": "in_progress",
-      "observed_run_conclusion": null,
+      "observed_run_status": "completed",
+      "observed_run_conclusion": "success",
       "ui_click_count": 1,
       "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-review-request-proof.png",
       "ui_screenshot_sha256": "1ffa58d0d89df94ecadf5d575cfd0cb556e4957496af3998ea57dd40286b1a8c",
-      "ui_observation": "Supported Reviewers menu selected Balanced. After one submission the refreshed UI says Reviewing at balanced effort; Last completed: lite is historical. Current result effort is unknown."
+      "ui_observation": "Supported Reviewers menu selected Balanced. After one submission the refreshed UI says Reviewing at balanced effort; Last completed: lite is historical. Current result effort is unknown.",
+      "clean": true,
+      "review_id": 5409553923,
+      "review_submitted_at": "2026-10-05T02:47:42Z",
+      "review_body": "<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n### \ud83d\udd35 Needs a closer look\n\nThe change spans security-sensitive CI trust-root, workflow-policy, and git-audit logic across many files, and the author explicitly states fresh reviews, independent quality checks, and human approval are still required.\n\n**Review effort:** Balanced  \n**Findings:** None\n\n<details>\n<summary><strong>Resolved since last review (4)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This performs a full repo glob (`**/.markdownlint*`) on every lint configuration load, which can\u2026](#discussion_r4179947038)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The job timeout (59 minutes) is lower than the maximum cumulative wall-time implied by later step\u2026](#discussion_r4179947028)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`hostedAuthorityReference()` now effectively operates on a `reference` that can be either a commit\u2026](#discussion_r4179947014)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The `paths` filter includes broad globs like `.github/workflows/**` and then repeats specific files\u2026](#discussion_r4179947053)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
+      "review_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#pullrequestreview-5409553923",
+      "observed_result_effort": "Balanced",
+      "live_job_id": 111591692527,
+      "terminal_jobs": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-copilot-terminal-jobs.json",
+        "sha256": "0a2e2818f1ff17fde819d6786861b428a79c72a54844336c0b6efd78d429983e"
+      },
+      "body_scope_note": "Needs a closer look is a general reminder of independent quality and actual authority gates, not an additional code finding or approval grant."
     },
     "manual_codex": {
-      "state": "running",
+      "state": "completed_with_findings",
       "started_at": "2026-10-05T02:29:13.571660+00:00",
       "channel_attempts": 1,
       "exact_body": "@codex review",
@@ -7823,10 +7895,16 @@
       "confirmed_at": "2026-10-05T02:30:25.194100+00:00",
       "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5987077643",
       "summary_comment_id": 5982194609,
-      "summary_updated_at": "2026-10-05T02:29:23Z",
-      "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \ud83d\udd04 **Running** since <relative-time datetime=\"2026-10-05T02:29:22.772824Z\">2026-10-05T02:29:22.772824Z</relative-time> | `db54d68` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>"
+      "summary_updated_at": "2026-10-05T02:40:18Z",
+      "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \u2705 **Completed** <relative-time datetime=\"2026-10-05T02:40:17.294307Z\">2026-10-05T02:40:17.294307Z</relative-time> | `db54d68` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
+      "clean": false,
+      "review_id": 5409525065,
+      "review_body": "\n### \ud83d\udca1 Codex Review\n\nHere are some automated review suggestions for this pull request.\n\n**Reviewed commit:** `db54d687b1`\n    \n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\".\n\nIf Codex has suggestions, it will comment; otherwise it will react with \ud83d\udc4d.\n\n\n\n\nCodex can also answer questions or update the PR. Try commenting \"@codex address that feedback\".\n            \n</details>",
+      "review_submitted_at": "2026-10-05T02:40:13Z",
+      "review_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#pullrequestreview-5409525065",
+      "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-continuation-01-db54d68.json"
     },
-    "request_set_terminal": false,
+    "request_set_terminal": true,
     "clean": false,
     "started_at": "2026-10-05T02:28:20Z",
     "nonreview_run_summary": [
@@ -7836,14 +7914,6 @@
         "event": "pull_request_target",
         "status": "completed",
         "conclusion": "success",
-        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
-      },
-      {
-        "id": 37254870290,
-        "name": "Agent instruction validation",
-        "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null,
         "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
       },
       {
@@ -7863,16 +7933,24 @@
         "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
       },
       {
-        "id": 37254870261,
-        "name": "Copilot setup steps",
+        "id": 37254870356,
+        "name": "Markdown Lint",
         "event": "pull_request",
-        "status": "in_progress",
-        "conclusion": null,
+        "status": "completed",
+        "conclusion": "success",
         "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
       },
       {
-        "id": 37254870356,
-        "name": "Markdown Lint",
+        "id": 37254870261,
+        "name": "Copilot setup steps",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254870290,
+        "name": "Agent instruction validation",
         "event": "pull_request",
         "status": "completed",
         "conclusion": "success",
@@ -7887,27 +7965,11 @@
         "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
       },
       {
-        "id": 37254866643,
-        "name": "Copilot setup steps",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null,
-        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
-      },
-      {
         "id": 37254866686,
         "name": "Dev container boundary",
         "event": "push",
         "status": "completed",
         "conclusion": "success",
-        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
-      },
-      {
-        "id": 37254866650,
-        "name": "Agent instruction validation",
-        "event": "push",
-        "status": "in_progress",
-        "conclusion": null,
         "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
       },
       {
@@ -7925,14 +7987,86 @@
         "status": "completed",
         "conclusion": "success",
         "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254866643,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254866650,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
       }
     ],
-    "all_nonreview_workflows_success": false,
-    "latest_native_snapshot": {
-      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-both-requested-db54d68.json",
-      "sha256": "3823cd3cf32a26d828e022ef677ed6216e551fd0dccd0466496a06e7e972ab5d",
-      "captured_at": "2026-10-05T02:32:21.052619+00:00"
+    "all_nonreview_workflows_success": true,
+    "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-terminal-db54d68.json",
+    "findings": [
+      {
+        "key": "R21",
+        "owner": "A07",
+        "comment_id": 4180361504,
+        "thread_id": "PRRT_kwDOSAZRhc6o4_-k",
+        "path": ".github/workflows/lint-markdown.mjs",
+        "line": 12,
+        "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Reject escaping package-manifest symlinks before reading**\n\nWhen the root `package.json` is a symlink to a JSON file outside the repository, this read follows the link and trusts the external `engines.node` value; I reproduced this with an escaping manifest link and `lintMarkdownFiles` returned 0. Validate the manifest as a non-symlink regular file and confirm its canonical path remains inside the canonical repository root before reading it, as is already done for the child script.\n\nAGENTS.md reference: [AGENTS.md:L50-L53](https://github.com/franklesniak/TerraformStyleGuide/blob/db54d687b105e548117c1e8a60ba155fab1a376f/AGENTS.md#L50-L53)\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4180361504",
+        "review_id": 5409525065,
+        "original_commit_id": "db54d687b105e548117c1e8a60ba155fab1a376f",
+        "state": "validating_options",
+        "owned_eyes_reaction_id": 450197993,
+        "reaction_readback_verified": true
+      },
+      {
+        "key": "R22",
+        "owner": "A21",
+        "comment_id": 4180361508,
+        "thread_id": "PRRT_kwDOSAZRhc6o4_-m",
+        "path": ".github/workflows/Test-AgentInstructions.ps1",
+        "line": 5443,
+        "body": "**<sub><sub>![P2 Badge](https://img.shields.io/badge/P2-yellow?style=flat)</sub></sub>  Handle decision records without a Metadata heading**\n\nWhen a new or changed decision record uses the allowed direct metadata-list form\u2014an H1 followed immediately by the Tier 1 list, without the optional `## Metadata` heading\u2014`Get-DocumentMetadataContext` succeeds, but this expression produces `$null`; under `Set-StrictMode`, the subsequent reads of `$objMetadataHeading.Start` terminate validation. This makes a compliant decision record unmergeable, so handle the absent heading and use the parsed metadata-list bounds when computing the exclusion region.\n\nUseful? React with \ud83d\udc4d\u00a0/ \ud83d\udc4e.",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4180361508",
+        "review_id": 5409525065,
+        "original_commit_id": "db54d687b105e548117c1e8a60ba155fab1a376f",
+        "state": "validating_options",
+        "owned_eyes_reaction_id": 450197995,
+        "reaction_readback_verified": true
+      }
+    ],
+    "inventory": {
+      "inline_findings": 2,
+      "body_only_findings": 0,
+      "resolved_prior_threads": 19,
+      "open_threads": 2,
+      "complete_body_and_pagination_checked": true
+    },
+    "independent_interim_quality": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\db54d68-current-input-20261005\\REPORT.md",
+      "sha256": "8881c5d38eba4a4df70cbca79becba30f19be1d636c4518abd72c761ecf1fa6a",
+      "state": "no_material_source_or_integration_finding_before_new_remote_findings",
+      "final_pass": false,
+      "new_remote_findings_require_resolution": true
+    },
+    "hosted_log_collection": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-hosted-db54d68\\round6-terminal-db54d68-collection.json",
+      "sha256": "53919a186f30826d6c29d7b67ab2970fc2a2950f41b817461f3a99cb98e7d514",
+      "run_count": 12,
+      "all_terminal_success": true,
+      "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+      "scope": "All twelve terminal nonreview runs captured by the round6 snapshot. Event-inapplicable jobs are not failed or passed tests."
     }
   },
-  "date_validation_limit": "Current staged-input and ProposedPolicy diagnostics do not verify the author date. Root reviewed all nine metadata finalizations against actual UTC date 2026-10-05. Accepted B lacks FinalizeMetadataNow; ProposedPolicy cannot combine with that switch. First-adoption authority remains separate."
+  "date_validation_limit": "Current staged-input and ProposedPolicy diagnostics do not verify the author date. Root reviewed all nine metadata finalizations against actual UTC date 2026-10-05. Accepted B lacks FinalizeMetadataNow; ProposedPolicy cannot combine with that switch. First-adoption authority remains separate.",
+  "future_linux_runner_review": {
+    "state": "root_and_independent_static_pass_not_executed",
+    "report_sha256": "0feacc63600ea67dbace2b8a01f6955900753a352a0ff9e8f554b0d25f6dcb13",
+    "catalog_sha256": "a61adac8e620b667bbb4d211c463edb8017307cd3b084b5a62c148b741311d77",
+    "scope": "Exact approved TF11-hook profile only; requires fresh candidate, authority, date and installed-dependency provenance checks before execution. No runtime or speed claim."
+  }
 }

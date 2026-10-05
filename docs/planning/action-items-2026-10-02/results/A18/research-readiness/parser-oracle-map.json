@@ -1,0 +1,169 @@
+{
+  "schema": "a18-parser-oracle-family-map-v1",
+  "prepared_utc": "2026-10-05T02:14:27.119284+00:00",
+  "source": {
+    "commit": "51dbeb560dd518b904cf1b571dc7d01fd8045749",
+    "path": ".github/workflows/Test-AgentInstructionParserManifest.mjs",
+    "sha256": "138d3a5949f4334dd7a39a05e47978135ff800c916abd49ac61ce5bcc017eade"
+  },
+  "refs": {
+    "research": {
+      "ref": "51dbeb560dd518b904cf1b571dc7d01fd8045749",
+      "tree": "ec9c46e3770ab79169d5520f2f743cb1d1853c16"
+    },
+    "PS": {
+      "ref": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380"
+    },
+    "TF": {
+      "ref": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1"
+    },
+    "TF_candidate": {
+      "ref": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+      "tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197"
+    }
+  },
+  "path_prefix": ".github/workflows/ unless explicitly otherwise",
+  "families": [
+    {
+      "family": "Accepted authority and immutable candidate data",
+      "historical": "Test-AgentInstructionParserManifest.mjs:102-177,1098-1138; source agent-instructions.yml trusted-revision/input-revision caller",
+      "current_PS": [
+        "Classify-InstructionMaintenance.mjs:7-35,75-103",
+        "Classify-InstructionMaintenance.test.mjs:168-255",
+        "agent-instructions.yml:24-106",
+        "Validate-WorkflowPolicy.test.mjs:265-289"
+      ],
+      "current_TF": [
+        "Classify-InstructionMaintenance.mjs (same accepted-checkout/endpoints algorithm; exact blob in identities)",
+        "Classify-InstructionMaintenance.test.mjs:26-118",
+        "agent-instructions.yml:26-106",
+        "Validate-WorkflowPolicy.test.mjs:224-248"
+      ],
+      "overlay": "Same authority architecture as PS; current file hashes are separate. ProposedPolicy in candidate job is not accepted policy.",
+      "disposition": "Retained via broader exact-path maintenance classification and inert Git reading, not historical parser-specific equality.",
+      "test_relevance": "Actual Git temporary repositories, actual readInstructionMaintenance and validator subprocesses. Candidate module is replaced with hostile content but accepted module is restored before reading candidate blobs. Policy tests also inject a forbidden candidate permission. These are substantive authority oracles; push wrapper uses declared checker/Git stubs and is not substituted for them.",
+      "limits": "Classifier reports maintenance_required, not authorization. Owner grant/fresh native review is procedural P. Neither local test authenticates live GitHub refs or arbitrary runners.",
+      "decision": "A03 selected P under D08; A03/threat-map; A00 R02/R03/R04",
+      "owner": "A03/A21/A18"
+    },
+    {
+      "family": "Parser dependency closure and manifest/lock integrity",
+      "historical": "232-258,450-494; tests560-587 (parser/transitive drift, deletion, shadowing)",
+      "current_PS": [
+        "Validate-WorkflowPolicy.mjs:378-438,554-561",
+        "Validate-WorkflowPolicy.test.mjs:144-162,244-249",
+        "Classify-InstructionMaintenance.mjs:7-35"
+      ],
+      "current_TF": [
+        "Validate-WorkflowPolicy.mjs:376-436,551-558",
+        "Validate-WorkflowPolicy.test.mjs:127-145,203-208",
+        "Classify-InstructionMaintenance.mjs selectorPaths/packageDirectories"
+      ],
+      "overlay": "Same semantic validator algorithm as PS; finite artifactVerifier native role remains explicit.",
+      "disposition": "Retain reviewed lock/registry integrity and ordinary-input immutability; retire blanket equality of every historical markdown-it transitive descriptor. Any package/lock or installed-tree change is maintenance.",
+      "test_relevance": "Direct production validatePackagePair tests mutate actual loaded lock copies; subprocess parser-lock mismatch tests exercise pre-import checks. Positive reviewed dependency-update case deliberately accepts changed valid lock data.",
+      "limits": "validatePackagePair does not recursively prove every transitive edge resolves and is not equivalent to old getParserClosure. Ordinary authority is instead supplied by whole-file classifier + accepted installed dependencies; npm ci is still responsible for installation consistency. No claim that all arbitrary maintenance candidates pass complete graph proof.",
+      "decision": "A00 R02/R05/R07; A03 P and preinstall P98; A07 D07-1/D07-2 and D90/E90",
+      "owner": "A03/A07"
+    },
+    {
+      "family": "Runtime selectors and optional precedence fields",
+      "historical": "329-448; tests590-660,696-1055 (Node/npm, Volta/devEngines, os/cpu/libc, overrides)",
+      "current_PS": [
+        "Initialize-CiToolchain.ps1:44-79",
+        "NpmTools.mjs:65-103",
+        "Test-CiHelpers.test.mjs:301-358",
+        "NpmTools.test.mjs:124-136",
+        "Classify-InstructionMaintenance.mjs:7-35"
+      ],
+      "current_TF": [
+        "Initialize-CiToolchain.ps1:44-78",
+        "NpmTools.mjs:65-103",
+        "Test-CiHelpers.test.mjs:175-228",
+        "NpmTools.test.mjs:124-136"
+      ],
+      "overlay": "Initializer intentionally remains accepted TF bytes; Node/npm checks retained; current Copilot finite capability/history logic is proposed.",
+      "disposition": "Actual root engines select downloaded runtime; exact executable versions checked. Package changes including optional selector/override fields require maintenance. Old unconditional equality of each historical optional field is not the current admission mechanism.",
+      "test_relevance": "Runtime fixture executes actual initializer with private archive, curl substitution and synthetic Node/npm probes; checks requested URL, version failure before ci and order. NpmTools tests invoke real selected runtime/bundled npm for required-versus-observed failures.",
+      "limits": "Synthetic archive cases are not official download or old runtime execution. No standalone complete Volta/devEngines/platform mutation family is claimed. Direct installer paths and manifest-change classification supply current boundary; npm may enforce devEngines/platform constraints and fail, not silently select accepted policy.",
+      "decision": "A03 P, D9 finite historical compatibility; A07 runtime/install decisions; A00 R05",
+      "owner": "A03/A07"
+    },
+    {
+      "family": "Alternate npm inputs and native failure truth",
+      "historical": "14,139-148,451-452,1110-1113; tests663-680,1052-1055,1086-1095",
+      "current_PS": [
+        "NpmTools.mjs:20-61,75-126",
+        "NpmTools.test.mjs:9-38,66-78,106-136,157-216",
+        "Initialize-CiToolchain.ps1:24-35,78-88",
+        "Test-CiHelpers.test.mjs:668-686"
+      ],
+      "current_TF": [
+        "NpmTools.mjs:20-61,75-126",
+        "NpmTools.test.mjs:9-38,66-78,106-136,157-216",
+        "Initialize-CiToolchain.ps1:24-35,77-87",
+        "Test-CiHelpers.test.mjs:338-358"
+      ],
+      "overlay": "Preserves same controls, adds reviewed entry identity behavior; not new npm authority.",
+      "disposition": "npmrc/shrinkwrap absence, environment isolation, ignored scripts and native failures retained. Overrides absence as an exact historical field policy is replaced by current whole-manifest maintenance review, not an unconditional new allowlist.",
+      "test_relevance": "Production checkInstallInputs on real files; bundled npm configuration/version calls; actual stale-lock install and hook failure tests. Central transport uses stubbed launcher results for timeout/output cases, distinct from actual install failures.",
+      "limits": "Not hostile same-user process containment or a race-free filesystem guarantee. Windows/Linux-specific coverage is retained as originally reported.",
+      "decision": "A07 D07-4/D07-5, A03 D6/D9/D11; A00 R02/R07",
+      "owner": "A07/A03"
+    },
+    {
+      "family": "Bounded Git/UTF-8/JSON input failure",
+      "historical": "59-177; tests1057-1084 (malformed JSON/BOM/UTF8/size/nonblob)",
+      "current_PS": [
+        "Validate-WorkflowPolicy.mjs:167-206,306-327,404-417",
+        "Validate-WorkflowPolicy.test.mjs:100-140,218-234,265-289",
+        "Classify-InstructionMaintenance.test.mjs:207-255"
+      ],
+      "current_TF": [
+        "Validate-WorkflowPolicy.mjs:167-206,306-327,402-415",
+        "Validate-WorkflowPolicy.test.mjs:83-123,178-193,224-248",
+        "Classify-InstructionMaintenance.test.mjs:68-118"
+      ],
+      "overlay": "Same bounded readers/duplicate-name semantics as PS. Instruction validator has additional retained strict JSON and parser transport cases under A21.",
+      "disposition": "Retained bounded inert reads, strict encoding and unambiguous data; current capacities and supported SHA1 endpoints replace historical exact constants.",
+      "test_relevance": "Production JSON duplicate/malformed controls and real Git candidate reads. YAML invalid UTF8/size tests exercise YAML reader; do not call them direct JSON-BOM tests.",
+      "limits": "No dedicated replay of every old BOM/size/nonblob assertion was performed or claimed. Code rejects UTF8/BOM/size. Current Git reader admits100644/100755 inert blobs versus historical100644; executable mode is not execution. Current40-hex SHA1 endpoint contract matches these repositories; old64-hex generic support is not claimed. No atomic concurrent-writer proof.",
+      "decision": "A03 bounded parser/threat map; A02 strict JSON decisions/A21; A00 R02/R07",
+      "owner": "A03/A21"
+    },
+    {
+      "family": "Preinstall ordering and installed parser execution boundary",
+      "historical": "Parser manifest main1098-1138 before source workflow parser installation; trusted descriptor checks450-494",
+      "current_PS": [
+        "Validate-WorkflowPolicy.mjs:20-36,39-103,428-438,554-561",
+        "Validate-WorkflowPolicy.test.mjs:165-193,235-263",
+        "copilot-setup-steps.yml:658-669",
+        "Test-CiHelpers.test.mjs:1262-1344"
+      ],
+      "current_TF": [
+        "Validate-WorkflowPolicy.mjs:20-36,39-103,426-436,551-558",
+        "Validate-WorkflowPolicy.test.mjs:148-176,194-222",
+        "copilot-setup-steps.yml:549-556"
+      ],
+      "overlay": "Copilot install body646-655 and real-policy tests Test-CiHelpers.test.mjs:1277-1359 port the stronger PS ordering tests. Main candidate still unaccepted.",
+      "disposition": "Retain built-in-only preflight before npm and verify installed YAML tree/entry before importing it. Root markdown-it runs from accepted installation for ordinary PRs; historical candidate parser graph cannot replace accepted execution.",
+      "test_relevance": "Actual copied validator child without installed YAML; real modified installed parser marker never executes; real hardlink case; synthetic bounded-tree traversal seam. Copilot actual extracted install body + real validator + npm sentinel proves invalid input causes zero npm calls. Separate exit37 helper is only a dispatch probe.",
+      "limits": "Sentinel proves no-install ordering, not network/npm success. Accepted TF has guard code but lacks later Copilot real-policy zero-npm witnesses. Candidate test coverage does not make candidate accepted. YAML installed-tree fingerprint is not a claim that root markdown-it has the same fingerprint mechanism.",
+      "decision": "A03 D11 P98/D13 isolation, A07 locked bootstrap, A21 adoption; A00 R05/R07",
+      "owner": "A03/A07/A21"
+    }
+  ],
+  "conclusion": "Preparation mapping closed at family level; no demonstrated new material defect. Not complete old-assertion equivalence, A06 completion, A18 acceptance or proposed-TF acceptance.",
+  "remaining_actual_delivery": "Accepted TF preflight callers lack the later D11 real-policy Copilot ordering test block; current overlay carries it. Complete selected TF lifecycle and reverse/current-pair proof.",
+  "reopen": "Actual loader/contract/selector or authority change, new supported runtime, failed current oracle, or evidence showing a retired field is again an operative trust selector.",
+  "root_readback": {
+    "at": "2026-10-05T02:44:20.472419+00:00",
+    "private_map_sha256": "fd786643a3b7dfb2e442ba600ead4acbf4d302aa5f21c13164a8f8d078b66fe5",
+    "source_identities_sha256": "9ca11ccaff2249be7928bf46caf035f159d8be2facadc3ba5a08394809fb158b",
+    "reused_evidence_sha256": "1c2808217c67188b4df435977f92342fa9e2e4747f2da1e80f1e7a437f4492ce",
+    "checks": "Complete six-family map/report read; three raw source hashes and two unchanged test-log hashes independently sampled. Source/test relevance inspected. No new suite run.",
+    "current_candidate": "Tree5fbf060 is now published at Hdb54d687b105e548117c1e8a60ba155fab1a376f. It remains unaccepted; neither main changed."
+  }
+}

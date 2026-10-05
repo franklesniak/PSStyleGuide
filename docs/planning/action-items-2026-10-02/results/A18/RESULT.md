@@ -3,7 +3,7 @@
 
 State: pending. No additional acceptance is claimed by this restart pointer.
 
-Read [the current task](../../tasks/A18.md) and [research readiness](research-readiness/REPORT.md). Read-only comparison now covers the pinned 28-path research catalog against accepted PSf168f83/TF06ad4f7, with a separate unaccepted TF overlay. Two existing-owner verification obligations remain explicit; no new demonstrated defect or final exception approval is claimed. Next: close the A06 parser-oracle and A07 hook-applicability mappings, then perform the full final union and A10/A11 checklist after products.
+Read [the current task](../../tasks/A18.md) and [research readiness](research-readiness/REPORT.md). The pinned28-path comparison and both useful-family mappings are prepared and root-reviewed. [Parser mapping](research-readiness/parser-oracle-mapping.md) retains the actual TF delivery obligation. [A07 hook applicability](../A07/research-hook-applicability.md) selects the portable compiled-Python guard; its implementation remains pending. Final accepted-main union, required-capability, exception and A10/A11 checks remain.
 
 ## Carried exception rows to revalidate on final mains
 

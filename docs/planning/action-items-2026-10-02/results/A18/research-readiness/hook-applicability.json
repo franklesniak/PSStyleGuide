@@ -1,0 +1,926 @@
+{
+  "kind": "bounded research-hook applicability preparation; A18 acceptance pending",
+  "created_utc": "2026-10-05T02:20:04.817040+00:00",
+  "pins": {
+    "research_PR78_merge": "51dbeb560dd518b904cf1b571dc7d01fd8045749",
+    "research_tree": "ec9c46e3770ab79169d5520f2f743cb1d1853c16",
+    "PS_accepted_main": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "TF_accepted_main": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "TF_proposed_unaccepted_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+    "planning": "aaca549105f41c572eb1050037013946338c0503"
+  },
+  "source_and_target_raw_guards": {
+    "research": {
+      ".pre-commit-config.yaml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6a138c59a0ce62ad9679c815e024c9d6e9902ccf",
+        "bytes": 7318,
+        "sha256": "4c0ec5c0bf12afe953e2635c2903fb0ce5d0d3232eebfc2b5fc74af68f1ea3e6"
+      },
+      ".gitignore": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e42d3bbc695f8bb78fb6a49a5672f973803719a3",
+        "bytes": 194,
+        "sha256": "7fd0380a67d3a9952e24a8ca815f8111dce89e1d4a8eb00d2aa41794e6f2376b"
+      },
+      ".github/scripts/check-evidence-manifests.py": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bc26392c9586e4f76647403fef0a9b2a41a39404",
+        "bytes": 55430,
+        "sha256": "4772e77ce19b2f61936570c6050283856b34a34470136c768dbc20362ed98917"
+      },
+      ".github/scripts/check-doc-metadata.py": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "28ee9376de5b656b6ab2fe8832b37f25e4e3bc38",
+        "bytes": 33160,
+        "sha256": "30e34da564a82289583b0db70b3153090bd857353d67a03a8eb1bf88e81ea4b6"
+      },
+      ".github/scripts/lint-trope.js": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ce343ad44fe4228fe9b2f16d2f16430862df6ca1",
+        "bytes": 7597,
+        "sha256": "dbe6ea2be8d565d27d10234a23a2d2ec753e7ab5f3e469ef546df0417a716564"
+      },
+      ".devcontainer/tests/test-static-validation.sh": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c3b8dda090c8ee786103555d3bee4e6ff8cee91c",
+        "bytes": 33528,
+        "sha256": "cddfce188d3c34e519cae69f8e980fed3a477c4e2890c2e125113b9f8894cdc0"
+      },
+      ".devcontainer/tests/test-devcontainer-volume-resolver.mjs": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "91323e6656e9f0acf5d41c7e8b70c5bc6e6ac219",
+        "bytes": 9958,
+        "sha256": "412e6f62314cb7a3496f283b78fb4d177cbf833e24a5f78547c5ab78b242678a"
+      },
+      ".devcontainer/tests/resolve-devcontainer-volume-names.mjs": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b781461e63ee746bc2a062995e02761b1c184404",
+        "bytes": 10817,
+        "sha256": "5e07813f6e38c1ba664a02afb348af861bcb7fe2e7f47591f370c5a3bd1ff3c8"
+      },
+      ".devcontainer/tests/run-ordinary-container-cell.sh": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "445aa70b7406d14c82da31acdd7b362b8acd630d",
+        "bytes": 120929,
+        "sha256": "5675706e494797610c6c899f9bfb2d0e8e67edfa0d7fea70d06c1ce518ee06da"
+      },
+      ".github/workflows/devcontainer-ci.yml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5599eb27bd42af85bed376e82a60bff4524dcc70",
+        "bytes": 30461,
+        "sha256": "e48b96b5cebd3527ace4c5a819b1e71a736fbefc9633829b01b366ef0afba00b"
+      },
+      "package.json": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "062a0fc09368701f07a9db3d8b09877866463644",
+        "bytes": 723,
+        "sha256": "977f9803d16bd09c8333ab59f57688110ebf79be166be1e028f857234842a74d"
+      },
+      "2026/ai-writing-trope-data.json": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1a4a3a33cd7041763fb6a88675739a3fa18eb9f4",
+        "bytes": 11739,
+        "sha256": "8c78739c60807232a197d434201b00c3eff289f3232eb3ac31c797f7231e9ae9"
+      }
+    },
+    "PS": {
+      ".pre-commit-config.yaml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "bytes": 5398,
+        "sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+      },
+      ".gitignore": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+        "bytes": 289,
+        "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+      },
+      ".github/workflows/devcontainer-ci.yml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "bytes": 8391,
+        "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      ".github/workflows/Test-AgentInstructions.ps1": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb",
+        "bytes": 474787,
+        "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+      },
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+        "bytes": 218742,
+        "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+      },
+      ".github/workflows/agent-instructions.yml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+        "bytes": 12748,
+        "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+      },
+      ".github/document-metadata-classification.json": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2e714fcc8ba113da7265eeec50ffe8094aa3a2a0",
+        "bytes": 388,
+        "sha256": "dde7762b2588b583c47bb342f0a34c938c593b9391abbcecfca0d2ab5012d89c"
+      },
+      ".github/workflows/Invoke-LockedPythonHook.ps1": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+        "bytes": 3127,
+        "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+      },
+      "requirements-dev.txt": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+        "bytes": 5920,
+        "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+      },
+      ".github/instructions/docs.instructions.md": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd",
+        "bytes": 46230,
+        "sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b"
+      },
+      ".github/workflows/Test-CiHelpers.test.mjs": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+        "bytes": 98497,
+        "sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb"
+      },
+      ".github/workflows/copilot-setup-steps.yml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b0f7fb0b657232fa0e857e946d725fdd6876c028",
+        "bytes": 52385,
+        "sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f"
+      },
+      "docs/dependency-maintenance.md": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7478f929942accd00195f8bf5d5dce56a80b0fda",
+        "bytes": 9672,
+        "sha256": "930407d43e94ae6bf19749dcfab69c09855ed24f890ca6d612699e2b25da1c21"
+      },
+      ".github/workflows/Get-SupplyFreezeDigest.mjs": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "009f29663399b9f9c0b669a214859a3b52dbb5a6",
+        "bytes": 376988,
+        "sha256": "53f5c986b6b9545d257d3549172ddd1005a302da2c8296ba7b52c0e4d85a66c1"
+      },
+      ".husky/pre-commit": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "bytes": 3249,
+        "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d"
+      },
+      "package.json": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+        "bytes": 816,
+        "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+      }
+    },
+    "TF_accepted": {
+      ".pre-commit-config.yaml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "bytes": 5405,
+        "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      },
+      ".gitignore": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+        "bytes": 249,
+        "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+      },
+      ".github/workflows/devcontainer-ci.yml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+        "bytes": 7645,
+        "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+      },
+      ".github/workflows/Test-AgentInstructions.ps1": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+        "bytes": 460163,
+        "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+      },
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+        "present": false
+      },
+      ".github/workflows/agent-instructions.yml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+        "bytes": 9558,
+        "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+      },
+      ".github/document-metadata-classification.json": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+        "bytes": 387,
+        "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+      },
+      ".github/workflows/Invoke-LockedPythonHook.ps1": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+        "bytes": 3127,
+        "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+      },
+      "requirements-dev.txt": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+        "bytes": 5920,
+        "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+      },
+      ".github/instructions/docs.instructions.md": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+        "bytes": 46254,
+        "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+      },
+      ".github/workflows/Test-CiHelpers.test.mjs": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+        "bytes": 33662,
+        "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+      },
+      ".github/workflows/copilot-setup-steps.yml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+        "bytes": 33862,
+        "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+      },
+      "docs/dependency-maintenance.md": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+        "bytes": 6448,
+        "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+      },
+      ".github/workflows/Get-SupplyFreezeDigest.mjs": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+        "bytes": 377161,
+        "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f"
+      },
+      ".husky/pre-commit": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+        "bytes": 3544,
+        "sha256": "1888b6c6e29c1c06baebbdf2946cc7b465ce5adcc869c2977dfd774d68b96df0"
+      },
+      "package.json": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "bytes": 837,
+        "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      }
+    },
+    "TF_proposed": {
+      ".pre-commit-config.yaml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "bytes": 5405,
+        "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      },
+      ".gitignore": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+        "bytes": 289,
+        "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+      },
+      ".github/workflows/devcontainer-ci.yml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "bytes": 8391,
+        "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      ".github/workflows/Test-AgentInstructions.ps1": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f91929885e6069eb83bfd757d882b278551cfe35",
+        "bytes": 477603,
+        "sha256": "5af494dd3c6ecdcf1e6901b709690ad745dbce451a97402a41926dac70b1c6ac"
+      },
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "423a1e02869cbcb8b29fe4e56f53a014ebe39e8f",
+        "bytes": 229956,
+        "sha256": "f80f2b3ca171a1010ecd6cffe55e160574d80d2a7b9837aae181910b3f0a1e33"
+      },
+      ".github/workflows/agent-instructions.yml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+        "bytes": 12865,
+        "sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc"
+      },
+      ".github/document-metadata-classification.json": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+        "bytes": 387,
+        "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+      },
+      ".github/workflows/Invoke-LockedPythonHook.ps1": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+        "bytes": 3127,
+        "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+      },
+      "requirements-dev.txt": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+        "bytes": 5920,
+        "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+      },
+      ".github/instructions/docs.instructions.md": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+        "bytes": 46254,
+        "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+      },
+      ".github/workflows/Test-CiHelpers.test.mjs": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+        "bytes": 100007,
+        "sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea"
+      },
+      ".github/workflows/copilot-setup-steps.yml": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "bytes": 51830,
+        "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+      },
+      "docs/dependency-maintenance.md": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "61977b68f4adc7a31aa822fb224efe41b0ea45af",
+        "bytes": 9874,
+        "sha256": "864427fc673b8d257d384ec55ea45e60612883624a071c5df616170342c32654"
+      },
+      ".github/workflows/Get-SupplyFreezeDigest.mjs": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+        "bytes": 377161,
+        "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f"
+      },
+      ".husky/pre-commit": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "bytes": 3249,
+        "sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d"
+      },
+      "package.json": {
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "bytes": 837,
+        "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      }
+    }
+  },
+  "census": {
+    "research": {
+      "tracked_count": 1198,
+      "python_source": [
+        ".devcontainer/features/hardened-devcontainer/create-instance-nonce.py",
+        ".devcontainer/features/hardened-devcontainer/read-pid1-starttime.py",
+        ".devcontainer/features/hardened-devcontainer/read-site-runtime-config.py",
+        ".devcontainer/scripts/escalation-policy.py",
+        ".devcontainer/tests/test-pre-tini-observer-lifecycle.py",
+        ".github/scripts/check-doc-metadata.py",
+        ".github/scripts/check-evidence-manifests.py",
+        ".github/scripts/detect-devcontainer-changes.py",
+        ".github/scripts/hardened_devcontainer_site_config.py",
+        ".github/scripts/load-hardened-devcontainer-site-config.py",
+        ".github/scripts/tests/test_check_doc_metadata.py",
+        ".github/scripts/tests/test_check_evidence_manifests.py",
+        "2026/admin-tiering-and-PAW/12-updated-plan/bhce93_tier0_readonly.py",
+        "2026/admin-tiering-and-PAW/12-updated-plan/tests/test_bhce93_tier0_readonly.py",
+        "2026/bash-style-guide/artifacts/finding-03-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-04-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-05-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-07-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-08-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-12-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-13-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-14-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-15-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-16-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-17-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-18-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-20-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-21-local-verification.py",
+        "2026/bash-style-guide/artifacts/finding-22-local-verification.py",
+        "2026/bash-style-guide/artifacts/validate-revised-issue-slate.py"
+      ],
+      "compiled_python": [],
+      "SHA256SUMS": [
+        "2026/admin-tiering-and-PAW/12-updated-plan/SHA256SUMS.txt"
+      ],
+      "devcontainer": [
+        ".devcontainer/Dockerfile",
+        ".devcontainer/devcontainer-lock.json",
+        ".devcontainer/devcontainer.json",
+        ".devcontainer/features/hardened-devcontainer/coordinator.sh",
+        ".devcontainer/features/hardened-devcontainer/create-instance-nonce.py",
+        ".devcontainer/features/hardened-devcontainer/devcontainer-feature.json",
+        ".devcontainer/features/hardened-devcontainer/finalize-toolchain.sh",
+        ".devcontainer/features/hardened-devcontainer/install.sh",
+        ".devcontainer/features/hardened-devcontainer/module-paths.sh",
+        ".devcontainer/features/hardened-devcontainer/pid1-supervisor.c",
+        ".devcontainer/features/hardened-devcontainer/read-pid1-starttime.py",
+        ".devcontainer/features/hardened-devcontainer/read-site-runtime-config.py",
+        ".devcontainer/features/hardened-devcontainer/runtime-lib.sh",
+        ".devcontainer/features/hardened-devcontainer/site-config.json",
+        ".devcontainer/features/hardened-devcontainer/verify-immutable-toolchain.sh",
+        ".devcontainer/features/hardened-devcontainer/wait-ready.sh",
+        ".devcontainer/package-lock.json",
+        ".devcontainer/package.json",
+        ".devcontainer/post-create.sh",
+        ".devcontainer/requirements.txt",
+        ".devcontainer/scripts/check-safe-defaults.sh",
+        ".devcontainer/scripts/disable-unattended.sh",
+        ".devcontainer/scripts/doctor.sh",
+        ".devcontainer/scripts/enable-unattended.sh",
+        ".devcontainer/scripts/escalation-policy.py",
+        ".devcontainer/scripts/inventory-escalation.sh",
+        ".devcontainer/scripts/lib.sh",
+        ".devcontainer/scripts/on-create.sh",
+        ".devcontainer/scripts/run-unattended.sh",
+        ".devcontainer/scripts/unattended-lib.sh",
+        ".devcontainer/scripts/unattended-state.pl",
+        ".devcontainer/scripts/unattended-status.sh",
+        ".devcontainer/scripts/update-content.sh",
+        ".devcontainer/scripts/verify-immutable-toolchain.sh",
+        ".devcontainer/tests/pre-tini-observer-lifecycle-v1.json",
+        ".devcontainer/tests/resolve-devcontainer-volume-names.mjs",
+        ".devcontainer/tests/run-ordinary-container-cell.sh",
+        ".devcontainer/tests/run-security-test-tiers.sh",
+        ".devcontainer/tests/test-budget-origin.c",
+        ".devcontainer/tests/test-devcontainer-change-detector.sh",
+        ".devcontainer/tests/test-devcontainer-volume-resolver.mjs",
+        ".devcontainer/tests/test-escalation-policy.sh",
+        ".devcontainer/tests/test-immutable-toolchain.sh",
+        ".devcontainer/tests/test-postdrop-arbitration.c",
+        ".devcontainer/tests/test-pre-tini-observer-lifecycle.py",
+        ".devcontainer/tests/test-static-validation.sh",
+        ".devcontainer/tests/test-supervisor-unit.sh",
+        ".devcontainer/tests/test-tini-signal-group.sh",
+        ".devcontainer/tests/test-unattended.sh"
+      ],
+      "trope_corpus": [
+        "2026/AI-writing-trope-research/ai-writing-trope-research-backlog-prioritization-rubric.md",
+        "2026/AI-writing-trope-research/ai-writing-trope-research-improvement-prompt.md",
+        "2026/AI-writing-trope-research/ai-writing-trope-research-lower-priority-improvement-backlog.md",
+        "2026/AI-writing-trope-research/ai-writing-trope-research-sequenced-priority-findings-preliminary.md",
+        "2026/AI-writing-trope-research/ai-writing-trope-research-sequenced-priority-findings-research.md",
+        "2026/AI-writing-trope-research/ai-writing-trope-research-sequenced-priority-work-items.md",
+        "2026/AI-writing-trope-research/ai-writing-trope-research.md",
+        "2026/AI-writing-trope-research/github-issue-style-guide.md"
+      ]
+    },
+    "PS": {
+      "tracked_count": 75,
+      "python_source": [],
+      "compiled_python": [],
+      "SHA256SUMS": [],
+      "devcontainer": [],
+      "trope_corpus": []
+    },
+    "TF_accepted": {
+      "tracked_count": 75,
+      "python_source": [],
+      "compiled_python": [],
+      "SHA256SUMS": [],
+      "devcontainer": [],
+      "trope_corpus": []
+    },
+    "TF_proposed": {
+      "tracked_count": 78,
+      "python_source": [],
+      "compiled_python": [],
+      "SHA256SUMS": [],
+      "devcontainer": [],
+      "trope_corpus": []
+    }
+  },
+  "prior_canonical_references": {
+    "results/A18/research-readiness/REPORT.md": {
+      "commit": "aaca549105f41c572eb1050037013946338c0503",
+      "sha256": "c4b63257b8fa66a50861901da4cef859b643aa092918a39a92759ab04dad72bb"
+    },
+    "results/A18/research-readiness/applicability-matrix.json": {
+      "commit": "aaca549105f41c572eb1050037013946338c0503",
+      "sha256": "47e333b348a30f1d088c655392a1f83f296ee3097b613bb975b7347a47a3a533"
+    },
+    "results/A07/RESULT.md": {
+      "commit": "aaca549105f41c572eb1050037013946338c0503",
+      "sha256": "0c4dc033ebdad7c2b18fc542eb61687630df56fcd04e1f32f8dc0cb34f7b645d"
+    },
+    "results/A02/RESULT.md": {
+      "commit": "aaca549105f41c572eb1050037013946338c0503",
+      "sha256": "ebde5b16d9526730b2d0a2d175e1896dde4e5486c0cd27de05a9d0ba68dd2d96"
+    },
+    "results/A03/devcontainer-decisions.md": {
+      "commit": "aaca549105f41c572eb1050037013946338c0503",
+      "sha256": "456d27282c48f63cb442973294016e123f5af55b799b09b5d91779b0b342065c"
+    },
+    "results/A00/RESULT.md": {
+      "commit": "aaca549105f41c572eb1050037013946338c0503",
+      "sha256": "28ad310d71fc3cabe18d4bb482bf5b6ea494846ffc85e209b278cc2375f8acf8"
+    },
+    "RETIREMENT-REVIEW.md": {
+      "commit": "aaca549105f41c572eb1050037013946338c0503",
+      "sha256": "b5d5ca75e59ea7d13f317bbfb1282bcc89b80a0d5bba99584cc2405acf37541c"
+    },
+    "DECISION-PROCESS.md": {
+      "commit": "aaca549105f41c572eb1050037013946338c0503",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299"
+    }
+  },
+  "applicability": [
+    {
+      "family": "standalone Bash ShellCheck",
+      "classification": "proven source-only caller; target workflow-inline validation retained",
+      "source": ".pre-commit-config.yaml103-108; .devcontainer/tests/test-static-validation.sh19-55",
+      "purpose": "ShellCheck external-source Bash code in exact hardened-devcontainer paths; source hook does not select Husky or arbitrary repository shell",
+      "current_counterpart": "Targets deliberately prohibit devcontainer entries; pinned actionlint checks inline Bash workflows separately; native Husky tests retain its own sh caller behavior",
+      "decisions": [
+        "A03 U98/S96",
+        "A07 D07-4/5",
+        "D-A00-02"
+      ],
+      "trigger": "A real allowed devcontainer implementation or new standalone Bash consumer changes applicability. Reopen A03 exclusion/scoped authority first; choose checks for actual Bash source and external sources, not the research runner wholesale.",
+      "status": "no devcontainer hook port now; no generic shell-equivalence claim"
+    },
+    {
+      "family": "devcontainer volume resolver/static hardened security",
+      "classification": "proven source-only callers; retained exclusion replacement",
+      "source": ".pre-commit-config.yaml109-122; volume-resolver test4-14,55-253; static test1-75,528-575,733-787",
+      "purpose": "Known-answer volume IDs, exact source/config/labels and real four mounts; nonroot actor, shell/Perl/C/Python static compilation, native supervisor invokers/stop/argv/real matrix consumers",
+      "current_counterpart": "Accepted PS U/S full NUL/tree inventory rejects root/nested/case devcontainer objects without checkout or candidate execution. Accepted TF older recursive NUL inventory retains known -t gap; proposed TF carries U/S but is unaccepted.",
+      "decisions": [
+        "A03 U98/S96 (existing finding owns TF delivery)",
+        "D-A00-02"
+      ],
+      "trigger": "Authorized real devcontainer consumer removes current exclusion; then map exact runtime/mount/process threats and actual invokers before adoption.",
+      "status": "existing A03 convergence gate remains; do not invent hardened-runtime support or new duplicate defect"
+    },
+    {
+      "family": "compiled Python artifacts and ignore",
+      "classification": "actual unresolved general portable safeguard opportunity; no reproduced current tracked-file defect",
+      "source": ".pre-commit-config.yaml123-143; .gitignore7-9",
+      "purpose": "Reject case-insensitive __pycache__ paths and .pyc/.pyo/.pyd tracked files, including force-added ignored files; avoid interpreter/platform-specific unverified bytes",
+      "current_counterpart": "No generic rejection or compiled ignore rules in either accepted config or proposed TF. Python hook tooling is active; node_modules ignored and PS/proposed .venv ignored, but those directory exclusions do not reject a force-added compiled file elsewhere.",
+      "decisions": [
+        "A07 D07-4/5 retains useful checks",
+        "D-A00-02 requires scoped applicability, not absence exception"
+      ],
+      "trigger": "Opportunity is portable now; actual violation trigger is a matching tracked file. Keep as A07 follow-up pending root decision and supported-caller validation.",
+      "status": "full ordered proposal below; leave frozen TF66 inputs unchanged"
+    },
+    {
+      "family": "evidence manifest freshness",
+      "classification": "explicit conditional future trigger; source package requirement is source-only",
+      "source": ".pre-commit-config.yaml144-153; checker1-24,44-78,108-218,1033-1089",
+      "purpose": "Every tracked *SHA256SUMS.txt, current worktree digests, covered-file edits even if manifest unchanged, full tracked package coverage, load-bearing manifest deletion detection, bounded no-follow admitted-file checks and Git-failure refusal",
+      "current_counterpart": "No tracked SHA256SUMS package or client checksum-verification consumer. Current runtime/archive/parser/lock integrity checks remain under R05 and A07; these are not equivalent to arbitrary evidence-package freshness. Research REQUIRED_MANIFESTS names only admin-tiering-and-PAW/12-updated-plan.",
+      "decisions": [
+        "R05 current supply integrity retained",
+        "R06 dormant archive writer retired, not generic manifest safeguard",
+        "D-A00-02"
+      ],
+      "trigger": "Before any target adopts a tracked *SHA256SUMS.txt or a client-verifiable covered evidence package, identify actual manifest/package/format and activate drift checks on every commit, not just manifest edits. Preserve required-manifest deletion and enumeration-failure checks; reassess bounds/platform filesystem limits.",
+      "status": "conditional-no-current-consumer with future owner gate; no retired publisher/profile restoration or full-equivalence claim"
+    },
+    {
+      "family": "document metadata vocabulary",
+      "classification": "retained current counterpart; narrower source vocabulary is not target policy",
+      "source": ".pre-commit-config.yaml154-162; checker1-18,31-54,96-117,365-576,579-621",
+      "purpose": "Always-running md/mdc field validation including hidden paths, exact Status/date/separator/duplicates, calendar dates and exclusions for front matter/fences/comments; optional missing header requires separate triage",
+      "current_counterpart": "Always-run Test-AgentInstructions/SelfTest consumes classification and full tracked inventory; D04 trusted-baseline exemptions, fail-closed Tier1 discovery, optional-header validation and document-specific ADR states. PS metadata parser6320-6328 uses exact documented union; ADR subset5371-5376 is intentional. TF accepted/proposed keep native counterparts.",
+      "decisions": [
+        "A02 D-A02-04",
+        "selected A21 shared metadata/finalization decision",
+        "R07 actual-oracle mapping"
+      ],
+      "trigger": "A changed tracked Markdown discovery, intentional header, vocabulary, classification, parser/reader or caller invalidates only its affected proof. New paths cannot self-exempt through candidate data.",
+      "status": "reuse current accepted evidence; static mapping does not prove Python no-follow race guarantees equal; existing A14 filesystem residual remains separate"
+    },
+    {
+      "family": "research trope/non-ASCII corpus",
+      "classification": "proven source-only corpus caller",
+      "source": ".pre-commit-config.yaml163-167; lint-trope.js7-25,31-38,169-212; package.json lint:trope",
+      "purpose": "Fixed2026 AI-writing research data/corpus; hard non-ASCII failure, advisory trope/style patterns, CLI defaults same corpus",
+      "current_counterpart": "No target corpus/data/command; source hook regex is exactly ^2026/AI-writing-trope-research/.*\\.md$. It is not a general style-guide ASCII policy. Current targets preserve legitimate Unicode and their own documented Markdown rules.",
+      "decisions": [
+        "D-A00-02 pinned comparison; normative/language scope retained"
+      ],
+      "trigger": "Only a real adopted corpus with an explicit ASCII/advisory analysis contract warrants this helper/data/caller. A new general prose rule needs its own owner authority, not regex broadening.",
+      "status": "no port or blanket ASCII/trope requirement"
+    },
+    {
+      "family": "ignore dependencies and research state archives",
+      "classification": "retained dependency counterpart plus exact source-only archive names; compiled exclusion separate",
+      "source": ".gitignore1-9",
+      "purpose": "Untracked dependency/venv environments, research-misc-agent-state*.tgz and macoslab-codex-home*.tgz host backup snapshots; compiled exclusions are generic separate row",
+      "current_counterpart": "node_modules/ retained; PS .venv/ accepted, TF .venv/ is proposed-only pending current delivery. Targets retain personal-memory and their own cache exclusions. No target archive-writing caller for exact research backup names was found.",
+      "decisions": [
+        "A07 D07-4/5",
+        "A02 personal-memory scope",
+        "D-A00-02"
+      ],
+      "trigger": "A real target snapshot/archive writer requires its own exact artifact name/privacy ignore scope; do not broadly ignore all archives or import research host identities.",
+      "status": "do not treat the whole gitignore as an exception"
+    }
+  ],
+  "static_compiled_pattern_examples": {
+    "module.pyc": true,
+    "MODULE.PYC": true,
+    "Cache.PYD": true,
+    "module.pyo": true,
+    "pkg/__PYCACHE__/payload.txt": true,
+    "source.py": false,
+    "module.pyc.txt": false,
+    "pkg/__pycache_notes__/readme.md": false
+  },
+  "compiled_safeguard_proposal": {
+    "role": "Root selected B99 after ordered validation, options, rubric, table and selection; actual fixture readiness underway. Product implementation follows current TF acceptance in the existing directional lifecycle.",
+    "criteria": [
+      {
+        "name": "scope fidelity",
+        "weight": 30
+      },
+      {
+        "name": "enforcement strength",
+        "weight": 25
+      },
+      {
+        "name": "activation fit",
+        "weight": 15
+      },
+      {
+        "name": "supported setup",
+        "weight": 15
+      },
+      {
+        "name": "observable verification",
+        "weight": 10
+      },
+      {
+        "name": "maintenance",
+        "weight": 5
+      }
+    ],
+    "scores": [
+      {
+        "id": "A",
+        "option": "Defer guard; require manual review at the first compiled-artifact introduction",
+        "scores": [
+          5,
+          2,
+          3,
+          5,
+          3,
+          5
+        ],
+        "weighted_numerator": 375,
+        "total": 75.0,
+        "eligible": true
+      },
+      {
+        "id": "B",
+        "option": "Retain source fail hook and compiled ignore rules; couple finite caller tests/count contract",
+        "scores": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          4
+        ],
+        "weighted_numerator": 495,
+        "total": 99.0,
+        "eligible": true
+      },
+      {
+        "id": "C",
+        "option": "Add an always-running Python Git inventory scanner plus ignore rules",
+        "scores": [
+          5,
+          5,
+          4,
+          4,
+          5,
+          3
+        ],
+        "weighted_numerator": 460,
+        "total": 92.0,
+        "eligible": true
+      },
+      {
+        "id": "D",
+        "option": "Add rejection to existing always-running PowerShell validator plus ignore rules",
+        "scores": [
+          5,
+          5,
+          4,
+          5,
+          4,
+          3
+        ],
+        "weighted_numerator": 465,
+        "total": 93.0,
+        "eligible": true
+      },
+      {
+        "id": "E",
+        "option": "Add ignore patterns only",
+        "scores": [
+          5,
+          1,
+          4,
+          5,
+          2,
+          5
+        ],
+        "weighted_numerator": 355,
+        "total": 71.0,
+        "eligible": false
+      },
+      {
+        "id": "F",
+        "option": "Approve absence-based permanent exemption/no guard",
+        "scores": [
+          1,
+          1,
+          5,
+          5,
+          1,
+          5
+        ],
+        "weighted_numerator": 240,
+        "total": 48.0,
+        "eligible": false
+      }
+    ],
+    "proposed_selection": "B99",
+    "implementation_released": false,
+    "frozen_TF66_inputs_invalidated": false,
+    "selected": "B99"
+  },
+  "retirement_boundary": "R05 current supplies, R06 dormant publisher and R07 concrete threat/caller tests do not authorize deleting an active manifest guarantee or require restoring dormant code",
+  "evidence_scope": "Static raw Git/caller/regex analysis only. No hook execution, suite, fixture commit, install, native write or behavioral test. Historical evidence reused only on immutable unchanged inputs.",
+  "remaining_gates": [
+    "root decision display/selection and A07 scoped follow-up scheduling",
+    "TF66 accepted source and actual transfer release remain separate",
+    "future compiled-guard exact caller/finite contract/meaningful native validation before delivery",
+    "conditional manifest consumer and actual current counterpart checks at final A18",
+    "final accepted-main full union/capability/exception/A10-A11 audit pending"
+  ],
+  "native_end": {
+    "read_at_utc": "2026-10-05T02:20:05.145233+00:00",
+    "method": "read-only git ls-remote origin refs/heads/main and gh api research PR78",
+    "PS_main": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "TF_main": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "research_current_main": "127180ea2910dea9707553ff5b2205c462dd900b",
+    "research_main_is_not_comparison_source": true,
+    "PR78": {
+      "number": 78,
+      "merged": true,
+      "state": "closed",
+      "merged_at": "2026-08-21T12:17:29Z",
+      "merge_commit_sha": "51dbeb560dd518b904cf1b571dc7d01fd8045749",
+      "head": "69bf0aeda1b9bc41a298ce73332fcfc1f3269de3",
+      "base": "12caf99d6d686cdcaeb5e9b0cbe9444a24a2a02a"
+    },
+    "accepted_target_refs_match_pins": true
+  },
+  "writes": "only two new private report/map files in the approved hook-applicability directory; earlier readiness untouched",
+  "root_readback": {
+    "at": "2026-10-05T02:44:20.473921+00:00",
+    "private_map_sha256": "e0ba735b3ae5b1a8133a0ffef909623a1f56a952b128b45b34008a844dd09bd7",
+    "checks": "Complete report and applicability rows read; all six score totals checked; six raw research/accepted-PS/accepted-TF precommit and gitignore blobs sampled.",
+    "references": [
+      "https://pre-commit.com/#fail",
+      "https://git-scm.com/docs/gitignore"
+    ],
+    "canonical_decision": "../../A07/research-hook-applicability.md"
+  }
+}
