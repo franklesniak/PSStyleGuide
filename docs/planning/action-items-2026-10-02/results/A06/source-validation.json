@@ -1,6 +1,6 @@
 {
-  "status": "pr234_repair_committed_locally_validated_pending_publication",
-  "recorded_at": "2026-10-05T21:12:54.800708+00:00",
+  "status": "round2_reviews_and_hosted_validation_pending",
+  "recorded_at": "2026-10-05T21:21:16.076661+00:00",
   "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
   "base_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
   "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
@@ -229,84 +229,6 @@
     "finding": "Confirmed: both failed harness calls exit7, but later Git resets native status and proof publishes current revision with host exit0."
   },
   "R1_focused_result": "All12 caller fixture combinations pass:3 actual job bodies times first-pass7, second-pass7, exception and2-success. Failures publish no revision; no hosted-generator credit.",
-  "focused": {
-    "actual_windows7_assertions_each": 112,
-    "actual_windows7_passes": 2,
-    "immutable_tf_golden_passes": 2,
-    "immutable_tf_outputs_each": 4,
-    "workflow_policy_tests": 178,
-    "platform_control_groups": 4,
-    "classifier_control_groups": 1,
-    "failed": 0,
-    "cancelled": 0,
-    "skipped": 0,
-    "powershell_parse_errors": 0,
-    "powershell_analyzer_warnings_errors": 0
-  },
-  "evidence_sha256": "57f31d725091a07c0b793a93cd4d0871f37c50245f59a77036b6b806099d458b",
-  "report_sha256": "e8999d4e0172b8df273b1c70699816f7f7f02a8371a552f7f51b1e2affb917fb",
-  "log_catalog": {
-    "generator-pass1.log": {
-      "bytes": 215,
-      "sha256": "24cb9597e7ea52cd213cbd12d2122b53a0b26b36df1bd6d77797a8e83826ec8c"
-    },
-    "generator-pass2.log": {
-      "bytes": 215,
-      "sha256": "24cb9597e7ea52cd213cbd12d2122b53a0b26b36df1bd6d77797a8e83826ec8c"
-    },
-    "peer-golden.json": {
-      "bytes": 620,
-      "sha256": "3ffc2baf082b85e11227bacc3a7ec79bdc80f21c838e3e3e7a230f202d47a670"
-    },
-    "peer-pass1.log": {
-      "bytes": 3062,
-      "sha256": "c046701a137167cb874f8eec3117ad77c9366f5cb0ffea2076d1127cc6a1ab50"
-    },
-    "peer-pass2.log": {
-      "bytes": 3062,
-      "sha256": "c046701a137167cb874f8eec3117ad77c9366f5cb0ffea2076d1127cc6a1ab50"
-    },
-    "policy-test.log": {
-      "bytes": 12848,
-      "sha256": "5b734c049c558134b3a41a57bf940fcfcadb4902efebd37e2a949e0af864466e"
-    },
-    "platform-controls.log": {
-      "bytes": 526,
-      "sha256": "0bb92d7a168b51ec0c022e8d145739807fd4eba5f36eaf8793ee5fb9c42e5c1c"
-    },
-    "classifier-controls.log": {
-      "bytes": 183,
-      "sha256": "4539869e81f1c8117909935a80d8f3c89d44b024f7fa2b050d62f18500c530a8"
-    },
-    "workflow-cli.log": {
-      "bytes": 384,
-      "sha256": "699e0848f9aa224e7e05a0a4cc27a5054b998e8866ce716bc398b5da09bf395b"
-    },
-    "powershell-analysis.json": {
-      "bytes": 393,
-      "sha256": "5e2ea38570f608582b1ae9fd20f9351d04cb60e10c53ba063e009bdd9fff2914"
-    },
-    "verifier-final-analysis.log": {
-      "bytes": 56,
-      "sha256": "512fa3585115d9cc81e63f42f83d2322f3b9e54506a8adf66b2963b13cf2d912"
-    },
-    "A06-R1-platform-exit.md": {
-      "bytes": 11125,
-      "sha256": "7bad8c76db8ba4aa79f8e72ac931e1fd474e5e249db3e11350feb3d3864ba2ed"
-    },
-    "fixture-notes.md": {
-      "bytes": 401,
-      "sha256": "c4412a806665a1c0f7e32c41875c7c9589d34801c31b716d9e68c47218138555"
-    },
-    "verify_peer.py": {
-      "bytes": 3058,
-      "sha256": "7007882a075a6761696e27f1ef4beb078f5176428e9f986f0708c35a0ed1dd5c"
-    },
-    "check-powershell.ps1": {
-      "bytes": 1072,
-      "sha256": "82ec6e4f9d32698e3c484a54c780f162c5ae6c020853c8709b1ad0068182f533"
-    }
-  },
   "runtime": {
     "node": "24.18.1",
     "npm": "11.16.0 (root installed; no writer installation)",
@@ -401,22 +323,39 @@
     "A03": "2/12",
     "A21": "4/12"
   },
-  "rounds_used": 1,
+  "rounds_used": 2,
   "first_request_at": "2026-10-05T20:12:24.969231+00:00",
   "deadline": "2026-10-13T20:12:24.969231+00:00",
-  "pending_native_operations": [],
+  "pending_native_operations": [
+    {
+      "service": "Copilot",
+      "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+      "request_event": 32545544793,
+      "workflow_run": 37375005271,
+      "effort_selected": "Balanced",
+      "observed_completed_effort": null,
+      "status": "confirmed_pending"
+    },
+    {
+      "service": "remote Codex",
+      "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+      "trigger_comment": 6003128652,
+      "summary_comment": 6002108102,
+      "status": "confirmed_running_manual"
+    }
+  ],
   "limits": [
-    "No local Windows5.1 file execution: Restricted, no bypass.",
-    "No native Linux/ext4 or BSD generator execution here.",
-    "GNU/BSD/unknown stat probes and Windows acquisition substitutes are synthetic.",
+    "Local Windows5.1 script execution remains Restricted; no bypass. Hosted current-head proof is required.",
+    "Old parent24b1879 hosted Windows cells and reviews are historical. New07636c8 hosted platform/whole-workflow acceptance remains pending.",
+    "GNU/BSD/unknown stat probes and Windows acquisition substitutes are synthetic; no native BSD execution claim.",
+    "Round1 R2 proves named checkpoint cases only, not universal ACL/full-wrapper behavior; R4 fixtures do not prove actual hosted acquisition.",
     "Issue155 remains open; D92/D93 path publication/cleanup limitations remain.",
-    "Local final candidate passed; actual hosted platform logs, remote review results, independent final quality and normal landed acceptance are not yet accepted.",
-    "Actual hosted Windows5.1/Windows7 candidate proof is now recorded; Linux, whole-workflow and landed acceptance remain pending."
+    "Current remote reviews, independent final quality, normal merge/landed acceptance, peer transfer and reverse comparison remain."
   ],
   "remaining": [
-    "Publish repair and accurate PR body, reply once per prior thread, resolve dispositions and remove recorded eyes reactions.",
-    "Issue round2 on current input after full old-input reconciliation; preserve original first-request time/deadline.",
-    "Require actual new-input hosted platform/CI proof, both current reviews, independent final quality, normal merge and landed acceptance.",
+    "Collect both issued round2 reviews without duplicate requests; validate any new finding under the existing decision process.",
+    "Collect actual current-head hosted Windows5.1/Windows7/native-ext4 Linux7 two-pass proof and required CI.",
+    "Finish independent final quality on actual final input, then normal merge and landed acceptance.",
     "Refresh peer, increment destination transfers before port, follow scoped lifecycle and raw-byte reverse comparison."
   ],
   "candidate_history": [
@@ -632,7 +571,7 @@
   "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
   "pr": 234,
   "pr_url": "https://github.com/franklesniak/PSStyleGuide/pull/234",
-  "body_sha256": "f634dd77774501cec26ce80e977448adc1ffb33bcfad4b7ae0c09027ab9a42eb",
+  "body_sha256": "0143e8015a81e6eba20d9a3a76c0271b24f8f28006e7369012bb64e3e242b763",
   "commit": {
     "status": "committed",
     "expected_parent": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
@@ -787,7 +726,7 @@
             4188451021
           ],
           "subject": "Channel FileInfo length diagnostic",
-          "status": "refuted_ready_for_reply",
+          "status": "refuted_answered_resolved",
           "decision_path": "writer/PR234-round1/R2-channel-diagnostic.md",
           "root_review": "Current product AGENTS step2 permits evidenced early refutation; missing/directory cases reject as intended, no universal ACL/error claim."
         },
@@ -797,7 +736,7 @@
             4188451094
           ],
           "subject": "Duplicated fixed platform identifiers",
-          "status": "implemented_final_byte_validation_passed",
+          "status": "implemented_validated_answered_resolved",
           "decision_path": "writer/PR234-round1/R3-platform-policy.md",
           "root_review": "Root read complete options, unique rubric, table and selection; all displayed totals checked. Deferral aliases and unlike combined options sent for canonical wording correction; no selection change."
         },
@@ -808,7 +747,7 @@
             4188451200
           ],
           "subject": "Linux immutable acquisition environment and autocrlf",
-          "status": "implemented_final_byte_validation_passed",
+          "status": "implemented_validated_answered_resolved",
           "decision_path": "writer/PR234-round1/R4-linux-acquisition.md",
           "root_review": "Root read complete options, unique rubric, table and selection; all displayed totals checked. Deferral aliases and unlike combined options sent for canonical wording correction; no selection change."
         },
@@ -818,12 +757,68 @@
             4188451256
           ],
           "subject": "Repeated generator output scans",
-          "status": "implemented_final_byte_validation_passed",
+          "status": "implemented_validated_answered_resolved",
           "decision_path": "writer/PR234-round1/R5-summary-scans.md",
           "root_review": "Root read complete options, unique rubric, table and selection; all displayed totals checked. Deferral aliases and unlike combined options sent for canonical wording correction; no selection change."
         }
       ],
-      "reaction_tracking": "round1-reaction-tracking.json"
+      "reaction_tracking": "round1-reaction-tracking.json",
+      "status": "superseded_after_dispositions",
+      "dispositions": "round1-dispositions.json",
+      "dispositions_sha256": "e53d16265f6c7791bee03c118b016ac19ebb328450c0fede248a8eeff11e80da",
+      "note": "One refutation and three implemented decisions answered once per thread; all5 resolved and all5 exact eyes reactions removed/read back. Old-input results remain historical, not current-input clean."
+    },
+    {
+      "round": 2,
+      "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+      "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "body_sha256": "0143e8015a81e6eba20d9a3a76c0271b24f8f28006e7369012bb64e3e242b763",
+      "started_at": "2026-10-05T21:17:23.788790+00:00",
+      "deadline": "2026-10-13T20:12:24.969231+00:00",
+      "baseline": "round2-pre-ui-request.json",
+      "baseline_sha256": "74f1d4b64e3120fe61a8cbe0b1bf0277c2500e4c0cabc7fb370c39e54daf0329",
+      "copilot": {
+        "status": "confirmed_pending",
+        "requested_at": "2026-10-05T21:17:23.788790+00:00",
+        "effort_selected": "Balanced",
+        "observed_effort": null,
+        "channel_attempt": 1,
+        "request_events": [
+          {
+            "id": 32545544793,
+            "created_at": "2026-10-05T21:17:55Z",
+            "actor": "franklesniak",
+            "requested_reviewer": "Copilot"
+          }
+        ],
+        "workflow_run": 37375005271,
+        "workflow_created_at": "2026-10-05T21:18:05Z",
+        "confirmation_snapshot": "round2-before-codex.json",
+        "ui_confirmation": "Review requested; Reviewing at balanced effort. Last completed Lite is historical, not observed current effort."
+      },
+      "codex": {
+        "status": "confirmed_pending",
+        "manual_trigger_issued": true,
+        "requested_at": "2026-10-05T21:18:38.837795+00:00",
+        "baseline": "round2-before-codex.json",
+        "request_body_sha256": "c3d75c069f2d8ae09f080200450453c5b429f187089773b433399bd25f3ade27",
+        "channel_attempt": 1,
+        "automatic_reconciliation": "Complete collections show unchanged old terminal summary and no new-head automatic request or result at baseline.",
+        "transport_exit": 0,
+        "transport_stdout": "https://github.com/franklesniak/PSStyleGuide/pull/234#issuecomment-6003128652\n",
+        "transport_stderr": "",
+        "trigger_comment": 6003128652,
+        "trigger_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#issuecomment-6003128652",
+        "native_created_at": "2026-10-05T21:19:04Z",
+        "summary_comment": 6002108102,
+        "latest_summary": {
+          "comment": 6002108102,
+          "updated_at": "2026-10-05T21:19:22Z",
+          "body_sha256": "d7ef8c8ae2adbedcdf47a268c0ae8953d9366d572d953b7c84c95e5f5b1f47f8",
+          "snapshot": "round2-manual-confirmation.json"
+        }
+      },
+      "findings": []
     }
   ],
   "A14_preparation": {
@@ -1255,7 +1250,8 @@
         "R2 uses real Win7/Linux7 extracted checkpoint bodies with stubbed Git/worktree producers, not full-wrapper or ACL/unreadable-metadata proof.",
         "Acquisition mutation/control tests replace fixed Git with a recording fixture; no claim of actual hosted/network acquisition.",
         "No competing-writer race closure; issue155 remains open."
-      ]
+      ],
+      "attribution": "Round1 writer focused behavior before metadata-only restoration; final v4 aggregate covers committed bytes. Earlier writer limitations are historical to the focused stage."
     },
     "aggregate": {
       "status": "passed",
@@ -1341,8 +1337,85 @@
       "finished_at": "2026-10-05T21:07:54.741759+00:00"
     },
     "root_review": "Read all four complete decisions, all six final diffs, actual focused test and mutation evidence. Checked rubric totals, source preimages/postimages, all writer artifact hashes and full source/dependency catalog. R2 limited refutation includes actual Linux checkpoint evidence; B99/B99/C96 fixes preserve finite role and source scope. Final metadata restoration is explicitly separated from focused behavior logs.",
-    "status": "committed_locally_validated_pending_publication",
-    "committed_head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e"
+    "status": "published_dispositions_resolved_current_round2_pending",
+    "committed_head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+    "dispositions": {
+      "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+      "body_sha256": "0143e8015a81e6eba20d9a3a76c0271b24f8f28006e7369012bb64e3e242b763",
+      "baseline": "round1-before-dispositions.json",
+      "rows": [
+        {
+          "comment_id": 4188451021,
+          "thread": "PRRT_kwDOQkjdhM6pM-Ge",
+          "body": "The specified missing-channel and directory-replacement cases already produce the fixed refusal on actual Windows7 and Linux7: all eight checkpoint cases passed on each host. The gate remains unchanged; the evidence does not claim universal ACL or full-wrapper coverage.\n[Decision and evidence](https://github.com/franklesniak/PSStyleGuide/blob/3fc49fd47b40879532b71c53560a86718779ad7d/docs/planning/action-items-2026-10-02/results/A06/PR234-round1/R2-channel-diagnostic.md)\nGenerated with Codex",
+          "status": "resolved",
+          "requested_at": "2026-10-05T21:15:10.530148+00:00",
+          "preimage_body_sha256": "bd856129c30e6985b0bbe21d7549f1f56500d72710f7ffd235d07646fcdb7dae",
+          "reply_id": 4188891481,
+          "reply_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#discussion_r4188891481",
+          "native_created_at": "2026-10-05T21:15:35Z",
+          "confirmed_at": "2026-10-05T21:15:30.957105+00:00",
+          "resolution_requested_at": "2026-10-05T21:16:07.794396+00:00",
+          "resolution_confirmed_at": "2026-10-05T21:16:08.919499+00:00"
+        },
+        {
+          "comment_id": 4188451094,
+          "thread": "PRRT_kwDOQkjdhM6pM-HC",
+          "body": "Implemented B99 in 07636c8: the embedded policy array now uses the policy\u2019s fixed platform table, while workflow and test literals remain independent. Three role mutations are rejected; policy179/179 and final567tests/11hooks pass.\n[Decision and evidence](https://github.com/franklesniak/PSStyleGuide/blob/3fc49fd47b40879532b71c53560a86718779ad7d/docs/planning/action-items-2026-10-02/results/A06/PR234-round1/R3-platform-policy.md)\nGenerated with Codex",
+          "status": "resolved",
+          "requested_at": "2026-10-05T21:15:33.064645+00:00",
+          "preimage_body_sha256": "be48b3b050a3713fa1a0c3dc5f321772c22871916421e068aef5a9de3cd60fee",
+          "reply_id": 4188895259,
+          "reply_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#discussion_r4188895259",
+          "native_created_at": "2026-10-05T21:15:57Z",
+          "confirmed_at": "2026-10-05T21:15:35.671667+00:00",
+          "resolution_requested_at": "2026-10-05T21:16:09.446292+00:00",
+          "resolution_confirmed_at": "2026-10-05T21:16:10.578335+00:00"
+        },
+        {
+          "comment_id": 4188451151,
+          "thread": "PRRT_kwDOQkjdhM6pM-Hn",
+          "body": "Implemented B99 in 07636c8: both Linux callers refuse five Git repository/index/object selectors before Git and check local autocrlf=false before fetch/checkout. All18 acquisition cases and four broken-control mutants pass; actual hosted acquisition remains required.\n[Decision and evidence](https://github.com/franklesniak/PSStyleGuide/blob/3fc49fd47b40879532b71c53560a86718779ad7d/docs/planning/action-items-2026-10-02/results/A06/PR234-round1/R4-linux-acquisition.md)\nGenerated with Codex",
+          "status": "resolved",
+          "requested_at": "2026-10-05T21:15:37.776966+00:00",
+          "preimage_body_sha256": "6782ba568f095cef891fff2575cc6f66e1b9d64754a37d99c5c35393286f8b25",
+          "reply_id": 4188896112,
+          "reply_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#discussion_r4188896112",
+          "native_created_at": "2026-10-05T21:16:02Z",
+          "confirmed_at": "2026-10-05T21:15:40.066303+00:00",
+          "resolution_requested_at": "2026-10-05T21:16:11.045971+00:00",
+          "resolution_confirmed_at": "2026-10-05T21:16:12.823675+00:00"
+        },
+        {
+          "comment_id": 4188451200,
+          "thread": "PRRT_kwDOQkjdhM6pM-IE",
+          "body": "This is the same R4 finding as4188451151 and uses the same B99 decision. Both Linux callers are repaired in07636c8; all18 acquisition cases and four broken-control mutants pass, with hosted acquisition still required.\n[Decision and evidence](https://github.com/franklesniak/PSStyleGuide/blob/3fc49fd47b40879532b71c53560a86718779ad7d/docs/planning/action-items-2026-10-02/results/A06/PR234-round1/R4-linux-acquisition.md)\nGenerated with Codex",
+          "status": "resolved",
+          "requested_at": "2026-10-05T21:15:42.181136+00:00",
+          "preimage_body_sha256": "6782ba568f095cef891fff2575cc6f66e1b9d64754a37d99c5c35393286f8b25",
+          "reply_id": 4188896803,
+          "reply_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#discussion_r4188896803",
+          "native_created_at": "2026-10-05T21:16:07Z",
+          "confirmed_at": "2026-10-05T21:15:44.466568+00:00",
+          "resolution_requested_at": "2026-10-05T21:16:13.262307+00:00",
+          "resolution_confirmed_at": "2026-10-05T21:16:14.480141+00:00"
+        },
+        {
+          "comment_id": 4188451256,
+          "thread": "PRRT_kwDOQkjdhM6pM-Ig",
+          "body": "Implemented C96 in07636c8: cursor-based presence tracking includes marker/guide/rationale output and adjusts after trimming. All14 differential outputs match;117 harness assertions and final567tests/11hooks pass. Repeated-boundary operation counts improve without a runtime-benchmark claim.\n[Decision and evidence](https://github.com/franklesniak/PSStyleGuide/blob/3fc49fd47b40879532b71c53560a86718779ad7d/docs/planning/action-items-2026-10-02/results/A06/PR234-round1/R5-summary-scans.md)\nGenerated with Codex",
+          "status": "resolved",
+          "requested_at": "2026-10-05T21:15:46.680016+00:00",
+          "preimage_body_sha256": "67c2ef170124893aa816e3bc8dc647124070f8e24cee2a8f5d31f0706fbfe140",
+          "reply_id": 4188897558,
+          "reply_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#discussion_r4188897558",
+          "native_created_at": "2026-10-05T21:16:11Z",
+          "confirmed_at": "2026-10-05T21:15:49.273417+00:00",
+          "resolution_requested_at": "2026-10-05T21:16:15.011057+00:00",
+          "resolution_confirmed_at": "2026-10-05T21:16:16.311524+00:00"
+        }
+      ]
+    }
   },
   "published_input_history": [
     {
@@ -1505,7 +1578,7 @@
       "body_sha256": "f634dd77774501cec26ce80e977448adc1ffb33bcfad4b7ae0c09027ab9a42eb"
     }
   ],
-  "native_published_head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+  "native_published_head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
   "peer_port_preparation": {
     "report": "writer/peer-port-map-round1.md",
     "report_sha256": "1f3e3721b4133cb5a088c09979750eeee486a0115f70ac03260cb1724e6adf14",
@@ -1513,5 +1586,111 @@
     "tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
     "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
     "root_review": "Read complete map and checked all13 source raw blobs/modes/lengths against committed tree. Exact finite substitutions and target-contract-derived R4 callers retain18 controls. No test, transfer or acceptance; refresh actual peer before any port."
+  },
+  "initial_preparation": {
+    "note": "Historical initial-source focused preparation; superseded behavior is not current-input acceptance.",
+    "focused": {
+      "actual_windows7_assertions_each": 112,
+      "actual_windows7_passes": 2,
+      "immutable_tf_golden_passes": 2,
+      "immutable_tf_outputs_each": 4,
+      "workflow_policy_tests": 178,
+      "platform_control_groups": 4,
+      "classifier_control_groups": 1,
+      "failed": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "powershell_parse_errors": 0,
+      "powershell_analyzer_warnings_errors": 0
+    },
+    "evidence_sha256": "57f31d725091a07c0b793a93cd4d0871f37c50245f59a77036b6b806099d458b",
+    "report_sha256": "e8999d4e0172b8df273b1c70699816f7f7f02a8371a552f7f51b1e2affb917fb",
+    "log_catalog": {
+      "generator-pass1.log": {
+        "bytes": 215,
+        "sha256": "24cb9597e7ea52cd213cbd12d2122b53a0b26b36df1bd6d77797a8e83826ec8c"
+      },
+      "generator-pass2.log": {
+        "bytes": 215,
+        "sha256": "24cb9597e7ea52cd213cbd12d2122b53a0b26b36df1bd6d77797a8e83826ec8c"
+      },
+      "peer-golden.json": {
+        "bytes": 620,
+        "sha256": "3ffc2baf082b85e11227bacc3a7ec79bdc80f21c838e3e3e7a230f202d47a670"
+      },
+      "peer-pass1.log": {
+        "bytes": 3062,
+        "sha256": "c046701a137167cb874f8eec3117ad77c9366f5cb0ffea2076d1127cc6a1ab50"
+      },
+      "peer-pass2.log": {
+        "bytes": 3062,
+        "sha256": "c046701a137167cb874f8eec3117ad77c9366f5cb0ffea2076d1127cc6a1ab50"
+      },
+      "policy-test.log": {
+        "bytes": 12848,
+        "sha256": "5b734c049c558134b3a41a57bf940fcfcadb4902efebd37e2a949e0af864466e"
+      },
+      "platform-controls.log": {
+        "bytes": 526,
+        "sha256": "0bb92d7a168b51ec0c022e8d145739807fd4eba5f36eaf8793ee5fb9c42e5c1c"
+      },
+      "classifier-controls.log": {
+        "bytes": 183,
+        "sha256": "4539869e81f1c8117909935a80d8f3c89d44b024f7fa2b050d62f18500c530a8"
+      },
+      "workflow-cli.log": {
+        "bytes": 384,
+        "sha256": "699e0848f9aa224e7e05a0a4cc27a5054b998e8866ce716bc398b5da09bf395b"
+      },
+      "powershell-analysis.json": {
+        "bytes": 393,
+        "sha256": "5e2ea38570f608582b1ae9fd20f9351d04cb60e10c53ba063e009bdd9fff2914"
+      },
+      "verifier-final-analysis.log": {
+        "bytes": 56,
+        "sha256": "512fa3585115d9cc81e63f42f83d2322f3b9e54506a8adf66b2963b13cf2d912"
+      },
+      "A06-R1-platform-exit.md": {
+        "bytes": 11125,
+        "sha256": "7bad8c76db8ba4aa79f8e72ac931e1fd474e5e249db3e11350feb3d3864ba2ed"
+      },
+      "fixture-notes.md": {
+        "bytes": 401,
+        "sha256": "c4412a806665a1c0f7e32c41875c7c9589d34801c31b716d9e68c47218138555"
+      },
+      "verify_peer.py": {
+        "bytes": 3058,
+        "sha256": "7007882a075a6761696e27f1ef4beb078f5176428e9f986f0708c35a0ed1dd5c"
+      },
+      "check-powershell.ps1": {
+        "bytes": 1072,
+        "sha256": "82ec6e4f9d32698e3c484a54c780f162c5ae6c020853c8709b1ad0068182f533"
+      }
+    }
+  },
+  "focused": {
+    "policy_tests": 179,
+    "acquisition_cases": 18,
+    "acquisition_mutants_killed": 4,
+    "Windows7_harness_assertions": 117,
+    "TF_golden_passes": 2,
+    "composition_differential_cases": 14,
+    "summary_mutant_killed": true,
+    "R2_Windows_cases": 8,
+    "R2_Linux_cases": 8,
+    "limitations": [
+      "No full aggregate, staged endpoint validation, publication, review requests, settings/ref/planning writes or TF delivery. Root owns remaining lifecycle.",
+      "Focused generator and analyzer behavior logs precede only restoration of already-correct WIP .0 metadata; final-source parser/version checks passed. Root will run final-byte aggregate.",
+      "R2 uses real Win7/Linux7 extracted checkpoint bodies with stubbed Git/worktree producers, not full-wrapper or ACL/unreadable-metadata proof.",
+      "Acquisition mutation/control tests replace fixed Git with a recording fixture; no claim of actual hosted/network acquisition.",
+      "No competing-writer race closure; issue155 remains open."
+    ],
+    "attribution": "Round1 writer focused behavior before metadata-only restoration; final v4 aggregate covers committed bytes. Earlier writer limitations are historical to the focused stage."
+  },
+  "final_quality": {
+    "status": "running",
+    "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+    "body_sha256": "0143e8015a81e6eba20d9a3a76c0271b24f8f28006e7369012bb64e3e242b763",
+    "worker": "/root/ps234_final_quality"
   }
 }
