@@ -1,10 +1,10 @@
 {
-  "status": "pr234_round1_findings_validation",
-  "recorded_at": "2026-10-05T20:33:34.132739+00:00",
+  "status": "pr234_repair_committed_locally_validated_pending_publication",
+  "recorded_at": "2026-10-05T21:12:54.800708+00:00",
   "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
   "base_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
   "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
-  "candidate_tree": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+  "candidate_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
   "branch": "codex/a06-generator-convergence",
   "changed_paths": {
     ".github/workflows/Classify-InstructionMaintenance.mjs": {
@@ -315,82 +315,86 @@
   },
   "aggregate": {
     "status": "passed",
-    "run_id": "a06-source-20261005-v3",
-    "manifest_sha256": "a91af4c9b8e92b2bd9a7784655a0fb14ee96b89df3720dc1c883a3de7ac515d8",
-    "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
-    "expected_hooks": 11,
-    "node_suites": 7,
-    "requested_at": "2026-10-05T19:52:37.743592+00:00",
-    "node": {
-      "name": "full-node",
-      "command": [
-        "node",
-        "--test",
-        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
-        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
-        ".github/workflows/Test-CiHelpers.test.mjs",
-        ".github/workflows/NpmTools.test.mjs",
-        ".github/workflows/Check-NpmAudit.test.mjs",
-        ".github/workflows/Test-LocalValidation.test.mjs",
-        ".github/workflows/lint-markdown.test.mjs"
-      ],
-      "started_at": "2026-10-05T19:53:00.780525+00:00",
-      "timeout_seconds": 3600,
-      "state": "passed",
-      "pid": 617,
-      "exit": 0,
-      "finished_at": "2026-10-05T19:55:57.381821+00:00",
-      "log_sha256": "a82801118ab32ec7bab7a1e1165e9ce9b89523f49f13fe2800b0ca821014b9e1"
-    },
+    "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\aggregate-manifest-v4.json",
+    "manifest_sha256": "0e5232a6c4196738a6bb40ceaa04cf186da697b6816b0bf073e6735345377af2",
+    "expected_node_tests": 567,
+    "requested_at": "2026-10-05T20:53:33.643523+00:00",
     "node_counts": {
-      "tests": 565,
-      "pass": 565,
+      "tests": 567,
+      "pass": 567,
       "fail": 0,
       "cancelled": 0,
       "skipped": 0
     },
-    "staged_preflight": {
-      "name": "staged-preflight",
-      "command": [
-        "pwsh",
-        "-NoLogo",
-        "-NoProfile",
-        "-NonInteractive",
-        "-File",
-        ".github/workflows/Test-AgentInstructions.ps1",
-        "-RequireStagedInputMatch"
-      ],
-      "started_at": "2026-10-05T19:52:52.544292+00:00",
-      "timeout_seconds": 600,
-      "state": "passed",
-      "pid": 79,
-      "exit": 0,
-      "finished_at": "2026-10-05T19:53:00.586659+00:00",
-      "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
-    },
-    "result_sha256": "ebc33280daee2f4e4fe81e502c3e0b878e3a84e023a452cbf04b9811fb755d45",
-    "status_sha256": "c21ccdfb8f7c817e713d1eb9bc9e2b904251bcb856d152677c34937f54dc8105",
+    "node_log_sha256": "489f0a481676518019010de158496b73136c64d98aa312faa7e644e31b1a04eb",
+    "node_finished_at": "2026-10-05T20:57:15.513808+00:00",
+    "result_sha256": "0ec706cf01865c79adf86e3480568ee910f26a567680c5dff9cc7ebd16153923",
+    "status_sha256": "a743f8935f048a4bb606d50761800e78c8164ff6c858bb46118ce2053f596f87",
+    "passed_hooks": 11,
+    "skipped_hooks": 0,
     "source_after_equal": true,
-    "aggregate": {
-      "name": "aggregate",
-      "command": [
-        "/opt/psstyleguide-runtime/venv/bin/python",
-        "-m",
-        "pre_commit",
-        "run",
-        "--all-files"
-      ],
-      "started_at": "2026-10-05T19:55:57.574831+00:00",
-      "timeout_seconds": 14400,
-      "state": "passed",
-      "pid": 20687,
-      "exit": 0,
-      "finished_at": "2026-10-05T20:06:42.548568+00:00",
-      "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
-      "passed_hooks": 11,
-      "skipped_hooks": 0
-    },
-    "finished_at": "2026-10-05T20:06:42.751331+00:00"
+    "commands": [
+      {
+        "name": "staged-preflight",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-RequireStagedInputMatch"
+        ],
+        "started_at": "2026-10-05T20:53:50.102855+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 79,
+        "exit": 0,
+        "finished_at": "2026-10-05T20:53:58.853283+00:00",
+        "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+      },
+      {
+        "name": "full-node",
+        "command": [
+          "node",
+          "--test",
+          ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+          ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          ".github/workflows/Test-CiHelpers.test.mjs",
+          ".github/workflows/NpmTools.test.mjs",
+          ".github/workflows/Check-NpmAudit.test.mjs",
+          ".github/workflows/Test-LocalValidation.test.mjs",
+          ".github/workflows/lint-markdown.test.mjs"
+        ],
+        "started_at": "2026-10-05T20:53:59.036553+00:00",
+        "timeout_seconds": 3600,
+        "state": "passed",
+        "pid": 616,
+        "exit": 0,
+        "finished_at": "2026-10-05T20:57:15.513808+00:00",
+        "log_sha256": "489f0a481676518019010de158496b73136c64d98aa312faa7e644e31b1a04eb"
+      },
+      {
+        "name": "aggregate",
+        "command": [
+          "/opt/psstyleguide-runtime/venv/bin/python",
+          "-m",
+          "pre_commit",
+          "run",
+          "--all-files"
+        ],
+        "started_at": "2026-10-05T20:57:15.724940+00:00",
+        "timeout_seconds": 14400,
+        "state": "passed",
+        "pid": 21649,
+        "exit": 0,
+        "finished_at": "2026-10-05T21:07:54.491911+00:00",
+        "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+        "passed_hooks": 11,
+        "skipped_hooks": 0
+      }
+    ],
+    "finished_at": "2026-10-05T21:07:54.741759+00:00"
   },
   "transfers": {
     "A06": "0/12",
@@ -400,25 +404,7 @@
   "rounds_used": 1,
   "first_request_at": "2026-10-05T20:12:24.969231+00:00",
   "deadline": "2026-10-13T20:12:24.969231+00:00",
-  "pending_native_operations": [
-    {
-      "service": "Copilot",
-      "request_event": 32541792654,
-      "workflow_run": 37368361326,
-      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
-      "effort_selected": "Balanced",
-      "observed_completed_effort": null
-    },
-    {
-      "service": "remote Codex",
-      "trigger": "manual post-Copilot review",
-      "comment": 6002212311,
-      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
-      "status": "confirmed_pending",
-      "prior_automatic_summary": 6002108102,
-      "prior_automatic_disposition": "Completed before manual trigger; no duplicated pending review."
-    }
-  ],
+  "pending_native_operations": [],
   "limits": [
     "No local Windows5.1 file execution: Restricted, no bypass.",
     "No native Linux/ext4 or BSD generator execution here.",
@@ -428,10 +414,10 @@
     "Actual hosted Windows5.1/Windows7 candidate proof is now recorded; Linux, whole-workflow and landed acceptance remain pending."
   ],
   "remaining": [
-    "Reconcile issued remote reviews without duplicate pending requests; preserve round1 and original deadline.",
-    "Collect actual same-revision hosted two-pass Windows5.1/Windows7/native-ext4 Linux7 proof.",
-    "Resolve findings, obtain fresh independent final quality, then normal merge and landed validation.",
-    "Refresh accepted peer main, increment destination counters before implementation, transfer and reverse-compare raw bytes."
+    "Publish repair and accurate PR body, reply once per prior thread, resolve dispositions and remove recorded eyes reactions.",
+    "Issue round2 on current input after full old-input reconciliation; preserve original first-request time/deadline.",
+    "Require actual new-input hosted platform/CI proof, both current reviews, independent final quality, normal merge and landed acceptance.",
+    "Refresh peer, increment destination transfers before port, follow scoped lifecycle and raw-byte reverse comparison."
   ],
   "candidate_history": [
     {
@@ -643,30 +629,30 @@
     "report_sha256": "d40a3b8f0f9782e9ccd3269e552b7270c6f225fc83e0e8ecc718d4a22f9ca1be",
     "root_review": "Complete fixture diff reviewed before release of this staging script. Explicit finite role selection and bounded PS children preserve wrapper controls without missing peer helper. Actual production semantic helpers/gates and all other source bytes unchanged; no extra helper or skipped peer controls."
   },
-  "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+  "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
   "pr": 234,
   "pr_url": "https://github.com/franklesniak/PSStyleGuide/pull/234",
   "body_sha256": "f634dd77774501cec26ce80e977448adc1ffb33bcfad4b7ae0c09027ab9a42eb",
   "commit": {
     "status": "committed",
-    "expected_parent": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
-    "expected_tree": "180fbb1eed69730c433f0a2aca164523c3c3a343",
-    "requested_at": "2026-10-05T20:07:08.257138+00:00",
+    "expected_parent": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+    "expected_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+    "requested_at": "2026-10-05T21:10:31.256619+00:00",
     "exit": 0,
-    "log_sha256": "7c2b57e813b4a078bc772b41a4032a112650625994a4c677066cd98857c882d7",
-    "observed_head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
-    "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
-    "parent": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
-    "tree": "180fbb1eed69730c433f0a2aca164523c3c3a343",
-    "completed_at": "2026-10-05T20:07:16.817392+00:00"
+    "log_sha256": "7480c2827de43f98a01fe793c2cb087ea04d1c1ad0b939103f4c91280ecf9973",
+    "observed_head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+    "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+    "parent": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+    "tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+    "completed_at": "2026-10-05T21:10:33.930769+00:00"
   },
   "actual_endpoints": {
     "status": "passed",
+    "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
     "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
-    "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
     "classification": {
       "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
-      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
       "policy": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
       "classification": "maintenance_required",
       "maintenancePaths": [
@@ -686,40 +672,40 @@
       {
         "mode": "AcceptedMaintenance",
         "exit": 0,
-        "started_at": "2026-10-05T20:07:55.745149+00:00",
-        "finished_at": "2026-10-05T20:07:56.104546+00:00",
-        "log_sha256": "ba9a759dd438e43f6c7b1decaaa6b5be5a379d241dc6c32152d9a8b7abcec592"
+        "started_at": "2026-10-05T21:10:58.431282+00:00",
+        "finished_at": "2026-10-05T21:10:58.774822+00:00",
+        "log_sha256": "0c495dfe23788092416e5b286e91d8566bdbecdb7ff98531fe75aab209f532ee"
       },
       {
         "mode": "FinalizeMetadataNow",
         "exit": 0,
-        "started_at": "2026-10-05T20:07:59.207447+00:00",
-        "finished_at": "2026-10-05T20:08:22.733768+00:00",
-        "log_sha256": "a8482680e4924b8a088bf87d1ce0b7bf8cc7bf9ebfb7751df138ba02af1d5657"
+        "started_at": "2026-10-05T21:11:02.416393+00:00",
+        "finished_at": "2026-10-05T21:11:25.787921+00:00",
+        "log_sha256": "14fef70419240899b0fd5b24bda1eda11556f562109f91ec5e47bdeef8151c2b"
       },
       {
         "mode": "MetadataClassificationOnly",
         "exit": 0,
-        "started_at": "2026-10-05T20:08:26.357231+00:00",
-        "finished_at": "2026-10-05T20:08:28.281247+00:00",
-        "log_sha256": "a01af47923bc088ff0e1e0f48f0edeedffe26a96480b476e6d66668f32bdc2ab"
+        "started_at": "2026-10-05T21:11:29.111438+00:00",
+        "finished_at": "2026-10-05T21:11:30.882923+00:00",
+        "log_sha256": "7127e90a63beb0553c7e4e87fb918971362ea499ba4e5388e5d1224822f4f971"
       },
       {
         "mode": "ProposedPolicy",
         "exit": 0,
-        "started_at": "2026-10-05T20:08:31.737018+00:00",
-        "finished_at": "2026-10-05T20:08:55.710244+00:00",
-        "log_sha256": "ba9e8e27063a270e7fda05d40d043313710f2f95e83e53bcd90a2e8b74c21cd2"
+        "started_at": "2026-10-05T21:11:34.541324+00:00",
+        "finished_at": "2026-10-05T21:11:58.186341+00:00",
+        "log_sha256": "eb8b953a16d5bc24f8e212422b97176a10508a49340ce19d58024c068df83197"
       }
     ]
   },
   "current_audit": {
     "exit": 0,
-    "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+    "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
     "authority": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
     "mode": "ordinary local no-argument two-root audit",
-    "started_at": "2026-10-05T20:08:59.585800+00:00",
-    "finished_at": "2026-10-05T20:09:15.369910+00:00",
+    "started_at": "2026-10-05T21:12:01.996227+00:00",
+    "finished_at": "2026-10-05T21:12:19.738576+00:00",
     "sha256": "1571e207cd44536f75f9b823641506fd84e72ffe4ad90cdaff017ffca9d6cc6f"
   },
   "review_rounds": [
@@ -801,7 +787,9 @@
             4188451021
           ],
           "subject": "Channel FileInfo length diagnostic",
-          "status": "writer_validating"
+          "status": "refuted_ready_for_reply",
+          "decision_path": "writer/PR234-round1/R2-channel-diagnostic.md",
+          "root_review": "Current product AGENTS step2 permits evidenced early refutation; missing/directory cases reject as intended, no universal ACL/error claim."
         },
         {
           "id": "R3",
@@ -809,7 +797,9 @@
             4188451094
           ],
           "subject": "Duplicated fixed platform identifiers",
-          "status": "writer_validating"
+          "status": "implemented_final_byte_validation_passed",
+          "decision_path": "writer/PR234-round1/R3-platform-policy.md",
+          "root_review": "Root read complete options, unique rubric, table and selection; all displayed totals checked. Deferral aliases and unlike combined options sent for canonical wording correction; no selection change."
         },
         {
           "id": "R4",
@@ -818,7 +808,9 @@
             4188451200
           ],
           "subject": "Linux immutable acquisition environment and autocrlf",
-          "status": "writer_validating"
+          "status": "implemented_final_byte_validation_passed",
+          "decision_path": "writer/PR234-round1/R4-linux-acquisition.md",
+          "root_review": "Root read complete options, unique rubric, table and selection; all displayed totals checked. Deferral aliases and unlike combined options sent for canonical wording correction; no selection change."
         },
         {
           "id": "R5",
@@ -826,9 +818,12 @@
             4188451256
           ],
           "subject": "Repeated generator output scans",
-          "status": "writer_validating"
+          "status": "implemented_final_byte_validation_passed",
+          "decision_path": "writer/PR234-round1/R5-summary-scans.md",
+          "root_review": "Root read complete options, unique rubric, table and selection; all displayed totals checked. Deferral aliases and unlike combined options sent for canonical wording correction; no selection change."
         }
-      ]
+      ],
+      "reaction_tracking": "round1-reaction-tracking.json"
     }
   ],
   "A14_preparation": {
@@ -898,7 +893,7 @@
       "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
       "prior_attempt": 1,
       "request_at": "2026-10-05T20:30:02.112042+00:00",
-      "status": "confirmed_pending",
+      "status": "terminal",
       "method": "gh run rerun --failed",
       "cause": "Authenticated runner acquisition failure; no executed job steps",
       "evidence": "hosted-24b1879/37368078735/failure-evidence.json",
@@ -910,15 +905,17 @@
       "observed_status": "queued",
       "confirmation": "Terminal failure transitioned to queued after successful native re-run request. Attempt number may update after scheduling; do not repeat.",
       "latest_observed_attempt": 2,
-      "latest_observed_status": "queued",
-      "reconciled_at": "2026-10-05T20:30:24.675064+00:00"
+      "latest_observed_status": "completed",
+      "reconciled_at": "2026-10-05T21:11:03.103291+00:00",
+      "conclusion": "failure",
+      "snapshot": "round1-before-repair-publication.json"
     },
     {
       "run_id": 37368079022,
       "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
       "prior_attempt": 1,
       "request_at": "2026-10-05T20:30:25.981701+00:00",
-      "status": "confirmed_pending",
+      "status": "terminal",
       "method": "gh run rerun --failed",
       "cause": "Authenticated runner acquisition failure; no executed job steps",
       "evidence": "hosted-24b1879/37368079022/failure-evidence.json",
@@ -927,14 +924,19 @@
       "stderr": "",
       "observed_at": "2026-10-05T20:30:27.264334+00:00",
       "observed_attempt": 1,
-      "observed_status": "queued"
+      "observed_status": "queued",
+      "latest_observed_attempt": 2,
+      "latest_observed_status": "completed",
+      "conclusion": "failure",
+      "reconciled_at": "2026-10-05T21:11:03.103291+00:00",
+      "snapshot": "round1-before-repair-publication.json"
     },
     {
       "run_id": 37368079015,
       "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
       "prior_attempt": 1,
       "request_at": "2026-10-05T20:30:28.478032+00:00",
-      "status": "confirmed_pending",
+      "status": "terminal",
       "method": "gh run rerun --failed",
       "cause": "Authenticated runner acquisition failure; no executed job steps",
       "evidence": "hosted-24b1879/37368079015/failure-evidence.json",
@@ -943,14 +945,19 @@
       "stderr": "",
       "observed_at": "2026-10-05T20:30:29.699402+00:00",
       "observed_attempt": 1,
-      "observed_status": "queued"
+      "observed_status": "queued",
+      "latest_observed_attempt": 2,
+      "latest_observed_status": "completed",
+      "conclusion": "failure",
+      "reconciled_at": "2026-10-05T21:11:03.103291+00:00",
+      "snapshot": "round1-before-repair-publication.json"
     },
     {
       "run_id": 37368034970,
       "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
       "prior_attempt": 1,
       "request_at": "2026-10-05T20:30:30.836224+00:00",
-      "status": "confirmed_pending",
+      "status": "terminal",
       "method": "gh run rerun --failed",
       "cause": "Authenticated runner acquisition failure; no executed job steps",
       "evidence": "hosted-24b1879/37368034970/failure-evidence.json",
@@ -959,14 +966,19 @@
       "stderr": "",
       "observed_at": "2026-10-05T20:30:32.152369+00:00",
       "observed_attempt": 1,
-      "observed_status": "queued"
+      "observed_status": "queued",
+      "latest_observed_attempt": 2,
+      "latest_observed_status": "completed",
+      "conclusion": "success",
+      "reconciled_at": "2026-10-05T21:11:03.103291+00:00",
+      "snapshot": "round1-before-repair-publication.json"
     },
     {
       "run_id": 37368035031,
       "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
       "prior_attempt": 1,
       "request_at": "2026-10-05T20:30:33.263605+00:00",
-      "status": "confirmed_pending",
+      "status": "terminal",
       "method": "gh run rerun --failed",
       "cause": "Authenticated runner acquisition failure; no executed job steps",
       "evidence": "hosted-24b1879/37368035031/failure-evidence.json",
@@ -975,7 +987,12 @@
       "stderr": "",
       "observed_at": "2026-10-05T20:30:34.928414+00:00",
       "observed_attempt": 1,
-      "observed_status": "queued"
+      "observed_status": "queued",
+      "latest_observed_attempt": 2,
+      "latest_observed_status": "completed",
+      "conclusion": "failure",
+      "reconciled_at": "2026-10-05T21:11:03.103291+00:00",
+      "snapshot": "round1-before-repair-publication.json"
     }
   ],
   "hosted_terminal_observations": {
@@ -997,6 +1014,504 @@
       37368034970,
       37368035031
     ],
-    "notes": "Root read terminal summaries/log evidence and exact failed-job annotations. All failed job steps absent, no runner assigned. Missing log collector error retained; per-attempt collector now preserves attempt identity and missing logs without fabricating success."
+    "notes": "Root read terminal summaries/log evidence and exact failed-job annotations. All failed job steps absent, no runner assigned. Missing log collector error retained; per-attempt collector now preserves attempt identity and missing logs without fabricating success.",
+    "pr_setup": {
+      "run": 37368078894,
+      "attempt": 1,
+      "passed_hooks": 11,
+      "skipped_hooks": 0,
+      "log_sha256": "0f6975798a98d9c9f49c27b598e827d3794d50c21dd7c8a6a99c457022217eca",
+      "final_guard": "success"
+    },
+    "push_build_terminal": {
+      "run": 37368034961,
+      "attempt": 1,
+      "conclusion": "failure",
+      "evidence": "hosted-24b1879/37368034961/attempt-1/annotations.json",
+      "cause": "Linux generator and verifier jobs were not acquired by hosted runners; existing Windows passes retained",
+      "retry": "Not requested: source repairs now selected; preserve original result and require new-input CI after publication."
+    }
+  },
+  "hosted_service_incident": {
+    "source": "https://www.githubstatus.com/api/v2/summary.json",
+    "incident": "https://www.githubstatus.com/incidents/3q1yb5m7ltvb",
+    "id": "3q1yb5m7ltvb",
+    "status": "investigating",
+    "component": "Actions",
+    "component_status": "degraded_performance",
+    "started_at": "2026-10-05T19:11:58.373Z",
+    "latest_source_update": "2026-10-05T19:50:50.720Z",
+    "observed_at": "2026-10-05T20:35:38.758485+00:00",
+    "finding": "GitHub reports delayed assignment of hosted runners across multiple configurations. Consistent with native no-runner/no-step acquisition failures; do not infer product failure or clean CI."
+  },
+  "round1_repair": {
+    "source_head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+    "published_tree": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+    "staged_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+    "paths": [
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-StyleGuideGenerator.ps1",
+      ".github/workflows/Validate-WorkflowPolicy.mjs",
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      ".github/workflows/build.yml"
+    ],
+    "writer_evidence_sha256": "d2020a25dd6b6a0cc0fed25995b4e4ef89be6e331433852d78a9d1424b050575",
+    "writer_report_sha256": "077dcc209a51f36aedbea3d674a252d6c9ec6f06e2c6910d889777c15b548533",
+    "canonical_records": {
+      "R2-channel-diagnostic.md": {
+        "writer_sha256": "4b5d953c78f91fbcc133d970320ad4f2ebb9a310f069b37400ce50c40065f40f",
+        "planning_sha256": "6781637dc81321ddd915c87f3db79174a44e8bc985e3436bcd38718b8dd47865"
+      },
+      "R3-platform-policy.md": {
+        "writer_sha256": "3c83bf69c863e1c32ad56709d122a5c2c021f0e82f88d54e74816a0f2ac57d08",
+        "planning_sha256": "43eddd97066c1759fa681f57b68d616e6fdf31bf296b4fe4eb4ab9bcdc91a7bd"
+      },
+      "R4-linux-acquisition.md": {
+        "writer_sha256": "06ece2498299cca7e3a783658bfd4d3cee45adb71c7cad39f06e5cd44549c417",
+        "planning_sha256": "08b22f803b8f5557f814c315eb553b2d47a5f90469a387048be931bc58111a22"
+      },
+      "R5-summary-scans.md": {
+        "writer_sha256": "172edc101fb1d8d518ee3148a48b5e3100d6edaeb4571edfbeb4e2f06fc6ad65",
+        "planning_sha256": "f81786c9c68f4a2a83c811bb41c46a1adced6b9b0f7ed77da68adbb2aaccb13d"
+      },
+      "REPORT.md": {
+        "writer_sha256": "077dcc209a51f36aedbea3d674a252d6c9ec6f06e2c6910d889777c15b548533",
+        "planning_sha256": "85efb366521834bfe15ec3dfe118b6fe4d0ea6ca0794acd868db8036e3a12f38"
+      }
+    },
+    "files": [
+      {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "changed_in_round1": false,
+        "mode": "100644",
+        "bytes": 6095,
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        "raw_git_blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "preimage_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+        "preimage_blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343"
+      },
+      {
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "changed_in_round1": false,
+        "mode": "100644",
+        "bytes": 26191,
+        "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+        "raw_git_blob": "166d137206aff8f503911be9a569efbd204e023b",
+        "preimage_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+        "preimage_blob": "166d137206aff8f503911be9a569efbd204e023b"
+      },
+      {
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "changed_in_round1": true,
+        "mode": "100644",
+        "bytes": 90995,
+        "sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+        "raw_git_blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+        "preimage_sha256": "c14cfc105ae19352afd0aa7c779adcbf9e2fe5d7b8eba885267d181745593a61",
+        "preimage_blob": "ed78c197274393a1a16274221ec27c697166ca45"
+      },
+      {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "changed_in_round1": true,
+        "mode": "100644",
+        "bytes": 123582,
+        "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+        "raw_git_blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+        "preimage_sha256": "202c109d1253db4c3f59116c507f0ee9ce1241fdb7aaff0994bf067cc1dfe1f2",
+        "preimage_blob": "8e815f76c59aba31cd2d37f8979ed24a7ede44a5"
+      },
+      {
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "changed_in_round1": false,
+        "mode": "100644",
+        "bytes": 253908,
+        "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+        "raw_git_blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+        "preimage_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+        "preimage_blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7"
+      },
+      {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "changed_in_round1": false,
+        "mode": "100644",
+        "bytes": 36090,
+        "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+        "raw_git_blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+        "preimage_sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+        "preimage_blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f"
+      },
+      {
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "changed_in_round1": true,
+        "mode": "100644",
+        "bytes": 23465,
+        "sha256": "4fedd3ae9aba44dc4bfef263b3a614e486c4314d0fd1c3af12cd1dd9733f539f",
+        "raw_git_blob": "47ba3e3e4ce1dbc3066471b09e4ee8d49dd5b33f",
+        "preimage_sha256": "acdf9ccbee458f05469fdba7b403a9b97a70f9597e965934156b1ec7e10d7b60",
+        "preimage_blob": "837ddc35f2141c134bc219e5ad07d106cce3f72e"
+      },
+      {
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "changed_in_round1": true,
+        "mode": "100644",
+        "bytes": 31176,
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+        "raw_git_blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "preimage_sha256": "bc15c0ba96e7508960ae3cbd4008937c004f5396d4c7345def1f8f29ed203ee8",
+        "preimage_blob": "c351cc864b741037b5a604b94f167257c58e3347"
+      },
+      {
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "changed_in_round1": true,
+        "mode": "100644",
+        "bytes": 17625,
+        "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+        "raw_git_blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+        "preimage_sha256": "1f47f8d82dfdf1eb8659796baabb20802a34ab6146b1f9e6864e5956ae73be09",
+        "preimage_blob": "a76dd4ca720d17ee5abba8a79885dd706befdefa"
+      },
+      {
+        "path": ".github/workflows/build.yml",
+        "changed_in_round1": true,
+        "mode": "100644",
+        "bytes": 25715,
+        "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+        "raw_git_blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+        "preimage_sha256": "1807813adad6d093fdf97ce4d434c3467edc0c0bd0788e71cd3b27836a7fac60",
+        "preimage_blob": "6609830b2fb8032b29339f28702f085c98288295"
+      },
+      {
+        "path": ".github/workflows/scripts-README.md",
+        "changed_in_round1": false,
+        "mode": "100644",
+        "bytes": 13541,
+        "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+        "raw_git_blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+        "preimage_sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+        "preimage_blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f"
+      },
+      {
+        "path": ".github/workflows/workflow-policy-cases.json",
+        "changed_in_round1": false,
+        "mode": "100644",
+        "bytes": 26216,
+        "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+        "raw_git_blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+        "preimage_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+        "preimage_blob": "731c3bde3ba87efa684eef380e0d99b9297d091c"
+      },
+      {
+        "path": "powershell.instructions.md",
+        "changed_in_round1": false,
+        "mode": "100644",
+        "bytes": 148831,
+        "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+        "raw_git_blob": "b711cec80333e409cb4e644eb94530653ca39109",
+        "preimage_sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+        "preimage_blob": "b711cec80333e409cb4e644eb94530653ca39109"
+      }
+    ],
+    "decisions": {
+      "R2": {
+        "comments": [
+          4188451021
+        ],
+        "selection": "step2 limited refutation; gate unchanged"
+      },
+      "R3": {
+        "comments": [
+          4188451094
+        ],
+        "selection": "B99"
+      },
+      "R4": {
+        "comments": [
+          4188451151,
+          4188451200
+        ],
+        "selection": "B99; duplicate linked"
+      },
+      "R5": {
+        "comments": [
+          4188451256
+        ],
+        "selection": "C96"
+      }
+    },
+    "validation": {
+      "policy_tests": 179,
+      "acquisition_cases": 18,
+      "acquisition_mutants_killed": 4,
+      "Windows7_harness_assertions": 117,
+      "TF_golden_passes": 2,
+      "composition_differential_cases": 14,
+      "summary_mutant_killed": true,
+      "R2_Windows_cases": 8,
+      "R2_Linux_cases": 8,
+      "limitations": [
+        "No full aggregate, staged endpoint validation, publication, review requests, settings/ref/planning writes or TF delivery. Root owns remaining lifecycle.",
+        "Focused generator and analyzer behavior logs precede only restoration of already-correct WIP .0 metadata; final-source parser/version checks passed. Root will run final-byte aggregate.",
+        "R2 uses real Win7/Linux7 extracted checkpoint bodies with stubbed Git/worktree producers, not full-wrapper or ACL/unreadable-metadata proof.",
+        "Acquisition mutation/control tests replace fixed Git with a recording fixture; no claim of actual hosted/network acquisition.",
+        "No competing-writer race closure; issue155 remains open."
+      ]
+    },
+    "aggregate": {
+      "status": "passed",
+      "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\aggregate-manifest-v4.json",
+      "manifest_sha256": "0e5232a6c4196738a6bb40ceaa04cf186da697b6816b0bf073e6735345377af2",
+      "expected_node_tests": 567,
+      "requested_at": "2026-10-05T20:53:33.643523+00:00",
+      "node_counts": {
+        "tests": 567,
+        "pass": 567,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0
+      },
+      "node_log_sha256": "489f0a481676518019010de158496b73136c64d98aa312faa7e644e31b1a04eb",
+      "node_finished_at": "2026-10-05T20:57:15.513808+00:00",
+      "result_sha256": "0ec706cf01865c79adf86e3480568ee910f26a567680c5dff9cc7ebd16153923",
+      "status_sha256": "a743f8935f048a4bb606d50761800e78c8164ff6c858bb46118ce2053f596f87",
+      "passed_hooks": 11,
+      "skipped_hooks": 0,
+      "source_after_equal": true,
+      "commands": [
+        {
+          "name": "staged-preflight",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-RequireStagedInputMatch"
+          ],
+          "started_at": "2026-10-05T20:53:50.102855+00:00",
+          "timeout_seconds": 600,
+          "state": "passed",
+          "pid": 79,
+          "exit": 0,
+          "finished_at": "2026-10-05T20:53:58.853283+00:00",
+          "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+        },
+        {
+          "name": "full-node",
+          "command": [
+            "node",
+            "--test",
+            ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+            ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+            ".github/workflows/Test-CiHelpers.test.mjs",
+            ".github/workflows/NpmTools.test.mjs",
+            ".github/workflows/Check-NpmAudit.test.mjs",
+            ".github/workflows/Test-LocalValidation.test.mjs",
+            ".github/workflows/lint-markdown.test.mjs"
+          ],
+          "started_at": "2026-10-05T20:53:59.036553+00:00",
+          "timeout_seconds": 3600,
+          "state": "passed",
+          "pid": 616,
+          "exit": 0,
+          "finished_at": "2026-10-05T20:57:15.513808+00:00",
+          "log_sha256": "489f0a481676518019010de158496b73136c64d98aa312faa7e644e31b1a04eb"
+        },
+        {
+          "name": "aggregate",
+          "command": [
+            "/opt/psstyleguide-runtime/venv/bin/python",
+            "-m",
+            "pre_commit",
+            "run",
+            "--all-files"
+          ],
+          "started_at": "2026-10-05T20:57:15.724940+00:00",
+          "timeout_seconds": 14400,
+          "state": "passed",
+          "pid": 21649,
+          "exit": 0,
+          "finished_at": "2026-10-05T21:07:54.491911+00:00",
+          "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+          "passed_hooks": 11,
+          "skipped_hooks": 0
+        }
+      ],
+      "finished_at": "2026-10-05T21:07:54.741759+00:00"
+    },
+    "root_review": "Read all four complete decisions, all six final diffs, actual focused test and mutation evidence. Checked rubric totals, source preimages/postimages, all writer artifact hashes and full source/dependency catalog. R2 limited refutation includes actual Linux checkpoint evidence; B99/B99/C96 fixes preserve finite role and source scope. Final metadata restoration is explicitly separated from focused behavior logs.",
+    "status": "committed_locally_validated_pending_publication",
+    "committed_head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e"
+  },
+  "published_input_history": [
+    {
+      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "candidate_tree": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "aggregate": {
+        "status": "passed",
+        "run_id": "a06-source-20261005-v3",
+        "manifest_sha256": "a91af4c9b8e92b2bd9a7784655a0fb14ee96b89df3720dc1c883a3de7ac515d8",
+        "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+        "expected_hooks": 11,
+        "node_suites": 7,
+        "requested_at": "2026-10-05T19:52:37.743592+00:00",
+        "node": {
+          "name": "full-node",
+          "command": [
+            "node",
+            "--test",
+            ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+            ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+            ".github/workflows/Test-CiHelpers.test.mjs",
+            ".github/workflows/NpmTools.test.mjs",
+            ".github/workflows/Check-NpmAudit.test.mjs",
+            ".github/workflows/Test-LocalValidation.test.mjs",
+            ".github/workflows/lint-markdown.test.mjs"
+          ],
+          "started_at": "2026-10-05T19:53:00.780525+00:00",
+          "timeout_seconds": 3600,
+          "state": "passed",
+          "pid": 617,
+          "exit": 0,
+          "finished_at": "2026-10-05T19:55:57.381821+00:00",
+          "log_sha256": "a82801118ab32ec7bab7a1e1165e9ce9b89523f49f13fe2800b0ca821014b9e1"
+        },
+        "node_counts": {
+          "tests": 565,
+          "pass": 565,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "staged_preflight": {
+          "name": "staged-preflight",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-RequireStagedInputMatch"
+          ],
+          "started_at": "2026-10-05T19:52:52.544292+00:00",
+          "timeout_seconds": 600,
+          "state": "passed",
+          "pid": 79,
+          "exit": 0,
+          "finished_at": "2026-10-05T19:53:00.586659+00:00",
+          "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+        },
+        "result_sha256": "ebc33280daee2f4e4fe81e502c3e0b878e3a84e023a452cbf04b9811fb755d45",
+        "status_sha256": "c21ccdfb8f7c817e713d1eb9bc9e2b904251bcb856d152677c34937f54dc8105",
+        "source_after_equal": true,
+        "aggregate": {
+          "name": "aggregate",
+          "command": [
+            "/opt/psstyleguide-runtime/venv/bin/python",
+            "-m",
+            "pre_commit",
+            "run",
+            "--all-files"
+          ],
+          "started_at": "2026-10-05T19:55:57.574831+00:00",
+          "timeout_seconds": 14400,
+          "state": "passed",
+          "pid": 20687,
+          "exit": 0,
+          "finished_at": "2026-10-05T20:06:42.548568+00:00",
+          "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+          "passed_hooks": 11,
+          "skipped_hooks": 0
+        },
+        "finished_at": "2026-10-05T20:06:42.751331+00:00"
+      },
+      "commit": {
+        "status": "committed",
+        "expected_parent": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "expected_tree": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+        "requested_at": "2026-10-05T20:07:08.257138+00:00",
+        "exit": 0,
+        "log_sha256": "7c2b57e813b4a078bc772b41a4032a112650625994a4c677066cd98857c882d7",
+        "observed_head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "parent": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "tree": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+        "completed_at": "2026-10-05T20:07:16.817392+00:00"
+      },
+      "actual_endpoints": {
+        "status": "passed",
+        "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "classification": {
+          "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+          "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+          "policy": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+          "classification": "maintenance_required",
+          "maintenancePaths": [
+            ".github/workflows/Classify-InstructionMaintenance.mjs",
+            ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+            ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+            ".github/workflows/Test-CiHelpers.test.mjs",
+            ".github/workflows/Test-ExactGitPathSet.ps1",
+            ".github/workflows/Test-StyleGuideArtifacts.ps1",
+            ".github/workflows/Validate-WorkflowPolicy.mjs",
+            ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+            ".github/workflows/build.yml",
+            ".github/workflows/workflow-policy-cases.json"
+          ]
+        },
+        "results": [
+          {
+            "mode": "AcceptedMaintenance",
+            "exit": 0,
+            "started_at": "2026-10-05T20:07:55.745149+00:00",
+            "finished_at": "2026-10-05T20:07:56.104546+00:00",
+            "log_sha256": "ba9a759dd438e43f6c7b1decaaa6b5be5a379d241dc6c32152d9a8b7abcec592"
+          },
+          {
+            "mode": "FinalizeMetadataNow",
+            "exit": 0,
+            "started_at": "2026-10-05T20:07:59.207447+00:00",
+            "finished_at": "2026-10-05T20:08:22.733768+00:00",
+            "log_sha256": "a8482680e4924b8a088bf87d1ce0b7bf8cc7bf9ebfb7751df138ba02af1d5657"
+          },
+          {
+            "mode": "MetadataClassificationOnly",
+            "exit": 0,
+            "started_at": "2026-10-05T20:08:26.357231+00:00",
+            "finished_at": "2026-10-05T20:08:28.281247+00:00",
+            "log_sha256": "a01af47923bc088ff0e1e0f48f0edeedffe26a96480b476e6d66668f32bdc2ab"
+          },
+          {
+            "mode": "ProposedPolicy",
+            "exit": 0,
+            "started_at": "2026-10-05T20:08:31.737018+00:00",
+            "finished_at": "2026-10-05T20:08:55.710244+00:00",
+            "log_sha256": "ba9e8e27063a270e7fda05d40d043313710f2f95e83e53bcd90a2e8b74c21cd2"
+          }
+        ]
+      },
+      "current_audit": {
+        "exit": 0,
+        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "authority": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "mode": "ordinary local no-argument two-root audit",
+        "started_at": "2026-10-05T20:08:59.585800+00:00",
+        "finished_at": "2026-10-05T20:09:15.369910+00:00",
+        "sha256": "1571e207cd44536f75f9b823641506fd84e72ffe4ad90cdaff017ffca9d6cc6f"
+      },
+      "body_sha256": "f634dd77774501cec26ce80e977448adc1ffb33bcfad4b7ae0c09027ab9a42eb"
+    }
+  ],
+  "native_published_head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+  "peer_port_preparation": {
+    "report": "writer/peer-port-map-round1.md",
+    "report_sha256": "1f3e3721b4133cb5a088c09979750eeee486a0115f70ac03260cb1724e6adf14",
+    "json_sha256": "6d017e9a15e089e78292ce5e3a2a7503c7f993d5cac18dff39e337efe909e089",
+    "tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+    "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "root_review": "Read complete map and checked all13 source raw blobs/modes/lengths against committed tree. Exact finite substitutions and target-contract-derived R4 callers retain18 controls. No test, transfer or acceptance; refresh actual peer before any port."
   }
 }
