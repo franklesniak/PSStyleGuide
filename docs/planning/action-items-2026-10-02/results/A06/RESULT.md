@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A06 current result
 
+**Prerequisite clarification, 2026-10-05:** [C98](../A03/foundation-dependency-decision.md) makes the existing A15 sequence explicit. The A03 prerequisite is the accepted paired coherent workflow foundation. The selected generator/verifier, current TF T2, platform and paired acceptance work remains pending. Actual new-harness integration follows its implementation; it remains A06 work. No prerequisite is accepted by this planning correction.
+
 **Research-source mapping complete:** The [six-family parser mapping](../A18/research-readiness/parser-oracle-mapping.md) maps useful historical guarantees to actual A03/A07/A21 consumers and records the limits of reused tests. No new product defect was demonstrated. A06 keeps its real-generator/publication and C98 work; current TF delivery and final accepted-pair audit remain pending.
 
 **Current handoff verified, 2026-10-04:** The [post231 readiness report](post231-readiness/REPORT.md) rechecks58 exact path observations. Four original PS inputs changed since425795b; eleven PS and all15 TF original entries remain unchanged. Existing D1/D2/D3/C98 remain applicable, with no new material finding. Root read the complete report and independently sampled four source entries. The handoff specifies actual finite workflow graph changes, the new generator-harness classifier selector, preserved PS/TF semantic oracles and runtime/recovery sequencing. No product tests ran. Coherent TF foundations are now being implemented; accept them and refresh native inputs before releasing the PS A06 writer.

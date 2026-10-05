@@ -1,6 +1,6 @@
 {
-  "status": "round2_local_pass_pending_publication",
-  "captured_at": "2026-10-05T07:25:23.031807+00:00",
+  "status": "round2_reviews_and_hosted_checks_pending",
+  "captured_at": "2026-10-05T07:48:00.993951+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -552,11 +552,11 @@
     }
   },
   "reverse_PR": "https://github.com/franklesniak/PSStyleGuide/pull/232",
-  "rounds_used": 1,
+  "rounds_used": 2,
   "first_request_at": "2026-10-05T06:26:07Z",
   "deadline": "2026-10-13T06:26:07+00:00",
   "metadata_carry_back": "A21 six shared notes plus classifier deletion; A07 shared fixture prefix. Transfer3 not released; refresh accepted peers before the next directional batch.",
-  "remaining": "Publish repaired head/body, resolve R1/R2, request round2, then current-input reviews/hosted checks/final quality/normal merge/landed acceptance and compare-back. All22 outcomes and402 contracts remain in scope.",
+  "remaining": "Copilot result, remaining hosted instruction run, independent final quality, normal merge/landed acceptance, then exact paired comparison and needed carry-back.",
   "implementation_evidence_sha256": "a974f641c004e31a3b2d47c953e9763338ec5314b7c8fb14afa492a27213e95e",
   "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8",
   "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
@@ -1256,6 +1256,59 @@
       "finished_at": "2026-10-05T07:24:29.030079+00:00",
       "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-current-audit-aafa9a4.log",
       "sha256": "8c1159f87e22e0169762e31649051bdb7d711e3113aed34ae09e3574004ae950"
+    },
+    "publication": {
+      "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+      "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+      "prior_body_sha256": "002158c189fa8da426cb2996f8b794b6defbb175719443c0ce6eac2dbd33841a",
+      "body_sha256": "7108a820b61309cf310f1c8b03ad7234c9536cc5b6a10593b749ca268abc74c7",
+      "status": "published",
+      "push_exit": 0,
+      "body_update_exit": 0,
+      "confirmed_at": "2026-10-05T07:28:16.094836+00:00",
+      "reconciliation": "Push succeeded once. Immediate PR readback failed its identity precondition before any body write. Fresh readback matched expected new head/base/old body; performed the single body update only. No second push."
+    }
+  },
+  "round2": {
+    "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+    "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "body_sha256": "7108a820b61309cf310f1c8b03ad7234c9536cc5b6a10593b749ca268abc74c7",
+    "baseline": "round2-pre-request-current.json",
+    "started_at": "2026-10-05T07:38:00Z",
+    "copilot": {
+      "request_event_id": 32486559870,
+      "request_at": "2026-10-05T07:38:00Z",
+      "actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "workflow_run_id": 37278842804,
+      "transport": "GitHub UI",
+      "selected_effort": "Balanced",
+      "observed_effort": null,
+      "status": "pending"
+    },
+    "codex": {
+      "status": "clean",
+      "trigger_comment_id": 5990196197,
+      "request_at": "2026-10-05T07:39:55Z",
+      "actor_id": 11204406,
+      "baseline": "round2-pre-request-current.json",
+      "result_comment_id": 5990287207,
+      "completed_at": "2026-10-05T07:46:57Z",
+      "summary_comment_id": 5989249158,
+      "snapshot": "round2-after-dependency-selection.json"
+    },
+    "request_set_terminal": false,
+    "clean": false,
+    "recording_note": "Initial local attribution assertion expected request-transport login; native event uses Copilot display login. Reconciled stable bot ID175728472 and exact-head run. No duplicate request.",
+    "hosted_validation": {
+      "snapshot": "round2-after-dependency-selection.json",
+      "ordinary_runs": 12,
+      "successful_runs": 11,
+      "pending_run_ids": [
+        37277829954
+      ],
+      "collection": "round2-hosted-aafa9a4/round2-after-dependency-selection-collection.json"
     }
   }
 }

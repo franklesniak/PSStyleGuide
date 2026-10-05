@@ -57,6 +57,17 @@ This folder and the new orchestration prompt supersede the October monolith's ex
 
 Read-only discovery for independent future tasks may run ahead. An implementation dependency is a real acceptance boundary; starting research does not satisfy it. Honor file ownership even when the DAG permits parallel work.
 
+The [foundation dependency decision C98](results/A03/foundation-dependency-decision.md) binds these implementation edges to finite accepted results. It does not mark their broad outcomes complete. All other dependencies and the final A18 prerequisites retain their full scope.
+
+| Implementation edge | Accepted prerequisite required before implementation |
+| --- | --- |
+| A03 → A06 | Paired coherent workflow foundation, current coupled tests and normal lifecycle, including PR232 and applicable compare-back. Later R5/B1 and D2 integration remains A03 work. |
+| A06 → A16 | Shared generator/verifier foundation, current TF T2 admission, required generator platform proof and paired acceptance. New-harness integration remains A06 work. |
+| A07 → A16 | Current dependency/lint/hooks foundation, B99, and independently usable R5/B1 acquisition with accepted coordinated consumers. Actual recovery cells follow the real A16 harness. |
+| A16 → A17 | Full Gate A acceptance, including actual same-revision platform results and real operator plus independent-peer approvals. This edge is not reduced to a foundation stage. |
+
+Record accepted source identities, scope, evidence and remaining work in each existing owner result. A selected design, passing local test or stage name alone does not accept a prerequisite. Known missing work keeps its broad outcome open. Stages reset no counters and add no outcome or approval ledger.
+
 ## Evidence and review
 
 - [ISSUE-COVERAGE.md](ISSUE-COVERAGE.md): all five current open issues, their acceptance owners and improvements.
