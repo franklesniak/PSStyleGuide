@@ -1,7 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # A14 current filesystem residual assessment
 
-## Current reassessment after accepted TF66: 2026-10-05
+## Current reassessment after accepted PS232: 2026-10-05
+
+The selected R2 child and R21 manifest checks are now delivered at accepted PSf0684ac and TF56cb041. The [fresh assessment](postPS232/REPORT.md) and [exact source/native evidence](postPS232/evidence.json) replace the prior pending-PS-delivery condition. Root verified67 present raw identities,2 absent identities,8 retired-path absences,36 supporting hashes and all9child/11manifest success cases in each existing landed log. [Root verification](postPS232/root-verification.json) records the exact scope. The six generator/verifier engine blobs remain unchanged. PS155 is open; PS156 remains closed not_planned; the canonical D92/D93 decision body is unchanged.
+
+No new material supported defect or changed trust assumption was established. Preserve D92/D93 and all named check/read/spawn, pathname cleanup/publication, hardlink, Windows alias and same-user limits. Keep A14 active for relevant actually accepted carryback, A06, qualified R5/runtime and recovery changes, then the final A18/A19 pair. No tests, probes, permissions changes, issue mutation, transfer or review clock was added.
+
+## Historical reassessment after accepted TF66: 2026-10-05
 
 TF main56cb041 delivers the selected R2 child and R21 manifest guards; its five landed workflows passed. Accepted PSf168 still has the reproduced original static child gap, so its counterpart remains pending until the current reverse lifecycle lands. The [fresh assessment](postTF66/REPORT.md) retains exact source/test/caller evidence, unchanged D92/D93 choices and explicit reopening triggers. Root read the full report and independently checked all39 present immutable blobs and the one absent historical path; [verification](postTF66/parent-verification.json) records the limits.
 

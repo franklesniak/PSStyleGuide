@@ -1,0 +1,1718 @@
+{
+  "kind": "A14 bounded post-PS232 accepted-input reassessment",
+  "captured_utc": "2026-10-05T13:57:57.980168+00:00",
+  "accepted_pair": {
+    "PS": {
+      "commit": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+      "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+      "objectstore": "C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide"
+    },
+    "TF": {
+      "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "objectstore": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003"
+    }
+  },
+  "sources": [
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a23d38c42770d7463920704e108ccd63240dc90b",
+        "size": 86655,
+        "raw_sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a23d38c42770d7463920704e108ccd63240dc90b",
+        "size": 86655,
+        "raw_sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+        "size": 95329,
+        "raw_sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+      },
+      "PS_changed": false,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "size": 1510,
+        "raw_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "size": 1510,
+        "raw_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+        "size": 1510,
+        "raw_sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+      },
+      "PS_changed": false,
+      "pair_equal": true,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+        "size": 7375,
+        "raw_sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "size": 7656,
+        "raw_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "size": 7656,
+        "raw_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+      },
+      "PS_changed": true,
+      "pair_equal": true,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8249cd855785e2847df7ab6fad60caf219da59bc",
+        "size": 11392,
+        "raw_sha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+        "size": 13810,
+        "raw_sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+        "size": 13810,
+        "raw_sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1"
+      },
+      "PS_changed": true,
+      "pair_equal": true,
+      "prior_guards_match": {
+        "PS": null,
+        "TF": null
+      }
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+        "size": 98497,
+        "raw_sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "4098cd1c6d8dadd114fbd1c7a7da5b1918d9eacb",
+        "size": 98544,
+        "raw_sha256": "5a14647cf03e46f0c776813ef637b6872097a43210efdedee7a095c523e88002"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+        "size": 100007,
+        "raw_sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea"
+      },
+      "PS_changed": true,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+        "size": 253910,
+        "raw_sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+        "size": 253910,
+        "raw_sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+        "size": 253918,
+        "raw_sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+      },
+      "PS_changed": false,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "PS_before": null,
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7965b2476cf022e6efea355d438162937bef04b3",
+        "size": 4039,
+        "raw_sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "86e7b19fa5453efbe5373a1a1dd052b4b2dc7b82",
+        "size": 4038,
+        "raw_sha256": "decdffd21c04e3f5bca5364842a734543c2681a60ea6d2792c7acc65e1ae13cb"
+      },
+      "PS_changed": true,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": null,
+        "TF": null
+      }
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "size": 32648,
+        "raw_sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "size": 32648,
+        "raw_sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+        "size": 31949,
+        "raw_sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+      },
+      "PS_changed": false,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+        "size": 12748,
+        "raw_sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+        "size": 12837,
+        "raw_sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+        "size": 12865,
+        "raw_sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc"
+      },
+      "PS_changed": true,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+        "size": 4375,
+        "raw_sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+        "size": 4375,
+        "raw_sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1",
+        "size": 4348,
+        "raw_sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b"
+      },
+      "PS_changed": false,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b0f7fb0b657232fa0e857e946d725fdd6876c028",
+        "size": 52385,
+        "raw_sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+        "size": 51809,
+        "raw_sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "size": 51830,
+        "raw_sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+      },
+      "PS_changed": true,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "size": 8391,
+        "raw_sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "size": 8391,
+        "raw_sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "size": 8391,
+        "raw_sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "PS_changed": false,
+      "pair_equal": true,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "9b0abb08d1a17ed4306ef771822d980aabff86b5",
+        "size": 1691,
+        "raw_sha256": "3410d109d4c842a83bf41dc5674874db8d046929742a7fadba0e60026203c126"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "111664ff4fdc416d4599d80f3657d29c9e7dba15",
+        "size": 3231,
+        "raw_sha256": "2936daa02f279b8701c9671e3ec610729e3fd09feb9235c26f763e0df65139bf"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "8efcf8686a55835ba87af43dbe357011b856c1dd",
+        "size": 3063,
+        "raw_sha256": "766d357075fe18d9c8239c31e09065c25bd302777e619adea4787498cf146056"
+      },
+      "PS_changed": true,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "2d79be38b1caeeb871de4ed2c8222b950c4a6ae7",
+        "size": 12676,
+        "raw_sha256": "e93be06d32fff7ef9b02a33668918213f068c460f477ecd62e668f43c7004c76"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e3d5bb84e389d1b6ffe0033aafb1b821eb792a58",
+        "size": 26625,
+        "raw_sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "e3d5bb84e389d1b6ffe0033aafb1b821eb792a58",
+        "size": 26625,
+        "raw_sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235"
+      },
+      "PS_changed": true,
+      "pair_equal": true,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0c7633c0793be84ce6768698387052807a149329",
+        "size": 18348,
+        "raw_sha256": "6f90d52361c564772094ee0a2410f9cc407803f4784aafda3c5e8096c2281327"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3284f63d128288ce511391b693b1ba350b918f2c",
+        "size": 19388,
+        "raw_sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "3284f63d128288ce511391b693b1ba350b918f2c",
+        "size": 19388,
+        "raw_sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83"
+      },
+      "PS_changed": true,
+      "pair_equal": true,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "21063b3c86ffcee7c928b149d390065b8bcc1840",
+        "size": 5611,
+        "raw_sha256": "c473b3df463d99d88de07ef883214f0a8aaedce111579d676bf39324902d14d3"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+        "size": 5745,
+        "raw_sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+        "size": 5745,
+        "raw_sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0"
+      },
+      "PS_changed": true,
+      "pair_equal": true,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "59054973e607c793e821f0ba21fc32143a716b43",
+        "size": 6686,
+        "raw_sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "59054973e607c793e821f0ba21fc32143a716b43",
+        "size": 6686,
+        "raw_sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+        "size": 6714,
+        "raw_sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+      },
+      "PS_changed": false,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": null,
+        "TF": null
+      }
+    },
+    {
+      "path": ".github/workflows/package.json",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b09ca859508430050dc0b023b3dba62e50748680",
+        "size": 844,
+        "raw_sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b09ca859508430050dc0b023b3dba62e50748680",
+        "size": 844,
+        "raw_sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+        "size": 902,
+        "raw_sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c"
+      },
+      "PS_changed": false,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".husky/pre-commit",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "size": 3249,
+        "raw_sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "size": 3249,
+        "raw_sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "4cbc97e2ce8822821ef3c14687f8d69787b939e7",
+        "size": 3249,
+        "raw_sha256": "a630448548da8eb9374358b768d2fc2c8f2366c7fbc657706f6103e82e51606d"
+      },
+      "PS_changed": false,
+      "pair_equal": true,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "size": 5398,
+        "raw_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "f0fcbb13bfdb25d7549cae7aea216ae9b81ee564",
+        "size": 5398,
+        "raw_sha256": "05a6616918d519d654041f6683e380b9fbf0c308bd58fd88118615e53607a738"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+        "size": 5405,
+        "raw_sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+      },
+      "PS_changed": false,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+        "size": 9114,
+        "raw_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+        "size": 9114,
+        "raw_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "b4a9929050ba641c6f16276e5afa57f3d896d7da",
+        "size": 9117,
+        "raw_sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d"
+      },
+      "PS_changed": false,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": "docs/decisions/0001-accept-in-repository-trust-root.md",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+        "size": 12177,
+        "raw_sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0386f596033b6871f01bb4c7c8f471b1087476bd",
+        "size": 12177,
+        "raw_sha256": "111f16d06470b82f46c717ad4fd51117e7efedad9b4b9e6bb64512360a8634f1"
+      },
+      "TF": null,
+      "PS_changed": false,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    },
+    {
+      "path": "package.json",
+      "PS_before": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+        "size": 816,
+        "raw_sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+      },
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+        "size": 816,
+        "raw_sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "oid": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "size": 837,
+        "raw_sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      },
+      "PS_changed": false,
+      "pair_equal": false,
+      "prior_guards_match": {
+        "PS": true,
+        "TF": true
+      }
+    }
+  ],
+  "PS_full_diff_name_status": [
+    "M\t.github/workflows/Check-NpmAudit.mjs",
+    "M\t.github/workflows/Check-NpmAudit.test.mjs",
+    "M\t.github/workflows/Classify-InstructionMaintenance.mjs",
+    "M\t.github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+    "M\t.github/workflows/NpmTools.mjs",
+    "M\t.github/workflows/NpmTools.test.mjs",
+    "M\t.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    "M\t.github/workflows/Test-AgentInstructions.ps1",
+    "M\t.github/workflows/Test-CiHelpers.test.mjs",
+    "A\t.github/workflows/Test-LocalValidation.test.mjs",
+    "M\t.github/workflows/Validate-WorkflowPolicy.mjs",
+    "M\t.github/workflows/agent-instructions.yml",
+    "M\t.github/workflows/copilot-setup-steps.yml",
+    "M\t.github/workflows/lint-markdown.mjs",
+    "M\t.github/workflows/lint-markdown.test.mjs",
+    "M\t.github/workflows/lint-nested-markdown.js",
+    "M\t.github/workflows/lint-staged-markdown.mjs",
+    "M\t.github/workflows/scripts-README.md",
+    "M\tAGENTS.md",
+    "M\tCLAUDE.md",
+    "M\tdocs/ISSUE_EVALUATION_PROMPT.md",
+    "M\tdocs/dependency-maintenance.md"
+  ],
+  "retired_paths": [
+    {
+      "path": ".github/workflows/Expand-StyleGuideCandidateArtifact.ps1",
+      "identities": {
+        "PS": null,
+        "TF": null
+      }
+    },
+    {
+      "path": ".github/workflows/Manage-StyleGuideCandidateInvocationContext.ps1",
+      "identities": {
+        "PS": null,
+        "TF": null
+      }
+    },
+    {
+      "path": ".github/workflows/Test-Expand-StyleGuideCandidateArtifact.ps1",
+      "identities": {
+        "PS": null,
+        "TF": null
+      }
+    },
+    {
+      "path": ".github/workflows/style-guide-candidate-cases.json",
+      "identities": {
+        "PS": null,
+        "TF": null
+      }
+    }
+  ],
+  "provenance": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "sha256": "e3bdf5832e955194c9080df41f168b9ecb6aca7c8d7dfe924b81b85a84aa8bf9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "sha256": "04bc871d57d8b3cb2ff31dfa6bf6d2d626c23bae86e56b4f26603d80dbb2a4bf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A14.md",
+      "sha256": "6d715ac454f858c7329d064f9bee2b62d86d84648d93c47524de27ad3af20484"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\RESULT.md",
+      "sha256": "6cd15fa74078d367a2b377c5579fe3e8fd0a69692e6fa0126b8aaf49545c2185"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\postTF66\\REPORT.md",
+      "sha256": "88bbc31f24aa04b55078bbfd322cd4713a0fa1ee47b2d6fe88795d9366139d2a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\postTF66\\evidence.json",
+      "sha256": "02a0b3180acfb14895e66a3fb3ada3360c63d017c6aafe4ef633f069c406d0a2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\native-evidence.json",
+      "sha256": "6a103ca8b56c7fa01412ef1b77bfac32cea967051b495ec8abc1dc0eda7afd12"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\native-issues.json",
+      "sha256": "b78dfb4daf758199bdee30decfc65d0daf150b845b9a6c013be29150a89e2b02"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R2-child-boundary.md",
+      "sha256": "fb6b7d84b389e1e8ce15f5894fa46c8df0b61a8a6b4313d0180e74df53003ef4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\TF66-R21-manifest-boundary.md",
+      "sha256": "07cbe8c90603c95ccc41a0d8fd5e584c61a54684ddb60a2b38ba30d8e2a97605"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A00\\dispositions.json",
+      "sha256": "45e83dca413045ee58d22930dbdaf771caa832bd3ea831b575dc28c4f2b42e47"
+    }
+  ],
+  "acceptance": {
+    "PS": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-source-acceptance.json",
+      "sha256": "2005c051fbc11017c416f919a0467fd704c73efc850a27912216261a6483d783",
+      "verified_supporting_files": [
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round10-landed-final-1340.json",
+          "sha256": "399a74028984881eda89d8665bf001e761689c975db29d969b7f24df77f426cf",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-source-acceptance-native-pair.json",
+          "sha256": "2e33afcbdefa3c477564ba55b2f033d5f971fe9eec08df911a05808caf31b12e",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027166\\log.txt",
+          "sha256": "3c83d874cf2500c4c41a7ae211724b62054de86cca25cfcdbe5e504b00e8365c",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027166\\jobs.json",
+          "sha256": "ffb6afeddc355539cdfaecf5ffcb695924801b261204df9b9bad0895aa0d8af8",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027313\\log.txt",
+          "sha256": "841cba69add47b5fc8ae7dc0c576aac0019f3a74b5f6e3bafc2f73cfba50aae3",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027313\\jobs.json",
+          "sha256": "ed741dea27d3cb1f305687cd40603a1914f07867859b71f3db71de75a2399f9a",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027178\\log.txt",
+          "sha256": "a8c5aefafec12f2abb20cbfd2edade59bdf75a61e5968d727221d41db3fee5d3",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027178\\jobs.json",
+          "sha256": "c575edbe73e001ebd318201d3c8beea8f51a3267db089a9bc2ea901db45c2ef6",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027327\\log.txt",
+          "sha256": "e0986c4d237dc589d2e758de0e75dbc26a7a4a49f21130ddb8ca741f87373c6a",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027327\\jobs.json",
+          "sha256": "8fc510e6b54b4bc99ce6f92970001e379bf0b3f7676bf9483f870dad549d7763",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027168\\log.txt",
+          "sha256": "c701fc00f7e3336bc37a7002152ac9590c4722680c95ab7dc0cb144f888b2fad",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027168\\jobs.json",
+          "sha256": "ed59457a44bf35d07839aeffa4df271abf523533c8a6d577e521a13acaac580b",
+          "matches": true
+        }
+      ],
+      "receipt_summary": {
+        "accepted_at": "2026-10-05T13:42:41.234151+00:00",
+        "head": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+        "reviewed_head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+        "review_round": 10,
+        "runs": [
+          {
+            "id": 37315027166,
+            "name": "Markdown Lint",
+            "event": "push",
+            "head_sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37315027313,
+            "name": "Build Style Guide Artifacts",
+            "event": "push",
+            "head_sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37315027178,
+            "name": "Dev container boundary",
+            "event": "push",
+            "head_sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37315027327,
+            "name": "Copilot setup steps",
+            "event": "push",
+            "head_sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37315027168,
+            "name": "Agent instruction validation",
+            "event": "push",
+            "head_sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ],
+        "node_tests": {
+          "passed": 507,
+          "failed": 0,
+          "skipped": 0,
+          "cancelled": 0
+        },
+        "setup_passed_hooks": [
+          "check json...............................................................Passed",
+          "check yaml...............................................................Passed",
+          "fix end of files.........................................................Passed",
+          "trim trailing whitespace.................................................Passed",
+          "yamllint.................................................................Passed",
+          "Lint GitHub Actions workflow files.......................................Passed",
+          "Validate Dependabot Config (v2)..........................................Passed",
+          "Validate GitHub Workflows................................................Passed",
+          "staged Markdown..........................................................Passed",
+          "workflow policy contract.................................................Passed",
+          "agent instruction contract and mutation tests............................Passed"
+        ],
+        "instruction_contract": "content, mutation SelfTest, structural/calendar/baseline/version and proposed-policy transition checks passed",
+        "setup_final_immutable_guard": "passed",
+        "limits": "Accepts the actual PS232 merged batch and its five landed workflows. Does not claim whole-plan, A03/A07/A21, or final paired convergence. A02/A20 closure uses the separate verified full scope audit; A07/A21 still require the six-path TF transfer."
+      }
+    },
+    "TF": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-acceptance.json",
+      "sha256": "0003dd7f852bf1854d29a8bb5dc4625af481b7142b627b1b21b799be79d68f36",
+      "verified_supporting_files": [
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-terminal-01.json",
+          "sha256": "07c80952bee80547b50e75215d73aaddfc905991fc6df28cd7fff954fbba7d9a",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076771\\log.txt",
+          "sha256": "2b518afdfb0d2755de6c500fe3b3b3c6e2ab842fd963d2df5895adb084cad860",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076771\\jobs.json",
+          "sha256": "0a5aa2220c7c245df9eea9e4da7257d89a36c71703e33a81a67806a1e9f051c0",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076782\\log.txt",
+          "sha256": "94d5bff83f5b770e4c12c634e7c6a783cfaeb3df7307e942947c51f4ad91925d",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076782\\jobs.json",
+          "sha256": "b5a61ed4b8d6d53aed1720bb21a97bda501197ad4189246c5f7d69131f734f0f",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076754\\log.txt",
+          "sha256": "e49061528ee7c93f1f474f603b8ad306747a5ae951aa032946ad4e297961f526",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076754\\jobs.json",
+          "sha256": "320d85697dec90c8a9861c1b35668ffdc5f7866b2c71ee890f2dab9649c92c03",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076803\\log.txt",
+          "sha256": "a7dc1a42c5bab4faa25243626d94ff29dc767c380efd08b502947c4d57f12c9f",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076803\\jobs.json",
+          "sha256": "528eb0d5062a2531ffea629c1092ae565374376ab1f8184964826d4df1d2d7c6",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076765\\log.txt",
+          "sha256": "cbc0ffe77df767bce68d6c8451460e78dd64032c125581e38e7c7529dda7961e",
+          "matches": true
+        },
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076765\\jobs.json",
+          "sha256": "f4aeb4df3c85b430afa2fe746a5db1d4e9561a7787d266e16bc55a10fe8b9401",
+          "matches": true
+        }
+      ],
+      "receipt_summary": {
+        "accepted_at": "2026-10-05T05:25:04.627912+00:00",
+        "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+        "reviewed_head": "17caede017a8054bed529517ce473ef75682b5bf",
+        "review_round": 8,
+        "runs": [
+          {
+            "id": 37266076771,
+            "name": "Dev container boundary",
+            "event": "push",
+            "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37266076782,
+            "name": "Markdown Lint",
+            "event": "push",
+            "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37266076754,
+            "name": "Build Style Guide Artifacts",
+            "event": "push",
+            "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37266076803,
+            "name": "Agent instruction validation",
+            "event": "push",
+            "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37266076765,
+            "name": "Copilot setup steps",
+            "event": "push",
+            "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ],
+        "node_tests": {
+          "passed": 515,
+          "failed": 0,
+          "skipped": 0
+        },
+        "setup_passed_hooks": [
+          "check json...............................................................Passed",
+          "check yaml...............................................................Passed",
+          "fix end of files.........................................................Passed",
+          "trim trailing whitespace.................................................Passed",
+          "yamllint.................................................................Passed",
+          "Lint GitHub Actions workflow files.......................................Passed",
+          "Validate Dependabot Config (v2)..........................................Passed",
+          "Validate GitHub Workflows................................................Passed",
+          "staged Markdown..........................................................Passed",
+          "workflow policy contract.................................................Passed",
+          "agent instruction contract and mutation tests............................Passed"
+        ],
+        "limits": "Actual merged TF push workflows, including full validation and immutable-input check, passed. Does not establish paired convergence, close any whole outcome, or release the reverse writer. Current PS, authority, date, mapping and transfer2 must be refreshed first."
+      }
+    }
+  },
+  "native_reads": {
+    "PS_ref": {
+      "endpoint": "repos/franklesniak/PSStyleGuide/git/ref/heads/main",
+      "raw_response_sha256": "4c225fa122863796ad68e429024bfd4be47235e522372ac7b0c41abb22751141",
+      "captured_utc": "2026-10-05T13:58:19.943807+00:00",
+      "ref": "refs/heads/main",
+      "sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c"
+    },
+    "TF_ref": {
+      "endpoint": "repos/franklesniak/TerraformStyleGuide/git/ref/heads/main",
+      "raw_response_sha256": "d1a028371a73ad6ac403ca3330be1a744aa9c56f763433c17c9dd9cc17e116ee",
+      "captured_utc": "2026-10-05T13:58:19.947685+00:00",
+      "ref": "refs/heads/main",
+      "sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9"
+    },
+    "PS_runners": {
+      "endpoint": "repos/franklesniak/PSStyleGuide/actions/runners?per_page=100",
+      "raw_response_sha256": "ae91d6c887e277dbbdbaf2d56d18cb264e52d5ed52f80da000dd6372eb085ec1",
+      "captured_utc": "2026-10-05T13:58:19.932957+00:00",
+      "total_count": 0,
+      "runners": [],
+      "complete": true
+    },
+    "TF_runners": {
+      "endpoint": "repos/franklesniak/TerraformStyleGuide/actions/runners?per_page=100",
+      "raw_response_sha256": "ae91d6c887e277dbbdbaf2d56d18cb264e52d5ed52f80da000dd6372eb085ec1",
+      "captured_utc": "2026-10-05T13:58:20.107619+00:00",
+      "total_count": 0,
+      "runners": [],
+      "complete": true
+    },
+    "issue155": {
+      "endpoint": "repos/franklesniak/PSStyleGuide/issues/155",
+      "raw_response_sha256": "140bb0e35523894f73ee525f8d32b9f72afc79956045947b9fbb81b4211e567e",
+      "captured_utc": "2026-10-05T13:58:19.944270+00:00",
+      "object": {
+        "id": 5077000849,
+        "number": 155,
+        "state": "open",
+        "state_reason": null,
+        "comments": 4,
+        "created_at": "2026-08-06T02:33:25Z",
+        "updated_at": "2026-10-02T00:33:56Z",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/issues/155",
+        "author": "franklesniak",
+        "body_sha256": "ebc5a55ddb8ded8a91ee109ff9312467890dcf1ba38facba9e1be63d61d35067"
+      }
+    },
+    "issue156": {
+      "endpoint": "repos/franklesniak/PSStyleGuide/issues/156",
+      "raw_response_sha256": "2d50b78631b64900767a7bd91ac43023b4c40bcdfb689d86ab3601faa4883d7f",
+      "captured_utc": "2026-10-05T13:58:19.957718+00:00",
+      "object": {
+        "id": 5077002354,
+        "number": 156,
+        "state": "closed",
+        "state_reason": "not_planned",
+        "comments": 1,
+        "created_at": "2026-08-06T02:33:43Z",
+        "updated_at": "2026-10-02T00:33:59Z",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/issues/156",
+        "author": "franklesniak",
+        "body_sha256": "6379d629a4b9d58bab5d43847c2947686e407556bfcc08b24b94e45c29b77cbf"
+      }
+    },
+    "comments155": {
+      "endpoint": "repos/franklesniak/PSStyleGuide/issues/155/comments?per_page=100",
+      "raw_response_sha256": "73249638b33f7136bbdbc90b8e22ee839f1419eb259543ea9d878449b9a7a46f",
+      "captured_utc": "2026-10-05T13:58:20.976711+00:00",
+      "complete": true,
+      "comments": [
+        {
+          "id": 5227199805,
+          "created_at": "2026-08-08T17:13:16Z",
+          "updated_at": "2026-08-08T17:13:16Z",
+          "html_url": "https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5227199805",
+          "author": "franklesniak",
+          "body_sha256": "18b9643c8d77e291f8e3ef6c4bd01cf6c6ff8d096a1e351bd898b068437aed10"
+        },
+        {
+          "id": 5233004306,
+          "created_at": "2026-08-09T18:10:30Z",
+          "updated_at": "2026-08-09T18:10:30Z",
+          "html_url": "https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5233004306",
+          "author": "franklesniak",
+          "body_sha256": "a077c64190eab305a25f518987019d00577334341b3d3680c01c656ecc60dbc9"
+        },
+        {
+          "id": 5233025993,
+          "created_at": "2026-08-09T18:13:22Z",
+          "updated_at": "2026-08-09T18:13:22Z",
+          "html_url": "https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5233025993",
+          "author": "franklesniak",
+          "body_sha256": "ca65053b2729593fac813556f2add2ebabcec531c497889d603053075aaa7eb5"
+        },
+        {
+          "id": 5943334454,
+          "created_at": "2026-10-02T00:33:39Z",
+          "updated_at": "2026-10-02T00:33:39Z",
+          "html_url": "https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5943334454",
+          "author": "franklesniak",
+          "body_sha256": "2c9e63ed939ba54d72b4b66602c20138c5bd78f64a8194ec3af61b505bca5fec"
+        }
+      ]
+    },
+    "comments156": {
+      "endpoint": "repos/franklesniak/PSStyleGuide/issues/156/comments?per_page=100",
+      "raw_response_sha256": "a0843eec587feb391a7c7af593a8c734a9f961ab463235df2cc12e5acf45bcb1",
+      "captured_utc": "2026-10-05T13:58:20.864360+00:00",
+      "complete": true,
+      "comments": [
+        {
+          "id": 5233026690,
+          "created_at": "2026-08-09T18:13:26Z",
+          "updated_at": "2026-08-09T18:13:26Z",
+          "html_url": "https://github.com/franklesniak/PSStyleGuide/issues/156#issuecomment-5233026690",
+          "author": "franklesniak",
+          "body_sha256": "173355873cac8087a33d4d1e178d2737371dbe36f37d643f97b88a057c8fa64d"
+        }
+      ]
+    },
+    "acceptance_comment": {
+      "endpoint": "repos/franklesniak/PSStyleGuide/issues/comments/5995838012",
+      "raw_response_sha256": "7d2bd1d7ef63c2f319cb2fcdddb9b915a63954b45fbbcae49d8c64d77e14eaff",
+      "captured_utc": "2026-10-05T13:58:21.092656+00:00",
+      "object": {
+        "id": 5995838012,
+        "created_at": "2026-10-05T13:50:49Z",
+        "updated_at": "2026-10-05T13:50:49Z",
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/pull/232#issuecomment-5995838012",
+        "author": "franklesniak",
+        "body_sha256": "38f12227b15d376caa5a31d8c52efa95ac51cd3c05b3ae70302347789e91d38d",
+        "body": "Accepted merged-source validation for `f0684acd81a1a6e53d87e43881c1ec4f1310b17c` (tree `2cf6900441e7a64d2248769e6b9159caa48cc313`). All five actual push workflows passed: [instructions](https://github.com/franklesniak/PSStyleGuide/actions/runs/37315027168) ran 507 tests with zero failures/skips plus content and mutation checks; [setup](https://github.com/franklesniak/PSStyleGuide/actions/runs/37315027327) passed all 11 hooks and its final immutable-input guard. [Markdown/policy](https://github.com/franklesniak/PSStyleGuide/actions/runs/37315027166), [artifact verification/publication](https://github.com/franklesniak/PSStyleGuide/actions/runs/37315027313), and [devcontainer exclusion](https://github.com/franklesniak/PSStyleGuide/actions/runs/37315027178) also passed. Fresh native reads confirmed the merge parents, reviewed tree, current PS/TF mains and unchanged protection.\n\nThe independent scope audit and root byte/hash verification close A02 and A20 at PS `f0684ac` / TF `56cb041`, with exact necessary repository/language exceptions. A07/A21 still own the six-file Terraform follow-up; broader A03 and final cross-repository acceptance remain open. [Completion evidence](https://github.com/franklesniak/PSStyleGuide/blob/84e2dbbdd6eefa7aaad7d9eb43a136009a90a597/docs/planning/action-items-2026-10-02/results/A02/post232-closure-audit.md) and [landed evidence](https://github.com/franklesniak/PSStyleGuide/blob/84e2dbbdd6eefa7aaad7d9eb43a136009a90a597/docs/planning/action-items-2026-10-02/results/A02/ps232-landed-acceptance.json) are supporting records on the intentionally unmerged planning branch. Historical service cancellations remain canceled; no human-review approval is claimed."
+      }
+    }
+  },
+  "scope": {
+    "writes_only": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A14-post232-reassessment-20261005",
+    "tests_or_probes_run": false,
+    "product_worktree_bytes_used": false,
+    "transfers_used": 0,
+    "transfer_cap": 8,
+    "review_clock": "none; assessment only"
+  },
+  "prior_inventory_all_guards_match": true,
+  "six_core_engines_unchanged": true,
+  "pair_adapter_only_diff": "--- TF accepted\n+++ PS accepted\n@@ -20,7 +20,10 @@\n     throw new Error('Markdown lint package manifest resolves outside the repository.');\n   }\n   const required = JSON.parse(fs.readFileSync(canonicalManifest, 'utf8')).engines?.node;\n-  if (!/^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$/u.test(required ?? '') || required !== process.versions.node) {\n+  if (typeof required !== 'string' || !/^(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)\\.(?:0|[1-9]\\d*)$/u.test(required)) {\n+    throw new Error('Markdown lint requires root package.json engines.node to declare an exact Node version (major.minor.patch).');\n+  }\n+  if (required !== process.versions.node) {\n     throw new Error(`Markdown lint requires declared Node ${required ?? 'version'}; observed ${process.versions.node}.`);\n   }\n   const child = path.join(root, '.github/workflows/lint-nested-markdown.js');\n",
+  "workflow_privilege_and_retired_scan": {
+    "PS": {
+      "executable_paths_scanned": 33,
+      "retired_references": [],
+      "workflow_permissions_runners": [
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "line": 12,
+          "text": "permissions: {}"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "line": 17,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "line": 19,
+          "text": "    permissions: {}"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "line": 110,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "line": 112,
+          "text": "    permissions: {}"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "line": 5,
+          "text": "permissions: {}"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "line": 9,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "line": 11,
+          "text": "    permissions: {}"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "line": 63,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "line": 65,
+          "text": "    permissions:"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "line": 30,
+          "text": "permissions: {}"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "line": 35,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "line": 37,
+          "text": "    permissions: {}"
+        },
+        {
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "line": 13,
+          "text": "permissions: {}"
+        },
+        {
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "line": 24,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "line": 7,
+          "text": "permissions: {}"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "line": 11,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "line": 13,
+          "text": "    permissions: {}"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "line": 72,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "line": 74,
+          "text": "    permissions: {}"
+        }
+      ]
+    },
+    "TF": {
+      "executable_paths_scanned": 33,
+      "retired_references": [],
+      "workflow_permissions_runners": [
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "line": 12,
+          "text": "permissions: {}"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "line": 17,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "line": 19,
+          "text": "    permissions: {}"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "line": 110,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "line": 112,
+          "text": "    permissions: {}"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "line": 5,
+          "text": "permissions: {}"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "line": 9,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "line": 11,
+          "text": "    permissions: {}"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "line": 63,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "line": 65,
+          "text": "    permissions:"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "line": 30,
+          "text": "permissions: {}"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "line": 35,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "line": 37,
+          "text": "    permissions: {}"
+        },
+        {
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "line": 13,
+          "text": "permissions: {}"
+        },
+        {
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "line": 24,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "line": 7,
+          "text": "permissions: {}"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "line": 11,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "line": 13,
+          "text": "    permissions: {}"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "line": 72,
+          "text": "    runs-on: ubuntu-24.04"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "line": 74,
+          "text": "    permissions: {}"
+        }
+      ]
+    }
+  },
+  "source_ranges": [
+    {
+      "side": "PS",
+      "path": ".github/workflows/lint-markdown.mjs",
+      "ranges": [
+        [
+          10,
+          42
+        ],
+        [
+          44,
+          63
+        ]
+      ],
+      "meaning": "R21 manifest; exact Node declaration; R2 child; bounded runner; CLI identity"
+    },
+    {
+      "side": "PS+TF",
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "ranges": [
+        [
+          259,
+          303
+        ],
+        [
+          435,
+          473
+        ]
+      ],
+      "meaning": "Nine actual child and eleven actual manifest execution-marker cases; whole blob equal"
+    },
+    {
+      "side": "PS",
+      "path": ".github/workflows/agent-instructions.yml",
+      "ranges": [
+        [
+          210,
+          211
+        ]
+      ],
+      "meaning": "Actual landed Node suite caller now includes lint tests"
+    }
+  ],
+  "landed_log_observations": {
+    "PS": {
+      "run_id": 37315027168,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-ps232-hosted\\f0684acd81a1a6e53d87e43881c1ec4f1310b17c\\37315027168\\log.txt",
+      "sha256": "c701fc00f7e3336bc37a7002152ac9590c4722680c95ab7dc0cb144f888b2fad",
+      "child_success_cases": 9,
+      "manifest_success_cases": 11,
+      "claim_limit": "Existing landed Linux CI; no new execution, race/alias test or full Windows suite.",
+      "observed_case_names": [
+        "regular",
+        "leaf-inside",
+        "leaf-outside",
+        "directory",
+        "missing",
+        "broken-link",
+        "ancestor-outside",
+        "ancestor-inside",
+        "root-alias",
+        "regular",
+        "root-alias",
+        "leaf-inside",
+        "leaf-outside",
+        "broken-link",
+        "directory",
+        "missing",
+        "malformed",
+        "wrong-version",
+        "one-mib",
+        "over-one-mib"
+      ],
+      "observed_totals": [
+        "2026-10-05T13:34:47.8158097Z \u2139 tests 507",
+        "2026-10-05T13:34:47.8158706Z \u2139 pass 507",
+        "2026-10-05T13:34:47.8159288Z \u2139 fail 0",
+        "2026-10-05T13:34:47.8160147Z \u2139 skipped 0"
+      ]
+    },
+    "TF": {
+      "run_id": 37266076803,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076803\\log.txt",
+      "sha256": "a7dc1a42c5bab4faa25243626d94ff29dc767c380efd08b502947c4d57f12c9f",
+      "child_success_cases": 9,
+      "manifest_success_cases": 11,
+      "claim_limit": "Existing landed Linux CI; no new execution, race/alias test or full Windows suite.",
+      "observed_case_names": [
+        "regular",
+        "leaf-inside",
+        "leaf-outside",
+        "directory",
+        "missing",
+        "broken-link",
+        "ancestor-outside",
+        "ancestor-inside",
+        "root-alias",
+        "regular",
+        "root-alias",
+        "leaf-inside",
+        "leaf-outside",
+        "broken-link",
+        "directory",
+        "missing",
+        "malformed",
+        "wrong-version",
+        "one-mib",
+        "over-one-mib"
+      ],
+      "observed_totals": [
+        "2026-10-05T05:23:48.0656922Z \u2139 tests 515",
+        "2026-10-05T05:23:48.0657538Z \u2139 pass 515",
+        "2026-10-05T05:23:48.0657835Z \u2139 fail 0",
+        "2026-10-05T05:23:48.0658415Z \u2139 skipped 0"
+      ]
+    }
+  },
+  "historical_R2_boundary_tests": {
+    "Windows_final_boundary": {
+      "passed": 9,
+      "skipped": 0
+    },
+    "Linux_final_boundary": {
+      "passed": 9,
+      "skipped": 0
+    },
+    "original_adapter_negative_control_each_platform": {
+      "passed": 6,
+      "failed": 3
+    },
+    "not_current_full_Windows_suite": "historical exact inputs; later cleanup/native entry/R12/R21 changes have separate evidence",
+    "different_drive_UNC_hardlink_race_cases_not_proven": true
+  },
+  "trigger_map": [
+    {
+      "family": "Generator/verifier path substitution, publication and cleanup",
+      "selected_decision": "D92 B conditional-no-trigger retained for these named unchanged engines",
+      "current_evidence": "All six engine blobs unchanged from prior and original A14. PS build, Markdown workflow, devcontainer, CONTRIBUTING and ordinary local callers unchanged from f168. PS setup diff only removes redundant event path entries; instruction job adds retained Node suites. No changed authority or competing-writer contract.",
+      "reopen": "A06 changes create/read/publish/cleanup or exact-path operations; A03 adds promotion/write authority, shared/hostile workspace or materially different caller; a concrete supported failure or deliberately admitted competing writer; a qualified portable primitive addressing the operation."
+    },
+    {
+      "family": "Outer child static admission",
+      "selected_decision": "R2 B97.6 delivered on both accepted inputs",
+      "current_evidence": "PS now has non-symlink regular child leaf, canonical containment and canonical-path bounded spawn. Nine real-child cases are byte-identical to accepted TF tests and each passes in both existing landed logs.",
+      "reopen": "A07/A03 changes selected-root/child/cwd/import/loader contract; supported static escape; admitted concurrent writer or atomic-execution requirement. Reassess relevant actually accepted TF carryback, not dirty worktree bytes."
+    },
+    {
+      "family": "Root manifest static admission",
+      "selected_decision": "R21 E98.6 delivered on both accepted inputs; no atomic identity guarantee",
+      "current_evidence": "PS now checks non-symlink regular manifest leaf, one-MiB cap and canonical containment before canonical-path read. Eleven marker/CLI cases are whole-blob identical to TF and pass in both existing landed logs.",
+      "reopen": "A07 changes root/manifest selection or identity/read semantics; supported guard bypass; admitted competing writer or stronger immutable module identity requirement."
+    },
+    {
+      "family": "Hardlinks, universal Windows aliases and TOCTOU",
+      "selected_decision": "R2/R21/D92 explicit limits remain live",
+      "current_evidence": "Separate lstat/realpath/read/spawn operations remain. No retained executable descriptor/digest snapshot. Existing generator identity helper and later pathname publication/cleanup are unchanged; ordinary contained aliases stay supported.",
+      "reopen": "Supported hardlink/alias failure, admitted adversarial parent/writer, or A07/R5/B1 host/runtime change that qualifies an actually useful primitive or drops a relevant supported platform branch."
+    },
+    {
+      "family": "Retired extractor/context/harness and PS156 limits",
+      "selected_decision": "D93 B candid retirement retained",
+      "current_evidence": "Four retired paths absent in both accepted trees; no references in executable .github scan. Current PS155 open/PS156 closed not_planned, complete current issue comments unchanged by count and D92/D93 hash; both repository runner censuses empty.",
+      "reopen": "A06/A16/A17 introduces a current extractor/context/recovery consumer needing the missing property, a supported failure reopens its branch, or an actual available runner plus live consumer supplies new meaningful evidence. Do not revive helpers just for historical closure."
+    }
+  ],
+  "material_new_findings": [],
+  "overall_status": "Accepted PS232 closes pending scoped R2/R21 delivery assessment. D92/D93 conditional-no-trigger retained for named residuals. A14 remains active for relevant later A06/R5/runtime/recovery and final accepted-pair reassessments.",
+  "next_action": "Root verify and integrate this bounded result; keep PS155 open and A14 active. Reassess actual accepted A07/A21 TF carryback if root/manifest/caller authority inputs change, then A06 create/read/identity/publication/cleanup, qualified R5/B1 runtime inputs and A16/A17 recovery consumers.",
+  "original_contracts": {
+    "total": 402,
+    "379_390_preserved": [
+      {
+        "id": 379,
+        "present_disposition": "superseded",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A14",
+        "original_body_sha256": "37e174e99d864df274860930894c9b3f3f1e2b81537b1f8f2379ee763ea0dd13"
+      },
+      {
+        "id": 380,
+        "present_disposition": "conditional-no-trigger",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A14",
+        "original_body_sha256": "aec5c99d7bffd9e82b9f50e296a336d24023172c75c4b29690f20a9d05049175"
+      },
+      {
+        "id": 381,
+        "present_disposition": "conditional-no-trigger",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A14",
+        "original_body_sha256": "a96d4ca4763469ed3b6a3b91fd0a7b0dc7325bf4c22f70e539bc8ccd2604dbcd"
+      },
+      {
+        "id": 382,
+        "present_disposition": "conditional-no-trigger",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A14",
+        "original_body_sha256": "bdd0250d0214954645d3df99b9f7c81a81804302dc6d999087ef3725dd00789e"
+      },
+      {
+        "id": 383,
+        "present_disposition": "conditional-no-trigger",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A14",
+        "original_body_sha256": "a04383531a631d2ce30252a301efc45182bb52c674a7b9702f9e232223aa7381"
+      },
+      {
+        "id": 384,
+        "present_disposition": "conditional-no-trigger",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A14",
+        "original_body_sha256": "8b8e2ca6202018a424b512058fdb3aee0dc3638e295a2f44ecf14829d048a431"
+      },
+      {
+        "id": 385,
+        "present_disposition": "conditional-no-trigger",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A14",
+        "original_body_sha256": "dfa24e752d1171e209803df7cd14e30491760b55a08504ca011d119416103030"
+      },
+      {
+        "id": 386,
+        "present_disposition": "conditional-no-trigger",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A14",
+        "original_body_sha256": "a749a9621801ce4d20ee2009e438b7b5f84fe0fcb96a798e8ab051aca024111b"
+      },
+      {
+        "id": 387,
+        "present_disposition": "conditional-no-trigger",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A14",
+        "original_body_sha256": "a64ca9e0befc81f9eb92e6fea1caa47e26898a6808f00c62719e36ddefd5fcc2"
+      },
+      {
+        "id": 388,
+        "present_disposition": "conditional-no-trigger",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A14",
+        "original_body_sha256": "cdc82a77e9ccefd6748ae71b183a7345597c29fee25a302ad8938a0a13f0771b"
+      },
+      {
+        "id": 389,
+        "present_disposition": "pending",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A18",
+        "collaborators": [
+          "A06",
+          "A19"
+        ],
+        "original_body_sha256": "63babcabc97f085ba1525c43ee13d0bf691e2ae5310087ffab0c5b83e3b8aecb"
+      },
+      {
+        "id": 390,
+        "present_disposition": "pending",
+        "historical_credit": "RETAIN",
+        "remaining_owner": "A18",
+        "collaborators": [
+          "A06",
+          "A19"
+        ],
+        "original_body_sha256": "bc0a9e83728043d5fd132ab40a37965c7589ecb56434a3579b8202443a7ccb37"
+      }
+    ],
+    "all_outcome_contracts_preserved": 22,
+    "modifications": 0
+  },
+  "D92_D93": {
+    "id": 5943334454,
+    "body_sha256": "2c9e63ed939ba54d72b4b66602c20138c5bd78f64a8194ec3af61b505bca5fec",
+    "matches_prior": true,
+    "selected_options": "D92 B96; D93 B100; reused, no duplicate rubric",
+    "url": "https://github.com/franklesniak/PSStyleGuide/issues/155#issuecomment-5943334454"
+  },
+  "final_native_refs": {
+    "PS": {
+      "sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+      "captured_utc": "2026-10-05T14:01:27.512353+00:00",
+      "matches": true
+    },
+    "TF": {
+      "sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "captured_utc": "2026-10-05T14:01:27.571789+00:00",
+      "matches": true
+    }
+  },
+  "limits": [
+    "Read-only raw named Git objects and authenticated GETs; only this output directory written. No product/planning/index/ref/native mutations.",
+    "No suites, installations, containers, filesystem behavioral/adversarial probes, permission changes or descendants.",
+    "No full A03/A07/A21 closure, main-to-main equality, fixed point or A18/A19 final acceptance.",
+    "Static boundary tests prove selected ordinary inputs; they do not prove hardlink/UNC/different-drive/Windows alias, competing-writer, same-user confinement or atomic read/spawn/cleanup safety.",
+    "Repository runner inventory is bounded; no claim about all external services or independently sandboxed authority."
+  ]
+}

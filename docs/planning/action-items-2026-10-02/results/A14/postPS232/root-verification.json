@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-10-05T14:07:26.850038+00:00",
+  "result": "passed_reassessment_no_new_material_finding",
+  "present_raw_identities": 67,
+  "absent_identities": 2,
+  "raw_verification_note": "All23path x3revision source/mode/hash/length/equality checks passed in the preceding root invocation; corrected only the retired-path record extraction before completing remaining checks.",
+  "retired_path_absences": 8,
+  "supporting_hashes": 36,
+  "landed_execution_cases_each_side": {
+    "child": 9,
+    "manifest": 11
+  },
+  "evidence_sha256": "354abe8d7cfbd7fe9e6957db1bd34017e811d24cfc357580eb193967a462ab37",
+  "report_sha256": "5b3114dc344b5617d6e2fab40b61659f95916c0eac148ae26fa5f1296a177299",
+  "A14": "active; preserve live residuals and reopen on mapped relevant changes",
+  "transfers": "0/8 unchanged",
+  "canonical_decision_comment": {
+    "id": 5943334454,
+    "body_sha256": "2c9e63ed939ba54d72b4b66602c20138c5bd78f64a8194ec3af61b505bca5fec",
+    "author_id": 11204406,
+    "fresh_root_read_at": "2026-10-05T14:08:16.659143+00:00"
+  }
+}
