@@ -1,6 +1,6 @@
 {
-  "status": "round2_reviews_and_hosted_validation_pending",
-  "recorded_at": "2026-10-05T21:21:16.076661+00:00",
+  "status": "R7_staged_aggregate_ready_round2_copilot_pending",
+  "recorded_at": "2026-10-05T21:32:52.521728+00:00",
   "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
   "base_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
   "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
@@ -330,18 +330,11 @@
     {
       "service": "Copilot",
       "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+      "requested_body_sha256": "0143e8015a81e6eba20d9a3a76c0271b24f8f28006e7369012bb64e3e242b763",
       "request_event": 32545544793,
       "workflow_run": 37375005271,
-      "effort_selected": "Balanced",
-      "observed_completed_effort": null,
-      "status": "confirmed_pending"
-    },
-    {
-      "service": "remote Codex",
-      "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
-      "trigger_comment": 6003128652,
-      "summary_comment": 6002108102,
-      "status": "confirmed_running_manual"
+      "status": "confirmed_pending",
+      "observed_completed_effort": null
     }
   ],
   "limits": [
@@ -353,10 +346,10 @@
     "Current remote reviews, independent final quality, normal merge/landed acceptance, peer transfer and reverse comparison remain."
   ],
   "remaining": [
-    "Collect both issued round2 reviews without duplicate requests; validate any new finding under the existing decision process.",
-    "Collect actual current-head hosted Windows5.1/Windows7/native-ext4 Linux7 two-pass proof and required CI.",
-    "Finish independent final quality on actual final input, then normal merge and landed acceptance.",
-    "Refresh peer, increment destination transfers before port, follow scoped lifecycle and raw-byte reverse comparison."
+    "Run final v5 validation on the staged harness repair.",
+    "Collect existing Copilot terminal result; preserve completed Codex and original body attribution.",
+    "Commit/publish final repair/body and request next input only after old request set reconciles.",
+    "Require current-input hosted proof, bounded independent-quality follow-up, normal source/landed acceptance and paired delivery."
   ],
   "candidate_history": [
     {
@@ -571,7 +564,7 @@
   "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
   "pr": 234,
   "pr_url": "https://github.com/franklesniak/PSStyleGuide/pull/234",
-  "body_sha256": "0143e8015a81e6eba20d9a3a76c0271b24f8f28006e7369012bb64e3e242b763",
+  "body_sha256": "f5ddf4877c0a24c3262bef26bc8daff9444d030835a621ba381c4acad5a87367",
   "commit": {
     "status": "committed",
     "expected_parent": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
@@ -797,7 +790,7 @@
         "ui_confirmation": "Review requested; Reviewing at balanced effort. Last completed Lite is historical, not observed current effort."
       },
       "codex": {
-        "status": "confirmed_pending",
+        "status": "completed_clean",
         "manual_trigger_issued": true,
         "requested_at": "2026-10-05T21:18:38.837795+00:00",
         "baseline": "round2-before-codex.json",
@@ -816,9 +809,19 @@
           "updated_at": "2026-10-05T21:19:22Z",
           "body_sha256": "d7ef8c8ae2adbedcdf47a268c0ae8953d9366d572d953b7c84c95e5f5b1f47f8",
           "snapshot": "round2-manual-confirmation.json"
+        },
+        "manual_terminal": {
+          "summary_comment": 6002108102,
+          "result_comment": 6003239142,
+          "result_created_at": "2026-10-05T21:25:02Z",
+          "snapshot": "round2-progress-2.json",
+          "summary_body_sha256": "a210f6845c1df46ddb14c5388adafb5c826b50d573d316053c6b507457b58b61",
+          "result_body_sha256": "f9040ba2aa36e9e880ccfe7cd0390de389ed71eadbde2d8c849c71af6250cff7",
+          "disposition": "Authenticated manual summary terminal and new post-trigger exact-head clean comment; complete comments/reviews/threads contain no new finding. Input body0143 is retained; R6 later correction and pending R7 mean this is not final acceptance."
         }
       },
-      "findings": []
+      "findings": [],
+      "supersession_pending": "Body evidence comparison corrected under R6; retain old body attribution and collect both already-issued requests before a new set. R7 coverage decision/repair is being prepared; no new round yet."
     }
   ],
   "A14_preparation": {
@@ -827,60 +830,51 @@
     "disposition": "No new supported defect; root read complete report and complete production generator/gate diffs. Retain D92/D93 and issue155 open. Reassess actual caller/storage facts after paired acceptance; no independent final-quality or race-closure credit."
   },
   "hosted_platform_progress": {
-    "source": "hosted-platform-jobs/initial-windows-proof.json",
-    "sha256": "c2a34c3a80ccfcbd82f94a5875b4c23619b6a0e03a6ee6902869f4a79a532630",
-    "observations": [
+    "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-07636c8\\PR-platform-proof.json",
+    "sha256": "831fa7ef90d8a6508fa2be8080f768de8aab0540aa525d116d1300b710efab43",
+    "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+    "candidate_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+    "run": 37374614958,
+    "attempt": 1,
+    "event": "pull_request",
+    "actual_checkout_revision": "4b9c2c62afd7dc2455dd56907382ce9c9b6e2072",
+    "synthetic_merge_parents": [
+      "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "07636c8633b8544eb30c71ce1b24d2bcdef4c74e"
+    ],
+    "tree_equal_to_candidate": true,
+    "all_three_cells": [
       {
-        "job_id": 111958047322,
-        "name": "generator_windows_7",
-        "run_id": 37368079167,
-        "event": "pull_request",
-        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
-        "passes": [
-          "Generator tests passed: 112 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
-          "Generator tests passed: 112 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
-        ],
-        "log_sha256": "736b016ff4492e93af63b8a1c85b7cb5edeaf8cd05fbfc90eddf5c0048f5c6ae"
-      },
-      {
-        "job_id": 111958046985,
         "name": "generator_windows_51",
-        "run_id": 37368079167,
-        "event": "pull_request",
-        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "job_id": 111979946677,
         "passes": [
-          "Generator tests passed: 112 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
-          "Generator tests passed: 112 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
-        ],
-        "log_sha256": "4be7c9d7bdadf063b8d2c6b71fe61812277bdc4f554d7302f36d9e01f6892391"
+          "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T21:15:01.5524210Z Generator tests passed: 117 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+          "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T21:15:13.2276057Z Generator tests passed: 117 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+        ]
       },
       {
-        "job_id": 111957899736,
-        "name": "generator_windows_51",
-        "run_id": 37368034961,
-        "event": "push",
-        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
-        "passes": [
-          "Generator tests passed: 112 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
-          "Generator tests passed: 112 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
-        ],
-        "log_sha256": "8c4a68c6cd6347596a3ad3ef4dd16fd11403faf8ec54571a2c8141f41143760f"
-      },
-      {
-        "job_id": 111957900174,
         "name": "generator_windows_7",
-        "run_id": 37368034961,
-        "event": "push",
-        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "job_id": 111979946303,
         "passes": [
-          "Generator tests passed: 112 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
-          "Generator tests passed: 112 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
-        ],
-        "log_sha256": "b2a668f55ffd9c428c272111897a09952053d69b5862da597fc36df039a35add"
+          "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T21:15:11.2893209Z Generator tests passed: 117 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+          "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T21:15:26.1618074Z Generator tests passed: 117 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+        ]
+      },
+      {
+        "name": "generator_linux_7",
+        "job_id": 111979946732,
+        "passes": [
+          "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T21:19:56.2126525Z Generator tests passed: 117 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+          "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T21:20:03.8161815Z Generator tests passed: 117 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+        ]
       }
     ],
-    "limits": "PR-head attribution; actual PR runs validate synthetic merge revision through immutable acquisition. Two passes in each cited cell verified. Linux, complete workflow and landed acceptance pending.",
-    "additional_evidence": "hosted-platform-jobs/111957900174/evidence.json"
+    "log_sha256": "c6413a12d9c63d0485b34ab41ab58ebf3e5fbdcca7e583c97ee8e754ff1d32c2",
+    "all_jobs": "success",
+    "same_revision_admission": "Three successful job outputs explicitly use actual merge revision; verifier and publisher succeeded.",
+    "artifact_id": 11371201071,
+    "captured_at": "2026-10-05T21:27:31.961315+00:00",
+    "limits": "Current published07636c8 input only. R7 test repair is being prepared and will require new-input validation. No landed or paired acceptance."
   },
   "hosted_retries": [
     {
@@ -1033,11 +1027,11 @@
     "id": "3q1yb5m7ltvb",
     "status": "investigating",
     "component": "Actions",
-    "component_status": "degraded_performance",
+    "component_status": "major_outage",
     "started_at": "2026-10-05T19:11:58.373Z",
-    "latest_source_update": "2026-10-05T19:50:50.720Z",
-    "observed_at": "2026-10-05T20:35:38.758485+00:00",
-    "finding": "GitHub reports delayed assignment of hosted runners across multiple configurations. Consistent with native no-runner/no-step acquisition failures; do not infer product failure or clean CI."
+    "latest_source_update": "2026-10-05T20:47:22.557Z",
+    "observed_at": "2026-10-05T21:23:27.159910+00:00",
+    "finding": "Official GitHub status escalates Actions to major outage; hosted runner assignment/workflow-start failures and delays remain under investigation. Do not count missing or queued tests as acceptance."
   },
   "round1_repair": {
     "source_head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
@@ -1688,9 +1682,83 @@
     "attribution": "Round1 writer focused behavior before metadata-only restoration; final v4 aggregate covers committed bytes. Earlier writer limitations are historical to the focused stage."
   },
   "final_quality": {
-    "status": "running",
+    "status": "conditional_findings_followup",
+    "worker": "/root/ps234_final_quality",
     "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
     "body_sha256": "0143e8015a81e6eba20d9a3a76c0271b24f8f28006e7369012bb64e3e242b763",
-    "worker": "/root/ps234_final_quality"
+    "limits": "Independent current-candidate review. Remote results/hosted CI remain separate gates. Reassess subsequent findings and actual final inputs before merge.",
+    "finding": "R6: PR body directly compares R5 operation counts from different probe input shapes; root verified scripts. Writer preparing bounded decision and corrected wording, no product defect identified.",
+    "report_sha256": "1452aa9828d67299e1ed15cadad8462380240bc376d2284f101a6ebd7019d719",
+    "evidence_sha256": "46eb033e8e3394ec8cc3f3330e12ad529e6cd8cabe843c525cb50ccc679c2e1c",
+    "findings": [
+      "FQ-1/R6 reporting correction being published",
+      "FQ-2/R7 candidate/final identity mismatch mutation coverage under validation"
+    ]
+  },
+  "current_hosted_partial_failure": {
+    "run": 37374614952,
+    "attempt": 1,
+    "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+    "event": "pull_request",
+    "status": "completed",
+    "conclusion": "failure",
+    "failed_step": "Run complete repository validation",
+    "detail": "Ten hooks passed; final instruction/mutation hook and final integrity step interrupted. Native annotation says operation canceled. Cause not established by that annotation; do not label it runner-allocation failure.",
+    "log_sha256": "d2272f69701914f0f9ccf28c3235cee31fb023e8e8f63407c1e7dd5d06aeba9a",
+    "retry": "None issued: current07636c8 result retained while R7 test repair is prepared; next input needs fresh validation."
+  },
+  "R6": {
+    "selection": "C99",
+    "body_and_reply": "corrected and read back",
+    "body_sha256": "f5ddf4877c0a24c3262bef26bc8daff9444d030835a621ba381c4acad5a87367",
+    "reply_id": 4188897558,
+    "canonical_record": "PR234-round1/R6-measurement-reporting.md",
+    "receipt_sha256": "03fedb10ed5e1164bcadd14bd3781ab4a2bc4f399b93015d7f99f7e5012d463c"
+  },
+  "R7": {
+    "status": "staged_aggregate_ready",
+    "parent": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+    "prior_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+    "sha256": "5c66f5a867ffb9867e3bb61550bfb4e1607cbc00dbffd989e240e21ca277e187",
+    "report_sha256": "08ede36ad5800ec421f12b79a159c385502d4cc7b9ab55465b64e0415e7ce741",
+    "decision_sha256": "b32492a14915baf7b7099c1c53b39781b3c577ee878dbf8357e49399c50bdf17",
+    "paths": [
+      ".github/workflows/Test-StyleGuideGenerator.ps1"
+    ],
+    "selection": "C97",
+    "focused": {
+      "windows7_actual_harness_assertions": 156,
+      "native_exit": 0,
+      "parser_errors": 0,
+      "analyzer_issues": 0,
+      "diff_check": "pass",
+      "index_changed_paths": [],
+      "unstaged_changed_paths": [
+        ".github/workflows/Test-StyleGuideGenerator.ps1"
+      ],
+      "generator_sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+      "identity_injection_cases": [
+        "File.Replace guarded refusal",
+        "File.Move guarded refusal",
+        "File.Replace guard-disabled success",
+        "File.Move guard-disabled success"
+      ],
+      "all_four_goldens_per_case": true
+    },
+    "peer_map_delta": {
+      "historical": "writer/peer-port-map-round1.json",
+      "common_path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "accepted_peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "other_substitutions": "unchanged",
+      "tf_execution": false,
+      "transfer_increment": false
+    },
+    "root_review": "Read full decision, all50addedlines and actual focused evidence. Verified7artifacthashes,6rubric totals,77source/1910deps and exact one-path scope. D90 arithmetic corrected without selection change. Real scratch Replace/Move, stable injected noncandidate identity, exact comparison-disabled mutants, native/schema refusal, equalbytes and allfourgoldens distinguish candidate binding. No native race or substitution proof.",
+    "staged_tree": "0d0be7e39c29abf29b67384f3c44796a06118abf",
+    "aggregate": {
+      "status": "ready",
+      "manifest_sha256": "b94a01647b1ffe2dfaca842099f4131839d0887f5f6eb2276ad8a3a247b0fa00",
+      "expected_node_tests": 567
+    }
   }
 }
