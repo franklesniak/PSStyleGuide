@@ -1,5 +1,5 @@
 {
-  "status": "writer_released",
+  "status": "round1_reviews_pending_finding_assessment",
   "released_at": "2026-10-05T17:25:59.997917+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
@@ -54,12 +54,12 @@
     "first_request_at": "2026-10-05T14:30:38.034661Z",
     "deadline": "2026-10-13T14:30:38.034661Z"
   },
-  "rounds_used": 0,
-  "first_request_at": null,
-  "deadline": null,
-  "pr": null,
-  "head": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
-  "writer": "root pending bounded assignment",
+  "rounds_used": 1,
+  "first_request_at": "2026-10-05T17:57:53.173192+00:00",
+  "deadline": "2026-10-13T17:57:53.173192+00:00",
+  "pr": 233,
+  "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+  "writer": "ps_tf67_compareback_writer",
   "model": [
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
@@ -112,5 +112,235 @@
     "record_sha256": "6a7062c713b314f07eded550f3e87c1081576e4a76e0349eee1fdbed4b11dce6"
   },
   "public_authority": "Root owns index, aggregate, commits, native lifecycle and planning. Writer owns only the two product paths and private implementation evidence.",
-  "next_action": "Apply the exact two-file model at real October5 metadata date; meaningful affected checks, one final candidate aggregate, normal lifecycle and actual compare-back remain required."
+  "next_action": "Finish the enclosing-version finding decision; collect pending Copilot/manual Codex and remaining exact-head hosted validation without duplicate requests.",
+  "planning_checkpoint": "eac18de3a7d33e6df03b4a9d2f084e9f718fee9c",
+  "acceptance_checkpoint_publication": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\checkpoint-publication.json",
+  "candidate_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+  "worker_evidence": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\writer\\evidence.json",
+    "sha256": "7d2e14db73691a63fd38293d72d795bfc9978216b188621d8c948f7bc62852e1",
+    "report_sha256": "6b7630a5633f57cc44dad71978a589ef20c11228165b0ae1a3b1a8d09a996324"
+  },
+  "root_readiness": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\root-readiness.json",
+    "sha256": "2d93d23bbeb1c922b6730cba9512dbcc88393178353b0c5e016ee6db5b71fffb"
+  },
+  "aggregate": {
+    "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\linux-full-validation\\runs\\ps-tf67-compareback-20261005",
+    "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\aggregate-manifest.json",
+    "manifest_sha256": "1d20b849dc03c17bd7ad3bba9a21fa0c6aed7a56ba141cac54d02054db3a03d9",
+    "status": "passed",
+    "session_id": 1328,
+    "started_at": "2026-10-05T17:41:15.724022+00:00",
+    "result_sha256": "fce999be53808d9b7d24fe064a9763f7e8da2c5ae2b06bf9850f68363172f946",
+    "status_sha256": "5e9f87598ce8eed7e5bef57b95aa73238a595140eea79a741d9847bdd3ddbbf9",
+    "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+    "passed_hooks": 11,
+    "skipped_hooks": 0,
+    "source_after_equal": true
+  },
+  "commit": {
+    "status": "committed",
+    "expected_parent": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "expected_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+    "requested_at": "2026-10-05T17:52:52.311265+00:00",
+    "exit": 0,
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\normal-product-commit.log",
+    "log_sha256": "38877b142d1593ca90b3dcc13b3dddabc6d890b2b8fe66b36dacb34c33b12525",
+    "observed_head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "parent": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+    "completed_at": "2026-10-05T17:52:55.052632+00:00"
+  },
+  "actual_endpoints": {
+    "status": "passed",
+    "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "policy_fixture": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+    "results": [
+      {
+        "mode": "AcceptedMaintenance",
+        "command": [
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+          "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+          "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+          "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+          "4783da302e26515d770bad716f02297fe3b08a8d"
+        ],
+        "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+        "started_at": "2026-10-05T17:53:19.477857+00:00",
+        "finished_at": "2026-10-05T17:53:19.815717+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\AcceptedMaintenance-4783da3.log",
+        "log_sha256": "1ccbd6d5d286aba1f018b9c1d003331a66b2ceb6a3625973c1d41c53481f1898"
+      },
+      {
+        "mode": "FinalizeMetadataNow",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "4783da302e26515d770bad716f02297fe3b08a8d",
+          "-PublishedBaselineRevision",
+          "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+          "-FinalizeMetadataNow"
+        ],
+        "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+        "started_at": "2026-10-05T17:53:23.085584+00:00",
+        "finished_at": "2026-10-05T17:53:45.174175+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\FinalizeMetadataNow-4783da3.log",
+        "log_sha256": "269fcbc1cd950584e5ad2d65b9756eb5a6c335de47b8f70ee47db728dd3f6ca9"
+      },
+      {
+        "mode": "MetadataClassificationOnly",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "4783da302e26515d770bad716f02297fe3b08a8d",
+          "-PublishedBaselineRevision",
+          "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+          "-MetadataClassificationOnly"
+        ],
+        "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+        "started_at": "2026-10-05T17:53:48.363367+00:00",
+        "finished_at": "2026-10-05T17:53:50.157695+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\MetadataClassificationOnly-4783da3.log",
+        "log_sha256": "e218ee388a9781961b912b25eb761b9c3d41f3d559d1212be256b3095097df85"
+      },
+      {
+        "mode": "ProposedPolicy",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "4783da302e26515d770bad716f02297fe3b08a8d",
+          "-PublishedBaselineRevision",
+          "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+          "-ProposedPolicy"
+        ],
+        "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
+        "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+        "started_at": "2026-10-05T17:53:53.518470+00:00",
+        "finished_at": "2026-10-05T17:54:15.502788+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\ProposedPolicy-4783da3.log",
+        "log_sha256": "b18f5232cede8847626dbff68a45027f05c9aee8bcdb7b820e34b62d0080da01"
+      }
+    ],
+    "classification": {
+      "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+      "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+      "policy": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+      "classification": "maintenance_required",
+      "maintenancePaths": [
+        ".github/workflows/Test-AgentInstructions.ps1",
+        ".github/workflows/lint-markdown.mjs"
+      ]
+    }
+  },
+  "current_audit": {
+    "exit": 0,
+    "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "authority": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "mode": "ordinary local no-argument two-root audit",
+    "started_at": "2026-10-05T17:54:19.303048+00:00",
+    "finished_at": "2026-10-05T17:54:35.916873+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\current-audit-4783da3.log",
+    "sha256": "0ccaa1d56ed0040cb468462010d83c3aff4111b4e43ae31fa9c8fd476547de7c"
+  },
+  "pr_title": "Align shared validator notes and lint diagnostic with Terraform",
+  "body_sha256": "cb2e1bf0a3582a77d5d015cd607f1afee9233214bf360379ae10d93c8e5284a2",
+  "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\pr-body.md",
+  "publication": {
+    "status": "pushed",
+    "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "branch": "codex/tf67-compareback",
+    "started_at": "2026-10-05T17:55:29.757607+00:00",
+    "remote_branch_preimage": "absent",
+    "exit": 0,
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\topic-push.log",
+    "log_sha256": "b253b046b31a684851d364dd7a7fd714b9def255ed5340cba9a1b120d0b954ee",
+    "actual_head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "verified_at": "2026-10-05T17:55:32.490329+00:00"
+  },
+  "pr_creation": {
+    "status": "confirmed",
+    "requested_at": "2026-10-05T17:56:01.886181+00:00",
+    "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "title": "Align shared validator notes and lint diagnostic with Terraform",
+    "body_sha256": "cb2e1bf0a3582a77d5d015cd607f1afee9233214bf360379ae10d93c8e5284a2",
+    "number": 233,
+    "created_at": "2026-10-05T17:56:27Z",
+    "verified_at": "2026-10-05T17:56:27.933290+00:00"
+  },
+  "pr_url": "https://github.com/franklesniak/PSStyleGuide/pull/233",
+  "round1": {
+    "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "body_sha256": "cb2e1bf0a3582a77d5d015cd607f1afee9233214bf360379ae10d93c8e5284a2",
+    "baseline": "round1-pre-request-final.json",
+    "request_intent_at": "2026-10-05T17:57:53.173192+00:00",
+    "copilot": {
+      "status": "confirmed_pending",
+      "selected_effort": "Balanced",
+      "observed_effort": null,
+      "transport": "supported authenticated Edge Reviewers UI",
+      "request_event_id": 32533320587,
+      "request_at": "2026-10-05T17:58:22Z",
+      "actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "snapshot": "round1-copilot-confirmation.json"
+    },
+    "codex": {
+      "status": "confirmed_pending",
+      "automatic_comment_id": 6000086105,
+      "request_intent_at": "2026-10-05T18:03:48.132651+00:00",
+      "baseline": "round1-resume-reconciliation.json",
+      "automatic_status": "completed_with_finding",
+      "automatic_review_id": 5418629513,
+      "automatic_finding_id": 4187129240,
+      "trigger_id": 6000209320,
+      "request_at": "2026-10-05T18:04:13Z",
+      "actor_id": 11204406,
+      "snapshot": "round1-manual-confirmation.json"
+    },
+    "latest_observation": "round1-manual-confirmation.json",
+    "open_findings": [
+      {
+        "id": 4187129240,
+        "review_id": 5418629513,
+        "thread_id": "PRRT_kwDOQkjdhM6pJwxd",
+        "source": "automatic Codex",
+        "title": "Increment the enclosing script revision",
+        "status": "validation_and_decision_in_progress",
+        "owner": "ps_tf67_compareback_writer"
+      }
+    ],
+    "hosted_collection": "round1-hosted-4783da3/round1-manual-confirmation-collection.json"
+  }
 }

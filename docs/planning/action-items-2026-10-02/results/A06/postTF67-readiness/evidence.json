@@ -1,0 +1,788 @@
+{
+  "kind": "bounded read-only conditional A06/C98 readiness; no release or acceptance",
+  "captured_utc": "2026-10-05T17:51:02.144166+00:00",
+  "source_guards": [
+    {
+      "path": "plan:STATUS.md",
+      "sha256": "3c2735773f28e58e6ed800768de946b66f780324cb73da67f6bed9abc5db160a"
+    },
+    {
+      "path": "plan:README.md",
+      "sha256": "f7228cfd5bc0dd59aafddb89880930f9930fe4e5ddf3305d0b4999a6c11b6fd4"
+    },
+    {
+      "path": "plan:LOOP-POLICY.md",
+      "sha256": "04bc871d57d8b3cb2ff31dfa6bf6d2d626c23bae86e56b4f26603d80dbb2a4bf"
+    },
+    {
+      "path": "plan:DECISION-PROCESS.md",
+      "sha256": "23a576d520012b188a70615f3f0c121800a9a8dcf714ceb15fcd24e7741b1299"
+    },
+    {
+      "path": "plan:tasks/A06.md",
+      "sha256": "332e538613bd227564932a2ec10889f797959495f7580c343324b85509c1f1e7"
+    },
+    {
+      "path": "plan:results/A06/RESULT.md",
+      "sha256": "3b35e79088725227a82d568961c44c63637915093b3ff973b5ecc89100beedfd"
+    },
+    {
+      "path": "plan:results/A06/design.md",
+      "sha256": "6b5d43d8a1eafe2b6a4f07593d82012f5aa62a8432d275fa1a0a653eb7ba8d51"
+    },
+    {
+      "path": "plan:results/A06/frontmatter-spacing-decision.md",
+      "sha256": "d40c9d59d23a7d0d3b9c621a970899f6eaaf1cc4b86a79779fd69e7b22e1d9a0"
+    },
+    {
+      "path": "plan:results/A06/postTF66-readiness/REPORT.md",
+      "sha256": "1936517fa0e4c62b989fee9fe78658007096bba3812fa30a1bea45753b382a4a"
+    },
+    {
+      "path": "plan:results/A03/RESULT.md",
+      "sha256": "984658e760ec13ec47466ba891d853929b280a0685bcf476f7286064190d9bbb"
+    },
+    {
+      "path": "plan:results/A03/foundation-dependency-decision.md",
+      "sha256": "fd19e4ab29c9f6c23541796550f088ae1c4fdb0dd530b2aee1bb9e78e44903d4"
+    },
+    {
+      "path": "plan:results/A02/ps232-landed-acceptance.json",
+      "sha256": "2005c051fbc11017c416f919a0467fd704c73efc850a27912216261a6483d783"
+    },
+    {
+      "path": "plan:results/A06/postTF66-readiness/evidence.json",
+      "sha256": "9d24caaaac68a869d5e84a01e7895e9c48f8b21bc7b7e22a8c5151d307d938fe"
+    },
+    {
+      "path": "scratch:PSStyleGuide-PS-postTF67-R1-readiness-20261005/catalog.json",
+      "sha256": "d322c8b2c54e44ef8807d6f2d89f5f5c3d8ddd9f4cce982fa98ef1ebc9328c04"
+    },
+    {
+      "path": "scratch:PSStyleGuide-PS-TF67-compareback-20261005/execution-state.json",
+      "sha256": "8429fcdd9f90666b2f9ab516050d31602d37502ee7b4fccd58a99ced3d123142"
+    },
+    {
+      "path": "scratch:PSStyleGuide-TF-carryback-20261005/landed-peer-acceptance.json",
+      "sha256": "fa624be22b0bd381de4f77c5a0f64721c2e6a254beffe4bad0fd1185d64ac3a7"
+    }
+  ],
+  "lanes": {
+    "PSaccepted": {
+      "object": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+      "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+      "accepted": true,
+      "prior_lane": "PSaccepted",
+      "prior_object": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "observations": 38,
+      "unchanged_reuse_prior": [
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        ".github/workflows/Initialize-CiToolchain.ps1",
+        ".github/workflows/Test-BlankLineExamples.ps1",
+        ".github/workflows/Test-CheckoutCredentials.ps1",
+        ".github/workflows/Test-ExactGitPathSet.ps1",
+        ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-StyleGuideGenerator.ps1",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/build.yml",
+        ".github/workflows/ci-toolchain.json",
+        ".github/workflows/devcontainer-ci.yml",
+        ".github/workflows/package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/workflow-policy-cases.json",
+        ".github/workflows/workflow-policy-contract.json",
+        ".pre-commit-config.yaml",
+        "CONTRIBUTING.md",
+        "STYLE_GUIDE.md",
+        "STYLE_GUIDE_CHAT.md",
+        "STYLE_GUIDE_FULL.md",
+        "STYLE_GUIDE_RATIONALE.md",
+        "copilot-instructions.md",
+        "package-lock.json",
+        "package.json",
+        "powershell.instructions.md"
+      ],
+      "changed": [
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "c36ffc6bf2f845f2ff297e2045799331365634e0",
+            "bytes": 5786,
+            "sha256": "99327c4c73610ba42057b6cfa94c5d2178d991b1741e194733ccfcbac8524fb7"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+            "bytes": 6063,
+            "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae"
+          }
+        },
+        {
+          "path": ".github/workflows/NpmTools.mjs",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+            "bytes": 7375,
+            "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+            "bytes": 7656,
+            "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+          }
+        },
+        {
+          "path": ".github/workflows/NpmTools.test.mjs",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "8249cd855785e2847df7ab6fad60caf219da59bc",
+            "bytes": 11392,
+            "sha256": "812384d898f3222e3f0c39a9e1f07c8d233b021dff9f0a5ef15c34ebfc65167b"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+            "bytes": 13810,
+            "sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1"
+          }
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "469f6f6fe3f44baf912cf1b3b7af3c58471580ad",
+            "bytes": 218742,
+            "sha256": "0d15cae50240f7b872b1647733c429a9b76f9337aba3f09cb45408e03bcdf5c6"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+            "bytes": 229936,
+            "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c"
+          }
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "4541b6a4322af6192044a8eff5a4e55ab13b28cb",
+            "bytes": 474787,
+            "sha256": "90d25fa4716509043c33d9dc5c57790d076c11f66131fcd2db6e14dfda4d4e11"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "0da8c5c11b1dd18872167b3aeb63bbdb2041ff45",
+            "bytes": 482175,
+            "sha256": "31f41e8833f62810f00ed32e3d6f5c4b857770359bc4f94d9a667fe65edfd64b"
+          }
+        },
+        {
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "ed4e9ef4b5bea4967477c9b11666e90b2a8be49e",
+            "bytes": 98497,
+            "sha256": "e3a53bd3bbcd82cbf751f753a7a4b2f44afa3d3efd3c643662b2f8c2baae41eb"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "4098cd1c6d8dadd114fbd1c7a7da5b1918d9eacb",
+            "bytes": 98544,
+            "sha256": "5a14647cf03e46f0c776813ef637b6872097a43210efdedee7a095c523e88002"
+          }
+        },
+        {
+          "path": ".github/workflows/Test-LocalValidation.test.mjs",
+          "prior": {
+            "exists": false,
+            "mode": null,
+            "type": null,
+            "blob": null,
+            "bytes": null,
+            "sha256": null
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "7965b2476cf022e6efea355d438162937bef04b3",
+            "bytes": 4039,
+            "sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b"
+          }
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "997d9eac5ce93c379179b6ba75d1839cb6eb4f73",
+            "bytes": 25947,
+            "sha256": "52e30b5c3f430223874ea3d13a6a2d6fa595b60b876b1fa587417fcb1cb6f547"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+            "bytes": 26228,
+            "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
+          }
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "a35931f8a7de2c9a8d029c24ba796179399b9a56",
+            "bytes": 12748,
+            "sha256": "e3699604289757035df08212470bb0b2d7c3ec8a3cb59d0270cee74952dfdc4c"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+            "bytes": 12837,
+            "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7"
+          }
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "b0f7fb0b657232fa0e857e946d725fdd6876c028",
+            "bytes": 52385,
+            "sha256": "81e32f80c701a6a2e53443e10d3a0a4852d288af54b92dc0019e84d0c8be266f"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+            "bytes": 51809,
+            "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a"
+          }
+        },
+        {
+          "path": ".github/workflows/scripts-README.md",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "17e5633d0e1485ad51e2edb83eb9156a81bc17e7",
+            "bytes": 6613,
+            "sha256": "bd26609bfda4711e02f11eec138cc108d95059cd637b7822236a0056f4ebf38b"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "6446258f0d71c22ff68aceb64c87121d3f9c72d8",
+            "bytes": 13157,
+            "sha256": "e782b1a213003ca19f4ece0ccb992f0343eaaec9f89dcc6255b376741dc20881"
+          }
+        }
+      ]
+    },
+    "TFaccepted": {
+      "object": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631",
+      "accepted": true,
+      "prior_lane": "TFaccepted",
+      "prior_object": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "observations": 38,
+      "unchanged_reuse_prior": [
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        ".github/workflows/Initialize-CiToolchain.ps1",
+        ".github/workflows/NpmTools.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Test-CheckoutCredentials.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-ExactGitPathSet.ps1",
+        ".github/workflows/Test-StateRecoveryExamples.mjs",
+        ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-StyleGuideGenerator.ps1",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/agent-instructions.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/ci-toolchain.json",
+        ".github/workflows/copilot-setup-steps.yml",
+        ".github/workflows/devcontainer-ci.yml",
+        ".github/workflows/package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/workflow-policy-cases.json",
+        ".github/workflows/workflow-policy-contract.json",
+        ".pre-commit-config.yaml",
+        "CONTRIBUTING.md",
+        "STYLE_GUIDE.md",
+        "STYLE_GUIDE_CHAT.md",
+        "STYLE_GUIDE_FULL.md",
+        "STYLE_GUIDE_RATIONALE.md",
+        "copilot-instructions.md",
+        "package-lock.json",
+        "package.json",
+        "terraform.instructions.md"
+      ],
+      "changed": [
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "916e0a34258de762772fa888808e403e798099f3",
+            "bytes": 6093,
+            "sha256": "08f0533a20c2292b13434de9e4b858d64d33d77b2c40a3e8888d9b561651af63"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+            "bytes": 6063,
+            "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae"
+          }
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "423a1e02869cbcb8b29fe4e56f53a014ebe39e8f",
+            "bytes": 229956,
+            "sha256": "f80f2b3ca171a1010ecd6cffe55e160574d80d2a7b9837aae181910b3f0a1e33"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "7275b050ca3067706d646412a7f751138073e5bb",
+            "bytes": 229955,
+            "sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2"
+          }
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "eee62dff4e2970dc7b8ba197eb3872cc4eca639d",
+            "bytes": 482223,
+            "sha256": "dd77f67a8eb79584d86a69a8806302a7fd0a26251da90b6a9f5e7fd281011790"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+            "bytes": 482175,
+            "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+          }
+        },
+        {
+          "path": ".github/workflows/Test-LocalValidation.test.mjs",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "86e7b19fa5453efbe5373a1a1dd052b4b2dc7b82",
+            "bytes": 4038,
+            "sha256": "decdffd21c04e3f5bca5364842a734543c2681a60ea6d2792c7acc65e1ae13cb"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "7965b2476cf022e6efea355d438162937bef04b3",
+            "bytes": 4039,
+            "sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b"
+          }
+        },
+        {
+          "path": ".github/workflows/scripts-README.md",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "b049d7881a2cd2ba144dd63b67e10bb0287a7aaf",
+            "bytes": 11650,
+            "sha256": "240b53ff2651bd11c30fde2feacd3d259dbd533ee7fa6a646302b0f2874d1480"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "9a88a8ebdba3a24cf45c82639da4bcb2442c5271",
+            "bytes": 13086,
+            "sha256": "9e483a42e1a01130205bc7dfa55fdac5e4a4c36244f98eb57e250d2cc0c86d97"
+          }
+        }
+      ]
+    },
+    "PSconditionalCandidate": {
+      "object": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+      "tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+      "accepted": false,
+      "prior_lane": "PSproposed",
+      "prior_object": "95d5e8a1f46040c2044717e156e81638f1764bb3",
+      "observations": 38,
+      "unchanged_reuse_prior": [
+        ".github/workflows/Classify-InstructionMaintenance.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        ".github/workflows/Initialize-CiToolchain.ps1",
+        ".github/workflows/NpmTools.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-BlankLineExamples.ps1",
+        ".github/workflows/Test-CheckoutCredentials.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-ExactGitPathSet.ps1",
+        ".github/workflows/Test-LocalValidation.test.mjs",
+        ".github/workflows/Test-StateRecoveryPowerShell.ps1",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-StyleGuideGenerator.ps1",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/agent-instructions.yml",
+        ".github/workflows/build.yml",
+        ".github/workflows/ci-toolchain.json",
+        ".github/workflows/copilot-setup-steps.yml",
+        ".github/workflows/devcontainer-ci.yml",
+        ".github/workflows/package-lock.json",
+        ".github/workflows/package.json",
+        ".github/workflows/workflow-policy-cases.json",
+        ".github/workflows/workflow-policy-contract.json",
+        ".pre-commit-config.yaml",
+        "CONTRIBUTING.md",
+        "STYLE_GUIDE.md",
+        "STYLE_GUIDE_CHAT.md",
+        "STYLE_GUIDE_FULL.md",
+        "STYLE_GUIDE_RATIONALE.md",
+        "copilot-instructions.md",
+        "package-lock.json",
+        "package.json",
+        "powershell.instructions.md"
+      ],
+      "changed": [
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "0da8c5c11b1dd18872167b3aeb63bbdb2041ff45",
+            "bytes": 482175,
+            "sha256": "31f41e8833f62810f00ed32e3d6f5c4b857770359bc4f94d9a667fe65edfd64b"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+            "bytes": 482175,
+            "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+          }
+        },
+        {
+          "path": ".github/workflows/scripts-README.md",
+          "prior": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "7e26f58ea772aa3f8c40ed4a76310a55f8b9c701",
+            "bytes": 11721,
+            "sha256": "03cf4148bd37895a66b3112861caf96f358c4ce7018136b2829096ac43a979f3"
+          },
+          "current": {
+            "exists": true,
+            "mode": "100644",
+            "type": "blob",
+            "blob": "6446258f0d71c22ff68aceb64c87121d3f9c72d8",
+            "bytes": 13157,
+            "sha256": "e782b1a213003ca19f4ece0ccb992f0343eaaec9f89dcc6255b376741dc20881"
+          }
+        }
+      ]
+    }
+  },
+  "artifact_regions": {
+    "PS": {
+      "sha256": "e1a9fac3ad87f8714cca38099273f6b5ec2d67069812a13ae2db31e74caa5bee",
+      "start_line": 473,
+      "end_line": 543,
+      "unchanged_from_prior": true,
+      "unchanged_complete_file_from_prior_lane": true,
+      "digest_convention": "selected LF lines without final LF"
+    },
+    "TF": {
+      "sha256": "90feff7e41f85f1fa866cfc7bfb21dc358439ea157d03ddb090c20db405e5e23",
+      "start_line": 473,
+      "end_line": 557,
+      "unchanged_from_prior": true,
+      "unchanged_complete_file_from_prior_lane": true,
+      "digest_convention": "selected LF lines without final LF"
+    }
+  },
+  "catalog_reuse": {
+    "source": {
+      "path": "scratch:PSStyleGuide-PS-postTF67-R1-readiness-20261005/catalog.json",
+      "sha256": "d322c8b2c54e44ef8807d6f2d89f5f5c3d8ddd9f4cce982fa98ef1ebc9328c04"
+    },
+    "exact_all_22_candidate_and_TF_identity_guards": true,
+    "equal": 13,
+    "retained_exceptions": 9,
+    "not_full_tree_audit": true
+  },
+  "additional_C98_workflow_comparison": {
+    ".github/workflows/build.yml": {
+      "PS": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+        "bytes": 4375,
+        "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+      },
+      "TF": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1",
+        "bytes": 4348,
+        "sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b"
+      },
+      "raw_equal": false,
+      "exact_diff": "--- PS:d0025e28eaaef57f4466bc83e9154cd9e7115fb3:.github/workflows/build.yml\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/build.yml\n@@ -6,3 +6,3 @@\n jobs:\n-  verify_generated_artifacts:\n+  verify:\n     if: github.event_name != 'push' || github.event.deleted != true\n@@ -19,3 +19,3 @@\n           if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or\n-              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n+              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n               throw 'Unexpected acquisition repository.'\n@@ -37,3 +37,3 @@\n           if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }\n-          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n+          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n           if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }\n@@ -66,3 +66,3 @@\n       contents: read\n-    needs: verify_generated_artifacts\n+    needs: verify\n     steps:\n@@ -91,3 +91,3 @@\n             copilot-instructions.md\n-            powershell.instructions.md\n+            terraform.instructions.md\n             STYLE_GUIDE_CHAT.md\n"
+    },
+    ".github/workflows/markdownlint.yml": {
+      "PS": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+        "bytes": 6686,
+        "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+      },
+      "TF": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+        "bytes": 6714,
+        "sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+      },
+      "raw_equal": false,
+      "exact_diff": "--- PS:d0025e28eaaef57f4466bc83e9154cd9e7115fb3:.github/workflows/markdownlint.yml\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/markdownlint.yml\n@@ -21,3 +21,3 @@\n           if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or\n-              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n+              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n               throw 'Unexpected acquisition repository.'\n@@ -39,3 +39,3 @@\n           if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }\n-          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n+          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n           if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }\n@@ -82,3 +82,3 @@\n           if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or\n-              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n+              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n               throw 'Unexpected acquisition repository.'\n@@ -100,3 +100,3 @@\n           if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }\n-          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n+          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n           if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }\n"
+    },
+    ".github/workflows/devcontainer-ci.yml": {
+      "PS": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "bytes": 8391,
+        "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "TF": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "bytes": 8391,
+        "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "raw_equal": true,
+      "exact_diff": ""
+    },
+    ".github/workflows/Test-CheckoutCredentials.ps1": {
+      "PS": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+        "bytes": 3081,
+        "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+      },
+      "TF": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+        "bytes": 3088,
+        "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+      },
+      "raw_equal": false,
+      "exact_diff": "--- PS:d0025e28eaaef57f4466bc83e9154cd9e7115fb3:.github/workflows/Test-CheckoutCredentials.ps1\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/Test-CheckoutCredentials.ps1\n@@ -39,3 +39,3 @@\n }\n-if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n+if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {\n     throw 'credential-policy: origin is not a credential-free GitHub HTTPS URL'\n"
+    },
+    ".github/workflows/workflow-policy-contract.json": {
+      "PS": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "bytes": 1517,
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+      },
+      "TF": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+        "bytes": 1496,
+        "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9"
+      },
+      "raw_equal": false,
+      "exact_diff": "--- PS:d0025e28eaaef57f4466bc83e9154cd9e7115fb3:.github/workflows/workflow-policy-contract.json\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/workflow-policy-contract.json\n@@ -3,3 +3,3 @@\n   \"roles\": {\n-    \"artifactVerifier\": \"verify_generated_artifacts\"\n+    \"artifactVerifier\": \"verify\"\n   },\n@@ -33,3 +33,3 @@\n         \"name\": \"style-guide-committed-${{ github.run_id }}-${{ github.run_attempt }}\",\n-        \"path\": \"copilot-instructions.md\\npowershell.instructions.md\\nSTYLE_GUIDE_CHAT.md\\nSTYLE_GUIDE_FULL.md\\n\",\n+        \"path\": \"copilot-instructions.md\\nterraform.instructions.md\\nSTYLE_GUIDE_CHAT.md\\nSTYLE_GUIDE_FULL.md\\n\",\n         \"if-no-files-found\": \"error\",\n"
+    },
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+      "PS": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+      },
+      "TF": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+      },
+      "raw_equal": true,
+      "exact_diff": ""
+    },
+    ".github/workflows/workflow-policy-cases.json": {
+      "PS": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      },
+      "TF": {
+        "exists": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      },
+      "raw_equal": true,
+      "exact_diff": ""
+    }
+  },
+  "candidate_scope": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/lint-markdown.mjs"
+  ],
+  "candidate_diff": "diff --git a/.github/workflows/Test-AgentInstructions.ps1 b/.github/workflows/Test-AgentInstructions.ps1\nindex 0da8c5c..7ee712e 100644\n--- a/.github/workflows/Test-AgentInstructions.ps1\n+++ b/.github/workflows/Test-AgentInstructions.ps1\n@@ -5412,7 +5412,7 @@ function Get-DecisionRecordLifecycleFailure {\n     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.\n     # Parameters, return shape, and positional contract can change without notice.\n     # Positional parameters are disabled; internal callers use named arguments.\n-    # Version: 1.0.20261005.0\n+    # Version: 1.0.20261005.1\n     [CmdletBinding(PositionalBinding = $false)]\n     [OutputType([string])]\n     param(\n@@ -6204,7 +6204,7 @@ function Get-DocumentMetadataContext {\n     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.\n     # Parameters, return shape, and positional contract can change without notice.\n     # Positional parameters are disabled; internal callers use named arguments.\n-    # Version: 1.7.20261005.0\n+    # Version: 1.7.20261005.1\n     [CmdletBinding(PositionalBinding = $false)]\n     [OutputType([pscustomobject])]\n     param(\ndiff --git a/.github/workflows/lint-markdown.mjs b/.github/workflows/lint-markdown.mjs\nindex 111664f..08942d7 100644\n--- a/.github/workflows/lint-markdown.mjs\n+++ b/.github/workflows/lint-markdown.mjs\n@@ -24,7 +24,7 @@ export async function lintMarkdownFiles(root = repoRoot, run = runBounded) {\n     throw new Error('Markdown lint requires root package.json engines.node to declare an exact Node version (major.minor.patch).');\n   }\n   if (required !== process.versions.node) {\n-    throw new Error(`Markdown lint requires declared Node ${required ?? 'version'}; observed ${process.versions.node}.`);\n+    throw new Error(`Markdown lint requires declared Node ${required}; observed ${process.versions.node}.`);\n   }\n   const child = path.join(root, '.github/workflows/lint-nested-markdown.js');\n   const leaf = fs.lstatSync(child);\n",
+  "decisions_retained": [
+    "A06-D1 C96",
+    "A06-D2 C97.4",
+    "A06-D3 C96.6",
+    "frontmatter-D4 C98",
+    "foundation-C98"
+  ],
+  "new_material_findings": [],
+  "implementation_scope_reused": {
+    "A06_core_write_paths": [
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-ExactGitPathSet.ps1",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-StyleGuideGenerator.ps1"
+    ],
+    "PS_intentional_generated_delta": "powershell.instructions.md applyTo one-space; actual regeneration determines all output bytes",
+    "generated_guard_paths": [
+      "copilot-instructions.md",
+      "STYLE_GUIDE_CHAT.md",
+      "STYLE_GUIDE_FULL.md",
+      "PS powershell.instructions.md / TF terraform.instructions.md"
+    ],
+    "A03_generator_platform_integration": [
+      ".github/workflows/build.yml",
+      ".github/workflows/Validate-WorkflowPolicy.mjs",
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      ".github/workflows/workflow-policy-cases.json"
+    ],
+    "A03_contract_conditional": ".github/workflows/workflow-policy-contract.json only for actual finite-role/schema change; no automatic parser/action edits",
+    "A21_generator_admission": [
+      ".github/workflows/Classify-InstructionMaintenance.mjs",
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs"
+    ],
+    "new_generator_selector_absent": true,
+    "new_recovery_harness_absent": true,
+    "later_harness_work": "A06/A03/A07/A21 selected integration after A16 real13-path batch; real GateA/B and D5 cells remain; no deadline/owner/counter reset"
+  },
+  "A06_original_remaining_ids": {
+    "count": 86,
+    "source": {
+      "path": "plan:results/A06/postTF66-readiness/evidence.json",
+      "sha256": "9d24caaaac68a869d5e84a01e7895e9c48f8b21bc7b7e22a8c5151d307d938fe"
+    },
+    "unchanged": true
+  },
+  "counters": {
+    "A06": "0/12; no PR clock",
+    "A03": "2/12",
+    "A07": "4/12",
+    "A21": "4/12"
+  },
+  "root_state_at_read": {
+    "status": "final_candidate_aggregate_running",
+    "aggregate_status": "running",
+    "accepted": false,
+    "limitation": "Root-owned state may lag its running aggregate; no polling or inferred completion."
+  },
+  "limits": [
+    "No network/native queries, tests, installs, downloads, aggregate, review or descendants.",
+    "Only assigned REPORT.md and evidence.json writes.",
+    "No product/index/ref/planning/root-state writes.",
+    "Actual main freshness remains root responsibility.",
+    "5.1 parse/refusal evidence is not runtime acceptance; no native-ext4 generator proof inferred."
+  ],
+  "tooling_note": "Initial read-only collector stopped before any writes because it included the selected region final LF; the prior convention omits that LF. Corrected digest convention matched both stored regions and complete source blobs. No product test failed or changed.",
+  "next_action": "Root accepts current PS compare-back normally, records refreshed actual paired C98 foundation, then releases serialized PS A06 batch."
+}
