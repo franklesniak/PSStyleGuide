@@ -1,11 +1,11 @@
 {
-  "status": "round2_reviews_and_hosted_checks_pending",
-  "captured_at": "2026-10-05T07:48:00.993951+00:00",
+  "status": "round3_local_pass_pending_publication",
+  "captured_at": "2026-10-05T08:37:23.045065+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
   "accepted_peer": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
-  "candidate_tree": "e5f2aee1fbe9eb4650af69c30aa94edc914e4dcf",
+  "candidate_tree": "95d5e8a1f46040c2044717e156e81638f1764bb3",
   "catalog": [
     {
       "path": ".github/workflows/Check-NpmAudit.mjs",
@@ -155,9 +155,9 @@
       },
       "postimage": {
         "mode": "100644",
-        "bytes": 229937,
-        "sha256": "96521801b6d60d0a2f1e75b42b75c867ea5caf310863746d0e730e6a5451eff2",
-        "blob": "b742c29187f76c79f6e6cb20aed1e68dab2b7478"
+        "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+        "bytes": 229936,
+        "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c"
       },
       "accepted_TF": {
         "mode": "100644",
@@ -165,7 +165,13 @@
         "bytes": 229956,
         "sha256": "f80f2b3ca171a1010ecd6cffe55e160574d80d2a7b9837aae181910b3f0a1e33"
       },
-      "raw_equal_TF": false
+      "raw_equal_TF": false,
+      "round2_postimage": {
+        "mode": "100644",
+        "bytes": 229937,
+        "sha256": "96521801b6d60d0a2f1e75b42b75c867ea5caf310863746d0e730e6a5451eff2",
+        "blob": "b742c29187f76c79f6e6cb20aed1e68dab2b7478"
+      }
     },
     {
       "path": ".github/workflows/Test-AgentInstructions.ps1",
@@ -177,9 +183,9 @@
       },
       "postimage": {
         "mode": "100644",
-        "bytes": 482223,
-        "sha256": "9c7afd9d4e9a67da3e78492b2fad8e6c67275adff91605713cc23d6eb5161912",
-        "blob": "47c83c6afaa239413cc9e4d3ccecce72d9260c91"
+        "blob": "0da8c5c11b1dd18872167b3aeb63bbdb2041ff45",
+        "bytes": 482175,
+        "sha256": "31f41e8833f62810f00ed32e3d6f5c4b857770359bc4f94d9a667fe65edfd64b"
       },
       "accepted_TF": {
         "mode": "100644",
@@ -187,7 +193,13 @@
         "bytes": 482223,
         "sha256": "dd77f67a8eb79584d86a69a8806302a7fd0a26251da90b6a9f5e7fd281011790"
       },
-      "raw_equal_TF": false
+      "raw_equal_TF": false,
+      "round2_postimage": {
+        "mode": "100644",
+        "bytes": 482223,
+        "sha256": "9c7afd9d4e9a67da3e78492b2fad8e6c67275adff91605713cc23d6eb5161912",
+        "blob": "47c83c6afaa239413cc9e4d3ccecce72d9260c91"
+      }
     },
     {
       "path": ".github/workflows/Test-CiHelpers.test.mjs",
@@ -512,22 +524,21 @@
     "scope": "Existing classifier/local validation on both platforms plus Linux NpmTools; original broader focused results retained separately at original head."
   },
   "independent_quality": {
-    "status": "pass",
-    "report": "round2-repair-quality/REPORT.md",
-    "sha256": "71133ab0f53e8b5cc112ab7c17fe11df610f987aef181b5601437bcbd443e9c8"
+    "status": "bounded_staged_source_pass_not_final_PR_pass",
+    "report_sha256": "d44a0c6c999278446d8e53f7cd6cdadc7e457346fed2e48467287f2b1d5b6c0f",
+    "evidence_sha256": "beda90fc33740bf728962bdb21fd5e4fb4cf5a594bede49f099863afd4149cee",
+    "candidate_tree": "95d5e8a1f46040c2044717e156e81638f1764bb3"
   },
   "validation": {
-    "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\linux-full-validation\\round2-manifest.json",
-    "manifest_sha256": "1b094fa8d6f8ef7126c0fbf320502395af4f200fb5fd2b463b8ad812340ef50b",
-    "aggregate_run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\linux-full-validation\\runs\\ps232-round2-20261005",
+    "manifest_sha256": "cfc14da563740e9ca78c9514acf44784ea9f7222728f0f6c5a3e3ec99fe32277",
+    "candidate_tree": "95d5e8a1f46040c2044717e156e81638f1764bb3",
     "staged_preflight": "passed",
-    "focused_node": "43 passed; zero failures/skips",
     "aggregate": "passed",
     "hooks_passed": 11,
     "hooks_skipped": 0,
     "wrapper_exit": 0,
     "all_source_index_config_dependency_ref_guards": "unchanged",
-    "result_sha256": "a10e4c5be3151ff77fd1ec7b1ed18a32b540cacf7f07e31051b4460f9d47b960"
+    "result_sha256": "8029f75d54cd4e6deec0740a47c27c8a4f37888bf564bd5e92ea5414f1f29a75"
   },
   "transfers": {
     "A02": {
@@ -555,11 +566,11 @@
   "rounds_used": 2,
   "first_request_at": "2026-10-05T06:26:07Z",
   "deadline": "2026-10-13T06:26:07+00:00",
-  "metadata_carry_back": "A21 six shared notes plus classifier deletion; A07 shared fixture prefix. Transfer3 not released; refresh accepted peers before the next directional batch.",
-  "remaining": "Copilot result, remaining hosted instruction run, independent final quality, normal merge/landed acceptance, then exact paired comparison and needed carry-back.",
+  "metadata_carry_back": "A21 currently54 differing Version notes (50main/4SelfTest) plus classifier deletion; A07 shared fixture prefix. Two accepted TF helpers already have Oct5.0 tuples, requiring actual destination/date arithmetic. Transfer3 is not released; refresh accepted peers before it.",
+  "remaining": "Publish repaired head/body, reply once to each R3 duplicate, resolve, and request round3. Current-input reviews/hosted checks/final quality/normal merge/landed acceptance and paired compare-back remain. All22 outcomes and402 contracts stay in scope.",
   "implementation_evidence_sha256": "a974f641c004e31a3b2d47c953e9763338ec5314b7c8fb14afa492a27213e95e",
   "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8",
-  "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+  "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
   "round1": {
     "head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
     "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -771,7 +782,7 @@
     "actual_endpoints": {
       "status": "passed",
       "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
-      "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+      "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
       "results": [
         {
           "mode": "AcceptedMaintenance",
@@ -780,16 +791,16 @@
             "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
             "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
             "f168f83b89f64b6bca9d520ddec4b58969060fb6",
-            "aafa9a4a41318d0cf1b61d873b321567b31ac985"
+            "f77a58dede8f6f68b45e0d62e5b96e2fed477c58"
           ],
           "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
           "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
-          "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
-          "started_at": "2026-10-05T07:22:41.916065+00:00",
-          "finished_at": "2026-10-05T07:22:43.521468+00:00",
+          "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+          "started_at": "2026-10-05T08:35:32.668995+00:00",
+          "finished_at": "2026-10-05T08:35:33.326863+00:00",
           "exit": 0,
-          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-AcceptedMaintenance-aafa9a4.log",
-          "log_sha256": "2b929dcc9a3d30acfced3b946b33db4382def9dc2b06b14b918fa6417931ca3d"
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round3-AcceptedMaintenance-f77a58d.log",
+          "log_sha256": "984d2ea2998bc88752328a76c774e5a5fca8419b257dd871d2a9b8c5a9c66594"
         },
         {
           "mode": "FinalizeMetadataNow",
@@ -801,19 +812,19 @@
             "-File",
             ".github/workflows/Test-AgentInstructions.ps1",
             "-InputRevision",
-            "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+            "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
             "-PublishedBaselineRevision",
             "f168f83b89f64b6bca9d520ddec4b58969060fb6",
             "-FinalizeMetadataNow"
           ],
           "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
           "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
-          "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
-          "started_at": "2026-10-05T07:22:45.173008+00:00",
-          "finished_at": "2026-10-05T07:23:33.956060+00:00",
+          "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+          "started_at": "2026-10-05T08:35:34.506194+00:00",
+          "finished_at": "2026-10-05T08:36:12.744908+00:00",
           "exit": 0,
-          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-FinalizeMetadataNow-aafa9a4.log",
-          "log_sha256": "e988c25f97d09641b71b2cf5e87dcdcd355a5d853625f42a436c9a342b470b4f"
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round3-FinalizeMetadataNow-f77a58d.log",
+          "log_sha256": "e1ab2897e0415b22f9360973930ae7caa5ee76633f8c52d49992061dcfd0f896"
         },
         {
           "mode": "MetadataClassificationOnly",
@@ -825,19 +836,19 @@
             "-File",
             ".github/workflows/Test-AgentInstructions.ps1",
             "-InputRevision",
-            "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+            "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
             "-PublishedBaselineRevision",
             "f168f83b89f64b6bca9d520ddec4b58969060fb6",
             "-MetadataClassificationOnly"
           ],
           "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
           "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
-          "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
-          "started_at": "2026-10-05T07:23:35.051720+00:00",
-          "finished_at": "2026-10-05T07:23:37.362790+00:00",
+          "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+          "started_at": "2026-10-05T08:36:13.927725+00:00",
+          "finished_at": "2026-10-05T08:36:16.042873+00:00",
           "exit": 0,
-          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-MetadataClassificationOnly-aafa9a4.log",
-          "log_sha256": "f0ae9a64b26d00d27a1b95be05d494fd28dbb38d9c42b3f19f1fc984729e5e2a"
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round3-MetadataClassificationOnly-f77a58d.log",
+          "log_sha256": "de5df4455577d498b2ae1d24fd0fcd666c2e150a615fd761b056b49fac268e96"
         },
         {
           "mode": "ProposedPolicy",
@@ -849,43 +860,43 @@
             "-File",
             ".github/workflows/Test-AgentInstructions.ps1",
             "-InputRevision",
-            "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+            "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
             "-PublishedBaselineRevision",
             "f168f83b89f64b6bca9d520ddec4b58969060fb6",
             "-ProposedPolicy"
           ],
           "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
           "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
-          "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
-          "started_at": "2026-10-05T07:23:38.329730+00:00",
-          "finished_at": "2026-10-05T07:24:11.506396+00:00",
+          "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+          "started_at": "2026-10-05T08:36:17.064390+00:00",
+          "finished_at": "2026-10-05T08:36:47.659889+00:00",
           "exit": 0,
-          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-ProposedPolicy-aafa9a4.log",
-          "log_sha256": "25c6d642c5e18d3393ba8a49675d28c964c8795a420f2e2999f3a5798453beab"
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round3-ProposedPolicy-f77a58d.log",
+          "log_sha256": "8283015412b872fce026a2edb68b43c9ca808dca06145dc9fc9ab614ce968d1d"
         }
       ]
     },
     "current_audit": {
       "exit": 0,
-      "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+      "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
       "authority": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
       "mode": "ordinary local no-argument two-root audit",
-      "started_at": "2026-10-05T07:24:13.270455+00:00",
-      "finished_at": "2026-10-05T07:24:29.030079+00:00",
-      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-current-audit-aafa9a4.log",
+      "started_at": "2026-10-05T08:36:49.143232+00:00",
+      "finished_at": "2026-10-05T08:37:03.972123+00:00",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round3-current-audit-f77a58d.log",
       "sha256": "8c1159f87e22e0169762e31649051bdb7d711e3113aed34ae09e3574004ae950"
     },
     "commit": {
-      "started_at": "2026-10-05T07:22:16.751825+00:00",
-      "finished_at": "2026-10-05T07:22:20.086035+00:00",
+      "started_at": "2026-10-05T08:35:10.564057+00:00",
+      "finished_at": "2026-10-05T08:35:13.571236+00:00",
       "exit": 0,
-      "head_after": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
-      "prior_head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
-      "candidate_tree": "e5f2aee1fbe9eb4650af69c30aa94edc914e4dcf",
-      "log_sha256": "5c99e030ed2597f91ab124ca520a048de3a6972d1e8973f7d8c0a433797988d3",
+      "head_after": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+      "prior_head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+      "candidate_tree": "95d5e8a1f46040c2044717e156e81638f1764bb3",
+      "log_sha256": "5ab2a5791717f312df69bfd1045faff07f8f3a28be0633fb4d5bc8b482039332",
       "status": "committed_pending_endpoint_validation",
-      "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
-      "author_date": "2026-10-05T02:22:16-05:00",
+      "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+      "author_date": "2026-10-05T03:35:10-05:00",
       "source_and_dependencies_unchanged": true
     },
     "whole_file_analysis": {
@@ -1284,8 +1295,19 @@
       "workflow_run_id": 37278842804,
       "transport": "GitHub UI",
       "selected_effort": "Balanced",
-      "observed_effort": null,
-      "status": "pending"
+      "observed_effort": "Lite",
+      "status": "terminal_findings",
+      "review_id": 5411547544,
+      "submitted_at": "2026-10-05T08:00:14Z",
+      "snapshot": "round2-copilot-fallback-review.json",
+      "service_execution": {
+        "run_id": 37278842804,
+        "conclusion": "cancelled",
+        "cause": "Authenticated check annotation: maximum execution time20m exceeded. All11 hooks printedPassed; processing request skipped.",
+        "evidence_directory": "round2-copilot-attempt1",
+        "log_sha256": "085e4aaf1b20782fe0a875f1f205585e67b316cdaf1faaac1882ab6abda2e7bc"
+      },
+      "fallback": "GitHub emitted authenticated current-head Lite review5411547544 after failed full agentic setup; valid under AGENTS. No retry issued."
     },
     "codex": {
       "status": "clean",
@@ -1298,17 +1320,474 @@
       "summary_comment_id": 5989249158,
       "snapshot": "round2-after-dependency-selection.json"
     },
-    "request_set_terminal": false,
+    "request_set_terminal": true,
     "clean": false,
     "recording_note": "Initial local attribution assertion expected request-transport login; native event uses Copilot display login. Reconciled stable bot ID175728472 and exact-head run. No duplicate request.",
     "hosted_validation": {
-      "snapshot": "round2-after-dependency-selection.json",
+      "snapshot": "round2-review-checkpoint-0753.json",
       "ordinary_runs": 12,
-      "successful_runs": 11,
-      "pending_run_ids": [
-        37277829954
+      "successful_runs": 12,
+      "pending_run_ids": [],
+      "collection": "round2-hosted-aafa9a4/round2-review-checkpoint-0753-collection.json",
+      "status": "all_12_workflows_success",
+      "accepted_run_ids": [
+        37277907391,
+        37277829984,
+        37277829946,
+        37277829964,
+        37277829876,
+        37277829954,
+        37277827960,
+        37277824840,
+        37277824824,
+        37277824820,
+        37277824814,
+        37277824831
       ],
-      "collection": "round2-hosted-aafa9a4/round2-after-dependency-selection-collection.json"
+      "push_instruction_tests": {
+        "pass": 507,
+        "fail": 0,
+        "skip": 0
+      },
+      "setup_hooks": {
+        "push_pass": 11,
+        "pr_pass": 11,
+        "skipped": 0
+      },
+      "pr_instruction_tests": {
+        "pass": 507,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    "independent_quality": {
+      "status": "interim_no_material_defect_R3_disposition_open",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-final-quality\\REPORT.md",
+      "report_sha256": "9f4c159db9f48605754fcbc91519969f51195274e71e0d222433e90830613242",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-final-quality\\EVIDENCE.json",
+      "evidence_sha256": "1e57c82495a801f30c9ef823251bbcfee47ca2c6d7e0b4dae114da882e9af6b1",
+      "root_read_full": true,
+      "agent": "/root/a02_tf_prepublication_quality",
+      "fallback_delta": "round2-final-quality/COPILOT-FALLBACK-DELTA.md",
+      "fallback_delta_sha256": "ce99afd8bcc34fbc5b75d91ec3df151ad102ed00b89477fc7972d8bd69594a26"
+    },
+    "findings": [
+      {
+        "finding": "PS232-R3",
+        "comments": [
+          4181830632,
+          4181830689,
+          4181830739
+        ],
+        "status": "A97.2_implemented_local_probe_passed_aggregate_pending",
+        "scope": "All49 same-format helper values in two existing PowerShell files; comments only with truthful dates",
+        "decision": "docs/planning/action-items-2026-10-02/results/A21/PS232-R3-help-version-format.md"
+      }
+    ],
+    "commit": {
+      "started_at": "2026-10-05T07:22:16.751825+00:00",
+      "finished_at": "2026-10-05T07:22:20.086035+00:00",
+      "exit": 0,
+      "head_after": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+      "prior_head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+      "candidate_tree": "e5f2aee1fbe9eb4650af69c30aa94edc914e4dcf",
+      "log_sha256": "5c99e030ed2597f91ab124ca520a048de3a6972d1e8973f7d8c0a433797988d3",
+      "status": "committed_pending_endpoint_validation",
+      "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+      "author_date": "2026-10-05T02:22:16-05:00",
+      "source_and_dependencies_unchanged": true
+    },
+    "actual_endpoints": {
+      "status": "passed",
+      "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+      "results": [
+        {
+          "mode": "AcceptedMaintenance",
+          "command": [
+            "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+            "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+            "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "aafa9a4a41318d0cf1b61d873b321567b31ac985"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+          "started_at": "2026-10-05T07:22:41.916065+00:00",
+          "finished_at": "2026-10-05T07:22:43.521468+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-AcceptedMaintenance-aafa9a4.log",
+          "log_sha256": "2b929dcc9a3d30acfced3b946b33db4382def9dc2b06b14b918fa6417931ca3d"
+        },
+        {
+          "mode": "FinalizeMetadataNow",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-InputRevision",
+            "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+            "-PublishedBaselineRevision",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "-FinalizeMetadataNow"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+          "started_at": "2026-10-05T07:22:45.173008+00:00",
+          "finished_at": "2026-10-05T07:23:33.956060+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-FinalizeMetadataNow-aafa9a4.log",
+          "log_sha256": "e988c25f97d09641b71b2cf5e87dcdcd355a5d853625f42a436c9a342b470b4f"
+        },
+        {
+          "mode": "MetadataClassificationOnly",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-InputRevision",
+            "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+            "-PublishedBaselineRevision",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "-MetadataClassificationOnly"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+          "started_at": "2026-10-05T07:23:35.051720+00:00",
+          "finished_at": "2026-10-05T07:23:37.362790+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-MetadataClassificationOnly-aafa9a4.log",
+          "log_sha256": "f0ae9a64b26d00d27a1b95be05d494fd28dbb38d9c42b3f19f1fc984729e5e2a"
+        },
+        {
+          "mode": "ProposedPolicy",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-InputRevision",
+            "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+            "-PublishedBaselineRevision",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "-ProposedPolicy"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+          "started_at": "2026-10-05T07:23:38.329730+00:00",
+          "finished_at": "2026-10-05T07:24:11.506396+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-ProposedPolicy-aafa9a4.log",
+          "log_sha256": "25c6d642c5e18d3393ba8a49675d28c964c8795a420f2e2999f3a5798453beab"
+        }
+      ]
+    },
+    "current_audit": {
+      "exit": 0,
+      "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+      "authority": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "mode": "ordinary local no-argument two-root audit",
+      "started_at": "2026-10-05T07:24:13.270455+00:00",
+      "finished_at": "2026-10-05T07:24:29.030079+00:00",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-current-audit-aafa9a4.log",
+      "sha256": "8c1159f87e22e0169762e31649051bdb7d711e3113aed34ae09e3574004ae950"
+    }
+  },
+  "prior_round2_validation": {
+    "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+    "candidate_tree": "e5f2aee1fbe9eb4650af69c30aa94edc914e4dcf",
+    "validation": {
+      "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\linux-full-validation\\round2-manifest.json",
+      "manifest_sha256": "1b094fa8d6f8ef7126c0fbf320502395af4f200fb5fd2b463b8ad812340ef50b",
+      "aggregate_run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\linux-full-validation\\runs\\ps232-round2-20261005",
+      "staged_preflight": "passed",
+      "focused_node": "43 passed; zero failures/skips",
+      "aggregate": "passed",
+      "hooks_passed": 11,
+      "hooks_skipped": 0,
+      "wrapper_exit": 0,
+      "all_source_index_config_dependency_ref_guards": "unchanged",
+      "result_sha256": "a10e4c5be3151ff77fd1ec7b1ed18a32b540cacf7f07e31051b4460f9d47b960"
+    },
+    "local_validation": {
+      "actual_endpoints": {
+        "status": "passed",
+        "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+        "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+        "results": [
+          {
+            "mode": "AcceptedMaintenance",
+            "command": [
+              "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+              "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+              "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+              "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+              "aafa9a4a41318d0cf1b61d873b321567b31ac985"
+            ],
+            "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+            "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+            "started_at": "2026-10-05T07:22:41.916065+00:00",
+            "finished_at": "2026-10-05T07:22:43.521468+00:00",
+            "exit": 0,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-AcceptedMaintenance-aafa9a4.log",
+            "log_sha256": "2b929dcc9a3d30acfced3b946b33db4382def9dc2b06b14b918fa6417931ca3d"
+          },
+          {
+            "mode": "FinalizeMetadataNow",
+            "command": [
+              "pwsh",
+              "-NoLogo",
+              "-NoProfile",
+              "-NonInteractive",
+              "-File",
+              ".github/workflows/Test-AgentInstructions.ps1",
+              "-InputRevision",
+              "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+              "-PublishedBaselineRevision",
+              "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+              "-FinalizeMetadataNow"
+            ],
+            "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+            "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+            "started_at": "2026-10-05T07:22:45.173008+00:00",
+            "finished_at": "2026-10-05T07:23:33.956060+00:00",
+            "exit": 0,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-FinalizeMetadataNow-aafa9a4.log",
+            "log_sha256": "e988c25f97d09641b71b2cf5e87dcdcd355a5d853625f42a436c9a342b470b4f"
+          },
+          {
+            "mode": "MetadataClassificationOnly",
+            "command": [
+              "pwsh",
+              "-NoLogo",
+              "-NoProfile",
+              "-NonInteractive",
+              "-File",
+              ".github/workflows/Test-AgentInstructions.ps1",
+              "-InputRevision",
+              "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+              "-PublishedBaselineRevision",
+              "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+              "-MetadataClassificationOnly"
+            ],
+            "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+            "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+            "started_at": "2026-10-05T07:23:35.051720+00:00",
+            "finished_at": "2026-10-05T07:23:37.362790+00:00",
+            "exit": 0,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-MetadataClassificationOnly-aafa9a4.log",
+            "log_sha256": "f0ae9a64b26d00d27a1b95be05d494fd28dbb38d9c42b3f19f1fc984729e5e2a"
+          },
+          {
+            "mode": "ProposedPolicy",
+            "command": [
+              "pwsh",
+              "-NoLogo",
+              "-NoProfile",
+              "-NonInteractive",
+              "-File",
+              ".github/workflows/Test-AgentInstructions.ps1",
+              "-InputRevision",
+              "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+              "-PublishedBaselineRevision",
+              "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+              "-ProposedPolicy"
+            ],
+            "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
+            "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+            "started_at": "2026-10-05T07:23:38.329730+00:00",
+            "finished_at": "2026-10-05T07:24:11.506396+00:00",
+            "exit": 0,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-ProposedPolicy-aafa9a4.log",
+            "log_sha256": "25c6d642c5e18d3393ba8a49675d28c964c8795a420f2e2999f3a5798453beab"
+          }
+        ]
+      },
+      "current_audit": {
+        "exit": 0,
+        "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+        "authority": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+        "mode": "ordinary local no-argument two-root audit",
+        "started_at": "2026-10-05T07:24:13.270455+00:00",
+        "finished_at": "2026-10-05T07:24:29.030079+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round2-current-audit-aafa9a4.log",
+        "sha256": "8c1159f87e22e0169762e31649051bdb7d711e3113aed34ae09e3574004ae950"
+      },
+      "commit": {
+        "started_at": "2026-10-05T07:22:16.751825+00:00",
+        "finished_at": "2026-10-05T07:22:20.086035+00:00",
+        "exit": 0,
+        "head_after": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+        "prior_head": "886f3837cb729b73bffec78e966d9ceb7fa78592",
+        "candidate_tree": "e5f2aee1fbe9eb4650af69c30aa94edc914e4dcf",
+        "log_sha256": "5c99e030ed2597f91ab124ca520a048de3a6972d1e8973f7d8c0a433797988d3",
+        "status": "committed_pending_endpoint_validation",
+        "head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+        "author_date": "2026-10-05T02:22:16-05:00",
+        "source_and_dependencies_unchanged": true
+      },
+      "whole_file_analysis": {
+        "sha256": "701bce28d9263a0afa6d6d864c60e6dacd6c04a0cfc5c42e813573da61d23afb",
+        "PowerShell": "7.6.5",
+        "PSScriptAnalyzer": "1.24.0",
+        "files": 2,
+        "parser_errors": 0,
+        "analyzer_warnings_or_errors": 0
+      },
+      "aggregate_acceptance_sha256": "2aa0c4fdc5b747c4c838852a7928d67276e129dc3330f0655cf8d4c7c68fecd2",
+      "independent_reconciliation_sha256": "4ebc13a816adaec18f03f203f337506eb7b5b152d6ed446dfb5bf7373cf297be"
+    },
+    "independent_quality": {
+      "status": "pass",
+      "report": "round2-repair-quality/REPORT.md",
+      "sha256": "71133ab0f53e8b5cc112ab7c17fe11df610f987aef181b5601437bcbd443e9c8"
+    }
+  },
+  "round3_repair": {
+    "status": "committed_pending_endpoint_validation",
+    "prior_head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+    "candidate_tree": "95d5e8a1f46040c2044717e156e81638f1764bb3",
+    "paths": [
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+    ],
+    "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\linux-full-validation\\round3-manifest.json",
+    "manifest_sha256": "cfc14da563740e9ca78c9514acf44784ea9f7222728f0f6c5a3e3ec99fe32277",
+    "aggregate_run": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\linux-full-validation\\runs\\ps232-round3-20261005",
+    "decision": "PS232-R3 A97.2",
+    "session_id": 47939,
+    "source_repair_evidence": "round2-findings/R3-period/repair/final-evidence.json",
+    "source_repair_evidence_sha256": "d8f83937e11da79372c7e1e9d96ac315ce686d41282b88f84e5493935bbbe1d8",
+    "windows_verification_log_sha256": "df484f58be956ce105f3f2251085204013e9fc86826efc69039b69d04e693403",
+    "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+    "endpoints": {
+      "status": "passed",
+      "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+      "results": [
+        {
+          "mode": "AcceptedMaintenance",
+          "command": [
+            "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+            "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+            "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "f77a58dede8f6f68b45e0d62e5b96e2fed477c58"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+          "started_at": "2026-10-05T08:35:32.668995+00:00",
+          "finished_at": "2026-10-05T08:35:33.326863+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round3-AcceptedMaintenance-f77a58d.log",
+          "log_sha256": "984d2ea2998bc88752328a76c774e5a5fca8419b257dd871d2a9b8c5a9c66594"
+        },
+        {
+          "mode": "FinalizeMetadataNow",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-InputRevision",
+            "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+            "-PublishedBaselineRevision",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "-FinalizeMetadataNow"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+          "started_at": "2026-10-05T08:35:34.506194+00:00",
+          "finished_at": "2026-10-05T08:36:12.744908+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round3-FinalizeMetadataNow-f77a58d.log",
+          "log_sha256": "e1ab2897e0415b22f9360973930ae7caa5ee76633f8c52d49992061dcfd0f896"
+        },
+        {
+          "mode": "MetadataClassificationOnly",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-InputRevision",
+            "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+            "-PublishedBaselineRevision",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "-MetadataClassificationOnly"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-reverse-accepted-policy\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+          "started_at": "2026-10-05T08:36:13.927725+00:00",
+          "finished_at": "2026-10-05T08:36:16.042873+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round3-MetadataClassificationOnly-f77a58d.log",
+          "log_sha256": "de5df4455577d498b2ae1d24fd0fcd666c2e150a615fd761b056b49fac268e96"
+        },
+        {
+          "mode": "ProposedPolicy",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-InputRevision",
+            "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+            "-PublishedBaselineRevision",
+            "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+            "-ProposedPolicy"
+          ],
+          "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
+          "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+          "started_at": "2026-10-05T08:36:17.064390+00:00",
+          "finished_at": "2026-10-05T08:36:47.659889+00:00",
+          "exit": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round3-ProposedPolicy-f77a58d.log",
+          "log_sha256": "8283015412b872fce026a2edb68b43c9ca808dca06145dc9fc9ab614ce968d1d"
+        }
+      ]
+    },
+    "current_audit": {
+      "exit": 0,
+      "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+      "authority": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "mode": "ordinary local no-argument two-root audit",
+      "started_at": "2026-10-05T08:36:49.143232+00:00",
+      "finished_at": "2026-10-05T08:37:03.972123+00:00",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round3-current-audit-f77a58d.log",
+      "sha256": "8c1159f87e22e0169762e31649051bdb7d711e3113aed34ae09e3574004ae950"
+    },
+    "source_quality": {
+      "status": "bounded_staged_source_pass_not_final_PR_pass",
+      "report_sha256": "d44a0c6c999278446d8e53f7cd6cdadc7e457346fed2e48467287f2b1d5b6c0f",
+      "evidence_sha256": "beda90fc33740bf728962bdb21fd5e4fb4cf5a594bede49f099863afd4149cee",
+      "candidate_tree": "95d5e8a1f46040c2044717e156e81638f1764bb3"
     }
   }
 }

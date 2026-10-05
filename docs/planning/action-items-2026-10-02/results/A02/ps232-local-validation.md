@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # PS232 local validation
 
+**Current R3 repair `f77a58d`:** exactly49 help-comment values changed in two PowerShell files. Full Windows parsing, PSScriptAnalyzer1.24 and real help-value checks passed; non-comment tokens are identical. One final-byte Linux11-hook aggregate passed with no skips and all guards unchanged. Normal hooks, actual published-B/current-H metadata/classification/proposed-policy checks and fresh ordinary two-root audit CLEAN passed. Earlier test results below retain their original input scopes. Current native review and final PR quality remain due.
+
 **Current repair `aafa9a4`:** selected R1/R2 alter exactly two JavaScript lines. Existing Windows tests17/0fail/6 Linux-only skips; Linux43/0fail/0skip. The staged-input preflight and final11-hook aggregate passed with all source/index/configuration/dependency/ref guards unchanged. Normal commit hooks and actual accepted-B/new-H classification, finalization, metadata and proposed-policy diagnostics passed. Fresh ordinary audit CLEAN has zero findings or exceptions. Unchanged full-file PowerShell analysis remains applicable. Earlier input results below retain their original scope and wrapper-failure history.
 
 PR232 contains commit `886f3837cb729b73bffec78e966d9ceb7fa78592`, tree `192a203a1d7e53065fcf6e3d662047df3696c3f5`, from accepted PS baseline `f168f83b89f64b6bca9d520ddec4b58969060fb6`. The exact22-path catalog remains in [canonical evidence](coherent-reverse-candidate.json). Source peer TF66 is accepted at56cb041; final paired acceptance remains pending.
