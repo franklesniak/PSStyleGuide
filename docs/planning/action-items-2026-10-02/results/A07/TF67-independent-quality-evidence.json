@@ -1,0 +1,18 @@
+{
+  "created_utc": "2026-10-05T14:33:53.519993+00:00",
+  "artifacts": {
+    "aggregate-integrity.json": "1a9b571eb5af999bc4a16b240bbf2f31e07a3f4071d516f8447ccce62fd2b75c",
+    "base-to-candidate.diff": "66fd455797d2b4aaaa038e3527739b74749999762cce7a8b00557d7e349ff32c",
+    "execution-state-snapshot.json": "edbcdb441ef299df79e8ba80718659ae7b027e8a539972413cd8bb3d46c412c5",
+    "independent-parser.json": "fb8e02b8c97d212d3a6f36a6603b565e05a477695be2e9f072d5eebadbcb8444",
+    "inspect.py": "53196d8af39394246e50fa6b89ca5fb9eb9f80b522719e6500a262dcc3cb120c",
+    "integrity.json": "b509fd69dd50a878f4ff939a991f3cc48d9643be5c73dacf9375e63fb6ee39d7",
+    "parse.ps1": "8d3a6a2703a189f24a5fd3f95f69665a65e03fb4618c627d53873042b3b45b34",
+    "REPORT.md": "9dddafb7760c82ef97a26927e552317184b3e295dfb3fdb3241a5c5712574e85",
+    "source-to-candidate.diff": "a1f8b7cde196d11134e754f2d6728365c5d306c31c31d1e5df3714e069cbe9c5",
+    "Test-AgentInstructions.ps1.base": "dd77f67a8eb79584d86a69a8806302a7fd0a26251da90b6a9f5e7fd281011790",
+    "Test-AgentInstructions.ps1.head": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+    "Test-AgentInstructions.SelfTest.ps1.base": "f80f2b3ca171a1010ecd6cffe55e160574d80d2a7b9837aae181910b3f0a1e33",
+    "Test-AgentInstructions.SelfTest.ps1.head": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2"
+  }
+}

@@ -1,12 +1,17 @@
 {
-  "status": "final_aggregate_running",
+  "status": "round1_reviews_and_hosted_validation_pending",
+  "released_at": "2026-10-05T08:43:39.818871-05:00",
   "repository": "franklesniak/TerraformStyleGuide",
+  "worktree": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
   "branch": "codex/coherent-tooling-carryback",
   "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
   "base_tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
   "accepted_source": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
   "accepted_source_tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
-  "candidate_tree": "51c405ff8f5d6acebf6fe694f5c2b4007870b6f8",
+  "source_acceptance": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-source-acceptance.json",
+  "source_acceptance_sha256": "2005c051fbc11017c416f919a0467fd704c73efc850a27912216261a6483d783",
+  "catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round5-conditional-carryback\\catalog.json",
+  "catalog_sha256": "b10e2eec733b453eb3d0576e931c49fe819bd22aa1fa4ce936d614b4c0a2ef5e",
   "scope": [
     ".github/workflows/Classify-InstructionMaintenance.mjs",
     ".github/workflows/Test-LocalValidation.test.mjs",
@@ -37,7 +42,7 @@
       "cap": 12
     }
   },
-  "other_counters": {
+  "prior_counters_preserved": {
     "A02": {
       "used": 2,
       "cap": 12
@@ -51,190 +56,17 @@
       "cap": 8
     }
   },
-  "rounds_used": 0,
-  "first_request_at": null,
-  "deadline": null,
-  "worker": {
-    "created_utc": "2026-10-05T13:57:25.759886+00:00",
-    "status": "local_six_path_repair_frozen_for_root",
-    "product": [
-      {
-        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
-        "mode": "100644",
-        "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae",
-        "bytes": 6063,
-        "raw_equal_source": true
-      },
-      {
-        "path": ".github/workflows/Test-LocalValidation.test.mjs",
-        "mode": "100644",
-        "sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
-        "bytes": 4039,
-        "raw_equal_source": true
-      },
-      {
-        "path": ".github/workflows/Test-AgentInstructions.ps1",
-        "mode": "100644",
-        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
-        "bytes": 482175,
-        "raw_equal_source": false
-      },
-      {
-        "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
-        "mode": "100644",
-        "sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2",
-        "bytes": 229955,
-        "raw_equal_source": false
-      },
-      {
-        "path": ".github/workflows/scripts-README.md",
-        "mode": "100644",
-        "sha256": "9e483a42e1a01130205bc7dfa55fdac5e4a4c36244f98eb57e250d2cc0c86d97",
-        "bytes": 13086,
-        "raw_equal_source": false
-      },
-      {
-        "path": ".github/workflows/lint-markdown.mjs",
-        "mode": "100644",
-        "sha256": "2936daa02f279b8701c9671e3ec610729e3fd09feb9235c26f763e0df65139bf",
-        "bytes": 3231,
-        "raw_equal_source": true
-      }
-    ],
-    "metadata": {
-      "all_notes": 84,
-      "changed": 54,
-      "main_changed": 50,
-      "SelfTest_changed": 4,
-      "older_build_reset": 52,
-      "same_day_increment": 2,
-      "untouched": 30,
-      "all_untouched_exact": true,
-      "code_tokens": "separate actual PowerShell parser check"
-    },
-    "guard": {
-      "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
-      "index_sha256": "bfe099f1b17825f8eb6168eb5b49cdfecbe127841dc2bf43ca65a0fe6ae093b2",
-      "stage0_sha256": "fc0726685a8c8c24729f027b6a62d6de1c5986d150484c134d3b57892ea03bb7",
-      "changed_paths": [
-        ".github/workflows/Classify-InstructionMaintenance.mjs",
-        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
-        ".github/workflows/Test-AgentInstructions.ps1",
-        ".github/workflows/Test-LocalValidation.test.mjs",
-        ".github/workflows/lint-markdown.mjs",
-        ".github/workflows/scripts-README.md"
-      ],
-      "all_other_tracked_bytes_unchanged": true
-    },
-    "native_commands": {
-      "node-suites": {
-        "command": [
-          "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
-          "--test",
-          ".github/workflows/lint-markdown.test.mjs",
-          ".github/workflows/Classify-InstructionMaintenance.test.mjs",
-          ".github/workflows/Test-LocalValidation.test.mjs"
-        ],
-        "cwd": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
-        "started_utc": "2026-10-05T13:51:07.070823+00:00",
-        "ended_utc": "2026-10-05T13:52:50.424160+00:00",
-        "exit_code": 0,
-        "log_sha256": "f9ec013a54b395d5a9d3f3059f57743e5bcaf700e6bee63005efe2821dcbd723",
-        "log_bytes": 6046,
-        "platform": "win32",
-        "Node_PATH_prefix": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64"
-      },
-      "powershell": {
-        "command": [
-          "pwsh",
-          "-NoLogo",
-          "-NoProfile",
-          "-NonInteractive",
-          "-File",
-          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\worker\\powershell-check.ps1",
-          "-Root",
-          "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
-          "-Evidence",
-          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\worker"
-        ],
-        "cwd": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
-        "started_utc": "2026-10-05T13:51:07.086512+00:00",
-        "ended_utc": "2026-10-05T13:52:27.105039+00:00",
-        "exit_code": 0,
-        "log_sha256": "a0a03dd846057c2c02d6ce1539a2e72df3e4f77c2fb5a6e177db14181f8bdfcb",
-        "log_bytes": 209,
-        "platform": "win32",
-        "Node_PATH_prefix": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64"
-      },
-      "integrity": {
-        "command": [
-          "py",
-          "-3.12",
-          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\worker\\integrity.py"
-        ],
-        "cwd": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
-        "started_utc": "2026-10-05T13:55:39.929906+00:00",
-        "ended_utc": "2026-10-05T13:55:41.278078+00:00",
-        "exit_code": 0,
-        "log_sha256": "9d3bd5e24472b9088741109a25fed28da444b04b6fc5fa9c194bfbd3e8ceea89",
-        "log_bytes": 5925,
-        "platform": "win32",
-        "Node_PATH_prefix": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64"
-      }
-    },
-    "focused_tool_command": {
-      "command": [
-        "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
-        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\worker\\focused.mjs"
-      ],
-      "exit_code": 0,
-      "cwd": "C:/Users/flesniak/GitHub/PSStyleGuide",
-      "output_kind": "stdout preserved from tool transcript; not an independently captured native log",
-      "output_sha256": "10af486a78191360cbc2e20f28344374f81125e9bc941daafa91a15e7720326c",
-      "precise_native_timestamps": "not captured; execution preceded 2026-10-05T13:53:01Z clock read"
-    },
-    "collector_failure": {
-      "native_node_command_exit": 0,
-      "python_display_wrapper_exit": 1,
-      "reason": "cp1252 cannot encode U+2714; saved native results retained",
-      "test_replay": false
-    },
-    "artifact_sha256": {
-      "applied.json": "bd7c9b73d01a4d7a6153377208463e0b0cb2c96b5cbf96806f44232b6334bcff",
-      "carryback.py": "67197198ae35e4256b6e8bb2f7e86883728a7961d88c39793d6124fc2ebcf0e4",
-      "Classify-InstructionMaintenance.mjs.postimage": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae",
-      "Classify-InstructionMaintenance.mjs.preimage": "08f0533a20c2292b13434de9e4b858d64d33d77b2c40a3e8888d9b561651af63",
-      "focused-command.json": "82870b9b524a5affa4e4ffa57833079265e4c105f53dd8a3b0b7e1a790be3d8f",
-      "focused-tool-output.txt": "10af486a78191360cbc2e20f28344374f81125e9bc941daafa91a15e7720326c",
-      "focused.mjs": "62ba1deb78f727098f5a267843237cf327f7e62008bddfe5e9fbc2496f96ea4d",
-      "integrity-command.json": "ea0f4a8e21befe3cc1672c9aa4da1712080e022473db142b9c875370138f3798",
-      "integrity.json": "43d433e519949409423e2cbaf17c6f21603278d78e0465b5da4d4473f6677a8a",
-      "integrity.log": "9d3bd5e24472b9088741109a25fed28da444b04b6fc5fa9c194bfbd3e8ceea89",
-      "integrity.py": "9c22decc9f23c12f55768d7ce8b3ff4ef5a11daaa9acdc5ceadb3e0b1c4141e9",
-      "lint-markdown.mjs.postimage": "2936daa02f279b8701c9671e3ec610729e3fd09feb9235c26f763e0df65139bf",
-      "lint-markdown.mjs.preimage": "766d357075fe18d9c8239c31e09065c25bd302777e619adea4787498cf146056",
-      "node-suites-command.json": "a6aec51b4d186316e883a084ba582666234a58437dd990bcc3706d3669397210",
-      "node-suites.log": "f9ec013a54b395d5a9d3f3059f57743e5bcaf700e6bee63005efe2821dcbd723",
-      "powershell-check.ps1": "a155eb2d6c1a1a582ae39c3f310b2a81d2f6f97f23b3693fea9d76421e6282a0",
-      "powershell-command.json": "6bac116af2c068fb126ca9c7e22b76db6d0ac0de11bbc667279a9b2948e1e280",
-      "powershell-results.json": "9f5923ae0b2bb9a3ffe14bedfbb544ddc9e3814a2588ba036ad968710aa8a2f4",
-      "powershell.log": "a0a03dd846057c2c02d6ce1539a2e72df3e4f77c2fb5a6e177db14181f8bdfcb",
-      "preflight.json": "891abfea6edef37b3901cbf88cf21c7835758343d3a451dbcabb98b51f760e62",
-      "REPORT.md": "97736f9863700894b1a81b0ef83132283279b2b1f65beffcf19b187b1dd59162",
-      "report.py": "a6a17f89a81fc6fc17b8ab1f3c75d34367ba0f4dd967868e6693c57f89c432f3",
-      "run-check.py": "4ca42eff5bc888212a036bdafe88949899030e9f1258808f371bdbd7db12b9ab",
-      "scripts-README.md.postimage": "9e483a42e1a01130205bc7dfa55fdac5e4a4c36244f98eb57e250d2cc0c86d97",
-      "scripts-README.md.preimage": "240b53ff2651bd11c30fde2feacd3d259dbd533ee7fa6a646302b0f2874d1480",
-      "Test-AgentInstructions.ps1.postimage": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
-      "Test-AgentInstructions.ps1.preimage": "dd77f67a8eb79584d86a69a8806302a7fd0a26251da90b6a9f5e7fd281011790",
-      "Test-AgentInstructions.SelfTest.ps1.postimage": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2",
-      "Test-AgentInstructions.SelfTest.ps1.preimage": "f80f2b3ca171a1010ecd6cffe55e160574d80d2a7b9837aae181910b3f0a1e33",
-      "Test-LocalValidation.test.mjs.postimage": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b",
-      "Test-LocalValidation.test.mjs.preimage": "decdffd21c04e3f5bca5364842a734543c2681a60ea6d2792c7acc65e1ae13cb",
-      "TOOLING-NOTE.md": "bd8b7488933b64a495124f570dfb2a5fb0a402e06b84796cd9e2d6829ee634f9"
-    },
-    "report_sha256": "97736f9863700894b1a81b0ef83132283279b2b1f65beffcf19b187b1dd59162",
-    "limits": "No task completion, final aggregate, full mutationSelfTest, Linux execution or public mutation by worker."
+  "rounds_used": 1,
+  "first_request_at": "2026-10-05T14:30:38.034661+00:00",
+  "deadline": "2026-10-13T14:30:38.034661+00:00",
+  "writer": "a07_a21_tf_carryback",
+  "public_authority": "root owns publication, review requests, merge and acceptance; worker owns only six product paths and private report",
+  "limits": "Full outcomes and402contracts retained; this transfer does not close A03/A07/A21. Real-date metadata may require later A21 compare-back.",
+  "candidate_tree": "51c405ff8f5d6acebf6fe694f5c2b4007870b6f8",
+  "worker_evidence": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\worker\\evidence.json",
+    "sha256": "0a9f844e231791d1165a45735016b200dd2efbbed19fb7bfc2c3b1117455cdf6",
+    "report_sha256": "97736f9863700894b1a81b0ef83132283279b2b1f65beffcf19b187b1dd59162"
   },
   "root_readiness": {
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\root-candidate-readiness.json",
@@ -245,12 +77,225 @@
     "manifest_sha256": "6be8dd3ec1348708b21c53806a0ed77a41283da8dbb8fa314c340b5258be91fa",
     "runner": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\linux-full-validation-readiness\\launch.py",
     "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\linux-full-validation-readiness\\runs\\tf-carryback-20261005",
-    "state": "running",
+    "state": "passed",
     "session_id": 23789,
     "container_id": "a7f2b5fa0b3f9a4789dd65063a41a15a2cfcfb0745617dbebec7fe1ccec9ef20",
-    "started_at": "2026-10-05T14:00:09.129631+00:00",
-    "last_authoritative_observation": "2026-10-05T14:01:10.842116+00:00"
+    "started_at": "2026-10-05T09:00:09.129631-05:00",
+    "last_authoritative_observation": "2026-10-05T09:01:10.842116-05:00",
+    "container_exit": 0,
+    "source_after_equal": true,
+    "source_files": 78,
+    "dependency_files": 1910,
+    "passed_hooks": 11,
+    "skipped_hooks": 0,
+    "finished_at": "2026-10-05T09:13:42.739136-05:00",
+    "aggregate_log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+    "preflight_log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+    "result_sha256": "a2dfae56f9db4466abff601900955b18cc5e442770fffe126ff91cc2d6b73404",
+    "host_status_sha256": "06a10ce1591698e08da46d4db53b8d3d7fe39314835033047d5758ff9478d745"
   },
-  "next_action": "Read complete aggregate terminal output and unchanged source/dependency guards; then normal commit and actual endpoint/audit validation before native PR publication.",
-  "limits": "No commit/PR, aggregate success, paired convergence or broad outcome completion is claimed."
+  "accepted_base_policy": {
+    "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\accepted-base-policy",
+    "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\accepted-base-policy.json",
+    "sha256": "5ce37da0d984e9c269c8f3434b2d540bd37292dfbcdfe239570e23489212b560",
+    "status": "accepted_base_ready"
+  },
+  "next_action": "Collect both pending reviewer results and remaining hosted validation; keep automatic Codex history separate. Do not duplicate requests.",
+  "planning_checkpoint": "ff210e9836da84d913aa41ecf78908b20baebc00",
+  "commit": {
+    "exit": 0,
+    "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+    "parent": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "tree": "51c405ff8f5d6acebf6fe694f5c2b4007870b6f8",
+    "at": "2026-10-05T09:15:39.87946-05:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\normal-commit.log",
+    "log_sha256": "b040c1aba00a516db1a46b656d73b75f36aa5de5bc3831f0e83de651c050e08d"
+  },
+  "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+  "actual_endpoints": {
+    "status": "passed",
+    "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+    "policy_fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\accepted-base-policy",
+    "results": [
+      {
+        "mode": "AcceptedMaintenance",
+        "command": [
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\accepted-base-policy\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\accepted-base-policy",
+          "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "b8d38effaea1a566d7f9c1d5fefc67cc688661ed"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\accepted-base-policy",
+        "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+        "started_at": "2026-10-05T09:22:47.552537-05:00",
+        "finished_at": "2026-10-05T09:22:48.916334-05:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\AcceptedMaintenance-b8d38ef.log",
+        "log_sha256": "2aef29fe3aa4bdb9e4c9e89b8cbcf4ef252f5021bae589d148a946d59e12d1a3"
+      },
+      {
+        "mode": "FinalizeMetadataNow",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+          "-PublishedBaselineRevision",
+          "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "-FinalizeMetadataNow"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\accepted-base-policy",
+        "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+        "started_at": "2026-10-05T09:22:51.114704-05:00",
+        "finished_at": "2026-10-05T09:24:15.937799-05:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\FinalizeMetadataNow-b8d38ef.log",
+        "log_sha256": "9767c9e048d0ebb0f4c81d2793a9ded932a84e4413fc02ae8098e81ccd8bc8f5"
+      },
+      {
+        "mode": "MetadataClassificationOnly",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+          "-PublishedBaselineRevision",
+          "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "-MetadataClassificationOnly"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\accepted-base-policy",
+        "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+        "started_at": "2026-10-05T09:24:17.695666-05:00",
+        "finished_at": "2026-10-05T09:24:27.88436-05:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\MetadataClassificationOnly-b8d38ef.log",
+        "log_sha256": "952d2523364e2d866a97595e59ed9cd8c44f4c1681d64e1852a2887ffa74acb8"
+      },
+      {
+        "mode": "ProposedPolicy",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+          "-PublishedBaselineRevision",
+          "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "-ProposedPolicy"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+        "started_at": "2026-10-05T09:24:29.489061-05:00",
+        "finished_at": "2026-10-05T09:25:58.356209-05:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\ProposedPolicy-b8d38ef.log",
+        "log_sha256": "9b9c8ecdb1430c413463323d9014fcfdeb903a2c0b8014bac4aa57174babc297"
+      }
+    ],
+    "classification": {
+      "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+      "policy": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "classification": "maintenance_required",
+      "maintenancePaths": [
+        ".github/workflows/Classify-InstructionMaintenance.mjs",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        ".github/workflows/Test-LocalValidation.test.mjs",
+        ".github/workflows/lint-markdown.mjs"
+      ]
+    }
+  },
+  "current_audit": {
+    "exit": 0,
+    "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+    "authority": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "mode": "ordinary local no-argument two-root audit",
+    "started_at": "2026-10-05T09:26:04.368765-05:00",
+    "finished_at": "2026-10-05T09:26:25.477728-05:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\current-audit-b8d38ef.log",
+    "sha256": "085ddbc0bf816cacf8ef499cd0318dc78fee9a1a5cf429d4614455dba750853b"
+  },
+  "publication": {
+    "status": "pushed",
+    "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+    "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "branch": "codex/coherent-tooling-carryback",
+    "started_at": "2026-10-05T09:27:38.291216-05:00",
+    "remote_branch_preimage": "absent",
+    "exit": 0,
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-20261005\\topic-push.log",
+    "log_sha256": "962827de0d80130321da4135d6c20d820d0e72b36a4bda46e70d816b9e1985c5",
+    "actual_head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+    "verified_at": "2026-10-05T09:27:43.079255-05:00"
+  },
+  "pr": 67,
+  "pr_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/67",
+  "body_sha256": "1a496ab14a1e49a73c17425c44f5a356c0fdbccb8fc1ec71c104b59ba2f72f7c",
+  "round1": {
+    "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+    "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "body_sha256": "1a496ab14a1e49a73c17425c44f5a356c0fdbccb8fc1ec71c104b59ba2f72f7c",
+    "baseline": "round1-pre-ui-request.json",
+    "request_intent_at": "2026-10-05T14:30:38.034661+00:00",
+    "copilot": {
+      "status": "pending",
+      "transport": "supported GitHub Reviewers UI; Edge5 authenticated owner",
+      "selected_effort": "Balanced",
+      "observed_effort": null,
+      "request_event_id": 32517402722,
+      "request_at": "2026-10-05T14:30:43Z",
+      "actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "snapshot": "round1-copilot-request-confirmation.json",
+      "in_progress_ui_effort": "Balanced",
+      "workflow_run_id": 37325315114
+    },
+    "codex": {
+      "status": "pending",
+      "automatic_comment_id": 5996535319,
+      "automatic_started_at": "2026-10-05T14:28:47.633430Z",
+      "automatic_terminal_at": "2026-10-05T14:34:18Z",
+      "automatic_result": "Completed; no native review threads or findings in complete snapshot; does not replace mandatory manual trigger",
+      "automatic_snapshot": "round1-progress-1434.json",
+      "manual_baseline": "round1-progress-1434.json",
+      "manual_request_intent_at": "2026-10-05T14:35:48.171840+00:00",
+      "trigger_id": 5996661350,
+      "request_at": "2026-10-05T14:35:42Z",
+      "actor_id": 11204406,
+      "snapshot": "round1-paired-request-confirmation.json"
+    },
+    "clean": false,
+    "request_set_terminal": false,
+    "latest_observation": "round1-paired-request-confirmation.json"
+  },
+  "independent_quality": {
+    "status": "pass",
+    "reviewer": "/root/tf_carryback_final_quality",
+    "head": "b8d38effaea1a566d7f9c1d5fefc67cc688661ed",
+    "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+    "tree": "51c405ff8f5d6acebf6fe694f5c2b4007870b6f8",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-final-quality-20261005\\REPORT.md",
+    "report_sha256": "9dddafb7760c82ef97a26927e552317184b3e295dfb3fdb3241a5c5712574e85",
+    "evidence_manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-carryback-final-quality-20261005\\evidence-manifest.json",
+    "manifest_sha256": "ce25c0d34fb48d486decea803031772163497e7c9dda609eeffeb86f6c0fc605",
+    "root_review": "Full report read; sampled five evidence hashes; actual source diff/aggregate/endpoints separately verified. Pending native lifecycle remains separate."
+  }
 }
