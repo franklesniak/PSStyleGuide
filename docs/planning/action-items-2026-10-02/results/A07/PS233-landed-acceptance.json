@@ -1,0 +1,175 @@
+{
+  "accepted_at": "2026-10-05T18:46:53.051052+00:00",
+  "head": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+  "tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+  "parents": [
+    "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "4783da302e26515d770bad716f02297fe3b08a8d"
+  ],
+  "reviewed_head": "4783da302e26515d770bad716f02297fe3b08a8d",
+  "review_round": 1,
+  "review_body_sha256": "ce1e7fd01f7cf525e3b1057d0b0752f9ece02d61d85ea3993ef49d7549b8d9b6",
+  "native_evidence_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-progress-8.json",
+  "native_evidence_sha256": "4ebbb483eef1262b8d3764e44bd1ea131c0ef62fe7592f51c08349293e336a6b",
+  "runs": [
+    {
+      "id": 37355672740,
+      "name": "Markdown Lint",
+      "event": "push",
+      "head_sha": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37355672758,
+      "name": "Dev container boundary",
+      "event": "push",
+      "head_sha": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37355672560,
+      "name": "Build Style Guide Artifacts",
+      "event": "push",
+      "head_sha": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37355672633,
+      "name": "Copilot setup steps",
+      "event": "push",
+      "head_sha": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "status": "completed",
+      "conclusion": "success"
+    },
+    {
+      "id": 37355672750,
+      "name": "Agent instruction validation",
+      "event": "push",
+      "head_sha": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "status": "completed",
+      "conclusion": "success"
+    }
+  ],
+  "terminal_logs": [
+    {
+      "id": 37355672740,
+      "name": "Markdown Lint",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37355672740",
+      "head": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-ps233-hosted\\d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48\\37355672740\\log.txt",
+      "log_sha256": "b62de3abd2619aa60903008df10ecd24556f4db3395e19985979a7436ef40332",
+      "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-ps233-hosted\\d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48\\37355672740\\jobs.json",
+      "jobs_sha256": "b942189e98336b5b2c7d479ee58f7177da2c8929ac080c95ea9ebe23eefc32ea"
+    },
+    {
+      "id": 37355672758,
+      "name": "Dev container boundary",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37355672758",
+      "head": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-ps233-hosted\\d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48\\37355672758\\log.txt",
+      "log_sha256": "dcde8603829807594d29de43c3d9e54eba829e64f074beef4b423efbbfad7038",
+      "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-ps233-hosted\\d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48\\37355672758\\jobs.json",
+      "jobs_sha256": "9dca982ab71fd7731c758e5e5254c88154db3ec5dca11d2c1900f9b335a89724"
+    },
+    {
+      "id": 37355672560,
+      "name": "Build Style Guide Artifacts",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37355672560",
+      "head": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-ps233-hosted\\d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48\\37355672560\\log.txt",
+      "log_sha256": "54a18d9fcf9b9a2a82d08b262a8f7a1915d8fad4f378b525a5feb97c2e62330a",
+      "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-ps233-hosted\\d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48\\37355672560\\jobs.json",
+      "jobs_sha256": "f0ee7cb142ba9df92f97a74630dbc8cccbd90bfc52e592626010275ff12aba5e"
+    },
+    {
+      "id": 37355672633,
+      "name": "Copilot setup steps",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37355672633",
+      "head": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-ps233-hosted\\d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48\\37355672633\\log.txt",
+      "log_sha256": "47c55eef36265395e20e5b37047c39d1d7b8f6e153d5ae7aba5af1a7bf8637a9",
+      "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-ps233-hosted\\d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48\\37355672633\\jobs.json",
+      "jobs_sha256": "90dcf462d721a11edef6d529aba2ee99f288dd89c4d2720afb978ab1f83557f9"
+    },
+    {
+      "id": 37355672750,
+      "name": "Agent instruction validation",
+      "event": "push",
+      "status": "completed",
+      "conclusion": "success",
+      "run_attempt": 1,
+      "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37355672750",
+      "head": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-ps233-hosted\\d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48\\37355672750\\log.txt",
+      "log_sha256": "29631465d7b8d0b251d95b1554061e8e238d4c424a5fbe301d4174ade43dbd2e",
+      "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\landed-ps233-hosted\\d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48\\37355672750\\jobs.json",
+      "jobs_sha256": "1715643b229563f3b8495c4ee71eb23a47d65d3097f1114bc002cf44ec381c48"
+    }
+  ],
+  "setup_passed_hooks": [
+    "check json...............................................................Passed",
+    "check yaml...............................................................Passed",
+    "fix end of files.........................................................Passed",
+    "trim trailing whitespace.................................................Passed",
+    "yamllint.................................................................Passed",
+    "Lint GitHub Actions workflow files.......................................Passed",
+    "Validate Dependabot Config (v2)..........................................Passed",
+    "Validate GitHub Workflows................................................Passed",
+    "staged Markdown..........................................................Passed",
+    "workflow policy contract.................................................Passed",
+    "agent instruction contract and mutation tests............................Passed"
+  ],
+  "node_tests": {
+    "passed": 507,
+    "failed": 0,
+    "skipped": 0
+  },
+  "audit": {
+    "status": "CLEAN",
+    "unresolved": [],
+    "acceptedPackages": 0,
+    "unusedExceptions": [],
+    "proposedState": false,
+    "authority": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "authoritySource": "event-main",
+    "limitation": "Authority is the recorded main snapshot; owner/executor must check known revocations before acceptance.",
+    "installedGraphRoots": [
+      ".github/workflows"
+    ],
+    "findings": [],
+    "applicable": true
+  },
+  "workflow_policy": {
+    "schema": "StyleGuide.WorkflowPolicyResult.v1",
+    "validatorVersion": "3.0.0",
+    "success": true,
+    "contractCanonicalSha256": "d3eab5d3ec77489a9ebb92baa52bcaec820ab9cceddf5c933906c95cb9f57291",
+    "casesPassed": 0,
+    "workflowSha256": {
+      "build.yml": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d",
+      "markdownlint.yml": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+    }
+  },
+  "ruleset_unchanged": 24419725,
+  "destination_batch_result": "accepted",
+  "limits": "Actual merged PS push workflows, including full validation and immutable-input check, passed. Does not establish paired convergence or close a broad outcome. Refresh both actual mains and raw coupled contracts before C98 acceptance."
+}
