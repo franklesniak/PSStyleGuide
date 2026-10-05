@@ -1,6 +1,6 @@
 {
   "recorded_at": "2026-10-05T02:54:01.511336+00:00",
-  "status": "round6_findings_under_analysis",
+  "status": "round6_linux_validation_running",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -3779,7 +3779,7 @@
     }
   },
   "current_review_status": "Round6 terminal/nonclean: Copilot Balanced5409553923 has no findings and its run succeeded; Codex5409525065 has reproduced R21/R22. All12 nonreview runs pass; two open threads. Full decisions and repair remain.",
-  "next_action": "Complete distinct R21/R22 decisions; implement selected repairs privately, then independent quality and changed-input validation.",
+  "next_action": "Collect live Linux51512; preserve exact candidate and do not start another aggregate.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -8060,6 +8060,80 @@
       "all_terminal_success": true,
       "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
       "scope": "All twelve terminal nonreview runs captured by the round6 snapshot. Event-inapplicable jobs are not failed or passed tests."
+    },
+    "repair": {
+      "state": "frozen_focused_and_independent_quality_passed",
+      "worker": "a02_tf_coherent_implementation",
+      "released_at": "2026-10-05T03:11:33.336619+00:00",
+      "selections": [
+        {
+          "finding": "R21",
+          "owner": "A07",
+          "choice": "E98.6",
+          "decision": "results/A07/TF66-R21-manifest-boundary.md",
+          "proposal_sha256": "fdee22f085ad1416d1bab6eec8d71ab3d037a3989c96397b2276c0551526286d",
+          "decision_sha256": "07cbe8c90603c95ccc41a0d8fd5e584c61a54684ddb60a2b38ba30d8e2a97605"
+        },
+        {
+          "finding": "R22",
+          "owner": "A21",
+          "choice": "P98.6",
+          "decision": "results/A21/TF66-R22-metadata-lifecycle-bounds.md",
+          "proposal_sha256": "aa63b781225318f7bd32f616497335324ec4aa9be23a5368b3d35c061615e8f7",
+          "decision_sha256": "c4e5a2e5a554d4b6f4826105d1c7f3fe89018566a8a6e9f25bc1e8f9fb6d8315"
+        }
+      ],
+      "allowed_paths": [
+        ".github/workflows/lint-markdown.mjs",
+        ".github/workflows/lint-markdown.test.mjs",
+        ".github/workflows/Test-AgentInstructions.ps1"
+      ],
+      "source_head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+      "source_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+      "product_integrated": false,
+      "aggregate_started": false
+    },
+    "independent_repair_quality": {
+      "state": "bounded_pass_final3paths",
+      "final_pr_pass": false,
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\round6-r21-r22-repair-quality-20261005\\FINAL-REPORT.md",
+      "report_sha256": "eb6004f9106fbdb67988fea0d9f4c8b2b4ddb621ab6a3c6ebdab0ca7d7164d3d",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\round6-r21-r22-repair-quality-20261005\\FINAL-EVIDENCE.json",
+      "evidence_sha256": "ab6247b156d1bfc1673737574eb805f3ec533a7e751c3467926cf9c254f1dba8"
+    },
+    "repair_handback": {
+      "path_count": 3,
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round6-review-findings\\repair\\HANDOFF.md",
+      "sha256": "69fc82da11b6ed7131f41dd336d68b0a7e7c29573a36dabb3c2e8467a3b7546c",
+      "catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round6-review-findings\\repair\\postimage-catalog.json",
+      "catalog_sha256": "95ff2043d5fd9a8d6b4be85f5eb29200710d772d6432ec7236c9410f8dfa42c9",
+      "focused_windows_linux": "23/23 selected Node cases each; meaningful original-code failures and complete affected lifecycle section; actual Windows headed/direct CLI0 and extra-field CLI1. Narrow collector formatting failure retained."
+    },
+    "proposed_validation": {
+      "created_at": "2026-10-05T03:37:25.428209+00:00",
+      "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-proposed-validation-checkout",
+      "published_base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "source_head": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "product_parent_head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+      "candidate_tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "dependency_count": 1910,
+      "index_catalog_sha256": "fc0726685a8c8c24729f027b6a62d6de1c5986d150484c134d3b57892ea03bb7",
+      "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at actual B. This is not accepted-B authority. One aggregate runs here or on exact native-Linux materialization before normal product commit.",
+      "product_unchanged": true,
+      "dependencies_unchanged": true,
+      "state": "prepared_pending_preflight_and_aggregate"
+    },
+    "linux_validation": {
+      "state": "running",
+      "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\linux-full-validation-readiness\\root-round6-manifest.json",
+      "manifest_sha256": "e2b4e392d94b2706556b6a8aaa9a30b9cd60a32661993bf7680ce7607d0969ed",
+      "run_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\linux-full-validation-readiness\\runs\\tf66-r21-r22-20261005",
+      "candidate_tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "root_readiness": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\linux-full-validation-readiness\\root-round6-readiness.json",
+      "root_readiness_sha256": "c87c1fe12bcc330993852061b1c7f329f8bf22dbaaf4c2ecbda12a113e0cfd34",
+      "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+      "session_id": 51512,
+      "observed_host_state": "running"
     }
   },
   "date_validation_limit": "Current staged-input and ProposedPolicy diagnostics do not verify the author date. Root reviewed all nine metadata finalizations against actual UTC date 2026-10-05. Accepted B lacks FinalizeMetadataNow; ProposedPolicy cannot combine with that switch. First-adoption authority remains separate.",
