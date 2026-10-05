@@ -1,0 +1,84 @@
+{
+  "checked_at": "2026-10-05T23:27:24.849704+00:00",
+  "source_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "source_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "worker_evidence_sha256": "96a6a04501afda17ebf9060b223f583af79b54dd55010cf44ef496e62b0a613e",
+  "changed_path_count": 12,
+  "unchanged_tracked_count": 67,
+  "proof": [
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "source_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "candidate_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "verification": "Exact source blob bytes retained."
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "source_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "candidate_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "verification": "Exact source blob bytes retained."
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "source_sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+      "candidate_sha256": "19ab48af8cc9ed2ff719c31129986d1b9fbedb6653409dd30a09dbd5b81df2ba",
+      "verification": "Shared prefix/suffix byte-identical; independent exact finite descriptor verified."
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "source_sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+      "candidate_sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9",
+      "verification": "Only exact approved repository identity/verifier/scoped filename substitutions."
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "source_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "candidate_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "verification": "Exact source blob bytes retained."
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "source_sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+      "candidate_sha256": "656e4441e76a1f3db8fd1eb9955267bc44addb3d0fe86f07c956281f9c83bad8",
+      "verification": "Shared prefix/suffix byte-identical; independent exact finite descriptor verified."
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "source_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "candidate_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "verification": "Exact source blob bytes retained."
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "source_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "candidate_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "verification": "Exact source blob bytes retained."
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "source_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "candidate_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "verification": "Exact source blob bytes retained."
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "source_sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      "candidate_sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc",
+      "verification": "Only exact approved repository identity/verifier/scoped filename substitutions."
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "source_sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+      "candidate_sha256": "8f4fcd5c26992a73270501e64501d2f0d038907e549a4adb6a6bd2dfad0a2869",
+      "verification": "Only exact source harness row inserted; accepted TF README preserved."
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "source_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "candidate_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "verification": "Exact source blob bytes retained."
+    }
+  ],
+  "scope": "Root independent raw source/postimage comparison; all changed paths match selected port, all unchanged paths retained. Product tests/aggregate/final quality/native lifecycle remain separate."
+}

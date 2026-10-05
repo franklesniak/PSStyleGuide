@@ -1,0 +1,125 @@
+{
+  "status": "candidate_aggregate_running",
+  "released_at": "2026-10-05T23:21:53.100682+00:00",
+  "repository": "franklesniak/TerraformStyleGuide",
+  "branch": "codex/a06-generator-convergence",
+  "worktree": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+  "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "base_tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631",
+  "source_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "source_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "source_state": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\execution-state.json",
+  "source_acceptance": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-acceptance.json",
+  "source_acceptance_sha256": "8302c6faca4fd2dc2648509ed324f17a9b3dd22839df01f1c3bcb7597a0cca2e",
+  "port_map": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\peer-port-map-round1.md",
+  "actual_comparison": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\merged-source-peer-comparison.json",
+  "allowed_changed_paths": [
+    ".github/workflows/Classify-InstructionMaintenance.mjs",
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+    ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/Test-ExactGitPathSet.ps1",
+    ".github/workflows/Test-StyleGuideArtifacts.ps1",
+    ".github/workflows/Test-StyleGuideGenerator.ps1",
+    ".github/workflows/Validate-WorkflowPolicy.mjs",
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    ".github/workflows/build.yml",
+    ".github/workflows/scripts-README.md",
+    ".github/workflows/workflow-policy-cases.json"
+  ],
+  "generated_outputs_expected_unchanged": [
+    "copilot-instructions.md",
+    "terraform.instructions.md",
+    "STYLE_GUIDE_CHAT.md",
+    "STYLE_GUIDE_FULL.md"
+  ],
+  "decisions": [
+    "A06 D1 C96",
+    "A06 D2 C97.4",
+    "A06 D3 C96.6",
+    "A06 frontmatter D4 C98",
+    "A03 foundation C98"
+  ],
+  "transfers_before": {
+    "A06": {
+      "used": 0,
+      "cap": 12
+    },
+    "A03": {
+      "used": 2,
+      "cap": 12
+    },
+    "A21": {
+      "used": 4,
+      "cap": 12
+    }
+  },
+  "transfers": {
+    "A06": {
+      "used": 1,
+      "cap": 12
+    },
+    "A03": {
+      "used": 3,
+      "cap": 12
+    },
+    "A21": {
+      "used": 5,
+      "cap": 12
+    }
+  },
+  "rounds_used": 0,
+  "first_request_at": null,
+  "deadline": null,
+  "source_review_history": {
+    "pr": 234,
+    "rounds_used": 3,
+    "first_request_at": "2026-10-05T20:12:24.969231+00:00",
+    "deadline": "2026-10-13T20:12:24.969231+00:00"
+  },
+  "existing_worktree_preimage": {
+    "branch": "codex/coherent-tooling-carryback",
+    "head": "443b2fe3cbeda18402f0432e5c95379d09096d6a",
+    "tracked_and_untracked_clean": true
+  },
+  "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits.",
+  "next_action": "Read aggregate progress/results without changing any TF shared refs/config/index/source/dependencies. Accept only after final host source guard. Read independent quality result; on success prepare normal commit/endpoints/audit/body/publication and actual reviews/hosted proof. No PR request clock has begun.",
+  "checkout_exit": 0,
+  "candidate_tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
+  "implementation": {
+    "status": "root_verified",
+    "worker": "/root/a06_tf_generator_owner",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\IMPLEMENTATION.md",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\implementation-evidence.json",
+    "evidence_sha256": "6218238f22e7346e3065d49ca2ab72279ea7505c5e91d559116a605a3e05e606",
+    "root_verification": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-port-verification.json",
+    "readiness": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-candidate-readiness.json"
+  },
+  "aggregate": {
+    "status": "running",
+    "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\aggregate-manifest-v1.json",
+    "manifest_sha256": "1cf9c36a40f2fc3d5bf7de7316511eb736c322ab089f12c14bb75a156624dad4",
+    "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1",
+    "session_id": 44300,
+    "requested_at": "2026-10-05T23:30:00.831168+00:00"
+  },
+  "local_operations": "Root aggregate session44300 active; TF refs/config/index/source/dependencies frozen. Product writer complete/idle. One read-only independent quality worker active.",
+  "pending_native_operations": [],
+  "final_quality": {
+    "status": "in_progress",
+    "worker": "/root/ps234_final_quality",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality",
+    "candidate_tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
+    "limits": "Candidate review first; final validation, commit/body/native binding and hosted platform/artifact proof remain separate gates."
+  },
+  "accepted_base_policy": {
+    "status": "accepted_base_ready",
+    "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+    "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy.json",
+    "sha256": "c70df33c6bfd507a173ae3da34e4aa612385280985e04a1028ee743fae88fd59"
+  },
+  "root_readiness": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-candidate-readiness.json",
+    "sha256": "b364b7ebcbd57484ad386336e53e7ba75576889a18ffedd31bc0547cc4e17d96"
+  }
+}
