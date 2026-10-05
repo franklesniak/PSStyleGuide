@@ -1,0 +1,65 @@
+{
+  "status": "writer_released",
+  "released_at": "2026-10-05T13:43:39.818871+00:00",
+  "repository": "franklesniak/TerraformStyleGuide",
+  "worktree": "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
+  "branch": "codex/coherent-tooling-carryback",
+  "base": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+  "base_tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+  "accepted_source": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+  "accepted_source_tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+  "source_acceptance": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\landed-source-acceptance.json",
+  "source_acceptance_sha256": "2005c051fbc11017c416f919a0467fd704c73efc850a27912216261a6483d783",
+  "catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round5-conditional-carryback\\catalog.json",
+  "catalog_sha256": "b10e2eec733b453eb3d0576e931c49fe819bd22aa1fa4ce936d614b4c0a2ef5e",
+  "scope": [
+    ".github/workflows/Classify-InstructionMaintenance.mjs",
+    ".github/workflows/Test-LocalValidation.test.mjs",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/scripts-README.md",
+    ".github/workflows/lint-markdown.mjs"
+  ],
+  "owners": {
+    "A21": [
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Classify-InstructionMaintenance.mjs"
+    ],
+    "A07": [
+      ".github/workflows/Test-LocalValidation.test.mjs",
+      ".github/workflows/scripts-README.md",
+      ".github/workflows/lint-markdown.mjs"
+    ]
+  },
+  "transfers": {
+    "A07": {
+      "used": 3,
+      "cap": 12
+    },
+    "A21": {
+      "used": 3,
+      "cap": 12
+    }
+  },
+  "prior_counters_preserved": {
+    "A02": {
+      "used": 2,
+      "cap": 12
+    },
+    "A03": {
+      "used": 2,
+      "cap": 12
+    },
+    "A20": {
+      "used": 2,
+      "cap": 8
+    }
+  },
+  "rounds_used": 0,
+  "first_request_at": null,
+  "deadline": null,
+  "writer": "a07_a21_tf_carryback",
+  "public_authority": "root owns publication, review requests, merge and acceptance; worker owns only six product paths and private report",
+  "limits": "Full outcomes and402contracts retained; this transfer does not close A03/A07/A21. Real-date metadata may require later A21 compare-back."
+}

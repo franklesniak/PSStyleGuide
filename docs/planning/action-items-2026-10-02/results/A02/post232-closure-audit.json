@@ -1,0 +1,1715 @@
+{
+  "captured_at": "2026-10-05T13:24:43.965805+00:00",
+  "verdict": "conditional_pass_no_new_A02_A20_source_gap",
+  "condition": "Root must accept actual PS232 merged-main validation at PS f0684ac and refresh native main identities before recording outcome completion.",
+  "sources": {
+    "PS": {
+      "commit": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+      "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+      "parents": "f168f83b89f64b6bca9d520ddec4b58969060fb6 86f35f47cfc744780c4c419912fcdae06fdd6f83"
+    },
+    "TF": {
+      "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+      "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+      "parents": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c 17caede017a8054bed529517ce473ef75682b5bf"
+    }
+  },
+  "paths": [
+    {
+      "path": ".gitignore",
+      "owner": "A02",
+      "PS": {
+        "commit": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+        "bytes": 289,
+        "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+      },
+      "TF": {
+        "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "926d96e120f52d9e812ab4f07d6c835ab74941a6",
+        "bytes": 289,
+        "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+      },
+      "raw_equal": true,
+      "mode_equal": true,
+      "complete_raw_partition": [
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            1,
+            19
+          ],
+          "TF_lines": [
+            1,
+            19
+          ],
+          "bytes": 289,
+          "sha256": "b3542a9cc92737823cc2c6f3307d4f3b2b7279812e64995866871df77a5b47f8"
+        }
+      ]
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "owner": "A02",
+      "PS": {
+        "commit": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+        "bytes": 9114,
+        "sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4"
+      },
+      "TF": {
+        "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b4a9929050ba641c6f16276e5afa57f3d896d7da",
+        "bytes": 9117,
+        "sha256": "5331b60f99b0af8bff03a146bb6873ab39490db05be24a39575a9a1a6849ca8d"
+      },
+      "raw_equal": false,
+      "mode_equal": true,
+      "complete_raw_partition": [
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            1,
+            2
+          ],
+          "TF_lines": [
+            1,
+            2
+          ],
+          "bytes": 37,
+          "sha256": "0067b4c6503ee3bd5e732fdd4693318eb7efb52660614a09f674cf0eacde0d76"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            3,
+            3
+          ],
+          "TF_lines": [
+            3,
+            3
+          ],
+          "PS_exact": "# Contributing to PowerShell Style Guide\n",
+          "TF_exact": "# Contributing to Terraform Style Guide\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            4,
+            20
+          ],
+          "TF_lines": [
+            4,
+            20
+          ],
+          "bytes": 1204,
+          "sha256": "463140e1c25bd3b0caaa18f3e806ec9ed5dcf56dd66386268f56843340759f86"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            21,
+            21
+          ],
+          "TF_lines": [
+            21,
+            21
+          ],
+          "PS_exact": "- `powershell.instructions.md` \u2014 generated from `STYLE_GUIDE.md` with YAML front matter\n",
+          "TF_exact": "- `terraform.instructions.md` \u2014 generated from `STYLE_GUIDE.md` with YAML front matter\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            22,
+            40
+          ],
+          "TF_lines": [
+            22,
+            40
+          ],
+          "bytes": 1183,
+          "sha256": "1c625f19d249e997c2b986d28cb176acc2e9836a3f20ad1de53e66e796359d76"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            41,
+            41
+          ],
+          "TF_lines": [
+            41,
+            41
+          ],
+          "PS_exact": "The generator writes `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, and `STYLE_GUIDE_FULL.md`. Review the generated changes and commit all changed outputs with the source changes in the same pull request. Do not edit the generated files by hand. Run the [dependency setup and checks](docs/dependency-maintenance.md) before committing.\n",
+          "TF_exact": "The generator writes `copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, and `STYLE_GUIDE_FULL.md`. Review the generated changes and commit all changed outputs with the source changes in the same pull request. Do not edit the generated files by hand. Run the [dependency setup and checks](docs/dependency-maintenance.md) before committing.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            42,
+            60
+          ],
+          "TF_lines": [
+            42,
+            60
+          ],
+          "bytes": 1804,
+          "sha256": "c9305d0b93ea1c09f889a1b29c23134897ff70ca5dc0e7067bfa56b7252259cc"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            61,
+            61
+          ],
+          "TF_lines": [
+            61,
+            61
+          ],
+          "PS_exact": "- `powershell.instructions.md`\n",
+          "TF_exact": "- `terraform.instructions.md`\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            62,
+            95
+          ],
+          "TF_lines": [
+            62,
+            95
+          ],
+          "bytes": 1933,
+          "sha256": "eb385d8bd4cf8cacb881f0634697a9af015ca9606b4cdf441167821f81511729"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            96,
+            96
+          ],
+          "TF_lines": [
+            96,
+            96
+          ],
+          "PS_exact": "$strPolicyPath = Join-Path (Split-Path (Get-Location).Path -Parent) 'PSStyleGuide-finalization-policy'\n",
+          "TF_exact": "$strPolicyPath = Join-Path (Split-Path (Get-Location).Path -Parent) 'TerraformStyleGuide-finalization-policy'\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            97,
+            114
+          ],
+          "TF_lines": [
+            97,
+            114
+          ],
+          "bytes": 2320,
+          "sha256": "80b7f6aa019245da324ec8c406bd7df0a23ff2b38ad697521378769d5aa29381"
+        }
+      ]
+    },
+    {
+      "path": "README.md",
+      "owner": "A02",
+      "PS": {
+        "commit": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0dbd77c1fe581bc1b32aa97e4dfb6c5119192560",
+        "bytes": 4720,
+        "sha256": "1167635bfa9bf43b4f276c47c930ef6f6fc501bdad9920b48ef5086e8c9adc8d"
+      },
+      "TF": {
+        "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "98f936f0dd1d2101dccf62ebf5f81b3e5f738453",
+        "bytes": 5053,
+        "sha256": "16bd0439b421f4b7b9bcdfd5e4dd2be7239f70934fdcfbe16b16100edf5400d3"
+      },
+      "raw_equal": false,
+      "mode_equal": true,
+      "complete_raw_partition": [
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            1,
+            1
+          ],
+          "TF_lines": [
+            1,
+            1
+          ],
+          "PS_exact": "# PowerShell Style Guide\n",
+          "TF_exact": "# Terraform Style Guide\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            2,
+            2
+          ],
+          "TF_lines": [
+            2,
+            2
+          ],
+          "bytes": 1,
+          "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            3,
+            3
+          ],
+          "TF_lines": [
+            3,
+            3
+          ],
+          "PS_exact": "A comprehensive style guide for writing consistent, maintainable, and professional PowerShell code. Designed for use by both human developers and AI agents (LLMs).\n",
+          "TF_exact": "A comprehensive style guide for writing consistent, maintainable, and professional Terraform code. Designed for use by both human developers and AI agents (LLMs).\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            4,
+            6
+          ],
+          "TF_lines": [
+            4,
+            6
+          ],
+          "bytes": 11,
+          "sha256": "2bde08dd3f82223a7beaf72c8e6a36df80f05ca1f1ffc4515feb90259839b49c"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            7,
+            7
+          ],
+          "TF_lines": [
+            7,
+            7
+          ],
+          "PS_exact": "This repository contains a detailed PowerShell style guide that establishes coding standards and best practices. Whether you're a developer writing PowerShell scripts or an AI agent generating code, this guide provides clear conventions to ensure consistency and quality.\n",
+          "TF_exact": "This repository contains a detailed Terraform style guide that establishes coding standards and best practices. Whether you're a developer writing Terraform configurations or an AI agent generating infrastructure as code, this guide provides clear conventions to ensure consistency and quality.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            8,
+            16
+          ],
+          "TF_lines": [
+            8,
+            16
+          ],
+          "bytes": 354,
+          "sha256": "d70ad7e3ddb2a526d1ac0f074fe39ab36738dc077cca24b1af486324fb981be5"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            17,
+            17
+          ],
+          "TF_lines": [
+            17,
+            17
+          ],
+          "PS_exact": "- **[copilot-instructions.md](copilot-instructions.md)** \u2014 For GitHub Copilot custom instructions in repositories that contain exclusively PowerShell code. Copy this file to your repository's `.github` folder as `.github/copilot-instructions.md` to enable Copilot to follow these conventions when generating code across your entire PowerShell project.\n",
+          "TF_exact": "- **[copilot-instructions.md](copilot-instructions.md)** \u2014 For GitHub Copilot custom instructions in repositories that contain exclusively Terraform code. Copy this file to your repository's `.github` folder as `.github/copilot-instructions.md` to enable Copilot to follow these conventions when generating code across your entire Terraform project.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            18,
+            18
+          ],
+          "TF_lines": [
+            18,
+            18
+          ],
+          "bytes": 1,
+          "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            19,
+            19
+          ],
+          "TF_lines": [
+            19,
+            19
+          ],
+          "PS_exact": "- **[powershell.instructions.md](powershell.instructions.md)** \u2014 For GitHub Copilot file-specific instructions in repositories with multiple programming languages. This version includes YAML frontmatter that targets only `*.ps1` files. Copy this file to your repository as `.github/instructions/powershell.instructions.md` to enable Copilot to follow these PowerShell conventions specifically for `.ps1` files, allowing you to have different instructions for other file types.\n",
+          "TF_exact": "- **[terraform.instructions.md](terraform.instructions.md)** \u2014 For GitHub Copilot file-specific instructions in repositories with multiple programming languages. This version includes YAML frontmatter that targets `.tf`, `.tfvars`, `.tftest.hcl`, `.tf.json`, `.tftpl`, and `.tfbackend` files. Copy this file to your repository as `.github/instructions/terraform.instructions.md` to enable Copilot to follow these Terraform conventions specifically for Terraform files, allowing you to have different instructions for other file types.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            20,
+            32
+          ],
+          "TF_lines": [
+            20,
+            32
+          ],
+          "bytes": 1659,
+          "sha256": "008646129ac936d9ec009b885ed29d5f4aa07f9a014fcf797ff25236d8b7a894"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            33,
+            40
+          ],
+          "TF_lines": [
+            33,
+            46
+          ],
+          "PS_exact": "1. [Code Layout and Formatting](STYLE_GUIDE.md#code-layout-and-formatting)\n2. [Capitalization and Naming Conventions](STYLE_GUIDE.md#capitalization-and-naming-conventions)\n3. [Documentation and Comments](STYLE_GUIDE.md#documentation-and-comments)\n4. [Functions and Parameter Blocks](STYLE_GUIDE.md#functions-and-parameter-blocks)\n5. [Error Handling](STYLE_GUIDE.md#error-handling)\n6. [Language Interop, Versioning, and .NET](STYLE_GUIDE.md#language-interop-versioning-and-net)\n7. [Output Formatting and Streams](STYLE_GUIDE.md#output-formatting-and-streams)\n8. [Performance, Security, and Other](STYLE_GUIDE.md#performance-security-and-other)\n",
+          "TF_exact": "1. [Quick Reference Checklist](STYLE_GUIDE.md#quick-reference-checklist)\n2. [Terraform Version Requirements](STYLE_GUIDE.md#terraform-version-requirements)\n3. [Formatting and Style](STYLE_GUIDE.md#formatting-and-style)\n4. [Naming Conventions](STYLE_GUIDE.md#naming-conventions)\n5. [File Organization (Quick Reference)](STYLE_GUIDE.md#file-organization-quick-reference)\n6. [Variable and Output Design](STYLE_GUIDE.md#variable-and-output-design)\n7. [Resource Configuration](STYLE_GUIDE.md#resource-configuration)\n8. [Module Design](STYLE_GUIDE.md#module-design)\n9. [State Management](STYLE_GUIDE.md#state-management)\n10. [Cross-Stack Data Sharing](STYLE_GUIDE.md#cross-stack-data-sharing)\n11. [Provider Management](STYLE_GUIDE.md#provider-management)\n12. [Security Best Practices](STYLE_GUIDE.md#security-best-practices)\n13. [Testing with Terraform Test](STYLE_GUIDE.md#testing-with-terraform-test)\n14. [Documentation Standards](STYLE_GUIDE.md#documentation-standards)\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            41,
+            43
+          ],
+          "TF_lines": [
+            47,
+            49
+          ],
+          "bytes": 11,
+          "sha256": "388e3bf1d673458a36af5d8d828c364cfa9107870336e3e97a4c8cd8e158ae8b"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            44,
+            44
+          ],
+          "TF_lines": [
+            50,
+            50
+          ],
+          "PS_exact": "- **Consistency**: Establish uniform coding patterns across all PowerShell projects\n",
+          "TF_exact": "- **Consistency**: Establish uniform coding patterns across all Terraform projects\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            45,
+            54
+          ],
+          "TF_lines": [
+            51,
+            60
+          ],
+          "bytes": 343,
+          "sha256": "c6362de4102712ba0f7c932561628de4e5ed3dc43f497408abe144795b8fc0f3"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            55,
+            55
+          ],
+          "TF_lines": [
+            61,
+            61
+          ],
+          "PS_exact": "This style guide was informed by established community resources and official Microsoft guidance. See [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) for detailed attribution and sources.\n",
+          "TF_exact": "See [ACKNOWLEDGMENTS.md](ACKNOWLEDGMENTS.md) for detailed attribution and sources.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            56,
+            62
+          ],
+          "TF_lines": [
+            62,
+            68
+          ],
+          "bytes": 113,
+          "sha256": "b8caae306ffc225d1607fac7e6847d3ab37df239662c6c3fe139f79f12ab5baa"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            63,
+            63
+          ],
+          "TF_lines": [
+            69,
+            69
+          ],
+          "PS_exact": "Created by Frank Lesniak\n",
+          "TF_exact": "Created by Frank Lesniak, Blake Cherry, and Danny Stutz\n"
+        }
+      ]
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "owner": "A02",
+      "PS": {
+        "commit": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f66c405398db94f21d8caeae4b94487fe5ffa75d",
+        "bytes": 2179,
+        "sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d"
+      },
+      "TF": {
+        "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f66c405398db94f21d8caeae4b94487fe5ffa75d",
+        "bytes": 2179,
+        "sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d"
+      },
+      "raw_equal": true,
+      "mode_equal": true,
+      "complete_raw_partition": [
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            1,
+            38
+          ],
+          "TF_lines": [
+            1,
+            38
+          ],
+          "bytes": 2179,
+          "sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d"
+        }
+      ]
+    },
+    {
+      "path": "AGENTS.md",
+      "owner": "A20",
+      "PS": {
+        "commit": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a10d44f6d61c9126d8aa8f4445926579eafbb67b",
+        "bytes": 32654,
+        "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d"
+      },
+      "TF": {
+        "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "be1e52363e92daec056660b3e1147527874ccbf9",
+        "bytes": 32746,
+        "sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f"
+      },
+      "raw_equal": false,
+      "mode_equal": true,
+      "complete_raw_partition": [
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            1,
+            10
+          ],
+          "TF_lines": [
+            1,
+            10
+          ],
+          "bytes": 224,
+          "sha256": "fa6932e4a897a1bc9c20e4a8f5e232899621e1bb45d2e6d0efee7a06978fe813"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            11,
+            11
+          ],
+          "TF_lines": [
+            11,
+            11
+          ],
+          "PS_exact": "- **Scope:** Codex and compatible agents in PSStyleGuide. Brief shared rules and full Codex protocols; `.github/copilot-instructions.md` governs documentation authoring.\n",
+          "TF_exact": "- **Scope:** Codex and compatible agents in TerraformStyleGuide. Brief shared rules and full Codex protocols; `.github/copilot-instructions.md` governs documentation authoring.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            12,
+            39
+          ],
+          "TF_lines": [
+            12,
+            39
+          ],
+          "bytes": 3471,
+          "sha256": "6c939336251d0a287b22be36fff3553ef73b1331b1e3958a25a906dec1edf600"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            40,
+            40
+          ],
+          "TF_lines": [
+            40,
+            40
+          ],
+          "PS_exact": "  - PSStyleGuide defines actionable PowerShell rules for humans and coding agents.\n",
+          "TF_exact": "  - TerraformStyleGuide defines actionable Terraform rules for humans and coding agents.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            41,
+            41
+          ],
+          "TF_lines": [
+            41,
+            41
+          ],
+          "bytes": 123,
+          "sha256": "bf97ef256e1c13946490dc0321dfc36bbe5f23337c53a2f53018921b186e936e"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            42,
+            42
+          ],
+          "TF_lines": [
+            42,
+            42
+          ],
+          "PS_exact": "  - Do not hand-edit `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n",
+          "TF_exact": "  - Do not hand-edit `copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            43,
+            45
+          ],
+          "TF_lines": [
+            43,
+            45
+          ],
+          "bytes": 149,
+          "sha256": "c670050b0bf1e17bf592773add7bbff93fe9d11d2fd91e281d3e3068e7dd9619"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            46,
+            46
+          ],
+          "TF_lines": [
+            46,
+            46
+          ],
+          "PS_exact": "  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in `STYLE_GUIDE.md`.\n",
+          "TF_exact": "  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in the [PSStyleGuide](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md).\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            47,
+            247
+          ],
+          "TF_lines": [
+            47,
+            247
+          ],
+          "bytes": 27979,
+          "sha256": "7775d0db484b66f0954315545d698360a006a8810b6971fd67e6423f1005493e"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            248,
+            248
+          ],
+          "TF_lines": [
+            248,
+            248
+          ],
+          "PS_exact": "> This file is the Codex entry point for PSStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n",
+          "TF_exact": "> This file is the Codex entry point for TerraformStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n"
+        }
+      ]
+    },
+    {
+      "path": "CLAUDE.md",
+      "owner": "A20",
+      "PS": {
+        "commit": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5eeadb1e9d9e2ddb77c9c7904861a2a19659e08c",
+        "bytes": 83316,
+        "sha256": "bb936f19fdbbcbb0e64502ea3ae7b75de447d39942a083ec03d237fe374f0ea6"
+      },
+      "TF": {
+        "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6a646684e062c418bf124fa5d78690d3e86611cf",
+        "bytes": 83433,
+        "sha256": "efd0c70621f46bd65119dab82ec9a1cb6fde8a0112a3f0d13d57c83267296bc1"
+      },
+      "raw_equal": false,
+      "mode_equal": true,
+      "complete_raw_partition": [
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            1,
+            10
+          ],
+          "TF_lines": [
+            1,
+            10
+          ],
+          "bytes": 220,
+          "sha256": "883aa050f56d7e09375247024b0682b9b46f9a5ad1f12fc21d09f22ec1706de4"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            11,
+            11
+          ],
+          "TF_lines": [
+            11,
+            11
+          ],
+          "PS_exact": "- **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.\n",
+          "TF_exact": "- **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in TerraformStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            12,
+            15
+          ],
+          "TF_lines": [
+            12,
+            15
+          ],
+          "bytes": 263,
+          "sha256": "9303eca4d2e673a0eee68b9e78f7c5d860e8bd52717b1f17121d189f185f93d7"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            16,
+            16
+          ],
+          "TF_lines": [
+            16,
+            16
+          ],
+          "PS_exact": "This file provides PSStyleGuide-specific instructions for Claude Code and compatible AI coding agents. These instructions apply the repository's PowerShell, documentation, safety, and review contracts.\n",
+          "TF_exact": "This file provides TerraformStyleGuide-specific instructions for Claude Code and compatible AI coding agents. These instructions apply the repository's Terraform, PowerShell, documentation, safety, and review contracts.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            17,
+            19
+          ],
+          "TF_lines": [
+            17,
+            19
+          ],
+          "bytes": 28,
+          "sha256": "2b89588c1c33277509f54c846969d3eb3ff03279406122ef9d3ccf0b2b726e85"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            20,
+            20
+          ],
+          "TF_lines": [
+            20,
+            20
+          ],
+          "PS_exact": "The authoritative source of truth for PSStyleGuide documentation authoring is **`.github/copilot-instructions.md`**. Its normative-versus-rationale split and generated-artifact rules apply without exception. **Read that file before changing style-guide content.**\n",
+          "TF_exact": "The authoritative source of truth for TerraformStyleGuide documentation authoring is **`.github/copilot-instructions.md`**. Its normative-versus-rationale split and generated-artifact rules apply without exception. **Read that file before changing style-guide content.**\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            21,
+            40
+          ],
+          "TF_lines": [
+            21,
+            40
+          ],
+          "bytes": 2616,
+          "sha256": "653d78613a49ee613ea1a01ebab04b37084b8fa2937f8aa7322ecc28f988eadc"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            41,
+            41
+          ],
+          "TF_lines": [
+            41,
+            41
+          ],
+          "PS_exact": "  - PSStyleGuide defines actionable PowerShell rules for humans and coding agents.\n",
+          "TF_exact": "  - TerraformStyleGuide defines actionable Terraform rules for humans and coding agents.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            42,
+            42
+          ],
+          "TF_lines": [
+            42,
+            42
+          ],
+          "bytes": 123,
+          "sha256": "bf97ef256e1c13946490dc0321dfc36bbe5f23337c53a2f53018921b186e936e"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            43,
+            43
+          ],
+          "TF_lines": [
+            43,
+            43
+          ],
+          "PS_exact": "  - Do not hand-edit `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n",
+          "TF_exact": "  - Do not hand-edit `copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            44,
+            46
+          ],
+          "TF_lines": [
+            44,
+            46
+          ],
+          "bytes": 149,
+          "sha256": "c670050b0bf1e17bf592773add7bbff93fe9d11d2fd91e281d3e3068e7dd9619"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            47,
+            47
+          ],
+          "TF_lines": [
+            47,
+            47
+          ],
+          "PS_exact": "  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in `STYLE_GUIDE.md`.\n",
+          "TF_exact": "  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in the [PSStyleGuide](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md).\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            48,
+            443
+          ],
+          "TF_lines": [
+            48,
+            443
+          ],
+          "bytes": 78629,
+          "sha256": "38ec29290e0634715266366bf95274cbe5c3d558652261cf0e9bcdac671b1ac6"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            444,
+            444
+          ],
+          "TF_lines": [
+            444,
+            444
+          ],
+          "PS_exact": "> This file is the Claude entry point for PSStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n",
+          "TF_exact": "> This file is the Claude entry point for TerraformStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n"
+        }
+      ]
+    },
+    {
+      "path": ".github/copilot-instructions.md",
+      "owner": "A20",
+      "PS": {
+        "commit": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "763aaac2000166b570e39a0c3d8847aa231b294d",
+        "bytes": 2517,
+        "sha256": "134325afd9ab1ee5ca6878352292ee2dc3a2987d5473657bf85a2d822b46a4f6"
+      },
+      "TF": {
+        "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5de5474c3e2125d1f0171a305b094d514cc37ff5",
+        "bytes": 2522,
+        "sha256": "5e9744858581ca9c663945c2eac4f636e18aff899e604d0c6f845505972783c6"
+      },
+      "raw_equal": false,
+      "mode_equal": true,
+      "complete_raw_partition": [
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            1,
+            1
+          ],
+          "TF_lines": [
+            1,
+            1
+          ],
+          "PS_exact": "# Repository instructions for PSStyleGuide\n",
+          "TF_exact": "# Repository instructions for TerraformStyleGuide\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            2,
+            10
+          ],
+          "TF_lines": [
+            2,
+            10
+          ],
+          "bytes": 643,
+          "sha256": "ea01bbaa59acf03e870ed6ecf629a4e84bb036a22c2fd42726107273f1ffd5d5"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            11,
+            11
+          ],
+          "TF_lines": [
+            11,
+            11
+          ],
+          "PS_exact": "- `powershell.instructions.md` \u2014 generated from `STYLE_GUIDE.md` with YAML front matter.\n",
+          "TF_exact": "- `terraform.instructions.md` \u2014 generated from `STYLE_GUIDE.md` with YAML front matter.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            12,
+            23
+          ],
+          "TF_lines": [
+            12,
+            23
+          ],
+          "bytes": 1229,
+          "sha256": "101f15c45225719f523802772beaff5288f0cfa5ce8e83cf04cc711882a03c6d"
+        },
+        {
+          "kind": "necessary_exception",
+          "PS_lines": [
+            24,
+            24
+          ],
+          "TF_lines": [
+            24,
+            24
+          ],
+          "PS_exact": "6. Consumer-facing style guide files (`STYLE_GUIDE.md` and its generated derivatives: `/copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, `STYLE_GUIDE_FULL.md`) must not cross-reference other files in this repository, including each other.\n",
+          "TF_exact": "6. Consumer-facing style guide files (`STYLE_GUIDE.md` and its generated derivatives: `/copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, `STYLE_GUIDE_FULL.md`) must not cross-reference other files in this repository, including each other.\n"
+        },
+        {
+          "kind": "identical_raw_region",
+          "PS_lines": [
+            25,
+            25
+          ],
+          "TF_lines": [
+            25,
+            25
+          ],
+          "bytes": 242,
+          "sha256": "405b8756c5197c7c9fdfaa2f14ad663a78a86db6b4551c93b8960eb5922d8c2d"
+        }
+      ]
+    }
+  ],
+  "supporting_evidence": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A02.md",
+      "bytes": 4447,
+      "sha256": "383b2645358f049bc36e77cbd120963478d8081c7934ceee913771ed9d52b15a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A20.md",
+      "bytes": 2232,
+      "sha256": "688cac0dabb1b8cd750dc8eac85417953915a236b7eb7649a20f7742dacc3eae"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\README.md",
+      "bytes": 10209,
+      "sha256": "f7228cfd5bc0dd59aafddb89880930f9930fe4e5ddf3305d0b4999a6c11b6fd4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "bytes": 15723,
+      "sha256": "04bc871d57d8b3cb2ff31dfa6bf6d2d626c23bae86e56b4f26603d80dbb2a4bf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\DECISIONS.md",
+      "bytes": 20567,
+      "sha256": "f58131a8dfd0452ba69310b2dab04f0a0133ff758bea1d19111e2b58fd20d3f6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A00\\RESULT.md",
+      "bytes": 15042,
+      "sha256": "28ad310d71fc3cabe18d4bb482bf5b6ea494846ffc85e209b278cc2375f8acf8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A00\\dispositions.json",
+      "bytes": 461586,
+      "sha256": "45e83dca413045ee58d22930dbdaf771caa832bd3ea831b575dc28c4f2b42e47"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\RESULT.md",
+      "bytes": 103365,
+      "sha256": "68b739507fee7918fb71f17ce323d135e7397c6c4052494f26635072278ee087"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A20\\RESULT.md",
+      "bytes": 15846,
+      "sha256": "44d38f46050d97b460924b1c0cd97cb332183ea62d22e58a8e98eb4f6bb0f2a8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\protected-v2-request.md",
+      "bytes": 3902,
+      "sha256": "371de3c01fcf377757f835e68c0a5b0751420eafe13002873f83a897baf920e6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\protected-v2-manifest.json",
+      "bytes": 3950,
+      "sha256": "02de08bddeca01b17fd377217b5aff4f61dffa8ef478b55566bcf19a18ee6b03"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A20\\integration-current\\DECISION.md",
+      "bytes": 18951,
+      "sha256": "0f2c2d0820d3e6c80ed2789784f512abe71ca063f36cb3f5f6e46ffe54a07832"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A20\\integration-current\\identities.json",
+      "bytes": 14745,
+      "sha256": "180b59eae7b0085ff919c36b9d5fd27b375ac0c27859215a618d0f6d3c0629ad"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A20\\integration-current\\round1-decisions.md",
+      "bytes": 12795,
+      "sha256": "884c323abf2c543768a68b80c1a582dc5f09f6e1c1423a17e2e8e0ad3cd77628"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A20\\integration-current\\round1-repair.json",
+      "bytes": 28345,
+      "sha256": "3f6c37e5e922a6367e826bf1f2f4cf3f62b337f95dadeb234a530bf667eeb4a4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A20\\integration-current\\review-state.json",
+      "bytes": 19187,
+      "sha256": "d1a82975e6b7dd32f21b9331318a23ceeea116206c59084eecae77e3a24a016f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A20\\TF66-R3-runtime-pointer.md",
+      "bytes": 15407,
+      "sha256": "aada52342acf206f57a74b80694be6be97ba2d86bc2417abffcd2c2fb2b2bf83"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A08\\assessment.md",
+      "bytes": 15953,
+      "sha256": "ab23b26a6a85d9a84aed80a30ad98b3b08dc288a3f76e30f2e06506e61ce100c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\peer-readme-navigation-decision.md",
+      "bytes": 5358,
+      "sha256": "c08918f3f3f1ffacfb04d41bceddd66a4ef691bc6692cfe1062b79cbfc39e776"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\coherent-peer-candidate.json",
+      "bytes": 519904,
+      "sha256": "e6307ca0ddbab4836247925bcb6a7d87d4a7e0ad05d3a17a9ec3aa0e51349eaf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\coherent-reverse-candidate.json",
+      "bytes": 171082,
+      "sha256": "4b985486772ec08ded46b3b1a14e6ebddbf93bd1fd6b68c2a08618062790036b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\coherent-reverse-release.json",
+      "bytes": 19382,
+      "sha256": "a2cc109a87c87c09ab62c65c481a7ece97395f991c63cb20a2f022452a5c0bd1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\ps232-round10-final-quality.md",
+      "bytes": 7199,
+      "sha256": "1164eea724018acabeed14054ab5bff8b1e90ba7e2d3f68768b4cb3c1994ec6c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\ps-reverse-quality.md",
+      "bytes": 9528,
+      "sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A02\\ps232-local-validation.md",
+      "bytes": 4409,
+      "sha256": "9b7cdd18a619d2071bac8c7861780dd9f81a59b2d7f731ceb419745f2be7602f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076771\\log.txt",
+      "sha256": "2b518afdfb0d2755de6c500fe3b3b3c6e2ab842fd963d2df5895adb084cad860",
+      "expected_sha256": "2b518afdfb0d2755de6c500fe3b3b3c6e2ab842fd963d2df5895adb084cad860",
+      "hash_matches": true
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076782\\log.txt",
+      "sha256": "94d5bff83f5b770e4c12c634e7c6a783cfaeb3df7307e942947c51f4ad91925d",
+      "expected_sha256": "94d5bff83f5b770e4c12c634e7c6a783cfaeb3df7307e942947c51f4ad91925d",
+      "hash_matches": true
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076754\\log.txt",
+      "sha256": "e49061528ee7c93f1f474f603b8ad306747a5ae951aa032946ad4e297961f526",
+      "expected_sha256": "e49061528ee7c93f1f474f603b8ad306747a5ae951aa032946ad4e297961f526",
+      "hash_matches": true
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076803\\log.txt",
+      "sha256": "a7dc1a42c5bab4faa25243626d94ff29dc767c380efd08b502947c4d57f12c9f",
+      "expected_sha256": "a7dc1a42c5bab4faa25243626d94ff29dc767c380efd08b502947c4d57f12c9f",
+      "hash_matches": true
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076765\\log.txt",
+      "sha256": "cbc0ffe77df767bce68d6c8451460e78dd64032c125581e38e7c7529dda7961e",
+      "expected_sha256": "cbc0ffe77df767bce68d6c8451460e78dd64032c125581e38e7c7529dda7961e",
+      "hash_matches": true
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\17caede-current-input-20261005\\FINAL-QUALITY-17caede-20261005-REPORT.md",
+      "sha256": "8346d9d583881e7d92c35ebcab8ad0627c399a9677a69b46e675abea60a8873e",
+      "expected_sha256": "8346d9d583881e7d92c35ebcab8ad0627c399a9677a69b46e675abea60a8873e",
+      "hash_matches": true
+    }
+  ],
+  "requirements": [
+    {
+      "owner": "A02",
+      "requirement": "PR224 current review/quality/source merge gates",
+      "proof": "RESULT.md PR224 round9 and PR226 source acceptance; accepted PR226 2a2d14a, run37108666604, public handoff5967208846. PR224 failed push remains failed."
+    },
+    {
+      "owner": "A02",
+      "requirement": "Four retained paths common raw bytes and modes",
+      "proof": "Complete raw partitions in paths; two equal blobs, exact narrow substitutions in CONTRIBUTING/README. D05/D06/navigation B100."
+    },
+    {
+      "owner": "A02",
+      "requirement": "Policy preservation and metadata-consumer ownership",
+      "proof": "Both docs.instructions.md blobs/modes unchanged from A02 starting baseline. No new template-derived deletion. Validator/manifest/classifier original4 explicitly owned by A21; workflow A03 and tooling A07 handed off."
+    },
+    {
+      "owner": "A20",
+      "requirement": "Exact scoped authority",
+      "proof": "DECISIONS D08 item2 plus selected S94; item3 separate two-CLAUDE repair; round1 S97/V98 and runtime-pointer D98.4 remain within recorded grant. No cap/config/settings expansion."
+    },
+    {
+      "owner": "A20",
+      "requirement": "Protected content, metadata, limits and protocols",
+      "proof": "Complete raw partition of three protected pairs; metadata raw-equal. Current AGENTS bounded32768; config65536 and reserve16384 unchanged. Native CLAUDE362-374 causal/terminal rules and438-440 resume retain defaults80/6h and task overrides."
+    },
+    {
+      "owner": "A20",
+      "requirement": "Meaningful parsing/commands/size/contract verification",
+      "proof": "S94 actual reader32768/32769 and112 command mutations, guard removal controls; current validator actual command helper and mutation cases persist. PR229 normal full11-hook source acceptance; TF66 actual landed logs rehashed; PS232 unchanged final-source quality and507-test hosted evidence reused."
+    },
+    {
+      "owner": "A02/A20",
+      "requirement": "Paired normal lifecycle and accepted mains",
+      "proof": "PS PR224/226 and A20 PR229 source -> TF66 accepted -> PS232 normal merged exact reviewed tree; raw compare-back performed here. Final PS landed acceptance remains root-owned condition."
+    }
+  ],
+  "lifecycle": {
+    "PS": {
+      "merge": {
+        "requested_at": "2026-10-05T13:12:29.932750+00:00",
+        "method": "merge",
+        "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+        "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+        "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+        "gate_sha256": "9ecc7b485238fc9e159ec830ecf47e36b5cd2a3617de287930318e91ea8e8244",
+        "native_sha256": "6831213154c4b1eac3bd6f60638f91db12387b9fcd0d6966674a8580d0dafe43",
+        "exit": 0,
+        "response": {
+          "sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+          "merged": true,
+          "message": "Pull Request successfully merged"
+        },
+        "sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "parents": [
+          "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "86f35f47cfc744780c4c419912fcdae06fdd6f83"
+        ],
+        "merged_at": "2026-10-05T13:12:25Z",
+        "verified_at": "2026-10-05T13:12:34.869869+00:00"
+      },
+      "quality": {
+        "result": "passed_no_material_finding",
+        "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+        "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+        "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+        "body_sha256": "7221c071ff008d322c0f066b17d43b9fc2f5f44eeb98295f3a74643404015e6c",
+        "report": "ps232-round10-final-quality.md",
+        "source_report_sha256": "5e96e652ac1611e48404a9ef8e4685d8abfad2de051d78f9e9b46bb4a419af5c",
+        "evidence_sha256": "1d8e6b29860fcbcf8f708f99ce35487c9f3d05469d69774815a1dc6e56b206d0",
+        "native_snapshot_sha256": "fdddca93bdeb50af1ce3a0915505d049283034e209cd9903f25a529b5356004b",
+        "native_gate_sha256": "5ada8593d4e27dbf9bc14f2a7b11a93f5d807c106f522c3035bfbbc0ee9391b6",
+        "admitted_service_cancellations": [
+          {
+            "round": 5,
+            "run_id": 37296746380,
+            "review_id": 5413289214,
+            "reason": "native_service_deadline_with_valid_lite_result",
+            "summary_sha256": "a499bc279199a0d718b65d87e882c59206baa62cce73b893fbeb8fc9d6912e01"
+          },
+          {
+            "round": 6,
+            "run_id": 37299688603,
+            "review_id": 5413616728,
+            "reason": "native_service_deadline_with_valid_lite_result",
+            "summary_sha256": "5b9fc77354fe9a3c4c81ea08e76759b952bf7846cc00e02e4f055fc3c876c2ed"
+          },
+          {
+            "round": 7,
+            "run_id": 37303115319,
+            "review_id": 5413989631,
+            "reason": "native_service_deadline_with_valid_lite_result",
+            "summary_sha256": "5ac8c3420acd67b597f0317c794ace2c7124011e7d6ad654ad26706bf6dba1dc"
+          },
+          {
+            "round": 8,
+            "run_id": 37306286348,
+            "review_id": 5414329909,
+            "reason": "native_service_deadline_with_valid_lite_result",
+            "summary_sha256": "b094069984d0e15b6b8a0d0a13fb4dd51a3b2e07750f26e99e831958a26bed73"
+          },
+          {
+            "round": 9,
+            "run_id": 37309257514,
+            "review_id": 5414623091,
+            "reason": "native_service_deadline_with_valid_lite_result",
+            "summary_sha256": "a9184e9c9b929811248d5cfd10203fadf86edaf9b545e6ed7dbd40254767b3ee"
+          }
+        ]
+      },
+      "round": 10,
+      "landed_acceptance": "root_owned_pending_for_this_audit"
+    },
+    "TF": {
+      "merge": {
+        "requested_at": "2026-10-05T05:03:05.570831+00:00",
+        "method": "merge",
+        "expected_head": "17caede017a8054bed529517ce473ef75682b5bf",
+        "expected_base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "expected_tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+        "preflight": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-premerge-gates.json",
+        "preflight_sha256": "80c8ea6b1ffb5803d7b943b6fa8f376a087e28326cfc6e729722d37da243f89c",
+        "exit_code": 0,
+        "response": {
+          "sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "merged": true,
+          "message": "Pull Request successfully merged"
+        },
+        "sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+        "parents": [
+          "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+          "17caede017a8054bed529517ce473ef75682b5bf"
+        ],
+        "merged_at": "2026-10-05T05:03:00Z",
+        "verified_at": "2026-10-05T05:03:09.953138+00:00"
+      },
+      "quality": {
+        "result": "passed_no_material_finding",
+        "head": "17caede017a8054bed529517ce473ef75682b5bf",
+        "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+        "body_sha256": "a5f0314868a42df0869a100d0de4061e1343e99a31dd4cbbb64aceacfd956628",
+        "report_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\17caede-current-input-20261005\\FINAL-QUALITY-17caede-20261005-REPORT.md",
+        "report_sha256": "8346d9d583881e7d92c35ebcab8ad0627c399a9677a69b46e675abea60a8873e",
+        "evidence_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\17caede-current-input-20261005\\FINAL-QUALITY-17caede-20261005-EVIDENCE.json",
+        "evidence_sha256": "e0f63dec7d9ea3f4fb6e85eb438db4178f7e56bcbd112eb9840701ad4ee6ada5",
+        "native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round8-terminal-01-17caede.json",
+        "native_snapshot_sha256": "4da6433c582b20ccf36273f4da1aabc5741ee2b8b73c834a3364b21dcac9b2b8",
+        "reviewer": "/root/a02_tf_prepublication_quality",
+        "root_read_complete_report": true,
+        "recorded_at": "2026-10-05T05:02:59.351218+00:00",
+        "limits": "Final current PR input only; immediate native freshness, normal merge, landed checks and reverse pair acceptance remain."
+      },
+      "landed_acceptance": {
+        "accepted_at": "2026-10-05T05:25:04.627912+00:00",
+        "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "tree": "377d9980fdd4008e806366ca90b1ce2811c2f519",
+        "parents": [
+          "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+          "17caede017a8054bed529517ce473ef75682b5bf"
+        ],
+        "reviewed_head": "17caede017a8054bed529517ce473ef75682b5bf",
+        "review_round": 8,
+        "review_body_sha256": "a5f0314868a42df0869a100d0de4061e1343e99a31dd4cbbb64aceacfd956628",
+        "native_evidence_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-terminal-01.json",
+        "native_evidence_sha256": "07c80952bee80547b50e75215d73aaddfc905991fc6df28cd7fff954fbba7d9a",
+        "runs": [
+          {
+            "id": 37266076771,
+            "name": "Dev container boundary",
+            "event": "push",
+            "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37266076782,
+            "name": "Markdown Lint",
+            "event": "push",
+            "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37266076754,
+            "name": "Build Style Guide Artifacts",
+            "event": "push",
+            "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37266076803,
+            "name": "Agent instruction validation",
+            "event": "push",
+            "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "status": "completed",
+            "conclusion": "success"
+          },
+          {
+            "id": 37266076765,
+            "name": "Copilot setup steps",
+            "event": "push",
+            "head_sha": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "status": "completed",
+            "conclusion": "success"
+          }
+        ],
+        "terminal_logs": [
+          {
+            "id": 37266076771,
+            "name": "Dev container boundary",
+            "event": "push",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1,
+            "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37266076771",
+            "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076771\\log.txt",
+            "log_sha256": "2b518afdfb0d2755de6c500fe3b3b3c6e2ab842fd963d2df5895adb084cad860",
+            "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076771\\jobs.json",
+            "jobs_sha256": "0a5aa2220c7c245df9eea9e4da7257d89a36c71703e33a81a67806a1e9f051c0"
+          },
+          {
+            "id": 37266076782,
+            "name": "Markdown Lint",
+            "event": "push",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1,
+            "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37266076782",
+            "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076782\\log.txt",
+            "log_sha256": "94d5bff83f5b770e4c12c634e7c6a783cfaeb3df7307e942947c51f4ad91925d",
+            "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076782\\jobs.json",
+            "jobs_sha256": "b5a61ed4b8d6d53aed1720bb21a97bda501197ad4189246c5f7d69131f734f0f"
+          },
+          {
+            "id": 37266076754,
+            "name": "Build Style Guide Artifacts",
+            "event": "push",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1,
+            "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37266076754",
+            "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076754\\log.txt",
+            "log_sha256": "e49061528ee7c93f1f474f603b8ad306747a5ae951aa032946ad4e297961f526",
+            "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076754\\jobs.json",
+            "jobs_sha256": "320d85697dec90c8a9861c1b35668ffdc5f7866b2c71ee890f2dab9649c92c03"
+          },
+          {
+            "id": 37266076803,
+            "name": "Agent instruction validation",
+            "event": "push",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1,
+            "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37266076803",
+            "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076803\\log.txt",
+            "log_sha256": "a7dc1a42c5bab4faa25243626d94ff29dc767c380efd08b502947c4d57f12c9f",
+            "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076803\\jobs.json",
+            "jobs_sha256": "528eb0d5062a2531ffea629c1092ae565374376ab1f8184964826d4df1d2d7c6"
+          },
+          {
+            "id": 37266076765,
+            "name": "Copilot setup steps",
+            "event": "push",
+            "status": "completed",
+            "conclusion": "success",
+            "run_attempt": 1,
+            "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37266076765",
+            "head": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+            "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076765\\log.txt",
+            "log_sha256": "cbc0ffe77df767bce68d6c8451460e78dd64032c125581e38e7c7529dda7961e",
+            "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\landed-peer-hosted\\56cb0418dcdcf71be94acc78d8963ea580b8a9e9\\37266076765\\jobs.json",
+            "jobs_sha256": "f4aeb4df3c85b430afa2fe746a5db1d4e9561a7787d266e16bc55a10fe8b9401"
+          }
+        ],
+        "setup_passed_hooks": [
+          "check json...............................................................Passed",
+          "check yaml...............................................................Passed",
+          "fix end of files.........................................................Passed",
+          "trim trailing whitespace.................................................Passed",
+          "yamllint.................................................................Passed",
+          "Lint GitHub Actions workflow files.......................................Passed",
+          "Validate Dependabot Config (v2)..........................................Passed",
+          "Validate GitHub Workflows................................................Passed",
+          "staged Markdown..........................................................Passed",
+          "workflow policy contract.................................................Passed",
+          "agent instruction contract and mutation tests............................Passed"
+        ],
+        "node_tests": {
+          "passed": 515,
+          "failed": 0,
+          "skipped": 0
+        },
+        "audit": {
+          "status": "CLEAN",
+          "unresolved": [],
+          "acceptedPackages": 0,
+          "unusedExceptions": [],
+          "proposedState": false,
+          "authority": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+          "authoritySource": "event-main",
+          "limitation": "Authority is the recorded main snapshot; owner/executor must check known revocations before acceptance.",
+          "installedGraphRoots": [
+            ".github/workflows"
+          ],
+          "findings": [],
+          "applicable": true
+        },
+        "workflow_policy": {
+          "schema": "StyleGuide.WorkflowPolicyResult.v1",
+          "validatorVersion": "3.0.0",
+          "success": true,
+          "contractCanonicalSha256": "9d7fadbff11db3e3b837e1e9f059bd5b142ff6e8fc0ad5a83196afca3c9c7f30",
+          "casesPassed": 0,
+          "workflowSha256": {
+            "build.yml": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b",
+            "markdownlint.yml": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+          }
+        },
+        "ruleset_unchanged": 20623677,
+        "peer_batch_result": "accepted",
+        "limits": "Actual merged TF push workflows, including full validation and immutable-input check, passed. Does not establish paired convergence, close any whole outcome, or release the reverse writer. Current PS, authority, date, mapping and transfer2 must be refreshed first."
+      }
+    }
+  },
+  "unchanged_policy": {
+    "PS": {
+      "old": {
+        "commit": "48f4d8a36c8faceee12afac78aaecea0d176125d",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd",
+        "bytes": 46230,
+        "sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b"
+      },
+      "current": {
+        "commit": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0b0c1ddc83938cfa9706418d45f619b1bfa03ffd",
+        "bytes": 46230,
+        "sha256": "d44a17724478620b5b47ca4c9990a1dc9850707c2460a3117f96157b9d58978b"
+      },
+      "raw_and_mode_unchanged": true
+    },
+    "TF": {
+      "old": {
+        "commit": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+        "bytes": 46254,
+        "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+      },
+      "current": {
+        "commit": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9",
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+        "bytes": 46254,
+        "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+      },
+      "raw_and_mode_unchanged": true
+    }
+  },
+  "original_A02_dispositions_retained": [
+    {
+      "id": 1,
+      "title": "create or update the PS metadata-policy corrective issue",
+      "source_contract": "../../original-tasks/001.md",
+      "original_body_sha256": "1bec26869abb69da7ac4b58443a22a864bad290dec6372d2783e9b822207a031",
+      "present_disposition": "unverified-administrative-leaf",
+      "historical_credit": "RETAIN",
+      "evidence": [
+        "RESULT.md"
+      ],
+      "policy": "remaining-validation",
+      "family": "metadata policy",
+      "delivered_via": [
+        "https://github.com/franklesniak/PSStyleGuide/pull/180"
+      ],
+      "remaining_owner": "A02",
+      "disposition_note": "Native family delivery is established; this specific administrative or conditional lifecycle leaf is not independently credited. Do not replay it solely for bookkeeping."
+    },
+    {
+      "id": 2,
+      "title": "commence the PS metadata-policy correction",
+      "source_contract": "../../original-tasks/002.md",
+      "original_body_sha256": "b64467c676ecc4af4cf71e331d64a3c3d5b8ac14f883ba5c6f42386846c26c55",
+      "present_disposition": "unverified-administrative-leaf",
+      "historical_credit": "RETAIN",
+      "evidence": [
+        "RESULT.md"
+      ],
+      "policy": "remaining-validation",
+      "family": "metadata policy",
+      "delivered_via": [
+        "https://github.com/franklesniak/PSStyleGuide/pull/180"
+      ],
+      "remaining_owner": "A02",
+      "disposition_note": "Native family delivery is established; this specific administrative or conditional lifecycle leaf is not independently credited. Do not replay it solely for bookkeeping."
+    },
+    {
+      "id": 3,
+      "title": "establish clause-level metadata-policy provenance",
+      "source_contract": "../../original-tasks/003.md",
+      "original_body_sha256": "1f7e80d5fce998d43e756f8d8024a77206badfe30d5b335ed6c6d1d0de29686f",
+      "present_disposition": "unverified-administrative-leaf",
+      "historical_credit": "RETAIN",
+      "evidence": [
+        "RESULT.md"
+      ],
+      "policy": "remaining-validation",
+      "family": "metadata policy",
+      "delivered_via": [
+        "https://github.com/franklesniak/PSStyleGuide/pull/180"
+      ],
+      "remaining_owner": "A02",
+      "disposition_note": "Native family delivery is established; this specific administrative or conditional lifecycle leaf is not independently credited. Do not replay it solely for bookkeeping."
+    },
+    {
+      "id": 5,
+      "title": "create or update the PS metadata-policy corrective PR and freeze its reviewer-facing body",
+      "source_contract": "../../original-tasks/005.md",
+      "original_body_sha256": "9fef2b03a2d74e5dbf51de1765e7c8c7b788dadd7e21e378f1814cd76ee21d54",
+      "present_disposition": "unverified-administrative-leaf",
+      "historical_credit": "RETAIN",
+      "evidence": [
+        "RESULT.md"
+      ],
+      "policy": "remaining-validation",
+      "family": "metadata policy",
+      "delivered_via": [
+        "https://github.com/franklesniak/PSStyleGuide/pull/180"
+      ],
+      "remaining_owner": "A02",
+      "disposition_note": "Native family delivery is established; this specific administrative or conditional lifecycle leaf is not independently credited. Do not replay it solely for bookkeeping."
+    },
+    {
+      "id": 6,
+      "title": "run the corrected Copilot-and-Codex review loop on the PS metadata-policy PR",
+      "source_contract": "../../original-tasks/006.md",
+      "original_body_sha256": "015268b3b17a87bebcdcfe1420cc08e78e1a9a1483aa26e27213ff1c241b6a5d",
+      "present_disposition": "unverified-administrative-leaf",
+      "historical_credit": "RETAIN",
+      "evidence": [
+        "RESULT.md"
+      ],
+      "policy": "remaining-validation",
+      "family": "metadata policy",
+      "delivered_via": [
+        "https://github.com/franklesniak/PSStyleGuide/pull/180"
+      ],
+      "remaining_owner": "A02",
+      "disposition_note": "Native family delivery is established; this specific administrative or conditional lifecycle leaf is not independently credited. Do not replay it solely for bookkeeping."
+    },
+    {
+      "id": 7,
+      "title": "run the independent final quality check on the PS metadata-policy PR",
+      "source_contract": "../../original-tasks/007.md",
+      "original_body_sha256": "4ff2e3460cc50a3136e02aa51c60b5ca8cf064c690e4c0344f2fd70c59bc8fe8",
+      "present_disposition": "unverified-administrative-leaf",
+      "historical_credit": "RETAIN",
+      "evidence": [
+        "RESULT.md"
+      ],
+      "policy": "remaining-validation",
+      "family": "metadata policy",
+      "delivered_via": [
+        "https://github.com/franklesniak/PSStyleGuide/pull/180"
+      ],
+      "remaining_owner": "A02",
+      "disposition_note": "Native family delivery is established; this specific administrative or conditional lifecycle leaf is not independently credited. Do not replay it solely for bookkeeping."
+    },
+    {
+      "id": 8,
+      "title": "merge the PS metadata-policy corrective PR",
+      "source_contract": "../../original-tasks/008.md",
+      "original_body_sha256": "2b81a8a894af814d91f4355cb55e73eb0831f6eab5bc4cfa817ee6068d9ca798",
+      "present_disposition": "delivered-historically",
+      "historical_credit": "RETAIN",
+      "evidence": [
+        "RESULT.md"
+      ],
+      "policy": "remaining-validation",
+      "family": "metadata policy",
+      "delivered_via": [
+        "https://github.com/franklesniak/PSStyleGuide/pull/180"
+      ],
+      "remaining_owner": "A02",
+      "disposition_note": "Native family product delivery or existing leaf credit is retained; this does not accept current convergence or add historical completion credit."
+    },
+    {
+      "id": 9,
+      "title": "publish the PS metadata-policy landed handoff",
+      "source_contract": "../../original-tasks/009.md",
+      "original_body_sha256": "8d57286dae48286cba9b200f190fad55bf87ed5503ac33b29c20bc4f6856889c",
+      "present_disposition": "unverified-administrative-leaf",
+      "historical_credit": "RETAIN",
+      "evidence": [
+        "RESULT.md"
+      ],
+      "policy": "remaining-validation",
+      "family": "metadata policy",
+      "delivered_via": [
+        "https://github.com/franklesniak/PSStyleGuide/pull/180"
+      ],
+      "remaining_owner": "A02",
+      "disposition_note": "Native family delivery is established; this specific administrative or conditional lifecycle leaf is not independently credited. Do not replay it solely for bookkeeping."
+    }
+  ],
+  "historical_scope": {
+    "A02_primary_ids": [
+      1,
+      2,
+      3,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "A21_primary_id": 4,
+    "related_governance_primary_owners": {
+      "19-28": "A03",
+      "29-40": "A18"
+    },
+    "limit": "No historical administrative leaf newly credited; current outcome acceptance uses D07/D-A00-01 and current paired lifecycle, not replay of obsolete stages. A19 still reconciles all 402 contracts."
+  },
+  "remaining_conditions": [
+    "Root completes actual PS232 merged-main acceptance and fresh native pair check.",
+    "Root integrates concise final outcome records without changing historical administrative credit or closing A03/A07/A21/A18/A19 obligations."
+  ],
+  "limits": [
+    "Read-only Git object/source/evidence inspection; no product/runtime tests, probes, installs, native reads/writes, fetch, checkout, index/ref/product/planning modifications.",
+    "Only this scratch audit script, REPORT.md and evidence.json are written.",
+    "Evidence-extraction failures were local display-only (PowerShell absent substring and Windows console encoding); corrected source reads succeeded; no product failure inferred.",
+    "No whole-file metadata exception, normalized-equality claim, new decision rubric or historical full-suite replay."
+  ],
+  "root_integration": {
+    "result": "verified_complete_A02_A20",
+    "accepted_at": "2026-10-05T13:42:41.234151+00:00",
+    "root_verification": {
+      "verified_at": "2026-10-05T13:34:38.867271+00:00",
+      "result": "passed",
+      "source_file_identities": 14,
+      "complete_raw_partitions": 60,
+      "necessary_exception_regions": 29,
+      "unchanged_policy_identities": 4,
+      "supporting_file_hashes": 31,
+      "report_sha256": "96da11b3d55391d55b51b82c231abf76bf5535aa7f3989631eb138583d92d8ad",
+      "evidence_sha256": "01bf3058364c0e8c9f5ef6aca6ec8d7b2592ca91aafea251082260fa3c22ae8a",
+      "completion": "conditional_only_pending_actual_PS_landed_acceptance",
+      "note": "Optional supporting-file byte counts handled according to the evidence schema; every SHA-256 verified."
+    },
+    "source_acceptance": "ps232-landed-acceptance.json",
+    "source_acceptance_sha256": "2005c051fbc11017c416f919a0467fd704c73efc850a27912216261a6483d783",
+    "complete_outcomes": [
+      "A02",
+      "A20"
+    ],
+    "other_outcomes_not_closed": [
+      "A03",
+      "A07",
+      "A21",
+      "A18",
+      "A19"
+    ],
+    "transfers_at_closure": {
+      "A02": {
+        "used": 2,
+        "cap": 12
+      },
+      "A20": {
+        "used": 2,
+        "cap": 8
+      }
+    }
+  }
+}
