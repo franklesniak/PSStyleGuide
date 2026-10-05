@@ -11,7 +11,7 @@ const repository = path.resolve(directory, '../..');
 const linux = process.platform === 'linux';
 
 function fixture(t) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'terraform-local-validation-'));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-local-validation-'));
   t.after(() => fs.rmSync(root, { recursive: true, force: true }));
   const workflows = path.join(root, '.github/workflows');
   fs.mkdirSync(workflows, { recursive: true });
