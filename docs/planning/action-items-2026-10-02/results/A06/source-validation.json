@@ -1,6 +1,6 @@
 {
   "status": "merged_landed_checks_pending",
-  "recorded_at": "2026-10-05T22:56:46.898324+00:00",
+  "recorded_at": "2026-10-05T23:12:14.658175+00:00",
   "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
   "base_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
   "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
@@ -1157,9 +1157,14 @@
     }
   ],
   "A14_preparation": {
-    "sha256": "2a5258039209cee7a82075142525614e38825fea1db23921db275b4d54beedc8",
-    "evidence_sha256": "87de17b89dade792cc98f0d3555c06f1b1137d30e1f96be6a0faff02065128d3",
-    "disposition": "No new supported defect; root read complete report and complete production generator/gate diffs. Retain D92/D93 and issue155 open. Reassess actual caller/storage facts after paired acceptance; no independent final-quality or race-closure credit."
+    "status": "read_only_root_verified",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A14-final-A06-impact-20261005\\REPORT.md",
+    "sha256": "3f1c113714d0e6be15e514027c395bf979ffc5751a93cbadf40eb0280078bbb6",
+    "evidence_sha256": "6521ac6f6478d2664cdc9eeee245de2cb675aefcb0c975ccaa8a186ab98ab03d",
+    "source_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "source_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+    "canonical_report": "results/A14/postA06-source/REPORT.md",
+    "disposition": "Retain D92 B96/D93 B100 and issue155 open. No new material finding; reassess actual accepted pair and later runtime/recovery callers."
   },
   "hosted_platform_progress": {
     "status": "current_head_three_platforms_passed_twice",
@@ -2460,11 +2465,11 @@
     "actual_head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
     "verified_at": "2026-10-05T22:28:26.731065+00:00"
   },
-  "local_operations": "No local test, worker or source freeze is active. Normal merge confirmed; no ambiguous mutation or reviewer request remains. Five landed workflows recorded; no retry issued.",
+  "local_operations": "No local test or source freeze. Only bounded read-only TF writer preparation; no product repair or counter increment. A14 and R5 interface workers completed; root verified.",
   "progress": {
-    "recorded_at": "2026-10-05T22:59:22.225594+00:00",
-    "stage": "Source PR234 normally merged after clean round3 and all current-input gates",
-    "remaining": "Actual landed-source acceptance, TF transfer and paired convergence; broad goal incomplete.",
+    "recorded_at": "2026-10-05T23:12:14.658175+00:00",
+    "stage": "Source merged; actual platform/artifact checks pass; A14 and R5 interfaces current; two landed validation jobs confirmed live",
+    "remaining": "Complete actual landed acceptance, then serialized TF port and paired convergence. Broad plan remains incomplete.",
     "native_pending": [
       {
         "service": "GitHub Actions",
@@ -2484,7 +2489,7 @@
       }
     ]
   },
-  "next_action": "Collect the two remaining actual9817762 merged-main workflows and logs. accept-landed-ps234.py is prepared but NOT executed. Once all landed predicates pass, refresh actual PS/TF refs and increment before TF repair; do not repeat source merge/reviews.",
+  "next_action": "Collect actual landed setup37385523615/job112017722346 and behavior37385523624/job112017722624. Both are confirmed in their validation steps. On all5passed, run prepared accept-landed-ps234.py against a fresh snapshot. Then run prepared release-tf-a06.py once, which rechecks refs/raw preimages and increments0/2/4 to1/3/5 before switching the clean reused TF worktree. Review worker readiness and release focused implementation; root owns aggregate/native lifecycle. Neither acceptance nor TF release helper has run.",
   "A09_preparation": {
     "status": "read_only_root_verified",
     "worker": "/root/a09_post_a06_readiness",
@@ -2497,7 +2502,7 @@
     "catalog_sha256": "752660478a5bee12b65b3ec54c3683c2c3debf9d6205adc1203498e3e4807a0b",
     "canonical_report": "results/A09/postA06/REPORT.md"
   },
-  "planning_checkpoint": "06d0ad236eedb787269c0d125437a44a6c4353cf",
+  "planning_checkpoint": "a0218b5194c36c60f0b689f5dd120a7fe7f06639",
   "hosted_current_progress": {
     "status": "all_current_candidate_runs_passed",
     "snapshot": "round3-progress-7.json",
@@ -2522,7 +2527,7 @@
   "landed_progress": {
     "status": "incomplete",
     "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
-    "snapshot": "landed-progress-2.json",
+    "snapshot": "landed-progress-5.json",
     "runs": [
       {
         "id": 37385523636,
@@ -2554,7 +2559,8 @@
         "status": "completed",
         "conclusion": "success"
       }
-    ]
+    ],
+    "live_job_receipt": "landed-live-jobs-1.json"
   },
   "merge": {
     "requested_at": "2026-10-05T22:55:25.561518+00:00",
@@ -2592,5 +2598,32 @@
     "tf_commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
     "scope": "13delivered and12coupled paths; actual native before/after refs stable",
     "result": "Useful shared delta remains. All selected instructions retained; only common harness changes since conditional map. No transfer or implementation."
+  },
+  "A14_preparation_history": [
+    {
+      "report": "writer/A14-source-impact.md",
+      "sha256": "2a5258039209cee7a82075142525614e38825fea1db23921db275b4d54beedc8",
+      "evidence_sha256": "87de17b89dade792cc98f0d3555c06f1b1137d30e1f96be6a0faff02065128d3",
+      "disposition": "No new supported defect; root read complete report and complete production generator/gate diffs. Retain D92/D93 and issue155 open. Reassess actual caller/storage facts after paired acceptance; no independent final-quality or race-closure credit."
+    }
+  ],
+  "R5_preparation": {
+    "status": "read_only_root_verified",
+    "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-post-A06-interfaces-20261005",
+    "report_sha256": "d4146868fa496e33e40dda257267c911af36cd4321221a3c18198aab10b9bc89",
+    "evidence_sha256": "e4bf1f037b30c70dedb9d384549a627a154a3434d99807247aa1b2c30c3b5bef",
+    "canonical_report": "results/A07/recovery-runtime/postA06-interfaces/REPORT.md",
+    "scope_paths": [
+      ".github/workflows/Initialize-CiToolchain.ps1",
+      ".github/workflows/ci-toolchain.json",
+      ".github/workflows/Test-CheckoutCredentials.ps1",
+      ".github/workflows/Invoke-MarkdownLint.ps1",
+      ".github/workflows/copilot-setup-steps.yml",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      "docs/dependency-maintenance.md",
+      ".github/workflows/scripts-README.md"
+    ],
+    "selection": "R5 95/B1 94 retained; future PS-first after paired A06 acceptance.",
+    "new_user_decision": false
   }
 }

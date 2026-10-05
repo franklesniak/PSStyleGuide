@@ -1,0 +1,9 @@
+{
+  "recorded_at": "2026-10-05T23:07:43.889824+00:00",
+  "worker": "/root/a14_final_a06_impact",
+  "report_sha256": "3f1c113714d0e6be15e514027c395bf979ffc5751a93cbadf40eb0280078bbb6",
+  "evidence_sha256": "6521ac6f6478d2664cdc9eeee245de2cb675aefcb0c975ccaa8a186ab98ab03d",
+  "root_review": "Read complete report; rechecked all19current raw objects and both unchanged generator primitive regions; verified all8declared input hashes. Reuses previously root-reviewed complete R3/R4/R5/R7/R10 diffs and final quality. No production race primitive or authority expansion; retained D92/D93.",
+  "limits": "Source landed CI/TF transfer remain pending; this does not close A14 or issue155. No tests repeated.",
+  "private_recording_note": "First private recorder attempt expected null; evidence used false. It stopped before writes. Corrected only that expected JSON type; all identity checks then passed. No product or decision change."
+}

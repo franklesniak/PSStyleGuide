@@ -1,0 +1,26 @@
+{
+  "recorded_at": "2026-10-05T23:09:54.274349+00:00",
+  "worker": "/root/r5_post_a06_interfaces",
+  "report_sha256": "d4146868fa496e33e40dda257267c911af36cd4321221a3c18198aab10b9bc89",
+  "evidence_sha256": "e4bf1f037b30c70dedb9d384549a627a154a3434d99807247aa1b2c30c3b5bef",
+  "verified_core_objects": [
+    "PS:.github/workflows/Initialize-CiToolchain.ps1",
+    "PS:.github/workflows/ci-toolchain.json",
+    "PS:.github/workflows/Test-CheckoutCredentials.ps1",
+    "PS:.github/workflows/Invoke-MarkdownLint.ps1",
+    "PS:.github/workflows/copilot-setup-steps.yml",
+    "PS:.github/workflows/Test-CiHelpers.test.mjs",
+    "PS:docs/dependency-maintenance.md",
+    "PS:.github/workflows/scripts-README.md",
+    "TF:.github/workflows/Initialize-CiToolchain.ps1",
+    "TF:.github/workflows/ci-toolchain.json",
+    "TF:.github/workflows/Test-CheckoutCredentials.ps1",
+    "TF:.github/workflows/Invoke-MarkdownLint.ps1",
+    "TF:.github/workflows/copilot-setup-steps.yml",
+    "TF:.github/workflows/Test-CiHelpers.test.mjs",
+    "TF:docs/dependency-maintenance.md",
+    "TF:.github/workflows/scripts-README.md"
+  ],
+  "root_review": "Read complete report, selected proposal/selection and scope ownership. Verified16current core raw objects and18authority/prior-evidence hashes. Retain eight-path R5/B1/C98 selection; preserve separate generator/recovery proof, actual current tests and B1/A06 bootstrap distinctions. No new material finding or owner decision.",
+  "limits": "No installer/hosted/recovery execution or product acceptance; re-pin actual paired A06 inputs before R5 implementation."
+}

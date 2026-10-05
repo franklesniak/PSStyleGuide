@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A14 current filesystem residual assessment
 
+**Merged A06 source reassessed,2026-10-05:** [Current impact](postA06-source/REPORT.md) binds PS9817762/treefd66ed6 and currentTFe21b74f. All51prior observations were rebound; root rechecked19current raw objects and the two unchanged generator primitive regions. R3/R4 admission controls, R5 in-memory scanning, R7 injected identity oracles and R10 cleanup reporting add no new race primitive or consumer authority. Keep D92 B96/D93 B100, PS155 open and PS156 retirement limits. Source landed acceptance and TF repair remain separate gates. Reassess the accepted pair, actual platforms/storage and future R5/A16 callers; A14 stays0/8.
+
 **Windows host boundary,2026-10-05:** [WQ1 P94](../A07/recovery-runtime/WQ1-Windows-host.md) selected a fresh protected direct-profile root. Actual PowerShell7 storage execution and current integrity checks passed; the original cleanup failure remains recorded, with three passing exact-restoration controls. Product acquisition and real5.1 recovery tests remain open. Existing Temp principal uncertainty is not resolved or waived. No new human input is needed.
 
 ## Current reassessment after accepted PS232: 2026-10-05

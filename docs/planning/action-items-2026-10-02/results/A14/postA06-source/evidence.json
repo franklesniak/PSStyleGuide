@@ -1,0 +1,1045 @@
+{
+  "created_utc": "2026-10-05T23:03:50.464730+00:00",
+  "status": "bounded merged-source refresh; source landed CI acceptance pending; TF repair unstarted",
+  "method": "Replacement-disabled immutable Git reads. Raw bytes, blob identities and modes; no normalization, product execution, tests, fetch or native calls. Prior token analysis reused only through verified raw bindings.",
+  "refs": {
+    "PSBase": {
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3"
+    },
+    "PSPriorTree": {
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "tree": "180fbb1eed69730c433f0a2aca164523c3c3a343"
+    },
+    "PSReviewedHead": {
+      "ref": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+      "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6"
+    },
+    "PSMerged": {
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6"
+    },
+    "TFCurrentSupplied": {
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631"
+    }
+  },
+  "merge_parents": [
+    "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "dec18a6303bd6ad5fe9a43b383a62daa70527aca"
+  ],
+  "reviewed_to_merged_diff": "",
+  "changed_paths_since_prior": [
+    ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/Test-StyleGuideGenerator.ps1",
+    ".github/workflows/Validate-WorkflowPolicy.mjs",
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    ".github/workflows/build.yml"
+  ],
+  "input_hashes": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\A14-source-impact.json",
+      "raw_sha256": "87de17b89dade792cc98f0d3555c06f1b1137d30e1f96be6a0faff02065128d3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\A14-source-impact.md",
+      "raw_sha256": "2a5258039209cee7a82075142525614e38825fea1db23921db275b4d54beedc8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\STATUS.md",
+      "raw_sha256": "eb03ceff35735429be96ad22916a9e0bbcc0eafc1f321182432cf660f5858b10"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\tasks\\A14.md",
+      "raw_sha256": "6d715ac454f858c7329d064f9bee2b62d86d84648d93c47524de27ad3af20484"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A14\\RESULT.md",
+      "raw_sha256": "16e1bf7888449b2383dc8cd2ec5200fe83816a93f8cc004be154034eefa7fb3d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\ROUTING-AND-PARALLELISM.md",
+      "raw_sha256": "8dcdc68eb243fdebd79043036641dfd4dc0ae20d12296b5eca39de78017d69a2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\LOOP-POLICY.md",
+      "raw_sha256": "04bc871d57d8b3cb2ff31dfa6bf6d2d626c23bae86e56b4f26603d80dbb2a4bf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\README.md",
+      "raw_sha256": "f7228cfd5bc0dd59aafddb89880930f9930fe4e5ddf3305d0b4999a6c11b6fd4"
+    }
+  ],
+  "prior_objects_rebound": [
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+      "bytes": 86655,
+      "raw_sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+      "bytes": 253910,
+      "raw_sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+      "bytes": 32648,
+      "raw_sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+      "bytes": 4375,
+      "raw_sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "present": false,
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "4098cd1c6d8dadd114fbd1c7a7da5b1918d9eacb",
+      "bytes": 98544,
+      "raw_sha256": "5a14647cf03e46f0c776813ef637b6872097a43210efdedee7a095c523e88002",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+      "bytes": 3081,
+      "raw_sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+      "bytes": 3218,
+      "raw_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "bytes": 7656,
+      "raw_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+      "bytes": 51809,
+      "raw_sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "ed78c197274393a1a16274221ec27c697166ca45",
+      "bytes": 89914,
+      "raw_sha256": "c14cfc105ae19352afd0aa7c779adcbf9e2fe5d7b8eba885267d181745593a61",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+      "bytes": 253908,
+      "raw_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+      "bytes": 36090,
+      "raw_sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6609830b2fb8032b29339f28702f085c98288295",
+      "bytes": 24995,
+      "raw_sha256": "1807813adad6d093fdf97ce4d434c3467edc0c0bd0788e71cd3b27836a7fac60",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "837ddc35f2141c134bc219e5ad07d106cce3f72e",
+      "bytes": 22087,
+      "raw_sha256": "acdf9ccbee458f05469fdba7b403a9b97a70f9597e965934156b1ec7e10d7b60",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "8e815f76c59aba31cd2d37f8979ed24a7ede44a5",
+      "bytes": 120299,
+      "raw_sha256": "202c109d1253db4c3f59116c507f0ee9ce1241fdb7aaff0994bf067cc1dfe1f2",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+      "bytes": 3081,
+      "raw_sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+      "bytes": 3218,
+      "raw_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "bytes": 7656,
+      "raw_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+      "bytes": 51809,
+      "raw_sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+      "bytes": 95329,
+      "raw_sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+      "bytes": 253918,
+      "raw_sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+      "bytes": 31949,
+      "raw_sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1",
+      "bytes": 4348,
+      "raw_sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "present": false,
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+      "bytes": 100007,
+      "raw_sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+      "bytes": 3088,
+      "raw_sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+      "bytes": 3218,
+      "raw_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "bytes": 7656,
+      "raw_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "bytes": 51830,
+      "raw_sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+      "bytes": 6063,
+      "raw_sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+      "bytes": 25554,
+      "raw_sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+      "bytes": 26228,
+      "raw_sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+      "bytes": 17320,
+      "raw_sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6446258f0d71c22ff68aceb64c87121d3f9c72d8",
+      "bytes": 13157,
+      "raw_sha256": "e782b1a213003ca19f4ece0ccb992f0343eaaec9f89dcc6255b376741dc20881",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+      "bytes": 17621,
+      "raw_sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": "powershell.instructions.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "e68999483c41c07e732772d88b2c43dd1467f367",
+      "bytes": 148832,
+      "raw_sha256": "fd993b9658f434af7b668d18670326c19d76a0728a170465c686d628ce2597f8",
+      "role": "PSBase",
+      "ref": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "bytes": 6095,
+      "raw_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "bytes": 26191,
+      "raw_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "c351cc864b741037b5a604b94f167257c58e3347",
+      "bytes": 31020,
+      "raw_sha256": "bc15c0ba96e7508960ae3cbd4008937c004f5396d4c7345def1f8f29ed203ee8",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a76dd4ca720d17ee5abba8a79885dd706befdefa",
+      "bytes": 16796,
+      "raw_sha256": "1f47f8d82dfdf1eb8659796baabb20802a34ab6146b1f9e6864e5956ae73be09",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+      "bytes": 13541,
+      "raw_sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "bytes": 26216,
+      "raw_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": "powershell.instructions.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b711cec80333e409cb4e644eb94530653ca39109",
+      "bytes": 148831,
+      "raw_sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "role": "PSCandidate",
+      "ref": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+      "bytes": 6063,
+      "raw_sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+      "bytes": 25554,
+      "raw_sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+      "bytes": 26228,
+      "raw_sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+      "bytes": 17320,
+      "raw_sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "9a88a8ebdba3a24cf45c82639da4bcb2442c5271",
+      "bytes": 13086,
+      "raw_sha256": "9e483a42e1a01130205bc7dfa55fdac5e4a4c36244f98eb57e250d2cc0c86d97",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+      "bytes": 17621,
+      "raw_sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    },
+    {
+      "path": "terraform.instructions.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+      "bytes": 153067,
+      "raw_sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a",
+      "role": "TFAccepted",
+      "ref": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "prior_record_match": true
+    }
+  ],
+  "current_objects": [
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "bytes": 6095,
+      "raw_sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "bytes": 26191,
+      "raw_sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+      "bytes": 90995,
+      "raw_sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": false
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+      "bytes": 7656,
+      "raw_sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+      "bytes": 3081,
+      "raw_sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+      "bytes": 123582,
+      "raw_sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": false
+    },
+    {
+      "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+      "bytes": 253908,
+      "raw_sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+      "bytes": 36090,
+      "raw_sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+      "bytes": 27656,
+      "raw_sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": false
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "bytes": 31176,
+      "raw_sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": false
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "bytes": 17625,
+      "raw_sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": false
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+      "bytes": 25715,
+      "raw_sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": false
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+      "bytes": 51809,
+      "raw_sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+      "bytes": 3218,
+      "raw_sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+      "bytes": 13541,
+      "raw_sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "bytes": 26216,
+      "raw_sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": "AGENTS.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "a10d44f6d61c9126d8aa8f4445926579eafbb67b",
+      "bytes": 32654,
+      "raw_sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": "CONTRIBUTING.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "229ad5e4b109d1d7c1d47e35d7a305dcbdc00e2b",
+      "bytes": 9114,
+      "raw_sha256": "be11dec87672aee506fa08aa44a08f667d5e193584306461421d736596054ab4",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    },
+    {
+      "path": "powershell.instructions.md",
+      "present": true,
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b711cec80333e409cb4e644eb94530653ca39109",
+      "bytes": 148831,
+      "raw_sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "role": "PSMerged",
+      "ref": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "equal_prior_mode_blob": true
+    }
+  ],
+  "unchanged_generator_regions": [
+    {
+      "region": "before_NewFullPayload",
+      "prior_byte_offset": 0,
+      "current_byte_offset": 0,
+      "bytes": 43232,
+      "raw_sha256": "4bfff2c1d71c12f5b23dda61f126b13c82a0783bd4e34a2ae73013fa4069788d",
+      "byte_equal": true,
+      "normalization": "none"
+    },
+    {
+      "region": "from_NewStyleGuidePayloadMap",
+      "prior_byte_offset": 51976,
+      "current_byte_offset": 53057,
+      "bytes": 37938,
+      "raw_sha256": "be7c9e789a943f5b84fdfa2455df4689f79770385fe08ca3388eb9ec4dc29e03",
+      "byte_equal": true,
+      "normalization": "none"
+    }
+  ],
+  "scoped_changed_extents": [
+    {
+      "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      "start": 1271,
+      "end": 1430,
+      "raw_sha256": "814a6bedd86e65e194e59b6c87305964809bff2f3d7df47079b48af514cb727a",
+      "text": "    param (\n        [Parameter(Mandatory = $true)]\n        [string]$GuideContent,\n\n        [Parameter(Mandatory = $true)]\n        [string]$RationaleContent\n    )\n\n    # One parse supplies both leaf insertion and top-level standalone emission.\n    $hashtableSections = @{}\n    $listTopSections = New-Object 'System.Collections.Generic.List[hashtable]'\n    $hashtableLeaf = $null\n    $hashtableTop = $null\n    foreach ($strLine in ($RationaleContent -split '\\r?\\n')) {\n        if ($strLine -match '^(#{2,3}) (.+)$') {\n            $intLevel = $Matches[1].Length\n            $strHeading = $Matches[2]\n            $strAnchor = $strHeading.ToLowerInvariant() -replace '[^a-z0-9 -]', '' -replace ' ', '-'\n            $strAnchor = $strAnchor -replace '-+', '-' -replace '^-|-$', ''\n            $hashtableLeaf = $null\n            $hashtableSection = @{\n                Heading = ('#' * $intLevel) + ' ' + $strHeading\n                Title = $strHeading\n                Body = New-Object 'System.Collections.Generic.List[string]'\n            }\n            if ($intLevel -eq 2) {\n                $hashtableTop = $hashtableSection\n                $listTopSections.Add($hashtableTop)\n                if ($strHeading -eq $script:hashtableLanguage.SummaryHeading) {\n                    $hashtableSections[$script:hashtableLanguage.SummaryAnchor] = $hashtableTop\n                }\n            } else {\n                $hashtableLeaf = $hashtableSection\n                $hashtableSections[$strAnchor] = $hashtableLeaf\n                if ($null -ne $hashtableTop) {\n                    $hashtableTop.Body.Add($strLine)\n                }\n            }\n        } else {\n            if ($null -ne $hashtableLeaf) {\n                $hashtableLeaf.Body.Add($strLine)\n            }\n            if ($null -ne $hashtableTop) {\n                $hashtableTop.Body.Add($strLine)\n            }\n        }\n    }\n    foreach ($hashtableSection in @($hashtableSections.Values) + $listTopSections.ToArray()) {\n        $hashtableSection.CleanBody = @(ConvertTo-RationaleBody -Lines $hashtableSection.Body.ToArray())\n    }\n    $listOutputLines = New-Object 'System.Collections.Generic.List[string]'\n    $intSummaryScanIndex = 0\n    $boolSummaryTextSeen = $false\n    $boolSummaryHeadingSeen = $false\n    foreach ($strLine in ($GuideContent -split '\\r?\\n')) {\n        if ($strLine.Trim() -eq '*This section intentionally left blank.*') {\n            continue\n        }\n        if ($strLine -match '^\\s*<!--\\s*rationale-toc:\\s*(.+?)\\s*-->\\s*$') {\n            $listOutputLines.Add($Matches[1].Trim())\n            continue\n        }\n        if ($strLine -match '^\\s*<!--\\s*(rationale-anchor|RATIONALE):\\s*(.+?)\\s*-->\\s*$') {\n            $boolIncludeHeading = $Matches[1] -eq 'rationale-anchor'\n            $strAnchor = $Matches[2].Trim()\n            if (-not $hashtableSections.ContainsKey($strAnchor) -or\n                $hashtableSections[$strAnchor].CleanBody.Count -eq 0) {\n                throw 'missing-rationale-anchor'\n            }\n            if ($boolIncludeHeading) {\n                $listOutputLines.Add('')\n                $listOutputLines.Add($hashtableSections[$strAnchor].Heading)\n                $listOutputLines.Add('')\n            }\n            foreach ($strBodyLine in $hashtableSections[$strAnchor].CleanBody) {\n                $listOutputLines.Add($strBodyLine)\n            }\n            continue\n        }\n        if ($script:hashtableLanguage.SummaryBefore -ne '' -and\n            $hashtableSections.ContainsKey($script:hashtableLanguage.SummaryAnchor)) {\n            $strSummaryHeading = $script:hashtableLanguage.SummaryHeading\n            $strSummaryAnchor = $script:hashtableLanguage.SummaryAnchor\n            $boolSummaryTocBoundary = $strLine -match ('^- \\[' + [regex]::Escape($script:hashtableLanguage.SummaryBefore) + '\\]')\n            $boolSummarySectionBoundary = $strLine -match ('^## ' + [regex]::Escape($script:hashtableLanguage.SummaryBefore))\n            if ($boolSummaryTocBoundary -or $boolSummarySectionBoundary) {\n                # Include guide, marker and rationale output already emitted.\n                # Each line is inspected once, even with repeated boundaries.\n                while ($intSummaryScanIndex -lt $listOutputLines.Count) {\n                    $strObservedLine = $listOutputLines[$intSummaryScanIndex]\n                    if ($strObservedLine -match [regex]::Escape($strSummaryHeading)) {\n                        $boolSummaryTextSeen = $true\n                    }\n                    if ($strObservedLine -match ('^## ' + [regex]::Escape($strSummaryHeading))) {\n                        $boolSummaryHeadingSeen = $true\n                    }\n                    $intSummaryScanIndex++\n                }\n            }\n            if ($boolSummaryTocBoundary -and -not $boolSummaryTextSeen) {\n                $listOutputLines.Add(('- [{0}](#{1})' -f $strSummaryHeading, $strSummaryAnchor))\n                $boolSummaryTextSeen = $true\n            }\n            if ($boolSummarySectionBoundary -and -not $boolSummaryHeadingSeen) {\n                while ($listOutputLines.Count -gt 0 -and\n                    $listOutputLines[$listOutputLines.Count - 1].Trim() -in @('', '---')) {\n                    $listOutputLines.RemoveAt($listOutputLines.Count - 1)\n                }\n                $intSummaryScanIndex = [Math]::Min($intSummaryScanIndex, $listOutputLines.Count)\n                $listOutputLines.Add('')\n                $listOutputLines.Add('## ' + $strSummaryHeading)\n                $boolSummaryTextSeen = $true\n                $boolSummaryHeadingSeen = $true\n                $listOutputLines.Add('')\n                foreach ($strBodyLine in $hashtableSections[$strSummaryAnchor].CleanBody) {\n                    $listOutputLines.Add($strBodyLine)\n                }\n                $listOutputLines.Add('')\n                $listOutputLines.Add('---')\n                $listOutputLines.Add('')\n            }\n        }\n        $listOutputLines.Add($strLine)\n        if ($script:hashtableLanguage.Composition -eq 'HeadingLinked' -and $strLine -match '^(#{2,3}) (.+)$') {\n            $strHeading = $Matches[2]\n            $strAnchor = $strHeading.ToLowerInvariant() -replace '[^a-z0-9 -]', '' -replace ' ', '-'\n            $strAnchor = $strAnchor -replace '-+', '-' -replace '^-|-$', ''\n            if ($hashtableSections.ContainsKey($strAnchor) -and $hashtableSections[$strAnchor].CleanBody.Count -gt 0) {\n                $listOutputLines.Add('')\n                foreach ($strBodyLine in $hashtableSections[$strAnchor].CleanBody) {\n                    $listOutputLines.Add($strBodyLine)\n                }\n            }\n        }\n    }\n    if ($script:hashtableLanguage.AppendStandalone) {\n        $arrExistingHeadings = @($listOutputLines | Where-Object { $_ -match '^## ' } |\n            ForEach-Object { ($_ -replace '^## ', '').Trim() })\n        foreach ($hashtableSection in $listTopSections) {\n            if ($hashtableSection.Title -eq 'Table of Contents' -or\n                $hashtableSection.Title -match '^Executive Summary|Rationale$' -or\n                $arrExistingHeadings -contains $hashtableSection.Title) {\n                continue\n            }\n            $listOutputLines.Add('')\n            $listOutputLines.Add($hashtableSection.Heading)\n            if ($hashtableSection.CleanBody.Count -gt 0) {\n                $listOutputLines.Add('')\n                foreach ($strBodyLine in $hashtableSection.CleanBody) {\n                    $listOutputLines.Add($strBodyLine)\n                }\n            }\n        }\n    }\n    $strOutput = $listOutputLines.ToArray() -join \"`n\"\n    while ($strOutput -match \"`n`n`n\") {\n        $strOutput = $strOutput -replace \"`n`n`n\", \"`n`n\"\n    }\n    return $strOutput.TrimEnd(\"`n\") + \"`n\"\n}\n"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "start": 33,
+      "end": 64,
+      "raw_sha256": "a4bca7e93aafc5f97705ff44cf32d8f882a0ad5b42513d2d52114b057f22fd99",
+      "text": "Set-StrictMode -Version Latest\n$ErrorActionPreference = 'Stop'\nif (Test-Path Variable:PSNativeCommandUseErrorActionPreference) {\n    $PSNativeCommandUseErrorActionPreference = $false\n}\n$strPowerShell = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName\n$boolWindows = [Environment]::OSVersion.Platform -eq [PlatformID]::Win32NT\nif (($ExpectedHost -eq 'WindowsPowerShell51' -and\n        (-not $boolWindows -or $PSVersionTable.PSEdition -cne 'Desktop' -or $PSVersionTable.PSVersion.Major -ne 5)) -or\n    ($ExpectedHost -eq 'WindowsPowerShell7' -and (-not $boolWindows -or $PSVersionTable.PSVersion.Major -ne 7)) -or\n    ($ExpectedHost -eq 'LinuxPowerShell7' -and ($boolWindows -or $PSVersionTable.PSVersion.Major -ne 7))) {\n    throw 'generator-test: wrong platform or PowerShell edition'\n}\n$strGit = (Microsoft.PowerShell.Core\\Get-Command -Name git -CommandType Application -All -TotalCount 1 -ErrorAction Stop).Source\n$strRepository = Split-Path -Path (Split-Path -Path $PSScriptRoot -Parent) -Parent\n$strRepository = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($strRepository)\n$strScratchParent = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath([IO.Path]::GetTempPath())\n$strScratch = Join-Path -Path $strScratchParent -ChildPath ('styleguide-generator-' + [Guid]::NewGuid().ToString('N'))\n[void][IO.Directory]::CreateDirectory($strScratch)\n$objEncoding = New-Object System.Text.UTF8Encoding($false, $true)\n$strGeneratorPath = Join-Path -Path $PSScriptRoot -ChildPath 'Generate-StyleGuideArtifacts.ps1'\n$strGenerator = [IO.File]::ReadAllText($strGeneratorPath, $objEncoding)\n$strStorage = 'not-required'\nif ($ExpectedHost -eq 'LinuxPowerShell7') {\n    foreach ($strStoragePath in @($strRepository, $strScratch)) {\n        $arrStorage = @(& /usr/bin/findmnt --noheadings --output FSTYPE --target $strStoragePath)\n        if ($LASTEXITCODE -ne 0 -or $arrStorage.Count -ne 1 -or $arrStorage[0].Trim() -cne 'ext4') {\n            throw 'generator-test: native ext4 is required for source and fixture storage'\n        }\n    }\n    $strStorage = 'ext4'\n}\n"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "start": 108,
+      "end": 147,
+      "raw_sha256": "322d250e12b2e83177aae4b0eee638622902759bdf6d2e83144cce5a5de457d0",
+      "text": "function Invoke-GeneratorFixture {\n    # .SYNOPSIS\n    # Runs the real fixture generator in a separate process.\n    #\n    # .DESCRIPTION\n    # Keeps native status separate from the parsed result and requires one object.\n    #\n    # .PARAMETER Root\n    # Absolute fixture repository directory.\n    #\n    # .EXAMPLE\n    # $objRun = Invoke-GeneratorFixture -Root $strFixture\n    #\n    # # Returns ExitCode and Result without converting failure into success.\n    #\n    # .INPUTS\n    # None. Pipeline input is not supported.\n    #\n    # .OUTPUTS\n    # System.Management.Automation.PSCustomObject. Native exit and parsed result.\n    # Invalid output terminates.\n    #\n    # .NOTES\n    # PRIVATE/INTERNAL HELPER - Not public API. Parameters, return shape and\n    # positional contract may change without notice. All parameters are named.\n    #\n    # Version: 1.0.20261005.0\n    [CmdletBinding(PositionalBinding = $false)]\n    [OutputType([pscustomobject])]\n    param ([string]$Root)\n\n    $strScript = Join-Path -Path $Root -ChildPath '.github/workflows/Generate-StyleGuideArtifacts.ps1'\n    $arrOutput = @(& $strPowerShell -NoLogo -NoProfile -NonInteractive -File $strScript)\n    $intExit = $LASTEXITCODE\n    Assert-GeneratorCondition -Condition ($arrOutput.Count -eq 1) -Label 'result cardinality'\n    $objResult = $arrOutput[0] | ConvertFrom-Json -ErrorAction Stop\n    Assert-GeneratorCondition -Condition ($objResult -is [pscustomobject] -and\n        $objResult.Schema -ceq 'StyleGuide.GeneratorResult.v2' -and $objResult.Artifacts.Count -eq 4) -Label 'result schema'\n    [pscustomobject]@{ ExitCode = $intExit; Result = $objResult }\n}\n"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "start": 192,
+      "end": 212,
+      "raw_sha256": "82d9ef2b8689aa14441801a89466bd7c497cf48b364679ea4143f29f5aef0234",
+      "text": "$boolPrimaryFailure = $false\ntry {\n    # Load only the actual function declarations and fixed initialization. Never\n    # dot-source the entry point, which would publish into the source checkout.\n    $arrTokens = $null\n    $arrErrors = $null\n    $objSyntax = [System.Management.Automation.Language.Parser]::ParseInput($strGenerator, [ref]$arrTokens, [ref]$arrErrors)\n    Assert-GeneratorCondition -Condition ($arrErrors.Count -eq 0) -Label 'generator parser'\n    $arrFunctions = @($objSyntax.FindAll({ param($objNode)\n                $objNode -is [System.Management.Automation.Language.FunctionDefinitionAst]\n            }, $false))\n    Assert-GeneratorCondition -Condition ($arrFunctions.Count -gt 0) -Label 'actual function extraction'\n    . ([scriptblock]::Create($strGenerator.Substring(0, $arrFunctions[0].Extent.StartOffset)))\n    foreach ($objFunction in $arrFunctions) {\n        . ([scriptblock]::Create($objFunction.Extent.Text))\n    }\n    $strFixture = Join-Path -Path $strScratch -ChildPath 'actual'\n    $strScripts = Join-Path -Path $strFixture -ChildPath '.github/workflows'\n    [void][IO.Directory]::CreateDirectory($strScripts)\n    [IO.File]::WriteAllText((Join-Path -Path $strScripts -ChildPath 'Generate-StyleGuideArtifacts.ps1'), $strGenerator, $objEncoding)\n    $hashtableGolden = @{}\n"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "start": 279,
+      "end": 308,
+      "raw_sha256": "fa97739ca461fa9f9b7f92e619b01abed2a86a5fb51f18e1e6d6e87b5e5c0036",
+      "text": "        $script:hashtableLanguage.SummaryAnchor = 'executive-summary-fixture'\n        $script:hashtableLanguage.SummaryBefore = 'Version Requirements'\n        $script:hashtableLanguage.AppendStandalone = $true\n        $strGuide = \"# Guide`n- [Version Requirements](#version-requirements)`n`n---`n`n## Version Requirements`n<!-- RATIONALE: identity -->`n<!-- rationale-toc: - [Extra](#extra) -->`n<!-- rationale-anchor: extra -->`n\"\n        $strRationale = \"## Executive Summary: Fixture`nsummary`n## Group Rationale`n### IDENTITY`nbody`n### Extra`nextra body`n## Recovery`nrecover [guide](STYLE_GUIDE.md)`n## Appendix`nappendix`n\"\n        $strFull = New-FullPayload -GuideContent $strGuide -RationaleContent $strRationale\n        Assert-GeneratorCondition -Condition ($strFull.IndexOf('## Executive Summary: Fixture') -lt\n            $strFull.IndexOf('## Version Requirements') -and $strFull.IndexOf('## Recovery') -lt $strFull.IndexOf('## Appendix') -and\n            ([regex]::Matches($strFull, '## Executive Summary: Fixture')).Count -eq 1 -and\n            $strFull.Contains(\"### Extra`n`nextra body\") -and $strFull.Contains(\"## Version Requirements`nbody\") -and\n            -not $strFull.Contains('STYLE_GUIDE.md')) -Label 'marker summary standalone ordering'\n        # Presence comes from all emitted content, not only inferred insertions.\n        $strSummaryToc = '- [Executive Summary: Fixture](#executive-summary-fixture)'\n        $strBoundary = \"- [Version Requirements](#version-requirements)`n## Version Requirements`n\"\n        $arrSummaryCases = @(\n            @{ Prefix = 'Executive Summary: Fixture is discussed here.'; TocCount = 0; HeadingCount = 1 },\n            @{ Prefix = '## Executive Summary: Fixture'; TocCount = 0; HeadingCount = 1 },\n            @{ Prefix = '<!-- rationale-toc: ' + $strSummaryToc + ' -->'; TocCount = 1; HeadingCount = 1 },\n            @{ Prefix = '<!-- rationale-anchor: executive-summary-fixture -->'; TocCount = 0; HeadingCount = 1 },\n            @{ Prefix = \"# Guide`n\" + (\"`n---`n\" * 100); TocCount = 1; HeadingCount = 1 }\n        )\n        foreach ($hashtableCase in $arrSummaryCases) {\n            $strFull = New-FullPayload -GuideContent ($hashtableCase.Prefix + \"`n\" + ($strBoundary * 100)) -RationaleContent $strRationale\n            Assert-GeneratorCondition -Condition (\n                ([regex]::Matches($strFull, [regex]::Escape($strSummaryToc))).Count -eq $hashtableCase.TocCount -and\n                ([regex]::Matches($strFull, '(?m)^## Executive Summary: Fixture$')).Count -eq $hashtableCase.HeadingCount\n            ) -Label 'summary presence across repeated boundaries'\n        }\n        $boolRejected = $false\n        try {\n"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "start": 339,
+      "end": 398,
+      "raw_sha256": "c84f0bc652c67cf99f7b9ccec10597f2a390d4847debd44922e52ff70f6f4357",
+      "text": "    # A post-publication identity failure is injected into a scratch copy only.\n    $strMutation = $strGenerator.Replace('$strFinalIdentityBeforeRead = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath',\n        \"throw 'injected-final-identity-failure'\")\n    Assert-GeneratorCondition -Condition ($strMutation -cne $strGenerator) -Label 'publication mutation applied'\n    [IO.File]::WriteAllText((Join-Path -Path $strScripts -ChildPath 'Generate-StyleGuideArtifacts.ps1'), $strMutation, $objEncoding)\n    [IO.File]::WriteAllText($strCopilot, \"stale`n\", $objEncoding)\n    $objRun = Invoke-GeneratorFixture -Root $strFixture\n    Assert-GeneratorCondition -Condition ($objRun.ExitCode -ne 0 -and\n        $objRun.Result.Overall -ceq 'ReplacementStateUncertain' -and\n        $objRun.Result.Artifacts[0].PublicationReturned) -Label 'uncertain publication fails closed'\n\n    # Inject stable final observations that differ from the candidate. The bytes\n    # and publication are real; this is not a native substitution or race test.\n    $strBeforeIdentityRead = '$strFinalIdentityBeforeRead = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath'\n    $strAfterIdentityRead = '$hashtableRecord.FinalOrdinaryIdentity = Get-OrdinaryFileIdentity -LiteralPath $strDestinationPath'\n    $strCandidateEqualityGuard = 'if ($hashtableRecord.FinalOrdinaryIdentity -cne $strCandidateIdentity) {'\n    foreach ($strTarget in @($strBeforeIdentityRead, $strAfterIdentityRead, $strCandidateEqualityGuard)) {\n        Assert-GeneratorCondition -Condition (\n            ([regex]::Matches($strGenerator, [regex]::Escape($strTarget))).Count -eq 1\n        ) -Label 'candidate equality injection target'\n    }\n    $strIdentityInjection = $strGenerator.Replace($strBeforeIdentityRead,\n        '$strFinalIdentityBeforeRead = $strCandidateIdentity + '':injected-final''').Replace($strAfterIdentityRead,\n        '$hashtableRecord.FinalOrdinaryIdentity = $strFinalIdentityBeforeRead')\n    foreach ($boolDisableCandidateEquality in @($false, $true)) {\n        $strControlledGenerator = $strIdentityInjection\n        if ($boolDisableCandidateEquality) {\n            $strControlledGenerator = $strIdentityInjection.Replace($strCandidateEqualityGuard, 'if ($false) {')\n        }\n        [IO.File]::WriteAllText((Join-Path -Path $strScripts -ChildPath 'Generate-StyleGuideArtifacts.ps1'),\n            $strControlledGenerator, $objEncoding)\n        foreach ($strMethod in @('File.Replace', 'File.Move')) {\n            if ($strMethod -eq 'File.Replace') {\n                [IO.File]::WriteAllText($strCopilot, \"stale`n\", $objEncoding)\n            } else {\n                [IO.File]::Delete($strCopilot)\n            }\n            $objRun = Invoke-GeneratorFixture -Root $strFixture\n            $objArtifact = $objRun.Result.Artifacts[0]\n            Assert-GeneratorCondition -Condition ($objArtifact.PublicationReturned -and\n                $objArtifact.PublicationMethod -ceq $strMethod -and $objArtifact.FinalState -ceq 'Existing' -and\n                $objArtifact.FinalOrdinaryIdentity -ceq ($objArtifact.CandidateOrdinaryIdentity + ':injected-final') -and\n                $objArtifact.CandidateOrdinaryIdentity -cne $objArtifact.FinalOrdinaryIdentity -and\n                $objArtifact.CandidateLength -eq $objArtifact.FinalLength -and\n                $objArtifact.CandidateSha256 -ceq $objArtifact.FinalSha256) -Label 'injected same-byte different-identity publication'\n            $boolIdentityRefusal = $objRun.ExitCode -ne 0 -and\n                $objRun.Result.Overall -ceq 'ReplacementStateUncertain' -and\n                $objArtifact.Status -ceq 'ReplacementStateUncertain' -and\n                $objRun.Result.Phase -ceq 'verify-publication' -and\n                $objRun.Result.Category -ceq 'filesystem-state-uncertain'\n            if ($boolDisableCandidateEquality) {\n                Assert-GeneratorCondition -Condition (-not $boolIdentityRefusal -and $objRun.ExitCode -eq 0 -and\n                    $objRun.Result.Overall -ceq 'Success' -and $objArtifact.Status -ceq 'Success') -Label 'candidate equality mutation killed'\n            } else {\n                Assert-GeneratorCondition -Condition $boolIdentityRefusal -Label 'candidate identity mismatch fails closed'\n            }\n            Assert-GeneratorByteSequence -Root $strFixture -Golden $hashtableGolden\n        }\n    }\n    [IO.File]::WriteAllText((Join-Path -Path $strScripts -ChildPath 'Generate-StyleGuideArtifacts.ps1'), $strGenerator, $objEncoding)\n"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "start": 460,
+      "end": 488,
+      "raw_sha256": "217fb5f568f67e1a51392b92c3a62171aa46e64c619d7c557fcfe6e7cbc3961a",
+      "text": "} catch {\n    $boolPrimaryFailure = $true\n    throw\n} finally {\n    $strCleanupFailure = $null\n    try {\n        # Only this invocation's independently named child may be removed.\n        $strResolvedScratch = [IO.Path]::GetFullPath($strScratch)\n        if ([IO.Path]::GetDirectoryName($strResolvedScratch).TrimEnd('\\', '/') -cne $strScratchParent.TrimEnd('\\', '/') -or\n            [IO.Path]::GetFileName($strResolvedScratch) -cnotmatch '^styleguide-generator-[0-9a-f]{32}$') {\n            $strCleanupFailure = 'generator-test: cleanup containment failure'\n        } else {\n            Remove-Item -LiteralPath $strResolvedScratch -Recurse -Force\n        }\n    } catch {\n        # Classify cleanup without exposing its details or replacing the primary error.\n        $strCleanupFailure = 'generator-test: cleanup failed'\n    }\n    if ($null -ne $strCleanupFailure) {\n        if ($boolPrimaryFailure) {\n            Write-Warning -Message $strCleanupFailure -WarningAction Continue\n        } else {\n            throw $strCleanupFailure\n        }\n    }\n}\n'Generator tests passed: {0} assertions; edition={1}; version={2}; executable={3}; storage={4}; image={5}/{6}.' -f\n    $script:intAssertions, $PSVersionTable.PSEdition, $PSVersionTable.PSVersion, $strPowerShell, $strStorage,\n    $env:ImageOS, $env:ImageVersion\n"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "start": 455,
+      "end": 600,
+      "raw_sha256": "90a050aa8b429105d7b11c3945ce13a97479a6d3feab2b5d42b16da25a00b004",
+      "text": "\nconst generatorPlatforms = [\"generator_windows_51\", \"generator_windows_7\", \"generator_linux_7\"];\n// The policy owns this finite list; workflow and test expectations stay independent.\nconst generatorRequiredStatement = \"$arrRequired = @(\" + generatorPlatforms.map(id => \"'\" + id + \"'\").join(', ') + ')';\nconst generatorAdmission = \"$ErrorActionPreference = 'Stop'\\n$objResults = $env:GENERATOR_RESULTS | ConvertFrom-Json -ErrorAction Stop\\n\" + generatorRequiredStatement + \"\\nif (@($objResults.PSObject.Properties).Count -ne $arrRequired.Count) {\\n    throw 'Generator platform results are incomplete.'\\n}\\nforeach ($strJob in $arrRequired) {\\n    $objProperty = $objResults.PSObject.Properties[$strJob]\\n    if ($null -eq $objProperty -or $objProperty.Value.result -cne 'success' -or\\n        $objProperty.Value.outputs.revision -cne $env:GITHUB_SHA -or\\n        $env:GITHUB_SHA -cnotmatch '^[0-9a-f]{40}$') {\\n        throw 'Generator platform admission failed.'\\n    }\\n}\\n\";\n\nfunction validateRunStep(step, id, expected) {\n  const keys = ['id', 'shell', 'run'];\n  if (Object.hasOwn(step, 'name')) keys.push('name');\n  expectExactKeys(step, keys, 'code-step-shape');\n  if (step.id !== id || step.shell !== 'pwsh' || (step.name !== undefined && typeof step.name !== 'string')) fail('code-step-interface');\n  const lines = visibleLines(step.run);\n  if (id === 'acquire') {\n    // This bootstrap necessarily runs before repo helpers exist. Source safety is\n    // covered by accepted-loader behavior tests and maintenance review; this is\n    // deliberately not a shell interpreter or a source-spelling proof.\n    if (lines.length === 0) fail('acquisition-empty');\n    return;\n  }\n  if (id === 'validate') {\n    if (lines.length !== 2) fail('helper-call');\n    expectDeepEqual(helperCall(lines[0].replace(/;$/u, '')), ['node', './.github/workflows/Validate-WorkflowPolicy.mjs', '.github/workflows/build.yml', '.github/workflows/markdownlint.yml'], 'helper-call');\n    if (!/^if\\s*\\(\\s*\\$LASTEXITCODE\\s+-ne\\s+0\\s*\\)\\s*\\{\\s*throw\\s+(['\"])Workflow policy validation failed\\.\\1\\s*;?\\s*\\}$/u.test(lines[1])) fail('native-failure-check');\n    return;\n  }\n  if (id === 'audit') {\n    if (lines.length !== 2) fail('helper-call');\n    expectDeepEqual(helperCall(lines[0].replace(/;$/u, '')), ['node', './.github/workflows/Check-NpmAudit.mjs', '--ci'], 'helper-call');\n    if (!/^if\\s*\\(\\s*\\$LASTEXITCODE\\s+-ne\\s+0\\s*\\)\\s*\\{\\s*throw\\s+(['\"])[A-Za-z0-9 .:-]+\\1\\s*;?\\s*\\}$/u.test(lines[1])) fail('native-failure-check');\n    return;\n  }\n  if (lines.length !== 1) fail('helper-call');\n  expectDeepEqual(helperCall(lines[0]), expected, 'helper-call');\n}\n\nfunction validateWorkflowObject(fileName, workflow, contract) {\n  if (!WORKFLOWS.includes(fileName)) fail('workflow-name');\n  expectExactKeys(workflow, ['name', 'on', 'permissions', 'jobs'], 'workflow-shape');\n  if (typeof workflow.name !== 'string' || !workflow.name.trim()) fail('workflow-name');\n  const build = fileName === 'build.yml';\n  const events = { push: null, pull_request: null };\n  if (!build) {\n    const schedule = workflow.on?.schedule;\n    if (!Array.isArray(schedule) || schedule.length !== 1) fail('workflow-events');\n    expectExactKeys(schedule[0], ['cron'], 'workflow-events');\n    const weekly = typeof schedule[0].cron === 'string' && /^(\\d{1,2}) +(\\d{1,2}) +\\* +\\* +([0-6])$/u.exec(schedule[0].cron);\n    if (!weekly || Number(weekly[1]) > 59 || Number(weekly[2]) > 23) fail('workflow-events');\n    events.schedule = schedule;\n  }\n  expectDeepEqual(workflow.on, events, 'workflow-events');\n  expectDeepEqual(workflow.permissions, {}, 'workflow-permissions');\n  const codeJobs = build ? [contract.roles.artifactVerifier, ...generatorPlatforms] : ['policy', 'markdownlint'];\n  expectExactKeys(workflow.jobs, build ? [...codeJobs, 'publish_committed_artifacts'] : codeJobs, 'isolation-jobs');\n  for (const id of codeJobs) {\n    const job = workflow.jobs[id];\n    const platform = generatorPlatforms.indexOf(id);\n    const aggregate = build && platform < 0;\n    const keys = ['if', 'runs-on', 'timeout-minutes', 'permissions', 'steps'];\n    if (aggregate) keys.push('needs');\n    if (platform >= 0) keys.push('outputs');\n    expectExactKeys(job, keys, 'code-job-shape');\n    const live = \"github.event_name != 'push' || github.event.deleted != true\";\n    if (job.if !== (aggregate ? 'always() && (' + live + ')' : live)) fail('code-job-event');\n    expectDeepEqual(job.permissions, {}, 'code-job-permissions');\n    const runner = platform === 0 || platform === 1 ? 'windows-2025' : 'ubuntu-24.04';\n    if (job['runs-on'] !== runner || job['timeout-minutes'] !== 30) fail('code-job-execution');\n    if (aggregate) expectDeepEqual(job.needs, generatorPlatforms, 'generator-dependencies');\n    if (platform >= 0) {\n      expectDeepEqual(job.outputs, { revision: '${{ steps.proof.outputs.revision }}' }, 'generator-outputs');\n      const shell = platform === 0 ? 'powershell' : 'pwsh';\n      const expectedCount = platform === 2 ? 3 : 2;\n      if (!Array.isArray(job.steps) || job.steps.length !== expectedCount) fail('code-step-cardinality');\n      const acquire = job.steps[0];\n      expectExactKeys(acquire, ['id', 'shell', 'run', ...(Object.hasOwn(acquire, 'name') ? ['name'] : [])], 'code-step-shape');\n      if (acquire.id !== 'acquire' || acquire.shell !== shell || visibleLines(acquire.run).length === 0) fail('code-step-interface');\n      if (platform === 2) validateRunStep(job.steps[1], 'verify-checkout-credentials', ['./.github/workflows/Test-CheckoutCredentials.ps1']);\n      const proof = job.steps.at(-1);\n      expectExactKeys(proof, ['id', 'shell', 'run', ...(Object.hasOwn(proof, 'name') ? ['name'] : [])], 'code-step-shape');\n      if (proof.id !== 'proof' || proof.shell !== shell) fail('code-step-interface');\n      const host = ['WindowsPowerShell51', 'WindowsPowerShell7', 'LinuxPowerShell7'][platform];\n      const lines = visibleLines(proof.run);\n      if (lines.length !== 23) fail('generator-proof');\n      const expected = [\n        \"$env:GIT_CONFIG_NOSYSTEM = '1'\",\n        \"$env:GIT_CONFIG_GLOBAL = '\" + (platform === 2 ? '/dev/null' : 'NUL') + \"'\",\n        \"$env:GIT_TERMINAL_PROMPT = '0'\",\n        \"$env:GIT_NO_REPLACE_OBJECTS = '1'\",\n        '$strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName',\n        'if ([string]::IsNullOrEmpty($strPowerShellPath) -or -not [IO.File]::Exists($strPowerShellPath)) {',\n        \"throw 'The current PowerShell executable is unavailable.'\",\n        '}',\n      ];\n      for (const pass of [1, 2]) expected.push(\n        \"& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost \" + host,\n        '$intGeneratorExit = $LASTEXITCODE',\n        'if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {',\n        \"throw 'Generator pass \" + pass + \" failed.'\",\n        '}',\n      );\n      expectDeepEqual(lines.slice(0, 18), expected, 'generator-proof');\n      const git = platform === 2 ? \"'/usr/bin/git'\" : \"'C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe'\";\n      const tail = [\n        \"$arrHead = @(& \" + git + \" rev-parse --verify 'HEAD^{commit}')\",\n        \"if ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $env:GITHUB_SHA) {\",\n        \"throw 'Generator proof revision mismatch.';\",\n        '}',\n        '[IO.File]::AppendAllText($env:GITHUB_OUTPUT, (\\'revision=\\' + $arrHead[0] + \"`n\"), (New-Object Text.UTF8Encoding($false)))',\n      ];\n      expectDeepEqual(lines.slice(18).map(line => line.replace(/;$/u, '')), tail.map(line => line.replace(/;$/u, '')), 'generator-proof');\n      continue;\n    }\n    const roles = [\n      ...(aggregate ? [['admit-generator-platforms', null]] : []),\n      ['acquire', null],\n      ['verify-checkout-credentials', ['./.github/workflows/Test-CheckoutCredentials.ps1']],\n      ...(build ? [] : [['initialize-toolchain', ['./.github/workflows/Initialize-CiToolchain.ps1', '-WorkflowDependencies']]]),\n      build ? ['generate_style_guide_artifacts', ['./.github/workflows/Test-StyleGuideArtifacts.ps1']]\n        : id === 'policy' ? ['validate', null] : ['lint', ['./.github/workflows/Invoke-MarkdownLint.ps1']],\n      ...(id === 'markdownlint' ? [['audit', null]] : []),\n    ];\n    if (!Array.isArray(job.steps) || job.steps.length !== roles.length) fail('code-step-cardinality');\n    roles.forEach(([role, call], index) => {\n      const step = job.steps[index];\n      if (role === 'admit-generator-platforms') {\n        expectExactKeys(step, ['id', 'shell', 'run', 'env', ...(Object.hasOwn(step, 'name') ? ['name'] : [])], 'generator-admission');\n        if (step.id !== role || step.shell !== 'pwsh') fail('generator-admission');\n        expectDeepEqual(step.env, { GENERATOR_RESULTS: '${{ toJSON(needs) }}' }, 'generator-admission');\n        expectDeepEqual(visibleLines(step.run), visibleLines(generatorAdmission), 'generator-admission');\n      } else validateRunStep(step, role, call);\n    });\n  }\n  if (!build) return;\n  const publisher = workflow.jobs.publish_committed_artifacts;\n  expectExactKeys(publisher, ['runs-on', 'timeout-minutes', 'permissions', 'needs', 'steps'], 'publisher-shape');\n  expectDeepEqual(publisher.permissions, { contents: 'read' }, 'publisher-permissions');\n  if (publisher.needs !== contract.roles.artifactVerifier || publisher['runs-on'] !== 'ubuntu-24.04' || publisher['timeout-minutes'] !== 10) fail('publisher-execution');\n  if (!Array.isArray(publisher.steps) || publisher.steps.length !== 2) fail('publisher-steps');\n  for (const [index, actionName] of ['checkout', 'uploadArtifact'].entries()) {\n    const step = publisher.steps[index];\n    const keys = ['id', 'uses', 'with'];\n    if (Object.hasOwn(step, 'name')) keys.push('name');\n    expectExactKeys(step, keys, 'publisher-step-shape');\n    if (step.id !== (index === 0 ? 'checkout_repository' : 'publish_committed_style_guide_artifacts') || step.uses !== contract.actions[actionName].uses) fail('action-identity');\n    expectDeepEqual(step.with, contract.actions[actionName].inputs, 'action-inputs');\n  }\n}\n"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "start": 263,
+      "end": 451,
+      "raw_sha256": "4df4ab7552df31e953d718290ae614398b968e3aa61ac1750e46b0eb4c2b1c7b",
+      "text": "  generator_linux_7:\n    if: github.event_name != 'push' || github.event.deleted != true\n    runs-on: ubuntu-24.04\n    timeout-minutes: 30\n    permissions: {}\n    outputs:\n      revision: ${{ steps.proof.outputs.revision }}\n    steps:\n      - name: Acquire the exact revision without credentials\n        id: acquire\n        shell: pwsh\n        run: |\n          $ErrorActionPreference = 'Stop'\n          $PSNativeCommandUseErrorActionPreference = $false\n          if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or\n              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n              throw 'Unexpected acquisition repository.'\n          }\n          foreach ($strName in @('GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',\n              'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_DIR', 'GIT_WORK_TREE',\n              'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES')) {\n              if ([Environment]::GetEnvironmentVariable($strName)) {\n                  throw 'Unexpected credentials or external Git configuration.'\n              }\n          }\n          $env:GIT_CONFIG_NOSYSTEM = '1'\n          $env:GIT_CONFIG_GLOBAL = '/dev/null'\n          $env:GIT_TERMINAL_PROMPT = '0'\n          $env:GIT_NO_REPLACE_OBJECTS = '1'\n          $strRevision = $env:GITHUB_SHA\n          if ($strRevision -cnotmatch '^[0-9a-f]{40}$') { throw 'A full commit hash is required.' }\n          if (@([IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {\n              throw 'The acquisition workspace must be empty.'\n          }\n          & /usr/bin/git -c core.hooksPath=/dev/null init --quiet .\n          if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }\n          & /usr/bin/git config --local core.autocrlf false\n          if ($LASTEXITCODE -ne 0) { throw 'Git byte-preserving checkout configuration failed.' }\n          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n          if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }\n          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {\n              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision\n              if ($LASTEXITCODE -eq 0) { break }\n              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }\n              Start-Sleep -Seconds 2\n          }\n          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'\n          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }\n          & /usr/bin/git -c core.hooksPath=/dev/null checkout --quiet --detach $strRevision\n          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }\n          $strHead = & /usr/bin/git rev-parse --verify 'HEAD^{commit}'\n          if ($LASTEXITCODE -ne 0 -or $strHead -cne $strRevision) { throw 'Checked-out commit mismatch.' }\n      - name: Verify checkout credentials\n        id: verify-checkout-credentials\n        shell: pwsh\n        run: |\n          ./.github/workflows/Test-CheckoutCredentials.ps1\n      - name: Run the actual generator suite twice\n        id: proof\n        shell: pwsh\n        run: |\n          $env:GIT_CONFIG_NOSYSTEM = '1'\n          $env:GIT_CONFIG_GLOBAL = '/dev/null'\n          $env:GIT_TERMINAL_PROMPT = '0'\n          $env:GIT_NO_REPLACE_OBJECTS = '1'\n          $strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName\n          if ([string]::IsNullOrEmpty($strPowerShellPath) -or -not [IO.File]::Exists($strPowerShellPath)) {\n              throw 'The current PowerShell executable is unavailable.'\n          }\n          & $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost LinuxPowerShell7\n          $intGeneratorExit = $LASTEXITCODE\n          if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n              throw 'Generator pass 1 failed.'\n          }\n          & $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost LinuxPowerShell7\n          $intGeneratorExit = $LASTEXITCODE\n          if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n              throw 'Generator pass 2 failed.'\n          }\n          $arrHead = @(& '/usr/bin/git' rev-parse --verify 'HEAD^{commit}')\n          if ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $env:GITHUB_SHA) {\n              throw 'Generator proof revision mismatch.'\n          }\n          [IO.File]::AppendAllText($env:GITHUB_OUTPUT, ('revision=' + $arrHead[0] + \"`n\"), (New-Object Text.UTF8Encoding($false)))\n  verify_generated_artifacts:\n    if: always() && (github.event_name != 'push' || github.event.deleted != true)\n    needs:\n      - generator_windows_51\n      - generator_windows_7\n      - generator_linux_7\n    runs-on: ubuntu-24.04\n    timeout-minutes: 30\n    permissions: {}\n    steps:\n      - name: Require all platform results for this revision\n        id: admit-generator-platforms\n        shell: pwsh\n        env:\n          GENERATOR_RESULTS: ${{ toJSON(needs) }}\n        run: |\n          $ErrorActionPreference = 'Stop'\n          $objResults = $env:GENERATOR_RESULTS | ConvertFrom-Json -ErrorAction Stop\n          $arrRequired = @('generator_windows_51', 'generator_windows_7', 'generator_linux_7')\n          if (@($objResults.PSObject.Properties).Count -ne $arrRequired.Count) {\n              throw 'Generator platform results are incomplete.'\n          }\n          foreach ($strJob in $arrRequired) {\n              $objProperty = $objResults.PSObject.Properties[$strJob]\n              if ($null -eq $objProperty -or $objProperty.Value.result -cne 'success' -or\n                  $objProperty.Value.outputs.revision -cne $env:GITHUB_SHA -or\n                  $env:GITHUB_SHA -cnotmatch '^[0-9a-f]{40}$') {\n                  throw 'Generator platform admission failed.'\n              }\n          }\n      - name: Acquire the exact revision without credentials\n        id: acquire\n        shell: pwsh\n        run: |\n          $ErrorActionPreference = 'Stop'\n          $PSNativeCommandUseErrorActionPreference = $false\n          if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or\n              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n              throw 'Unexpected acquisition repository.'\n          }\n          foreach ($strName in @('GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',\n              'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_DIR', 'GIT_WORK_TREE',\n              'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES')) {\n              if ([Environment]::GetEnvironmentVariable($strName)) {\n                  throw 'Unexpected credentials or external Git configuration.'\n              }\n          }\n          $env:GIT_CONFIG_NOSYSTEM = '1'\n          $env:GIT_CONFIG_GLOBAL = '/dev/null'\n          $env:GIT_TERMINAL_PROMPT = '0'\n          $env:GIT_NO_REPLACE_OBJECTS = '1'\n          $strRevision = $env:GITHUB_SHA\n          if ($strRevision -cnotmatch '^[0-9a-f]{40}$') { throw 'A full commit hash is required.' }\n          if (@([IO.Directory]::EnumerateFileSystemEntries($PWD.Path)).Count -ne 0) {\n              throw 'The acquisition workspace must be empty.'\n          }\n          & /usr/bin/git -c core.hooksPath=/dev/null init --quiet .\n          if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }\n          & /usr/bin/git config --local core.autocrlf false\n          if ($LASTEXITCODE -ne 0) { throw 'Git byte-preserving checkout configuration failed.' }\n          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n          if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }\n          for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {\n              & /usr/bin/git -c credential.helper= -c http.extraheader= -c core.hooksPath=/dev/null fetch --depth 1 --no-tags --no-recurse-submodules origin $strRevision\n              if ($LASTEXITCODE -eq 0) { break }\n              if ($intAttempt -eq 3) { throw 'Exact revision fetch failed after three attempts.' }\n              Start-Sleep -Seconds 2\n          }\n          $strFetched = & /usr/bin/git rev-parse --verify 'FETCH_HEAD^{commit}'\n          if ($LASTEXITCODE -ne 0 -or $strFetched -cne $strRevision) { throw 'Fetched commit mismatch.' }\n          & /usr/bin/git -c core.hooksPath=/dev/null checkout --quiet --detach $strRevision\n          if ($LASTEXITCODE -ne 0) { throw 'Exact checkout failed.' }\n          $strHead = & /usr/bin/git rev-parse --verify 'HEAD^{commit}'\n          if ($LASTEXITCODE -ne 0 -or $strHead -cne $strRevision) { throw 'Checked-out commit mismatch.' }\n      - name: Verify checkout credentials\n        id: verify-checkout-credentials\n        shell: pwsh\n        run: |\n          ./.github/workflows/Test-CheckoutCredentials.ps1\n      - name: Generate and verify committed artifacts\n        id: generate_style_guide_artifacts\n        shell: pwsh\n        run: |\n          ./.github/workflows/Test-StyleGuideArtifacts.ps1\n  publish_committed_artifacts:\n    runs-on: ubuntu-24.04\n    timeout-minutes: 10\n    permissions:\n      contents: read\n    needs: verify_generated_artifacts\n    steps:\n      - name: Checkout repository\n        id: checkout_repository\n        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1\n        with:\n          repository: ${{ github.repository }}\n          ref: ${{ github.sha }}\n          token: ${{ github.token }}\n          persist-credentials: false\n          clean: true\n          fetch-depth: 1\n          fetch-tags: false\n          show-progress: true\n          lfs: false\n          submodules: false\n"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "start": 209,
+      "end": 265,
+      "raw_sha256": "ff6dd5d3896feff74aacf6b2702816abcfd97824084da34bc999f48d9de36e22",
+      "text": "});\n\ntest('Linux build acquisition rejects Git selectors before dispatch and checks byte configuration', t => {\n  // Execute both actual Linux bodies with only fixed Git dispatch replaced.\n  // This is portable control evidence, not hosted Linux acquisition proof.\n  const jobs = parse(read('build.yml')).jobs;\n  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'generator-linux-acquire-'));\n  t.after(() => fs.rmSync(root, { recursive: true, force: true }));\n  const git = path.join(root, 'git.ps1'), script = path.join(root, 'acquire.ps1');\n  fs.writeFileSync(git, `\n[IO.File]::AppendAllText($env:GENERATOR_GIT_LOG, ((@($args) | ConvertTo-Json -Compress) + \"\\n\"))\n$global:LASTEXITCODE = 0\nif ($args -contains 'config' -and $env:GENERATOR_GIT_MODE -eq 'config-failure') { $global:LASTEXITCODE = 7 }\nif ($args -contains 'rev-parse') { $env:GITHUB_SHA }\n`);\n  const selectors = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY',\n    'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS'];\n  for (const id of ['generator_linux_7', artifactVerifier]) {\n    const source = jobs[id].steps.find(step => step.id === 'acquire').run;\n    fs.writeFileSync(script, source.replaceAll('/usr/bin/git', quote(git)));\n    for (const [index, mode] of ['', ...selectors, 'config-failure'].entries()) {\n      const workspace = path.join(root, `${id}-${index}`); fs.mkdirSync(workspace);\n      const log = path.join(root, `${id}-${index}.jsonl`);\n      const env = { ...process.env, GENERATOR_GIT_MODE: mode, GENERATOR_GIT_LOG: log,\n        GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head };\n      for (const name of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', ...selectors]) delete env[name];\n      if (selectors.includes(mode)) env[mode] = 'fixture-external-selector';\n      const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {\n        cwd: workspace, env, encoding: 'utf8', timeout: 30000, windowsHide: true,\n      });\n      assert.equal(result.error, undefined, `${id}:${mode}`);\n      assert.equal(result.status === 0, mode === '', `${id}:${mode}: ${result.stderr}`);\n      if (selectors.includes(mode)) {\n        assert.equal(fs.existsSync(log), false, 'Reject external selectors before the first Git call.');\n        assert.match(result.stderr, /Unexpected credentials or external Git configuration\\./u);\n        continue;\n      }\n      const calls = fs.readFileSync(log, 'utf8').trim().split('\\n').map(JSON.parse);\n      const configuration = calls.findIndex(args => args.includes('config'));\n      assert.deepEqual(calls[configuration], ['config', '--local', 'core.autocrlf', 'false']);\n      assert.ok(configuration > calls.findIndex(args => args.includes('init')));\n      if (mode === 'config-failure') {\n        assert.equal(calls.some(args => args.includes('fetch') || args.includes('checkout') || args.includes('remote')), false);\n        assert.match(result.stderr, /Git byte-preserving checkout configuration failed\\./u);\n      } else {\n        assert.ok(configuration < calls.findIndex(args => args.includes('fetch')));\n        assert.ok(configuration < calls.findIndex(args => args.includes('checkout')));\n      }\n    }\n  }\n});\n\ntest('actual workflows cover every live push and PR base with an isolated target-event policy', () => {\n  const liveGuard = \"github.event_name != 'push' || github.event.deleted != true\";\n  for (const file of ['build.yml', 'markdownlint.yml', 'agent-instructions.yml']) {\n    const workflow = parse(read(file));\n    assert.ok(Object.hasOwn(workflow.on, 'push'));\n"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "start": 35,
+      "end": 60,
+      "raw_sha256": "9c84dfca3e82338c5a408811a3a0fc526fe1d7ca0602672de975c4f8da49bcad",
+      "text": "\ntest('valid small workflow interfaces; build requires no Node installation', () => {\n  for (const [file, value] of Object.entries(fixtures)) validateWorkflowObject(file, value, contract);\n  assert.equal(fixtures['build.yml'].jobs[contract.roles.artifactVerifier].steps.length, 4);\n});\n\ntest('platform role mutations cannot supply their own policy expectations', () => {\n  for (const [mode, category] of [['admission', 'generator-admission'],\n    ['dependency', 'generator-dependencies'], ['job', 'isolation-jobs']]) {\n    const value = clone(fixtures['build.yml']);\n    const verifier = value.jobs[contract.roles.artifactVerifier];\n    if (mode === 'admission') verifier.steps[0].run = verifier.steps[0].run.replace(\"'generator_linux_7'\", \"'generator_linux_other'\");\n    if (mode === 'dependency') verifier.needs[2] = 'generator_linux_other';\n    if (mode === 'job') {\n      value.jobs.generator_linux_other = value.jobs.generator_linux_7;\n      delete value.jobs.generator_linux_7;\n    }\n    assert.throws(() => validateWorkflowObject('build.yml', value, contract), error => error.category === category);\n  }\n});\n\ntest('labels, comments, CRLF, whitespace and literal call quoting are harmless', () => {\n  const value = clone(fixtures['markdownlint.yml']);\n  value.name = 'New descriptive name';\n  const credential = value.jobs.policy.steps[1];\n  credential.name = 'Changed label';\n"
+    }
+  ],
+  "peer_AGENTS": {
+    "path": "AGENTS.md",
+    "present": true,
+    "mode": "100644",
+    "type": "blob",
+    "blob": "be1e52363e92daec056660b3e1147527874ccbf9",
+    "bytes": 32746,
+    "raw_sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f"
+  },
+  "retained_decisions": [
+    "D92 option B score 96: keep PS155 open as conditional maintainer-owned residual",
+    "D93 option B score 100: preserve PS156 retirement and historical test limits"
+  ],
+  "new_material_finding": false,
+  "new_decision_required": false,
+  "native_state_limit": "Merge/current-main status and pending CI come from coordinator/STATUS. Local raw merge object and tree verified. No fresh issue, runner or native-main census.",
+  "remaining_triggers": [
+    "Concrete supported-caller failure with exact input, host and observation",
+    "Explicitly admitted concurrent untrusted writer or hostile writable parent",
+    "Specific available primitive that closes a relevant supported operation with adequate portability and failure behavior",
+    "Materially changed writer/promotion/privilege/credential/shared-runner/caller authority",
+    "A current supported consumer requiring an old PS156 property or current failure making its retired branch relevant",
+    "Specifically available useful runner plus live affected branch; runner availability alone does not revive retired consumers"
+  ],
+  "paired_acceptance_rechecks": [
+    "Actual source landed CI/service results bound to merge 98177628b7bc02c646724bfc8aa0fd73fed0cd24, not just reviewed-tree test results",
+    "Accepted TF repair commit/tree, raw modes/blobs and reverse comparison, language descriptors/T2 admission and actual shared primitive/caller deltas",
+    "Actual same-revision Windows PowerShell 5.1, Windows PowerShell 7 and Linux PowerShell 7/ext4 runs twice, including candidate guard/cleanup control scope; no race inference",
+    "Current acquisition selectors/configuration and caller authority, permissions, credential projection, child observations and separate committed-artifact publisher",
+    "Issue155 open residual and issue156 retirement/current applicable consumers; qualified R5 host/root/product 5.1/runtime and A16/A17 recovery consumers when delivered",
+    "Final A18/A19 native ref and conditional-trigger refresh"
+  ],
+  "tests_run": [],
+  "mutations": [
+    "Only REPORT.md and evidence.json in the assigned new scratch directory"
+  ],
+  "A14_transfer_count": "0/8 unchanged",
+  "PR_clock": "none; A06 clock/counters owned by coordinator"
+}
