@@ -1,6 +1,6 @@
 {
-  "status": "round6_codex_clean_copilot_pending",
-  "captured_at": "2026-10-05T11:11:58.575836+00:00",
+  "status": "round7_paired_reviews_pending",
+  "captured_at": "2026-10-05T11:29:30.114342+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -563,11 +563,11 @@
     }
   },
   "reverse_PR": "https://github.com/franklesniak/PSStyleGuide/pull/232",
-  "rounds_used": 6,
+  "rounds_used": 7,
   "first_request_at": "2026-10-05T06:26:07Z",
   "deadline": "2026-10-13T06:26:07+00:00",
   "metadata_carry_back": "Prepared six-path A21/A07 repair:54 differing Version notes, classifier deletion, local-test prefix, README inventory and lint diagnostics. Genuine destination date/baseline arithmetic and exact language exceptions remain; transfer3 is not released.",
-  "remaining": "Collect only the issued round6 Copilot/Codex results on unchanged86f35f4/body7221. Reuse current12 ordinary passes and local validation. Complete independent final quality and fresh native gates, normal merge, actual landed acceptance, six-path peer repair and raw compare-back. No owner action.",
+  "remaining": "Round7 terminal reviews, independent final quality, immediate native gates, normal merge, landed acceptance and six-path TF follow-up; no owner action.",
   "implementation_evidence_sha256": "a974f641c004e31a3b2d47c953e9763338ec5314b7c8fb14afa492a27213e95e",
   "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8",
   "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
@@ -2720,14 +2720,14 @@
     "baseline": "round6-pre-request.json",
     "request_intent_at": "2026-10-05T10:55:45.725711+00:00",
     "reason": "Continue required paired review after confirmed duplicate R10 was replied/resolved; no source/body change. This is not an effort-only retry or service-failure replacement. Round5 findings remain historically nonclean.",
-    "request_set_terminal": false,
+    "request_set_terminal": true,
     "clean": false,
     "copilot": {
-      "status": "pending",
+      "status": "terminal_findings_dispositioned",
       "transport": "gh pr edit --add-reviewer @copilot",
       "preferred_effort": "Balanced",
       "selected_effort": null,
-      "observed_effort": null,
+      "observed_effort": "Lite",
       "ui_fallback_reason": "Fresh Edge3 PR232 page tab75572473 is signed out (Sign in / Sign in to comment visible) and has no authenticated request control. Previous tab75572472 is no longer present. No UI request was sent.",
       "command_exit": 0,
       "request_event_id": 32500651175,
@@ -2735,7 +2735,24 @@
       "actor_id": 11204406,
       "reviewer_id": 175728472,
       "snapshot": "round6-copilot-request-confirmation.json",
-      "workflow_run_id": 37299688603
+      "workflow_run_id": 37299688603,
+      "review_id": 5413616728,
+      "result_at": "2026-10-05T11:13:14Z",
+      "finding_ids": [
+        4183353416,
+        4183353476
+      ],
+      "findings_clean": false,
+      "service": {
+        "status": "completed",
+        "conclusion": "cancelled",
+        "run_id": 37299688603,
+        "check_id": 111729196153,
+        "summary_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round6-copilot-attempt1\\summary.json",
+        "summary_sha256": "5b9fc77354fe9a3c4c81ea08e76759b952bf7846cc00e02e4f055fc3c876c2ed",
+        "log_sha256": "49a02b887e0d7dd83cf7d5b13a2c045495ba40ed576f89389c04a1fa7fef65c7",
+        "cause": "Authenticated job annotation: maximum execution time of 20m0s. Run complete repository validation was cancelled; final immutable-input guard succeeded; Processing Request was skipped. The separate authenticated Lite review is valid but has two findings. This service run is not a validation pass."
+      }
     },
     "codex": {
       "status": "clean",
@@ -2790,15 +2807,15 @@
       "reused_from": "round5 on identical head/base/body; no source change or repeated suite"
     },
     "started_at": "2026-10-05T10:55:45Z",
-    "latest_snapshot": "round6-progress-1110.json",
+    "latest_snapshot": "round6-pre-resolution.json",
     "last_native_observation_at": "2026-10-05T11:10:57.973564+00:00",
     "planning_publication": {
-      "head": "5168c83a4c44205f2f93148bfc570c0995e1c77b",
-      "parent": "7433b19b1af93129e6477e7aff8bac84cf60dba6",
-      "tree": "866953c585bd6ea2d1ab6ae0985151f6406070ee",
+      "head": "e5dd52d52f321f0c652c6aa74dab3cf8c6376fc3",
+      "parent": "5168c83a4c44205f2f93148bfc570c0995e1c77b",
+      "tree": "4a6a92131a490793182cc408210062d4c503263e",
       "files": [
-        "docs/planning/action-items-2026-10-02/results/A02/PS232-R10-table-repeat.md",
         "docs/planning/action-items-2026-10-02/results/A02/coherent-reverse-candidate.json",
+        "docs/planning/action-items-2026-10-02/results/A02/ps232-round5-evidence-quality.md",
         "docs/planning/action-items-2026-10-02/results/A02/RESULT.md",
         "docs/planning/action-items-2026-10-02/results/A03/RESULT.md",
         "docs/planning/action-items-2026-10-02/results/A07/RESULT.md",
@@ -2807,9 +2824,9 @@
         "docs/planning/action-items-2026-10-02/STATUS.md"
       ],
       "status": "published",
-      "commit_log_sha256": "7c6e04bcb8f9bbfaa97ac2803fc3d531f86330a5e2cd3df76ea3fe91fa1000b8",
+      "commit_log_sha256": "c42330ec0e34e7112aca686e2e020bfcbe03de8beb1fc4c56dac3eff2dd88139",
       "push_exit": 0,
-      "published_at": "2026-10-05T10:59:51.382800+00:00"
+      "published_at": "2026-10-05T11:12:27.107733+00:00"
     },
     "quality_evidence_delta": {
       "result": "no_material_issue_final_gates_pending",
@@ -2820,6 +2837,108 @@
       "evidence_sha256": "177a27babc5dff9a08efa46bec7c2a8a330be078d7c2ba46c93b561e4d1348eb",
       "root_verification": "Complete report read; 53 cited file identities and all12 hosted log identities verified. Both507-case instruction results, both11-hook setup jobs and R10 raw/server-render proof sampled. No final PR PASS.",
       "remaining": "Round6 terminal reviewer evidence and fresh native merge gates; newer Codex result will be reconciled with Copilot in final delta."
+    },
+    "disposition": {
+      "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+      "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "body_sha256": "7221c071ff008d322c0f066b17d43b9fc2f5f44eeb98295f3a74643404015e6c",
+      "preimage_snapshot": "round6-pre-resolution.json",
+      "proof_sha256": "41e1d62ade8dde71fa8e70760c699a8008ec0d2f73d13e3c1ed8dbde4893f8b2",
+      "resolutions": {
+        "R11": {
+          "parent": 4183353416,
+          "reply": 4183388461,
+          "thread": "PRRT_kwDOQkjdhM6pAdhI",
+          "decision": "R4 N100 retained after exact dependency/source applicability verification",
+          "status": "resolved_confirmed",
+          "started_at": "2026-10-05T11:25:56.679273+00:00",
+          "confirmed_at": "2026-10-05T11:25:58.554012+00:00"
+        },
+        "R12": {
+          "parent": 4183353476,
+          "reply": 4183392863,
+          "thread": "PRRT_kwDOQkjdhM6pAdh1",
+          "decision": "R5/R8/R10 N100 retained after exact source/server-render applicability verification",
+          "status": "resolved_confirmed",
+          "started_at": "2026-10-05T11:25:59.372734+00:00",
+          "confirmed_at": "2026-10-05T11:26:01.371737+00:00"
+        }
+      }
     }
+  },
+  "round7": {
+    "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+    "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "body_sha256": "7221c071ff008d322c0f066b17d43b9fc2f5f44eeb98295f3a74643404015e6c",
+    "baseline": "round7-pre-request.json",
+    "request_intent_at": "2026-10-05T11:28:01.434598+00:00",
+    "reason": "Continue required paired review after round6 duplicate R11/R12 were verified, replied and resolved. No source/body change. Round6 remains a valid Lite review with findings; its separate service cancellation is not relabelled a pass. This request is not an effort-only retry or service-failure replacement.",
+    "request_set_terminal": false,
+    "clean": false,
+    "copilot": {
+      "status": "pending",
+      "preferred_effort": "Balanced",
+      "selected_effort": null,
+      "observed_effort": null,
+      "transport": "gh pr edit --add-reviewer @copilot",
+      "ui_fallback_reason": "Fresh Edge3 PR232 tab75572475 is signed out (Sign in and Sign in to comment visible), with no authenticated request control. The Balanced effort menu alone cannot submit a request. No UI request was sent.",
+      "command_exit": 0,
+      "request_event_id": 32502896501,
+      "request_at": "2026-10-05T11:27:56Z",
+      "actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "snapshot": "round7-copilot-reconciliation.json",
+      "workflow_run_id": 37303115319,
+      "timestamp_reconciliation": "The native request-event timestamp is 5.434598 seconds earlier than the local intent clock. Do not equate local and GitHub clocks. A sole new authenticated event excluded from the complete pre-request baseline, CLI exit0, and a sole new exact-head workflow run confirm the one accepted request. No write was repeated."
+    },
+    "codex": {
+      "status": "pending",
+      "baseline": "round7-pre-request.json",
+      "trigger_intent_after_snapshot": "round7-copilot-reconciliation.json",
+      "trigger_intent_at": "2026-10-05T11:28:56.587387+00:00",
+      "trigger_body": "@codex review",
+      "trigger_comment_id": 5993530189,
+      "request_at": "2026-10-05T11:28:55Z",
+      "actor_id": 11204406,
+      "snapshot": "round7-paired-request-confirmation.json"
+    },
+    "hosted_validation": {
+      "status": "passed",
+      "terminal_success_ids": [
+        37296273633,
+        37296254033,
+        37296253918,
+        37296253935,
+        37296253922,
+        37296253919,
+        37296249298,
+        37296246381,
+        37296246402,
+        37296246413,
+        37296246433,
+        37296246392
+      ],
+      "pending_run_ids": [],
+      "collected_evidence": "round5-hosted-86f35f4/round5-progress-1048-collection.json",
+      "accepted_run_ids": [
+        37296273633,
+        37296254033,
+        37296253918,
+        37296253935,
+        37296253922,
+        37296253919,
+        37296249298,
+        37296246381,
+        37296246402,
+        37296246413,
+        37296246433,
+        37296246392
+      ],
+      "evidence_readback": "Both proposed instruction jobs:507pass/0fail/0skip and mutation SelfTest PASS. Both setup jobs:all11hooks/0skips and final immutable-input guard PASS. All required producer logs collected on actual86f35f4.",
+      "reused_from": "round5 on identical head/base/body; no source change or repeated suite"
+    },
+    "started_at": "2026-10-05T11:27:56Z",
+    "latest_snapshot": "round7-paired-request-confirmation.json",
+    "last_native_observation_at": "2026-10-05T11:29:30.114342+00:00"
   }
 }
