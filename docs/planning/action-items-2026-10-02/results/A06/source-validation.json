@@ -1,6 +1,6 @@
 {
-  "status": "round3_reviews_and_hosted_validation_pending",
-  "recorded_at": "2026-10-05T22:35:26.232116+00:00",
+  "status": "merged_landed_checks_pending",
+  "recorded_at": "2026-10-05T22:56:46.898324+00:00",
   "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
   "base_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
   "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
@@ -330,13 +330,20 @@
   "deadline": "2026-10-13T20:12:24.969231+00:00",
   "pending_native_operations": [
     {
-      "service": "Copilot",
-      "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
-      "request_event": 32550168386,
-      "workflow_run": 37383095530,
-      "effort_selected": "Balanced",
-      "observed_completed_effort": null,
-      "status": "confirmed_pending"
+      "service": "GitHub Actions",
+      "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "run": 37385523615,
+      "name": "Copilot setup steps",
+      "status": "in_progress",
+      "created_at": "2026-10-05T22:55:54Z"
+    },
+    {
+      "service": "GitHub Actions",
+      "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "run": 37385523624,
+      "name": "Agent instruction validation",
+      "status": "in_progress",
+      "created_at": "2026-10-05T22:55:54Z"
     }
   ],
   "limits": [
@@ -346,12 +353,7 @@
     "Issue155 and broader runtime/recovery remain open.",
     "Independent quality passed for exact current head/base/body; remote reviews, remaining CI, normal merge/landed and paired acceptance remain."
   ],
-  "remaining": [
-    "Collect issued round3 reviews and apply finding decisions if necessary.",
-    "Complete remaining current-head CI and immediate premerge gates.",
-    "Normal merge and actual landed validation.",
-    "Refresh peer main; increment destination transfers before implementing the paired port; verify reverse comparison."
-  ],
+  "remaining": "Actual landed-source workflows, raw peer comparison, serialized TF implementation and reverse comparison. Current source reviews and independent quality passed.",
   "candidate_history": [
     {
       "tree": "04a0a02f490d597f209eeed41a0519b0959faac8",
@@ -974,10 +976,10 @@
       "baseline": "round3-baseline.json",
       "baseline_sha256": "41c5b33b9b7cb81d5008a6f74bc45a6464eccd5ec0ff754f8c3d511feda82d60",
       "copilot": {
-        "status": "confirmed_pending",
+        "status": "completed_clean",
         "requested_at": "2026-10-05T22:31:34.819317+00:00",
         "effort_selected": "Balanced",
-        "observed_effort": null,
+        "observed_effort": "Balanced",
         "channel_attempt": 1,
         "request_events": [
           {
@@ -991,7 +993,13 @@
         "ui_confirmation": "Review requested; Reviewing at balanced effort. Last completed Lite is historical.",
         "workflow_run": 37383095530,
         "workflow_created_at": "2026-10-05T22:32:12Z",
-        "latest_workflow_status": "in_progress"
+        "latest_workflow_status": "completed",
+        "observed_effort_source": "Complete authenticated review overview5421601380 read by root; explicit Review effort field.",
+        "review_id": 5421601380,
+        "submitted_at": "2026-10-05T22:49:38Z",
+        "review_body_sha256": "d5fcaf09a2f78bd03a4cf97c96a5279db136c4078bbaf915bc218bd65297fbd3",
+        "terminal_snapshot": "round3-progress-7.json",
+        "workflow_conclusion": "success"
       },
       "codex": {
         "status": "completed_clean",
@@ -1023,7 +1031,129 @@
           "disposition": "Authenticated manual summary terminal and baseline-excluded post-trigger exact-head clean result; complete comments/reviews/threads contain no new finding."
         }
       },
-      "findings": []
+      "findings": [],
+      "body_inventory": {
+        "declared_findings": 0,
+        "new_inline_findings": 0,
+        "historical_resolved_in_overview": 4,
+        "body_only_findings": [],
+        "review_caveat": "Copilot cannot itself verify actual hosted Windows/Linux execution. Root verified actual three-platform twice-run proof, matching candidate tree, all12 ordinary terminal success workflows, complete logs and independent final quality. This is an evidence requirement already satisfied, not a new source defect or universal security claim."
+      },
+      "clean": true,
+      "request_set_terminal": true,
+      "status": "current_input_clean",
+      "accepted_at": "2026-10-05T22:55:15.094867+00:00",
+      "hosted_validation": {
+        "status": "passed",
+        "accepted_run_ids": [
+          37382738489,
+          37382738491,
+          37382738493,
+          37382738494,
+          37382738512,
+          37382741445,
+          37382744231,
+          37382744258,
+          37382744305,
+          37382744546,
+          37382744820,
+          37382758348
+        ],
+        "attempt_collection": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\round3-progress-7-attempts.json",
+        "attempt_collection_sha256": "6bdba7f11fd9093c63d8b7f5dd9bc1e03bdbc4d479bc01e2d8f620340c8a3ced",
+        "logs": [
+          {
+            "run": 37383095530,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37383095530\\attempt-1\\log.txt",
+            "sha256": "7070bff51928ba8b17c515aabf5fa203c329fab1ebb96bf8ac2ab18c03f83c1f"
+          },
+          {
+            "run": 37382758348,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382758348\\attempt-1\\log.txt",
+            "sha256": "e2508ae73326d57f1c9de8d55ace940baa2afa482652f2cad42ca30460a602d5"
+          },
+          {
+            "run": 37382744258,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382744258\\attempt-1\\log.txt",
+            "sha256": "ec403858743096e32b25325c71abe990677f5ead36196694d03e6b65952cc7e5"
+          },
+          {
+            "run": 37382744546,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382744546\\attempt-1\\log.txt",
+            "sha256": "b09aff55b3c99ecebb636ba21c1fc3ed3fd59cfee96c1c37b87b8b6fede060b5"
+          },
+          {
+            "run": 37382744305,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382744305\\attempt-1\\log.txt",
+            "sha256": "54ecd76d1d8c35afa15e021560a38e7156f8996f63b55986b3b4ec7b7b8404ca"
+          },
+          {
+            "run": 37382744820,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382744820\\attempt-1\\log.txt",
+            "sha256": "3062c9b1c29777c6763f71ceffac7e7014ad036f52a771f372a70f0b2ba77228"
+          },
+          {
+            "run": 37382744231,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382744231\\attempt-1\\log.txt",
+            "sha256": "f9dc62fddb79935ed2a8bbed02e68405fdf16b8bd9c802bc9e06ec6f8889ab71"
+          },
+          {
+            "run": 37382741445,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382741445\\attempt-1\\log.txt",
+            "sha256": "678042195682358147b9d01286464b01ea4ac470b6ba5127be32c732528996cd"
+          },
+          {
+            "run": 37382738494,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382738494\\attempt-1\\log.txt",
+            "sha256": "3844d4cccb260f9289bd09787e5d55006a771e8365387999a01951a9e6127038"
+          },
+          {
+            "run": 37382738493,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382738493\\attempt-1\\log.txt",
+            "sha256": "10bae9ef3e2c13e03b7a79a02297867b9a65b2ac76a72b7c4c37bc6dc1098232"
+          },
+          {
+            "run": 37382738512,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382738512\\attempt-1\\log.txt",
+            "sha256": "e3f13b3286832b9bb75586fa507c5f0d274f6b5215066201673e9c655a1fcbc8"
+          },
+          {
+            "run": 37382738489,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382738489\\attempt-1\\log.txt",
+            "sha256": "7daeb3be7673d3ede81f05ee3ac46509de77ea5640a737b3e08c36c10b62e759"
+          },
+          {
+            "run": 37382738491,
+            "attempt": 1,
+            "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382738491\\attempt-1\\log.txt",
+            "sha256": "187777db80734850d53eb301cd303db65ce58aa2c51ae77e6e0f26099f4aac5d"
+          }
+        ],
+        "behavior_tests": "567 passed; zero failed/cancelled/skipped/todo in each push and PR run",
+        "setup_hooks": "11 passed in each push and PR setup; final immutable inputs step passed",
+        "platform_proof": {
+          "status": "current_head_three_platforms_passed_twice",
+          "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+          "run": 37382744305,
+          "proof": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\PR-platform-proof.json",
+          "sha256": "26a6e3dedf5ffea1e59fe6d6e34d9886c3d476b852a6a3066a9ae099b2df6c08",
+          "assertions_per_pass": 156,
+          "source_tree_equal": true
+        },
+        "limit": "Current published source candidate only; actual merged-main validation and paired acceptance remain."
+      }
     }
   ],
   "A14_preparation": {
@@ -2330,24 +2460,31 @@
     "actual_head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
     "verified_at": "2026-10-05T22:28:26.731065+00:00"
   },
-  "local_operations": "No local tests, source freeze or workers remain. Copilot37383095530 and ordinary37382744231/37382744820/37382738491 confirmed live by native run reads; do not restart. A09 readiness root-verified.",
+  "local_operations": "No local test, worker or source freeze is active. Normal merge confirmed; no ambiguous mutation or reviewer request remains. Five landed workflows recorded; no retry issued.",
   "progress": {
-    "recorded_at": "2026-10-05T22:45:54.675769+00:00",
-    "stage": "A09 current readiness verified; Codex clean; Copilot and three ordinary workflows live",
-    "remaining": "Current reviews/remaining CI, normal source merge/landed and paired delivery; broad goal incomplete.",
+    "recorded_at": "2026-10-05T22:59:22.225594+00:00",
+    "stage": "Source PR234 normally merged after clean round3 and all current-input gates",
+    "remaining": "Actual landed-source acceptance, TF transfer and paired convergence; broad goal incomplete.",
     "native_pending": [
       {
-        "service": "Copilot",
-        "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
-        "request_event": 32550168386,
-        "workflow_run": 37383095530,
-        "effort_selected": "Balanced",
-        "observed_completed_effort": null,
-        "status": "confirmed_pending"
+        "service": "GitHub Actions",
+        "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "run": 37385523615,
+        "name": "Copilot setup steps",
+        "status": "in_progress",
+        "created_at": "2026-10-05T22:55:54Z"
+      },
+      {
+        "service": "GitHub Actions",
+        "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "run": 37385523624,
+        "name": "Agent instruction validation",
+        "status": "in_progress",
+        "created_at": "2026-10-05T22:55:54Z"
       }
     ]
   },
-  "next_action": "Collect the issued Copilot round3 and remaining three ordinary workflows. Codex clean; current quality/platform proof passed. Reconcile complete review surfaces and run/check logs, then prepare current-input acceptance and fresh premerge gates. merge-reviewed-ps234.py is prepared but NOT executed and cannot run before acceptance. Source landed acceptance then real TF transfer remain.",
+  "next_action": "Collect the two remaining actual9817762 merged-main workflows and logs. accept-landed-ps234.py is prepared but NOT executed. Once all landed predicates pass, refresh actual PS/TF refs and increment before TF repair; do not repeat source merge/reviews.",
   "A09_preparation": {
     "status": "read_only_root_verified",
     "worker": "/root/a09_post_a06_readiness",
@@ -2360,27 +2497,100 @@
     "catalog_sha256": "752660478a5bee12b65b3ec54c3683c2c3debf9d6205adc1203498e3e4807a0b",
     "canonical_report": "results/A09/postA06/REPORT.md"
   },
-  "planning_checkpoint": "63930d42e70610c0c2d0b0b17eafd95bfa1c100b",
+  "planning_checkpoint": "06d0ad236eedb787269c0d125437a44a6c4353cf",
   "hosted_current_progress": {
-    "snapshot": "round3-progress-4.json",
+    "status": "all_current_candidate_runs_passed",
+    "snapshot": "round3-progress-7.json",
     "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
     "ordinary_success": [
-      37382758348,
-      37382744258,
-      37382744546,
-      37382744305,
-      37382741445,
-      37382738494,
+      37382738489,
+      37382738491,
       37382738493,
+      37382738494,
       37382738512,
-      37382738489
-    ],
-    "ordinary_pending": [
+      37382741445,
       37382744231,
+      37382744258,
+      37382744305,
+      37382744546,
       37382744820,
-      37382738491
+      37382758348
     ],
-    "terminal_receipt": "hosted-dec18a6/round3-progress-4-attempts.json",
-    "push_setup": "11hooks passed and final immutable setup check successful at22:42:47Z; complete actual log read."
+    "ordinary_pending": [],
+    "terminal_receipt": "hosted-dec18a6/round3-progress-7-attempts.json"
+  },
+  "landed_progress": {
+    "status": "incomplete",
+    "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "snapshot": "landed-progress-2.json",
+    "runs": [
+      {
+        "id": 37385523636,
+        "name": "Dev container boundary",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37385523615,
+        "name": "Copilot setup steps",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37385523624,
+        "name": "Agent instruction validation",
+        "status": "in_progress",
+        "conclusion": null
+      },
+      {
+        "id": 37385523708,
+        "name": "Markdown Lint",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37385523719,
+        "name": "Build Style Guide Artifacts",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ]
+  },
+  "merge": {
+    "requested_at": "2026-10-05T22:55:25.561518+00:00",
+    "method": "merge",
+    "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+    "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+    "gate_sha256": "9a3380cb54878f96782151cc3db265dcba8a91f835c73de7d0e0e9072f04679c",
+    "native_sha256": "8864f80ad4eb0fd446a62b238f2a39309158cbbaac39d822a86461e8887374c9",
+    "exit": 0,
+    "response": {
+      "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "merged": true,
+      "message": "Pull Request successfully merged"
+    },
+    "sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "parents": [
+      "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "dec18a6303bd6ad5fe9a43b383a62daa70527aca"
+    ],
+    "merged_at": "2026-10-05T22:55:51Z",
+    "verified_at": "2026-10-05T22:55:29.452872+00:00"
+  },
+  "input_acceptance": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\round3-input-acceptance.json",
+    "sha256": "4c1d3a371ff84db6c1f8744a575725bbb19adbd4540e423b5526f52a3d2d634b",
+    "accepted_at": "2026-10-05T22:55:15.094867+00:00"
+  },
+  "native_acceptance_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\round3-progress-7.json",
+  "native_acceptance_gate": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\round3-acceptance-gates.json",
+  "delivered_peer_comparison": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\merged-source-peer-comparison.json",
+    "sha256": "99bbfbbf3f67917dc221566bc7340d3459531be99dca35c55dd095524935e903",
+    "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "tf_commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "scope": "13delivered and12coupled paths; actual native before/after refs stable",
+    "result": "Useful shared delta remains. All selected instructions retained; only common harness changes since conditional map. No transfer or implementation."
   }
 }

@@ -1,0 +1,561 @@
+{
+  "status": "raw_comparison_complete_source_landed_validation_pending",
+  "captured_at": "2026-10-05T22:57:46.140942+00:00",
+  "ps_commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+  "ps_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "tf_commit": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "tf_tree": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631",
+  "native_before": {
+    "PSStyleGuide": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "TerraformStyleGuide": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+  },
+  "native_after": {
+    "PSStyleGuide": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "TerraformStyleGuide": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+  },
+  "paths": [
+    {
+      "source": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+        "bytes": 6095,
+        "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+      },
+      "peer": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+        "bytes": 6063,
+        "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Copy common bytes; retain exact new-harness selector."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "166d137206aff8f503911be9a569efbd204e023b",
+        "bytes": 26191,
+        "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff"
+      },
+      "peer": {
+        "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+        "bytes": 25554,
+        "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Copy common bytes; retain exact/case-alias/mixed/near-match controls."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9e52d7482e5105f8c661b1005ba0c76a8e2a939d",
+        "bytes": 90995,
+        "sha256": "ffbaf150e328ec2aeb202d9db99b9a23dd30d9ee666628b5ea9195351e6b7514"
+      },
+      "peer": {
+        "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+        "bytes": 95329,
+        "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Copy shared engine including R5; replace only marked language descriptor with listed TF literals."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+        "bytes": 123582,
+        "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c"
+      },
+      "peer": {
+        "path": ".github/workflows/Test-CiHelpers.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+        "bytes": 100007,
+        "sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Copy portable useful union and R4 controls; replace only 8 exact repository-identity occurrences, including negative origin."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+        "bytes": 253908,
+        "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30"
+      },
+      "peer": {
+        "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+        "bytes": 253918,
+        "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Copy common neutral engine/schema/diagnostic bytes; no version equality gate."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+        "bytes": 36090,
+        "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8"
+      },
+      "peer": {
+        "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+        "bytes": 31949,
+        "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Copy shared gate; replace its independent marked descriptor with TF scoped ID/path and TerraformRecovery."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+        "bytes": 27656,
+        "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+      },
+      "peer": {
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "present": false
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": true,
+      "necessary_action": "Add common final harness bytes, including R5 repeated-boundary/presence cases; no repository/language substitution. Include accepted R7 candidate-identity controls and R10 primary-error preservation."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+        "bytes": 31176,
+        "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f"
+      },
+      "peer": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+        "bytes": 26228,
+        "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Copy common R3 finite-table policy bytes; keep target contract independent."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+        "bytes": 17625,
+        "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+      },
+      "peer": {
+        "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Copy common tests; keep both required-context spellings and independent role-mutation literals."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/build.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d46981e38b54e8f8df42158b06ad149ca8c20c45",
+        "bytes": 25715,
+        "sha256": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4"
+      },
+      "peer": {
+        "path": ".github/workflows/build.yml",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1",
+        "bytes": 4348,
+        "sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Replace 10 repository-identity occurrences, verifier key/dependency (2 sites), and one published scoped path; retain R4 on both Linux callers."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/scripts-README.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+        "bytes": 13541,
+        "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02"
+      },
+      "peer": {
+        "path": ".github/workflows/scripts-README.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9a88a8ebdba3a24cf45c82639da4bcb2442c5271",
+        "bytes": 13086,
+        "sha256": "9e483a42e1a01130205bc7dfa55fdac5e4a4c36244f98eb57e250d2cc0c86d97"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Insert only common harness row into accepted TF README; preserve TF semantic row/description, verify context and T1 provenance link."
+    },
+    {
+      "source": {
+        "path": ".github/workflows/workflow-policy-cases.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+        "bytes": 26216,
+        "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a"
+      },
+      "peer": {
+        "path": ".github/workflows/workflow-policy-cases.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Copy common catalog; preserve $artifactVerifier indirection and all platform/R1 negative controls."
+    },
+    {
+      "source": {
+        "path": "powershell.instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b711cec80333e409cb4e644eb94530653ca39109",
+        "bytes": 148831,
+        "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f"
+      },
+      "peer": {
+        "path": "terraform.instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+        "bytes": 153067,
+        "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+      },
+      "raw_equal": false,
+      "changed_since_conditional_map": false,
+      "necessary_action": "Map ownership to terraform.instructions.md; preserve accepted TF bytes, never copy PS content."
+    }
+  ],
+  "coupled_unchanged_observations": {
+    ".github/workflows/workflow-policy-contract.json": {
+      "source": {
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "bytes": 1517,
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+      },
+      "peer": {
+        "path": ".github/workflows/workflow-policy-contract.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+        "bytes": 1496,
+        "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9"
+      },
+      "raw_equal": false
+    },
+    ".github/workflows/Test-CheckoutCredentials.ps1": {
+      "source": {
+        "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+        "bytes": 3081,
+        "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+      },
+      "peer": {
+        "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+        "bytes": 3088,
+        "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+      },
+      "raw_equal": false
+    },
+    ".github/workflows/Test-StateRecoveryExamples.mjs": {
+      "source": {
+        "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+        "present": false
+      },
+      "peer": {
+        "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+        "bytes": 22102,
+        "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+      },
+      "raw_equal": false
+    },
+    ".github/workflows/Test-BlankLineExamples.ps1": {
+      "source": {
+        "path": ".github/workflows/Test-BlankLineExamples.ps1",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "068c7139a9e6a9276073211f48eca88464204362",
+        "bytes": 15201,
+        "sha256": "a81575b8103f1ba973ed7858908b2f3b53d7a68fb4522d9f334762cfdbe6bcc7"
+      },
+      "peer": {
+        "path": ".github/workflows/Test-BlankLineExamples.ps1",
+        "present": false
+      },
+      "raw_equal": false
+    },
+    ".github/workflows/ci-toolchain.json": {
+      "source": {
+        "path": ".github/workflows/ci-toolchain.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "bytes": 91,
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+      },
+      "peer": {
+        "path": ".github/workflows/ci-toolchain.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+        "bytes": 91,
+        "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+      },
+      "raw_equal": true
+    },
+    "package.json": {
+      "source": {
+        "path": "package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "0421d27aaf9d0facb15b5aa2a214d0757c768358",
+        "bytes": 816,
+        "sha256": "cf8cf089fedbd81599a67ef2cc9352dd638d6d46783ddc78c8f15ea998985ae4"
+      },
+      "peer": {
+        "path": "package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+        "bytes": 837,
+        "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+      },
+      "raw_equal": false
+    },
+    ".github/workflows/package.json": {
+      "source": {
+        "path": ".github/workflows/package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b09ca859508430050dc0b023b3dba62e50748680",
+        "bytes": 844,
+        "sha256": "163f62d4f833b6969ddfd935e7d1beabd3e09dad8b7b38987ff7bcdb05fe1dad"
+      },
+      "peer": {
+        "path": ".github/workflows/package.json",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "10078fa5c1f4817a5705188ba61e46a02be41ec4",
+        "bytes": 902,
+        "sha256": "f4b97f287a3f745a0ebca25148dff84ad5831b0756ed1ba07d27cb5444718c0c"
+      },
+      "raw_equal": false
+    },
+    "STYLE_GUIDE.md": {
+      "source": {
+        "path": "STYLE_GUIDE.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+        "bytes": 148759,
+        "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd"
+      },
+      "peer": {
+        "path": "STYLE_GUIDE.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "bytes": 152868,
+        "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+      },
+      "raw_equal": false
+    },
+    "STYLE_GUIDE_RATIONALE.md": {
+      "source": {
+        "path": "STYLE_GUIDE_RATIONALE.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "afb5ba370810e36a9c1ba103aa8e5691a3131581",
+        "bytes": 135295,
+        "sha256": "0b1eec4b1154c2054a9c9152308e8aab3b38be961784accc05476bd2d2fdd6b4"
+      },
+      "peer": {
+        "path": "STYLE_GUIDE_RATIONALE.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+        "bytes": 73953,
+        "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+      },
+      "raw_equal": false
+    },
+    "copilot-instructions.md": {
+      "source": {
+        "path": "copilot-instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "21bbb515429eb5fdac47f14128a95d5fd55122aa",
+        "bytes": 148759,
+        "sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd"
+      },
+      "peer": {
+        "path": "copilot-instructions.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+        "bytes": 152868,
+        "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+      },
+      "raw_equal": false
+    },
+    "STYLE_GUIDE_CHAT.md": {
+      "source": {
+        "path": "STYLE_GUIDE_CHAT.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "556538c7664327652bc42875b63a5bf6bc16783f",
+        "bytes": 148852,
+        "sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb"
+      },
+      "peer": {
+        "path": "STYLE_GUIDE_CHAT.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+        "bytes": 152962,
+        "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72"
+      },
+      "raw_equal": false
+    },
+    "STYLE_GUIDE_FULL.md": {
+      "source": {
+        "path": "STYLE_GUIDE_FULL.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "c06830461f45d089c1f1f2c36d7a7b6472e3d6aa",
+        "bytes": 257290,
+        "sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d"
+      },
+      "peer": {
+        "path": "STYLE_GUIDE_FULL.md",
+        "present": true,
+        "mode": "100644",
+        "type": "blob",
+        "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+        "bytes": 222292,
+        "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab"
+      },
+      "raw_equal": false
+    }
+  },
+  "conditional_map_sha256": "6d017e9a15e089e78292ce5e3a2a7503c7f993d5cac18dff39e337efe909e089",
+  "retained_port_instructions": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\peer-port-map-round1.md",
+  "harness_delta": "Only source change since conditional map is accepted R7/R10 common harness. All other12 source entries and all13 peer entries are unchanged. All12 coupled entries on each side retain recorded bytes/modes.",
+  "decision": "A useful shared delta remains. Keep the selected bounded TF port. Do not copy PS guide outputs; preserve narrow descriptor/context/identity differences and existing TF semantic checks.",
+  "limits": "No TF implementation, test, counter increment or paired acceptance. Require actual landed-source acceptance and current-peer recheck before destination repair. Not a full-tree A18 comparison."
+}

@@ -1,0 +1,211 @@
+{
+  "accepted_at": "2026-10-05T22:55:15.094867+00:00",
+  "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+  "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+  "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "body_sha256": "8744ed3f3af5105058be086ddb90d0ed93f8b3e3828ca45fa3e28dce9969e982",
+  "round": {
+    "round": 3,
+    "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+    "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "body_sha256": "8744ed3f3af5105058be086ddb90d0ed93f8b3e3828ca45fa3e28dce9969e982",
+    "started_at": "2026-10-05T22:31:34.819317+00:00",
+    "deadline": "2026-10-13T20:12:24.969231+00:00",
+    "baseline": "round3-baseline.json",
+    "baseline_sha256": "41c5b33b9b7cb81d5008a6f74bc45a6464eccd5ec0ff754f8c3d511feda82d60",
+    "copilot": {
+      "status": "completed_clean",
+      "requested_at": "2026-10-05T22:31:34.819317+00:00",
+      "effort_selected": "Balanced",
+      "observed_effort": "Balanced",
+      "channel_attempt": 1,
+      "request_events": [
+        {
+          "id": 32550168386,
+          "created_at": "2026-10-05T22:32:02Z",
+          "actor": "franklesniak",
+          "requested_reviewer": "Copilot"
+        }
+      ],
+      "confirmation_snapshot": "round3-before-codex.json",
+      "ui_confirmation": "Review requested; Reviewing at balanced effort. Last completed Lite is historical.",
+      "workflow_run": 37383095530,
+      "workflow_created_at": "2026-10-05T22:32:12Z",
+      "latest_workflow_status": "completed",
+      "observed_effort_source": "Complete authenticated review overview5421601380 read by root; explicit Review effort field.",
+      "review_id": 5421601380,
+      "submitted_at": "2026-10-05T22:49:38Z",
+      "review_body_sha256": "d5fcaf09a2f78bd03a4cf97c96a5279db136c4078bbaf915bc218bd65297fbd3",
+      "terminal_snapshot": "round3-progress-7.json",
+      "workflow_conclusion": "success"
+    },
+    "codex": {
+      "status": "completed_clean",
+      "manual_trigger_issued": true,
+      "requested_at": "2026-10-05T22:32:52.280559+00:00",
+      "baseline": "round3-before-codex.json",
+      "request_body_sha256": "02880f6d5019e267edd8c6167efb032f6b60ac1c5c77ac56c59bb21d6ed3cdad",
+      "request_body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\round3-codex-request.md",
+      "channel_attempt": 1,
+      "automatic_reconciliation": "Complete collections show unchanged old terminal summary and no new-head automatic request or result at baseline.",
+      "trigger_comment": 6004532304,
+      "trigger_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#issuecomment-6004532304",
+      "native_created_at": "2026-10-05T22:33:17Z",
+      "confirmed_at": "2026-10-05T22:32:55.011698+00:00",
+      "summary_comment": 6002108102,
+      "latest_summary": {
+        "comment": 6002108102,
+        "updated_at": "2026-10-05T22:33:31Z",
+        "body_sha256": "ce175a830c5333f2ee3e52936a29b6a41a663ce82e34718a1f1732aa4a5eda30",
+        "snapshot": "round3-paired-confirmation.json"
+      },
+      "manual_terminal": {
+        "summary_comment": 6002108102,
+        "result_comment": 6004595014,
+        "result_created_at": "2026-10-05T22:37:12Z",
+        "snapshot": "round3-progress-2.json",
+        "summary_body_sha256": "8027482a49ab7a765082ab94d1f3071fea37f2da4d1a4a21c264f96cf68a2679",
+        "result_body_sha256": "4715d8029979e29f36df9f2f29efb383a4f5ad4d83e3403ace961a62603bf672",
+        "disposition": "Authenticated manual summary terminal and baseline-excluded post-trigger exact-head clean result; complete comments/reviews/threads contain no new finding."
+      }
+    },
+    "findings": [],
+    "body_inventory": {
+      "declared_findings": 0,
+      "new_inline_findings": 0,
+      "historical_resolved_in_overview": 4,
+      "body_only_findings": [],
+      "review_caveat": "Copilot cannot itself verify actual hosted Windows/Linux execution. Root verified actual three-platform twice-run proof, matching candidate tree, all12 ordinary terminal success workflows, complete logs and independent final quality. This is an evidence requirement already satisfied, not a new source defect or universal security claim."
+    },
+    "clean": true,
+    "request_set_terminal": true,
+    "status": "current_input_clean",
+    "accepted_at": "2026-10-05T22:55:15.094867+00:00",
+    "hosted_validation": {
+      "status": "passed",
+      "accepted_run_ids": [
+        37382738489,
+        37382738491,
+        37382738493,
+        37382738494,
+        37382738512,
+        37382741445,
+        37382744231,
+        37382744258,
+        37382744305,
+        37382744546,
+        37382744820,
+        37382758348
+      ],
+      "attempt_collection": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\round3-progress-7-attempts.json",
+      "attempt_collection_sha256": "6bdba7f11fd9093c63d8b7f5dd9bc1e03bdbc4d479bc01e2d8f620340c8a3ced",
+      "logs": [
+        {
+          "run": 37383095530,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37383095530\\attempt-1\\log.txt",
+          "sha256": "7070bff51928ba8b17c515aabf5fa203c329fab1ebb96bf8ac2ab18c03f83c1f"
+        },
+        {
+          "run": 37382758348,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382758348\\attempt-1\\log.txt",
+          "sha256": "e2508ae73326d57f1c9de8d55ace940baa2afa482652f2cad42ca30460a602d5"
+        },
+        {
+          "run": 37382744258,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382744258\\attempt-1\\log.txt",
+          "sha256": "ec403858743096e32b25325c71abe990677f5ead36196694d03e6b65952cc7e5"
+        },
+        {
+          "run": 37382744546,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382744546\\attempt-1\\log.txt",
+          "sha256": "b09aff55b3c99ecebb636ba21c1fc3ed3fd59cfee96c1c37b87b8b6fede060b5"
+        },
+        {
+          "run": 37382744305,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382744305\\attempt-1\\log.txt",
+          "sha256": "54ecd76d1d8c35afa15e021560a38e7156f8996f63b55986b3b4ec7b7b8404ca"
+        },
+        {
+          "run": 37382744820,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382744820\\attempt-1\\log.txt",
+          "sha256": "3062c9b1c29777c6763f71ceffac7e7014ad036f52a771f372a70f0b2ba77228"
+        },
+        {
+          "run": 37382744231,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382744231\\attempt-1\\log.txt",
+          "sha256": "f9dc62fddb79935ed2a8bbed02e68405fdf16b8bd9c802bc9e06ec6f8889ab71"
+        },
+        {
+          "run": 37382741445,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382741445\\attempt-1\\log.txt",
+          "sha256": "678042195682358147b9d01286464b01ea4ac470b6ba5127be32c732528996cd"
+        },
+        {
+          "run": 37382738494,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382738494\\attempt-1\\log.txt",
+          "sha256": "3844d4cccb260f9289bd09787e5d55006a771e8365387999a01951a9e6127038"
+        },
+        {
+          "run": 37382738493,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382738493\\attempt-1\\log.txt",
+          "sha256": "10bae9ef3e2c13e03b7a79a02297867b9a65b2ac76a72b7c4c37bc6dc1098232"
+        },
+        {
+          "run": 37382738512,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382738512\\attempt-1\\log.txt",
+          "sha256": "e3f13b3286832b9bb75586fa507c5f0d274f6b5215066201673e9c655a1fcbc8"
+        },
+        {
+          "run": 37382738489,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382738489\\attempt-1\\log.txt",
+          "sha256": "7daeb3be7673d3ede81f05ee3ac46509de77ea5640a737b3e08c36c10b62e759"
+        },
+        {
+          "run": 37382738491,
+          "attempt": 1,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\37382738491\\attempt-1\\log.txt",
+          "sha256": "187777db80734850d53eb301cd303db65ce58aa2c51ae77e6e0f26099f4aac5d"
+        }
+      ],
+      "behavior_tests": "567 passed; zero failed/cancelled/skipped/todo in each push and PR run",
+      "setup_hooks": "11 passed in each push and PR setup; final immutable inputs step passed",
+      "platform_proof": {
+        "status": "current_head_three_platforms_passed_twice",
+        "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+        "run": 37382744305,
+        "proof": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-dec18a6\\PR-platform-proof.json",
+        "sha256": "26a6e3dedf5ffea1e59fe6d6e34d9886c3d476b852a6a3066a9ae099b2df6c08",
+        "assertions_per_pass": 156,
+        "source_tree_equal": true
+      },
+      "limit": "Current published source candidate only; actual merged-main validation and paired acceptance remain."
+    }
+  },
+  "native_snapshot_sha256": "da297976d2e91b081b25625b050cb358ef0b9d276158f44e71c14ee29f84252d",
+  "gate_sha256": "6d585ec8c3170b8069d2d247f66573b90af3d7da62fc5d7d7ad2409b5ddad225",
+  "final_quality": {
+    "status": "passed",
+    "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+    "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+    "body_sha256": "8744ed3f3af5105058be086ddb90d0ed93f8b3e3828ca45fa3e28dce9969e982",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS234-final-quality-20261005\\final-binding.md",
+    "report_sha256": "71f18751454aa1ebf0b4bc54aa4d064e636430e09aaf458635a74eb3e92085b4",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS234-final-quality-20261005\\final-binding.json",
+    "evidence_sha256": "2ed93e153d2a42eea31eee84b6f3439264979cc4a65cff844d0a0908b4a5df5d",
+    "root_review": "Read full report and evidence; verified declared record/log identities. Reuses original13-path and bounded delta reviews; no hosted/remote/merge acceptance inferred."
+  },
+  "limits": "No landed-source or paired acceptance yet. Transfer counts unchanged."
+}
