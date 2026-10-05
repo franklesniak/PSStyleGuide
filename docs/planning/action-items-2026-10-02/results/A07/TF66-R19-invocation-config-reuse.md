@@ -74,3 +74,13 @@ Private commands and full outputs are located by [STATUS](../../STATUS.md), unde
 | `linux/result.json` | `23cc455b29f420d268b775e8e268fc7474b896b03858898d4cf4ff6ab9f6c87b` |
 
 [Canonical peer lifecycle](../A02/coherent-peer-candidate.json) records implementation, tests, native dispositions, review rounds and acceptance separately.
+
+## Private implementation verification
+
+The final private implementation passes focused Windows/Linux checks and independent source review. Full candidate validation is still required before publication. The actual staged process uses one real selector scan; the final configured-rule case fails with the original two-scan implementation. Independent API freshness controls also pass.
+
+Fixture note: the retained fake module lacked the new loader export, so three expected status-2 cases could pass before reaching the intended call. Add that export and an outer-call marker. All five status cases pass on each platform with the staged-byte assertions retained.
+
+Encoding note: private default-decoding edits changed existing Unicode test literals. Restore the complete21009-byte original prefix from raw Git bytes and retain the two added tests unchanged. The three affected Unicode cases pass on each platform; the rejected freeze remains recorded.
+
+The [canonical peer evidence](../A02/coherent-peer-candidate.json) links the frozen handoff, source guards, exact commands/logs and independent report. Neither focused evidence nor this review establishes full-aggregate, native-review or paired acceptance.

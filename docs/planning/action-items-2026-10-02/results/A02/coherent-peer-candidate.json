@@ -1,6 +1,6 @@
 {
-  "recorded_at": "2026-10-05T00:52:57.270653+00:00",
-  "status": "round5_selected_private_repair_running",
+  "recorded_at": "2026-10-05T01:16:41.090863+00:00",
+  "status": "round5_proposed_aggregate_running",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -1073,11 +1073,46 @@
           ".github/workflows/lint-staged-markdown.mjs",
           ".github/workflows/lint-markdown.test.mjs",
           ".github/workflows/copilot-setup-steps.yml",
-          ".github/workflows/Test-CiHelpers.test.mjs"
+          ".github/workflows/Test-CiHelpers.test.mjs",
+          ".github/workflows/Test-LocalValidation.test.mjs",
+          "AGENTS.md",
+          "CLAUDE.md",
+          ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+          ".github/workflows/scripts-README.md",
+          "docs/ISSUE_EVALUATION_PROMPT.md",
+          "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+          "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+          "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+          "docs/dependency-maintenance.md"
         ],
         "scope": "R17 comment-only contract; R19 one invocation-owned validated configuration with fresh standalone defaults; R20 equivalent trigger-filter simplification. R18 retains canonical D9-D B94.",
         "root_verification": "All four proposals read; ordered options, three unique rubrics, all23 score rows and selections displayed; all23 totals checked; four immutable raw blobs and actual Windows/Linux probe data sampled.",
-        "forbidden": "No product/index/dependency/native writes, full suite, aggregate, install, protected/guide changes or descendants."
+        "forbidden": "No product/index/dependency/native writes, full suite, aggregate, install, protected policy/body edits, unmapped metadata edits or descendants.",
+        "fixture_extension": {
+          "path": ".github/workflows/Test-LocalValidation.test.mjs",
+          "at": "2026-10-05T00:57:08.376040+00:00",
+          "reason": "Independent source review found the retained fake module lacks loadMarkdownlintConfig; status2 could pass before reaching normalization. Preserve status/staged-byte assertions and adapt fixture export with meaningful reachability evidence. D07 short fixture note; no production behavior change."
+        },
+        "aggregate_runtime": "Retain qualified Windows route; prepared Linux image lacks currently enabled ShellCheck integration.",
+        "metadata_extension": {
+          "at": "2026-10-05T01:00:46.641610+00:00",
+          "readiness_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\linux-next-aggregate-readiness\\readiness.json",
+          "readiness_sha256": "893659f238d547d5d671ef64a1b0d010e92bf84ec562e94cf5c3a82671f601a9",
+          "paths": [
+            "AGENTS.md",
+            "CLAUDE.md",
+            ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+            ".github/workflows/scripts-README.md",
+            "docs/ISSUE_EVALUATION_PROMPT.md",
+            "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+            "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+            "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+            "docs/dependency-maintenance.md"
+          ],
+          "authority": "Accepted B docs.instructions.md115\u2013124 plus existing selected finalization policy; explicit owner-approved protected-v2 request item4 covers AGENTS/CLAUDE Version and Last Updated at actual finalization. Root read both sources and sampled3 actual B/H pairs.",
+          "allowed": "Only mapped Last Updated and two dated Version changes to actualOct5; retain major/minor/revision0, body, ADR facts, links and modes.",
+          "requires_new_decision": false
+        }
       },
       "proposal_evidence": {
         "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round5-review-findings",
@@ -3930,8 +3965,8 @@
       "old_input_clean": false
     }
   },
-  "current_review_status": "Round5 remains terminal/nonclean. R17 J99.4, R19 P94 and R20 A100 selected after the full decision process; R18 reuses verified D9-D B94. Private six-path repair is active; all four native threads remain open pending tested implementation/disposition. Product H and review counters unchanged.",
-  "next_action": "Collect frozen six-path repair and affected validation; obtain independent quality, assemble exact candidate and run one complete qualified aggregate.",
+  "current_review_status": "Round5 remains terminal/nonclean on published H. Corrected16path private repair passes independent source/focused quality; proposed tree5fbf060 is under sole full Windows validation session30940. No new review request or product publication.",
+  "next_action": "Collect the existing validation session; inspect complete output and all identity guards. Integrate only after terminal pass.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -5103,9 +5138,19 @@
       ".github/workflows/lint-staged-markdown.mjs",
       ".github/workflows/lint-markdown.test.mjs",
       ".github/workflows/copilot-setup-steps.yml",
-      ".github/workflows/Test-CiHelpers.test.mjs"
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-LocalValidation.test.mjs",
+      "AGENTS.md",
+      "CLAUDE.md",
+      ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      ".github/workflows/scripts-README.md",
+      "docs/ISSUE_EVALUATION_PROMPT.md",
+      "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+      "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+      "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+      "docs/dependency-maintenance.md"
     ],
-    "remaining": "Collect frozen six-path repair and affected validation; obtain independent quality, assemble exact candidate and run one complete qualified aggregate."
+    "remaining": "Collect frozen16path private repair (7code/test and9required metadata), targeted checks and independent review; assemble exact B-anchored candidate, run actualUTC staged preflight and one complete Windows aggregate."
   },
   "round3": {
     "head": "055f112f762a466ed693c073083225f8ec9ee79d",
@@ -7008,11 +7053,46 @@
         ".github/workflows/lint-staged-markdown.mjs",
         ".github/workflows/lint-markdown.test.mjs",
         ".github/workflows/copilot-setup-steps.yml",
-        ".github/workflows/Test-CiHelpers.test.mjs"
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-LocalValidation.test.mjs",
+        "AGENTS.md",
+        "CLAUDE.md",
+        ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+        ".github/workflows/scripts-README.md",
+        "docs/ISSUE_EVALUATION_PROMPT.md",
+        "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+        "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+        "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+        "docs/dependency-maintenance.md"
       ],
       "scope": "R17 comment-only contract; R19 one invocation-owned validated configuration with fresh standalone defaults; R20 equivalent trigger-filter simplification. R18 retains canonical D9-D B94.",
       "root_verification": "All four proposals read; ordered options, three unique rubrics, all23 score rows and selections displayed; all23 totals checked; four immutable raw blobs and actual Windows/Linux probe data sampled.",
-      "forbidden": "No product/index/dependency/native writes, full suite, aggregate, install, protected/guide changes or descendants."
+      "forbidden": "No product/index/dependency/native writes, full suite, aggregate, install, protected policy/body edits, unmapped metadata edits or descendants.",
+      "fixture_extension": {
+        "path": ".github/workflows/Test-LocalValidation.test.mjs",
+        "at": "2026-10-05T00:57:08.376040+00:00",
+        "reason": "Independent source review found the retained fake module lacks loadMarkdownlintConfig; status2 could pass before reaching normalization. Preserve status/staged-byte assertions and adapt fixture export with meaningful reachability evidence. D07 short fixture note; no production behavior change."
+      },
+      "aggregate_runtime": "Retain qualified Windows route; prepared Linux image lacks currently enabled ShellCheck integration.",
+      "metadata_extension": {
+        "at": "2026-10-05T01:00:46.641610+00:00",
+        "readiness_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\linux-next-aggregate-readiness\\readiness.json",
+        "readiness_sha256": "893659f238d547d5d671ef64a1b0d010e92bf84ec562e94cf5c3a82671f601a9",
+        "paths": [
+          "AGENTS.md",
+          "CLAUDE.md",
+          ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+          ".github/workflows/scripts-README.md",
+          "docs/ISSUE_EVALUATION_PROMPT.md",
+          "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+          "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+          "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+          "docs/dependency-maintenance.md"
+        ],
+        "authority": "Accepted B docs.instructions.md115\u2013124 plus existing selected finalization policy; explicit owner-approved protected-v2 request item4 covers AGENTS/CLAUDE Version and Last Updated at actual finalization. Root read both sources and sampled3 actual B/H pairs.",
+        "allowed": "Only mapped Last Updated and two dated Version changes to actualOct5; retain major/minor/revision0, body, ADR facts, links and modes.",
+        "requires_new_decision": false
+      }
     },
     "proposal_evidence": {
       "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round5-review-findings",
@@ -7020,6 +7100,96 @@
       "catalog_sha256": "f08f72e90776f16ab015e628d987aec219f264364b6c0b0bea7ced21a3c8b2e5",
       "guard_sha256": "6e695acbb4820fb7e661972869b79aa8019e8cf015252f2e4d020d6cb884f5ef",
       "root_checked_at": "2026-10-05T00:52:57.270653+00:00"
+    },
+    "rejected_initial_freeze": {
+      "at": "2026-10-05T01:09:06.660901+00:00",
+      "catalog_sha256": "619ff4a8a9296e1c9fac66efc740dd3fc19c8994d0c6325673278c353a091170",
+      "reason": "Independent quality found unintended mojibake in retained Unicode test literals; author restores raw original prefix and reruns affected Unicode cases. No product integration.",
+      "reviewer": "/root/a02_tf_prepublication_quality"
+    },
+    "repair_handback": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round5-review-findings\\repair",
+      "frozen_evidence": {
+        "HANDOFF.md": "481800900ef2e3a6b9c629c6f9f8a687105ae1f8e9a9777fb3512faebd9e5642",
+        "postimage-catalog.json": "918b411ce6d6b99e9be93f83181bc1f4a3f87c748ccea3d6271238d81c2691fb",
+        "repair.patch": "fe212f29bcb7ae49757c9c91aca123b5409f20ed074397576c926fcaa562d558",
+        "evidence-catalog.json": "7ef3f919ff06cb5a2053f674a259370380cde15da4215cb47e6115a03f5e0b92",
+        "final-source-guard.json": "72d178a1c539c76a579f6bacd612cb22ada27cf161d8bf3416c2233f338e93bb"
+      },
+      "root_verified_at": "2026-10-05T01:12:51.100990+00:00",
+      "path_count": 16,
+      "unicode_correction": "Raw original prefix restored; all6 affected platform cases pass, prior rejected freeze preserved."
+    },
+    "independent_repair_quality": {
+      "state": "bounded_pass_final16paths",
+      "reviewer": "/root/a02_tf_prepublication_quality",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-R17-R20-FINAL-REPAIR-REVIEW-dde2b9a.md",
+      "report_sha256": "ec802518d77c1b3520e9eeff98c0e0f5f8c29ce260f9fdb7763b847781d26322",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-R17-R20-FINAL-REPAIR-EVIDENCE-dde2b9a.json",
+      "evidence_sha256": "11c79c525fc78de16fa44a924bd1ab06f1dda14967e6b5738a48c7fb6ef4805b",
+      "root_read_and_hash_checked_at": "2026-10-05T01:14:18.247610+00:00",
+      "final_pr_pass": false,
+      "limitations": "Aggregate, actual new-H/B checks, new-input native reviews/checks, final PR quality and paired acceptance remain."
+    },
+    "proposed_validation": {
+      "created_at": "2026-10-05T01:14:40.005432+00:00",
+      "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-validation-checkout",
+      "published_base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "product_parent_head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+      "candidate_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+      "dependency_count": 1910,
+      "index_catalog_sha256": "f4cae5b0b70da7b28fb136370106a7e410437972fb3ea86e587c0248851d57b2",
+      "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+      "product_unchanged": true,
+      "dependencies_unchanged": true,
+      "state": "aggregate_running",
+      "staged_preflight": {
+        "state": "passed",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-RequireStagedInputMatch"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-validation-checkout",
+        "started_at": "2026-10-05T01:15:06.187191+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-staged_preflight.log",
+        "pid": 210040,
+        "candidate_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+        "before_identity_passed": true,
+        "after_identity_passed": true,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+        "exit_code": 0,
+        "finished_at": "2026-10-05T01:16:13.217930+00:00",
+        "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
+      },
+      "aggregate": {
+        "state": "running",
+        "command": [
+          "py",
+          "-3.12",
+          "-m",
+          "pre_commit",
+          "run",
+          "--all-files"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-validation-checkout",
+        "started_at": "2026-10-05T01:16:13.221803+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-aggregate.log",
+        "pid": 210040,
+        "candidate_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+        "before_identity_passed": true,
+        "after_identity_passed": false,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit."
+      }
+    },
+    "validation_readiness": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-validation-readiness.json",
+      "sha256": "71bad4dc6b9f8346c237a0da69d50ae3cf32f6f4819129fcbe791ecbf61fd4dd",
+      "session": 30940
     }
   }
 }
