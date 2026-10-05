@@ -2,7 +2,7 @@
 Purpose: current state and one next action; chronology is in optional per-task journals.
 Restart: read this table, README, LOOP-POLICY, your task file, your task's RESULT; open a journal only when resuming that task.
 States: pending, active, validating, waiting_external, waiting_human, complete, verified, conditional-no-trigger, superseded, convergence-blocked. Verified requires an independent reader on final inputs.
-Planning head: `e5dd52d52f321f0c652c6aa74dab3cf8c6376fc3` (published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
+Planning head: `46cedbc76b1063206c215038947ee56b6eb2881c` (published checkpoint) plus current execution checkpoint on `planning-CRT-PR-852`; never merge this branch into main.
 
 | ID | Outcome | State | Owner/worker | Repository and branch | Pinned head/base | PR number | Round used/80 and deadline UTC | Transfers used/cap | Latest evidence | One next action |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -34,7 +34,7 @@ Planning head: `e5dd52d52f321f0c652c6aa74dab3cf8c6376fc3` (published checkpoint)
 - Planning: C:/Users/flesniak/GitHub/PSStyleGuide, planning-CRT-PR-852. Peer: C:/Users/flesniak/GitHub/TerraformStyleGuide. Never merge planning into main.
 - Scratch: C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-. Runtime A07-design-20261002/runtime/node-v24.18.1-win-x64; py3.12; pwsh7.6.5.
 - PS: C:/Users/flesniak/.codex/worktrees/a07-braces-remediation/PSStyleGuide; codex/coherent-foundation-reverse H86f35f4/Bf168/tree2cf6900. State coherent-reverse-20261005/execution-state.json. Root owns index/native/planning.
-- PR232 round7/80: unchanged H86f35f4/body7221c07. Local11-hook aggregate, endpoints/audit and12 ordinary workflows pass;507tests per instruction job. Round6 Codex clean; Lite R11/R12 disproved, replied/resolved; all14threads resolved. Its service timed out during validation after10hooks; final guard passed. Round7 Copilot event32502896501/run37303115319 and Codex5993530189 pending; CLI fallback. Final quality/native gates pending. Deadline2026-10-13T06:26:07Z; transfers2. No user action.
+- PR232 round7/80: unchanged H86f35f4/body7221c07. Local11-hook aggregate, endpoints/audit and12 ordinary workflows pass;507tests per instruction job. Round6 Codex clean; Lite R11/R12 disproved, replied/resolved; all14threads resolved. Its service timed out during validation after10hooks; final guard passed. Round7 Codex5993624480 clean at11:35Z; Copilot event32502896501/run37303115319 live; CLI fallback. Independent disposition review passed; final quality/native gates pending. Deadline2026-10-13T06:26:07Z; transfers2. No user action.
 - TF accepted56cb041/tree377d998:5landed runs/515tests/11hooks passed; round8 Balanced/Codex clean. Receipt TF-coherent-20261004/landed-peer-acceptance.json. Carry-back has six prospective paths; transfer3 not released.
 - Accepted-B fixture: C:/Users/flesniak/.codex/worktrees/ps-reverse-accepted-policy/PSStyleGuide atf168. Full11-hook Linux validation uses qualified8bdc image; future B99 twelve-hook input needs qualification.
 - Held A07: C:/Users/flesniak/.codex/worktrees/a07-tooling/PSStyleGuide treec68b5e1; preserve edits/index. R5/B1 results/A07/recovery-runtime;3real archives qualified. Windows bootstrap/DACL proof saved privately;5.1 policy/parent trust remain unqualified; installer pending.
