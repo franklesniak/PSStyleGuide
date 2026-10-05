@@ -1,0 +1,23 @@
+{
+  "verified_at": "2026-10-05T05:46:14.908509+00:00",
+  "worker_report_sha256": "cf9ebb4a81773c15bf342e45c5156c634bae60e7ad30a3fce57642766ee93dfa",
+  "worker_evidence_sha256": "5baff87e94b8f346b3d7e4710491773d2da69509644eca65c1dcd06ee03d6a1a",
+  "root_read_full_report": true,
+  "root_independent_raw_blobs_verified": {
+    "PS": 75,
+    "TF": 78
+  },
+  "complete_union": 83,
+  "counts": {
+    "different": 52,
+    "equal": 18,
+    "PS-only": 5,
+    "TF-only": 8
+  },
+  "fresh_native_heads": {
+    "PS": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "TF": "56cb0418dcdcf71be94acc78d8963ea580b8a9e9"
+  },
+  "historical_contracts_preserved": 402,
+  "limit": "Factual inventory acceptance only; unaccepted working edits and final A18/A19 acceptance excluded."
+}

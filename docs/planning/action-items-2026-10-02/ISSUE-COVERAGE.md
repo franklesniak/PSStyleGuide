@@ -1,7 +1,9 @@
 <!-- markdownlint-disable MD013 -->
 # Open issue coverage and plan improvements
 
-Current complete authenticated census, independently rechecked at **2026-10-04T09:22:15Z**: the same four PS issues (#213, #175, #155, #152), TF #25 and seven PS comments remain. All current titles, bodies, comment IDs/bodies and ownership are accounted for; neither repository has an open PR. See [post230 inventory](results/A01/post230/REPORT.md) and [parent verification](results/A01/post230/parent-verification.json). PR230 is merged. These issue states do not claim final acceptance of the remaining task scopes.
+Current complete authenticated census at **2026-10-05T05:40:16Z** confirms the same five open issues and seven comments, with unchanged titles, bodies and comment IDs/bodies. Neither repository has an open PR. [The TF66 refresh](results/A01/postTF66/REPORT.md) and [complete evidence](results/A01/postTF66/evidence.json) retain pagination and ownership; the assignments below remain applicable. This is current inventory, not final acceptance of unresolved work.
+
+Previous complete authenticated census, independently rechecked at **2026-10-04T09:22:15Z**: the same four PS issues (#213, #175, #155, #152), TF #25 and seven PS comments remain. All current titles, bodies, comment IDs/bodies and ownership are accounted for; neither repository has an open PR. See [post230 inventory](results/A01/post230/REPORT.md) and [parent verification](results/A01/post230/parent-verification.json). PR230 is merged. These issue states do not claim final acceptance of the remaining task scopes.
 
 The following earlier observations are preserved with their original dates.
 

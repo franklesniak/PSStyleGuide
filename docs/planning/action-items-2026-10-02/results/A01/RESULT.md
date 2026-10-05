@@ -1,7 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # A01 current issue and native tree inventory
 
-## Current refresh after PR231: 2026-10-04
+## Current refresh after TF PR66: 2026-10-05
+
+Accepted factual inventory is PS `f168f83b89f64b6bca9d520ddec4b58969060fb6` and TF `56cb0418dcdcf71be94acc78d8963ea580b8a9e9`. The full83-path union has18 equal,52 different,5 PS-only and8 TF-only paths, with75 PS and78 TF blobs. TF66 changed40 TF entries; every PS entry is unchanged. All five issue bodies/titles and seven comments remain unchanged. No open PR, new requirement or ownership gap was found. Historical81 paths,402 contracts and26 absent-both references are preserved.
+
+Root read the [full report](postTF66/REPORT.md), verified its [complete evidence](postTF66/evidence.json), independently checked every153 raw blob and full tree membership, recomputed the counts, and rechecked both native main refs. [Parent verification](postTF66/parent-verification.json) records this bounded acceptance. TF66 has separately passed all five landed workflows. Unaccepted PS reverse edits are excluded; this census does not establish paired convergence or final A18/A19 acceptance.
+
+## Previous refresh after PR231: 2026-10-04
 
 Accepted factual inventory at PS main `f168f83b89f64b6bca9d520ddec4b58969060fb6` / tree `c82fa2e11bfe333b9bcaf732bf12d1d9cb907380` and unchanged TF `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` / tree `dc8f6b82588b8f874d34cd5d0155791aea5793f1`. The complete83-path union remains13 equal,54 different,8 PS-only and8 TF-only, with75 blobs per side. Only the three PR231 A03 files changed. No new unowned path, open issue or conflicting PR appeared. Five open issues and seven comments remain; closed PS156 retains not_planned and its historical limits. Historical81 paths/402 contracts/26 absent-both references retain their prior dispositions.
 

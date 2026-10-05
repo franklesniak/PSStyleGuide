@@ -1,7 +1,11 @@
 <!-- markdownlint-disable MD013 -->
 # Full native-main path inventory
 
-## Current refresh after PR230: 2026-10-04
+## Current refresh after TF PR66: 2026-10-05
+
+Accepted PS `f168f83b89f64b6bca9d520ddec4b58969060fb6` has75 blobs; accepted TF `56cb0418dcdcf71be94acc78d8963ea580b8a9e9` has78. The complete union is **83 paths:18 equal,52 different,5 PS-only and8 TF-only**. [All native identities and owners](results/A01/postTF66/evidence.json) and [independent root verification](results/A01/postTF66/parent-verification.json) cover every153 blob and retain all83 owners. Forty TF entries changed; no union path was added or removed. Unaccepted PS working edits are excluded. The historical81-path baseline remains unchanged.
+
+## Previous refresh after PR230: 2026-10-04
 
 PS main `fb3288934215dfa9a25114cf79ad86e60b5fb107` and TF main `06ad4f7c9b6847028cafdacf1ae55128d0f2d56c` each contain75 tracked blobs. The complete union is **83 paths:13 equal,54 different,8 PS-only and8 TF-only**. [Current raw identities and owners](results/A01/post230/post230-native-raw.json) retain every path; [A01 verification](results/A01/post230/parent-verification.json) independently checks the11 changed PS blobs and139 unchanged identities. No path was added or removed. The historical81-path baseline below remains a reference, not the current product inventory.
 
