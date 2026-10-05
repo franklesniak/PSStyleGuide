@@ -1,6 +1,6 @@
 {
-  "status": "pr234_round1_reviews_and_hosted_validation_pending",
-  "recorded_at": "2026-10-05T20:15:38.847180+00:00",
+  "status": "pr234_round1_findings_validation",
+  "recorded_at": "2026-10-05T20:33:34.132739+00:00",
   "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
   "base_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
   "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
@@ -411,20 +411,21 @@
     },
     {
       "service": "remote Codex",
-      "trigger": "PR opened",
-      "summary_comment": 6002108102,
+      "trigger": "manual post-Copilot review",
+      "comment": 6002212311,
       "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
-      "status": "running",
-      "manual_trigger_issued": false
+      "status": "confirmed_pending",
+      "prior_automatic_summary": 6002108102,
+      "prior_automatic_disposition": "Completed before manual trigger; no duplicated pending review."
     }
   ],
   "limits": [
     "No local Windows5.1 file execution: Restricted, no bypass.",
-    "No actual hosted Windows5.1/Windows7/Linux7 proof here.",
     "No native Linux/ext4 or BSD generator execution here.",
     "GNU/BSD/unknown stat probes and Windows acquisition substitutes are synthetic.",
     "Issue155 remains open; D92/D93 path publication/cleanup limitations remain.",
-    "Local final candidate passed; actual hosted platform logs, remote review results, independent final quality and normal landed acceptance are not yet accepted."
+    "Local final candidate passed; actual hosted platform logs, remote review results, independent final quality and normal landed acceptance are not yet accepted.",
+    "Actual hosted Windows5.1/Windows7 candidate proof is now recorded; Linux, whole-workflow and landed acceptance remain pending."
   ],
   "remaining": [
     "Reconcile issued remote reviews without duplicate pending requests; preserve round1 and original deadline.",
@@ -732,7 +733,7 @@
       "baseline": "round1-pre-ui-request.json",
       "baseline_sha256": "aacf1763446f96235dbbc585dec8c91d6628cfb2594f10f328b0e93fece43152",
       "copilot": {
-        "status": "confirmed_pending",
+        "status": "completed_with_findings",
         "effort_selected": "Balanced",
         "issued_at": "2026-10-05T20:12:24.969231+00:00",
         "channel_attempt": 1,
@@ -747,19 +748,255 @@
         ],
         "workflow_run": 37368361326,
         "workflow_created_at": "2026-10-05T20:13:09Z",
-        "observed_effort": null
+        "observed_effort": "Lite",
+        "observed_effort_source": "Authenticated review overview plus rendered PR timeline read by root",
+        "review_id": 5420127477,
+        "submitted_at": "2026-10-05T20:30:58Z",
+        "review_body_sha256": "06d21e02be02711c683f2938f7ab870af67b4bc2e4a3624432b0ed3764adb9b9",
+        "terminal_snapshot": "round1-progress-4.json",
+        "service_disposition": "Dynamic workflow37368361326 terminal failure; GitHub states full agentic suite unavailable. Actual Lite review completed with5 comments/4 distinct findings. Valid fallback; no effort-only retry."
       },
       "codex": {
-        "status": "automatic_review_pending_before_manual_trigger",
+        "status": "completed_clean",
         "summary_comment": 6002108102,
-        "manual_trigger_issued": false,
-        "note": "PR-opened remote Codex review is confirmed running on24b1879. Do not duplicate it while pending; reconcile terminal result before required post-Copilot trigger."
-      }
+        "manual_trigger_issued": true,
+        "note": "Required manual remote Codex result completed on exact candidate; automatic earlier result remains separate history.",
+        "automatic_terminal": {
+          "summary_comment": 6002108102,
+          "updated_at": "2026-10-05T20:13:50Z",
+          "snapshot": "round1-progress-1.json",
+          "body_sha256": "a2c12628a839fc9aca19a3727189ffe4e188056f137d254633708f3c2f8b4fde",
+          "disposition": "Authenticated PR-opened review completed on exact short head; no finding present in complete snapshot; manual required trigger follows terminal reconciliation."
+        },
+        "requested_at": "2026-10-05T20:18:24.285005+00:00",
+        "baseline": "round1-progress-1.json",
+        "request_body_sha256": "405eefe40c8cdef657297829bb05dce85c1281c9bf8a6d772986c3928c6b4473",
+        "channel_attempt": 1,
+        "transport_exit": 0,
+        "transport_stdout": "https://github.com/franklesniak/PSStyleGuide/pull/234#issuecomment-6002212311\n",
+        "transport_stderr": "",
+        "trigger_comment": 6002212311,
+        "trigger_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#issuecomment-6002212311",
+        "native_created_at": "2026-10-05T20:18:49Z",
+        "latest_summary": {
+          "comment": 6002108102,
+          "updated_at": "2026-10-05T20:19:04Z",
+          "body_sha256": "4454126680896b1804f2d4e6a9af803d9f49ab6369569377d71044f82796e679",
+          "snapshot": "round1-manual-confirmation.json"
+        },
+        "manual_terminal": {
+          "summary_comment": 6002108102,
+          "result_comment": 6002274286,
+          "result_created_at": "2026-10-05T20:23:28Z",
+          "snapshot": "round1-progress-3.json",
+          "summary_body_sha256": "25bb9ded3c0ce026f726f40503f0ae8ba13cd6a7f6b39932e4509a4118d1ca1d",
+          "result_body_sha256": "2dc52d787a590e1885ba9e99bfb016dbb45580dfd82e4dd01b91ce939af1a344",
+          "disposition": "Authenticated manual summary completed, new post-trigger exact-head clean comment, complete review/threads/comments collections contain no findings."
+        }
+      },
+      "findings": [
+        {
+          "id": "R2",
+          "comments": [
+            4188451021
+          ],
+          "subject": "Channel FileInfo length diagnostic",
+          "status": "writer_validating"
+        },
+        {
+          "id": "R3",
+          "comments": [
+            4188451094
+          ],
+          "subject": "Duplicated fixed platform identifiers",
+          "status": "writer_validating"
+        },
+        {
+          "id": "R4",
+          "comments": [
+            4188451151,
+            4188451200
+          ],
+          "subject": "Linux immutable acquisition environment and autocrlf",
+          "status": "writer_validating"
+        },
+        {
+          "id": "R5",
+          "comments": [
+            4188451256
+          ],
+          "subject": "Repeated generator output scans",
+          "status": "writer_validating"
+        }
+      ]
     }
   ],
   "A14_preparation": {
     "sha256": "2a5258039209cee7a82075142525614e38825fea1db23921db275b4d54beedc8",
     "evidence_sha256": "87de17b89dade792cc98f0d3555c06f1b1137d30e1f96be6a0faff02065128d3",
     "disposition": "No new supported defect; root read complete report and complete production generator/gate diffs. Retain D92/D93 and issue155 open. Reassess actual caller/storage facts after paired acceptance; no independent final-quality or race-closure credit."
+  },
+  "hosted_platform_progress": {
+    "source": "hosted-platform-jobs/initial-windows-proof.json",
+    "sha256": "c2a34c3a80ccfcbd82f94a5875b4c23619b6a0e03a6ee6902869f4a79a532630",
+    "observations": [
+      {
+        "job_id": 111958047322,
+        "name": "generator_windows_7",
+        "run_id": 37368079167,
+        "event": "pull_request",
+        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "passes": [
+          "Generator tests passed: 112 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+          "Generator tests passed: 112 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+        ],
+        "log_sha256": "736b016ff4492e93af63b8a1c85b7cb5edeaf8cd05fbfc90eddf5c0048f5c6ae"
+      },
+      {
+        "job_id": 111958046985,
+        "name": "generator_windows_51",
+        "run_id": 37368079167,
+        "event": "pull_request",
+        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "passes": [
+          "Generator tests passed: 112 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+          "Generator tests passed: 112 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+        ],
+        "log_sha256": "4be7c9d7bdadf063b8d2c6b71fe61812277bdc4f554d7302f36d9e01f6892391"
+      },
+      {
+        "job_id": 111957899736,
+        "name": "generator_windows_51",
+        "run_id": 37368034961,
+        "event": "push",
+        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "passes": [
+          "Generator tests passed: 112 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+          "Generator tests passed: 112 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+        ],
+        "log_sha256": "8c4a68c6cd6347596a3ad3ef4dd16fd11403faf8ec54571a2c8141f41143760f"
+      },
+      {
+        "job_id": 111957900174,
+        "name": "generator_windows_7",
+        "run_id": 37368034961,
+        "event": "push",
+        "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "passes": [
+          "Generator tests passed: 112 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+          "Generator tests passed: 112 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+        ],
+        "log_sha256": "b2a668f55ffd9c428c272111897a09952053d69b5862da597fc36df039a35add"
+      }
+    ],
+    "limits": "PR-head attribution; actual PR runs validate synthetic merge revision through immutable acquisition. Two passes in each cited cell verified. Linux, complete workflow and landed acceptance pending.",
+    "additional_evidence": "hosted-platform-jobs/111957900174/evidence.json"
+  },
+  "hosted_retries": [
+    {
+      "run_id": 37368078735,
+      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "prior_attempt": 1,
+      "request_at": "2026-10-05T20:30:02.112042+00:00",
+      "status": "confirmed_pending",
+      "method": "gh run rerun --failed",
+      "cause": "Authenticated runner acquisition failure; no executed job steps",
+      "evidence": "hosted-24b1879/37368078735/failure-evidence.json",
+      "transport_exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "observed_at": "2026-10-05T20:30:03.415169+00:00",
+      "observed_attempt": 1,
+      "observed_status": "queued",
+      "confirmation": "Terminal failure transitioned to queued after successful native re-run request. Attempt number may update after scheduling; do not repeat.",
+      "latest_observed_attempt": 2,
+      "latest_observed_status": "queued",
+      "reconciled_at": "2026-10-05T20:30:24.675064+00:00"
+    },
+    {
+      "run_id": 37368079022,
+      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "prior_attempt": 1,
+      "request_at": "2026-10-05T20:30:25.981701+00:00",
+      "status": "confirmed_pending",
+      "method": "gh run rerun --failed",
+      "cause": "Authenticated runner acquisition failure; no executed job steps",
+      "evidence": "hosted-24b1879/37368079022/failure-evidence.json",
+      "transport_exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "observed_at": "2026-10-05T20:30:27.264334+00:00",
+      "observed_attempt": 1,
+      "observed_status": "queued"
+    },
+    {
+      "run_id": 37368079015,
+      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "prior_attempt": 1,
+      "request_at": "2026-10-05T20:30:28.478032+00:00",
+      "status": "confirmed_pending",
+      "method": "gh run rerun --failed",
+      "cause": "Authenticated runner acquisition failure; no executed job steps",
+      "evidence": "hosted-24b1879/37368079015/failure-evidence.json",
+      "transport_exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "observed_at": "2026-10-05T20:30:29.699402+00:00",
+      "observed_attempt": 1,
+      "observed_status": "queued"
+    },
+    {
+      "run_id": 37368034970,
+      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "prior_attempt": 1,
+      "request_at": "2026-10-05T20:30:30.836224+00:00",
+      "status": "confirmed_pending",
+      "method": "gh run rerun --failed",
+      "cause": "Authenticated runner acquisition failure; no executed job steps",
+      "evidence": "hosted-24b1879/37368034970/failure-evidence.json",
+      "transport_exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "observed_at": "2026-10-05T20:30:32.152369+00:00",
+      "observed_attempt": 1,
+      "observed_status": "queued"
+    },
+    {
+      "run_id": 37368035031,
+      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "prior_attempt": 1,
+      "request_at": "2026-10-05T20:30:33.263605+00:00",
+      "status": "confirmed_pending",
+      "method": "gh run rerun --failed",
+      "cause": "Authenticated runner acquisition failure; no executed job steps",
+      "evidence": "hosted-24b1879/37368035031/failure-evidence.json",
+      "transport_exit": 0,
+      "stdout": "",
+      "stderr": "",
+      "observed_at": "2026-10-05T20:30:34.928414+00:00",
+      "observed_attempt": 1,
+      "observed_status": "queued"
+    }
+  ],
+  "hosted_terminal_observations": {
+    "snapshot": "round1-progress-3.json",
+    "successful_workflows": [
+      37368078826,
+      37368034957,
+      37368034937
+    ],
+    "setup_hooks": {
+      "passed": 11,
+      "skipped": 0,
+      "guard_step": "success"
+    },
+    "allocation_failures": [
+      37368078735,
+      37368079022,
+      37368079015,
+      37368034970,
+      37368035031
+    ],
+    "notes": "Root read terminal summaries/log evidence and exact failed-job annotations. All failed job steps absent, no runner assigned. Missing log collector error retained; per-attempt collector now preserves attempt identity and missing logs without fabricating success."
   }
 }
