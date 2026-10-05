@@ -1,5 +1,5 @@
 {
-  "status": "round10_clean_pair_final_quality_pending",
+  "status": "merged_landed_checks_pending",
   "captured_at": "2026-10-05T12:47:07.007729+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
@@ -3431,5 +3431,89 @@
       "path": "round10-native-gate-final.json",
       "sha256": "5ada8593d4e27dbf9bc14f2a7b11a93f5d807c106f522c3035bfbbc0ee9391b6"
     }
+  },
+  "merge": {
+    "requested_at": "2026-10-05T13:12:29.932750+00:00",
+    "method": "merge",
+    "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+    "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+    "gate_sha256": "9ecc7b485238fc9e159ec830ecf47e36b5cd2a3617de287930318e91ea8e8244",
+    "native_sha256": "6831213154c4b1eac3bd6f60638f91db12387b9fcd0d6966674a8580d0dafe43",
+    "exit": 0,
+    "response": {
+      "sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+      "merged": true,
+      "message": "Pull Request successfully merged"
+    },
+    "sha": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "parents": [
+      "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "86f35f47cfc744780c4c419912fcdae06fdd6f83"
+    ],
+    "merged_at": "2026-10-05T13:12:25Z",
+    "verified_at": "2026-10-05T13:12:34.869869+00:00"
+  },
+  "final_quality": {
+    "result": "passed_no_material_finding",
+    "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+    "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "tree": "2cf6900441e7a64d2248769e6b9159caa48cc313",
+    "body_sha256": "7221c071ff008d322c0f066b17d43b9fc2f5f44eeb98295f3a74643404015e6c",
+    "report": "ps232-round10-final-quality.md",
+    "source_report_sha256": "5e96e652ac1611e48404a9ef8e4685d8abfad2de051d78f9e9b46bb4a419af5c",
+    "evidence_sha256": "1d8e6b29860fcbcf8f708f99ce35487c9f3d05469d69774815a1dc6e56b206d0",
+    "native_snapshot_sha256": "fdddca93bdeb50af1ce3a0915505d049283034e209cd9903f25a529b5356004b",
+    "native_gate_sha256": "5ada8593d4e27dbf9bc14f2a7b11a93f5d807c106f522c3035bfbbc0ee9391b6",
+    "admitted_service_cancellations": [
+      {
+        "round": 5,
+        "run_id": 37296746380,
+        "review_id": 5413289214,
+        "reason": "native_service_deadline_with_valid_lite_result",
+        "summary_sha256": "a499bc279199a0d718b65d87e882c59206baa62cce73b893fbeb8fc9d6912e01"
+      },
+      {
+        "round": 6,
+        "run_id": 37299688603,
+        "review_id": 5413616728,
+        "reason": "native_service_deadline_with_valid_lite_result",
+        "summary_sha256": "5b9fc77354fe9a3c4c81ea08e76759b952bf7846cc00e02e4f055fc3c876c2ed"
+      },
+      {
+        "round": 7,
+        "run_id": 37303115319,
+        "review_id": 5413989631,
+        "reason": "native_service_deadline_with_valid_lite_result",
+        "summary_sha256": "5ac8c3420acd67b597f0317c794ace2c7124011e7d6ad654ad26706bf6dba1dc"
+      },
+      {
+        "round": 8,
+        "run_id": 37306286348,
+        "review_id": 5414329909,
+        "reason": "native_service_deadline_with_valid_lite_result",
+        "summary_sha256": "b094069984d0e15b6b8a0d0a13fb4dd51a3b2e07750f26e99e831958a26bed73"
+      },
+      {
+        "round": 9,
+        "run_id": 37309257514,
+        "review_id": 5414623091,
+        "reason": "native_service_deadline_with_valid_lite_result",
+        "summary_sha256": "a9184e9c9b929811248d5cfd10203fadf86edaf9b545e6ed7dbd40254767b3ee"
+      }
+    ]
+  },
+  "landed_validation": {
+    "status": "pending",
+    "snapshot": "round10-landed-1313.json",
+    "passed_run_ids": [
+      37315027178
+    ],
+    "pending_run_ids": [
+      37315027313,
+      37315027166,
+      37315027327,
+      37315027168
+    ]
   }
 }
