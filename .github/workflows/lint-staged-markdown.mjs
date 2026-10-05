@@ -105,11 +105,13 @@ try {
 }
 
 let exitCode;
+let markdownlintConfig;
 
 try {
   const require = createRequire(import.meta.url);
-  const { lintOuterMarkdownContents } = require('./lint-nested-markdown.js');
-  const markdownlintExitCode = await lintOuterMarkdownContents(repoRoot, stagedMarkdownInputs);
+  const { lintOuterMarkdownContents, loadMarkdownlintConfig } = require('./lint-nested-markdown.js');
+  markdownlintConfig = loadMarkdownlintConfig(repoRoot);
+  const markdownlintExitCode = await lintOuterMarkdownContents(repoRoot, stagedMarkdownInputs, markdownlintConfig);
   exitCode = normalizeMarkdownlintExitCode(markdownlintExitCode);
   if (exitCode === exitStatus.toolingFailure) {
     console.error('pre-commit: Markdown lint tooling returned an unexpected exit status.');
@@ -135,7 +137,7 @@ if (exitCode === exitStatus.lintFailure) {
     } = require('./lint-nested-markdown.js');
     const { totalBlocks, allResults } = lintNestedMarkdownContents(
       stagedMarkdownInputs,
-      undefined,
+      markdownlintConfig,
       console.log
     );
     console.log(`\nTotal nested Markdown blocks found: ${totalBlocks}\n`);

@@ -33,7 +33,7 @@
 # None. The script throws when a self-test fails.
 #
 # .NOTES
-# Version: 1.8.20261003.0
+# Version: 1.8.20261005.0
 
 [CmdletBinding(PositionalBinding = $false)]
 [OutputType([void])]
@@ -2269,6 +2269,208 @@ function Assert-GitRevisionTextSelfTest {
     }
 }
 
+function Assert-PublishedBaselineCapacitySelfTest {
+    # .SYNOPSIS
+    # Separates current instruction capacity from complete historical metadata.
+    #
+    # .DESCRIPTION
+    # Uses real regular Git blobs for both parent callers and exact bound,
+    # path, mode, encoding and metadata-version negative controls.
+    #
+    # .PARAMETER MaximumMetadataUtcDate
+    # The trusted current date used in the metadata transition fixture.
+    #
+    # .EXAMPLE
+    # Assert-PublishedBaselineCapacitySelfTest -MaximumMetadataUtcDate '2026-10-04'
+    #
+    # # Throws if historical compatibility weakens current admission.
+    #
+    # .INPUTS
+    # None. No pipeline input.
+    #
+    # .OUTPUTS
+    # None. Failed controls throw.
+    #
+    # .NOTES
+    # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
+    # Positional parameters are disabled; callers use named arguments.
+    # Version: 1.0.20261005.0
+    [CmdletBinding(PositionalBinding = $false)]
+    [OutputType([void])]
+    param([Parameter(Mandatory)][string] $MaximumMetadataUtcDate)
+
+    $strTempRoot = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
+    $strFixtureRoot = [IO.Path]::Combine($strTempRoot, 'agent-parent-capacity-' + [Guid]::NewGuid().ToString('N'))
+    [void][IO.Directory]::CreateDirectory($strFixtureRoot)
+    $strEmptyHooks = [IO.Path]::Combine($strFixtureRoot, 'empty-hooks')
+    [void][IO.Directory]::CreateDirectory($strEmptyHooks)
+    $strHeader = "# Historical instructions`n`n**Version:** 1.7.20261001.0`n`n## Metadata`n`n- **Status:** Active`n- **Owner:** Fixture`n- **Last Updated:** 2026-10-01`n- **Scope:** Parent comparison.`n`n## Procedure`n`n"
+    $strParent = $strHeader + ('x' * (65536 - [Text.Encoding]::UTF8.GetByteCount($strHeader)))
+    try {
+        & git -C $strFixtureRoot -c "init.templateDir=$strEmptyHooks" init --quiet
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Parent capacity fixture initialization failed.'
+        }
+        foreach ($strPath in @('AGENTS.md', 'OTHER.md')) {
+            [IO.File]::WriteAllText([IO.Path]::Combine($strFixtureRoot, $strPath), $strParent, [Text.UTF8Encoding]::new($false))
+        }
+        & git -C $strFixtureRoot -c core.autocrlf=false add --all
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Parent capacity fixture indexing failed.'
+        }
+        $strParentBlob = [string](& git -C $strFixtureRoot hash-object -- AGENTS.md)
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Parent capacity blob lookup failed.'
+        }
+        & git -C $strFixtureRoot update-index --add --cacheinfo "100644,$($strParentBlob.Trim()),agents.md"
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Case-variant parent fixture indexing failed.'
+        }
+        & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+            -c commit.gpgsign=false -c "core.hooksPath=$strEmptyHooks" commit --quiet --no-gpg-sign --message=parent
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Parent capacity fixture commit failed.'
+        }
+        $strRevision = [string](& git -C $strFixtureRoot rev-parse HEAD)
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Parent capacity revision lookup failed.'
+        }
+        $strRevision = $strRevision.Trim()
+        $strCurrent = $strHeader.Replace('2026-10-01', $MaximumMetadataUtcDate).Replace('20261001', $MaximumMetadataUtcDate.Replace('-', '')) + "Current procedure.`n"
+        [IO.File]::WriteAllText([IO.Path]::Combine($strFixtureRoot, 'AGENTS.md'), $strCurrent, [Text.UTF8Encoding]::new($false))
+        $strExplicitParent = Read-PublishedBaselineDocumentText -RepositoryRootPath $strFixtureRoot `
+            -Revision $strRevision -RepositoryRelativePath 'AGENTS.md' -CurrentMaximumBytes 32768
+        $objLocalParent = Get-PublishedBaselineDocumentContext -RepositoryRootPath $strFixtureRoot `
+            -RepositoryRelativePath 'AGENTS.md' -MaximumBytes 32768
+        if ($strExplicitParent -cne $strParent -or $objLocalParent.ParentContent -cne $strParent -or
+            -not $objLocalParent.IsWorktreeTransition -or $objLocalParent.ExpectedUtcDate -cne $MaximumMetadataUtcDate) {
+            throw 'Complete historical metadata did not survive both parent callers.'
+        }
+        if (@(Get-PublishedEndpointMetadataFailure -Name 'AGENTS.md' -CurrentContent $strCurrent `
+                    -ParentContent $strExplicitParent -ExpectedUtcDate $MaximumMetadataUtcDate -IsNewDocumentTransition $false).Count -ne 0) {
+            throw 'Valid shrinking metadata transition was rejected.'
+        }
+        foreach ($objCase in @(
+                @{ Current = $strCurrent.Replace('1.7.', '0.7.'); Parent = $strExplicitParent },
+                @{ Current = $strCurrent; Parent = $strExplicitParent.Replace('2026-10-01', 'invalid-date') }
+            )) {
+            if (@(Get-PublishedEndpointMetadataFailure -Name 'AGENTS.md' -CurrentContent $objCase.Current `
+                        -ParentContent $objCase.Parent -ExpectedUtcDate $MaximumMetadataUtcDate -IsNewDocumentTransition $false).Count -eq 0) {
+                throw 'Historical compatibility discarded a real parent metadata failure.'
+            }
+        }
+        foreach ($objCase in @(
+                @{ Path = 'OTHER.md'; Failure = 'must not exceed 32768' },
+                @{ Path = 'agents.md'; Failure = 'must not exceed 32768' },
+                @{ Path = 'missing.md'; Failure = 'not one regular 100644 blob' }
+            )) {
+            $boolRejected = $false
+            try {
+                $null = Read-PublishedBaselineDocumentText -RepositoryRootPath $strFixtureRoot `
+                    -Revision $strRevision -RepositoryRelativePath $objCase.Path -CurrentMaximumBytes 32768
+            } catch {
+                if ($_.Exception.Message -notmatch $objCase.Failure) {
+                    throw
+                }
+                $boolRejected = $true
+            }
+            if (-not $boolRejected) {
+                throw "Historical capacity expanded another path: $($objCase.Path)"
+            }
+        }
+        # The current revision reader still rejects the larger historical blob.
+        $boolCurrentRejected = $false
+        try {
+            $null = Read-GitRevisionText -RepositoryRootPath $strFixtureRoot -Revision $strRevision `
+                -RepositoryRelativePath 'AGENTS.md' -MaximumBytes $intAgentsMaximumInputBytes -RequireRegularFile
+        } catch {
+            if ($_.Exception.Message -notmatch 'must not exceed 32768') {
+                throw
+            }
+            $boolCurrentRejected = $true
+        }
+        if (-not $boolCurrentRejected) {
+            throw 'Historical capacity widened the current instruction reader.'
+        }
+        # Remove the case-only index alias before changing the Windows worktree file.
+        & git -C $strFixtureRoot update-index --force-remove -- agents.md
+        if ($LASTEXITCODE -ne 0) {
+            throw 'Case-variant parent fixture cleanup failed.'
+        }
+        foreach ($strMode in @('current-overflow', 'parent-overflow', 'invalid-utf8', 'executable')) {
+            [byte[]] $arrBytes = if ($strMode -ceq 'invalid-utf8') {
+                [byte[]]@(255)
+            } else {
+                [Text.Encoding]::UTF8.GetBytes('x' * $(if ($strMode -ceq 'parent-overflow') { 65537 } else { 32769 }))
+            }
+            [IO.File]::WriteAllBytes([IO.Path]::Combine($strFixtureRoot, 'AGENTS.md'), $arrBytes)
+            & git -C $strFixtureRoot -c core.autocrlf=false add -- AGENTS.md
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Capacity negative fixture indexing failed.'
+            }
+            if ($strMode -ceq 'executable') {
+                & git -C $strFixtureRoot update-index --chmod=+x -- AGENTS.md
+                if ($LASTEXITCODE -ne 0) {
+                    throw 'Capacity negative fixture mode setup failed.'
+                }
+            }
+            & git -C $strFixtureRoot -c user.name=Fixture -c user.email=fixture@example.invalid `
+                -c commit.gpgsign=false -c "core.hooksPath=$strEmptyHooks" commit --quiet --no-gpg-sign --message=$strMode
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Capacity negative fixture commit failed.'
+            }
+            $strNegativeRevision = [string](& git -C $strFixtureRoot rev-parse HEAD)
+            if ($LASTEXITCODE -ne 0) {
+                throw 'Capacity negative revision lookup failed.'
+            }
+            $strNegativeRevision = $strNegativeRevision.Trim()
+            $intBlobSize = [int](& git -C $strFixtureRoot cat-file -s "${strNegativeRevision}:AGENTS.md")
+            if ($LASTEXITCODE -ne 0 -or $intBlobSize -ne $arrBytes.Length) {
+                throw 'Capacity negative fixture did not publish the intended raw bytes.'
+            }
+            $boolRejected = $false
+            try {
+                if ($strMode -ceq 'current-overflow') {
+                    $null = Read-RepositoryInputData -RepositoryRootPath $strFixtureRoot `
+                        -Path ([IO.Path]::Combine($strFixtureRoot, 'AGENTS.md')) -RepositoryRelativePath 'AGENTS.md' `
+                        -DisplayName 'current AGENTS.md' -MaximumBytes $intAgentsMaximumInputBytes -RequireIndexContentMatch
+                } else {
+                    $null = Read-PublishedBaselineDocumentText -RepositoryRootPath $strFixtureRoot `
+                        -Revision $strNegativeRevision -RepositoryRelativePath 'AGENTS.md' -CurrentMaximumBytes 32768
+                }
+            } catch {
+                $strExpected = switch ($strMode) {
+                    'current-overflow' {
+                        'must not exceed 32768'
+                    }
+                    'parent-overflow' {
+                        'must not exceed 65536'
+                    }
+                    'invalid-utf8' {
+                        'UTF-8'
+                    }
+                    'executable' {
+                        'not one regular 100644 blob'
+                    }
+                }
+                if ($_.Exception.Message -notmatch $strExpected) {
+                    throw
+                }
+                $boolRejected = $true
+            }
+            if (-not $boolRejected) {
+                throw "Historical capacity negative control was accepted: $strMode"
+            }
+        }
+    } finally {
+        $strResolvedFixtureRoot = [IO.Path]::GetFullPath($strFixtureRoot)
+        if ($strResolvedFixtureRoot.StartsWith($strTempRoot, [StringComparison]::OrdinalIgnoreCase) -and
+            $strResolvedFixtureRoot -cne $strTempRoot -and [IO.Directory]::Exists($strResolvedFixtureRoot)) {
+            Remove-Item -LiteralPath $strResolvedFixtureRoot -Recurse -Force
+        }
+    }
+}
+
 function Assert-AgentSetupSelfTest {
     # .SYNOPSIS
     # Tests actual setup inputs, finite contracts and staged-reader closure.
@@ -2295,7 +2497,7 @@ function Assert-AgentSetupSelfTest {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20261003.0
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([void])]
     param([Parameter(Mandatory)][string] $RepositoryRootPath)
@@ -2325,6 +2527,8 @@ function Assert-AgentSetupSelfTest {
             ,@('package.json', '"devDependencies": {', '"devDependencies": {"markdownlint":"0.41.1",', 'must not declare direct markdownlint')
             ,@('package.json', '"devDependencies": {', '"devDependencies": {"markdownlint-cli2":"0.23.2",', 'must not declare direct markdownlint-cli2')
             ,@('.github/workflows/package.json', 'node lint-markdown.mjs', 'node lint-nested-markdown.js --outer', 'Setup package command')
+            ,@('.github/workflows/package.json', '"lint:md:nested": "node lint-nested-markdown.js",', '', 'Setup package command.*\.github/workflows/package\.json scripts\.lint:md:nested')
+            ,@('.github/workflows/package.json', 'node lint-nested-markdown.js', 'node -e 0', 'Setup package command.*\.github/workflows/package\.json scripts\.lint:md:nested')
             ,@('.github/workflows/package.json', 'node install-husky.mjs', 'node install-husky.mjs || true', 'Setup package command')
             ,@('.husky/pre-commit', " '*.mdc'", '', 'reviewed guard/lint phase')
             ,@('.husky/pre-commit', '--diff-filter=ACMR', '--diff-filter=ACM', 'reviewed guard/lint phase')
@@ -2821,6 +3025,7 @@ Assert-AgentSetupSelfTest -RepositoryRootPath $RepositoryRootPath
 Assert-StagedInputSelfTest
 Assert-ApplicationRuntimeSelfTest
 Assert-GitRevisionTextSelfTest
+Assert-PublishedBaselineCapacitySelfTest -MaximumMetadataUtcDate $MaximumMetadataUtcDate
 Assert-DocumentMetadataClassificationSelfTest -MaximumMetadataUtcDate $MaximumMetadataUtcDate
 Assert-OptionalMetadataSelfTest -MaximumMetadataUtcDate $MaximumMetadataUtcDate
 Assert-DocumentMetadataPlacementSelfTest -RepositoryRootPath $RepositoryRootPath -MaximumMetadataUtcDate $MaximumMetadataUtcDate
@@ -3013,7 +3218,7 @@ function ConvertTo-CreatedPushCommitEvidenceObject {
     # PRIVATE/INTERNAL HELPER - This function is not part of the public API.
     # Parameters, return shape, and positional contract can change without notice.
     # Positional parameters are disabled; internal callers use named arguments.
-    # Version: 1.0.20260914.0.
+    # Version: 1.0.20261005.0
     [CmdletBinding(PositionalBinding = $false)]
     [OutputType([pscustomobject])]
     param(

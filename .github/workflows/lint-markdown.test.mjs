@@ -10,7 +10,7 @@ import { runBounded } from './NpmTools.mjs';
 
 const source = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
-const { lintOuterMarkdownContents, lintNestedMarkdownContents, validateMarkdownInput } = require('./lint-nested-markdown.js');
+const { lintOuterMarkdownContents, lintNestedMarkdownContents, loadMarkdownlintConfig, validateMarkdownInput } = require('./lint-nested-markdown.js');
 const clean = '# Example\n\nClean text.\n';
 const invalid = '# Broken\ntext\n';
 const nestedInvalid = '# Example\n\n```markdown\n# Broken\ntext\n```\n';
@@ -28,7 +28,7 @@ function fixture() {
   return root;
 }
 function remove(root) {
-  assert.equal(path.dirname(root), fs.realpathSync(os.tmpdir()));
+  assert.equal(fs.realpathSync(path.dirname(root)), fs.realpathSync(os.tmpdir()));
   assert.ok(path.basename(root).startsWith('markdown-tool-test-'));
   fs.rmSync(root, { recursive: true });
 }
@@ -61,6 +61,46 @@ test('empty discovery deliberately succeeds through the actual outer child', () 
   const root = fixture();
   try { expect(run(root), 0, /Found 0 Markdown file/u); }
   finally { remove(root); }
+});
+
+for (const [order, contents] of [['invalid then clean', [invalid, clean]], ['clean then invalid', [clean, invalid]]]) {
+  test(`outer API rejects conflicting repeated labels: ${order}`, async t => {
+    const root = fixture(), diagnostics = [];
+    t.mock.method(console, 'error', (...args) => diagnostics.push(args.join(' ')));
+    try {
+      await assert.rejects(lintOuterMarkdownContents(root, contents.map(content => ({ filePath: 'same.md', content }))), error => {
+        assert.match(error.message, /Conflicting outer Markdown inputs/u);
+        assert.ok(error.message.includes('same.md'));
+        return true;
+      });
+      assert.deepEqual(diagnostics, []);
+    } finally { remove(root); }
+  });
+}
+
+for (const [name, content, status] of [['clean', clean, 0], ['invalid', invalid, 1]]) {
+  test(`outer API preserves lint results for identical repeated labels: ${name}`, async t => {
+    const root = fixture(), diagnostics = [];
+    t.mock.method(console, 'error', (...args) => diagnostics.push(args.join(' ')));
+    try {
+      assert.equal(await lintOuterMarkdownContents(root, [{ filePath: 'same.md', content }, { filePath: 'same.md', content }]), status);
+      if (status === 1) assert.match(diagnostics.join('\n'), /same\.md:.*MD022/u);
+      else assert.deepEqual(diagnostics, []);
+    } finally { remove(root); }
+  });
+}
+
+test('outer API preserves distinct case-sensitive labels and their diagnostics', async t => {
+  const root = fixture(), diagnostics = [];
+  t.mock.method(console, 'error', (...args) => diagnostics.push(args.join(' ')));
+  try {
+    assert.equal(await lintOuterMarkdownContents(root, [{ filePath: 'same.md', content: invalid }, { filePath: 'SAME.md', content: clean }]), 1);
+    assert.match(diagnostics.join('\n'), /same\.md:.*MD022/u);
+    assert.ok(diagnostics.every(message => !message.startsWith('SAME.md:')));
+    diagnostics.length = 0;
+    assert.equal(await lintOuterMarkdownContents(root, [{ filePath: 'same.md', content: clean }, { filePath: 'SAME.md', content: clean }]), 0);
+    assert.deepEqual(diagnostics, []);
+  } finally { remove(root); }
 });
 
 test('JSONC strings/comments, configured rules and JSON fallback agree in child and API', async () => {
@@ -215,3 +255,219 @@ test('real leaf/ancestor escape and nonregular paths are refused before reads', 
     }
   } finally { remove(root); fs.rmSync(outside, { recursive: true }); }
 });
+
+for (const kind of ['regular', 'leaf-inside', 'leaf-outside', 'directory', 'missing', 'broken-link', 'ancestor-outside', 'ancestor-inside', 'root-alias']) {
+  test(`actual outer child execution boundary: ${kind}`, async () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'markdown-tool-test-'));
+    fs.mkdirSync(path.join(root, '.github/workflows'), { recursive: true });
+    write(root, 'package.json', JSON.stringify({ engines: { node: process.versions.node } }));
+    const outside = `${root}-outside`, alias = `${root}-alias`;
+    const directoryLink = process.platform === 'win32' ? 'junction' : 'dir';
+    const marker = path.join(root, 'child-executed');
+    let suppliedRoot = root;
+    fs.mkdirSync(outside);
+    try {
+      const child = path.join(root, '.github/workflows/lint-nested-markdown.js');
+      fs.writeFileSync(child, `require('node:fs').writeFileSync(${JSON.stringify(marker)}, 'executed');`);
+      if (kind.startsWith('leaf-')) {
+        const target = path.join(kind === 'leaf-inside' ? root : outside, 'child.cjs');
+        fs.renameSync(child, target); fs.symlinkSync(target, child, 'file');
+      } else if (kind === 'directory' || kind === 'missing' || kind === 'broken-link') {
+        fs.unlinkSync(child);
+        if (kind === 'directory') fs.mkdirSync(child);
+        if (kind === 'broken-link') fs.symlinkSync(path.join(outside, 'absent.cjs'), child, 'file');
+      } else if (kind.startsWith('ancestor-')) {
+        const destination = path.join(kind === 'ancestor-inside' ? root : outside, 'relocated-workflows');
+        fs.renameSync(path.dirname(child), destination);
+        fs.symlinkSync(destination, path.dirname(child), directoryLink);
+      } else if (kind === 'root-alias') {
+        fs.symlinkSync(root, alias, directoryLink); suppliedRoot = alias;
+      }
+      const accepted = ['regular', 'ancestor-inside', 'root-alias'].includes(kind);
+      if (accepted) {
+        assert.equal(await lintMarkdownFiles(suppliedRoot), 0);
+        assert.equal(fs.readFileSync(marker, 'utf8'), 'executed');
+      } else {
+        const failure = ['missing', 'broken-link'].includes(kind) ? /ENOENT|regular outer child/u : kind === 'ancestor-outside' ? /outside the repository/u : /regular outer child/u;
+        const error = await lintMarkdownFiles(suppliedRoot).then(() => null, failure => failure);
+        assert.equal(fs.existsSync(marker), false, 'Rejected child must not execute.');
+        assert.ok(error instanceof Error, 'Invalid child must report a tooling error.');
+        assert.match(error.message, failure);
+      }
+    } finally {
+      if (fs.existsSync(alias)) fs.unlinkSync(alias);
+      remove(root);
+      fs.rmSync(outside, { recursive: true });
+    }
+  });
+}
+
+for (const [name, content, code, line, column, count] of [
+  ['LF', '{\n "default" true\n}', 'ColonExpected', 2, 12, 1],
+  ['CRLF', '{\r\n "default":\r\n}', 'ValueExpected', 3, 1, 1],
+  ['CR', '{\r "default":\r}', 'ValueExpected', 3, 1, 1],
+  ['UTF-16', '{ "name":"😀", "default" true }', 'ColonExpected', 1, 26, 1],
+  ['multiple', '{ "a":, "b":, "c": }', 'ValueExpected', 1, 7, 3],
+]) {
+  test(`JSONC diagnostics preserve first native position and count: ${name}`, () => {
+    const root = fixture();
+    try {
+      const file = write(root, '.github/workflows/.markdownlint.jsonc', content);
+      assert.throws(() => loadMarkdownlintConfig(root), error => {
+        assert.ok(error.message.includes(file));
+        assert.equal(error.message.match(new RegExp(code, 'gu'))?.length, 1);
+        const location = /line (\d+), UTF-16 column (\d+); (\d+) parse error/u.exec(error.message);
+        assert.ok(location, error.message);
+        assert.deepEqual(location.slice(1).map(Number), [line, column, count]);
+        return true;
+      });
+    } finally { remove(root); }
+  });
+}
+
+test('JSONC diagnostics bound added detail and do not disclose source contents', () => {
+  const root = fixture(), marker = 'PRIVATE_CONFIG_SOURCE_MARKER';
+  try {
+    const file = path.join(root, '.github/workflows/.markdownlint.jsonc');
+    for (const content of [`/*${marker}${'x'.repeat(900000)}*/\n{"default":}`,
+      `{${Array.from({ length: 500 }, (_, index) => `"${marker}${index}":`).join(',')}}`]) {
+      fs.writeFileSync(file, content);
+      assert.throws(() => loadMarkdownlintConfig(root), error => {
+        assert.match(error.message, /ValueExpected/u);
+        assert.match(error.message, /\bline \d+, UTF-16 column \d+; (?:1|500) parse error/u);
+        assert.equal(error.message.includes(marker), false);
+        assert.ok(error.message.length < file.length + 200);
+        assert.equal(error.message.match(/ValueExpected/gu)?.length, 1);
+        return true;
+      });
+    }
+    fs.writeFileSync(file, ' '.repeat(1024 * 1024 + 1));
+    assert.throws(() => loadMarkdownlintConfig(root), /exceeds one MiB/u);
+  } finally { remove(root); }
+});
+
+test('JSONC diagnostics retain separate semantic rejection and valid-object acceptance', () => {
+  const root = fixture();
+  try {
+    const file = path.join(root, '.github/workflows/.markdownlint.jsonc');
+    for (const content of ['[]', 'null', 'true', '1', '"text"']) {
+      fs.writeFileSync(file, content);
+      assert.throws(() => loadMarkdownlintConfig(root), error => {
+        assert.match(error.message, /Invalid Markdown lint configuration/u);
+        assert.doesNotMatch(error.message, /parse error|UTF-16 column/u);
+        return true;
+      });
+    }
+    fs.writeFileSync(file, '{"default":true}');
+    assert.equal(loadMarkdownlintConfig(root).default, true);
+  } finally { remove(root); }
+});
+
+test('JSONC diagnostics reach outer staged and nested CLI failure paths', () => {
+  const root = fixture();
+  try {
+    git(root, 'init', '--quiet');
+    write(root, 'example.md', clean); git(root, 'add', '--', 'example.md');
+    write(root, '.github/workflows/.markdownlint.jsonc', '{\n "default" true\n}');
+    for (const name of ['lint-markdown.mjs', 'lint-staged-markdown.mjs', 'lint-nested-markdown.js']) {
+      const output = expect(run(root, name), 2, /ColonExpected/u);
+      assert.match(output, /line 2, UTF-16 column 12; 1 parse error/u);
+    }
+  } finally { remove(root); }
+});
+
+test('staged invocation scans configuration once and enforces configured outer and nested rules', () => {
+  const root = fixture();
+  try {
+    git(root, 'init', '--quiet');
+    write(root, '.github/workflows/.markdownlint.jsonc', '{"default":false,"MD013":{"line_length":20,"code_blocks":false}}');
+    const counts = path.join(root, 'config-scans.txt');
+    const preload = write(root, '.github/workflows/observe-glob.cjs', `
+const fs = require('node:fs'), Module = require('node:module');
+const original = Module._load;
+Module._load = function(name, ...args) {
+  const loaded = original.call(this, name, ...args);
+  if (name !== 'glob') return loaded;
+  return { ...loaded, globSync(...parameters) {
+    if (parameters[0] === '**/.markdownlint*') fs.appendFileSync(process.env.LINT_TEST_SCANS, 'scan\\n');
+    return loaded.globSync(...parameters);
+  } };
+};
+`);
+    const invoke = () => {
+      fs.writeFileSync(counts, '');
+      const result = runBounded(process.execPath, ['--require', preload, path.join(root, '.github/workflows/lint-staged-markdown.mjs')],
+        { cwd: root, env: { ...process.env, LINT_TEST_SCANS: counts } });
+      assert.equal(fs.readFileSync(counts, 'utf8'), 'scan\n', 'One real configuration discovery per staged invocation.');
+      return result;
+    };
+    for (const [content, status, diagnostic] of [
+      ['Plain text.\n\n```markdown\nPlain snippet.\n```\n', 0, /Total nested Markdown blocks found: 1/u],
+      ['# Valid\n\n' + 'long text '.repeat(4).trim() + '\n', 1, /MD013/u],
+      ['# Valid\n\n```markdown\n' + 'long text '.repeat(4).trim() + '\n```\n', 1, /MD013[\s\S]*Nested Markdown lint failed/u],
+    ]) {
+      write(root, 'example.md', content); git(root, 'add', '--', 'example.md');
+      expect(invoke(), status, diagnostic);
+    }
+    write(root, 'deep/selector/.markdownlint.json', '{"default":false}');
+    expect(invoke(), 2, /Unsupported Markdown lint configuration/u);
+  } finally { remove(root); }
+});
+
+test('independent default API calls reload rules and reject newly introduced selectors', async t => {
+  const root = fixture();
+  t.mock.method(console, 'error', () => {});
+  try {
+    const api = require(path.join(root, '.github/workflows/lint-nested-markdown.js'));
+    const outer = [{ filePath: 'example.md', content: invalid }];
+    const nested = [{ filePath: 'example.md', content: nestedInvalid }];
+    write(root, '.github/workflows/.markdownlint.jsonc', '{"default":false,"MD022":true}');
+    assert.equal(await api.lintOuterMarkdownContents(root, outer), 1);
+    assert.equal(api.lintNestedMarkdownContents(nested).allResults.length, 1);
+    write(root, '.github/workflows/.markdownlint.jsonc', '{"default":false}');
+    assert.equal(await api.lintOuterMarkdownContents(root, outer), 0);
+    assert.equal(api.lintNestedMarkdownContents(nested).allResults.length, 0);
+    write(root, 'deep/selector/.markdownlint.json', '{"default":false}');
+    await assert.rejects(api.lintOuterMarkdownContents(root, outer), /Unsupported Markdown lint configuration/u);
+    assert.throws(() => api.lintNestedMarkdownContents(nested), /Unsupported Markdown lint configuration/u);
+  } finally { remove(root); }
+});
+// These controls use a real bounded child and observable execution markers.
+for (const kind of ['regular', 'root-alias', 'leaf-inside', 'leaf-outside', 'broken-link', 'directory', 'missing', 'malformed', 'wrong-version', 'one-mib', 'over-one-mib']) {
+  test(`actual root manifest execution boundary: ${kind}`, async () => {
+    const root = fixture(), outside = `${root}-outside`, alias = `${root}-alias`;
+    const manifest = path.join(root, 'package.json'), marker = path.join(root, 'manifest-child-executed');
+    const value = JSON.stringify({ engines: { node: process.versions.node } });
+    let selectedRoot = root;
+    fs.mkdirSync(outside);
+    try {
+      write(root, '.github/workflows/lint-nested-markdown.js', `require('node:fs').writeFileSync(${JSON.stringify(marker)}, 'executed');`);
+      if (kind.startsWith('leaf-')) {
+        const target = path.join(kind === 'leaf-inside' ? root : outside, 'manifest.json');
+        fs.renameSync(manifest, target); fs.symlinkSync(target, manifest, 'file');
+      } else if (['broken-link', 'directory', 'missing'].includes(kind)) {
+        fs.unlinkSync(manifest);
+        if (kind === 'broken-link') fs.symlinkSync(path.join(outside, 'missing.json'), manifest, 'file');
+        if (kind === 'directory') fs.mkdirSync(manifest);
+      } else if (kind === 'root-alias') {
+        fs.symlinkSync(root, alias, process.platform === 'win32' ? 'junction' : 'dir'); selectedRoot = alias;
+      } else if (kind === 'malformed') fs.writeFileSync(manifest, '{');
+      else if (kind === 'wrong-version') fs.writeFileSync(manifest, '{"engines":{"node":"0.0.0"}}');
+      else if (kind === 'one-mib' || kind === 'over-one-mib') fs.writeFileSync(manifest, value.padEnd(1024 * 1024 + (kind === 'over-one-mib' ? 1 : 0), ' '));
+      const accepted = ['regular', 'root-alias', 'one-mib'].includes(kind);
+      if (accepted) {
+        assert.equal(await lintMarkdownFiles(selectedRoot), 0);
+        assert.equal(fs.readFileSync(marker, 'utf8'), 'executed');
+        fs.unlinkSync(marker);
+      } else {
+        await assert.rejects(lintMarkdownFiles(selectedRoot));
+        assert.equal(fs.existsSync(marker), false);
+      }
+      expect(run(selectedRoot), accepted ? 0 : 2, accepted ? undefined : /Markdown lint tooling:/u);
+      assert.equal(fs.existsSync(marker), accepted);
+    } finally {
+      if (fs.existsSync(alias)) fs.unlinkSync(alias);
+      remove(root); remove(outside);
+    }
+  });
+}

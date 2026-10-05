@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkInstallInputs, runBounded, safeNpmEnvironment, withNpmEnvironment } from './NpmTools.mjs';
 
 test('every npm configuration spelling is removed before the first npm child', () => {
@@ -44,7 +44,7 @@ function inputFixture() {
 }
 
 function removeFixture(root) {
-  assert.equal(path.dirname(root), fs.realpathSync(os.tmpdir()));
+  assert.equal(fs.realpathSync(path.dirname(root)), fs.realpathSync(os.tmpdir()));
   assert.ok(path.basename(root).startsWith('npm-input-test-'));
   fs.rmSync(root, { recursive: true });
 }
@@ -207,3 +207,49 @@ test('actual hook child failure exposes stderr and cannot claim setup success', 
     assert.doesNotMatch(result.stdout.toString(), /Locked tools installed/u);
   } finally { removeFixture(root); }
 });
+
+const entryModules = [
+  ['lint-markdown.mjs', 2, /Usage: node .*lint-markdown\.mjs/u],
+  ['NpmTools.mjs', 2, /Usage: node .*NpmTools\.mjs install/u],
+  ['Check-NpmAudit.mjs', 2, /Usage: node .*Check-NpmAudit\.mjs/u],
+  ['Classify-InstructionMaintenance.mjs', 1, /Usage: node Classify-InstructionMaintenance\.mjs/u],
+  ['Validate-WorkflowPolicy.mjs', 1, /"category":"arguments"/u],
+];
+
+function entryFixture() {
+  const root = inputFixture(), alias = `${root}-alias`;
+  for (const [name] of entryModules) {
+    fs.copyFileSync(fileURLToPath(new URL(name, import.meta.url)), path.join(root, '.github/workflows', name));
+  }
+  fs.symlinkSync(root, alias, process.platform === 'win32' ? 'junction' : 'dir');
+  return { root, alias };
+}
+
+for (const [name, status, diagnostic] of entryModules) {
+  test(`linked command entry preserves argument errors: ${name}`, () => {
+    const { root, alias } = entryFixture();
+    try {
+      for (const directory of [root, alias]) {
+        const result = runBounded(process.execPath, [path.join(directory, '.github/workflows', name), '--invalid-entry-test'], { cwd: directory });
+        assert.equal(result.status, status, result.stdout.toString() + result.stderr.toString());
+        assert.match(result.stdout.toString() + result.stderr.toString(), diagnostic);
+      }
+    } finally { fs.unlinkSync(alias); removeFixture(root); }
+  });
+
+  test(`module imports remain inert with absent or misleading argv: ${name}`, () => {
+    const { root, alias } = entryFixture();
+    try {
+      const script = path.join(root, '.github/workflows', name);
+      const linkedScript = path.join(alias, '.github/workflows', name);
+      for (const argv of [undefined, '', path.join(root, 'absent.mjs'), script, linkedScript]) {
+        const setArgv = argv === undefined ? 'delete process.argv[1];' : `process.argv[1] = ${JSON.stringify(argv)};`;
+        const copiedSource = `${setArgv} await import(${JSON.stringify(pathToFileURL(script).href)}); console.log('ENTRY_IMPORT_ONLY');`;
+        const result = runBounded(process.execPath, ['--input-type=module', '-e', copiedSource], { cwd: root });
+        assert.equal(result.status, 0, result.stderr.toString());
+        assert.equal(result.stdout.toString(), 'ENTRY_IMPORT_ONLY\n');
+        assert.equal(result.stderr.toString(), '');
+      }
+    } finally { fs.unlinkSync(alias); removeFixture(root); }
+  });
+}

@@ -87,7 +87,7 @@ test('CI scope uses real complete Git endpoints; mismatches and unavailable obje
     }
     assert.throws(() => ciScope({ root, environment: {}, authority: { sha: base } }), /hosted event/u);
   } finally {
-    assert.equal(path.dirname(root), fs.realpathSync(os.tmpdir()));
+    assert.equal(fs.realpathSync(path.dirname(root)), fs.realpathSync(os.tmpdir()));
     assert.ok(path.basename(root).startsWith('npm-audit-scope-'));
     fs.rmSync(root, { recursive: true });
   }
@@ -353,7 +353,7 @@ test('ordinary CLI keeps local authority under agent variables and reports parse
     assert.match(malformedFailure.message, /SyntaxError/u);
     assert.match(malformedFailure.message, /Correct the reported cause/u);
   } finally {
-    assert.equal(path.dirname(root), fs.realpathSync(os.tmpdir()));
+    assert.equal(fs.realpathSync(path.dirname(root)), fs.realpathSync(os.tmpdir()));
     assert.ok(path.basename(root).startsWith('npm-audit-missing-parser-'));
     fs.rmSync(root, { recursive: true });
   }
@@ -417,7 +417,7 @@ test('a missing accepted record is empty authority; a failed Git read is an erro
     assert.throws(() => acceptedBase({ root, environment: {} }), /unavailable/u);
     assert.throws(() => acceptedBase({ root, environment: agentEnvironment }), /unavailable/u);
   } finally {
-    assert.equal(path.dirname(root), fs.realpathSync(os.tmpdir()));
+    assert.equal(fs.realpathSync(path.dirname(root)), fs.realpathSync(os.tmpdir()));
     assert.ok(path.basename(root).startsWith('npm-authority-test-'));
     fs.rmSync(root, { recursive: true });
   }
@@ -429,7 +429,7 @@ test('a missing accepted record is empty authority; a failed Git read is an erro
 function hostedFixture(t) {
   const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'npm-hosted-authority-'));
   t.after(() => {
-    assert.equal(path.dirname(temporary), fs.realpathSync(os.tmpdir()));
+    assert.equal(fs.realpathSync(path.dirname(temporary)), fs.realpathSync(os.tmpdir()));
     assert.ok(path.basename(temporary).startsWith('npm-hosted-authority-'));
     fs.rmSync(temporary, { recursive: true, force: true });
   });

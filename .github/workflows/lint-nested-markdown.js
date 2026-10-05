@@ -12,10 +12,10 @@
 
 const fs = require('fs');
 const path = require('path');
-let glob, globSync, parseJsonc, MarkdownIt, markdownlintSync;
+let glob, globSync, parseJsonc, visitJsonc, printParseErrorCode, MarkdownIt, markdownlintSync;
 try {
     ({ glob, globSync } = require('glob'));
-    ({ parse: parseJsonc } = require('jsonc-parser'));
+    ({ parse: parseJsonc, visit: visitJsonc, printParseErrorCode } = require('jsonc-parser'));
     MarkdownIt = require('markdown-it');
     ({ lint: markdownlintSync } = require('markdownlint/sync'));
 } catch (error) {
@@ -190,7 +190,7 @@ function assertLintConfigurationInputs(repoRoot = path.resolve(__dirname, '../..
     const selectorName = /^\.markdownlint(?:-cli2\.(?:jsonc|json|ya?ml|cjs|mjs)|rc|ignore|\.(?:jsonc|json|ya?ml|cjs|mjs|js|toml))$/iu;
     for (const relative of selectors) {
         if (selectorName.test(path.basename(relative)) && !allowed.has(relative.split(path.sep).join('/'))) {
-            throw new Error(`Unsupported Markdown lint configuration: ${relative}. Use .github/workflows/.markdownlint.jsonc.`);
+            throw new Error(`Unsupported Markdown lint configuration: ${relative}. Use .github/workflows/.markdownlint.jsonc (preferred) or .github/workflows/.markdownlint.json.`);
         }
     }
 
@@ -210,9 +210,22 @@ function loadMarkdownlintConfig(repoRoot = path.resolve(__dirname, '../..')) {
     assertLintConfigurationInputs(repoRoot);
     const file = markdownlintConfigPath(repoRoot);
     if (fs.statSync(file).size > 1024 * 1024) throw new Error('Markdown lint configuration exceeds one MiB.');
+    const text = fs.readFileSync(file, 'utf8');
     const errors = [];
-    const config = parseJsonc(fs.readFileSync(file, 'utf8'), errors);
-    if (errors.length || !config || typeof config !== 'object' || Array.isArray(config)) {
+    const config = parseJsonc(text, errors);
+    if (errors.length) {
+        let firstError;
+        visitJsonc(text, {
+            onError(error, _offset, _length, startLine, startCharacter) {
+                firstError ??= { error, line: startLine + 1, column: startCharacter + 1 };
+            }
+        });
+        const detail = firstError
+            ? ` ${printParseErrorCode(firstError.error)} at line ${firstError.line}, UTF-16 column ${firstError.column}; ${errors.length} parse error(s).`
+            : '';
+        throw new Error(`Invalid Markdown lint configuration: ${file}.${detail}`);
+    }
+    if (!config || typeof config !== 'object' || Array.isArray(config)) {
         throw new Error(`Invalid Markdown lint configuration: ${file}.`);
     }
     if (Object.hasOwn(config, 'extends')) {
@@ -362,16 +375,20 @@ function lintNestedMarkdownContents(
 
 /**
  * Run outer Markdown lint against caller-supplied in-memory content.
+ * Repeated filePath labels must contain identical content.
  * @param {string} repoRoot - Repository root.
  * @param {Array<{filePath: string, content: string}>} markdownInputs - Safe inputs.
+ * @param {object} [config] - Caller configuration; defaults to a fresh repository load.
  * @returns {Promise<number>} Zero for success or one for lint findings; throws on tooling failure.
  */
-async function lintOuterMarkdownContents(repoRoot, markdownInputs) {
-    const config = loadMarkdownlintConfig(repoRoot);
+async function lintOuterMarkdownContents(repoRoot, markdownInputs, config = loadMarkdownlintConfig(repoRoot)) {
     const strings = Object.create(null);
     for (const input of markdownInputs) {
         if (!input || typeof input.filePath !== 'string' || typeof input.content !== 'string') {
             throw new TypeError('Each outer Markdown input must contain string filePath and content values.');
+        }
+        if (Object.hasOwn(strings, input.filePath) && strings[input.filePath] !== input.content) {
+            throw new Error(`Conflicting outer Markdown inputs for filePath: ${input.filePath}`);
         }
         strings[input.filePath] = input.content;
     }
