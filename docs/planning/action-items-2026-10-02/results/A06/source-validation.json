@@ -1,6 +1,6 @@
 {
-  "status": "merged_landed_checks_pending",
-  "recorded_at": "2026-10-05T23:12:14.658175+00:00",
+  "status": "source_accepted_tf_repair_released",
+  "recorded_at": "2026-10-05T23:24:07.704248+00:00",
   "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
   "base_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
   "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
@@ -321,31 +321,23 @@
     ]
   },
   "transfers": {
-    "A06": "0/12",
-    "A03": "2/12",
-    "A21": "4/12"
+    "A06": {
+      "used": 1,
+      "cap": 12
+    },
+    "A03": {
+      "used": 3,
+      "cap": 12
+    },
+    "A21": {
+      "used": 5,
+      "cap": 12
+    }
   },
   "rounds_used": 3,
   "first_request_at": "2026-10-05T20:12:24.969231+00:00",
   "deadline": "2026-10-13T20:12:24.969231+00:00",
-  "pending_native_operations": [
-    {
-      "service": "GitHub Actions",
-      "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
-      "run": 37385523615,
-      "name": "Copilot setup steps",
-      "status": "in_progress",
-      "created_at": "2026-10-05T22:55:54Z"
-    },
-    {
-      "service": "GitHub Actions",
-      "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
-      "run": 37385523624,
-      "name": "Agent instruction validation",
-      "status": "in_progress",
-      "created_at": "2026-10-05T22:55:54Z"
-    }
-  ],
+  "pending_native_operations": [],
   "limits": [
     "Local Windows5.1 remains Restricted; no bypass. Actual hosted current-head5.1/7/Linux7 proof passed twice with156assertions.",
     "Old-head hosted failures and review/service history remain historical; no old result accepts new bytes.",
@@ -2465,31 +2457,14 @@
     "actual_head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
     "verified_at": "2026-10-05T22:28:26.731065+00:00"
   },
-  "local_operations": "No local test or source freeze. Only bounded read-only TF writer preparation; no product repair or counter increment. A14 and R5 interface workers completed; root verified.",
+  "local_operations": "One bounded TF product writer active. No PS writer, local aggregate, source freeze or pending remote operation.",
   "progress": {
-    "recorded_at": "2026-10-05T23:12:14.658175+00:00",
-    "stage": "Source merged; actual platform/artifact checks pass; A14 and R5 interfaces current; two landed validation jobs confirmed live",
-    "remaining": "Complete actual landed acceptance, then serialized TF port and paired convergence. Broad plan remains incomplete.",
-    "native_pending": [
-      {
-        "service": "GitHub Actions",
-        "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
-        "run": 37385523615,
-        "name": "Copilot setup steps",
-        "status": "in_progress",
-        "created_at": "2026-10-05T22:55:54Z"
-      },
-      {
-        "service": "GitHub Actions",
-        "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
-        "run": 37385523624,
-        "name": "Agent instruction validation",
-        "status": "in_progress",
-        "created_at": "2026-10-05T22:55:54Z"
-      }
-    ]
+    "recorded_at": "2026-10-05T23:24:07.704248+00:00",
+    "stage": "Source accepted; first TF repair released after fresh raw comparison and counter increment",
+    "remaining": "TF focused implementation, final validation, publication/reviews/quality/normal merge/landed/reverse comparison. Broad goal remains incomplete.",
+    "native_pending": []
   },
-  "next_action": "Collect actual landed setup37385523615/job112017722346 and behavior37385523624/job112017722624. Both are confirmed in their validation steps. On all5passed, run prepared accept-landed-ps234.py against a fresh snapshot. Then run prepared release-tf-a06.py once, which rechecks refs/raw preimages and increments0/2/4 to1/3/5 before switching the clean reused TF worktree. Review worker readiness and release focused implementation; root owns aggregate/native lifecycle. Neither acceptance nor TF release helper has run.",
+  "next_action": "Read bounded TF writer result, verify all12paths and unchanged four outputs/contract, prepare qualified Linux candidate, then root final validation and normal PR lifecycle. Do not repeat source merge/acceptance or transfer release. Counters1/3/5 consumed.",
   "A09_preparation": {
     "status": "read_only_root_verified",
     "worker": "/root/a09_post_a06_readiness",
@@ -2502,7 +2477,7 @@
     "catalog_sha256": "752660478a5bee12b65b3ec54c3683c2c3debf9d6205adc1203498e3e4807a0b",
     "canonical_report": "results/A09/postA06/REPORT.md"
   },
-  "planning_checkpoint": "a0218b5194c36c60f0b689f5dd120a7fe7f06639",
+  "planning_checkpoint": "8baedc5260aa734fbacd498d76a0f0928dbd7204",
   "hosted_current_progress": {
     "status": "all_current_candidate_runs_passed",
     "snapshot": "round3-progress-7.json",
@@ -2525,27 +2500,15 @@
     "terminal_receipt": "hosted-dec18a6/round3-progress-7-attempts.json"
   },
   "landed_progress": {
-    "status": "incomplete",
+    "status": "accepted",
     "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
-    "snapshot": "landed-progress-5.json",
+    "snapshot": "landed-progress-8.json",
     "runs": [
       {
         "id": 37385523636,
         "name": "Dev container boundary",
         "status": "completed",
         "conclusion": "success"
-      },
-      {
-        "id": 37385523615,
-        "name": "Copilot setup steps",
-        "status": "in_progress",
-        "conclusion": null
-      },
-      {
-        "id": 37385523624,
-        "name": "Agent instruction validation",
-        "status": "in_progress",
-        "conclusion": null
       },
       {
         "id": 37385523708,
@@ -2558,9 +2521,21 @@
         "name": "Build Style Guide Artifacts",
         "status": "completed",
         "conclusion": "success"
+      },
+      {
+        "id": 37385523615,
+        "name": "Copilot setup steps",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37385523624,
+        "name": "Agent instruction validation",
+        "status": "completed",
+        "conclusion": "success"
       }
     ],
-    "live_job_receipt": "landed-live-jobs-1.json"
+    "acceptance": "landed-ps234-acceptance.json"
   },
   "merge": {
     "requested_at": "2026-10-05T22:55:25.561518+00:00",
@@ -2625,5 +2600,253 @@
     ],
     "selection": "R5 95/B1 94 retained; future PS-first after paired A06 acceptance.",
     "new_user_decision": false
+  },
+  "tf_writer_readiness": {
+    "worker": "/root/a06_tf_generator_owner",
+    "status": "implementation_released",
+    "handoff": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\HANDOFF.md",
+    "handoff_sha256": "b34cc621bad4a900077cc1ef4a60f92f242e3b7ee2d9cb02cac699d89e89deb7",
+    "root_review": "Read full handoff; reuses root-verified25path raw comparison and selected finite substitutions. No new finding.12workflow paths; four TF outputs preserved.",
+    "runtime_readiness": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-readiness.json",
+    "runtime_readiness_sha256": "74361bb4763e4b3a7ccbca03a4394cfd5827ee861ff15d71a4d9704e08a8f4f8",
+    "limits": "No TF branch switch, implementation, product test or transfer. Local5.1 remains Restricted; use actual permitted hosted proof, no bypass."
+  },
+  "landed_acceptance": {
+    "accepted_at": "2026-10-05T23:21:38.665763+00:00",
+    "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+    "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+    "parents": [
+      "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "dec18a6303bd6ad5fe9a43b383a62daa70527aca"
+    ],
+    "reviewed_head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+    "review_round": 3,
+    "review_body_sha256": "8744ed3f3af5105058be086ddb90d0ed93f8b3e3828ca45fa3e28dce9969e982",
+    "native_evidence_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-progress-8.json",
+    "native_evidence_sha256": "367656b4574f580ac55098bb67df817d8a88d3f69df347cad1cb92daaad68cfd",
+    "runs": [
+      {
+        "id": 37385523636,
+        "name": "Dev container boundary",
+        "event": "push",
+        "head_sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37385523708,
+        "name": "Markdown Lint",
+        "event": "push",
+        "head_sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37385523719,
+        "name": "Build Style Guide Artifacts",
+        "event": "push",
+        "head_sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37385523615,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "head_sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "status": "completed",
+        "conclusion": "success"
+      },
+      {
+        "id": 37385523624,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "head_sha": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "status": "completed",
+        "conclusion": "success"
+      }
+    ],
+    "terminal_logs": [
+      {
+        "id": 37385523636,
+        "name": "Dev container boundary",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37385523636",
+        "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523636\\log.txt",
+        "log_sha256": "fde7ca734c0784f720a54ed986dec4cd793f3dabb3723b377ae585407232e2f3",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523636\\jobs.json",
+        "jobs_sha256": "f96b5211b4cf5def2adaf52b37bbc11eafe976c04a7625ef4ad59fa6181e7120"
+      },
+      {
+        "id": 37385523708,
+        "name": "Markdown Lint",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37385523708",
+        "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523708\\log.txt",
+        "log_sha256": "5b2ddeabfbbcf93ef8aaa8672afd2aa30ef9499e2e12bb1e1f599a4d6a541aba",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523708\\jobs.json",
+        "jobs_sha256": "44c9878a3aa58923a44da33934a4441e525040f6b764a201b3ab86749e1394ce"
+      },
+      {
+        "id": 37385523719,
+        "name": "Build Style Guide Artifacts",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37385523719",
+        "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523719\\log.txt",
+        "log_sha256": "6c286d97befd776c70f65d4605cf0c4d2769352720d9bcadb549408e32e9cc90",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523719\\jobs.json",
+        "jobs_sha256": "ca76d3adb1de7f48072fd06efe95f911550f0814448d5c21be5d0e3257100d16"
+      },
+      {
+        "id": 37385523615,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37385523615",
+        "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523615\\log.txt",
+        "log_sha256": "5dd2009221dc465961f8231e1aedf834eb222aeeb42f35d4a3e3a35da56b70fb",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523615\\jobs.json",
+        "jobs_sha256": "8f3f51a5fc2d77a1c31a723f9d39150b28956505dcc1971495018d5c99b869cd"
+      },
+      {
+        "id": 37385523624,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "run_attempt": 1,
+        "html_url": "https://github.com/franklesniak/PSStyleGuide/actions/runs/37385523624",
+        "head": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+        "log_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523624\\log.txt",
+        "log_sha256": "45a628779f64d555160d41b5aa28f4c5f46701ae49586f48c68806b311fd59f9",
+        "jobs_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\landed-ps234-hosted\\98177628b7bc02c646724bfc8aa0fd73fed0cd24\\37385523624\\jobs.json",
+        "jobs_sha256": "a2517f02f3188771a599753b02b07156dfc32cb9cec2e3a09b9c2bb61e472c8e"
+      }
+    ],
+    "setup_passed_hooks": [
+      "check json...............................................................Passed",
+      "check yaml...............................................................Passed",
+      "fix end of files.........................................................Passed",
+      "trim trailing whitespace.................................................Passed",
+      "yamllint.................................................................Passed",
+      "Lint GitHub Actions workflow files.......................................Passed",
+      "Validate Dependabot Config (v2)..........................................Passed",
+      "Validate GitHub Workflows................................................Passed",
+      "staged Markdown..........................................................Passed",
+      "workflow policy contract.................................................Passed",
+      "agent instruction contract and mutation tests............................Passed"
+    ],
+    "node_tests": {
+      "passed": 567,
+      "failed": 0,
+      "skipped": 0
+    },
+    "audit": {
+      "status": "CLEAN",
+      "unresolved": [],
+      "acceptedPackages": 0,
+      "unusedExceptions": [],
+      "proposedState": false,
+      "authority": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "authoritySource": "event-main",
+      "limitation": "Authority is the recorded main snapshot; owner/executor must check known revocations before acceptance.",
+      "installedGraphRoots": [
+        ".github/workflows"
+      ],
+      "findings": [],
+      "applicable": true
+    },
+    "workflow_policy": {
+      "schema": "StyleGuide.WorkflowPolicyResult.v1",
+      "validatorVersion": "3.0.0",
+      "success": true,
+      "contractCanonicalSha256": "d3eab5d3ec77489a9ebb92baa52bcaec820ab9cceddf5c933906c95cb9f57291",
+      "casesPassed": 0,
+      "workflowSha256": {
+        "build.yml": "66050d2aeb73e3866ad518e991d29780e742fe7ce6b1dab5de9097f49707d8e4",
+        "markdownlint.yml": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+      }
+    },
+    "ruleset_unchanged": 24419725,
+    "source_batch_result": "accepted",
+    "platform_proof": {
+      "commit": "98177628b7bc02c646724bfc8aa0fd73fed0cd24",
+      "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+      "actual_merged_main": true,
+      "all_three_cells": [
+        {
+          "name": "generator_windows_51",
+          "job_id": 112017722712,
+          "passes": [
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T22:56:38.8852379Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T22:57:04.2740931Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_windows_7",
+          "job_id": 112017722979,
+          "passes": [
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T22:56:27.8591506Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+            "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T22:56:50.1687283Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+          ]
+        },
+        {
+          "name": "generator_linux_7",
+          "job_id": 112017722902,
+          "passes": [
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T22:56:21.3302096Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+            "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T22:56:32.2573924Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+          ]
+        }
+      ],
+      "same_revision_admission": {
+        "generator_windows_51": {
+          "result": "success",
+          "outputs": {
+            "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+          }
+        },
+        "generator_windows_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+          }
+        },
+        "generator_linux_7": {
+          "result": "success",
+          "outputs": {
+            "revision": "98177628b7bc02c646724bfc8aa0fd73fed0cd24"
+          }
+        }
+      },
+      "artifact_id": 11377816610,
+      "assertions_per_pass": 156,
+      "passes_per_platform": 2,
+      "limits": "Generator proof only. No broad recovery-platform or hostile filesystem race credit."
+    },
+    "limits": "Actual merged PS push workflows, including full validation and immutable-input check, passed. Does not establish paired convergence or close a broad outcome. Refresh both actual mains and raw coupled contracts before the TF transfer. This source result does not close A06 or issue155."
+  },
+  "pending_native_operation": "None.",
+  "peer_release": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\execution-state.json",
+    "status": "released_waiting_for_bounded_writer",
+    "released_at": "2026-10-05T23:21:53.100682+00:00",
+    "worktree": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+    "branch": "codex/a06-generator-convergence"
   }
 }
