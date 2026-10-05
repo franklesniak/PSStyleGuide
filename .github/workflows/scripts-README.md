@@ -11,22 +11,29 @@
 
 This directory contains utility scripts for the repository.
 
-## Script inventory
+## Workflow tools and helpers
+
+This table lists the workflow tools and helpers in this directory. It excludes `*.test.mjs` suites and `Test-AgentInstructions.SelfTest.ps1`; see [the directory listing](.) for those files. Selected test commands appear below.
 
 | Script | Purpose | Supported command |
 | --- | --- | --- |
 | `Check-NpmAudit.mjs` | Checks the locked dependency graphs against current npm advisories. | `node .github/workflows/Check-NpmAudit.mjs` |
+| `Classify-InstructionMaintenance.mjs` | Classifies whether a change requires instruction maintenance. | Called from the accepted-base checkout by `agent-instructions.yml` with the checkout root and exact base/head revisions. It does not grant maintenance authority. |
 | `Generate-StyleGuideArtifacts.ps1` | Regenerates consumer style-guide artifacts from the normative and rationale sources. | `pwsh -NoLogo -NoProfile -File .github/workflows/Generate-StyleGuideArtifacts.ps1` |
 | `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/P1-SUPPLY-FREEZE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |
+| `Initialize-CiToolchain.ps1` | Installs the reviewed Linux Node/npm runtime and selected locked dependency trees. | Called by CI with `-WorkflowDependencies` and, for instruction jobs, `-InstructionDependencies`; requires its Linux runner environment. |
 | `install-husky.mjs` | Activates the retained Git hook during setup and prepare. | Called by `NpmTools.mjs install` and the workflow package's `prepare` script; no separate routine invocation is needed. |
 | `lint-markdown.mjs` | Runs the bounded outer Markdown API. | `npm run lint:md` |
 | `lint-nested-markdown.js` | Recursively lints `markdown` and `md` fenced content in repository `.md` and `.mdc` files. | `npm run lint:md:nested` |
 | `lint-staged-markdown.mjs` | Selects and lints outer and nested staged `.md` and `.mdc` content without replacing worktree files. | `node .github/workflows/lint-staged-markdown.mjs` |
 | `Invoke-LockedPythonHook.ps1` | Selects Python 3.12 for allowlisted locked hook modules. | Called by the configured pre-commit hooks. |
+| `Invoke-MarkdownLint.ps1` | Runs outer and nested Markdown checks and preserves both native results. | Called by `markdownlint.yml` after runtime setup; requires the reviewed Linux runner runtime. |
 | `NpmTools.mjs` | Installs both locked dependency graphs with isolated npm configuration and activates the retained hook. | `node .github/workflows/NpmTools.mjs install` |
 | `Test-AgentInstructions.ps1` | Validates governed instruction capacity, operative policy, final-state metadata, staged-input matching, and behavioral mutation controls. | `npm run test:agent-instructions` |
+| `Test-CheckoutCredentials.ps1` | Verifies the anonymous checkout's origin and credential policy. | Called by CI and shared helpers after anonymous acquisition; requires the expected origin and credential-free Linux runner context. |
 | `Test-StyleGuideArtifacts.ps1` | Runs the blank-line semantic child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |
 | `Test-BlankLineExamples.ps1` | Checks the published PowerShell blank-line examples and their focused mutation controls. | `pwsh -NoLogo -NoProfile -File .github/workflows/Test-BlankLineExamples.ps1` (no parameters). |
+| `Test-ExactGitPathSet.ps1` | Verifies an exact raw Git path set and optional worktree/index equality. | `Test-StyleGuideArtifacts.ps1` supplies the repository root, expected paths and mode; no argument-free invocation is supported. |
 | `Validate-WorkflowPolicy.mjs` | Validates workflow structure, helper interfaces, and locked parser integrity; run `node --test .github/workflows/Validate-WorkflowPolicy.test.mjs` for negative fixtures. | `node .github/workflows/Validate-WorkflowPolicy.mjs .github/workflows/build.yml .github/workflows/markdownlint.yml` |
 
 The native required checks keep their existing names. `verify_generated_artifacts` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.
