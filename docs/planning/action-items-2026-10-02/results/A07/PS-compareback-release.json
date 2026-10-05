@@ -1,5 +1,5 @@
 {
-  "status": "round1_reviews_pending_finding_assessment",
+  "status": "merged_landed_checks_pending",
   "released_at": "2026-10-05T17:25:59.997917+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "worktree": "C:\\Users\\flesniak\\.codex\\worktrees\\a07-braces-remediation\\PSStyleGuide",
@@ -112,8 +112,8 @@
     "record_sha256": "6a7062c713b314f07eded550f3e87c1081576e4a76e0349eee1fdbed4b11dce6"
   },
   "public_authority": "Root owns index, aggregate, commits, native lifecycle and planning. Writer owns only the two product paths and private implementation evidence.",
-  "next_action": "Finish the enclosing-version finding decision; collect pending Copilot/manual Codex and remaining exact-head hosted validation without duplicate requests.",
-  "planning_checkpoint": "eac18de3a7d33e6df03b4a9d2f084e9f718fee9c",
+  "next_action": "Verify actual merged-main workflows before destination acceptance and final paired comparison.",
+  "planning_checkpoint": "73381bd517bc12e86a70d2ba5a1dff9de1242bc6",
   "acceptance_checkpoint_publication": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\checkpoint-publication.json",
   "candidate_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
   "worker_evidence": {
@@ -272,8 +272,8 @@
     "sha256": "0ccaa1d56ed0040cb468462010d83c3aff4111b4e43ae31fa9c8fd476547de7c"
   },
   "pr_title": "Align shared validator notes and lint diagnostic with Terraform",
-  "body_sha256": "cb2e1bf0a3582a77d5d015cd607f1afee9233214bf360379ae10d93c8e5284a2",
-  "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\pr-body.md",
+  "body_sha256": "ce1e7fd01f7cf525e3b1057d0b0752f9ece02d61d85ea3993ef49d7549b8d9b6",
+  "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\pr-body-r1-disposition.md",
   "publication": {
     "status": "pushed",
     "head": "4783da302e26515d770bad716f02297fe3b08a8d",
@@ -306,18 +306,29 @@
     "baseline": "round1-pre-request-final.json",
     "request_intent_at": "2026-10-05T17:57:53.173192+00:00",
     "copilot": {
-      "status": "confirmed_pending",
+      "status": "completed_clean",
       "selected_effort": "Balanced",
-      "observed_effort": null,
+      "observed_effort": "Balanced",
       "transport": "supported authenticated Edge Reviewers UI",
       "request_event_id": 32533320587,
       "request_at": "2026-10-05T17:58:22Z",
       "actor_id": 11204406,
       "reviewer_id": 175728472,
-      "snapshot": "round1-copilot-confirmation.json"
+      "snapshot": "round1-copilot-confirmation.json",
+      "observed_effort_source": "authenticated completed ccr-overview-v2 review5418780251",
+      "review_id": 5418780251,
+      "review_at": "2026-10-05T18:14:12Z",
+      "workflow_run_id": 37352452664,
+      "service": {
+        "status": "completed",
+        "conclusion": "success",
+        "evidence": "round1-copilot-service/summary.json"
+      },
+      "native_state": "COMMENTED",
+      "native_overview_caution": "Automated approval withheld pending final human review; no issues identified. This is not a claimed human approval; actual native required approval rules are checked separately."
     },
     "codex": {
-      "status": "confirmed_pending",
+      "status": "completed_clean",
       "automatic_comment_id": 6000086105,
       "request_intent_at": "2026-10-05T18:03:48.132651+00:00",
       "baseline": "round1-resume-reconciliation.json",
@@ -327,9 +338,13 @@
       "trigger_id": 6000209320,
       "request_at": "2026-10-05T18:04:13Z",
       "actor_id": 11204406,
-      "snapshot": "round1-manual-confirmation.json"
+      "snapshot": "round1-review-progress-2.json",
+      "result_id": 6000239607,
+      "result_at": "2026-10-05T18:06:04Z",
+      "result_author_id": 199175422,
+      "attribution": "Authenticated bot, excluded from full pretrigger baseline, after sole manual trigger and automatic terminal, explicit reviewed commit, manual summary completed."
     },
-    "latest_observation": "round1-manual-confirmation.json",
+    "latest_observation": "round1-final-quality-native.json",
     "open_findings": [
       {
         "id": 4187129240,
@@ -337,10 +352,115 @@
         "thread_id": "PRRT_kwDOQkjdhM6pJwxd",
         "source": "automatic Codex",
         "title": "Increment the enclosing script revision",
-        "status": "validation_and_decision_in_progress",
-        "owner": "ps_tf67_compareback_writer"
+        "status": "refuted_N96_replied_resolved",
+        "owner": "ps_tf67_compareback_writer",
+        "decision": "docs/planning/action-items-2026-10-02/results/A21/PS233-R1-enclosing-revision.md",
+        "decision_commit": "73381bd517bc12e86a70d2ba5a1dff9de1242bc6"
       }
     ],
-    "hosted_collection": "round1-hosted-4783da3/round1-manual-confirmation-collection.json"
+    "hosted_collection": "round1-hosted-4783da3/round1-manual-confirmation-collection.json",
+    "workflow_list_anomaly": {
+      "snapshot": "round1-review-progress-2.json",
+      "description": "Head-filter run list temporarily empty while native check runs retain known runs. Preserve earlier run inventory; no negative attribution or vanished-job claim."
+    },
+    "finding_disposition": {
+      "status": "completed_no_product_change",
+      "finding_id": 4187129240,
+      "thread_id": "PRRT_kwDOQkjdhM6pJwxd",
+      "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+      "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+      "body_preimage_sha256": "cb2e1bf0a3582a77d5d015cd607f1afee9233214bf360379ae10d93c8e5284a2",
+      "decision": "N96",
+      "requested_at": "2026-10-05T18:13:22.001621+00:00",
+      "planning_commit": "73381bd517bc12e86a70d2ba5a1dff9de1242bc6",
+      "reply_id": 4187253132,
+      "reply_at": "2026-10-05T18:13:47Z",
+      "body_postimage_sha256": "ce1e7fd01f7cf525e3b1057d0b0752f9ece02d61d85ea3993ef49d7549b8d9b6",
+      "completed_at": "2026-10-05T18:14:21.744159+00:00",
+      "body_change": "Factual no-change finding disposition only; head/base/diff/intended behavior and existing validation scope unchanged. No new review round."
+    },
+    "clean": true,
+    "request_set_terminal": true,
+    "hosted_validation": {
+      "status": "passed",
+      "accepted_run_ids": [
+        37354490898,
+        37352197994,
+        37352197960,
+        37352197996,
+        37352198137,
+        37352197983,
+        37352198109,
+        37352130688,
+        37352130730,
+        37352130995,
+        37352130731,
+        37352130964
+      ],
+      "collection": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\round1-hosted-4783da3\\round1-final-quality-native-collection.json",
+      "collection_sha256": "a1b7a848ed884b7461cb4ebe769bf2bd889551151b5af215d38f4a71873e4290",
+      "node_tests_each": 507,
+      "node_failures": 0,
+      "node_skips": 0,
+      "setup_hooks_each": 11,
+      "setup_hook_skips": 0,
+      "root_semantic_inspection": "Actual instruction/mutation output; two507-test totals; 11 hooks and final guards; maintenance_required limits; two current audits; generator and publication jobs; devcontainer exclusion."
+    }
+  },
+  "review_checkpoint_publication": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\round1-checkpoint-publication.json",
+  "body_history": [
+    {
+      "sha256": "cb2e1bf0a3582a77d5d015cd607f1afee9233214bf360379ae10d93c8e5284a2",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\pr-body.md",
+      "scope": "original reviewed implementation"
+    }
+  ],
+  "final_quality": {
+    "result": "passed_no_material_finding",
+    "reviewer": "/root/ps233_final_quality",
+    "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+    "body_sha256": "ce1e7fd01f7cf525e3b1057d0b0752f9ece02d61d85ea3993ef49d7549b8d9b6",
+    "report_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS233-final-quality-20261005\\REPORT.md",
+    "report_sha256": "577798e124e25d5a403a52cbde8adb25f1784475648fcdd9aa0088ec123752f8",
+    "evidence_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS233-final-quality-20261005\\evidence.json",
+    "evidence_sha256": "b02ea8f997dc9b6d820313f6971a734a7aa678d1961a8a62f324f2b0b089fffb",
+    "native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\round1-final-quality-native.json",
+    "native_snapshot_sha256": "89540fdc4249cfe22961e392644f2004965ab0a7daa1aacc2dacaa06420b25dd",
+    "native_gate": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\round1-final-quality-gates.json",
+    "native_gate_sha256": "e84b755afd703c6179dacae0e0725ef52d8d840424d7410304943b3b5606844a",
+    "root_review": "Read full report and evidence summary; checked frozen hashes and every referenced artifact hash. Independently sampled actual guide/rationale/validator objects and recomputed N96 scores."
+  },
+  "merge": {
+    "requested_at": "2026-10-05T18:23:46.523755+00:00",
+    "method": "merge",
+    "head": "4783da302e26515d770bad716f02297fe3b08a8d",
+    "base": "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+    "tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+    "gate_sha256": "5da31f4af304746f77abce6c7ceb558a98d9f6ddb791d02cf27c3e837f34e490",
+    "native_sha256": "a02b48709899824b58948a41698ebe4252471a1b599faaaf56248856bf5af360",
+    "exit": 0,
+    "response": {
+      "sha": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "merged": true,
+      "message": "Pull Request successfully merged"
+    },
+    "sha": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "parents": [
+      "f0684acd81a1a6e53d87e43881c1ec4f1310b17c",
+      "4783da302e26515d770bad716f02297fe3b08a8d"
+    ],
+    "merged_at": "2026-10-05T18:24:13Z",
+    "verified_at": "2026-10-05T18:23:52.140066+00:00"
+  },
+  "pair_comparison": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS-TF67-compareback-20261005\\main-pair-comparison.json",
+    "sha256": "5d7e29cfdbac6249024fe1ae9547b24b3e3479036e16fd44198f170779714aab",
+    "refs": {
+      "PS": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "TF": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+    },
+    "status": "raw_pair_verified_landed_acceptance_pending"
   }
 }

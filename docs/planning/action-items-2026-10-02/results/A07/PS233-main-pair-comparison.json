@@ -1,0 +1,669 @@
+{
+  "captured_at": "2026-10-05T18:25:56.391868+00:00",
+  "status": "raw_pair_verified_landed_acceptance_pending",
+  "refs": {
+    "PS": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "TF": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+  },
+  "trees": {
+    "PS": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+    "TF": "89f470ceb6b3e6e9d4ae757e38997f1c6e7bd631"
+  },
+  "native_before": {
+    "PS": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48"
+      }
+    },
+    "TF": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+      }
+    }
+  },
+  "native_after": {
+    "PS": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOQkjdhK9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/PSStyleGuide/git/commits/d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48"
+      }
+    },
+    "TF": {
+      "ref": "refs/heads/main",
+      "node_id": "REF_kwDOSAZRha9yZWZzL2hlYWRzL21haW4",
+      "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/refs/heads/main",
+      "object": {
+        "sha": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "type": "commit",
+        "url": "https://api.github.com/repos/franklesniak/TerraformStyleGuide/git/commits/e21b74fe0b56551008f78f9f2946cd2a0f9c19ce"
+      }
+    }
+  },
+  "catalog_sha256": "d322c8b2c54e44ef8807d6f2d89f5f5c3d8ddd9f4cce982fa98ef1ebc9328c04",
+  "readiness_sha256": "f9bf0d947fb3dcd1f4bf523a3e3a3f3c9490cfc4d697f52556dcd0baac93a898",
+  "scope22": [
+    {
+      "path": ".github/workflows/Check-NpmAudit.mjs",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a99303ac9e828eb1719fd669d969da31ab79c9e2",
+        "bytes": 23273,
+        "sha256": "7cdb15b87a6e66b254e178c806037a2819a78408e3471dcd3ae7f490eec89c6f"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "04cc1ee1b3ac867878e6ebe10af81f322712e34b",
+        "bytes": 23280,
+        "sha256": "729aa4178660a5b20d1947e804937813f73b60497df46a81b8f6dbf023d8a322"
+      },
+      "raw_equal": false,
+      "disposition": "expectedRepository identity only.",
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:.github/workflows/Check-NpmAudit.mjs\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/Check-NpmAudit.mjs\n@@ -6,3 +6,3 @@\n \n-export const expectedRepository = 'franklesniak/PSStyleGuide';\n+export const expectedRepository = 'franklesniak/TerraformStyleGuide';\n \n"
+    },
+    {
+      "path": ".github/workflows/Check-NpmAudit.test.mjs",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1b38ba7a9c6e441fb62b276795a951831c709dc9",
+        "bytes": 42149,
+        "sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1b38ba7a9c6e441fb62b276795a951831c709dc9",
+        "bytes": 42149,
+        "sha256": "307881478268591ceac829204da15d9e4855ce23456c83ead98230d93bab62f2"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "owner": "A21",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+        "bytes": 6063,
+        "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+        "bytes": 6063,
+        "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "494c6804f05c7ff54364e139004eeb67d8d879cd",
+        "bytes": 3017,
+        "sha256": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "494c6804f05c7ff54364e139004eeb67d8d879cd",
+        "bytes": 3017,
+        "sha256": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/NpmTools.mjs",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "bytes": 7656,
+        "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "63ef521a77b4c515d17b3152e92d2666f9d4a6d8",
+        "bytes": 7656,
+        "sha256": "23104a30d0e13b4607a8543b2e38680411b52bd8719adfa0b460f1faa12c7e45"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/NpmTools.test.mjs",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+        "bytes": 13810,
+        "sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d48a162663a2392d36c74fb09afd08b2d802b94f",
+        "bytes": 13810,
+        "sha256": "ba1edff16690047bfb9ebf31a39ad6cd33c60c69bdf43633007a1fd8ef3ff1d1"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "owner": "A21",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9918aaae6d0658c0e9ab4d8bf16de9716d52ac87",
+        "bytes": 229936,
+        "sha256": "86fb8f9dc645d9454bde845e878e1798108419cc48e457da6a227f71b0b26a0c"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7275b050ca3067706d646412a7f751138073e5bb",
+        "bytes": 229955,
+        "sha256": "2c525cced38681d99318cb3015dec7ec2d17ec7cc1ff663c2e145b9d46ff0ad2"
+      },
+      "raw_equal": false,
+      "disposition": "Only actual PS P1 versus TF T1 provenance-fixture path.",
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:.github/workflows/Test-AgentInstructions.SelfTest.ps1\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/Test-AgentInstructions.SelfTest.ps1\n@@ -1853,3 +1853,3 @@\n     }\n-    foreach ($strCheckoutPath in @('.claude/commands/review-loop.md', 'docs/P1-SUPPLY-FREEZE-v1.md', 'docs/dependency-maintenance.md', '.github/instructions/docs.instructions.md')) {\n+    foreach ($strCheckoutPath in @('.claude/commands/review-loop.md', 'docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md', 'docs/dependency-maintenance.md', '.github/instructions/docs.instructions.md')) {\n         $strCheckoutContent = Read-GitRevisionText -RepositoryRootPath $RepositoryRootPath `\n"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "owner": "A21",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+        "bytes": 482175,
+        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7ee712e048ab512aa751cf77c530d985d458bf7f",
+        "bytes": 482175,
+        "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "owner": "A03",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4098cd1c6d8dadd114fbd1c7a7da5b1918d9eacb",
+        "bytes": 98544,
+        "sha256": "5a14647cf03e46f0c776813ef637b6872097a43210efdedee7a095c523e88002"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+        "bytes": 100007,
+        "sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea"
+      },
+      "raw_equal": false,
+      "disposition": "Acquisition identity fixtures; complete PS blank-line semantic/artifact-oracle block versus TF recovery child failure/signal/timeout/channel/config/source/self and first-runtime controls plus corresponding result schemas. Retain both actual language consumers; A06 owns artifact implementations.",
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:.github/workflows/Test-CiHelpers.test.mjs\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/Test-CiHelpers.test.mjs\n@@ -153,3 +153,3 @@\n }\n-if (args.includes('remote') && args.includes('get-url')) console.log('https://github.com/franklesniak/PSStyleGuide');\n+if (args.includes('remote') && args.includes('get-url')) console.log('https://github.com/franklesniak/TerraformStyleGuide');\n if (args.includes('config') && (args.includes('--get-all') || args.includes('--get-regexp'))) process.exit(1);\n@@ -161,3 +161,3 @@\n     const environment = { ...process.env, GITHUB_SERVER_URL: 'https://github.com',\n-      GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head,\n+      GITHUB_REPOSITORY: 'franklesniak/TerraformStyleGuide', GITHUB_SHA: head,\n       TEST_REVISION: head, TEST_LOG: log, TEST_MODE: '', RUNNER_TEMP: root,\n@@ -472,4 +472,6 @@\n \n-for (const mode of ['clean', 'stale', 'semantic-failure', 'semantic-side-effect',\n-  'verifier-channel', 'verifier-config', 'verifier-worktree', 'verifier-failure']) {\n+for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 'verifier-worktree', 'verifier-failure',\n+  'recovery-missing', 'recovery-failure', 'recovery-signal', 'recovery-timeout',\n+  'recovery-channel', 'recovery-config', 'recovery-source', 'recovery-self',\n+  'multiple-node-paths', 'first-node-failure']) {\n   test(`artifact gate includes verifier child effects: ${mode}`, { skip: !linux }, t => {\n@@ -479,18 +481,20 @@\n     fs.mkdirSync(scripts, { recursive: true });\n-    const records = [['copilot', 'copilot-instructions.md'], ['powershell-instructions', 'powershell.instructions.md'],\n+    const records = [['copilot', 'copilot-instructions.md'], ['terraform-instructions', 'terraform.instructions.md'],\n       ['chat', 'STYLE_GUIDE_CHAT.md'], ['full', 'STYLE_GUIDE_FULL.md']];\n     for (const [, name] of records) fs.writeFileSync(path.join(work, name), 'committed fixture\\n');\n-    fs.writeFileSync(path.join(scripts, 'Test-StyleGuideArtifacts.ps1'), read('Test-StyleGuideArtifacts.ps1'));\n-    fs.writeFileSync(path.join(work, 'STYLE_GUIDE.md'), [\n-      '# PowerShell Writing Style', '',\n-      '### Examples', '',\n-      '**Compliant example:**', '',\n-      '```powershell', '{', '    Invoke-First', '', '    Invoke-Second', '}', '```', '',\n-      '**Non-Compliant example:**', '',\n-      'The `\u2420` glyph is an illustration marker and is not PowerShell syntax. Do not copy it.', '',\n-      '```powershell', '{', '    Invoke-First', '\u2420', '    Invoke-Second', '}', '```', '',\n-    ].join('\\n'));\n-    fs.copyFileSync(path.join(directory, 'Test-BlankLineExamples.ps1'),\n-      path.join(scripts, 'Test-BlankLineExamples.ps1'));\n-    const generation = { Schema: 'PSStyleGuide.GeneratorResult.v2', Overall: 'NoChange', Phase: 'complete',\n+    fs.writeFileSync(path.join(scripts, 'Test-StyleGuideArtifacts.ps1'), mode === 'recovery-timeout' ?\n+      read('Test-StyleGuideArtifacts.ps1').replace('WaitForExit(300000)', 'WaitForExit(100)') : read('Test-StyleGuideArtifacts.ps1'));\n+    fs.writeFileSync(path.join(work, 'STYLE_GUIDE.md'), 'source fixture\\n');\n+    const recoveryCode = {\n+      'recovery-failure': 'process.exit(19);',\n+      'recovery-signal': \"process.kill(process.pid, 'SIGTERM');\",\n+      'recovery-timeout': 'setInterval(() => {}, 1000);',\n+      'recovery-channel': \"fs.appendFileSync(process.env.GITHUB_OUTPUT, 'fixture=changed');\",\n+      'recovery-config': \"fs.appendFileSync('.git/config', '\\\\n# changed by recovery\\\\n');\",\n+      'recovery-source': \"fs.appendFileSync('STYLE_GUIDE.md', 'changed by recovery');\",\n+      'recovery-self': \"fs.appendFileSync(new URL(import.meta.url), '// changed by recovery');\",\n+    }[mode] ?? '';\n+    if (mode !== 'recovery-missing') fs.writeFileSync(path.join(scripts, 'Test-StateRecoveryExamples.mjs'),\n+      \"import fs from 'node:fs';\\n\" + recoveryCode + '\\n');\n+    const generation = { Schema: 'TerraformStyleGuide.GeneratorResult.v2', Overall: 'NoChange', Phase: 'complete',\n       Category: 'none', NativeOutcome: 'Success', ExitCode: 0,\n@@ -505,14 +509,5 @@\n     }[mode] ?? '';\n-    if (mode === 'semantic-side-effect') {\n-      fs.writeFileSync(path.join(scripts, 'Test-BlankLineExamples.ps1'),\n-        \"[IO.File]::WriteAllText('unexpected.txt', 'changed by semantic verifier')\\n\" +\n-        \"Write-Output 'Blank-line example semantics passed, including focused mutation checks.'\\nexit 0\\n\");\n-    }\n-    if (mode === 'semantic-failure') {\n-      fs.writeFileSync(path.join(work, 'STYLE_GUIDE.md'),\n-        fs.readFileSync(path.join(work, 'STYLE_GUIDE.md'), 'utf8').replace('\\n\u2420\\n', '\\n\\n'));\n-    }\n     const verifierFails = ['stale', 'verifier-failure'].includes(mode);\n     fs.writeFileSync(path.join(scripts, 'Test-ExactGitPathSet.ps1'), mutation + '\\n' +\n-      quote(JSON.stringify({ Schema: 'PSStyleGuide.ExactGitPathSetResult.v2', Success: !verifierFails })) +\n+      quote(JSON.stringify({ Schema: 'TerraformStyleGuide.ExactGitPathSetResult.v2', Success: !verifierFails })) +\n       `\\nexit ${verifierFails ? 1 : 0}\\n`);\n@@ -520,2 +515,15 @@\n       GIT_CONFIG_GLOBAL: '/dev/null', GIT_TERMINAL_PROMPT: '0' };\n+    const runtimeLog = path.join(root, 'runtime-selection');\n+    if (['multiple-node-paths', 'first-node-failure'].includes(mode)) {\n+      const shellQuote = value => `'${value.replaceAll(\"'\", \"'\\\\''\")}'`;\n+      const runtimeDirectories = ['first-runtime', 'second-runtime'].map(name => path.join(root, name));\n+      for (const [index, runtimeDirectory] of runtimeDirectories.entries()) {\n+        fs.mkdirSync(runtimeDirectory);\n+        const outcome = index === 0 && mode === 'multiple-node-paths' ?\n+          `exec ${shellQuote(process.execPath)} \"$@\"` : 'exit 23';\n+        fs.writeFileSync(path.join(runtimeDirectory, 'node'),\n+          `#!/bin/sh\\nprintf '%s\\\\n' ${index} >> ${shellQuote(runtimeLog)}\\n${outcome}\\n`, { mode: 0o700 });\n+      }\n+      env.PATH = [...runtimeDirectories, env.PATH].join(path.delimiter);\n+    }\n     for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];\n@@ -531,12 +539,18 @@\n       path.join(scripts, 'Test-StyleGuideArtifacts.ps1')], { cwd: work, env, encoding: 'utf8', timeout: 30000 });\n-    assert.equal(result.status, mode === 'clean' ? 0 : 1, result.stdout + result.stderr);\n+    assert.equal(result.status, ['clean', 'multiple-node-paths'].includes(mode) ? 0 : 1, result.stdout + result.stderr);\n     const expected = { clean: /committed bytes match generator output/, stale: /Generate-StyleGuideArtifacts\\.ps1/,\n-      'semantic-failure': /blank-line semantic check failed/i,\n-      'semantic-side-effect': /outside the four[\\s\\S]{0,100}generated artifacts/,\n       'verifier-channel': /runner-state/, 'verifier-config': /configuration or hooks/,\n-      'verifier-worktree': /outside the four/, 'verifier-failure': /Exact-path verification did not confirm/ }[mode];\n-    const diagnostic = result.stdout + result.stderr;\n-    assert.match(mode === 'semantic-side-effect'\n-      ? diagnostic.replace(/\\x1B\\[[0-?]*[ -/]*[@-~]/g, '')\n-      : diagnostic, expected);\n+      'verifier-worktree': /outside the four/, 'verifier-failure': /Exact-path verification did not confirm/,\n+      'recovery-missing': /state-recovery: published-example tests did not complete/,\n+      'recovery-failure': /state-recovery: published-example tests did not complete/,\n+      'recovery-signal': /state-recovery: published-example tests did not complete/,\n+      'recovery-timeout': /state-recovery: published-example tests did not complete/,\n+      'recovery-channel': /runner-state/, 'recovery-config': /configuration or hooks/,\n+      'recovery-source': /outside the four/, 'recovery-self': /outside the four/,\n+      'multiple-node-paths': /committed bytes match generator output/,\n+      'first-node-failure': /state-recovery: published-example tests did not complete/ }[mode];\n+    assert.match(result.stdout + result.stderr, expected);\n+    if (['multiple-node-paths', 'first-node-failure'].includes(mode)) {\n+      assert.equal(fs.readFileSync(runtimeLog, 'utf8'), '0\\n', 'select the first application once; never fall back after failure');\n+    }\n   });\n@@ -1097,3 +1111,3 @@\n     const replace = source => source.replaceAll(\"'/usr/bin/git'\", quote(adapter)).replaceAll(\"'/bin/git'\", quote(adapter));\n-    const env = { GITHUB_SHA: event, GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide' };\n+    const env = { GITHUB_SHA: event, GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/TerraformStyleGuide' };\n     const acquired = f.run('Acquire triggering revision without an action', env, replace);\n"
+    },
+    {
+      "path": ".github/workflows/Test-LocalValidation.test.mjs",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7965b2476cf022e6efea355d438162937bef04b3",
+        "bytes": 4039,
+        "sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7965b2476cf022e6efea355d438162937bef04b3",
+        "bytes": 4039,
+        "sha256": "91f8ac7b263cf646354bcea8b011acb109b3d1f336e859e99190a1b1ceaa546b"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "owner": "A03",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+        "bytes": 26228,
+        "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+        "bytes": 26228,
+        "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "owner": "A03",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4020163b9d5f594232f76e54f9aeb28c3676a123",
+        "bytes": 12837,
+        "sha256": "c2377783f9d9e9dfe3751360312732959dc9574233b20eb23358bdb0ffe83eb7"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dfff2364064ca3ac8e030fad0e404b3676a16edb",
+        "bytes": 12865,
+        "sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc"
+      },
+      "raw_equal": false,
+      "disposition": "Four acquisition repository/URL identities.",
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:.github/workflows/agent-instructions.yml\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/agent-instructions.yml\n@@ -30,3 +30,3 @@\n           if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or\n-              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n+              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n               throw 'Unexpected acquisition repository.'\n@@ -48,3 +48,3 @@\n           if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }\n-          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n+          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n           if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }\n@@ -120,3 +120,3 @@\n           if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or\n-              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n+              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n               throw 'Unexpected acquisition repository.'\n@@ -138,3 +138,3 @@\n           if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }\n-          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n+          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n           if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }\n"
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "owner": "A03",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3585d8534ff6b2820debe306c540f6c9cea187c2",
+        "bytes": 51809,
+        "sha256": "4134d09b8630417887b53e6d3d24e8fe35ded9a6451e5e1935d4623f1a5a8e1a"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+        "bytes": 51830,
+        "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+      },
+      "raw_equal": false,
+      "disposition": "Three repository/origin identities.",
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:.github/workflows/copilot-setup-steps.yml\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/copilot-setup-steps.yml\n@@ -80,3 +80,3 @@\n           }\n-          if ($strRepository -cne 'franklesniak/PSStyleGuide') {\n+          if ($strRepository -cne 'franklesniak/TerraformStyleGuide') {\n               throw 'acquire: the triggering repository is not the expected repository'\n@@ -181,3 +181,3 @@\n           }\n-          if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n+          if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {\n               throw 'credential-policy: origin is not a credential-free GitHub HTTPS URL'\n@@ -238,3 +238,3 @@\n           if ($LASTEXITCODE -ne 0 -or $arrUrls.Count -ne 1 -or\n-              $arrUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n+              $arrUrls[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {\n               throw 'main: origin identity is invalid'\n"
+    },
+    {
+      "path": ".github/workflows/lint-markdown.mjs",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+        "bytes": 3218,
+        "sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "08942d7df2fa607941ebb901e0477f1088175326",
+        "bytes": 3218,
+        "sha256": "ccd5ba35d181af52734d2d372eaa3af5a6c75a771f7eb7a721dc43c21b30aa68"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/lint-markdown.test.mjs",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e3d5bb84e389d1b6ffe0033aafb1b821eb792a58",
+        "bytes": 26625,
+        "sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e3d5bb84e389d1b6ffe0033aafb1b821eb792a58",
+        "bytes": 26625,
+        "sha256": "1de2dc5cd3f482a7a5ba77289716f7ec2e22af4668092811e90207220ff81235"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/lint-nested-markdown.js",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3284f63d128288ce511391b693b1ba350b918f2c",
+        "bytes": 19388,
+        "sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "3284f63d128288ce511391b693b1ba350b918f2c",
+        "bytes": 19388,
+        "sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/lint-staged-markdown.mjs",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+        "bytes": 5745,
+        "sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+        "bytes": 5745,
+        "sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/scripts-README.md",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6446258f0d71c22ff68aceb64c87121d3f9c72d8",
+        "bytes": 13157,
+        "sha256": "e782b1a213003ca19f4ece0ccb992f0343eaaec9f89dcc6255b376741dc20881"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "9a88a8ebdba3a24cf45c82639da4bcb2442c5271",
+        "bytes": 13086,
+        "sha256": "9e483a42e1a01130205bc7dfa55fdac5e4a4c36244f98eb57e250d2cc0c86d97"
+      },
+      "raw_equal": false,
+      "disposition": "Only actual P1/T1 provenance link, blank-line/recovery child description and entry/command, and verify_generated_artifacts/verify native check name.",
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:.github/workflows/scripts-README.md\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/scripts-README.md\n@@ -22,3 +22,3 @@\n | `Generate-StyleGuideArtifacts.ps1` | Regenerates consumer style-guide artifacts from the normative and rationale sources. | `pwsh -NoLogo -NoProfile -File .github/workflows/Generate-StyleGuideArtifacts.ps1` |\n-| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/P1-SUPPLY-FREEZE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |\n+| `Get-SupplyFreezeDigest.mjs` | Optional manual diagnostic; no routine CI, update, or merge requirement. Reads `historical-supply-profile.json` for the retained historical tuple. Computes the reviewed workflow supply-freeze digest. | See [Prepare and record on Linux/x64](../../docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md#prepare-and-record-on-linuxx64); bare invocation is unsupported. |\n | `Initialize-CiToolchain.ps1` | Installs the reviewed Linux Node/npm runtime and selected locked dependency trees. | Called by CI with `-WorkflowDependencies` and, for instruction jobs, `-InstructionDependencies`; requires its Linux runner environment. |\n@@ -33,4 +33,4 @@\n | `Test-CheckoutCredentials.ps1` | Verifies the anonymous checkout's origin and credential policy. | Called by CI and shared helpers after anonymous acquisition; requires the expected origin and credential-free Linux runner context. |\n-| `Test-StyleGuideArtifacts.ps1` | Runs the blank-line semantic child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |\n-| `Test-BlankLineExamples.ps1` | Checks the published PowerShell blank-line examples and their focused mutation controls. | `pwsh -NoLogo -NoProfile -File .github/workflows/Test-BlankLineExamples.ps1` (no parameters). |\n+| `Test-StyleGuideArtifacts.ps1` | Runs the recovery-example child, generation and committed-artifact checks. | Called by the build workflow; requires its Linux runner environment. |\n+| `Test-StateRecoveryExamples.mjs` | Checks the published Terraform state-recovery examples. | `node .github/workflows/Test-StateRecoveryExamples.mjs` |\n | `Test-ExactGitPathSet.ps1` | Verifies an exact raw Git path set and optional worktree/index equality. | `Test-StyleGuideArtifacts.ps1` supplies the repository root, expected paths and mode; no argument-free invocation is supported. |\n@@ -38,3 +38,3 @@\n \n-The native required checks keep their existing names. `verify_generated_artifacts` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.\n+The native required checks keep their existing names. `verify` runs deterministic generation and checks the stable result schemas and committed artifacts. `policy` validates the workflow structure, helper selection, and reviewed parser integrity. `markdownlint` runs both existing Markdown lint phases. Candidate instruction tests are separate from the accepted-base maintenance classification. Classification does not grant maintenance authority; the authenticated owner/executor review process still binds scope, current head/base/policy, candidate tests, findings, and independent final quality review.\n \n"
+    },
+    {
+      "path": "AGENTS.md",
+      "owner": "A20",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a10d44f6d61c9126d8aa8f4445926579eafbb67b",
+        "bytes": 32654,
+        "sha256": "c0a907c5f59bf9031b1441f0861b336e15415d0e794ed377c0aab79ce850242d"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "be1e52363e92daec056660b3e1147527874ccbf9",
+        "bytes": 32746,
+        "sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f"
+      },
+      "raw_equal": false,
+      "disposition": "Scope/purpose/product language, generated filename, local PS versus canonical external PS guide for TF PowerShell, final identity; shared rules and metadata equal.",
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:AGENTS.md\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:AGENTS.md\n@@ -10,3 +10,3 @@\n - **Last Updated:** 2026-10-05\n-- **Scope:** Codex and compatible agents in PSStyleGuide. Brief shared rules and full Codex protocols; `.github/copilot-instructions.md` governs documentation authoring.\n+- **Scope:** Codex and compatible agents in TerraformStyleGuide. Brief shared rules and full Codex protocols; `.github/copilot-instructions.md` governs documentation authoring.\n <!-- template-sync: begin markdown-reference-only -->\n@@ -39,5 +39,5 @@\n - **Repository purpose and documentation contract**\n-  - PSStyleGuide defines actionable PowerShell rules for humans and coding agents.\n+  - TerraformStyleGuide defines actionable Terraform rules for humans and coding agents.\n   - `STYLE_GUIDE.md` is the normative source. Put extended explanation and design rationale in `STYLE_GUIDE_RATIONALE.md`.\n-  - Do not hand-edit `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n+  - Do not hand-edit `copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n   - Regenerate these files with `.github/workflows/Generate-StyleGuideArtifacts.ps1`. CI rejects generated-file drift.\n@@ -45,3 +45,3 @@\n - **PowerShell conformance**\n-  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in `STYLE_GUIDE.md`.\n+  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in the [PSStyleGuide](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md).\n   - This rule applies to `.github/workflows/Generate-StyleGuideArtifacts.ps1` and inline `pwsh` steps in GitHub Actions workflows.\n@@ -247,2 +247,2 @@\n \n-> This file is the Codex entry point for PSStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n+> This file is the Codex entry point for TerraformStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n"
+    },
+    {
+      "path": "CLAUDE.md",
+      "owner": "A20",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5eeadb1e9d9e2ddb77c9c7904861a2a19659e08c",
+        "bytes": 83316,
+        "sha256": "bb936f19fdbbcbb0e64502ea3ae7b75de447d39942a083ec03d237fe374f0ea6"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6a646684e062c418bf124fa5d78690d3e86611cf",
+        "bytes": 83433,
+        "sha256": "efd0c70621f46bd65119dab82ec9a1cb6fde8a0112a3f0d13d57c83267296bc1"
+      },
+      "raw_equal": false,
+      "disposition": "Scope/product introduction and purpose, source-of-truth identity, generated filename, local/external canonical PS guide and final identity; shared protocols/defaults/metadata equal.",
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:CLAUDE.md\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:CLAUDE.md\n@@ -10,3 +10,3 @@\n - **Last Updated:** 2026-10-05\n-- **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in PSStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.\n+- **Scope:** Agent-specific entry point for Claude Code and compatible AI coding agents operating in TerraformStyleGuide. Mirrors a minimal inline summary of the highest-priority shared rules; `.github/copilot-instructions.md` remains the canonical documentation-authoring source of truth.\n <!-- template-sync: begin markdown-reference-only -->\n@@ -15,3 +15,3 @@\n \n-This file provides PSStyleGuide-specific instructions for Claude Code and compatible AI coding agents. These instructions apply the repository's PowerShell, documentation, safety, and review contracts.\n+This file provides TerraformStyleGuide-specific instructions for Claude Code and compatible AI coding agents. These instructions apply the repository's Terraform, PowerShell, documentation, safety, and review contracts.\n \n@@ -19,3 +19,3 @@\n \n-The authoritative source of truth for PSStyleGuide documentation authoring is **`.github/copilot-instructions.md`**. Its normative-versus-rationale split and generated-artifact rules apply without exception. **Read that file before changing style-guide content.**\n+The authoritative source of truth for TerraformStyleGuide documentation authoring is **`.github/copilot-instructions.md`**. Its normative-versus-rationale split and generated-artifact rules apply without exception. **Read that file before changing style-guide content.**\n \n@@ -40,5 +40,5 @@\n - **Repository purpose and documentation contract**\n-  - PSStyleGuide defines actionable PowerShell rules for humans and coding agents.\n+  - TerraformStyleGuide defines actionable Terraform rules for humans and coding agents.\n   - `STYLE_GUIDE.md` is the normative source. Put extended explanation and design rationale in `STYLE_GUIDE_RATIONALE.md`.\n-  - Do not hand-edit `copilot-instructions.md`, `powershell.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n+  - Do not hand-edit `copilot-instructions.md`, `terraform.instructions.md`, `STYLE_GUIDE_CHAT.md`, or `STYLE_GUIDE_FULL.md`; the repository generator owns them.\n   - Regenerate these files with `.github/workflows/Generate-StyleGuideArtifacts.ps1`. CI rejects generated-file drift.\n@@ -46,3 +46,3 @@\n - **PowerShell conformance**\n-  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in `STYLE_GUIDE.md`.\n+  - PowerShell authored or modified in this repository MUST comply with the applicable `[All]`, `[Modern]`, and `[v1.0]` rules in the [PSStyleGuide](https://github.com/franklesniak/PSStyleGuide/blob/main/STYLE_GUIDE.md).\n   - This rule applies to `.github/workflows/Generate-StyleGuideArtifacts.ps1` and inline `pwsh` steps in GitHub Actions workflows.\n@@ -443,2 +443,2 @@\n \n-> This file is the Claude entry point for PSStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n+> This file is the Claude entry point for TerraformStyleGuide. The repository's generated consumer documentation remains derived from `STYLE_GUIDE.md`.\n"
+    },
+    {
+      "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+      "owner": "A02",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f66c405398db94f21d8caeae4b94487fe5ffa75d",
+        "bytes": 2179,
+        "sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "f66c405398db94f21d8caeae4b94487fe5ffa75d",
+        "bytes": 2179,
+        "sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d"
+      },
+      "raw_equal": true,
+      "disposition": "Raw bytes/type/mode equal.",
+      "exact_diff": ""
+    },
+    {
+      "path": "docs/dependency-maintenance.md",
+      "owner": "A07",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6c9c2e62804d4979a7401d421f81083ba7829bac",
+        "bytes": 9867,
+        "sha256": "09a57a1fed1bf694cd5e43d67a749af5a28b96556fe87fdfa98095075e0b667d"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "61977b68f4adc7a31aa822fb224efe41b0ea45af",
+        "bytes": 9874,
+        "sha256": "864427fc673b8d257d384ec55ea45e60612883624a071c5df616170342c32654"
+      },
+      "raw_equal": false,
+      "disposition": "Scope repository identity only.",
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:docs/dependency-maintenance.md\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:docs/dependency-maintenance.md\n@@ -7,3 +7,3 @@\n - **Last Updated:** 2026-10-05\n-- **Scope:** Locked npm and Python tools, the local Markdown hook, and current dependency-risk checks in PSStyleGuide.\n+- **Scope:** Locked npm and Python tools, the local Markdown hook, and current dependency-risk checks in TerraformStyleGuide.\n \n"
+    }
+  ],
+  "additional_workflow_paths": [
+    {
+      "path": ".github/workflows/build.yml",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+        "bytes": 4375,
+        "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "38c0b643a7bc41189bd15f57c3197d2fcff12ab1",
+        "bytes": 4348,
+        "sha256": "935f8b37c4d7c31e418ce74a3f6f5d2802dc597ec2860a0039847d69cf9e876b"
+      },
+      "raw_equal": false,
+      "prior_disposition_unchanged": true,
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:.github/workflows/build.yml\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/build.yml\n@@ -6,3 +6,3 @@\n jobs:\n-  verify_generated_artifacts:\n+  verify:\n     if: github.event_name != 'push' || github.event.deleted != true\n@@ -19,3 +19,3 @@\n           if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or\n-              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n+              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n               throw 'Unexpected acquisition repository.'\n@@ -37,3 +37,3 @@\n           if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }\n-          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n+          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n           if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }\n@@ -66,3 +66,3 @@\n       contents: read\n-    needs: verify_generated_artifacts\n+    needs: verify\n     steps:\n@@ -91,3 +91,3 @@\n             copilot-instructions.md\n-            powershell.instructions.md\n+            terraform.instructions.md\n             STYLE_GUIDE_CHAT.md\n"
+    },
+    {
+      "path": ".github/workflows/markdownlint.yml",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "59054973e607c793e821f0ba21fc32143a716b43",
+        "bytes": 6686,
+        "sha256": "4b938c608feb4e5fcbf3afe80277ec789f93967a8457b5c8a27f0c6a6f5eb4b0"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "7a4f8c4a8379745c7e83934b0a5804e588d9681d",
+        "bytes": 6714,
+        "sha256": "176bb3071b889726dd33a608994934fc281e247ead6839e1a3b3fa1e9fd38d03"
+      },
+      "raw_equal": false,
+      "prior_disposition_unchanged": true,
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:.github/workflows/markdownlint.yml\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/markdownlint.yml\n@@ -21,3 +21,3 @@\n           if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or\n-              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n+              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n               throw 'Unexpected acquisition repository.'\n@@ -39,3 +39,3 @@\n           if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }\n-          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n+          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n           if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }\n@@ -82,3 +82,3 @@\n           if ($env:GITHUB_SERVER_URL -cne 'https://github.com' -or\n-              $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {\n+              $env:GITHUB_REPOSITORY -cne 'franklesniak/TerraformStyleGuide') {\n               throw 'Unexpected acquisition repository.'\n@@ -100,3 +100,3 @@\n           if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }\n-          & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'\n+          & /usr/bin/git remote add origin 'https://github.com/franklesniak/TerraformStyleGuide'\n           if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }\n"
+    },
+    {
+      "path": ".github/workflows/devcontainer-ci.yml",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "bytes": 8391,
+        "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "ade80d635425ce90e6520dfe934aa660eed46321",
+        "bytes": 8391,
+        "sha256": "205afac285903a132cf3c1837e84de610071d38661d2b129fb940d4e403b943a"
+      },
+      "raw_equal": true,
+      "prior_disposition_unchanged": true,
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "85905890f1eebd304fb8f6613b3e93a67c42043a",
+        "bytes": 3081,
+        "sha256": "8f67e696147c96be5e973d859f5079de6cdc223f7c23eb8a876cb9b09d73a24b"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+        "bytes": 3088,
+        "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+      },
+      "raw_equal": false,
+      "prior_disposition_unchanged": true,
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:.github/workflows/Test-CheckoutCredentials.ps1\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/Test-CheckoutCredentials.ps1\n@@ -39,3 +39,3 @@\n }\n-if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/PSStyleGuide') {\n+if ($arrRemoteUrls[0] -cne 'https://github.com/franklesniak/TerraformStyleGuide') {\n     throw 'credential-policy: origin is not a credential-free GitHub HTTPS URL'\n"
+    },
+    {
+      "path": ".github/workflows/workflow-policy-contract.json",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "53d81439e58eb33b95bb1e6f97bc1a124c0b5fac",
+        "bytes": 1517,
+        "sha256": "53d7d51f5c823ab76de74529eca6ccd93c237a4b64ab6a80e1d9ab2668794142"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b7ab4acd91e45652836fe35069dce5268a8e3395",
+        "bytes": 1496,
+        "sha256": "379bd3979152d2c10c875b4c1cfc18e13660ec838d822bb215014a6000bb7ef9"
+      },
+      "raw_equal": false,
+      "prior_disposition_unchanged": true,
+      "exact_diff": "--- PS:d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48:.github/workflows/workflow-policy-contract.json\n+++ TF:e21b74fe0b56551008f78f9f2946cd2a0f9c19ce:.github/workflows/workflow-policy-contract.json\n@@ -3,3 +3,3 @@\n   \"roles\": {\n-    \"artifactVerifier\": \"verify_generated_artifacts\"\n+    \"artifactVerifier\": \"verify\"\n   },\n@@ -33,3 +33,3 @@\n         \"name\": \"style-guide-committed-${{ github.run_id }}-${{ github.run_attempt }}\",\n-        \"path\": \"copilot-instructions.md\\npowershell.instructions.md\\nSTYLE_GUIDE_CHAT.md\\nSTYLE_GUIDE_FULL.md\\n\",\n+        \"path\": \"copilot-instructions.md\\nterraform.instructions.md\\nSTYLE_GUIDE_CHAT.md\\nSTYLE_GUIDE_FULL.md\\n\",\n         \"if-no-files-found\": \"error\",\n"
+    },
+    {
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+      },
+      "raw_equal": true,
+      "prior_disposition_unchanged": true,
+      "exact_diff": ""
+    },
+    {
+      "path": ".github/workflows/workflow-policy-cases.json",
+      "PS": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      },
+      "TF": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      },
+      "raw_equal": true,
+      "prior_disposition_unchanged": true,
+      "exact_diff": ""
+    }
+  ],
+  "scope22_equal": 13,
+  "scope22_retained_differences": 9,
+  "additional_equal": 3,
+  "two_repair_postimages_equal": true,
+  "limits": "Raw Git blob/type/mode comparison at native main refs, including all named coupled foundation paths. Both reviewed repairs are equal. Does not accept pending PS landed workflows, broad A03/A07/A21, generator work or the A18 full union. Prior exact exceptions remain valid only for unchanged identities and stated consumers."
+}
