@@ -1,0 +1,368 @@
+{
+  "status": "frozen_source_under_full_linux_validation",
+  "recorded_at": "2026-10-05T19:26:32.329559+00:00",
+  "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+  "base_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
+  "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "04a0a02f490d597f209eeed41a0519b0959faac8",
+  "branch": "codex/a06-generator-convergence",
+  "changed_paths": {
+    ".github/workflows/Classify-InstructionMaintenance.mjs": {
+      "bytes": 6095,
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+      "raw_git_blob": "d9802a71a9e257bcbd0b9d5055e9f3ed9f430343",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e09a17d8fb394ff9d1465baf2d9a6286c288e04d",
+        "bytes": 6063,
+        "sha256": "239aec6264d77f38733ff414d901cc0c83388d60766e26293204e1d588ef01ae"
+      }
+    },
+    ".github/workflows/Classify-InstructionMaintenance.test.mjs": {
+      "bytes": 26191,
+      "sha256": "ec524175f9a10dfb0825844707692de93f86b6bb0c182ed1d3a440d96aa7c5ff",
+      "raw_git_blob": "166d137206aff8f503911be9a569efbd204e023b",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "dfda67ad00c602280ec716d8407e1816de495452",
+        "bytes": 25554,
+        "sha256": "63fb8cddc5c1ccd08254068b101b87ef2d8674c1edf088d823f9f0ecfda876e5"
+      }
+    },
+    ".github/workflows/Generate-StyleGuideArtifacts.ps1": {
+      "bytes": 89914,
+      "sha256": "c14cfc105ae19352afd0aa7c779adcbf9e2fe5d7b8eba885267d181745593a61",
+      "raw_git_blob": "ed78c197274393a1a16274221ec27c697166ca45",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "a23d38c42770d7463920704e108ccd63240dc90b",
+        "bytes": 86655,
+        "sha256": "b65985bbda043ad16530d775ddc2f5c7e25ca2185a704605d7c8d9b09b4eda48"
+      }
+    },
+    ".github/workflows/Test-CiHelpers.test.mjs": {
+      "bytes": 119501,
+      "sha256": "219fcb050f574dd223595b7556e67c941ede4250178a2d9e89c5774650959623",
+      "raw_git_blob": "13004799acef426ae886158ff54c7021d0687a01",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "4098cd1c6d8dadd114fbd1c7a7da5b1918d9eacb",
+        "bytes": 98544,
+        "sha256": "5a14647cf03e46f0c776813ef637b6872097a43210efdedee7a095c523e88002"
+      }
+    },
+    ".github/workflows/Test-ExactGitPathSet.ps1": {
+      "bytes": 253908,
+      "sha256": "796e6efe02d3ca4a817c6e1430f9c71fb9d6d4bd4cf6be21df512e19e3b49d30",
+      "raw_git_blob": "76cad06fd918ac2405981d205814c7e8d85e4dc7",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "b6ddf4f05a7f147d8e239b223dc7d5dae6bf4114",
+        "bytes": 253910,
+        "sha256": "b4cdfe400a8efcb4aab47433775966e898bb5e76e1e9161c02e26a03638be909"
+      }
+    },
+    ".github/workflows/Test-StyleGuideArtifacts.ps1": {
+      "bytes": 36090,
+      "sha256": "827056661bc464fabaa1612e6bc908b9442e1bd6ae7560baa497b01516b70bf8",
+      "raw_git_blob": "6dc5276d95ac5b161ce28e6ea8eb95f85accfe7f",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "18b8048aac58ed7b1d28a532a2aa413890483042",
+        "bytes": 32648,
+        "sha256": "41a3a6afeed7d49a78b8112d6477f49b8f329de4e7d77c5e4789ca68f156f996"
+      }
+    },
+    ".github/workflows/Test-StyleGuideGenerator.ps1": {
+      "bytes": 22087,
+      "sha256": "acdf9ccbee458f05469fdba7b403a9b97a70f9597e965934156b1ec7e10d7b60",
+      "raw_git_blob": "837ddc35f2141c134bc219e5ad07d106cce3f72e",
+      "intended_mode": "100644",
+      "base": {
+        "exists": false
+      }
+    },
+    ".github/workflows/Validate-WorkflowPolicy.mjs": {
+      "bytes": 31020,
+      "sha256": "bc15c0ba96e7508960ae3cbd4008937c004f5396d4c7345def1f8f29ed203ee8",
+      "raw_git_blob": "c351cc864b741037b5a604b94f167257c58e3347",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "36da1d6085e0e67ab1faaccff073dc3caccfbc62",
+        "bytes": 26228,
+        "sha256": "aca0d66b5bd72b406693569363d2db4d5d572fd785b2a6be03eb889b6a9e83f0"
+      }
+    },
+    ".github/workflows/Validate-WorkflowPolicy.test.mjs": {
+      "bytes": 16796,
+      "sha256": "1f47f8d82dfdf1eb8659796baabb20802a34ab6146b1f9e6864e5956ae73be09",
+      "raw_git_blob": "a76dd4ca720d17ee5abba8a79885dd706befdefa",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "295da6170ae721ca8c02509b308ac3660f66a974",
+        "bytes": 17320,
+        "sha256": "b612fd12dbebffcc7d177a0fe10d7aa7689b699bbaa3669858441e762a31cd6c"
+      }
+    },
+    ".github/workflows/build.yml": {
+      "bytes": 24995,
+      "sha256": "1807813adad6d093fdf97ce4d434c3467edc0c0bd0788e71cd3b27836a7fac60",
+      "raw_git_blob": "6609830b2fb8032b29339f28702f085c98288295",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "d499e1f8c2b3a8b6bc7f6af5445aa0ab97d44dc7",
+        "bytes": 4375,
+        "sha256": "98355028848f323fd28c2e26fb32126c374bfcd9fe2cc70656a37291bc5ad80d"
+      }
+    },
+    ".github/workflows/scripts-README.md": {
+      "bytes": 13541,
+      "sha256": "58cb5ba567be65c087fca07a4653d887597b3a90cc5e1d7928fe7ffbf8c13e02",
+      "raw_git_blob": "8510f350f0247b919b6e1527bcd7b7b7091b103f",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "6446258f0d71c22ff68aceb64c87121d3f9c72d8",
+        "bytes": 13157,
+        "sha256": "e782b1a213003ca19f4ece0ccb992f0343eaaec9f89dcc6255b376741dc20881"
+      }
+    },
+    ".github/workflows/workflow-policy-cases.json": {
+      "bytes": 26216,
+      "sha256": "350937aa600e712a4179d262228e0a85df7375f549e1124a51b23c4b1c311f1a",
+      "raw_git_blob": "731c3bde3ba87efa684eef380e0d99b9297d091c",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "5f19dc9175dd7dd3f9eb2cd8369ece8986e29326",
+        "bytes": 17621,
+        "sha256": "37e420f58ecb522b07fc350fde42ccb2fa96464880811c5d0703e50b86505dda"
+      }
+    },
+    "powershell.instructions.md": {
+      "bytes": 148831,
+      "sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "raw_git_blob": "b711cec80333e409cb4e644eb94530653ca39109",
+      "intended_mode": "100644",
+      "base": {
+        "mode": "100644",
+        "type": "blob",
+        "blob": "e68999483c41c07e732772d88b2c43dd1467f367",
+        "bytes": 148832,
+        "sha256": "fd993b9658f434af7b668d18670326c19d76a0728a170465c686d628ce2597f8"
+      }
+    }
+  },
+  "source_files": 77,
+  "dependency_files": 1910,
+  "source_guard_unchanged_count": 64,
+  "golden_outputs": {
+    "copilot-instructions.md": {
+      "base_sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "final_sha256": "331a401e3f26dbd4c497e156784c8f3e41f17bc295ec9f6a734639f2d6bb62fd",
+      "change": "byte-identical"
+    },
+    "powershell.instructions.md": {
+      "base_sha256": "fd993b9658f434af7b668d18670326c19d76a0728a170465c686d628ce2597f8",
+      "final_sha256": "647fa0d6ec9781058951c529c33f59d06e98a8e970e8e74f19743254707f3b3f",
+      "change": "approved one-space applyTo"
+    },
+    "STYLE_GUIDE_CHAT.md": {
+      "base_sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+      "final_sha256": "d1e49373a1883dafd1384bcc25e016bdb19dc5039d5164fc32bb39a2989b75eb",
+      "change": "byte-identical"
+    },
+    "STYLE_GUIDE_FULL.md": {
+      "base_sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+      "final_sha256": "622493c9da1b31490e37bda6bd6c041144e20145515abc578e96e45ea41df87d",
+      "change": "byte-identical"
+    }
+  },
+  "decisions": [
+    "A06-D1 C96",
+    "A06-D2 C97.4",
+    "A06-D3 C96.6",
+    "frontmatter D4 C98",
+    "A06-R1 C96"
+  ],
+  "R1_original_reproduction": {
+    "captured_at": "2026-10-05T19:08:04.083666+00:00",
+    "workflow_sha256": "fbe1d77c578e0b48d942fde6d8a094c23206faa6f8c48b31954d31821834b9b1",
+    "proof_body_sha256": "92720af5b7a4f55518472b628b8f7e78c339bcf8f792f269f12dc66cd7427187",
+    "shell_contract": "Hosted Stop preference and final LASTEXITCODE forwarding; actual proof body unchanged. Real fixed Windows Git in isolated temporary repository; fixture harness exit only. No product edit.",
+    "results": [
+      {
+        "harness_exit_each_pass": 0,
+        "host_exit": 0,
+        "published_output": "revision=82abb4d8b7a566e33e2517e16ef1b7080b6e4527\n",
+        "stdout_bytes": 0,
+        "stderr_bytes": 0
+      },
+      {
+        "harness_exit_each_pass": 7,
+        "host_exit": 0,
+        "published_output": "revision=82abb4d8b7a566e33e2517e16ef1b7080b6e4527\n",
+        "stdout_bytes": 0,
+        "stderr_bytes": 0
+      }
+    ],
+    "finding": "Confirmed: both failed harness calls exit7, but later Git resets native status and proof publishes current revision with host exit0."
+  },
+  "R1_focused_result": "All12 caller fixture combinations pass:3 actual job bodies times first-pass7, second-pass7, exception and2-success. Failures publish no revision; no hosted-generator credit.",
+  "focused": {
+    "actual_windows7_assertions_each": 112,
+    "actual_windows7_passes": 2,
+    "immutable_tf_golden_passes": 2,
+    "immutable_tf_outputs_each": 4,
+    "workflow_policy_tests": 178,
+    "platform_control_groups": 4,
+    "classifier_control_groups": 1,
+    "failed": 0,
+    "cancelled": 0,
+    "skipped": 0,
+    "powershell_parse_errors": 0,
+    "powershell_analyzer_warnings_errors": 0
+  },
+  "evidence_sha256": "57f31d725091a07c0b793a93cd4d0871f37c50245f59a77036b6b806099d458b",
+  "report_sha256": "e8999d4e0172b8df273b1c70699816f7f7f02a8371a552f7f51b1e2affb917fb",
+  "log_catalog": {
+    "generator-pass1.log": {
+      "bytes": 215,
+      "sha256": "24cb9597e7ea52cd213cbd12d2122b53a0b26b36df1bd6d77797a8e83826ec8c"
+    },
+    "generator-pass2.log": {
+      "bytes": 215,
+      "sha256": "24cb9597e7ea52cd213cbd12d2122b53a0b26b36df1bd6d77797a8e83826ec8c"
+    },
+    "peer-golden.json": {
+      "bytes": 620,
+      "sha256": "3ffc2baf082b85e11227bacc3a7ec79bdc80f21c838e3e3e7a230f202d47a670"
+    },
+    "peer-pass1.log": {
+      "bytes": 3062,
+      "sha256": "c046701a137167cb874f8eec3117ad77c9366f5cb0ffea2076d1127cc6a1ab50"
+    },
+    "peer-pass2.log": {
+      "bytes": 3062,
+      "sha256": "c046701a137167cb874f8eec3117ad77c9366f5cb0ffea2076d1127cc6a1ab50"
+    },
+    "policy-test.log": {
+      "bytes": 12848,
+      "sha256": "5b734c049c558134b3a41a57bf940fcfcadb4902efebd37e2a949e0af864466e"
+    },
+    "platform-controls.log": {
+      "bytes": 526,
+      "sha256": "0bb92d7a168b51ec0c022e8d145739807fd4eba5f36eaf8793ee5fb9c42e5c1c"
+    },
+    "classifier-controls.log": {
+      "bytes": 183,
+      "sha256": "4539869e81f1c8117909935a80d8f3c89d44b024f7fa2b050d62f18500c530a8"
+    },
+    "workflow-cli.log": {
+      "bytes": 384,
+      "sha256": "699e0848f9aa224e7e05a0a4cc27a5054b998e8866ce716bc398b5da09bf395b"
+    },
+    "powershell-analysis.json": {
+      "bytes": 393,
+      "sha256": "5e2ea38570f608582b1ae9fd20f9351d04cb60e10c53ba063e009bdd9fff2914"
+    },
+    "verifier-final-analysis.log": {
+      "bytes": 56,
+      "sha256": "512fa3585115d9cc81e63f42f83d2322f3b9e54506a8adf66b2963b13cf2d912"
+    },
+    "A06-R1-platform-exit.md": {
+      "bytes": 11125,
+      "sha256": "7bad8c76db8ba4aa79f8e72ac931e1fd474e5e249db3e11350feb3d3864ba2ed"
+    },
+    "fixture-notes.md": {
+      "bytes": 401,
+      "sha256": "c4412a806665a1c0f7e32c41875c7c9589d34801c31b716d9e68c47218138555"
+    },
+    "verify_peer.py": {
+      "bytes": 3058,
+      "sha256": "7007882a075a6761696e27f1ef4beb078f5176428e9f986f0708c35a0ed1dd5c"
+    },
+    "check-powershell.ps1": {
+      "bytes": 1072,
+      "sha256": "82ec6e4f9d32698e3c484a54c780f162c5ae6c020853c8709b1ad0068182f533"
+    }
+  },
+  "runtime": {
+    "node": "24.18.1",
+    "npm": "11.16.0 (root installed; no writer installation)",
+    "powershell": "7.6.5 Core Windows",
+    "PSScriptAnalyzer": "1.24.0"
+  },
+  "aggregate": {
+    "status": "running",
+    "run_id": "a06-source-20261005-v1",
+    "manifest_sha256": "8a95400243e02ef9a7e0e2594ef25509711d772b8e832feb64de46c5625b5125",
+    "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "expected_hooks": 11,
+    "node_suites": 7,
+    "staged_preflight": {
+      "name": "staged-preflight",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-RequireStagedInputMatch"
+      ],
+      "started_at": "2026-10-05T19:24:46.680883+00:00",
+      "timeout_seconds": 600,
+      "state": "passed",
+      "pid": 79,
+      "exit": 0,
+      "finished_at": "2026-10-05T19:24:54.974617+00:00",
+      "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    }
+  },
+  "transfers": {
+    "A06": "0/12",
+    "A03": "2/12",
+    "A21": "4/12"
+  },
+  "rounds_used": 0,
+  "first_request_at": null,
+  "deadline": null,
+  "pending_native_operations": [],
+  "limits": [
+    "No local Windows5.1 file execution: Restricted, no bypass.",
+    "No actual hosted Windows5.1/Windows7/Linux7 proof here.",
+    "No native Linux/ext4 or BSD generator execution here.",
+    "GNU/BSD/unknown stat probes and Windows acquisition substitutes are synthetic.",
+    "Artifact-gate PS/TF useful child oracle union is retained; Linux execution belongs to root.",
+    "No whole Node or11-hook aggregate run here.",
+    "No staged/committed endpoint checks or native settings/publication/review performed.",
+    "Issue155 remains open; D92/D93 path publication/cleanup limitations remain."
+  ],
+  "remaining": [
+    "Stage exact13 paths; final staged/committed endpoint validation.",
+    "Qualified11-hook Linux aggregate and full Node/CI-helper suites.",
+    "Actual focused harness twice per Windows5.1,Windows7,native-ext4 Linux7 hosted cell on same revision.",
+    "Exact-head lifecycle/review/publication and later paired integration."
+  ]
+}
