@@ -1,0 +1,10 @@
+<!-- markdownlint-disable MD013 -->
+# R9: recovery child working directory — evidenced no change
+
+Review5420961221, comment4189169268, input07636c8633b8544eb30c71ce1b24d2bcdef4c74e. Allegation explicitly concerns invocation from a different cwd in future callers; proposed absolute Node script path or WorkingDirectory.
+
+The actual artifact verifier is documented as a Linux CI checkout helper, not an arbitrary-cwd public entry point (script DESCRIPTION and scripts-README row34). Its supported workflow invokes it from the acquired workspace root (build430); current role fixtures explicitly spawn from their work root (Test-CiHelpers804/896). The workflow's finite schema disallows an added defaults/working-directory surface. This is a whole-wrapper caller contract: GitControlSurfaceDigest combines PWD with .git (356); the file digest map uses PWD (483); PS semantic, generator and exact-verifier paths are also root-relative (601,660,719). The external ProcessStartInfo child inherits the actual process working directory in these launched-root callers. No current path changes that working directory before Node.
+
+Making only the Node argument absolute would leave the rest of the wrapper tied to the root and would not establish cwd independence. Setting just its WorkingDirectory would create a different authority basis from the existing Git and file snapshots when an unsupported caller starts elsewhere. The current first-resolved Node,300000ms deadline, output drain and child-integrity envelope remain selected under D3; missing-child and failure modes are already covered.
+
+Disposition: no supported-caller defect demonstrated; no product edit or new cwd-independent promise. Keep the actual fixed caller contract. A future real arbitrary-cwd use must address the entire snapshot/child/root contract together; that hypothetical is not required work in this batch. This is evidenced AGENTS step2 refutation of present materiality, not a claim that arbitrary-cwd invocation succeeds. No product execution was performed here.

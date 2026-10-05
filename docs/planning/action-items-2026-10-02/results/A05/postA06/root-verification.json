@@ -1,0 +1,39 @@
+{
+  "recorded_at": "2026-10-05T21:47:26.348736+00:00",
+  "reader": "root",
+  "review": "Read full report; verified both artifact hashes, four independently sampled raw objects/modes and all four retained runtime artifact hashes. No tests rerun; no product acceptance.",
+  "sampled": [
+    {
+      "source": "PS-accepted",
+      "path": ".github/instructions/yaml.instructions.md",
+      "blob": "edef19560d3403985d1417af4772d74bbf9eacf4",
+      "sha256": "ceba4a87452eded866681a914bdb9049b9eda1ae71a000da27fe566c07fb72d3"
+    },
+    {
+      "source": "TF-accepted",
+      "path": ".github/instructions/yaml.instructions.md",
+      "blob": "924d12c833d07def47d05137b532e622db622fa4",
+      "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+    },
+    {
+      "source": "A06-published-prospective",
+      "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      "blob": "3f4bb6c982b584aed1535e9ef04dd918f9069055",
+      "sha256": "d1f646e16fc2c5417dafaa1c631e06421a62a94c28618a205affde61dfb4f5e5"
+    },
+    {
+      "source": "A06-staged-prospective",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "blob": "7e9c97c06d3c4c937538e634ffe8cf08ea3e4435",
+      "sha256": "fbfa8555cd9596073abb78200af00eba9df38e60f336c0bf500342401ca17584"
+    }
+  ],
+  "catalog_sha256": "b9d5726a25db5f632d5d35e44537edbe22ca6153d0b61a0b0d21ce6d86ae1eb8",
+  "transfers": {
+    "transfers_used": 0,
+    "transfer_cap": 8,
+    "rounds_used": 0,
+    "review_clock_started": false
+  },
+  "next_action": "After paired A06 acceptance, refresh changed inputs, implement approved patches and real moved-ref fixture, then final Windows/Linux validation and PS175 two complete clean pre-commit passes."
+}

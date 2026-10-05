@@ -1,10 +1,10 @@
 {
-  "status": "R7_staged_aggregate_ready_round2_copilot_pending",
-  "recorded_at": "2026-10-05T21:32:52.521728+00:00",
+  "status": "R10_staged_aggregate_ready",
+  "recorded_at": "2026-10-05T22:06:28.516160+00:00",
   "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
   "base_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
   "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
-  "candidate_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+  "candidate_tree": "0d0be7e39c29abf29b67384f3c44796a06118abf",
   "branch": "codex/a06-generator-convergence",
   "changed_paths": {
     ".github/workflows/Classify-InstructionMaintenance.mjs": {
@@ -237,10 +237,12 @@
   },
   "aggregate": {
     "status": "passed",
-    "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\aggregate-manifest-v4.json",
-    "manifest_sha256": "0e5232a6c4196738a6bb40ceaa04cf186da697b6816b0bf073e6735345377af2",
+    "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v5",
+    "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\aggregate-manifest-v5.json",
+    "manifest_sha256": "b94a01647b1ffe2dfaca842099f4131839d0887f5f6eb2276ad8a3a247b0fa00",
     "expected_node_tests": 567,
-    "requested_at": "2026-10-05T20:53:33.643523+00:00",
+    "session_id": 70730,
+    "requested_at": "2026-10-05T21:34:29.996899+00:00",
     "node_counts": {
       "tests": 567,
       "pass": 567,
@@ -248,10 +250,9 @@
       "cancelled": 0,
       "skipped": 0
     },
-    "node_log_sha256": "489f0a481676518019010de158496b73136c64d98aa312faa7e644e31b1a04eb",
-    "node_finished_at": "2026-10-05T20:57:15.513808+00:00",
-    "result_sha256": "0ec706cf01865c79adf86e3480568ee910f26a567680c5dff9cc7ebd16153923",
-    "status_sha256": "a743f8935f048a4bb606d50761800e78c8164ff6c858bb46118ce2053f596f87",
+    "node_log_sha256": "b626693129176d99eece84417ef313b80f26501d75eed98093f4490759e73e3c",
+    "result_sha256": "3ff4a25e7c845b7bf687abdd2d3e50ecffffd01743c04abe0789a727b58437b5",
+    "status_sha256": "624e3483980a7d4ef04d1d3a2c2f7291a3ca0c37398fc65bf892325b2a4a2ae3",
     "passed_hooks": 11,
     "skipped_hooks": 0,
     "source_after_equal": true,
@@ -267,12 +268,12 @@
           ".github/workflows/Test-AgentInstructions.ps1",
           "-RequireStagedInputMatch"
         ],
-        "started_at": "2026-10-05T20:53:50.102855+00:00",
+        "started_at": "2026-10-05T21:33:54.468675+00:00",
         "timeout_seconds": 600,
         "state": "passed",
-        "pid": 79,
+        "pid": 78,
         "exit": 0,
-        "finished_at": "2026-10-05T20:53:58.853283+00:00",
+        "finished_at": "2026-10-05T21:34:02.662204+00:00",
         "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
       },
       {
@@ -288,13 +289,13 @@
           ".github/workflows/Test-LocalValidation.test.mjs",
           ".github/workflows/lint-markdown.test.mjs"
         ],
-        "started_at": "2026-10-05T20:53:59.036553+00:00",
+        "started_at": "2026-10-05T21:34:02.886400+00:00",
         "timeout_seconds": 3600,
         "state": "passed",
-        "pid": 616,
+        "pid": 615,
         "exit": 0,
-        "finished_at": "2026-10-05T20:57:15.513808+00:00",
-        "log_sha256": "489f0a481676518019010de158496b73136c64d98aa312faa7e644e31b1a04eb"
+        "finished_at": "2026-10-05T21:37:10.855768+00:00",
+        "log_sha256": "b626693129176d99eece84417ef313b80f26501d75eed98093f4490759e73e3c"
       },
       {
         "name": "aggregate",
@@ -305,18 +306,18 @@
           "run",
           "--all-files"
         ],
-        "started_at": "2026-10-05T20:57:15.724940+00:00",
+        "started_at": "2026-10-05T21:37:11.082393+00:00",
         "timeout_seconds": 14400,
         "state": "passed",
-        "pid": 21649,
+        "pid": 21668,
         "exit": 0,
-        "finished_at": "2026-10-05T21:07:54.491911+00:00",
+        "finished_at": "2026-10-05T21:49:04.262109+00:00",
         "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
         "passed_hooks": 11,
         "skipped_hooks": 0
       }
     ],
-    "finished_at": "2026-10-05T21:07:54.741759+00:00"
+    "finished_at": "2026-10-05T21:49:04.544240+00:00"
   },
   "transfers": {
     "A06": "0/12",
@@ -326,17 +327,7 @@
   "rounds_used": 2,
   "first_request_at": "2026-10-05T20:12:24.969231+00:00",
   "deadline": "2026-10-13T20:12:24.969231+00:00",
-  "pending_native_operations": [
-    {
-      "service": "Copilot",
-      "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
-      "requested_body_sha256": "0143e8015a81e6eba20d9a3a76c0271b24f8f28006e7369012bb64e3e242b763",
-      "request_event": 32545544793,
-      "workflow_run": 37375005271,
-      "status": "confirmed_pending",
-      "observed_completed_effort": null
-    }
-  ],
+  "pending_native_operations": [],
   "limits": [
     "Local Windows5.1 script execution remains Restricted; no bypass. Hosted current-head proof is required.",
     "Old parent24b1879 hosted Windows cells and reviews are historical. New07636c8 hosted platform/whole-workflow acceptance remains pending.",
@@ -346,10 +337,9 @@
     "Current remote reviews, independent final quality, normal merge/landed acceptance, peer transfer and reverse comparison remain."
   ],
   "remaining": [
-    "Run final v5 validation on the staged harness repair.",
-    "Collect existing Copilot terminal result; preserve completed Codex and original body attribution.",
-    "Commit/publish final repair/body and request next input only after old request set reconciles.",
-    "Require current-input hosted proof, bounded independent-quality follow-up, normal source/landed acceptance and paired delivery."
+    "Run v6 on final R10 staged bytes; preserve passed R7 prior-input results.",
+    "Validate final changed bytes and publish one combined candidate/body.",
+    "Current-input hosted platform proof, both remote reviews, bounded independent quality, normal source/landed acceptance and paired delivery."
   ],
   "candidate_history": [
     {
@@ -561,30 +551,124 @@
     "report_sha256": "d40a3b8f0f9782e9ccd3269e552b7270c6f225fc83e0e8ecc718d4a22f9ca1be",
     "root_review": "Complete fixture diff reviewed before release of this staging script. Explicit finite role selection and bounded PS children preserve wrapper controls without missing peer helper. Actual production semantic helpers/gates and all other source bytes unchanged; no extra helper or skipped peer controls."
   },
-  "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+  "head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
   "pr": 234,
   "pr_url": "https://github.com/franklesniak/PSStyleGuide/pull/234",
   "body_sha256": "f5ddf4877c0a24c3262bef26bc8daff9444d030835a621ba381c4acad5a87367",
   "commit": {
     "status": "committed",
-    "expected_parent": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
-    "expected_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
-    "requested_at": "2026-10-05T21:10:31.256619+00:00",
+    "expected_parent": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+    "expected_tree": "0d0be7e39c29abf29b67384f3c44796a06118abf",
+    "requested_at": "2026-10-05T21:50:22.333758+00:00",
     "exit": 0,
-    "log_sha256": "7480c2827de43f98a01fe793c2cb087ea04d1c1ad0b939103f4c91280ecf9973",
-    "observed_head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
-    "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
-    "parent": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
-    "tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
-    "completed_at": "2026-10-05T21:10:33.930769+00:00"
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\normal-product-r7-commit.log",
+    "log_sha256": "65aea254032178743fee18551ed2a29b788a0bdf1ecab2ef930ae683ec38d7d8",
+    "observed_head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+    "head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+    "parent": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+    "tree": "0d0be7e39c29abf29b67384f3c44796a06118abf",
+    "completed_at": "2026-10-05T21:50:25.975161+00:00"
   },
   "actual_endpoints": {
     "status": "passed",
-    "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
     "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+    "policy_fixture": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+    "results": [
+      {
+        "mode": "AcceptedMaintenance",
+        "command": [
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+          "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+          "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+          "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+          "d7bb8ada326d52fab091b1d59b932288d56c4d91"
+        ],
+        "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+        "started_at": "2026-10-05T21:50:53.665610+00:00",
+        "finished_at": "2026-10-05T21:50:54.042299+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\AcceptedMaintenance-d7bb8ad.log",
+        "log_sha256": "cfd5b35e10106e0087def2994ab3a778901d02319cb4b1f2fcecea7ea167841f"
+      },
+      {
+        "mode": "FinalizeMetadataNow",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+          "-PublishedBaselineRevision",
+          "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+          "-FinalizeMetadataNow"
+        ],
+        "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+        "started_at": "2026-10-05T21:50:58.346009+00:00",
+        "finished_at": "2026-10-05T21:51:24.352064+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\FinalizeMetadataNow-d7bb8ad.log",
+        "log_sha256": "0cde4a2c01c07b12c81b83653dddff855b296708d48923fe35696f1a14e6eef7"
+      },
+      {
+        "mode": "MetadataClassificationOnly",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+          "-PublishedBaselineRevision",
+          "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+          "-MetadataClassificationOnly"
+        ],
+        "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+        "started_at": "2026-10-05T21:51:28.831118+00:00",
+        "finished_at": "2026-10-05T21:51:30.964119+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\MetadataClassificationOnly-d7bb8ad.log",
+        "log_sha256": "7597674b460853a079139b51f353452c006c8461656dfff10b060a3362265438"
+      },
+      {
+        "mode": "ProposedPolicy",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+          "-PublishedBaselineRevision",
+          "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+          "-ProposedPolicy"
+        ],
+        "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+        "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+        "started_at": "2026-10-05T21:51:35.590158+00:00",
+        "finished_at": "2026-10-05T21:52:01.298624+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\ProposedPolicy-d7bb8ad.log",
+        "log_sha256": "bd60f75f56ca006d01dea9d496ed004a839d1481d858046a35e13fcbf194143c"
+      }
+    ],
     "classification": {
       "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
-      "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+      "head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
       "policy": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
       "classification": "maintenance_required",
       "maintenancePaths": [
@@ -599,45 +683,16 @@
         ".github/workflows/build.yml",
         ".github/workflows/workflow-policy-cases.json"
       ]
-    },
-    "results": [
-      {
-        "mode": "AcceptedMaintenance",
-        "exit": 0,
-        "started_at": "2026-10-05T21:10:58.431282+00:00",
-        "finished_at": "2026-10-05T21:10:58.774822+00:00",
-        "log_sha256": "0c495dfe23788092416e5b286e91d8566bdbecdb7ff98531fe75aab209f532ee"
-      },
-      {
-        "mode": "FinalizeMetadataNow",
-        "exit": 0,
-        "started_at": "2026-10-05T21:11:02.416393+00:00",
-        "finished_at": "2026-10-05T21:11:25.787921+00:00",
-        "log_sha256": "14fef70419240899b0fd5b24bda1eda11556f562109f91ec5e47bdeef8151c2b"
-      },
-      {
-        "mode": "MetadataClassificationOnly",
-        "exit": 0,
-        "started_at": "2026-10-05T21:11:29.111438+00:00",
-        "finished_at": "2026-10-05T21:11:30.882923+00:00",
-        "log_sha256": "7127e90a63beb0553c7e4e87fb918971362ea499ba4e5388e5d1224822f4f971"
-      },
-      {
-        "mode": "ProposedPolicy",
-        "exit": 0,
-        "started_at": "2026-10-05T21:11:34.541324+00:00",
-        "finished_at": "2026-10-05T21:11:58.186341+00:00",
-        "log_sha256": "eb8b953a16d5bc24f8e212422b97176a10508a49340ce19d58024c068df83197"
-      }
-    ]
+    }
   },
   "current_audit": {
     "exit": 0,
-    "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+    "head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
     "authority": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
     "mode": "ordinary local no-argument two-root audit",
-    "started_at": "2026-10-05T21:12:01.996227+00:00",
-    "finished_at": "2026-10-05T21:12:19.738576+00:00",
+    "started_at": "2026-10-05T21:52:06.193866+00:00",
+    "finished_at": "2026-10-05T21:52:25.677421+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\current-audit-d7bb8ad.log",
     "sha256": "1571e207cd44536f75f9b823641506fd84e72ffe4ad90cdaff017ffca9d6cc6f"
   },
   "review_rounds": [
@@ -771,10 +826,10 @@
       "baseline": "round2-pre-ui-request.json",
       "baseline_sha256": "74f1d4b64e3120fe61a8cbe0b1bf0277c2500e4c0cabc7fb370c39e54daf0329",
       "copilot": {
-        "status": "confirmed_pending",
+        "status": "completed_with_findings",
         "requested_at": "2026-10-05T21:17:23.788790+00:00",
         "effort_selected": "Balanced",
-        "observed_effort": null,
+        "observed_effort": "Lite",
         "channel_attempt": 1,
         "request_events": [
           {
@@ -787,7 +842,17 @@
         "workflow_run": 37375005271,
         "workflow_created_at": "2026-10-05T21:18:05Z",
         "confirmation_snapshot": "round2-before-codex.json",
-        "ui_confirmation": "Review requested; Reviewing at balanced effort. Last completed Lite is historical, not observed current effort."
+        "ui_confirmation": "Review requested; Reviewing at balanced effort. Last completed Lite is historical, not observed current effort.",
+        "latest_workflow_status": "completed",
+        "observed_effort_source": "Authenticated complete submitted review overview5420961221; Balanced requested, full agentic start timed out.",
+        "review_id": 5420961221,
+        "submitted_at": "2026-10-05T21:45:55Z",
+        "review_body_sha256": "8b70d04a9354dd27c91e9904f5d519784bc8b673d040eabbecd71ae405dffdc5",
+        "terminal_snapshot": "round2-progress-6.json",
+        "service_disposition": "Full agentic review unavailable; completed Lite review5420961221 remains valid. Exact dynamic run37375005271 later completed cancelled; requested reviewers empty. No effort-only retry.",
+        "workflow_conclusion": "cancelled",
+        "workflow_updated_at": "2026-10-05T21:53:20Z",
+        "service_receipt": "round2-copilot-service-progress.json"
       },
       "codex": {
         "status": "completed_clean",
@@ -820,8 +885,66 @@
           "disposition": "Authenticated manual summary terminal and new post-trigger exact-head clean comment; complete comments/reviews/threads contain no new finding. Input body0143 is retained; R6 later correction and pending R7 mean this is not final acceptance."
         }
       },
-      "findings": [],
-      "supersession_pending": "Body evidence comparison corrected under R6; retain old body attribution and collect both already-issued requests before a new set. R7 coverage decision/repair is being prepared; no new round yet."
+      "findings": [
+        {
+          "id": "R8",
+          "comments": [
+            4189169213
+          ],
+          "thread": "PRRT_kwDOQkjdhM6pOt7f",
+          "subject": "Unknown-artifact diagnostic detail",
+          "status": "validated_no_change_pending_reply",
+          "body": "The thrown error `'unknown-artifact'` is not very actionable when this fails in CI logs. Include the actual `$ArtifactId` value and the allowed keys (e.g., `($DestinationMap.Keys -join ', ')`) so failures can be diagnosed without re-running under a debugger.",
+          "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+          "original_commit_id": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e"
+        },
+        {
+          "id": "R9",
+          "comments": [
+            4189169268
+          ],
+          "thread": "PRRT_kwDOQkjdhM6pOt79",
+          "subject": "Recovery child current-working-directory contract",
+          "status": "validated_no_change_pending_reply",
+          "body": "The recovery harness launches Node with a relative script path, which will fail if the working directory isn\u2019t the repository root (e.g., if the script is invoked from a different cwd in future callers). Prefer building an absolute path from `$PSScriptRoot` (and/or setting `ProcessStartInfo.WorkingDirectory`) so the invocation is cwd-independent.",
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "original_commit_id": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e"
+        },
+        {
+          "id": "R10",
+          "comments": [
+            4189169317
+          ],
+          "thread": "PRRT_kwDOQkjdhM6pOt8b",
+          "subject": "Generator harness cleanup masks primary error",
+          "status": "selected_repair_released",
+          "body": "The unconditional `Remove-Item` in `finally` can mask the original test failure if cleanup fails (e.g., due to transient file locks or partial directory deletion). To keep CI diagnostics stable, guard cleanup with `Test-Path` and avoid throwing on deletion failure (reserve throws for the containment check).",
+          "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+          "original_commit_id": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e"
+        },
+        {
+          "id": "R11",
+          "comments": [
+            4189169357
+          ],
+          "thread": "PRRT_kwDOQkjdhM6pOt84",
+          "subject": "Inline acquisition/proof factoring",
+          "status": "validated_no_change_pending_reply",
+          "body": "The acquisition/proof logic is embedded as large inline `run:` blocks and (from this diff) is substantially duplicated across the platform generator jobs. This increases the risk of platforms drifting unintentionally and makes review harder. Consider moving these scripts into versioned `.ps1` helpers (invoked with parameters like expected host / git path) so the workflow only wires inputs/outputs.",
+          "path": ".github/workflows/build.yml",
+          "original_commit_id": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e"
+        }
+      ],
+      "supersession_pending": "Both issued round2 requests are authenticated terminal. R7/R10 changed harness and corrected R6 body require final validation/publication/dispositions then round3; original clock retained.",
+      "body_inventory": {
+        "declared_open": 4,
+        "inline_new": 4,
+        "historical_resolved": 5,
+        "body_only_findings": [],
+        "root_read": "Complete original body and all9threads reconciled. Start-timeout notice is a service limitation, not an extra source finding."
+      },
+      "reaction_tracking": "round2-reaction-tracking.json",
+      "status": "disposition_in_progress"
     }
   ],
   "A14_preparation": {
@@ -1570,6 +1693,216 @@
         "sha256": "1571e207cd44536f75f9b823641506fd84e72ffe4ad90cdaff017ffca9d6cc6f"
       },
       "body_sha256": "f634dd77774501cec26ce80e977448adc1ffb33bcfad4b7ae0c09027ab9a42eb"
+    },
+    {
+      "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+      "candidate_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+      "body_sha256": "f5ddf4877c0a24c3262bef26bc8daff9444d030835a621ba381c4acad5a87367",
+      "aggregate": {
+        "status": "passed",
+        "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\aggregate-manifest-v4.json",
+        "manifest_sha256": "0e5232a6c4196738a6bb40ceaa04cf186da697b6816b0bf073e6735345377af2",
+        "expected_node_tests": 567,
+        "requested_at": "2026-10-05T20:53:33.643523+00:00",
+        "node_counts": {
+          "tests": 567,
+          "pass": 567,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "node_log_sha256": "489f0a481676518019010de158496b73136c64d98aa312faa7e644e31b1a04eb",
+        "node_finished_at": "2026-10-05T20:57:15.513808+00:00",
+        "result_sha256": "0ec706cf01865c79adf86e3480568ee910f26a567680c5dff9cc7ebd16153923",
+        "status_sha256": "a743f8935f048a4bb606d50761800e78c8164ff6c858bb46118ce2053f596f87",
+        "passed_hooks": 11,
+        "skipped_hooks": 0,
+        "source_after_equal": true,
+        "commands": [
+          {
+            "name": "staged-preflight",
+            "command": [
+              "pwsh",
+              "-NoLogo",
+              "-NoProfile",
+              "-NonInteractive",
+              "-File",
+              ".github/workflows/Test-AgentInstructions.ps1",
+              "-RequireStagedInputMatch"
+            ],
+            "started_at": "2026-10-05T20:53:50.102855+00:00",
+            "timeout_seconds": 600,
+            "state": "passed",
+            "pid": 79,
+            "exit": 0,
+            "finished_at": "2026-10-05T20:53:58.853283+00:00",
+            "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+          },
+          {
+            "name": "full-node",
+            "command": [
+              "node",
+              "--test",
+              ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+              ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+              ".github/workflows/Test-CiHelpers.test.mjs",
+              ".github/workflows/NpmTools.test.mjs",
+              ".github/workflows/Check-NpmAudit.test.mjs",
+              ".github/workflows/Test-LocalValidation.test.mjs",
+              ".github/workflows/lint-markdown.test.mjs"
+            ],
+            "started_at": "2026-10-05T20:53:59.036553+00:00",
+            "timeout_seconds": 3600,
+            "state": "passed",
+            "pid": 616,
+            "exit": 0,
+            "finished_at": "2026-10-05T20:57:15.513808+00:00",
+            "log_sha256": "489f0a481676518019010de158496b73136c64d98aa312faa7e644e31b1a04eb"
+          },
+          {
+            "name": "aggregate",
+            "command": [
+              "/opt/psstyleguide-runtime/venv/bin/python",
+              "-m",
+              "pre_commit",
+              "run",
+              "--all-files"
+            ],
+            "started_at": "2026-10-05T20:57:15.724940+00:00",
+            "timeout_seconds": 14400,
+            "state": "passed",
+            "pid": 21649,
+            "exit": 0,
+            "finished_at": "2026-10-05T21:07:54.491911+00:00",
+            "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+            "passed_hooks": 11,
+            "skipped_hooks": 0
+          }
+        ],
+        "finished_at": "2026-10-05T21:07:54.741759+00:00"
+      },
+      "commit": {
+        "status": "committed",
+        "expected_parent": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "expected_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+        "requested_at": "2026-10-05T21:10:31.256619+00:00",
+        "exit": 0,
+        "log_sha256": "7480c2827de43f98a01fe793c2cb087ea04d1c1ad0b939103f4c91280ecf9973",
+        "observed_head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+        "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+        "parent": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+        "tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+        "completed_at": "2026-10-05T21:10:33.930769+00:00"
+      },
+      "actual_endpoints": {
+        "status": "passed",
+        "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+        "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "classification": {
+          "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+          "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+          "policy": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+          "classification": "maintenance_required",
+          "maintenancePaths": [
+            ".github/workflows/Classify-InstructionMaintenance.mjs",
+            ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+            ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+            ".github/workflows/Test-CiHelpers.test.mjs",
+            ".github/workflows/Test-ExactGitPathSet.ps1",
+            ".github/workflows/Test-StyleGuideArtifacts.ps1",
+            ".github/workflows/Validate-WorkflowPolicy.mjs",
+            ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+            ".github/workflows/build.yml",
+            ".github/workflows/workflow-policy-cases.json"
+          ]
+        },
+        "results": [
+          {
+            "mode": "AcceptedMaintenance",
+            "exit": 0,
+            "started_at": "2026-10-05T21:10:58.431282+00:00",
+            "finished_at": "2026-10-05T21:10:58.774822+00:00",
+            "log_sha256": "0c495dfe23788092416e5b286e91d8566bdbecdb7ff98531fe75aab209f532ee"
+          },
+          {
+            "mode": "FinalizeMetadataNow",
+            "exit": 0,
+            "started_at": "2026-10-05T21:11:02.416393+00:00",
+            "finished_at": "2026-10-05T21:11:25.787921+00:00",
+            "log_sha256": "14fef70419240899b0fd5b24bda1eda11556f562109f91ec5e47bdeef8151c2b"
+          },
+          {
+            "mode": "MetadataClassificationOnly",
+            "exit": 0,
+            "started_at": "2026-10-05T21:11:29.111438+00:00",
+            "finished_at": "2026-10-05T21:11:30.882923+00:00",
+            "log_sha256": "7127e90a63beb0553c7e4e87fb918971362ea499ba4e5388e5d1224822f4f971"
+          },
+          {
+            "mode": "ProposedPolicy",
+            "exit": 0,
+            "started_at": "2026-10-05T21:11:34.541324+00:00",
+            "finished_at": "2026-10-05T21:11:58.186341+00:00",
+            "log_sha256": "eb8b953a16d5bc24f8e212422b97176a10508a49340ce19d58024c068df83197"
+          }
+        ]
+      },
+      "current_audit": {
+        "exit": 0,
+        "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+        "authority": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "mode": "ordinary local no-argument two-root audit",
+        "started_at": "2026-10-05T21:12:01.996227+00:00",
+        "finished_at": "2026-10-05T21:12:19.738576+00:00",
+        "sha256": "1571e207cd44536f75f9b823641506fd84e72ffe4ad90cdaff017ffca9d6cc6f"
+      },
+      "hosted_platform_progress": {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\hosted-07636c8\\PR-platform-proof.json",
+        "sha256": "831fa7ef90d8a6508fa2be8080f768de8aab0540aa525d116d1300b710efab43",
+        "head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+        "candidate_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+        "run": 37374614958,
+        "attempt": 1,
+        "event": "pull_request",
+        "actual_checkout_revision": "4b9c2c62afd7dc2455dd56907382ce9c9b6e2072",
+        "synthetic_merge_parents": [
+          "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+          "07636c8633b8544eb30c71ce1b24d2bcdef4c74e"
+        ],
+        "tree_equal_to_candidate": true,
+        "all_three_cells": [
+          {
+            "name": "generator_windows_51",
+            "job_id": 111979946677,
+            "passes": [
+              "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T21:15:01.5524210Z Generator tests passed: 117 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+              "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T21:15:13.2276057Z Generator tests passed: 117 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+            ]
+          },
+          {
+            "name": "generator_windows_7",
+            "job_id": 111979946303,
+            "passes": [
+              "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T21:15:11.2893209Z Generator tests passed: 117 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+              "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T21:15:26.1618074Z Generator tests passed: 117 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+            ]
+          },
+          {
+            "name": "generator_linux_7",
+            "job_id": 111979946732,
+            "passes": [
+              "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T21:19:56.2126525Z Generator tests passed: 117 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+              "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T21:20:03.8161815Z Generator tests passed: 117 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+            ]
+          }
+        ],
+        "log_sha256": "c6413a12d9c63d0485b34ab41ab58ebf3e5fbdcca7e583c97ee8e754ff1d32c2",
+        "all_jobs": "success",
+        "same_revision_admission": "Three successful job outputs explicitly use actual merge revision; verifier and publisher succeeded.",
+        "artifact_id": 11371201071,
+        "captured_at": "2026-10-05T21:27:31.961315+00:00",
+        "limits": "Current published07636c8 input only. R7 test repair is being prepared and will require new-input validation. No landed or paired acceptance."
+      }
     }
   ],
   "native_published_head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
@@ -1716,9 +2049,10 @@
     "receipt_sha256": "03fedb10ed5e1164bcadd14bd3781ab4a2bc4f399b93015d7f99f7e5012d463c"
   },
   "R7": {
-    "status": "staged_aggregate_ready",
+    "status": "committed_locally_validated_unpublished",
     "parent": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
     "prior_tree": "01e26ec47626495e76a29fe5cb407a02781d5d7a",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-R7\\evidence.json",
     "sha256": "5c66f5a867ffb9867e3bb61550bfb4e1607cbc00dbffd989e240e21ca277e187",
     "report_sha256": "08ede36ad5800ec421f12b79a159c385502d4cc7b9ab55465b64e0415e7ce741",
     "decision_sha256": "b32492a14915baf7b7099c1c53b39781b3c577ee878dbf8357e49399c50bdf17",
@@ -1755,9 +2089,64 @@
     },
     "root_review": "Read full decision, all50addedlines and actual focused evidence. Verified7artifacthashes,6rubric totals,77source/1910deps and exact one-path scope. D90 arithmetic corrected without selection change. Real scratch Replace/Move, stable injected noncandidate identity, exact comparison-disabled mutants, native/schema refusal, equalbytes and allfourgoldens distinguish candidate binding. No native race or substitution proof.",
     "staged_tree": "0d0be7e39c29abf29b67384f3c44796a06118abf",
+    "head": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+    "tree": "0d0be7e39c29abf29b67384f3c44796a06118abf"
+  },
+  "round2_selected": {
+    "R8": "evidenced no change",
+    "R9": "evidenced no change",
+    "R10": "C99 implemented; focused passed; staged for v6",
+    "R11": "A94 retain bounded inline architecture",
+    "decisions": "PR234-round2/PREPARATION.md",
+    "release": {
+      "released_at": "2026-10-05T21:56:49.602009+00:00",
+      "parent": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+      "tree": "0d0be7e39c29abf29b67384f3c44796a06118abf",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "preimage_sha256": "fbfa8555cd9596073abb78200af00eba9df38e60f336c0bf500342401ca17584",
+      "selection": "R10 C99; R8/R9 evidenced refutations; R11 A94 no change",
+      "decision_evidence_sha256": "9b8f915664327a771750a999afb93900a32eecb392e526a9fa6c0968ca3d354e",
+      "review": "Root read complete four records, probe, report and evidence; independently verified8source/7artifact hashes and12score totals. Options/rubrics/tables and selections displayed before release.",
+      "restrictions": "Only harness product edit. Preserve R7 controls. No staging/commit/fetch/ref/config/dependency/native/planning mutation or descendants. Run meaningful private six-case precedence/mutants plus actual Win7 harness/parser/analyzer; root owns aggregate/platform/publication."
+    }
+  },
+  "R10": {
+    "status": "staged_aggregate_ready",
+    "parent": "d7bb8ada326d52fab091b1d59b932288d56c4d91",
+    "prior_tree": "0d0be7e39c29abf29b67384f3c44796a06118abf",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\implementation-evidence.json",
+    "sha256": "ded89d3e08b7abd841c94c81afa798d0b647055e85ad336b0ca941a76432102b",
+    "report_sha256": "5768ba720c1c54fb9a4f4db519b28dd4a1135927470eaf6dfdb4c8d9672c6540",
+    "decision_sha256": "c989a718778db5cde6d84da980eb723ed1ef266c64705d412e1fc9076954d2be",
+    "paths": [
+      ".github/workflows/Test-StyleGuideGenerator.ps1"
+    ],
+    "selection": "C99",
+    "focused": {
+      "windows7_harness_assertions": 156,
+      "native_exit": 0,
+      "parser_errors": 0,
+      "analyzer_issues": 0,
+      "private_cases": 12,
+      "killed_mutants": 3,
+      "unchanged_main_test_statements": 59,
+      "unchanged_other_source_files": 76
+    },
+    "peer_map_delta": {
+      "accepted_peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "role": "common, no language substitution",
+      "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+      "other_substitutions": "unchanged",
+      "tf_execution": false,
+      "transfer_increment": false
+    },
+    "root_review": "Read full27addition/9deletion diff, decision, probe code/results and final report/evidence. Verified15artifacthashes,77source/1910dependencies. Actual extracted control preserves primary exception and ID, fixed secondary diagnostics, containment refusal, cleanup-only native failure and success placement;12cases/3mutants. R7 statements unchanged. No native lock/race proof.",
+    "staged_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
     "aggregate": {
       "status": "ready",
-      "manifest_sha256": "b94a01647b1ffe2dfaca842099f4131839d0887f5f6eb2276ad8a3a247b0fa00",
+      "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v6",
+      "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\aggregate-manifest-v6.json",
+      "manifest_sha256": "82e86053eccda78ddb8f1814b30c7bd983c17d0428c195946879a3c6e844218d",
       "expected_node_tests": 567
     }
   }

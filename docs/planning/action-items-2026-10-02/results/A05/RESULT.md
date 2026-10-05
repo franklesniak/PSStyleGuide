@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A05 current result
 
+**Post-A06 readiness refreshed,2026-10-05:** [Current report](postA06/REPORT.md) preserves I99/D08 and both exact approved guide patches against accepted PSd7b206a/TFe21b74f and prospective A06H07636c8/tree0d0be7e. The actual policy-harness caller and native-exit check remain. A06 adds platform and identity controls but no moved-ref oracle. Root read the full report and independently verified four raw Git objects/modes and all four retained runtime artifact hashes; the [catalog](postA06/identity-change-catalog.json) preserves60path observations. No product test was rerun. Final implementation, final authoring metadata, Windows/Linux fixture checks, PS175 two complete clean pre-commit passes and paired acceptance remain due after the serialized A06 foundation. A05 stays0/8 with an unstarted review clock; no new owner decision is needed.
+
 State: active. On2026-10-03 item4 explicitly approved the two-guide immutable-event-acquisition recommendation. Protected authority for that exact scope is resolved; see D08. Product implementation and acceptance remain due.
 
 Read [the current task](../../tasks/A05.md) and [selected design](design.md). Next: refresh the exact two-guide patch against accepted A02/A03 foundations, implement its shared text and portable ref-move fixture, then run the required Windows/Linux checks and PS175's two complete clean passes. Preserve explicit immutable acquisition, exact post-acquisition comparison, least privilege and unavailable-object failure. No permission question remains for those edits.
