@@ -1,12 +1,12 @@
 {
-  "recorded_at": "2026-10-05T01:39:40.570963+00:00",
-  "status": "round5_proposed_aggregate_running",
+  "recorded_at": "2026-10-05T02:34:13.540318+00:00",
+  "status": "round6_reviews_pending",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a02-peer-docs",
   "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
   "base_tree": "dc8f6b82588b8f874d34cd5d0155791aea5793f1",
-  "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-  "candidate_tree": "d59a740b7b1d88f7986075ac9328d9998629aa71",
+  "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+  "candidate_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
   "accepted_source": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
   "accepted_source_tree": "c82fa2e11bfe333b9bcaf732bf12d1d9cb907380",
   "changed_paths": [
@@ -118,9 +118,9 @@
     {
       "path": ".github/workflows/Check-NpmAudit.mjs",
       "mode": "100644",
-      "blob": "28b7ff1974290a15df252631dc782f9c231b34da",
-      "bytes": 22680,
-      "sha256": "0ff46149bd63b69997dfb34e3b572a7389845029ce4f3722b64ee011a5b185bf"
+      "blob": "04cc1ee1b3ac867878e6ebe10af81f322712e34b",
+      "bytes": 23280,
+      "sha256": "729aa4178660a5b20d1947e804937813f73b60497df46a81b8f6dbf023d8a322"
     },
     {
       "path": ".github/workflows/Check-NpmAudit.test.mjs",
@@ -188,9 +188,9 @@
     {
       "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
       "mode": "100644",
-      "blob": "0be279cf6b4cb76a99d927f6cfcaa97e58ea9c84",
+      "blob": "494c6804f05c7ff54364e139004eeb67d8d879cd",
       "bytes": 3017,
-      "sha256": "9f5321dff431f2a86641f595be9724b260277ddb4afe8bef2d95b13cb0f4527d"
+      "sha256": "559ec3ce1f36d607cdef77257dc333b4e6bdca365b59b18a8f71d00df0c9ffb6"
     },
     {
       "path": ".github/workflows/NpmTools.mjs",
@@ -230,9 +230,9 @@
     {
       "path": ".github/workflows/Test-CiHelpers.test.mjs",
       "mode": "100644",
-      "blob": "26176163225be5ae18585e82b21dccf7ef1f3cda",
-      "bytes": 100034,
-      "sha256": "88a35be62a72e9e31084f6b82dc89056f3da5e84c4469c3ffc13d329dd22a96a"
+      "blob": "6b063a8143a5737bed51c0a5282c857ffefdca95",
+      "bytes": 100007,
+      "sha256": "ac0695ace132b8b0119429258680db3ab056265fae183d1f017b8b435e34daea"
     },
     {
       "path": ".github/workflows/Test-ExactGitPathSet.ps1",
@@ -244,9 +244,9 @@
     {
       "path": ".github/workflows/Test-LocalValidation.test.mjs",
       "mode": "100644",
-      "blob": "fdee150a47af7593d8315bb5f2c3b9ee4f9c2030",
-      "bytes": 3870,
-      "sha256": "7a4e5608c55631ecc115431587096049b5035c6abbca352de097edf3687305e1"
+      "blob": "86e7b19fa5453efbe5373a1a1dd052b4b2dc7b82",
+      "bytes": 4038,
+      "sha256": "decdffd21c04e3f5bca5364842a734543c2681a60ea6d2792c7acc65e1ae13cb"
     },
     {
       "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
@@ -300,9 +300,9 @@
     {
       "path": ".github/workflows/copilot-setup-steps.yml",
       "mode": "100644",
-      "blob": "d94cf1c0572059a79f6968438566478a28d4f523",
-      "bytes": 52406,
-      "sha256": "c276d234e68c8dd81f1437cf676fd69b2b77a4973d2100a5c35b77a978fb1350"
+      "blob": "1e63056656df62e78f4b6aaa5f14f0c81b9055cb",
+      "bytes": 51830,
+      "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
     },
     {
       "path": ".github/workflows/devcontainer-ci.yml",
@@ -335,23 +335,23 @@
     {
       "path": ".github/workflows/lint-markdown.test.mjs",
       "mode": "100644",
-      "blob": "42ba384995230e32bc42f3ece4c1efa1f45b2c7d",
-      "bytes": 21009,
-      "sha256": "704a25745556a7e5cb27d5b93d4cfee9d20b4e0ff0036e38ef4b804eb00b8c40"
+      "blob": "4b1dfb3e2807887356027451fb290420a8e6d18d",
+      "bytes": 24184,
+      "sha256": "094e3f133bcbe945d1e2b2f63b87470efde51205620c48d913ba2e4703306ce1"
     },
     {
       "path": ".github/workflows/lint-nested-markdown.js",
       "mode": "100644",
-      "blob": "bda6944742cbc7e38efd3f4194de69fd1ed60e8c",
-      "bytes": 19309,
-      "sha256": "2a5a8536a4a606374895b24c55d4e9178cb11bee9110a90c9b1903dce8e67e67"
+      "blob": "3284f63d128288ce511391b693b1ba350b918f2c",
+      "bytes": 19388,
+      "sha256": "df608d5bf95061dd50f09527a3191f81af08a95318bf96da0b289fa18762ee83"
     },
     {
       "path": ".github/workflows/lint-staged-markdown.mjs",
       "mode": "100644",
-      "blob": "21063b3c86ffcee7c928b149d390065b8bcc1840",
-      "bytes": 5611,
-      "sha256": "c473b3df463d99d88de07ef883214f0a8aaedce111579d676bf39324902d14d3"
+      "blob": "24f0ea7d1f94752547b7e363eaf92595f6b07b11",
+      "bytes": 5745,
+      "sha256": "cbfaafd5510598344ac14b7421bc7a9fbdcf8845339396da1d47d17f410af5a0"
     },
     {
       "path": ".github/workflows/markdownlint.yml",
@@ -384,9 +384,9 @@
     {
       "path": ".github/workflows/scripts-README.md",
       "mode": "100644",
-      "blob": "9dd6a074db78a47c499aa6c5ac6f02e31afff5a6",
+      "blob": "b049d7881a2cd2ba144dd63b67e10bb0287a7aaf",
       "bytes": 11650,
-      "sha256": "15f54dd6f2910656ca21aaf94f85a55937698a6d0c5e8ca4712f335b80a6ac77"
+      "sha256": "240b53ff2651bd11c30fde2feacd3d259dbd533ee7fa6a646302b0f2874d1480"
     },
     {
       "path": ".github/workflows/workflow-policy-cases.json",
@@ -440,16 +440,16 @@
     {
       "path": "AGENTS.md",
       "mode": "100644",
-      "blob": "f405b7336889709bac6f1c027079ae565c8822f2",
+      "blob": "be1e52363e92daec056660b3e1147527874ccbf9",
       "bytes": 32746,
-      "sha256": "ea658b1ea8a87175461a9f81dc1d7d93c9bf7336cc1ffdff20217048d4f65cca"
+      "sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f"
     },
     {
       "path": "CLAUDE.md",
       "mode": "100644",
-      "blob": "cb74f1f845538e1dd5e8adc80a3a693927482d17",
+      "blob": "6a646684e062c418bf124fa5d78690d3e86611cf",
       "bytes": 83433,
-      "sha256": "6a617b0d5a464ddd85de9d363506bd503a88ae63ba43b4fe50fcc416d6dd1bbf"
+      "sha256": "efd0c70621f46bd65119dab82ec9a1cb6fde8a0112a3f0d13d57c83267296bc1"
     },
     {
       "path": "CONTRIBUTING.md",
@@ -510,9 +510,9 @@
     {
       "path": "docs/ISSUE_EVALUATION_PROMPT.md",
       "mode": "100644",
-      "blob": "1c86fdcc00c1ab856667c747909ca0a2b75f2187",
+      "blob": "f66c405398db94f21d8caeae4b94487fe5ffa75d",
       "bytes": 2179,
-      "sha256": "d2d1d6f086f21b5b9b34d0c5ad67d0d6323854ad39567f78f7c33487e47ffe69"
+      "sha256": "202335591990d8cd1e1beb3c8b8455d231ed0711a84461f3cf8eb59272292c0d"
     },
     {
       "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
@@ -531,30 +531,30 @@
     {
       "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
       "mode": "100644",
-      "blob": "4482ed5b79da763876462382e60fdd82b8eb2073",
+      "blob": "8e8d56ea567eab0f252916804b49b866cafeabc6",
       "bytes": 16605,
-      "sha256": "e751e2a2d172354c6f9476ebbc4ee972798eadb43b5afa6393bd79469b1300f4"
+      "sha256": "dbe787c8d869151b007082937725c8152bef854f5d66db29014cc7ae0b602b94"
     },
     {
       "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
       "mode": "100644",
-      "blob": "a9100a6448762d6cc8f27821fe2b16b50d2357ad",
+      "blob": "71ab82286d05e83ec83d66eb1ebd666d0d19386b",
       "bytes": 21720,
-      "sha256": "68423b5dd1b6c8c2101c1aaf37168e93a425302b89e6e4e7d050e1add3fb7704"
+      "sha256": "533f01ff2dccc785c4aca8c52e4e736d26e184ca14bc6fd6fd429d6963901e16"
     },
     {
       "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
       "mode": "100644",
-      "blob": "f9064f0bbefa8ff9de463e8fab0a29a4a12e4a09",
+      "blob": "d44dba86a66f6dfc126247c97d81bfeeee8f3763",
       "bytes": 11738,
-      "sha256": "a81a00b4f8a63c0d946852618d404e41806361db81adb87d0a292c7ed7c5bd86"
+      "sha256": "e7647180e675168ee6dc465d20ab209b5301c5ccd3b15cb53ae34a51baae39ec"
     },
     {
       "path": "docs/dependency-maintenance.md",
       "mode": "100644",
-      "blob": "f0705f4aff50b03d54a1cb8fd540fc65b53f435e",
+      "blob": "61977b68f4adc7a31aa822fb224efe41b0ea45af",
       "bytes": 9874,
-      "sha256": "0ce689b28747d49c221d65dbe9799930f7cd040ccfbe7557e8677b4ba85008b3"
+      "sha256": "864427fc673b8d257d384ec55ea45e60612883624a071c5df616170342c32654"
     },
     {
       "path": "package-lock.json",
@@ -640,16 +640,16 @@
       ".github/workflows/Test-AgentInstructions.ps1",
       "-RequireStagedInputMatch"
     ],
-    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-proposed-validation-checkout",
-    "started_at": "2026-10-04T22:05:56.053987+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-proposed-staged_preflight.log",
-    "pid": 111248,
-    "candidate_tree": "d59a740b7b1d88f7986075ac9328d9998629aa71",
+    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-validation-checkout",
+    "started_at": "2026-10-05T01:15:06.187191+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-staged_preflight.log",
+    "pid": 210040,
+    "candidate_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
     "before_identity_passed": true,
     "after_identity_passed": true,
     "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
     "exit_code": 0,
-    "finished_at": "2026-10-04T22:07:42.751074+00:00",
+    "finished_at": "2026-10-05T01:16:13.217930+00:00",
     "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
   },
   "aggregate": {
@@ -662,464 +662,213 @@
       "run",
       "--all-files"
     ],
-    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-proposed-validation-checkout",
-    "started_at": "2026-10-04T22:07:42.758152+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-proposed-aggregate.log",
-    "pid": 111248,
-    "candidate_tree": "d59a740b7b1d88f7986075ac9328d9998629aa71",
+    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-validation-checkout",
+    "started_at": "2026-10-05T01:16:13.221803+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-aggregate.log",
+    "pid": 210040,
+    "candidate_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
     "before_identity_passed": true,
     "after_identity_passed": true,
     "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
     "exit_code": 0,
-    "finished_at": "2026-10-04T23:13:39.736862+00:00",
+    "finished_at": "2026-10-05T02:12:56.823309+00:00",
     "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
     "passed_hook_count": 11,
     "skipped_hook_count": 0
   },
   "session": {
-    "session_id": 58936,
+    "id": 30940,
     "state": "terminal_passed",
-    "exit_code": 0,
-    "finished_at": "2026-10-04T23:13:39.736862+00:00",
-    "candidate_tree": "d59a740b7b1d88f7986075ac9328d9998629aa71",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-proposed-aggregate.log",
-    "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    "exit_code": 0
   },
   "independent_review": {
-    "agent": "/root/a02_tf_prepublication_quality",
-    "original_tree": "af0c029a53603a114be4d2c3e481ab0dfb70a85b",
-    "original_status": "bounded pass; later aggregate identified test-only path failure",
-    "current_state": "Private capacity repair and actual integrated525147aa both bounded PASS; aggregate and native acceptance remain due.",
-    "reconciliation": {
-      "state": "bounded_pass_on_37c_before_later_capacity_fixture_failure",
-      "report": "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-TF-prepublication-quality-20261004/RECONCILIATION.md",
-      "sha256": "f56957bfb2a78b2ec1c3fe07e808fce0d312c37f4dd6176eb6b05c855fb36975",
-      "limits": "One-literal path repair reviewed; does not establish aggregate acceptance or review a future repair."
-    },
-    "capacity_report": {
-      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\CAPACITY-RECONCILIATION.md",
-      "sha256": "be9a43de78081e933be5563d4b1aea3e67ad6fb85dfec08313afddb6e81d0437"
-    },
-    "integrated_readback": {
-      "state": "passed",
-      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\CAPACITY-INTEGRATED-READBACK.md",
-      "sha256": "c5aebd1dec0c2e960bd19711bf42efc7e4b9c19337a6be40605bbaa893671251",
-      "tree": "525147aac9804088b8b9e743a7e441a5276d59f2",
-      "limits": "Exact integrated bytes only; not aggregate or native acceptance."
-    }
+    "state": "bounded_pass_final16paths",
+    "reviewer": "/root/a02_tf_prepublication_quality",
+    "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-R17-R20-FINAL-REPAIR-REVIEW-dde2b9a.md",
+    "report_sha256": "ec802518d77c1b3520e9eeff98c0e0f5f8c29ce260f9fdb7763b847781d26322",
+    "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-R17-R20-FINAL-REPAIR-EVIDENCE-dde2b9a.json",
+    "evidence_sha256": "11c79c525fc78de16fa44a924bd1ab06f1dda14967e6b5738a48c7fb6ef4805b",
+    "root_read_and_hash_checked_at": "2026-10-05T01:14:18.247610+00:00",
+    "final_pr_pass": false,
+    "limitations": "Aggregate, actual new-H/B checks, new-input native reviews/checks, final PR quality and paired acceptance remain."
   },
   "reviews": {
     "pr": 66,
     "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66",
-    "rounds_used": 5,
+    "rounds_used": 6,
     "first_request_at": "2026-10-04T16:41:24+00:00",
     "deadline": "2026-10-12T16:41:24+00:00",
     "current_round": {
-      "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+      "prepared_at": "2026-10-05T02:28:11.246399+00:00",
+      "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
       "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-      "body_sha256": "b4733143f7d7110fa01f72723a49e187375378dd2e119a96bac970a22478208f",
-      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-request-baseline-dde2b9a.json",
-      "baseline_sha256": "275f34ee7284a7732577db5db6ed7ec21888aebb253b307277838a94b7453d96",
-      "prepared_at": "2026-10-05T00:12:48.853083+00:00",
-      "request_set_terminal": true,
-      "clean": false,
+      "body_sha256": "a1431b323168ff13035b46fcab8108ea807a624392314a7eef7dd54a763f940f",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-request-baseline-db54d68.json",
+      "baseline_sha256": "b9dd6cbb54b372d8864ebfa738c1819d4cc01054e7ccc5a4ae4b6fb230b213b2",
       "copilot": {
+        "state": "requested_pending",
+        "started_at": "2026-10-05T02:28:11.246399+00:00",
         "transport": "supported GitHub Reviewers UI",
         "requested_effort": "Balanced",
-        "state": "completed_with_findings",
-        "result_effort": "Lite",
-        "ui_submission_recorded_at": "2026-10-05T00:13:24.405791+00:00",
-        "ui_click_count": 1,
-        "request_event_id": 32467617732,
-        "request_event_at": "2026-10-05T00:12:56Z",
+        "result_effort": null,
+        "channel_attempts": 1,
+        "request_event_id": 32472497545,
+        "request_event_at": "2026-10-05T02:28:20Z",
         "request_actor_id": 11204406,
         "reviewer_id": 175728472,
-        "request_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-after-copilot-request-dde2b9a.json",
-        "request_observation_sha256": "01c7243503402a305723eedd8dccdc2c1e0864141f71d040d336b76dfec489c4",
+        "request_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-after-copilot-request-db54d68.json",
+        "request_observation_sha256": "ab78c22cdaedc296ea9b938c2b1bf27254ce2e919ceefd2636ed17ec3d0b1f8d",
         "attempts": 1,
-        "workflow_run_id": 37246631275,
-        "observed_run_status": "completed",
-        "observed_run_conclusion": "cancelled",
-        "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-review-request-proof.png",
-        "ui_observation": "Signed-in supported Reviewers UI explicitly selected Balanced and submitted one request. Sidebar says Reviewing at balanced effort; Last completed: lite refers to prior round4. Current observed result effort remains unknown.",
-        "live_job_id": 111565710806,
-        "clean": false,
-        "review_id": 5408989852,
-        "review_body": "> [!WARNING]\n> Copilot couldn't run its full agentic review because it didn't start before the timeout. Make sure your repository has a runner available, or add a `copilot-code-review.yml` file specifying one with the `runs-on` attribute. See the [docs](https://gh.io/AA11tgch) for more details.\n\n<!-- ccr-overview-v2 -->\n\n## Copilot review overview\n\n**Review effort:** Lite  \n**Findings:** 3 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> \u00b7 1 <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture>\n\n<details open>\n<summary><strong>Open (4)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`hostedAuthorityReference()` now effectively operates on a `reference` that can be either a commit\u2026](#discussion_r4179947014) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The job timeout (59 minutes) is lower than the maximum cumulative wall-time implied by later step\u2026](#discussion_r4179947028) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This performs a full repo glob (`**/.markdownlint*`) on every lint configuration load, which can\u2026](#discussion_r4179947038) \u00b7 New\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/low-v2-light.png\" alt=\"Low severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [The `paths` filter includes broad globs like `.github/workflows/**` and then repeats specific files\u2026](#discussion_r4179947053) \u00b7 New\n</details>\n\n<details>\n<summary><strong>Resolved since last review (3)</strong></summary>\n\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [`assertLintConfigurationInputs()` normalizes discovered paths using\u2026](#discussion_r4179817891)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [When this module is imported (e.g., by `lint-staged-markdown.mjs`) and a dependency is missing, the\u2026](#discussion_r4179817873)\n- <picture><source media=\"(prefers-color-scheme: dark)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-dark.svg\"><source media=\"(prefers-color-scheme: light)\" srcset=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.svg\"><img src=\"https://github.githubassets.com/static/images/icons/copilot-code-review/medium-v2-light.png\" alt=\"Medium severity\" width=\"62\" height=\"18\" align=\"texttop\"></picture> [This setup flow embeds specific historical Node/npm versions (`11.16.0`, `24.18.0`, `24.18.1`)\u2026](#discussion_r4179817842)\n</details>\n\n<details>\n<summary>Files not reviewed (1)</summary>\n\n* **.github/workflows/package-lock.json**: Generated file\n</details>",
-        "review_submitted_at": "2026-10-05T00:32:40Z",
-        "review_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#pullrequestreview-5408989852",
-        "observed_result_effort": "Lite",
-        "service_disposition": {
-          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-copilot-service-disposition.json",
-          "sha256": "915d062809ae599869b2ee5f7a8401e793e99ee7bcc0d7fb5d84280bcd0075ce",
-          "full_validation_conclusion": "success",
-          "processing_conclusion": "cancelled",
-          "service_limit_minutes": 20
-        }
+        "workflow_run_id": 37255543195,
+        "observed_run_status": "in_progress",
+        "observed_run_conclusion": null,
+        "ui_click_count": 1,
+        "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-review-request-proof.png",
+        "ui_screenshot_sha256": "1ffa58d0d89df94ecadf5d575cfd0cb556e4957496af3998ea57dd40286b1a8c",
+        "ui_observation": "Supported Reviewers menu selected Balanced. After one submission the refreshed UI says Reviewing at balanced effort; Last completed: lite is historical. Current result effort is unknown."
       },
       "manual_codex": {
-        "state": "completed_clean",
-        "started_at": "2026-10-05T00:13:29.256267+00:00",
+        "state": "running",
+        "started_at": "2026-10-05T02:29:13.571660+00:00",
         "channel_attempts": 1,
         "exact_body": "@codex review",
         "transport": "GitHub connector github_add_comment_to_issue",
-        "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-after-copilot-request-dde2b9a.json",
-        "baseline_sha256": "01c7243503402a305723eedd8dccdc2c1e0864141f71d040d336b76dfec489c4",
+        "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-after-copilot-request-db54d68.json",
+        "baseline_sha256": "ab78c22cdaedc296ea9b938c2b1bf27254ce2e919ceefd2636ed17ec3d0b1f8d",
         "baseline_comment_ids": [
           5982194609,
           5983180593,
           5984519616,
           5984558238,
           5985594078,
-          5985623901
+          5985623901,
+          5985928054,
+          5985975078
         ],
-        "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-        "body_sha256": "b4733143f7d7110fa01f72723a49e187375378dd2e119a96bac970a22478208f",
-        "trigger_id": 5985928054,
-        "native_created_at": "2026-10-05T00:13:30Z",
+        "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+        "body_sha256": "a1431b323168ff13035b46fcab8108ea807a624392314a7eef7dd54a763f940f",
+        "timestamp_reconciliation": {
+          "local_pre_request_at": "2026-10-05T02:29:13.571660+00:00",
+          "native_created_at": "2026-10-05T02:29:09Z",
+          "local_minus_native_seconds": 4.57166,
+          "basis": "Exact connector-returned ID, authenticated author/body/PR, complete baseline exclusion, unique new manual trigger and native Copilot event ordering.",
+          "repeated_write": false
+        },
+        "trigger_id": 5987077643,
+        "native_created_at": "2026-10-05T02:29:09Z",
         "authenticated_author_id": 11204406,
-        "confirmed_at": "2026-10-05T00:13:46.794307+00:00",
-        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5985928054",
+        "confirmed_at": "2026-10-05T02:30:25.194100+00:00",
+        "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5987077643",
         "summary_comment_id": 5982194609,
-        "summary_updated_at": "2026-10-05T00:18:38Z",
-        "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \u2705 **Completed** <relative-time datetime=\"2026-10-05T00:18:38.061133Z\">2026-10-05T00:18:38.061133Z</relative-time> | `dde2b9a` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>",
-        "clean": true,
-        "result_comment_id": 5985975078,
-        "result_body": "Codex Review: Didn't find any major issues. You're on a roll.\n\n**Reviewed commit:** `dde2b9abe7`\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\".\n\nIf Codex has suggestions, it will comment; otherwise it will react with \ud83d\udc4d.\n\n\n\n\nCodex can also answer questions or update the PR. Try commenting \"@codex address that feedback\".\n            \n</details>",
-        "result_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5985975078",
-        "result_at": "2026-10-05T00:18:36Z",
-        "terminal_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-continuation-02-dde2b9a.json"
+        "summary_updated_at": "2026-10-05T02:29:23Z",
+        "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \ud83d\udd04 **Running** since <relative-time datetime=\"2026-10-05T02:29:22.772824Z\">2026-10-05T02:29:22.772824Z</relative-time> | `db54d68` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>"
       },
-      "all_nonreview_workflows_success": true,
+      "request_set_terminal": false,
+      "clean": false,
+      "started_at": "2026-10-05T02:28:20Z",
       "nonreview_run_summary": [
         {
-          "id": 37246453878,
+          "id": 37254891522,
           "name": "Agent instruction validation",
           "event": "pull_request_target",
           "status": "completed",
           "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37243174299,
+          "id": 37254870290,
           "name": "Agent instruction validation",
-          "event": "pull_request_target",
-          "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "event": "pull_request",
+          "status": "in_progress",
+          "conclusion": null,
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37243162572,
+          "id": 37254870402,
           "name": "Dev container boundary",
           "event": "pull_request",
           "status": "completed",
           "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37243162516,
-          "name": "Markdown Lint",
-          "event": "pull_request",
-          "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
-        },
-        {
-          "id": 37243162547,
+          "id": 37254870354,
           "name": "Build Style Guide Artifacts",
           "event": "pull_request",
           "status": "completed",
           "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37243162531,
+          "id": 37254870261,
           "name": "Copilot setup steps",
           "event": "pull_request",
-          "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "status": "in_progress",
+          "conclusion": null,
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37243162509,
-          "name": "Agent instruction validation",
+          "id": 37254870356,
+          "name": "Markdown Lint",
           "event": "pull_request",
           "status": "completed",
           "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37243160790,
+          "id": 37254868945,
           "name": "Agent instruction validation",
           "event": "pull_request_target",
           "status": "completed",
           "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37243159434,
+          "id": 37254866643,
+          "name": "Copilot setup steps",
+          "event": "push",
+          "status": "in_progress",
+          "conclusion": null,
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+        },
+        {
+          "id": 37254866686,
           "name": "Dev container boundary",
           "event": "push",
           "status": "completed",
           "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37243159367,
-          "name": "Markdown Lint",
+          "id": 37254866650,
+          "name": "Agent instruction validation",
           "event": "push",
-          "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "status": "in_progress",
+          "conclusion": null,
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37243159420,
+          "id": 37254866624,
           "name": "Build Style Guide Artifacts",
           "event": "push",
           "status": "completed",
           "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         },
         {
-          "id": 37243159463,
-          "name": "Copilot setup steps",
+          "id": 37254866671,
+          "name": "Markdown Lint",
           "event": "push",
           "status": "completed",
           "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
-        },
-        {
-          "id": 37243159416,
-          "name": "Agent instruction validation",
-          "event": "push",
-          "status": "completed",
-          "conclusion": "success",
-          "head_sha": "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
         }
       ],
-      "hosted_evidence_reused_from": "Round4 same H/B and product tree. Body edit caused additional accepted-base run37246453878, success; its logs remain to collect.",
-      "started_at": "2026-10-05T00:12:56Z",
-      "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-terminal-findings-dde2b9a.json",
-      "hosted_log_collection": {
-        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round4-hosted-dde2b9a\\round5-request-baseline-dde2b9a-collection.json",
-        "sha256": "be448ab067df6dd5240ef2f958817e297909ea54d442cb3e5bc663779fb8a103",
-        "count": 13,
-        "prior_twelve_reused_unchanged": true
-      },
-      "additional_body_edit_check": {
-        "id": 37246453878,
-        "name": "Agent instruction validation",
-        "event": "pull_request_target",
-        "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-        "conclusion": "success",
-        "log_sha256": "66342074f23ab71ccbc7a6a60f9fb06bc0b07f2c52ee4f51604a32c56ab93b22",
-        "log_bytes": 22910,
-        "jobs": [
-          {
-            "id": 111565209521,
-            "name": "Classify maintenance and validate ordinary instructions",
-            "conclusion": "success",
-            "steps": [
-              {
-                "name": "Set up job",
-                "conclusion": "success"
-              },
-              {
-                "name": "Acquire accepted policy without credentials",
-                "conclusion": "success"
-              },
-              {
-                "name": "Verify checkout credentials",
-                "conclusion": "success"
-              },
-              {
-                "name": "Install accepted parser dependencies",
-                "conclusion": "success"
-              },
-              {
-                "name": "Classify exact PR input and validate ordinary content",
-                "conclusion": "success"
-              },
-              {
-                "name": "Complete job",
-                "conclusion": "success"
-              }
-            ]
-          },
-          {
-            "id": 111565210568,
-            "name": "Test proposed instruction and workflow behavior",
-            "conclusion": "skipped",
-            "steps": []
-          }
-        ],
-        "interpretation": "Actual accepted B06ad classifier returns MAINTENANCE_REQUIRED, explicitly not ordinary policy admission. Opposite-event proposed behavior job intentionally skips. No candidate suite replay or new owner authority implied."
-      },
-      "independent_disposition_quality": {
-        "state": "bounded_pass_no_material_finding",
-        "reviewer": "/root/a02_tf_prepublication_quality",
-        "scope": "R14-R16 evidence/dispositions, native placement and new body/check; reuse prior exact-source and hosted reports. Final PR verdict awaits round5 review results.",
-        "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-R14-R15-R16-SUPPLEMENT-dde2b9a.md",
-        "report_sha256": "98f94b2a44fa03b196a7abf2e8bd3c81ef04b006080e96f9f6e1073ad95ff45d",
-        "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-R14-R15-R16-SUPPLEMENT-EVIDENCE-dde2b9a.json",
-        "evidence_sha256": "151e20423d694465ec352155f3d9025784d30eb61ebb32e6069cda85b29ec960",
-        "root_verification": "Complete report read; report/evidence hashes and input identity checked; prior sampled source, exact command and log evidence reused.",
-        "final_pr_pass": false
-      },
-      "findings": [
-        {
-          "key": "R17",
-          "owner": "A07",
-          "comment_id": 4179947014,
-          "thread_id": "PRRT_kwDOSAZRhc6o4BX1",
-          "path": ".github/workflows/Check-NpmAudit.mjs",
-          "line": 223,
-          "body": "`hostedAuthorityReference()` now effectively operates on a `reference` that can be either a commit SHA (event-main) or a symbolic ref string like `refs/heads/main` (remote-main). Since it\u2019s exported, this mixed return domain is easy to misuse (e.g., treating it as a commit id everywhere). Consider either (mandatory if external callers exist): (1) updating/adding JSDoc that explicitly documents the allowed return forms and when each occurs, or (2) changing the export to return a structured object (or renaming it) so callers don\u2019t accidentally assume a commit SHA.",
-          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947014",
-          "review_id": 5408989852,
-          "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-          "state": "selected_private_implementation",
-          "owned_eyes_reaction_id": 450170649,
-          "reaction_readback_verified": true,
-          "selected_option": "J",
-          "score": 99.4,
-          "selected_at": "2026-10-05T00:50:37.233582+00:00",
-          "proposal": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round5-review-findings\\R17-authority-reference-contract.md",
-          "proposal_sha256": "48cb9c36c1dc11e1310a83d203509895f082d8873290ee1d99489563c4994c1e",
-          "decision": "results/A07/TF66-R17-authority-reference-contract.md",
-          "decision_sha256": "0f8cafc144d4d3f2998759e8cad5cbff31afa60379edd647a8e0d94c863afa75"
-        },
-        {
-          "key": "R18",
-          "owner": "A03",
-          "comment_id": 4179947028,
-          "thread_id": "PRRT_kwDOSAZRhc6o4BX8",
-          "path": ".github/workflows/copilot-setup-steps.yml",
-          "line": 50,
-          "body": "The job timeout (59 minutes) is lower than the maximum cumulative wall-time implied by later step timeouts (including a 45-minute full-validation step plus multiple preceding minutes of bounded acquisition/toolchain steps). This can cause the job to be terminated by the job-level timeout before step-level timeouts fire, producing confusing failures and making the upper-bound guarantees inconsistent. Consider increasing the job-level timeout to cover the worst-case step budget for the `full` path, or reduce step timeouts / split the workflow so the job-level limit is a true upper bound.",
-          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947028",
-          "review_id": 5408989852,
-          "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-          "state": "selected_existing_decision_pending_disposition",
-          "owned_eyes_reaction_id": 450170650,
-          "reaction_readback_verified": true,
-          "selected_option": "D9-D B",
-          "score": 94,
-          "selected_at": "2026-10-05T00:50:37.233582+00:00",
-          "proposal": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round5-review-findings\\R18-timeout-applicability.md",
-          "proposal_sha256": "3d79a88be3bf8f2ceb2caac340976922a978d5a3edb32b42bd3ac0a94f2716b1",
-          "decision": "results/A03/TF66-R18-timeout-applicability.md",
-          "decision_sha256": "18d0bdbc039b03bacd0b065c8cc3261a1eadda8c448d063380cf03c4c84b9551"
-        },
-        {
-          "key": "R19",
-          "owner": "A07",
-          "comment_id": 4179947038,
-          "thread_id": "PRRT_kwDOSAZRhc6o4BYC",
-          "path": ".github/workflows/lint-nested-markdown.js",
-          "line": 193,
-          "body": "This performs a full repo glob (`**/.markdownlint*`) on every lint configuration load, which can become a noticeable cost in pre-commit hooks and CI (especially on larger repos or slower filesystems). If the policy requirement is simply to refuse alternative config selectors, consider tightening the scan (e.g., only check known disallowed root-level filenames and `.github/workflows` siblings), caching results per process invocation, or performing the scan once in the CLI entrypoint and passing a validated config to downstream functions.",
-          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947038",
-          "review_id": 5408989852,
-          "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-          "state": "selected_private_implementation",
-          "owned_eyes_reaction_id": 450170654,
-          "reaction_readback_verified": true,
-          "selected_option": "P",
-          "score": 94,
-          "selected_at": "2026-10-05T00:50:37.233582+00:00",
-          "proposal": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round5-review-findings\\R19-invocation-config-reuse.md",
-          "proposal_sha256": "23cf168dda7878011375597610593344fd258c0dbe47113538da87762d517e61",
-          "decision": "results/A07/TF66-R19-invocation-config-reuse.md",
-          "decision_sha256": "e28f4e2e01176fc755f22538c52e37fb11be1b61db7e8703f66bf4ae31d6d391"
-        },
-        {
-          "key": "R20",
-          "owner": "A03",
-          "comment_id": 4179947053,
-          "thread_id": "PRRT_kwDOSAZRhc6o4BYK",
-          "path": ".github/workflows/copilot-setup-steps.yml",
-          "line": 16,
-          "body": "The `paths` filter includes broad globs like `.github/workflows/**` and then repeats specific files within the same directory (e.g., `.github/workflows/ci-toolchain.json`, `.github/workflows/copilot-setup-steps.yml`). This duplication is harmless but makes it harder to audit what changes are intended to trigger the workflow. Consider removing redundant specific entries when a covering glob is already present (or, if the intent is to be explicit, drop the broad glob and enumerate the exact files).",
-          "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4179947053",
-          "review_id": 5408989852,
-          "original_commit_id": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-          "state": "selected_private_implementation",
-          "owned_eyes_reaction_id": 450170657,
-          "reaction_readback_verified": true,
-          "selected_option": "A",
-          "score": 100,
-          "selected_at": "2026-10-05T00:50:37.233582+00:00",
-          "proposal": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round5-review-findings\\R20-trigger-filter-deduplication.md",
-          "proposal_sha256": "a62d2ec2c8fe960aa0fd46edd2c4b2b19f60cf525f6c3de2619c8768255ae19b",
-          "decision": "results/A03/TF66-R20-trigger-filter-deduplication.md",
-          "decision_sha256": "b17f630846dbebe3bad0268946cd71900a7bbeb41f7d1a9b847e73c209cdbba5"
-        }
-      ],
-      "inventory": {
-        "inline_findings": 4,
-        "body_only_findings": 0,
-        "resolved_prior_threads": 15,
-        "open_threads": 4,
-        "complete_body_and_pagination_checked": true
-      },
-      "repair_release": {
-        "released_at": "2026-10-05T00:50:37.233582+00:00",
-        "writer": "/root/a02_tf_coherent_implementation",
-        "private_only": true,
-        "paths": [
-          ".github/workflows/Check-NpmAudit.mjs",
-          ".github/workflows/lint-nested-markdown.js",
-          ".github/workflows/lint-staged-markdown.mjs",
-          ".github/workflows/lint-markdown.test.mjs",
-          ".github/workflows/copilot-setup-steps.yml",
-          ".github/workflows/Test-CiHelpers.test.mjs",
-          ".github/workflows/Test-LocalValidation.test.mjs",
-          "AGENTS.md",
-          "CLAUDE.md",
-          ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
-          ".github/workflows/scripts-README.md",
-          "docs/ISSUE_EVALUATION_PROMPT.md",
-          "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
-          "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
-          "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
-          "docs/dependency-maintenance.md"
-        ],
-        "scope": "R17 comment-only contract; R19 one invocation-owned validated configuration with fresh standalone defaults; R20 equivalent trigger-filter simplification. R18 retains canonical D9-D B94.",
-        "root_verification": "All four proposals read; ordered options, three unique rubrics, all23 score rows and selections displayed; all23 totals checked; four immutable raw blobs and actual Windows/Linux probe data sampled.",
-        "forbidden": "No product/index/dependency/native writes, full suite, aggregate, install, protected policy/body edits, unmapped metadata edits or descendants.",
-        "fixture_extension": {
-          "path": ".github/workflows/Test-LocalValidation.test.mjs",
-          "at": "2026-10-05T00:57:08.376040+00:00",
-          "reason": "Independent source review found the retained fake module lacks loadMarkdownlintConfig; status2 could pass before reaching normalization. Preserve status/staged-byte assertions and adapt fixture export with meaningful reachability evidence. D07 short fixture note; no production behavior change."
-        },
-        "aggregate_runtime": "Retain qualified Windows route; prepared Linux image lacks currently enabled ShellCheck integration.",
-        "metadata_extension": {
-          "at": "2026-10-05T01:00:46.641610+00:00",
-          "readiness_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\linux-next-aggregate-readiness\\readiness.json",
-          "readiness_sha256": "893659f238d547d5d671ef64a1b0d010e92bf84ec562e94cf5c3a82671f601a9",
-          "paths": [
-            "AGENTS.md",
-            "CLAUDE.md",
-            ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
-            ".github/workflows/scripts-README.md",
-            "docs/ISSUE_EVALUATION_PROMPT.md",
-            "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
-            "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
-            "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
-            "docs/dependency-maintenance.md"
-          ],
-          "authority": "Accepted B docs.instructions.md115\u2013124 plus existing selected finalization policy; explicit owner-approved protected-v2 request item4 covers AGENTS/CLAUDE Version and Last Updated at actual finalization. Root read both sources and sampled3 actual B/H pairs.",
-          "allowed": "Only mapped Last Updated and two dated Version changes to actualOct5; retain major/minor/revision0, body, ADR facts, links and modes.",
-          "requires_new_decision": false
-        }
-      },
-      "proposal_evidence": {
-        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\implementation\\round5-review-findings",
-        "handoff_sha256": "0bf764e89a1b02aa93fc41172df3221a41de572226e51c9a1f78daafbc29e701",
-        "catalog_sha256": "f08f72e90776f16ab015e628d987aec219f264364b6c0b0bea7ced21a3c8b2e5",
-        "guard_sha256": "6e695acbb4820fb7e661972869b79aa8019e8cf015252f2e4d020d6cb884f5ef",
-        "root_checked_at": "2026-10-05T00:52:57.270653+00:00"
+      "all_nonreview_workflows_success": false,
+      "latest_native_snapshot": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-both-requested-db54d68.json",
+        "sha256": "3823cd3cf32a26d828e022ef677ed6216e551fd0dccd0466496a06e7e972ab5d",
+        "captured_at": "2026-10-05T02:32:21.052619+00:00"
       }
     }
   },
@@ -1429,43 +1178,43 @@
   },
   "commit": {
     "exit_code": 0,
-    "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-    "parent": "055f112f762a466ed693c073083225f8ec9ee79d",
-    "tree": "d59a740b7b1d88f7986075ac9328d9998629aa71",
-    "at": "2026-10-04T23:14:35.165032+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-normal-repair-commit.log",
-    "log_sha256": "e7e765b581a22d981c942f74df6f315eb0c2fbed6ae0979f659db603883cf307"
+    "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+    "parent": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+    "tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+    "at": "2026-10-05T02:14:22.164943+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-normal-repair-commit.log",
+    "log_sha256": "399090642d8ffffb61ef27e1fb961339bb8838b4f5d36bdf729ca4dc4a1a6f84"
   },
   "publication": {
     "status": "topic_and_body_published",
-    "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-    "previous_native_head": "055f112f762a466ed693c073083225f8ec9ee79d",
+    "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+    "previous_native_head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "started_at": "2026-10-04T23:16:30.165332+00:00",
-    "prepush_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-repair-prepush-native.json",
-    "prepush_baseline_sha256": "22628a462503ff97f4a073a94163e5067cde42d1a7992a988ebe6129abe6f875",
-    "next_body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\PR-body-round3-repair.md",
-    "next_body_sha256": "bfabba143aa097682ae60db53f008b2667aa94ed3d4dabe1eb12eefeaaceda07",
-    "old_body_sha256": "fd2a92eabf68c3b392810844df5ff2cb403be42c44ba57f382b4bf8200f2e50f",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-normal-repair-push.log",
+    "started_at": "2026-10-05T02:18:16.805048+00:00",
+    "prepush_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-repair-prepush-native.json",
+    "prepush_baseline_sha256": "7fd7a0c115c444eec3c0ee18593d51ed3419478b018a6bb64d6d86cd1dee9234",
+    "next_body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\PR-body-round5-repair.md",
+    "next_body_sha256": "a1431b323168ff13035b46fcab8108ea807a624392314a7eef7dd54a763f940f",
+    "old_body_sha256": "b4733143f7d7110fa01f72723a49e187375378dd2e119a96bac970a22478208f",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-normal-repair-push.log",
     "review_status": "Old-input set terminal and nonclean; capture new native requests/results after publication. No old review is clean for changed bytes.",
     "exit_code": 0,
-    "finished_at": "2026-10-04T23:16:33.249916+00:00",
-    "readback": "dde2b9abe761af69a7f561512df7d44d0dec6745\trefs/heads/codex/a02-peer-docs",
-    "log_sha256": "13a8c17a4b68aa408f24b0d4e7859c9253115daa7e1eee77f1cbfd2ba8c9d432",
+    "finished_at": "2026-10-05T02:18:20.451790+00:00",
+    "readback": "db54d687b105e548117c1e8a60ba155fab1a376f\trefs/heads/codex/a02-peer-docs",
+    "log_sha256": "986a621ecd56aef5ac02856d66bb9520ad6b465b3661ba66ab250f9ec966dd11",
     "body_update": {
       "status": "confirmed",
-      "started_at": "2026-10-04T23:16:46.947990+00:00",
-      "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+      "started_at": "2026-10-05T02:18:39.343084+00:00",
+      "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
       "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-      "before_sha256": "fd2a92eabf68c3b392810844df5ff2cb403be42c44ba57f382b4bf8200f2e50f",
-      "after_sha256": "bfabba143aa097682ae60db53f008b2667aa94ed3d4dabe1eb12eefeaaceda07",
+      "before_sha256": "b4733143f7d7110fa01f72723a49e187375378dd2e119a96bac970a22478208f",
+      "after_sha256": "a1431b323168ff13035b46fcab8108ea807a624392314a7eef7dd54a763f940f",
       "exit_code": 0,
-      "response": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-repair-body-update-response.json",
-      "response_sha256": "3bc22e905f92ed1b4851425df6c0a222a6c4f7a31caff93cf8380e65d6a089a1",
-      "confirmed_at": "2026-10-04T23:16:48.611548+00:00",
-      "readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round3-repair-body-readback.json",
-      "readback_sha256": "aee0bdb4f10d358e78f036d68d05c14ccd7d37a985157e75d055df326d974d78"
+      "response": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-repair-body-update-response.json",
+      "response_sha256": "0407f4c2b5cb05181a491ae6e8d7e370d587e3df8dffa997c5b8fe6dfca64d69",
+      "confirmed_at": "2026-10-05T02:18:43.416880+00:00",
+      "readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-repair-body-readback.json",
+      "readback_sha256": "37689f88f5585a771e2e1a6561eec28c8e9d37da2ebcb3a04a42ea29a15b5307"
     }
   },
   "pr_creation": {
@@ -1488,28 +1237,32 @@
       ".github/workflows/Check-NpmAudit.mjs"
     ],
     "exit_code": 0,
-    "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+    "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
     "authority": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "at": "2026-10-04T23:15:51.724589+00:00",
-    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\current-audit-dde2b9a.log",
+    "at": "2026-10-05T02:16:29.179229+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\current-audit-db54d68.log",
     "sha256": "c0d8c26ced062a80c856e39b0baf08540c7987785bb4c772dfe50b6a9679fecc",
     "mode": "ordinary local two-root audit after fresh origin/main fetch; external revocation limitation retained"
   },
   "current_audit_result": {
-    "result": "CLEAN",
-    "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+    "status": "CLEAN",
+    "unresolved": [],
+    "acceptedPackages": 0,
+    "unusedExceptions": [],
+    "proposedState": false,
     "authority": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "roots": 2,
-    "findings": 0,
-    "exceptions": 0,
-    "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\current-audit-dde2b9a.log",
-    "sha256": "c0d8c26ced062a80c856e39b0baf08540c7987785bb4c772dfe50b6a9679fecc",
-    "limitations": "Ordinary installed-root audit after normal fetch; external-revocation limitation retained."
+    "authoritySource": "local-origin-main",
+    "limitation": "Offline authority uses the locally fetched origin/main commit; external revocation and ref freshness are not discovered.",
+    "installedGraphRoots": [
+      ".",
+      ".github/workflows"
+    ],
+    "findings": []
   },
   "actual_endpoints": {
     "status": "passed",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-    "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+    "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
     "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
     "accepted_baseline_files": [
       {
@@ -1971,20 +1724,20 @@
           ".github/workflows/Classify-InstructionMaintenance.mjs",
           "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
           "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-          "dde2b9abe761af69a7f561512df7d44d0dec6745"
+          "db54d687b105e548117c1e8a60ba155fab1a376f"
         ],
         "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
         "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-        "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-        "started_at": "2026-10-04T23:14:57.770066+00:00",
-        "finished_at": "2026-10-04T23:14:59.304400+00:00",
+        "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+        "started_at": "2026-10-05T02:15:20.021362+00:00",
+        "finished_at": "2026-10-05T02:15:21.850216+00:00",
         "exit_code": 0,
-        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\accepted-base-inert-classifier-dde2b9a.log",
-        "log_sha256": "6204f95b1698818a25aa2c984cd065ae3f0d786066463ec6980fcd62edd842a8",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\accepted-base-inert-classifier-db54d68.log",
+        "log_sha256": "e5e33e2caea739e19b57c1bd300982e0fad8744fd1f58dd10a66593161baa32f",
         "inputs_unchanged": true,
         "classification": {
           "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-          "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
           "policy": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
           "classification": "maintenance_required",
           "maintenancePaths": [
@@ -2027,18 +1780,18 @@
           ".github/workflows/Test-AgentInstructions.ps1",
           "-ProposedPolicy",
           "-InputRevision",
-          "dde2b9abe761af69a7f561512df7d44d0dec6745",
+          "db54d687b105e548117c1e8a60ba155fab1a376f",
           "-PublishedBaselineRevision",
           "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
         ],
         "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
         "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
-        "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
-        "started_at": "2026-10-04T23:14:59.324985+00:00",
-        "finished_at": "2026-10-04T23:15:35.813603+00:00",
+        "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+        "started_at": "2026-10-05T02:15:21.872709+00:00",
+        "finished_at": "2026-10-05T02:16:04.887084+00:00",
         "exit_code": 0,
-        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\proposed-policy-dde2b9a.log",
-        "log_sha256": "47af57f0fc9b87eb0832da11cb0f8cda0a3f0ff237d8e86cf09e2f02f5d572a6",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\proposed-policy-db54d68.log",
+        "log_sha256": "bc9ed0641101c10861f1bef3c30ba1c8b3320d8973c60696bf5bce015fd19d24",
         "inputs_unchanged": true
       }
     ],
@@ -2046,9 +1799,9 @@
   },
   "accepted_baseline_file_count": 75,
   "latest_native_snapshot": {
-    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-terminal-findings-dde2b9a.json",
-    "sha256": "f29f8a48e7692ec83254f17ed8804eb72765c66d14c7d7b6445b714ad07f726d",
-    "captured_at": "2026-10-05T00:35:22.532448+00:00"
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-both-requested-db54d68.json",
+    "sha256": "3823cd3cf32a26d828e022ef677ed6216e551fd0dccd0466496a06e7e972ab5d",
+    "captured_at": "2026-10-05T02:32:21.052619+00:00"
   },
   "round1": {
     "head": "e2f0652654ef0954e17fc3a255b87375908d0521",
@@ -3965,8 +3718,8 @@
       "old_input_clean": false
     }
   },
-  "current_review_status": "Round5 remains terminal/nonclean on published H. Corrected16path private repair passes independent source/focused quality; proposed tree5fbf060 is under sole full Windows validation session30940. No new review request or product publication.",
-  "next_action": "Collect the existing validation session; inspect complete output and all identity guards. Integrate only after terminal pass.",
+  "current_review_status": "Both round6 reviews pending on db54d68; prior 19 threads resolved. Final quality, merge and reverse transfer remain.",
+  "next_action": "Collect both current-input review results and remaining hosted checks without duplicate requests; final quality, normal merge and landed acceptance remain.",
   "round2": {
     "head": "4375f2e3c98a6aeb0dd916d26620ed63a42abafe",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -6692,8 +6445,8 @@
       "verified_at": "2026-10-05T00:10:36.479909+00:00"
     }
   },
-  "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\PR-body-round4-dispositions.md",
-  "body_sha256": "b4733143f7d7110fa01f72723a49e187375378dd2e119a96bac970a22478208f",
+  "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\PR-body-round5-repair.md",
+  "body_sha256": "a1431b323168ff13035b46fcab8108ea807a624392314a7eef7dd54a763f940f",
   "round5": {
     "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
     "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
@@ -7142,7 +6895,7 @@
       "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
       "product_unchanged": true,
       "dependencies_unchanged": true,
-      "state": "aggregate_running",
+      "state": "aggregate_passed",
       "staged_preflight": {
         "state": "passed",
         "command": [
@@ -7167,7 +6920,7 @@
         "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
       },
       "aggregate": {
-        "state": "running",
+        "state": "passed",
         "command": [
           "py",
           "-3.12",
@@ -7182,14 +6935,14 @@
         "pid": 210040,
         "candidate_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
         "before_identity_passed": true,
-        "after_identity_passed": false,
-        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit."
+        "after_identity_passed": true,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+        "exit_code": 0,
+        "finished_at": "2026-10-05T02:12:56.823309+00:00",
+        "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+        "passed_hook_count": 11,
+        "skipped_hook_count": 0
       }
-    },
-    "validation_readiness": {
-      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-validation-readiness.json",
-      "sha256": "71bad4dc6b9f8346c237a0da69d50ae3cf32f6f4819129fcbe791ecbf61fd4dd",
-      "session": 30940
     },
     "publication_readiness": {
       "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-publication-readiness.json",
@@ -7215,6 +6968,971 @@
       "full_linux_equivalence": false,
       "speed_claim": false,
       "current_windows_run_unchanged": 30940
+    },
+    "prepared_native_disposition_helpers": {
+      "update-round5-repair-pr-body.py": "5ab0a700f7b60b0e55350361a607d42bd9204ee2b10ec992c2c81a0817e84921",
+      "round5-thread-dispositions.py": "e8fbac9f50c4e49a7372416a27002627b15cf356e9771679da243611a4a1ed84"
+    },
+    "repair_integration": {
+      "state": "committed",
+      "started_at": "2026-10-05T02:14:06.096173+00:00",
+      "parent": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+      "tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+      "paths": [
+        ".github/workflows/Check-NpmAudit.mjs",
+        ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-LocalValidation.test.mjs",
+        ".github/workflows/copilot-setup-steps.yml",
+        ".github/workflows/lint-markdown.test.mjs",
+        ".github/workflows/lint-nested-markdown.js",
+        ".github/workflows/lint-staged-markdown.mjs",
+        ".github/workflows/scripts-README.md",
+        "AGENTS.md",
+        "CLAUDE.md",
+        "docs/ISSUE_EVALUATION_PROMPT.md",
+        "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+        "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+        "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+        "docs/dependency-maintenance.md"
+      ],
+      "old_input_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-pre-integration-execution-state.json",
+      "old_input_snapshot_sha256": "530e65f96adb2656deae0833447290943b49a6ff14b6362230a23da4544d171d",
+      "independent_reviews": [
+        {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-prepublication-quality-20261004\\TF66-R17-R20-FINAL-REPAIR-REVIEW-dde2b9a.md",
+          "sha256": "ec802518d77c1b3520e9eeff98c0e0f5f8c29ce260f9fdb7763b847781d26322",
+          "verdict": "PASS",
+          "scope": "Final16path repair source/focused evidence; not final native PR acceptance."
+        }
+      ],
+      "precommit_aggregate": {
+        "state": "passed",
+        "command": [
+          "py",
+          "-3.12",
+          "-m",
+          "pre_commit",
+          "run",
+          "--all-files"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-validation-checkout",
+        "started_at": "2026-10-05T01:16:13.221803+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-aggregate.log",
+        "pid": 210040,
+        "candidate_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+        "before_identity_passed": true,
+        "after_identity_passed": true,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+        "exit_code": 0,
+        "finished_at": "2026-10-05T02:12:56.823309+00:00",
+        "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+        "passed_hook_count": 11,
+        "skipped_hook_count": 0
+      },
+      "staged_preflight": {
+        "state": "passed",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-RequireStagedInputMatch"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-validation-checkout",
+        "started_at": "2026-10-05T01:15:06.187191+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-proposed-staged_preflight.log",
+        "pid": 210040,
+        "candidate_tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+        "before_identity_passed": true,
+        "after_identity_passed": true,
+        "role": "Proposed candidate checker and complete staged candidate in a disposable checkout anchored at real B. This is not accepted-B authority. Root full aggregate runs here before normal product commit.",
+        "exit_code": 0,
+        "finished_at": "2026-10-05T01:16:13.217930+00:00",
+        "log_sha256": "9a44b1aca9035c1d913fb5d78fdda2bf43e44610a4edf0df9d589e6d1f7c4d96"
+      },
+      "commit_started_at": "2026-10-05T02:14:08.147729+00:00",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-normal-repair-commit.log",
+      "pid": 203808,
+      "commit": {
+        "exit_code": 0,
+        "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+        "parent": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+        "tree": "5fbf0601b7da43ae6872fa23a89e60cc5cd01197",
+        "at": "2026-10-05T02:14:22.164943+00:00",
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-normal-repair-commit.log",
+        "log_sha256": "399090642d8ffffb61ef27e1fb961339bb8838b4f5d36bdf729ca4dc4a1a6f84"
+      },
+      "finished_at": "2026-10-05T02:14:23.896560+00:00",
+      "files_unchanged": true,
+      "dependencies_unchanged": true
+    },
+    "original_input_record": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-pre-integration-execution-state.json",
+      "sha256": "530e65f96adb2656deae0833447290943b49a6ff14b6362230a23da4544d171d",
+      "head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+      "tree": "d59a740b7b1d88f7986075ac9328d9998629aa71",
+      "role": "Historical old-input aggregate, diagnostics, audit, publication and reviews; none validate new H."
+    },
+    "repair_endpoints": {
+      "status": "passed",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+      "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+      "accepted_baseline_files": [
+        {
+          "path": ".claude/commands/review-loop.md",
+          "mode": "100644",
+          "blob": "62b63fabdc8ce64ede8539b884aa904a46cb3eaf",
+          "sha256": "eb877158c2bf1ca1cafcdd343214c2865dc2816b6e7a42f54bee50dc571d1437"
+        },
+        {
+          "path": ".codex/config.toml",
+          "mode": "100644",
+          "blob": "89eb76dba2ac64bf811cf4272b033a30de241d80",
+          "sha256": "e2c707d61bfedaae2281b501350381e312ed648ea920ce60df45a2cfaa9e796c"
+        },
+        {
+          "path": ".gitattributes",
+          "mode": "100644",
+          "blob": "6313b56c57848efce05faa7aa7e901ccfc2886ea",
+          "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+        },
+        {
+          "path": ".github/copilot-instructions.md",
+          "mode": "100644",
+          "blob": "d4ad431a6c629203aa6cd88b9cea6f9caa4c293b",
+          "sha256": "81fbe1615dd96fe99afca2738ff5888a6f7b7390068c1087d3d817fad73ff614"
+        },
+        {
+          "path": ".github/dependabot.yml",
+          "mode": "100644",
+          "blob": "ca79ca5b4d5245d3dbcf49889b73d7fd0f076132",
+          "sha256": "eada67e1b7f73d16a4c240ede6193c4852a2b0887e678a23dc7a3462810502e7"
+        },
+        {
+          "path": ".github/document-metadata-classification.json",
+          "mode": "100644",
+          "blob": "79b79ebef9da1175a18a42748c1f69b6df58af35",
+          "sha256": "f56833f8a68fc15887851784d854fab8cc7ea705c9422df64ded1c6845398298"
+        },
+        {
+          "path": ".github/instructions/docs.instructions.md",
+          "mode": "100644",
+          "blob": "4a8f2addc02af857928205199b66cf3918ae9a82",
+          "sha256": "d4f9f8b3f249d67a013a03d0e4611f20a1246c22237091ced8f9e4aeb31883c6"
+        },
+        {
+          "path": ".github/instructions/yaml.instructions.md",
+          "mode": "100644",
+          "blob": "924d12c833d07def47d05137b532e622db622fa4",
+          "sha256": "b009264adc0f9b488fa13ab7fdbfc23af83a3040b9b71ecb71ef3510eff73745"
+        },
+        {
+          "path": ".github/workflows/.markdownlint.jsonc",
+          "mode": "100644",
+          "blob": "cd9b559b7254dab422b97e493bdb41c40b5511c1",
+          "sha256": "5eb07bf7f30829e0091e82f235a96fdba21be1ef1160ca1e22cdbe8d82da5300"
+        },
+        {
+          "path": ".github/workflows/Check-NpmAudit.mjs",
+          "mode": "100644",
+          "blob": "10b352c23b4abe1e7cc3b7ba6b1f32a4ea9312a0",
+          "sha256": "5ab1cccec38557a81c7711c076efb7702087f666396714678e88211556855bfb"
+        },
+        {
+          "path": ".github/workflows/Check-NpmAudit.test.mjs",
+          "mode": "100644",
+          "blob": "54684b739a74e0c64df50d4a9cd697f0c57b447d",
+          "sha256": "b2899ae38a2446112aaa058f7d35a9260f08af8642ed668ea263a89f4aa7aaf3"
+        },
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+          "mode": "100644",
+          "blob": "00c5857b701c9c85668f9fe66e33838f82d313e8",
+          "sha256": "981d34947b81a02105a62f26c676e84ffa018e254c63e4df290f93ab56143528"
+        },
+        {
+          "path": ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+          "mode": "100644",
+          "blob": "c24be2165520a02cb622f47dc03c4e4ad9ddd716",
+          "sha256": "b10eb660ff110aed58948ba92a00a55df4d1543ea9c46583562f4d1cf5c6f706"
+        },
+        {
+          "path": ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+          "mode": "100644",
+          "blob": "a3e7e664e441d2e51f0b6f5709b8a010d6877e82",
+          "sha256": "d369fcfd1d2e6b036473233f3fed39c0b1e761cdbe78182917cd46ba83e70b3c"
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.mjs",
+          "mode": "100644",
+          "blob": "33771aa438f441bd96a0fcaa4c103a379fc8b302",
+          "sha256": "858df69123630890c24d61b30fa47fcf462a206bb2b7699697158f9868c2439f"
+        },
+        {
+          "path": ".github/workflows/Get-SupplyFreezeDigest.test.mjs",
+          "mode": "100644",
+          "blob": "25abdcb61aca8a1c0df9e3643aa7b68781ab6052",
+          "sha256": "56b5a277b929f15136c88f51a781c2c957c8eb53b4cd0b09efb017a6d9002d57"
+        },
+        {
+          "path": ".github/workflows/Initialize-CiToolchain.ps1",
+          "mode": "100644",
+          "blob": "906460d818674199b32294185ed6525c143b48bb",
+          "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438"
+        },
+        {
+          "path": ".github/workflows/Invoke-LockedPythonHook.ps1",
+          "mode": "100644",
+          "blob": "e6e566ed7de9fc065c98338d93ef08699e40b354",
+          "sha256": "9bc31918ba4407bf86a4d0d8e568962d05c157752a9df13e9bae2f081aa80e96"
+        },
+        {
+          "path": ".github/workflows/Invoke-MarkdownLint.ps1",
+          "mode": "100644",
+          "blob": "8331d93c54fae6eba440e25e5d489f5dd1ec0f3a",
+          "sha256": "948ceea6754a189fa6395e3a917bcb11c8374c0ecc7e874c5107f8076bb548ce"
+        },
+        {
+          "path": ".github/workflows/MARKDOWN-LINTING-IMPLEMENTATION.md",
+          "mode": "100644",
+          "blob": "5622bb03dd0af81ed44d4709a7eda8c644ce9530",
+          "sha256": "f6fa69cc97f351b778678b247f3986dc3e8fb2a6741c062191fadb8c3093555a"
+        },
+        {
+          "path": ".github/workflows/NpmTools.mjs",
+          "mode": "100644",
+          "blob": "6f1739b6dfd0108f813506f86f95ec4f2a75bd7e",
+          "sha256": "196532a700af8b90fcab4914eb541b8b4a710c2341d29e59b01bd5181cce2587"
+        },
+        {
+          "path": ".github/workflows/NpmTools.test.mjs",
+          "mode": "100644",
+          "blob": "65416a6fd9bd3f46f871af51833f91ad031b9ec7",
+          "sha256": "077d6631c40f6a0bf01dc3d925e12d6d06d9bd6f49981ff942eb5ae55785568b"
+        },
+        {
+          "path": ".github/workflows/Test-AgentInstructions.ps1",
+          "mode": "100644",
+          "blob": "c84d9067c1b315e037850f2cd40e79c0704356b5",
+          "sha256": "254d1a9499bdc134fae75f97f1e0943fb07e4c6368a1bb06650f17629b5d3875"
+        },
+        {
+          "path": ".github/workflows/Test-CheckoutCredentials.ps1",
+          "mode": "100644",
+          "blob": "45db9b3fdfa3e85f05d6b567fbaa547d16a8132d",
+          "sha256": "90701e8586242ac8bdde9d722288ca3b96751ae242cde86d7431f89424f0e487"
+        },
+        {
+          "path": ".github/workflows/Test-CiHelpers.test.mjs",
+          "mode": "100644",
+          "blob": "7855cc0c1be90096abae979168ed1e282d535998",
+          "sha256": "63b6fd039eca0c4aa29a45def096b026695d1e97f8c8242f19cb94068b47d2ab"
+        },
+        {
+          "path": ".github/workflows/Test-ExactGitPathSet.ps1",
+          "mode": "100644",
+          "blob": "0a9f312d62ca753689abe05d3519cf0e64e74ea0",
+          "sha256": "fa45650db815d2bfe6cbcf66e76915889f0133b28ad8b92df6c11fc62cbb86b0"
+        },
+        {
+          "path": ".github/workflows/Test-LocalValidation.test.mjs",
+          "mode": "100644",
+          "blob": "87f68f5f02eb2303059be06c219253ab37853197",
+          "sha256": "41e8d68636cd8a32569266eb4daf14da9559160679cbb1793d194533f9d32ba5"
+        },
+        {
+          "path": ".github/workflows/Test-StateRecoveryExamples.mjs",
+          "mode": "100644",
+          "blob": "0c53093e6a5de264deae9f9269e11c5981d4bdad",
+          "sha256": "a087d24c1a4a8036e92828e194f515d65c56cba7a7ab82e8cc9d4f98a202b5ca"
+        },
+        {
+          "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+          "mode": "100644",
+          "blob": "01b8fbd9f5dd9e34a4f0a3708f74eb8fd9336a5e",
+          "sha256": "959181ab666dce12b0d403cb7a34cb0532090270c35c155f11348828ba882ab4"
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+          "mode": "100644",
+          "blob": "995b72a7b48dea2636094d81226893a519950797",
+          "sha256": "37462f7f29ad09c8b4bf2a535c870fa758a41c2dcd776bfa1f0be9973b27e4b7"
+        },
+        {
+          "path": ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          "mode": "100644",
+          "blob": "aa1be01df5a3c8b5369bf8e4313089de9c356365",
+          "sha256": "7987508cdf992c4f7f87b6fe294bd506d768369e83d547b56e1a1a9275956327"
+        },
+        {
+          "path": ".github/workflows/agent-instructions.yml",
+          "mode": "100644",
+          "blob": "7bf29f43ea081e9861ad53ecf0951831bf878075",
+          "sha256": "f7a9bc6990a168cf37fe41ce10dad7aba421f6413c29bca21b58cde42c123d2c"
+        },
+        {
+          "path": ".github/workflows/build.yml",
+          "mode": "100644",
+          "blob": "6cbd7f1233baf28ea2242b2a6207b6ebd29ad073",
+          "sha256": "adaadac0ae5c5aeeb9ec933c42583babc3e1de207a2e8e2fa9ad026ac67f5acd"
+        },
+        {
+          "path": ".github/workflows/ci-toolchain.json",
+          "mode": "100644",
+          "blob": "740a7749945acbf53e9981241ea553dc1431d3c8",
+          "sha256": "77fd3affa2207d0bef24a57489c5161ec2f0e25b419cc61cfa326ea649c3c108"
+        },
+        {
+          "path": ".github/workflows/copilot-setup-steps.yml",
+          "mode": "100644",
+          "blob": "de6d55690478deacc6bb58f65f4f437cb43cc87e",
+          "sha256": "f5e135e3a4cf70b015ed31243b079b508108b9a1acca448fcebe49dbd475b1ae"
+        },
+        {
+          "path": ".github/workflows/devcontainer-ci.yml",
+          "mode": "100644",
+          "blob": "bfad83b60e7a808d6f44ae11d4e6fab8d73cfaec",
+          "sha256": "d8ebeeb740af6e05413535d8997338d48966279dd1136daca2a0fcc9a0f3de62"
+        },
+        {
+          "path": ".github/workflows/historical-supply-profile.json",
+          "mode": "100644",
+          "blob": "471fe6dd03676739c2c8a031f2d42010169b8dea",
+          "sha256": "47310fc4a772175c1ad411c5bdad13bdd1fe080e372a611f6a0c523c78a42f1d"
+        },
+        {
+          "path": ".github/workflows/install-husky.mjs",
+          "mode": "100644",
+          "blob": "6a12568776f6473472193bc98638f1856a7c9dec",
+          "sha256": "609a230b5100f6bcb7b4cbacde11aa3d3b4a175d9d97fcedc9702341daf508c7"
+        },
+        {
+          "path": ".github/workflows/lint-nested-markdown.js",
+          "mode": "100644",
+          "blob": "9ea34e743098b6d527195ae81e06c77c7d7c06d6",
+          "sha256": "5f3bbefdd02af786bd39ae6a31685a4daf073981c2c072a51b590c75a6626205"
+        },
+        {
+          "path": ".github/workflows/lint-staged-markdown.mjs",
+          "mode": "100644",
+          "blob": "c35575990d5854ea6da9d5f6d49d23287df43146",
+          "sha256": "0e8b0b5c725227b98a338e44e630f6b50a90f725e2f01b2f0262284ffdd6926b"
+        },
+        {
+          "path": ".github/workflows/markdownlint.yml",
+          "mode": "100644",
+          "blob": "e665a1b1e45de4f33b62b64fd75c4974b9156b4d",
+          "sha256": "3a6a9b0e2e06c499d0409eb07b75eaa1fae62e1b9c9de712f1634790311c64ad"
+        },
+        {
+          "path": ".github/workflows/npm-risk-exceptions.json",
+          "mode": "100644",
+          "blob": "b5aac17ff77c7ce0f773ffd7534ec28749216fd0",
+          "sha256": "584e697cce0eb005ea6f0037f5757f418c6cad912bcca8f486ed97c7cdfa7fe1"
+        },
+        {
+          "path": ".github/workflows/package-lock.json",
+          "mode": "100644",
+          "blob": "8836c53a7d86ea9eeab8d0ba10b4026cb848b3ae",
+          "sha256": "ccab570b453d95557f5ad250d15efdcee9e2fcb6999b561a899aca1ea3d2da5a"
+        },
+        {
+          "path": ".github/workflows/package.json",
+          "mode": "100644",
+          "blob": "65aebbba501747454aede48fe32ce406a2ce43ff",
+          "sha256": "761cd323d4997b108cf748ef0eccf052e083fa4f1212e4e4a27228ab1129588f"
+        },
+        {
+          "path": ".github/workflows/scripts-README.md",
+          "mode": "100644",
+          "blob": "cc6a3b60a9c19249d9d3e083493ea76e9c006ad3",
+          "sha256": "ee33fab39492c4c3ca4c4d7263f442d443395a70f23268fe5cdea396f49cfbe6"
+        },
+        {
+          "path": ".github/workflows/workflow-policy-cases.json",
+          "mode": "100644",
+          "blob": "7e63fc866ac9ee62b5cf436ab9d06789c804ae4e",
+          "sha256": "13ad5bda1a31a9c1dfe922bfd3c68d29ff6011209aca337bb03370f962040c89"
+        },
+        {
+          "path": ".github/workflows/workflow-policy-contract.json",
+          "mode": "100644",
+          "blob": "09ccc8139ef8a90da08e75f2c467ac47a0b868ff",
+          "sha256": "6fa78e05cd9ccd582414151188c4780d23f1f9a8b31688b2a5b390ffb2bac222"
+        },
+        {
+          "path": ".gitignore",
+          "mode": "100644",
+          "blob": "76b672659bef2bda7a97f7fa8e7878e1cacafdc9",
+          "sha256": "6db22eb747bbc304c7479a428c56226197d9719d348cc3a0ab519b78107fcc87"
+        },
+        {
+          "path": ".husky/pre-commit",
+          "mode": "100644",
+          "blob": "71d8f4949043c1b64ffc68c92dcee58a4c3bde4b",
+          "sha256": "1888b6c6e29c1c06baebbdf2946cc7b465ce5adcc869c2977dfd774d68b96df0"
+        },
+        {
+          "path": ".pre-commit-config.yaml",
+          "mode": "100644",
+          "blob": "d6fa21489388686703c94ea33c39d0dd41b8bd16",
+          "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+        },
+        {
+          "path": ".vscode/settings.json",
+          "mode": "100644",
+          "blob": "b0c4bf2a554ab15c106268cfa7d29dd0ddbf2f8d",
+          "sha256": "3ce226f79d8a80b3953cf40adee69d971513af58a8fe25283a95a7f461b5d3da"
+        },
+        {
+          "path": "ACKNOWLEDGMENTS.md",
+          "mode": "100644",
+          "blob": "f1ae2dd938628424412d9edd6787e99a9246f5ff",
+          "sha256": "885e89c0344a72066ba32cbd45466d92a6ee32896d3db1c59d2af597904c4f42"
+        },
+        {
+          "path": "AGENTS.md",
+          "mode": "100644",
+          "blob": "aa643a442d6a0c59c05d2aff8737564981147fc6",
+          "sha256": "209f364a3f10df6a40df5e1835ac867901c908ede25cb1d610e0378039682266"
+        },
+        {
+          "path": "CLAUDE.md",
+          "mode": "100644",
+          "blob": "3cc21fc793944033be430ad08722081db4e7b9dd",
+          "sha256": "7ebf2a20bb6bdc5b8e172f230b95bc5e8c83b31fb263771da57977195a5021d2"
+        },
+        {
+          "path": "CONTRIBUTING.md",
+          "mode": "100644",
+          "blob": "94beedee85478c14d284ca830e94d4a5f4ece202",
+          "sha256": "31b2325fd4fd4e51944cb70f2597ff7eda099cd3edbeb6ea108d487aa1e78dda"
+        },
+        {
+          "path": "LICENSE",
+          "mode": "100644",
+          "blob": "98ca721ce2a880acbcbce1d9690cab0100b8bb7a",
+          "sha256": "46f0f6953f2e6149ee6d15c58a60b832a12314e0094362392e1519f8f84846eb"
+        },
+        {
+          "path": "README.md",
+          "mode": "100644",
+          "blob": "f04368718d580fe61d9a22f4c92cdfdf8287b28d",
+          "sha256": "affbdcdced05773f20895a397d1e062d716fb9e2b2215d0a4f412d7ed8b7a200"
+        },
+        {
+          "path": "STYLE_GUIDE.md",
+          "mode": "100644",
+          "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+          "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+        },
+        {
+          "path": "STYLE_GUIDE_CHAT.md",
+          "mode": "100644",
+          "blob": "a6c4a1aa84cb6c1b0452d3f8d0f071b9a57ba3c8",
+          "sha256": "190179ef082085f8919cd2a265a683ffa103cdd000c12725f3a8a464235e4f72"
+        },
+        {
+          "path": "STYLE_GUIDE_FULL.md",
+          "mode": "100644",
+          "blob": "faaf49ee2bcde0d23da2acd397a73511fe2b6f00",
+          "sha256": "9e9a86ecb5e748c78629cfcc2514dadbd9dd3b90ba2e62dbf522e77ce8db5fab"
+        },
+        {
+          "path": "STYLE_GUIDE_RATIONALE.md",
+          "mode": "100644",
+          "blob": "b5efeee6cb8b6ded6099bbee13b6307ea103cc5c",
+          "sha256": "669629a996b4165162c277cf6deafaf26f0e45f4d2005d73ec92fc35cdfbfc74"
+        },
+        {
+          "path": "copilot-instructions.md",
+          "mode": "100644",
+          "blob": "f872e52ee5b7ded737157dcf745cb93013005a2b",
+          "sha256": "4a2f457d7334cb45e21f6e50a7973e10e765b05832487a2db0d2a229f7eef11e"
+        },
+        {
+          "path": "docs/ISSUE_EVALUATION_PROMPT.md",
+          "mode": "100644",
+          "blob": "f43b5168ce508a9a054dc85ba7231e27d8c70809",
+          "sha256": "5a578d0a9cf82439bed991fcd533bf01c6720686691fd075c7d6aaa4e578eae1"
+        },
+        {
+          "path": "docs/T1-SUPPLY-FREEZE-CURRENT-PROVENANCE-v1.md",
+          "mode": "100644",
+          "blob": "b567f286e9a00add2ef345ef11481efe19516ca8",
+          "sha256": "bfa261228e91d1009a90dcf619cd8e74f940607b4d10b9ecfff64c211b2882f2"
+        },
+        {
+          "path": "docs/T1-SUPPLY-FREEZE-v1.md",
+          "mode": "100644",
+          "blob": "9e04225a355997850e4817f9163868089a773332",
+          "sha256": "b80e083ad4b609b52af262a5fde5701fd82b896e25cbcd645b3a710e731bfb93"
+        },
+        {
+          "path": "docs/decisions/0001-accept-generated-artifact-lint-lag.md",
+          "mode": "100644",
+          "blob": "b1065e9a330dc2a37e6f56eedc38f720558e6528",
+          "sha256": "d2b20a47d918b31e6443d17bb8a305a83a1d3102cc5ad3b9362c0594440d570f"
+        },
+        {
+          "path": "docs/decisions/0002-accept-repository-code-in-the-write-enabled-job.md",
+          "mode": "100644",
+          "blob": "970afd6f1df559f3085bd39cff2f7b961cc96a15",
+          "sha256": "88f628441c80c9aa7ec99e94e8f67e87dedade21f9275547147508950fd15d87"
+        },
+        {
+          "path": "docs/decisions/0003-accept-required-check-workflow-edit-residual.md",
+          "mode": "100644",
+          "blob": "277ef8998b19e5d0c7bdae1a1d025cd17e02b9ba",
+          "sha256": "c8994c132bf13fae0500e0cd429999cd36c9ccf4fa26bdcffe7f97a6cd9cf5cc"
+        },
+        {
+          "path": "docs/dependency-maintenance.md",
+          "mode": "100644",
+          "blob": "a23eefb137c4c1c1cf39ec9bd4372915bcf47ce0",
+          "sha256": "b2e59c388bcef956013007c65a68429b4ee755d7e6d9feb9e382f7e6acb877f6"
+        },
+        {
+          "path": "package-lock.json",
+          "mode": "100644",
+          "blob": "83641b58e56c6a01690c32af410b4a5423be9ad1",
+          "sha256": "5095ee588831de6bab6a23325b18eadace9f42738c474b84661ad299e76b7f57"
+        },
+        {
+          "path": "package.json",
+          "mode": "100644",
+          "blob": "dec41f61c36e5770487eb431bd57f2f7dfe62832",
+          "sha256": "5d01a0a51b2af427cf4de83b656c773e54e008c72b607ef22f7b717e0d9bd535"
+        },
+        {
+          "path": "requirements-dev.txt",
+          "mode": "100644",
+          "blob": "1409f6e150f9880b881b8a4dd6ceb699f11ee53c",
+          "sha256": "f9aaac5456d8c076becff82222a49a3a16ef1267de93d347ebcac0fe3a3f5652"
+        },
+        {
+          "path": "samples/test-nested-markdown-linting.md",
+          "mode": "100644",
+          "blob": "1d06987410afac4fdf845d5d976dd9e984639156",
+          "sha256": "9e0c8d0e43d2bd181ec21e24528ae15755c3536ddd144db7d7c11a39e0802a54"
+        },
+        {
+          "path": "samples/test-recursive-nested-markdown.md",
+          "mode": "100644",
+          "blob": "381310a48f8b7f0c3482d5554c42b797cd685ed6",
+          "sha256": "400c0fa9e91d0624c4a9995baedf41f7506c71173913c99eead3a85dae0d3a4c"
+        },
+        {
+          "path": "terraform.instructions.md",
+          "mode": "100644",
+          "blob": "59eeedcfe4cab11ebf87d439d5117f7203b0ea98",
+          "sha256": "be0e3b5ea03de9d1963014dabcc3cf82c6400f2239cceb5474125c4f8ecfb38a"
+        }
+      ],
+      "results": [
+        {
+          "mode": "accepted-base-inert-classifier",
+          "command": [
+            "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+            ".github/workflows/Classify-InstructionMaintenance.mjs",
+            "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+            "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "db54d687b105e548117c1e8a60ba155fab1a376f"
+          ],
+          "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-accepted-base-20261004\\accepted-base-checkout",
+          "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+          "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+          "started_at": "2026-10-05T02:15:20.021362+00:00",
+          "finished_at": "2026-10-05T02:15:21.850216+00:00",
+          "exit_code": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\accepted-base-inert-classifier-db54d68.log",
+          "log_sha256": "e5e33e2caea739e19b57c1bd300982e0fad8744fd1f58dd10a66593161baa32f",
+          "inputs_unchanged": true,
+          "classification": {
+            "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+            "policy": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+            "classification": "maintenance_required",
+            "maintenancePaths": [
+              ".github/workflows/Check-NpmAudit.mjs",
+              ".github/workflows/Check-NpmAudit.test.mjs",
+              ".github/workflows/Classify-InstructionMaintenance.mjs",
+              ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+              ".github/workflows/NpmTools.mjs",
+              ".github/workflows/NpmTools.test.mjs",
+              ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+              ".github/workflows/Test-AgentInstructions.ps1",
+              ".github/workflows/Test-CiHelpers.test.mjs",
+              ".github/workflows/Test-LocalValidation.test.mjs",
+              ".github/workflows/Validate-WorkflowPolicy.mjs",
+              ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+              ".github/workflows/agent-instructions.yml",
+              ".github/workflows/build.yml",
+              ".github/workflows/copilot-setup-steps.yml",
+              ".github/workflows/devcontainer-ci.yml",
+              ".github/workflows/lint-nested-markdown.js",
+              ".github/workflows/lint-staged-markdown.mjs",
+              ".github/workflows/markdownlint.yml",
+              ".github/workflows/package-lock.json",
+              ".github/workflows/package.json",
+              ".github/workflows/workflow-policy-cases.json",
+              ".github/workflows/workflow-policy-contract.json",
+              ".husky/pre-commit",
+              "package-lock.json"
+            ]
+          }
+        },
+        {
+          "mode": "proposed-policy",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-ProposedPolicy",
+            "-InputRevision",
+            "db54d687b105e548117c1e8a60ba155fab1a376f",
+            "-PublishedBaselineRevision",
+            "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c"
+          ],
+          "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+          "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+          "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+          "started_at": "2026-10-05T02:15:21.872709+00:00",
+          "finished_at": "2026-10-05T02:16:04.887084+00:00",
+          "exit_code": 0,
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\proposed-policy-db54d68.log",
+          "log_sha256": "bc9ed0641101c10861f1bef3c30ba1c8b3320d8973c60696bf5bce015fd19d24",
+          "inputs_unchanged": true
+        }
+      ],
+      "mode_policy": "Old accepted B classifier only, with candidate H as inert Git data; proposed H/B validation from exact H. No unsupported old-B metadata flags or copied candidate engine."
+    },
+    "repair_current_audit": {
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        ".github/workflows/Check-NpmAudit.mjs"
+      ],
+      "exit_code": 0,
+      "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+      "authority": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "at": "2026-10-05T02:16:29.179229+00:00",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\current-audit-db54d68.log",
+      "sha256": "c0d8c26ced062a80c856e39b0baf08540c7987785bb4c772dfe50b6a9679fecc",
+      "mode": "ordinary local two-root audit after fresh origin/main fetch; external revocation limitation retained"
+    },
+    "repair_publication": {
+      "status": "topic_and_body_published",
+      "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+      "previous_native_head": "dde2b9abe761af69a7f561512df7d44d0dec6745",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "started_at": "2026-10-05T02:18:16.805048+00:00",
+      "prepush_baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-repair-prepush-native.json",
+      "prepush_baseline_sha256": "7fd7a0c115c444eec3c0ee18593d51ed3419478b018a6bb64d6d86cd1dee9234",
+      "next_body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\PR-body-round5-repair.md",
+      "next_body_sha256": "a1431b323168ff13035b46fcab8108ea807a624392314a7eef7dd54a763f940f",
+      "old_body_sha256": "b4733143f7d7110fa01f72723a49e187375378dd2e119a96bac970a22478208f",
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-normal-repair-push.log",
+      "review_status": "Old-input set terminal and nonclean; capture new native requests/results after publication. No old review is clean for changed bytes.",
+      "exit_code": 0,
+      "finished_at": "2026-10-05T02:18:20.451790+00:00",
+      "readback": "db54d687b105e548117c1e8a60ba155fab1a376f\trefs/heads/codex/a02-peer-docs",
+      "log_sha256": "986a621ecd56aef5ac02856d66bb9520ad6b465b3661ba66ab250f9ec966dd11",
+      "body_update": {
+        "status": "confirmed",
+        "started_at": "2026-10-05T02:18:39.343084+00:00",
+        "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+        "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+        "before_sha256": "b4733143f7d7110fa01f72723a49e187375378dd2e119a96bac970a22478208f",
+        "after_sha256": "a1431b323168ff13035b46fcab8108ea807a624392314a7eef7dd54a763f940f",
+        "exit_code": 0,
+        "response": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-repair-body-update-response.json",
+        "response_sha256": "0407f4c2b5cb05181a491ae6e8d7e370d587e3df8dffa997c5b8fe6dfca64d69",
+        "confirmed_at": "2026-10-05T02:18:43.416880+00:00",
+        "readback": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round5-repair-body-readback.json",
+        "readback_sha256": "37689f88f5585a771e2e1a6561eec28c8e9d37da2ebcb3a04a42ea29a15b5307"
+      }
+    },
+    "native_thread_dispositions": {
+      "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+      "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+      "body_sha256": "a1431b323168ff13035b46fcab8108ea807a624392314a7eef7dd54a763f940f",
+      "threads": [
+        {
+          "finding": "R17",
+          "comment_id": 4179947014,
+          "thread_id": "PRRT_kwDOSAZRhc6o4BX1",
+          "draft": "R17-reply.md",
+          "sha256": "18a4131eeb0383066aa422c0238fc49f20473acdce8f06608ea4b6044906f9d8",
+          "lines_plus_link": 4,
+          "publish_state": "draft only; root verifies input and publishes once",
+          "key": "R17",
+          "comment": "The selected repair documents the optional event and SHA/ref return union; the export and executable behavior are unchanged. Selection remains separate from acquiring accepted authority.\nExisting selector controls and the executable-byte guard pass.\nGenerated with Codex\n[R17 decision](https://github.com/franklesniak/PSStyleGuide/blob/c63b627b65c96e7b0af1a56a1b81fb16f7d4f704/docs/planning/action-items-2026-10-02/results/A07/TF66-R17-authority-reference-contract.md)",
+          "reaction_id": 450170649,
+          "status": "resolved_own_eyes_removed",
+          "prepared_at": "2026-10-05T02:18:45.599728+00:00",
+          "reply_id": 4180270629,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4180270629",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450170649
+          ],
+          "own_eyes_removed": true,
+          "own_eyes_readback_count": 0
+        },
+        {
+          "finding": "R18",
+          "comment_id": 4179947028,
+          "thread_id": "PRRT_kwDOSAZRhc6o4BX8",
+          "draft": "R18-reply.md",
+          "sha256": "07fa20dfe3b8b19aa3b5509c9c7f79f3a44340f69ed5f719a35494f27b9d637d",
+          "lines_plus_link": 3,
+          "publish_state": "draft only; root verifies input and publishes once",
+          "key": "R18",
+          "comment": "Retained the existing D9-D B94 limits: step maxima are not additive reservations, and the 59-minute job ceiling remains authoritative.\nThe observed 20-minute review-service cancellation occurred after full validation passed; changing the YAML ceiling is not a demonstrated remedy. Generated with Codex\n[R18 applicability](https://github.com/franklesniak/PSStyleGuide/blob/c63b627b65c96e7b0af1a56a1b81fb16f7d4f704/docs/planning/action-items-2026-10-02/results/A03/TF66-R18-timeout-applicability.md)",
+          "reaction_id": 450170650,
+          "status": "resolved_own_eyes_removed",
+          "prepared_at": "2026-10-05T02:19:13.412813+00:00",
+          "reply_id": 4180272923,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4180272923",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450170650
+          ],
+          "own_eyes_removed": true,
+          "own_eyes_readback_count": 0
+        },
+        {
+          "finding": "R19",
+          "comment_id": 4179947038,
+          "thread_id": "PRRT_kwDOSAZRhc6o4BYC",
+          "draft": "R19-reply.md",
+          "sha256": "a4e4a609906278525fc8d769ef3f8cb33888a164f77a14c314fc447912d139ac",
+          "lines_plus_link": 3,
+          "publish_state": "draft only; root verifies input and publishes once",
+          "key": "R19",
+          "comment": "The selected repair shares one validated configuration within the staged invocation while preserving recursive selector checks and fresh independent API defaults.\nReal-scan, configured outer/nested, freshness and status controls pass on Windows/Linux; the original two-scan implementation fails the discriminator. Generated with Codex\n[R19 decision](https://github.com/franklesniak/PSStyleGuide/blob/c63b627b65c96e7b0af1a56a1b81fb16f7d4f704/docs/planning/action-items-2026-10-02/results/A07/TF66-R19-invocation-config-reuse.md)",
+          "reaction_id": 450170654,
+          "status": "resolved_own_eyes_removed",
+          "prepared_at": "2026-10-05T02:19:50.074189+00:00",
+          "reply_id": 4180274400,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4180274400",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450170654
+          ],
+          "own_eyes_removed": true,
+          "own_eyes_readback_count": 0
+        },
+        {
+          "finding": "R20",
+          "comment_id": 4179947053,
+          "thread_id": "PRRT_kwDOSAZRhc6o4BYK",
+          "draft": "R20-reply.md",
+          "sha256": "de88a78738f8028a42aadd7adfcb5567f8435b2c26ecf5bf0861161ce04553ed",
+          "lines_plus_link": 3,
+          "publish_state": "draft only; root verifies input and publishes once",
+          "key": "R20",
+          "comment": "Removed seven covered literals per event and the redundant test expectation; the broad workflow/YAML patterns and complete trigger set remain.\nStrict parsed-YAML comparison, the existing setup-shape test and qualified Linux actionlint pass. Generated with Codex\n[R20 decision](https://github.com/franklesniak/PSStyleGuide/blob/c63b627b65c96e7b0af1a56a1b81fb16f7d4f704/docs/planning/action-items-2026-10-02/results/A03/TF66-R20-trigger-filter-deduplication.md)",
+          "reaction_id": 450170657,
+          "status": "resolved_own_eyes_removed",
+          "prepared_at": "2026-10-05T02:20:22.433969+00:00",
+          "reply_id": 4180276013,
+          "reply_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#discussion_r4180276013",
+          "resolved": true,
+          "resolution_preexisting": false,
+          "own_eyes": [
+            450170657
+          ],
+          "own_eyes_removed": true,
+          "own_eyes_readback_count": 0
+        }
+      ],
+      "cleanup_readback": "All four connector removals succeeded and their immediate authenticated connector readbacks returned empty reaction arrays.",
+      "finished_at": "2026-10-05T02:21:10.293905+00:00"
     }
-  }
+  },
+  "round6": {
+    "prepared_at": "2026-10-05T02:28:11.246399+00:00",
+    "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+    "base": "06ad4f7c9b6847028cafdacf1ae55128d0f2d56c",
+    "body_sha256": "a1431b323168ff13035b46fcab8108ea807a624392314a7eef7dd54a763f940f",
+    "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-request-baseline-db54d68.json",
+    "baseline_sha256": "b9dd6cbb54b372d8864ebfa738c1819d4cc01054e7ccc5a4ae4b6fb230b213b2",
+    "copilot": {
+      "state": "requested_pending",
+      "started_at": "2026-10-05T02:28:11.246399+00:00",
+      "transport": "supported GitHub Reviewers UI",
+      "requested_effort": "Balanced",
+      "result_effort": null,
+      "channel_attempts": 1,
+      "request_event_id": 32472497545,
+      "request_event_at": "2026-10-05T02:28:20Z",
+      "request_actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "request_observation": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-after-copilot-request-db54d68.json",
+      "request_observation_sha256": "ab78c22cdaedc296ea9b938c2b1bf27254ce2e919ceefd2636ed17ec3d0b1f8d",
+      "attempts": 1,
+      "workflow_run_id": 37255543195,
+      "observed_run_status": "in_progress",
+      "observed_run_conclusion": null,
+      "ui_click_count": 1,
+      "ui_screenshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-review-request-proof.png",
+      "ui_screenshot_sha256": "1ffa58d0d89df94ecadf5d575cfd0cb556e4957496af3998ea57dd40286b1a8c",
+      "ui_observation": "Supported Reviewers menu selected Balanced. After one submission the refreshed UI says Reviewing at balanced effort; Last completed: lite is historical. Current result effort is unknown."
+    },
+    "manual_codex": {
+      "state": "running",
+      "started_at": "2026-10-05T02:29:13.571660+00:00",
+      "channel_attempts": 1,
+      "exact_body": "@codex review",
+      "transport": "GitHub connector github_add_comment_to_issue",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-after-copilot-request-db54d68.json",
+      "baseline_sha256": "ab78c22cdaedc296ea9b938c2b1bf27254ce2e919ceefd2636ed17ec3d0b1f8d",
+      "baseline_comment_ids": [
+        5982194609,
+        5983180593,
+        5984519616,
+        5984558238,
+        5985594078,
+        5985623901,
+        5985928054,
+        5985975078
+      ],
+      "head": "db54d687b105e548117c1e8a60ba155fab1a376f",
+      "body_sha256": "a1431b323168ff13035b46fcab8108ea807a624392314a7eef7dd54a763f940f",
+      "timestamp_reconciliation": {
+        "local_pre_request_at": "2026-10-05T02:29:13.571660+00:00",
+        "native_created_at": "2026-10-05T02:29:09Z",
+        "local_minus_native_seconds": 4.57166,
+        "basis": "Exact connector-returned ID, authenticated author/body/PR, complete baseline exclusion, unique new manual trigger and native Copilot event ordering.",
+        "repeated_write": false
+      },
+      "trigger_id": 5987077643,
+      "native_created_at": "2026-10-05T02:29:09Z",
+      "authenticated_author_id": 11204406,
+      "confirmed_at": "2026-10-05T02:30:25.194100+00:00",
+      "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/66#issuecomment-5987077643",
+      "summary_comment_id": 5982194609,
+      "summary_updated_at": "2026-10-05T02:29:23Z",
+      "observed_summary_body": "<!-- codex-pull-request-review-summary -->\n\n## Codex Review Summary\n\nThis comment shows the latest Codex review activity on this pull request.\n\n| Review | Status | Commit | Review trigger |\n| --- | --- | --- | --- |\n| \ud83d\udcdd **Code Review** | \ud83d\udd04 **Running** since <relative-time datetime=\"2026-10-05T02:29:22.772824Z\">2026-10-05T02:29:22.772824Z</relative-time> | `db54d68` | Manual request |\n\n\n\n<details> <summary>\u2139\ufe0f About Codex in GitHub</summary>\n<br/>\n\n[Your team has set up Codex to review pull requests in this repo](https://chatgpt.com/codex/cloud/settings/general). Reviews are triggered when you\n- Open a pull request for review\n- Mark a draft as ready\n- Comment \"@codex review\" or \"@codex security review\".\n\nCodex reacts with \ud83d\udc40 while any review is running, comments if it has suggestions, and reacts with \ud83d\udc4d once all reviews finish with no findings.\n\n</details>"
+    },
+    "request_set_terminal": false,
+    "clean": false,
+    "started_at": "2026-10-05T02:28:20Z",
+    "nonreview_run_summary": [
+      {
+        "id": 37254891522,
+        "name": "Agent instruction validation",
+        "event": "pull_request_target",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254870290,
+        "name": "Agent instruction validation",
+        "event": "pull_request",
+        "status": "in_progress",
+        "conclusion": null,
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254870402,
+        "name": "Dev container boundary",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254870354,
+        "name": "Build Style Guide Artifacts",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254870261,
+        "name": "Copilot setup steps",
+        "event": "pull_request",
+        "status": "in_progress",
+        "conclusion": null,
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254870356,
+        "name": "Markdown Lint",
+        "event": "pull_request",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254868945,
+        "name": "Agent instruction validation",
+        "event": "pull_request_target",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254866643,
+        "name": "Copilot setup steps",
+        "event": "push",
+        "status": "in_progress",
+        "conclusion": null,
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254866686,
+        "name": "Dev container boundary",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254866650,
+        "name": "Agent instruction validation",
+        "event": "push",
+        "status": "in_progress",
+        "conclusion": null,
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254866624,
+        "name": "Build Style Guide Artifacts",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      },
+      {
+        "id": 37254866671,
+        "name": "Markdown Lint",
+        "event": "push",
+        "status": "completed",
+        "conclusion": "success",
+        "head_sha": "db54d687b105e548117c1e8a60ba155fab1a376f"
+      }
+    ],
+    "all_nonreview_workflows_success": false,
+    "latest_native_snapshot": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\round6-both-requested-db54d68.json",
+      "sha256": "3823cd3cf32a26d828e022ef677ed6216e551fd0dccd0466496a06e7e972ab5d",
+      "captured_at": "2026-10-05T02:32:21.052619+00:00"
+    }
+  },
+  "date_validation_limit": "Current staged-input and ProposedPolicy diagnostics do not verify the author date. Root reviewed all nine metadata finalizations against actual UTC date 2026-10-05. Accepted B lacks FinalizeMetadataNow; ProposedPolicy cannot combine with that switch. First-adoption authority remains separate."
 }
