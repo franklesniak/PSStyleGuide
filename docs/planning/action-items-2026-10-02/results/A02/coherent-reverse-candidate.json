@@ -1,6 +1,6 @@
 {
-  "status": "round3_local_pass_pending_publication",
-  "captured_at": "2026-10-05T08:37:23.045065+00:00",
+  "status": "round3_codex_clean_copilot_and_hosted_pending",
+  "captured_at": "2026-10-05T08:58:56.655785+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -563,11 +563,11 @@
     }
   },
   "reverse_PR": "https://github.com/franklesniak/PSStyleGuide/pull/232",
-  "rounds_used": 2,
+  "rounds_used": 3,
   "first_request_at": "2026-10-05T06:26:07Z",
   "deadline": "2026-10-13T06:26:07+00:00",
   "metadata_carry_back": "A21 currently54 differing Version notes (50main/4SelfTest) plus classifier deletion; A07 shared fixture prefix. Two accepted TF helpers already have Oct5.0 tuples, requiring actual destination/date arithmetic. Transfer3 is not released; refresh accepted peers before it.",
-  "remaining": "Publish repaired head/body, reply once to each R3 duplicate, resolve, and request round3. Current-input reviews/hosted checks/final quality/normal merge/landed acceptance and paired compare-back remain. All22 outcomes and402 contracts stay in scope.",
+  "remaining": "Collect existing Copilot review and two ordinary hosted runs; then independent final quality, normal merge, landed acceptance and actual paired comparison. Conditional four-path TF carry-back is prepared but not released. All22 outcomes and402 contracts remain in scope.",
   "implementation_evidence_sha256": "a974f641c004e31a3b2d47c953e9763338ec5314b7c8fb14afa492a27213e95e",
   "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8",
   "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
@@ -1660,7 +1660,7 @@
     }
   },
   "round3_repair": {
-    "status": "committed_pending_endpoint_validation",
+    "status": "published_local_validation_passed_current_review_pending",
     "prior_head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
     "candidate_tree": "95d5e8a1f46040c2044717e156e81638f1764bb3",
     "paths": [
@@ -1787,7 +1787,106 @@
       "status": "bounded_staged_source_pass_not_final_PR_pass",
       "report_sha256": "d44a0c6c999278446d8e53f7cd6cdadc7e457346fed2e48467287f2b1d5b6c0f",
       "evidence_sha256": "beda90fc33740bf728962bdb21fd5e4fb4cf5a594bede49f099863afd4149cee",
-      "candidate_tree": "95d5e8a1f46040c2044717e156e81638f1764bb3"
+      "candidate_tree": "95d5e8a1f46040c2044717e156e81638f1764bb3",
+      "committed_input_status": "passed_no_material_finding_final_PR_gate_pending",
+      "committed_report": "round3-final-quality/COMMITTED-INPUT-SUPPLEMENT.md",
+      "committed_report_sha256": "373f42d48f2ae1710b552127886a34a9d295d9c2b44e2feff50dbb46356f7da7",
+      "committed_evidence_sha256": "f4f21f36e401d605b05629738a470e32b61acdb7b79baf425b8c639eedc05380"
+    },
+    "planning_publication": {
+      "head": "aca8312cc597c0355ae22086654db27b73598916",
+      "parent": "eddc9e867248e9e7791201d5c64122caac03e836",
+      "tree": "976f66e754badf0c9aa9eed55e8534992cc22288",
+      "files": [
+        "docs/planning/action-items-2026-10-02/STATUS.md",
+        "docs/planning/action-items-2026-10-02/results/A02/coherent-reverse-candidate.json",
+        "docs/planning/action-items-2026-10-02/results/A02/ps232-local-validation.md",
+        "docs/planning/action-items-2026-10-02/results/A02/ps232-round3-source-quality.md",
+        "docs/planning/action-items-2026-10-02/results/A21/PS232-R3-help-version-format.md",
+        "docs/planning/action-items-2026-10-02/results/A02/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A03/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A07/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A20/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A21/RESULT.md"
+      ],
+      "status": "published",
+      "commit_log_sha256": "32e02b42e4046858c3e8c14dfdfc044b0a06d15d12f0df67e21925aed210d2c8",
+      "push_exit": 0,
+      "published_at": "2026-10-05T08:38:25.932346+00:00"
+    },
+    "publication": {
+      "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+      "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "prior_head": "aafa9a4a41318d0cf1b61d873b321567b31ac985",
+      "prior_body_sha256": "7108a820b61309cf310f1c8b03ad7234c9536cc5b6a10593b749ca268abc74c7",
+      "body_sha256": "0a1daa2b01d307f0f74f28a41e0896f8a51c11a9263ffd67f69b4894ed10095c",
+      "status": "published",
+      "push_exit": 0,
+      "body_update_exit": 0,
+      "confirmed_at": "2026-10-05T08:39:28.266073+00:00"
+    },
+    "thread_disposition": {
+      "replies": {
+        "4181830632": 4182145838,
+        "4181830689": 4182146646,
+        "4181830739": 4182147853
+      },
+      "all5_threads_resolved": true,
+      "snapshot": "round3-pre-request-current.json",
+      "resolution_note": "All three R3 threads were already resolved in authenticated pre-reply snapshot. Root added one decision reply each; no resolution mutation sent."
     }
+  },
+  "round3": {
+    "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+    "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "body_sha256": "0a1daa2b01d307f0f74f28a41e0896f8a51c11a9263ffd67f69b4894ed10095c",
+    "baseline": "round3-pre-request-current.json",
+    "started_at": "2026-10-05T08:43:19Z",
+    "request_set_terminal": false,
+    "clean": false,
+    "copilot": {
+      "status": "pending",
+      "request_event_id": 32491011129,
+      "request_at": "2026-10-05T08:43:19Z",
+      "actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "workflow_run_id": 37285407379,
+      "transport": "GitHub UI",
+      "selected_effort": "Balanced",
+      "observed_effort": null,
+      "snapshot": "round3-paired-request-confirmation.json"
+    },
+    "codex": {
+      "status": "clean",
+      "trigger_comment_id": 5991095726,
+      "request_at": "2026-10-05T08:43:55Z",
+      "actor_id": 11204406,
+      "result_comment_id": 5991165994,
+      "reviewer_id": 199175422,
+      "result_at": "2026-10-05T08:48:44Z",
+      "reviewed_head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+      "snapshot": "round3-paired-request-confirmation.json",
+      "attribution": "Authenticated trigger and result; baseline exclusion; ordered timestamps; exact unique current-head prefix; no new Codex findings."
+    },
+    "hosted_snapshot": {
+      "captured_at": "2026-10-05T08:58:56.655785+00:00",
+      "snapshot": "round3-progress-after-carryback.json",
+      "ordinary_success": 10,
+      "ordinary_pending": 2,
+      "all5_threads_resolved": true
+    }
+  },
+  "conditional_carryback": {
+    "status": "prepared_not_released",
+    "report": "round3-conditional-carryback/REPORT.md",
+    "report_sha256": "d55040b95b3fa2e35fbf55e77d21333c4fd0cb9bdd6ac6bdff3daecb45030fe2",
+    "catalog_sha256": "a326368ad8ee14744382e0f40b588be5a93176ba69c845a48eeda97a48e1b19f",
+    "paths": 4,
+    "differing_notes": 54,
+    "affected_owners": [
+      "A21",
+      "A07"
+    ],
+    "transfer_released": false
   }
 }

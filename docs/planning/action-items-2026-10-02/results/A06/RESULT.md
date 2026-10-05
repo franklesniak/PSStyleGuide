@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A06 current result
 
+**Post-TF66 readiness refreshed, 2026-10-05:** The [current report](postTF66-readiness/REPORT.md) and [raw-object evidence](postTF66-readiness/evidence.json) retain the selected D1/D2/D3/frontmatter D4 decisions. All production generator/verifier implementations, sources, outputs and artifact-test regions are unchanged. Changed workflow, policy and test callers have finite implementation scopes. Root read the complete report, verified its source hashes and independently sampled two raw Git blob identities. The proposed PS tree is now committed as f77a58d, with local aggregate and endpoint checks passed; PS232 and paired workflow acceptance remain pending. No new product tests or A06 implementation ran in this refresh.
+
 **Prerequisite clarification, 2026-10-05:** [C98](../A03/foundation-dependency-decision.md) makes the existing A15 sequence explicit. The A03 prerequisite is the accepted paired coherent workflow foundation. The selected generator/verifier, current TF T2, platform and paired acceptance work remains pending. Actual new-harness integration follows its implementation; it remains A06 work. No prerequisite is accepted by this planning correction.
 
 **Research-source mapping complete:** The [six-family parser mapping](../A18/research-readiness/parser-oracle-mapping.md) maps useful historical guarantees to actual A03/A07/A21 consumers and records the limits of reused tests. No new product defect was demonstrated. A06 keeps its real-generator/publication and C98 work; current TF delivery and final accepted-pair audit remain pending.
