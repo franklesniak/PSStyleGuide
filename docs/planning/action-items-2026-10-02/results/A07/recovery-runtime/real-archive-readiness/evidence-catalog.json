@@ -1,0 +1,588 @@
+{
+  "schemaVersion": 1,
+  "createdUtc": "2026-10-05T09:09:56.816351+00:00",
+  "scope": "bounded real selected archive identity, layout, headroom, extraction and native Node/npm version evidence; no product implementation or gate acceptance",
+  "decisions": [
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\recovery-runtime\\SELECTION.md",
+      "sha256": "94c2ed9e8bd6f1377b4bef159fb6010f451cf501e6b47873de2f471e6c1bbe00"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A07\\recovery-runtime\\PROPOSAL.md",
+      "sha256": "476df9bf1dcf546f082f60a29f8f597993dbd8e53784da74b2a0e920714ee133"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A03\\foundation-dependency-decision.md",
+      "sha256": "fd19e4ab29c9f6c23541796550f088ae1c4fdb0dd530b2aee1bb9e78e44903d4"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-Linux-aggregate-runtime-20261004\\HANDOFF.md",
+      "sha256": "be9641a3739582a243b2ae5ee0267151ea50955fbf335464359353412dbb1e88"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-TF-coherent-20261004\\linux-shellcheck-qualification\\execution-result.json",
+      "sha256": "9893e0f9edafc40142d6c7f43cdd654702189060ef108db8cb601f01855735f8"
+    }
+  ],
+  "archiveInspection": {
+    "schemaVersion": 1,
+    "createdUtc": "2026-10-05T09:02:38.542460+00:00",
+    "limits": {
+      "entryCount": 50000,
+      "expandedBytes": 1073741824
+    },
+    "checksumSources": {
+      "24.18.1": {
+        "url": "https://nodejs.org/dist/v24.18.1/SHASUMS256.txt",
+        "status": 200,
+        "bytes": 2967,
+        "elapsedSeconds": 0.154,
+        "redirects": false,
+        "path": "SHASUMS256-v24.18.1.txt",
+        "sha256": "963b6fefe0c1b0f0d731da926ae12d4c552c3898090e94f3db1549b62e7bbb93"
+      },
+      "22.23.3": {
+        "url": "https://nodejs.org/dist/v22.23.3/SHASUMS256.txt",
+        "status": 200,
+        "bytes": 3981,
+        "elapsedSeconds": 0.101,
+        "redirects": false,
+        "path": "SHASUMS256-v22.23.3.txt",
+        "sha256": "4fe99a2ba9d552a6f51c13ed68fb11104cfa5df601aec616be689253a8139e7a"
+      }
+    },
+    "archives": [
+      {
+        "role": "preferred",
+        "platform": "linux-x64",
+        "nodeVersion": "24.18.1",
+        "npmVersion": "11.16.0",
+        "filename": "node-v24.18.1-linux-x64.tar.xz",
+        "sha256": "d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0",
+        "compressedBytes": 31525884,
+        "acquisition": {
+          "url": "https://nodejs.org/dist/v24.18.1/node-v24.18.1-linux-x64.tar.xz",
+          "status": 200,
+          "bytes": 31525884,
+          "elapsedSeconds": 0.876,
+          "redirects": false,
+          "kind": "official-HTTPS-download"
+        },
+        "officialSelectedChecksumMatches": true,
+        "topRoots": [
+          "node-v24.18.1-linux-x64"
+        ],
+        "entryCount": 5774,
+        "expandedBytes": 196033054,
+        "entryHeadroom": 44226,
+        "expandedByteHeadroom": 877708770,
+        "types": {
+          "directory": 1068,
+          "file": 4703,
+          "symlink": 3
+        },
+        "modes": {
+          "0o755": 1131,
+          "0o644": 4640,
+          "0o777": 3
+        },
+        "links": [
+          {
+            "path": "node-v24.18.1-linux-x64/bin/corepack",
+            "type": "symlink",
+            "target": "../lib/node_modules/corepack/dist/corepack.js",
+            "resolved": "node-v24.18.1-linux-x64/lib/node_modules/corepack/dist/corepack.js"
+          },
+          {
+            "path": "node-v24.18.1-linux-x64/bin/npx",
+            "type": "symlink",
+            "target": "../lib/node_modules/npm/bin/npx-cli.js",
+            "resolved": "node-v24.18.1-linux-x64/lib/node_modules/npm/bin/npx-cli.js"
+          },
+          {
+            "path": "node-v24.18.1-linux-x64/bin/npm",
+            "type": "symlink",
+            "target": "../lib/node_modules/npm/bin/npm-cli.js",
+            "resolved": "node-v24.18.1-linux-x64/lib/node_modules/npm/bin/npm-cli.js"
+          }
+        ],
+        "requiredLayoutPaths": [
+          "node-v24.18.1-linux-x64/bin/node",
+          "node-v24.18.1-linux-x64/lib/node_modules/npm/bin/npm-cli.js",
+          "node-v24.18.1-linux-x64/lib/node_modules/npm/bin/npx-cli.js",
+          "node-v24.18.1-linux-x64/lib/node_modules/npm/package.json",
+          "node-v24.18.1-linux-x64/bin/npm",
+          "node-v24.18.1-linux-x64/bin/npx"
+        ],
+        "hazards": [],
+        "entryInventory": {
+          "path": "results\\node-v24.18.1-linux-x64.tar.xz.entries.json",
+          "sha256": "eb35364d4aa7083891ed2af6075862b27f2608270e9d3c8c0bdaef37ce33f7f7"
+        },
+        "limitsPass": true
+      },
+      {
+        "role": "preferred",
+        "platform": "win-x64",
+        "nodeVersion": "24.18.1",
+        "npmVersion": "11.16.0",
+        "filename": "node-v24.18.1-win-x64.zip",
+        "sha256": "ec56b84a7551893ab2324ebdfdc4ab974a63b4781162600b68a1293cc3e53765",
+        "compressedBytes": 37177316,
+        "acquisition": {
+          "kind": "reused-full-digest-matched-cache",
+          "sourcePath": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\node-v24.18.1-win-x64.zip",
+          "bytes": 37177316
+        },
+        "officialSelectedChecksumMatches": true,
+        "topRoots": [
+          "node-v24.18.1-win-x64"
+        ],
+        "entryCount": 2449,
+        "expandedBytes": 105735176,
+        "entryHeadroom": 47551,
+        "expandedByteHeadroom": 968006648,
+        "types": {
+          "directory": 465,
+          "file": 1984
+        },
+        "modes": {
+          "0o0": 2449
+        },
+        "links": [],
+        "requiredLayoutPaths": [
+          "node-v24.18.1-win-x64/node.exe",
+          "node-v24.18.1-win-x64/node_modules/npm/bin/npm-cli.js",
+          "node-v24.18.1-win-x64/node_modules/npm/bin/npx-cli.js",
+          "node-v24.18.1-win-x64/node_modules/npm/package.json"
+        ],
+        "hazards": [],
+        "entryInventory": {
+          "path": "results\\node-v24.18.1-win-x64.zip.entries.json",
+          "sha256": "36e0a574a5ff069469f1538e3b9115e6d8a0876a9f2e601d08e25a81c094b0ce"
+        },
+        "limitsPass": true
+      },
+      {
+        "role": "recoveryCompatibility",
+        "platform": "linux-x64",
+        "nodeVersion": "22.23.3",
+        "npmVersion": "10.9.9",
+        "filename": "node-v22.23.3-linux-x64.tar.xz",
+        "sha256": "df450af89261115ef9f9e3830c3eeb2cc9213b63c720b1af623cb5dcbe2e02de",
+        "compressedBytes": 31001304,
+        "acquisition": {
+          "url": "https://nodejs.org/dist/v22.23.3/node-v22.23.3-linux-x64.tar.xz",
+          "status": 200,
+          "bytes": 31001304,
+          "elapsedSeconds": 1.128,
+          "redirects": false,
+          "kind": "official-HTTPS-download"
+        },
+        "officialSelectedChecksumMatches": true,
+        "topRoots": [
+          "node-v22.23.3-linux-x64"
+        ],
+        "entryCount": 5866,
+        "expandedBytes": 196362450,
+        "entryHeadroom": 44134,
+        "expandedByteHeadroom": 877379374,
+        "types": {
+          "directory": 1113,
+          "file": 4750,
+          "symlink": 3
+        },
+        "modes": {
+          "0o755": 1181,
+          "0o644": 4682,
+          "0o777": 3
+        },
+        "links": [
+          {
+            "path": "node-v22.23.3-linux-x64/bin/corepack",
+            "type": "symlink",
+            "target": "../lib/node_modules/corepack/dist/corepack.js",
+            "resolved": "node-v22.23.3-linux-x64/lib/node_modules/corepack/dist/corepack.js"
+          },
+          {
+            "path": "node-v22.23.3-linux-x64/bin/npx",
+            "type": "symlink",
+            "target": "../lib/node_modules/npm/bin/npx-cli.js",
+            "resolved": "node-v22.23.3-linux-x64/lib/node_modules/npm/bin/npx-cli.js"
+          },
+          {
+            "path": "node-v22.23.3-linux-x64/bin/npm",
+            "type": "symlink",
+            "target": "../lib/node_modules/npm/bin/npm-cli.js",
+            "resolved": "node-v22.23.3-linux-x64/lib/node_modules/npm/bin/npm-cli.js"
+          }
+        ],
+        "requiredLayoutPaths": [
+          "node-v22.23.3-linux-x64/bin/node",
+          "node-v22.23.3-linux-x64/lib/node_modules/npm/bin/npm-cli.js",
+          "node-v22.23.3-linux-x64/lib/node_modules/npm/bin/npx-cli.js",
+          "node-v22.23.3-linux-x64/lib/node_modules/npm/package.json",
+          "node-v22.23.3-linux-x64/bin/npm",
+          "node-v22.23.3-linux-x64/bin/npx"
+        ],
+        "hazards": [],
+        "entryInventory": {
+          "path": "results\\node-v22.23.3-linux-x64.tar.xz.entries.json",
+          "sha256": "bf4b60e436568b7a209aacf55fae754342d619c95fd110e738113e4c582b1618"
+        },
+        "limitsPass": true
+      }
+    ]
+  },
+  "windowsExecution": {
+    "createdUtc": "2026-10-05T09:05:00.8748742Z",
+    "platform": "Microsoft Windows 10.0.26200",
+    "osArchitecture": "X64",
+    "processArchitecture": "X64",
+    "powershellVersion": "7.6.5",
+    "dotnetVersion": "10.0.11",
+    "powershellExecutable": "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+    "filename": "node-v24.18.1-win-x64.zip",
+    "archiveSha256": "ec56b84a7551893ab2324ebdfdc4ab974a63b4781162600b68a1293cc3e53765",
+    "extractor": "PowerShell7 .NET System.IO.Compression.ZipFile + ExtractToFile(overwrite=false)",
+    "archiveEntryCount": 2449,
+    "actualFilesystemEntriesIncludingRoot": 2449,
+    "extractedFileCount": 1984,
+    "actualExpandedRegularFileBytes": 105735176.0,
+    "postExtractionReparseCount": 0,
+    "nodeExecutable": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-real-archive-readiness-20261005\\windows extracted runtime\\node-v24.18.1-win-x64\\node.exe",
+    "nodeSha256": "ac51903c4c111815d52280b1fdcc8da067cbb37e2fe1a765097b85c3292c8582",
+    "nodeVersion": "v24.18.1",
+    "nodeExitCode": 0,
+    "npmInvocation": [
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-real-archive-readiness-20261005\\windows extracted runtime\\node-v24.18.1-win-x64\\node.exe",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-R5-real-archive-readiness-20261005\\windows extracted runtime\\node-v24.18.1-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+      "--version"
+    ],
+    "npmCliSha256": "3ce7cba6f5128dd5f54c98b6a5036b0f850496878cc2e21044b675fe3c594e3e",
+    "npmPackageSha256": "c9e4dbbf3a23089937d9ee161b59b6ab6368a54de5663167c03bd45062afb004",
+    "npmPackageVersion": "11.16.0",
+    "npmVersion": "11.16.0",
+    "npmExitCode": 0,
+    "pass": true
+  },
+  "linuxExecution": {
+    "createdUtc": "2026-10-05T09:06:37.997557+00:00",
+    "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "uid": 1000,
+    "gid": 1000,
+    "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "python": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]",
+    "tarSha256": "3ee2c3c0b4dd9aacebfd2f0fbae44bad36348203acff78a44888dd58c05f811c",
+    "archives": [
+      {
+        "filename": "node-v24.18.1-linux-x64.tar.xz",
+        "archiveSha256": "d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0",
+        "actualExtractedEntryCount": 5774,
+        "actualExpandedRegularFileBytes": 196033054,
+        "linkProof": [
+          {
+            "path": "node-v24.18.1-linux-x64/bin/corepack",
+            "target": "../lib/node_modules/corepack/dist/corepack.js",
+            "resolvedIsRegular": true
+          },
+          {
+            "path": "node-v24.18.1-linux-x64/bin/npx",
+            "target": "../lib/node_modules/npm/bin/npx-cli.js",
+            "resolvedIsRegular": true
+          },
+          {
+            "path": "node-v24.18.1-linux-x64/bin/npm",
+            "target": "../lib/node_modules/npm/bin/npm-cli.js",
+            "resolvedIsRegular": true
+          }
+        ],
+        "nodeSha256": "f3432a45b03b2da0d270095fdd8813dc34cbea73f5fc8b18c7a384b7cf9b333a",
+        "nodeMode": "0o755",
+        "nodeVersion": "v24.18.1",
+        "npmCliSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+        "npmPackageSha256": "60ff022e32b5d8291d3e09849fd0cee6bbbff4e4d8352ad258214b1adf070714",
+        "npmPackageVersion": "11.16.0",
+        "npmVersion": "11.16.0",
+        "extractionAndVersionsPass": true
+      },
+      {
+        "filename": "node-v22.23.3-linux-x64.tar.xz",
+        "archiveSha256": "df450af89261115ef9f9e3830c3eeb2cc9213b63c720b1af623cb5dcbe2e02de",
+        "actualExtractedEntryCount": 5866,
+        "actualExpandedRegularFileBytes": 196362450,
+        "linkProof": [
+          {
+            "path": "node-v22.23.3-linux-x64/bin/corepack",
+            "target": "../lib/node_modules/corepack/dist/corepack.js",
+            "resolvedIsRegular": true
+          },
+          {
+            "path": "node-v22.23.3-linux-x64/bin/npx",
+            "target": "../lib/node_modules/npm/bin/npx-cli.js",
+            "resolvedIsRegular": true
+          },
+          {
+            "path": "node-v22.23.3-linux-x64/bin/npm",
+            "target": "../lib/node_modules/npm/bin/npm-cli.js",
+            "resolvedIsRegular": true
+          }
+        ],
+        "nodeSha256": "fde6a4bf8d0562f7751d1a2d6cb9b417c4cfe107bbcb0aa3e9a24e125e348f48",
+        "nodeMode": "0o755",
+        "nodeVersion": "v22.23.3",
+        "npmCliSha256": "8e5f6f3429f8cdbe693cdc29904e9d5a7b127a494bd15c804bd54c7403bfcbe7",
+        "npmPackageSha256": "7c04bf69824d17a1db64defd3a9a86d538781bf2d6ca2764e3f1143fa5b71166",
+        "npmPackageVersion": "10.9.9",
+        "npmVersion": "10.9.9",
+        "extractionAndVersionsPass": true
+      }
+    ],
+    "scratchMounts": [
+      "tmpfs /tmp tmpfs rw,nosuid,nodev,relatime,size=1048576k 0 0"
+    ],
+    "tarVersion": "tar (GNU tar) 1.35",
+    "pass": true
+  },
+  "actualLinuxCommandsReference": "results/linux-execution.json",
+  "windowsPostLayout": {
+    "pathSetAndKindsEqualIncludingImplicitParents": true,
+    "archiveEntries": 2449,
+    "implicitDirectoryEntries": 0,
+    "actualFilesystemEntries": 2449,
+    "extractionRootAndAncestorsNoSymlinkOrJunction": true,
+    "inventoryPythonVersion": "3.13.14 (tags/v3.13.14:fd17997, Jun 10 2026, 13:03:48) [MSC v.1944 64 bit (AMD64)]",
+    "hostPlatform": "Windows-11-10.0.26200-SP0"
+  },
+  "windowsNameAttributes": {
+    "nonAsciiMemberNames": 0,
+    "tildeMemberNames": 0,
+    "zipCreateSystems": [
+      0
+    ],
+    "externalAttributes": [
+      16,
+      32
+    ],
+    "filenameValidation": "all members: exact root, ordinary relative components, no controls/backslash/drive/UNC/ADS/reserved DOS names/trailing dot or space/case collision/duplicates/file-directory or linked-parent collision; no symlink/reparse attributes"
+  },
+  "terminalHandles": [
+    {
+      "sessionId": 28226,
+      "scope": "Windows .NET extraction and direct native versions",
+      "terminalExitCode": 0
+    },
+    {
+      "scope": "Linux attempt1 private inventory separator error before Node execution",
+      "terminalExitCode": 1,
+      "record": "results/linux-command.json"
+    },
+    {
+      "scope": "Linux attempt2 Docker default noexec scratch blocked Node exec",
+      "terminalExitCode": 1,
+      "record": "results/linux-command-attempt2.json"
+    },
+    {
+      "sessionId": 28531,
+      "scope": "Linux attempt3 executable private tmpfs, both extracted runtimes",
+      "terminalExitCode": 0,
+      "record": "results/linux-command-attempt3.json"
+    }
+  ],
+  "limitations": [
+    "No detached-signature verification",
+    "No future-installer execution",
+    "No Windows DACL isolation qualification",
+    "No hostile or mutation-control extractor tests",
+    "No credential-helper/acquisition retry/failure oracle",
+    "No Windows PowerShell5.1 or hosted-runner contract proof",
+    "No locked install or dependency tree changes",
+    "No full aggregate or GateA/B approval"
+  ],
+  "files": [
+    {
+      "path": "acquire-inspect.py",
+      "bytes": 7546,
+      "sha256": "0ac13f3593649395f2ad8c79049c1d781116647e1248a10b8c252f20bd836cda"
+    },
+    {
+      "path": "archive-catalog.json",
+      "bytes": 7281,
+      "sha256": "44f8cb3002f2316b82bbef874e682f88d8379b0f6226b662498337c941fe2226"
+    },
+    {
+      "path": "archives/node-v22.23.3-linux-x64.tar.xz",
+      "bytes": 31001304,
+      "sha256": "df450af89261115ef9f9e3830c3eeb2cc9213b63c720b1af623cb5dcbe2e02de"
+    },
+    {
+      "path": "archives/node-v24.18.1-linux-x64.tar.xz",
+      "bytes": 31525884,
+      "sha256": "d6c664df3f3f61458e8c277585571328522d705166723a7c7823a9253a4d15a0"
+    },
+    {
+      "path": "archives/node-v24.18.1-win-x64.zip",
+      "bytes": 37177316,
+      "sha256": "ec56b84a7551893ab2324ebdfdc4ab974a63b4781162600b68a1293cc3e53765"
+    },
+    {
+      "path": "linux-qualify-v2.py",
+      "bytes": 4149,
+      "sha256": "1b92db16c0b7e3d7370f21fff91bdf7cd9a4dff586149906e18228f08d9524f3"
+    },
+    {
+      "path": "linux-qualify-v3.py",
+      "bytes": 4275,
+      "sha256": "02dd596ae7722718f0fcc6664070c716e666dbb2aab3215bd695b1dfa63e7a3f"
+    },
+    {
+      "path": "linux-qualify.py",
+      "bytes": 3988,
+      "sha256": "96ce342481d3f8358aabf5c0584689c5ad2ba19949414b1352f43e8b732442ec"
+    },
+    {
+      "path": "results/image-inspect-attempt2.json",
+      "bytes": 10614,
+      "sha256": "f7288d052c613e3f7f85eed62cc696c9e511b0b3d68feccabedcf8d383e2171c"
+    },
+    {
+      "path": "results/image-inspect-attempt3.json",
+      "bytes": 10614,
+      "sha256": "f7288d052c613e3f7f85eed62cc696c9e511b0b3d68feccabedcf8d383e2171c"
+    },
+    {
+      "path": "results/image-inspect.json",
+      "bytes": 10614,
+      "sha256": "f7288d052c613e3f7f85eed62cc696c9e511b0b3d68feccabedcf8d383e2171c"
+    },
+    {
+      "path": "results/linux-command-attempt2.json",
+      "bytes": 911,
+      "sha256": "675a731fd39a592e1406dc39c7c82ad68c16e177f5f155890e92798cf6beb3c5"
+    },
+    {
+      "path": "results/linux-command-attempt3.json",
+      "bytes": 917,
+      "sha256": "82e329510b25e02e0e0e7e8b90aaac20c2725a68c2d657c1f08c2adde4996241"
+    },
+    {
+      "path": "results/linux-command.json",
+      "bytes": 908,
+      "sha256": "8448bf791dfdbae958360934afadbe51565080d3f925ecb7e3b6f5e8404c393c"
+    },
+    {
+      "path": "results/linux-execution.json",
+      "bytes": 5273,
+      "sha256": "f695fc29fc6b986c91219276e8333f10763bb7ab8b9591a8a097ecb9f378dc51"
+    },
+    {
+      "path": "results/linux-terminal-attempt2.log",
+      "bytes": 988,
+      "sha256": "9e7f7c2363ecaa8c960c1afae97da3acc84ef2bbf2bd1006ae9b5ede422ea5bc"
+    },
+    {
+      "path": "results/linux-terminal-attempt3.log",
+      "bytes": 107,
+      "sha256": "bb75477ae640999c43479de4c6157eb19d701550fae5ac81a2179150e1f8fd3f"
+    },
+    {
+      "path": "results/linux-terminal.log",
+      "bytes": 761,
+      "sha256": "57b5987faf5a765d1f937b038dbaf3c40e7abda413ac99e0b58b20c2ae05d347"
+    },
+    {
+      "path": "results/node-v22.23.3-linux-x64.tar.xz.entries.json",
+      "bytes": 1046122,
+      "sha256": "bf4b60e436568b7a209aacf55fae754342d619c95fd110e738113e4c582b1618"
+    },
+    {
+      "path": "results/node-v24.18.1-linux-x64.tar.xz.entries.json",
+      "bytes": 1028272,
+      "sha256": "eb35364d4aa7083891ed2af6075862b27f2608270e9d3c8c0bdaef37ce33f7f7"
+    },
+    {
+      "path": "results/node-v24.18.1-win-x64.zip.entries.json",
+      "bytes": 479687,
+      "sha256": "36e0a574a5ff069469f1538e3b9115e6d8a0876a9f2e601d08e25a81c094b0ce"
+    },
+    {
+      "path": "results/windows-execution.json",
+      "bytes": 1774,
+      "sha256": "c3b1acc1fb6a24b996fbdbc61e6870378faac1df5db33c88bdc9fbb297229e14"
+    },
+    {
+      "path": "results/windows-name-attributes.json",
+      "bytes": 407,
+      "sha256": "65012b5e2c567b6e12da7e63f1d54fa167807cbe4447fcc5f576cff9c9130ca5"
+    },
+    {
+      "path": "results/windows-post-layout.json",
+      "bytes": 380,
+      "sha256": "369a8979b6302771ab64a3b9a3aec337238b90fe49d69f82347893494a9bc6eb"
+    },
+    {
+      "path": "run-linux-v2.py",
+      "bytes": 1523,
+      "sha256": "e65060f3d491f57a621e3b821c9041b2677f262dfc4fd7d31beec164cefee78c"
+    },
+    {
+      "path": "run-linux-v3.py",
+      "bytes": 1528,
+      "sha256": "60e8e3e3005a85bc917ae3d47be3b8d5cde7d00babc699e9e2210aab77ed1fe7"
+    },
+    {
+      "path": "run-linux.py",
+      "bytes": 1481,
+      "sha256": "4596bc50b144374cd9af3884161b17096234422e3337722bff1ff2685117f871"
+    },
+    {
+      "path": "SHASUMS256-v22.23.3.txt",
+      "bytes": 3981,
+      "sha256": "4fe99a2ba9d552a6f51c13ed68fb11104cfa5df601aec616be689253a8139e7a"
+    },
+    {
+      "path": "SHASUMS256-v24.18.1.txt",
+      "bytes": 2967,
+      "sha256": "963b6fefe0c1b0f0d731da926ae12d4c552c3898090e94f3db1549b62e7bbb93"
+    },
+    {
+      "path": "windows-qualify.ps1",
+      "bytes": 4741,
+      "sha256": "410931c829d1fa5eddb7d98ef2426b0d5f26bd106d25dd9c9134f0a7141c148a"
+    },
+    {
+      "path": "results/node-binary-headers.json",
+      "bytes": 484,
+      "sha256": "3ee1b2bbac7e49a3fca7703217201cde9de2b1ab894aebeabdbb5378acf7352c"
+    }
+  ],
+  "binaryHeaderIdentities": [
+    {
+      "filename": "node-v24.18.1-linux-x64.tar.xz",
+      "format": "ELF64",
+      "byteOrder": "little-endian",
+      "machine": 62,
+      "architecture": "x86_64"
+    },
+    {
+      "filename": "node-v24.18.1-win-x64.zip",
+      "format": "PE32+",
+      "machine": "0x8664",
+      "architecture": "x86_64"
+    },
+    {
+      "filename": "node-v22.23.3-linux-x64.tar.xz",
+      "format": "ELF64",
+      "byteOrder": "little-endian",
+      "machine": 62,
+      "architecture": "x86_64"
+    }
+  ],
+  "selectedClauseReferences": {
+    "archiveRoles": "PROPOSAL.md:75-77",
+    "compatibilityPlatform": "PROPOSAL.md:122: Accept that switch only on Linux x64.",
+    "internalLinkBoundary": "PROPOSAL.md:127: Reject absolute/traversing members and links that escape that root.",
+    "headroomCaps": "PROPOSAL.md:127: 50,000 entries and 1 GiB total expanded bytes"
+  }
+}

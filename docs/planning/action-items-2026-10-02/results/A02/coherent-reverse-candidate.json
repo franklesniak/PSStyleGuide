@@ -1,6 +1,6 @@
 {
-  "status": "round3_decisions_selected_pending_native_disposition",
-  "captured_at": "2026-10-05T08:58:56.655785+00:00",
+  "status": "round4_reviews_pending",
+  "captured_at": "2026-10-05T09:23:13.033586+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -563,11 +563,11 @@
     }
   },
   "reverse_PR": "https://github.com/franklesniak/PSStyleGuide/pull/232",
-  "rounds_used": 3,
+  "rounds_used": 4,
   "first_request_at": "2026-10-05T06:26:07Z",
   "deadline": "2026-10-13T06:26:07+00:00",
   "metadata_carry_back": "A21 currently54 differing Version notes (50main/4SelfTest) plus classifier deletion; A07 shared fixture prefix. Two accepted TF helpers already have Oct5.0 tuples, requiring actual destination/date arithmetic. Transfer3 is not released; refresh accepted peers before it.",
-  "remaining": "Publish R4/R5 decisions, reply once and resolve validated false-positive threads, update PR body, then request round4 on the same product head and new reviewed body after complete baseline.",
+  "remaining": "Collect the existing round4 Copilot and Codex results; final independent current-input quality; normal merge; landed acceptance; actual paired comparison and applicable prepared repair. All22 outcomes and402 contracts remain in scope.",
   "implementation_evidence_sha256": "a974f641c004e31a3b2d47c953e9763338ec5314b7c8fb14afa492a27213e95e",
   "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8",
   "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
@@ -1869,7 +1869,7 @@
     "request_set_terminal": true,
     "clean": false,
     "copilot": {
-      "status": "terminal_findings_pending_disposition",
+      "status": "terminal_findings_disposed_no_change",
       "request_event_id": 32491011129,
       "request_at": "2026-10-05T08:43:19Z",
       "actor_id": 11204406,
@@ -1931,6 +1931,45 @@
         "source_proposal_sha256": "80a28c572ef18fecb12969fb16ec5f10447ce1bac1ead684083d900ffff518db",
         "source_evidence_sha256": "b71b7d24b73ba1a44ba42fa19f8d4e7f3001234e472cab5b950e921a9674b5a4"
       }
+    },
+    "disposition_planning_publication": {
+      "head": "f9d5555cd0cbee5a78572997c2d020012465bd9a",
+      "parent": "83fa6dc8ec9a134786ae79b031b1a944a605a272",
+      "tree": "e29ef2d450e9a5f786b5e9694ac9906ba49fbf03",
+      "files": [
+        "docs/planning/action-items-2026-10-02/results/A07/PS232-R4-jsonc-callback.md",
+        "docs/planning/action-items-2026-10-02/results/A02/PS232-R5-script-table.md",
+        "docs/planning/action-items-2026-10-02/results/A02/coherent-reverse-candidate.json",
+        "docs/planning/action-items-2026-10-02/results/A02/ps232-round3-source-quality.md",
+        "docs/planning/action-items-2026-10-02/results/A02/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A03/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A07/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A20/RESULT.md",
+        "docs/planning/action-items-2026-10-02/results/A21/RESULT.md",
+        "docs/planning/action-items-2026-10-02/STATUS.md"
+      ],
+      "status": "published",
+      "commit_log_sha256": "6c82d57eaaba4a76c94b0a4a445e59bcbb4fbab994be7c5f7793853bbcaa41dc",
+      "push_exit": 0,
+      "published_at": "2026-10-05T09:12:03.487667+00:00"
+    },
+    "native_disposition": {
+      "4182292113": {
+        "reply_id": 4182389734,
+        "thread_id": "PRRT_kwDOQkjdhM6o90e0",
+        "observed_resolved_before": false,
+        "captured_at": "2026-10-05T09:13:20.877527+00:00",
+        "resolution_request_sent": true,
+        "resolution_confirmed": true
+      },
+      "4182292172": {
+        "reply_id": 4182389921,
+        "thread_id": "PRRT_kwDOQkjdhM6o90fY",
+        "observed_resolved_before": false,
+        "captured_at": "2026-10-05T09:13:23.843942+00:00",
+        "resolution_request_sent": true,
+        "resolution_confirmed": true
+      }
     }
   },
   "conditional_carryback": {
@@ -1945,5 +1984,51 @@
       "A07"
     ],
     "transfer_released": false
+  },
+  "body_sha256": "4af6a5e78900cad48ddc84daefc332bf95e85acb28f6bdf9460a464df950f708",
+  "round4": {
+    "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+    "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "body_sha256": "4af6a5e78900cad48ddc84daefc332bf95e85acb28f6bdf9460a464df950f708",
+    "baseline": "round4-pre-request.json",
+    "started_at": "2026-10-05T09:16:20Z",
+    "request_set_terminal": false,
+    "clean": false,
+    "copilot": {
+      "status": "pending",
+      "request_event_id": 32493339422,
+      "request_at": "2026-10-05T09:16:20Z",
+      "actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "workflow_run_id": 37288951716,
+      "transport": "GitHub UI",
+      "selected_effort": "Balanced",
+      "observed_effort": null,
+      "snapshot": "round4-copilot-request-confirmation.json"
+    },
+    "codex": {
+      "status": "pending",
+      "trigger_comment_id": 5991573223,
+      "request_at": "2026-10-05T09:16:57Z",
+      "actor_id": 11204406,
+      "baseline": "round4-pre-request.json"
+    },
+    "hosted_snapshot": {
+      "snapshot": "round4-progress-0923.json",
+      "captured_at": "2026-10-05T09:23:13.033586+00:00",
+      "ordinary_success": 13,
+      "ordinary_pending": 0,
+      "resolved_threads": 7
+    }
+  },
+  "round4_preparation": {
+    "head": "f77a58dede8f6f68b45e0d62e5b96e2fed477c58",
+    "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "prior_body_sha256": "0a1daa2b01d307f0f74f28a41e0896f8a51c11a9263ffd67f69b4894ed10095c",
+    "body_sha256": "4af6a5e78900cad48ddc84daefc332bf95e85acb28f6bdf9460a464df950f708",
+    "body_file": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\PR-body-round4.md",
+    "body_update_intent_at": "2026-10-05T09:14:13.109099+00:00",
+    "body_update_exit": 0,
+    "body_update_confirmed_at": "2026-10-05T09:14:17.928998+00:00"
   }
 }
