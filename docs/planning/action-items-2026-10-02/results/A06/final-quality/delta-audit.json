@@ -1,0 +1,901 @@
+{
+  "at": "2026-10-05T22:15:24.115676+00:00",
+  "role": "bounded independent staged-byte delta audit",
+  "reuse_report_sha256": "1452aa9828d67299e1ed15cadad8462380240bc376d2284f101a6ebd7019d719",
+  "prior_head": "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+  "staged_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+  "product_writes": false,
+  "tests_rerun": false,
+  "native_reads_performed": false,
+  "delta_paths": [
+    ".github/workflows/Test-StyleGuideGenerator.ps1"
+  ],
+  "harness": {
+    "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+    "bytes": 27656,
+    "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+    "tree_entry": "100644 blob dcd0cb93354a74de4a5d8323a7018511323e8bbe\t.github/workflows/Test-StyleGuideGenerator.ps1"
+  },
+  "diff_check": "",
+  "read_and_verified_files": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-R7\\evidence.json",
+      "bytes": 3742,
+      "sha256": "5c66f5a867ffb9867e3bb61550bfb4e1607cbc00dbffd989e240e21ca277e187"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-R7\\R7-final-candidate-identity.md",
+      "bytes": 8244,
+      "sha256": "b32492a14915baf7b7099c1c53b39781b3c577ee878dbf8357e49399c50bdf17"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-R7\\run-focused.ps1",
+      "bytes": 1292,
+      "sha256": "a74d71273db68ee0d10a48f96578d9acb7513154a3d5661cd5f65c775354152f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-R7\\generator-result.json",
+      "bytes": 702,
+      "sha256": "04020efe5aa80885885d8f4e4b427e9682119b9c856eec32152c504af270c10d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-R7\\generator.log",
+      "bytes": 215,
+      "sha256": "152e4897f91b3ceac1febc453a9fe0b686328782f5fccf280011f053775f2d5c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-R7\\check-harness.ps1",
+      "bytes": 878,
+      "sha256": "97c0ef11114c3ac2e9103db566e63b22899d436ac7639fa9aa55c7b3f824dfdc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-R7\\analysis.json",
+      "bytes": 140,
+      "sha256": "29ba30720d63a73c42149f7da0cd12476f00f9efeec140c5a0bf509e474a41b2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-R7\\REPORT.md",
+      "bytes": 3201,
+      "sha256": "08ede36ad5800ec421f12b79a159c385502d4cc7b9ab55465b64e0415e7ce741"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\implementation-evidence.json",
+      "bytes": 11337,
+      "sha256": "ded89d3e08b7abd841c94c81afa798d0b647055e85ad336b0ca941a76432102b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\root-release.json",
+      "bytes": 985,
+      "sha256": "0e514dac02aed79f28007c41ebdb58d652f8260ee1092b27d6de6d7907d14721"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\implementation-start.txt",
+      "bytes": 28,
+      "sha256": "ed1efe8a69a585bb62a429be8957099a2c7a831eb396de970018d4fa7decbbf1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\R10-harness-before.ps1",
+      "bytes": 27089,
+      "sha256": "fbfa8555cd9596073abb78200af00eba9df38e60f336c0bf500342401ca17584"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\R10-after-probe-failed.ps1",
+      "bytes": 6427,
+      "sha256": "6aa5e9e3618511014b783a84d8bfc8aed0a81f265cc97ad9b43f45a842d09a7c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\probe-fixture-note.md",
+      "bytes": 340,
+      "sha256": "48c9f6c9ed61cabf95a3a304bb3135b98ecc25aaac49fda13ee128986c2c18d6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\R10-after-probe.ps1",
+      "bytes": 6428,
+      "sha256": "de1bec81aca395735c93f8dda916cb4433458dbd53ea08243d296b641bc5b28b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\R10-after-probe.json",
+      "bytes": 6697,
+      "sha256": "d7480390769fbdf6d9d1d7bfdb8310b13688cb034ff0177a3d5f6bb33fd5ed44"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\run-focused.ps1",
+      "bytes": 1292,
+      "sha256": "a74d71273db68ee0d10a48f96578d9acb7513154a3d5661cd5f65c775354152f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\generator-result.json",
+      "bytes": 702,
+      "sha256": "c607259bef51d4ea87544cefbdb812d301e28354f25edf1aa4c79a33e8eac905"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\generator.log",
+      "bytes": 215,
+      "sha256": "152e4897f91b3ceac1febc453a9fe0b686328782f5fccf280011f053775f2d5c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\check-harness.ps1",
+      "bytes": 878,
+      "sha256": "97c0ef11114c3ac2e9103db566e63b22899d436ac7639fa9aa55c7b3f824dfdc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\analysis.json",
+      "bytes": 140,
+      "sha256": "9ceb7563d55211a934182dbdc6c759e741c67e644e746dd31f5ea422763b214f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\whole-product-catalog.json",
+      "bytes": 26399,
+      "sha256": "9b3c22e104ddc5bdf56cefd7ed87967f2c3d562602ca7262a97eee505283a14d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\freeze-check.json",
+      "bytes": 591,
+      "sha256": "f204bc3a78bd95831fa6274be0c4122cdfd4a100ae47edce6dc991330f6fa5d3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\IMPLEMENTATION.md",
+      "bytes": 3812,
+      "sha256": "5768ba720c1c54fb9a4f4db519b28dd4a1135927470eaf6dfdb4c8d9672c6540"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\R8-unknown-artifact.md",
+      "bytes": 1873,
+      "sha256": "b8cf59073a47ff658e8f0850e9bcebb46dfc74ac8d9e67bc9a1390b09109cac3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\R9-recovery-working-directory.md",
+      "bytes": 2005,
+      "sha256": "6933ce6601bf64fee449a381442ff6e719b7cec765258c42617571335ce1ae1f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\R10-cleanup-precedence.md",
+      "bytes": 8161,
+      "sha256": "c989a718778db5cde6d84da980eb723ed1ef266c64705d412e1fc9076954d2be"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\R11-inline-workflow.md",
+      "bytes": 8318,
+      "sha256": "709eeae0942ce2fad7a0f2bddf8e674c03df9f8ba2647ca07e09b92b88a8135c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\evidence.json",
+      "bytes": 7807,
+      "sha256": "9b8f915664327a771750a999afb93900a32eecb392e526a9fa6c0968ca3d354e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\REPORT.md",
+      "bytes": 2890,
+      "sha256": "7ac1dba2d3ebc85e9cd5e81d15b92c751e47d5ddce7d21687d63e177cae3a758"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\R10-before-probe.ps1",
+      "bytes": 1841,
+      "sha256": "593f76b73f97ab061acfea169aaa639181febe7b63247b130d0032a423a4222a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\R10-before-probe.json",
+      "bytes": 1027,
+      "sha256": "08212cbff42543064636314346652ae28278fd312c15ccbb7203e4ca4aad1ecb"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\R6-publication.json",
+      "bytes": 2275,
+      "sha256": "03fedb10ed5e1164bcadd14bd3781ab4a2bc4f399b93015d7f99f7e5012d463c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\pr-body-r6-corrected.md",
+      "bytes": 6117,
+      "sha256": "f5ddf4877c0a24c3262bef26bc8daff9444d030835a621ba381c4acad5a87367"
+    }
+  ],
+  "FQ1": {
+    "status": "closed for exact R6 saved body and confirmed existing-reply receipt",
+    "body_sha256": "f5ddf4877c0a24c3262bef26bc8daff9444d030835a621ba381c4acad5a87367",
+    "reply_id": 4188897558,
+    "native_attribution": "Root publication/readback receipt, not independently re-polled"
+  },
+  "FQ2": {
+    "status": "closed for staged harness identity above",
+    "evidence": "Real scratch Replace/Move and byte reads; injected stable noncandidate final identities; original predicate yields native failure/ReplacementStateUncertain, removal mutant yields native Success. All four goldens checked each case.",
+    "limits": "No native substitution, competing-writer race, hosted-cell or merged acceptance inferred."
+  },
+  "rubric_totals": [
+    {
+      "decision": "PR234-R7/R7-final-candidate-identity.md",
+      "option": "A",
+      "weights": [
+        40,
+        25,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        1.0,
+        1.0,
+        3.0,
+        5.0,
+        5.0,
+        5.0
+      ],
+      "total": 42.0
+    },
+    {
+      "decision": "PR234-R7/R7-final-candidate-identity.md",
+      "option": "B",
+      "weights": [
+        40,
+        25,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        5.0,
+        5.0,
+        3.0,
+        5.0,
+        4.0,
+        5.0
+      ],
+      "total": 93.0
+    },
+    {
+      "decision": "PR234-R7/R7-final-candidate-identity.md",
+      "option": "C",
+      "weights": [
+        40,
+        25,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        5.0,
+        5.0,
+        5.0,
+        5.0,
+        4.0,
+        3.0
+      ],
+      "total": 97.0
+    },
+    {
+      "decision": "PR234-R7/R7-final-candidate-identity.md",
+      "option": "D",
+      "weights": [
+        40,
+        25,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        5.0,
+        5.0,
+        5.0,
+        3.0,
+        2.0,
+        2.0
+      ],
+      "total": 90.0
+    },
+    {
+      "decision": "PR234-R7/R7-final-candidate-identity.md",
+      "option": "E",
+      "weights": [
+        40,
+        25,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        2.0,
+        2.0,
+        5.0,
+        2.0,
+        2.0,
+        1.0
+      ],
+      "total": 48.0
+    },
+    {
+      "decision": "PR234-R7/R7-final-candidate-identity.md",
+      "option": "F",
+      "weights": [
+        40,
+        25,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        1.0,
+        1.0,
+        1.0,
+        5.0,
+        5.0,
+        5.0
+      ],
+      "total": 36.0
+    },
+    {
+      "decision": "PR234-round2/R10-cleanup-precedence.md",
+      "option": "A",
+      "weights": [
+        35,
+        30,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        1.0,
+        5.0,
+        2.0,
+        5.0,
+        4.0,
+        5.0
+      ],
+      "total": 62.0
+    },
+    {
+      "decision": "PR234-round2/R10-cleanup-precedence.md",
+      "option": "B",
+      "weights": [
+        35,
+        30,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        5.0,
+        1.0,
+        4.0,
+        5.0,
+        4.0,
+        5.0
+      ],
+      "total": 72.0
+    },
+    {
+      "decision": "PR234-round2/R10-cleanup-precedence.md",
+      "option": "C",
+      "weights": [
+        35,
+        30,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        5.0,
+        5.0,
+        5.0,
+        5.0,
+        5.0,
+        4.0
+      ],
+      "total": 99.0
+    },
+    {
+      "decision": "PR234-round2/R10-cleanup-precedence.md",
+      "option": "D",
+      "weights": [
+        35,
+        30,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        4.0,
+        5.0,
+        4.0,
+        4.0,
+        4.0,
+        3.0
+      ],
+      "total": 85.0
+    },
+    {
+      "decision": "PR234-round2/R10-cleanup-precedence.md",
+      "option": "E",
+      "weights": [
+        35,
+        30,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        3.0,
+        5.0,
+        2.0,
+        3.0,
+        3.0,
+        2.0
+      ],
+      "total": 68.0
+    },
+    {
+      "decision": "PR234-round2/R10-cleanup-precedence.md",
+      "option": "F",
+      "weights": [
+        35,
+        30,
+        15,
+        10,
+        5,
+        5
+      ],
+      "scores": [
+        4.0,
+        4.0,
+        4.0,
+        3.0,
+        3.0,
+        1.0
+      ],
+      "total": 74.0
+    },
+    {
+      "decision": "PR234-round2/R11-inline-workflow.md",
+      "option": "A",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "scores": [
+        5.0,
+        5.0,
+        5.0,
+        3.0,
+        5.0
+      ],
+      "total": 94.0
+    },
+    {
+      "decision": "PR234-round2/R11-inline-workflow.md",
+      "option": "B",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "scores": [
+        1.0,
+        5.0,
+        3.0,
+        5.0,
+        2.0
+      ],
+      "total": 61.0
+    },
+    {
+      "decision": "PR234-round2/R11-inline-workflow.md",
+      "option": "C",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "scores": [
+        5.0,
+        4.0,
+        4.0,
+        4.0,
+        3.0
+      ],
+      "total": 86.0
+    },
+    {
+      "decision": "PR234-round2/R11-inline-workflow.md",
+      "option": "D",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "scores": [
+        5.0,
+        4.0,
+        3.0,
+        4.0,
+        2.0
+      ],
+      "total": 81.0
+    },
+    {
+      "decision": "PR234-round2/R11-inline-workflow.md",
+      "option": "E",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "scores": [
+        5.0,
+        4.0,
+        3.0,
+        4.0,
+        2.0
+      ],
+      "total": 81.0
+    },
+    {
+      "decision": "PR234-round2/R11-inline-workflow.md",
+      "option": "F",
+      "weights": [
+        35,
+        25,
+        20,
+        15,
+        5
+      ],
+      "scores": [
+        3.0,
+        5.0,
+        3.0,
+        3.0,
+        1.0
+      ],
+      "total": 68.0
+    }
+  ],
+  "R10_controls": {
+    "Host": "7.6.5",
+    "SourceSha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+    "Cases": [
+      {
+        "Case": "clean",
+        "Preference": "Continue",
+        "Variant": "original",
+        "Failed": false,
+        "Diagnostic": null,
+        "ErrorId": null,
+        "PrimaryExceptionPreserved": false,
+        "Warnings": [],
+        "SuccessSummaries": 1,
+        "CleanupCalls": 1,
+        "NativeExit": 0
+      },
+      {
+        "Case": "primary-only",
+        "Preference": "Continue",
+        "Variant": "original",
+        "Failed": true,
+        "Diagnostic": "generator-test: primary assertion",
+        "ErrorId": "FixturePrimary",
+        "PrimaryExceptionPreserved": true,
+        "Warnings": [],
+        "SuccessSummaries": 0,
+        "CleanupCalls": 1,
+        "NativeExit": 1
+      },
+      {
+        "Case": "cleanup-only",
+        "Preference": "Continue",
+        "Variant": "original",
+        "Failed": true,
+        "Diagnostic": "generator-test: cleanup failed",
+        "ErrorId": "generator-test: cleanup failed",
+        "PrimaryExceptionPreserved": false,
+        "Warnings": [],
+        "SuccessSummaries": 0,
+        "CleanupCalls": 1,
+        "NativeExit": 1
+      },
+      {
+        "Case": "both",
+        "Preference": "Continue",
+        "Variant": "original",
+        "Failed": true,
+        "Diagnostic": "generator-test: primary assertion",
+        "ErrorId": "FixturePrimary",
+        "PrimaryExceptionPreserved": true,
+        "Warnings": [
+          "generator-test: cleanup failed"
+        ],
+        "SuccessSummaries": 0,
+        "CleanupCalls": 1,
+        "NativeExit": 1
+      },
+      {
+        "Case": "containment-only",
+        "Preference": "Continue",
+        "Variant": "original",
+        "Failed": true,
+        "Diagnostic": "generator-test: cleanup containment failure",
+        "ErrorId": "generator-test: cleanup containment failure",
+        "PrimaryExceptionPreserved": false,
+        "Warnings": [],
+        "SuccessSummaries": 0,
+        "CleanupCalls": 0,
+        "NativeExit": 1
+      },
+      {
+        "Case": "primary-containment",
+        "Preference": "Continue",
+        "Variant": "original",
+        "Failed": true,
+        "Diagnostic": "generator-test: primary assertion",
+        "ErrorId": "FixturePrimary",
+        "PrimaryExceptionPreserved": true,
+        "Warnings": [
+          "generator-test: cleanup containment failure"
+        ],
+        "SuccessSummaries": 0,
+        "CleanupCalls": 0,
+        "NativeExit": 1
+      },
+      {
+        "Case": "clean",
+        "Preference": "Stop",
+        "Variant": "original",
+        "Failed": false,
+        "Diagnostic": null,
+        "ErrorId": null,
+        "PrimaryExceptionPreserved": false,
+        "Warnings": [],
+        "SuccessSummaries": 1,
+        "CleanupCalls": 1,
+        "NativeExit": 0
+      },
+      {
+        "Case": "primary-only",
+        "Preference": "Stop",
+        "Variant": "original",
+        "Failed": true,
+        "Diagnostic": "generator-test: primary assertion",
+        "ErrorId": "FixturePrimary",
+        "PrimaryExceptionPreserved": true,
+        "Warnings": [],
+        "SuccessSummaries": 0,
+        "CleanupCalls": 1,
+        "NativeExit": 1
+      },
+      {
+        "Case": "cleanup-only",
+        "Preference": "Stop",
+        "Variant": "original",
+        "Failed": true,
+        "Diagnostic": "generator-test: cleanup failed",
+        "ErrorId": "generator-test: cleanup failed",
+        "PrimaryExceptionPreserved": false,
+        "Warnings": [],
+        "SuccessSummaries": 0,
+        "CleanupCalls": 1,
+        "NativeExit": 1
+      },
+      {
+        "Case": "both",
+        "Preference": "Stop",
+        "Variant": "original",
+        "Failed": true,
+        "Diagnostic": "generator-test: primary assertion",
+        "ErrorId": "FixturePrimary",
+        "PrimaryExceptionPreserved": true,
+        "Warnings": [
+          "generator-test: cleanup failed"
+        ],
+        "SuccessSummaries": 0,
+        "CleanupCalls": 1,
+        "NativeExit": 1
+      },
+      {
+        "Case": "containment-only",
+        "Preference": "Stop",
+        "Variant": "original",
+        "Failed": true,
+        "Diagnostic": "generator-test: cleanup containment failure",
+        "ErrorId": "generator-test: cleanup containment failure",
+        "PrimaryExceptionPreserved": false,
+        "Warnings": [],
+        "SuccessSummaries": 0,
+        "CleanupCalls": 0,
+        "NativeExit": 1
+      },
+      {
+        "Case": "primary-containment",
+        "Preference": "Stop",
+        "Variant": "original",
+        "Failed": true,
+        "Diagnostic": "generator-test: primary assertion",
+        "ErrorId": "FixturePrimary",
+        "PrimaryExceptionPreserved": true,
+        "Warnings": [
+          "generator-test: cleanup containment failure"
+        ],
+        "SuccessSummaries": 0,
+        "CleanupCalls": 0,
+        "NativeExit": 1
+      }
+    ],
+    "Mutants": [
+      {
+        "Variant": "primary-state",
+        "Killed": true,
+        "NativeExit": 1,
+        "Observed": {
+          "Case": "both",
+          "Preference": "Stop",
+          "Variant": "primary-state",
+          "Failed": true,
+          "Diagnostic": "generator-test: cleanup failed",
+          "ErrorId": "generator-test: cleanup failed",
+          "PrimaryExceptionPreserved": false,
+          "Warnings": [],
+          "SuccessSummaries": 0,
+          "CleanupCalls": 1
+        }
+      },
+      {
+        "Variant": "cleanup-swallow",
+        "Killed": true,
+        "NativeExit": 0,
+        "Observed": {
+          "Case": "cleanup-only",
+          "Preference": "Stop",
+          "Variant": "cleanup-swallow",
+          "Failed": false,
+          "Diagnostic": null,
+          "ErrorId": null,
+          "PrimaryExceptionPreserved": false,
+          "Warnings": [
+            "generator-test: cleanup failed"
+          ],
+          "SuccessSummaries": 1,
+          "CleanupCalls": 1
+        }
+      },
+      {
+        "Variant": "warning-policy",
+        "Killed": true,
+        "NativeExit": 1,
+        "Observed": {
+          "Case": "both",
+          "Preference": "Stop",
+          "Variant": "warning-policy",
+          "Failed": true,
+          "Diagnostic": "The running command stopped because the preference variable \"WarningPreference\" or common parameter is set to Stop: generator-test: cleanup failed",
+          "ErrorId": "ActionPreferenceStop,Microsoft.PowerShell.Commands.WriteWarningCommand",
+          "PrimaryExceptionPreserved": false,
+          "Warnings": [
+            "generator-test: cleanup failed"
+          ],
+          "SuccessSummaries": 0,
+          "CleanupCalls": 1
+        }
+      }
+    ],
+    "Limits": "Actual catch/finally/success statements extracted; test body and deletion dispatch synthetic. Each case is a real local Windows7 child process. No native lock or filesystem deletion proof."
+  },
+  "focused_log": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round2\\generator.log",
+    "bytes": 215,
+    "sha256": "152e4897f91b3ceac1febc453a9fe0b686328782f5fccf280011f053775f2d5c"
+  },
+  "focused_log_text": "Generator tests passed: 156 assertions; edition=Core; version=7.6.5; executable=C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe; storage=not-required; image=/.\n",
+  "analysis": {
+    "ParseErrors": [],
+    "AnalyzerIssues": [],
+    "HarnessSha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa"
+  },
+  "freeze_check": {
+    "catalog_count": 77,
+    "unchanged_main_test_statements": 59,
+    "summary_content_unchanged_except_indentation": true,
+    "preparation_artifacts_verified": 7,
+    "staged_paths": [],
+    "source_catalog": [
+      {
+        "path": ".github/workflows/Test-StyleGuideGenerator.ps1",
+        "mode": "100644",
+        "head_blob": "7e9c97c06d3c4c937538e634ffe8cf08ea3e4435",
+        "raw_git_blob": "dcd0cb93354a74de4a5d8323a7018511323e8bbe",
+        "bytes": 27656,
+        "sha256": "f84730e95eb73aa7d58a9c2f0f8232921e70d28d576fd24e3a87c750f2da4efa",
+        "equal_to_head": false
+      }
+    ]
+  },
+  "decisions": {
+    "R8": "No current consumer benefit from unchecked ID diagnostics; outer result excludes Exception.Message. No change justified.",
+    "R9": "Current whole-wrapper contract is acquired workspace-root invocation; Node-only cwd change would not establish arbitrary-cwd support. No change justified.",
+    "R11": "A94 merits selection retains pre-checkout trust boundary and independent proof expectations. Duplication is acknowledged, not declared impossible."
+  },
+  "v6_node_log": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v6\\output\\full-node.log",
+    "bytes": 47382,
+    "sha256": "f176dab1826f8ed6cb3e1db206465c5d7579a50135174e4fb3f97c8134c07571"
+  },
+  "v6_counts": {
+    "tests": 567,
+    "pass": 567,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "v6_aggregate_credit": "NONE: hooks and whole-source/dependency/ref/config guard were live at assignment; no completed acceptance is inferred.",
+  "peer_delta": "One common harness blob only, no descriptor/identity/context substitution; accepted TF e21b74fe0b56551008f78f9f2946cd2a0f9c19ce remains unmodified and untested here.",
+  "commands_inspected": [
+    [
+      "git",
+      "--no-optional-locks",
+      "--no-replace-objects",
+      "-C",
+      "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "diff",
+      "--name-only",
+      "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+      "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6"
+    ],
+    [
+      "git",
+      "--no-optional-locks",
+      "--no-replace-objects",
+      "-C",
+      "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "cat-file",
+      "blob",
+      "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6:.github/workflows/Test-StyleGuideGenerator.ps1"
+    ],
+    [
+      "git",
+      "--no-optional-locks",
+      "--no-replace-objects",
+      "-C",
+      "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "ls-tree",
+      "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+      "--",
+      ".github/workflows/Test-StyleGuideGenerator.ps1"
+    ],
+    [
+      "git",
+      "--no-optional-locks",
+      "--no-replace-objects",
+      "-C",
+      "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "diff",
+      "--check",
+      "07636c8633b8544eb30c71ce1b24d2bcdef4c74e",
+      "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6"
+    ]
+  ],
+  "remaining_gates": [
+    "Completed final-byte v6 aggregate/guards",
+    "Normal final commit and publication with tree/body binding",
+    "Current-input remote reviews and hosted platform checks",
+    "Immediate premerge native checks and landed acceptance",
+    "Paired port and reverse raw-byte/mode comparison"
+  ],
+  "verdict": "PASS for bounded staged-byte delta; no new material defect; conditional, not final native-input acceptance"
+}

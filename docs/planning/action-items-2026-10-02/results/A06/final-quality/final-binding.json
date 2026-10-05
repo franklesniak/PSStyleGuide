@@ -1,0 +1,333 @@
+{
+  "at": "2026-10-05T22:30:48.802257+00:00",
+  "verdict": "PASS: final published head/base/body bound to previously reviewed unchanged tree; no new material defect",
+  "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+  "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+  "tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "body_sha256": "8744ed3f3af5105058be086ddb90d0ed93f8b3e3828ca45fa3e28dce9969e982",
+  "native_readback": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS234-final-quality-20261005\\final-binding-native.json",
+    "bytes": 9991,
+    "sha256": "4f22b0b6fb94fe71a6e4b1542a25dfb2d53f22308b103de583d06fa27e5d2f08"
+  },
+  "prior_review_hashes": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS234-final-quality-20261005\\REPORT.md",
+      "bytes": 8278,
+      "sha256": "1452aa9828d67299e1ed15cadad8462380240bc376d2284f101a6ebd7019d719"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS234-final-quality-20261005\\evidence.json",
+      "bytes": 79461,
+      "sha256": "46eb033e8e3394ec8cc3f3330e12ad529e6cd8cabe843c525cb50ccc679c2e1c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS234-final-quality-20261005\\delta-audit.md",
+      "bytes": 5893,
+      "sha256": "4eb01160d82ee18ceb2330bb4df0a18a7610f8837d5a3efc4a08b6a32e5654be"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-PS234-final-quality-20261005\\delta-audit.json",
+      "bytes": 27780,
+      "sha256": "824c6a3936eccb284491d42f6666294d4e389f1350a5d44efb5a0185f1b35b81"
+    }
+  ],
+  "git_binding_command": [
+    "git",
+    "--no-optional-locks",
+    "--no-replace-objects",
+    "-C",
+    "C:/Users/flesniak/.codex/worktrees/a06-generator-convergence/PSStyleGuide",
+    "show",
+    "-s",
+    "--format=%H%n%T%n%P",
+    "dec18a6303bd6ad5fe9a43b383a62daa70527aca"
+  ],
+  "git_binding_result": [
+    "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+    "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+    "d7bb8ada326d52fab091b1d59b932288d56c4d91"
+  ],
+  "body_local": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\pr-body-round3.md",
+    "bytes": 9533,
+    "sha256": "8744ed3f3af5105058be086ddb90d0ed93f8b3e3828ca45fa3e28dce9969e982"
+  },
+  "validation_run": "a06-source-20261005-v6",
+  "node_counts": {
+    "tests": 567,
+    "pass": 567,
+    "fail": 0,
+    "cancelled": 0,
+    "skipped": 0
+  },
+  "hooks": {
+    "passed": 11,
+    "skipped": 0
+  },
+  "final_guard": {
+    "source_after_equal": true,
+    "container_exit": 0,
+    "finished_at": "2026-10-05T22:21:35.458875+00:00",
+    "scope": "recorded complete source/dependency/ref/config guard; raw guard record hashes retained"
+  },
+  "verified_logs_and_records": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v6\\output\\result.json",
+      "bytes": 2288,
+      "sha256": "12454e1620c6e94b3a30b448d1bcccb639fd14c6393a18ab726aa808f7c296e2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v6\\status.json",
+      "bytes": 1280,
+      "sha256": "8143277555ce8b755202506a8c59a194b41616d77c84669e4ff3ba4e80b7df80"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\aggregate-manifest-v6.json",
+      "bytes": 1471,
+      "sha256": "82e86053eccda78ddb8f1814b30c7bd983c17d0428c195946879a3c6e844218d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v6\\output\\staged-preflight.log",
+      "bytes": 194,
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v6\\output\\full-node.log",
+      "bytes": 47382,
+      "sha256": "f176dab1826f8ed6cb3e1db206465c5d7579a50135174e4fb3f97c8134c07571"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v6\\output\\aggregate.log",
+      "bytes": 880,
+      "sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\AcceptedMaintenance-dec18a6.log",
+      "bytes": 701,
+      "sha256": "3dd644336b354be279b49f0a2d3ba94ecc5c60d1886edfb1c2c33a509d7c11ec"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\FinalizeMetadataNow-dec18a6.log",
+      "bytes": 227,
+      "sha256": "993ad6b1a73cd7c407c40bba9b528485cc46455671b3b42d6b6960724bf43d81"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\MetadataClassificationOnly-dec18a6.log",
+      "bytes": 181,
+      "sha256": "2f62a3a95d4237e245c6565b545f9e40617d20e3412a3b1276b671b3482c634e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\ProposedPolicy-dec18a6.log",
+      "bytes": 624,
+      "sha256": "6044d0155071facace9c83e6ecd6a0cca67149297ee1225e0496a36e30e2edcf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\normal-product-r10-commit.log",
+      "bytes": 148,
+      "sha256": "98d27b901b849e7a1e964622d53d4172b5c1ae523e5061861dabf6a386a604ce"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\topic-r7-r10-push.log",
+      "bytes": 239,
+      "sha256": "eb6d12a98670a47095e5287ff26dddb980d105769127b1c40989dacf34f40e7c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\current-audit-dec18a6.log",
+      "bytes": 445,
+      "sha256": "1571e207cd44536f75f9b823641506fd84e72ffe4ad90cdaff017ffca9d6cc6f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v6\\output\\before.json",
+      "bytes": 411459,
+      "sha256": "c189d8a334c56425f70b820064ffe083d5b4a1b79cf9218079d5428f5e149438"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v6\\output\\aggregate-after.json",
+      "bytes": 411459,
+      "sha256": "c189d8a334c56425f70b820064ffe083d5b4a1b79cf9218079d5428f5e149438"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\linux-validation\\runs\\a06-source-20261005-v6\\output\\host-source-after.json",
+      "bytes": 400543,
+      "sha256": "9f95f70c93dc8859a04d64b5eaf3fd458366b96c27a93b450486ddd7e10d3628"
+    }
+  ],
+  "validation_commands": [
+    {
+      "name": "staged-preflight",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-RequireStagedInputMatch"
+      ],
+      "started_at": "2026-10-05T22:07:39.178734+00:00",
+      "timeout_seconds": 600,
+      "state": "passed",
+      "pid": 79,
+      "exit": 0,
+      "finished_at": "2026-10-05T22:07:48.382888+00:00",
+      "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+    },
+    {
+      "name": "full-node",
+      "command": [
+        "node",
+        "--test",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Check-NpmAudit.test.mjs",
+        ".github/workflows/Test-LocalValidation.test.mjs",
+        ".github/workflows/lint-markdown.test.mjs"
+      ],
+      "started_at": "2026-10-05T22:07:48.565731+00:00",
+      "timeout_seconds": 3600,
+      "state": "passed",
+      "pid": 617,
+      "exit": 0,
+      "finished_at": "2026-10-05T22:10:54.688035+00:00",
+      "log_sha256": "f176dab1826f8ed6cb3e1db206465c5d7579a50135174e4fb3f97c8134c07571"
+    },
+    {
+      "name": "aggregate",
+      "command": [
+        "/opt/psstyleguide-runtime/venv/bin/python",
+        "-m",
+        "pre_commit",
+        "run",
+        "--all-files"
+      ],
+      "started_at": "2026-10-05T22:10:54.884125+00:00",
+      "timeout_seconds": 14400,
+      "state": "passed",
+      "pid": 21256,
+      "exit": 0,
+      "finished_at": "2026-10-05T22:21:17.221021+00:00",
+      "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+      "passed_hooks": 11,
+      "skipped_hooks": 0
+    }
+  ],
+  "endpoint_commands": [
+    {
+      "mode": "AcceptedMaintenance",
+      "command": [
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+        "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+        "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+        "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "dec18a6303bd6ad5fe9a43b383a62daa70527aca"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+      "started_at": "2026-10-05T22:22:15.387724+00:00",
+      "finished_at": "2026-10-05T22:22:15.797124+00:00",
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\AcceptedMaintenance-dec18a6.log",
+      "log_sha256": "3dd644336b354be279b49f0a2d3ba94ecc5c60d1886edfb1c2c33a509d7c11ec"
+    },
+    {
+      "mode": "FinalizeMetadataNow",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+        "-PublishedBaselineRevision",
+        "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "-FinalizeMetadataNow"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+      "started_at": "2026-10-05T22:22:20.090203+00:00",
+      "finished_at": "2026-10-05T22:22:47.919210+00:00",
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\FinalizeMetadataNow-dec18a6.log",
+      "log_sha256": "993ad6b1a73cd7c407c40bba9b528485cc46455671b3b42d6b6960724bf43d81"
+    },
+    {
+      "mode": "MetadataClassificationOnly",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+        "-PublishedBaselineRevision",
+        "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "-MetadataClassificationOnly"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\ps-tf67-accepted-policy\\PSStyleGuide",
+      "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+      "started_at": "2026-10-05T22:22:52.527042+00:00",
+      "finished_at": "2026-10-05T22:22:54.623225+00:00",
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\MetadataClassificationOnly-dec18a6.log",
+      "log_sha256": "2f62a3a95d4237e245c6565b545f9e40617d20e3412a3b1276b671b3482c634e"
+    },
+    {
+      "mode": "ProposedPolicy",
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        ".github/workflows/Test-AgentInstructions.ps1",
+        "-InputRevision",
+        "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+        "-PublishedBaselineRevision",
+        "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+        "-ProposedPolicy"
+      ],
+      "cwd": "C:\\Users\\flesniak\\.codex\\worktrees\\a06-generator-convergence\\PSStyleGuide",
+      "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+      "started_at": "2026-10-05T22:22:59.382852+00:00",
+      "finished_at": "2026-10-05T22:23:25.591355+00:00",
+      "exit": 0,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\ProposedPolicy-dec18a6.log",
+      "log_sha256": "6044d0155071facace9c83e6ecd6a0cca67149297ee1225e0496a36e30e2edcf"
+    }
+  ],
+  "audit": {
+    "exit": 0,
+    "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+    "authority": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "mode": "ordinary local no-argument two-root audit",
+    "started_at": "2026-10-05T22:23:30.123493+00:00",
+    "finished_at": "2026-10-05T22:23:48.868446+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\current-audit-dec18a6.log",
+    "sha256": "1571e207cd44536f75f9b823641506fd84e72ffe4ad90cdaff017ffca9d6cc6f"
+  },
+  "product_or_native_mutations": false,
+  "new_test_runs": false,
+  "body_assessment": "Accurate final identities and local validation; FQ-1 remains corrected; R7 identities explicitly synthetic; R10 controls explicitly extracted/synthetic; old hosted results distinguished from current required proof; review/hosted/merge/paired gates remain unclaimed.",
+  "closed_findings": [
+    "FQ-1 reporting precision",
+    "FQ-2 retained candidate/final identity negative oracle"
+  ],
+  "uncredited_gates": [
+    "Current-input Copilot and remote Codex results and findings disposition; old round2 thread closure remains root-owned",
+    "Current-head hosted Windows5.1, Windows7, native-ext4 Linux7 two-pass proof and all required checks",
+    "Immediate premerge head/base/checks/approval/mergeability/scope and normal permitted merge",
+    "Landed acceptance and paired TF delivery/reverse comparison; broader runtime/recovery/issue155 outcomes remain open"
+  ],
+  "review_scope": "Only final input/body/validation binding; immutable original 13-path and bounded delta audits reused; no repeated whole-source audit."
+}

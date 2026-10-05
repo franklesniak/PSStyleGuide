@@ -1,0 +1,45 @@
+{
+  "recorded_at": "2026-10-05T22:17:25.635943+00:00",
+  "reader": "root",
+  "report_sha256": "0d0f2089cd508148a3589f3f487a889ed515fcfee72497ab471f53b8ac55eca1",
+  "catalog_sha256": "80168eb219aa85a3809b02c37f99d6a433bf43af814035b996903b8e31814359",
+  "sampled": [
+    {
+      "source": "PSaccepted",
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "dc0d195c72d8404e45c6eb39cb102898fd22b667",
+      "sha256": "66c8c2ac9a5b0fc610a1f9c1b4b212966b19f7530c8087f873a86d0f7e6ac220",
+      "bytes": 5844
+    },
+    {
+      "source": "TFaccepted",
+      "path": ".github/workflows/Initialize-CiToolchain.ps1",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "906460d818674199b32294185ed6525c143b48bb",
+      "sha256": "a4c30c0426afdd1cc1dbec2560117d8243763a7e4fbdf90aacd32af6bbb3e438",
+      "bytes": 5706
+    },
+    {
+      "source": "A06staged",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "2145cb90a7a5a2d292aac7375092dd6b33ea984e",
+      "sha256": "8d288530551d3e79bdbd67e05022d22441b8d618f989d2f3fa49ef9aaa46f78c",
+      "bytes": 123582
+    },
+    {
+      "source": "A06staged",
+      "path": ".github/workflows/Validate-WorkflowPolicy.mjs",
+      "mode": "100644",
+      "type": "blob",
+      "blob": "b68aa229ae32dae8ad62886e93e161f887f67a26",
+      "sha256": "f6333e7877b2ed39496185bb8a399e75ae183117f819003a7d0294a0e943517f",
+      "bytes": 31176
+    }
+  ],
+  "review": "Read full report; verified4raw Git object/mode samples and4retained evidence hashes. No tests or fresh native-ref authentication. D04-1/2/3 retained; A04 remains0/8/unstarted and product unaccepted."
+}

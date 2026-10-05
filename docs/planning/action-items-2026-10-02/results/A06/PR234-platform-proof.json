@@ -1,0 +1,64 @@
+{
+  "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+  "candidate_tree": "fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6",
+  "run": 37382744305,
+  "attempt": 1,
+  "event": "pull_request",
+  "actual_checkout_revision": "940a01d6fceee9e53ae84ba46055ead25d1196f7",
+  "synthetic_merge_parents": [
+    "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "dec18a6303bd6ad5fe9a43b383a62daa70527aca"
+  ],
+  "tree_equal_to_candidate": true,
+  "all_three_cells": [
+    {
+      "name": "generator_windows_51",
+      "job_id": 112008523355,
+      "passes": [
+        "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T22:29:28.3337770Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+        "generator_windows_51\tRun the actual generator suite twice\t2026-10-05T22:29:49.6077230Z Generator tests passed: 156 assertions; edition=Desktop; version=5.1.26100.33438; executable=C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+      ]
+    },
+    {
+      "name": "generator_windows_7",
+      "job_id": 112008523666,
+      "passes": [
+        "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T22:29:29.4038520Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1.",
+        "generator_windows_7\tRun the actual generator suite twice\t2026-10-05T22:29:51.9595573Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=C:\\Program Files\\PowerShell\\7\\pwsh.EXE; storage=not-required; image=win25-vs2026/20260925.250.1."
+      ]
+    },
+    {
+      "name": "generator_linux_7",
+      "job_id": 112008523583,
+      "passes": [
+        "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T22:29:51.6563829Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1.",
+        "generator_linux_7\tRun the actual generator suite twice\t2026-10-05T22:30:08.5419142Z Generator tests passed: 156 assertions; edition=Core; version=7.6.6; executable=/opt/microsoft/powershell/7/pwsh; storage=ext4; image=ubuntu24/20260927.320.1."
+      ]
+    }
+  ],
+  "log_sha256": "54ecd76d1d8c35afa15e021560a38e7156f8996f63b55986b3b4ec7b7b8404ca",
+  "all_jobs": "success",
+  "same_revision_admission": {
+    "generator_windows_51": {
+      "result": "success",
+      "outputs": {
+        "revision": "940a01d6fceee9e53ae84ba46055ead25d1196f7"
+      }
+    },
+    "generator_windows_7": {
+      "result": "success",
+      "outputs": {
+        "revision": "940a01d6fceee9e53ae84ba46055ead25d1196f7"
+      }
+    },
+    "generator_linux_7": {
+      "result": "success",
+      "outputs": {
+        "revision": "940a01d6fceee9e53ae84ba46055ead25d1196f7"
+      }
+    }
+  },
+  "artifact_id": 11375102838,
+  "captured_at": "2026-10-05T22:34:01.023619+00:00",
+  "limits": "Current published candidate platform proof only. Remote reviews, other current checks, normal merge/landed and paired acceptance remain."
+}

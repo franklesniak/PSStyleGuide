@@ -1,6 +1,8 @@
 <!-- markdownlint-disable MD013 -->
 # A04 current result
 
+**Post-A06 readiness refreshed,2026-10-05:** [The current report](postA06/REPORT.md) confirms D04-1 R93, D04-2 Q99 and D04-3 C93 against accepted PSd7b206a/TFe21b74f and prospective A06treefd66ed6. All four unchanged611-byte initializer segments preserve the existing findings. Actual ordinary fixture and asynchronous loopback regions remain unchanged through A06; integrate into the current complete test file. Root read the report, independently sampled four raw Git objects/modes and checked four retained evidence hashes. No tests were rerun. After serialized A06/A07 acceptance, implement first-argument disable/retry-max300 and actual Linux whole-helper controls, preserving independent runtime proof and paired lifecycle. A04 remains0/8 with an unstarted clock; no new owner decision.
+
 State: validating. Readiness is current; implementation and acceptance remain due.
 
 On2026-10-05 the [post-TF66 refresh](postTF66/REPORT.md) authenticated PS mainf168f83 and TF main56cb041. PS PR232 at86f35f4 remains a prospective foundation, not accepted code. The saved30-entry census has6 unchanged/9 changed PS entries and4 unchanged/11 changed TF entries. Both complete ordinary initializers remain unchanged, and all three download/native-exit/digest segments match the saved611-byte hash. D04-1 R93, D04-2 Q99 and D04-3 C93 remain the selected implementation and test approach; no distinct new finding requires another decision. Root independently verified all87 recorded raw file identities and both native main refs.

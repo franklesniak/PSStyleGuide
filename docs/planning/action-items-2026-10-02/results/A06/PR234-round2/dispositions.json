@@ -1,0 +1,69 @@
+{
+  "prepared_at": "2026-10-05T22:29:21.474777+00:00",
+  "head": "dec18a6303bd6ad5fe9a43b383a62daa70527aca",
+  "body_sha256": "8744ed3f3af5105058be086ddb90d0ed93f8b3e3828ca45fa3e28dce9969e982",
+  "baseline": "round2-final-pre-disposition.json",
+  "review": 5420961221,
+  "rows": [
+    {
+      "finding": "R8",
+      "comment_id": 4189169213,
+      "thread": "PRRT_kwDOQkjdhM6pOt7f",
+      "status": "resolved",
+      "body": "The actual caller passes keys from the same fixed destination map, and the outer CI result intentionally omits exception text. Interpolating unchecked identifiers would not provide the proposed current CI diagnostic; no change is selected.\n[Evidence, decision and limits](https://github.com/franklesniak/PSStyleGuide/blob/d7ae3b29e8a2955294e23e698076b512f7c8a21e/docs/planning/action-items-2026-10-02/results/A06/PR234-round2/R8-unknown-artifact.md).\nGenerated with Codex",
+      "requested_at": "2026-10-05T22:29:43.593790+00:00",
+      "preimage_body_sha256": "a51afa72ed5c8ad4bdf7ab6a0771b57660055791551ea453cbdb92e03dccad7c",
+      "reply_id": 4189530188,
+      "reply_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#discussion_r4189530188",
+      "native_created_at": "2026-10-05T22:30:08Z",
+      "confirmed_at": "2026-10-05T22:29:46.263695+00:00",
+      "resolution_requested_at": "2026-10-05T22:30:13.377740+00:00",
+      "resolution_confirmed_at": "2026-10-05T22:30:14.587162+00:00"
+    },
+    {
+      "finding": "R9",
+      "comment_id": 4189169268,
+      "thread": "PRRT_kwDOQkjdhM6pOt79",
+      "status": "resolved",
+      "body": "The supported verifier and its workflow/fixture callers use the acquired repository root. Making only the Node child path absolute would leave the integrity snapshots and other children root-relative; no arbitrary-directory contract is selected.\n[Evidence, decision and limits](https://github.com/franklesniak/PSStyleGuide/blob/d7ae3b29e8a2955294e23e698076b512f7c8a21e/docs/planning/action-items-2026-10-02/results/A06/PR234-round2/R9-recovery-working-directory.md).\nGenerated with Codex",
+      "requested_at": "2026-10-05T22:29:48.450511+00:00",
+      "preimage_body_sha256": "7241220595355e098b4badcb89fda9a93b68895da4d5ebd7b64b6a33f50f2c18",
+      "reply_id": 4189530800,
+      "reply_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#discussion_r4189530800",
+      "native_created_at": "2026-10-05T22:30:13Z",
+      "confirmed_at": "2026-10-05T22:29:51.155187+00:00",
+      "resolution_requested_at": "2026-10-05T22:30:15.054632+00:00",
+      "resolution_confirmed_at": "2026-10-05T22:30:16.134578+00:00"
+    },
+    {
+      "finding": "R10",
+      "comment_id": 4189169317,
+      "thread": "PRRT_kwDOQkjdhM6pOt8b",
+      "status": "resolved",
+      "body": "Implemented C99 in dec18a6303bd6ad5fe9a43b383a62daa70527aca: preserve the original error, emit a fixed secondary warning, retain cleanup-only failure and containment refusal, and print success only after cleanup. Actual Windows7 harness156, twelve extracted-control cases and three independent mutants pass; native lock behavior is not claimed.\n[Evidence, decision and limits](https://github.com/franklesniak/PSStyleGuide/blob/d7ae3b29e8a2955294e23e698076b512f7c8a21e/docs/planning/action-items-2026-10-02/results/A06/PR234-round2/R10-cleanup-precedence.md).\nGenerated with Codex",
+      "requested_at": "2026-10-05T22:29:53.373534+00:00",
+      "preimage_body_sha256": "ef71a398df536db9eff615beae4c6d86847821b7d1696be06ecbc4902b117ac6",
+      "reply_id": 4189531373,
+      "reply_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#discussion_r4189531373",
+      "native_created_at": "2026-10-05T22:30:18Z",
+      "confirmed_at": "2026-10-05T22:29:55.817227+00:00",
+      "resolution_requested_at": "2026-10-05T22:30:16.596983+00:00",
+      "resolution_confirmed_at": "2026-10-05T22:30:17.770299+00:00"
+    },
+    {
+      "finding": "R11",
+      "comment_id": 4189169357,
+      "thread": "PRRT_kwDOQkjdhM6pOt84",
+      "status": "resolved",
+      "body": "A94 retains the inline design after evaluating post-checkout-only factoring and other alternatives. Acquisition cannot load a repository helper before verified checkout; matching acquisition pairs agree, and platform proofs retain independent policy and actual-body failure controls.\n[Evidence, decision and limits](https://github.com/franklesniak/PSStyleGuide/blob/d7ae3b29e8a2955294e23e698076b512f7c8a21e/docs/planning/action-items-2026-10-02/results/A06/PR234-round2/R11-inline-workflow.md).\nGenerated with Codex",
+      "requested_at": "2026-10-05T22:29:58.055576+00:00",
+      "preimage_body_sha256": "653e1e83cacc08f03c3b6130517d80c4b69e33710833202454b6927ef47b5964",
+      "reply_id": 4189532000,
+      "reply_url": "https://github.com/franklesniak/PSStyleGuide/pull/234#discussion_r4189532000",
+      "native_created_at": "2026-10-05T22:30:23Z",
+      "confirmed_at": "2026-10-05T22:30:00.957494+00:00",
+      "resolution_requested_at": "2026-10-05T22:30:18.279504+00:00",
+      "resolution_confirmed_at": "2026-10-05T22:30:19.413132+00:00"
+    }
+  ]
+}

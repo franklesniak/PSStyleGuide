@@ -1,0 +1,14 @@
+<!-- markdownlint-disable MD013 -->
+# PS234 final published-input binding
+
+**PASS.** The published candidate matches the unchanged tree covered by the original13-path review and subsequent bounded delta audit. No new material defect was found. Both earlier final-quality observations remain closed: R6 corrects measurement reporting, and R7 supplies the candidate/final identity negative oracle. This completes the independent final-quality gate for the identified input; it is not remote-review, hosted, merge or paired acceptance.
+
+Authenticated GitHub connector readback at **2026-10-05 22:30:10 UTC** confirmed PR234 open and unmerged, head `dec18a6303bd6ad5fe9a43b383a62daa70527aca`, base `d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48`, and13 changed paths. The returned body exactly matches saved `pr-body-round3.md`, SHA256 `8744ed3f3af5105058be086ddb90d0ed93f8b3e3828ca45fa3e28dce9969e982`. Local immutable commit inspection binds that head to tree `fd66ed6c5b94d8c012a0aa06c8d30f2ae16746c6`, exactly the delta-audited tree, with parent `d7bb8ada326d52fab091b1d59b932288d56c4d91`.
+
+Read the complete final body. It accurately distinguishes final local validation from current hosted proof, injected identity observations from native substitution/race evidence, and extracted cleanup controls from native lock experiments. It retains R5's corrected wording and the bounded R8/R9/R11 dispositions. Old-head results are not presented as current acceptance.
+
+Verified16 validation/log/guard record hashes. Completed v6 is bound to the same tree/base: **567/567 Node tests, zero failures/cancellations/skips;11 hooks passed, zero skipped; final source/dependency/ref/config guard passed**. Result/status/manifest and all three command-log hashes match. Normal commit/publication logs, all four current committed endpoint checks and the fresh ordinary two-root audit also match their recorded identities/hashes and passed results. No tests or whole-source audit were repeated.
+
+Still uncredited: current-input Copilot and remote Codex results and findings disposition; root's remaining old-round thread closure; current-head hosted Windows5.1/Windows7/native-ext4 Linux7 two-pass proof and required checks; immediate premerge head/base/approval/check/scope/mergeability verification; normal merge and landed acceptance; TF delivery/reverse comparison. Broader runtime/recovery and issue155 remain open. Native mergeability observed here is only a snapshot, not the final premerge check.
+
+No product/native mutations, planning edits, descendants or new tests occurred. Previous report/evidence files are unchanged. Exact native snapshot, hashes and inspected validation commands are saved in `final-binding-native.json` and `final-binding.json`. Evidence SHA256: `2ed93e153d2a42eea31eee84b6f3439264979cc4a65cff844d0a0908b4a5df5d`.
