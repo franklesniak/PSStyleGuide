@@ -1,6 +1,6 @@
 {
-  "status": "round7_codex_clean_copilot_pending",
-  "captured_at": "2026-10-05T11:35:59.591639+00:00",
+  "status": "round8_paired_reviews_pending",
+  "captured_at": "2026-10-05T11:58:31.560008+00:00",
   "repository": "franklesniak/PSStyleGuide",
   "branch": "codex/coherent-foundation-reverse",
   "accepted_base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
@@ -563,11 +563,11 @@
     }
   },
   "reverse_PR": "https://github.com/franklesniak/PSStyleGuide/pull/232",
-  "rounds_used": 7,
+  "rounds_used": 8,
   "first_request_at": "2026-10-05T06:26:07Z",
   "deadline": "2026-10-13T06:26:07+00:00",
   "metadata_carry_back": "Prepared six-path A21/A07 repair:54 differing Version notes, classifier deletion, local-test prefix, README inventory and lint diagnostics. Genuine destination date/baseline arithmetic and exact language exceptions remain; transfer3 is not released.",
-  "remaining": "Round7 Copilot terminal review/service evidence, final independent quality/native gates, normal merge, landed acceptance and six-path TF follow-up; no owner action.",
+  "remaining": "Round8 terminal reviews and service evidence, final independent quality/native gates, normal merge, landed acceptance and six-path TF follow-up; no owner action.",
   "implementation_evidence_sha256": "a974f641c004e31a3b2d47c953e9763338ec5314b7c8fb14afa492a27213e95e",
   "quality_report_sha256": "2f647c94f8ba50461a642a3413da66275b65fb8de6eaa60a8a9e747a5b34aab8",
   "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
@@ -2873,13 +2873,13 @@
     "baseline": "round7-pre-request.json",
     "request_intent_at": "2026-10-05T11:28:01.434598+00:00",
     "reason": "Continue required paired review after round6 duplicate R11/R12 were verified, replied and resolved. No source/body change. Round6 remains a valid Lite review with findings; its separate service cancellation is not relabelled a pass. This request is not an effort-only retry or service-failure replacement.",
-    "request_set_terminal": false,
+    "request_set_terminal": true,
     "clean": false,
     "copilot": {
-      "status": "pending",
+      "status": "terminal_findings_dispositioned",
       "preferred_effort": "Balanced",
       "selected_effort": null,
-      "observed_effort": null,
+      "observed_effort": "Lite",
       "transport": "gh pr edit --add-reviewer @copilot",
       "ui_fallback_reason": "Fresh Edge3 PR232 tab75572475 is signed out (Sign in and Sign in to comment visible), with no authenticated request control. The Balanced effort menu alone cannot submit a request. No UI request was sent.",
       "command_exit": 0,
@@ -2887,9 +2887,25 @@
       "request_at": "2026-10-05T11:27:56Z",
       "actor_id": 11204406,
       "reviewer_id": 175728472,
-      "snapshot": "round7-copilot-reconciliation.json",
+      "snapshot": "round7-progress-114543.json",
       "workflow_run_id": 37303115319,
-      "timestamp_reconciliation": "The native request-event timestamp is 5.434598 seconds earlier than the local intent clock. Do not equate local and GitHub clocks. A sole new authenticated event excluded from the complete pre-request baseline, CLI exit0, and a sole new exact-head workflow run confirm the one accepted request. No write was repeated."
+      "timestamp_reconciliation": "The native request-event timestamp is 5.434598 seconds earlier than the local intent clock. Do not equate local and GitHub clocks. A sole new authenticated event excluded from the complete pre-request baseline, CLI exit0, and a sole new exact-head workflow run confirm the one accepted request. No write was repeated.",
+      "review_id": 5413989631,
+      "result_at": "2026-10-05T11:45:09Z",
+      "finding_ids": [
+        4183598019
+      ],
+      "findings_clean": false,
+      "service": {
+        "status": "completed",
+        "conclusion": "cancelled",
+        "run_id": 37303115319,
+        "check_id": 111740331393,
+        "summary_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-coherent-reverse-20261005\\round7-copilot-attempt1\\summary.json",
+        "summary_sha256": "5ac8c3420acd67b597f0317c794ace2c7124011e7d6ad654ad26706bf6dba1dc",
+        "log_sha256": "442b091837e54723751db3d20d81a8884bdbc295dfb189ae8553dc53caa3df8a",
+        "cause": "Authenticated20-minute maximum. All11 hook Passed lines printed, last at11:48:27.258Z, but validation step cancelled at11:48:27.465Z and has no successful native completion. Final immutable guard succeeded; Processing Request skipped. Separate Lite review has one disproved finding; neither whole service nor review is relabelled clean/successful."
+      }
     },
     "codex": {
       "status": "clean",
@@ -2946,14 +2962,14 @@
       "reused_from": "round5 on identical head/base/body; no source change or repeated suite"
     },
     "started_at": "2026-10-05T11:27:56Z",
-    "latest_snapshot": "round7-progress-1135.json",
-    "last_native_observation_at": "2026-10-05T11:35:59.591639+00:00",
+    "latest_snapshot": "round7-progress-114543.json",
+    "last_native_observation_at": "2026-10-05T11:45:46.385256+00:00",
     "planning_publication": {
-      "head": "46cedbc76b1063206c215038947ee56b6eb2881c",
-      "parent": "e5dd52d52f321f0c652c6aa74dab3cf8c6376fc3",
-      "tree": "0139105ea7aacce38d040daba48580ddd2746afd",
+      "head": "0e3018b2e8df04082e106111b15029367b27fb14",
+      "parent": "46cedbc76b1063206c215038947ee56b6eb2881c",
+      "tree": "03ec171f88546edeb2434949e13abacf99a4c86a",
       "files": [
-        "docs/planning/action-items-2026-10-02/results/A02/PS232-round6-duplicate-findings.md",
+        "docs/planning/action-items-2026-10-02/results/A02/ps232-round6-disposition-quality.md",
         "docs/planning/action-items-2026-10-02/results/A02/coherent-reverse-candidate.json",
         "docs/planning/action-items-2026-10-02/results/A02/RESULT.md",
         "docs/planning/action-items-2026-10-02/results/A03/RESULT.md",
@@ -2963,9 +2979,9 @@
         "docs/planning/action-items-2026-10-02/STATUS.md"
       ],
       "status": "published",
-      "commit_log_sha256": "977b2eb189f92eadf543a33437e69db9d767c43b1d83d44975c3aadee104326d",
+      "commit_log_sha256": "63fd5f0cf55463ec5dcb5bffc3a9b93ecdc60d5777c2659ff93c34cfd8f6f171",
       "push_exit": 0,
-      "published_at": "2026-10-05T11:31:37.622551+00:00"
+      "published_at": "2026-10-05T11:40:39.702581+00:00"
     },
     "quality_evidence_delta": {
       "result": "no_material_issue_final_gates_pending",
@@ -2976,6 +2992,113 @@
       "evidence_sha256": "c2daa4648fbebeedeacd2390f66ab02ccf68ede5226f89a3e8b6fb9bb821d2df",
       "root_verification": "Complete report read; all25 cited immutable source/installed/evidence bindings rehashed. Actual round6 ten-hook cancellation distinguished from round5 eleven-hook completion. No final PR PASS.",
       "remaining": "Current round7 reviewer/service terminal evidence and fresh native gate; new round7 Codex clean result awaits final reconciliation."
+    },
+    "disposition": {
+      "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+      "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+      "body_sha256": "7221c071ff008d322c0f066b17d43b9fc2f5f44eeb98295f3a74643404015e6c",
+      "thread": "PRRT_kwDOQkjdhM6pBEQO",
+      "parent_id": 4183598019,
+      "reply_id": 4183672861,
+      "decision": "R13 repeats R5/R8/R10/R12 N100; separate review-usability assessment retains table N84.",
+      "preimage": {
+        "id": "PRRT_kwDOQkjdhM6pBEQO",
+        "isResolved": false,
+        "pullRequest": {
+          "headRefOid": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+          "baseRefOid": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+          "body": "Apply the shared fixes accepted in [TerraformStyleGuide PR #66](https://github.com/franklesniak/TerraformStyleGuide/pull/66) to the PowerShell repository. This brings the instruction validator, local lint tools, setup workflow and their tests onto the reviewed common implementation.\n\n- Read older published instruction documents with the historical-parent bound while keeping the current document limits. Preserve metadata placement rules, real Git history checks, setup failure handling and required package validation.\n- Check the actual lint child and package manifest before execution. Preserve bounded execution, native exit statuses, direct CLI and inert import behavior, JSONC diagnostics and one configuration scan per invocation.\n- Add the shared local-validation and Markdown suites to the instruction workflow. Retain the PowerShell P1 fixture, repository identity, artifact job and all existing semantic blank-line tests. Apply the approved runtime-authority wording and finalize modified metadata from the published PowerShell baseline.\n\nThe implementation includes the selected shared-code repairs: remove the unused classifier import, use a repository-neutral local-validation fixture prefix, and return bare four-part Version values in PowerShell comment help. These repairs preserve classification and cleanup behavior. The help-value repair changes comments only and preserves private-helper notices and test assertions.\n\nThe complete help-value check found 49 trailing periods across the validator and SelfTest. All 49 full values failed direct `System.Version` conversion; their bare values passed. No existing runtime consumer failure was demonstrated. [R3](https://github.com/franklesniak/PSStyleGuide/blob/aca8312cc597c0355ae22086654db27b73598916/docs/planning/action-items-2026-10-02/results/A21/PS232-R3-help-version-format.md) compares seven options with compatibility and help clarity weighted highest; A97.2 selects correction of all 49 with truthful date/version arithmetic. It adds no new linter or parser. [R1](https://github.com/franklesniak/PSStyleGuide/blob/aca8312cc597c0355ae22086654db27b73598916/docs/planning/action-items-2026-10-02/results/A21/PS232-R1-unused-import.md) and [R2](https://github.com/franklesniak/PSStyleGuide/blob/aca8312cc597c0355ae22086654db27b73598916/docs/planning/action-items-2026-10-02/results/A07/PS232-R2-shared-fixture-prefix.md) retain their separate selected decisions. These planning links support the PR diff and this decision summary.\n\nThe workflow README now lists all operational tools and helpers, states which test files are excluded, and describes the five added tools' actual callers and restrictions. The lint wrapper separately reports an invalid `root package.json` `engines.node` declaration and a valid declared-versus-running version mismatch. All admission checks and child-execution limits remain.\n\nReview dispositions:\n\n- R6 O97.4 completes the operational catalog instead of merely labeling an incomplete selection. Existing entries and detailed instructions remain. The expanded table renders as 19 rows including its header, each with three cells. Its excluded test files have explicit directory navigation. [Decision](https://github.com/franklesniak/PSStyleGuide/blob/c6bc449fc851521a18eec560bedaf16e86cc5767/docs/planning/action-items-2026-10-02/results/A07/PS232-R6-script-inventory.md).\n- R7 S98 separates missing/malformed exact declarations from valid runtime mismatches. The first message identifies the file, field and exact-version format without echoing arbitrary invalid values. The existing required/observed mismatch message, native filesystem/JSON failures, rejection and execution behavior remain. [Decision](https://github.com/franklesniak/PSStyleGuide/blob/c6bc449fc851521a18eec560bedaf16e86cc5767/docs/planning/action-items-2026-10-02/results/A07/PS232-R7-node-diagnostic.md).\n- R8 repeats R5's disproved allegation that the original rows begin with two pipes. Both reports concern f77a58d; all original source rows had one leading pipe and three cells. R6 adds coverage, not a delimiter repair. [R5 no-change evidence](https://github.com/franklesniak/PSStyleGuide/blob/f9d5555cd0cbee5a78572997c2d020012465bd9a/docs/planning/action-items-2026-10-02/results/A02/PS232-R5-script-table.md).\n- R9 retains the already selected native-first inline entry guards. The earlier H-inline98 versus H-shared96 decision explicitly weighed shared maintenance against standalone accepted-classifier/pre-install dependency acquisition and verification. The same five guards remain identical; no new consumer or drift defect was demonstrated. [Current applicability](https://github.com/franklesniak/PSStyleGuide/blob/c6bc449fc851521a18eec560bedaf16e86cc5767/docs/planning/action-items-2026-10-02/results/A07/PS232-R9-entry-helper.md).\n\nR4 N100 remains a no-change disposition: locked jsonc-parser3.3.1 declares and supplies all five visitor error arguments; actual probes and retained tests prove finite locations and error counts. [Evidence](https://github.com/franklesniak/PSStyleGuide/blob/f9d5555cd0cbee5a78572997c2d020012465bd9a/docs/planning/action-items-2026-10-02/results/A07/PS232-R4-jsonc-callback.md). The decision summaries here and the PR diff are the review record; planning links provide supporting evidence.\n\nValidation on repaired commit `86f35f47cfc744780c4c419912fcdae06fdd6f83`:\n\n- Retained unchanged-source evidence, PowerShell 7.6.5 on Windows: complete pre/post parsing reports zero errors; all non-comment tokens match; all 49 actual help values convert successfully. Whole-file PSScriptAnalyzer 1.24.0 reports zero warnings or errors.\n- Windows Node24.18.1: all11 existing named manifest-boundary controls pass with zero skips; nine manifest cases through the actual API and exact-byte copied CLI (18 calls) prove rejection before child execution, unchanged exit statuses and actionable diagnostics. Focused README lint, complete operational coverage, relative-link checks and three-column rendering pass.\n- Staged-input validation and one full Linux `python -m pre_commit run --all-files` pass all 11 hooks with zero skips. Product source, index, configuration, dependency and shared-ref guards are unchanged. Linux runtime: PowerShell 7.6.3, Node 24.18.1/npm 11.16.0, Python 3.12.3.\n- Normal commit hooks pass. Actual accepted-base `f168f83` classification returns the expected `maintenance_required` route under existing scoped authority. `FinalizeMetadataNow` at genuine UTC October 5, `MetadataClassificationOnly`, and candidate `ProposedPolicy` checks pass for this commit.\n- A fresh ordinary local two-root dependency audit is CLEAN with no findings or exceptions.\n- [Independent bounded source review](https://github.com/franklesniak/PSStyleGuide/blob/c6bc449fc851521a18eec560bedaf16e86cc5767/docs/planning/action-items-2026-10-02/results/A02/ps232-round5-repair-quality.md) passes; final PR quality remains a separate gate. Earlier Linux43/Windows17 focused JavaScript results retain their unchanged-source scope, with six Windows skips explicitly limited to Linux-only cases.\n\nThese local results apply to the committed repair. New-head hosted checks and remote reviews are pending; older-head results do not accept this input.\n\nRound4 on prior f77a58d is terminal/nonclean. Codex raised R6; the valid Copilot Lite result raised R7-R9. The separate Copilot run reached its20-minute cap after complete repository validation and final input verification succeeded; request processing was cancelled. That service run is not a successful agentic review. Current-input remote reviews and independent final quality remain separate gates.\n\nThis is return transfer2. After PS acceptance, refresh Terraform's accepted main and the six-path compare-back: 54 differing Version notes, classifier cleanup, shared test prefix, README coverage and the lint diagnostic. Preserve actual publication/date rules and exact language-specific exceptions. Final paired convergence and remaining issue work are not complete.\n\nGenerated with Codex\n"
+        },
+        "comments": {
+          "pageInfo": {
+            "hasNextPage": false
+          },
+          "nodes": [
+            {
+              "databaseId": 4183598019
+            },
+            {
+              "databaseId": 4183672861
+            }
+          ]
+        }
+      },
+      "status": "resolved_confirmed",
+      "intent_at": "2026-10-05T11:54:28.980758+00:00",
+      "confirmed_at": "2026-10-05T11:54:30.159057+00:00"
     }
+  },
+  "round8": {
+    "head": "86f35f47cfc744780c4c419912fcdae06fdd6f83",
+    "base": "f168f83b89f64b6bca9d520ddec4b58969060fb6",
+    "body_sha256": "7221c071ff008d322c0f066b17d43b9fc2f5f44eeb98295f3a74643404015e6c",
+    "baseline": "round8-pre-request.json",
+    "request_intent_at": "2026-10-05T11:57:25.285678+00:00",
+    "reason": "Continue required paired review after round7 duplicate R13 were verified, replied and resolved. No source/body change. Round6 remains a valid Lite review with findings; its separate service cancellation is not relabelled a pass. This request is not an effort-only retry or service-failure replacement.",
+    "request_set_terminal": false,
+    "clean": false,
+    "copilot": {
+      "status": "pending",
+      "preferred_effort": "Balanced",
+      "selected_effort": null,
+      "observed_effort": null,
+      "transport": "gh pr edit --add-reviewer @copilot",
+      "ui_fallback_reason": "Fresh Edge3 PR232 tab75572477 is signed out (Sign in and Sign in to comment visible), with no authenticated request control. The Balanced effort menu alone cannot submit a request. No UI request was sent.",
+      "command_exit": 0,
+      "request_event_id": 32504996851,
+      "request_at": "2026-10-05T11:57:20Z",
+      "actor_id": 11204406,
+      "reviewer_id": 175728472,
+      "snapshot": "round8-copilot-request-confirmation.json"
+    },
+    "codex": {
+      "status": "pending",
+      "baseline": "round8-pre-request.json",
+      "trigger_intent_after_snapshot": "round8-copilot-request-confirmation.json",
+      "trigger_intent_at": "2026-10-05T11:57:47.419267+00:00",
+      "trigger_body": "@codex review",
+      "trigger_comment_id": 5993954328,
+      "request_at": "2026-10-05T11:57:41Z",
+      "actor_id": 11204406,
+      "snapshot": "round8-paired-request-confirmation.json"
+    },
+    "hosted_validation": {
+      "status": "passed",
+      "terminal_success_ids": [
+        37296273633,
+        37296254033,
+        37296253918,
+        37296253935,
+        37296253922,
+        37296253919,
+        37296249298,
+        37296246381,
+        37296246402,
+        37296246413,
+        37296246433,
+        37296246392
+      ],
+      "pending_run_ids": [],
+      "collected_evidence": "round5-hosted-86f35f4/round5-progress-1048-collection.json",
+      "accepted_run_ids": [
+        37296273633,
+        37296254033,
+        37296253918,
+        37296253935,
+        37296253922,
+        37296253919,
+        37296249298,
+        37296246381,
+        37296246402,
+        37296246413,
+        37296246433,
+        37296246392
+      ],
+      "evidence_readback": "Both proposed instruction jobs:507pass/0fail/0skip and mutation SelfTest PASS. Both setup jobs:all11hooks/0skips and final immutable-input guard PASS. All required producer logs collected on actual86f35f4.",
+      "reused_from": "round5 on identical head/base/body; no source change or repeated suite"
+    },
+    "started_at": "2026-10-05T11:57:20Z",
+    "latest_snapshot": "round8-paired-request-confirmation.json",
+    "last_native_observation_at": "2026-10-05T11:58:31.560008+00:00"
   }
 }
