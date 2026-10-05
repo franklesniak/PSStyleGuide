@@ -1,5 +1,5 @@
 {
-  "status": "candidate_aggregate_running",
+  "status": "round1_reviews_and_ci_pending",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -68,9 +68,9 @@
       "cap": 12
     }
   },
-  "rounds_used": 0,
-  "first_request_at": null,
-  "deadline": null,
+  "rounds_used": 1,
+  "first_request_at": "2026-10-05T23:47:31+00:00",
+  "deadline": "2026-10-13T23:47:31+00:00",
   "source_review_history": {
     "pr": 234,
     "rounds_used": 3,
@@ -83,7 +83,7 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits.",
-  "next_action": "Read aggregate progress/results without changing any TF shared refs/config/index/source/dependencies. Accept only after final host source guard. Read independent quality result; on success prepare normal commit/endpoints/audit/body/publication and actual reviews/hosted proof. No PR request clock has begun.",
+  "next_action": "Collect pending Copilot and ordinary CI; finish independent final binding; then recheck normal merge gates.",
   "checkout_exit": 0,
   "candidate_tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
   "implementation": {
@@ -96,30 +96,606 @@
     "readiness": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-candidate-readiness.json"
   },
   "aggregate": {
-    "status": "running",
+    "status": "passed",
     "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\aggregate-manifest-v1.json",
     "manifest_sha256": "1cf9c36a40f2fc3d5bf7de7316511eb736c322ab089f12c14bb75a156624dad4",
     "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation\\runs\\a06-tf-peer-20261005-v1",
     "session_id": 44300,
-    "requested_at": "2026-10-05T23:30:00.831168+00:00"
+    "requested_at": "2026-10-05T23:30:00.831168+00:00",
+    "node_counts": {
+      "tests": 567,
+      "pass": 567,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
+    "node_log_sha256": "d4dc79f7a7c0357839729fb88d0391dd234827fb0cbd1e98a81dfc41e198c8b8",
+    "node_finished_at": "2026-10-05T23:32:58.876316+00:00",
+    "latest_commands": [
+      {
+        "name": "staged-preflight",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-RequireStagedInputMatch"
+        ],
+        "started_at": "2026-10-05T23:29:10.184509+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 79,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:19.584283+00:00",
+        "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+      },
+      {
+        "name": "generator-linux-current-1",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-StyleGuideGenerator.ps1",
+          "-ExpectedHost",
+          "Current"
+        ],
+        "started_at": "2026-10-05T23:29:19.772994+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 676,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:30.279571+00:00",
+        "log_sha256": "12f94e9fe88a05c35615aea8c6762c0fe0beca391f691b366ade6452ac74d02b"
+      },
+      {
+        "name": "generator-linux-current-2",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-StyleGuideGenerator.ps1",
+          "-ExpectedHost",
+          "Current"
+        ],
+        "started_at": "2026-10-05T23:29:30.498878+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 1213,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:40.200659+00:00",
+        "log_sha256": "12f94e9fe88a05c35615aea8c6762c0fe0beca391f691b366ade6452ac74d02b"
+      },
+      {
+        "name": "actual-tf-generator-1",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Generate-StyleGuideArtifacts.ps1"
+        ],
+        "started_at": "2026-10-05T23:29:40.411551+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 1751,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:41.241662+00:00",
+        "log_sha256": "2415097181beccc8be60de14c50b35f63708b4e897f665ed44e47d9379b56982"
+      },
+      {
+        "name": "actual-tf-generator-2",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Generate-StyleGuideArtifacts.ps1"
+        ],
+        "started_at": "2026-10-05T23:29:41.424255+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 1804,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:42.251316+00:00",
+        "log_sha256": "2415097181beccc8be60de14c50b35f63708b4e897f665ed44e47d9379b56982"
+      },
+      {
+        "name": "tf-semantic",
+        "command": [
+          "node",
+          ".github/workflows/Test-StateRecoveryExamples.mjs"
+        ],
+        "started_at": "2026-10-05T23:29:42.435164+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 1857,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:54.789481+00:00",
+        "log_sha256": "81ca4e911d0cb8784687f16af01ffad57b9cde869a2970d16af40dba96c1c8fe"
+      },
+      {
+        "name": "full-node",
+        "command": [
+          "node",
+          "--test",
+          ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+          ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          ".github/workflows/Test-CiHelpers.test.mjs",
+          ".github/workflows/NpmTools.test.mjs",
+          ".github/workflows/Check-NpmAudit.test.mjs",
+          ".github/workflows/Test-LocalValidation.test.mjs",
+          ".github/workflows/lint-markdown.test.mjs"
+        ],
+        "started_at": "2026-10-05T23:29:55.008210+00:00",
+        "timeout_seconds": 3600,
+        "state": "passed",
+        "pid": 10801,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:32:58.876316+00:00",
+        "log_sha256": "d4dc79f7a7c0357839729fb88d0391dd234827fb0cbd1e98a81dfc41e198c8b8"
+      },
+      {
+        "name": "aggregate",
+        "command": [
+          "/opt/psstyleguide-runtime/venv/bin/python",
+          "-m",
+          "pre_commit",
+          "run",
+          "--all-files"
+        ],
+        "started_at": "2026-10-05T23:32:59.092821+00:00",
+        "timeout_seconds": 14400,
+        "state": "passed",
+        "pid": 31841,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:43:37.599307+00:00",
+        "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+        "passed_hooks": 11,
+        "skipped_hooks": 0
+      }
+    ],
+    "result_sha256": "a081f6d0f31e5c092f052bba9baa21b697346413eb6f8493335c0c22665c1060",
+    "status_sha256": "d72b8e624abcf0f10f743b67b8974750a7d6417a55f32b139c2e871710f0cbe5",
+    "passed_hooks": 11,
+    "skipped_hooks": 0,
+    "source_after_equal": true,
+    "commands": [
+      {
+        "name": "staged-preflight",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-RequireStagedInputMatch"
+        ],
+        "started_at": "2026-10-05T23:29:10.184509+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 79,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:19.584283+00:00",
+        "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+      },
+      {
+        "name": "generator-linux-current-1",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-StyleGuideGenerator.ps1",
+          "-ExpectedHost",
+          "Current"
+        ],
+        "started_at": "2026-10-05T23:29:19.772994+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 676,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:30.279571+00:00",
+        "log_sha256": "12f94e9fe88a05c35615aea8c6762c0fe0beca391f691b366ade6452ac74d02b"
+      },
+      {
+        "name": "generator-linux-current-2",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-StyleGuideGenerator.ps1",
+          "-ExpectedHost",
+          "Current"
+        ],
+        "started_at": "2026-10-05T23:29:30.498878+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 1213,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:40.200659+00:00",
+        "log_sha256": "12f94e9fe88a05c35615aea8c6762c0fe0beca391f691b366ade6452ac74d02b"
+      },
+      {
+        "name": "actual-tf-generator-1",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Generate-StyleGuideArtifacts.ps1"
+        ],
+        "started_at": "2026-10-05T23:29:40.411551+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 1751,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:41.241662+00:00",
+        "log_sha256": "2415097181beccc8be60de14c50b35f63708b4e897f665ed44e47d9379b56982"
+      },
+      {
+        "name": "actual-tf-generator-2",
+        "command": [
+          "pwsh",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Generate-StyleGuideArtifacts.ps1"
+        ],
+        "started_at": "2026-10-05T23:29:41.424255+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 1804,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:42.251316+00:00",
+        "log_sha256": "2415097181beccc8be60de14c50b35f63708b4e897f665ed44e47d9379b56982"
+      },
+      {
+        "name": "tf-semantic",
+        "command": [
+          "node",
+          ".github/workflows/Test-StateRecoveryExamples.mjs"
+        ],
+        "started_at": "2026-10-05T23:29:42.435164+00:00",
+        "timeout_seconds": 600,
+        "state": "passed",
+        "pid": 1857,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:29:54.789481+00:00",
+        "log_sha256": "81ca4e911d0cb8784687f16af01ffad57b9cde869a2970d16af40dba96c1c8fe"
+      },
+      {
+        "name": "full-node",
+        "command": [
+          "node",
+          "--test",
+          ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+          ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+          ".github/workflows/Test-CiHelpers.test.mjs",
+          ".github/workflows/NpmTools.test.mjs",
+          ".github/workflows/Check-NpmAudit.test.mjs",
+          ".github/workflows/Test-LocalValidation.test.mjs",
+          ".github/workflows/lint-markdown.test.mjs"
+        ],
+        "started_at": "2026-10-05T23:29:55.008210+00:00",
+        "timeout_seconds": 3600,
+        "state": "passed",
+        "pid": 10801,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:32:58.876316+00:00",
+        "log_sha256": "d4dc79f7a7c0357839729fb88d0391dd234827fb0cbd1e98a81dfc41e198c8b8"
+      },
+      {
+        "name": "aggregate",
+        "command": [
+          "/opt/psstyleguide-runtime/venv/bin/python",
+          "-m",
+          "pre_commit",
+          "run",
+          "--all-files"
+        ],
+        "started_at": "2026-10-05T23:32:59.092821+00:00",
+        "timeout_seconds": 14400,
+        "state": "passed",
+        "pid": 31841,
+        "exit": 0,
+        "finished_at": "2026-10-05T23:43:37.599307+00:00",
+        "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+        "passed_hooks": 11,
+        "skipped_hooks": 0
+      }
+    ],
+    "finished_at": "2026-10-05T23:43:54.871451+00:00",
+    "live_observation_history": [
+      {
+        "observed_at": "2026-10-05T23:39:18.093639+00:00",
+        "session_id": 44300,
+        "container_id": "6dd439e875b7bac757f409bbaeeb2b33978a89c1304490e0feabb37ba958c528",
+        "running": true,
+        "manifest_sha256": "1cf9c36a40f2fc3d5bf7de7316511eb736c322ab089f12c14bb75a156624dad4",
+        "stage": "Final instruction-contract/mutation hook; first10hooks passed; host source guard remains pending."
+      }
+    ],
+    "session_state": "completed_exit_0"
   },
-  "local_operations": "Root aggregate session44300 active; TF refs/config/index/source/dependencies frozen. Product writer complete/idle. One read-only independent quality worker active.",
-  "pending_native_operations": [],
+  "local_operations": "Local aggregate, normal commit, four committed endpoint modes and current dependency audit passed. No local process or source freeze remains. Candidate quality conditional pass; final native binding pending.",
+  "pending_native_operations": [
+    {
+      "kind": "Copilot review",
+      "run": 37390664560,
+      "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2"
+    },
+    {
+      "kind": "ordinary CI",
+      "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2"
+    }
+  ],
   "final_quality": {
-    "status": "in_progress",
+    "status": "final_binding_running",
     "worker": "/root/ps234_final_quality",
     "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality",
     "candidate_tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
-    "limits": "Candidate review first; final validation, commit/body/native binding and hosted platform/artifact proof remain separate gates."
+    "limits": "Candidate review first; final validation, commit/body/native binding and hosted platform/artifact proof remain separate gates.",
+    "report_sha256": "b5a1f68e77c1080f0a0ce5d0bd07198dd704d42ea525cf433d0e8760768ade72",
+    "evidence_sha256": "95fd47ebbeb5a1714e85f668163edb2d27a655205486331958efb944f267eee6",
+    "root_read": "Complete report read; source/candidate identities and no-findings/limits checked. Actual final commit/body/native/hosted binding remains."
   },
   "accepted_base_policy": {
     "status": "accepted_base_ready",
     "fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
     "record": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy.json",
-    "sha256": "c70df33c6bfd507a173ae3da34e4aa612385280985e04a1028ee743fae88fd59"
+    "sha256": "6d9c09cf06888c739571e1d0074febd809f1e56b0fa1efba77bfd7932b72846e"
   },
   "root_readiness": {
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-candidate-readiness.json",
     "sha256": "b364b7ebcbd57484ad386336e53e7ba75576889a18ffedd31bc0547cc4e17d96"
-  }
+  },
+  "planning_checkpoint": "68d335f840f30aaab0faf6c15584827fd37e87ec",
+  "commit": {
+    "status": "committed",
+    "expected_parent": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "expected_tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
+    "requested_at": "2026-10-05T23:44:35.373562+00:00",
+    "exit": 0,
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\normal-product-commit.log",
+    "log_sha256": "3995696f0497d7017f9da2e3d6c27ebb7d44a27b1575eace5cb06d52d537dd8d",
+    "observed_head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "parent": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "tree": "ced4bb594a121b6c1ead983242ce2967032edd96",
+    "completed_at": "2026-10-05T23:44:42.816313+00:00"
+  },
+  "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+  "actual_endpoints": {
+    "status": "passed",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "policy_fixture": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+    "results": [
+      {
+        "mode": "AcceptedMaintenance",
+        "command": [
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy\\.github\\workflows\\Classify-InstructionMaintenance.mjs",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+          "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+          "6c0c987799425b60c0e7b76650aa5ec7946811e2"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+        "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "started_at": "2026-10-05T23:44:58.673896+00:00",
+        "finished_at": "2026-10-05T23:44:58.994235+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\AcceptedMaintenance-6c0c987.log",
+        "log_sha256": "b129351f9cbbe1408b79e5c1c863a647ec03f80ebead44c6abd207e553a050a0"
+      },
+      {
+        "mode": "FinalizeMetadataNow",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+          "-PublishedBaselineRevision",
+          "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+          "-FinalizeMetadataNow"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+        "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "started_at": "2026-10-05T23:44:59.733628+00:00",
+        "finished_at": "2026-10-05T23:45:23.996453+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\FinalizeMetadataNow-6c0c987.log",
+        "log_sha256": "ab67b12f7f220877d7e679e492d1346a8d4aedb703e69c08473958570048f7b6"
+      },
+      {
+        "mode": "MetadataClassificationOnly",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+          "-PublishedBaselineRevision",
+          "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+          "-MetadataClassificationOnly"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\accepted-base-policy",
+        "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "started_at": "2026-10-05T23:45:24.826622+00:00",
+        "finished_at": "2026-10-05T23:45:26.531892+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\MetadataClassificationOnly-6c0c987.log",
+        "log_sha256": "6e6a45928e02d4845c88acdca8773086d8d19a600ecc26b4e442a5dc8538d2c3"
+      },
+      {
+        "mode": "ProposedPolicy",
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          ".github/workflows/Test-AgentInstructions.ps1",
+          "-InputRevision",
+          "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+          "-PublishedBaselineRevision",
+          "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+          "-ProposedPolicy"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+        "started_at": "2026-10-05T23:45:27.272562+00:00",
+        "finished_at": "2026-10-05T23:45:51.052135+00:00",
+        "exit": 0,
+        "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\ProposedPolicy-6c0c987.log",
+        "log_sha256": "4a4f571a0662eaeedbbf754e92a27328a8e8b1f7b54b4eb3772bc392459609ec"
+      }
+    ],
+    "classification": {
+      "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "policy": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "classification": "maintenance_required",
+      "maintenancePaths": [
+        ".github/workflows/Classify-InstructionMaintenance.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-ExactGitPathSet.ps1",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/build.yml",
+        ".github/workflows/workflow-policy-cases.json"
+      ]
+    }
+  },
+  "current_audit": {
+    "exit": 0,
+    "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "authority": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "mode": "ordinary local no-argument two-root audit",
+    "started_at": "2026-10-05T23:45:52.169318+00:00",
+    "finished_at": "2026-10-05T23:46:04.453233+00:00",
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\current-audit-6c0c987.log",
+    "sha256": "7dcb39c33f612027e40ccc0687a8268076259faa2b07d3c2946a759366a988a9"
+  },
+  "body_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\pr-body.md",
+  "body_sha256": "97304cd338689a328362ff50d4683bf93b4c677998045eaf532dead3ec957cab",
+  "title": "Converge generator and artifact platform proof with PS234",
+  "publication": {
+    "status": "pushed",
+    "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "branch": "codex/a06-generator-convergence",
+    "started_at": "2026-10-05T23:46:37.909369+00:00",
+    "remote_branch_preimage": "absent",
+    "exit": 0,
+    "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\topic-push.log",
+    "log_sha256": "6ac693ff1ba8bf93e5024bb188eb560392d76cf7bde5d4be289a53091d25a950",
+    "actual_head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "verified_at": "2026-10-05T23:46:40.494098+00:00"
+  },
+  "pr_creation": {
+    "status": "confirmed",
+    "requested_at": "2026-10-05T23:47:03.194060+00:00",
+    "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "body_sha256": "97304cd338689a328362ff50d4683bf93b4c677998045eaf532dead3ec957cab",
+    "title": "Converge generator and artifact platform proof with PS234",
+    "existing_prs": [],
+    "transport": "GitHub connector",
+    "number": 68,
+    "url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68",
+    "created_at": "2026-10-05T23:47:31Z",
+    "verified_at": "2026-10-05T23:47:20.642915+00:00"
+  },
+  "pr": 68,
+  "pr_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68",
+  "review_rounds": [
+    {
+      "round": 1,
+      "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+      "body_sha256": "97304cd338689a328362ff50d4683bf93b4c677998045eaf532dead3ec957cab",
+      "started_at": "2026-10-05T23:47:31+00:00",
+      "deadline": "2026-10-13T23:47:31+00:00",
+      "first_request_basis": "Existing authenticated automatic Codex PR-open trigger. Use native PR creation timestamp conservatively; do not start a later clock at Copilot click.",
+      "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round1-baseline.json",
+      "baseline_sha256": "f4e02890bee80cd8d4714fcd43ebf8f2344484ad1589ab1ba3b859186ee9a0b7",
+      "copilot": {
+        "status": "confirmed_pending",
+        "requested_at": "2026-10-05T23:48:46.151528+00:00",
+        "effort_selected": "Balanced",
+        "observed_effort": null,
+        "channel_attempt": 1,
+        "request_event_id": 32554473645,
+        "native_requested_at": "2026-10-05T23:49:15Z",
+        "channel": "supported GitHub Reviewers UI",
+        "confirmation": "round1-after-copilot.json",
+        "workflow_run": 37390664560
+      },
+      "codex": {
+        "status": "completed_clean",
+        "channel": "automatic PR opened",
+        "manual_trigger_issued": false,
+        "summary_comment": 6005735493,
+        "author_id": 199175422,
+        "native_created_at": "2026-10-05T23:47:39Z",
+        "summary_updated_at": "2026-10-05T23:47:39Z",
+        "native_started_at": "2026-10-05T23:47:37.992550Z",
+        "baseline": "round1-baseline.json",
+        "body_sha256": "e0b6f438c1d7c69c7b4e4357f7fbbfc1da24bc4a21f0718df6502e923053b07e",
+        "causal_binding": "New PR68 owned creation, exact current short head, authenticated bot summary identifies PR-open trigger. Already issued; no duplicate manual trigger.",
+        "terminal_snapshot": "round1-progress-1.json",
+        "native_completed_at": "2026-10-05T23:50:33.486526Z",
+        "positive_reaction": 547144240,
+        "reaction_evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round1-codex-reactions.json",
+        "terminal_summary_body_sha256": "565132c692903a341fe89a1125ead8089544ff5ee893db3dd29329b233df8490",
+        "attribution": "Authenticated automatic PR-open summary changed from Running to Completed on exact head; authenticated post-completion +1 and full empty finding inventory. No duplicate manual trigger."
+      },
+      "findings": []
+    }
+  ],
+  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round1-progress-2.json",
+  "hosted_platform_progress": {
+    "status": "passed",
+    "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+    "proof": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\platform-proof.json",
+    "sha256": "2e395d039c2b99faa5956bcec0fc144e1adcfd9e695d818fec4ee5732182b89e",
+    "assertions_per_pass": 156,
+    "passes_per_platform": 2,
+    "platform_count": 3,
+    "events": [
+      "push",
+      "pull_request"
+    ],
+    "tree_equal": true
+  },
+  "next_poll_not_before": "2026-10-05T23:58:26.824234+00:00"
 }
