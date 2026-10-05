@@ -571,7 +571,17 @@ async function main(args = process.argv.slice(2)) {
 
 export { PolicyError, LIMITS, readContract, readJsonBytes, validatePackagePair, validateParserLock, foldParserTree, assertReviewedParserTree, loadYamlBindings, parseStrictYaml, validateWorkflowObject, readInput, main };
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// Prefer loader identity; retain direct-call detection on runtimes without this property.
+const isMain = typeof import.meta.main === 'boolean' ? import.meta.main : (() => {
+  if (!process.argv[1]) return false;
+  try {
+    return fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+})();
+
+if (isMain) {
   try { process.stdout.write(JSON.stringify(await main()) + '\n'); }
   catch (error) {
     process.stdout.write(JSON.stringify({ schema: process.argv.includes('--preflight') ? PREFLIGHT_SCHEMA : RESULT_SCHEMA, validatorVersion: VALIDATOR_VERSION, success: false, category: error instanceof PolicyError ? error.category : 'tool-failure' }) + '\n');

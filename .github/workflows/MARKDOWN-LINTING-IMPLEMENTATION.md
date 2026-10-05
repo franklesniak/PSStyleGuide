@@ -6,7 +6,7 @@
 
 - **Status:** Active
 - **Owner:** Repository Maintainers
-- **Last Updated:** 2026-10-03
+- **Last Updated:** 2026-10-05
 - **Scope:** Current outer-file and recursive nested-Markdown lint behavior. Does not define general documentation authoring rules.
 - **Related:** [Workflow script index](scripts-README.md), [Markdown workflow](markdownlint.yml), [Documentation writing style](../instructions/docs.instructions.md)
 

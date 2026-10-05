@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -103,7 +104,17 @@ export function readInstructionMaintenance(repositoryRoot, base, head) {
     changedPaths: names === '' ? [] : names.slice(0, -1).split('\0') });
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// Prefer loader identity; retain direct-call detection on runtimes without this property.
+const isMain = typeof import.meta.main === 'boolean' ? import.meta.main : (() => {
+  if (!process.argv[1]) return false;
+  try {
+    return fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+})();
+
+if (isMain) {
   try {
     if (process.argv.length !== 5) throw new Error('Usage: node Classify-InstructionMaintenance.mjs REPOSITORY BASE HEAD');
     process.stdout.write(`${JSON.stringify(readInstructionMaintenance(...process.argv.slice(2)))}\n`);

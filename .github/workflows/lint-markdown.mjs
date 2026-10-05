@@ -8,13 +8,30 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../
 export function normalizeLintStatus(status) { return status === 0 || status === 1 ? status : 2; }
 
 export async function lintMarkdownFiles(root = repoRoot, run = runBounded) {
-  const required = JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).engines?.node;
+  const canonicalRoot = fs.realpathSync(root);
+  const manifest = path.join(root, 'package.json');
+  const manifestLeaf = fs.lstatSync(manifest);
+  if (manifestLeaf.isSymbolicLink() || !manifestLeaf.isFile() || manifestLeaf.size > 1024 * 1024) {
+    throw new Error('Markdown lint requires a non-symlink regular package manifest of at most 1 MiB.');
+  }
+  const canonicalManifest = fs.realpathSync(manifest);
+  const manifestRelative = path.relative(canonicalRoot, canonicalManifest);
+  if (manifestRelative === '..' || manifestRelative.startsWith(`..${path.sep}`) || path.isAbsolute(manifestRelative)) {
+    throw new Error('Markdown lint package manifest resolves outside the repository.');
+  }
+  const required = JSON.parse(fs.readFileSync(canonicalManifest, 'utf8')).engines?.node;
   if (!/^(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)\.(?:0|[1-9]\d*)$/u.test(required ?? '') || required !== process.versions.node) {
     throw new Error(`Markdown lint requires declared Node ${required ?? 'version'}; observed ${process.versions.node}.`);
   }
   const child = path.join(root, '.github/workflows/lint-nested-markdown.js');
-  if (!fs.statSync(child).isFile()) throw new Error('Markdown lint requires the regular outer child script.');
-  const result = run(process.execPath, [child, '--outer'], { cwd: root });
+  const leaf = fs.lstatSync(child);
+  if (leaf.isSymbolicLink() || !leaf.isFile()) throw new Error('Markdown lint requires a non-symlink regular outer child script.');
+  const canonicalChild = fs.realpathSync(child);
+  const relative = path.relative(canonicalRoot, canonicalChild);
+  if (relative === '..' || relative.startsWith(`..${path.sep}`) || path.isAbsolute(relative)) {
+    throw new Error('Markdown lint outer child resolves outside the repository.');
+  }
+  const result = run(process.execPath, [canonicalChild, '--outer'], { cwd: root, timeout: 120000, maxBuffer: 2 * 1024 * 1024 });
   if (result.stdout?.length) process.stdout.write(result.stdout);
   if (result.stderr?.length) process.stderr.write(result.stderr);
   const status = normalizeLintStatus(result.status);
@@ -22,7 +39,17 @@ export async function lintMarkdownFiles(root = repoRoot, run = runBounded) {
   return status;
 }
 
-if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+// Prefer loader identity; retain direct-call detection on runtimes without this property.
+const isMain = typeof import.meta.main === 'boolean' ? import.meta.main : (() => {
+  if (!process.argv[1]) return false;
+  try {
+    return fs.realpathSync(process.argv[1]) === fs.realpathSync(fileURLToPath(import.meta.url));
+  } catch {
+    return false;
+  }
+})();
+
+if (isMain) {
   try {
     if (process.argv.length !== 2) throw new Error('Usage: node .github/workflows/lint-markdown.mjs');
     process.exitCode = await lintMarkdownFiles();

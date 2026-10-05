@@ -207,5 +207,5 @@ jobs:
                   }
               }
           }
-          & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs
+          & node --test .github/workflows/Classify-InstructionMaintenance.test.mjs .github/workflows/Validate-WorkflowPolicy.test.mjs .github/workflows/Test-CiHelpers.test.mjs .github/workflows/NpmTools.test.mjs .github/workflows/Check-NpmAudit.test.mjs .github/workflows/Test-LocalValidation.test.mjs .github/workflows/lint-markdown.test.mjs
           if ($LASTEXITCODE -ne 0) { throw 'Workflow behavior tests failed.' }

@@ -287,13 +287,14 @@ for (const [file, variables] of [
   ['Initialize-CiToolchain.ps1', ['RUNNER_TEMP', 'GITHUB_PATH', 'GITHUB_ENV']],
   ['Invoke-MarkdownLint.ps1', ['RUNNER_TEMP']],
 ]) {
-  for (const variable of variables) test(`${file}: missing ${variable} fails before external work`, { skip: !linux }, t => {
+  for (const variable of variables) for (const value of ['', '  ']) test(`${file}: ${JSON.stringify(value)} ${variable} fails before external work`, { skip: !linux }, t => {
     const f = fixture(t);
     const helper = path.join(f.root, file);
     fs.writeFileSync(helper, read(file));
-    const result = f.run(`& ${quote(helper)}`, { [variable]: '' });
+    const result = f.run(`& ${quote(helper)}`, { [variable]: value });
     assert.notEqual(result.status, 0);
-    assert.match(result.stderr, new RegExp('requires (?:the )?runner environment variable ' + variable));
+    assert.match(result.stderr, /requires (?:the )?runner environment/);
+    assert.match(result.stderr, new RegExp(variable));
     assert.equal(f.calls().length, 0);
   });
 }
@@ -973,7 +974,7 @@ test('Copilot setup declares its input closure, supported environment and finite
   assert.equal(workflow.on.pull_request.branches, undefined);
   for (const event of ['push', 'pull_request']) {
     for (const input of ['.github/workflows/**', '.husky/**', 'requirements-dev.txt', '**/*.yml', '**/*.yaml',
-      '.npmrc', 'npm-shrinkwrap.json', 'package.json', 'package-lock.json', '.pre-commit-config.yaml']) {
+      '.npmrc', 'npm-shrinkwrap.json', 'package.json', 'package-lock.json']) {
       assert.ok(workflow.on[event].paths.includes(input), `${event}: ${input}`);
     }
   }

@@ -1,13 +1,13 @@
 <!-- markdownlint-disable MD013 -->
 # Agent Instructions for OpenAI Codex CLI
 
-**Version:** 1.7.20261003.0
+**Version:** 1.7.20261005.0
 
 ## Metadata
 
 - **Status:** Active
 - **Owner:** Repository maintainer (@franklesniak)
-- **Last Updated:** 2026-10-03
+- **Last Updated:** 2026-10-05
 - **Scope:** Codex and compatible agents in PSStyleGuide. Brief shared rules and full Codex protocols; `.github/copilot-instructions.md` governs documentation authoring.
 <!-- template-sync: begin markdown-reference-only -->
 - **Related:** [Repository Copilot Instructions](.github/copilot-instructions.md), [Documentation Writing Style](.github/instructions/docs.instructions.md)
@@ -55,7 +55,7 @@ During downstream template adoption and stack selection, perform non-protected c
 - **Pre-commit and validation**
   - Require `pwsh` 7 on `PATH`: `pwsh -NoProfile -Command 'if ($PSVersionTable.PSVersion.Major -lt 7) { exit 1 }'`.
   - Follow [Python 3.12 setup](docs/dependency-maintenance.md), including the Linux virtual environment. From the repository root, install pinned tools: Windows `py -3.12 -m pip --isolated install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r requirements-dev.txt`; Linux `python3.12 -m pip --isolated install --require-hashes --only-binary=:all: --index-url https://pypi.org/simple -r requirements-dev.txt`.
-  - Use exact Node/npm from [ci-toolchain.json](.github/workflows/ci-toolchain.json). After clone or lock changes: `node .github/workflows/NpmTools.mjs install`.
+  - Use exact Node/npm from root [package.json](package.json) `engines`. After clone or lock changes: `node .github/workflows/NpmTools.mjs install`.
   - Before every commit: Windows `py -3.12 -m pre_commit run --all-files`; elsewhere `python3.12 -m pre_commit run --all-files`; verified 3.12 equivalents allowed.
   - Keep Husky staged checks: `npm --prefix .github/workflows run lint:md`, `npm --prefix .github/workflows run lint:md:nested`.
   - Run applicable `npm run lint:md`, `npm run lint:md:nested`, `npm run test:agent-instructions`. Commit auto-fixes with changes. Push only after all required validation passes.
