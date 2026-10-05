@@ -38,6 +38,21 @@ test('valid small workflow interfaces; build requires no Node installation', () 
   assert.equal(fixtures['build.yml'].jobs[contract.roles.artifactVerifier].steps.length, 4);
 });
 
+test('platform role mutations cannot supply their own policy expectations', () => {
+  for (const [mode, category] of [['admission', 'generator-admission'],
+    ['dependency', 'generator-dependencies'], ['job', 'isolation-jobs']]) {
+    const value = clone(fixtures['build.yml']);
+    const verifier = value.jobs[contract.roles.artifactVerifier];
+    if (mode === 'admission') verifier.steps[0].run = verifier.steps[0].run.replace("'generator_linux_7'", "'generator_linux_other'");
+    if (mode === 'dependency') verifier.needs[2] = 'generator_linux_other';
+    if (mode === 'job') {
+      value.jobs.generator_linux_other = value.jobs.generator_linux_7;
+      delete value.jobs.generator_linux_7;
+    }
+    assert.throws(() => validateWorkflowObject('build.yml', value, contract), error => error.category === category);
+  }
+});
+
 test('labels, comments, CRLF, whitespace and literal call quoting are harmless', () => {
   const value = clone(fixtures['markdownlint.yml']);
   value.name = 'New descriptive name';

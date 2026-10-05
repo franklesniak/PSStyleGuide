@@ -208,6 +208,56 @@ if ($args -contains '--list') {
   }
 });
 
+test('Linux build acquisition rejects Git selectors before dispatch and checks byte configuration', t => {
+  // Execute both actual Linux bodies with only fixed Git dispatch replaced.
+  // This is portable control evidence, not hosted Linux acquisition proof.
+  const jobs = parse(read('build.yml')).jobs;
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'generator-linux-acquire-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const git = path.join(root, 'git.ps1'), script = path.join(root, 'acquire.ps1');
+  fs.writeFileSync(git, `
+[IO.File]::AppendAllText($env:GENERATOR_GIT_LOG, ((@($args) | ConvertTo-Json -Compress) + "\n"))
+$global:LASTEXITCODE = 0
+if ($args -contains 'config' -and $env:GENERATOR_GIT_MODE -eq 'config-failure') { $global:LASTEXITCODE = 7 }
+if ($args -contains 'rev-parse') { $env:GITHUB_SHA }
+`);
+  const selectors = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY',
+    'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS'];
+  for (const id of ['generator_linux_7', artifactVerifier]) {
+    const source = jobs[id].steps.find(step => step.id === 'acquire').run;
+    fs.writeFileSync(script, source.replaceAll('/usr/bin/git', quote(git)));
+    for (const [index, mode] of ['', ...selectors, 'config-failure'].entries()) {
+      const workspace = path.join(root, `${id}-${index}`); fs.mkdirSync(workspace);
+      const log = path.join(root, `${id}-${index}.jsonl`);
+      const env = { ...process.env, GENERATOR_GIT_MODE: mode, GENERATOR_GIT_LOG: log,
+        GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head };
+      for (const name of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', ...selectors]) delete env[name];
+      if (selectors.includes(mode)) env[mode] = 'fixture-external-selector';
+      const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+        cwd: workspace, env, encoding: 'utf8', timeout: 30000, windowsHide: true,
+      });
+      assert.equal(result.error, undefined, `${id}:${mode}`);
+      assert.equal(result.status === 0, mode === '', `${id}:${mode}: ${result.stderr}`);
+      if (selectors.includes(mode)) {
+        assert.equal(fs.existsSync(log), false, 'Reject external selectors before the first Git call.');
+        assert.match(result.stderr, /Unexpected credentials or external Git configuration\./u);
+        continue;
+      }
+      const calls = fs.readFileSync(log, 'utf8').trim().split('\n').map(JSON.parse);
+      const configuration = calls.findIndex(args => args.includes('config'));
+      assert.deepEqual(calls[configuration], ['config', '--local', 'core.autocrlf', 'false']);
+      assert.ok(configuration > calls.findIndex(args => args.includes('init')));
+      if (mode === 'config-failure') {
+        assert.equal(calls.some(args => args.includes('fetch') || args.includes('checkout') || args.includes('remote')), false);
+        assert.match(result.stderr, /Git byte-preserving checkout configuration failed\./u);
+      } else {
+        assert.ok(configuration < calls.findIndex(args => args.includes('fetch')));
+        assert.ok(configuration < calls.findIndex(args => args.includes('checkout')));
+      }
+    }
+  }
+});
+
 test('actual workflows cover every live push and PR base with an isolated target-event policy', () => {
   const liveGuard = "github.event_name != 'push' || github.event.deleted != true";
   for (const file of ['build.yml', 'markdownlint.yml', 'agent-instructions.yml']) {

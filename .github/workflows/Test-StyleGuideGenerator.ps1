@@ -286,6 +286,23 @@ try {
             ([regex]::Matches($strFull, '## Executive Summary: Fixture')).Count -eq 1 -and
             $strFull.Contains("### Extra`n`nextra body") -and $strFull.Contains("## Version Requirements`nbody") -and
             -not $strFull.Contains('STYLE_GUIDE.md')) -Label 'marker summary standalone ordering'
+        # Presence comes from all emitted content, not only inferred insertions.
+        $strSummaryToc = '- [Executive Summary: Fixture](#executive-summary-fixture)'
+        $strBoundary = "- [Version Requirements](#version-requirements)`n## Version Requirements`n"
+        $arrSummaryCases = @(
+            @{ Prefix = 'Executive Summary: Fixture is discussed here.'; TocCount = 0; HeadingCount = 1 },
+            @{ Prefix = '## Executive Summary: Fixture'; TocCount = 0; HeadingCount = 1 },
+            @{ Prefix = '<!-- rationale-toc: ' + $strSummaryToc + ' -->'; TocCount = 1; HeadingCount = 1 },
+            @{ Prefix = '<!-- rationale-anchor: executive-summary-fixture -->'; TocCount = 0; HeadingCount = 1 },
+            @{ Prefix = "# Guide`n" + ("`n---`n" * 100); TocCount = 1; HeadingCount = 1 }
+        )
+        foreach ($hashtableCase in $arrSummaryCases) {
+            $strFull = New-FullPayload -GuideContent ($hashtableCase.Prefix + "`n" + ($strBoundary * 100)) -RationaleContent $strRationale
+            Assert-GeneratorCondition -Condition (
+                ([regex]::Matches($strFull, [regex]::Escape($strSummaryToc))).Count -eq $hashtableCase.TocCount -and
+                ([regex]::Matches($strFull, '(?m)^## Executive Summary: Fixture$')).Count -eq $hashtableCase.HeadingCount
+            ) -Label 'summary presence across repeated boundaries'
+        }
         $boolRejected = $false
         try {
             $null = New-FullPayload -GuideContent '<!-- RATIONALE: absent -->' -RationaleContent $strRationale

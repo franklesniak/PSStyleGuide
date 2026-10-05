@@ -278,9 +278,12 @@ jobs:
               $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {
               throw 'Unexpected acquisition repository.'
           }
-          if ($env:GITHUB_TOKEN -or $env:GH_TOKEN -or $env:ACTIONS_RUNTIME_TOKEN -or
-              $env:GIT_CONFIG_COUNT -or $env:GIT_CONFIG_PARAMETERS) {
-              throw 'Unexpected credentials or external Git configuration.'
+          foreach ($strName in @('GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
+              'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_DIR', 'GIT_WORK_TREE',
+              'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES')) {
+              if ([Environment]::GetEnvironmentVariable($strName)) {
+                  throw 'Unexpected credentials or external Git configuration.'
+              }
           }
           $env:GIT_CONFIG_NOSYSTEM = '1'
           $env:GIT_CONFIG_GLOBAL = '/dev/null'
@@ -293,6 +296,8 @@ jobs:
           }
           & /usr/bin/git -c core.hooksPath=/dev/null init --quiet .
           if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }
+          & /usr/bin/git config --local core.autocrlf false
+          if ($LASTEXITCODE -ne 0) { throw 'Git byte-preserving checkout configuration failed.' }
           & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'
           if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }
           for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {
@@ -379,9 +384,12 @@ jobs:
               $env:GITHUB_REPOSITORY -cne 'franklesniak/PSStyleGuide') {
               throw 'Unexpected acquisition repository.'
           }
-          if ($env:GITHUB_TOKEN -or $env:GH_TOKEN -or $env:ACTIONS_RUNTIME_TOKEN -or
-              $env:GIT_CONFIG_COUNT -or $env:GIT_CONFIG_PARAMETERS) {
-              throw 'Unexpected credentials or external Git configuration.'
+          foreach ($strName in @('GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN',
+              'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS', 'GIT_DIR', 'GIT_WORK_TREE',
+              'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY', 'GIT_ALTERNATE_OBJECT_DIRECTORIES')) {
+              if ([Environment]::GetEnvironmentVariable($strName)) {
+                  throw 'Unexpected credentials or external Git configuration.'
+              }
           }
           $env:GIT_CONFIG_NOSYSTEM = '1'
           $env:GIT_CONFIG_GLOBAL = '/dev/null'
@@ -394,6 +402,8 @@ jobs:
           }
           & /usr/bin/git -c core.hooksPath=/dev/null init --quiet .
           if ($LASTEXITCODE -ne 0) { throw 'git init failed.' }
+          & /usr/bin/git config --local core.autocrlf false
+          if ($LASTEXITCODE -ne 0) { throw 'Git byte-preserving checkout configuration failed.' }
           & /usr/bin/git remote add origin 'https://github.com/franklesniak/PSStyleGuide'
           if ($LASTEXITCODE -ne 0) { throw 'git remote add failed.' }
           for ($intAttempt = 1; $intAttempt -le 3; $intAttempt++) {

@@ -1319,6 +1319,9 @@ function New-FullPayload {
         $hashtableSection.CleanBody = @(ConvertTo-RationaleBody -Lines $hashtableSection.Body.ToArray())
     }
     $listOutputLines = New-Object 'System.Collections.Generic.List[string]'
+    $intSummaryScanIndex = 0
+    $boolSummaryTextSeen = $false
+    $boolSummaryHeadingSeen = $false
     foreach ($strLine in ($GuideContent -split '\r?\n')) {
         if ($strLine.Trim() -eq '*This section intentionally left blank.*') {
             continue
@@ -1348,18 +1351,36 @@ function New-FullPayload {
             $hashtableSections.ContainsKey($script:hashtableLanguage.SummaryAnchor)) {
             $strSummaryHeading = $script:hashtableLanguage.SummaryHeading
             $strSummaryAnchor = $script:hashtableLanguage.SummaryAnchor
-            if ($strLine -match ('^- \[' + [regex]::Escape($script:hashtableLanguage.SummaryBefore) + '\]') -and
-                @($listOutputLines | Where-Object { $_ -match [regex]::Escape($strSummaryHeading) }).Count -eq 0) {
-                $listOutputLines.Add(('- [{0}](#{1})' -f $strSummaryHeading, $strSummaryAnchor))
+            $boolSummaryTocBoundary = $strLine -match ('^- \[' + [regex]::Escape($script:hashtableLanguage.SummaryBefore) + '\]')
+            $boolSummarySectionBoundary = $strLine -match ('^## ' + [regex]::Escape($script:hashtableLanguage.SummaryBefore))
+            if ($boolSummaryTocBoundary -or $boolSummarySectionBoundary) {
+                # Include guide, marker and rationale output already emitted.
+                # Each line is inspected once, even with repeated boundaries.
+                while ($intSummaryScanIndex -lt $listOutputLines.Count) {
+                    $strObservedLine = $listOutputLines[$intSummaryScanIndex]
+                    if ($strObservedLine -match [regex]::Escape($strSummaryHeading)) {
+                        $boolSummaryTextSeen = $true
+                    }
+                    if ($strObservedLine -match ('^## ' + [regex]::Escape($strSummaryHeading))) {
+                        $boolSummaryHeadingSeen = $true
+                    }
+                    $intSummaryScanIndex++
+                }
             }
-            if ($strLine -match ('^## ' + [regex]::Escape($script:hashtableLanguage.SummaryBefore)) -and
-                @($listOutputLines | Where-Object { $_ -match ('^## ' + [regex]::Escape($strSummaryHeading)) }).Count -eq 0) {
+            if ($boolSummaryTocBoundary -and -not $boolSummaryTextSeen) {
+                $listOutputLines.Add(('- [{0}](#{1})' -f $strSummaryHeading, $strSummaryAnchor))
+                $boolSummaryTextSeen = $true
+            }
+            if ($boolSummarySectionBoundary -and -not $boolSummaryHeadingSeen) {
                 while ($listOutputLines.Count -gt 0 -and
                     $listOutputLines[$listOutputLines.Count - 1].Trim() -in @('', '---')) {
                     $listOutputLines.RemoveAt($listOutputLines.Count - 1)
                 }
+                $intSummaryScanIndex = [Math]::Min($intSummaryScanIndex, $listOutputLines.Count)
                 $listOutputLines.Add('')
                 $listOutputLines.Add('## ' + $strSummaryHeading)
+                $boolSummaryTextSeen = $true
+                $boolSummaryHeadingSeen = $true
                 $listOutputLines.Add('')
                 foreach ($strBodyLine in $hashtableSections[$strSummaryAnchor].CleanBody) {
                     $listOutputLines.Add($strBodyLine)

@@ -454,7 +454,9 @@ function helperCall(line) {
 }
 
 const generatorPlatforms = ["generator_windows_51", "generator_windows_7", "generator_linux_7"];
-const generatorAdmission = "$ErrorActionPreference = 'Stop'\n$objResults = $env:GENERATOR_RESULTS | ConvertFrom-Json -ErrorAction Stop\n$arrRequired = @('generator_windows_51', 'generator_windows_7', 'generator_linux_7')\nif (@($objResults.PSObject.Properties).Count -ne $arrRequired.Count) {\n    throw 'Generator platform results are incomplete.'\n}\nforeach ($strJob in $arrRequired) {\n    $objProperty = $objResults.PSObject.Properties[$strJob]\n    if ($null -eq $objProperty -or $objProperty.Value.result -cne 'success' -or\n        $objProperty.Value.outputs.revision -cne $env:GITHUB_SHA -or\n        $env:GITHUB_SHA -cnotmatch '^[0-9a-f]{40}$') {\n        throw 'Generator platform admission failed.'\n    }\n}\n";
+// The policy owns this finite list; workflow and test expectations stay independent.
+const generatorRequiredStatement = "$arrRequired = @(" + generatorPlatforms.map(id => "'" + id + "'").join(', ') + ')';
+const generatorAdmission = "$ErrorActionPreference = 'Stop'\n$objResults = $env:GENERATOR_RESULTS | ConvertFrom-Json -ErrorAction Stop\n" + generatorRequiredStatement + "\nif (@($objResults.PSObject.Properties).Count -ne $arrRequired.Count) {\n    throw 'Generator platform results are incomplete.'\n}\nforeach ($strJob in $arrRequired) {\n    $objProperty = $objResults.PSObject.Properties[$strJob]\n    if ($null -eq $objProperty -or $objProperty.Value.result -cne 'success' -or\n        $objProperty.Value.outputs.revision -cne $env:GITHUB_SHA -or\n        $env:GITHUB_SHA -cnotmatch '^[0-9a-f]{40}$') {\n        throw 'Generator platform admission failed.'\n    }\n}\n";
 
 function validateRunStep(step, id, expected) {
   const keys = ['id', 'shell', 'run'];
