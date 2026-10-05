@@ -1,10 +1,10 @@
 {
-  "status": "frozen_source_under_full_linux_validation",
-  "recorded_at": "2026-10-05T19:26:32.329559+00:00",
+  "status": "pr234_round1_reviews_and_hosted_validation_pending",
+  "recorded_at": "2026-10-05T20:15:38.847180+00:00",
   "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
   "base_tree": "d0025e28eaaef57f4466bc83e9154cd9e7115fb3",
   "peer": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
-  "candidate_tree": "04a0a02f490d597f209eeed41a0519b0959faac8",
+  "candidate_tree": "180fbb1eed69730c433f0a2aca164523c3c3a343",
   "branch": "codex/a06-generator-convergence",
   "changed_paths": {
     ".github/workflows/Classify-InstructionMaintenance.mjs": {
@@ -47,9 +47,9 @@
       }
     },
     ".github/workflows/Test-CiHelpers.test.mjs": {
-      "bytes": 119501,
-      "sha256": "219fcb050f574dd223595b7556e67c941ede4250178a2d9e89c5774650959623",
-      "raw_git_blob": "13004799acef426ae886158ff54c7021d0687a01",
+      "bytes": 120299,
+      "sha256": "202c109d1253db4c3f59116c507f0ee9ce1241fdb7aaff0994bf067cc1dfe1f2",
+      "raw_git_blob": "8e815f76c59aba31cd2d37f8979ed24a7ede44a5",
       "intended_mode": "100644",
       "base": {
         "mode": "100644",
@@ -314,12 +314,41 @@
     "PSScriptAnalyzer": "1.24.0"
   },
   "aggregate": {
-    "status": "running",
-    "run_id": "a06-source-20261005-v1",
-    "manifest_sha256": "8a95400243e02ef9a7e0e2594ef25509711d772b8e832feb64de46c5625b5125",
+    "status": "passed",
+    "run_id": "a06-source-20261005-v3",
+    "manifest_sha256": "a91af4c9b8e92b2bd9a7784655a0fb14ee96b89df3720dc1c883a3de7ac515d8",
     "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
     "expected_hooks": 11,
     "node_suites": 7,
+    "requested_at": "2026-10-05T19:52:37.743592+00:00",
+    "node": {
+      "name": "full-node",
+      "command": [
+        "node",
+        "--test",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/NpmTools.test.mjs",
+        ".github/workflows/Check-NpmAudit.test.mjs",
+        ".github/workflows/Test-LocalValidation.test.mjs",
+        ".github/workflows/lint-markdown.test.mjs"
+      ],
+      "started_at": "2026-10-05T19:53:00.780525+00:00",
+      "timeout_seconds": 3600,
+      "state": "passed",
+      "pid": 617,
+      "exit": 0,
+      "finished_at": "2026-10-05T19:55:57.381821+00:00",
+      "log_sha256": "a82801118ab32ec7bab7a1e1165e9ce9b89523f49f13fe2800b0ca821014b9e1"
+    },
+    "node_counts": {
+      "tests": 565,
+      "pass": 565,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0
+    },
     "staged_preflight": {
       "name": "staged-preflight",
       "command": [
@@ -331,38 +360,406 @@
         ".github/workflows/Test-AgentInstructions.ps1",
         "-RequireStagedInputMatch"
       ],
-      "started_at": "2026-10-05T19:24:46.680883+00:00",
+      "started_at": "2026-10-05T19:52:52.544292+00:00",
       "timeout_seconds": 600,
       "state": "passed",
       "pid": 79,
       "exit": 0,
-      "finished_at": "2026-10-05T19:24:54.974617+00:00",
+      "finished_at": "2026-10-05T19:53:00.586659+00:00",
       "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
-    }
+    },
+    "result_sha256": "ebc33280daee2f4e4fe81e502c3e0b878e3a84e023a452cbf04b9811fb755d45",
+    "status_sha256": "c21ccdfb8f7c817e713d1eb9bc9e2b904251bcb856d152677c34937f54dc8105",
+    "source_after_equal": true,
+    "aggregate": {
+      "name": "aggregate",
+      "command": [
+        "/opt/psstyleguide-runtime/venv/bin/python",
+        "-m",
+        "pre_commit",
+        "run",
+        "--all-files"
+      ],
+      "started_at": "2026-10-05T19:55:57.574831+00:00",
+      "timeout_seconds": 14400,
+      "state": "passed",
+      "pid": 20687,
+      "exit": 0,
+      "finished_at": "2026-10-05T20:06:42.548568+00:00",
+      "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+      "passed_hooks": 11,
+      "skipped_hooks": 0
+    },
+    "finished_at": "2026-10-05T20:06:42.751331+00:00"
   },
   "transfers": {
     "A06": "0/12",
     "A03": "2/12",
     "A21": "4/12"
   },
-  "rounds_used": 0,
-  "first_request_at": null,
-  "deadline": null,
-  "pending_native_operations": [],
+  "rounds_used": 1,
+  "first_request_at": "2026-10-05T20:12:24.969231+00:00",
+  "deadline": "2026-10-13T20:12:24.969231+00:00",
+  "pending_native_operations": [
+    {
+      "service": "Copilot",
+      "request_event": 32541792654,
+      "workflow_run": 37368361326,
+      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "effort_selected": "Balanced",
+      "observed_completed_effort": null
+    },
+    {
+      "service": "remote Codex",
+      "trigger": "PR opened",
+      "summary_comment": 6002108102,
+      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "status": "running",
+      "manual_trigger_issued": false
+    }
+  ],
   "limits": [
     "No local Windows5.1 file execution: Restricted, no bypass.",
     "No actual hosted Windows5.1/Windows7/Linux7 proof here.",
     "No native Linux/ext4 or BSD generator execution here.",
     "GNU/BSD/unknown stat probes and Windows acquisition substitutes are synthetic.",
-    "Artifact-gate PS/TF useful child oracle union is retained; Linux execution belongs to root.",
-    "No whole Node or11-hook aggregate run here.",
-    "No staged/committed endpoint checks or native settings/publication/review performed.",
-    "Issue155 remains open; D92/D93 path publication/cleanup limitations remain."
+    "Issue155 remains open; D92/D93 path publication/cleanup limitations remain.",
+    "Local final candidate passed; actual hosted platform logs, remote review results, independent final quality and normal landed acceptance are not yet accepted."
   ],
   "remaining": [
-    "Stage exact13 paths; final staged/committed endpoint validation.",
-    "Qualified11-hook Linux aggregate and full Node/CI-helper suites.",
-    "Actual focused harness twice per Windows5.1,Windows7,native-ext4 Linux7 hosted cell on same revision.",
-    "Exact-head lifecycle/review/publication and later paired integration."
-  ]
+    "Reconcile issued remote reviews without duplicate pending requests; preserve round1 and original deadline.",
+    "Collect actual same-revision hosted two-pass Windows5.1/Windows7/native-ext4 Linux7 proof.",
+    "Resolve findings, obtain fresh independent final quality, then normal merge and landed validation.",
+    "Refresh accepted peer main, increment destination counters before implementation, transfer and reverse-compare raw bytes."
+  ],
+  "candidate_history": [
+    {
+      "tree": "04a0a02f490d597f209eeed41a0519b0959faac8",
+      "TestCi": {
+        "bytes": 119501,
+        "sha256": "219fcb050f574dd223595b7556e67c941ede4250178a2d9e89c5774650959623",
+        "raw_git_blob": "13004799acef426ae886158ff54c7021d0687a01",
+        "intended_mode": "100644",
+        "base": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4098cd1c6d8dadd114fbd1c7a7da5b1918d9eacb",
+          "bytes": 98544,
+          "sha256": "5a14647cf03e46f0c776813ef637b6872097a43210efdedee7a095c523e88002"
+        }
+      },
+      "validation": {
+        "manifest_sha256": "8a95400243e02ef9a7e0e2594ef25509711d772b8e832feb64de46c5625b5125",
+        "status": "failed",
+        "requested_at": "2026-10-05T19:24:30.248078+00:00",
+        "tests": 565,
+        "passed": 562,
+        "failed": 3,
+        "skipped": 0,
+        "source_after_equal": true,
+        "aggregate_hooks": "not started",
+        "result_sha256": "4af5f7e4c05f8e1005a1116eb805af0ac12f2c5ac087d19474d85fc11162b830"
+      }
+    },
+    {
+      "tree": "0583d369c9c71f7fd336e263d8d540196aab6880",
+      "TestCi": {
+        "bytes": 119886,
+        "sha256": "04618a95820ae68d51b743d4a93c2ab083d7146d30f58c9e474f77a69091439c",
+        "raw_git_blob": "5314009a00301a6dbe1f3099f324915b58d4f37b",
+        "intended_mode": "100644",
+        "base": {
+          "mode": "100644",
+          "type": "blob",
+          "blob": "4098cd1c6d8dadd114fbd1c7a7da5b1918d9eacb",
+          "bytes": 98544,
+          "sha256": "5a14647cf03e46f0c776813ef637b6872097a43210efdedee7a095c523e88002"
+        }
+      },
+      "validation": {
+        "status": "passed",
+        "run_id": "a06-source-20261005-v2",
+        "manifest_sha256": "98a21bb1b5a07144e15cddd1480e26386d71ebaf7d51e18ce64c92ca8a839f0f",
+        "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+        "expected_hooks": 11,
+        "node_suites": 7,
+        "staged_preflight": {
+          "name": "staged-preflight",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            ".github/workflows/Test-AgentInstructions.ps1",
+            "-RequireStagedInputMatch"
+          ],
+          "started_at": "2026-10-05T19:32:26.378729+00:00",
+          "timeout_seconds": 600,
+          "state": "passed",
+          "pid": 79,
+          "exit": 0,
+          "finished_at": "2026-10-05T19:32:35.073499+00:00",
+          "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+        },
+        "node": {
+          "name": "full-node",
+          "command": [
+            "node",
+            "--test",
+            ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+            ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+            ".github/workflows/Test-CiHelpers.test.mjs",
+            ".github/workflows/NpmTools.test.mjs",
+            ".github/workflows/Check-NpmAudit.test.mjs",
+            ".github/workflows/Test-LocalValidation.test.mjs",
+            ".github/workflows/lint-markdown.test.mjs"
+          ],
+          "started_at": "2026-10-05T19:32:35.272015+00:00",
+          "timeout_seconds": 3600,
+          "state": "passed",
+          "pid": 617,
+          "exit": 0,
+          "finished_at": "2026-10-05T19:35:35.728217+00:00",
+          "log_sha256": "5204546d6d9e87935e46df80c4df18c194a01dac982673301bdfe12cee278b9a"
+        },
+        "node_counts": {
+          "tests": 565,
+          "pass": 565,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0
+        },
+        "aggregate_started_at": "2026-10-05T19:35:35.952536+00:00",
+        "aggregate": {
+          "name": "aggregate",
+          "command": [
+            "/opt/psstyleguide-runtime/venv/bin/python",
+            "-m",
+            "pre_commit",
+            "run",
+            "--all-files"
+          ],
+          "started_at": "2026-10-05T19:35:35.952536+00:00",
+          "timeout_seconds": 14400,
+          "state": "passed",
+          "pid": 21171,
+          "exit": 0,
+          "finished_at": "2026-10-05T19:45:25.031373+00:00",
+          "log_sha256": "36a436cb6db77d5ac3d86b55ffe2c930dee217382e9d54381075c065c13af45c",
+          "passed_hooks": 11,
+          "skipped_hooks": 0
+        },
+        "source_after_equal": true,
+        "result_sha256": "4ae51b3bf47f4ed862b5d4d74371ad26d1d2d1eb9ecf49adae87c25b3cb4fbeb",
+        "finished_at": "2026-10-05T19:45:41.973598+00:00"
+      }
+    }
+  ],
+  "fixture_repair": {
+    "test_oracles": {
+      "status": "fixture_only_repair_frozen_for_root_restage",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "bytes": 119886,
+      "sha256": "04618a95820ae68d51b743d4a93c2ab083d7146d30f58c9e474f77a69091439c",
+      "raw_git_blob": "5314009a00301a6dbe1f3099f324915b58d4f37b",
+      "staged_preimage_sha256": "219fcb050f574dd223595b7556e67c941ede4250178a2d9e89c5774650959623",
+      "original_evidence_sha256": "57f31d725091a07c0b793a93cd4d0871f37c50245f59a77036b6b806099d458b",
+      "original_report_sha256": "e8999d4e0172b8df273b1c70699816f7f7f02a8371a552f7f51b1e2affb917fb",
+      "root_log_sha256": "7e48ff80310ef263a5c9bbdf49c66646532f8d64465b7f6ab82313eb94242025",
+      "changes": [
+        "semantic-side-effect requires the full fixed git-state message after ANSI/prefix/whitespace normalization.",
+        "generator-hostile requires the full failure prefix, all six fixed labels in order, and the terminal period after the same normalization.",
+        "Native exit1 and raw no-UNTRUSTED-value assertions remain unchanged; other mode presentation is unchanged."
+      ],
+      "checks": {
+        "syntax_exit": 0,
+        "diff_check_exit": 0,
+        "captured_diagnostic_positives": 2,
+        "missing_or_reordered_label_or_changed_message_negatives": 8,
+        "other_frozen_files_unchanged": 12,
+        "root_staged_file_unchanged": true
+      },
+      "limits": "No Linux test rerun or aggregate by writer. Root owns actual two-case/full-suite revalidation and historical Husky fixture repair. No product behavior changed."
+    },
+    "evidence_sha256": "4cb3fd81e4b8a5074bc977d69c96425217b80acf7d40e3ae1fca721e605348b6",
+    "private_linux_adaptation": {
+      "path": ".github/workflows/node_modules/husky/bin.js",
+      "sha256": "c6965589a83667d43c4dc22f90dccfa91c133f8ed23629b896ce326f0a6c5cc8",
+      "before_mode": "0o644",
+      "mode": "0o755",
+      "scope": "Disposable Linux fixture only; package-declared executable; bytes unchanged. Mode is included in each subsequent identity guard."
+    },
+    "note": "v1 failed3 fixture/setup checks with unchanged input guards. Two presentation-sensitive assertions now retain full messages and ordered labels after decoration normalization. Restore755 only on pinned package-declared Husky bin.js inside disposable Linux. v2 all565tests pass; original failures remain evidence."
+  },
+  "portability_repair": {
+    "status": "frozen_root_reviewed",
+    "evidence": {
+      "status": "portable_fixture_adaptation_frozen_for_root_restage",
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "staged_preimage_sha256": "04618a95820ae68d51b743d4a93c2ab083d7146d30f58c9e474f77a69091439c",
+      "bytes": 120299,
+      "sha256": "202c109d1253db4c3f59116c507f0ee9ce1241fdb7aaff0994bf067cc1dfe1f2",
+      "raw_git_blob": "8e815f76c59aba31cd2d37f8979ed24a7ede44a5",
+      "staged_preimage_unchanged": true,
+      "staged_tree_before_root_restage": "0583d369c9c71f7fd336e263d8d540196aab6880",
+      "changes": [
+        "Explicit finite marked descriptor per requested semantic role independent of repository default.",
+        "Both role loops explicitly request their own descriptor.",
+        "Portable PS child emits the same fixed success line with exit0 normally and exit7 for semantic-failure.",
+        "Removed repository copy of PS semantic helper and duplicated miniature-guide semantic mutation; real helper and real gate are untouched."
+      ],
+      "checks": {
+        "node_syntax_exit": 0,
+        "diff_check_exit": 0,
+        "descriptor_default_requested_combinations": 4,
+        "invalid_role_and_marker_cases_rejected": 3,
+        "ps_mode_list_unchanged": true,
+        "ps_assertion_block_unchanged": true,
+        "tf16_modes_and_remaining_file_byte_identical": true,
+        "tf_tail_sha256": "a98c6bb32c39131ff3352010a989f34d71dd63280e678ad1fa88d3f0da93ce98",
+        "other_frozen_files_unchanged": 12,
+        "childResults": [
+          {
+            "mode": "clean",
+            "exit": 0,
+            "stdout": "Blank-line example semantics passed, including focused mutation checks.\r\n",
+            "stderr": "",
+            "script_sha256": "815c3940926f1d45dcc96ec27c9758c0c91ef3263383a4e5c199b8682440d062"
+          },
+          {
+            "mode": "semantic-failure",
+            "exit": 7,
+            "stdout": "Blank-line example semantics passed, including focused mutation checks.\r\n",
+            "stderr": "",
+            "script_sha256": "aad0846fc9759dbd5f5e777ee835a04327ec0b5665c66c25ab2636479f94cd0c"
+          }
+        ]
+      },
+      "limits": "Bounded adapter and actual Windows7 fixture-child controls only. No Linux wrapper/full-suite rerun, TF implementation, guide/production/helper edits, index/ref/native writes or skipped-peer claims. Root owns final Linux validation and real semantic gate evidence."
+    },
+    "evidence_sha256": "7adb342259f30227300890fa86f19460bd8eb33c1b24747667b744aa4f3f1677",
+    "report_sha256": "d40a3b8f0f9782e9ccd3269e552b7270c6f225fc83e0e8ecc718d4a22f9ca1be",
+    "root_review": "Complete fixture diff reviewed before release of this staging script. Explicit finite role selection and bounded PS children preserve wrapper controls without missing peer helper. Actual production semantic helpers/gates and all other source bytes unchanged; no extra helper or skipped peer controls."
+  },
+  "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+  "pr": 234,
+  "pr_url": "https://github.com/franklesniak/PSStyleGuide/pull/234",
+  "body_sha256": "f634dd77774501cec26ce80e977448adc1ffb33bcfad4b7ae0c09027ab9a42eb",
+  "commit": {
+    "status": "committed",
+    "expected_parent": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "expected_tree": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+    "requested_at": "2026-10-05T20:07:08.257138+00:00",
+    "exit": 0,
+    "log_sha256": "7c2b57e813b4a078bc772b41a4032a112650625994a4c677066cd98857c882d7",
+    "observed_head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+    "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+    "parent": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "tree": "180fbb1eed69730c433f0a2aca164523c3c3a343",
+    "completed_at": "2026-10-05T20:07:16.817392+00:00"
+  },
+  "actual_endpoints": {
+    "status": "passed",
+    "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+    "classification": {
+      "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "policy": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "classification": "maintenance_required",
+      "maintenancePaths": [
+        ".github/workflows/Classify-InstructionMaintenance.mjs",
+        ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+        ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+        ".github/workflows/Test-CiHelpers.test.mjs",
+        ".github/workflows/Test-ExactGitPathSet.ps1",
+        ".github/workflows/Test-StyleGuideArtifacts.ps1",
+        ".github/workflows/Validate-WorkflowPolicy.mjs",
+        ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+        ".github/workflows/build.yml",
+        ".github/workflows/workflow-policy-cases.json"
+      ]
+    },
+    "results": [
+      {
+        "mode": "AcceptedMaintenance",
+        "exit": 0,
+        "started_at": "2026-10-05T20:07:55.745149+00:00",
+        "finished_at": "2026-10-05T20:07:56.104546+00:00",
+        "log_sha256": "ba9a759dd438e43f6c7b1decaaa6b5be5a379d241dc6c32152d9a8b7abcec592"
+      },
+      {
+        "mode": "FinalizeMetadataNow",
+        "exit": 0,
+        "started_at": "2026-10-05T20:07:59.207447+00:00",
+        "finished_at": "2026-10-05T20:08:22.733768+00:00",
+        "log_sha256": "a8482680e4924b8a088bf87d1ce0b7bf8cc7bf9ebfb7751df138ba02af1d5657"
+      },
+      {
+        "mode": "MetadataClassificationOnly",
+        "exit": 0,
+        "started_at": "2026-10-05T20:08:26.357231+00:00",
+        "finished_at": "2026-10-05T20:08:28.281247+00:00",
+        "log_sha256": "a01af47923bc088ff0e1e0f48f0edeedffe26a96480b476e6d66668f32bdc2ab"
+      },
+      {
+        "mode": "ProposedPolicy",
+        "exit": 0,
+        "started_at": "2026-10-05T20:08:31.737018+00:00",
+        "finished_at": "2026-10-05T20:08:55.710244+00:00",
+        "log_sha256": "ba9e8e27063a270e7fda05d40d043313710f2f95e83e53bcd90a2e8b74c21cd2"
+      }
+    ]
+  },
+  "current_audit": {
+    "exit": 0,
+    "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+    "authority": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+    "mode": "ordinary local no-argument two-root audit",
+    "started_at": "2026-10-05T20:08:59.585800+00:00",
+    "finished_at": "2026-10-05T20:09:15.369910+00:00",
+    "sha256": "1571e207cd44536f75f9b823641506fd84e72ffe4ad90cdaff017ffca9d6cc6f"
+  },
+  "review_rounds": [
+    {
+      "round": 1,
+      "head": "24b18795e5f6e260b095310ddd116cb0f1b19f6b",
+      "base": "d7b206adbce4f54edd6dd3d86d3dc2fa8e344b48",
+      "body_sha256": "f634dd77774501cec26ce80e977448adc1ffb33bcfad4b7ae0c09027ab9a42eb",
+      "started_at": "2026-10-05T20:12:24.969231+00:00",
+      "deadline": "2026-10-13T20:12:24.969231+00:00",
+      "baseline": "round1-pre-ui-request.json",
+      "baseline_sha256": "aacf1763446f96235dbbc585dec8c91d6628cfb2594f10f328b0e93fece43152",
+      "copilot": {
+        "status": "confirmed_pending",
+        "effort_selected": "Balanced",
+        "issued_at": "2026-10-05T20:12:24.969231+00:00",
+        "channel_attempt": 1,
+        "confirmation": "round1-post-ui-request.json",
+        "request_events": [
+          {
+            "id": 32541792654,
+            "created_at": "2026-10-05T20:12:59Z",
+            "actor": "franklesniak",
+            "requested_reviewer": "Copilot"
+          }
+        ],
+        "workflow_run": 37368361326,
+        "workflow_created_at": "2026-10-05T20:13:09Z",
+        "observed_effort": null
+      },
+      "codex": {
+        "status": "automatic_review_pending_before_manual_trigger",
+        "summary_comment": 6002108102,
+        "manual_trigger_issued": false,
+        "note": "PR-opened remote Codex review is confirmed running on24b1879. Do not duplicate it while pending; reconcile terminal result before required post-Copilot trigger."
+      }
+    }
+  ],
+  "A14_preparation": {
+    "sha256": "2a5258039209cee7a82075142525614e38825fea1db23921db275b4d54beedc8",
+    "evidence_sha256": "87de17b89dade792cc98f0d3555c06f1b1137d30e1f96be6a0faff02065128d3",
+    "disposition": "No new supported defect; root read complete report and complete production generator/gate diffs. Retain D92/D93 and issue155 open. Reassess actual caller/storage facts after paired acceptance; no independent final-quality or race-closure credit."
+  }
 }
