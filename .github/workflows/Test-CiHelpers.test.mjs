@@ -20,6 +20,244 @@ const read = name => fs.readFileSync(path.join(directory, name), 'utf8');
 const artifactVerifier = readContract().roles.artifactVerifier;
 const quote = value => `'${value.replaceAll("'", "''")}'`;
 
+test('generator proof preserves each child exit before revision publication', t => {
+  // Actual proof bodies launch a fixture harness in a real current-host process.
+  // Only foreign fixed Git paths are adapted; this does not simulate hosted
+  // Windows5.1 or native-ext4 generator execution.
+  const jobs = parse(read('build.yml')).jobs;
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'generator-proof-exit-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const work = path.join(root, 'work'), scripts = path.join(work, '.github/workflows');
+  fs.mkdirSync(scripts, { recursive: true });
+  const git = process.platform === 'win32' ? 'C:\\Program Files\\Git\\bin\\git.exe' : '/usr/bin/git';
+  assert.ok(fs.existsSync(git), 'The fixture requires the platform fixed Git application.');
+  const env = { ...process.env, GIT_CONFIG_NOSYSTEM: '1', GIT_CONFIG_GLOBAL: process.platform === 'win32' ? 'NUL' : '/dev/null',
+    GIT_TERMINAL_PROMPT: '0', GIT_NO_REPLACE_OBJECTS: '1' };
+  for (const name of Object.keys(env)) if (/^GIT_(?:CONFIG_(?:COUNT|KEY_|VALUE_|PARAMETERS)|DIR$|WORK_TREE$|INDEX_FILE$|OBJECT_DIRECTORY$|ALTERNATE_OBJECT_DIRECTORIES$)/u.test(name)) delete env[name];
+  fs.writeFileSync(path.join(scripts, 'Test-StyleGuideGenerator.ps1'), `
+param([string]$ExpectedHost)
+$intPass = if ([IO.File]::Exists($env:GENERATOR_PROOF_LOG)) { [IO.File]::ReadAllLines($env:GENERATOR_PROOF_LOG).Count + 1 } else { 1 }
+[IO.File]::AppendAllText($env:GENERATOR_PROOF_LOG, ($ExpectedHost + "\n"))
+if ($env:GENERATOR_PROOF_MODE -eq ('pass' + $intPass)) { exit 7 }
+if ($env:GENERATOR_PROOF_MODE -eq 'exception') { throw 'Fixture terminating exception.' }
+exit 0
+`);
+  for (const args of [['init', '--quiet'], ['add', '--all'],
+    ['-c', 'core.hooksPath=', '-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '--quiet', '-m', 'Fixture']]) {
+    const result = spawnSync(git, args, { cwd: work, env, encoding: 'utf8', timeout: 30000, windowsHide: true });
+    assert.equal(result.status, 0, result.stderr);
+  }
+  const revision = spawnSync(git, ['rev-parse', 'HEAD'], { cwd: work, env, encoding: 'utf8', timeout: 30000, windowsHide: true });
+  assert.equal(revision.status, 0, revision.stderr);
+  const sha = revision.stdout.trim();
+  for (const [id, host] of [['generator_windows_51', 'WindowsPowerShell51'], ['generator_windows_7', 'WindowsPowerShell7'],
+    ['generator_linux_7', 'LinuxPowerShell7']]) {
+    const source = jobs[id].steps.find(step => step.id === 'proof').run
+      .replace("'C:\\Program Files\\Git\\bin\\git.exe'", quote(git)).replace("'/usr/bin/git'", quote(git));
+    const script = path.join(root, `${id}.ps1`);
+    fs.writeFileSync(script, "$ErrorActionPreference = 'Stop'\n" + source +
+      "\nif (Test-Path -LiteralPath variable:\\LASTEXITCODE) { exit $LASTEXITCODE }\n");
+    for (const mode of ['success', 'pass1', 'pass2', 'exception']) {
+      const output = path.join(root, `${id}-${mode}.output`), log = path.join(root, `${id}-${mode}.calls`);
+      const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+        cwd: work, env: { ...env, GITHUB_SHA: sha, GITHUB_OUTPUT: output, GENERATOR_PROOF_MODE: mode, GENERATOR_PROOF_LOG: log },
+        encoding: 'utf8', timeout: 30000, windowsHide: true,
+      });
+      assert.equal(result.error, undefined, `${id}:${mode}`);
+      assert.equal(result.status === 0, mode === 'success', `${id}:${mode}: ${result.stderr}`);
+      const calls = fs.readFileSync(log, 'utf8').trim().split('\n');
+      assert.deepEqual(calls, Array(mode === 'success' || mode === 'pass2' ? 2 : 1).fill(host));
+      if (mode === 'success') assert.equal(fs.readFileSync(output, 'utf8'), `revision=${sha}\n`);
+      else {
+        assert.equal(fs.existsSync(output), false, `${id}:${mode} must not publish revision`);
+        assert.match(result.stderr, /Generator pass [12] failed\./u);
+      }
+    }
+  }
+});
+
+test('generator platform admission rejects every incomplete or wrong-revision result', t => {
+  const workflow = parse(read('build.yml'));
+  const job = workflow.jobs[artifactVerifier];
+  const ids = ['generator_windows_51', 'generator_windows_7', 'generator_linux_7'];
+  assert.deepEqual(job.needs, ids);
+  assert.equal(workflow.jobs.publish_committed_artifacts.needs, artifactVerifier);
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'generator-admission-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const script = path.join(root, 'admit.ps1');
+  const admission = job.steps.find(step => step.id === 'admit-generator-platforms');
+  assert.deepEqual(admission.env, { GENERATOR_RESULTS: '${{ toJSON(needs) }}' });
+  fs.writeFileSync(script, admission.run);
+  const valid = Object.fromEntries(ids.map(id => [id, { result: 'success', outputs: { revision: head } }]));
+  const cases = [{ name: 'all cells same revision', results: valid, pass: true }];
+  for (const id of ids) {
+    for (const result of ['failure', 'skipped', 'cancelled', '', 'Success']) {
+      const results = structuredClone(valid);
+      results[id].result = result;
+      cases.push({ name: `${id}:${result}`, results });
+    }
+    const missing = structuredClone(valid); delete missing[id];
+    const wrong = structuredClone(valid); wrong[id].outputs.revision = base;
+    const noOutput = structuredClone(valid); noOutput[id].outputs = {};
+    cases.push({ name: `${id}:absent`, results: missing }, { name: `${id}:wrong head`, results: wrong },
+      { name: `${id}:absent revision`, results: noOutput });
+  }
+  cases.push({ name: 'extra role', results: { ...valid, unexpected: valid[ids[0]] } },
+    { name: 'malformed JSON', raw: '{' }, { name: 'invalid current revision', results: valid, sha: '' });
+  for (const item of cases) {
+    const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+      cwd: root, env: { ...process.env, GENERATOR_RESULTS: item.raw ?? JSON.stringify(item.results), GITHUB_SHA: item.sha ?? head },
+      encoding: 'utf8', timeout: 30000, windowsHide: true,
+    });
+    assert.equal(result.error, undefined, item.name);
+    assert.equal(result.status === 0, item.pass === true, `${item.name}: ${result.stderr}`);
+  }
+});
+
+test('Windows generator acquisition preserves post-checkout credential and native-status checks', t => {
+  // This executes the actual inline body with only its fixed external Git path
+  // replaced. It is a dispatch/control probe; hosted jobs prove the real Git path.
+  const jobs = parse(read('build.yml')).jobs;
+  const source = jobs.generator_windows_51.steps[0].run;
+  assert.equal(source, jobs.generator_windows_7.steps[0].run);
+  assert.ok(source.includes("$strGitPath = 'C:\\Program Files\\Git\\bin\\git.exe'"));
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'generator-windows-acquire-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const git = path.join(root, 'git.ps1'), script = path.join(root, 'acquire.ps1');
+  fs.writeFileSync(git, `
+[IO.File]::AppendAllText($env:GENERATOR_GIT_LOG, ((@($args) | ConvertTo-Json -Compress) + "\n"))
+$global:LASTEXITCODE = 0
+$strMode = $env:GENERATOR_GIT_MODE
+if ($args -contains 'fetch' -and $strMode -eq 'fetch-failure') { $global:LASTEXITCODE = 9 }
+if ($args -contains 'checkout') {
+    if ($strMode -eq 'post-token') { $env:GH_TOKEN = 'fixture-secret' }
+    if ($strMode -eq 'post-command-config') { $env:GIT_CONFIG_COUNT = '1' }
+    if ($strMode -eq 'checkout-failure') { $global:LASTEXITCODE = 7 }
+}
+if ($args -contains 'rev-parse') {
+    if ($strMode -eq 'identity-failure') { $global:LASTEXITCODE = 6 }
+    if ($strMode -ne 'identity-empty') {
+        if ($strMode -eq 'wrong-identity') { 'b' * 40 } else { $env:GITHUB_SHA }
+    }
+    if ($strMode -eq 'identity-multiple') { $env:GITHUB_SHA }
+}
+if ($args -contains 'get-url') {
+    if ($strMode -eq 'origin-failure') { $global:LASTEXITCODE = 6 }
+    if ($strMode -ne 'origin-empty') {
+        if ($strMode -eq 'origin-credentials') { 'https://fixture-secret@github.com/franklesniak/PSStyleGuide' }
+        elseif ($strMode -eq 'origin-wrong') { 'https://github.com/other/repository' }
+        else { 'https://github.com/franklesniak/PSStyleGuide' }
+    }
+    if ($strMode -eq 'origin-multiple') { 'https://github.com/franklesniak/PSStyleGuide' }
+}
+if ($args -contains '--get-regexp') {
+    $global:LASTEXITCODE = 1
+    if ($strMode -eq 'config-failure') { $global:LASTEXITCODE = 7 }
+    if ($strMode -eq 'config-zero-empty') { $global:LASTEXITCODE = 0 }
+    if (($strMode -eq 'helper' -and $args[-1].Contains('credential')) -or
+        ($strMode -eq 'authorization' -and $args[-1].Contains('extraheader')) -or
+        ($strMode -eq 'include' -and $args[-1].Contains('include'))) {
+        $global:LASTEXITCODE = 0
+        'fixture.forbidden'
+    }
+    if ($strMode -eq 'config-one-output') { 'fixture.forbidden' }
+}
+if ($args -contains '--list') {
+    if ($strMode -eq 'effective-failure') { $global:LASTEXITCODE = 9 }
+    if ($strMode -ne 'effective-empty') {
+        if ($strMode -eq 'global-source') { "global\tfile:hostile.config\tcredential.helper" }
+        elseif ($strMode -eq 'included-source') { "local\tfile:included.config\thttp.extraheader" }
+        elseif ($strMode -eq 'system-source') { "system\tfile:hostile.config\tcredential.helper" }
+        else { "local\tfile:.git/config\tcore.repositoryformatversion" }
+    }
+}
+`);
+  const modes = ['', 'fetch-failure', 'checkout-failure', 'identity-failure', 'identity-empty', 'wrong-identity',
+    'identity-multiple', 'post-token', 'post-command-config', 'origin-failure', 'origin-empty', 'origin-credentials',
+    'origin-wrong', 'origin-multiple', 'config-failure', 'config-zero-empty', 'config-one-output', 'helper',
+    'authorization', 'include', 'effective-failure', 'effective-empty', 'global-source', 'included-source', 'system-source',
+    'fixed-missing', 'pre-token'];
+  for (const [index, mode] of modes.entries()) {
+    const workspace = path.join(root, `workspace-${index}`); fs.mkdirSync(workspace);
+    const log = path.join(root, `calls-${index}.jsonl`);
+    const env = { ...process.env, GENERATOR_GIT_MODE: mode, GENERATOR_GIT_LOG: log, RUNNER_TEMP: root,
+      GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head };
+    for (const name of Object.keys(env)) if (/^(?:GH_TOKEN|GITHUB_TOKEN|ACTIONS_RUNTIME_TOKEN|GIT_CONFIG_|GIT_DIR$|GIT_WORK_TREE$|GIT_INDEX_FILE$|GIT_OBJECT_DIRECTORY$|GIT_ALTERNATE_OBJECT_DIRECTORIES$)/u.test(name)) delete env[name];
+    if (mode === 'pre-token') env.GH_TOKEN = 'fixture-secret';
+    fs.writeFileSync(script, source.replace("'C:\\Program Files\\Git\\bin\\git.exe'",
+      quote(mode === 'fixed-missing' ? path.join(root, 'missing-git') : git))
+      .replace('Start-Sleep -Seconds 2', "Write-Output 'fixture retry'"));
+    const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+      cwd: workspace, env, encoding: 'utf8', timeout: 30000, windowsHide: true,
+    });
+    assert.equal(result.error, undefined, mode);
+    assert.equal(result.status === 0, mode === '', `${mode}: ${result.stderr}`);
+    assert.ok(!`${result.stdout}${result.stderr}`.includes('fixture-secret'), mode);
+    if (['fixed-missing', 'pre-token'].includes(mode)) {
+      assert.equal(fs.existsSync(log), false, 'No name-resolution fallback or native work before refusal.');
+      continue;
+    }
+    const calls = fs.readFileSync(log, 'utf8').trim().split('\n').map(JSON.parse);
+    if (mode === 'fetch-failure') assert.equal(calls.filter(args => args.includes('fetch')).length, 3);
+    if (mode === '') {
+      assert.equal(calls.filter(args => args.includes('--get-regexp')).length, 3);
+      assert.ok(calls.at(-1).includes('--show-origin'));
+      assert.ok(calls.at(-1).includes('--show-scope'));
+      assert.ok(calls.at(-1).includes('--includes'));
+    }
+  }
+});
+
+test('Linux build acquisition rejects Git selectors before dispatch and checks byte configuration', t => {
+  // Execute both actual Linux bodies with only fixed Git dispatch replaced.
+  // This is portable control evidence, not hosted Linux acquisition proof.
+  const jobs = parse(read('build.yml')).jobs;
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'generator-linux-acquire-'));
+  t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+  const git = path.join(root, 'git.ps1'), script = path.join(root, 'acquire.ps1');
+  fs.writeFileSync(git, `
+[IO.File]::AppendAllText($env:GENERATOR_GIT_LOG, ((@($args) | ConvertTo-Json -Compress) + "\n"))
+$global:LASTEXITCODE = 0
+if ($args -contains 'config' -and $env:GENERATOR_GIT_MODE -eq 'config-failure') { $global:LASTEXITCODE = 7 }
+if ($args -contains 'rev-parse') { $env:GITHUB_SHA }
+`);
+  const selectors = ['GIT_DIR', 'GIT_WORK_TREE', 'GIT_INDEX_FILE', 'GIT_OBJECT_DIRECTORY',
+    'GIT_ALTERNATE_OBJECT_DIRECTORIES', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS'];
+  for (const id of ['generator_linux_7', artifactVerifier]) {
+    const source = jobs[id].steps.find(step => step.id === 'acquire').run;
+    fs.writeFileSync(script, source.replaceAll('/usr/bin/git', quote(git)));
+    for (const [index, mode] of ['', ...selectors, 'config-failure'].entries()) {
+      const workspace = path.join(root, `${id}-${index}`); fs.mkdirSync(workspace);
+      const log = path.join(root, `${id}-${index}.jsonl`);
+      const env = { ...process.env, GENERATOR_GIT_MODE: mode, GENERATOR_GIT_LOG: log,
+        GITHUB_SERVER_URL: 'https://github.com', GITHUB_REPOSITORY: 'franklesniak/PSStyleGuide', GITHUB_SHA: head };
+      for (const name of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', ...selectors]) delete env[name];
+      if (selectors.includes(mode)) env[mode] = 'fixture-external-selector';
+      const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File', script], {
+        cwd: workspace, env, encoding: 'utf8', timeout: 30000, windowsHide: true,
+      });
+      assert.equal(result.error, undefined, `${id}:${mode}`);
+      assert.equal(result.status === 0, mode === '', `${id}:${mode}: ${result.stderr}`);
+      if (selectors.includes(mode)) {
+        assert.equal(fs.existsSync(log), false, 'Reject external selectors before the first Git call.');
+        assert.match(result.stderr, /Unexpected credentials or external Git configuration\./u);
+        continue;
+      }
+      const calls = fs.readFileSync(log, 'utf8').trim().split('\n').map(JSON.parse);
+      const configuration = calls.findIndex(args => args.includes('config'));
+      assert.deepEqual(calls[configuration], ['config', '--local', 'core.autocrlf', 'false']);
+      assert.ok(configuration > calls.findIndex(args => args.includes('init')));
+      if (mode === 'config-failure') {
+        assert.equal(calls.some(args => args.includes('fetch') || args.includes('checkout') || args.includes('remote')), false);
+        assert.match(result.stderr, /Git byte-preserving checkout configuration failed\./u);
+      } else {
+        assert.ok(configuration < calls.findIndex(args => args.includes('fetch')));
+        assert.ok(configuration < calls.findIndex(args => args.includes('checkout')));
+      }
+    }
+  }
+});
+
 test('actual workflows cover every live push and PR base with an isolated target-event policy', () => {
   const liveGuard = "github.event_name != 'push' || github.event.deleted != true";
   for (const file of ['build.yml', 'markdownlint.yml', 'agent-instructions.yml']) {
@@ -36,7 +274,7 @@ test('actual workflows cover every live push and PR base with an isolated target
       assert.deepEqual(workflow.jobs['candidate-tests'].permissions, {});
     } else {
       for (const id of file === 'build.yml' ? [artifactVerifier] : ['policy', 'markdownlint']) {
-        assert.equal(workflow.jobs[id].if, liveGuard);
+        assert.equal(workflow.jobs[id].if, file === 'build.yml' ? 'always() && (' + liveGuard + ')' : liveGuard);
       }
     }
   }
@@ -470,8 +708,36 @@ exit 98
   });
 }
 
+function artifactRoleSource(role) {
+  const descriptors = {
+    PowerShellExamples: `# BEGIN LANGUAGE DESCRIPTOR
+$script:hashtableArtifactLanguage = @{
+    ScopedId = 'powershell-instructions'
+    ScopedPath = 'powershell.instructions.md'
+    SemanticRole = 'PowerShellExamples'
+}
+# END LANGUAGE DESCRIPTOR`,
+    TerraformRecovery: `# BEGIN LANGUAGE DESCRIPTOR
+$script:hashtableArtifactLanguage = @{
+    ScopedId = 'terraform-instructions'
+    ScopedPath = 'terraform.instructions.md'
+    SemanticRole = 'TerraformRecovery'
+}
+# END LANGUAGE DESCRIPTOR`,
+  };
+  assert.ok(Object.hasOwn(descriptors, role), 'The fixture requires a fixed semantic role.');
+  const source = read('Test-StyleGuideArtifacts.ps1');
+  const pattern = /# BEGIN LANGUAGE DESCRIPTOR[\s\S]*?# END LANGUAGE DESCRIPTOR/gu;
+  const blocks = [...source.matchAll(pattern)];
+  assert.equal(blocks.length, 1);
+  return source.replace(pattern, descriptors[role]);
+}
+
 for (const mode of ['clean', 'stale', 'semantic-failure', 'semantic-side-effect',
-  'verifier-channel', 'verifier-config', 'verifier-worktree', 'verifier-failure']) {
+  'verifier-channel', 'verifier-config', 'verifier-worktree', 'verifier-failure',
+  'generator-native', 'generator-result', 'generator-schema', 'generator-hostile',
+  'generator-json', 'generator-nonobject', 'generator-count', 'generator-order', 'generator-path',
+  'verifier-json', 'verifier-nonobject', 'verifier-native', 'verifier-schema', 'semantic-artifact']) {
   test(`artifact gate includes verifier child effects: ${mode}`, { skip: !linux }, t => {
     const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-artifact-child-'));
     t.after(() => fs.rmSync(root, { recursive: true, force: true }));
@@ -480,7 +746,7 @@ for (const mode of ['clean', 'stale', 'semantic-failure', 'semantic-side-effect'
     const records = [['copilot', 'copilot-instructions.md'], ['powershell-instructions', 'powershell.instructions.md'],
       ['chat', 'STYLE_GUIDE_CHAT.md'], ['full', 'STYLE_GUIDE_FULL.md']];
     for (const [, name] of records) fs.writeFileSync(path.join(work, name), 'committed fixture\n');
-    fs.writeFileSync(path.join(scripts, 'Test-StyleGuideArtifacts.ps1'), read('Test-StyleGuideArtifacts.ps1'));
+    fs.writeFileSync(path.join(scripts, 'Test-StyleGuideArtifacts.ps1'), artifactRoleSource('PowerShellExamples'));
     fs.writeFileSync(path.join(work, 'STYLE_GUIDE.md'), [
       '# PowerShell Writing Style', '',
       '### Examples', '',
@@ -490,32 +756,39 @@ for (const mode of ['clean', 'stale', 'semantic-failure', 'semantic-side-effect'
       'The `␠` glyph is an illustration marker and is not PowerShell syntax. Do not copy it.', '',
       '```powershell', '{', '    Invoke-First', '␠', '    Invoke-Second', '}', '```', '',
     ].join('\n'));
-    fs.copyFileSync(path.join(directory, 'Test-BlankLineExamples.ps1'),
-      path.join(scripts, 'Test-BlankLineExamples.ps1'));
-    const generation = { Schema: 'PSStyleGuide.GeneratorResult.v2', Overall: 'NoChange', Phase: 'complete',
+    // Isolate the wrapper interface; the real PS gate still checks guide semantics.
+    fs.writeFileSync(path.join(scripts, 'Test-BlankLineExamples.ps1'),
+      "Write-Output 'Blank-line example semantics passed, including focused mutation checks.'\n" +
+      `exit ${mode === 'semantic-failure' ? 7 : 0}\n`);
+    const generation = { Schema: 'StyleGuide.GeneratorResult.v2', Overall: 'NoChange', Phase: 'complete',
       Category: 'none', NativeOutcome: 'Success', ExitCode: 0,
       Artifacts: records.map(([ArtifactId, Path]) => ({ ArtifactId, Path, Status: 'NoChange' })) };
+    if (mode === 'generator-result') generation.ExitCode = 4;
+    if (mode === 'generator-schema') generation.Schema = 'wrong';
+    if (mode === 'generator-count') generation.Artifacts.pop();
+    if (mode === 'generator-order') generation.Artifacts.reverse();
+    if (mode === 'generator-path') generation.Artifacts[0].Path = '../escape';
+    if (mode === 'generator-hostile') for (const field of ['Schema', 'Overall', 'Phase', 'Category', 'NativeOutcome', 'ExitCode']) {
+      generation[field] = 'UNTRUSTED-' + 'x'.repeat(2000);
+    }
+    const generatorJson = mode === 'generator-json' ? '{' : mode === 'generator-nonobject' ? '[]' : JSON.stringify(generation);
     fs.writeFileSync(path.join(scripts, 'Generate-StyleGuideArtifacts.ps1'),
       (mode === 'stale' ? "[IO.File]::WriteAllText('STYLE_GUIDE_CHAT.md', 'regenerated fixture')\n" : '') +
-      quote(JSON.stringify(generation)) + '\nexit 0\n');
+      quote(generatorJson) + `\nexit ${mode === 'generator-native' ? 7 : 0}\n`);
     const mutation = {
       'verifier-channel': "[IO.File]::AppendAllText($env:GITHUB_OUTPUT, 'fixture=changed')",
       'verifier-config': "[IO.File]::AppendAllText((Join-Path $env:GITHUB_WORKSPACE '.git/config'), \"`n# changed by verifier`n\")",
       'verifier-worktree': "[IO.File]::WriteAllText('unexpected.txt', 'changed by verifier')",
     }[mode] ?? '';
-    if (mode === 'semantic-side-effect') {
+    if (['semantic-side-effect', 'semantic-artifact'].includes(mode)) {
       fs.writeFileSync(path.join(scripts, 'Test-BlankLineExamples.ps1'),
-        "[IO.File]::WriteAllText('unexpected.txt', 'changed by semantic verifier')\n" +
+        `[IO.File]::WriteAllText('${mode === "semantic-artifact" ? "STYLE_GUIDE_CHAT.md" : "unexpected.txt"}', 'changed by semantic verifier')\n` +
         "Write-Output 'Blank-line example semantics passed, including focused mutation checks.'\nexit 0\n");
-    }
-    if (mode === 'semantic-failure') {
-      fs.writeFileSync(path.join(work, 'STYLE_GUIDE.md'),
-        fs.readFileSync(path.join(work, 'STYLE_GUIDE.md'), 'utf8').replace('\n␠\n', '\n\n'));
     }
     const verifierFails = ['stale', 'verifier-failure'].includes(mode);
     fs.writeFileSync(path.join(scripts, 'Test-ExactGitPathSet.ps1'), mutation + '\n' +
-      quote(JSON.stringify({ Schema: 'PSStyleGuide.ExactGitPathSetResult.v2', Success: !verifierFails })) +
-      `\nexit ${verifierFails ? 1 : 0}\n`);
+      quote(mode === 'verifier-json' ? '{' : mode === 'verifier-nonobject' ? '[]' : JSON.stringify({ Schema: mode === 'verifier-schema' ? 'wrong' : 'StyleGuide.ExactGitPathSetResult.v2', Success: !verifierFails })) +
+      `\nexit ${verifierFails || mode === 'verifier-native' ? 1 : 0}\n`);
     const env = { ...process.env, GITHUB_WORKSPACE: work, GIT_CONFIG_NOSYSTEM: '1',
       GIT_CONFIG_GLOBAL: '/dev/null', GIT_TERMINAL_PROMPT: '0' };
     for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];
@@ -532,13 +805,111 @@ for (const mode of ['clean', 'stale', 'semantic-failure', 'semantic-side-effect'
     assert.equal(result.status, mode === 'clean' ? 0 : 1, result.stdout + result.stderr);
     const expected = { clean: /committed bytes match generator output/, stale: /Generate-StyleGuideArtifacts\.ps1/,
       'semantic-failure': /blank-line semantic check failed/i,
-      'semantic-side-effect': /outside the four[\s\S]{0,100}generated artifacts/,
+      'semantic-side-effect': /git-state: a child changed a path outside the four permitted generated artifacts/,
       'verifier-channel': /runner-state/, 'verifier-config': /configuration or hooks/,
-      'verifier-worktree': /outside the four/, 'verifier-failure': /Exact-path verification did not confirm/ }[mode];
+      'verifier-worktree': /outside the four/, 'verifier-failure': /Exact-path verification did not confirm/,
+      'generator-native': /NativeExit/, 'generator-result': /ResultExitCode/, 'generator-schema': /Schema/,
+      'generator-hostile': /Artifact generation failed result checks: Schema, Overall, Phase, Category, NativeOutcome, ResultExitCode\./,
+      'generator-json': /invalid JSON/, 'generator-nonobject': /non-object/, 'generator-count': /record count/,
+      'generator-order': /invalid artifact record/, 'generator-path': /invalid artifact record/,
+      'verifier-json': /invalid JSON/, 'verifier-nonobject': /did not confirm/,
+      'verifier-native': /did not confirm/, 'verifier-schema': /did not confirm/,
+      'semantic-artifact': /outside the four/ }[mode];
     const diagnostic = result.stdout + result.stderr;
-    assert.match(mode === 'semantic-side-effect'
-      ? diagnostic.replace(/\x1B\[[0-?]*[ -/]*[@-~]/g, '')
-      : diagnostic, expected);
+    assert.equal(diagnostic.includes('UNTRUSTED-'), false, 'hostile result values must not enter diagnostics');
+    // PowerShell may decorate and wrap the same diagnostic across renderer lines.
+    // Normalize only presentation; retain the full message and ordered labels.
+    const renderedDiagnostic = ['semantic-side-effect', 'generator-hostile'].includes(mode)
+      ? diagnostic.replace(/\x1B\[[0-?]*[ -/]*[@-~]/gu, '')
+        .replace(/^[ \t]*\|[ \t]?/gmu, '').replace(/\s+/gu, ' ')
+      : diagnostic;
+    assert.match(renderedDiagnostic, expected);
+  });
+}
+
+for (const mode of ['clean', 'stale', 'verifier-channel', 'verifier-config', 'verifier-worktree', 'verifier-failure',
+  'recovery-missing', 'recovery-failure', 'recovery-signal', 'recovery-timeout',
+  'recovery-channel', 'recovery-config', 'recovery-source', 'recovery-self',
+  'multiple-node-paths', 'first-node-failure']) {
+  test(`artifact gate recovery role includes verifier child effects: ${mode}`, { skip: !linux }, t => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'styleguide-artifact-child-'));
+    t.after(() => fs.rmSync(root, { recursive: true, force: true }));
+    const work = path.join(root, 'work'), scripts = path.join(work, '.github/workflows');
+    fs.mkdirSync(scripts, { recursive: true });
+    const records = [['copilot', 'copilot-instructions.md'], ['terraform-instructions', 'terraform.instructions.md'],
+      ['chat', 'STYLE_GUIDE_CHAT.md'], ['full', 'STYLE_GUIDE_FULL.md']];
+    for (const [, name] of records) fs.writeFileSync(path.join(work, name), 'committed fixture\n');
+    fs.writeFileSync(path.join(scripts, 'Test-StyleGuideArtifacts.ps1'), mode === 'recovery-timeout' ?
+      artifactRoleSource('TerraformRecovery').replace('WaitForExit(300000)', 'WaitForExit(100)') : artifactRoleSource('TerraformRecovery'));
+    fs.writeFileSync(path.join(work, 'STYLE_GUIDE.md'), 'source fixture\n');
+    const recoveryCode = {
+      'recovery-failure': 'process.exit(19);',
+      'recovery-signal': "process.kill(process.pid, 'SIGTERM');",
+      'recovery-timeout': 'setInterval(() => {}, 1000);',
+      'recovery-channel': "fs.appendFileSync(process.env.GITHUB_OUTPUT, 'fixture=changed');",
+      'recovery-config': "fs.appendFileSync('.git/config', '\\n# changed by recovery\\n');",
+      'recovery-source': "fs.appendFileSync('STYLE_GUIDE.md', 'changed by recovery');",
+      'recovery-self': "fs.appendFileSync(new URL(import.meta.url), '// changed by recovery');",
+    }[mode] ?? '';
+    if (mode !== 'recovery-missing') fs.writeFileSync(path.join(scripts, 'Test-StateRecoveryExamples.mjs'),
+      "import fs from 'node:fs';\n" + recoveryCode + '\n');
+    const generation = { Schema: 'StyleGuide.GeneratorResult.v2', Overall: 'NoChange', Phase: 'complete',
+      Category: 'none', NativeOutcome: 'Success', ExitCode: 0,
+      Artifacts: records.map(([ArtifactId, Path]) => ({ ArtifactId, Path, Status: 'NoChange' })) };
+    fs.writeFileSync(path.join(scripts, 'Generate-StyleGuideArtifacts.ps1'),
+      (mode === 'stale' ? "[IO.File]::WriteAllText('STYLE_GUIDE_CHAT.md', 'regenerated fixture')\n" : '') +
+      quote(JSON.stringify(generation)) + '\nexit 0\n');
+    const mutation = {
+      'verifier-channel': "[IO.File]::AppendAllText($env:GITHUB_OUTPUT, 'fixture=changed')",
+      'verifier-config': "[IO.File]::AppendAllText((Join-Path $env:GITHUB_WORKSPACE '.git/config'), \"`n# changed by verifier`n\")",
+      'verifier-worktree': "[IO.File]::WriteAllText('unexpected.txt', 'changed by verifier')",
+    }[mode] ?? '';
+    const verifierFails = ['stale', 'verifier-failure'].includes(mode);
+    fs.writeFileSync(path.join(scripts, 'Test-ExactGitPathSet.ps1'), mutation + '\n' +
+      quote(JSON.stringify({ Schema: 'StyleGuide.ExactGitPathSetResult.v2', Success: !verifierFails })) +
+      `\nexit ${verifierFails ? 1 : 0}\n`);
+    const env = { ...process.env, GITHUB_WORKSPACE: work, GIT_CONFIG_NOSYSTEM: '1',
+      GIT_CONFIG_GLOBAL: '/dev/null', GIT_TERMINAL_PROMPT: '0' };
+    const runtimeLog = path.join(root, 'runtime-selection');
+    if (['multiple-node-paths', 'first-node-failure'].includes(mode)) {
+      const shellQuote = value => `'${value.replaceAll("'", "'\\''")}'`;
+      const runtimeDirectories = ['first-runtime', 'second-runtime'].map(name => path.join(root, name));
+      for (const [index, runtimeDirectory] of runtimeDirectories.entries()) {
+        fs.mkdirSync(runtimeDirectory);
+        const outcome = index === 0 && mode === 'multiple-node-paths' ?
+          `exec ${shellQuote(process.execPath)} "$@"` : 'exit 23';
+        fs.writeFileSync(path.join(runtimeDirectory, 'node'),
+          `#!/bin/sh\nprintf '%s\\n' ${index} >> ${shellQuote(runtimeLog)}\n${outcome}\n`, { mode: 0o700 });
+      }
+      env.PATH = [...runtimeDirectories, env.PATH].join(path.delimiter);
+    }
+    for (const key of ['GITHUB_TOKEN', 'GH_TOKEN', 'ACTIONS_RUNTIME_TOKEN', 'GIT_CONFIG_COUNT', 'GIT_CONFIG_PARAMETERS']) delete env[key];
+    for (const key of ['GITHUB_ENV', 'GITHUB_PATH', 'GITHUB_OUTPUT', 'GITHUB_STEP_SUMMARY']) {
+      env[key] = path.join(root, key); fs.writeFileSync(env[key], '');
+    }
+    for (const args of [['init', '-q'], ['add', '-A'],
+      ['-c', 'user.name=Fixture', '-c', 'user.email=fixture@example.invalid', 'commit', '-qm', 'Artifact fixture']]) {
+      const result = spawnSync('/usr/bin/git', args, { cwd: work, env, encoding: 'utf8', timeout: 30000 });
+      assert.equal(result.status, 0, result.stdout + result.stderr);
+    }
+    const result = spawnSync('pwsh', ['-NoLogo', '-NoProfile', '-NonInteractive', '-File',
+      path.join(scripts, 'Test-StyleGuideArtifacts.ps1')], { cwd: work, env, encoding: 'utf8', timeout: 30000 });
+    assert.equal(result.status, ['clean', 'multiple-node-paths'].includes(mode) ? 0 : 1, result.stdout + result.stderr);
+    const expected = { clean: /committed bytes match generator output/, stale: /Generate-StyleGuideArtifacts\.ps1/,
+      'verifier-channel': /runner-state/, 'verifier-config': /configuration or hooks/,
+      'verifier-worktree': /outside the four/, 'verifier-failure': /Exact-path verification did not confirm/,
+      'recovery-missing': /state-recovery: published-example tests did not complete/,
+      'recovery-failure': /state-recovery: published-example tests did not complete/,
+      'recovery-signal': /state-recovery: published-example tests did not complete/,
+      'recovery-timeout': /state-recovery: published-example tests did not complete/,
+      'recovery-channel': /runner-state/, 'recovery-config': /configuration or hooks/,
+      'recovery-source': /outside the four/, 'recovery-self': /outside the four/,
+      'multiple-node-paths': /committed bytes match generator output/,
+      'first-node-failure': /state-recovery: published-example tests did not complete/ }[mode];
+    assert.match(result.stdout + result.stderr, expected);
+    if (['multiple-node-paths', 'first-node-failure'].includes(mode)) {
+      assert.equal(fs.readFileSync(runtimeLog, 'utf8'), '0\n', 'select the first application once; never fall back after failure');
+    }
   });
 }
 

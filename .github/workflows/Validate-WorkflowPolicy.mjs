@@ -453,6 +453,11 @@ function helperCall(line) {
   });
 }
 
+const generatorPlatforms = ["generator_windows_51", "generator_windows_7", "generator_linux_7"];
+// The policy owns this finite list; workflow and test expectations stay independent.
+const generatorRequiredStatement = "$arrRequired = @(" + generatorPlatforms.map(id => "'" + id + "'").join(', ') + ')';
+const generatorAdmission = "$ErrorActionPreference = 'Stop'\n$objResults = $env:GENERATOR_RESULTS | ConvertFrom-Json -ErrorAction Stop\n" + generatorRequiredStatement + "\nif (@($objResults.PSObject.Properties).Count -ne $arrRequired.Count) {\n    throw 'Generator platform results are incomplete.'\n}\nforeach ($strJob in $arrRequired) {\n    $objProperty = $objResults.PSObject.Properties[$strJob]\n    if ($null -eq $objProperty -or $objProperty.Value.result -cne 'success' -or\n        $objProperty.Value.outputs.revision -cne $env:GITHUB_SHA -or\n        $env:GITHUB_SHA -cnotmatch '^[0-9a-f]{40}$') {\n        throw 'Generator platform admission failed.'\n    }\n}\n";
+
 function validateRunStep(step, id, expected) {
   const keys = ['id', 'shell', 'run'];
   if (Object.hasOwn(step, 'name')) keys.push('name');
@@ -498,15 +503,68 @@ function validateWorkflowObject(fileName, workflow, contract) {
   }
   expectDeepEqual(workflow.on, events, 'workflow-events');
   expectDeepEqual(workflow.permissions, {}, 'workflow-permissions');
-  const codeJobs = build ? [contract.roles.artifactVerifier] : ['policy', 'markdownlint'];
+  const codeJobs = build ? [contract.roles.artifactVerifier, ...generatorPlatforms] : ['policy', 'markdownlint'];
   expectExactKeys(workflow.jobs, build ? [...codeJobs, 'publish_committed_artifacts'] : codeJobs, 'isolation-jobs');
   for (const id of codeJobs) {
     const job = workflow.jobs[id];
-    expectExactKeys(job, ['if', 'runs-on', 'timeout-minutes', 'permissions', 'steps'], 'code-job-shape');
-    if (job.if !== "github.event_name != 'push' || github.event.deleted != true") fail('code-job-event');
+    const platform = generatorPlatforms.indexOf(id);
+    const aggregate = build && platform < 0;
+    const keys = ['if', 'runs-on', 'timeout-minutes', 'permissions', 'steps'];
+    if (aggregate) keys.push('needs');
+    if (platform >= 0) keys.push('outputs');
+    expectExactKeys(job, keys, 'code-job-shape');
+    const live = "github.event_name != 'push' || github.event.deleted != true";
+    if (job.if !== (aggregate ? 'always() && (' + live + ')' : live)) fail('code-job-event');
     expectDeepEqual(job.permissions, {}, 'code-job-permissions');
-    if (job['runs-on'] !== 'ubuntu-24.04' || job['timeout-minutes'] !== 30) fail('code-job-execution');
+    const runner = platform === 0 || platform === 1 ? 'windows-2025' : 'ubuntu-24.04';
+    if (job['runs-on'] !== runner || job['timeout-minutes'] !== 30) fail('code-job-execution');
+    if (aggregate) expectDeepEqual(job.needs, generatorPlatforms, 'generator-dependencies');
+    if (platform >= 0) {
+      expectDeepEqual(job.outputs, { revision: '${{ steps.proof.outputs.revision }}' }, 'generator-outputs');
+      const shell = platform === 0 ? 'powershell' : 'pwsh';
+      const expectedCount = platform === 2 ? 3 : 2;
+      if (!Array.isArray(job.steps) || job.steps.length !== expectedCount) fail('code-step-cardinality');
+      const acquire = job.steps[0];
+      expectExactKeys(acquire, ['id', 'shell', 'run', ...(Object.hasOwn(acquire, 'name') ? ['name'] : [])], 'code-step-shape');
+      if (acquire.id !== 'acquire' || acquire.shell !== shell || visibleLines(acquire.run).length === 0) fail('code-step-interface');
+      if (platform === 2) validateRunStep(job.steps[1], 'verify-checkout-credentials', ['./.github/workflows/Test-CheckoutCredentials.ps1']);
+      const proof = job.steps.at(-1);
+      expectExactKeys(proof, ['id', 'shell', 'run', ...(Object.hasOwn(proof, 'name') ? ['name'] : [])], 'code-step-shape');
+      if (proof.id !== 'proof' || proof.shell !== shell) fail('code-step-interface');
+      const host = ['WindowsPowerShell51', 'WindowsPowerShell7', 'LinuxPowerShell7'][platform];
+      const lines = visibleLines(proof.run);
+      if (lines.length !== 23) fail('generator-proof');
+      const expected = [
+        "$env:GIT_CONFIG_NOSYSTEM = '1'",
+        "$env:GIT_CONFIG_GLOBAL = '" + (platform === 2 ? '/dev/null' : 'NUL') + "'",
+        "$env:GIT_TERMINAL_PROMPT = '0'",
+        "$env:GIT_NO_REPLACE_OBJECTS = '1'",
+        '$strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName',
+        'if ([string]::IsNullOrEmpty($strPowerShellPath) -or -not [IO.File]::Exists($strPowerShellPath)) {',
+        "throw 'The current PowerShell executable is unavailable.'",
+        '}',
+      ];
+      for (const pass of [1, 2]) expected.push(
+        "& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost " + host,
+        '$intGeneratorExit = $LASTEXITCODE',
+        'if ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {',
+        "throw 'Generator pass " + pass + " failed.'",
+        '}',
+      );
+      expectDeepEqual(lines.slice(0, 18), expected, 'generator-proof');
+      const git = platform === 2 ? "'/usr/bin/git'" : "'C:\\Program Files\\Git\\bin\\git.exe'";
+      const tail = [
+        "$arrHead = @(& " + git + " rev-parse --verify 'HEAD^{commit}')",
+        "if ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $env:GITHUB_SHA) {",
+        "throw 'Generator proof revision mismatch.';",
+        '}',
+        '[IO.File]::AppendAllText($env:GITHUB_OUTPUT, (\'revision=\' + $arrHead[0] + "`n"), (New-Object Text.UTF8Encoding($false)))',
+      ];
+      expectDeepEqual(lines.slice(18).map(line => line.replace(/;$/u, '')), tail.map(line => line.replace(/;$/u, '')), 'generator-proof');
+      continue;
+    }
     const roles = [
+      ...(aggregate ? [['admit-generator-platforms', null]] : []),
       ['acquire', null],
       ['verify-checkout-credentials', ['./.github/workflows/Test-CheckoutCredentials.ps1']],
       ...(build ? [] : [['initialize-toolchain', ['./.github/workflows/Initialize-CiToolchain.ps1', '-WorkflowDependencies']]]),
@@ -515,7 +573,15 @@ function validateWorkflowObject(fileName, workflow, contract) {
       ...(id === 'markdownlint' ? [['audit', null]] : []),
     ];
     if (!Array.isArray(job.steps) || job.steps.length !== roles.length) fail('code-step-cardinality');
-    roles.forEach(([role, call], index) => validateRunStep(job.steps[index], role, call));
+    roles.forEach(([role, call], index) => {
+      const step = job.steps[index];
+      if (role === 'admit-generator-platforms') {
+        expectExactKeys(step, ['id', 'shell', 'run', 'env', ...(Object.hasOwn(step, 'name') ? ['name'] : [])], 'generator-admission');
+        if (step.id !== role || step.shell !== 'pwsh') fail('generator-admission');
+        expectDeepEqual(step.env, { GENERATOR_RESULTS: '${{ toJSON(needs) }}' }, 'generator-admission');
+        expectDeepEqual(visibleLines(step.run), visibleLines(generatorAdmission), 'generator-admission');
+      } else validateRunStep(step, role, call);
+    });
   }
   if (!build) return;
   const publisher = workflow.jobs.publish_committed_artifacts;

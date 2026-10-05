@@ -405,3 +405,15 @@ function Invoke-FixtureNode {
     fs.rmSync(root, { recursive: true, force: true });
   }
 });
+
+test('generator harness classifier selector is exact', () => {
+  const exact = '.github/workflows/Test-StyleGuideGenerator.ps1';
+  for (const alias of [exact, exact.toLowerCase(), exact.toUpperCase()]) {
+    assert.equal(classify([alias]).classification, 'maintenance_required', alias);
+  }
+  assert.deepEqual(classify(['README.md', exact, 'new-example.ps1']).maintenancePaths, [exact]);
+  for (const near of [exact + '.bak', 'other/' + exact,
+    '.github/workflows/Test-StyleGuideGenerator2.ps1', '.github/workflows/nested/Test-StyleGuideGenerator.ps1']) {
+    assert.equal(classify([near]).classification, 'ordinary', near);
+  }
+});

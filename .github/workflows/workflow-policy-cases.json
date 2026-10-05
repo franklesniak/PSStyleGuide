@@ -60,7 +60,7 @@
       ],
       "operation": "set",
       "value": "publish_committed_artifacts",
-      "category": "code-job-shape"
+      "category": "generator-dependencies"
     },
     {
       "name": "rejects code job container injection",
@@ -93,7 +93,7 @@
         "jobs",
         "$artifactVerifier",
         "steps",
-        3
+        4
       ],
       "operation": "set",
       "value": {
@@ -110,7 +110,7 @@
         "jobs",
         "$artifactVerifier",
         "steps",
-        2,
+        3,
         "continue-on-error"
       ],
       "operation": "set",
@@ -124,7 +124,7 @@
         "jobs",
         "$artifactVerifier",
         "steps",
-        1,
+        2,
         "env"
       ],
       "operation": "set",
@@ -140,7 +140,7 @@
         "jobs",
         "$artifactVerifier",
         "steps",
-        0,
+        1,
         "uses"
       ],
       "operation": "set",
@@ -154,7 +154,7 @@
         "jobs",
         "$artifactVerifier",
         "steps",
-        0,
+        1,
         "run"
       ],
       "operation": "set",
@@ -168,7 +168,7 @@
         "jobs",
         "$artifactVerifier",
         "steps",
-        1,
+        2,
         "id"
       ],
       "operation": "set",
@@ -182,7 +182,7 @@
         "jobs",
         "$artifactVerifier",
         "steps",
-        2,
+        3,
         "run"
       ],
       "operation": "set",
@@ -196,7 +196,7 @@
         "jobs",
         "$artifactVerifier",
         "steps",
-        2,
+        3,
         "run"
       ],
       "operation": "set",
@@ -210,7 +210,7 @@
         "jobs",
         "$artifactVerifier",
         "steps",
-        2,
+        3,
         "run"
       ],
       "operation": "set",
@@ -224,7 +224,7 @@
         "jobs",
         "$artifactVerifier",
         "steps",
-        2,
+        3,
         "run"
       ],
       "operation": "set",
@@ -763,6 +763,164 @@
       "operation": "set",
       "value": "false",
       "category": "code-job-event"
+    },
+    {
+      "name": "platform absent",
+      "workflow": "build.yml",
+      "operation": "delete",
+      "path": [
+        "jobs",
+        "generator_windows_51"
+      ],
+      "category": "isolation-jobs"
+    },
+    {
+      "name": "aggregate missing platform dependency",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "$artifactVerifier",
+        "needs"
+      ],
+      "value": [
+        "generator_windows_51",
+        "generator_windows_7"
+      ],
+      "category": "generator-dependencies"
+    },
+    {
+      "name": "aggregate skip hides failure",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "$artifactVerifier",
+        "if"
+      ],
+      "value": "github.event_name != 'push' || github.event.deleted != true",
+      "category": "code-job-event"
+    },
+    {
+      "name": "platform wrong host",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "generator_windows_51",
+        "runs-on"
+      ],
+      "value": "ubuntu-24.04",
+      "category": "code-job-execution"
+    },
+    {
+      "name": "platform bypass failure",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "generator_windows_51",
+        "continue-on-error"
+      ],
+      "value": true,
+      "category": "code-job-shape"
+    },
+    {
+      "name": "platform wrong output revision",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "generator_windows_7",
+        "outputs",
+        "revision"
+      ],
+      "value": "${{ github.sha }}",
+      "category": "generator-outputs"
+    },
+    {
+      "name": "aggregate missing admission",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "$artifactVerifier",
+        "steps",
+        0,
+        "run"
+      ],
+      "value": "Write-Output 'pass'",
+      "category": "generator-admission"
+    },
+    {
+      "name": "platform missing second pass",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "generator_linux_7",
+        "steps",
+        2,
+        "run"
+      ],
+      "value": "./.github/workflows/Test-StyleGuideGenerator.ps1 -ExpectedHost LinuxPowerShell7",
+      "category": "generator-proof"
+    },
+    {
+      "name": "first pass native check removed",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "generator_windows_7",
+        "steps",
+        1,
+        "run"
+      ],
+      "value": "$env:GIT_CONFIG_NOSYSTEM = '1'\n$env:GIT_CONFIG_GLOBAL = 'NUL'\n$env:GIT_TERMINAL_PROMPT = '0'\n$env:GIT_NO_REPLACE_OBJECTS = '1'\n$strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName\nif ([string]::IsNullOrEmpty($strPowerShellPath) -or -not [IO.File]::Exists($strPowerShellPath)) {\n    throw 'The current PowerShell executable is unavailable.'\n}\n& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost WindowsPowerShell7\n$intGeneratorExit = $LASTEXITCODE\n& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost WindowsPowerShell7\n$intGeneratorExit = $LASTEXITCODE\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    throw 'Generator pass 2 failed.'\n}\n$arrHead = @(& 'C:\\Program Files\\Git\\bin\\git.exe' rev-parse --verify 'HEAD^{commit}')\nif ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $env:GITHUB_SHA) {\n    throw 'Generator proof revision mismatch.'\n}\n[IO.File]::AppendAllText($env:GITHUB_OUTPUT, ('revision=' + $arrHead[0] + \"`n\"), (New-Object Text.UTF8Encoding($false)))\n",
+      "category": "generator-proof"
+    },
+    {
+      "name": "second pass native check removed",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "generator_windows_7",
+        "steps",
+        1,
+        "run"
+      ],
+      "value": "$env:GIT_CONFIG_NOSYSTEM = '1'\n$env:GIT_CONFIG_GLOBAL = 'NUL'\n$env:GIT_TERMINAL_PROMPT = '0'\n$env:GIT_NO_REPLACE_OBJECTS = '1'\n$strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName\nif ([string]::IsNullOrEmpty($strPowerShellPath) -or -not [IO.File]::Exists($strPowerShellPath)) {\n    throw 'The current PowerShell executable is unavailable.'\n}\n& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost WindowsPowerShell7\n$intGeneratorExit = $LASTEXITCODE\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    throw 'Generator pass 1 failed.'\n}\n& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost WindowsPowerShell7\n$intGeneratorExit = $LASTEXITCODE\n$arrHead = @(& 'C:\\Program Files\\Git\\bin\\git.exe' rev-parse --verify 'HEAD^{commit}')\nif ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $env:GITHUB_SHA) {\n    throw 'Generator proof revision mismatch.'\n}\n[IO.File]::AppendAllText($env:GITHUB_OUTPUT, ('revision=' + $arrHead[0] + \"`n\"), (New-Object Text.UTF8Encoding($false)))\n",
+      "category": "generator-proof"
+    },
+    {
+      "name": "platform host resolved through PATH",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "generator_windows_7",
+        "steps",
+        1,
+        "run"
+      ],
+      "value": "$env:GIT_CONFIG_NOSYSTEM = '1'\n$env:GIT_CONFIG_GLOBAL = 'NUL'\n$env:GIT_TERMINAL_PROMPT = '0'\n$env:GIT_NO_REPLACE_OBJECTS = '1'\n$strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName\nif ([string]::IsNullOrEmpty($strPowerShellPath) -or -not [IO.File]::Exists($strPowerShellPath)) {\n    throw 'The current PowerShell executable is unavailable.'\n}\n& pwsh -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost WindowsPowerShell7\n$intGeneratorExit = $LASTEXITCODE\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    throw 'Generator pass 1 failed.'\n}\n& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost WindowsPowerShell7\n$intGeneratorExit = $LASTEXITCODE\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    throw 'Generator pass 2 failed.'\n}\n$arrHead = @(& 'C:\\Program Files\\Git\\bin\\git.exe' rev-parse --verify 'HEAD^{commit}')\nif ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $env:GITHUB_SHA) {\n    throw 'Generator proof revision mismatch.'\n}\n[IO.File]::AppendAllText($env:GITHUB_OUTPUT, ('revision=' + $arrHead[0] + \"`n\"), (New-Object Text.UTF8Encoding($false)))\n",
+      "category": "generator-proof"
+    },
+    {
+      "name": "platform status capture overwritten",
+      "workflow": "build.yml",
+      "operation": "set",
+      "path": [
+        "jobs",
+        "generator_windows_7",
+        "steps",
+        1,
+        "run"
+      ],
+      "value": "$env:GIT_CONFIG_NOSYSTEM = '1'\n$env:GIT_CONFIG_GLOBAL = 'NUL'\n$env:GIT_TERMINAL_PROMPT = '0'\n$env:GIT_NO_REPLACE_OBJECTS = '1'\n$strPowerShellPath = [System.Diagnostics.Process]::GetCurrentProcess().MainModule.FileName\nif ([string]::IsNullOrEmpty($strPowerShellPath) -or -not [IO.File]::Exists($strPowerShellPath)) {\n    throw 'The current PowerShell executable is unavailable.'\n}\n& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost WindowsPowerShell7\n$intGeneratorExit = 0\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    throw 'Generator pass 1 failed.'\n}\n& $strPowerShellPath -NoLogo -NoProfile -NonInteractive -File './.github/workflows/Test-StyleGuideGenerator.ps1' -ExpectedHost WindowsPowerShell7\n$intGeneratorExit = $LASTEXITCODE\nif ($intGeneratorExit -isnot [int] -or $intGeneratorExit -ne 0) {\n    throw 'Generator pass 2 failed.'\n}\n$arrHead = @(& 'C:\\Program Files\\Git\\bin\\git.exe' rev-parse --verify 'HEAD^{commit}')\nif ($LASTEXITCODE -ne 0 -or $arrHead.Count -ne 1 -or $arrHead[0] -cne $env:GITHUB_SHA) {\n    throw 'Generator proof revision mismatch.'\n}\n[IO.File]::AppendAllText($env:GITHUB_OUTPUT, ('revision=' + $arrHead[0] + \"`n\"), (New-Object Text.UTF8Encoding($false)))\n",
+      "category": "generator-proof"
     }
   ]
 }
