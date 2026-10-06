@@ -1,0 +1,810 @@
+{
+  "status": "read-only proposals; no product release",
+  "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+  "captured_utc": "2026-10-06T06:03:15.796125+00:00",
+  "source": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "entry": "100644 blob d0a6b62013d1772388aa7d20773d2db592bf91dc\t.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "entry": "100644 blob 3a62fde67925bc99285f8a0c3c74b53ac7f7f109\t.github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9"
+    },
+    {
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "entry": "100644 blob 1ad1fd449f3b6f98d9295e5d7a1f1a55740a671e\t.github/workflows/Test-StyleGuideArtifacts.ps1",
+      "sha256": "8b59d48ebda6e45e5bf50167d8ce0ee19753efc321dd863014581c33edb38120"
+    },
+    {
+      "path": ".github/workflows/build.yml",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "entry": "100644 blob c7865981e4755df08eecdeed59af21cb2d09ac90\t.github/workflows/build.yml",
+      "sha256": "f167000746a833091b656bfe796c57d667badff691fd4d6a305307166982afdc"
+    },
+    {
+      "path": "AGENTS.md",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "entry": "100644 blob be1e52363e92daec056660b3e1147527874ccbf9\tAGENTS.md",
+      "sha256": "9fbe17ed237c1d7fc1bc5333613f901559e79e94d7617413f3944b7fa8f51f9f"
+    }
+  ],
+  "comments": {
+    "4191973425": {
+      "id": 4191973425,
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "line": 949,
+      "body": "`Set-PSBreakpoint -Script` is being passed a wildcard pattern (escaped path). In some PowerShell versions, the resulting breakpoint\u2019s `.Script` field can reflect the pattern rather than the literal path. Later checks in this self-test compare breakpoint `.Script` against the unescaped `$CheckerPath`, which can produce false failures even when the breakpoint targets the correct file. Consider normalizing the comparison to accept both the escaped pattern and the literal resolved path (or compare using wildcard matching against `$CheckerPath`) to make the verification robust.",
+      "commit_id": "3b12700eb636da67f5861637e5b139a18fa82140"
+    },
+    "4191973454": {
+      "id": 4191973454,
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "line": 1001,
+      "body": "`Set-PSBreakpoint -Script` is being passed a wildcard pattern (escaped path). In some PowerShell versions, the resulting breakpoint\u2019s `.Script` field can reflect the pattern rather than the literal path. Later checks in this self-test compare breakpoint `.Script` against the unescaped `$CheckerPath`, which can produce false failures even when the breakpoint targets the correct file. Consider normalizing the comparison to accept both the escaped pattern and the literal resolved path (or compare using wildcard matching against `$CheckerPath`) to make the verification robust.",
+      "commit_id": "3b12700eb636da67f5861637e5b139a18fa82140"
+    },
+    "4191973471": {
+      "id": 4191973471,
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "line": 33,
+      "body": "These tests hard-require `pwsh` and Git at fixed paths (`/usr/bin/git` or `C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe`). That makes the Node test suite brittle for contributors running it on environments where PowerShell or Git are installed elsewhere (or not installed). Prefer feature-detecting required executables and skipping with a clear message when unavailable, or resolving Git/PowerShell via PATH for tests (keeping fixed-path enforcement to workflow-policy validation where it\u2019s actually required).",
+      "commit_id": "3b12700eb636da67f5861637e5b139a18fa82140"
+    },
+    "4191973511": {
+      "id": 4191973511,
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "line": 65,
+      "body": "These tests hard-require `pwsh` and Git at fixed paths (`/usr/bin/git` or `C:\\\\Program Files\\\\Git\\\\bin\\\\git.exe`). That makes the Node test suite brittle for contributors running it on environments where PowerShell or Git are installed elsewhere (or not installed). Prefer feature-detecting required executables and skipping with a clear message when unavailable, or resolving Git/PowerShell via PATH for tests (keeping fixed-path enforcement to workflow-policy validation where it\u2019s actually required).",
+      "commit_id": "3b12700eb636da67f5861637e5b139a18fa82140"
+    },
+    "4191973543": {
+      "id": 4191973543,
+      "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      "line": 564,
+      "body": "`[System.IO.FileInfo]::new($strChannel).Length` throws if the channel file path is set but the file does not exist, which would bypass the intended fixed diagnostic and potentially leak an unstructured exception message. To keep failures deterministic, explicitly check existence (e.g., `Test-Path -LiteralPath`) before reading `.Length`, and throw a fixed `runner-state:` diagnostic if the file is missing or non-empty.",
+      "commit_id": "3b12700eb636da67f5861637e5b139a18fa82140"
+    }
+  },
+  "R10": {
+    "reuse": "R5 B97.5",
+    "source_exactly_matches_final_R5": true,
+    "matrices": {
+      "windows": {
+        "runtime": "7.6.5",
+        "actual_rows": [
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "plain",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "plain",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\plain\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "bracket[ab]",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "bracket[ab]",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\bracket[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "literal`tick[ab]",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "literal`tick[ab]",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\literal`tick[ab]\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "backtick`only",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "backtick`only",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\backtick`only\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "quote ' unicode-\u00e9",
+            "mode": "initialization-and-local",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1"
+          },
+          {
+            "variant": "Actual",
+            "success": true,
+            "failure": null,
+            "remaining_breakpoints": 0,
+            "path_kind": "quote ' unicode-\u00e9",
+            "mode": "local-only",
+            "remaining_clock_variables": 0,
+            "registered": [
+              {
+                "Script": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1",
+                "Line": 13
+              }
+            ],
+            "checker": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\actual-windows\\matrix\\quote ' unicode-\u00e9\\checker.ps1"
+          }
+        ],
+        "persistent": {
+          "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+          "original_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+          "powershell": "7.6.5",
+          "block_start_line": 1029,
+          "rows": [
+            {
+              "expected_outcome": "rejected",
+              "variant": "Original",
+              "remaining_clock_variables": 0,
+              "failure": "The fixture clock registered breakpoints outside the exact probe path.\nFixture clock control failed: Local clock did not fire with a successful readback.",
+              "remaining_breakpoints": 0
+            },
+            {
+              "expected_outcome": "passed",
+              "variant": "Actual",
+              "remaining_clock_variables": 0,
+              "failure": null,
+              "remaining_breakpoints": 0
+            }
+          ],
+          "scope": "Exact changed persistent block, including original helper negative, difference 0/1, missing/duplicate/inactive anchor, primary error and uninstrumented post-cleanup controls"
+        }
+      },
+      "linux": {
+        "runtime": "7.6.3",
+        "actual_rows": [
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/plain/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/plain/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/plain/checker.ps1",
+            "path_kind": "plain",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/plain/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/plain/checker.ps1",
+            "path_kind": "plain",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/bracket[ab]/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/bracket[ab]/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/bracket[ab]/checker.ps1",
+            "path_kind": "bracket[ab]",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/bracket[ab]/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/bracket[ab]/checker.ps1",
+            "path_kind": "bracket[ab]",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/literal`tick[ab]/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/literal`tick[ab]/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/literal`tick[ab]/checker.ps1",
+            "path_kind": "literal`tick[ab]",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/literal`tick[ab]/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/literal`tick[ab]/checker.ps1",
+            "path_kind": "literal`tick[ab]",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/backtick`only/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/backtick`only/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/backtick`only/checker.ps1",
+            "path_kind": "backtick`only",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/backtick`only/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/backtick`only/checker.ps1",
+            "path_kind": "backtick`only",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+            "path_kind": "quote ' unicode-\u00e9",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/quote ' unicode-\u00e9/checker.ps1",
+            "path_kind": "quote ' unicode-\u00e9",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/star*literal/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/star*literal/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/star*literal/checker.ps1",
+            "path_kind": "star*literal",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/star*literal/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/star*literal/checker.ps1",
+            "path_kind": "star*literal",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/question?literal/checker.ps1",
+                "Line": 6
+              },
+              {
+                "Script": "/output/matrix/question?literal/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/question?literal/checker.ps1",
+            "path_kind": "question?literal",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "initialization-and-local"
+          },
+          {
+            "remaining_breakpoints": 0,
+            "registered": [
+              {
+                "Script": "/output/matrix/question?literal/checker.ps1",
+                "Line": 13
+              }
+            ],
+            "success": true,
+            "variant": "Actual",
+            "checker": "/output/matrix/question?literal/checker.ps1",
+            "path_kind": "question?literal",
+            "failure": null,
+            "remaining_clock_variables": 0,
+            "mode": "local-only"
+          }
+        ],
+        "persistent": {
+          "source_sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+          "original_sha256": "2c7aaaeea5efd74c22ea395d93fc3bc1d508f78ae46e4ac1296a41aef905e67d",
+          "powershell": "7.6.3",
+          "block_start_line": 1029,
+          "rows": [
+            {
+              "remaining_breakpoints": 0,
+              "failure": "The fixture clock registered breakpoints outside the exact probe path.\nFixture clock control failed: Local clock did not fire with a successful readback.",
+              "remaining_clock_variables": 0,
+              "variant": "Original",
+              "expected_outcome": "rejected"
+            },
+            {
+              "remaining_breakpoints": 0,
+              "failure": null,
+              "remaining_clock_variables": 0,
+              "variant": "Actual",
+              "expected_outcome": "passed"
+            }
+          ],
+          "scope": "Exact changed persistent block, including original helper negative, difference 0/1, missing/duplicate/inactive anchor, primary error and uninstrumented post-cleanup controls"
+        }
+      }
+    }
+  },
+  "R11": {
+    "weights": {
+      "proof_correctness": 35,
+      "authority_separation": 20,
+      "contributor_usability": 25,
+      "failure_observability": 15,
+      "maintenance": 5
+    },
+    "options": [
+      {
+        "option": "A",
+        "scores": [
+          10,
+          10,
+          5,
+          8,
+          10
+        ],
+        "total": 84.5,
+        "reason": "Known CI works; another valid Git location fails before proof execution."
+      },
+      {
+        "option": "B",
+        "scores": [
+          10,
+          10,
+          9,
+          9,
+          8
+        ],
+        "total": 95.0,
+        "reason": "Keeps actual execution and production contracts; supports ordinary discovery with explicit failures."
+      },
+      {
+        "option": "C",
+        "scores": [
+          10,
+          10,
+          7,
+          8,
+          7
+        ],
+        "total": 88.0,
+        "reason": "Adds user configuration and another selector to validate."
+      },
+      {
+        "option": "D",
+        "scores": [
+          8,
+          8,
+          8,
+          5,
+          7
+        ],
+        "total": 75.0,
+        "reason": "A local green result can omit required evidence; mode authority is unproved."
+      },
+      {
+        "option": "E",
+        "scores": [
+          3,
+          7,
+          8,
+          2,
+          9
+        ],
+        "total": 52.0,
+        "reason": "Converts missing prerequisites into missing evidence; ineligible."
+      },
+      {
+        "option": "F",
+        "scores": [
+          6,
+          8,
+          5,
+          5,
+          8
+        ],
+        "total": 61.0,
+        "reason": "Removes real Windows current-host coverage rather than fixing discovery."
+      },
+      {
+        "option": "G",
+        "scores": [
+          8,
+          9,
+          7,
+          8,
+          5
+        ],
+        "total": 78.0,
+        "reason": "Changes commands and caller wiring for a local tool-selection concern."
+      },
+      {
+        "option": "H",
+        "scores": [
+          10,
+          10,
+          6,
+          9,
+          9
+        ],
+        "total": 88.0,
+        "reason": "Better diagnosis still rejects another usable installation."
+      },
+      {
+        "option": "I",
+        "scores": [
+          9,
+          10,
+          4,
+          8,
+          6
+        ],
+        "total": 76.5,
+        "reason": "Imposes environment migration where the existing actual-body adapter can suffice."
+      }
+    ],
+    "selected": "B",
+    "total": 95,
+    "proposed_paths": [
+      ".github/workflows/Test-CiHelpers.test.mjs"
+    ],
+    "new_execution": false
+  },
+  "R12": {
+    "reuse": "PS234 round1 R2",
+    "intermediate_function_raw_equal": true,
+    "function_sha256": "3d0da36223233eb5db4f391ee905996700f5e14a2817a0cb111e12a2c073f29f",
+    "shared_Length_expression_count": 2,
+    "strict_mode_enabled": false,
+    "prior_linux_result": {
+      "Version": "7.6.3",
+      "Platform": "Unix",
+      "Results": [
+        {
+          "Mode": "empty",
+          "Checkpoint": "intermediate",
+          "Accepted": true,
+          "Diagnostic": null
+        },
+        {
+          "Mode": "empty",
+          "Checkpoint": "final",
+          "Accepted": true,
+          "Diagnostic": null
+        },
+        {
+          "Mode": "written",
+          "Checkpoint": "intermediate",
+          "Accepted": false,
+          "Diagnostic": "runner-state: a child changed a runner step communication file"
+        },
+        {
+          "Mode": "written",
+          "Checkpoint": "final",
+          "Accepted": false,
+          "Diagnostic": "runner-state: the generator or verifier wrote to a runner step communication file"
+        },
+        {
+          "Mode": "missing",
+          "Checkpoint": "intermediate",
+          "Accepted": false,
+          "Diagnostic": "runner-state: a child changed a runner step communication file"
+        },
+        {
+          "Mode": "missing",
+          "Checkpoint": "final",
+          "Accepted": false,
+          "Diagnostic": "runner-state: the generator or verifier wrote to a runner step communication file"
+        },
+        {
+          "Mode": "directory",
+          "Checkpoint": "intermediate",
+          "Accepted": false,
+          "Diagnostic": "runner-state: a child changed a runner step communication file"
+        },
+        {
+          "Mode": "directory",
+          "Checkpoint": "final",
+          "Accepted": false,
+          "Diagnostic": "runner-state: the generator or verifier wrote to a runner step communication file"
+        }
+      ],
+      "Limits": "Extracted actual checkpoints; Git/worktree digest producers stubbed. No ACL, unreadable-metadata or full-wrapper proof."
+    }
+  },
+  "prior_evidence": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round4-progress-6.json",
+      "sha256": "8578b48517296db08d4cd146ddbc89fe9bbac4f4343d027f838f0c991119afb8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\implementation-evidence.json",
+      "sha256": "a495a1099d747e964e0678acc1cf19dc0a2bfca85d81956bde90cc1544cc341e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R5\\IMPLEMENTATION.md",
+      "sha256": "82c107176536205632589e759b713d803ab80fdb2172ce7197a76b05900d3e67"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A21\\TF68-R5\\DECISION.md",
+      "sha256": "bd1dbd74a046962b1830cc91171eab0185d49cf53c3ce9974b52327d9631a45c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PR234-round1\\R2-channel-diagnostic.md",
+      "sha256": "6781637dc81321ddd915c87f3db79174a44e8bc985e3436bcd38718b8dd47865"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\round1-r2-linux-probe\\evidence.json",
+      "sha256": "4a65603fb6aab8ab2f7a3dd07ecbd30bbdfd673e4278986150bde2dd68bcc596"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\round1-r2-linux-probe\\stdout.json",
+      "sha256": "ac3ef37bb56a9af64d97cf398bf1e5c9988239dfe5fbb5882f96edca3d462452"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round1\\pre-edit-probes.json",
+      "sha256": "f40d811c117491d27e72b0397a77610b9c7eb131348c1d4f4002467c5ddb325e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-source-20261005\\writer\\PR234-round1\\post-edit-probes.json",
+      "sha256": "62c8e9a048d996d4082b48a6cc160100f3f9891627c6bd1e43db02557ee30120"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\design.md",
+      "sha256": "6b5d43d8a1eafe2b6a4f07593d82012f5aa62a8432d275fa1a0a653eb7ba8d51"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\PR234-round2\\R11-inline-workflow.md",
+      "sha256": "6736fa7450ea3d2cba046abe6f0555d1cc4fc306bd0d34c49ae3492801480deb"
+    }
+  ],
+  "guard": {
+    "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+    "index": "29c5915aa3949d7048c41c9c09e18b5946602524f6e56d5f1ddda4737748cfa4",
+    "refs": "aa33f4a192a4fa72a9eda4f745b77c671c3c9b3129936b72f5db5926a4296ba5"
+  },
+  "guard_equal": true,
+  "new_tests": false,
+  "product_or_native_writes": false,
+  "report_sha256": "747ccf12377f583eb17b2f5c64dcc104dfa9b3ca5a63e2a4f484bba245d6655f"
+}

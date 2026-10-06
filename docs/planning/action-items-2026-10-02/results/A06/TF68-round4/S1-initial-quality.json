@@ -1,0 +1,94 @@
+{
+  "status": "CHANGES_REQUIRED_PROPOSAL_SCOPE",
+  "created_at_utc": "2026-10-06T06:01:42.5382660Z",
+  "role": "independent_local_quality",
+  "review_kind": "bounded_read_only_design_review",
+  "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+  "tree": "a4e7ce67d14cb4d5b4e0b677ff995ff4adbd2d29",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "body_sha256": "b7ba5f1c9908f7afd4df1ba44462c98de881556747ffe6c0103419dc684c7dd7",
+  "proposal_sha256": "99da02aff7f7437554fbd37f929884b2446abba74945515600c0d8f75c9333a0",
+  "evidence_sha256": "87a4ec975f93f1260ae1dd919c1271698be5f3a5e03de3f54069d7d2428359c1",
+  "report_sha256": "d561552c7b8988f269d6425765b311cb444c2c7d520d44bec9e5077bce64040f",
+  "material_findings": [
+    {
+      "id": "SETUP-P1",
+      "priority": "P2",
+      "title": "New review workflow omitted from finite setup reader/security contract",
+      "proposal_location": "REPORT.md:72",
+      "source_locations": [
+        "Test-AgentInstructions.ps1:327-367",
+        "Test-AgentInstructions.ps1:413-423",
+        "Test-AgentInstructions.ps1:681-697",
+        "Test-AgentInstructions.ps1:94",
+        "Test-AgentInstructions.SelfTest.ps1:2783-2795",
+        "Test-AgentInstructions.SelfTest.ps1:2829-2865"
+      ],
+      "consequence": "Two-file proposal leaves new setup workflow outside existing bounded staged/revision reads and action/credential validation; CI-helper working-tree assertions alone do not supply equivalent protection.",
+      "basis": "Static source inspection; no reproduction executed.",
+      "required_correction": "Include equivalent finite reader/security/governed-path and regression coverage, with explicit historical absence handling; ordinarily expand to production validator and self-test paths. Correct proposal scope and score assumptions before release."
+    }
+  ],
+  "checks": {
+    "referenced_hashes_verified": 49,
+    "recorded_source_hashes_verified": 3,
+    "option_totals_verified": 12,
+    "unique_selected_option": "C",
+    "selected_total": 95.9,
+    "arithmetic_pass": true,
+    "service_timeout_annotations_verified": 3,
+    "current_cancelled_service_run": 37419002022,
+    "ordinary_full_validation_seconds": [
+      961,
+      1328
+    ],
+    "classifier_new_workflow_coverage": "already maintenance-required",
+    "workflow_metadata_change_required": false,
+    "new_source_tests_run": false,
+    "product_changes_made": false,
+    "native_changes_made": false,
+    "product_worktree_clean": true
+  },
+  "source_sha256": {
+    ".pre-commit-config.yaml": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112",
+    ".github/workflows/agent-instructions.yml": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc",
+    ".github/workflows/Test-AgentInstructions.ps1": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020",
+    ".github/workflows/Classify-InstructionMaintenance.mjs": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e",
+    ".github/workflows/Test-CiHelpers.test.mjs": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9"
+  },
+  "reused_evidence": [
+    "final-quality/R8-decision-delta-review.md",
+    "final-quality/R8-decision-delta-review.json",
+    "final-quality/R8-final-binding.md",
+    "final-quality/R8-final-binding.json"
+  ],
+  "remaining_gates": [
+    "Parent corrected proposal display/selection/release",
+    "Affected implementation and final mandatory validation",
+    "Current R10-R12 dispositions and remaining current ordinary CI",
+    "Current cancelled service remains unresolved",
+    "Actual dedicated service revision/file selection proof",
+    "Fresh exact-input native review and CI after change",
+    "Final binding, strict landing and paired convergence"
+  ],
+  "authority": {
+    "no_ci_failure_merge": true,
+    "historical_exception_generalized": false,
+    "minimum_retry_interval_minutes": 60,
+    "original_deadline": "2026-10-13T23:47:31Z",
+    "transfer_counters": {
+      "A06": 1,
+      "A03": 3,
+      "A21": 5,
+      "A07": 5
+    },
+    "counter_limit": 12,
+    "no_ps_repair_before_tf_acceptance": true
+  },
+  "primary_sources": [
+    "https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners",
+    "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/customize-the-agent-environment",
+    "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+  ]
+}

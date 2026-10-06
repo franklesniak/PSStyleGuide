@@ -1,0 +1,5143 @@
+{
+  "status": "read-only proposal; no implementation release",
+  "captured_utc": "2026-10-06T05:54:33.125109+00:00",
+  "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+  "source": [
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "revision": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "git_entry": "100644 blob 1e63056656df62e78f4b6aaa5f14f0c81b9055cb\t.github/workflows/copilot-setup-steps.yml",
+      "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "revision": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "git_entry": "100644 blob 3a62fde67925bc99285f8a0c3c74b53ac7f7f109\t.github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9"
+    },
+    {
+      "path": ".pre-commit-config.yaml",
+      "revision": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "git_entry": "100644 blob d6fa21489388686703c94ea33c39d0dd41b8bd16\t.pre-commit-config.yaml",
+      "sha256": "fd7cc87c8da07a7fa5138dcf1ce4a3b85d2e089ddab452db753782d29b211112"
+    }
+  ],
+  "current_dynamic_saved_state": {
+    "id": 37419002022,
+    "status": "completed",
+    "conclusion": "cancelled",
+    "head_sha": "3b12700eb636da67f5861637e5b139a18fa82140",
+    "html_url": "https://github.com/franklesniak/TerraformStyleGuide/actions/runs/37419002022",
+    "snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round4-progress-7.json",
+    "snapshot_time": "2026-10-06T05:53:27.009820+00:00"
+  },
+  "prior_decision": {
+    "path": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A03\\copilot-setup-decisions.md",
+    "sha256": "eefdff4eee16e7fcc1a0941a8d405958222a0a78fbaef99f08ddf88a0ea76c2e",
+    "reused": "D6 and D9 exact acquisition/preparation/failure constraints",
+    "reevaluated": "D9 section D concrete timeout bottleneck; dedicated review versus full coding setup"
+  },
+  "timings": [
+    {
+      "run_id": 37418864567,
+      "job_id": 112123500657,
+      "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "workflow": "Copilot setup steps",
+      "result": "success",
+      "job_seconds": 977.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-06T05:30:38Z",
+        "completed_at": "2026-10-06T05:46:39Z",
+        "seconds": 961.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:24Z",
+          "completed_at": "2026-10-06T05:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:24Z",
+          "completed_at": "2026-10-06T05:30:26Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:26Z",
+          "completed_at": "2026-10-06T05:30:27Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:27Z",
+          "completed_at": "2026-10-06T05:30:28Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:28Z",
+          "completed_at": "2026-10-06T05:30:28Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:28Z",
+          "completed_at": "2026-10-06T05:30:28Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:28Z",
+          "completed_at": "2026-10-06T05:30:28Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:28Z",
+          "completed_at": "2026-10-06T05:30:31Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:31Z",
+          "completed_at": "2026-10-06T05:30:31Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:31Z",
+          "completed_at": "2026-10-06T05:30:32Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:32Z",
+          "completed_at": "2026-10-06T05:30:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:32Z",
+          "completed_at": "2026-10-06T05:30:35Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:35Z",
+          "completed_at": "2026-10-06T05:30:38Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:38Z",
+          "completed_at": "2026-10-06T05:30:38Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:38Z",
+          "completed_at": "2026-10-06T05:46:39Z",
+          "seconds": 961.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:46:39Z",
+          "completed_at": "2026-10-06T05:46:39Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:46:39Z",
+          "completed_at": "2026-10-06T05:46:39Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [],
+      "excerpts": [
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T05:30:38.7736318Z Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T05:31:02.8062946Z workflow policy contract.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T05:46:39.2817685Z agent instruction contract and mutation tests............................Passed"
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864567\\attempt-1"
+    },
+    {
+      "run_id": 37390452073,
+      "job_id": 112034001317,
+      "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "workflow": "Copilot setup steps",
+      "result": "success",
+      "job_seconds": 728.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-05T23:47:21Z",
+        "completed_at": "2026-10-05T23:59:14Z",
+        "seconds": 713.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:09Z",
+          "completed_at": "2026-10-05T23:47:09Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:09Z",
+          "completed_at": "2026-10-05T23:47:11Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:11Z",
+          "completed_at": "2026-10-05T23:47:11Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:11Z",
+          "completed_at": "2026-10-05T23:47:12Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:12Z",
+          "completed_at": "2026-10-05T23:47:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:12Z",
+          "completed_at": "2026-10-05T23:47:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:12Z",
+          "completed_at": "2026-10-05T23:47:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:12Z",
+          "completed_at": "2026-10-05T23:47:15Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:15Z",
+          "completed_at": "2026-10-05T23:47:15Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:15Z",
+          "completed_at": "2026-10-05T23:47:16Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:16Z",
+          "completed_at": "2026-10-05T23:47:16Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:16Z",
+          "completed_at": "2026-10-05T23:47:18Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:18Z",
+          "completed_at": "2026-10-05T23:47:21Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:21Z",
+          "completed_at": "2026-10-05T23:47:21Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:21Z",
+          "completed_at": "2026-10-05T23:59:14Z",
+          "seconds": 713.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:59:14Z",
+          "completed_at": "2026-10-05T23:59:14Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:59:14Z",
+          "completed_at": "2026-10-05T23:59:14Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [],
+      "excerpts": [
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-05T23:47:22.1291292Z Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-05T23:47:42.8379519Z workflow policy contract.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-05T23:59:14.0148448Z agent instruction contract and mutation tests............................Passed"
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390452073\\attempt-1"
+    },
+    {
+      "run_id": 37390496063,
+      "job_id": 112034143366,
+      "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "workflow": "Copilot setup steps",
+      "result": "success",
+      "job_seconds": 949.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-05T23:48:00Z",
+        "completed_at": "2026-10-06T00:03:24Z",
+        "seconds": 924.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:37Z",
+          "completed_at": "2026-10-05T23:47:37Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:37Z",
+          "completed_at": "2026-10-05T23:47:41Z",
+          "seconds": 4.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:41Z",
+          "completed_at": "2026-10-05T23:47:42Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:42Z",
+          "completed_at": "2026-10-05T23:47:42Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:42Z",
+          "completed_at": "2026-10-05T23:47:42Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:42Z",
+          "completed_at": "2026-10-05T23:47:43Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:43Z",
+          "completed_at": "2026-10-05T23:47:43Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:43Z",
+          "completed_at": "2026-10-05T23:47:46Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:46Z",
+          "completed_at": "2026-10-05T23:47:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:46Z",
+          "completed_at": "2026-10-05T23:47:48Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:48Z",
+          "completed_at": "2026-10-05T23:47:48Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:48Z",
+          "completed_at": "2026-10-05T23:47:52Z",
+          "seconds": 4.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:47:52Z",
+          "completed_at": "2026-10-05T23:48:00Z",
+          "seconds": 8.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:48:00Z",
+          "completed_at": "2026-10-05T23:48:00Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:48:00Z",
+          "completed_at": "2026-10-06T00:03:24Z",
+          "seconds": 924.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:03:24Z",
+          "completed_at": "2026-10-06T00:03:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:03:24Z",
+          "completed_at": "2026-10-06T00:03:24Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [],
+      "excerpts": [
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-05T23:48:01.2177436Z Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-05T23:48:30.9986698Z workflow policy contract.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T00:03:24.5518593Z agent instruction contract and mutation tests............................Passed"
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390496063\\attempt-1"
+    },
+    {
+      "run_id": 37390664560,
+      "job_id": 112034711384,
+      "head": "6c0c987799425b60c0e7b76650aa5ec7946811e2",
+      "workflow": "Running Copilot Code Review",
+      "result": "failure",
+      "job_seconds": 1024.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "failure",
+        "started_at": "2026-10-05T23:50:24Z",
+        "completed_at": "2026-10-06T00:02:39Z",
+        "seconds": 735.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:33Z",
+          "completed_at": "2026-10-05T23:49:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Initialize",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:33Z",
+          "completed_at": "2026-10-05T23:49:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate runner OS",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:49:33Z",
+          "completed_at": "2026-10-05T23:49:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate firewall settings (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:49:33Z",
+          "completed_at": "2026-10-05T23:49:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate firewall settings (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:49:33Z",
+          "completed_at": "2026-10-05T23:49:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Pre-cache Playwright MCP server in the background (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:33Z",
+          "completed_at": "2026-10-05T23:49:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Pre-cache Playwright MCP server in the background (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:49:33Z",
+          "completed_at": "2026-10-05T23:49:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Prepare Copilot (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:33Z",
+          "completed_at": "2026-10-05T23:49:47Z",
+          "seconds": 14.0
+        },
+        {
+          "name": "Prepare Copilot (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:49:47Z",
+          "completed_at": "2026-10-05T23:49:47Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:47Z",
+          "completed_at": "2026-10-05T23:49:50Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:49:50Z",
+          "completed_at": "2026-10-05T23:49:50Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:50Z",
+          "completed_at": "2026-10-05T23:49:56Z",
+          "seconds": 6.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:56Z",
+          "completed_at": "2026-10-05T23:49:56Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:49:56Z",
+          "completed_at": "2026-10-05T23:49:56Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:56Z",
+          "completed_at": "2026-10-05T23:49:57Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:49:57Z",
+          "completed_at": "2026-10-05T23:49:57Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:57Z",
+          "completed_at": "2026-10-05T23:49:57Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:57Z",
+          "completed_at": "2026-10-05T23:49:58Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:49:58Z",
+          "completed_at": "2026-10-05T23:49:58Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:58Z",
+          "completed_at": "2026-10-05T23:49:58Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:49:58Z",
+          "completed_at": "2026-10-05T23:49:58Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:58Z",
+          "completed_at": "2026-10-05T23:49:59Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:49:59Z",
+          "completed_at": "2026-10-05T23:50:00Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:00Z",
+          "completed_at": "2026-10-05T23:50:00Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:00Z",
+          "completed_at": "2026-10-05T23:50:00Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:00Z",
+          "completed_at": "2026-10-05T23:50:00Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:00Z",
+          "completed_at": "2026-10-05T23:50:00Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:00Z",
+          "completed_at": "2026-10-05T23:50:01Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:01Z",
+          "completed_at": "2026-10-05T23:50:01Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:01Z",
+          "completed_at": "2026-10-05T23:50:01Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:01Z",
+          "completed_at": "2026-10-05T23:50:01Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:01Z",
+          "completed_at": "2026-10-05T23:50:02Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:02Z",
+          "completed_at": "2026-10-05T23:50:02Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:02Z",
+          "completed_at": "2026-10-05T23:50:02Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:02Z",
+          "completed_at": "2026-10-05T23:50:03Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:03Z",
+          "completed_at": "2026-10-05T23:50:03Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:03Z",
+          "completed_at": "2026-10-05T23:50:03Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:03Z",
+          "completed_at": "2026-10-05T23:50:03Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:03Z",
+          "completed_at": "2026-10-05T23:50:03Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:03Z",
+          "completed_at": "2026-10-05T23:50:03Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:03Z",
+          "completed_at": "2026-10-05T23:50:03Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:03Z",
+          "completed_at": "2026-10-05T23:50:07Z",
+          "seconds": 4.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:07Z",
+          "completed_at": "2026-10-05T23:50:07Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:07Z",
+          "completed_at": "2026-10-05T23:50:07Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:07Z",
+          "completed_at": "2026-10-05T23:50:08Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:08Z",
+          "completed_at": "2026-10-05T23:50:08Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:08Z",
+          "completed_at": "2026-10-05T23:50:08Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:08Z",
+          "completed_at": "2026-10-05T23:50:08Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:08Z",
+          "completed_at": "2026-10-05T23:50:08Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:08Z",
+          "completed_at": "2026-10-05T23:50:09Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:09Z",
+          "completed_at": "2026-10-05T23:50:09Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:09Z",
+          "completed_at": "2026-10-05T23:50:11Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:11Z",
+          "completed_at": "2026-10-05T23:50:11Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:11Z",
+          "completed_at": "2026-10-05T23:50:11Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:11Z",
+          "completed_at": "2026-10-05T23:50:11Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:11Z",
+          "completed_at": "2026-10-05T23:50:11Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:11Z",
+          "completed_at": "2026-10-05T23:50:12Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:12Z",
+          "completed_at": "2026-10-05T23:50:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:12Z",
+          "completed_at": "2026-10-05T23:50:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:12Z",
+          "completed_at": "2026-10-05T23:50:13Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:13Z",
+          "completed_at": "2026-10-05T23:50:13Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:13Z",
+          "completed_at": "2026-10-05T23:50:16Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:16Z",
+          "completed_at": "2026-10-05T23:50:16Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:16Z",
+          "completed_at": "2026-10-05T23:50:16Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:16Z",
+          "completed_at": "2026-10-05T23:50:16Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:16Z",
+          "completed_at": "2026-10-05T23:50:16Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:16Z",
+          "completed_at": "2026-10-05T23:50:21Z",
+          "seconds": 5.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:21Z",
+          "completed_at": "2026-10-05T23:50:21Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:21Z",
+          "completed_at": "2026-10-05T23:50:21Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:21Z",
+          "completed_at": "2026-10-05T23:50:22Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:22Z",
+          "completed_at": "2026-10-05T23:50:22Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:22Z",
+          "completed_at": "2026-10-05T23:50:22Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:22Z",
+          "completed_at": "2026-10-05T23:50:23Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:23Z",
+          "completed_at": "2026-10-05T23:50:23Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-05T23:50:23Z",
+          "completed_at": "2026-10-05T23:50:23Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-05T23:50:24Z",
+          "completed_at": "2026-10-05T23:50:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "failure",
+          "started_at": "2026-10-05T23:50:24Z",
+          "completed_at": "2026-10-06T00:02:39Z",
+          "seconds": 735.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:02:39Z",
+          "completed_at": "2026-10-06T00:02:40Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:02:40Z",
+          "completed_at": "2026-10-06T00:02:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:02:40Z",
+          "completed_at": "2026-10-06T00:02:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:02:40Z",
+          "completed_at": "2026-10-06T00:02:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:02:40Z",
+          "completed_at": "2026-10-06T00:02:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:02:40Z",
+          "completed_at": "2026-10-06T00:02:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:02:40Z",
+          "completed_at": "2026-10-06T00:02:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download Autofind (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:02:40Z",
+          "completed_at": "2026-10-06T00:02:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download Autofind (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:02:40Z",
+          "completed_at": "2026-10-06T00:02:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Generate agent firewall CA (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:02:40Z",
+          "completed_at": "2026-10-06T00:02:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Start MCP Servers (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:02:40Z",
+          "completed_at": "2026-10-06T00:02:41Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Start MCP Servers (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:02:41Z",
+          "completed_at": "2026-10-06T00:02:41Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Setup Agent (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:02:41Z",
+          "completed_at": "2026-10-06T00:02:43Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Setup Agent (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:02:43Z",
+          "completed_at": "2026-10-06T00:02:43Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download git-proxy (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:02:43Z",
+          "completed_at": "2026-10-06T00:02:43Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download git-proxy (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:02:43Z",
+          "completed_at": "2026-10-06T00:02:43Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Processing Request (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:02:43Z",
+          "completed_at": "2026-10-06T00:06:33Z",
+          "seconds": 230.0
+        },
+        {
+          "name": "Processing Request (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:06:33Z",
+          "completed_at": "2026-10-06T00:06:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Clean Up (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:06:33Z",
+          "completed_at": "2026-10-06T00:06:34Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Clean Up (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:06:34Z",
+          "completed_at": "2026-10-06T00:06:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "[Optional] Archive Details",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T00:06:34Z",
+          "completed_at": "2026-10-06T00:06:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T00:06:34Z",
+          "completed_at": "2026-10-06T00:06:34Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [
+        {
+          "job_id": 112034711384,
+          "pages": [
+            [
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/6c0c987799425b60c0e7b76650aa5ec7946811e2/.github",
+                "start_line": 74,
+                "start_column": null,
+                "end_line": 74,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "Complete validation failed with status 1; fixes remain only in the disposable copy.",
+                "raw_details": ""
+              },
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/6c0c987799425b60c0e7b76650aa5ec7946811e2/.github",
+                "start_line": 168,
+                "start_column": null,
+                "end_line": 168,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "Process completed with exit code 1.",
+                "raw_details": ""
+              },
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/6c0c987799425b60c0e7b76650aa5ec7946811e2/.github",
+                "start_line": 167,
+                "start_column": null,
+                "end_line": 167,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "Complete validation failed with status 1; fixes remain only in the disposable copy.",
+                "raw_details": ""
+              }
+            ]
+          ]
+        }
+      ],
+      "excerpts": [
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-05T23:50:24.3259701Z Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-05T23:50:58.2988987Z workflow policy contract.................................................Passed",
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T00:02:39.7251806Z agent instruction contract and mutation tests............................Failed",
+        "copilot-pull-request-reviewer\tFinished User Configured Setup Step (Linux)\t2026-10-06T00:02:39.9377695Z Run complete repository validation / <error>Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "copilot-pull-request-reviewer\tFinished User Configured Setup Step (Linux)\t2026-10-06T00:02:39.9386897Z workflow policy contract.................................................Passed",
+        "copilot-pull-request-reviewer\tFinished User Configured Setup Step (Linux)\t2026-10-06T00:02:39.9387411Z agent instruction contract and mutation tests............................Failed"
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390664560\\attempt-1"
+    },
+    {
+      "run_id": 37412263799,
+      "job_id": 112103093586,
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "workflow": "Copilot setup steps",
+      "result": "success",
+      "job_seconds": 1160.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-06T04:08:44Z",
+        "completed_at": "2026-10-06T04:27:37Z",
+        "seconds": 1133.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:20Z",
+          "completed_at": "2026-10-06T04:08:20Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:20Z",
+          "completed_at": "2026-10-06T04:08:26Z",
+          "seconds": 6.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:26Z",
+          "completed_at": "2026-10-06T04:08:27Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:27Z",
+          "completed_at": "2026-10-06T04:08:28Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:28Z",
+          "completed_at": "2026-10-06T04:08:28Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:28Z",
+          "completed_at": "2026-10-06T04:08:28Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:28Z",
+          "completed_at": "2026-10-06T04:08:28Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:28Z",
+          "completed_at": "2026-10-06T04:08:32Z",
+          "seconds": 4.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:32Z",
+          "completed_at": "2026-10-06T04:08:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:32Z",
+          "completed_at": "2026-10-06T04:08:33Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:33Z",
+          "completed_at": "2026-10-06T04:08:34Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:34Z",
+          "completed_at": "2026-10-06T04:08:38Z",
+          "seconds": 4.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:38Z",
+          "completed_at": "2026-10-06T04:08:44Z",
+          "seconds": 6.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:44Z",
+          "completed_at": "2026-10-06T04:08:44Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:44Z",
+          "completed_at": "2026-10-06T04:27:37Z",
+          "seconds": 1133.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:27:37Z",
+          "completed_at": "2026-10-06T04:27:37Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:27:37Z",
+          "completed_at": "2026-10-06T04:27:37Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [],
+      "excerpts": [
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T04:08:45.1821770Z Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T04:09:16.1875505Z workflow policy contract.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T04:27:36.9924679Z agent instruction contract and mutation tests............................Passed"
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412263799\\attempt-1"
+    },
+    {
+      "run_id": 37412265677,
+      "job_id": 112103099999,
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "workflow": "Copilot setup steps",
+      "result": "success",
+      "job_seconds": 1495.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-06T04:08:40Z",
+        "completed_at": "2026-10-06T04:33:13Z",
+        "seconds": 1473.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:22Z",
+          "completed_at": "2026-10-06T04:08:22Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:22Z",
+          "completed_at": "2026-10-06T04:08:24Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:24Z",
+          "completed_at": "2026-10-06T04:08:25Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:25Z",
+          "completed_at": "2026-10-06T04:08:26Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:26Z",
+          "completed_at": "2026-10-06T04:08:26Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:26Z",
+          "completed_at": "2026-10-06T04:08:27Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:27Z",
+          "completed_at": "2026-10-06T04:08:27Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:27Z",
+          "completed_at": "2026-10-06T04:08:30Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:30Z",
+          "completed_at": "2026-10-06T04:08:31Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:31Z",
+          "completed_at": "2026-10-06T04:08:32Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:32Z",
+          "completed_at": "2026-10-06T04:08:33Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:33Z",
+          "completed_at": "2026-10-06T04:08:36Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:36Z",
+          "completed_at": "2026-10-06T04:08:40Z",
+          "seconds": 4.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:40Z",
+          "completed_at": "2026-10-06T04:08:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:08:40Z",
+          "completed_at": "2026-10-06T04:33:13Z",
+          "seconds": 1473.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:33:13Z",
+          "completed_at": "2026-10-06T04:33:13Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:33:13Z",
+          "completed_at": "2026-10-06T04:33:13Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [],
+      "excerpts": [
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T04:08:40.7909229Z Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T04:09:12.7824681Z workflow policy contract.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T04:33:13.5828658Z agent instruction contract and mutation tests............................Passed"
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412265677\\attempt-1"
+    },
+    {
+      "run_id": 37412403267,
+      "job_id": 112103539186,
+      "head": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
+      "workflow": "Running Copilot Code Review",
+      "result": "cancelled",
+      "job_seconds": 1218.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "started_at": "2026-10-06T04:10:55Z",
+        "completed_at": "2026-10-06T04:30:24Z",
+        "seconds": 1169.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:11Z",
+          "completed_at": "2026-10-06T04:10:12Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Initialize",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:12Z",
+          "completed_at": "2026-10-06T04:10:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate runner OS",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:12Z",
+          "completed_at": "2026-10-06T04:10:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate firewall settings (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:12Z",
+          "completed_at": "2026-10-06T04:10:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate firewall settings (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:12Z",
+          "completed_at": "2026-10-06T04:10:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Pre-cache Playwright MCP server in the background (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:12Z",
+          "completed_at": "2026-10-06T04:10:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Pre-cache Playwright MCP server in the background (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:12Z",
+          "completed_at": "2026-10-06T04:10:12Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Prepare Copilot (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:12Z",
+          "completed_at": "2026-10-06T04:10:26Z",
+          "seconds": 14.0
+        },
+        {
+          "name": "Prepare Copilot (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:26Z",
+          "completed_at": "2026-10-06T04:10:26Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:26Z",
+          "completed_at": "2026-10-06T04:10:27Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:27Z",
+          "completed_at": "2026-10-06T04:10:27Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:27Z",
+          "completed_at": "2026-10-06T04:10:29Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:29Z",
+          "completed_at": "2026-10-06T04:10:29Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:29Z",
+          "completed_at": "2026-10-06T04:10:29Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:29Z",
+          "completed_at": "2026-10-06T04:10:30Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:30Z",
+          "completed_at": "2026-10-06T04:10:30Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:30Z",
+          "completed_at": "2026-10-06T04:10:31Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:31Z",
+          "completed_at": "2026-10-06T04:10:31Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:31Z",
+          "completed_at": "2026-10-06T04:10:31Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:31Z",
+          "completed_at": "2026-10-06T04:10:32Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:32Z",
+          "completed_at": "2026-10-06T04:10:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:32Z",
+          "completed_at": "2026-10-06T04:10:33Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:33Z",
+          "completed_at": "2026-10-06T04:10:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:33Z",
+          "completed_at": "2026-10-06T04:10:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:33Z",
+          "completed_at": "2026-10-06T04:10:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:33Z",
+          "completed_at": "2026-10-06T04:10:34Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:34Z",
+          "completed_at": "2026-10-06T04:10:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:34Z",
+          "completed_at": "2026-10-06T04:10:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:34Z",
+          "completed_at": "2026-10-06T04:10:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:34Z",
+          "completed_at": "2026-10-06T04:10:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:34Z",
+          "completed_at": "2026-10-06T04:10:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:34Z",
+          "completed_at": "2026-10-06T04:10:35Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:35Z",
+          "completed_at": "2026-10-06T04:10:36Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:36Z",
+          "completed_at": "2026-10-06T04:10:36Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:36Z",
+          "completed_at": "2026-10-06T04:10:36Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:36Z",
+          "completed_at": "2026-10-06T04:10:36Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:36Z",
+          "completed_at": "2026-10-06T04:10:36Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:36Z",
+          "completed_at": "2026-10-06T04:10:36Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:36Z",
+          "completed_at": "2026-10-06T04:10:36Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:36Z",
+          "completed_at": "2026-10-06T04:10:37Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:37Z",
+          "completed_at": "2026-10-06T04:10:37Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:37Z",
+          "completed_at": "2026-10-06T04:10:40Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:40Z",
+          "completed_at": "2026-10-06T04:10:41Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:41Z",
+          "completed_at": "2026-10-06T04:10:41Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:41Z",
+          "completed_at": "2026-10-06T04:10:41Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:41Z",
+          "completed_at": "2026-10-06T04:10:41Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:41Z",
+          "completed_at": "2026-10-06T04:10:41Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:41Z",
+          "completed_at": "2026-10-06T04:10:42Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:42Z",
+          "completed_at": "2026-10-06T04:10:42Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:42Z",
+          "completed_at": "2026-10-06T04:10:42Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:42Z",
+          "completed_at": "2026-10-06T04:10:42Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:42Z",
+          "completed_at": "2026-10-06T04:10:44Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:44Z",
+          "completed_at": "2026-10-06T04:10:44Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:44Z",
+          "completed_at": "2026-10-06T04:10:44Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:44Z",
+          "completed_at": "2026-10-06T04:10:45Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:45Z",
+          "completed_at": "2026-10-06T04:10:45Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:45Z",
+          "completed_at": "2026-10-06T04:10:45Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:45Z",
+          "completed_at": "2026-10-06T04:10:46Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:46Z",
+          "completed_at": "2026-10-06T04:10:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:46Z",
+          "completed_at": "2026-10-06T04:10:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:46Z",
+          "completed_at": "2026-10-06T04:10:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:46Z",
+          "completed_at": "2026-10-06T04:10:49Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:49Z",
+          "completed_at": "2026-10-06T04:10:49Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:49Z",
+          "completed_at": "2026-10-06T04:10:49Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:49Z",
+          "completed_at": "2026-10-06T04:10:50Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:50Z",
+          "completed_at": "2026-10-06T04:10:50Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:50Z",
+          "completed_at": "2026-10-06T04:10:53Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:53Z",
+          "completed_at": "2026-10-06T04:10:54Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:54Z",
+          "completed_at": "2026-10-06T04:10:54Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:54Z",
+          "completed_at": "2026-10-06T04:10:54Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:54Z",
+          "completed_at": "2026-10-06T04:10:54Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:54Z",
+          "completed_at": "2026-10-06T04:10:54Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:54Z",
+          "completed_at": "2026-10-06T04:10:55Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:55Z",
+          "completed_at": "2026-10-06T04:10:55Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:10:55Z",
+          "completed_at": "2026-10-06T04:10:55Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:10:55Z",
+          "completed_at": "2026-10-06T04:10:55Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "started_at": "2026-10-06T04:10:55Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 1169.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download Autofind (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download Autofind (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Generate agent firewall CA (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Start MCP Servers (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Start MCP Servers (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Setup Agent (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Setup Agent (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download git-proxy (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download git-proxy (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Processing Request (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Processing Request (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Clean Up (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:30:24Z",
+          "completed_at": "2026-10-06T04:30:25Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Clean Up (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:25Z",
+          "completed_at": "2026-10-06T04:30:25Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "[Optional] Archive Details",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T04:30:25Z",
+          "completed_at": "2026-10-06T04:30:25Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T04:30:25Z",
+          "completed_at": "2026-10-06T04:30:25Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [
+        {
+          "job_id": 112103539186,
+          "pages": [
+            [
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/7dd48f52c9e4c17268b4a571919622f4d701e5d0/.github",
+                "start_line": 1,
+                "start_column": null,
+                "end_line": 1,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "The job has exceeded the maximum execution time of 20m0s",
+                "raw_details": ""
+              },
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/7dd48f52c9e4c17268b4a571919622f4d701e5d0/.github",
+                "start_line": 152,
+                "start_column": null,
+                "end_line": 152,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "The operation was canceled.",
+                "raw_details": ""
+              }
+            ]
+          ]
+        }
+      ],
+      "excerpts": [
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T04:10:55.6381933Z Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T04:11:32.1746676Z workflow policy contract.................................................Passed",
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T04:30:24.3465955Z ##[error]The operation was canceled."
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412403267\\attempt-1"
+    },
+    {
+      "run_id": 37403245762,
+      "job_id": 112074934439,
+      "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+      "workflow": "Copilot setup steps",
+      "result": "success",
+      "job_seconds": 1564.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-06T02:15:59Z",
+        "completed_at": "2026-10-06T02:41:31Z",
+        "seconds": 1532.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:32Z",
+          "completed_at": "2026-10-06T02:15:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:32Z",
+          "completed_at": "2026-10-06T02:15:42Z",
+          "seconds": 10.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:42Z",
+          "completed_at": "2026-10-06T02:15:43Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:43Z",
+          "completed_at": "2026-10-06T02:15:44Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:44Z",
+          "completed_at": "2026-10-06T02:15:44Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:44Z",
+          "completed_at": "2026-10-06T02:15:45Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:45Z",
+          "completed_at": "2026-10-06T02:15:45Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:45Z",
+          "completed_at": "2026-10-06T02:15:48Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:48Z",
+          "completed_at": "2026-10-06T02:15:48Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:48Z",
+          "completed_at": "2026-10-06T02:15:50Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:50Z",
+          "completed_at": "2026-10-06T02:15:51Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:51Z",
+          "completed_at": "2026-10-06T02:15:54Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:54Z",
+          "completed_at": "2026-10-06T02:15:59Z",
+          "seconds": 5.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:59Z",
+          "completed_at": "2026-10-06T02:15:59Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:59Z",
+          "completed_at": "2026-10-06T02:41:31Z",
+          "seconds": 1532.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:41:31Z",
+          "completed_at": "2026-10-06T02:41:31Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:41:31Z",
+          "completed_at": "2026-10-06T02:41:31Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [],
+      "excerpts": [
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T02:15:59.5022274Z Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T02:16:34.8907349Z workflow policy contract.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T02:41:31.4993603Z agent instruction contract and mutation tests............................Passed"
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403245762\\attempt-1"
+    },
+    {
+      "run_id": 37403248022,
+      "job_id": 112074941342,
+      "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+      "workflow": "Copilot setup steps",
+      "result": "success",
+      "job_seconds": 944.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-06T02:15:51Z",
+        "completed_at": "2026-10-06T02:31:13Z",
+        "seconds": 922.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:33Z",
+          "completed_at": "2026-10-06T02:15:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:33Z",
+          "completed_at": "2026-10-06T02:15:39Z",
+          "seconds": 6.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:39Z",
+          "completed_at": "2026-10-06T02:15:39Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:39Z",
+          "completed_at": "2026-10-06T02:15:40Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:40Z",
+          "completed_at": "2026-10-06T02:15:40Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:40Z",
+          "completed_at": "2026-10-06T02:15:41Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:41Z",
+          "completed_at": "2026-10-06T02:15:41Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:41Z",
+          "completed_at": "2026-10-06T02:15:43Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:43Z",
+          "completed_at": "2026-10-06T02:15:43Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:43Z",
+          "completed_at": "2026-10-06T02:15:45Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:45Z",
+          "completed_at": "2026-10-06T02:15:45Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:45Z",
+          "completed_at": "2026-10-06T02:15:47Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:47Z",
+          "completed_at": "2026-10-06T02:15:50Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:50Z",
+          "completed_at": "2026-10-06T02:15:51Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:15:51Z",
+          "completed_at": "2026-10-06T02:31:13Z",
+          "seconds": 922.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:31:13Z",
+          "completed_at": "2026-10-06T02:31:13Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:31:13Z",
+          "completed_at": "2026-10-06T02:31:13Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [],
+      "excerpts": [
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T02:15:51.3430791Z Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T02:16:15.0800130Z workflow policy contract.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T02:31:13.4469632Z agent instruction contract and mutation tests............................Passed"
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403248022\\attempt-1"
+    },
+    {
+      "run_id": 37403381576,
+      "job_id": 112075385627,
+      "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
+      "workflow": "Running Copilot Code Review",
+      "result": "cancelled",
+      "job_seconds": 1221.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "started_at": "2026-10-06T02:18:07Z",
+        "completed_at": "2026-10-06T02:37:32Z",
+        "seconds": 1165.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:19Z",
+          "completed_at": "2026-10-06T02:17:20Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Initialize",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:20Z",
+          "completed_at": "2026-10-06T02:17:20Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate runner OS",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:20Z",
+          "completed_at": "2026-10-06T02:17:20Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate firewall settings (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:20Z",
+          "completed_at": "2026-10-06T02:17:20Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate firewall settings (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:20Z",
+          "completed_at": "2026-10-06T02:17:20Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Pre-cache Playwright MCP server in the background (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:20Z",
+          "completed_at": "2026-10-06T02:17:20Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Pre-cache Playwright MCP server in the background (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:20Z",
+          "completed_at": "2026-10-06T02:17:20Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Prepare Copilot (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:20Z",
+          "completed_at": "2026-10-06T02:17:34Z",
+          "seconds": 14.0
+        },
+        {
+          "name": "Prepare Copilot (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:34Z",
+          "completed_at": "2026-10-06T02:17:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:34Z",
+          "completed_at": "2026-10-06T02:17:36Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:36Z",
+          "completed_at": "2026-10-06T02:17:36Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:36Z",
+          "completed_at": "2026-10-06T02:17:38Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:38Z",
+          "completed_at": "2026-10-06T02:17:38Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:38Z",
+          "completed_at": "2026-10-06T02:17:38Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:38Z",
+          "completed_at": "2026-10-06T02:17:39Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:39Z",
+          "completed_at": "2026-10-06T02:17:39Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:39Z",
+          "completed_at": "2026-10-06T02:17:40Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:40Z",
+          "completed_at": "2026-10-06T02:17:41Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:41Z",
+          "completed_at": "2026-10-06T02:17:41Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:41Z",
+          "completed_at": "2026-10-06T02:17:41Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:41Z",
+          "completed_at": "2026-10-06T02:17:41Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:41Z",
+          "completed_at": "2026-10-06T02:17:42Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:42Z",
+          "completed_at": "2026-10-06T02:17:43Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:43Z",
+          "completed_at": "2026-10-06T02:17:43Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:43Z",
+          "completed_at": "2026-10-06T02:17:43Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:43Z",
+          "completed_at": "2026-10-06T02:17:43Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:43Z",
+          "completed_at": "2026-10-06T02:17:43Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:43Z",
+          "completed_at": "2026-10-06T02:17:44Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:44Z",
+          "completed_at": "2026-10-06T02:17:44Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:44Z",
+          "completed_at": "2026-10-06T02:17:44Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:44Z",
+          "completed_at": "2026-10-06T02:17:44Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:44Z",
+          "completed_at": "2026-10-06T02:17:45Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:45Z",
+          "completed_at": "2026-10-06T02:17:45Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:45Z",
+          "completed_at": "2026-10-06T02:17:45Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:45Z",
+          "completed_at": "2026-10-06T02:17:46Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:46Z",
+          "completed_at": "2026-10-06T02:17:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:46Z",
+          "completed_at": "2026-10-06T02:17:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:46Z",
+          "completed_at": "2026-10-06T02:17:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:46Z",
+          "completed_at": "2026-10-06T02:17:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:46Z",
+          "completed_at": "2026-10-06T02:17:47Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:47Z",
+          "completed_at": "2026-10-06T02:17:47Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:47Z",
+          "completed_at": "2026-10-06T02:17:50Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:50Z",
+          "completed_at": "2026-10-06T02:17:51Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:51Z",
+          "completed_at": "2026-10-06T02:17:51Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:51Z",
+          "completed_at": "2026-10-06T02:17:51Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:51Z",
+          "completed_at": "2026-10-06T02:17:51Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:51Z",
+          "completed_at": "2026-10-06T02:17:52Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:52Z",
+          "completed_at": "2026-10-06T02:17:52Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:52Z",
+          "completed_at": "2026-10-06T02:17:52Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:52Z",
+          "completed_at": "2026-10-06T02:17:53Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:53Z",
+          "completed_at": "2026-10-06T02:17:53Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:53Z",
+          "completed_at": "2026-10-06T02:17:54Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:54Z",
+          "completed_at": "2026-10-06T02:17:55Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:55Z",
+          "completed_at": "2026-10-06T02:17:55Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:55Z",
+          "completed_at": "2026-10-06T02:17:55Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:55Z",
+          "completed_at": "2026-10-06T02:17:55Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:55Z",
+          "completed_at": "2026-10-06T02:17:56Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:56Z",
+          "completed_at": "2026-10-06T02:17:56Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:56Z",
+          "completed_at": "2026-10-06T02:17:56Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:56Z",
+          "completed_at": "2026-10-06T02:17:57Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:17:57Z",
+          "completed_at": "2026-10-06T02:17:57Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:17:57Z",
+          "completed_at": "2026-10-06T02:18:00Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:18:00Z",
+          "completed_at": "2026-10-06T02:18:00Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:18:00Z",
+          "completed_at": "2026-10-06T02:18:00Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:18:00Z",
+          "completed_at": "2026-10-06T02:18:01Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:18:01Z",
+          "completed_at": "2026-10-06T02:18:01Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:18:01Z",
+          "completed_at": "2026-10-06T02:18:05Z",
+          "seconds": 4.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:18:05Z",
+          "completed_at": "2026-10-06T02:18:06Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:18:06Z",
+          "completed_at": "2026-10-06T02:18:06Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:18:06Z",
+          "completed_at": "2026-10-06T02:18:06Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:18:06Z",
+          "completed_at": "2026-10-06T02:18:06Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:18:06Z",
+          "completed_at": "2026-10-06T02:18:06Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:18:06Z",
+          "completed_at": "2026-10-06T02:18:07Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:18:07Z",
+          "completed_at": "2026-10-06T02:18:07Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:18:07Z",
+          "completed_at": "2026-10-06T02:18:07Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:18:07Z",
+          "completed_at": "2026-10-06T02:18:07Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "started_at": "2026-10-06T02:18:07Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 1165.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download Autofind (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download Autofind (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Generate agent firewall CA (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Start MCP Servers (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Start MCP Servers (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Setup Agent (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Setup Agent (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download git-proxy (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download git-proxy (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Processing Request (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Processing Request (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:32Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Clean Up (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:37:32Z",
+          "completed_at": "2026-10-06T02:37:33Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Clean Up (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:33Z",
+          "completed_at": "2026-10-06T02:37:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "[Optional] Archive Details",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T02:37:33Z",
+          "completed_at": "2026-10-06T02:37:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T02:37:33Z",
+          "completed_at": "2026-10-06T02:37:33Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [
+        {
+          "job_id": 112075385627,
+          "pages": [
+            [
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/f89d47d6780db47df29be4eb6d79cab35051f598/.github",
+                "start_line": 1,
+                "start_column": null,
+                "end_line": 1,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "The job has exceeded the maximum execution time of 20m0s",
+                "raw_details": ""
+              },
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/f89d47d6780db47df29be4eb6d79cab35051f598/.github",
+                "start_line": 152,
+                "start_column": null,
+                "end_line": 152,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "The operation was canceled.",
+                "raw_details": ""
+              }
+            ]
+          ]
+        }
+      ],
+      "excerpts": [
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T02:18:08.0729045Z Dependencies and hooks are ready; running complete validation in a disposable copy.",
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T02:18:40.6796412Z workflow policy contract.................................................Passed",
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T02:37:32.0998638Z ##[error]The operation was canceled."
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403381576\\attempt-1"
+    },
+    {
+      "run_id": 37419002022,
+      "job_id": 112123925649,
+      "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "workflow": "Running Copilot Code Review",
+      "result": "cancelled",
+      "job_seconds": 1217.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "started_at": "2026-10-06T05:32:47Z",
+        "completed_at": "2026-10-06T05:52:18Z",
+        "seconds": 1171.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:05Z",
+          "completed_at": "2026-10-06T05:32:06Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Initialize",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:06Z",
+          "completed_at": "2026-10-06T05:32:06Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate runner OS",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:06Z",
+          "completed_at": "2026-10-06T05:32:06Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate firewall settings (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:06Z",
+          "completed_at": "2026-10-06T05:32:06Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Validate firewall settings (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:06Z",
+          "completed_at": "2026-10-06T05:32:06Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Pre-cache Playwright MCP server in the background (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:06Z",
+          "completed_at": "2026-10-06T05:32:06Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Pre-cache Playwright MCP server in the background (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:06Z",
+          "completed_at": "2026-10-06T05:32:06Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Prepare Copilot (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:06Z",
+          "completed_at": "2026-10-06T05:32:20Z",
+          "seconds": 14.0
+        },
+        {
+          "name": "Prepare Copilot (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:20Z",
+          "completed_at": "2026-10-06T05:32:20Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:20Z",
+          "completed_at": "2026-10-06T05:32:21Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:21Z",
+          "completed_at": "2026-10-06T05:32:21Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:21Z",
+          "completed_at": "2026-10-06T05:32:23Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:23Z",
+          "completed_at": "2026-10-06T05:32:23Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:23Z",
+          "completed_at": "2026-10-06T05:32:23Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:23Z",
+          "completed_at": "2026-10-06T05:32:24Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:24Z",
+          "completed_at": "2026-10-06T05:32:24Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:24Z",
+          "completed_at": "2026-10-06T05:32:25Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:25Z",
+          "completed_at": "2026-10-06T05:32:25Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:25Z",
+          "completed_at": "2026-10-06T05:32:25Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:25Z",
+          "completed_at": "2026-10-06T05:32:25Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:25Z",
+          "completed_at": "2026-10-06T05:32:25Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:25Z",
+          "completed_at": "2026-10-06T05:32:26Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:26Z",
+          "completed_at": "2026-10-06T05:32:26Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:26Z",
+          "completed_at": "2026-10-06T05:32:26Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:26Z",
+          "completed_at": "2026-10-06T05:32:27Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:27Z",
+          "completed_at": "2026-10-06T05:32:27Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:27Z",
+          "completed_at": "2026-10-06T05:32:27Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:27Z",
+          "completed_at": "2026-10-06T05:32:27Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:27Z",
+          "completed_at": "2026-10-06T05:32:27Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:27Z",
+          "completed_at": "2026-10-06T05:32:28Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:28Z",
+          "completed_at": "2026-10-06T05:32:28Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:28Z",
+          "completed_at": "2026-10-06T05:32:28Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:28Z",
+          "completed_at": "2026-10-06T05:32:29Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:29Z",
+          "completed_at": "2026-10-06T05:32:29Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:29Z",
+          "completed_at": "2026-10-06T05:32:29Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:29Z",
+          "completed_at": "2026-10-06T05:32:29Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:29Z",
+          "completed_at": "2026-10-06T05:32:29Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:29Z",
+          "completed_at": "2026-10-06T05:32:29Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:29Z",
+          "completed_at": "2026-10-06T05:32:29Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:29Z",
+          "completed_at": "2026-10-06T05:32:30Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:30Z",
+          "completed_at": "2026-10-06T05:32:30Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:30Z",
+          "completed_at": "2026-10-06T05:32:33Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:33Z",
+          "completed_at": "2026-10-06T05:32:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:33Z",
+          "completed_at": "2026-10-06T05:32:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:33Z",
+          "completed_at": "2026-10-06T05:32:34Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:34Z",
+          "completed_at": "2026-10-06T05:32:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:34Z",
+          "completed_at": "2026-10-06T05:32:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:34Z",
+          "completed_at": "2026-10-06T05:32:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:34Z",
+          "completed_at": "2026-10-06T05:32:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:34Z",
+          "completed_at": "2026-10-06T05:32:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:34Z",
+          "completed_at": "2026-10-06T05:32:34Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:34Z",
+          "completed_at": "2026-10-06T05:32:36Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:36Z",
+          "completed_at": "2026-10-06T05:32:37Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:37Z",
+          "completed_at": "2026-10-06T05:32:37Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:37Z",
+          "completed_at": "2026-10-06T05:32:37Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:37Z",
+          "completed_at": "2026-10-06T05:32:37Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:37Z",
+          "completed_at": "2026-10-06T05:32:38Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:38Z",
+          "completed_at": "2026-10-06T05:32:38Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:38Z",
+          "completed_at": "2026-10-06T05:32:38Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:38Z",
+          "completed_at": "2026-10-06T05:32:38Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:38Z",
+          "completed_at": "2026-10-06T05:32:38Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:38Z",
+          "completed_at": "2026-10-06T05:32:41Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:41Z",
+          "completed_at": "2026-10-06T05:32:42Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:42Z",
+          "completed_at": "2026-10-06T05:32:42Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:42Z",
+          "completed_at": "2026-10-06T05:32:42Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:42Z",
+          "completed_at": "2026-10-06T05:32:42Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:42Z",
+          "completed_at": "2026-10-06T05:32:46Z",
+          "seconds": 4.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:46Z",
+          "completed_at": "2026-10-06T05:32:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:46Z",
+          "completed_at": "2026-10-06T05:32:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:46Z",
+          "completed_at": "2026-10-06T05:32:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:46Z",
+          "completed_at": "2026-10-06T05:32:46Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:46Z",
+          "completed_at": "2026-10-06T05:32:47Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:47Z",
+          "completed_at": "2026-10-06T05:32:47Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:47Z",
+          "completed_at": "2026-10-06T05:32:47Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:32:47Z",
+          "completed_at": "2026-10-06T05:32:47Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:32:47Z",
+          "completed_at": "2026-10-06T05:32:47Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "cancelled",
+          "started_at": "2026-10-06T05:32:47Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 1171.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Starting User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Finished User Configured Setup Step (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download Autofind (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download Autofind (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Generate agent firewall CA (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Start MCP Servers (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Start MCP Servers (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Setup Agent (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Setup Agent (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download git-proxy (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Download git-proxy (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Processing Request (Linux)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Processing Request (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:18Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Clean Up (Linux)",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:52:18Z",
+          "completed_at": "2026-10-06T05:52:19Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Clean Up (Windows)",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:19Z",
+          "completed_at": "2026-10-06T05:52:19Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "[Optional] Archive Details",
+          "status": "completed",
+          "conclusion": "skipped",
+          "started_at": "2026-10-06T05:52:19Z",
+          "completed_at": "2026-10-06T05:52:19Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:52:19Z",
+          "completed_at": "2026-10-06T05:52:19Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [
+        {
+          "job_id": 112123925649,
+          "pages": [
+            [
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/3b12700eb636da67f5861637e5b139a18fa82140/.github",
+                "start_line": 1,
+                "start_column": null,
+                "end_line": 1,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "The job has exceeded the maximum execution time of 20m0s",
+                "raw_details": ""
+              },
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/3b12700eb636da67f5861637e5b139a18fa82140/.github",
+                "start_line": 152,
+                "start_column": null,
+                "end_line": 152,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "The operation was canceled.",
+                "raw_details": ""
+              }
+            ]
+          ]
+        }
+      ],
+      "excerpts": [
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T05:33:20.5217713Z workflow policy contract.................................................Passed",
+        "copilot-pull-request-reviewer\tRun complete repository validation\t2026-10-06T05:52:18.1115225Z ##[error]The operation was canceled."
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37419002022\\attempt-1"
+    },
+    {
+      "run_id": 37418858374,
+      "job_id": 112123482753,
+      "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "workflow": "Copilot setup steps",
+      "result": "success",
+      "job_seconds": 1352.0,
+      "full_validation": {
+        "name": "Run complete repository validation",
+        "status": "completed",
+        "conclusion": "success",
+        "started_at": "2026-10-06T05:30:41Z",
+        "completed_at": "2026-10-06T05:52:49Z",
+        "seconds": 1328.0
+      },
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:21Z",
+          "completed_at": "2026-10-06T05:30:21Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Acquire triggering revision without an action",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:21Z",
+          "completed_at": "2026-10-06T05:30:27Z",
+          "seconds": 6.0
+        },
+        {
+          "name": "Verify checkout credential cleanup",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:27Z",
+          "completed_at": "2026-10-06T05:30:28Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Acquire published main reference",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:28Z",
+          "completed_at": "2026-10-06T05:30:29Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Reject alternate npm install inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:29Z",
+          "completed_at": "2026-10-06T05:30:29Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Detect locked validation-tool layout",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:29Z",
+          "completed_at": "2026-10-06T05:30:30Z",
+          "seconds": 1.0
+        },
+        {
+          "name": "Verify acquired immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:30Z",
+          "completed_at": "2026-10-06T05:30:30Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up verified official Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:30Z",
+          "completed_at": "2026-10-06T05:30:33Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Verify selected Node.js runtime",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:33Z",
+          "completed_at": "2026-10-06T05:30:33Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Install locked Node.js validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:33Z",
+          "completed_at": "2026-10-06T05:30:35Z",
+          "seconds": 2.0
+        },
+        {
+          "name": "Verify locked dependency trees and immutable manifests",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:35Z",
+          "completed_at": "2026-10-06T05:30:35Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Set up isolated Python 3.12",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:35Z",
+          "completed_at": "2026-10-06T05:30:38Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Install locked Python validation tools",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:38Z",
+          "completed_at": "2026-10-06T05:30:41Z",
+          "seconds": 3.0
+        },
+        {
+          "name": "Activate repository hooks",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:41Z",
+          "completed_at": "2026-10-06T05:30:41Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Run complete repository validation",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:30:41Z",
+          "completed_at": "2026-10-06T05:52:49Z",
+          "seconds": 1328.0
+        },
+        {
+          "name": "Verify final immutable setup inputs",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:52:49Z",
+          "completed_at": "2026-10-06T05:52:49Z",
+          "seconds": 0.0
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "started_at": "2026-10-06T05:52:49Z",
+          "completed_at": "2026-10-06T05:52:49Z",
+          "seconds": 0.0
+        }
+      ],
+      "annotations": [],
+      "excerpts": [
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T05:31:11.5618523Z workflow policy contract.................................................Passed",
+        "Install locked repository validation tools\tRun complete repository validation\t2026-10-06T05:52:49.6356517Z agent instruction contract and mutation tests............................Passed"
+      ],
+      "evidence_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858374\\attempt-1"
+    }
+  ],
+  "weights": {
+    "Acceptance correctness": 30,
+    "Review availability": 25,
+    "Trust preservation": 20,
+    "Contributor clarity": 15,
+    "Evidence testability": 7,
+    "Cost maintenance": 3
+  },
+  "scores": [
+    {
+      "option": "A",
+      "name": "Retain shared full setup; wait/retry only under hourly rule",
+      "scores": [
+        10,
+        3,
+        10,
+        5,
+        7,
+        10
+      ],
+      "total": 72.9,
+      "reason": "Keeps all existing checks but does not address demonstrated repeated last-hook timeout."
+    },
+    {
+      "option": "B",
+      "name": "Change only timeout numbers",
+      "scores": [
+        8,
+        1,
+        10,
+        3,
+        6,
+        9
+      ],
+      "total": 57.9,
+      "reason": "Already 59/45; no evidence a larger value changes the observed service job budget; >59 unsupported."
+    },
+    {
+      "option": "C",
+      "name": "Dedicated review preparation; keep complete coding/ordinary validation",
+      "scores": [
+        10,
+        9,
+        10,
+        10,
+        9,
+        7
+      ],
+      "total": 95.9,
+      "reason": "Removes measured redundant setup bottleneck while retaining prerequisites and all independent full acceptance gates; service selection still needs proof."
+    },
+    {
+      "option": "D",
+      "name": "One shared file with service/event-dependent aggregate condition",
+      "scores": [
+        8,
+        7,
+        7,
+        6,
+        5,
+        8
+      ],
+      "total": 70.4,
+      "reason": "Needs a trusted documented discriminator; none validated here; easy to misclassify ordinary or coding sessions."
+    },
+    {
+      "option": "E",
+      "name": "Remove full validation from the shared setup for every consumer",
+      "scores": [
+        7,
+        9,
+        9,
+        6,
+        8,
+        9
+      ],
+      "total": 78.8,
+      "reason": "Solves delay but unnecessarily changes the selected coding-agent full-validation contract."
+    },
+    {
+      "option": "F",
+      "name": "Dedicated review setup runs a named subset excluding the long hook",
+      "scores": [
+        9,
+        8,
+        9,
+        7,
+        8,
+        6
+      ],
+      "total": 82.9,
+      "reason": "Can be honest about partial checks, but adds another test-selection contract and no needed prerequisite beyond C."
+    },
+    {
+      "option": "G",
+      "name": "Optimize or parallelize full SelfTest while retaining all setup work",
+      "scores": [
+        10,
+        6,
+        9,
+        8,
+        6,
+        4
+      ],
+      "total": 80.4,
+      "reason": "Potential real benefit, but current evidence identifies a hook, not an internal optimization or safe speedup guarantee."
+    },
+    {
+      "option": "H",
+      "name": "Cache or snapshot dependencies and tools; retain full suite",
+      "scores": [
+        9,
+        4,
+        7,
+        7,
+        5,
+        4
+      ],
+      "total": 66.2,
+      "reason": "Prerequisites take under a minute in these runs; does not remove 15\u201325min test phase; adds cache trust/invalidation."
+    },
+    {
+      "option": "I",
+      "name": "Purchase/configure larger hosted runner; retain full suite",
+      "scores": [
+        10,
+        7,
+        8,
+        7,
+        5,
+        2
+      ],
+      "total": 78.1,
+      "reason": "May help CPU-bound work but hardware/bottleneck scaling is unmeasured; paid organization infrastructure is not established."
+    },
+    {
+      "option": "J",
+      "name": "Provision ARC self-hosted review runners",
+      "scores": [
+        10,
+        7,
+        5,
+        6,
+        5,
+        1
+      ],
+      "total": 70.3,
+      "reason": "Supported review runner family but adds major network/ephemeral-host operations and separate infrastructure authority."
+    },
+    {
+      "option": "K",
+      "name": "Seek provider clarification/fix while retaining current setup",
+      "scores": [
+        10,
+        4,
+        10,
+        6,
+        6,
+        7
+      ],
+      "total": 75.3,
+      "reason": "Useful for unexplained 20m enforcement, but no provider response or delivery date is available."
+    },
+    {
+      "option": "L",
+      "name": "Treat cancellation as success, skip setup, or force Lite acceptance",
+      "scores": [
+        0,
+        8,
+        2,
+        1,
+        1,
+        10
+      ],
+      "total": 29.2,
+      "reason": "Violates current no-failing-CI rule and truthful setup/acceptance; ineligible."
+    }
+  ],
+  "selected": "C",
+  "selected_total": 95.9,
+  "proposed_paths": [
+    ".github/workflows/copilot-code-review.yml",
+    ".github/workflows/Test-CiHelpers.test.mjs"
+  ],
+  "primary_sources": [
+    "https://docs.github.com/en/copilot/how-tos/copilot-on-github/set-up-copilot/configure-runners",
+    "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/customize-cloud-agent/customize-the-agent-environment",
+    "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+  ],
+  "limits": [
+    "Observed20m annotations are not a documented universal limit.",
+    "Current service cancellation confirmed by saved root snapshot, jobs, log and explicit20m annotation; no live native query by worker.",
+    "Last-hook boundary timing does not profile individual fixtures or prove hardware equivalence.",
+    "Public standard-runner minutes free; no actual billing usage measured.",
+    "Default-branch/service selection must be proven; no merge exception supplied.",
+    "No new tests or installs."
+  ],
+  "source_index_refs_guard": {
+    "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+    "index": "29c5915aa3949d7048c41c9c09e18b5946602524f6e56d5f1ddda4737748cfa4",
+    "refs": "aa33f4a192a4fa72a9eda4f745b77c671c3c9b3129936b72f5db5926a4296ba5"
+  },
+  "guard_equal": true,
+  "evidence_files": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864567\\attempt-1\\jobs.json",
+      "sha256": "921931e4a14aed3616ddf486cd03a3d52ab4df0e67af67e5bd7fb6c433bb6bac"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864567\\attempt-1\\annotations.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864567\\attempt-1\\log.txt",
+      "sha256": "f33444232fef32435f7ece28de4e54e0c4f2581dd51a0c5097be3e87eef212d3"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864567\\attempt-1\\run.json",
+      "sha256": "07e142b38fd557e9aff2835b8aeced8f00ecb311d18401f10215cd73895f7c3d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390452073\\attempt-1\\jobs.json",
+      "sha256": "803b0889d58e77d9a2c6b3e553a3e2e66ec3385323e23e261f945983c026016b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390452073\\attempt-1\\annotations.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390452073\\attempt-1\\log.txt",
+      "sha256": "c12ebe13d86105445a9601464fa55db271c3b200a7c6e6c6740a6513cd333ec1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390452073\\attempt-1\\run.json",
+      "sha256": "82e1e39dea7de2e31f32c1502036cdab23e4f15b05d2af405274a02ecbec3823"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390496063\\attempt-1\\jobs.json",
+      "sha256": "7030a4405a16d07051d7e0d1ecb3d681cde5e4d9141fae27629f79494e17f9fa"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390496063\\attempt-1\\annotations.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390496063\\attempt-1\\log.txt",
+      "sha256": "9a9c4b6cac6f908dc1dced42af6dc4f71e3a0cfc31b7df50f4069aa2fbfc3c86"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390496063\\attempt-1\\run.json",
+      "sha256": "0d08a76474b377c7a3b01b2d6dbb4d8fe0d709761250aee9c68b7552c38e880a"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390664560\\attempt-1\\jobs.json",
+      "sha256": "6cfbdad61cc3dd04878306a9d67a37e3f01d27151b9acd848bf30401caf89bad"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390664560\\attempt-1\\annotations.json",
+      "sha256": "fbf3bbeabc8cddd010143ff5c5ee68a294df8baa1e55e8dc26ff291e79c7c8ec"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390664560\\attempt-1\\log.txt",
+      "sha256": "b7dcc2987dc6e6d971ac4fc243f365d76b035b9f46414707a381da05e111a8bc"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-6c0c987\\37390664560\\attempt-1\\run.json",
+      "sha256": "c5a005d374446e59c4ea0550c1ad376517f28e625bf3f1ea29d9591d94e4c2ab"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412263799\\attempt-1\\jobs.json",
+      "sha256": "e03d0e28f33ad69a04f2f182331c53ee694f866acc7da6ecbb468af5c82387b0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412263799\\attempt-1\\annotations.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412263799\\attempt-1\\log.txt",
+      "sha256": "7043c753516a33218a61fbd817fbe2301fd5c46731195cd026b496eb52413577"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412263799\\attempt-1\\run.json",
+      "sha256": "b430aeec32e3316498afec21eeacfde7a4223737414f90f7b0b018d8009a6faa"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412265677\\attempt-1\\jobs.json",
+      "sha256": "50295739eebe6757f1323dd6e61e229a91c37fbdcd3b3d28b25c45f65f666cac"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412265677\\attempt-1\\annotations.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412265677\\attempt-1\\log.txt",
+      "sha256": "e0fb16827792118b32183b2e64793474bd6533a8f85b8a170cf5472b2d071007"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412265677\\attempt-1\\run.json",
+      "sha256": "56e97fed28afb308a8f787e58ceea754bd4556ca5947cd5bbe9a404542bd26c8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412403267\\attempt-1\\jobs.json",
+      "sha256": "cd119e504b131e76547a75e3a376b6b801a4764749b8ba41d7c0848e7e23ffe9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412403267\\attempt-1\\annotations.json",
+      "sha256": "207f984a9c832a45b0465c08c9db3004fbb27f69f71e35cbff6002d939ffb61e"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412403267\\attempt-1\\log.txt",
+      "sha256": "90bc684eae4c745b25820246893c02d5fe7519048ba087b9de48d35260b0082b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-7dd48f5\\37412403267\\attempt-1\\run.json",
+      "sha256": "f57e175ec03ecbe35bfa7b32803a65b662269d0b5a879bfe82e300a26368954d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403245762\\attempt-1\\jobs.json",
+      "sha256": "fae5d8cbb2a3d706f101a9bb1ed7a11b4d70d9f8f5b9ff40f08f28441fd399e7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403245762\\attempt-1\\annotations.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403245762\\attempt-1\\log.txt",
+      "sha256": "e25076baeb665343fd26c645058d39ee53f3346c03a61b6196953efd65308943"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403245762\\attempt-1\\run.json",
+      "sha256": "3d2bda1e7e89d2cbe7b372efb085c74fdec4bc70556bb393dfbb7bad66ed6d21"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403248022\\attempt-1\\jobs.json",
+      "sha256": "c235c25b580d154ae49088a1f5e2024951dab6703300e3e93beec0d23087e9d2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403248022\\attempt-1\\annotations.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403248022\\attempt-1\\log.txt",
+      "sha256": "3bcfaa57a42866cbd147fc0b7ce4b213a69a844eb882814775e0e3a61504f7d8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403248022\\attempt-1\\run.json",
+      "sha256": "da6f682ca16a482474a5fdc963c2301648fce406fd8867ce6d8e59b00908b2c7"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403381576\\attempt-1\\jobs.json",
+      "sha256": "9354863f309cb23da44d48141696639f08e4b7e7bdc31050d465165641e5feb6"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403381576\\attempt-1\\annotations.json",
+      "sha256": "91982a7ca9e8d8292b5ed8b5ee31360a94459df8d1cc48ed7c5c09552cfa77c5"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403381576\\attempt-1\\log.txt",
+      "sha256": "f688b4a561e091bb98b7d3367270df1892f88d230f0a5fe79969729e13ea31cf"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-f89d47d\\37403381576\\attempt-1\\run.json",
+      "sha256": "83e623f8cfdfee62beb439dea5aaecda2a33313a29f7d77656f3199a8774da5b"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round4-progress-7.json",
+      "sha256": "faee5151d25dbfa4403dd7ffced4925e7d3b399a86288749790116f56b68c6c2"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37419002022\\attempt-1\\jobs.json",
+      "sha256": "a4ee1d490705b028193160faa8f1e01cdcb85f21ca700d854fac179df117359d"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37419002022\\attempt-1\\annotations.json",
+      "sha256": "6ff410c2898222420590a1876987b655ae4dd7440edad287ab2a527808afe91c"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37419002022\\attempt-1\\log.txt",
+      "sha256": "62d4dc68b2ffc809ccf81fbce661bf70ec374a5ed8fb91fb11dbb21b541d41f9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37419002022\\attempt-1\\run.json",
+      "sha256": "b5530795999ceb8e44fbc654668d04efcf36bb988f15558907f15890ec6fe5a9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858374\\attempt-1\\jobs.json",
+      "sha256": "13744b83dca260656d037a6318d2d027f875443da2c8b482c0ef6d73cd9cc4da"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858374\\attempt-1\\annotations.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858374\\attempt-1\\log.txt",
+      "sha256": "c689c95ebe7ded3f3592baecb86d47806925b7a63809fb8dc705b988d1ca0abd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858374\\attempt-1\\run.json",
+      "sha256": "76caa530fb411b5ecac7f6534de74569bea66f584600cfb81aeed0c7cded1f9a"
+    }
+  ],
+  "report_sha256": "99da02aff7f7437554fbd37f929884b2446abba74945515600c0d8f75c9333a0",
+  "current_dynamic_terminal_blocker": true,
+  "updated_utc": "2026-10-06T05:55:11.667751+00:00"
+}

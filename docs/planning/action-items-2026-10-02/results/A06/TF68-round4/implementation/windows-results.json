@@ -1,0 +1,121 @@
+[
+  {
+    "name": "quality",
+    "command": [
+      "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "-NoLogo",
+      "-NoProfile",
+      "-NonInteractive",
+      "-Command",
+      "$ErrorActionPreference='Stop'; Import-Module PSScriptAnalyzer -RequiredVersion 1.24.0; foreach ($p in @('.github/workflows/Test-AgentInstructions.ps1','.github/workflows/Test-AgentInstructions.SelfTest.ps1')) { $t=$null; $e=$null; $a=[Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD $p),[ref]$t,[ref]$e); if ($e.Count) { throw ($e|Out-String) }; $issues=@(Invoke-ScriptAnalyzer -Path $p -Severity Warning,Error); if ($issues.Count) { $issues|Format-List|Out-String|Write-Output; exit 1 } }; 'Full-file parser and PSScriptAnalyzer1.24.0 passed.'"
+    ],
+    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+    "started_utc": "2026-10-06T06:28:57.617755+00:00",
+    "source_sha256": {
+      "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+      "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+      "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+    },
+    "native_exit": 0,
+    "finished_utc": "2026-10-06T06:29:53.284256+00:00",
+    "log_sha256": "b0d4935f680f691971a252ffbcbd769c51c4be0502c7de01a5766a7f43ea657a"
+  },
+  {
+    "name": "setup-reader",
+    "command": [
+      "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "-NoLogo",
+      "-NoProfile",
+      "-NonInteractive",
+      "-File",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\setup-focus.ps1",
+      "-RepositoryRootPath",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture"
+    ],
+    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+    "started_utc": "2026-10-06T06:29:53.291084+00:00",
+    "source_sha256": {
+      "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+      "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+      "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+    },
+    "native_exit": 1,
+    "finished_utc": "2026-10-06T06:29:56.573629+00:00",
+    "log_sha256": "4356bd714438fcde7fd48727ecb02b9163f6df7df5d77fbb784cc6e622e0056e"
+  },
+  {
+    "name": "setup-reader",
+    "command": [
+      "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "-NoLogo",
+      "-NoProfile",
+      "-NonInteractive",
+      "-File",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\setup-focus.ps1",
+      "-RepositoryRootPath",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture"
+    ],
+    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+    "started_utc": "2026-10-06T06:30:27.834659+00:00",
+    "source_sha256": {
+      "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+      "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+      "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+    },
+    "native_exit": 1,
+    "finished_utc": "2026-10-06T06:30:29.944443+00:00",
+    "log_sha256": "4356bd714438fcde7fd48727ecb02b9163f6df7df5d77fbb784cc6e622e0056e"
+  },
+  {
+    "name": "setup-reader",
+    "command": [
+      "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "-NoLogo",
+      "-NoProfile",
+      "-NonInteractive",
+      "-File",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\setup-focus.ps1",
+      "-RepositoryRootPath",
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture"
+    ],
+    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+    "started_utc": "2026-10-06T06:31:13.806183+00:00",
+    "source_sha256": {
+      "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+      "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+      "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+    },
+    "native_exit": 0,
+    "finished_utc": "2026-10-06T06:32:27.148343+00:00",
+    "log_sha256": "21799691ec441be6273802528c04ee8589a8bb82ae8818e519180a7a84514f43"
+  },
+  {
+    "name": "ci-helpers",
+    "command": [
+      "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+      "--test",
+      "--test-name-pattern=fixture Git discovery|generator proof preserves|dedicated review setup preserves|actual workflows cover",
+      ".github/workflows/Test-CiHelpers.test.mjs"
+    ],
+    "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+    "started_utc": "2026-10-06T06:32:27.155134+00:00",
+    "source_sha256": {
+      "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+      "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+      "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+    },
+    "native_exit": 0,
+    "finished_utc": "2026-10-06T06:32:41.823991+00:00",
+    "log_sha256": "22a3d0e4612f67c58b7b51ba8caec9d5280d3ba22a0f09c56dddd3162936e497"
+  }
+]

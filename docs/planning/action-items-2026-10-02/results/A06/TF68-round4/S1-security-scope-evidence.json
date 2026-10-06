@@ -1,0 +1,168 @@
+{
+  "status": "read-only proposal; original frozen bytes preserved",
+  "captured_utc": "2026-10-06T06:14:02.230046+00:00",
+  "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+  "source": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "mode_blob": "100644 blob 7ee712e048ab512aa751cf77c530d985d458bf7f\t.github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "4534cecbed38f559ed617136d796f103773851c8919489ce53b3a97ff9750020"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "mode_blob": "100644 blob d0a6b62013d1772388aa7d20773d2db592bf91dc\t.github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "0f0abc0b9f84b6f5863a823e4c0f277cc479b207cabc240c8a62e1a92dc6f64e"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "mode_blob": "100644 blob 3a62fde67925bc99285f8a0c3c74b53ac7f7f109\t.github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9"
+    },
+    {
+      "path": ".github/workflows/copilot-setup-steps.yml",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "mode_blob": "100644 blob 1e63056656df62e78f4b6aaa5f14f0c81b9055cb\t.github/workflows/copilot-setup-steps.yml",
+      "sha256": "44ea169d2f0fef29086f92bbd5f4145fbd60403d498ea3f96ff16cb702494a29"
+    },
+    {
+      "path": ".github/workflows/Classify-InstructionMaintenance.mjs",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "mode_blob": "100644 blob d9802a71a9e257bcbd0b9d5055e9f3ed9f430343\t.github/workflows/Classify-InstructionMaintenance.mjs",
+      "sha256": "2517e4fb96ae1d029450dca72ad048ef49416654fae55641c586f22a31e831e8"
+    }
+  ],
+  "evidence_files": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-setup-timeout-readiness\\REPORT.md",
+      "sha256": "99da02aff7f7437554fbd37f929884b2446abba74945515600c0d8f75c9333a0"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-setup-timeout-readiness\\evidence.json",
+      "sha256": "87a4ec975f93f1260ae1dd919c1271698be5f3a5e03de3f54069d7d2428359c1"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\setup-timeout-proposal-review.md",
+      "sha256": "d561552c7b8988f269d6425765b311cb444c2c7d520d44bec9e5077bce64040f"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\setup-timeout-proposal-review.json",
+      "sha256": "ba431285ef46da7d4b85d4b49cc0f8de995f42bba126b27db9d26924165b3fae"
+    }
+  ],
+  "weights": [
+    35,
+    20,
+    20,
+    20,
+    5
+  ],
+  "scores": {
+    "A": {
+      "criteria": [
+        2,
+        8,
+        10,
+        2,
+        10
+      ],
+      "total": 52.0,
+      "basis": "Keep original two-file scope; fixtures alone cannot guard staged/revision input; ineligible."
+    },
+    "B": {
+      "criteria": [
+        10,
+        2,
+        8,
+        8,
+        9
+      ],
+      "total": 75.5,
+      "basis": "Require new file everywhere; breaks supported historical absence."
+    },
+    "C": {
+      "criteria": [
+        10,
+        10,
+        10,
+        10,
+        7
+      ],
+      "total": 98.5,
+      "basis": "Finite optional-presence member with strict existing present-input protections."
+    },
+    "D": {
+      "criteria": [
+        8,
+        6,
+        8,
+        7,
+        3
+      ],
+      "total": 71.5,
+      "basis": "Discover every workflow; unnecessary wider admission and bounds."
+    },
+    "E": {
+      "criteria": [
+        8,
+        8,
+        9,
+        7,
+        4
+      ],
+      "total": 78.0,
+      "basis": "Independent special reader/security checks duplicate existing mechanisms."
+    },
+    "F": {
+      "criteria": [
+        7,
+        5,
+        8,
+        6,
+        6
+      ],
+      "total": 65.5,
+      "basis": "Date/version/branch cutoff does not establish actual absence or identity."
+    },
+    "G": {
+      "criteria": [
+        9,
+        8,
+        7,
+        8,
+        4
+      ],
+      "total": 79.5,
+      "basis": "New capability manifest can work but creates extra coupled declaration."
+    },
+    "H": {
+      "criteria": [
+        10,
+        10,
+        0,
+        7,
+        10
+      ],
+      "total": 74.0,
+      "basis": "Defer dedicated setup; safe current contract but retains service blocker."
+    }
+  },
+  "selected": "C",
+  "selected_total": 98.5,
+  "proposed_paths": [
+    ".github/workflows/copilot-code-review.yml",
+    ".github/workflows/Test-CiHelpers.test.mjs",
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "tests_run": [],
+  "report_sha256": "8f04e055b9403ed3d11427b2f8ae00462f0430c9f46db61ff801cbe58034d28b",
+  "guard": {
+    "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+    "status": "",
+    "index_sha256": "fe82ed28175dc142c63c9e43541f49702e171ec12698ea7f426952170a014d82",
+    "refs_sha256": "aa33f4a192a4fa72a9eda4f745b77c671c3c9b3129936b72f5db5926a4296ba5"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "status": "prepared_not_executed",
+  "source_runner": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1",
+  "runner": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-round4-repair",
+  "changes": "Remove only standalone unchanged generator/golden/semantic command block. Retain staged preflight, all seven Node suites, mandatory all-files precommit, qualified offline runtime and every source/dependency/index/ref/config guard. Execution requires separately frozen final candidate and root readiness manifest.",
+  "sha256": {
+    "common.py": "77ee43d56d2d2d74ecb231b586d9d3f5b118fcc60e6b75cf63dc123d4739a64c",
+    "launch.py": "23993762a5187b1e41e20725aacdf3bac650b0e023a8ee8bc8f6007bd33e04a1",
+    "inside.py": "586f90626bd70ef5dd19e1527ef4b4b994b93bf7fc893b70dda9c0ed27d6df9c"
+  }
+}

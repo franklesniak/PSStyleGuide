@@ -1,5 +1,5 @@
 {
-  "status": "round4_reviews_pending",
+  "status": "round4_repair_final_validation_running",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -18,13 +18,16 @@
     ".github/workflows/Classify-InstructionMaintenance.test.mjs",
     ".github/workflows/Generate-StyleGuideArtifacts.ps1",
     ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1",
     ".github/workflows/Test-CiHelpers.test.mjs",
     ".github/workflows/Test-ExactGitPathSet.ps1",
     ".github/workflows/Test-StyleGuideArtifacts.ps1",
     ".github/workflows/Test-StyleGuideGenerator.ps1",
     ".github/workflows/Validate-WorkflowPolicy.mjs",
     ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+    ".github/workflows/agent-instructions.yml",
     ".github/workflows/build.yml",
+    ".github/workflows/copilot-code-review.yml",
     ".github/workflows/package-lock.json",
     ".github/workflows/package.json",
     ".github/workflows/scripts-README.md",
@@ -91,9 +94,9 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits. R2 selected release permits only its three dependency/doc paths and isolated scratch installs/tests; original restrictions continue elsewhere.",
-  "next_action": "Collect exact-head hosted results and both existing round4 review results without duplicate triggers; bind independent final native readiness before normal merge. CI failures block merge; retries at most hourly.",
+  "next_action": "Wait for session80671; inspect full suite/hook counts and final guard. If passed, perform normal commit, actual accepted-B/new-H endpoints and audit, then current-input publication/reviews/CI. No failing-CI merge.",
   "checkout_exit": 0,
-  "candidate_tree": "a4e7ce67d14cb4d5b4e0b677ff995ff4adbd2d29",
+  "candidate_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
   "implementation": {
     "status": "root_verified",
     "worker": "/root/a06_tf_generator_owner",
@@ -181,7 +184,7 @@
       }
     ]
   },
-  "local_operations": "All local R8 validation, normal commit and publication are terminal. No task-owned local test remains. Source H3b12700/treea4e7ce6 is clean and published. Independent local final binding passed; current native reviews/CI remain pending. Workers idle.",
+  "local_operations": "Root final validation session80671 running on stagedtree441d84c13f46d94c6a032e828615a10fae8d4c7e. Preserve80source/1914dependencies/index/TFrefs/config through final host guard. Both workers and focused sessions16507/97683 terminal. No product writer/native request.",
   "pending_native_operations": [],
   "final_quality": {
     "status": "current_input_native_binding_pending",
@@ -207,7 +210,17 @@
       "material_findings": [],
       "remaining": "Final actual candidate aggregate/endpoints/body/current-native binding and acceptance."
     },
-    "previous_input_quality_reused": true
+    "previous_input_quality_reused": true,
+    "setup_timeout_design": {
+      "status": "CHANGES_REQUIRED_PROPOSAL_SCOPE",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\setup-timeout-proposal-review.md",
+      "report_sha256": "d561552c7b8988f269d6425765b311cb444c2c7d520d44bec9e5077bce64040f",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\setup-timeout-proposal-review.json",
+      "evidence_sha256": "ba431285ef46da7d4b85d4b49cc0f8de995f42bba126b27db9d26924165b3fae",
+      "material_findings": [
+        "New workflow must receive existing finite bounded staged/revision/regular-file/no-action/no-credential checks and regression coverage, with explicit historicalabsence."
+      ]
+    }
   },
   "accepted_base_policy": {
     "status": "accepted_base_ready",
@@ -219,7 +232,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-r8-candidate-readiness.json",
     "sha256": "4e3887311857fcc550b83a409cec118f3ea55731cb825b8c4eb3d15242b84cd6"
   },
-  "planning_checkpoint": "46f952b8fb25fcf1427d899b0938e0d724e67f42",
+  "planning_checkpoint": "76f30102471f3db5778eb8ef1b906754e255ba00",
   "commit": {
     "status": "committed",
     "expected_parent": "7dd48f52c9e4c17268b4a571919622f4d701e5d0",
@@ -1949,10 +1962,10 @@
       "baseline": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round4-current-head-baseline.json",
       "baseline_sha256": "daf0d7babc22d69aba1d974c32633de2c5e4a90bc1b7f1043cf759c371e6f371",
       "copilot": {
-        "status": "confirmed_pending",
+        "status": "completed_findings",
         "requested_at": "2026-10-06T05:31:34.145223+00:00",
         "effort_selected": null,
-        "observed_effort": null,
+        "observed_effort": "Lite",
         "channel_attempt": 1,
         "channel": "documented gh pr edit @copilot fallback",
         "fallback_reason": "Existing Edge PR tab binding and a fresh task-tab creation each timed out after30s in supported cua_repl; kernel reset. No review control or submit action occurred. Supported UI cannot select Balanced in this session; documented CLI @copilot fallback is authorized by AGENTS.",
@@ -1961,10 +1974,23 @@
         "confirmation": "round4-after-copilot.json",
         "cli_exit": 0,
         "cli_log_sha256": "dabc8fa01183e2192c4fe5d6231c85dd82928406b2979e33e6da69365289e388",
-        "workflow_run": 37419002022
+        "workflow_run": 37419002022,
+        "workflow_status": "completed",
+        "observed_effort_source": "Root read explicit effort field in complete authenticated current-head review overview.",
+        "review_id": 5424298691,
+        "submitted_at": "2026-10-06T05:50:51Z",
+        "review_body_sha256": "224b1650c8128c1535faff3f4c61dee972d405ec07bcb0e5fa9e432fdb11e505",
+        "result_snapshot": "round4-progress-6.json",
+        "service_warning": "Full agentic review did not start before timeout; exact workflow still in progress at saved snapshot. Preserve separate terminal reconciliation.",
+        "workflow_conclusion": "cancelled",
+        "terminal_service_cause_verified": true,
+        "terminal_service_cause": "Authenticated job112123925649 exceeded20minute maximum during full repository validation; first10hooks passed, final instruction/mutation hook incomplete. No billing failure is reported.",
+        "terminal_service_log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37419002022\\attempt-1\\log.txt",
+        "terminal_service_log_sha256": "62d4dc68b2ffc809ccf81fbce661bf70ec374a5ed8fb91fb11dbb21b541d41f9",
+        "terminal_service_snapshot": "round4-progress-7.json"
       },
       "codex": {
-        "status": "confirmed_pending",
+        "status": "completed_clean",
         "automatic_reconciled": true,
         "manual_trigger_issued": true,
         "channel": "GitHub connector PR comment",
@@ -1972,24 +1998,281 @@
         "baseline": "round4-after-copilot.json",
         "trigger_comment": 6010052597,
         "native_requested_at": "2026-10-06T05:33:05Z",
-        "trigger_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#issuecomment-6010052597"
+        "trigger_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#issuecomment-6010052597",
+        "summary_comment": 6005735493,
+        "author_id": 199175422,
+        "summary_updated_at": "2026-10-06T05:36:28Z",
+        "summary_body_sha256": "d23a747de11de1f184667d98afd755b23e7d0bb672b86414ede83ae600e1ccbe",
+        "causal_binding": "Root read the complete authenticated result and completed summary. New result is absent from the complete pre-trigger baseline, follows sole trigger6010052597 and explicitly names current3b12700eb6. No new Codex inline finding exists.",
+        "result_comment": 6010088566,
+        "result_url": "https://github.com/franklesniak/TerraformStyleGuide/pull/68#issuecomment-6010088566",
+        "completed_at": "2026-10-06T05:36:26Z",
+        "result_body_sha256": "ef6688f9fd7db2aafea802f2edf18d922f808d474399a67ca0770fcd7de2de94",
+        "terminal_summary_body_sha256": "aafbf9f1494279b226a854ce4b40f9f45ad40355e6cb7df083ffffd3c4bf4d43",
+        "terminal_snapshot": "round4-progress-3.json"
       },
-      "request_set_terminal": false,
+      "request_set_terminal": true,
       "clean": false,
-      "findings": []
+      "findings": [
+        {
+          "id": "TF68-R10",
+          "title": "Breakpoint escaped pattern and literal identity comparison",
+          "comment_ids": [
+            4191973425,
+            4191973454
+          ],
+          "status": "closed_no_change",
+          "comments": [
+            {
+              "id": 4191973425,
+              "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+              "line": 949,
+              "body_sha256": "15f91453c12c25ea662de25cb7ba97379e53736c0fdaa93fefe1b4fbed57f87e",
+              "thread": "PRRT_kwDOSAZRhc6pVeMo"
+            },
+            {
+              "id": 4191973454,
+              "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+              "line": 1001,
+              "body_sha256": "15f91453c12c25ea662de25cb7ba97379e53736c0fdaa93fefe1b4fbed57f87e",
+              "thread": "PRRT_kwDOSAZRhc6pVeM5"
+            }
+          ],
+          "native_dispositions": {
+            "4191973425": {
+              "status": "resolved",
+              "body": "No change: the unchanged R5 helper passed 10 Windows PowerShell 7.6.5 and 14 Linux PowerShell 7.6.3 path cases with exact literal Script targets, counts and cleanup, including escaped paths and decoys. No supported-version reproduction is supplied; wildcard comparison would weaken that check.\n[Existing decision and scoped evidence](https://github.com/franklesniak/PSStyleGuide/blob/76f30102471f3db5778eb8ef1b906754e255ba00/docs/planning/action-items-2026-10-02/results/A21/TF68-R5/DECISION.md)\nGenerated with Codex",
+              "body_sha256": "f02a27d29c61f835f22c3719b6866d72b88de59bc2c8291aa36e8bb9ee9b245b",
+              "thread_id": "PRRT_kwDOSAZRhc6pVeMo",
+              "requested_at": "2026-10-06T06:06:17.764935+00:00",
+              "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+              "round": 4,
+              "reply_id": 4192067941,
+              "reply_review_id": 5424423552,
+              "native_created_at": "2026-10-06T06:06:18Z",
+              "verified_at": "2026-10-06T06:06:22.825291+00:00"
+            },
+            "4191973454": {
+              "status": "resolved",
+              "body": "No change: the unchanged R5 helper passed 10 Windows PowerShell 7.6.5 and 14 Linux PowerShell 7.6.3 path cases with exact literal Script targets, counts and cleanup, including escaped paths and decoys. No supported-version reproduction is supplied; wildcard comparison would weaken that check.\n[Existing decision and scoped evidence](https://github.com/franklesniak/PSStyleGuide/blob/76f30102471f3db5778eb8ef1b906754e255ba00/docs/planning/action-items-2026-10-02/results/A21/TF68-R5/DECISION.md)\nGenerated with Codex",
+              "body_sha256": "f02a27d29c61f835f22c3719b6866d72b88de59bc2c8291aa36e8bb9ee9b245b",
+              "thread_id": "PRRT_kwDOSAZRhc6pVeM5",
+              "requested_at": "2026-10-06T06:06:24.821317+00:00",
+              "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+              "round": 4,
+              "reply_id": 4192068608,
+              "reply_review_id": 5424424386,
+              "native_created_at": "2026-10-06T06:06:25Z",
+              "verified_at": "2026-10-06T06:06:29.492572+00:00"
+            }
+          },
+          "decision_reuse": {
+            "path": "docs/planning/action-items-2026-10-02/results/A21/TF68-R5/DECISION.md",
+            "current_applicability": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round4-findings\\evidence.json",
+            "evidence_sha256": "5e6dc1dca82253cd7fbab9cc2f1092b3eaf6fbe604c9ca40f54a0c506875e1e6",
+            "root_verified": "Complete report,5raw source hashes,11prior artifact hashes,24matrix rows and9R11score totals read/checked; no new execution claimed."
+          }
+        },
+        {
+          "id": "TF68-R11",
+          "title": "Required fixed Git and PowerShell test tools",
+          "comment_ids": [
+            4191973471,
+            4191973511
+          ],
+          "status": "selected_implementation_released",
+          "comments": [
+            {
+              "id": 4191973471,
+              "path": ".github/workflows/Test-CiHelpers.test.mjs",
+              "line": 33,
+              "body_sha256": "c8dd216822eab5ff1dd655a14452935f514d45c1a87c7b2c59da51dec376880b",
+              "thread": "PRRT_kwDOSAZRhc6pVeNE"
+            },
+            {
+              "id": 4191973511,
+              "path": ".github/workflows/Test-CiHelpers.test.mjs",
+              "line": 65,
+              "body_sha256": "c8dd216822eab5ff1dd655a14452935f514d45c1a87c7b2c59da51dec376880b",
+              "thread": "PRRT_kwDOSAZRhc6pVeNd"
+            }
+          ],
+          "proposal": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round4-findings\\REPORT.md",
+          "proposal_sha256": "747ccf12377f583eb17b2f5c64dcc104dfa9b3ca5a63e2a4f484bba245d6655f",
+          "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round4-findings\\evidence.json",
+          "evidence_sha256": "5e6dc1dca82253cd7fbab9cc2f1092b3eaf6fbe604c9ca40f54a0c506875e1e6",
+          "selection": "Root displayed9options, unique35/20/25/15/5rubric, all9scores and choseB95: fixture-only singleGit application discovery, mandatory allcases/no skip, production fixedpaths unchanged. Combine under solewriter after remaining setup/R13decisions.",
+          "root_verified": "5sourcehashes,11priorartifacthashes,24successfulR5matrixrows,9scoretotals; fullpacketread. No new execution claimed.",
+          "release_key": "round4_repair_release"
+        },
+        {
+          "id": "TF68-R12",
+          "title": "Missing private channel diagnostic",
+          "comment_ids": [
+            4191973543
+          ],
+          "status": "closed_no_change",
+          "comments": [
+            {
+              "id": 4191973543,
+              "path": ".github/workflows/Test-StyleGuideArtifacts.ps1",
+              "line": 564,
+              "body_sha256": "3bfdd5f5ce6ca4c22c1e4bcc18c15d109b418882b9ba7e41af03df62b558b3fb",
+              "thread": "PRRT_kwDOSAZRhc6pVeNv"
+            }
+          ],
+          "native_dispositions": {
+            "4191973543": {
+              "status": "resolved",
+              "body": "No change: the current checkpoint function and both Length predicates match the tested non-StrictMode implementation. Missing and directory channels produced the fixed runner-state errors in extracted PowerShell 7.6.5 (Windows) and 7.6.3 (Linux) checkpoint tests; direct .NET getter behavior does not establish this PowerShell property-access result.\n[Existing decision and scoped evidence](https://github.com/franklesniak/PSStyleGuide/blob/76f30102471f3db5778eb8ef1b906754e255ba00/docs/planning/action-items-2026-10-02/results/A06/PR234-round1/R2-channel-diagnostic.md)\nGenerated with Codex",
+              "body_sha256": "1419c4458bf37d602521942fce0b8f74a8f8efe44ec3071506c06343f17f66ac",
+              "thread_id": "PRRT_kwDOSAZRhc6pVeNv",
+              "requested_at": "2026-10-06T06:06:31.522047+00:00",
+              "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+              "round": 4,
+              "reply_id": 4192069328,
+              "reply_review_id": 5424425361,
+              "native_created_at": "2026-10-06T06:06:32Z",
+              "verified_at": "2026-10-06T06:06:36.722337+00:00"
+            }
+          },
+          "decision_reuse": {
+            "path": "docs/planning/action-items-2026-10-02/results/A06/PR234-round1/R2-channel-diagnostic.md",
+            "current_applicability": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round4-findings\\evidence.json",
+            "evidence_sha256": "5e6dc1dca82253cd7fbab9cc2f1092b3eaf6fbe604c9ca40f54a0c506875e1e6",
+            "root_verified": "Complete report,5raw source hashes,11prior artifact hashes,24matrix rows and9R11score totals read/checked; no new execution claimed."
+          }
+        },
+        {
+          "id": "TF68-R13",
+          "title": "Ordinary proposed-behavior validation exceeds30minute job limit",
+          "status": "selected_implementation_released",
+          "source": "Current native CI cancellation",
+          "run": 37418858312,
+          "job": 112123482433,
+          "attempt": 1,
+          "annotations": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858312\\attempt-1\\annotations.json",
+          "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858312\\attempt-1\\log.txt",
+          "log_sha256": "3947cd00efc9efeb3ceaa79e4efee4142bf65715e838e2ffcc5a938ecb3a9a40",
+          "counterexample_run": 37418864320,
+          "counterexample": "Matching PR full step1740seconds passes SelfTest and567Node tests,0fail/cancel/skip/todo; no safe margin in30minute totaljob.",
+          "release_key": "round4_repair_release",
+          "proposal": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\R13.md",
+          "proposal_sha256": "753a1694b844e290859fdad4f62ec9dc85d50eaea8d06f8495043d5a0a7cc3e6",
+          "evidence": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\R13-evidence.json",
+          "selected_option": "C97.9"
+        },
+        {
+          "id": "TF68-S1",
+          "title": "Dedicated review preparation to remove repeated service setup timeout",
+          "status": "selected_implementation_released",
+          "source": "Observed service failure and review overview warning",
+          "synthetic_key": "review:5424298691:agentic-timeout:1",
+          "proposal": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-setup-timeout-readiness\\REPORT.md",
+          "proposal_sha256": "99da02aff7f7437554fbd37f929884b2446abba74945515600c0d8f75c9333a0",
+          "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-setup-timeout-readiness\\evidence.json",
+          "evidence_sha256": "87a4ec975f93f1260ae1dd919c1271698be5f3a5e03de3f54069d7d2428359c1",
+          "selection": "Original C95.9 design plus separately displayed security C98.5 scope correction selected; four-path setup scope combined with R11 and one-path R13 in a five-path sole-writer release.",
+          "root_verified": "3sourcehashes and all12 arithmetic totals; complete proposal read; current native20mtimeout and ordinary16m01/22m08 timings read.",
+          "release_key": "round4_repair_release",
+          "security_scope_proposal": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1-security-scope.md"
+        }
+      ],
+      "body_inventory": {
+        "declared_findings": 5,
+        "inline_findings": 5,
+        "distinct_groups": 3,
+        "body_only_findings": [],
+        "resolved_since_last_review": 6,
+        "generated_lockfile_excluded": true,
+        "read_scope": "Root read complete overview and each new inline body; code review warning separately triggers existing timeout investigation.",
+        "body_service_findings": [
+          {
+            "key": "review:5424298691:agentic-timeout:1",
+            "finding": "TF68-S1",
+            "status": "open",
+            "note": "Service warning is separate from the5declared inline findings; full process underway."
+          }
+        ]
+      },
+      "status": "repairs_implementation_active",
+      "processing_reactions": {
+        "status": "R11_two_active_R10_R12_removed",
+        "requested_at": "2026-10-06T05:59:07.627852+00:00",
+        "comments": [
+          4191973425,
+          4191973454,
+          4191973471,
+          4191973511,
+          4191973543
+        ],
+        "baseline": "Each complete100-capacity connector reaction list was empty. Reconcile these native comments before any retry.",
+        "confirmed_at": "2026-10-06T05:59:23.357212+00:00",
+        "items": [
+          {
+            "comment_id": 4191973425,
+            "reaction_id": 450964086,
+            "created_at": "2026-10-06T05:59:08Z",
+            "status": "removed_after_refutation",
+            "verified_at": "2026-10-06T06:06:57.333598+00:00"
+          },
+          {
+            "comment_id": 4191973454,
+            "reaction_id": 450964089,
+            "created_at": "2026-10-06T05:59:08Z",
+            "status": "removed_after_refutation",
+            "verified_at": "2026-10-06T06:06:57.333613+00:00"
+          },
+          {
+            "comment_id": 4191973471,
+            "reaction_id": 450964095,
+            "created_at": "2026-10-06T05:59:09Z"
+          },
+          {
+            "comment_id": 4191973511,
+            "reaction_id": 450964099,
+            "created_at": "2026-10-06T05:59:09Z"
+          },
+          {
+            "comment_id": 4191973543,
+            "reaction_id": 450964101,
+            "created_at": "2026-10-06T05:59:10Z",
+            "status": "removed_after_refutation",
+            "verified_at": "2026-10-06T06:06:57.333617+00:00"
+          }
+        ]
+      }
     }
   ],
-  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round2-progress-12.json",
+  "latest_native_snapshot": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round4-progress-9.json",
   "hosted_platform_progress": {
-    "status": "new_head_pending",
-    "head": "3b12700eb636da67f5861637e5b139a18fa82140"
+    "status": "passed",
+    "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+    "proof": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\platform-proof.json",
+    "sha256": "ac11386d3c4adefe24e08b3684f344c1f151f5ed42778552cfac07c04cc35236",
+    "assertions_per_pass": 156,
+    "passes_per_platform": 2,
+    "platform_count": 3,
+    "events": [
+      "push",
+      "pull_request"
+    ],
+    "tree_equal": true
   },
   "paired_candidate_comparison": {
     "status": "accepted TF-to-PS compareback still required",
     "R8_common_paths": [
       ".github/workflows/Test-StyleGuideArtifacts.ps1"
     ],
-    "scope": "Six common paths: SelfTest, scripts-README metadata, workflow package.json/package-lock.json, dependency-maintenance note and artifact-helper annotation/metadata. Rebind to actual accepted TF/current PS main and increment applicable counters before destination implementation. No PS repair or additional transfer started."
+    "scope": "Six common paths: SelfTest, scripts-README metadata, workflow package.json/package-lock.json, dependency-maintenance note and artifact-helper annotation/metadata. Rebind to actual accepted TF/current PS main and increment applicable counters before destination implementation. No PS repair or additional transfer started.",
+    "R8_six_path_readiness": {
+      "status": "conditional six-path read-only counterpart preparation; TF candidate not accepted",
+      "report": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R8-peer-readiness\\REPORT.md",
+      "report_sha256": "a1122355955bf7b858c8cab979393c4c1f89a775d0b97d2b294fb1e8b8b48b75",
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R8-peer-readiness\\evidence.json",
+      "evidence_sha256": "f9c3c8d3b188e45ec87a568cef0050394f8c114de23f293372addb5cc182e29b",
+      "root_verified": "Read complete proposal; sampled actual raw PS/TF sixth path, exact descriptor substitution, prospective hash and exactly3changedlines. Six paths; no new finding or extra coupled edit. Rebind actual accepted TF/current PS main before implementation."
+    }
   },
   "repair": {
     "id": "TF68-R1",
@@ -5040,13 +5323,13 @@
       }
     }
   ],
-  "updated_at": "2026-10-06T05:34:33.736317+00:00",
+  "updated_at": "2026-10-06T06:53:10.510810+00:00",
   "prepared_acceptance_helpers": {
     "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R2-normal-acceptance-helper-readiness.json",
-    "status": "Not executed and now stale: current R3/R4 findings invalidate zero-finding acceptance assumptions. Rebind only after actual dispositions/final input.",
+    "status": "All older round2/round3 acceptance and merge helpers are stale; do not execute. New input3b/round4 and strict owner no-failing-CI rule must be bound before any future acceptance.",
     "merge": "merge-reviewed-tf68-r2.py",
     "landed": "collect-landed-tf68-r2.py",
-    "restriction": "Do not use obsolete round1 helpers or run until all current required gates pass.",
+    "restriction": "No cancelled-service exception from older helpers applies to current CI. A valid Lite review does not make a cancelled workflow pass. No merge while current CI fails.",
     "input_acceptance": "accept-tf68-round2.py",
     "landed_acceptance": "accept-landed-tf68-r2.py",
     "input_acceptance_condition": "Root must read complete new Copilot review and supply ID/full-body digest, then require terminal current-head CI and logs before executing.",
@@ -5057,7 +5340,7 @@
       "accept-landed-tf68-r2.py": "2dfd42e879d60d37868635126acda42dc4d559f7340e10a872b783b9a6072574"
     }
   },
-  "last_goal_turn_classification": "Progress: exact three-line R8 committed and published after final4wrappers/11hooks/guards, five actual accepted-B/newH checks, CLEAN audit and independent final binding; all9 threads resolved; one new Copilot and one remote Codex request confirmed under original clock.",
+  "last_goal_turn_classification": "Progress: R10/R12 refuted and three native threads resolved; R11/S1/security/R13 decisions complete and five-path implementation released. No approval missing.",
   "partial_hosted_r2": {
     "head": "f89d47d6780db47df29be4eb6d79cab35051f598",
     "push_behavior": {
@@ -5145,5 +5428,230 @@
     "minimum_interval_seconds": 3600,
     "last_relaunch_at": null,
     "restriction": "No merge while CI is failing. No automatic retry schedule. Reconcile all native operations before a permitted relaunch. A new-input review cannot silently waive a cancelled/failed current workflow; acceptance of historical TF67/PS224 is not a blanket exemption."
+  },
+  "live_remote_observation": {
+    "snapshot": "round4-progress-9.json",
+    "captured_at": "2026-10-06T06:00:48.396426+00:00",
+    "ordinary_success": 10,
+    "ordinary_cancelled": 1,
+    "ordinary_pending": 0,
+    "review_results_pending": 0,
+    "review_service_pending": 0,
+    "unresolved_threads": 2,
+    "merge_block": "Both20minute Copilot service cancellation and30minute ordinary behavior cancellation remain unresolved; findings pending.",
+    "thread_update": "Three current R10/R12 refutation replies confirmed/resolved individually after terminal snapshot. R11 two threads remain open. Two eyes reactions remain active for R11."
+  },
+  "next_poll_not_before": null,
+  "partial_hosted_r4": {
+    "pr_setup": {
+      "run": 37418864567,
+      "status": "passed",
+      "hooks_passed": 11,
+      "hooks_failed": 0,
+      "hooks_skipped": 0,
+      "final_immutable_guard": "success",
+      "full_validation_seconds": 961,
+      "log": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864567\\attempt-1\\log.txt",
+      "log_sha256": "f33444232fef32435f7ece28de4e54e0c4f2581dd51a0c5097be3e87eef212d3"
+    },
+    "limit": "Other current runs and review dispositions remain pending.",
+    "push_setup": {
+      "run": 37418858374,
+      "status": "passed",
+      "hooks_passed": 11,
+      "hooks_failed": 0,
+      "hooks_skipped": 0,
+      "final_immutable_guard": "success",
+      "full_validation_seconds": 1328,
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858374\\attempt-1\\summary.json"
+    },
+    "pr_behavior": {
+      "run": 37418864320,
+      "status": "passed",
+      "mutation_selftests": "passed",
+      "node_tests": 567,
+      "pass": 567,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "full_step_seconds": 1740,
+      "evidence": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864320\\attempt-1\\summary.json"
+    }
+  },
+  "round4_repair_release": {
+    "status": "staged_final_validation_ready",
+    "recorded_at": "2026-10-06T06:22:41.818799+00:00",
+    "writer": "/root/a06_tf_generator_owner",
+    "input_head": "3b12700eb636da67f5861637e5b139a18fa82140",
+    "input_tree": "a4e7ce67d14cb4d5b4e0b677ff995ff4adbd2d29",
+    "allowed_paths": [
+      ".github/workflows/copilot-code-review.yml",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/agent-instructions.yml"
+    ],
+    "selections": {
+      "R11": "B95",
+      "S1": "C95.9",
+      "S1_security_scope": "C98.5",
+      "R13": "C97.9"
+    },
+    "root_verification": "Complete reports and evidence read;20 source/evidence hashes and20 new score totals independently verified. Options, unique rubrics, full score tables and selections displayed before release. Earlier R11/S1 displayed decisions retained.",
+    "artifacts": [
+      {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round4-findings\\REPORT.md",
+        "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\R10-R12.md",
+        "sha256": "747ccf12377f583eb17b2f5c64dcc104dfa9b3ca5a63e2a4f484bba245d6655f"
+      },
+      {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round4-findings\\evidence.json",
+        "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\R10-R12-evidence.json",
+        "sha256": "5e6dc1dca82253cd7fbab9cc2f1092b3eaf6fbe604c9ca40f54a0c506875e1e6"
+      },
+      {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round4-findings\\R13.md",
+        "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\R13.md",
+        "sha256": "753a1694b844e290859fdad4f62ec9dc85d50eaea8d06f8495043d5a0a7cc3e6"
+      },
+      {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-round4-findings\\R13-evidence.json",
+        "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\R13-evidence.json",
+        "sha256": "169e83a528c2f8c94efa798cb58c4e988c0156a33dba54926e27223b664040ce"
+      },
+      {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-setup-timeout-readiness\\REPORT.md",
+        "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1.md",
+        "sha256": "99da02aff7f7437554fbd37f929884b2446abba74945515600c0d8f75c9333a0",
+        "canonical_sha256": "534a17a5cd0358f88cf78338a3593727d1b12a17561252a8fd017456538d6921",
+        "canonical_format_change": "One duplicate blank line removed; original source SHA256 retained in sha256."
+      },
+      {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-setup-timeout-readiness\\evidence.json",
+        "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1-evidence.json",
+        "sha256": "87a4ec975f93f1260ae1dd919c1271698be5f3a5e03de3f54069d7d2428359c1"
+      },
+      {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-setup-timeout-readiness\\SECURITY-SCOPE.md",
+        "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1-security-scope.md",
+        "sha256": "8f04e055b9403ed3d11427b2f8ae00462f0430c9f46db61ff801cbe58034d28b"
+      },
+      {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-setup-timeout-readiness\\security-scope-evidence.json",
+        "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1-security-scope-evidence.json",
+        "sha256": "7ed27ab75853a669591fa71acaf3864f1bdd5d1c7a6356d2cdc57be7566a082d"
+      },
+      {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\setup-timeout-proposal-review.md",
+        "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1-initial-quality.md",
+        "sha256": "d561552c7b8988f269d6425765b311cb444c2c7d520d44bec9e5077bce64040f"
+      },
+      {
+        "source": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\setup-timeout-proposal-review.json",
+        "canonical": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1-initial-quality.json",
+        "sha256": "ba431285ef46da7d4b85d4b49cc0f8de995f42bba126b27db9d26924165b3fae"
+      }
+    ],
+    "restrictions": "One writer; no stage/commit/push/native review/retry/merge or opposite-repository changes. Full required tests remain. Root owns final aggregate, independent quality and exact-input native acceptance. No cancelled-CI waiver.",
+    "service_activation_limit": "A PR file or ordinary workflow success does not prove Copilot selected the dedicated setup. Require actual service selection/completion on final input; default-branch activation remains unverified.",
+    "counter_effect": "Same-repository repair; no transfer or review round increment. Original deadlines unchanged. Reassess A03/A21/A07/A06 scope before actual PS carryback.",
+    "design_quality": {
+      "status": "PASS_DESIGN_CLOSURE",
+      "report": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\S1-design-closure.md",
+      "sha256": "eb69f4cbd325ca434bc64904b3d3dacd411aabb9827e43006fa99e81c744ea7b",
+      "limit": "Design only; frozen implementation/actual focused tests/final/native acceptance pending.567 is baseline count; final regressions may increase it."
+    },
+    "prepared_runner": {
+      "status": "prepared_not_executed",
+      "source_runner": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-r1",
+      "runner": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-round4-repair",
+      "changes": "Remove only standalone unchanged generator/golden/semantic command block. Retain staged preflight, all seven Node suites, mandatory all-files precommit, qualified offline runtime and every source/dependency/index/ref/config guard. Execution requires separately frozen final candidate and root readiness manifest.",
+      "sha256": {
+        "common.py": "77ee43d56d2d2d74ecb231b586d9d3f5b118fcc60e6b75cf63dc123d4739a64c",
+        "launch.py": "23993762a5187b1e41e20725aacdf3bac650b0e023a8ee8bc8f6007bd33e04a1",
+        "inside.py": "586f90626bd70ef5dd19e1527ef4b4b994b93bf7fc893b70dda9c0ed27d6df9c"
+      }
+    },
+    "worker_progress": {
+      "reported_at": "2026-10-06T06:32:23.034128+00:00",
+      "status": "Windows_focus_passed_Linux_preparing",
+      "session_id": 16507,
+      "owner": "/root/a06_tf_generator_owner",
+      "reported_pass": "Parser/PSSA1.24, actual reader/security/bounds,4Node proof/discovery/parity/event tests0fail/cancel/skip, metadata/error controls passed. Final packet and Linux controls remain pending.",
+      "preserved_attempts": "Two extracted-reader scratch-driver failures from missing actual PSScriptRoot preserved. Corrected driver places unchanged functions under fixture workflow directory; this is not evidence of a product failure.",
+      "freeze": "Five-path catalog frozen; no further product edit without notification.",
+      "output_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation",
+      "session_status": "terminal_exit0",
+      "first_linux_attempt": {
+        "status": "failed_scratch_tool_path",
+        "native_exit": 1,
+        "yaml_syntax_style": "passed",
+        "cause": "Installed actionlint was absent from scratch driver PATH; failure occurred before behavioral tests.",
+        "host_guard": "source/index/refs/dependencies equal",
+        "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\linux-output\\host-result.json",
+        "retry": "Corrected uniquely named attempt permitted; preserve prior attempt, add owned-container bounded cleanup; no product change."
+      }
+    },
+    "source_freeze": {
+      "catalog": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\source-final.json",
+      "sha256": "045da9f92d5189a462a00f960f0e59d024fdc776f715cd427ace608fa6c7db5d",
+      "files": 80,
+      "changed": 5,
+      "unchanged": 75,
+      "root_verified": "Every catalog hash,size,Git blob and exact allowed-path diff independently verified; no source acceptance yet."
+    },
+    "source_quality": {
+      "status": "PASS_SOURCE_REVIEW_PENDING_VALIDATION_BINDING",
+      "report": "C:\\Users\\flesniak\\GitHub\\PSStyleGuide\\docs\\planning\\action-items-2026-10-02\\results\\A06\\TF68-round4\\source-review.md",
+      "sha256": "f1d4336b27d3b09a5b79d5515e170449627f3bf037a135889b006a1b6ef298ac",
+      "finding_count": 0,
+      "scope_finding_closed_in_source": true,
+      "limits": "Linux focus, selected-plan negative controls, final aggregate/endpoints/commit/body/current native CI and reviews remain pending."
+    },
+    "candidate_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+    "whole_pr_paths": [
+      ".github/workflows/Classify-InstructionMaintenance.mjs",
+      ".github/workflows/Classify-InstructionMaintenance.test.mjs",
+      ".github/workflows/Generate-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1",
+      ".github/workflows/Test-CiHelpers.test.mjs",
+      ".github/workflows/Test-ExactGitPathSet.ps1",
+      ".github/workflows/Test-StyleGuideArtifacts.ps1",
+      ".github/workflows/Test-StyleGuideGenerator.ps1",
+      ".github/workflows/Validate-WorkflowPolicy.mjs",
+      ".github/workflows/Validate-WorkflowPolicy.test.mjs",
+      ".github/workflows/agent-instructions.yml",
+      ".github/workflows/build.yml",
+      ".github/workflows/copilot-code-review.yml",
+      ".github/workflows/package-lock.json",
+      ".github/workflows/package.json",
+      ".github/workflows/scripts-README.md",
+      ".github/workflows/workflow-policy-cases.json",
+      "docs/dependency-maintenance.md"
+    ],
+    "root_readiness": {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-round4-repair-candidate-readiness.json",
+      "sha256": "09f73007d783a2f6ae8ebdb8c9afa3c2ac24691268e3172963b80e4c099db7ec"
+    },
+    "aggregate": {
+      "status": "running",
+      "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\aggregate-manifest-round4-repair.json",
+      "manifest_sha256": "6d9436558041243826d1018ff846de34603540c83048a574dcf654591c2c8fc7",
+      "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-round4-repair\\runs\\a06-tf-peer-20261006-round4-repair",
+      "session_id": 80671,
+      "started_at": "2026-10-06T06:52:07.445684+00:00",
+      "status_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\linux-validation-round4-repair\\runs\\a06-tf-peer-20261006-round4-repair\\status.json",
+      "full_node_observed": {
+        "tests": 600,
+        "pass": 600,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "limit": "Aggregate and final host guard still pending."
+      }
+    }
   }
 }

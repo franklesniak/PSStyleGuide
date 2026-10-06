@@ -1,0 +1,689 @@
+{
+  "captured_utc": "2026-10-06T06:47:04.842892+00:00",
+  "state": "frozen focused candidate; not aggregate or hosted acceptance",
+  "base_head": "3b12700eb636da67f5861637e5b139a18fa82140",
+  "scope": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+      "bytes": 247937,
+      "mode": "100644",
+      "blob": "afbc01b4ae103cc660fc28ac1e3bf28a9d885eeb"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+      "bytes": 484458,
+      "mode": "100644",
+      "blob": "b41dbf43f0bc67fd73d406b5d297f384e94ff4bd"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+      "bytes": 130059,
+      "mode": "100644",
+      "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "bytes": 12893,
+      "mode": "100644",
+      "blob": "134865bf1b239b766fc3199af116e91d127169bd"
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "bytes": 45016,
+      "mode": "100644",
+      "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe"
+    }
+  ],
+  "source_catalog": {
+    "path": "source-final.json",
+    "sha256": "045da9f92d5189a462a00f960f0e59d024fdc776f715cd427ace608fa6c7db5d",
+    "count": 80,
+    "unchanged_tracked_count": 75
+  },
+  "guard": {
+    "head_equal": true,
+    "index_equal": true,
+    "refs_equal": true,
+    "all_source_equal": true,
+    "all_1914_dependencies_equal": true,
+    "index_sha256": "fe82ed28175dc142c63c9e43541f49702e171ec12698ea7f426952170a014d82",
+    "refs_sha256": "aa33f4a192a4fa72a9eda4f745b77c671c3c9b3129936b72f5db5926a4296ba5"
+  },
+  "exact_budget_diff_only": true,
+  "windows": {
+    "native_session_final": 16507,
+    "native_exit": 0,
+    "runs": [
+      {
+        "name": "quality",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-Command",
+          "$ErrorActionPreference='Stop'; Import-Module PSScriptAnalyzer -RequiredVersion 1.24.0; foreach ($p in @('.github/workflows/Test-AgentInstructions.ps1','.github/workflows/Test-AgentInstructions.SelfTest.ps1')) { $t=$null; $e=$null; $a=[Management.Automation.Language.Parser]::ParseFile((Join-Path $PWD $p),[ref]$t,[ref]$e); if ($e.Count) { throw ($e|Out-String) }; $issues=@(Invoke-ScriptAnalyzer -Path $p -Severity Warning,Error); if ($issues.Count) { $issues|Format-List|Out-String|Write-Output; exit 1 } }; 'Full-file parser and PSScriptAnalyzer1.24.0 passed.'"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+        "started_utc": "2026-10-06T06:28:57.617755+00:00",
+        "source_sha256": {
+          "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+          "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+          "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+          "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+          "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+        },
+        "native_exit": 0,
+        "finished_utc": "2026-10-06T06:29:53.284256+00:00",
+        "log_sha256": "b0d4935f680f691971a252ffbcbd769c51c4be0502c7de01a5766a7f43ea657a",
+        "retained_log": "quality-windows.log"
+      },
+      {
+        "name": "setup-reader",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\setup-focus.ps1",
+          "-RepositoryRootPath",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+        "started_utc": "2026-10-06T06:29:53.291084+00:00",
+        "source_sha256": {
+          "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+          "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+          "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+          "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+          "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+        },
+        "native_exit": 1,
+        "finished_utc": "2026-10-06T06:29:56.573629+00:00",
+        "log_sha256": "4356bd714438fcde7fd48727ecb02b9163f6df7df5d77fbb784cc6e622e0056e",
+        "retained_log": "setup-reader-windows-initial-driver.log"
+      },
+      {
+        "name": "setup-reader",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\setup-focus.ps1",
+          "-RepositoryRootPath",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+        "started_utc": "2026-10-06T06:30:27.834659+00:00",
+        "source_sha256": {
+          "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+          "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+          "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+          "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+          "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+        },
+        "native_exit": 1,
+        "finished_utc": "2026-10-06T06:30:29.944443+00:00",
+        "log_sha256": "4356bd714438fcde7fd48727ecb02b9163f6df7df5d77fbb784cc6e622e0056e",
+        "retained_log": "setup-reader-windows-driver-scope.log"
+      },
+      {
+        "name": "setup-reader",
+        "command": [
+          "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\setup-focus.ps1",
+          "-RepositoryRootPath",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+        "started_utc": "2026-10-06T06:31:13.806183+00:00",
+        "source_sha256": {
+          "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+          "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+          "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+          "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+          "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+        },
+        "native_exit": 0,
+        "finished_utc": "2026-10-06T06:32:27.148343+00:00",
+        "log_sha256": "21799691ec441be6273802528c04ee8589a8bb82ae8818e519180a7a84514f43",
+        "retained_log": "setup-reader-windows.log"
+      },
+      {
+        "name": "ci-helpers",
+        "command": [
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A07-design-20261002\\runtime\\node-v24.18.1-win-x64\\node.exe",
+          "--test",
+          "--test-name-pattern=fixture Git discovery|generator proof preserves|dedicated review setup preserves|actual workflows cover",
+          ".github/workflows/Test-CiHelpers.test.mjs"
+        ],
+        "cwd": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture",
+        "started_utc": "2026-10-06T06:32:27.155134+00:00",
+        "source_sha256": {
+          "agent-instructions.yml": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+          "copilot-code-review.yml": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+          "Test-AgentInstructions.ps1": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+          "Test-AgentInstructions.SelfTest.ps1": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+          "Test-CiHelpers.test.mjs": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d"
+        },
+        "native_exit": 0,
+        "finished_utc": "2026-10-06T06:32:41.823991+00:00",
+        "log_sha256": "22a3d0e4612f67c58b7b51ba8caec9d5280d3ba22a0f09c56dddd3162936e497",
+        "retained_log": "ci-helpers-windows.log"
+      }
+    ],
+    "supplemental": [
+      {
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\metadata-controls.ps1",
+          "-RepositoryRootPath",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture"
+        ],
+        "native_exit": 0,
+        "log": "metadata-controls-windows.log",
+        "log_sha256": "c27d9b72e08a1e9bc4a70d1df53114fb8950b3dbbdd14be14843252e605fa6e2",
+        "retained_executed_driver": "metadata-controls.ps1",
+        "driver_sha256": "e021baee3678586f47fd817b8a885f4b3b1c24fb6c08ca52b64c6182f2be5f02",
+        "qualification": "Discovery Windows log predates extra Linux-only discriminator controls; Windows executed common actual/missing-tool controls. Extra-reader final Windows run includes explicit restoration of private mutants."
+      },
+      {
+        "command": [
+          "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+          "-NoLogo",
+          "-NoProfile",
+          "-NonInteractive",
+          "-File",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\extra-reader-controls.ps1",
+          "-RepositoryRootPath",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture"
+        ],
+        "native_exit": 0,
+        "log": "extra-reader-windows.log",
+        "log_sha256": "4f2306bd6694b253cf74712b912842b6377e4f79c4062327b12a698fb231d171",
+        "retained_executed_driver": "extra-reader-controls.ps1",
+        "driver_sha256": "b36c55a842be781e9687531470f0ecee715b57abb8b09ea7b04fdf8080db40ef",
+        "qualification": "Discovery Windows log predates extra Linux-only discriminator controls; Windows executed common actual/missing-tool controls. Extra-reader final Windows run includes explicit restoration of private mutants."
+      },
+      {
+        "command": [
+          "C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A07-design-20261002/runtime/node-v24.18.1-win-x64/node.exe",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\discovery-controls.mjs",
+          "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\windows-fixture"
+        ],
+        "native_exit": 0,
+        "log": "discovery-controls-windows.log",
+        "log_sha256": "3e3ca4ed36b97875cd77182be90f597ee61888fb1c8d16ae63cd110fc1f75abb",
+        "retained_executed_driver": "linux-input\\discovery-controls.mjs",
+        "driver_sha256": "db58f7a6db707cf6ef7502edd50baf2c7c8cb8fddcd49c8253f99ffca73133c1",
+        "qualification": "Discovery Windows log predates extra Linux-only discriminator controls; Windows executed common actual/missing-tool controls. Extra-reader final Windows run includes explicit restoration of private mutants."
+      }
+    ],
+    "runtime": {
+      "node": {
+        "version": "24.18.1",
+        "sha256": "ac51903c4c111815d52280b1fdcc8da067cbb37e2fe1a765097b85c3292c8582"
+      },
+      "powershell": {
+        "version": "7.6.5",
+        "sha256": "362a356ce7f0940ec74f73a8fc2c990a2cc24a38a11c90bbd8eca947110ad139"
+      },
+      "PSScriptAnalyzer": "1.24.0"
+    }
+  },
+  "linux": {
+    "native_session": 97683,
+    "native_exit": 0,
+    "result": {
+      "role": "isolated focused fixtures, not aggregate or accepted-policy authority",
+      "runtime": {
+        "node": "v24.18.1",
+        "npm": "11.16.0",
+        "python": "Python 3.12.3",
+        "pwsh": "7.6.3"
+      },
+      "commands": [
+        {
+          "name": "yaml-parse",
+          "command": [
+            "python",
+            "-m",
+            "pre_commit_hooks.check_yaml",
+            ".github/workflows/copilot-code-review.yml",
+            ".github/workflows/agent-instructions.yml"
+          ],
+          "started_utc": "2026-10-06T06:43:50.960081+00:00",
+          "native_exit": 0,
+          "finished_utc": "2026-10-06T06:43:51.028881+00:00",
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "yaml-style",
+          "command": [
+            "python",
+            "-m",
+            "yamllint",
+            "--config-data",
+            "extends: default\nrules:\n  line-length:\n    level: warning\n  truthy:\n    check-keys: false\n",
+            ".github/workflows/copilot-code-review.yml",
+            ".github/workflows/agent-instructions.yml"
+          ],
+          "started_utc": "2026-10-06T06:43:51.072374+00:00",
+          "native_exit": 0,
+          "finished_utc": "2026-10-06T06:43:51.196898+00:00",
+          "log_sha256": "9060d685f19d02a59833681c98c7df13da1d7838cf6b3e26f13f867e4b6b0a1d"
+        },
+        {
+          "name": "actionlint",
+          "command": [
+            "/opt/psstyleguide-runtime/pre-commit-cache/repoghosj9tg/golangenv-system/bin/actionlint",
+            ".github/workflows/copilot-code-review.yml",
+            ".github/workflows/agent-instructions.yml"
+          ],
+          "started_utc": "2026-10-06T06:43:51.233901+00:00",
+          "native_exit": 0,
+          "finished_utc": "2026-10-06T06:43:51.358161+00:00",
+          "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "name": "setup-reader",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            "/input/setup-focus.ps1",
+            "-RepositoryRootPath",
+            "/work/tf68-setup-focus-5fuv9whl/repository"
+          ],
+          "started_utc": "2026-10-06T06:43:51.395899+00:00",
+          "native_exit": 0,
+          "finished_utc": "2026-10-06T06:44:01.896859+00:00",
+          "log_sha256": "88cbaccaa707125673c0017a594bdd1fac5be953b05c29e8fd05800a370730d8"
+        },
+        {
+          "name": "metadata-controls",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            "/input/metadata-controls.ps1",
+            "-RepositoryRootPath",
+            "/work/tf68-setup-focus-5fuv9whl/repository"
+          ],
+          "started_utc": "2026-10-06T06:44:01.937463+00:00",
+          "native_exit": 0,
+          "finished_utc": "2026-10-06T06:44:02.718865+00:00",
+          "log_sha256": "ff465da3b832c45196de54797b1e234028bc2a7f709019c24d5be38e2097affd"
+        },
+        {
+          "name": "extra-reader-controls",
+          "command": [
+            "pwsh",
+            "-NoLogo",
+            "-NoProfile",
+            "-NonInteractive",
+            "-File",
+            "/input/extra-reader-controls.ps1",
+            "-RepositoryRootPath",
+            "/work/tf68-setup-focus-5fuv9whl/repository"
+          ],
+          "started_utc": "2026-10-06T06:44:02.843591+00:00",
+          "native_exit": 0,
+          "finished_utc": "2026-10-06T06:44:05.778308+00:00",
+          "log_sha256": "ca7005096a3175dac9b19fbe314d78e9ab7a057bc3c4f85e081771825ca4e882"
+        },
+        {
+          "name": "discovery-controls",
+          "command": [
+            "node",
+            "/input/discovery-controls.mjs",
+            "/work/tf68-setup-focus-5fuv9whl/repository"
+          ],
+          "started_utc": "2026-10-06T06:44:05.816737+00:00",
+          "native_exit": 0,
+          "finished_utc": "2026-10-06T06:44:24.190386+00:00",
+          "log_sha256": "27dff6902b5cdbe0394071523e9f0c9009ba2c715cbff93f0293311441ba7c72"
+        },
+        {
+          "name": "affected-ci-helpers",
+          "command": [
+            "node",
+            "--test",
+            "--test-name-pattern=Copilot|dedicated review|fixture Git discovery|generator proof preserves|actual workflows cover",
+            ".github/workflows/Test-CiHelpers.test.mjs"
+          ],
+          "started_utc": "2026-10-06T06:44:24.231582+00:00",
+          "native_exit": 0,
+          "finished_utc": "2026-10-06T06:45:48.908710+00:00",
+          "log_sha256": "1668b95fd499da834ea9fdeb87774fa725e77124ba71dc3517003c53f1ac0d39"
+        }
+      ],
+      "source_count": 80,
+      "dependency_count": 1914,
+      "source_equal": true,
+      "state": "passed"
+    },
+    "host": {
+      "command": [
+        "docker",
+        "run",
+        "--rm",
+        "--pull",
+        "never",
+        "--network",
+        "none",
+        "--name",
+        "tf68-r11-s1-r13-focus-attempt2",
+        "--label",
+        "tf68.focus-payload=ce75e57af372d204122686f50ec091b405438e1255ea5f67efe6f4fdb0adfd3d",
+        "--mount",
+        "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\linux-input-attempt2,target=/input,readonly",
+        "--mount",
+        "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-R11-S1-R13-implementation\\linux-output-attempt2,target=/output",
+        "--entrypoint",
+        "python",
+        "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+        "/input/linux-focus.py"
+      ],
+      "started_utc": "2026-10-06T06:43:48.975522+00:00",
+      "state": "passed",
+      "payload_sha256": "ce75e57af372d204122686f50ec091b405438e1255ea5f67efe6f4fdb0adfd3d",
+      "native_exit": 0,
+      "host_source_index_refs_dependencies_equal": true,
+      "finished_utc": "2026-10-06T06:45:50.106027+00:00",
+      "log_sha256": "6f687ca8e3cff1c7e923d71fd3568e27c0b4fde0ce622cdfb0f15f8ee47a725d"
+    }
+  },
+  "retained_attempt_failures": [
+    {
+      "logs": [
+        "setup-reader-windows-initial-driver.log",
+        "setup-reader-windows-driver-scope.log"
+      ],
+      "exit": 1,
+      "classification": "Private AST driver lost file-bound PSScriptRoot; actual functions hosted in disposable workflow file fixed driver, no product edit."
+    },
+    {
+      "log": "extra-reader-windows-initial-expectation.log",
+      "exit": 1,
+      "classification": "Negative case correctly refused missing required file before metadata check; scratch assertion expected only later error."
+    },
+    {
+      "log": "extra-reader-windows-mutant-scope.log",
+      "exit": 1,
+      "classification": "Scratch function mutation leaked across child scope; final probe restores exact function in finally."
+    },
+    {
+      "log": "linux-output/container.log",
+      "exit": 1,
+      "classification": "Qualified image tool exists outside chosen PATH; corrected absolute actionlint path, no image/dependency/product change."
+    }
+  ],
+  "limitations": [
+    "Private exact-body probes do not establish hosted service scheduling, platform runtime or total duration.",
+    "Windows symbolic links were not created; native Linux symbolic-link controls passed.",
+    "R13 extends budgets without changing behavior; actual new hosted completion remains pending.",
+    "One root-owned mandatory all-files pre-commit and final seven-suite aggregate remain; final total is not assumed to be 567.",
+    "No current/future cancelled CI waiver; current failed/cancelled head is not accepted.",
+    "Peer PS changes and counter increments remain root-owned after actual TF acceptance."
+  ],
+  "artifacts": {
+    "ci-helpers-windows.log": {
+      "sha256": "22a3d0e4612f67c58b7b51ba8caec9d5280d3ba22a0f09c56dddd3162936e497",
+      "bytes": 499
+    },
+    "discovery-controls-windows.log": {
+      "sha256": "3e3ca4ed36b97875cd77182be90f597ee61888fb1c8d16ae63cd110fc1f75abb",
+      "bytes": 375
+    },
+    "discovery-controls.mjs": {
+      "sha256": "1f19d756b71fe62f3a099baea1d4d033fa670fbd0c3361eefaef57d7322819ce",
+      "bytes": 4680
+    },
+    "extra-reader-controls.ps1": {
+      "sha256": "b36c55a842be781e9687531470f0ecee715b57abb8b09ea7b04fdf8080db40ef",
+      "bytes": 6907
+    },
+    "extra-reader-windows-initial-expectation.log": {
+      "sha256": "0a0bbe37a1a386352df70ed06b572dccc943b4a8f5b794bc7b6c2da98b0e1628",
+      "bytes": 619
+    },
+    "extra-reader-windows-mutant-scope.log": {
+      "sha256": "c61a3b3bf87899a179db8abc037b2dea2432dda14dd5fb9ade19429b8acb52a3",
+      "bytes": 409
+    },
+    "extra-reader-windows.log": {
+      "sha256": "4f2306bd6694b253cf74712b912842b6377e4f79c4062327b12a698fb231d171",
+      "bytes": 360
+    },
+    "finalize-evidence.py": {
+      "sha256": "fd21b1ad9ecc07122d9dba47fae008b8c60030087b745afab4328d264c3a232b",
+      "bytes": 7045
+    },
+    "launch-linux-attempt2.py": {
+      "sha256": "447f1e16c1de2c980387c9a791c47b319b99c7e6addcac27870381a0e0bc4d37",
+      "bytes": 4029
+    },
+    "launch-linux.py": {
+      "sha256": "83b70c54108c3dbffc3bd42a1283e0105299137ab0a646ff18dfe35efc05ff74",
+      "bytes": 2991
+    },
+    "linux-focus-attempt1.py": {
+      "sha256": "42b407f6ce15cf9bbe9e85c28a015360ccd110fc1d14a87a39643906465a5991",
+      "bytes": 4757
+    },
+    "linux-focus.py": {
+      "sha256": "b7ecebf4eb5f9c643d2045c1af45730c5525d959723cb0d6d588d726570308b1",
+      "bytes": 4988
+    },
+    "metadata-controls-windows.log": {
+      "sha256": "c27d9b72e08a1e9bc4a70d1df53114fb8950b3dbbdd14be14843252e605fa6e2",
+      "bytes": 115
+    },
+    "metadata-controls.ps1": {
+      "sha256": "e021baee3678586f47fd817b8a885f4b3b1c24fb6c08ca52b64c6182f2be5f02",
+      "bytes": 4930
+    },
+    "preimage.json": {
+      "sha256": "c9e63cdc55329edb9c63af4983f1b5358cb9566800404cdb84df783182843b9b",
+      "bytes": 9164
+    },
+    "quality-windows.log": {
+      "sha256": "b0d4935f680f691971a252ffbcbd769c51c4be0502c7de01a5766a7f43ea657a",
+      "bytes": 53
+    },
+    "run-windows.py": {
+      "sha256": "d90a4d8ded77e84083d645524d32f6d62b8ac26663cb6a75f772ada308e4177a",
+      "bytes": 2898
+    },
+    "setup-focus.ps1": {
+      "sha256": "10d80e92aef1bb98195392e82e9ed6cb891102289551fe2d24973c029169f57b",
+      "bytes": 2291
+    },
+    "setup-reader-windows-driver-scope.log": {
+      "sha256": "4356bd714438fcde7fd48727ecb02b9163f6df7df5d77fbb784cc6e622e0056e",
+      "bytes": 223
+    },
+    "setup-reader-windows-initial-driver.log": {
+      "sha256": "4356bd714438fcde7fd48727ecb02b9163f6df7df5d77fbb784cc6e622e0056e",
+      "bytes": 223
+    },
+    "setup-reader-windows.log": {
+      "sha256": "21799691ec441be6273802528c04ee8589a8bb82ae8818e519180a7a84514f43",
+      "bytes": 90
+    },
+    "source-final.json": {
+      "sha256": "045da9f92d5189a462a00f960f0e59d024fdc776f715cd427ace608fa6c7db5d",
+      "bytes": 19655
+    },
+    "windows-results.json": {
+      "sha256": "230e3a3bd245384bd9566e1aea129b871282e53b60b48ba05d68f4093efb2bd7",
+      "bytes": 7622
+    },
+    "linux-input/candidate.tar": {
+      "sha256": "27fd621bab50eb6b0da6d75648590ca419b43cd07a44637dfcc255946d3adf89",
+      "bytes": 3799040
+    },
+    "linux-input/dependencies.tar": {
+      "sha256": "4e11000a7c4612d40224fc91fbd4653dfb6a1bc8604f035a36bb22b5c388c80a",
+      "bytes": 20316160
+    },
+    "linux-input/dependency-catalog.json": {
+      "sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+      "bytes": 411879
+    },
+    "linux-input/discovery-controls.mjs": {
+      "sha256": "db58f7a6db707cf6ef7502edd50baf2c7c8cb8fddcd49c8253f99ffca73133c1",
+      "bytes": 2547
+    },
+    "linux-input/linux-focus.py": {
+      "sha256": "42b407f6ce15cf9bbe9e85c28a015360ccd110fc1d14a87a39643906465a5991",
+      "bytes": 4757
+    },
+    "linux-input/metadata-controls.ps1": {
+      "sha256": "e021baee3678586f47fd817b8a885f4b3b1c24fb6c08ca52b64c6182f2be5f02",
+      "bytes": 4930
+    },
+    "linux-input/payload.json": {
+      "sha256": "c02f655c1a5f11e208e5455c52976ccefd5416f811d0ba31f89439a51632d963",
+      "bytes": 746
+    },
+    "linux-input/setup-focus.ps1": {
+      "sha256": "10d80e92aef1bb98195392e82e9ed6cb891102289551fe2d24973c029169f57b",
+      "bytes": 2291
+    },
+    "linux-input/source-final.json": {
+      "sha256": "045da9f92d5189a462a00f960f0e59d024fdc776f715cd427ace608fa6c7db5d",
+      "bytes": 19655
+    },
+    "linux-output/actionlint.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "linux-output/container.log": {
+      "sha256": "2e8428f0a5670c263789d8a67bc3a5a9541922ad7a5d2c406faa51fa1cefb177",
+      "bytes": 830
+    },
+    "linux-output/host-result.json": {
+      "sha256": "af67c5ce8be3ec529dddc805703021dbb8d01e0f6c7ed10355d60b8b1b331187",
+      "bytes": 1078
+    },
+    "linux-output/result.json": {
+      "sha256": "2768c28456b5cdd037cc4086fb69e2f9d119a322d5a2ffe2cd20835bf8d162a5",
+      "bytes": 1603
+    },
+    "linux-output/yaml-parse.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "linux-output/yaml-style.log": {
+      "sha256": "9060d685f19d02a59833681c98c7df13da1d7838cf6b3e26f13f867e4b6b0a1d",
+      "bytes": 13003
+    },
+    "linux-input-attempt2/candidate.tar": {
+      "sha256": "27fd621bab50eb6b0da6d75648590ca419b43cd07a44637dfcc255946d3adf89",
+      "bytes": 3799040
+    },
+    "linux-input-attempt2/dependencies.tar": {
+      "sha256": "4e11000a7c4612d40224fc91fbd4653dfb6a1bc8604f035a36bb22b5c388c80a",
+      "bytes": 20316160
+    },
+    "linux-input-attempt2/dependency-catalog.json": {
+      "sha256": "cffdc5c28e47c05ed65a9518e9d514697f069243b16d761749fa186d0d653dc1",
+      "bytes": 411879
+    },
+    "linux-input-attempt2/discovery-controls.mjs": {
+      "sha256": "1f19d756b71fe62f3a099baea1d4d033fa670fbd0c3361eefaef57d7322819ce",
+      "bytes": 4680
+    },
+    "linux-input-attempt2/extra-reader-controls.ps1": {
+      "sha256": "b36c55a842be781e9687531470f0ecee715b57abb8b09ea7b04fdf8080db40ef",
+      "bytes": 6907
+    },
+    "linux-input-attempt2/linux-focus.py": {
+      "sha256": "b7ecebf4eb5f9c643d2045c1af45730c5525d959723cb0d6d588d726570308b1",
+      "bytes": 4988
+    },
+    "linux-input-attempt2/metadata-controls.ps1": {
+      "sha256": "e021baee3678586f47fd817b8a885f4b3b1c24fb6c08ca52b64c6182f2be5f02",
+      "bytes": 4930
+    },
+    "linux-input-attempt2/payload.json": {
+      "sha256": "ce75e57af372d204122686f50ec091b405438e1255ea5f67efe6f4fdb0adfd3d",
+      "bytes": 846
+    },
+    "linux-input-attempt2/setup-focus.ps1": {
+      "sha256": "10d80e92aef1bb98195392e82e9ed6cb891102289551fe2d24973c029169f57b",
+      "bytes": 2291
+    },
+    "linux-input-attempt2/source-final.json": {
+      "sha256": "045da9f92d5189a462a00f960f0e59d024fdc776f715cd427ace608fa6c7db5d",
+      "bytes": 19655
+    },
+    "linux-output-attempt2/actionlint.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "linux-output-attempt2/affected-ci-helpers.log": {
+      "sha256": "1668b95fd499da834ea9fdeb87774fa725e77124ba71dc3517003c53f1ac0d39",
+      "bytes": 13806
+    },
+    "linux-output-attempt2/container.log": {
+      "sha256": "6f687ca8e3cff1c7e923d71fd3568e27c0b4fde0ce622cdfb0f15f8ee47a725d",
+      "bytes": 3538
+    },
+    "linux-output-attempt2/discovery-controls.log": {
+      "sha256": "27dff6902b5cdbe0394071523e9f0c9009ba2c715cbff93f0293311441ba7c72",
+      "bytes": 509
+    },
+    "linux-output-attempt2/extra-reader-controls.log": {
+      "sha256": "ca7005096a3175dac9b19fbe314d78e9ab7a057bc3c4f85e081771825ca4e882",
+      "bytes": 367
+    },
+    "linux-output-attempt2/host-result.json": {
+      "sha256": "2069f9eddaa1a6bf655b649b9c77cdd5daa88e5d424b5ab645c15b369ca2697e",
+      "bytes": 1213
+    },
+    "linux-output-attempt2/metadata-controls.log": {
+      "sha256": "ff465da3b832c45196de54797b1e234028bc2a7f709019c24d5be38e2097affd",
+      "bytes": 114
+    },
+    "linux-output-attempt2/result.json": {
+      "sha256": "75adb6af80784ea70a4caeaef3b908cdc0da83f50c2779a4f428bea3bce34cbc",
+      "bytes": 4378
+    },
+    "linux-output-attempt2/setup-reader.log": {
+      "sha256": "88cbaccaa707125673c0017a594bdd1fac5be953b05c29e8fd05800a370730d8",
+      "bytes": 89
+    },
+    "linux-output-attempt2/yaml-parse.log": {
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    "linux-output-attempt2/yaml-style.log": {
+      "sha256": "9060d685f19d02a59833681c98c7df13da1d7838cf6b3e26f13f867e4b6b0a1d",
+      "bytes": 13003
+    }
+  },
+  "report_sha256": "7c4306926d0fd04ee35b1fb8179a379e58748ffa9b5ed75709d79aa32d36a949"
+}

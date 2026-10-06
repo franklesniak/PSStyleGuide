@@ -1,0 +1,94 @@
+{
+  "status": "PASS_SOURCE_REVIEW_PENDING_VALIDATION_BINDING",
+  "material_findings": [],
+  "prior_scope_p2": "closed_in_frozen_source; terminal validation pending",
+  "parent_head": "3b12700eb636da67f5861637e5b139a18fa82140",
+  "parent_tree": "a4e7ce67d14cb4d5b4e0b677ff995ff4adbd2d29",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_commit": null,
+  "candidate_tree": null,
+  "candidate_body_sha256": null,
+  "source_manifest_sha256": "045da9f92d5189a462a00f960f0e59d024fdc776f715cd427ace608fa6c7db5d",
+  "source_files_verified": 80,
+  "unchanged_from_parent": 75,
+  "changed_files": [
+    {
+      "path": ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      "sha256": "40e7c631aa266cc8d0f2f64e9f91c55ec28c3636e870c75854237083cf81e681",
+      "bytes": 247937,
+      "mode": "100644",
+      "blob": "afbc01b4ae103cc660fc28ac1e3bf28a9d885eeb"
+    },
+    {
+      "path": ".github/workflows/Test-AgentInstructions.ps1",
+      "sha256": "d6faafa20cd6af4057c59208a98e023f58f23167131ba9c650e7c9bd7cde2f9e",
+      "bytes": 484458,
+      "mode": "100644",
+      "blob": "b41dbf43f0bc67fd73d406b5d297f384e94ff4bd"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "c5da4af5bb2da1d642b7acf7d308ca5f848527b6366a5eee934364723493145d",
+      "bytes": 130059,
+      "mode": "100644",
+      "blob": "a565d3d1e7fe62d815e03b5c6ef54a33beca3019"
+    },
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "sha256": "4db16a194d432c241f464e501dfdd19e9a9aa1c01d193a1408bc7fe2163a05f8",
+      "bytes": 12893,
+      "mode": "100644",
+      "blob": "134865bf1b239b766fc3199af116e91d127169bd"
+    },
+    {
+      "path": ".github/workflows/copilot-code-review.yml",
+      "sha256": "e998905e4883d456cb0c1f62e95e434c7aafb4bc1a51370dbd37ab3e17b6464a",
+      "bytes": 45016,
+      "mode": "100644",
+      "blob": "780daadb72e9c0861889ccf12e948e6488ad5cbe"
+    }
+  ],
+  "decisions": [
+    "S1 C95.9",
+    "security C98.5",
+    "R11 B95",
+    "R13 C97.9"
+  ],
+  "report_sha256": "f1d4336b27d3b09a5b79d5515e170449627f3bf037a135889b006a1b6ef298ac",
+  "reviewer_tests_executed": [],
+  "product_changes_made": false,
+  "native_calls_made": false,
+  "validation_binding": "pending final implementation packet and Linux terminals",
+  "evidence_seen": [
+    "quality-windows.log",
+    "setup-reader-windows.log",
+    "ci-helpers-windows.log: four actual tests passed",
+    "metadata-controls.ps1 and metadata-controls-windows.log",
+    "discovery-controls.mjs and discovery-controls-windows.log",
+    "preserved initial scratch-driver failures"
+  ],
+  "pending_selected_controls": [
+    "actual link handling",
+    "required old coding-workflow deletion",
+    "selected-Git command failure and no fallback",
+    "old fixed-selection negative against alternate valid install",
+    "Linux alternate spaced Git actual proof terminal"
+  ],
+  "remaining_gates": [
+    "Final implementation evidence and source guard binding",
+    "Final mandatory all-files precommit and affected validation",
+    "Accepted-base/candidate endpoints and current audit",
+    "Candidate commit/body final binding",
+    "Fresh exact-input native reviews and CI",
+    "Actual dedicated service selection/completion",
+    "Strict landing and paired convergence"
+  ],
+  "original_deadline": "2026-10-13T23:47:31Z",
+  "transfer_counters": {
+    "A06": 1,
+    "A03": 3,
+    "A21": 5,
+    "A07": 5
+  },
+  "strict_no_failing_ci_merge": true
+}

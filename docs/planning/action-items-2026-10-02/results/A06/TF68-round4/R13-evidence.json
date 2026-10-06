@@ -1,0 +1,315 @@
+{
+  "status": "read-only proposal; no tests executed",
+  "captured_utc": "2026-10-06T06:16:20.579994+00:00",
+  "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+  "source": [
+    {
+      "path": ".github/workflows/agent-instructions.yml",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "mode_blob": "100644 blob dfff2364064ca3ac8e030fad0e404b3676a16edb\t.github/workflows/agent-instructions.yml",
+      "sha256": "973b15947fd3f3f07d1a6b57e6ec8cff51012a7502cb4eca0ff63b81e9ae76bc"
+    },
+    {
+      "path": ".github/workflows/Test-CiHelpers.test.mjs",
+      "commit": "3b12700eb636da67f5861637e5b139a18fa82140",
+      "mode_blob": "100644 blob 3a62fde67925bc99285f8a0c3c74b53ac7f7f109\t.github/workflows/Test-CiHelpers.test.mjs",
+      "sha256": "4e7fbf7636215c18cf3514fb4bf6db219e4407c070d27b8341fe60680926f6a9"
+    }
+  ],
+  "evidence_files": [
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858312\\attempt-1\\log.txt",
+      "sha256": "3947cd00efc9efeb3ceaa79e4efee4142bf65715e838e2ffcc5a938ecb3a9a40"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858312\\attempt-1\\jobs.json",
+      "sha256": "650063bba49b0bc8bd466954e626f3ee99fd434b4f4b463f67cda3da7ce022e8"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858312\\attempt-1\\annotations.json",
+      "sha256": "4054730b4e1adf015bb1b2647a14232b4f8b0cb13b3285335d7efba773fcaacd"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418858312\\attempt-1\\run.json",
+      "sha256": "56a5452f6d27ad1e366b0403f96112f356a2602bc8e42ceba5054b283ab85e65"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864320\\attempt-1\\log.txt",
+      "sha256": "21243b0db73f433cfe01846004d7f2fdca23be5bd550c882004c670d8b10b890"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864320\\attempt-1\\jobs.json",
+      "sha256": "eb76e628ded53d5f2d8c340d5dedae073172c775916eebaad23c4d67d8bb2644"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864320\\attempt-1\\annotations.json",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\hosted-3b12700\\37418864320\\attempt-1\\run.json",
+      "sha256": "e2f38af6c65eaef9284fd9ddcac5804cb2309429b37dacd4e3788ac25e201dd9"
+    },
+    {
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round4-progress-9.json",
+      "sha256": "9cf5ca31e114404d964072eabf04e290bd017f0a112be5ef9c5a0287fd305e66"
+    }
+  ],
+  "observations": [
+    {
+      "run": "37418858312",
+      "job_id": 112123482433,
+      "conclusion": "cancelled",
+      "job_started": "2026-10-06T05:30:20Z",
+      "job_completed": "2026-10-06T06:00:35Z",
+      "test_step": {
+        "name": "Test proposed behavior without publication authority",
+        "status": "completed",
+        "conclusion": "cancelled",
+        "number": 5,
+        "started_at": "2026-10-06T05:30:33Z",
+        "completed_at": "2026-10-06T06:00:33Z"
+      },
+      "receipts": [
+        "Test proposed instruction and workflow behavior\tTest proposed behavior without publication authority\t2026-10-06T05:57:32.4571982Z Agent-instruction mutation self-tests passed."
+      ],
+      "annotations": [
+        {
+          "job_id": 112123482433,
+          "pages": [
+            [
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/3b12700eb636da67f5861637e5b139a18fa82140/.github",
+                "start_line": 1,
+                "start_column": null,
+                "end_line": 1,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "The job has exceeded the maximum execution time of 30m0s",
+                "raw_details": ""
+              },
+              {
+                "path": ".github",
+                "blob_href": "https://github.com/franklesniak/TerraformStyleGuide/blob/3b12700eb636da67f5861637e5b139a18fa82140/.github",
+                "start_line": 118,
+                "start_column": null,
+                "end_line": 118,
+                "end_column": null,
+                "annotation_level": "failure",
+                "title": "",
+                "message": "The operation was canceled.",
+                "raw_details": ""
+              }
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "run": "37418864320",
+      "job_id": 112123499903,
+      "conclusion": "success",
+      "job_started": "2026-10-06T05:30:25Z",
+      "job_completed": "2026-10-06T05:59:41Z",
+      "test_step": {
+        "name": "Test proposed behavior without publication authority",
+        "status": "completed",
+        "conclusion": "success",
+        "number": 5,
+        "started_at": "2026-10-06T05:30:38Z",
+        "completed_at": "2026-10-06T05:59:38Z"
+      },
+      "receipts": [
+        "Test proposed instruction and workflow behavior\tTest proposed behavior without publication authority\t2026-10-06T05:55:24.9357742Z Agent-instruction mutation self-tests passed.",
+        "Test proposed instruction and workflow behavior\tTest proposed behavior without publication authority\t2026-10-06T05:59:38.1735962Z \u2139 tests 567",
+        "Test proposed instruction and workflow behavior\tTest proposed behavior without publication authority\t2026-10-06T05:59:38.1736354Z \u2139 pass 567",
+        "Test proposed instruction and workflow behavior\tTest proposed behavior without publication authority\t2026-10-06T05:59:38.1736540Z \u2139 fail 0",
+        "Test proposed instruction and workflow behavior\tTest proposed behavior without publication authority\t2026-10-06T05:59:38.1736731Z \u2139 cancelled 0",
+        "Test proposed instruction and workflow behavior\tTest proposed behavior without publication authority\t2026-10-06T05:59:38.1736941Z \u2139 skipped 0",
+        "Test proposed instruction and workflow behavior\tTest proposed behavior without publication authority\t2026-10-06T05:59:38.1737131Z \u2139 todo 0"
+      ],
+      "annotations": []
+    }
+  ],
+  "weights": [
+    30,
+    30,
+    18,
+    12,
+    7,
+    3
+  ],
+  "scores": {
+    "A": {
+      "criteria": [
+        10,
+        3,
+        9,
+        5,
+        9,
+        10
+      ],
+      "total": 70.5,
+      "basis": "Retain30 and retry only hourly; no remedy for demonstrated lack of margin."
+    },
+    "B": {
+      "criteria": [
+        10,
+        9,
+        9,
+        9,
+        10,
+        10
+      ],
+      "total": 94.0,
+      "basis": "Raise job to45 only; useful margin but setup and tests still share one deadline."
+    },
+    "C": {
+      "criteria": [
+        10,
+        10,
+        9,
+        10,
+        10,
+        9
+      ],
+      "total": 97.9,
+      "basis": "Job59/test step45; finite separate envelope with existing repository full-validation budget."
+    },
+    "D": {
+      "criteria": [
+        10,
+        10,
+        7,
+        9,
+        10,
+        10
+      ],
+      "total": 93.4,
+      "basis": "Job59 or60 only; longer allowance but a hung test can consume the whole outer budget."
+    },
+    "E": {
+      "criteria": [
+        10,
+        10,
+        3,
+        6,
+        9,
+        10
+      ],
+      "total": 81.9,
+      "basis": "Job90/120/default360; unsupported excess for observed29-minute successful work."
+    },
+    "F": {
+      "criteria": [
+        10,
+        9,
+        8,
+        7,
+        7,
+        5
+      ],
+      "total": 86.2,
+      "basis": "Split SelfTest and Node into independently qualified jobs; repeats acquisition and alters result topology."
+    },
+    "G": {
+      "criteria": [
+        9,
+        7,
+        8,
+        6,
+        6,
+        4
+      ],
+      "total": 75.0,
+      "basis": "Parallelize within job; shared fixture/process isolation and scaling not established."
+    },
+    "H": {
+      "criteria": [
+        10,
+        6,
+        9,
+        8,
+        6,
+        4
+      ],
+      "total": 79.2,
+      "basis": "Profile/optimize without deleting tests; potential improvement but no demonstrated safe optimization yet."
+    },
+    "I": {
+      "criteria": [
+        10,
+        3,
+        8,
+        7,
+        7,
+        5
+      ],
+      "total": 68.2,
+      "basis": "Cache prerequisites/prebuild; observed preparation only13 seconds, misses long measured phase."
+    },
+    "J": {
+      "criteria": [
+        10,
+        7,
+        7,
+        5,
+        6,
+        2
+      ],
+      "total": 74.4,
+      "basis": "Larger/managed self-hosted runners; speedup unmeasured, adds cost/security/operations."
+    },
+    "K": {
+      "criteria": [
+        1,
+        9,
+        4,
+        2,
+        2,
+        10
+      ],
+      "total": 44.0,
+      "basis": "Remove slow tests, truncate output or continue-on-error; loses proof, ineligible."
+    },
+    "L": {
+      "criteria": [
+        0,
+        8,
+        3,
+        1,
+        1,
+        10
+      ],
+      "total": 34.3,
+      "basis": "Treat PR success as cancelled push success/waive failing CI; owner-rule violation, ineligible."
+    }
+  },
+  "selected": "C",
+  "selected_total": 97.9,
+  "proposed_paths": [
+    ".github/workflows/agent-instructions.yml"
+  ],
+  "proposed_changes": {
+    "candidate-tests.timeout-minutes": {
+      "before": 30,
+      "after": 59
+    },
+    "candidate-tests.steps[id=test].timeout-minutes": {
+      "before": null,
+      "after": 45
+    }
+  },
+  "primary_sources": [
+    "https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#jobsjob_idtimeout-minutes",
+    "https://docs.github.com/en/billing/concepts/product-billing/github-actions"
+  ],
+  "report_sha256": "753a1694b844e290859fdad4f62ec9dc85d50eaea8d06f8495043d5a0a7cc3e6",
+  "guard": {
+    "head": "3b12700eb636da67f5861637e5b139a18fa82140",
+    "status": "",
+    "index_sha256": "fe82ed28175dc142c63c9e43541f49702e171ec12698ea7f426952170a014d82",
+    "refs_sha256": "aa33f4a192a4fa72a9eda4f745b77c671c3c9b3129936b72f5db5926a4296ba5"
+  }
+}
