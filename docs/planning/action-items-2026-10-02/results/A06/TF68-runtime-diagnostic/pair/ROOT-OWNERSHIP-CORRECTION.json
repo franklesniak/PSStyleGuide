@@ -1,0 +1,87 @@
+{
+  "selected_at": "2026-10-06T09:29:11.495730+00:00",
+  "finding": "Draft direct required-Version endpoint allocated unused snapshots while main owner could already retain eight",
+  "validated": "Root source read and writer caller census confirm current/prior each parsed once, no nested metadata delegation; direct Get-AgentInstructionFailure call overlaps main budget. No product runtime failure claimed.",
+  "options": [
+    "A direct endpoint stays fresh; borrow only supplied slots",
+    "B thread shared main budget through additional helpers",
+    "C raise declared bound for extra unused copies",
+    "D retain inconsistent bound"
+  ],
+  "criteria": [
+    {
+      "name": "Correct retention bound",
+      "weight": 35
+    },
+    {
+      "name": "Unchanged validation",
+      "weight": 25
+    },
+    {
+      "name": "Useful performance work",
+      "weight": 20
+    },
+    {
+      "name": "Clear ownership",
+      "weight": 15
+    },
+    {
+      "name": "Implementation cost",
+      "weight": 5
+    }
+  ],
+  "scores": [
+    {
+      "option": "A",
+      "vector": [
+        10,
+        10,
+        10,
+        10,
+        9
+      ],
+      "total": 99.5,
+      "eligible": true
+    },
+    {
+      "option": "B",
+      "vector": [
+        10,
+        10,
+        4,
+        7,
+        5
+      ],
+      "total": 81,
+      "eligible": true
+    },
+    {
+      "option": "C",
+      "vector": [
+        8,
+        10,
+        3,
+        7,
+        9
+      ],
+      "total": 74,
+      "eligible": true
+    },
+    {
+      "option": "D",
+      "vector": [
+        0,
+        10,
+        2,
+        2,
+        10
+      ],
+      "total": 37,
+      "eligible": false
+    }
+  ],
+  "selected": "A99.5",
+  "implementation": "Remove required-Version endpoint automatic local owner and its owned cleanup; retain supplied slot forwarding. LastUpdated retains local owner for real nested repeats. Test no direct required-Version retention and correct borrowed ownership.",
+  "displayed_before_correction": true,
+  "owner_input_needed": false
+}

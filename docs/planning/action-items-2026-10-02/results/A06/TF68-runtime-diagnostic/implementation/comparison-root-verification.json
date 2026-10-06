@@ -1,0 +1,70 @@
+{
+  "verified_at": "2026-10-06T10:00:17.271988+00:00",
+  "status": "PASS_BOUNDED_COMPARISON_NOT_FINAL_ACCEPTANCE",
+  "artifacts_verified": 29,
+  "payloads_verified": 15,
+  "variants": {
+    "control": {
+      "counts": {
+        "Invoke-MarkdownParserProcess": 59,
+        "ConvertFrom-ParserJsonContext": 59
+      },
+      "seconds": {
+        "Invoke-MarkdownParserProcess": 2.8265778119999982,
+        "ConvertFrom-ParserJsonContext": 6.230417404000001
+      },
+      "events": 236,
+      "intervals": 118,
+      "case_seconds": 13.564239010999927
+    },
+    "profile": {
+      "counts": {
+        "Invoke-MarkdownParserProcess": 59,
+        "ConvertFrom-ParserJsonContext": 51,
+        "Copy-MarkdownParseReuseContext": 33
+      },
+      "seconds": {
+        "Invoke-MarkdownParserProcess": 2.7394421009999994,
+        "ConvertFrom-ParserJsonContext": 5.169265380000001,
+        "Copy-MarkdownParseReuseContext": 0.49687825099999994
+      },
+      "events": 286,
+      "intervals": 143,
+      "case_seconds": 12.47501529100009
+    }
+  },
+  "events": 522,
+  "intervals": 261,
+  "host_private_complete_guards_equal": true,
+  "original_clock_and_complete_commands_equal": true,
+  "stdout_and_nonmarker_stderr_equal": true,
+  "source_count": 80,
+  "dependency_count": 1914,
+  "observations": {
+    "native_calls": 59,
+    "original_structural_interpretations": 59,
+    "changed_structural_interpretations": 51,
+    "actual_hits": 8,
+    "elapsed_reduction_seconds": 1.0892237199998362,
+    "elapsed_reduction_percent": 8.030112998720607
+  },
+  "limitations": [
+    "Single sequential original-then-changed same-case comparison; both variants instrumented.",
+    "The fixture is reconstructed, not a replay of prior deleted ephemeral Git identities.",
+    "Decoder intervals do not include every subsequent structural schema validation statement.",
+    "No full SelfTest, aggregate or hosted service completion guarantee.",
+    "Runtime JSON decoding is excluded from structural counts; fresh native parser calls remain."
+  ],
+  "result_envelope_sha256": "3fab7a88d729a05634573092aedfeb8ddd74163a6480caf35a408aa05e4de247",
+  "native_snapshot": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-runtime-C-prevalidation-native.json",
+    "sha256": "ccd2d23bd18abc87ecc45c2b359e0319b1ebfb5ac399c16ca41dc7dad258543d",
+    "captured_at": "2026-10-06T09:59:02.040530+00:00",
+    "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "body_sha256": "fb04de79de1b55f376eea677c4d77e9b27472389a76db202daa2d6818c249463",
+    "pr_open_unmerged": true,
+    "ci": "13 ordinary successes; dynamic37430212759 cancelled; no retry or native write"
+  },
+  "remaining": "One final candidate mandatory aggregate, normal commit, actual accepted-B/new-H endpoints and audit, final binding, fresh exact-input reviews and hosted acceptance, then normal landing and peer convergence."
+}

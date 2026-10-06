@@ -1,0 +1,2471 @@
+{
+  "summary": {
+    "state": "passed_non_acceptance",
+    "captured_utc": "2026-10-06T09:58:15.026040+00:00",
+    "host_exit": 0,
+    "finished_at": "2026-10-06T09:57:59.587352+00:00",
+    "candidate_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+    "variants": {
+      "control": {
+        "pid": 7241,
+        "native_exit": 0,
+        "elapsed_seconds": 13.564239010999927,
+        "events": 236,
+        "intervals": 118,
+        "counts": {
+          "Invoke-MarkdownParserProcess": 59,
+          "ConvertFrom-ParserJsonContext": 59
+        },
+        "seconds": {
+          "Invoke-MarkdownParserProcess": 2.8265778119999982,
+          "ConvertFrom-ParserJsonContext": 6.230417404000001
+        },
+        "stdout_sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+        "raw_stderr_sha256": "b34767f96ba0108a6d6e7b4b55cc0d39659bdcb7f53374fad95f61f122cfb879",
+        "non_marker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "clock": "2026-10-06T09:57:09.0286394+00:00",
+        "arguments": [
+          "-InputRevision",
+          "8c18e5e19b7797ad4555375f772e9d573c84b131",
+          "-PublishedBaselineRevision",
+          "3b5472325b03f27c68472d6a6598efb629e4f422",
+          "-FinalizeMetadataNow"
+        ],
+        "cwd": "/work/validation-tf68-20261006-structural-reuse-one-3yu9bu28/repository",
+        "checker_sha256": "c8a1a1c93757fcd8c884138015f05581a744bebadba7daf3aa73fcdecbd6cafe"
+      },
+      "profile": {
+        "pid": 7861,
+        "native_exit": 0,
+        "elapsed_seconds": 12.47501529100009,
+        "events": 286,
+        "intervals": 143,
+        "counts": {
+          "Invoke-MarkdownParserProcess": 59,
+          "ConvertFrom-ParserJsonContext": 51,
+          "Copy-MarkdownParseReuseContext": 33
+        },
+        "seconds": {
+          "Invoke-MarkdownParserProcess": 2.7394421009999994,
+          "ConvertFrom-ParserJsonContext": 5.169265380000001,
+          "Copy-MarkdownParseReuseContext": 0.49687825099999994
+        },
+        "stdout_sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+        "raw_stderr_sha256": "987c850ee982b4fefa0286b8c3ffe18c546afd882d5efddadebdd8d44d5d4eb7",
+        "non_marker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "clock": "2026-10-06T09:57:09.0286394+00:00",
+        "arguments": [
+          "-InputRevision",
+          "8c18e5e19b7797ad4555375f772e9d573c84b131",
+          "-PublishedBaselineRevision",
+          "3b5472325b03f27c68472d6a6598efb629e4f422",
+          "-FinalizeMetadataNow"
+        ],
+        "cwd": "/work/validation-tf68-20261006-structural-reuse-one-3yu9bu28/repository",
+        "checker_sha256": "ff5b1f2d6150f4241cee484f7d8c62e38d9acacaaac679a137fb11e27636bc2c"
+      }
+    },
+    "case": {
+      "Role": "non-acceptance reconstructed first current-date case",
+      "Baseline": "3b5472325b03f27c68472d6a6598efb629e4f422",
+      "Candidate": "8c18e5e19b7797ad4555375f772e9d573c84b131",
+      "Clock": "2026-10-06T09:57:09.0286394+00:00",
+      "ExpectedDate": "2026-10-06",
+      "ExpectedExit": 0,
+      "ExpectedMessage": "Author finalization UTC date checked: 2026-10-06; B=3b5472325b03f27c68472d6a6598efb629e4f422 H=8c18e5e19b7797ad4555375f772e9d573c84b131",
+      "PriorEphemeralIdentityReplayed": false
+    },
+    "focused": {
+      "state": "passed",
+      "source_hashes": [
+        "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+        "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+      ],
+      "pwsh": "7.6.3",
+      "started_utc": "2026-10-06T09:56:47.1773169+00:00",
+      "checks": [
+        "persistent structural reuse/freshness/alias/budget controls",
+        "actual optional metadata regression function"
+      ],
+      "source_after_equal": true,
+      "elapsed_seconds": 11.4928075,
+      "finished_utc": "2026-10-06T09:56:58.6684661+00:00"
+    },
+    "guards": {
+      "private_source_git_dependencies_equal": true,
+      "host_source_git_dependencies_equal": true,
+      "source_count": 80,
+      "dependency_count": 1914,
+      "all_marker_intervals_complete": true,
+      "same_native_parser_count": true,
+      "same_raw_non_marker_streams": true,
+      "same_argv_cwd_clock": true
+    },
+    "observations": {
+      "native_calls": 59,
+      "original_structural_interpretations": 59,
+      "changed_structural_interpretations": 51,
+      "actual_hits": 8,
+      "elapsed_reduction_seconds": 1.0892237199998362,
+      "elapsed_reduction_percent": 8.030112998720607
+    },
+    "limitations": [
+      "Single sequential original-then-changed same-case comparison; both variants instrumented.",
+      "The fixture is reconstructed, not a replay of prior deleted ephemeral Git identities.",
+      "Decoder intervals do not include every subsequent structural schema validation statement.",
+      "No full SelfTest, aggregate or hosted service completion guarantee.",
+      "Runtime JSON decoding is excluded from structural counts; fresh native parser calls remain."
+    ]
+  },
+  "intervals": [
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 896580206839,
+      "end_ticks": 896632797155,
+      "frequency": 1000000000,
+      "seconds": 0.052590316
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 896633405738,
+      "end_ticks": 896678805104,
+      "frequency": 1000000000,
+      "seconds": 0.045399366
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 896778782648,
+      "end_ticks": 896826319956,
+      "frequency": 1000000000,
+      "seconds": 0.047537308
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 896826393550,
+      "end_ticks": 896846647114,
+      "frequency": 1000000000,
+      "seconds": 0.020253564
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 896904806926,
+      "end_ticks": 896983421283,
+      "frequency": 1000000000,
+      "seconds": 0.078614357
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 896983484497,
+      "end_ticks": 897431380971,
+      "frequency": 1000000000,
+      "seconds": 0.447896474
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 897567400173,
+      "end_ticks": 897625060688,
+      "frequency": 1000000000,
+      "seconds": 0.057660515
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 897625121908,
+      "end_ticks": 897652852012,
+      "frequency": 1000000000,
+      "seconds": 0.027730104
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 897682217289,
+      "end_ticks": 897734285088,
+      "frequency": 1000000000,
+      "seconds": 0.052067799
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 897734347119,
+      "end_ticks": 897832359448,
+      "frequency": 1000000000,
+      "seconds": 0.098012329
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 897873899582,
+      "end_ticks": 897930754970,
+      "frequency": 1000000000,
+      "seconds": 0.056855388
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 897930815458,
+      "end_ticks": 898053639207,
+      "frequency": 1000000000,
+      "seconds": 0.122823749
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 898139245195,
+      "end_ticks": 898189494660,
+      "frequency": 1000000000,
+      "seconds": 0.050249465
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 898189552193,
+      "end_ticks": 898322863237,
+      "frequency": 1000000000,
+      "seconds": 0.133311044
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 898384875900,
+      "end_ticks": 898432687085,
+      "frequency": 1000000000,
+      "seconds": 0.047811185
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 898432774176,
+      "end_ticks": 898516617507,
+      "frequency": 1000000000,
+      "seconds": 0.083843331
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 898601641299,
+      "end_ticks": 898645444799,
+      "frequency": 1000000000,
+      "seconds": 0.0438035
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 898645504686,
+      "end_ticks": 898671681475,
+      "frequency": 1000000000,
+      "seconds": 0.026176789
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 898692659401,
+      "end_ticks": 898727409725,
+      "frequency": 1000000000,
+      "seconds": 0.034750324
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 898727459112,
+      "end_ticks": 898766338660,
+      "frequency": 1000000000,
+      "seconds": 0.038879548
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 898808478995,
+      "end_ticks": 898854226721,
+      "frequency": 1000000000,
+      "seconds": 0.045747726
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 898854280155,
+      "end_ticks": 898972122604,
+      "frequency": 1000000000,
+      "seconds": 0.117842449
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 899040851010,
+      "end_ticks": 899099060283,
+      "frequency": 1000000000,
+      "seconds": 0.058209273
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 899099118567,
+      "end_ticks": 899443624602,
+      "frequency": 1000000000,
+      "seconds": 0.344506035
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 899566184123,
+      "end_ticks": 899602521960,
+      "frequency": 1000000000,
+      "seconds": 0.036337837
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 899602577809,
+      "end_ticks": 899609012787,
+      "frequency": 1000000000,
+      "seconds": 0.006434978
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 899626454881,
+      "end_ticks": 899666653450,
+      "frequency": 1000000000,
+      "seconds": 0.040198569
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 899666703077,
+      "end_ticks": 899724310017,
+      "frequency": 1000000000,
+      "seconds": 0.05760694
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 899755752349,
+      "end_ticks": 899801324264,
+      "frequency": 1000000000,
+      "seconds": 0.045571915
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 899801380454,
+      "end_ticks": 899844527527,
+      "frequency": 1000000000,
+      "seconds": 0.043147073
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 899871258163,
+      "end_ticks": 899905936055,
+      "frequency": 1000000000,
+      "seconds": 0.034677892
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 899905993197,
+      "end_ticks": 899922604207,
+      "frequency": 1000000000,
+      "seconds": 0.01661101
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 899938939637,
+      "end_ticks": 899978113081,
+      "frequency": 1000000000,
+      "seconds": 0.039173444
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 899978178589,
+      "end_ticks": 899994163110,
+      "frequency": 1000000000,
+      "seconds": 0.015984521
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 900033244985,
+      "end_ticks": 900080629741,
+      "frequency": 1000000000,
+      "seconds": 0.047384756
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 900080691722,
+      "end_ticks": 900161636568,
+      "frequency": 1000000000,
+      "seconds": 0.080944846
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 900293398932,
+      "end_ticks": 900345030430,
+      "frequency": 1000000000,
+      "seconds": 0.051631498
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 900345100708,
+      "end_ticks": 900479349507,
+      "frequency": 1000000000,
+      "seconds": 0.134248799
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 900521031392,
+      "end_ticks": 900575044775,
+      "frequency": 1000000000,
+      "seconds": 0.054013383
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 900575114121,
+      "end_ticks": 900763047752,
+      "frequency": 1000000000,
+      "seconds": 0.187933631
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 900928685832,
+      "end_ticks": 900979341683,
+      "frequency": 1000000000,
+      "seconds": 0.050655851
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 900979404977,
+      "end_ticks": 901122935769,
+      "frequency": 1000000000,
+      "seconds": 0.143530792
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 901202372374,
+      "end_ticks": 901260970724,
+      "frequency": 1000000000,
+      "seconds": 0.05859835
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 901261039599,
+      "end_ticks": 901458918313,
+      "frequency": 1000000000,
+      "seconds": 0.197878714
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 901597260199,
+      "end_ticks": 901645480938,
+      "frequency": 1000000000,
+      "seconds": 0.048220739
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 901645531567,
+      "end_ticks": 901782949652,
+      "frequency": 1000000000,
+      "seconds": 0.137418085
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 901871077176,
+      "end_ticks": 901922095644,
+      "frequency": 1000000000,
+      "seconds": 0.051018468
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 901922153558,
+      "end_ticks": 901992712485,
+      "frequency": 1000000000,
+      "seconds": 0.070558927
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 902027739978,
+      "end_ticks": 902069000774,
+      "frequency": 1000000000,
+      "seconds": 0.041260796
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 902069063097,
+      "end_ticks": 902145350632,
+      "frequency": 1000000000,
+      "seconds": 0.076287535
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 902183427042,
+      "end_ticks": 902224400383,
+      "frequency": 1000000000,
+      "seconds": 0.040973341
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 902224460180,
+      "end_ticks": 902271380936,
+      "frequency": 1000000000,
+      "seconds": 0.046920756
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 902294992002,
+      "end_ticks": 902337637095,
+      "frequency": 1000000000,
+      "seconds": 0.042645093
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 902337709087,
+      "end_ticks": 902426333115,
+      "frequency": 1000000000,
+      "seconds": 0.088624028
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 902469299726,
+      "end_ticks": 902516525744,
+      "frequency": 1000000000,
+      "seconds": 0.047226018
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 902516571514,
+      "end_ticks": 902607860715,
+      "frequency": 1000000000,
+      "seconds": 0.091289201
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 902649616627,
+      "end_ticks": 902697100856,
+      "frequency": 1000000000,
+      "seconds": 0.047484229
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 902697157868,
+      "end_ticks": 902826490454,
+      "frequency": 1000000000,
+      "seconds": 0.129332586
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 902882108282,
+      "end_ticks": 902932397851,
+      "frequency": 1000000000,
+      "seconds": 0.050289569
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 902932451195,
+      "end_ticks": 903035644386,
+      "frequency": 1000000000,
+      "seconds": 0.103193191
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 903088164981,
+      "end_ticks": 903134529481,
+      "frequency": 1000000000,
+      "seconds": 0.0463645
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 903134598737,
+      "end_ticks": 903249933090,
+      "frequency": 1000000000,
+      "seconds": 0.115334353
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 903301390378,
+      "end_ticks": 903349153404,
+      "frequency": 1000000000,
+      "seconds": 0.047763026
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 903349204805,
+      "end_ticks": 903480220440,
+      "frequency": 1000000000,
+      "seconds": 0.131015635
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 903533394497,
+      "end_ticks": 903579347305,
+      "frequency": 1000000000,
+      "seconds": 0.045952808
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 903579397504,
+      "end_ticks": 903695826923,
+      "frequency": 1000000000,
+      "seconds": 0.116429419
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 903745170877,
+      "end_ticks": 903806566190,
+      "frequency": 1000000000,
+      "seconds": 0.061395313
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 903806611959,
+      "end_ticks": 903945212738,
+      "frequency": 1000000000,
+      "seconds": 0.138600779
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 904008759617,
+      "end_ticks": 904046891664,
+      "frequency": 1000000000,
+      "seconds": 0.038132047
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 904047092478,
+      "end_ticks": 904058177812,
+      "frequency": 1000000000,
+      "seconds": 0.011085334
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 904061596720,
+      "end_ticks": 904094586473,
+      "frequency": 1000000000,
+      "seconds": 0.032989753
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 904094619699,
+      "end_ticks": 904105169487,
+      "frequency": 1000000000,
+      "seconds": 0.010549788
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 904110329200,
+      "end_ticks": 904161504029,
+      "frequency": 1000000000,
+      "seconds": 0.051174829
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 904161540591,
+      "end_ticks": 904431934403,
+      "frequency": 1000000000,
+      "seconds": 0.270393812
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 904557858474,
+      "end_ticks": 904613162736,
+      "frequency": 1000000000,
+      "seconds": 0.055304262
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 904613202083,
+      "end_ticks": 904845221568,
+      "frequency": 1000000000,
+      "seconds": 0.232019485
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 904945207001,
+      "end_ticks": 904980218793,
+      "frequency": 1000000000,
+      "seconds": 0.035011792
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 904980258310,
+      "end_ticks": 904986634574,
+      "frequency": 1000000000,
+      "seconds": 0.006376264
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 904995184472,
+      "end_ticks": 905030402584,
+      "frequency": 1000000000,
+      "seconds": 0.035218112
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 905030444176,
+      "end_ticks": 905040873759,
+      "frequency": 1000000000,
+      "seconds": 0.010429583
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 905045396364,
+      "end_ticks": 905083952714,
+      "frequency": 1000000000,
+      "seconds": 0.03855635
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 905083989927,
+      "end_ticks": 905127856374,
+      "frequency": 1000000000,
+      "seconds": 0.043866447
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 905145266455,
+      "end_ticks": 905187895433,
+      "frequency": 1000000000,
+      "seconds": 0.042628978
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 905187935061,
+      "end_ticks": 905227729808,
+      "frequency": 1000000000,
+      "seconds": 0.039794747
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 905247437978,
+      "end_ticks": 905290489199,
+      "frequency": 1000000000,
+      "seconds": 0.043051221
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 905290527744,
+      "end_ticks": 905369311660,
+      "frequency": 1000000000,
+      "seconds": 0.078783916
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 905400526685,
+      "end_ticks": 905443868951,
+      "frequency": 1000000000,
+      "seconds": 0.043342266
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 905443909460,
+      "end_ticks": 905517608508,
+      "frequency": 1000000000,
+      "seconds": 0.073699048
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 905546772447,
+      "end_ticks": 905589976637,
+      "frequency": 1000000000,
+      "seconds": 0.04320419
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 905590014992,
+      "end_ticks": 905654082904,
+      "frequency": 1000000000,
+      "seconds": 0.064067912
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 905685279684,
+      "end_ticks": 905730746184,
+      "frequency": 1000000000,
+      "seconds": 0.0454665
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 905730782194,
+      "end_ticks": 905813106243,
+      "frequency": 1000000000,
+      "seconds": 0.082324049
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 905845672136,
+      "end_ticks": 905887573268,
+      "frequency": 1000000000,
+      "seconds": 0.041901132
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 905887615441,
+      "end_ticks": 905927806750,
+      "frequency": 1000000000,
+      "seconds": 0.040191309
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 905941488398,
+      "end_ticks": 905979597632,
+      "frequency": 1000000000,
+      "seconds": 0.038109234
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 905979635416,
+      "end_ticks": 906020751543,
+      "frequency": 1000000000,
+      "seconds": 0.041116127
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 906038695827,
+      "end_ticks": 906121610349,
+      "frequency": 1000000000,
+      "seconds": 0.082914522
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 906121652451,
+      "end_ticks": 906635290074,
+      "frequency": 1000000000,
+      "seconds": 0.513637623
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 906785848757,
+      "end_ticks": 906880900270,
+      "frequency": 1000000000,
+      "seconds": 0.095051513
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 906880940899,
+      "end_ticks": 907430575881,
+      "frequency": 1000000000,
+      "seconds": 0.549634982
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 907609263190,
+      "end_ticks": 907648275174,
+      "frequency": 1000000000,
+      "seconds": 0.039011984
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 907648310032,
+      "end_ticks": 907656790610,
+      "frequency": 1000000000,
+      "seconds": 0.008480578
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 907661733733,
+      "end_ticks": 907702461150,
+      "frequency": 1000000000,
+      "seconds": 0.040727417
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 907702498062,
+      "end_ticks": 907711067239,
+      "frequency": 1000000000,
+      "seconds": 0.008569177
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 907715522101,
+      "end_ticks": 907751190074,
+      "frequency": 1000000000,
+      "seconds": 0.035667973
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 907751228099,
+      "end_ticks": 907763523474,
+      "frequency": 1000000000,
+      "seconds": 0.012295375
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 907768134096,
+      "end_ticks": 907806836263,
+      "frequency": 1000000000,
+      "seconds": 0.038702167
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 907806873346,
+      "end_ticks": 907822088920,
+      "frequency": 1000000000,
+      "seconds": 0.015215574
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 907828523523,
+      "end_ticks": 907867788882,
+      "frequency": 1000000000,
+      "seconds": 0.039265359
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 907867826406,
+      "end_ticks": 907872381695,
+      "frequency": 1000000000,
+      "seconds": 0.004555289
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 907876169229,
+      "end_ticks": 907920579518,
+      "frequency": 1000000000,
+      "seconds": 0.044410289
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 907920618004,
+      "end_ticks": 907971191544,
+      "frequency": 1000000000,
+      "seconds": 0.05057354
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 907986146463,
+      "end_ticks": 908034045365,
+      "frequency": 1000000000,
+      "seconds": 0.047898902
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 908034082659,
+      "end_ticks": 908095735826,
+      "frequency": 1000000000,
+      "seconds": 0.061653167
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 908113604557,
+      "end_ticks": 908177641456,
+      "frequency": 1000000000,
+      "seconds": 0.064036899
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 908177677155,
+      "end_ticks": 908358388654,
+      "frequency": 1000000000,
+      "seconds": 0.180711499
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "Invoke-MarkdownParserProcess:3405",
+      "begin_ticks": 908417959494,
+      "end_ticks": 908478025064,
+      "frequency": 1000000000,
+      "seconds": 0.06006557
+    },
+    {
+      "variant": "control",
+      "pid": 7241,
+      "label": "ConvertFrom-ParserJsonContext:3411",
+      "begin_ticks": 908478061315,
+      "end_ticks": 908662453513,
+      "frequency": 1000000000,
+      "seconds": 0.184392198
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 910229058125,
+      "end_ticks": 910273977427,
+      "frequency": 1000000000,
+      "seconds": 0.044919302
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 910274916147,
+      "end_ticks": 910313788166,
+      "frequency": 1000000000,
+      "seconds": 0.038872019
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 910334081939,
+      "end_ticks": 910355032063,
+      "frequency": 1000000000,
+      "seconds": 0.020950124
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 910420077045,
+      "end_ticks": 910457478074,
+      "frequency": 1000000000,
+      "seconds": 0.037401029
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 910457539614,
+      "end_ticks": 910467623115,
+      "frequency": 1000000000,
+      "seconds": 0.010083501
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 910478178606,
+      "end_ticks": 910480463134,
+      "frequency": 1000000000,
+      "seconds": 0.002284528
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 910507859399,
+      "end_ticks": 910562575610,
+      "frequency": 1000000000,
+      "seconds": 0.054716211
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 910562634716,
+      "end_ticks": 910945122053,
+      "frequency": 1000000000,
+      "seconds": 0.382487337
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 911084609600,
+      "end_ticks": 911195300647,
+      "frequency": 1000000000,
+      "seconds": 0.110691047
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 911219015526,
+      "end_ticks": 911255443666,
+      "frequency": 1000000000,
+      "seconds": 0.03642814
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 911255509395,
+      "end_ticks": 911291262485,
+      "frequency": 1000000000,
+      "seconds": 0.03575309
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 911296561732,
+      "end_ticks": 911300484211,
+      "frequency": 1000000000,
+      "seconds": 0.003922479
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 911332577332,
+      "end_ticks": 911374298702,
+      "frequency": 1000000000,
+      "seconds": 0.04172137
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 911374364360,
+      "end_ticks": 911460813476,
+      "frequency": 1000000000,
+      "seconds": 0.086449116
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 911481814361,
+      "end_ticks": 911498447488,
+      "frequency": 1000000000,
+      "seconds": 0.016633127
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 911518905678,
+      "end_ticks": 911566633039,
+      "frequency": 1000000000,
+      "seconds": 0.047727361
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 911566704790,
+      "end_ticks": 911704086792,
+      "frequency": 1000000000,
+      "seconds": 0.137382002
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 911744358203,
+      "end_ticks": 911774907583,
+      "frequency": 1000000000,
+      "seconds": 0.03054938
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 911796576137,
+      "end_ticks": 911841455910,
+      "frequency": 1000000000,
+      "seconds": 0.044879773
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 911841516690,
+      "end_ticks": 911997105634,
+      "frequency": 1000000000,
+      "seconds": 0.155588944
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 912037926462,
+      "end_ticks": 912074639966,
+      "frequency": 1000000000,
+      "seconds": 0.036713504
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 912095480264,
+      "end_ticks": 912141968307,
+      "frequency": 1000000000,
+      "seconds": 0.046488043
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 912142037943,
+      "end_ticks": 912223436786,
+      "frequency": 1000000000,
+      "seconds": 0.081398843
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 912249826949,
+      "end_ticks": 912268091359,
+      "frequency": 1000000000,
+      "seconds": 0.01826441
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 912365897992,
+      "end_ticks": 912409191657,
+      "frequency": 1000000000,
+      "seconds": 0.043293665
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 912409259540,
+      "end_ticks": 912455823738,
+      "frequency": 1000000000,
+      "seconds": 0.046564198
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 912468552572,
+      "end_ticks": 912472980812,
+      "frequency": 1000000000,
+      "seconds": 0.00442824
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 912493406849,
+      "end_ticks": 912540348721,
+      "frequency": 1000000000,
+      "seconds": 0.046941872
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 912540413639,
+      "end_ticks": 912569068416,
+      "frequency": 1000000000,
+      "seconds": 0.028654777
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 912627500645,
+      "end_ticks": 912682607692,
+      "frequency": 1000000000,
+      "seconds": 0.055107047
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 912682664433,
+      "end_ticks": 912796691805,
+      "frequency": 1000000000,
+      "seconds": 0.114027372
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 912883876013,
+      "end_ticks": 912956829079,
+      "frequency": 1000000000,
+      "seconds": 0.072953066
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 912956892754,
+      "end_ticks": 913238427080,
+      "frequency": 1000000000,
+      "seconds": 0.281534326
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 913349701842,
+      "end_ticks": 913384776333,
+      "frequency": 1000000000,
+      "seconds": 0.035074491
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 913384840308,
+      "end_ticks": 913391463039,
+      "frequency": 1000000000,
+      "seconds": 0.006622731
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 913407365140,
+      "end_ticks": 913442891211,
+      "frequency": 1000000000,
+      "seconds": 0.035526071
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 913442956118,
+      "end_ticks": 913479029805,
+      "frequency": 1000000000,
+      "seconds": 0.036073687
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 913503488898,
+      "end_ticks": 913540928240,
+      "frequency": 1000000000,
+      "seconds": 0.037439342
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 913540991194,
+      "end_ticks": 913567545002,
+      "frequency": 1000000000,
+      "seconds": 0.026553808
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 913592982823,
+      "end_ticks": 913625189207,
+      "frequency": 1000000000,
+      "seconds": 0.032206384
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 913625240307,
+      "end_ticks": 913636481452,
+      "frequency": 1000000000,
+      "seconds": 0.011241145
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 913649926340,
+      "end_ticks": 913683089659,
+      "frequency": 1000000000,
+      "seconds": 0.033163319
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 913683136611,
+      "end_ticks": 913690222675,
+      "frequency": 1000000000,
+      "seconds": 0.007086064
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 913738805678,
+      "end_ticks": 913781191733,
+      "frequency": 1000000000,
+      "seconds": 0.042386055
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 913781245508,
+      "end_ticks": 913849796092,
+      "frequency": 1000000000,
+      "seconds": 0.068550584
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 913957709012,
+      "end_ticks": 914001504107,
+      "frequency": 1000000000,
+      "seconds": 0.043795095
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 914001563754,
+      "end_ticks": 914083263411,
+      "frequency": 1000000000,
+      "seconds": 0.081699657
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 914116547302,
+      "end_ticks": 914164337808,
+      "frequency": 1000000000,
+      "seconds": 0.047790506
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 914164399740,
+      "end_ticks": 914274503324,
+      "frequency": 1000000000,
+      "seconds": 0.110103584
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 914399848197,
+      "end_ticks": 914441417610,
+      "frequency": 1000000000,
+      "seconds": 0.041569413
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 914441473199,
+      "end_ticks": 914536949631,
+      "frequency": 1000000000,
+      "seconds": 0.095476432
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 914611920009,
+      "end_ticks": 914663784445,
+      "frequency": 1000000000,
+      "seconds": 0.051864436
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 914663850705,
+      "end_ticks": 914769758379,
+      "frequency": 1000000000,
+      "seconds": 0.105907674
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 914894148712,
+      "end_ticks": 914943602949,
+      "frequency": 1000000000,
+      "seconds": 0.049454237
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 914943667195,
+      "end_ticks": 915052891586,
+      "frequency": 1000000000,
+      "seconds": 0.109224391
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 915115028519,
+      "end_ticks": 915171755231,
+      "frequency": 1000000000,
+      "seconds": 0.056726712
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 915171822402,
+      "end_ticks": 915226924054,
+      "frequency": 1000000000,
+      "seconds": 0.055101652
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 915260411009,
+      "end_ticks": 915304675533,
+      "frequency": 1000000000,
+      "seconds": 0.044264524
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 915304736052,
+      "end_ticks": 915372701794,
+      "frequency": 1000000000,
+      "seconds": 0.067965742
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 915413423490,
+      "end_ticks": 915455503473,
+      "frequency": 1000000000,
+      "seconds": 0.042079983
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 915455559022,
+      "end_ticks": 915496556372,
+      "frequency": 1000000000,
+      "seconds": 0.04099735
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 915522501478,
+      "end_ticks": 915563118425,
+      "frequency": 1000000000,
+      "seconds": 0.040616947
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 915563178482,
+      "end_ticks": 915625667558,
+      "frequency": 1000000000,
+      "seconds": 0.062489076
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 915657294512,
+      "end_ticks": 915702837027,
+      "frequency": 1000000000,
+      "seconds": 0.045542515
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 915702903878,
+      "end_ticks": 915771576201,
+      "frequency": 1000000000,
+      "seconds": 0.068672323
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 915812432490,
+      "end_ticks": 915877006704,
+      "frequency": 1000000000,
+      "seconds": 0.064574214
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 915877065590,
+      "end_ticks": 916019670906,
+      "frequency": 1000000000,
+      "seconds": 0.142605316
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 916073560202,
+      "end_ticks": 916123360172,
+      "frequency": 1000000000,
+      "seconds": 0.04979997
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 916123419358,
+      "end_ticks": 916232915326,
+      "frequency": 1000000000,
+      "seconds": 0.109495968
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 916271402737,
+      "end_ticks": 916320330438,
+      "frequency": 1000000000,
+      "seconds": 0.048927701
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 916320383792,
+      "end_ticks": 916414351026,
+      "frequency": 1000000000,
+      "seconds": 0.093967234
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 916451738922,
+      "end_ticks": 916497645208,
+      "frequency": 1000000000,
+      "seconds": 0.045906286
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 916497693964,
+      "end_ticks": 916600999894,
+      "frequency": 1000000000,
+      "seconds": 0.10330593
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 916661458818,
+      "end_ticks": 916720842008,
+      "frequency": 1000000000,
+      "seconds": 0.05938319
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 916720898398,
+      "end_ticks": 916826837439,
+      "frequency": 1000000000,
+      "seconds": 0.105939041
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 916870281019,
+      "end_ticks": 916922210198,
+      "frequency": 1000000000,
+      "seconds": 0.051929179
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 916922257902,
+      "end_ticks": 917049974479,
+      "frequency": 1000000000,
+      "seconds": 0.127716577
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 917096349270,
+      "end_ticks": 917133190744,
+      "frequency": 1000000000,
+      "seconds": 0.036841474
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 917133233047,
+      "end_ticks": 917137719261,
+      "frequency": 1000000000,
+      "seconds": 0.004486214
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 917148526510,
+      "end_ticks": 917191978717,
+      "frequency": 1000000000,
+      "seconds": 0.043452207
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3637",
+      "begin_ticks": 917196650730,
+      "end_ticks": 917197922348,
+      "frequency": 1000000000,
+      "seconds": 0.001271618
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 917205500457,
+      "end_ticks": 917262631894,
+      "frequency": 1000000000,
+      "seconds": 0.057131437
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 917262677193,
+      "end_ticks": 917499917862,
+      "frequency": 1000000000,
+      "seconds": 0.237240669
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 917562894261,
+      "end_ticks": 917604888224,
+      "frequency": 1000000000,
+      "seconds": 0.041993963
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 917610535524,
+      "end_ticks": 917662748008,
+      "frequency": 1000000000,
+      "seconds": 0.052212484
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3637",
+      "begin_ticks": 917662928873,
+      "end_ticks": 917722823704,
+      "frequency": 1000000000,
+      "seconds": 0.059894831
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 917737015151,
+      "end_ticks": 917775459749,
+      "frequency": 1000000000,
+      "seconds": 0.038444598
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 917775497353,
+      "end_ticks": 917797339280,
+      "frequency": 1000000000,
+      "seconds": 0.021841927
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 917798796597,
+      "end_ticks": 917800174948,
+      "frequency": 1000000000,
+      "seconds": 0.001378351
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 917801526768,
+      "end_ticks": 917846297722,
+      "frequency": 1000000000,
+      "seconds": 0.044770954
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3637",
+      "begin_ticks": 917846461092,
+      "end_ticks": 917847727665,
+      "frequency": 1000000000,
+      "seconds": 0.001266573
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 917850875911,
+      "end_ticks": 917889354009,
+      "frequency": 1000000000,
+      "seconds": 0.038478098
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 917889390841,
+      "end_ticks": 917924298128,
+      "frequency": 1000000000,
+      "seconds": 0.034907287
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 917932251157,
+      "end_ticks": 917938030612,
+      "frequency": 1000000000,
+      "seconds": 0.005779455
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 917939495483,
+      "end_ticks": 917980959262,
+      "frequency": 1000000000,
+      "seconds": 0.041463779
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3637",
+      "begin_ticks": 917981128444,
+      "end_ticks": 917986389957,
+      "frequency": 1000000000,
+      "seconds": 0.005261513
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 917990261206,
+      "end_ticks": 918034396342,
+      "frequency": 1000000000,
+      "seconds": 0.044135136
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 918034437122,
+      "end_ticks": 918089451523,
+      "frequency": 1000000000,
+      "seconds": 0.055014401
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 918103074259,
+      "end_ticks": 918114534398,
+      "frequency": 1000000000,
+      "seconds": 0.011460139
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 918116661828,
+      "end_ticks": 918159791835,
+      "frequency": 1000000000,
+      "seconds": 0.043130007
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3637",
+      "begin_ticks": 918159974292,
+      "end_ticks": 918169887073,
+      "frequency": 1000000000,
+      "seconds": 0.009912781
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 918174457201,
+      "end_ticks": 918223619657,
+      "frequency": 1000000000,
+      "seconds": 0.049162456
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 918223662991,
+      "end_ticks": 918299261459,
+      "frequency": 1000000000,
+      "seconds": 0.075598468
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 918315421736,
+      "end_ticks": 918333814038,
+      "frequency": 1000000000,
+      "seconds": 0.018392302
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 918336066538,
+      "end_ticks": 918382954791,
+      "frequency": 1000000000,
+      "seconds": 0.046888253
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3637",
+      "begin_ticks": 918383126257,
+      "end_ticks": 918392688310,
+      "frequency": 1000000000,
+      "seconds": 0.009562053
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 918404727513,
+      "end_ticks": 918451901016,
+      "frequency": 1000000000,
+      "seconds": 0.047173503
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 918451946645,
+      "end_ticks": 918507037084,
+      "frequency": 1000000000,
+      "seconds": 0.055090439
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 918526232261,
+      "end_ticks": 918534291172,
+      "frequency": 1000000000,
+      "seconds": 0.008058911
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 918545164375,
+      "end_ticks": 918592364990,
+      "frequency": 1000000000,
+      "seconds": 0.047200615
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3637",
+      "begin_ticks": 918592556836,
+      "end_ticks": 918597795896,
+      "frequency": 1000000000,
+      "seconds": 0.00523906
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 918605620152,
+      "end_ticks": 918677305300,
+      "frequency": 1000000000,
+      "seconds": 0.071685148
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 918677348124,
+      "end_ticks": 919326157553,
+      "frequency": 1000000000,
+      "seconds": 0.648809429
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 919448166905,
+      "end_ticks": 919451263264,
+      "frequency": 1000000000,
+      "seconds": 0.003096359
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 919464603142,
+      "end_ticks": 919531412599,
+      "frequency": 1000000000,
+      "seconds": 0.066809457
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 919531451064,
+      "end_ticks": 920066438156,
+      "frequency": 1000000000,
+      "seconds": 0.534987092
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 920224677235,
+      "end_ticks": 920227553523,
+      "frequency": 1000000000,
+      "seconds": 0.002876288
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 920257225195,
+      "end_ticks": 920293579459,
+      "frequency": 1000000000,
+      "seconds": 0.036354264
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 920293619297,
+      "end_ticks": 920302467370,
+      "frequency": 1000000000,
+      "seconds": 0.008848073
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 920304294402,
+      "end_ticks": 920305652133,
+      "frequency": 1000000000,
+      "seconds": 0.001357731
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 920307059311,
+      "end_ticks": 920342514554,
+      "frequency": 1000000000,
+      "seconds": 0.035455243
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3637",
+      "begin_ticks": 920342636233,
+      "end_ticks": 920343975899,
+      "frequency": 1000000000,
+      "seconds": 0.001339666
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 920347289087,
+      "end_ticks": 920381506729,
+      "frequency": 1000000000,
+      "seconds": 0.034217642
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 920381547960,
+      "end_ticks": 920395423117,
+      "frequency": 1000000000,
+      "seconds": 0.013875157
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 920398785177,
+      "end_ticks": 920400915182,
+      "frequency": 1000000000,
+      "seconds": 0.002130005
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 920402113060,
+      "end_ticks": 920440265905,
+      "frequency": 1000000000,
+      "seconds": 0.038152845
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 920440307196,
+      "end_ticks": 920455993208,
+      "frequency": 1000000000,
+      "seconds": 0.015686012
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 920458830785,
+      "end_ticks": 920461020733,
+      "frequency": 1000000000,
+      "seconds": 0.002189948
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 920464161945,
+      "end_ticks": 920501650433,
+      "frequency": 1000000000,
+      "seconds": 0.037488488
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 920501686404,
+      "end_ticks": 920506753956,
+      "frequency": 1000000000,
+      "seconds": 0.005067552
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 920507504197,
+      "end_ticks": 920508231012,
+      "frequency": 1000000000,
+      "seconds": 0.000726815
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 920511802342,
+      "end_ticks": 920561218325,
+      "frequency": 1000000000,
+      "seconds": 0.049415983
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 920561257732,
+      "end_ticks": 920612827851,
+      "frequency": 1000000000,
+      "seconds": 0.051570119
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 920625305529,
+      "end_ticks": 920639231366,
+      "frequency": 1000000000,
+      "seconds": 0.013925837
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 920640911309,
+      "end_ticks": 920689735959,
+      "frequency": 1000000000,
+      "seconds": 0.04882465
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 920689776097,
+      "end_ticks": 920749433263,
+      "frequency": 1000000000,
+      "seconds": 0.059657166
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 920761628602,
+      "end_ticks": 920771633213,
+      "frequency": 1000000000,
+      "seconds": 0.010004611
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 920776436077,
+      "end_ticks": 920837476475,
+      "frequency": 1000000000,
+      "seconds": 0.061040398
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 920837515822,
+      "end_ticks": 920990831518,
+      "frequency": 1000000000,
+      "seconds": 0.153315696
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 921048576957,
+      "end_ticks": 921065509542,
+      "frequency": 1000000000,
+      "seconds": 0.016932585
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Invoke-MarkdownParserProcess:3613",
+      "begin_ticks": 921072177642,
+      "end_ticks": 921129093175,
+      "frequency": 1000000000,
+      "seconds": 0.056915533
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "ConvertFrom-ParserJsonContext:3645",
+      "begin_ticks": 921129130969,
+      "end_ticks": 921286809157,
+      "frequency": 1000000000,
+      "seconds": 0.157678188
+    },
+    {
+      "variant": "profile",
+      "pid": 7861,
+      "label": "Copy-MarkdownParseReuseContext:3920",
+      "begin_ticks": 921321064377,
+      "end_ticks": 921339454394,
+      "frequency": 1000000000,
+      "seconds": 0.018390017
+    }
+  ]
+}

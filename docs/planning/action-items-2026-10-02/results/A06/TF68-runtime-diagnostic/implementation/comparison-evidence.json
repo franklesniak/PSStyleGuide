@@ -1,0 +1,267 @@
+{
+  "summary": {
+    "state": "passed_non_acceptance",
+    "captured_utc": "2026-10-06T09:58:15.026040+00:00",
+    "host_exit": 0,
+    "finished_at": "2026-10-06T09:57:59.587352+00:00",
+    "candidate_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+    "variants": {
+      "control": {
+        "pid": 7241,
+        "native_exit": 0,
+        "elapsed_seconds": 13.564239010999927,
+        "events": 236,
+        "intervals": 118,
+        "counts": {
+          "Invoke-MarkdownParserProcess": 59,
+          "ConvertFrom-ParserJsonContext": 59
+        },
+        "seconds": {
+          "Invoke-MarkdownParserProcess": 2.8265778119999982,
+          "ConvertFrom-ParserJsonContext": 6.230417404000001
+        },
+        "stdout_sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+        "raw_stderr_sha256": "b34767f96ba0108a6d6e7b4b55cc0d39659bdcb7f53374fad95f61f122cfb879",
+        "non_marker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "clock": "2026-10-06T09:57:09.0286394+00:00",
+        "arguments": [
+          "-InputRevision",
+          "8c18e5e19b7797ad4555375f772e9d573c84b131",
+          "-PublishedBaselineRevision",
+          "3b5472325b03f27c68472d6a6598efb629e4f422",
+          "-FinalizeMetadataNow"
+        ],
+        "cwd": "/work/validation-tf68-20261006-structural-reuse-one-3yu9bu28/repository",
+        "checker_sha256": "c8a1a1c93757fcd8c884138015f05581a744bebadba7daf3aa73fcdecbd6cafe"
+      },
+      "profile": {
+        "pid": 7861,
+        "native_exit": 0,
+        "elapsed_seconds": 12.47501529100009,
+        "events": 286,
+        "intervals": 143,
+        "counts": {
+          "Invoke-MarkdownParserProcess": 59,
+          "ConvertFrom-ParserJsonContext": 51,
+          "Copy-MarkdownParseReuseContext": 33
+        },
+        "seconds": {
+          "Invoke-MarkdownParserProcess": 2.7394421009999994,
+          "ConvertFrom-ParserJsonContext": 5.169265380000001,
+          "Copy-MarkdownParseReuseContext": 0.49687825099999994
+        },
+        "stdout_sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+        "raw_stderr_sha256": "987c850ee982b4fefa0286b8c3ffe18c546afd882d5efddadebdd8d44d5d4eb7",
+        "non_marker_stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "clock": "2026-10-06T09:57:09.0286394+00:00",
+        "arguments": [
+          "-InputRevision",
+          "8c18e5e19b7797ad4555375f772e9d573c84b131",
+          "-PublishedBaselineRevision",
+          "3b5472325b03f27c68472d6a6598efb629e4f422",
+          "-FinalizeMetadataNow"
+        ],
+        "cwd": "/work/validation-tf68-20261006-structural-reuse-one-3yu9bu28/repository",
+        "checker_sha256": "ff5b1f2d6150f4241cee484f7d8c62e38d9acacaaac679a137fb11e27636bc2c"
+      }
+    },
+    "case": {
+      "Role": "non-acceptance reconstructed first current-date case",
+      "Baseline": "3b5472325b03f27c68472d6a6598efb629e4f422",
+      "Candidate": "8c18e5e19b7797ad4555375f772e9d573c84b131",
+      "Clock": "2026-10-06T09:57:09.0286394+00:00",
+      "ExpectedDate": "2026-10-06",
+      "ExpectedExit": 0,
+      "ExpectedMessage": "Author finalization UTC date checked: 2026-10-06; B=3b5472325b03f27c68472d6a6598efb629e4f422 H=8c18e5e19b7797ad4555375f772e9d573c84b131",
+      "PriorEphemeralIdentityReplayed": false
+    },
+    "focused": {
+      "state": "passed",
+      "source_hashes": [
+        "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+        "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+      ],
+      "pwsh": "7.6.3",
+      "started_utc": "2026-10-06T09:56:47.1773169+00:00",
+      "checks": [
+        "persistent structural reuse/freshness/alias/budget controls",
+        "actual optional metadata regression function"
+      ],
+      "source_after_equal": true,
+      "elapsed_seconds": 11.4928075,
+      "finished_utc": "2026-10-06T09:56:58.6684661+00:00"
+    },
+    "guards": {
+      "private_source_git_dependencies_equal": true,
+      "host_source_git_dependencies_equal": true,
+      "source_count": 80,
+      "dependency_count": 1914,
+      "all_marker_intervals_complete": true,
+      "same_native_parser_count": true,
+      "same_raw_non_marker_streams": true,
+      "same_argv_cwd_clock": true
+    },
+    "observations": {
+      "native_calls": 59,
+      "original_structural_interpretations": 59,
+      "changed_structural_interpretations": 51,
+      "actual_hits": 8,
+      "elapsed_reduction_seconds": 1.0892237199998362,
+      "elapsed_reduction_percent": 8.030112998720607
+    },
+    "limitations": [
+      "Single sequential original-then-changed same-case comparison; both variants instrumented.",
+      "The fixture is reconstructed, not a replay of prior deleted ephemeral Git identities.",
+      "Decoder intervals do not include every subsequent structural schema validation statement.",
+      "No full SelfTest, aggregate or hosted service completion guarantee.",
+      "Runtime JSON decoding is excluded from structural counts; fresh native parser calls remain."
+    ]
+  },
+  "artifacts": [
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/attribution-pair-after.json",
+      "sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "bytes": 414074
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/attribution-pair.log",
+      "sha256": "fd7748bac8b0a03b32575d84e2b3e921ed70f547c4998bdb3081f43a1e639d8c",
+      "bytes": 76
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/before.json",
+      "sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "bytes": 414074
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/bootstrap-output.txt",
+      "sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05",
+      "bytes": 194
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/bootstrap.json",
+      "sha256": "8a5bc90b013cf01f7444020d6e90885ec46e0530786d3457f78e85adaa211da0",
+      "bytes": 147
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/case.json",
+      "sha256": "8277afe947ccf7c669e73f7092b026e8d714a3e0f16a80ffa2186cbbe0f74329",
+      "bytes": 490
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/comparison-counts.json",
+      "sha256": "a69ce3d05d846afc443e2b395856c45b8bd10f2e44b36b109cfe6555602da4cf",
+      "bytes": 286
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/control-child.json",
+      "sha256": "60a7382f99e591ae42b69c7cc279f1c77bd2ff4c5f3af4f5ce758d395777b33e",
+      "bytes": 26725
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/control-stderr.txt",
+      "sha256": "b34767f96ba0108a6d6e7b4b55cc0d39659bdcb7f53374fad95f61f122cfb879",
+      "bytes": 18290
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/control-stdout.txt",
+      "sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+      "bytes": 225
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/control.spec.json",
+      "sha256": "d618c04151a3c32c7565e4a4b3ce624405162a58b2e379ccce30048d85dcfa63",
+      "bytes": 8070
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/fixture-adaptation.json",
+      "sha256": "1d5386c6ff1f593d8ad8e6eae9f995ad31c8c10cda4c8cc7c50c67c8b5034fd4",
+      "bytes": 328
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/focused-result.json",
+      "sha256": "5407ef3d1564e282d67c694bd9efa2dbd01446bfa90573b2bc3bc6d9e20b87a6",
+      "bytes": 521
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/focused-reuse-after.json",
+      "sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "bytes": 414074
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/focused-reuse.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/host-source-after.json",
+      "sha256": "11b6b06ae4744b1958f039dd69006867a23e4f3e39360f03f1d761ffb5c1b76e",
+      "bytes": 402147
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/pair-result.json",
+      "sha256": "4dc9795dbf2bf17e4e1d545e569db586a42e19021d577d5e44361ef89e317f6e",
+      "bytes": 407
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/profile-child.json",
+      "sha256": "e679c5558d6b85320d4d7943a47e83b83394cc879d89f4c5dee5631ce9dc4aad",
+      "bytes": 30740
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/profile-stderr.txt",
+      "sha256": "987c850ee982b4fefa0286b8c3ffe18c546afd882d5efddadebdd8d44d5d4eb7",
+      "bytes": 22256
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/profile-stdout.txt",
+      "sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+      "bytes": 225
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/profile.spec.json",
+      "sha256": "56f45bb99d192efbabf4032b55301ab61cbebe2349cd8c47d1441326ade2e8e5",
+      "bytes": 8070
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/result.json",
+      "sha256": "54d08d92c86bb5ac6d986a1b830421c629fca3fc1f8e0cfe4882ca91eb326ba3",
+      "bytes": 2295
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/output/runtime.json",
+      "sha256": "29dc640ca13f69609ebdd0780d43f558cc20b661724013c91b0a5a7466067030",
+      "bytes": 457
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/status.json",
+      "sha256": "4bff3dfce4efa224c5bbdd929f0045c56f9568ea19ae135c48c10d1ec7995b4d",
+      "bytes": 1399
+    },
+    {
+      "path": "runs/tf68-20261006-structural-reuse-one/container.log",
+      "sha256": "4766b18e475d80c9af5d98cb008d0ec72bbfffbcecae148de58b5a5c910242e8",
+      "bytes": 30
+    },
+    {
+      "path": "ROOT-RELEASE.json",
+      "sha256": "3e12411468a05b6312e6a2c1286e6e2d078767e1710e7be8af11042e0503d658",
+      "bytes": 3261
+    },
+    {
+      "path": "manifest.authorized.json",
+      "sha256": "385aea0c7dd2e783d4a6c949fadfd4cc53f442627d3b514cd62e0e532e98b9b3",
+      "bytes": 3114
+    },
+    {
+      "path": "timing.json",
+      "sha256": "f1aa6f50852f4cae6b6182c5229f938441f70e00af3458baeaaa98a16e27c5d0",
+      "bytes": 70386
+    },
+    {
+      "path": "summarize-comparison.py",
+      "sha256": "0bc9a4636ab3621df5e3cd7640457c726868beb92487889d7f068664c3d45750",
+      "bytes": 5206
+    }
+  ]
+}

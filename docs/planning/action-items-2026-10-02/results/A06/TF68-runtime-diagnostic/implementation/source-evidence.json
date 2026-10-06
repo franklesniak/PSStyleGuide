@@ -1,0 +1,435 @@
+{
+  "state": "candidate_frozen_comparison_prepared_unreleased",
+  "captured_utc": "2026-10-06T09:50:18.636793+00:00",
+  "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "source": {
+    ".github/workflows/Test-AgentInstructions.ps1": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+  },
+  "scope": [
+    ".github/workflows/Test-AgentInstructions.ps1",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1"
+  ],
+  "selection": "C89.85 refinement and A99.5 ownership correction",
+  "validation": {
+    "windows_final_focus": {
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\focus.ps1",
+        "-SourceRoot",
+        "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
+        "-OutputPath",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\windows-attempt7\\result.json"
+      ],
+      "native_exit": 0,
+      "started_utc": "2026-10-06T09:41:51.514683+00:00",
+      "finished_utc": "2026-10-06T09:42:20.138227+00:00",
+      "source_hashes": {
+        ".github/workflows/Test-AgentInstructions.ps1": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+      },
+      "driver_sha256": "4e9645cbab30a2599a20cb503ea081f3cb63c25d8403a13c3c389443a29ee88f",
+      "outcome": "passed",
+      "result": {
+        "state": "passed",
+        "source_hashes": [
+          "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+          "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+        ],
+        "pwsh": "7.6.5",
+        "started_utc": "2026-10-06T09:41:52.0601000+00:00",
+        "checks": [
+          "persistent structural reuse/freshness/alias/budget controls",
+          "actual optional metadata regression function"
+        ],
+        "source_after_equal": true,
+        "elapsed_seconds": 28.0473731,
+        "finished_utc": "2026-10-06T09:42:20.1057625+00:00"
+      }
+    },
+    "private_shortcut_mutants": {
+      "command": [
+        "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\mutants.ps1",
+        "-SourceRoot",
+        "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
+        "-OutputPath",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\windows-mutants1\\result.json"
+      ],
+      "native_exit": 0,
+      "started_utc": "2026-10-06T09:42:46.223848+00:00",
+      "finished_utc": "2026-10-06T09:42:55.591601+00:00",
+      "source_hashes": {
+        ".github/workflows/Test-AgentInstructions.ps1": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+      },
+      "driver_sha256": "f5d5e915d5676f03a4b76ad2d2ebe7da9e370e65482e2934d8f3d72a882c1d21",
+      "outcome": "passed",
+      "result": {
+        "source_sha256": [
+          "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+          "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+        ],
+        "source_equal": true,
+        "results": [
+          {
+            "name": "skip-fresh-parser",
+            "expected": "two real parser calls",
+            "failure": "Structural reuse must retain two real parser calls and one interpretation.",
+            "elapsed_seconds": 0.6408143,
+            "detected": true
+          },
+          {
+            "name": "shared-return-graph",
+            "expected": "Returned-object mutation",
+            "failure": "Returned-object mutation reached the owned interpretation.",
+            "elapsed_seconds": 0.6490544,
+            "detected": true
+          },
+          {
+            "name": "ignore-decoder-change",
+            "expected": "decoder replacement",
+            "failure": "A decoder replacement was hidden by reuse.",
+            "elapsed_seconds": 2.4310015,
+            "detected": true
+          },
+          {
+            "name": "retain-nine",
+            "expected": "retention exceeded eight",
+            "failure": "Snapshot retention exceeded eight or rejected its fresh fallback.",
+            "elapsed_seconds": 4.1000703,
+            "detected": true
+          }
+        ],
+        "finished_utc": "2026-10-06T09:42:55.4526759+00:00"
+      }
+    },
+    "final_full_file_quality": {
+      "native_exit": 0,
+      "command": [
+        "C:/Users/flesniak/.cache/codex-runtimes/codex-primary-runtime/dependencies/native/powershell/pwsh.exe",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\quality.ps1",
+        "-SourceRoot",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003",
+        "-OutputPath",
+        "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\quality-final.json"
+      ],
+      "driver_sha256": "265ce786b1789b7199224572ef9c7fc06090c8ddd6a16ada7203d39b1ddb0439",
+      "outcome": "passed",
+      "result": {
+        "pwsh": "7.6.5",
+        "analyzer": "1.24.0",
+        "rows": [
+          {
+            "diagnostics": [],
+            "parser_errors": [],
+            "sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+            "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.ps1"
+          },
+          {
+            "diagnostics": [],
+            "parser_errors": [],
+            "sha256": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31",
+            "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1"
+          }
+        ]
+      }
+    }
+  },
+  "comparison": {
+    "manifest": "comparison/manifest.prepared.json",
+    "manifest_sha256": "52be6fb68a5e348534eead946b6c811f5a8bc0c8c3c6cb963d48e5cc4077319c",
+    "execution_authorized": false
+  },
+  "limitations": [
+    "No actual caller speedup has been measured for this candidate.",
+    "Linux focused controls and original/changed comparison are prepared, not executed.",
+    "No full SelfTest, Node suite, aggregate or hosted proof for the changed candidate has run.",
+    "Snapshot accounting bounds payload and object counts, not exact CLR heap bytes.",
+    "No product Git/index/ref/config/dependency changes or peer implementation."
+  ],
+  "artifacts": [
+    {
+      "path": "IMPLEMENTATION.md",
+      "sha256": "eb0afc86fc2f146dc0589d220dd97778170f434e3df0c2a316e9ec92d7386876",
+      "bytes": 3821
+    },
+    {
+      "path": "frozen-source-guard.json",
+      "sha256": "c7664f8a37f724135b682ebcc1c39c05d771fce1fb369f13f948179606687cf1",
+      "bytes": 6534
+    },
+    {
+      "path": "quality-attempt1.json",
+      "sha256": "68303f01c3c3d736d25d0cca7415c15493a476b7b192bba98d858376bac02801",
+      "bytes": 1141
+    },
+    {
+      "path": "quality-attempt2.json",
+      "sha256": "2e856efef3be33fac81a0bd419d6166e778f47f93425404f53fcde65ca321054",
+      "bytes": 687
+    },
+    {
+      "path": "quality-final.json",
+      "sha256": "c0637a437a2e197b902f972a1961f716087c32678865816eec12925f7160b37c",
+      "bytes": 687
+    },
+    {
+      "path": "quality.ps1",
+      "sha256": "265ce786b1789b7199224572ef9c7fc06090c8ddd6a16ada7203d39b1ddb0439",
+      "bytes": 1064
+    },
+    {
+      "path": "focus.ps1",
+      "sha256": "4e9645cbab30a2599a20cb503ea081f3cb63c25d8403a13c3c389443a29ee88f",
+      "bytes": 2557
+    },
+    {
+      "path": "mutants.ps1",
+      "sha256": "f5d5e915d5676f03a4b76ad2d2ebe7da9e370e65482e2934d8f3d72a882c1d21",
+      "bytes": 3408
+    },
+    {
+      "path": "launch-focus.py",
+      "sha256": "3e9464e260938482dca6c3b7779c84677dab17b5418a6d6e55a8dcd46b4a1d21",
+      "bytes": 1946
+    },
+    {
+      "path": "launch-mutants.py",
+      "sha256": "65cc97a5113bc781bfae0591236cfbbfe185ac69d7aed33b58a1f22a16756224",
+      "bytes": 1948
+    },
+    {
+      "path": "prepare-comparison.py",
+      "sha256": "cc3d0298db3bbd36156a6e6f578f6d609c9a71034a6f0edfe45a6e4d4b11dbb9",
+      "bytes": 7542
+    },
+    {
+      "path": "prepare-comparison-profiles.ps1",
+      "sha256": "44f9aef85be7b5f9f0d12fbe68a2398b2688aa68ff65c2e056a209b78ea70217",
+      "bytes": 3855
+    },
+    {
+      "path": "windows-attempt1/native.json",
+      "sha256": "9b1e20e5c61533de6cc23cf4b03df83d7a810eda7c0a3c00571883470eda1473",
+      "bytes": 845
+    },
+    {
+      "path": "windows-attempt1/result.json",
+      "sha256": "6538fda2df367659e174505832e53f86e6a2b2a472fbdc9f5f58090b1c8b61cc",
+      "bytes": 504
+    },
+    {
+      "path": "windows-attempt1/log.txt",
+      "sha256": "6b5473d9cfa1c0241a7e16a1f27d2da4377d560571ed7ffb21c68ccf3afd26ea",
+      "bytes": 403
+    },
+    {
+      "path": "windows-attempt2/native.json",
+      "sha256": "35d4d3c383e96f6b8dfd4b245ec01cc9804477379117e989ea689fb254e2abef",
+      "bytes": 846
+    },
+    {
+      "path": "windows-attempt2/result.json",
+      "sha256": "d9fe73d9b4396428d07ee8412f921badfabf6763a16476d5b8ab7ab269ed6241",
+      "bytes": 552
+    },
+    {
+      "path": "windows-attempt2/log.txt",
+      "sha256": "159171ab75511a5fa9d95d8541989a1e3d9a487e9ff3a9a29b8d27659a3c7e2b",
+      "bytes": 459
+    },
+    {
+      "path": "windows-attempt3/native.json",
+      "sha256": "2f0669cb75179e367ab817e3929a3bf24cefe62ca88318f2d1cc0fe543e56057",
+      "bytes": 846
+    },
+    {
+      "path": "windows-attempt3/result.json",
+      "sha256": "2a3538c106eacb7c1d8575081eae20d075b17c9cb1219834e7e5f1f5abf608d6",
+      "bytes": 630
+    },
+    {
+      "path": "windows-attempt3/log.txt",
+      "sha256": "d7dfd1a9654ed5997505f4780ad051df2eee0bb60c265a0ca1b067caa774c694",
+      "bytes": 537
+    },
+    {
+      "path": "windows-attempt4/native.json",
+      "sha256": "12fa53b1300b96a384269c2f34b41a487ce7691c0dfa98c5daba31881b75aa37",
+      "bytes": 845
+    },
+    {
+      "path": "windows-attempt4/result.json",
+      "sha256": "c5eee38a701dba99aa850f5ee73989b932a66fc67ba218c597107896d4bef144",
+      "bytes": 537
+    },
+    {
+      "path": "windows-attempt4/log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "windows-attempt5/native.json",
+      "sha256": "05ee8b067f9a6a932d4c7dd2d337a334a497b6a298bf2c04e6937cb2f713dfb3",
+      "bytes": 846
+    },
+    {
+      "path": "windows-attempt5/result.json",
+      "sha256": "d2ba0de7c136f180d0e82e40767ed0565ccfaa4e4a973015580fc414467d6bf9",
+      "bytes": 537
+    },
+    {
+      "path": "windows-attempt5/log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "windows-attempt6/native.json",
+      "sha256": "ca7224b4a1444768784700c37e91dcdeaa63f3b68d7d7d641a675934bfaa1544",
+      "bytes": 845
+    },
+    {
+      "path": "windows-attempt6/result.json",
+      "sha256": "00e45ed8b9dbf7c7f69be921940b3bb6dba8a3fb2b669094eecb7226c6a5bf70",
+      "bytes": 537
+    },
+    {
+      "path": "windows-attempt6/log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "windows-attempt7/native.json",
+      "sha256": "f40e03bee535f1017fa912fd20f1ea9e05a4ecfec796cc25e3549e098715eef4",
+      "bytes": 845
+    },
+    {
+      "path": "windows-attempt7/result.json",
+      "sha256": "d01a771a794f9f1cbac2f782f42d53466ecb052129be3cf5d11196a773517cbb",
+      "bytes": 537
+    },
+    {
+      "path": "windows-attempt7/log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "windows-mutants1/native.json",
+      "sha256": "0ca3e28e150584568cab78a04e7e210b08524b7a4468c944221169de1443eed5",
+      "bytes": 847
+    },
+    {
+      "path": "windows-mutants1/result.json",
+      "sha256": "f6c9cd62e5a0637dabffe98c0141435559fba2c8200d9eb7dc79ae3688729647",
+      "bytes": 1235
+    },
+    {
+      "path": "windows-mutants1/log.txt",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "bytes": 0
+    },
+    {
+      "path": "comparison/author-catalog.json",
+      "sha256": "b48d807f2c2f3e109cf3bf39db844368239571bd74f46d1ce5654d1d0c55c1d3",
+      "bytes": 594
+    },
+    {
+      "path": "comparison/author-one-case.ps1",
+      "sha256": "7bf650521a71d635d5cb666e7ed46d411f6144a1c0277ce194bbd22d648b025d",
+      "bytes": 37514
+    },
+    {
+      "path": "comparison/check-prepared.ps1",
+      "sha256": "343372e61e7ee144534eed109dadd2d1440cc0c5cbf9d2dbd5cf66a734a4268a",
+      "bytes": 586
+    },
+    {
+      "path": "comparison/common.py",
+      "sha256": "29196fb084fcbc7096d1f8fb6e8acc8c8230e08a8937710b62906e35e6ea134a",
+      "bytes": 3597
+    },
+    {
+      "path": "comparison/control.ps1",
+      "sha256": "c8a1a1c93757fcd8c884138015f05581a744bebadba7daf3aa73fcdecbd6cafe",
+      "bytes": 485304
+    },
+    {
+      "path": "comparison/focus.ps1",
+      "sha256": "4e9645cbab30a2599a20cb503ea081f3cb63c25d8403a13c3c389443a29ee88f",
+      "bytes": 2557
+    },
+    {
+      "path": "comparison/inside.py",
+      "sha256": "236ab8640e091e41af3ec41bfa927fc3d9333b48716992ce4d29a295b6631933",
+      "bytes": 11216
+    },
+    {
+      "path": "comparison/launch.py",
+      "sha256": "8082ddc1490d9131e6e924326f120f70a1a1a82b5a2693853e2aa5e17d7a1bf9",
+      "bytes": 8396
+    },
+    {
+      "path": "comparison/manifest.prepared.json",
+      "sha256": "52be6fb68a5e348534eead946b6c811f5a8bc0c8c3c6cb963d48e5cc4077319c",
+      "bytes": 3115
+    },
+    {
+      "path": "comparison/pair-driver.ps1",
+      "sha256": "a82ab0f3223ce0ff033257efa3379b8093c3041a8674d00a56f0b90334d15558",
+      "bytes": 5344
+    },
+    {
+      "path": "comparison/PLAN.md",
+      "sha256": "15ad3d86c41fc452b27ffec6ec0b5acf101c1d4a911a833ecbe8dff4195da2cf",
+      "bytes": 4069
+    },
+    {
+      "path": "comparison/prepare-author.ps1",
+      "sha256": "822f78fa951c068a94171cbeeaa0e8171f75b7458fca9e094bc7c631fea20351",
+      "bytes": 6935
+    },
+    {
+      "path": "comparison/prepare-comparison-profiles.ps1",
+      "sha256": "44f9aef85be7b5f9f0d12fbe68a2398b2688aa68ff65c2e056a209b78ea70217",
+      "bytes": 3855
+    },
+    {
+      "path": "comparison/prepared-parser.json",
+      "sha256": "0eb4c1e33f0ca127dd4bde06b1e71cbae5a411ef5e3a363e0258b17f351e428d",
+      "bytes": 1169
+    },
+    {
+      "path": "comparison/profile-catalog.json",
+      "sha256": "345179e1b4fe9ba011b541c5c9d258062906a255539d2016013985d8b51d9a9e",
+      "bytes": 5552
+    },
+    {
+      "path": "comparison/profile.ps1",
+      "sha256": "ff5b1f2d6150f4241cee484f7d8c62e38d9acacaaac679a137fb11e27636bc2c",
+      "bytes": 504942
+    },
+    {
+      "path": "comparison/run-child.py",
+      "sha256": "7465b7c69e454c06471c597eaf9e5b4e314b02642fd7de8953ec8d9b730da92b",
+      "bytes": 2790
+    },
+    {
+      "path": "comparison/source-catalog.json",
+      "sha256": "172ee124b1aa652009ccf3f9764b5696d9030b4ff7c1aee08dd04349922b3d98",
+      "bytes": 19093
+    }
+  ]
+}

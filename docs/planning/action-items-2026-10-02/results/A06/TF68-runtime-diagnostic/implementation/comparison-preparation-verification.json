@@ -1,0 +1,16 @@
+{
+  "verified_at": "2026-10-06T09:51:39.527132+00:00",
+  "prepared_manifest_sha256": "52be6fb68a5e348534eead946b6c811f5a8bc0c8c3c6cb963d48e5cc4077319c",
+  "prepared_files_verified": 14,
+  "source_files_verified": 80,
+  "dependencies_verified": 1914,
+  "changed_paths": [
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+    ".github/workflows/Test-AgentInstructions.ps1"
+  ],
+  "computed_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+  "host_index_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "both_instrumented_profiles_reconstruct_exact_raw_bytes": true,
+  "actual_fixture_and_clock_functions_unchanged": true,
+  "role": "Root source/manifest review; no execution release yet"
+}

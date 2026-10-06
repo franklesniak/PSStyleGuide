@@ -1,5 +1,5 @@
 {
-  "status": "round5_runtime_repair_C_implementation_released",
+  "status": "round5_runtime_C_final_validation_running",
   "released_at": "2026-10-05T23:21:53.100682+00:00",
   "repository": "franklesniak/TerraformStyleGuide",
   "branch": "codex/a06-generator-convergence",
@@ -94,7 +94,7 @@
     "tracked_and_untracked_clean": true
   },
   "restrictions": "One writer. Root owns Git index/commit/publication/reviews/merge/counters/planning. No protected guides/instructions, runtime installer/dependencies/settings or hand-edited generated output. Preserve exact current TF semantic checks and independent contract. No new finding edit before required decision process. No source PS edits. R2 selected release permits only its three dependency/doc paths and isolated scratch installs/tests; original restrictions continue elsewhere.",
-  "next_action": "Sole writer implements two-file C refinement and bounded focused tests; root reviews source and prospective same-case timing manifest before launch.",
+  "next_action": "Reconcile final aggregate terminal result and full guards; if passed, root verifies and normally commits exact candidate. Then actual accepted-B/new-H endpoints/audit and final binding. No failing-CI merge.",
   "checkout_exit": 0,
   "candidate_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
   "implementation": {
@@ -199,9 +199,13 @@
     ]
   },
   "local_operations": {
+    "active_test": true,
+    "active_git_write": false,
     "writer": "a06_tf_generator_owner",
-    "activity": "Two-path implementation and focused tests released; no current test/Git write",
-    "active_git_write": false
+    "activity": "Final aggregate; full instruction SelfTest active",
+    "session_id": 15212,
+    "host_python_pid": 128204,
+    "container_id": "efedcacfa39194360a098bdd15344d1d74bff2ee0f57563efd08ed179ee0a90c"
   },
   "pending_native_operations": [],
   "final_quality": {
@@ -231,7 +235,7 @@
     "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\root-round4-repair-candidate-readiness.json",
     "sha256": "09f73007d783a2f6ae8ebdb8c9afa3c2ac24691268e3172963b80e4c099db7ec"
   },
-  "planning_checkpoint": "5ba5c229321815a658f3a82c94ee9ad5b5d1e87a",
+  "planning_checkpoint": "2be2b747bfcd1d70f07dcd8ad0c14d98c5a0a86e",
   "commit": {
     "status": "committed",
     "expected_parent": "3b12700eb636da67f5861637e5b139a18fa82140",
@@ -5894,7 +5898,7 @@
       }
     }
   ],
-  "updated_at": "2026-10-06T09:18:31.994119+00:00",
+  "updated_at": "2026-10-06T10:07:36.964166+00:00",
   "prepared_acceptance_helpers": {
     "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\R2-normal-acceptance-helper-readiness.json",
     "status": "All older round2/round3 acceptance and merge helpers are stale; do not execute. New input3b/round4 and strict owner no-failing-CI rule must be bound before any future acceptance.",
@@ -6930,7 +6934,7 @@
     "product_repair_selected": true,
     "product_edits_released": true,
     "design_preparation_released": true,
-    "next_step": "Sole writer implements two-file C refinement and bounded focused tests; root reviews source and prospective same-case timing manifest before launch.",
+    "next_step": "Review prepared final-candidate validation packet; release one mandatory aggregate on frozen bytes. No failing-CI merge.",
     "owner_input_needed": false,
     "rounds_used": 5,
     "deadline": "2026-10-13T23:47:31Z",
@@ -6999,6 +7003,569 @@
       "ci_rule": "Current cancellation blocks merge. No existing approval waives failed CI.",
       "pending_native_operations": [],
       "owner_input_needed": false
+    },
+    "draft_ownership_correction": {
+      "selected_at": "2026-10-06T09:29:11.495730+00:00",
+      "finding": "Draft direct required-Version endpoint allocated unused snapshots while main owner could already retain eight",
+      "validated": "Root source read and writer caller census confirm current/prior each parsed once, no nested metadata delegation; direct Get-AgentInstructionFailure call overlaps main budget. No product runtime failure claimed.",
+      "options": [
+        "A direct endpoint stays fresh; borrow only supplied slots",
+        "B thread shared main budget through additional helpers",
+        "C raise declared bound for extra unused copies",
+        "D retain inconsistent bound"
+      ],
+      "criteria": [
+        {
+          "name": "Correct retention bound",
+          "weight": 35
+        },
+        {
+          "name": "Unchanged validation",
+          "weight": 25
+        },
+        {
+          "name": "Useful performance work",
+          "weight": 20
+        },
+        {
+          "name": "Clear ownership",
+          "weight": 15
+        },
+        {
+          "name": "Implementation cost",
+          "weight": 5
+        }
+      ],
+      "scores": [
+        {
+          "option": "A",
+          "vector": [
+            10,
+            10,
+            10,
+            10,
+            9
+          ],
+          "total": 99.5,
+          "eligible": true
+        },
+        {
+          "option": "B",
+          "vector": [
+            10,
+            10,
+            4,
+            7,
+            5
+          ],
+          "total": 81,
+          "eligible": true
+        },
+        {
+          "option": "C",
+          "vector": [
+            8,
+            10,
+            3,
+            7,
+            9
+          ],
+          "total": 74,
+          "eligible": true
+        },
+        {
+          "option": "D",
+          "vector": [
+            0,
+            10,
+            2,
+            2,
+            10
+          ],
+          "total": 37,
+          "eligible": false
+        }
+      ],
+      "selected": "A99.5",
+      "implementation": "Remove required-Version endpoint automatic local owner and its owned cleanup; retain supplied slot forwarding. LastUpdated retains local owner for real nested repeats. Test no direct required-Version retention and correct borrowed ownership.",
+      "displayed_before_correction": true,
+      "owner_input_needed": false
+    },
+    "implementation_directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation",
+    "focused_progress": {
+      "observed_at": "2026-10-06T09:35:40.855662+00:00",
+      "attempts": [
+        {
+          "directory": "windows-attempt1",
+          "result": {
+            "state": "failed",
+            "source_hashes": [
+              "16ff97acfec7f583f6bf8f0015cae79901ffd80f2ec60d4aac803f94bdebdf6e",
+              "df180ddf6d4ffccb16b98e936df56cea629919b76d8f23fa481d1576f3d33baf"
+            ],
+            "pwsh": "7.6.5",
+            "started_utc": "2026-10-06T09:31:36.5181546+00:00",
+            "checks": [],
+            "failure": "Structural reuse must retain two real parser calls and one interpretation.",
+            "source_after_equal": true,
+            "elapsed_seconds": 1.2940503,
+            "finished_utc": "2026-10-06T09:31:37.8109843+00:00"
+          },
+          "native": {
+            "state": "failed",
+            "timeout_seconds": 300,
+            "started_utc": "2026-10-06T09:31:35.717495+00:00",
+            "pid": 97804,
+            "exit": 1,
+            "finished_utc": "2026-10-06T09:31:38.001373+00:00"
+          }
+        },
+        {
+          "directory": "windows-attempt2",
+          "result": {
+            "state": "failed",
+            "source_hashes": [
+              "16ff97acfec7f583f6bf8f0015cae79901ffd80f2ec60d4aac803f94bdebdf6e",
+              "44d9261eb6e4788eb1ec13b008fb90d36acb97d1c83c7f1e7f47014e513e1634"
+            ],
+            "pwsh": "7.6.5",
+            "started_utc": "2026-10-06T09:32:17.2062703+00:00",
+            "checks": [],
+            "failure": "Structural reuse must retain two real parser calls and one interpretation; processes=2, decodes=2, retained=1, equal=True.",
+            "source_after_equal": true,
+            "elapsed_seconds": 0.6723266,
+            "finished_utc": "2026-10-06T09:32:17.8774029+00:00"
+          },
+          "native": {
+            "state": "failed",
+            "timeout_seconds": 300,
+            "started_utc": "2026-10-06T09:32:16.659490+00:00",
+            "pid": 125864,
+            "exit": 1,
+            "finished_utc": "2026-10-06T09:32:18.019531+00:00"
+          }
+        },
+        {
+          "directory": "windows-attempt3",
+          "result": {
+            "state": "failed",
+            "source_hashes": [
+              "16ff97acfec7f583f6bf8f0015cae79901ffd80f2ec60d4aac803f94bdebdf6e",
+              "1f5c621d2593799007d0e01ff62d1e55815880bda32d442443fab588f7c18d6a"
+            ],
+            "pwsh": "7.6.5",
+            "started_utc": "2026-10-06T09:33:00.3242271+00:00",
+            "checks": [],
+            "failure": "Structural reuse must retain two real parser calls and one interpretation; processes=2, decodes=2, retained=1, equal=True; parser=True, decoder=True, copy=True, text=True, output=True, lineType=Int32.",
+            "source_after_equal": true,
+            "elapsed_seconds": 0.6848956,
+            "finished_utc": "2026-10-06T09:33:01.0076559+00:00"
+          },
+          "native": {
+            "state": "failed",
+            "timeout_seconds": 300,
+            "started_utc": "2026-10-06T09:32:59.760928+00:00",
+            "pid": 124340,
+            "exit": 1,
+            "finished_utc": "2026-10-06T09:33:01.147137+00:00"
+          }
+        }
+      ],
+      "state": "interim_windows_focus_passed; final ownership assertions and metadata updates still pending",
+      "likely_attribution_to_validate": "Node runtime identity uses same decoder; count Markdown structural interpretations separately without removing fresh runtime path",
+      "counter_issue_confirmed": "Attempts1-3 counted Node runtime identity JSON through the same decoder. Count structural calls at their actual16777216-byte boundary while retaining independently counted runtime decoding; production reuse condition unchanged.",
+      "latest_pass": {
+        "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\windows-attempt4",
+        "result_sha256": "c5eee38a701dba99aa850f5ee73989b932a66fc67ba218c597107896d4bef144",
+        "result": {
+          "state": "passed",
+          "source_hashes": [
+            "16ff97acfec7f583f6bf8f0015cae79901ffd80f2ec60d4aac803f94bdebdf6e",
+            "43839064b815aab2a3828d8cb7024abdee6a6515871aed07673ca510ad9e185d"
+          ],
+          "pwsh": "7.6.5",
+          "started_utc": "2026-10-06T09:36:53.9133997+00:00",
+          "checks": [
+            "persistent structural reuse/freshness/alias/budget controls",
+            "actual optional metadata regression function"
+          ],
+          "source_after_equal": true,
+          "elapsed_seconds": 25.2306082,
+          "finished_utc": "2026-10-06T09:37:19.1425916+00:00"
+        },
+        "native_exit": 0
+      },
+      "updated_at": "2026-10-06T09:38:10.538306+00:00"
+    },
+    "candidate": {
+      "frozen_at": "2026-10-06T09:45:56.271092+00:00",
+      "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+      "files": {
+        ".github/workflows/Test-AgentInstructions.ps1": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+        ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+      },
+      "git_status": " M .github/workflows/Test-AgentInstructions.SelfTest.ps1\n M .github/workflows/Test-AgentInstructions.ps1\n",
+      "stage_commit_push_performed": false,
+      "directory": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation",
+      "windows_focus": {
+        "state": "passed",
+        "source_hashes": [
+          "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+          "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+        ],
+        "pwsh": "7.6.5",
+        "started_utc": "2026-10-06T09:41:52.0601000+00:00",
+        "checks": [
+          "persistent structural reuse/freshness/alias/budget controls",
+          "actual optional metadata regression function"
+        ],
+        "source_after_equal": true,
+        "elapsed_seconds": 28.0473731,
+        "finished_utc": "2026-10-06T09:42:20.1057625+00:00"
+      },
+      "quality": {
+        "pwsh": "7.6.5",
+        "analyzer": "1.24.0",
+        "rows": [
+          {
+            "diagnostics": [],
+            "parser_errors": [],
+            "sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+            "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.ps1"
+          },
+          {
+            "diagnostics": [],
+            "parser_errors": [],
+            "sha256": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31",
+            "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1"
+          }
+        ]
+      },
+      "private_mutants": {
+        "source_sha256": [
+          "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+          "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+        ],
+        "source_equal": true,
+        "results": [
+          {
+            "name": "skip-fresh-parser",
+            "expected": "two real parser calls",
+            "failure": "Structural reuse must retain two real parser calls and one interpretation.",
+            "elapsed_seconds": 0.6408143,
+            "detected": true
+          },
+          {
+            "name": "shared-return-graph",
+            "expected": "Returned-object mutation",
+            "failure": "Returned-object mutation reached the owned interpretation.",
+            "elapsed_seconds": 0.6490544,
+            "detected": true
+          },
+          {
+            "name": "ignore-decoder-change",
+            "expected": "decoder replacement",
+            "failure": "A decoder replacement was hidden by reuse.",
+            "elapsed_seconds": 2.4310015,
+            "detected": true
+          },
+          {
+            "name": "retain-nine",
+            "expected": "retention exceeded eight",
+            "failure": "Snapshot retention exceeded eight or rejected its fresh fallback.",
+            "elapsed_seconds": 4.1000703,
+            "detected": true
+          }
+        ],
+        "finished_utc": "2026-10-06T09:42:55.4526759+00:00"
+      },
+      "artifact_sha256": {
+        "IMPLEMENTATION.md": "eb0afc86fc2f146dc0589d220dd97778170f434e3df0c2a316e9ec92d7386876",
+        "windows-attempt7/result.json": "d01a771a794f9f1cbac2f782f42d53466ecb052129be3cf5d11196a773517cbb",
+        "windows-attempt7/native.json": "f40e03bee535f1017fa912fd20f1ea9e05a4ecfec796cc25e3549e098715eef4",
+        "quality-final.json": "c0637a437a2e197b902f972a1961f716087c32678865816eec12925f7160b37c",
+        "windows-mutants1/result.json": "f6c9cd62e5a0637dabffe98c0141435559fba2c8200d9eb7dc79ae3688729647",
+        "windows-mutants1/native.json": "0ca3e28e150584568cab78a04e7e210b08524b7a4468c944221169de1443eed5"
+      },
+      "independent_source_review": {
+        "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\runtime-C-source-review.json",
+        "sha256": "de016f02e8b92a324c20ab3e5ac6f448213ef400ba0859d656c431db1e443d88",
+        "status": "PASS_SOURCE_REVIEW_WITH_VALIDATION_PENDING"
+      },
+      "benchmark": {
+        "released_at": "2026-10-06T09:56:03.600169+00:00",
+        "state": "passed_non_acceptance",
+        "writer": "a06_tf_generator_owner",
+        "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\manifest.authorized.json",
+        "manifest_sha256": "385aea0c7dd2e783d4a6c949fadfd4cc53f442627d3b514cd62e0e532e98b9b3",
+        "run_id": "tf68-20261006-structural-reuse-one",
+        "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+        "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+        "candidate_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+        "source_hashes": {
+          ".github/workflows/Test-AgentInstructions.ps1": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+          ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+        },
+        "evidence_envelope_sha256": "fbb094dd028ac808287ceeec24a59a71655bdc07c85d799d68af437e343742fc",
+        "evidence_artifacts_verified": 54,
+        "independent_source_review": {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\runtime-C-source-review.json",
+          "sha256": "de016f02e8b92a324c20ab3e5ac6f448213ef400ba0859d656c431db1e443d88",
+          "status": "PASS_SOURCE_REVIEW_WITH_VALIDATION_PENDING"
+        },
+        "preparation_verification": {
+          "verified_at": "2026-10-06T09:51:39.527132+00:00",
+          "prepared_manifest_sha256": "52be6fb68a5e348534eead946b6c811f5a8bc0c8c3c6cb963d48e5cc4077319c",
+          "prepared_files_verified": 14,
+          "source_files_verified": 80,
+          "dependencies_verified": 1914,
+          "changed_paths": [
+            ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+            ".github/workflows/Test-AgentInstructions.ps1"
+          ],
+          "computed_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+          "host_index_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+          "both_instrumented_profiles_reconstruct_exact_raw_bytes": true,
+          "actual_fixture_and_clock_functions_unchanged": true,
+          "role": "Root source/manifest review; no execution release yet"
+        },
+        "allowed_execution": "One offline launch.py invocation using this exact authorized manifest and SHA; focused Linux test plus one original/changed pair only.",
+        "limits": {
+          "container_seconds": 300,
+          "focus_seconds": 90,
+          "parent_seconds": 270,
+          "child_seconds": 90,
+          "selected_children": 2,
+          "runs": 1
+        },
+        "constraints": [
+          "Source remains frozen. Preserve all failed outputs.",
+          "No automatic retry, retention widening, full suite, Git/index/ref/config/dependency write, native operation, CI retry, merge or PS carryback.",
+          "Record tool session and container identity promptly; reconcile existing run before any further action.",
+          "Keep original clocks and output checks, unchanged parser count, reduced structural interpretation requirement and all source/dependency/Git guards.",
+          "This is diagnostic validation, not final or hosted acceptance."
+        ],
+        "ci_merge_stop": true,
+        "round": 5,
+        "original_deadline": "2026-10-13T23:47:31Z",
+        "transfers": {
+          "A06": 1,
+          "A03": 3,
+          "A21": 5,
+          "A07": 5,
+          "cap": 12
+        },
+        "owner_input_needed": false,
+        "run_session": {
+          "session_id": 26984,
+          "run_id": "tf68-20261006-structural-reuse-one",
+          "started_at": "2026-10-06T09:56:39Z"
+        },
+        "terminal": {
+          "state": "passed",
+          "session_id": 26984,
+          "finished_at": "2026-10-06T09:57:59.587352+00:00",
+          "verification": {
+            "verified_at": "2026-10-06T10:00:17.271988+00:00",
+            "status": "PASS_BOUNDED_COMPARISON_NOT_FINAL_ACCEPTANCE",
+            "artifacts_verified": 29,
+            "payloads_verified": 15,
+            "variants": {
+              "control": {
+                "counts": {
+                  "Invoke-MarkdownParserProcess": 59,
+                  "ConvertFrom-ParserJsonContext": 59
+                },
+                "seconds": {
+                  "Invoke-MarkdownParserProcess": 2.8265778119999982,
+                  "ConvertFrom-ParserJsonContext": 6.230417404000001
+                },
+                "events": 236,
+                "intervals": 118,
+                "case_seconds": 13.564239010999927
+              },
+              "profile": {
+                "counts": {
+                  "Invoke-MarkdownParserProcess": 59,
+                  "ConvertFrom-ParserJsonContext": 51,
+                  "Copy-MarkdownParseReuseContext": 33
+                },
+                "seconds": {
+                  "Invoke-MarkdownParserProcess": 2.7394421009999994,
+                  "ConvertFrom-ParserJsonContext": 5.169265380000001,
+                  "Copy-MarkdownParseReuseContext": 0.49687825099999994
+                },
+                "events": 286,
+                "intervals": 143,
+                "case_seconds": 12.47501529100009
+              }
+            },
+            "events": 522,
+            "intervals": 261,
+            "host_private_complete_guards_equal": true,
+            "original_clock_and_complete_commands_equal": true,
+            "stdout_and_nonmarker_stderr_equal": true,
+            "source_count": 80,
+            "dependency_count": 1914,
+            "observations": {
+              "native_calls": 59,
+              "original_structural_interpretations": 59,
+              "changed_structural_interpretations": 51,
+              "actual_hits": 8,
+              "elapsed_reduction_seconds": 1.0892237199998362,
+              "elapsed_reduction_percent": 8.030112998720607
+            },
+            "limitations": [
+              "Single sequential original-then-changed same-case comparison; both variants instrumented.",
+              "The fixture is reconstructed, not a replay of prior deleted ephemeral Git identities.",
+              "Decoder intervals do not include every subsequent structural schema validation statement.",
+              "No full SelfTest, aggregate or hosted service completion guarantee.",
+              "Runtime JSON decoding is excluded from structural counts; fresh native parser calls remain."
+            ],
+            "result_envelope_sha256": "3fab7a88d729a05634573092aedfeb8ddd74163a6480caf35a408aa05e4de247",
+            "native_snapshot": {
+              "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-runtime-C-prevalidation-native.json",
+              "sha256": "ccd2d23bd18abc87ecc45c2b359e0319b1ebfb5ac399c16ca41dc7dad258543d",
+              "captured_at": "2026-10-06T09:59:02.040530+00:00",
+              "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+              "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+              "body_sha256": "fb04de79de1b55f376eea677c4d77e9b27472389a76db202daa2d6818c249463",
+              "pr_open_unmerged": true,
+              "ci": "13 ordinary successes; dynamic37430212759 cancelled; no retry or native write"
+            },
+            "remaining": "One final candidate mandatory aggregate, normal commit, actual accepted-B/new-H endpoints and audit, final binding, fresh exact-input reviews and hosted acceptance, then normal landing and peer convergence."
+          }
+        }
+      },
+      "limits": "No Linux/full aggregate/current CI/product acceptance yet",
+      "final_validation": {
+        "released_at": "2026-10-06T10:04:16.180308+00:00",
+        "state": "running",
+        "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation\\manifest.authorized.json",
+        "manifest_sha256": "04ff83f0c3b7b81a065c44b94be0d21d9d51457971568c038f1e9d83d26b4ab3",
+        "readiness_sha256": "ef53ed2cf2a29627c7387521c1e132b4e51398a079046118fe83b4530178fe46",
+        "run_id": "tf68-20261006-runtime-final-validation",
+        "writer": "a06_tf_generator_owner",
+        "candidate_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+        "runs_authorized": 1,
+        "constraints": [
+          "No source edit, dependency installation or retry.",
+          "No host Git/index/ref/config mutation, native operation, CI relaunch, merge or PS carryback.",
+          "Preserve failures and reconcile before further action.",
+          "Use actual UTC date and original fixture clocks."
+        ],
+        "timeouts": {
+          "preflight": 300,
+          "node": 300,
+          "aggregate": 3000,
+          "container": 3900
+        },
+        "run_session": {
+          "container_id": "efedcacfa39194360a098bdd15344d1d74bff2ee0f57563efd08ed179ee0a90c",
+          "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+          "session_id": 15212,
+          "process": [
+            {
+              "ProcessId": 128204,
+              "ParentProcessId": 105292,
+              "CommandLine": "\"C:\\Users\\flesniak\\AppData\\Local\\Programs\\Python\\Python313\\python.exe\" C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-runtime-diagnostic/implementation/final-validation/launch.py --execute-root-approved --manifest C:/Users/flesniak/AppData/Local/Temp/PSStyleGuide-A06-TF-peer-20261005/writer/TF68-runtime-diagnostic/implementation/final-validation/manifest.authorized.json --approved-manifest-sha256 04ff83f0c3b7b81a065c44b94be0d21d9d51457971568c038f1e9d83d26b4ab3"
+            }
+          ],
+          "captured_utc": "2026-10-06T10:05:10.6519558+00:00",
+          "label": "04ff83f0c3b7b81a065c44b94be0d21d9d51457971568c038f1e9d83d26b4ab3"
+        },
+        "run_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\final-validation\\runs\\tf68-20261006-runtime-final-validation",
+        "commands": [
+          {
+            "name": "staged-preflight",
+            "command": [
+              "pwsh",
+              "-NoLogo",
+              "-NoProfile",
+              "-NonInteractive",
+              "-File",
+              ".github/workflows/Test-AgentInstructions.ps1",
+              "-RequireStagedInputMatch"
+            ],
+            "started_at": "2026-10-06T10:05:00.743013+00:00",
+            "timeout_seconds": 300,
+            "state": "passed",
+            "pid": 85,
+            "exit": 0,
+            "finished_at": "2026-10-06T10:05:11.893231+00:00",
+            "log_sha256": "7d1e42b7e220d5c35d8e8782b7cbbf05e0a67bd1c72054e7f2a65dd2c7d89e05"
+          },
+          {
+            "name": "affected-node",
+            "command": [
+              "node",
+              "--test",
+              "--test-reporter=tap",
+              ".github/workflows/Classify-InstructionMaintenance.test.mjs"
+            ],
+            "started_at": "2026-10-06T10:05:12.150171+00:00",
+            "timeout_seconds": 300,
+            "state": "passed",
+            "pid": 691,
+            "exit": 0,
+            "finished_at": "2026-10-06T10:05:32.409024+00:00",
+            "log_sha256": "2cd4bbedf57772eacc33fc58de7c3d014a11a7f666b636803bfdb84186fbca1d",
+            "node_summary": {
+              "tests": 13,
+              "pass": 13,
+              "fail": 0,
+              "cancelled": 0,
+              "skipped": 0,
+              "todo": 0
+            }
+          },
+          {
+            "name": "aggregate",
+            "command": [
+              "/opt/psstyleguide-runtime/venv/bin/python",
+              "-m",
+              "pre_commit",
+              "run",
+              "--all-files"
+            ],
+            "started_at": "2026-10-06T10:05:32.747153+00:00",
+            "timeout_seconds": 3000,
+            "state": "running",
+            "pid": 2362
+          }
+        ]
+      },
+      "prepared_followups": {
+        "commit-runtime-C-candidate.py": {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\commit-runtime-C-candidate.py",
+          "sha256": "9f42bab21b29aa77201a284c0f7d1f71e6dfc4e705856cef0266e8d35da5ca9a",
+          "state": "prepared_not_executed",
+          "restriction": "Requires completed final candidate validation and explicit root invocation."
+        },
+        "validate-runtime-C-endpoints.py": {
+          "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\validate-runtime-C-endpoints.py",
+          "sha256": "a705ef1a28e060e387cc2990df6677a9ca59ff17ea282862efdf8defbb756838",
+          "state": "prepared_not_executed",
+          "restriction": "Requires completed final candidate validation and explicit root invocation."
+        }
+      }
     }
+  },
+  "planning_publication": {
+    "head": "2be2b747bfcd1d70f07dcd8ad0c14d98c5a0a86e",
+    "published_at": "2026-10-06T09:21:13.731427+00:00",
+    "owned_files": 32,
+    "unrelated_preserved": 2693,
+    "receipt": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\runtime-decision-planning-publication.json"
+  },
+  "last_read_only_native_observation": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\round5-runtime-C-prevalidation-native.json",
+    "sha256": "ccd2d23bd18abc87ecc45c2b359e0319b1ebfb5ac399c16ca41dc7dad258543d",
+    "captured_at": "2026-10-06T09:59:02.040530+00:00",
+    "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+    "base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+    "body_sha256": "fb04de79de1b55f376eea677c4d77e9b27472389a76db202daa2d6818c249463",
+    "pr_open_unmerged": true,
+    "ci": "13 ordinary successes; dynamic37430212759 cancelled; no retry or native write"
   }
 }

@@ -1,0 +1,65 @@
+{
+  "released_at": "2026-10-06T09:56:03.600169+00:00",
+  "state": "one_bounded_comparison_released_not_yet_launched",
+  "writer": "a06_tf_generator_owner",
+  "manifest": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\manifest.authorized.json",
+  "manifest_sha256": "385aea0c7dd2e783d4a6c949fadfd4cc53f442627d3b514cd62e0e532e98b9b3",
+  "run_id": "tf68-20261006-structural-reuse-one",
+  "source_head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+  "source_hashes": {
+    ".github/workflows/Test-AgentInstructions.ps1": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+  },
+  "evidence_envelope_sha256": "fbb094dd028ac808287ceeec24a59a71655bdc07c85d799d68af437e343742fc",
+  "evidence_artifacts_verified": 54,
+  "independent_source_review": {
+    "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\runtime-C-source-review.json",
+    "sha256": "de016f02e8b92a324c20ab3e5ac6f448213ef400ba0859d656c431db1e443d88",
+    "status": "PASS_SOURCE_REVIEW_WITH_VALIDATION_PENDING"
+  },
+  "preparation_verification": {
+    "verified_at": "2026-10-06T09:51:39.527132+00:00",
+    "prepared_manifest_sha256": "52be6fb68a5e348534eead946b6c811f5a8bc0c8c3c6cb963d48e5cc4077319c",
+    "prepared_files_verified": 14,
+    "source_files_verified": 80,
+    "dependencies_verified": 1914,
+    "changed_paths": [
+      ".github/workflows/Test-AgentInstructions.SelfTest.ps1",
+      ".github/workflows/Test-AgentInstructions.ps1"
+    ],
+    "computed_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+    "host_index_tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+    "both_instrumented_profiles_reconstruct_exact_raw_bytes": true,
+    "actual_fixture_and_clock_functions_unchanged": true,
+    "role": "Root source/manifest review; no execution release yet"
+  },
+  "allowed_execution": "One offline launch.py invocation using this exact authorized manifest and SHA; focused Linux test plus one original/changed pair only.",
+  "limits": {
+    "container_seconds": 300,
+    "focus_seconds": 90,
+    "parent_seconds": 270,
+    "child_seconds": 90,
+    "selected_children": 2,
+    "runs": 1
+  },
+  "constraints": [
+    "Source remains frozen. Preserve all failed outputs.",
+    "No automatic retry, retention widening, full suite, Git/index/ref/config/dependency write, native operation, CI retry, merge or PS carryback.",
+    "Record tool session and container identity promptly; reconcile existing run before any further action.",
+    "Keep original clocks and output checks, unchanged parser count, reduced structural interpretation requirement and all source/dependency/Git guards.",
+    "This is diagnostic validation, not final or hosted acceptance."
+  ],
+  "ci_merge_stop": true,
+  "round": 5,
+  "original_deadline": "2026-10-13T23:47:31Z",
+  "transfers": {
+    "A06": 1,
+    "A03": 3,
+    "A21": 5,
+    "A07": 5,
+    "cap": 12
+  },
+  "owner_input_needed": false
+}

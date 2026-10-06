@@ -1,0 +1,122 @@
+{
+  "status": "PASS_SOURCE_REVIEW_WITH_VALIDATION_PENDING",
+  "created_utc": "2026-10-06T09:50:55.6152372+00:00",
+  "review_role": "independent bounded source review",
+  "material_findings": [],
+  "head": "5ec4bdc06431de05e93067b0e52f0dfbb1631392",
+  "tree": "441d84c13f46d94c6a032e828615a10fae8d4c7e",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "source_hashes": {
+    ".github/workflows/Test-AgentInstructions.ps1": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+    ".github/workflows/Test-AgentInstructions.SelfTest.ps1": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+  },
+  "source_guard_before_after_equal": true,
+  "selected_design": "C refined 89.85; ownership correction A 99.5",
+  "tests_launched_by_reviewer": false,
+  "product_or_native_writes": false,
+  "retention_bounds": {
+    "snapshots": 8,
+    "counted_utf16_characters_per_snapshot": 524288,
+    "records_including_cells_per_snapshot": 2048,
+    "array_elements_per_snapshot": 8192,
+    "exact_clr_memory_cap_claimed": false,
+    "over_limit_behavior": "fresh validated output without retention"
+  },
+  "checked_source": [
+    "entire two-file diff against H5ec",
+    "actual callers and mutable consumers",
+    "native-before-reuse ordering",
+    "exact text/line count/fresh JSON/three definition identities",
+    "deep copies of seven arrays and nested mutable records/arrays",
+    "unchanged schema validation on miss",
+    "borrowed and local ownership",
+    "pre-append allocation and primary-error cleanup",
+    "existing output/policy ordering"
+  ],
+  "focused_evidence": {
+    "windows_attempt": 7,
+    "terminal_exit": 0,
+    "elapsed_seconds": 28.0473731,
+    "checks": [
+      "persistent structural reuse/freshness/alias/budget controls",
+      "actual optional metadata regression function"
+    ],
+    "parser_errors": 0,
+    "analyzer_diagnostics": 0,
+    "mutants_detected": [
+      "skip-fresh-parser",
+      "shared-return-graph",
+      "ignore-decoder-change",
+      "retain-nine"
+    ],
+    "earlier_scratch_failures_preserved": true
+  },
+  "remaining_gates": [
+    "runtime timing comparison",
+    "Linux validation",
+    "final complete mandatory aggregate",
+    "normal commit and exact source-tree binding",
+    "actual accepted-B/new-H endpoints and current audit",
+    "exact final body binding",
+    "fresh hosted and required current-input review acceptance",
+    "Copilot setup/service selection and successful required CI",
+    "eventual paired-repository acceptance"
+  ],
+  "current_cancelled_run": "37430212759",
+  "merge_waiver": false,
+  "round": 5,
+  "original_deadline": "2026-10-13T23:47:31Z",
+  "transfer_counters": {
+    "A06": 1,
+    "A03": 3,
+    "A21": 5,
+    "A07": 5,
+    "limit": 12
+  },
+  "evidence_files": [
+    {
+      "path": "writer/TF68-runtime-diagnostic/pair/IMPLEMENTATION-DESIGN.md",
+      "sha256": "dfcaad5a5041bf07f539efa5f728ace046a6eedd842fee3aa46e037ac7a02c7a"
+    },
+    {
+      "path": "writer/TF68-runtime-diagnostic/pair/ROOT-IMPLEMENTATION-RELEASE.json",
+      "sha256": "c7e7f9fdbe5d600093efa201c63c7d179418d10ee8b53291aa512561dc617b9d"
+    },
+    {
+      "path": "writer/TF68-runtime-diagnostic/pair/ROOT-OWNERSHIP-CORRECTION.json",
+      "sha256": "8beadc2a26930fc28db438d7ee09463e313a8228e1fe13a9a3c2cb09e7fe8e2c"
+    },
+    {
+      "path": "writer/TF68-runtime-diagnostic/implementation/IMPLEMENTATION.md",
+      "sha256": "eb0afc86fc2f146dc0589d220dd97778170f434e3df0c2a316e9ec92d7386876"
+    },
+    {
+      "path": "writer/TF68-runtime-diagnostic/implementation/quality-final.json",
+      "sha256": "c0637a437a2e197b902f972a1961f716087c32678865816eec12925f7160b37c"
+    },
+    {
+      "path": "writer/TF68-runtime-diagnostic/implementation/focus.ps1",
+      "sha256": "4e9645cbab30a2599a20cb503ea081f3cb63c25d8403a13c3c389443a29ee88f"
+    },
+    {
+      "path": "writer/TF68-runtime-diagnostic/implementation/mutants.ps1",
+      "sha256": "f5d5e915d5676f03a4b76ad2d2ebe7da9e370e65482e2934d8f3d72a882c1d21"
+    },
+    {
+      "path": "writer/TF68-runtime-diagnostic/implementation/windows-attempt7/native.json",
+      "sha256": "f40e03bee535f1017fa912fd20f1ea9e05a4ecfec796cc25e3549e098715eef4"
+    },
+    {
+      "path": "writer/TF68-runtime-diagnostic/implementation/windows-attempt7/result.json",
+      "sha256": "d01a771a794f9f1cbac2f782f42d53466ecb052129be3cf5d11196a773517cbb"
+    },
+    {
+      "path": "writer/TF68-runtime-diagnostic/implementation/windows-mutants1/native.json",
+      "sha256": "0ca3e28e150584568cab78a04e7e210b08524b7a4468c944221169de1443eed5"
+    },
+    {
+      "path": "writer/TF68-runtime-diagnostic/implementation/windows-mutants1/result.json",
+      "sha256": "f6c9cd62e5a0637dabffe98c0141435559fba2c8200d9eb7dc79ae3688729647"
+    }
+  ]
+}

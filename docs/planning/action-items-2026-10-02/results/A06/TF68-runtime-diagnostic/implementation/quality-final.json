@@ -1,0 +1,18 @@
+{
+  "pwsh": "7.6.5",
+  "analyzer": "1.24.0",
+  "rows": [
+    {
+      "diagnostics": [],
+      "parser_errors": [],
+      "sha256": "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.ps1"
+    },
+    {
+      "diagnostics": [],
+      "parser_errors": [],
+      "sha256": "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31",
+      "path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\TerraformStyleGuide-A02-peer-docs-20261003\\.github\\workflows\\Test-AgentInstructions.SelfTest.ps1"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "state": "passed",
+  "source_hashes": [
+    "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+    "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+  ],
+  "pwsh": "7.6.3",
+  "started_utc": "2026-10-06T09:56:47.1773169+00:00",
+  "checks": [
+    "persistent structural reuse/freshness/alias/budget controls",
+    "actual optional metadata regression function"
+  ],
+  "source_after_equal": true,
+  "elapsed_seconds": 11.4928075,
+  "finished_utc": "2026-10-06T09:56:58.6684661+00:00"
+}

@@ -1,0 +1,12 @@
+{
+  "control": {
+    "Invoke-MarkdownParserProcess": 59,
+    "Copy-MarkdownParseReuseContext": 0,
+    "ConvertFrom-ParserJsonContext": 59
+  },
+  "profile": {
+    "Invoke-MarkdownParserProcess": 59,
+    "Copy-MarkdownParseReuseContext": 33,
+    "ConvertFrom-ParserJsonContext": 51
+  }
+}

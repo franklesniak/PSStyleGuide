@@ -1,0 +1,20 @@
+{
+  "state": "passed",
+  "command": [
+    "C:\\Users\\flesniak\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+    "-NoLogo",
+    "-NoProfile",
+    "-NonInteractive",
+    "-File",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\focus.ps1",
+    "-SourceRoot",
+    "C:/Users/flesniak/AppData/Local/Temp/TerraformStyleGuide-A02-peer-docs-20261003",
+    "-OutputPath",
+    "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\windows-attempt7\\result.json"
+  ],
+  "timeout_seconds": 300,
+  "started_utc": "2026-10-06T09:41:51.514683+00:00",
+  "pid": 29240,
+  "exit": 0,
+  "finished_utc": "2026-10-06T09:42:20.138227+00:00"
+}

@@ -1,0 +1,73 @@
+{
+  "state": "passed",
+  "role": "runtime-attribution-pair-non-acceptance",
+  "accepted_base": "e21b74fe0b56551008f78f9f2946cd2a0f9c19ce",
+  "candidate_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+  "workspace": "/work/validation-tf68-20261006-structural-reuse-one-3yu9bu28",
+  "started_at": "2026-10-06T09:56:44.418108+00:00",
+  "commands": [
+    {
+      "name": "focused-reuse",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "/input/focus.ps1",
+        "-SourceRoot",
+        "/work/validation-tf68-20261006-structural-reuse-one-3yu9bu28/repository",
+        "-OutputPath",
+        "/output/focused-result.json"
+      ],
+      "started_at": "2026-10-06T09:56:46.803420+00:00",
+      "timeout_seconds": 90,
+      "state": "passed",
+      "pid": 85,
+      "exit": 0,
+      "finished_at": "2026-10-06T09:56:58.756612+00:00",
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "attribution-pair",
+      "command": [
+        "pwsh",
+        "-NoLogo",
+        "-NoProfile",
+        "-NonInteractive",
+        "-File",
+        "/input/pair-driver.ps1",
+        "-RepositoryRootPath",
+        "/work/validation-tf68-20261006-structural-reuse-one-3yu9bu28/repository",
+        "-OutputDirectory",
+        "/output"
+      ],
+      "started_at": "2026-10-06T09:56:58.998562+00:00",
+      "timeout_seconds": 270,
+      "state": "passed",
+      "pid": 1983,
+      "exit": 0,
+      "finished_at": "2026-10-06T09:57:56.373899+00:00",
+      "log_sha256": "fd7748bac8b0a03b32575d84e2b3e921ed70f547c4998bdb3081f43a1e639d8c"
+    }
+  ],
+  "non_acceptance": true,
+  "source_uninstrumented": true,
+  "diagnostic_tree": "cf9416f8137c0cb24c00dc0554e7929b72fd0634",
+  "pair": {
+    "state": "passed",
+    "non_acceptance": true,
+    "selected_children": 2,
+    "bootstrap_separate": true,
+    "control_exit": 0,
+    "profile_exit": 0,
+    "control_seconds": 13.564239010999927,
+    "profile_seconds": 12.47501529100009,
+    "stdout_equal": true,
+    "non_marker_stderr_equal": true,
+    "exact_argv_cwd_equal": true,
+    "original_clock_guard_retained": true,
+    "prior_ephemeral_identity_replayed": false
+  },
+  "finished_at": "2026-10-06T09:57:56.592393+00:00"
+}

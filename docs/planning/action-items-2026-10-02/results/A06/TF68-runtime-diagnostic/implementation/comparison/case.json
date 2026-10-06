@@ -1,0 +1,10 @@
+{
+  "Role": "non-acceptance reconstructed first current-date case",
+  "Baseline": "3b5472325b03f27c68472d6a6598efb629e4f422",
+  "Candidate": "8c18e5e19b7797ad4555375f772e9d573c84b131",
+  "Clock": "2026-10-06T09:57:09.0286394+00:00",
+  "ExpectedDate": "2026-10-06",
+  "ExpectedExit": 0,
+  "ExpectedMessage": "Author finalization UTC date checked: 2026-10-06; B=3b5472325b03f27c68472d6a6598efb629e4f422 H=8c18e5e19b7797ad4555375f772e9d573c84b131",
+  "PriorEphemeralIdentityReplayed": false
+}

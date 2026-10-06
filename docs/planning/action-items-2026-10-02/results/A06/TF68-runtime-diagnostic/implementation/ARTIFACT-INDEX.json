@@ -1,0 +1,200 @@
+{
+  "saved_at": "2026-10-06T10:01:34.712909+00:00",
+  "source_evidence_artifact_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation",
+  "comparison_evidence_artifact_root": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison",
+  "note": "Source envelope relative paths refer to their declared scratch roots. This index binds exact selected canonical copies; no source envelope is rewritten. Full preparation, attempts and source remain at the roots.",
+  "artifacts": [
+    {
+      "canonical_path": "source-evidence.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\evidence.json",
+      "sha256": "fbb094dd028ac808287ceeec24a59a71655bdc07c85d799d68af437e343742fc",
+      "bytes": 16227
+    },
+    {
+      "canonical_path": "frozen-source-guard.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\frozen-source-guard.json",
+      "sha256": "c7664f8a37f724135b682ebcc1c39c05d771fce1fb369f13f948179606687cf1",
+      "bytes": 6534
+    },
+    {
+      "canonical_path": "source-catalog.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\source-catalog.json",
+      "sha256": "172ee124b1aa652009ccf3f9764b5696d9030b4ff7c1aee08dd04349922b3d98",
+      "bytes": 19093
+    },
+    {
+      "canonical_path": "windows-final.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\windows-attempt7\\result.json",
+      "sha256": "d01a771a794f9f1cbac2f782f42d53466ecb052129be3cf5d11196a773517cbb",
+      "bytes": 537
+    },
+    {
+      "canonical_path": "windows-final-native.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\windows-attempt7\\native.json",
+      "sha256": "f40e03bee535f1017fa912fd20f1ea9e05a4ecfec796cc25e3549e098715eef4",
+      "bytes": 845
+    },
+    {
+      "canonical_path": "quality-final.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\quality-final.json",
+      "sha256": "c0637a437a2e197b902f972a1961f716087c32678865816eec12925f7160b37c",
+      "bytes": 687
+    },
+    {
+      "canonical_path": "mutants.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\windows-mutants1\\result.json",
+      "sha256": "f6c9cd62e5a0637dabffe98c0141435559fba2c8200d9eb7dc79ae3688729647",
+      "bytes": 1235
+    },
+    {
+      "canonical_path": "mutants-native.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\windows-mutants1\\native.json",
+      "sha256": "0ca3e28e150584568cab78a04e7e210b08524b7a4468c944221169de1443eed5",
+      "bytes": 847
+    },
+    {
+      "canonical_path": "independent-source-review.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\final-quality\\runtime-C-source-review.json",
+      "sha256": "de016f02e8b92a324c20ab3e5ac6f448213ef400ba0859d656c431db1e443d88",
+      "bytes": 4898
+    },
+    {
+      "canonical_path": "comparison-evidence.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\RESULTS.json",
+      "sha256": "3fab7a88d729a05634573092aedfeb8ddd74163a6480caf35a408aa05e4de247",
+      "bytes": 10971
+    },
+    {
+      "canonical_path": "comparison-timing.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\timing.json",
+      "sha256": "f1aa6f50852f4cae6b6182c5229f938441f70e00af3458baeaaa98a16e27c5d0",
+      "bytes": 70386
+    },
+    {
+      "canonical_path": "comparison-manifest.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\manifest.authorized.json",
+      "sha256": "385aea0c7dd2e783d4a6c949fadfd4cc53f442627d3b514cd62e0e532e98b9b3",
+      "bytes": 3114
+    },
+    {
+      "canonical_path": "comparison-release.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\ROOT-RELEASE.json",
+      "sha256": "3e12411468a05b6312e6a2c1286e6e2d078767e1710e7be8af11042e0503d658",
+      "bytes": 3261
+    },
+    {
+      "canonical_path": "comparison-preparation-verification.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\ROOT-PREPARATION-VERIFICATION.json",
+      "sha256": "026bb0364fddcdc837627b2be20854eac028406d1c9e943330dd8743f149e1c5",
+      "bytes": 706
+    },
+    {
+      "canonical_path": "comparison-root-verification.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\ROOT-RESULT-VERIFICATION.json",
+      "sha256": "3c9c623bc212538ffdfb39507ac5584b7c844f8cc96b92d3a58d20b7959f44d7",
+      "bytes": 2968
+    },
+    {
+      "canonical_path": "comparison/result.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\result.json",
+      "sha256": "54d08d92c86bb5ac6d986a1b830421c629fca3fc1f8e0cfe4882ca91eb326ba3",
+      "bytes": 2295
+    },
+    {
+      "canonical_path": "comparison/focused-result.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\focused-result.json",
+      "sha256": "5407ef3d1564e282d67c694bd9efa2dbd01446bfa90573b2bc3bc6d9e20b87a6",
+      "bytes": 521
+    },
+    {
+      "canonical_path": "comparison/pair-result.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\pair-result.json",
+      "sha256": "4dc9795dbf2bf17e4e1d545e569db586a42e19021d577d5e44361ef89e317f6e",
+      "bytes": 407
+    },
+    {
+      "canonical_path": "comparison/comparison-counts.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\comparison-counts.json",
+      "sha256": "a69ce3d05d846afc443e2b395856c45b8bd10f2e44b36b109cfe6555602da4cf",
+      "bytes": 286
+    },
+    {
+      "canonical_path": "comparison/case.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\case.json",
+      "sha256": "8277afe947ccf7c669e73f7092b026e8d714a3e0f16a80ffa2186cbbe0f74329",
+      "bytes": 490
+    },
+    {
+      "canonical_path": "comparison/control-child.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\control-child.json",
+      "sha256": "60a7382f99e591ae42b69c7cc279f1c77bd2ff4c5f3af4f5ce758d395777b33e",
+      "bytes": 26725
+    },
+    {
+      "canonical_path": "comparison/profile-child.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\profile-child.json",
+      "sha256": "e679c5558d6b85320d4d7943a47e83b83394cc879d89f4c5dee5631ce9dc4aad",
+      "bytes": 30740
+    },
+    {
+      "canonical_path": "comparison/control-stdout.txt",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\control-stdout.txt",
+      "sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+      "bytes": 225
+    },
+    {
+      "canonical_path": "comparison/control-stderr.txt",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\control-stderr.txt",
+      "sha256": "b34767f96ba0108a6d6e7b4b55cc0d39659bdcb7f53374fad95f61f122cfb879",
+      "bytes": 18290
+    },
+    {
+      "canonical_path": "comparison/profile-stdout.txt",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\profile-stdout.txt",
+      "sha256": "245cfda16b1f9e1be3cff107c66e1a8f8b817b466f270921e7033cbfb4febf5d",
+      "bytes": 225
+    },
+    {
+      "canonical_path": "comparison/profile-stderr.txt",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\profile-stderr.txt",
+      "sha256": "987c850ee982b4fefa0286b8c3ffe18c546afd882d5efddadebdd8d44d5d4eb7",
+      "bytes": 22256
+    },
+    {
+      "canonical_path": "comparison/before.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\before.json",
+      "sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "bytes": 414074
+    },
+    {
+      "canonical_path": "comparison/host-source-after.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\host-source-after.json",
+      "sha256": "11b6b06ae4744b1958f039dd69006867a23e4f3e39360f03f1d761ffb5c1b76e",
+      "bytes": 402147
+    },
+    {
+      "canonical_path": "comparison/focused-reuse-after.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\focused-reuse-after.json",
+      "sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "bytes": 414074
+    },
+    {
+      "canonical_path": "comparison/attribution-pair-after.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output\\attribution-pair-after.json",
+      "sha256": "44a0ebce7e04f4cb07fbe40ac30941a912413ee842654ba4e85f0517ad8857f1",
+      "bytes": 414074
+    },
+    {
+      "canonical_path": "comparison/status.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\status.json",
+      "sha256": "4bff3dfce4efa224c5bbdd929f0045c56f9568ea19ae135c48c10d1ec7995b4d",
+      "bytes": 1399
+    },
+    {
+      "canonical_path": "comparison/host-source-before.json",
+      "source_path": "C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\inputs\\source-before.json",
+      "sha256": "11b6b06ae4744b1958f039dd69006867a23e4f3e39360f03f1d761ffb5c1b76e",
+      "bytes": 402147
+    }
+  ]
+}

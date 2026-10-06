@@ -1,0 +1,32 @@
+{
+  "state": "passed",
+  "manifest_sha256": "385aea0c7dd2e783d4a6c949fadfd4cc53f442627d3b514cd62e0e532e98b9b3",
+  "started_at": "2026-10-06T09:56:39.426188+00:00",
+  "run_id": "tf68-20261006-structural-reuse-one",
+  "image": "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+  "role": "runtime-attribution-pair-non-acceptance",
+  "command": [
+    "docker",
+    "run",
+    "--rm",
+    "--pull",
+    "never",
+    "--name",
+    "tf68-attribution-pair-tf68-20261006-structural-reuse-one",
+    "--label",
+    "psstyleguide.validation-manifest=385aea0c7dd2e783d4a6c949fadfd4cc53f442627d3b514cd62e0e532e98b9b3",
+    "--network",
+    "none",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\inputs,target=/input,readonly",
+    "--mount",
+    "type=bind,source=C:\\Users\\flesniak\\AppData\\Local\\Temp\\PSStyleGuide-A06-TF-peer-20261005\\writer\\TF68-runtime-diagnostic\\implementation\\comparison\\runs\\tf68-20261006-structural-reuse-one\\output,target=/output",
+    "--entrypoint",
+    "python",
+    "sha256:8bdc7722fc55e19fd3df48d8fddf4568a75d8792cfc4ee105c8a8173559362f4",
+    "/input/inside.py"
+  ],
+  "container_exit": 0,
+  "source_after_equal": true,
+  "finished_at": "2026-10-06T09:57:59.587352+00:00"
+}

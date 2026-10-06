@@ -1,0 +1,38 @@
+{
+  "source_sha256": [
+    "9ca8f6ab530f4e1f30a9745d38a4f70d94d48016565e568d15b4a02b4b85b011",
+    "bc758e553ef32a82204aefb238ce4f95a1a3fd0c69de74fa337076077acb2c31"
+  ],
+  "source_equal": true,
+  "results": [
+    {
+      "name": "skip-fresh-parser",
+      "expected": "two real parser calls",
+      "failure": "Structural reuse must retain two real parser calls and one interpretation.",
+      "elapsed_seconds": 0.6408143,
+      "detected": true
+    },
+    {
+      "name": "shared-return-graph",
+      "expected": "Returned-object mutation",
+      "failure": "Returned-object mutation reached the owned interpretation.",
+      "elapsed_seconds": 0.6490544,
+      "detected": true
+    },
+    {
+      "name": "ignore-decoder-change",
+      "expected": "decoder replacement",
+      "failure": "A decoder replacement was hidden by reuse.",
+      "elapsed_seconds": 2.4310015,
+      "detected": true
+    },
+    {
+      "name": "retain-nine",
+      "expected": "retention exceeded eight",
+      "failure": "Snapshot retention exceeded eight or rejected its fresh fallback.",
+      "elapsed_seconds": 4.1000703,
+      "detected": true
+    }
+  ],
+  "finished_utc": "2026-10-06T09:42:55.4526759+00:00"
+}
